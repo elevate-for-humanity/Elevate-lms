@@ -22,7 +22,6 @@ on:
   push:
     branches:
       - main
-      - test/hvac-live-playback-20261030
     paths:
       - '.github/workflows/registered-apprenticeship-e2e.yml'
       - 'playwright.config.ts'
@@ -56,40 +55,22 @@ permissions:
   actions: read
 
 jobs:
-  hvac-buffer-diagnostic:
-    if: github.ref == 'refs/heads/test/hvac-live-playback-20261030' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: macos-15
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    env:
-      PLAYWRIGHT_BASE_URL: https://www.elevateforhumanity.org
-    steps:
-      - uses: actions/checkout@v4
-        with: { persist-credentials: false }
-      - uses: pnpm/action-setup@v4
-        with: { version: 10.28.2 }
-      - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: pnpm }
-      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
-      - run: pnpm exec playwright install webkit
-      - name: Verify unchanged public playback using Apple's native media stack
-        run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts --project=iphone-webkit --retries=0 --reporter=line,html --output=test-results/hvac-buffer-diagnostic
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: hvac-buffer-diagnostic-${{ github.run_id }}
-          path: |
-            test-results/hvac-buffer-diagnostic/
-            playwright-report/
-          retention-days: 14
   hvac-public-playback:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Google Marketing on trigger' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing')))
     strategy:
       fail-fast: false
       matrix:
-        device: [desktop-chrome, tablet-chrome, iphone-webkit, android-chrome]
-    runs-on: ubuntu-24.04
+        include:
+          - device: desktop-chrome
+            os: ubuntu-24.04
+          - device: tablet-chrome
+            os: ubuntu-24.04
+          - device: iphone-webkit
+            os: macos-15
+          - device: android-chrome
+            os: ubuntu-24.04
+    # Safari media uses Apple's decoder; Linux WebKit uses GStreamer instead.
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     permissions:
       contents: read
@@ -103,7 +84,31 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: pnpm }
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
-      - run: pnpm exec playwright install chromium webkit --with-deps
+      - if: matrix.device == 'iphone-webkit'
+        run: pnpm exec playwright install webkit
+      - if: matrix.device != 'iphone-webkit'
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Capture the live Marketing release being tested
+        env:
+          EXPECTED_MARKETING_SHA: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || '' }}
+          HVAC_DEVICE: ${{ matrix.device }}
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { mkdirSync, writeFileSync } from 'node:fs';
+          const response = await fetch('https://www.elevateforhumanity.org/api/version', {
+            cache: 'no-store', signal: AbortSignal.timeout(20000),
+          });
+          assert.equal(response.status, 200);
+          const version = await response.json();
+          assert.match(version.commitSha, /^[a-f0-9]{40}$/);
+          if (process.env.EXPECTED_MARKETING_SHA) assert.equal(version.commitSha, process.env.EXPECTED_MARKETING_SHA);
+          mkdirSync('test-results', { recursive: true });
+          writeFileSync('test-results/hvac-release-' + process.env.HVAC_DEVICE + '.json', JSON.stringify({
+            checkedAt: new Date().toISOString(), device: process.env.HVAC_DEVICE,
+            runnerOS: process.env.RUNNER_OS, website: 'https://www.elevateforhumanity.org/programs/hvac-technician', version,
+          }, null, 2));
+          NODE
       - name: Verify public HVAC film on desktop, tablet, iPhone and Android
         run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --reporter=line,html --output=test-results/hvac-hero --project=${{ matrix.device }}
       - name: Preserve playback samples, screenshots and browser report
@@ -113,6 +118,7 @@ jobs:
           name: hvac-hero-playback-${{ github.run_id }}-${{ matrix.device }}
           path: |
             test-results/hvac-hero/
+            test-results/hvac-release-*.json
             playwright-report/
           retention-days: 14
   production-authenticated-e2e:
@@ -200,11 +206,13 @@ jobs:
         run: pnpm exec playwright install chromium webkit --with-deps
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
+      # The complete HVAC film runs in hvac-public-playback, where the iPhone
+      # profile uses macOS media codecs. Keep portal and hydration checks here.
       - name: Verify public hydration, startup stability and audible-media exclusivity
         if: ${{ !cancelled() }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
         if: ${{ !cancelled() }}
         env:

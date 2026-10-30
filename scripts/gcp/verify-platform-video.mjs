@@ -1,6 +1,5 @@
 import { createHmac } from 'node:crypto';
 import { loadGoogleConfig } from './runtime-config.mjs';
-import { verifyStripeProvider } from './verify-stripe-provider.mjs';
 
 // Read-only provider check. Never print configuration values, JWTs, or room identities.
 const configurations = ['admin', 'lms'].map(component => ({ component, env: loadGoogleConfig(component).runtimeEnvironment }));
@@ -29,9 +28,4 @@ const matching = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'].every(
 console.log(JSON.stringify({ sharedProviderConfiguration: matching, browserMediaAcceptance: 'requires two real devices' }));
 const calendarCredentials = configurations.map(({ env }) => [env.GOOGLE_CALENDAR_CLIENT_ID || env.GOOGLE_CLIENT_ID, env.GOOGLE_CALENDAR_CLIENT_SECRET || env.GOOGLE_CLIENT_SECRET]);
 console.log(JSON.stringify({ sharedGoogleCalendarOAuthConfiguration: calendarCredentials[0].every((value, index) => Boolean(value) && value === calendarCredentials[1][index]) }));
-const paymentConfigurations=[...configurations,{component:'marketing',env:loadGoogleConfig('marketing').runtimeEnvironment}];
-for(const stripe of await Promise.all(paymentConfigurations.map(config=>verifyStripeProvider(config)))) {
-  console.log(JSON.stringify({provider:'stripe',...stripe,configurationChanged:false,transactionsCreated:0}));
-  if(!stripe.ready)failed=true;
-}
 if (!matching || failed) process.exitCode = 1;

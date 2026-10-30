@@ -35,7 +35,7 @@ export async function migrateStorePayPal({run=google,request=fetch,apply=false,r
   routing=await cutoverStorePayPalWebhook({request,base,token:token.access_token,hook,expectedSha,apply:routeMode==='apply'});
  }
  const next={...original,runtimeEnvironment:{...existing,...values}};validateConfig(next,'store');
- const summary={...(routing?{routing}:{}),keys:PAYPAL_KEYS,providerAuthorizationVerified:true,webhookRegistrationVerified:true,webhookUsesStoreOrigin:routing?.webhookUsesStoreOrigin??(url.origin==='https://store.elevateforhumanity.org'),configurationChanged:false,applicationDeployed:false,trafficChanged:false,transactionsCreated:0,commerceAccepted:false};
+ const summary={...(routing?{routing}:{}),keys:PAYPAL_KEYS,environment:mode,providerAuthorizationVerified:true,webhookRegistrationVerified:true,webhookUsesStoreOrigin:routing?.webhookUsesStoreOrigin??(url.origin==='https://store.elevateforhumanity.org'),configurationChanged:false,applicationDeployed:false,trafficChanged:false,transactionsCreated:0,commerceAccepted:false};
  if(!apply||JSON.stringify(next)===JSON.stringify(original))return {...summary,mode:apply?'already-configured':'validate-only'};
  if(JSON.stringify(loadGoogleConfig('store',run))!==JSON.stringify(original)||JSON.stringify(loadGoogleConfig('marketing',run))!==JSON.stringify(source))fail('STORE_PAYPAL_CONFIG_CHANGED');
  // Re-read the exact canonical family to avoid archiving a rotated credential.

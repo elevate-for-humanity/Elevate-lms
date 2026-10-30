@@ -20,7 +20,19 @@ export function directJobTemplate(source,{imageSha,imageDigest}) {
  spec.template.spec.taskCount=1;spec.template.spec.parallelism=1;
  return {apiVersion:'run.googleapis.com/v1',kind:'Job',metadata:{name:NAME,namespace:source.metadata?.namespace??PROJECT},spec};
 }
-export async function launchDirectRelease({imageSha,run=google,inspect=inspectRegionalCapacity}){
+// One owner-authorized replacement for the obsolete text-card producer.
+// Unknown/current executions retain the ordinary no-overlap protection.
+const OBSOLETE_PHOTO_EXECUTION='elevate-direct-course-release-mcf87';
+const OBSOLETE_PHOTO_SOURCE='3ae82989396abe436d503a694c02f54396d80bb4';
+const OBSOLETE_PHOTO_DIGEST='sha256:ef30b16e9cb3ea4e3517aab3ef6633db9d7dbf3aac56bb24489a10eb98194480';
+const activeExecution=execution=>!execution.status?.completionTime&&!execution.status?.conditions?.some(condition=>condition.type==='Completed'&&['True','False'].includes(condition.status));
+export function knownObsoletePhotoExecution(execution) {
+ const container=execution?.spec?.template?.spec?.containers?.[0];
+ return execution?.metadata?.name===OBSOLETE_PHOTO_EXECUTION && activeExecution(execution) &&
+  container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@${OBSOLETE_PHOTO_DIGEST}` &&
+  container?.env?.some(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA'&&entry.value===OBSOLETE_PHOTO_SOURCE)===true;
+}
+export async function launchDirectRelease({imageSha,run=google,inspect=inspectRegionalCapacity,retireKnownTextCardExecution=false}){
  const source=JSON.parse(run(['run','jobs','describe','elevate-course-builder','--project='+PROJECT,'--region='+REGION,'--format=json']));
  const digest=run(['artifacts','docker','images','describe',`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker:${imageSha}`,'--project='+PROJECT,'--format=value(image_summary.digest)']).trim();
  const job=directJobTemplate(source,{imageSha,imageDigest:digest});
@@ -28,7 +40,17 @@ export async function launchDirectRelease({imageSha,run=google,inspect=inspectRe
  try{run(['run','jobs','describe',NAME,'--project='+PROJECT,'--region='+REGION,'--format=value(metadata.name)']);exists=true;}catch(error){if(error.code!=='not_found')throw error;}
  if(exists){
   const executions=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
-  if(executions.some(execution=>!execution.status?.completionTime&&!execution.status?.conditions?.some(condition=>condition.type==='Completed'&&['True','False'].includes(condition.status))))return {state:'already-running'};
+  const active=executions.filter(activeExecution);
+  if(active.length){
+   if(!retireKnownTextCardExecution||active.length!==1||active[0].metadata?.name!==OBSOLETE_PHOTO_EXECUTION||imageSha===OBSOLETE_PHOTO_SOURCE)return {state:'already-running'};
+   const execution=JSON.parse(run(['run','jobs','executions','describe',OBSOLETE_PHOTO_EXECUTION,'--project='+PROJECT,'--region='+REGION,'--format=json']));
+   if(!knownObsoletePhotoExecution(execution))return {state:'already-running'};
+   // Cancellation retains database checkpoints and all saved media. Never
+   // replace configuration until readback proves the old task is terminal.
+   run(['run','jobs','executions','cancel',OBSOLETE_PHOTO_EXECUTION,'--project='+PROJECT,'--region='+REGION,'--quiet']);
+   const after=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
+   if(after.some(activeExecution))return {state:'obsolete-source-cancelling'};
+  }
  }
  const capacity=await inspect({region:REGION,run,task:job.spec.template.spec.template.spec,taskCount:1});
  if(capacity.fits!==true)throw Error('DIRECT_RELEASE_REGIONAL_CAPACITY_UNAVAILABLE');
@@ -42,7 +64,7 @@ export async function launchDirectRelease({imageSha,run=google,inspect=inspectRe
  return {state:'started',job:NAME,imageDigest:digest,retries:0};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- launchDirectRelease({imageSha:process.env.DIRECT_RELEASE_SOURCE_SHA})
+ launchDirectRelease({imageSha:process.env.DIRECT_RELEASE_SOURCE_SHA,retireKnownTextCardExecution:true})
   .then(result=>console.log(JSON.stringify(result)))
   .catch(error=>{console.error(JSON.stringify({state:'blocked',code:error.code??error.message?.match(/^[A-Z][A-Z0-9_]+/)?.[0]??'DIRECT_RELEASE_FAILED'}));process.exitCode=1;});
 }

@@ -22,7 +22,7 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let created=false,ruleCreated=false,passed=false,instance;
 try {
  const ips=json(['compute','addresses','list','--filter=name='+address]);
- if(!ips.some(x=>x.name===address))gc(['compute','addresses','create',address,'--region='+region,'--labels=customer=legacy83']);
+ if(!ips.some(x=>x.name===address))gc(['compute','addresses','create',address,'--region='+region]);
  const ip=json(['compute','addresses','describe',address,'--region='+region]).address;
  if(!/^[0-9]{1,3}([.][0-9]{1,3}){3}$/.test(ip))throw Error('Reserved public IPv4 required');
  const hostname='legacy83-'+ip.replaceAll('.','-')+'.sslip.io';
@@ -69,7 +69,7 @@ try {
  if(!env.NEXT_PUBLIC_SUPABASE_ANON_KEY||Object.values(env).some(x=>/[\r\n\0]/.test(x)))throw Error('Invalid customer runtime configuration');
  ssh('sudo install -m 600 /dev/stdin /etc/legacy83/runtime.env',Object.entries(env).map(([k,v])=>k+'='+v).join('\n')+'\n');
  const priorPort=ssh('sudo cat /etc/legacy83/active-port 2>/dev/null || true').trim();
- const port=priorPort==='8080'?'8081':'8080',container='legacy83-'+sha.slice(0,12);
+ const port=priorPort==='8080'?'8081':'8080',container='legacy83-'+sha.slice(0,12)+'-'+runId+'-'+(process.env.GITHUB_RUN_ATTEMPT||'1');
  ssh('sudo docker rm -f '+q(container)+' >/dev/null 2>&1 || true');
  ssh('sudo docker run -d --name '+q(container)+' --restart=always --init --memory=1g --memory-swap=1g --cpus=1 --pids-limit=256 --cap-drop=ALL --security-opt=no-new-privileges --log-opt=max-size=10m --log-opt=max-file=3 --env-file=/etc/legacy83/runtime.env --publish=127.0.0.1:'+port+':8080 '+q(image)+' >/dev/null');
  let appReady=false;

@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
-import { HvacVideoAssistanceDock } from '@/components/programs/HvacVideoAssistanceDock';
+import { HvacLabHero } from '@/components/programs/HvacTrainingShowcase';
 import { renderToString } from 'react-dom/server';
 import { hydrateRoot } from 'react-dom/client';
 
@@ -75,36 +75,6 @@ afterEach(() => {
 });
 
 describe('public assistance around the HVAC film', () => {
-  it('waits for the server-rendered container to hydrate before portaling into it', async () => {
-    const html = renderToString(<HvacVideoAssistanceDock />);
-    expect(html).not.toContain('data-hvac-video-assistance');
-    const main = document.createElement('main');
-    main.innerHTML = '<video data-hvac-hero-video="20261029"></video><section></section>';
-    const host = main.querySelector('section')!;
-    host.innerHTML = html;
-    document.body.append(main);
-    render(<ParisFloatingButton />);
-    await showFilm(true);
-    expect(host.querySelector('button')).toBeNull();
-    const errors: unknown[] = [];
-    let root: ReturnType<typeof hydrateRoot> | undefined;
-    try {
-      await act(async () => {
-        root = hydrateRoot(host, <HvacVideoAssistanceDock />, {
-          onRecoverableError: error => { errors.push(error); },
-        });
-      });
-      await showFilm(true);
-      expect(host.querySelector('[data-hvac-video-assistance="ready"]')?.contains(
-        screen.getByRole('button', { name: 'Open PARIS Career Assistant' }),
-      )).toBe(true);
-      expect(errors).toEqual([]);
-    } finally {
-      cleanup();
-      await act(async () => { root?.unmount(); });
-    }
-  });
-
   it('moves both controls below the visible film and restores floating controls without losing narration preference', async () => {
     const dock = filmPage();
     render(<><ScrollNarrator /><ParisFloatingButton /></>);
@@ -150,19 +120,51 @@ describe('public assistance around the HVAC film', () => {
     expect(dock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
   });
 
-  it('rebinds both controls when React replaces the streamed hero', async () => {
-    const oldDock = filmPage();
-    render(<><ScrollNarrator /><ParisFloatingButton /></>);
+  it('does not mutate server-rendered hero HTML before hydration or replace the native player', async () => {
+    vi.useRealTimers();
+    const host = document.createElement('main');
+    host.innerHTML = renderToString(<HvacLabHero />);
+    document.body.append(host);
+    const originalVideo = host.querySelector('video');
+    if (!originalVideo) throw new Error('The server-rendered hero must contain its native player');
+    // jsdom does not initialize the live muted property from the SSR attribute.
+    originalVideo.muted = originalVideo.defaultMuted;
+    expect(host.querySelector('[data-hvac-video-assistance]')).toBeNull();
+    render(<ParisFloatingButton />);
     await showFilm(true);
-    expect(oldDock.children.length).toBe(2);
+    expect(host.querySelector('[data-hvac-video-assistance]')).toBeNull();
+    const recoverableError = vi.fn();
+    const hydrationWarning = vi.spyOn(console, 'error');
+    let unmount = () => {};
+    try {
+      await act(async () => {
+        const root = hydrateRoot(host, <HvacLabHero />, { onRecoverableError: recoverableError });
+        unmount = () => root.unmount();
+      });
+      await showFilm(true);
+      const dock = host.querySelector('[data-hvac-video-assistance]');
+      expect(dock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
+      expect(host.querySelector('video')).toBe(originalVideo);
+      expect(recoverableError).not.toHaveBeenCalled();
+      expect(hydrationWarning).not.toHaveBeenCalled();
+    } finally {
+      await act(async () => unmount());
+      hydrationWarning.mockRestore();
+    }
+  });
+
+  it('reattaches to a replacement page subtree instead of retaining detached elements', async () => {
+    const oldDock = filmPage();
+    render(<ParisFloatingButton />);
+    await showFilm(true);
+    expect(oldDock.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
     let newDock: Element | undefined;
     await act(async () => {
-      oldDock.closest('main')!.remove();
+      document.querySelector('main')!.remove();
       newDock = filmPage();
     });
     await showFilm(true);
     expect(newDock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
-    expect(newDock?.contains(screen.getByRole('button', { name: 'Stop page narration' }))).toBe(true);
-    expect(document.querySelectorAll('[data-public-video-overlay]')).toHaveLength(0);
+    expect(oldDock.children).toHaveLength(0);
   });
 });

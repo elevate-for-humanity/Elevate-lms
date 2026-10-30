@@ -11,8 +11,8 @@ export function directJobTemplate(source,{imageSha,imageDigest}) {
  if(!Array.isArray(container.env)||!container.env.some(value=>value.name==='SUPABASE_SERVICE_ROLE_KEY'))throw Error('DIRECT_SOURCE_DATABASE_CONNECTION_REQUIRED');
  container.image=`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@${imageDigest}`;
  container.command=['node'];container.args=['--import=tsx','workers/direct-course-release.ts'];
- container.env=container.env.filter(value=>value.name!=='DIRECT_RELEASE_SOURCE_SHA');
- container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha});
+ container.env=container.env.filter(value=>!['DIRECT_RELEASE_SOURCE_SHA','ULTIMATE_PHOTO_REGION'].includes(value.name));
+ container.env.push({name:'DIRECT_RELEASE_SOURCE_SHA',value:imageSha},{name:'ULTIMATE_PHOTO_REGION',value:'global'});
  // One task processes course groups sequentially. HVAC's two preserved
  // snapshots stay together before another course starts. The task is finite and
  // cannot be retried by Cloud Run. Original job configuration stays intact.
@@ -28,6 +28,13 @@ const OBSOLETE_PHOTO_DIGEST='sha256:ef30b16e9cb3ea4e3517aab3ef6633db9d7dbf3aac56
 const activeExecution=execution=>!execution.status?.completionTime&&!execution.status?.conditions?.some(condition=>condition.type==='Completed'&&['True','False'].includes(condition.status));
 export function knownObsoletePhotoExecution(execution) {
  const container=execution?.spec?.template?.spec?.containers?.[0];
+ const source=container?.env?.find(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA')?.value;
+ // This exact intermediate image restores photographs but lacks the inspected
+ // JPEG reader and still uses the capacity-constrained US image endpoint.
+ const superseded=source==='79dc886bd59385d2f42069fe22c216211d8f00b9' &&
+  container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@sha256:b131064b00050f336357b40ffaab88362d9d90932c8ebadb18cd75461a830bb8` &&
+  new RegExp('^'+NAME+'-[a-z0-9]+$').test(execution?.metadata?.name??'');
+ if(superseded)return activeExecution(execution);
  return execution?.metadata?.name===OBSOLETE_PHOTO_EXECUTION && activeExecution(execution) &&
   container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@${OBSOLETE_PHOTO_DIGEST}` &&
   container?.env?.some(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA'&&entry.value===OBSOLETE_PHOTO_SOURCE)===true;
@@ -42,12 +49,13 @@ export async function launchDirectRelease({imageSha,run=google,inspect=inspectRe
   const executions=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
   const active=executions.filter(activeExecution);
   if(active.length){
-   if(!retireKnownTextCardExecution||active.length!==1||active[0].metadata?.name!==OBSOLETE_PHOTO_EXECUTION||imageSha===OBSOLETE_PHOTO_SOURCE)return {state:'already-running'};
-   const execution=JSON.parse(run(['run','jobs','executions','describe',OBSOLETE_PHOTO_EXECUTION,'--project='+PROJECT,'--region='+REGION,'--format=json']));
-   if(!knownObsoletePhotoExecution(execution))return {state:'already-running'};
+   if(!retireKnownTextCardExecution||active.length!==1||!new RegExp('^'+NAME+'-[a-z0-9]+$').test(active[0].metadata?.name??'')||imageSha===OBSOLETE_PHOTO_SOURCE)return {state:'already-running'};
+   const executionName=active[0].metadata.name;
+   const execution=JSON.parse(run(['run','jobs','executions','describe',executionName,'--project='+PROJECT,'--region='+REGION,'--format=json']));
+   if(!knownObsoletePhotoExecution(execution)||execution.spec?.template?.spec?.containers?.[0]?.env?.some(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA'&&entry.value===imageSha))return {state:'already-running'};
    // Cancellation retains database checkpoints and all saved media. Never
    // replace configuration until readback proves the old task is terminal.
-   run(['run','jobs','executions','cancel',OBSOLETE_PHOTO_EXECUTION,'--project='+PROJECT,'--region='+REGION,'--quiet']);
+   run(['run','jobs','executions','cancel',executionName,'--project='+PROJECT,'--region='+REGION,'--quiet']);
    const after=JSON.parse(run(['run','jobs','executions','list','--job='+NAME,'--project='+PROJECT,'--region='+REGION,'--format=json']));
    if(after.some(activeExecution))return {state:'obsolete-source-cancelling'};
   }

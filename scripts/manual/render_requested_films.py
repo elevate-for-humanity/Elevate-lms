@@ -3,8 +3,9 @@ import json,os,subprocess,sys,uuid
 from pathlib import Path
 
 def selected_lessons(value,request):
-    if value in ('saved-request','review-request','verify-request'):
+    if value in ('saved-request','review-request','verify-request','barber-request','hvac-request'):
         if request.get('mode') not in ('encode-review-candidate','refresh-review-previews','verify-uploaded-films'): raise ValueError('MANUAL_REQUEST_MODE_INVALID')
+        if value in ('barber-request','hvac-request') and request.get('mode')!='encode-review-candidate':raise ValueError('MANUAL_REQUEST_MODE_INVALID')
         if value=='review-request' and request.get('mode')!='refresh-review-previews': raise ValueError('MANUAL_REQUEST_MODE_INVALID')
         if value=='verify-request' and request.get('mode')!='verify-uploaded-films': raise ValueError('MANUAL_REQUEST_MODE_INVALID')
         ids=request.get('lessonIds',[])

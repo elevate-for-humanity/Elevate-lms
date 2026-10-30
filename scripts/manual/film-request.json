@@ -1,7 +1,20 @@
 {
   "mode": "encode-review-candidate",
+  "courseGroup": "barber",
   "lessonIds": [
     "1daf5923-8ac2-4622-853d-e15fa6f661d8",
-    "f1d32b7f-7cd4-44c4-9858-6b756ef21b89"
+    "f3bb1248-548e-4cd7-977d-d36079c47b9b",
+    "f3ed80af-705d-4482-ba25-9cfad9864203",
+    "78c754a3-6e48-45fb-8fdf-9397f8d1816f",
+    "0bd41361-f32b-4acf-98d3-30c81363c6c9",
+    "d5f746e6-5bd6-4dd8-b0c4-e3173c264fb1",
+    "c5ba80fa-6145-4827-b1f7-f75ec02333ba",
+    "2a590513-ee20-4473-8aa6-46950befbc0f",
+    "4c5f16ab-1a2b-4949-8616-ead431dce494",
+    "e370ade7-5566-4747-b6c3-087ddb5d26a1",
+    "cbf330b1-ddfe-438e-b583-f1035f045ff7",
+    "46d1c315-68d5-4855-85ea-b4f061ec7cd6",
+    "310eb276-19e4-4588-8a51-e065d918a8a2",
+    "972050a9-d51b-4e3d-86a1-16c03a631aed"
   ]
 }

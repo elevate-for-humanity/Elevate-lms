@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { WORKFORCE_ACCESS_ROLES } from '@/lib/workforce/records';
 
 const root = process.cwd();
 const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
@@ -8,7 +9,7 @@ const read = (relativePath: string) => readFileSync(resolve(root, relativePath),
 const guardedPortals: Array<{ path: string; required: string[]; shellPath?: string }> = [
   {
     path: 'components/lms/LearnerWorkspaceLayout.tsx',
-    required: ["requireRole([", "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
+    required: ['requireRole([', "'student'", "'learner'", "'apprentice'", "'admin'", "'staff'"],
   },
   {
     path: 'apps/lms/app/employer/layout.tsx',
@@ -16,7 +17,7 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
   },
   {
     path: 'apps/lms/app/workforce/layout.tsx',
-    required: ['requireRole([', "'workforce'", "'case_manager'"],
+    required: ['requireRole(WORKFORCE_ACCESS_ROLES)', "from '@/lib/workforce/records'"],
   },
   {
     path: 'apps/lms/app/apprentice/layout.tsx',
@@ -67,6 +68,11 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
 ];
 
 describe('portal authorization boundaries', () => {
+  it('keeps Workforce authorization on the shared explicit operational role allowlist', () => {
+    expect([...WORKFORCE_ACCESS_ROLES].sort()).toEqual(
+      ['admin', 'super_admin', 'staff', 'org_admin', 'case_manager', 'workforce_partner'].sort(),
+    );
+  });
   for (const portal of guardedPortals) {
     it(`${portal.path} enforces a server-side authorization boundary`, () => {
       const source = read(portal.path);

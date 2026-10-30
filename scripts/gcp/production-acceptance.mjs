@@ -34,6 +34,7 @@ export async function dispatchAcceptance(env=process.env,request=fetch) {
   const evidence=await live(component,sha,request);
   await api('actions/workflows/registered-apprenticeship-e2e.yml/dispatches',token,request,{ref:'main',inputs:{deployed_sha:sha,deployment_run_id:runId,component}});
   if(component==='admin')await api('actions/workflows/verify-owned-voicemail-speech.yml/dispatches',token,request,{ref:'main'});
+  if(component==='store')await api('actions/workflows/migrate-store-paypal-config.yml/dispatches',token,request,{ref:'main',inputs:{apply:'false',routing:'validate',store_sha:sha,deployment_run_id:runId}});
   return {...evidence,acceptanceDispatched:true,acceptancePassed:false};
 }
 export async function verifyAcceptance(env=process.env,request=fetch,delay=ms=>new Promise(resolve=>setTimeout(resolve,ms))) {

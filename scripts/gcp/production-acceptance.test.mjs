@@ -59,6 +59,30 @@ test('ambiguous dispatch failures are never retried',async()=>{
  }),/^Error: ACCEPTANCE_DISPATCH_TRANSPORT_FAILED$/);
  assert.equal(posts,1);
 });
+test('Store hands exact deployed source and run to validation-only payment acceptance',async()=>{
+ const f=fixture({live:{...health,service:'store'}});
+ const result=await dispatchAcceptance({...env,ACCEPTANCE_COMPONENT:'store'},f.request);
+ const payment=f.calls.find(c=>c.url.endsWith('/migrate-store-paypal-config.yml/dispatches'));
+ assert.ok(payment);
+ assert.deepEqual(JSON.parse(payment.options.body),{ref:'main',inputs:{apply:'false',routing:'validate',store_sha:env.ACCEPTANCE_SHA,deployment_run_id:'123'}});
+ assert.equal(result.acceptancePassed,false);
+ assert.equal(f.calls.filter(c=>c.options.method==='POST').length,2);
+});
+test('other services cannot start Store payment validation',async()=>{
+ for(const component of ['admin','marketing','lms']) {
+  const f=fixture({live:{...health,service:component}});
+  await dispatchAcceptance({...env,ACCEPTANCE_COMPONENT:component},f.request);
+  assert.equal(f.calls.some(c=>c.url.includes('/migrate-store-paypal-config.yml/')),false);
+ }
+});
+test('Store payment dispatch is never retried after an ambiguous acknowledgement',async()=>{
+ const f=fixture({live:{...health,service:'store'}});let paymentPosts=0;
+ await assert.rejects(dispatchAcceptance({...env,ACCEPTANCE_COMPONENT:'store'},async(url,options)=>{
+  if(url.includes('/migrate-store-paypal-config.yml/')){paymentPosts++;throw new TypeError('private-token');}
+  return f.request(url,options);
+ }),/^Error: ACCEPTANCE_DISPATCH_TRANSPORT_FAILED$/);
+ assert.equal(paymentPosts,1);
+});
 test('all four real deployment jobs explicitly hand off acceptance, never their push dispatchers',()=>{
  for(const [file,dependency,component] of [['deploy-admin.yml','deploy-admin','admin'],['deploy-google-lms-trigger.yml','deploy','lms'],['deploy-google-marketing-trigger.yml','deploy','marketing'],['deploy-google-store-runtime.yml','deploy','store']]) {
   const source=readFileSync(new URL('../../.github/workflows/'+file,import.meta.url),'utf8');

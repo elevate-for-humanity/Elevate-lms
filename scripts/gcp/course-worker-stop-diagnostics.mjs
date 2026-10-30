@@ -79,3 +79,6 @@ if(!active&&!priorProbe){
  const evidence=read(['logging','read','resource.type="cloud_run_job" AND resource.labels.job_name="elevate-direct-course-release" AND textPayload:"DIRECT_AUTHORING_DIAGNOSTIC_V1"','--project=elegant-racer-299721','--freshness=5m','--limit=3','--format=json']);
  for(const entry of evidence){try{const value=JSON.parse(entry.textPayload);console.log(JSON.stringify({at:entry.timestamp,providerDiagnostic:value.providerDiagnostic}));}catch{}}
 }else console.log(JSON.stringify({diagnosticProbe:active?'active-execution-preserved':'existing-probe-preserved'}));
+const recorded=read(['logging','read','resource.type="cloud_run_job" AND resource.labels.job_name="elevate-direct-course-release" AND (textPayload:"DIRECT_AUTHORING_DIAGNOSTIC_V1" OR jsonPayload.marker="DIRECT_AUTHORING_DIAGNOSTIC_V1")','--project=elegant-racer-299721','--freshness=20m','--limit=3','--format=json']);
+for(const entry of recorded){try{const value=entry.jsonPayload??JSON.parse(entry.textPayload);console.log(JSON.stringify({at:entry.timestamp,providerDiagnostic:value.providerDiagnostic}));}catch{}}
+

@@ -64,6 +64,7 @@ export function PlatformShell({
   recruitingEnabled = false,
 }: PlatformShellProps) {
   const pathname = usePathname();
+  const isWorkforce = role === 'workforce' || role === 'workforce_partner';
   const dashboardHref = getDashboardHref(role);
   const installHref =
     role === 'host_shop'

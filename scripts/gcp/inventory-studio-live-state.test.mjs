@@ -5,7 +5,7 @@ import {promisify} from 'node:util';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {METADATA_PROBE,inventoryStudioLiveState,studioProcessClass} from './inventory-studio-live-state.mjs';
+import {METADATA_PROBE,inventoryStudioLiveState,studioProcessClass,summarizeStudioProcessStats} from './inventory-studio-live-state.mjs';
 import {inspectStudioPreservation} from './inventory-studio-live-state.mjs';
 test('workspace diagnosis returns bounded aggregate differences without private output or mutations',async()=>{
  const traffic=[{revisionName:'candidate',tag:'sc-12345678-12345678',url:'https://candidate.run.app',percent:0}];
@@ -46,6 +46,35 @@ test('only known browser helpers are classified; arbitrary Node processes remain
  assert.equal(studioProcessClass('chrome_crashpad'),'browserHelper');assert.equal(studioProcessClass('chrome_crashpad_handler'),'browserHelper');
  assert.equal(studioProcessClass('chromium'),'browser');assert.equal(studioProcessClass('bash'),'shell');
  for(const name of ['node','python3','private-process-name','chrome_crashpad_unrecognized'])assert.equal(studioProcessClass(name),'unclassified');
+});
+
+test('process metadata distinguishes waiting shells, zombies and running descendants without private names',()=>{
+ const rows=['100 (server) S 1','101 (bash) S 100','102 (bash) Z 100','103 (private ) process) R 101','104 (node) R 100','105 (chrome_crashpad) S 100','106 (unrelated) R 1'];
+ const result=summarizeStudioProcessStats(rows,100,104);
+ assert.equal(result.directChildShells,2);
+ assert.equal(result.directNonBrowserProcesses,2);
+ assert.equal(result.directBrowserHelperProcesses,1);
+ assert.deepEqual(result.directShellStates,{running:0,sleeping:1,stopped:0,zombie:1,other:0});
+ assert.equal(result.descendantNonBrowserProcesses,1);
+ assert.deepEqual(result.descendantProcessStates,{running:1,sleeping:0,stopped:0,zombie:0,other:0});
+ assert.ok(!JSON.stringify(result).includes('private'));
+ assert.ok(!JSON.stringify(result).includes('103'));
+ assert.throws(()=>summarizeStudioProcessStats(['invalid'],100,104),/PROCESS_METADATA_UNVERIFIED/);
+ assert.throws(()=>summarizeStudioProcessStats(['101 (bash) ? 100'],100,104),/PROCESS_METADATA_UNVERIFIED/);
+});
+
+test('health inventory reports terminal and workspace recovery flags without returning private health fields',async()=>{
+ const run=args=>args[0]==='run'?JSON.stringify({status:{url:'https://studio.test.run.app',traffic:[]}}):'test-secret';
+ const health={activeSessions:0,terminalRecovery:{active:2,persistent:true,ready:true,owner:'private-owner'},workspaceRecovery:{ready:true,persistent:true,lastSaveError:'workspace_checkpoint_unavailable',lastSaveCode:'WORKSPACE_CHECKPOINT_CONFLICT',private:'private-payload'}};
+ const request=async url=>Response.json(String(url).endsWith('/health')?health:{exitCode:0,stdout:JSON.stringify({files:0,fileContentsRead:false,commandsRead:false})});
+ const result=await inventoryStudioLiveState({run,request});
+ assert.deepEqual(result.terminalRecovery,{active:2,persistent:true,ready:true});
+ assert.deepEqual(result.workspaceRecovery,{ready:true,persistent:true,saveFailed:true,failureCode:'WORKSPACE_CHECKPOINT_CONFLICT'});
+ assert.ok(!JSON.stringify(result).includes('private'));
+ delete health.terminalRecovery;delete health.workspaceRecovery;
+ const legacy=await inventoryStudioLiveState({run,request});
+ assert.deepEqual(legacy.terminalRecovery,{active:null,persistent:null,ready:null});
+ assert.deepEqual(legacy.workspaceRecovery,{ready:null,persistent:null,saveFailed:null,failureCode:null});
 });
 
 test('Admin binding inventory never emits inline credential values or runtime payloads',async()=>{

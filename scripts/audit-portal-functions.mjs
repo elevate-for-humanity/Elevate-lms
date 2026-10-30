@@ -2,6 +2,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { hasGetRouteHandler } from './portal-route-contract.mjs';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const APPS = { marketing: 'apps/marketing/app', lms: 'apps/lms/app', admin: 'apps/admin/app' };
@@ -57,6 +58,7 @@ for (const [app, relRoot] of Object.entries(APPS)) {
   const apis = walk(appRoot).filter((f) => /\/route\.(tsx?|jsx?|js)$/.test(f));
   routeIndex[app] = pages.map((file) => ({ file, route: routeFromFile(appRoot, file, 'page') }));
   apiIndex[app] = apis.map((file) => ({ file, route: routeFromFile(appRoot, file, 'route') }));
+  routeIndex[app].push(...apiIndex[app].filter(entry => hasGetRouteHandler(readFileSync(entry.file, 'utf8'))));
 }
 
 function normalizeDynamicTarget(target) {

@@ -3,6 +3,12 @@ export function directLessonEditorialHold(contentJson) {
   return contentJson?.savedFilmSourceNeedsRevision===true;
 }
 
+export function directCourseNeedsFinalPublication(course,lessonCount) {
+  if(!Number.isInteger(lessonCount)||lessonCount<1)throw Error('DIRECT_COURSE_LESSON_COUNT_REQUIRED');
+  return course?.status!=='published'||course?.is_active!==true||
+    course?.generation_status!=='published'||course?.generation_progress!==100||course?.total_lessons!==lessonCount;
+}
+
 export async function runDirectLessonPass({steps, reusable, fingerprint, attempted, execute, validate, save, reject}) {
   const decisions=[];
   for (const step of steps) {

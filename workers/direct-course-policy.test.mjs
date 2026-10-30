@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold,directCourseNeedsFinalPublication} from './direct-course-policy.mjs';
+test('an incrementally published shell still requires final course publication',()=>{
+ const full={status:'published',is_active:true,generation_status:'published',generation_progress:100,total_lessons:17};
+ assert.equal(directCourseNeedsFinalPublication({...full,generation_status:'draft',generation_progress:0},17),true);
+ assert.equal(directCourseNeedsFinalPublication({...full,total_lessons:3},17),true);
+ assert.equal(directCourseNeedsFinalPublication(full,17),false);
+ assert.throws(()=>directCourseNeedsFinalPublication(full,0),/LESSON_COUNT_REQUIRED/);
+});
 test('a specific saved-film source correction holds delivery without treating all drafts as held',()=>{
  assert.equal(directLessonEditorialHold({savedFilmSourceNeedsRevision:true}),true);
  assert.equal(directLessonEditorialHold({instructionReviewRequired:true}),false);

@@ -60,3 +60,16 @@ test('Admin binding inventory never emits inline credential values or runtime pa
  for(const value of ['private-key-payload-fixture','token-payload-fixture','unrelated-payload-fixture','config-payload-fixture'])assert.ok(!json.includes(value));
  assert.equal(result.stateChanged,false);
 });
+
+test('retained verification inventory uses only the exact observed non-serving tag',async()=>{
+ const tag='studio-verify',url='https://studio-verify---elevate-studio-browser-fixture.a.run.app';
+ const row={tag,url,revisionName:'elevate-studio-browser-00051-fec',percent:0};
+ const calls=[];
+ const run=args=>args[0]==='run'?JSON.stringify({status:{url:'https://elevate-studio-browser-fixture.a.run.app',traffic:[row]}}):'test-secret';
+ const request=async target=>{calls.push(String(target));return Response.json(String(target).endsWith('/health')?{commit:'retained',activeSessions:0}:{exitCode:0,stdout:JSON.stringify({files:0,directories:0,symlinks:0,bytes:0,directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true,fileContentsRead:false,commandsRead:false})});};
+ const result=await inventoryStudioLiveState({tag,run,request});assert.equal(result.commit,'retained');assert.ok(calls.every(c=>c.startsWith(url+'/')));assert.equal(result.stateChanged,false);
+ for(const tag of ['--unsafe','unknown','sc-12345678-12345678'])await assert.rejects(inventoryStudioLiveState({tag,run,request}),/TAG_UNVERIFIED/);
+ row.percent=100;await assert.rejects(inventoryStudioLiveState({tag,run,request}),/TAG_UNVERIFIED/);
+ row.percent=0;row.url='https://external.run.app';await assert.rejects(inventoryStudioLiveState({tag,run,request}),/ENDPOINT_UNVERIFIED/);
+ assert.equal(calls.length,2);
+});

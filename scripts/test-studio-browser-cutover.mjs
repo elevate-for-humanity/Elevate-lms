@@ -18,6 +18,7 @@ async function execute(overrides={}){
   return '';
  };
  globalThis.__studioCutoverFixture={
+  async bindProductionStudioBrowser({url}){if(f.adminBindingError)throw Error(f.adminBindingError);output(['run','services','update','elevate-admin-migration','--no-traffic','--update-env-vars=STUDIO_BROWSER_URL='+url]);return {adminSwitched:true,verified:true};},
   async verifyStudioRuntimeReplacement(options){f.replacementOptions=options;f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
   async inventoryStudioLiveState(){return f.live||{activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true};},
   async verifyStudioWorkspacePreservation(options){f.preservationOptions=options;f.events.push({workspacePreservation:true});if(!f.preservation)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');return f.preservation;},
@@ -36,6 +37,7 @@ async function execute(overrides={}){
   },
  };
  const source=raw
+  .replace("import {bindProductionStudioBrowser} from './production-browser-binding.mjs';","const bindProductionStudioBrowser=globalThis.__studioCutoverFixture.bindProductionStudioBrowser;")
   .replace("import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';","const verifyStudioRuntimeReplacement=globalThis.__studioCutoverFixture.verifyStudioRuntimeReplacement;")
   .replace("import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';","const inventoryStudioLiveState=globalThis.__studioCutoverFixture.inventoryStudioLiveState;")
   .replace("import {verifyStudioWorkspacePreservation} from './verify-studio-workspace-preservation.mjs';","const verifyStudioWorkspacePreservation=globalThis.__studioCutoverFixture.verifyStudioWorkspacePreservation;")
@@ -218,4 +220,9 @@ test('repeated verification of the same image uses a fresh tag and never reuses 
  assert.notEqual(tag(first),tag(second));
  assert.notEqual(tag(first),'--tag=studio-verify');
  assert.notEqual(tag(second),'--tag=studio-verify');
+});
+
+test('an unverified serving Admin binding fails the cutover instead of claiming it switched',async()=>{
+ const f=await execute({adminBindingError:'STUDIO_ADMIN_BINDING_NOT_SERVING'});
+ assert.match(f.error.message,/STUDIO_ADMIN_BINDING_NOT_SERVING/);
 });

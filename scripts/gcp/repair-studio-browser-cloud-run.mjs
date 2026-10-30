@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto';
+import {bindProductionStudioBrowser} from './production-browser-binding.mjs';
 import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';
 import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';
 import {verifyStudioWorkspacePreservation} from './verify-studio-workspace-preservation.mjs';
@@ -146,7 +147,7 @@ state=await verifyHealth(url,'Public browser did not serve the verified candidat
   }
 }
 if(process.env.STUDIO_CANDIDATE_ONLY!=='true'){
-command(['run','services','update','elevate-admin-migration','--project='+project,'--region='+region,'--update-env-vars=STUDIO_BROWSER_URL='+url+',STUDIO_BROWSER_PUBLIC_URL='+url,'--quiet']);
-console.log(JSON.stringify({service:name,url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,authorizedWorkspace:true,anonymousWorkspaceDenied:true,adminSwitched:true,oldProviderRemoved:false,existingProviderLoginRecovery:'not verified'}));
+const adminBinding=await bindProductionStudioBrowser({url,run:command});
+console.log(JSON.stringify({service:name,url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,authorizedWorkspace:true,anonymousWorkspaceDenied:true,adminSwitched:adminBinding.adminSwitched,adminBinding,oldProviderRemoved:false,existingProviderLoginRecovery:'not verified'}));
 
 }

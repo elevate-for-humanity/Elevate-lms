@@ -29,7 +29,7 @@ jobs:
         with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - run: node --test scripts/gcp/inventory-studio-live-state.test.mjs
+      - run: node --test scripts/gcp/inventory-studio-live-state.test.mjs scripts/gcp/production-browser-binding.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -43,3 +43,25 @@ jobs:
         run: node scripts/gcp/inventory-studio-live-state.mjs
       - name: Compare aggregate workspace proofs without changing files or traffic
         run: node scripts/gcp/inventory-studio-live-state.mjs --preservation
+      - name: Verify serving Admin bindings and inventory retained browser endpoints
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          import {productionBrowserEnvironment,inspectServingAdminBrowserBinding} from './scripts/gcp/production-browser-binding.mjs';
+          import {inventoryStudioLiveState} from './scripts/gcp/inventory-studio-live-state.mjs';
+          const read=args=>JSON.parse(google([...args,'--project='+PROJECT,'--format=json']));
+          const browser=read(['run','services','describe','elevate-studio-browser','--region=us-central1']);
+          const url=productionBrowserEnvironment(browser).STUDIO_BROWSER_URL;
+          console.log(JSON.stringify({kind:'serving_admin_browser',...inspectServingAdminBrowserBinding({url})}));
+          for(const row of browser.status.traffic.filter(t=>t.tag==='studio-verify'||/^course-qa-[a-f0-9]{12}$/.test(t.tag||''))){
+            console.log(JSON.stringify({kind:'retained_browser_state',tag:row.tag,revision:row.revisionName,...await inventoryStudioLiveState({tag:row.tag})}));
+          }
+          for(const [name,region] of [['elevate-course-builder','us-central1'],['elevate-course-builder-parallel','us-east1']]){
+            const job=read(['run','jobs','describe',name,'--region='+region]);
+            const binding=job.spec?.template?.spec?.template?.spec?.containers?.[0]?.env?.find(e=>e.name==='ULTIMATE_LEARNER_RUNTHROUGH_URL');
+            const endpoint=new URL(binding?.value);
+            if(endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.search||endpoint.hash)throw Error('COURSE_QA_ENDPOINT_UNVERIFIED');
+            console.log(JSON.stringify({kind:'course_qa_binding',job:name,region,endpoint:endpoint.origin+endpoint.pathname}));
+          }
+          NODE

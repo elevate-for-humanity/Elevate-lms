@@ -11,8 +11,6 @@ import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
-const BARBER_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4';
-const GENERAL_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4';
 
 async function completeOrientation(formData: FormData) {
   'use server';
@@ -68,7 +66,6 @@ export default async function ApprenticeOrientationPage({
     .limit(1)
     .maybeSingle();
 
-  const isBarber = programSlug === 'barber-apprenticeship';
   const courseHref = apprenticeshipLmsCoursePath(programSlug);
   const courseLabel = apprenticeshipRtiLabel(programSlug) || 'Assigned RTI course';
   const completed = Boolean(enrollment?.orientation_completed_at);
@@ -105,7 +102,7 @@ export default async function ApprenticeOrientationPage({
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
       <VisualDashboardOrientation audience="apprentice" />
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 text-white shadow-sm">
-        <div className="grid lg:grid-cols-[1.05fr_.95fr]">
+        <div className="grid">
           <div className="p-6 sm:p-8">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-300">Required onboarding</p>
             <h1 className="mt-2 text-3xl font-black sm:text-4xl">Apprentice Orientation</h1>
@@ -118,13 +115,6 @@ export default async function ApprenticeOrientationPage({
               </div>
             ) : null}
           </div>
-          <video
-            src={isBarber ? BARBER_VIDEO : GENERAL_VIDEO}
-            controls
-            playsInline
-            preload="metadata"
-            className="h-full min-h-[240px] w-full object-cover"
-          />
         </div>
       </section>
 

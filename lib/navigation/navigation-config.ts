@@ -187,6 +187,12 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
       id: 'apprenticeship',
       items: [
         { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
+        { id: 'theory', label: 'Theory / My Lessons', href: p('apprentice', 'theory'), icon: BookOpen },
+        { id: 'class-assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: FileText },
+        { id: 'class-calendar', label: 'Class Calendar', href: p('lms', 'calendar'), icon: Calendar },
+        { id: 'workbook', label: 'My Workbook', href: p('apprentice', 'workbook'), icon: BookOpen },
+        { id: 'training-records', label: 'Progress & Setup', href: `${p('apprentice')}?view=records`, icon: BarChart3 },
+        { id: 'profile', label: 'My Profile', href: p('apprentice', 'profile'), icon: Users },
         {
           id: 'orientation',
           label: 'Orientation',
@@ -230,7 +236,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
           href: p('apprentice', 'policies/payments'),
           icon: Shield,
         },
-        { id: 'rti', label: 'RTI', href: p('apprentice', 'rti'), icon: BookOpen },
+        { id: 'rti', label: 'RTI Hours & Evidence', href: p('apprentice', 'rti'), icon: BookOpen },
         {
           id: 'handbook',
           label: 'Handbook',
@@ -725,8 +731,9 @@ const WORKSPACE_GROUPS: Partial<Record<NavigationRole, Array<[string, string, st
     ['connect', 'Messages & career', ['learner-messages', 'interoffice-email', 'community', 'career', 'resume']],
   ],
   apprentice: [
-    ['today', 'Daily training', ['dashboard', 'timeclock', 'hours', 'rti', 'competencies']],
-    ['setup', 'Documents & requirements', ['orientation', 'documents', 'handbook', 'timeclock-policy', 'state-board']],
+    ['today', 'Daily training', ['dashboard', 'theory', 'timeclock', 'hours']],
+    ['learning', 'Theory & progress', ['class-assignments', 'class-calendar', 'workbook', 'rti', 'competencies', 'training-records']],
+    ['setup', 'Documents & requirements', ['profile', 'orientation', 'documents', 'handbook', 'timeclock-policy', 'state-board']],
     ['billing', 'Payments', ['billing', 'payment-policy']],
     ['connect', 'Messages & career', ['email', 'community', 'credentials', 'career', 'resume']],
   ],

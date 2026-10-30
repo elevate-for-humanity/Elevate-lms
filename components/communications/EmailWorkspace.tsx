@@ -391,6 +391,16 @@ export function EmailWorkspace({
     );
   }
 
+  if (error && !data) {
+    return (
+      <section role="alert" className="rounded-2xl border border-red-200 bg-white p-6">
+        <h2 className="text-xl font-bold">Email could not be loaded</h2>
+        <p className="mt-2">{error}</p>
+        <button type="button" onClick={() => void load(initialMailboxId)} className="mt-4 min-h-11 rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">Retry email</button>
+      </section>
+    );
+  }
+
   if (!data?.mailboxes.length) {
     return (
       <section className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">

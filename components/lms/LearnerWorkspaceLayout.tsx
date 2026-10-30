@@ -54,7 +54,7 @@ export default async function LearnerWorkspaceLayout({
       role={apprenticeWorkspace ? 'apprentice' : 'student'}
       paris={{ autoOpenOnDashboard: false }}
     >
-      {showLearnerNotices && !apprenticeWorkspace && !isAdmin && !photoProfile?.avatar_url ? (
+      {showLearnerNotices && !isAdmin && !photoProfile?.avatar_url && !apprenticeWorkspace ? (
         <div className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6">
           <details className="rounded-xl border border-slate-200 bg-white p-3">
             <summary className="cursor-pointer text-sm font-bold text-slate-700">
@@ -83,7 +83,7 @@ export default async function LearnerWorkspaceLayout({
           </details>
         </div>
       ) : null}
-      {showLearnerNotices && !apprenticeWorkspace && showBilling ? (
+      {showLearnerNotices && showBilling && !apprenticeWorkspace ? (
         <section
           className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6"
           aria-label="Your payment plan"

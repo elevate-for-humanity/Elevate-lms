@@ -1,6 +1,10 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
+import { PlatformShell } from '@/components/platform/PlatformShell';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { normalizeRole } from '@/lib/rbac/role-matrix';
 export const dynamic = 'force-dynamic';
 export default async function InterofficeEmail({
   searchParams,
@@ -16,14 +20,34 @@ export default async function InterofficeEmail({
   const {
     data: { user },
   } = await db.auth.getUser();
-  if (!user) redirect('/login?redirect=%2Fcommunications%2Femail');
+  const admin = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(admin, user?.id);
+  if (!subject.userId) redirect('/login?redirect=%2Fcommunications%2Femail');
+  const { data: profile, error } = await admin
+    .from('profiles')
+    .select('email,full_name,role,avatar_url')
+    .eq('id', subject.userId)
+    .maybeSingle();
+  if (error || !profile) throw new Error('Email account profile could not be loaded.');
+  const role = normalizeRole(profile.role);
+  if (!role) throw new Error('Email account role could not be resolved.');
   return (
-    <main className="p-4">
-      <EmailWorkspace
-        roleLabel="account holder"
-        initialRecipient={initialRecipient}
-        initialSubject={typeof params.subject === 'string' ? params.subject.slice(0, 200) : ''}
-      />
-    </main>
+    <PlatformShell
+      user={{
+        id: subject.userId,
+        email: profile.email || '',
+        full_name: profile.full_name || undefined,
+        avatar_url: profile.avatar_url || undefined,
+      }}
+      role={role}
+    >
+      <main className="p-4">
+        <EmailWorkspace
+          roleLabel="account holder"
+          initialRecipient={initialRecipient}
+          initialSubject={typeof params.subject === 'string' ? params.subject.slice(0, 200) : ''}
+        />
+      </main>
+    </PlatformShell>
   );
 }

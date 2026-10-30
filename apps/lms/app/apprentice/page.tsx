@@ -1,3 +1,4 @@
+import ApprenticeHomePanel from '@/components/apprenticeship/ApprenticeHomePanel';
 import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
 import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
 import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
@@ -90,7 +91,8 @@ function readPriorLearningImport(draftData: unknown): PriorLearningImport | null
   };
 }
 
-export default async function ApprenticePortalPage() {
+export default async function ApprenticePortalPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+  const view = (await searchParams).view;
   const supabase = await createClient();
   const {
     data: { user },
@@ -173,6 +175,10 @@ export default async function ApprenticePortalPage() {
   if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
   const beautyProgram = getBeautyApprenticeshipConfig(programSlug);
   const registeredStandard = getRegisteredProgramStandard(programSlug);
+
+  if (view !== 'records') {
+    return <ApprenticeHomePanel userId={subject.userId} programSlug={programSlug} runtime={runtime} billing={billingRequirement} />;
+  }
 
   const dashboardResults = await Promise.all([
     db

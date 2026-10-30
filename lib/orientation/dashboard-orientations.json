@@ -363,7 +363,7 @@
         "narration": "Your apprenticeship combines related technical instruction, or RTI, with supervised on-the-job learning, or OJL. Use the assigned course for theory, examples, and knowledge checks. Your approved shop and qualified supervisor provide practical training. Pictures and videos explain procedures, but they do not replace supervised practice or a competency sign-off. Read your own registered program plan and syllabus so you understand the hours, competencies, and evidence that apply to your occupation.",
         "href": "/apprentice/orientation",
         "action": "Review my program plan",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
         "title": "Your daily apprentice routine",
@@ -375,7 +375,7 @@
         "narration": "Open your apprentice dashboard each training day. Review announcements and your next theory lesson. At the approved shop, allow the location permissions the timeclock needs and clock in before supervised work starts. Record only the actual activity and time you completed. Clock out before you leave. Do not overlap theory study and supervised work entries. If a location or timeclock error occurs, tell your supervisor and request a correction with accurate dates, times, and evidence.",
         "href": "/apprentice/timeclock",
         "action": "Open my timeclock",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/generations-hair/salon-service.webp"
       },
       {
         "title": "Skill practice and verification",
@@ -387,7 +387,7 @@
         "narration": "Your competency checklist shows the skills your registered apprenticeship requires. Ask your supervisor which skill you should practice next. Demonstrate it safely under the required supervision, then ask the supervisor to record the observed evidence and sign-off. A self-reported completion, printed checklist, or watched video is not a verified practical competency. Review feedback and repeat practice when needed. Use the dashboard to check which records are submitted, approved, or returned for correction.",
         "href": "/apprentice",
         "action": "Review my progress",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
       },
       {
         "title": "Your weekly review",
@@ -399,7 +399,7 @@
         "narration": "Before the week ends, compare your clock entries, approved training hours, theory progress, and competency checklist. Follow the limits and targets shown in your program plan; do not invent extra hours to reach a target. Ask about a pending or returned entry before it becomes a reporting problem. Check your schedule and agree on the next week’s practical training with your shop supervisor. Contact Elevate if you cannot reach your shop or the assigned course is unavailable.",
         "href": "/apprentice",
         "action": "Review this week",
-        "image": "/images/pages/office-admin-desk.jpg"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
         "title": "Documents, payments, and support",
@@ -411,7 +411,7 @@
         "narration": "Keep required agreements, documents, and contact information current. Review any invoice or payment-plan terms in your own account. A displayed amount or due date should match your signed agreement; report a mismatch rather than paying an unfamiliar request. Do not send card details or identity documents through chat. A document submission may still need staff review. Use the dashboard support and communication tools to report an access hold, disputed hour, safety concern, or schedule problem.",
         "href": "/apprentice/billing",
         "action": "Review billing and records",
-        "image": "/images/pages/office-admin-desk.jpg"
+        "image": "/images/partners/generations-hair/salon-service.webp"
       },
       {
         "title": "Messages, meetings, and getting help",
@@ -423,7 +423,7 @@
         "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
         "href": "/lms/support",
         "action": "Contact learner support",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
       },
       {
         "title": "Finish training and prepare for work",
@@ -435,11 +435,11 @@
         "narration": "A finished video is one part of learning. Program completion can also require quizzes, assignments, attendance, supervised competencies, and verified credential evidence. Check your completion checklist with your program contact. Certification testing and a course completion certificate can be separate steps. Upload credentials you earn outside Elevate for verification. Start your résumé while you train and add only skills and credentials you can support. Use the career tools to prepare for applications and next steps.",
         "href": "/lms/career",
         "action": "Open career tools",
-        "image": "/images/pages/career-services-page-5.webp"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
         "title": "Inter-office email: contact your Elevate team",
-        "image": "/images/pages/contact-hero.jpg",
+        "image": "/images/partners/generations-hair/salon-service.webp",
         "points": [
           "Open your mailbox and choose Compose.",
           "Use your assigned staff contact and a clear subject.",
@@ -451,7 +451,7 @@
       },
       {
         "title": "Community: learn with your peers",
-        "image": "/images/pages/training-classroom.webp",
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp",
         "points": [
           "Browse groups for your program or study interests.",
           "Join a group, ask a question, and reply respectfully.",
@@ -463,7 +463,7 @@
       },
       {
         "title": "Career services: explore your job feed",
-        "image": "/images/pages/career-services-page-5.webp",
+        "image": "/images/partners/j-noelle/official-salon-2026.webp",
         "points": [
           "Start career services while you are training.",
           "Review job requirements, location, and closing dates.",
@@ -475,7 +475,7 @@
       },
       {
         "title": "Résumé builder: save, preview, and download",
-        "image": "/images/pages/office-admin-desk.jpg",
+        "image": "/images/partners/generations-hair/salon-service.webp",
         "points": [
           "Enter your contact details, experience, education, and skills.",
           "Save your résumé and reopen it to check your changes.",
@@ -487,7 +487,7 @@
       },
       {
         "title": "Credential uploads: submit and track review",
-        "image": "/images/pages/comp-home-highlight-success.webp",
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp",
         "points": [
           "Choose your program and the appropriate credential.",
           "Upload a clear supported file and submit it.",
@@ -498,7 +498,7 @@
         "action": "Upload an earned credential"
       }
     ],
-    "hero": "/images/barber-hero.jpg"
+    "hero": "/images/partners/j-noelle/official-salon-2026.webp"
   },
   "host-shop": {
     "title": "Help your apprentices grow with confidence",

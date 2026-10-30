@@ -107,3 +107,6 @@ tests/worker/*
 
 # Native narration must keep heartbeat scheduling live before worker release.
 !tests/worker/kokoro-liveness-smoke.mjs
+
+# Saved HVAC narration safety acceptance must run in the worker image.
+!tests/worker/hvac-saved-safety-role.test.mjs

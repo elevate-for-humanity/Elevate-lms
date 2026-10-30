@@ -59,6 +59,7 @@ jobs:
   hvac-buffer-diagnostic:
     if: github.ref == 'refs/heads/test/hvac-live-playback-20261030' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/playwright:v1.57.0-noble
     timeout-minutes: 10
     permissions:
       contents: read
@@ -72,9 +73,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: pnpm }
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
-      - run: pnpm exec playwright install webkit --with-deps
       - name: Compare complete original bytes with progressive streaming on iPhone WebKit
-        run: pnpm exec playwright test tests/e2e/hvac-buffer-diagnostic.spec.ts --project=iphone-webkit --retries=0 --reporter=line,html --output=test-results/hvac-buffer-diagnostic
+        run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts tests/e2e/hvac-buffer-diagnostic.spec.ts --project=iphone-webkit --retries=0 --reporter=line,html --output=test-results/hvac-buffer-diagnostic
       - uses: actions/upload-artifact@v4
         if: always()
         with:

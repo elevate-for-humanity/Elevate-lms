@@ -31,3 +31,16 @@ test('image-only releases reserve the existing allocation instead of assuming a 
 test('image-only releases cannot proceed with an unreadable current allocation',async()=>{
  await assert.rejects(preflightWebRollout({service:'elevate-admin-migration',run:()=>JSON.stringify({}),inspect:async()=>{throw Error('must not inspect');}}),/allocation required/);
 });
+
+test('capacity rejection retains bounded allocation evidence without service secrets',async()=>{
+ const capacity={region:'us-central1',required:{cpu:21000,memory:44*2**30},granted:{cpu:20000,memory:40*2**30},fits:false};
+ const calls=[];
+ await assert.rejects(preflightWebRollout({...options(),run:args=>{calls.push(args);return JSON.stringify({spec:{template:{spec:{containers:[{env:[{name:'PRIVATE_KEY',value:'fixture-secret'}]}]}}}});},inspect:async()=>capacity}),error=>{
+  assert.equal(error.code,'WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE');
+  assert.deepEqual(error.diagnostic,{service:'elevate-store-migration',region:'us-central1',candidate:{cpu:'4',memory:'8Gi'},capacity});
+  assert.equal(JSON.stringify(error).includes('fixture-secret'),false);
+  return true;
+ });
+ assert.equal(calls.length,1);
+ assert.equal(calls[0].slice(0,3).join(' '),'run services describe');
+});

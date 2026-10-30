@@ -70,18 +70,17 @@ const testedRollouts = {
   'deploy-google-marketing-trigger.yml': 'Marketing',
 };
 // GitHub gives an unstarted dependent job a synthetic started_at when its run
-// is cancelled. Its synthetic start can trail completion by one second. Require
-// that bounded receipt with no runner or steps; actual execution, positive
-// duration, missing metadata or larger clock discrepancies still block rollback.
+// is cancelled. GitHub can round that synthetic start one second after completion.
+// Require the complete no-runner, no-step receipt and only that observed clock
+// skew; missing metadata or any positive execution duration still blocks rollback.
 function cancelledBeforeExecution(job) {
-  const started = Date.parse(job.started_at), completed = Date.parse(job.completed_at);
+  const start=Date.parse(job.started_at), end=Date.parse(job.completed_at);
   return job.status === 'completed' && job.conclusion === 'cancelled' &&
     Array.isArray(job.steps) && job.steps.length === 0 &&
     (job.runner_id === null || job.runner_id === 0) &&
     (job.runner_name === null || job.runner_name === '') &&
     typeof job.started_at === 'string' && typeof job.completed_at === 'string' &&
-    Number.isFinite(started) && Number.isFinite(completed) &&
-    started >= completed && started - completed <= 1000;
+    Number.isFinite(start) && Number.isFinite(end) && end <= start && start - end <= 1000;
 }
 export async function assertTestedWebRollout({ api, repository, workflow, runId, commitSha }) {
   if (repository !== 'elevate-for-humanity/Elevate-lms' || !Object.hasOwn(testedRollouts, workflow))

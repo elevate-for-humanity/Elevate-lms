@@ -41,6 +41,19 @@ jobs:
       - name: Test cost inventory redaction and read-only behavior
         if: always()
         run: node --test scripts/gcp/audit-cost-resources.test.mjs
+      - name: Explain current LMS rollout capacity without changing resources
+        if: always()
+        run: |
+          node --test scripts/gcp/preflight-web-rollout.test.mjs scripts/gcp/regional-capacity.test.mjs
+          node --input-type=module <<'NODE'
+          import {preflightWebRollout} from './scripts/gcp/preflight-web-rollout.mjs';
+          try {
+            console.log(JSON.stringify(await preflightWebRollout({service:'elevate-lms-migration'})));
+          } catch (error) {
+            if (error.code !== 'WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE') throw error;
+            console.log(JSON.stringify({rolloutAllowed:false,error:error.code,...error.diagnostic}));
+          }
+          NODE
       - name: Inventory project resources without provisioning or deleting anything
         if: always()
         run: |

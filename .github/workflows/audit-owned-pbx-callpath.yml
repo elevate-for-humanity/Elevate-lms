@@ -10,6 +10,7 @@ on:
       - 'scripts/gcp/audit-pbx-runtime.py'
       - 'scripts/gcp/audit-live-phone-configuration.py'
       - 'scripts/gcp/test-live-phone-configuration.py'
+      - 'scripts/gcp/review-pbx-source.py'
       - 'scripts/gcp/verify-pbx-transport.mjs'
       - 'scripts/gcp/pbx-one-command-readiness.sh'
       - 'infra/pbx/paris/**'
@@ -98,6 +99,15 @@ jobs:
           python3 scripts/gcp/test-live-phone-configuration.py
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py | tee pbx-live-configuration-evidence.json
+      - name: Review source drift without changing the running services
+        if: always()
+        run: |
+          set -euo pipefail
+          for name in provisioner/server.mjs paris/turn-adapter.mjs paris/launch.mjs; do
+            gcloud compute scp "infra/pbx/$name" "elevate-pbx:/tmp/elevate-source-review-$GITHUB_SHA-${name//\//-}" --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          done
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo python3 - $GITHUB_SHA" < scripts/gcp/review-pbx-source.py | tee pbx-source-review-evidence.json
       - name: Diagnose private service configuration and existing secret access
         if: always()
         shell: bash

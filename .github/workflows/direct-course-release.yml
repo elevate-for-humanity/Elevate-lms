@@ -9,22 +9,56 @@ on:
         description: Full SHA of the successfully deployed tested image containing the direct release entrypoint
         required: true
         type: string
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/direct-course-release.yml'
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
   group: direct-course-release-launch
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Hand exact tested image to an identity-approved release event
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TESTED_IMAGE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$TESTED_IMAGE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/direct-course-release.yml/dispatches" \
+            -f ref=main \
+            -f "inputs[tested_image_sha]=$TESTED_IMAGE_SHA"
+
   release:
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15
     steps:
+      - name: Resolve the exact successfully deployed image source
+        id: tested
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TESTED_IMAGE_SHA: ${{ inputs.tested_image_sha }}
+        run: |
+          set -euo pipefail
+          SHA="$INPUT_TESTED_IMAGE_SHA"
+          if [[ -z "$SHA" ]]; then
+            SHA="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-course-worker.yml/runs?branch=main&status=success&per_page=20" --jq '.workflow_runs | map(select(.head_branch == "main" and .status == "completed" and .conclusion == "success")) | first | .head_sha')"
+          fi
+          [[ "$SHA" =~ ^[a-f0-9]{40}$ ]]
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+          ref: ${{ steps.tested.outputs.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
@@ -39,5 +73,5 @@ jobs:
         with: {skip_install: true}
       - name: Run finite direct completion outside builder queues
         env:
-          DIRECT_RELEASE_SOURCE_SHA: ${{ inputs.tested_image_sha || github.event.workflow_run.head_sha }}
+          DIRECT_RELEASE_SOURCE_SHA: ${{ steps.tested.outputs.sha }}
         run: node scripts/gcp/direct-course-release.mjs

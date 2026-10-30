@@ -10,7 +10,7 @@ export function useHvacVideoDock(enabled = true) {
 
   useEffect(() => {
     setDock(null);
-    if (!enabled) return;
+    if (!enabled || pathname !== '/programs/hvac-technician') return;
     let active = true;
     let observer: IntersectionObserver | undefined;
     let waiting: MutationObserver | undefined;

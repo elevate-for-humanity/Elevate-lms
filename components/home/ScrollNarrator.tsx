@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { createPortal } from 'react-dom';
+import { useHvacVideoDock } from '@/hooks/useHvacVideoDock';
 import {
   stopAllNaturalVoicePlayback,
   useNaturalVoice,
@@ -66,6 +68,7 @@ function mostVisiblePageSection() {
 
 export function ScrollNarrator() {
   const pathname = usePathname();
+  const videoDock = useHvacVideoDock();
   // The public site is a guided, narrated experience by default. Browsers may
   // still require one tap before allowing audible playback; an explicit "off"
   // choice is persisted so accessibility and visitor preference remain authoritative.
@@ -314,8 +317,11 @@ export function ScrollNarrator() {
   // the floating narrator from covering its instructor, benefits, or pathway copy.
   if (pathname === '/programs/bookkeeping' || !hasNarration) return null;
 
-  return (
-    <div className="fixed bottom-24 left-3 z-[80] sm:bottom-6 sm:left-6">
+  const controls = (
+    <div
+      data-public-video-overlay={videoDock ? undefined : ''}
+      className={videoDock ? 'relative z-[80]' : 'fixed bottom-24 left-3 z-[80] sm:bottom-6 sm:left-6'}
+    >
       <button
         data-page-narrator-control
         type="button"
@@ -349,4 +355,5 @@ export function ScrollNarrator() {
       ) : null}
     </div>
   );
+  return videoDock ? createPortal(controls, videoDock) : controls;
 }

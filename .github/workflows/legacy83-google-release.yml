@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      SOURCE_SHA: 5ff6b33a1bbbcba8cc232a96d62a53befabf40cf
+      SOURCE_SHA: a09cef63802f1b412cd7aaad2a2e54f3072f9a16
       NEXT_PUBLIC_SUPABASE_URL: https://vhulnzcfmlnsmoxixjco.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_lb8-f5trWyOLdTY-ElpX9A_ImDp8eGe
       PROJECT: elegant-racer-299721
@@ -35,8 +35,6 @@ jobs:
         with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - name: Verify automatic container memory policy
-        run: node scripts/check-build-memory-policy.mjs --source-only
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -56,8 +54,8 @@ jobs:
           import {readFileSync,writeFileSync} from 'node:fs';
           import {createHash,privateDecrypt,createDecipheriv,constants} from 'node:crypto';
           const manifest=JSON.parse(readFileSync('.deploy/legacy83-source/manifest.json','utf8'));
-          const expected="5ff6b33a1bbbcba8cc232a96d62a53befabf40cf";
-          if(manifest.sourceSha!==expected || manifest.sha256!=="7cd3f3445246ba7d3bf7a97238dcd9bbc1e5507c80bc2fe2488b6e819f1890cd")throw Error('Unexpected source revision');
+          const expected="a09cef63802f1b412cd7aaad2a2e54f3072f9a16";
+          if(manifest.sourceSha!==expected || manifest.sha256!=="60fd76bd44f7724883b37265d8ae377dec7723b30847e054554805a6df2d9853")throw Error('Unexpected source revision');
           const envelopeText=manifest.chunks.map(name=>{
            if(!/^part-[0-9]{3}[.]txt$/.test(name))throw Error('Invalid encrypted chunk path');
            return readFileSync('.deploy/legacy83-source/'+name,'utf8');
@@ -70,7 +68,7 @@ jobs:
           decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));
           writeFileSync(process.env.SOURCE_ARCHIVE,Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext,'base64')),decipher.final()]),{mode:0o600});
           console.log('Authenticated source revision: '+expected);
-
+          
           NODE
           mkdir "$RUNNER_TEMP/legacy83-source"
           tar -xzf "$SOURCE_ARCHIVE" -C "$RUNNER_TEMP/legacy83-source"
@@ -82,45 +80,15 @@ jobs:
           node --test tests/*.test.mjs
           SUPABASE_SERVICE_ROLE_KEY=build-only-no-live-access npx tsc --noEmit
       - name: Build and upload the isolated customer image
+        working-directory: ${{ runner.temp }}/legacy83-source
         run: |
           set -euo pipefail
-          SOURCE_DIR="$RUNNER_TEMP/legacy83-source"
-          DOCKERFILE="$(node scripts/container-build-policy.mjs legacy83-candidate)"
-          mkdir -p "$SOURCE_DIR/.elevate-build"
-          cp scripts/build-memory-policy.mjs scripts/run-bounded-build.mjs scripts/gcp/prepare-legacy83-config.mjs "$SOURCE_DIR/.elevate-build/"
-          printf '\n!.elevate-build\n!.elevate-build/**\n' >> "$SOURCE_DIR/.dockerignore"
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
           if ! gcloud artifacts docker images describe "$IMAGE" --project="$PROJECT" >/dev/null 2>&1; then
-            docker build -f "$DOCKERFILE" --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" "$SOURCE_DIR"
+            docker build --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" -t "$IMAGE" .
             docker push "$IMAGE"
           fi
-      - name: Inspect available runtime identities and project role bindings
-        run: |
-          gcloud iam service-accounts list --project="$PROJECT" --format='json(email,displayName,disabled)' || true
-          gcloud projects get-iam-policy "$PROJECT" --format=json || true
-          exit 1
-      - name: Deploy the candidate without changing the customer domain
-        run: |
-          set -euo pipefail
-          IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
-          gcloud run deploy "$SERVICE" --project="$PROJECT" --region="$REGION" --image="$IMAGE" \
-            --service-account="legacy83-runtime@$PROJECT.iam.gserviceaccount.com" \
-            --port=8080 --cpu=1 --memory=1Gi --concurrency=20 --min=0 --max=2 --timeout=60 --no-cpu-boost \
-            --set-env-vars="NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY,LEGACY83_REVISION=$SOURCE_SHA" \
-            --allow-unauthenticated --labels=customer=legacy83,managed-by=elevate --quiet
-          URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
-          echo "LEGACY83_CANDIDATE_URL=$URL" >> "$GITHUB_ENV"
-          echo "Legacy 83 candidate: $URL" >> "$GITHUB_STEP_SUMMARY"
-      - name: Verify revision and public page responses
-        run: |
-          node --input-type=module <<'NODE'
-          const base=process.env.LEGACY83_CANDIDATE_URL;
-          const health=await fetch(base+'/api/health').then(r=>r.json());
-          if(health.service!=='legacy83'||health.revision!==process.env.SOURCE_SHA)throw Error('Candidate revision mismatch');
-          for(const path of ['/','/about','/services','/academy','/resources','/contact','/growth-iq','/journal','/events','/schedule-a-call']){
-            const response=await fetch(base+path,{redirect:'manual',signal:AbortSignal.timeout(30000)});
-            console.log(JSON.stringify({path,status:response.status}));
-            if(response.status!==200)throw Error('Public page failed: '+path);
-          }
-          NODE
+      - name: Deploy and verify the isolated Google website host
+        timeout-minutes: 18
+        run: node scripts/gcp/deploy-legacy83-website.mjs

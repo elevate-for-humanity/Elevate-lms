@@ -1,3 +1,5 @@
+import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -24,49 +26,53 @@ async function _GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get('courseId');
 
-    const supabase = await createServerSupabaseClient();
-    if (!supabase) {
-      return NextResponse.json({ error: 'Assignment service unavailable' }, { status: 503 });
-    }
-
-    let query = supabase
-      .from('assignments')
-      .select(
-        `
-        id,
-        title,
-        description,
-        due_date,
-        points_possible,
-        submission_type,
-        courses (
-          id,
-          title
-        ),
-        assignment_submissions!left (
-          id,
-          status,
-          score,
-          submitted_at
-        )
-      `,
-      )
-      .order('due_date', { ascending: true });
-
-    if (courseId) {
-      query = query.eq('course_id', courseId);
-    }
-
-    const { data: assignments, error } = await query;
-
-    if (error) {
-      logger.error('Error fetching assignments', normalizeError(error, 'Failed to fetch assignments'), getErrorContext(error));
-      return NextResponse.json({ error: 'Failed to fetch assignments' }, { status: 500 });
-    }
-
-    return NextResponse.json({ assignments });
+    const db = await requireAdminClient();
+    const courseIds = await loadLearnerCourseIds(db, user.id, true);
+    if (courseId && !courseIds.includes(courseId))
+      return NextResponse.json({ error: 'Course enrollment required.' }, { status: 403 });
+    const allowedIds = courseId ? [courseId] : courseIds;
+    if (!allowedIds.length)
+      return NextResponse.json(
+        { assignments: [] },
+        { headers: { 'Cache-Control': 'private, no-store' } },
+      );
+    const [
+      { data: rows, error: assignmentError },
+      { data: submissions, error: submissionError },
+      { data: courses, error: courseError },
+    ] = await Promise.all([
+      db
+        .from('assignments')
+        .select('id,course_id,title,description,due_date,max_points,submission_type')
+        .in('course_id', allowedIds)
+        .order('due_date'),
+      db
+        .from('assignment_submissions')
+        .select('id,assignment_id,status,grade,submitted_at')
+        .or(`user_id.eq.${user.id},student_id.eq.${user.id}`),
+      db.from('courses').select('id,title').in('id', allowedIds),
+    ]);
+    if (assignmentError) throw assignmentError;
+    if (submissionError) throw submissionError;
+    if (courseError) throw courseError;
+    const assignments = (rows || []).map((row) => ({
+      ...row,
+      points_possible: row.max_points,
+      courses: (courses || []).find((course) => course.id === row.course_id) || null,
+      assignment_submissions: (submissions || [])
+        .filter((submission) => submission.assignment_id === row.id)
+        .map((submission) => ({ ...submission, score: submission.grade })),
+    }));
+    return NextResponse.json(
+      { assignments },
+      { headers: { 'Cache-Control': 'private, no-store' } },
+    );
   } catch (error) {
-    logger.error('Error in GET /api/assignments', normalizeError(error, 'Failed to fetch assignments'), getErrorContext(error));
+    logger.error(
+      'Error in GET /api/assignments',
+      normalizeError(error, 'Failed to fetch assignments'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -113,13 +119,21 @@ async function _POST(request: Request) {
       .maybeSingle();
 
     if (error) {
-      logger.error('Error creating assignment', normalizeError(error, 'Failed to create assignment'), getErrorContext(error));
+      logger.error(
+        'Error creating assignment',
+        normalizeError(error, 'Failed to create assignment'),
+        getErrorContext(error),
+      );
       return NextResponse.json({ error: 'Failed to create assignment' }, { status: 500 });
     }
 
     return NextResponse.json({ assignment }, { status: 201 });
   } catch (error) {
-    logger.error('Error in POST /api/assignments', normalizeError(error, 'Failed to create assignment'), getErrorContext(error));
+    logger.error(
+      'Error in POST /api/assignments',
+      normalizeError(error, 'Failed to create assignment'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

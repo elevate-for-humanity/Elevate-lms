@@ -1,4 +1,6 @@
-import { isAssignedCourseInstructor } from '@/lib/lms/instructor-course-access';
+import { canEditCourse } from '@/lib/authGuards';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { assignmentEvidenceLinks } from '@/lib/lms/assignment-evidence-links';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -23,24 +25,13 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     data: { user },
   } = await supabase.auth.getUser();
 
-
   // Guard against null user
   if (!user) redirect('/login');
-  // Verify instructor role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['admin', 'super_admin', 'staff', 'instructor'].includes(profile.role)) {
-    redirect('/learner/dashboard');
-  }
-
-  if (profile.role === 'instructor' && !(await isAssignedCourseInstructor(supabase, user.id, courseId))) redirect('/unauthorized');
+  if (!(await canEditCourse(courseId))) redirect('/unauthorized');
+  const db = await requireAdminClient();
 
   // Fetch assignment
-  const { data: assignment, error: assignmentError } = await supabase
+  const { data: assignment, error: assignmentError } = await db
     .from('assignments')
     .select('id, title, description, max_points, course_id, due_date')
     .eq('id', assignmentId)
@@ -52,25 +43,29 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   }
 
   // Fetch rubric if linked
-  const { data: rubricLink } = await supabase
+  const { data: rubricLink } = await db
     .from('assignment_rubrics')
     .select('rubric_id, rubrics(*)')
     .eq('assignment_id', assignmentId)
     .maybeSingle();
 
   // Fetch submissions
-  const { data: rawGradeSubmissions } = await supabase
+  const { data: rawGradeSubmissions, error: submissionError } = await db
     .from('assignment_submissions')
-    .select(`id, student_id, user_id, content:submission_text, file_urls:file_paths, submitted_at`)
+    .select('*')
     .eq('assignment_id', assignmentId)
     .order('submitted_at', { ascending: true });
 
+  if (submissionError) throw submissionError;
+
   // Hydrate profiles separately (assignment_submissions has no FK to profiles)
   const gradeStudentIds = [
-    ...new Set((rawGradeSubmissions ?? []).map((s: any) => s.student_id || s.user_id).filter(Boolean)),
+    ...new Set(
+      (rawGradeSubmissions ?? []).map((s: any) => s.student_id || s.user_id).filter(Boolean),
+    ),
   ];
   const { data: gradeStudentProfiles } = gradeStudentIds.length
-    ? await supabase.from('profiles').select('id, full_name, email').in('id', gradeStudentIds)
+    ? await db.from('profiles').select('id, full_name, email').in('id', gradeStudentIds)
     : { data: [] };
   const gradeStudentMap = Object.fromEntries(
     (gradeStudentProfiles ?? []).map((p: any) => [p.id, p]),
@@ -79,36 +74,33 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     ...s,
     student_id: s.student_id || s.user_id,
     profiles: gradeStudentMap[s.student_id || s.user_id] ?? null,
-    is_late: Boolean(assignment.due_date && s.submitted_at && Date.parse(s.submitted_at) > Date.parse(assignment.due_date)),
+    is_late: Boolean(
+      assignment.due_date &&
+      s.submitted_at &&
+      Date.parse(s.submitted_at) > Date.parse(assignment.due_date),
+    ),
   }));
 
-  // Fetch existing grades for these submissions
-  const submissionIds = (submissions || []).map((s: any) => s.id);
-  const { data: existingGrades } =
-    submissionIds.length > 0
-      ? await supabase.from('grades').select('*').in('submission_id', submissionIds)
-      : { data: [] };
-
-  const gradeMap = new Map((existingGrades || []).map((g: any) => [g.submission_id, g]));
-
-  // Transform for SpeedGrader component
-  const formattedSubmissions = (submissions || []).map((s: any) => ({
-    id: s.id,
-    assignmentId,
-    studentId: s.student_id,
-    studentName: s.profiles?.full_name || 'Student',
-    studentEmail: s.profiles?.email || '',
-    submittedAt: s.submitted_at,
-    content: s.content || '',
-    attachments: s.file_urls || [],
-    status: gradeMap.has(s.id)
-      ? ('graded' as const)
-      : s.is_late
-        ? ('late' as const)
-        : ('submitted' as const),
-    isLate: s.is_late || false,
-    existingGrade: gradeMap.get(s.id) || null,
-  }));
+  const formattedSubmissions = await Promise.all(
+    submissions.map(async (s: any) => ({
+      id: s.id,
+      assignmentId,
+      studentId: s.student_id,
+      studentName: s.profiles?.full_name || 'Student',
+      studentEmail: s.profiles?.email || '',
+      submittedAt: s.submitted_at,
+      content: s.submission_text || '',
+      attachments: await assignmentEvidenceLinks(db, s),
+      status:
+        s.grade != null
+          ? ('graded' as const)
+          : s.is_late
+            ? ('late' as const)
+            : ('submitted' as const),
+      isLate: s.is_late,
+      existingGrade: s.grade,
+    })),
+  );
 
   // Transform rubric if present
   const rubric = rubricLink?.rubrics
@@ -124,7 +116,9 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     <>
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+        <Image
+          placeholder="blur"
+          blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/instructor-page-4.webp"
           alt="Instructor portal"
           fill

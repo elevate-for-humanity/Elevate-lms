@@ -1,3 +1,5 @@
+import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
+import { requireAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -39,54 +41,76 @@ export default async function AnalyticsPage() {
     redirect('/login');
   }
 
-  // Fetch enrollments then hydrate course details separately (no FK on course_id)
-  const { data: rawEnrollments } = await supabase
-    .from('program_enrollments')
-    .select('id, status, course_id, progress_percent, completed_lessons, enrolled_at, updated_at')
-    .eq('user_id', user.id);
+  // Assignment tables are server-only. Every read below is scoped to this
+  // authenticated learner or their enrolled course IDs; do not grant public reads.
+  const recordsDb = await requireAdminClient();
 
-  const enrollmentCourseIds = [
-    ...new Set((rawEnrollments || []).map((e) => e.course_id).filter(Boolean)),
-  ];
-  const { data: enrollmentCourses } = enrollmentCourseIds.length
+  // Fetch enrollments then hydrate course details separately (no FK on course_id)
+  const { data: rawEnrollments, error: enrollmentError } = await supabase
+    .from('program_enrollments')
+    .select(
+      'id, status, course_id, program_id, progress_percent, completed_lessons, enrolled_at, updated_at',
+    )
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`);
+
+  if (enrollmentError) throw enrollmentError;
+  const enrollmentCourseIds = await loadLearnerCourseIds(recordsDb, user.id, true);
+  const { data: enrollmentCourses, error: courseError } = enrollmentCourseIds.length
     ? await supabase
         .from('courses')
-        .select('id, title, total_lessons, duration_hours')
+        .select('id, title, program_id, total_lessons, duration_hours')
         .in('id', enrollmentCourseIds)
-    : { data: [] };
-  const enrollmentCourseMap = Object.fromEntries((enrollmentCourses || []).map((c) => [c.id, c]));
-  const enrollments = (rawEnrollments || []).map((e) => ({
-    ...e,
-    courses: enrollmentCourseMap[e.course_id] ?? null,
-  }));
+    : { data: [], error: null };
+  if (courseError) throw courseError;
+  const enrollments = (enrollmentCourses || []).map((course) => {
+    const enrollment = (rawEnrollments || []).find(
+      (row) =>
+        row.course_id === course.id || (row.program_id && row.program_id === course.program_id),
+    );
+    return {
+      ...enrollment,
+      course_id: course.id,
+      status: enrollment?.status || 'assigned',
+      courses: course,
+    };
+  });
 
   // Fetch lesson progress
-  const { data: lessonProgress } = await supabase
-    .from('student_progress')
-    .select('*')
-    .eq('student_id', user.id)
-    .order('updated_at', { ascending: false });
-
-  // Fetch quiz attempts
-  const { data: quizAttempts } = await supabase
-    .from('quiz_attempts')
+  const { data: lessonProgress, error: progressError } = await supabase
+    .from('lesson_progress')
     .select('*')
     .eq('user_id', user.id)
+    .order('updated_at', { ascending: false });
+
+  if (progressError) throw progressError;
+
+  // Fetch quiz attempts
+  const { data: quizAttempts, error: quizError } = await supabase
+    .from('quiz_attempts')
+    .select('*')
+    .eq('user_uuid', user.id)
     .eq('status', 'completed')
     .order('completed_at', { ascending: false });
 
+  if (quizError) throw quizError;
+
   // Fetch assignment submissions
-  const { data: assignments } = await supabase
+  const { data: assignments, error: assignmentError } = await recordsDb
     .from('assignment_submissions')
     .select('*')
-    .eq('student_id', user.id)
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
     .order('submitted_at', { ascending: false });
+
+  if (assignmentError) throw assignmentError;
 
   // Calculate stats
   const stats = {
     totalCourses: enrollments?.length || 0,
     completedCourses: enrollments?.filter((e) => e.status === 'completed').length || 0,
-    activeCourses: enrollments?.filter((e) => e.status === 'active').length || 0,
+    activeCourses:
+      enrollments?.filter((e) =>
+        ['active', 'enrolled', 'in_progress', 'confirmed'].includes(e.status),
+      ).length || 0,
     totalLessons: enrollments?.reduce((sum, e) => sum + (e.courses?.total_lessons || 0), 0) || 0,
     completedLessons: lessonProgress?.filter((p) => p.completed).length || 0,
     totalQuizzes: quizAttempts?.length || 0,
@@ -117,7 +141,9 @@ export default async function AnalyticsPage() {
   const courseProgress =
     enrollments?.map((enrollment) => {
       const totalLessons = enrollment.courses?.total_lessons || 0;
-      const completedLessons = enrollment.completed_lessons || 0;
+      const completedLessons = (lessonProgress || []).filter(
+        (row) => row.course_id === enrollment.course_id && row.completed,
+      ).length;
       const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
       return {
         id: enrollment.course_id,
@@ -135,7 +161,9 @@ export default async function AnalyticsPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Analytics' }]} />
+        <Breadcrumbs
+          items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Analytics' }]}
+        />
       </div>
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}

@@ -1,3 +1,4 @@
+import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -78,24 +79,14 @@ export default async function CalendarPage() {
   }> = [];
 
   try {
-    const { data: enrollments, error: enrollmentError } = await supabase
-      .from('course_enrollments')
-      .select('course_id')
-      .eq('student_id', user.id)
-      .in('status', ['active', 'enrolled', 'in_progress', 'completed']);
-
-    if (enrollmentError) throw enrollmentError;
-
-    const courseIds = [
-      ...new Set((enrollments ?? []).map((row) => row.course_id).filter(Boolean)),
-    ] as string[];
+    const courseIds = await loadLearnerCourseIds(db, user.id, true);
 
     if (courseIds.length > 0) {
       const [
         { data: assignments, error: assignmentsError },
         { data: courses, error: coursesError },
       ] = await Promise.all([
-        supabase
+        db
           .from('assignments')
           .select('id, title, due_date, course_id')
           .in('course_id', courseIds)

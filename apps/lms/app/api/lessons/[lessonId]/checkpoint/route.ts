@@ -13,7 +13,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { recordCheckpointAttempt } from '@/lib/lms/engine';
 import { logger } from '@/lib/logger';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
-import { createClient } from '@/lib/supabase/server';
+import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
 
@@ -25,6 +25,10 @@ type StoredQuizQuestion = {
   prompt?: string;
   question?: string;
   options?: string[];
+  choices?: string[];
+  answerIndex?: number;
+  correct_answer?: number | string | boolean;
+  correct?: number | string | boolean;
   correctAnswer?: number | string | boolean;
 };
 
@@ -33,18 +37,25 @@ function scoreAnswers(questions: StoredQuizQuestion[], answers: Record<string, n
 
   let correct = 0;
   questions.forEach((question, index) => {
-    const questionId = String(question.id ?? index);
-    const selectedIndex = answers[questionId];
+    const questionId = String(question.id || `q-${index + 1}`);
+    const selectedIndex = answers[questionId] ?? answers[String(index)];
     if (!Number.isInteger(selectedIndex)) return;
 
-    const options = Array.isArray(question.options) ? question.options : [];
-    const expected = question.correctAnswer;
+    const options = Array.isArray(question.options)
+      ? question.options
+      : Array.isArray(question.choices)
+        ? question.choices
+        : [];
+    const expected =
+      question.correctAnswer ?? question.correct_answer ?? question.answerIndex ?? question.correct;
     if (typeof expected === 'number') {
       if (selectedIndex === expected) correct += 1;
       return;
     }
     if (typeof expected === 'boolean') {
-      const selected = options[selectedIndex] ?? (selectedIndex === 0 ? 'True' : selectedIndex === 1 ? 'False' : '');
+      const selected =
+        options[selectedIndex] ??
+        (selectedIndex === 0 ? 'True' : selectedIndex === 1 ? 'False' : '');
       if (selected.toLowerCase() === String(expected).toLowerCase()) correct += 1;
       return;
     }
@@ -93,16 +104,13 @@ export async function POST(
     return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
   }
 
-  const supabase = await createClient();
-  const { data: enrollment } = await supabase
-    .from('program_enrollments')
-    .select('id, status')
-    .eq('user_id', user.id)
-    .eq('course_id', courseId)
-    .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
-    .maybeSingle();
-
-  if (!enrollment) {
+  // Match lesson completion: direct course enrollment and program-course grants
+  // use the same user_id OR student_id ownership boundary.
+  const enrollment = await resolveCourseEnrollment(user.id, courseId);
+  if (
+    !enrollment ||
+    !['active', 'enrolled', 'in_progress', 'completed', 'confirmed'].includes(enrollment.status)
+  ) {
     return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
   }
 
@@ -118,7 +126,11 @@ export async function POST(
     if (lessonError || !lesson || !lesson.is_published) {
       return NextResponse.json({ error: 'Published assessment not found' }, { status: 404 });
     }
-    if (!['checkpoint', 'quiz', 'exam'].includes(String(lesson.lesson_type))) {
+    if (
+      !['checkpoint', 'quiz', 'exam', 'lesson', 'reading', 'video'].includes(
+        String(lesson.lesson_type),
+      )
+    ) {
       return NextResponse.json({ error: 'Lesson is not an assessment' }, { status: 400 });
     }
 
@@ -126,13 +138,17 @@ export async function POST(
       ? (lesson.quiz_questions as StoredQuizQuestion[])
       : [];
     if (!questions.length) {
-      return NextResponse.json({ error: 'Assessment questions are not configured' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'Assessment questions are not configured' },
+        { status: 409 },
+      );
     }
 
     const score = scoreAnswers(questions, answers);
-    const passingScore = Number.isFinite(Number(lesson.passing_score))
-      ? Math.max(0, Math.min(100, Number(lesson.passing_score)))
-      : 80;
+    const passingScore =
+      lesson.passing_score != null && Number.isFinite(Number(lesson.passing_score))
+        ? Math.max(0, Math.min(100, Number(lesson.passing_score)))
+        : 80;
 
     const result = await recordCheckpointAttempt(
       user.id,
@@ -164,7 +180,10 @@ export async function POST(
           Score: `${score}% (passing: ${passingScore}%)`,
           Attempt: String(result.attemptNumber),
         },
-      ).then(() => {}, () => {});
+      ).then(
+        () => {},
+        () => {},
+      );
     }
 
     return NextResponse.json(result);

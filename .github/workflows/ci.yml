@@ -43,6 +43,22 @@ jobs:
           tests/unit/student-enrollment-identity.test.ts
           tests/unit/epa-testing-readiness-route.test.ts
           --environment node
+      - name: Apprentice workspace, submissions and server scoring regressions
+        run: >-
+          pnpm exec vitest run
+          tests/unit/apprentice-workspace-data.test.tsx
+          tests/unit/apprentice-checkpoint-enrollment.test.ts
+          tests/unit/apprentice-enrollment-revocation.test.ts
+          tests/unit/apprentice-assignment-submit.test.ts
+          tests/unit/apprentice-admin-grading.test.ts
+          tests/unit/apprentice-admin-gradebook.test.tsx
+          tests/unit/apprentice-speedgrader-save.test.tsx
+          tests/unit/apprentice-lesson-quickcheck.test.tsx
+          tests/unit/manual-theory-clock.test.tsx
+          tests/unit/apprentice-dashboard-data-regression.test.ts
+          tests/unit/apprenticeship/admin-hours.test.ts
+          tests/unit/apprenticeship-portal-navigation-contract.test.ts
+          tests/unit/portal-preview-subject.test.ts
       - name: Required CI completion policy
         run: node --test scripts/test-ci-required-gate.mjs lib/phone/microphone.test.mjs
       - name: Studio GitHub credential fallback regression tests

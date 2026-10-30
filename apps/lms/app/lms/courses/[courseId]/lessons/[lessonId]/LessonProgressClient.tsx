@@ -44,19 +44,13 @@ export default function LessonProgressClient({
     setClockTarget(document.getElementById('theory-timeclock-slot'));
   }, []);
 
-  const isGated = lessonType === 'checkpoint' || lessonType === 'exam';
+  const isGated = ['checkpoint', 'quiz', 'exam'].includes(lessonType);
   const normalized = useMemo(
     () =>
       questions.map((q, index) => ({
         id: q.id || `q-${index + 1}`,
         text: q.question || q.question_text || `Question ${index + 1}`,
         options: Array.isArray(q.options) ? q.options.map(String) : [],
-        correctIndex:
-          typeof q.correctAnswer === 'number'
-            ? q.correctAnswer
-            : typeof q.correct_answer === 'number'
-              ? q.correct_answer
-              : Number(q.correct_answer),
         explanation: q.explanation || '',
       })),
     [questions],
@@ -91,26 +85,19 @@ export default function LessonProgressClient({
     setSaving(true);
     setResult('');
     try {
-      let correct = 0;
-      for (const q of normalized) {
-        if (answers[q.id] === q.correctIndex) correct += 1;
-      }
-      const score = Math.round((correct / normalized.length) * 100);
-
       const response = await fetch(`/api/lessons/${lessonId}/checkpoint`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId,
           moduleOrder,
-          score,
-          passingScore,
           answers,
         }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Assessment could not be recorded.');
 
+      const score = Number(data.score);
       if (!data.passed) {
         setResult(
           `Score: ${score}%. You need ${passingScore}% to pass. Review the lesson and try again.`,
@@ -118,8 +105,10 @@ export default function LessonProgressClient({
         return;
       }
 
-      await markComplete();
-      setResult(`Passed with ${score}%. This checkpoint is complete.`);
+      if (isGated) await markComplete();
+      setResult(
+        `Passed with ${score}%. ${isGated ? 'This assessment is complete.' : 'Quick-check result saved. Finish the lesson before marking it complete.'}`,
+      );
     } catch (error) {
       setResult(error instanceof Error ? error.message : 'Unable to save assessment.');
     } finally {
@@ -149,14 +138,20 @@ export default function LessonProgressClient({
         tabIndex={-1}
         className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
       >
-        {isGated ? (
+        {(isGated || normalized.length > 0) && (
           <>
             <h2 className="text-xl font-extrabold text-slate-950">
-              {lessonType === 'exam' ? 'Final exam' : 'Module checkpoint'}
+              {lessonType === 'exam'
+                ? 'Final exam'
+                : isGated
+                  ? 'Module checkpoint'
+                  : 'Lesson quick check'}
             </h2>
             <p className="mt-2 text-sm font-medium leading-6 text-slate-700">
-              Passing score: {passingScore}%. Your attempt is recorded by the LMS checkpoint engine
-              and controls access to the next module.
+              Passing score: {passingScore}%. Your answers are scored and saved by the LMS server.
+              {isGated
+                ? ' This assessment controls progression.'
+                : ' This quick check supports your lesson review.'}
             </p>
             <div className="mt-6 space-y-6">
               {normalized.map((q, questionIndex) => (
@@ -197,9 +192,10 @@ export default function LessonProgressClient({
               {completed ? 'Completed' : 'Submit assessment'}
             </button>
           </>
-        ) : (
+        )}
+        {!isGated && (
           <>
-            <h2 className="text-xl font-extrabold text-slate-950">Lesson progress</h2>
+            <h2 className="mt-6 text-xl font-extrabold text-slate-950">Lesson progress</h2>
             <p className="mt-2 text-sm font-medium leading-6 text-slate-700">
               Finish the lesson content and video before saving completion. The LMS server enforces
               enrollment, sequencing, and minimum engagement requirements.

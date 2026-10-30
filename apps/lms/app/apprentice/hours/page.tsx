@@ -23,7 +23,12 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function ApprenticeHoursPage() {
+export default async function ApprenticeHoursPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ all?: string }>;
+}) {
+  const showAll = (await searchParams).all === '1';
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,21 +40,25 @@ export default async function ApprenticeHoursPage() {
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   if (!programSlug) redirect('/apprentice');
-  const hoursData = await readHoursPages<any>((from, to) => db
-    .from('hour_entries')
-    .select('id,work_date,hours_claimed,accepted_hours,notes,status,approval_status,source_type,category,created_at')
-    .eq('user_id', subject.userId)
-    .eq('program_slug', programSlug)
-    .order('work_date', { ascending: false }).order('id').range(from, to));
+  const hoursData = await readHoursPages<any>((from, to) =>
+    db
+      .from('hour_entries')
+      .select(
+        'id,work_date,hours_claimed,accepted_hours,notes,status,approval_status,source_type,category,created_at',
+      )
+      .eq('user_id', subject.userId)
+      .eq('program_slug', programSlug)
+      .order('work_date', { ascending: false })
+      .order('id')
+      .range(from, to),
+  );
 
   const allLogs = hoursData || [];
   // Transfer credit is displayed from the verified enrollment fields below.
   // Historical transfer rows remain auditable but are excluded from weekly OJL.
-  const workLogs = allLogs.filter(
-    (log: any) => isOjlEntry(log),
-  );
-  const logs = workLogs.slice(0, 20);
-  const totalHours = workLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
+  const workLogs = allLogs.filter((log: any) => isOjlEntry(log));
+  const logs = showAll ? workLogs : workLogs.slice(0, 20);
+  const totalHours = workLogs.reduce((sum, log: any) => sum + recordedHours(log), 0);
   const approvedHours = workLogs
     .filter((log: any) => ['approved', 'locked'].includes(log.status))
     .reduce((sum, log: any) => sum + recordedHours(log), 0);
@@ -127,8 +136,8 @@ export default async function ApprenticeHoursPage() {
             <h2 className="font-semibold text-slate-900">Apprenticeship Progress</h2>
             <span className="text-sm text-slate-700">
               {requiredHours
-                ? `${creditedHours} / ${requiredHours} credited hours`
-                : `${creditedHours} credited hours`}
+                ? `${creditedHours.toFixed(2)} / ${requiredHours} credited hours`
+                : `${creditedHours.toFixed(2)} credited hours`}
             </span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4 mb-2">
@@ -152,7 +161,7 @@ export default async function ApprenticeHoursPage() {
                 <Clock className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{totalHours}</p>
+                <p className="text-2xl font-bold text-slate-900">{totalHours.toFixed(2)}</p>
                 <p className="text-sm text-slate-700">Total Logged</p>
               </div>
             </div>
@@ -163,7 +172,7 @@ export default async function ApprenticeHoursPage() {
                 <TrendingUp className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{approvedHours}</p>
+                <p className="text-2xl font-bold text-slate-900">{approvedHours.toFixed(2)}</p>
                 <p className="text-sm text-slate-700">Approved</p>
               </div>
             </div>
@@ -175,7 +184,7 @@ export default async function ApprenticeHoursPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {transferHoursVerified ? transferHours : 'Pending'}
+                  {transferHoursVerified ? transferHours.toFixed(2) : 'Pending'}
                 </p>
                 <p className="text-sm text-slate-700">Transfer Hours</p>
               </div>
@@ -188,7 +197,7 @@ export default async function ApprenticeHoursPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {requiredHours ? Math.max(requiredHours - creditedHours, 0) : 'N/A'}
+                  {requiredHours ? Math.max(requiredHours - creditedHours, 0).toFixed(2) : 'N/A'}
                 </p>
                 <p className="text-sm text-slate-700">Remaining</p>
               </div>
@@ -200,21 +209,23 @@ export default async function ApprenticeHoursPage() {
         {logs.length > 0 ? (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="px-6 py-4 border-b bg-white">
-              <h2 className="font-semibold text-slate-900">Recent Entries</h2>
+              <h2 className="font-semibold text-slate-900">
+                {showAll ? 'All Entries' : 'Recent Entries'}
+              </h2>
             </div>
             <div className="divide-y">
               {logs.map((log: any) => (
                 <div key={log.id} className="px-6 py-4 flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-slate-900">
-                      {formatHoursDate(log.work_date)}
-                    </p>
+                    <p className="font-medium text-slate-900">{formatHoursDate(log.work_date)}</p>
                     <p className="text-sm text-slate-700">
                       {log.notes || log.source_type?.toUpperCase() || 'Apprenticeship work'}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-semibold text-slate-900">{log.hours_claimed} hrs</span>
+                    <span className="font-semibold text-slate-900">
+                      {recordedHours(log).toFixed(2)} hrs
+                    </span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
                         ['approved', 'locked'].includes(log.status)
@@ -232,10 +243,10 @@ export default async function ApprenticeHoursPage() {
             </div>
             <div className="px-6 py-4 border-t bg-white">
               <Link
-                href="/apprentice/hours"
+                href={showAll ? '/apprentice/hours' : '/apprentice/hours?all=1'}
                 className="text-brand-blue-600 hover:underline text-sm"
               >
-                View all entries →
+                {showAll ? 'Show recent entries →' : 'View all entries →'}
               </Link>
             </div>
           </div>

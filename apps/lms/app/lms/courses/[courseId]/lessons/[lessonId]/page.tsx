@@ -306,7 +306,7 @@ export default async function LessonPage({
       ? videoConfig.instructor_avatar
       : assignedInstructor.avatar;
   const lessonType = String(lesson.lesson_type ?? 'lesson');
-  const passingScore = Number(lesson.passing_score ?? 70);
+  const passingScore = Number(lesson.passing_score ?? 80);
   const moduleOrder = Number(moduleRow?.order_index ?? 1);
 
   const lessonHeader = (
@@ -504,7 +504,11 @@ export default async function LessonPage({
                 lessonType={lessonType}
                 moduleOrder={moduleOrder}
                 passingScore={passingScore}
-                questions={questions as any[]}
+                questions={questions.map((question: any, index: number) => ({
+                  id: question.id || `q-${index + 1}`,
+                  question: question.question || question.question_text || question.prompt,
+                  options: question.options || question.choices || [],
+                }))}
               />
             </>
           )}

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/production-handlers.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replace('export function','function');
-const createHandlers=new Function('repeatedTeachingSegments','instructionView','instructionalQualityFailures',source+'\nreturn createProductionHandlers;')(()=>0,x=>x,()=>({failures:[]}));
+const createHandlers=new Function('repeatedTeachingSegments','instructionView','instructionalQualityFailures','renderInstructionArtifacts',source+'\nreturn createProductionHandlers;')(()=>0,x=>x,()=>({failures:[]}),artifacts=>structuredClone(artifacts));
 function fixture(canonicalLessonIds){
  const scenes=Array.from({length:8},(_,i)=>({id:'scene-'+i}));
  return {buildId:'build:reference-competency',profile:{sourcePolicy:'frozen-reference-v1',competencies:[{id:'reference-competency',type:'knowledge'}],canonicalLessonIds},artifacts:{

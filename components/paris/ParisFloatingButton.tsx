@@ -1,10 +1,12 @@
 'use client';
 
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import { X, MessageCircle, Mic } from 'lucide-react';
 import type { ParisLearnerContext } from './ParisFloatingWrapper';
 import { PARIS_PORTAL_ISSUE_EVENT, reportPortalWorkflowIssue, type PortalIssueReceipt, type PortalSupportIssue } from '@/lib/paris/portal-support';
+import { useHvacVideoDock } from '@/hooks/useHvacVideoDock';
 
 const ParisChat = lazy(() => import('./ParisChat'));
 
@@ -23,6 +25,7 @@ export function ParisFloatingButton({
   const [issueReceipt, setIssueReceipt] = useState<PortalIssueReceipt | null>(null);
   const reportingSequence = useRef(0);
   const pathname = usePathname();
+  const videoDock = useHvacVideoDock(surface === 'public');
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
@@ -91,6 +94,8 @@ export function ParisFloatingButton({
   if (surface === 'public' && (pathname === '/programs/bookkeeping' || hasEmbeddedParisWorkspace)) {
     return null;
   }
+
+  const renderLauncher = (content: ReactNode) => videoDock ? createPortal(content, videoDock) : content;
 
   return (
     <>
@@ -185,10 +190,11 @@ export function ParisFloatingButton({
         </div>
       )}
 
-      {showWelcome && !isOpen ? (
+      {renderLauncher(showWelcome && !isOpen ? (
         <div
           role="status"
-          className="fixed bottom-[calc(9.25rem+env(safe-area-inset-bottom))] right-3 z-50 w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl md:bottom-24 md:right-6"
+          data-public-video-overlay={surface === 'public' && !videoDock ? '' : undefined}
+          className={`${videoDock ? 'relative w-full' : 'fixed bottom-[calc(9.25rem+env(safe-area-inset-bottom))] right-3 w-[min(22rem,calc(100vw-1.5rem))] md:bottom-24 md:right-6'} z-50 rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl`}
         >
           <div className="flex items-center justify-between gap-3">
             <p className="font-black text-slate-950">Hi, I’m PARIS.</p>
@@ -221,10 +227,11 @@ export function ParisFloatingButton({
             Open PARIS
           </button>
         </div>
-      ) : null}
+      ) : null)}
 
-      {!showWelcome && !isOpen ? (
+      {renderLauncher(!showWelcome && !isOpen ? (
         <button
+          data-public-video-overlay={surface === 'public' && !videoDock ? '' : undefined}
           onClick={() => {
             dismissWelcome();
             open();
@@ -237,7 +244,7 @@ export function ParisFloatingButton({
                 ? 'Open PARIS Portal Assistant'
                 : 'Open PARIS Career Assistant'
           }
-          className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:right-4 sm:px-4 md:bottom-6 md:right-6"
+          className={`${videoDock ? 'relative' : 'fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 sm:right-4 md:bottom-6 md:right-6'} z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:px-4`}
         >
           <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
           <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -249,7 +256,7 @@ export function ParisFloatingButton({
                 : 'Ask PARIS'}
           </span>
         </button>
-      ) : null}
+      ) : null)}
     </>
   );
 }

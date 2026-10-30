@@ -76,12 +76,22 @@ test('HVAC hero plays the complete 96-second film and loops without cropping', a
   await testInfo.attach('hvac-hero-playing', { body: await page.screenshot(), contentType: 'image/png' });
 });
 
-test('install promotion does not cover the on-screen HVAC film or controls', async ({ page }, testInfo) => {
+test('optional assistance and installation do not cover the HVAC film or controls', async ({ page }, testInfo) => {
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   await expect(page.locator(selector)).toBeVisible();
   // Cover the delayed iOS install promotion as well as the initial page load.
   await page.waitForTimeout(12_000);
   await expect(page.locator('[data-pwa-install-banner]')).toHaveCount(0);
+  await expect(page.locator('[data-public-video-overlay]')).toHaveCount(0);
+  const controlsClear = await page.locator(selector).evaluate((element: HTMLVideoElement) => {
+    const rect = element.getBoundingClientRect();
+    const y = Math.min(rect.bottom, innerHeight) - 18;
+    return [rect.left + 24, rect.right - 24].every(x => {
+      const hit = document.elementFromPoint(x, y);
+      return hit === element || (hit !== null && element.contains(hit));
+    });
+  });
+  expect(controlsClear, 'Both ends of the native control bar must receive pointer input').toBe(true);
   await testInfo.attach('hvac-unobstructed-controls', { body: await page.screenshot(), contentType: 'image/png' });
 });
 

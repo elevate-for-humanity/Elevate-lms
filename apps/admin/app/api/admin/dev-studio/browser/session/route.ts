@@ -3,6 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 import { browserConfiguration } from '@/lib/devstudio/browser-configuration';
+import { retryableBrowserSessionRejection } from '@/lib/devstudio/studio-browser-session-start';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -101,7 +102,10 @@ export async function POST(req: NextRequest) {
         upstreamError: typeof payload?.error === 'string' ? payload.error : undefined,
       });
       return NextResponse.json(
-        { error: 'Studio browser session could not be created' },
+        {
+          error: 'Studio browser session could not be created',
+          retryable: retryableBrowserSessionRejection(response.status, payload),
+        },
         { status: response.status >= 400 && response.status < 600 ? response.status : 502 },
       );
     }

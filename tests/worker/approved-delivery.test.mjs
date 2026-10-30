@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {approvedDeliveryFailures,generatedTeachingPhoto,verifiedTeachingPhotoScene,narrationCoverageSeverity} from '../../lib/ultimate-course-builder/instructional/approved-delivery.mjs';
+import {approvedDeliveryFailures,generatedTeachingPhoto,verifiedTeachingPhotoScene,narrationCoverageSeverity,hasTextCardPhotographs} from '../../lib/ultimate-course-builder/instructional/approved-delivery.mjs';
 const sha='a'.repeat(64);
 function fixture(){
  const text='Inspect the clean tools. Separate the used tools. Keep clean equipment protected until the next client.';
@@ -47,12 +47,15 @@ test('generated illustrations preserve OpenAI provenance without pretending to b
  assert.equal(generatedTeachingPhoto({...scene,resolvedProvider:'untrusted'}),false);
 });
 
-test('saved Elevate instructional graphics retain the same strict owned-picture contract',()=>{
+test('saved text cards cannot pass as photographic lesson delivery',()=>{
  const scene={physicalDemonstration:false,resolvedProvider:'elevate-instructional',resolvedModel:'generated-teaching-photograph',
   pictureCues:[1,2].map(index=>({provider:'elevate-instructional',illustration:true,imageUrl:'https://media.example/'+index,
    sha256:String(index).repeat(64),storagePath:'approved-teaching-photos/'+index+'.png'}))};
- assert.equal(generatedTeachingPhoto(scene),true);
- assert.equal(verifiedTeachingPhotoScene(scene),true);
+ assert.equal(generatedTeachingPhoto(scene),false);
+ assert.equal(verifiedTeachingPhotoScene(scene),false);
+ const f=fixture();f.scene.pictureCues=scene.pictureCues;
+ assert.equal(hasTextCardPhotographs(f.render),true);
+ assert.ok(failures(f).includes('APPROVED_PHOTOGRAPHIC_PRESENTATION_REQUIRED'));
  assert.equal(verifiedTeachingPhotoScene({...scene,physicalDemonstration:true}),false);
  assert.equal(verifiedTeachingPhotoScene({...scene,pictureCues:[scene.pictureCues[0],{...scene.pictureCues[1],storagePath:'unapproved/file.png'}]}),false);
 });
@@ -77,4 +80,12 @@ test('mixed generated and licensed illustrations require evidence on every cue',
  for(const patch of [{licenseEvidenceUrl:''},{selectedSourceSha256:'b'.repeat(64)},{selectedSourceAssetId:''},{sampleFraction:NaN},{provider:'untrusted'},{illustration:false},{sha256:'bad'}])
   assert.equal(verifiedTeachingPhotoScene({...scene,pictureCues:[generated,{...licensed,...patch}]}),false);
  assert.equal(verifiedTeachingPhotoScene({...scene,pictureCues:[{...generated,provider:'untrusted'},licensed]}),false);
+});
+
+test('photographic delivery remains reusable while any cached card cue requires refresh',()=>{
+ const f=fixture();
+ assert.equal(hasTextCardPhotographs(f.render),false);
+ f.scene.pictureCues[1].repair={method:'lesson-conceptual-card-v1'};
+ assert.equal(hasTextCardPhotographs(f.render),true);
+ assert.ok(failures(f).includes('APPROVED_PHOTOGRAPHIC_PRESENTATION_REQUIRED'));
 });

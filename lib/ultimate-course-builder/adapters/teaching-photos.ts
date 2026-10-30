@@ -3,7 +3,8 @@ import {courseSelectedStill} from './selected-course-stills.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
-import { conceptualTeachingCard } from './conceptual-teaching-card.mjs';
+import { generateTeachingPhoto } from './google-teaching-photo.mjs';
+import { recoverTeachingPhoto } from './photo-repair.mjs';
 import { createHash } from 'node:crypto';
 import { describeWorkerError, optionalStorageCacheMiss } from '../core/worker-error.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -107,7 +108,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       // Keep content-addressed images while recording a durable cue-to-image
       // index. A resumed worker must reuse the saved asset before paid inference.
       const requestHash=createHash('sha256').update(JSON.stringify({
-        version:'storage-first-photo-cues-v3',lesson:input.lessonId,scene:scene.id,index,prompt,
+        version:'photographic-course-cues-v4',lesson:input.lessonId,scene:scene.id,index,prompt,
       })).digest('hex');
       const legacyRequestHash=createHash('sha256').update(JSON.stringify({
         version:'approved-picture-cues-photos-v2',lesson:input.lessonId,scene:scene.id,index,prompt,
@@ -136,15 +137,19 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
           .update(Buffer.from(await hit.data.arrayBuffer())).digest('hex')};
       }
       if(!saved){
-        // A missing photograph is not a course blocker. Conceptual scenes use
-        // a deterministic, clearly labelled instructional visual. Licensed
-        // photographs and inspected course stills above remain preferred, and
-        // practical scenes still require real observable footage separately.
-        const generated=await conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index,supplemental:true});
-        // Google teaching-photo generation is retired. Preserve saved images,
-        // selected course stills and licensed photographs above; never call a
-        // remote image generator when an asset is missing.
-        if(!generated) throw new Error('COURSE_VISUAL_ASSET_REQUIRED:'+scene.id+':cue='+index);
+        // The cue needs a relevant photograph, not a bespoke teacher portrait
+        // or an exact-match image. Reuse saved/licensed assets first; generate
+        // a course-related photo when the exact request returns no image.
+        // Never replace the requested photographic presentation with text cards.
+        const generated=await recoverTeachingPhoto({
+          primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,
+          generate:generateTeachingPhoto,
+          persistFailure:async detail=>{
+            const proof=await bucket.upload('approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'-provider.json',
+              Buffer.from(JSON.stringify({...detail,recordedAt:new Date().toISOString()})),{contentType:'application/json',upsert:true});
+            if(proof.error)throw new Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);
+          },
+        });
         if(!generated?.bytes || !Buffer.isBuffer(generated.bytes) || !generated.bytes.length)throw new Error('TEACHING_PHOTO_BYTES_REQUIRED');
         const sha256=createHash('sha256').update(generated.bytes).digest('hex');
         if(usedPhotoHashes.has(sha256))throw new Error('COURSE_PHOTO_ALREADY_USED');
@@ -152,7 +157,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(!['image/png','image/jpeg','image/webp'].includes(mimeType))throw new Error('TEACHING_PHOTO_MIME_INVALID');
         const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
         saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256,repair:generated.repair,
-          provider:generated.repair?.method==='lesson-conceptual-card-v1'?'elevate-instructional':generated.provider};
+          provider:generated.provider};
         const uploaded=await bucket.upload(saved.storagePath,generated.bytes,{contentType:mimeType,upsert:false});
         if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
       }
@@ -175,7 +180,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
         stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,
-        provider:saved.provider??(saved.repair?.method==='lesson-conceptual-card-v1'?'elevate-instructional':'google-generated'),repair:saved.repair}))
+        provider:saved.provider??'google-generated',repair:saved.repair}))
         throw new Error('COURSE_PHOTO_ALREADY_USED');
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
      } catch (error) {

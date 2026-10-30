@@ -7,7 +7,7 @@ import {ULTIMATE_BUILD_STEPS,type UltimateBuildStep,type UltimateCredentialProfi
 import type {UltimateRunContext} from '../lib/ultimate-course-builder/core/build-runner';
 import {UltimateReleaseService} from '../lib/ultimate-course-builder/release/release-service';
 import {resolveReleaseActor} from '../lib/ultimate-course-builder/worker/release-actor';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold} from './direct-course-policy.mjs';
 
 // Reuse media tools and release validators, but never invoke the build runner,
 // role dispatcher, automatic repair router, or any queue operation.
@@ -58,6 +58,15 @@ async function main(buildId:string){
  const accepted:string[]=[],blocked:Array<{lesson:string;step:string;reason:string}>=[];
  for(const lesson of inventory.data??[]){
   await assertSource();
+  const canonicalLessonId=profile.canonicalLessonIds?.[lesson.competency_id];
+  if(!canonicalLessonId)throw Error('DIRECT_RELEASE_CANONICAL_ID_REQUIRED');
+  const editorial=await db.from('course_lessons').select('content_json').eq('course_id',build.course_id).eq('id',canonicalLessonId).single();
+  if(editorial.error)throw editorial.error;
+  if(directLessonEditorialHold(editorial.data.content_json)){
+   blocked.push({lesson:lesson.competency_id,step:'learning_objectives',reason:'MANUAL_FILM_SOURCE_REVISION_REQUIRED'});
+   console.log(JSON.stringify({courseId:build.course_id,lessonId:lesson.competency_id,state:'editorial-hold',code:'MANUAL_FILM_SOURCE_REVISION_REQUIRED'}));
+   continue;
+  }
   const saved=await db.from('ultimate_lesson_builds').select('artifacts').eq('id',lesson.id).single();
   if(saved.error)throw saved.error;
   const cachedArtifacts=saved.data.artifacts as UltimateRunContext['artifacts'];
@@ -88,7 +97,7 @@ async function main(buildId:string){
    artifacts[step]=value!;context.passedSteps!.add(step);return true;
   };
   const result=await runDirectLessonPass({steps:ULTIMATE_BUILD_STEPS,reusable,
-   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='lesson_film_render'?{photoGenerationRevision:'photographic-course-cues-v4'}:{}),...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
+   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='lesson_film_render'?{photoGenerationRevision:'photographic-course-cues-v5-capacity-alternate'}:{}),...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
    attempted:async(step:UltimateBuildStep,fingerprint:string)=>{
     const logicalKey=`direct-failure:${lesson.id}:${step}:${fingerprint}`;attempts.set(step,logicalKey);
     const prior=await db.from('ultimate_artifacts').select('id').eq('build_id',build.id).eq('logical_key',logicalKey).maybeSingle();

@@ -128,4 +128,8 @@ test('only the identified superseded photo image can be replaced with the audite
  assert.equal(knownObsoletePhotoExecution(x),true);
  x.spec.template.spec.containers[0].env[0].value='80eb6455d0bfff9178306fcaedc9b88c84390e73';
  assert.equal(knownObsoletePhotoExecution(x),false);
+ x.spec.template.spec.containers[0].image='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:85ac9b7f7b4bdd4760e8032fc03dc5922c26dc6449d4671582a8987c36873ca3';
+ assert.equal(knownObsoletePhotoExecution(x),true);
+ x.spec.template.spec.containers[0].env[0].value='a'.repeat(40);
+ assert.equal(knownObsoletePhotoExecution(x),false);
 });

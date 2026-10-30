@@ -1,4 +1,8 @@
 /** A finite operator-directed pass. This module never requeues or rewinds. */
+export function directLessonEditorialHold(contentJson) {
+  return contentJson?.savedFilmSourceNeedsRevision===true;
+}
+
 export async function runDirectLessonPass({steps, reusable, fingerprint, attempted, execute, validate, save, reject}) {
   const decisions=[];
   for (const step of steps) {

@@ -60,18 +60,18 @@ export function HvacLabHero() {
           <video
             aria-label="Elevate for Humanity HVAC training program introduction"
             data-hvac-hero-video="20261029"
+            src="/videos/hvac-recruitment-20261029.mp4"
             autoPlay
             muted
             loop
             playsInline
             controls
-            preload="metadata"
+            preload="auto"
             poster={`${imageRoot}/lab-overview.webp`}
             width={1080}
             height={1350}
             className="mx-auto block max-h-[75svh] w-full object-contain"
           >
-            <source src="/videos/hvac-recruitment-20261029.mp4" type="video/mp4" />
             Your browser does not support embedded video.{' '}
             <a href="/videos/hvac-recruitment-20261029.mp4">Watch the HVAC program video</a>.
           </video>

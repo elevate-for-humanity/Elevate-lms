@@ -17,7 +17,8 @@ OLD = '6716190e3c4ef88dc9ca08440ba68042d75d063fda0d690033d5f8ff5c222f88'
 PREVIOUS = '175c9ee20ce1f949ff651b6b2b4460fa1827b79c56f772d6447cfa66f2ad8489'
 NATIVE = '57991094fce9d5992573429661eff8e0bb7e865a970f6025b38f6bd02655fade'
 REVIEWED_PREVIOUS = '5632d72f704f20b476a2248187197f5738216468250fcdd08256d88e146b8c4c'
-NEW = 'ba1f4f812ba025449240a51d15c5092ef626447e1b1ad0a97ccf44f661503dea'
+EMPTY_BOOTSTRAP_PREVIOUS = 'ba1f4f812ba025449240a51d15c5092ef626447e1b1ad0a97ccf44f661503dea'
+NEW = 'e26b89d9022df79cbb3b51ef9cfa4f781f09316ce2f8433e99e9ae76c8456f22'
 TARGET = Path('/opt/elevate-pbx/provisioner/server.mjs')
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
 UNIT = 'elevate-pbx-provisioner.service'
@@ -58,7 +59,7 @@ def repair(source, revision):
     for path in [source, TARGET]:
         if path.is_symlink() or not path.is_file() or (path == TARGET and (path.stat().st_uid != EXPECTED_UID or path.stat().st_mode & 0o022)):
             raise ValueError('provisioner_file_ownership_unverified')
-    if digest(source) != NEW or digest(TARGET) not in [OLD, PREVIOUS, NATIVE, REVIEWED_PREVIOUS, NEW]:
+    if digest(source) != NEW or digest(TARGET) not in [OLD, PREVIOUS, NATIVE, REVIEWED_PREVIOUS, EMPTY_BOOTSTRAP_PREVIOUS, NEW]:
         raise ValueError('provisioner_source_requires_review')
     run(['/usr/bin/node', '--check', str(source)])
     records_path = ROOT / 'current' / 'state.json'

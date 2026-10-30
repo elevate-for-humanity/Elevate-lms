@@ -243,6 +243,7 @@ export function createProvisioner(config, dependencies = {}) {
     // Verify actual objects, with a bounded settling period for apply AND rollback.
     for (let attempt = 0; ; attempt++) {
       try {
+        await inspectOperator(next);
         for (const record of next) await inspect(record);
         for (const record of removed) {
           const endpoint = await command(`pjsip show endpoint ${record.endpointId}`);
@@ -254,6 +255,20 @@ export function createProvisioner(config, dependencies = {}) {
           'asterisk_dialplan_unverified', 'asterisk_revocation_unverified'].includes(error.code)) throw error;
         await wait(250);
       }
+    }
+  }
+
+  async function inspectOperator(next) {
+    const plan = await command('dialplan show 0@elevate-pwa-extensions');
+    const admin = next.find(record => record.extension === record.adminExtension);
+    const direct = next.some(record => record.extension === '0');
+    const expected = !direct && admin
+      ? `Gosub(elevate-pwa-extensions,${admin.extension},1)`
+      : 'Set(PWA_CONTACTS=)';
+    if (!plan.includes('elevate-pwa-extensions') || !plan.includes(expected) ||
+        /no such|not exist/i.test(plan) ||
+        (!direct && !admin && (!plan.includes('Set(DIALSTATUS=CHANUNAVAIL)') || !plan.includes('Return()')))) {
+      throw new ProvisioningError('asterisk_dialplan_unverified');
     }
   }
 
@@ -336,8 +351,14 @@ export function createProvisioner(config, dependencies = {}) {
         try { active.push({ ...record, ...await owner(record) }); }
         catch (error) { if (error.code !== 'device_not_authorized') throw error; }
       }
-      if (JSON.stringify(active) !== JSON.stringify(records)) await apply(active);
-      else for (const record of records) await inspect(record);
+      // A fresh or older empty generation still needs the operator subroutine.
+      // Materialize the current renderer once at startup, even with no leases;
+      // an empty record comparison alone cannot detect missing dialplan code.
+      if (!initialized || JSON.stringify(active) !== JSON.stringify(records)) await apply(active);
+      else {
+        await inspectOperator(records);
+        for (const record of records) await inspect(record);
+      }
     });
   }
 

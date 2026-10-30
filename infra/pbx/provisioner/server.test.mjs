@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { createProvisioner, endpointFor, parseContacts, renderConfiguration, validateIdentity } from './server.mjs';
@@ -47,10 +47,20 @@ test('Asterisk 20 clipped AOR columns retain exact-query identity and full conta
   assert.throws(() => parseContacts(`Aor: ${endpoint} 2`, endpoint));
 });
 
-async function fixture(t) {
+async function fixture(t, options = {}) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'elevate-pbx-test-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  if (options.legacyEmpty) {
+    const generation = 'generation-' + 'a'.repeat(24);
+    await mkdir(path.join(root, generation));
+    for (const [name, content] of [['state.json', '[]'], ['pjsip.conf', ''], ['extensions.conf', '[elevate-pwa-extensions]\n']]) {
+      await writeFile(path.join(root, generation, name), content);
+    }
+    await symlink(generation, path.join(root, 'current'));
+  }
   let authorized = true; let contact = false; let reachable = false;
   let rejectedReadbacks = 0; let staleRemovals = 0; let waits = 0;
+  let reloads = 0; let operatorMissing = options.operatorMissing || false;
   let clock = Date.now();
   const config = { token: 'fixture-only-'.repeat(4), phoneSystemId: '55555555-5555-4555-8555-555555555555',
     supabaseKey: 'fixture-only', supabaseUrl: 'https://example.invalid', container: 'fixture',
@@ -66,7 +76,11 @@ async function fixture(t) {
     } }),
     command: async cmd => {
       if (cmd === 'pjsip reload') throw Error('Optional CLI aliases are not installed');
-      if (cmd === 'module reload res_pjsip.so' || cmd === 'dialplan reload') return 'Reloaded';
+      if (cmd === 'module reload res_pjsip.so' || cmd === 'dialplan reload') { reloads++; return 'Reloaded'; }
+      if (cmd.startsWith('dialplan show')) {
+        if (cmd === 'dialplan show 0@elevate-pwa-extensions' && operatorMissing) return 'No such extension';
+        return readFile(path.join(root, 'current','extensions.conf'), 'utf8');
+      }
       const cfg = await readFile(path.join(root, 'current', 'pjsip.conf'), 'utf8').catch(() => '');
       if (!cfg.includes(endpoint)) {
         if (cmd.startsWith('pjsip show endpoint') && staleRemovals-- > 0) return `Endpoint: ${endpoint}/101`;
@@ -76,13 +90,12 @@ async function fixture(t) {
         if (rejectedReadbacks-- > 0) return 'Unable to find object';
         return `Endpoint: ${endpoint}/101\ncontext : elevate-pwa \nauth : ${endpoint}-auth \naors : ${endpoint} \nmedia_encryption : dtls \n`;
       }
-      if (cmd.startsWith('dialplan show')) return readFile(path.join(root, 'current','extensions.conf'), 'utf8');
       return `Aor: ${endpoint} 1\n${contact ? `Contact: ${endpoint}/sip:fixture hash ${reachable ? 'Avail' : 'Unavail'} 1.0` : ''}`;
     },
   });
   await service.initialize();
   await new Promise(resolve => service.server.listen(0, '127.0.0.1', resolve));
-  t.after(async () => { service.server.closeAllConnections(); await new Promise(resolve => service.server.close(resolve)); await rm(root,{recursive:true,force:true}); });
+  t.after(async () => { service.server.closeAllConnections(); await new Promise(resolve => service.server.close(resolve)); });
   const request = async (action = '', auth = true, body = identity) => {
     const response = await fetch(`http://127.0.0.1:${service.server.address().port}/internal/pbx/devices${action}`, {
       method: 'POST', headers: { 'content-type': 'application/json', ...(auth ? { authorization: `Bearer ${config.token}` } : {}) }, body: JSON.stringify(body),
@@ -90,8 +103,28 @@ async function fixture(t) {
     return { status: response.status, body: await response.json() };
   };
   return { request, service, root, deny: () => authorized = false, contacts: (a,b) => {contact=a;reachable=b;},
+    reloads: () => reloads, loseOperator: () => operatorMissing = true,
     reject: (count = 12) => rejectedReadbacks = count, delayRemoval: count => staleRemovals = count, waits: () => waits, expire: () => clock += 700000 };
 }
+
+for (const legacyEmpty of [false, true]) {
+  test(`startup materializes and verifies operator routing with ${legacyEmpty ? 'legacy' : 'new'} empty state`, async t => {
+    const f = await fixture(t, { legacyEmpty });
+    const plan = await readFile(path.join(f.root, 'current', 'extensions.conf'), 'utf8');
+    assert.match(plan, /exten => 0,1,Set\(PWA_CONTACTS=\)/);
+    assert.match(plan, /Set\(DIALSTATUS=CHANUNAVAIL\)/);
+    const generation = await readlink(path.join(f.root, 'current'));
+    const reloads = f.reloads();
+    await f.service.reconcile();
+    assert.equal(await readlink(path.join(f.root, 'current')), generation);
+    assert.equal(f.reloads(), reloads, 'healthy reconciliation must not reload Asterisk');
+    f.loseOperator();
+    await assert.rejects(f.service.reconcile(), /asterisk_dialplan_unverified/);
+  });
+}
+test('startup refuses a listener when Asterisk never loads the operator route', async t => {
+  await assert.rejects(fixture(t, { operatorMissing: true }), /asterisk_rollback_failed|asterisk_dialplan_unverified/);
+});
 test('requires control-plane auth and independently verified Supabase ownership', async t => {
   const f = await fixture(t);
   assert.equal((await f.request('',false)).status,401);

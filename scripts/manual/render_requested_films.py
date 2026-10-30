@@ -17,5 +17,9 @@ def selected_lessons(value,request):
 if __name__=='__main__':
     root=Path(__file__).parent
     request=json.loads((root/'film-request.json').read_text())
+    if os.environ['LESSON_ID']=='sources-request':
+        if request.get('mode')!='prepare-source-frames':raise ValueError('MANUAL_REQUEST_MODE_INVALID')
+        subprocess.run([sys.executable,str(root/'prepare_source_frames.py')],env={**os.environ,'MANUAL_SOURCE_IDS':json.dumps(request.get('sourceVideoIds',[]))},check=True)
+        sys.exit(0)
     for lesson in selected_lessons(os.environ['LESSON_ID'],request):
         subprocess.run([sys.executable,str(root/'render_saved_lesson.py')],env={**os.environ,'LESSON_ID':lesson,'MANUAL_REVIEW_ONLY':'true' if os.environ['LESSON_ID']=='review-request' else 'false','MANUAL_VERIFY_UPLOADED':'true' if os.environ['LESSON_ID']=='verify-request' else 'false'},check=True)

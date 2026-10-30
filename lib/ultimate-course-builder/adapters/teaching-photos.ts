@@ -157,7 +157,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(!['image/png','image/jpeg','image/webp'].includes(mimeType))throw new Error('TEACHING_PHOTO_MIME_INVALID');
         const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
         saved={storagePath:'approved-teaching-photos/'+sha256+'.'+extension,sha256,repair:generated.repair,
-          provider:generated.provider};
+          provider:generated.provider,model:generated.model};
         const uploaded=await bucket.upload(saved.storagePath,generated.bytes,{contentType:mimeType,upsert:false});
         if(uploaded.error&&!/already exists|duplicate/i.test(uploaded.error.message))throw uploaded.error;
       }
@@ -180,7 +180,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,
         stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex,illustration:true,
-        provider:saved.provider??'google-generated',repair:saved.repair}))
+        provider:saved.provider??'google-generated',model:saved.model,repair:saved.repair}))
         throw new Error('COURSE_PHOTO_ALREADY_USED');
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
      } catch (error) {

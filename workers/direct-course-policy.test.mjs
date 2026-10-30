@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence} from './direct-course-policy.mjs';
+import {runDirectLessonPass,directCourseComplete,runDirectCourseSequence,directFailureEvidence,directLessonEditorialHold} from './direct-course-policy.mjs';
+test('a specific saved-film source correction holds delivery without treating all drafts as held',()=>{
+ assert.equal(directLessonEditorialHold({savedFilmSourceNeedsRevision:true}),true);
+ assert.equal(directLessonEditorialHold({instructionReviewRequired:true}),false);
+ assert.equal(directLessonEditorialHold({savedFilmSourceNeedsRevision:false}),false);
+ assert.equal(directLessonEditorialHold(null),false);
+});
 function harness(overrides={}) {
  const calls=[],saved=new Map([['script','original-script'],['narration','original-audio']]);
  return {calls,saved,input:{steps:['script','narration','render','qa','publish'],

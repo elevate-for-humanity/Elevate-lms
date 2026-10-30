@@ -125,7 +125,9 @@ jobs:
       - name: Canonical platform route and auth doctor
         run: node scripts/platform-doctor-static.mjs
       - name: Canonical portal contracts
-        run: node scripts/audit-portal-contracts.mjs
+        run: |
+          node --test scripts/portal-audit-detections.test.mjs
+          node scripts/audit-portal-contracts.mjs
       - name: Portal/database schema drift — live production contract
         if: github.event_name != 'pull_request'
         run: pnpm exec tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift

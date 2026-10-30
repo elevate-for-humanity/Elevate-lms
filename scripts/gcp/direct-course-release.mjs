@@ -31,8 +31,12 @@ export function knownObsoletePhotoExecution(execution) {
  const source=container?.env?.find(entry=>entry.name==='DIRECT_RELEASE_SOURCE_SHA')?.value;
  // This exact intermediate image restores photographs but lacks the inspected
  // JPEG reader and still uses the capacity-constrained US image endpoint.
- const superseded=source==='79dc886bd59385d2f42069fe22c216211d8f00b9' &&
-  container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@sha256:b131064b00050f336357b40ffaab88362d9d90932c8ebadb18cd75461a830bb8` &&
+ const obsoleteDigests={
+  '79dc886bd59385d2f42069fe22c216211d8f00b9':'b131064b00050f336357b40ffaab88362d9d90932c8ebadb18cd75461a830bb8',
+  '80eb6455d0bfff9178306fcaedc9b88c84390e73':'85ac9b7f7b4bdd4760e8032fc03dc5922c26dc6449d4671582a8987c36873ca3',
+ };
+ const superseded=Boolean(obsoleteDigests[source]) &&
+  container?.image===`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker@sha256:${obsoleteDigests[source]}` &&
   new RegExp('^'+NAME+'-[a-z0-9]+$').test(execution?.metadata?.name??'');
  if(superseded)return activeExecution(execution);
  return execution?.metadata?.name===OBSOLETE_PHOTO_EXECUTION && activeExecution(execution) &&

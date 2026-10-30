@@ -70,6 +70,17 @@ function existsRoute(app, target, api = false) {
   return (api ? apiIndex[app] : routeIndex[app]).some((entry) => pattern(entry.route).test(pathname));
 }
 
+function existsPortalAction(app, target) {
+  if (existsRoute(app, target)) return true;
+  const pathname = normalizeDynamicTarget(target.split(/[?#]/)[0] || '/');
+  // Download links can terminate at a Next route handler instead of a page.
+  // Require an actual GET export: a POST-only endpoint cannot serve a link.
+  return apiIndex[app].some(entry =>
+    pattern(entry.route).test(pathname) &&
+    /\bexport\s+(?:(?:async\s+)?function\s+GET\s*\(|const\s+GET\s*=)/.test(readFileSync(entry.file, 'utf8')),
+  );
+}
+
 function hasBalancedInterpolation(ref) {
   let depth = 0;
   for (let i = 0; i < ref.length; i++) {
@@ -110,7 +121,7 @@ for (const [app, name, prefix] of PORTALS) {
         continue;
       }
       if (target === prefix || target.startsWith(prefix + '/')) {
-        if (!existsRoute(app, target, false)) fail(`${relative(ROOT,file)} → missing portal route ${target} on ${app}`);
+        if (!existsPortalAction(app, target)) fail(`${relative(ROOT,file)} → missing portal route ${target} on ${app}`);
         checked++;
       }
     }

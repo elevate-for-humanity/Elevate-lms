@@ -16,7 +16,13 @@ export async function preflightWebRollout({service,cpu,memory,region='us-central
   cpu=cpuMatch?String(Number(cpuMatch[1])/(cpuMatch[2]?1000:1)):'';
   if(!/^[1-4]$/.test(cpu)||!['2Gi','4Gi','8Gi'].includes(memory))throw Error('Approved web candidate allocation required');
   const result=await inspect({region,run,task:{containers:[{resources:{limits:{cpu:String(cpu),memory}}}]},taskCount:1});
-  if(result.fits!==true)throw Error('WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE');
+  if(result.fits!==true) {
+    const error=Error('WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE');
+    error.code='WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE';
+    // Keep the allocation receipt, never the service spec or its environment.
+    error.diagnostic={service,region,candidate:{cpu:String(cpu),memory},capacity:result};
+    throw error;
+  }
   const after=read();
   if(before.status?.latestCreatedRevisionName!==after.status?.latestCreatedRevisionName||JSON.stringify(before.status?.traffic)!==JSON.stringify(after.status?.traffic))
     throw Error('Concurrent web release; repeat capacity preflight');
@@ -24,5 +30,5 @@ export async function preflightWebRollout({service,cpu,memory,region='us-central
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   preflightWebRollout({service:process.env.CANDIDATE_SERVICE,cpu:process.env.CANDIDATE_CPU,memory:process.env.CANDIDATE_MEMORY})
-    .then(result=>console.log(JSON.stringify(result))).catch(error=>{console.error(JSON.stringify({error:error.code||error.message}));process.exitCode=1;});
+    .then(result=>console.log(JSON.stringify(result))).catch(error=>{console.error(JSON.stringify({error:error.code||error.message,diagnostic:error.diagnostic}));process.exitCode=1;});
 }

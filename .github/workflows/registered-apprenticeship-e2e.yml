@@ -56,6 +56,10 @@ permissions:
 jobs:
   hvac-public-playback:
     if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [desktop-chrome, tablet-chrome, iphone-webkit, android-chrome]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
@@ -72,12 +76,12 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
       - run: pnpm exec playwright install chromium webkit --with-deps
       - name: Verify public HVAC film on desktop, tablet, iPhone and Android
-        run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --output=test-results/hvac-hero --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --reporter=line,html --output=test-results/hvac-hero --project=${{ matrix.device }}
       - name: Preserve playback samples, screenshots and browser report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hvac-hero-playback-${{ github.run_id }}
+          name: hvac-hero-playback-${{ github.run_id }}-${{ matrix.device }}
           path: |
             test-results/hvac-hero/
             playwright-report/

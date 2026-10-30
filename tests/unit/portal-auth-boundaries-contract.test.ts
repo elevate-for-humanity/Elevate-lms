@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { WORKFORCE_ACCESS_ROLES } from '@/lib/workforce/records';
+import { hasAnyRole, normalizeRoles } from '@/lib/rbac/role-matrix';
 
 const root = process.cwd();
 const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
@@ -16,7 +18,7 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
   },
   {
     path: 'apps/lms/app/workforce/layout.tsx',
-    required: ['requireRole([', "'workforce'", "'case_manager'"],
+    required: ['await requireRole(WORKFORCE_ACCESS_ROLES)', "from '@/lib/workforce/records'"],
   },
   {
     path: 'apps/lms/app/apprentice/layout.tsx',
@@ -67,6 +69,14 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
 ];
 
 describe('portal authorization boundaries', () => {
+  it('preserves canonical workforce and case-manager access without admitting learner or employer roles', () => {
+    for (const role of ['workforce', 'workforce_partner', 'case_manager', 'admin', 'staff']) {
+      expect(hasAnyRole(normalizeRoles([role]), WORKFORCE_ACCESS_ROLES), role).toBe(true);
+    }
+    for (const role of ['student', 'learner', 'employer', 'host_shop']) {
+      expect(hasAnyRole(normalizeRoles([role]), WORKFORCE_ACCESS_ROLES), role).toBe(false);
+    }
+  });
   for (const portal of guardedPortals) {
     it(`${portal.path} enforces a server-side authorization boundary`, () => {
       const source = read(portal.path);

@@ -35,15 +35,27 @@ test('HVAC hero plays the complete 96-second film and loops without cropping', a
   const samples: Array<{ time: number; elapsedMs: number; paused: boolean; error: number }> = [];
   const started = Date.now();
   let reachedEnd = false;
-  await expect.poll(async () => {
-    const sample = await video.evaluate((element: HTMLVideoElement) => ({ time: element.currentTime, paused: element.paused, error: element.error?.code ?? 0 }));
-    samples.push({ ...sample, elapsedMs: Date.now() - started });
-    if (sample.time >= 95) reachedEnd = true;
-    return reachedEnd && sample.time < 3;
-  }, { timeout: 110_000, intervals: [250], message: 'The real film must play through its final second and loop' }).toBe(true);
-  expect(samples.every(sample => sample.error === 0 && !sample.paused)).toBe(true);
-  expect(Date.now() - started).toBeGreaterThanOrEqual(94_000);
-  await testInfo.attach('hvac-full-playback', { body: JSON.stringify({ url: page.url(), project: testInfo.project.name, initial, samples }), contentType: 'application/json' });
+  let looped = false;
+  try {
+    while (Date.now() - started < 110_000) {
+      const sample = await video.evaluate((element: HTMLVideoElement) => ({
+        time: element.currentTime, paused: element.paused, error: element.error?.code ?? 0,
+        readyState: element.readyState, networkState: element.networkState, muted: element.muted,
+        seeking: element.seeking, visibility: document.visibilityState,
+        installBannerVisible: Boolean(document.querySelector('[data-pwa-install-banner]')),
+      }));
+      samples.push({ ...sample, elapsedMs: Date.now() - started });
+      expect(sample.error, JSON.stringify(sample)).toBe(0);
+      expect(sample.paused, JSON.stringify(sample)).toBe(false);
+      if (sample.time >= 95) reachedEnd = true;
+      if (reachedEnd && sample.time < 3) { looped = true; break; }
+      await page.waitForTimeout(250);
+    }
+    expect(looped, 'The real film must play through its final second and loop').toBe(true);
+    expect(Date.now() - started).toBeGreaterThanOrEqual(94_000);
+  } finally {
+    await testInfo.attach('hvac-full-playback', { body: JSON.stringify({ url: page.url(), project: testInfo.project.name, initial, samples }), contentType: 'application/json' });
+  }
   await testInfo.attach('hvac-hero-playing', { body: await page.screenshot(), contentType: 'image/png' });
 });
 

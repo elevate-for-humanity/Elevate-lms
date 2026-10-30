@@ -47,3 +47,12 @@ jobs:
                 print(json.dumps({'region':region,'service':row}))
           PY
           gcloud secrets list --project=elegant-racer-299721 --format='value(name)' | grep -Ei 'legacy|github|icy' || true
+      - name: Check existing GitHub credential access to the standalone source
+        shell: bash
+        run: |
+          set -euo pipefail
+          token="$(gcloud secrets versions access latest --secret=elevate-admin-github-token --project=elegant-racer-299721)"
+          test -n "$token"
+          echo "::add-mask::$token"
+          GH_TOKEN="$token" gh api repos/elevate-for-humanity/legacy83-unified-platform --jq '{name:.full_name,defaultBranch:.default_branch,push:.permissions.push}'
+          GH_TOKEN="$token" gh api repos/elevate-for-humanity/legacy83-unified-platform/commits/main --jq '{sha:.sha}'

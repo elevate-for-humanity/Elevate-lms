@@ -15,8 +15,11 @@ def photo(term):
 for image in PLAN['images']:
     p=ROOT/(image['id']+'.jpg')
     if not p.exists():
-        req=urllib.request.Request(image['url'],headers={'User-Agent':'Mozilla/5.0'})
-        with urllib.request.urlopen(req,timeout=30) as response: data=response.read()
+        if image['url'].startswith('data:image/jpeg;base64,'):
+            data=base64.b64decode(image['url'].split(',',1)[1],validate=True)
+        else:
+            req=urllib.request.Request(image['url'],headers={'User-Agent':'Mozilla/5.0'})
+            with urllib.request.urlopen(req,timeout=30) as response: data=response.read()
         if hashlib.sha256(data).hexdigest()!=image['sha256']:raise RuntimeError('SAVED_PHOTO_HASH_CHANGED:'+image['id'])
         p.write_bytes(data)
     if hashlib.sha256(p.read_bytes()).hexdigest()!=image['sha256']:raise RuntimeError('LOCAL_PHOTO_HASH_CHANGED')

@@ -4,6 +4,9 @@ spec=importlib.util.spec_from_file_location('manual',ROOT/'scripts/manual/render
 manual=importlib.util.module_from_spec(spec);spec.loader.exec_module(manual)
 
 class ReviewedSourceTests(unittest.TestCase):
+    def test_scope_allows_only_the_three_authorized_courses(self):
+        for course in ['e9a2547c-ae03-418e-97fc-51377d438f8c','580f7eeb-aa36-4b2a-8526-bbfa6899bb14','d48c61c4-8880-4d9d-9ab5-fab4dd51b201']:self.assertEqual(manual.course_scope({'course_id':course}),course)
+        with self.assertRaisesRegex(RuntimeError,'SCOPE_INVALID'):manual.course_scope({'course_id':'another-course'})
     def row(self):
         return {'content_json':{'experience':{'readingGuide':{'sections':[{'heading':'Review','body':'Saved instruction.'}]}},'manualMediaDraft':{'mode':'manually-reviewed-source-and-photo-selections','sourceTranscriptSha256':hashlib.sha256(b'Review. Saved instruction.').hexdigest(),'photoGroups':[['photo-a','photo-b']],'noAutomaticPublication':True,'reviewRequiredAfterEncoding':True}}}
     def test_exact_reviewed_source(self):

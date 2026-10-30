@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       lesson_id:
-        description: Exact Business lesson UUID, or saved-request for the explicitly selected request file
+        description: Exact authorized lesson UUID, or saved-request for the explicitly selected request file
         required: true
         type: string
 

@@ -1,1 +1,7 @@
-{"mode": "refresh-review-previews", "lessonIds": ["7f10eb1e-940d-4970-8dd5-8310dad6b321", "8a6e7ec1-d084-48a3-b146-5f80d0fa688b"]}
+{
+  "mode": "encode-review-candidate",
+  "lessonIds": [
+    "1daf5923-8ac2-4622-853d-e15fa6f661d8",
+    "f1d32b7f-7cd4-44c4-9858-6b756ef21b89"
+  ]
+}

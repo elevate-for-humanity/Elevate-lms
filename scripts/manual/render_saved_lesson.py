@@ -3,10 +3,14 @@ import base64, hashlib, json, os, re, subprocess, sys, tempfile, urllib.request,
 from pathlib import Path
 
 PROJECT='https://cuxzzpsyufcewtmicszk.supabase.co'
-COURSE='e9a2547c-ae03-418e-97fc-51377d438f8c'
+COURSES={'e9a2547c-ae03-418e-97fc-51377d438f8c','580f7eeb-aa36-4b2a-8526-bbfa6899bb14','d48c61c4-8880-4d9d-9ab5-fab4dd51b201'}
 BUCKET='elevate-course-media'
 
 def digest(data): return hashlib.sha256(data).hexdigest()
+
+def course_scope(row):
+    if row.get('course_id') not in COURSES:raise RuntimeError('MANUAL_COURSE_SCOPE_INVALID')
+    return row['course_id']
 
 def request(url, data=None, headers=None, method=None):
     req=urllib.request.Request(url,data=None if data is None else json.dumps(data).encode(),headers=headers or {},method=method)
@@ -37,16 +41,21 @@ def main():
     service=os.environ['SUPABASE_SERVICE_ROLE_KEY']
     headers={'apikey':service,'Authorization':'Bearer '+service,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates,return=representation'}
     def db(path,data=None,method=None): return request(PROJECT+'/rest/v1/'+path,data,headers,method)
-    rows=db('course_lessons?select=id,course_id,title,content_json&id=eq.'+lesson+'&course_id=eq.'+COURSE)
+    rows=db('course_lessons?select=id,course_id,title,content_json&id=eq.'+lesson)
     if len(rows)!=1: raise RuntimeError('MANUAL_LESSON_NOT_FOUND')
-    row=rows[0]; sections,groups,text=canonical_source(row)
+    row=rows[0];COURSE=course_scope(row);sections,groups,text=canonical_source(row)
     photos=db('course_visual_assets?select=id,asset_url,alt_text,metadata&course_id=eq.'+COURSE+'&metadata->>manualCatalogue=eq.true')
     lookup={p['id']:p for p in photos}; images=[]
     for photo_id in sorted({i for g in groups for i in g}):
         p=lookup[photo_id]; m=p['metadata']; url=p['asset_url']
         if m.get('license_observed') is not True or not m.get('entitlement_id') or not m.get('manualReviewedDerivative',{}).get('sha256'):
             raise RuntimeError('MANUAL_PHOTO_REVIEW_REQUIRED')
-        if not url.startswith('https://elements-resized.envatousercontent.com/'):
+        if url.startswith('data:image/jpeg;base64,'):
+            if not m.get('sourceVideoId') or not m.get('sourceSha256') or not m.get('frameStoragePath','').startswith('course-videos/manual-source-frames/'+COURSE+'/'):
+                raise RuntimeError('MANUAL_PHOTO_PROVENANCE_INVALID')
+            actual=base64.b64decode(url.split(',',1)[1],validate=True)
+            if len(actual)>2*1024*1024 or digest(actual)!=m['manualReviewedDerivative']['sha256']:raise RuntimeError('MANUAL_PHOTO_HASH_MISMATCH')
+        elif not url.startswith('https://elements-resized.envatousercontent.com/'):
             raise RuntimeError('MANUAL_PHOTO_ORIGIN_INVALID')
         images.append({'id':p['id'],'title':p['id'],'sourceTitle':p['alt_text'],'url':url,'sha256':m['manualReviewedDerivative']['sha256'],'entitlementId':m['entitlement_id']})
     # Read only the existing authorized runtime key family; never print credentials.

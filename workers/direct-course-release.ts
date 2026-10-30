@@ -88,7 +88,7 @@ async function main(buildId:string){
    artifacts[step]=value!;context.passedSteps!.add(step);return true;
   };
   const result=await runDirectLessonPass({steps:ULTIMATE_BUILD_STEPS,reusable,
-   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision}),
+   fingerprint:async(step:UltimateBuildStep)=>contractHash({input:stepInputHash(step,profile,artifacts),engineRevision,...(step==='learning_objectives'&&['a21cd441-9809-4b22-889e-880948e902b6','c80f470b-8250-4c0c-b866-7c2035813aed'].includes(lesson.competency_id)?{repairRevision:'hvac-nontechnical-safety-context-v1'}:{})}),
    attempted:async(step:UltimateBuildStep,fingerprint:string)=>{
     const logicalKey=`direct-failure:${lesson.id}:${step}:${fingerprint}`;attempts.set(step,logicalKey);
     const prior=await db.from('ultimate_artifacts').select('id').eq('build_id',build.id).eq('logical_key',logicalKey).maybeSingle();

@@ -52,6 +52,13 @@ export function assertHvacSafetyBlueprint(
   competency: UltimateCompetency,
 ) {
   if (!isHvacProfile(profile)) return;
+  // A course can also contain employability and external CPR instruction.
+  // Generic "service" and medical "recovery" do not make those lessons
+  // refrigerant/electrical procedures. Their domain safety gates still apply.
+  const subject = `${competency.title} ${competency.description ?? ''}`;
+  const nontechnical = /\b(?:customer service|job readiness|program completion|first aid|cpr|external skills verification)\b/i.test(subject);
+  const technical = /\b(?:refrigerant|electrical|voltage|cylinder|brazing|wiring|charging|recovery equipment)\b/i.test(subject);
+  if (nontechnical && !technical && competency.criticalSafetyCompetency !== true) return;
   const segments = Array.isArray(blueprint?.segments) ? blueprint.segments : [];
   const lessonText = `${competency.title} ${competency.description ?? ''} ${segments.map(segment => segment.text).join(' ')}`;
   if (!/recover|refrigerant|electrical|voltage|pressure|cylinder|service|procedure/i.test(lessonText)) return;

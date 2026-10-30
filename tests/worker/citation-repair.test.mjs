@@ -72,3 +72,20 @@ test('HVAC authoring repairs the missing warning before returning a blueprint',a
  assert.match(repair.instructions,/source-grounded safety_warning segment/);
  assert.equal(output.segments[0].sceneType,'safety_warning');
 });
+
+test('HVAC customer service and CPR do not require unrelated refrigerant warnings',()=>{
+ const profile={id:'course:hvac',title:'EPA 608 Training',authority:'course-defined'};
+ for(const title of ['Customer Service, Job Readiness and Program Completion','First Aid, CPR and External Skills Verification']) {
+  const competency={title,description:'Complete the existing authorized source topics. Preserve external examinations and trainer practical signoff.'};
+  const blueprint={segments:[{text:'Customer service and recovery position checks belong to their authorized training.'}]};
+  assert.doesNotThrow(()=>assertHvacSafetyBlueprint(blueprint,profile,competency));
+ }
+});
+test('technical and critical safety lessons retain the complete HVAC warning requirement',()=>{
+ const profile={id:'course:hvac',title:'EPA 608 Training',authority:'course-defined'};
+ for(const competency of [
+  {title:'Customer Service for Refrigerant Charging',description:'Apply refrigerant recovery procedures.'},
+  {title:'First Aid',description:'',criticalSafetyCompetency:true},
+  {title:'Electrical Fundamentals, Wiring and Diagnostic Instruments',description:''}
+ ])assert.throws(()=>assertHvacSafetyBlueprint({segments:[{text:'Refrigerant recovery procedures.'}]},profile,competency),/BLUEPRINT_HVAC_SAFETY_WARNING_REQUIRED/);
+});

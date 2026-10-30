@@ -1,22 +1,10 @@
 {
-  "mode": "encode-review-candidate",
-  "courseGroup": "hvac",
+  "mode": "refresh-review-previews",
   "lessonIds": [
-    "f1d32b7f-7cd4-44c4-9858-6b756ef21b89",
-    "a80053bb-03c2-4533-a3b8-60c3b92ceaeb",
-    "5d54f2f0-08f3-4fd8-bdce-a222c76fa44a",
-    "ec20b538-40f3-4779-bb2c-bc4777f5e406",
-    "9fc1e9bc-707e-4b3f-95a1-d3f727d1fce1",
-    "e82b52ba-45a0-4ed4-ac58-335284ddb695",
-    "8ac047d1-e197-42da-859b-d62183a1fed0",
-    "71f4a5cb-677e-49b2-bec1-a690ab9f20c6",
-    "42564382-7bf8-424e-8560-68b5b0a7897a",
-    "72104275-969b-4973-b237-8808adbae2a8",
-    "8be12981-5829-487b-8769-90a8a479d1b0",
-    "f0e124f0-b7b7-4caf-aed0-5d99ae00c40b",
-    "a605aae6-9e8f-48aa-bd47-d686059f2a9f",
-    "ce2dcadf-0647-4364-a39d-6cdefafb5b96",
-    "c80f470b-8250-4c0c-b866-7c2035813aed",
-    "a21cd441-9809-4b22-889e-880948e902b6"
+    "ccf5b8d1-5397-4906-b6e6-62167f465949",
+    "66b4131d-9d9c-4372-af02-703f3586400d",
+    "893795bb-6ce1-4113-b571-b63601c9073f",
+    "88536201-b8ad-476b-8158-a9cf806c45ac",
+    "db1d3261-ae36-4899-aa34-372f0e11c827"
   ]
 }

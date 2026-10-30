@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: manual-reviewed-film-${{ inputs.lesson_id }}
@@ -28,11 +29,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Install film encoding tools
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg fonts-dejavu-core
-          python -m pip install boto3==1.40.61 Pillow==12.0.0
+          python -m pip install boto3==1.40.61 Pillow==12.0.0 'google-auth[requests]==2.43.0'
       - name: Validate manual encoder contracts
         run: python -m unittest discover -s tests/manual -p 'test_*.py'
       - name: Encode saved instruction and photographs for review

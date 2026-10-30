@@ -13,7 +13,11 @@ def request(url, data=None, headers=None):
     try:
         with urllib.request.urlopen(req,timeout=90) as response: return json.load(response)
     except urllib.error.HTTPError as error:
-        raise RuntimeError('MANUAL_REMOTE_HTTP_'+str(error.code)) from None
+        try: failure=json.load(error)
+        except (ValueError,TypeError): failure={}
+        reason=next((d.get('reason') for d in failure.get('error',{}).get('details',[]) if isinstance(d,dict) and isinstance(d.get('reason'),str)),failure.get('error',{}).get('status','UNKNOWN'))
+        safe=reason if isinstance(reason,str) and re.fullmatch('[A-Z_]{1,80}',reason) else 'UNKNOWN'
+        raise RuntimeError('MANUAL_REMOTE_HTTP_'+str(error.code)+'_'+safe) from None
 
 def canonical_source(row):
     sections=row['content_json']['experience']['readingGuide']['sections']
@@ -68,7 +72,9 @@ def main():
         manifest=json.loads(old)
         if manifest.get('sourceTranscriptSha256')!=source_hash or manifest.get('reviewRequired') is not True: raise RuntimeError('MANUAL_CANDIDATE_CONFLICT')
         print(json.dumps({'lessonId':lesson,'state':'existing-review-candidate','manifestKey':manifest_key})); return
-    tts=secret('GOOGLE_CLOUD_API_KEY')
+    import google.auth
+    from google.auth.transport.requests import Request as GoogleRequest
+    speech_credentials,_=google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
     with tempfile.TemporaryDirectory(prefix='manual-lesson-') as directory:
         root=Path(directory); out=root/'film'; out.mkdir(); speech=out/'speech'; speech.mkdir()
         # Content-addressed private narration cache avoids repeated paid synthesis.
@@ -83,14 +89,16 @@ def main():
         for chunk in chunks:
             h=digest(chunk.encode()); cached=get('course-videos/manual-narration/en-US-Neural2-F/'+h+'.mp3')
             if not cached:
-                result=request('https://texttospeech.googleapis.com/v1/text:synthesize',{'input':{'text':chunk},'voice':{'languageCode':'en-US','name':'en-US-Neural2-F'},'audioConfig':{'audioEncoding':'MP3'}},{'Content-Type':'application/json','X-Goog-Api-Key':tts})
+                speech_headers={'Content-Type':'application/json'}
+                speech_credentials.before_request(GoogleRequest(),'POST','https://texttospeech.googleapis.com/v1/text:synthesize',speech_headers)
+                result=request('https://texttospeech.googleapis.com/v1/text:synthesize',{'input':{'text':chunk},'voice':{'languageCode':'en-US','name':'en-US-Neural2-F'},'audioConfig':{'audioEncoding':'MP3'}},speech_headers)
                 cached=base64.b64decode(result['audioContent'],validate=True)
                 if len(cached)<1000: raise RuntimeError('MANUAL_NARRATION_EMPTY')
                 put('course-videos/manual-narration/en-US-Neural2-F/'+h+'.mp3',cached,'audio/mpeg')
             (speech/(h+'.mp3')).write_bytes(cached)
         plan={'lessonId':lesson,'courseId':COURSE,'title':row['title'],'sections':sections,'images':images,'photoGroups':groups,'outputDirectory':'film'}
         path=root/'plan.json'; path.write_text(json.dumps(plan))
-        env={**os.environ,'MANUAL_RENDER_ROOT':str(root),'MANUAL_GOOGLE_TTS_KEY':tts}
+        env={**os.environ,'MANUAL_RENDER_ROOT':str(root)}
         subprocess.run([sys.executable,str(Path(__file__).with_name('encode_reviewed_lesson.py')),str(path)],check=True,env=env)
         film=out/'completed-lesson-manual.mp4'; manifest=json.loads((out/'render-manifest.json').read_text())
         if digest(film.read_bytes())!=manifest['sha256']: raise RuntimeError('MANUAL_FILM_HASH_MISMATCH')

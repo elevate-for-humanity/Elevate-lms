@@ -38,17 +38,7 @@ for n,section in enumerate(PLAN['sections']):
     start=cursor
     for j,chunk in enumerate(chunks):
         digest=hashlib.sha256(chunk.encode()).hexdigest();path=speech_dir/(digest+'.mp3')
-        if not path.exists():
-            req=urllib.request.Request('https://texttospeech.googleapis.com/v1/text:synthesize',
-                data=json.dumps({'input':{'text':chunk},'voice':{'languageCode':'en-US','name':'en-US-Neural2-F'},'audioConfig':{'audioEncoding':'MP3'}}).encode(),
-                headers={'Content-Type':'application/json','X-Goog-Api-Key':os.environ['MANUAL_GOOGLE_TTS_KEY']},method='POST')
-            try:
-                with urllib.request.urlopen(req,timeout=60) as response: payload=json.load(response)
-            except urllib.error.HTTPError as error:
-                raise RuntimeError('MANUAL_NARRATION_HTTP_'+str(error.code)) from None
-            body=base64.b64decode(payload['audioContent'],validate=True)
-            if len(body)<1000:raise RuntimeError('NARRATION_EMPTY')
-            path.write_bytes(body)
+        if not path.exists(): raise RuntimeError('MANUAL_PREPARED_NARRATION_MISSING')
         seconds=duration(path)
         if not 0.3<seconds<120:raise RuntimeError('NARRATION_DURATION_INVALID')
         audio.append(path);captions.append({'start':cursor,'end':cursor+seconds,'text':chunk});cursor+=seconds

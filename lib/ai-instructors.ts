@@ -129,6 +129,9 @@ export const AI_INSTRUCTORS: AIInstructor[] = [
  */
 export function getInstructorForCourse(courseName: string): AIInstructor {
   const lowerName = courseName.toLowerCase();
+  // Intuit contains the substring 'it'; keep its bookkeeping credential in
+  // the business domain before broad technology keyword matching.
+  if (/bookkeeping|quickbooks/.test(lowerName)) return getInstructorById('angela-thompson');
 
   for (const instructor of AI_INSTRUCTORS) {
     for (const category of instructor.categories) {

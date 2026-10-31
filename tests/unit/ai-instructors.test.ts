@@ -16,6 +16,11 @@ describe('course instructor routing', () => {
     expect(getInstructorForCourse('Barber Apprenticeship').id).toBe('james-williams');
   });
 
+  it('routes Intuit bookkeeping and QuickBooks to the business instructor', () => {
+    expect(getInstructorForCourse('Intuit Certified Bookkeeping Professional').id).toBe('angela-thompson');
+    expect(getInstructorForCourse('Bookkeeping & QuickBooks').id).toBe('angela-thompson');
+  });
+
   it('keeps the general fallback stable', () => {
     expect(getInstructorForCourse('Workplace Fundamentals').id).toBe('angela-thompson');
   });

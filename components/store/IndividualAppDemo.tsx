@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import SubscriptionCommercialPlayer from '@/components/store/SubscriptionCommercialPlayer';
 import { SamGovApp } from '@/apps/marketing/app/apps/sam-gov/SamGovApp';
 import { GrantsApp } from '@/apps/marketing/app/apps/grants/GrantsApp';
 import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercial';
@@ -37,16 +37,7 @@ export default function IndividualAppDemo({
         <p className="mt-4 max-w-3xl text-lg leading-8">
           Choose a plan to see its price, included features and workspace controls.
         </p>
-        <div className="relative mt-6 aspect-[21/8] overflow-hidden rounded-2xl">
-          <Image
-            src={`/images/store-commercials/${catalog.slug}.webp`}
-            alt={`Illustrative scene for ${catalog.displayName} business owners`}
-            fill
-            sizes="(max-width: 1280px) 100vw, 1280px"
-            className="object-cover"
-            priority
-          />
-        </div>
+        <SubscriptionCommercialPlayer catalog={catalog} plan={selected} />
         <div className="mt-5 flex flex-wrap gap-3" aria-label="Demo subscription plans">
           {catalog.plans.map((p) => (
             <button

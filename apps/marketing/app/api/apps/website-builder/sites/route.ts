@@ -92,7 +92,8 @@ export async function POST(request: NextRequest) {
   const reusable = existing || (ownedSites || []).find((site) => interviewPending(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !interviewPending(site.site_config)).length;
   const plan = access.plan || 'starter';
-  const limit = PLAN_SITE_LIMITS[plan] ?? 1;
+  // null means unlimited; only an unknown plan falls back to Starter.
+  const limit = Object.hasOwn(PLAN_SITE_LIMITS, plan) ? PLAN_SITE_LIMITS[plan] : 1;
   if (!reusable && limit !== null && completedCount >= limit) return NextResponse.json({ error: `${plan} plan allows ${limit} website${limit === 1 ? '' : 's'}`, upgradeUrl: '/store/apps/website-builder' }, { status: 409 });
 
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';

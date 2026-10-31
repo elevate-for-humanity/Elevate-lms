@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
 import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
 import { AutonomousWebsiteBuilder } from '@/components/website-builder/AutonomousWebsiteBuilder';
+import { WebsiteConfigProvider } from '@/components/website-builder/WebsiteConfigProvider';
 import { ZeroCodeStructureEditor } from '@/components/website-builder/ZeroCodeStructureEditor';
 import { DomainPanel } from '@/components/website-builder/DomainPanel';
 import { BusinessCardsPanel } from '@/components/website-builder/BusinessCardsPanel';
@@ -47,7 +48,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
   );
 
   return (
-    <>
+    <WebsiteConfigProvider key={site.id} initialConfig={config}>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
       <AutonomousWebsiteBuilder
         websiteId={site.id}
@@ -61,6 +62,6 @@ export default async function WebsiteEditorPage({ params }: Props) {
       <WebsiteClaimsPanel websiteId={site.id} />
       <DomainPanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
       <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
-    </>
+    </WebsiteConfigProvider>
   );
 }

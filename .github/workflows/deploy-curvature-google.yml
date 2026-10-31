@@ -1,0 +1,79 @@
+name: Deploy isolated Curvature backend
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Tested Curvature image with immutable sha256 digest
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: curvature-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: elevate-for-humanity/curvature-body-sculpting
+          ref: d57324e5b6ad49aa41a22e877db75c36f945e86b
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: '24' }
+      - name: Validate dedicated website image
+        env:
+          WEBSITE_IMAGE: ${{ inputs.image }}
+        run: |
+          set -euo pipefail
+          if [ -n "$WEBSITE_IMAGE" ]; then
+            [[ "$WEBSITE_IMAGE" =~ ^us-central1-docker.pkg.dev/elegant-racer-299721/elevate/curvature-body-sculpting@sha256:[a-f0-9]{64}$ ]] || exit 1
+          fi
+      - name: Verify Curvature backend
+        run: npm test
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Verify dedicated runtime configuration
+        run: |
+          set -euo pipefail
+          gcloud secrets versions describe latest --secret=curvature-supabase-service-role-key --project=elegant-racer-299721 >/dev/null
+          gcloud iam service-accounts describe curvature-runtime@elegant-racer-299721.iam.gserviceaccount.com --project=elegant-racer-299721 >/dev/null
+      - name: Resolve immutable tested image
+        id: image
+        env:
+          WEBSITE_IMAGE: ${{ inputs.image }}
+        run: |
+          set -euo pipefail
+          gcloud artifacts docker images describe "$WEBSITE_IMAGE" --project=elegant-racer-299721 >/dev/null
+          echo "image=$WEBSITE_IMAGE" >> "$GITHUB_OUTPUT"
+      - name: Deploy isolated service
+        env:
+          WEBSITE_IMAGE: ${{ steps.image.outputs.image }}
+        run: |
+          set -euo pipefail
+          gcloud run deploy curvature-body-sculpting \
+            --project=elegant-racer-299721 --region=us-central1 --image="$WEBSITE_IMAGE" \
+            --service-account=curvature-runtime@elegant-racer-299721.iam.gserviceaccount.com \
+            --update-env-vars=SUPABASE_URL=https://pztctqvzvsitcsvdolqr.supabase.co,CURVATURE_SOURCE_SHA=d57324e5b6ad49aa41a22e877db75c36f945e86b \
+            --set-secrets=SUPABASE_SERVICE_ROLE_KEY=curvature-supabase-service-role-key:latest \
+            --cpu=1 --memory=512Mi --min-instances=0 --max-instances=1 \
+            --port=8080 --timeout=60s --no-allow-unauthenticated --quiet
+      - name: Verify actual database readiness
+        run: |
+          set -euo pipefail
+          URL="$(gcloud run services describe curvature-body-sculpting --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
+          TOKEN="$(gcloud auth print-identity-token)"
+          echo "::add-mask::$TOKEN"
+          curl --fail --silent --show-error --max-time 60 -H "Authorization: Bearer $TOKEN" "$URL/readyz" > readiness.json
+          node --input-type=module -e 'import fs from "node:fs"; import assert from "node:assert/strict"; assert.equal(JSON.parse(fs.readFileSync("readiness.json","utf8")).ready,true); console.log("Dedicated Curvature database readiness verified.");'
+          gcloud run services describe curvature-body-sculpting --project=elegant-racer-299721 --region=us-central1 --format='yaml(status.latestReadyRevisionName,status.url)'

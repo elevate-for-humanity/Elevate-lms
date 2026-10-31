@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import Image from 'next/image';
 
@@ -11,23 +11,9 @@ export function AIInstructorCard(props: {
   roleTitle: string;
   programName: string;
   onOpenChat: () => void;
+  avatarUrl: string;
 }) {
-  const [instructorData, setInstructorData] = useState<any>(null);
-  const supabase = createClient();
-
-  // Load instructor data from DB
-  useEffect(() => {
-    async function loadInstructor() {
-      const { data } = await supabase
-        .from('ai_instructors')
-        .select('name, role_title, avatar_url, bio, availability_status')
-        .eq('program_name', props.programName)
-        .single();
-
-      if (data) setInstructorData(data);
-    }
-    loadInstructor();
-  }, [props.programName, supabase]);
+  const supabase = useMemo(() => createClient(), []);
 
   // Log card view for analytics
   useEffect(() => {
@@ -50,10 +36,9 @@ export function AIInstructorCard(props: {
       <div className="flex items-start gap-4">
         <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-full border-2 border-zinc-200">
           <Image
-            alt="AI instructor"
             loading="lazy"
-            src="/images/team/elizabeth-greene-headshot.webp"
-            alt="Elizabeth Greene"
+            src={props.avatarUrl}
+            alt={props.instructorName}
             fill
             sizes="100vw"
             className="object-cover"

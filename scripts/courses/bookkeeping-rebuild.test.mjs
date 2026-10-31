@@ -11,6 +11,7 @@ test('All 53 published subobjectives have instruction and practice',()=>{
 });
 test('Original final is valid and cumulative, with answers and explanations',()=>{
  assert.equal(finalQuestions.length,25);assert.equal(new Set(finalQuestions.map(q=>q.id)).size,25);
+ for(const index of [0,1,2,3]) assert.ok(finalQuestions.filter(q=>q.correctAnswer===index).length>=6);
  for(const domain of ['1','2','3','4']) assert.ok(finalQuestions.filter(q=>q.domain===domain).length>=6);
  for(const q of finalQuestions){assert.equal(q.options.length,4);assert.ok(Number.isInteger(q.correctAnswer)&&q.correctAnswer>=0&&q.correctAnswer<4);assert.ok(q.explanation.length>20);}
 });

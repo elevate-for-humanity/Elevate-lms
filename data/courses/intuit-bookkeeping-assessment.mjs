@@ -1,6 +1,12 @@
 // Original practice questions. answer indexes are zero-based; 80 is Elevate's
 // practice mastery threshold, not a representation of the sponsor's cut score.
-const q=(id,domain,objective,question,options,correctAnswer,explanation)=>({id,domain,objectiveIds:[objective],question,options,correctAnswer,explanation});
+const answerPositions=[1,2,3,0,2,1,3,0,2,1,3,0,2,0,3,1,0,2,1,3,2,0,3,1,2];
+const q=(id,domain,objective,question,options,answerIndex,explanation)=>{
+ const correctAnswer=answerPositions[Number(id.slice(-2))-1];
+ const rotated=[...options];
+ [rotated[correctAnswer],rotated[answerIndex]]=[rotated[answerIndex],rotated[correctAnswer]];
+ return {id,domain,objectiveIds:[objective],question,options:rotated,correctAnswer,explanation};
+};
 export const finalQuestions=[
  q('final-01','1','1.1.1','A receipt is missing for a recorded expense. What should the bookkeeper do first?',['Create a receipt that matches the entry','Investigate and document the missing evidence','Delete the expense without investigation','Move the amount into sales'],1,'Retain the record, investigate the support and document the exception. Do not invent evidence.'),
  q('final-02','1','1.1.2','Assets are $57,000 and liabilities are $22,000. What is equity?',['$79,000','$22,000','$35,000','$57,000'],2,'Equity equals assets minus liabilities: $57,000 − $22,000 = $35,000.'),

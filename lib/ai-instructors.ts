@@ -118,6 +118,8 @@ export const AI_INSTRUCTORS: AIInstructor[] = [
       'retail',
       'tax',
       'accounting',
+      'bookkeeping',
+      'quickbooks',
     ],
   },
 ];

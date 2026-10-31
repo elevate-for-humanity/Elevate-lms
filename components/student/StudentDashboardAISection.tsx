@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { getInstructorForCourse } from '@/lib/ai-instructors';
 
 import { useState } from 'react';
 import { AIInstructorCard } from '@/components/student/AIInstructorCard';
@@ -12,7 +13,8 @@ export function StudentDashboardAISection(props: { programSlug: string; programN
   const [chatOpen, setChatOpen] = useState(false);
   const [aiInstructor, setAiInstructor] = useState<any>(null);
   const [chatHistory, setChatHistory] = useState<any[]>([]);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+  const assignedInstructor = getInstructorForCourse(props.programName);
 
   // Load AI instructor config and chat history from DB
   useEffect(() => {
@@ -25,10 +27,11 @@ export function StudentDashboardAISection(props: { programSlug: string; programN
       const { data: instructor } = await supabase
         .from('ai_instructors')
         .select('id, name, role_title, avatar_url, personality_config')
-        .eq('program_slug', props.programSlug)
-        .single();
+        .eq('name', assignedInstructor.name)
+        .eq('active', true)
+        .maybeSingle();
 
-      if (instructor) setAiInstructor(instructor);
+      setAiInstructor(instructor ?? null);
 
       // Load recent chat history
       if (user) {
@@ -44,7 +47,7 @@ export function StudentDashboardAISection(props: { programSlug: string; programN
       }
     }
     loadAIData();
-  }, [props.programSlug, supabase]);
+  }, [props.programSlug, assignedInstructor.name, supabase]);
 
   // Log chat open event
   const handleOpenChat = async () => {
@@ -62,8 +65,9 @@ export function StudentDashboardAISection(props: { programSlug: string; programN
   return (
     <>
       <AIInstructorCard
-        instructorName={aiInstructor?.name || 'Elizabeth Greene'}
-        roleTitle={aiInstructor?.role_title || 'Program Instructor (AI)'}
+        instructorName={aiInstructor?.name || assignedInstructor.name}
+        roleTitle={aiInstructor?.role_title || `${assignedInstructor.title} (AI)`}
+        avatarUrl={aiInstructor?.avatar_url || assignedInstructor.avatar}
         programName={props.programName}
         onOpenChat={handleOpenChat}
       />

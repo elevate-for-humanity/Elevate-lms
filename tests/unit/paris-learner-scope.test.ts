@@ -33,7 +33,13 @@ describe('PARIS learner scope', () => {
     const apprenticeHours = source('apps/lms/app/apprentice/hours/page.tsx');
     const apprenticeBoard = source('apps/lms/app/apprentice/state-board/page.tsx');
 
-    for (const publicOrNonDashboardSurface of [home, contact, enrollment, apprenticeHours, apprenticeBoard]) {
+    for (const publicOrNonDashboardSurface of [
+      home,
+      contact,
+      enrollment,
+      apprenticeHours,
+      apprenticeBoard,
+    ]) {
       expect(publicOrNonDashboardSurface).not.toContain('ParisFloating');
     }
   });
@@ -41,8 +47,10 @@ describe('PARIS learner scope', () => {
   it('derives learner context from the authenticated enrollment and protects graded work', () => {
     const route = source('apps/lms/app/api/ai-chat/route.ts');
 
-    expect(route).toContain(".from('course_enrollments')");
-    expect(route).toContain(".eq('student_id', user.id)");
+    expect(route).toContain('return loadTrustedLearnerCourse(supabase, user.id)');
+    const context = source('lib/paris/trusted-learner-course.ts');
+    expect(context).toContain('resolveLatestEnrollment');
+    expect(context).toContain('loadLessonAvailability');
     expect(route).toContain('Never complete a graded assignment');
     expect(route).toContain('Authenticated learner course context is unavailable.');
   });

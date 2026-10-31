@@ -541,6 +541,9 @@ importers:
       '@axe-core/playwright':
         specifier: ^4.11.3
         version: 4.13.0(playwright-core@1.57.0)
+      '@electric-sql/pglite':
+        specifier: 0.5.13
+        version: 0.5.13
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.5.0(jiti@1.21.7))
@@ -1182,6 +1185,9 @@ packages:
     resolution: {integrity: sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg==}
     peerDependencies:
       react: '>=16.8.0'
+
+  '@electric-sql/pglite@0.5.13':
+    resolution: {integrity: sha512-4rZuxK1k07w6sSpJzjMri0B9+HuXuC7V9pxVB51pR0T9KPqXg6TD0mdaEwBA9rkcL4jdht4tGDf/wYzAiGhT7g==}
 
   '@elevate/bounded-braces@file:packages/bounded-braces':
     resolution: {directory: packages/bounded-braces, type: directory}
@@ -10655,6 +10661,8 @@ snapshots:
     dependencies:
       react: 19.2.7
       tslib: 2.8.1
+
+  '@electric-sql/pglite@0.5.13': {}
 
   '@elevate/bounded-braces@file:packages/bounded-braces':
     dependencies:

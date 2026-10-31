@@ -41,7 +41,8 @@ async function sendWelcomeEmail({ email, contactName, actionLink }) {
         html: `<p>Hello ${contactName},</p><p>The CDL Academy has been activated as a Program Holder for the CDL Training program.</p><p><a href="${actionLink}">Set your password and open the Program Holder portal</a></p><p>After setting your password, you can return to <a href="${PORTAL_URL}">${PORTAL_URL}</a>.</p><p>Elevate for Humanity</p>`,
       }),
     });
-    if (!response.ok) throw new Error(`Resend failed (${response.status}): ${await response.text()}`);
+    if (!response.ok)
+      throw new Error(`Resend failed (${response.status}): ${await response.text()}`);
     return;
   }
   const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -57,13 +58,16 @@ async function sendWelcomeEmail({ email, contactName, actionLink }) {
         name: 'Elevate for Humanity',
       },
       subject: 'Your CDL Academy Program Holder portal is ready',
-      content: [{
-        type: 'text/html',
-        value: `<p>Hello ${contactName},</p><p>The CDL Academy has been activated as a Program Holder for the CDL Training program.</p><p><a href="${actionLink}">Set your password and open the Program Holder portal</a></p><p>After setting your password, you can return to <a href="${PORTAL_URL}">${PORTAL_URL}</a>.</p><p>Elevate for Humanity</p>`,
-      }],
+      content: [
+        {
+          type: 'text/html',
+          value: `<p>Hello ${contactName},</p><p>The CDL Academy has been activated as a Program Holder for the CDL Training program.</p><p><a href="${actionLink}">Set your password and open the Program Holder portal</a></p><p>After setting your password, you can return to <a href="${PORTAL_URL}">${PORTAL_URL}</a>.</p><p>Elevate for Humanity</p>`,
+        },
+      ],
     }),
   });
-  if (!response.ok) throw new Error(`SendGrid failed (${response.status}): ${await response.text()}`);
+  if (!response.ok)
+    throw new Error(`SendGrid failed (${response.status}): ${await response.text()}`);
 }
 
 const { data: application, error: applicationError } = await db
@@ -71,7 +75,8 @@ const { data: application, error: applicationError } = await db
   .select('*')
   .eq('id', APPLICATION_ID)
   .single();
-if (applicationError || !application) throw applicationError || new Error('Application record not found');
+if (applicationError || !application)
+  throw applicationError || new Error('Application record not found');
 
 const email = application.email.trim().toLowerCase();
 const { data: program, error: programError } = await db
@@ -86,6 +91,7 @@ if (!user) {
   const { data, error } = await db.auth.admin.createUser({
     email,
     email_confirm: true,
+    app_metadata: { role: 'program_holder' },
     user_metadata: {
       full_name: application.contact_name,
       organization_name: application.organization_name,
@@ -123,58 +129,79 @@ let { data: holder, error: holderLookupError } = await db
   .maybeSingle();
 if (holderLookupError) throw holderLookupError;
 if (holder) {
-  const result = await db.from('program_holders').update(holderValues).eq('id', holder.id).select('id, welcome_email_sent').single();
+  const result = await db
+    .from('program_holders')
+    .update(holderValues)
+    .eq('id', holder.id)
+    .select('id, welcome_email_sent')
+    .single();
   if (result.error) throw result.error;
   holder = result.data;
 } else {
-  const result = await db.from('program_holders').insert(holderValues).select('id, welcome_email_sent').single();
+  const result = await db
+    .from('program_holders')
+    .insert(holderValues)
+    .select('id, welcome_email_sent')
+    .single();
   if (result.error) throw result.error;
   holder = result.data;
 }
 
-const { error: profileError } = await db.from('profiles').upsert({
-  id: user.id,
-  email,
-  full_name: application.contact_name,
-  first_name: application.contact_name?.split(/\s+/)[0] || null,
-  last_name: application.contact_name?.split(/\s+/).slice(1).join(' ') || null,
-  company: application.organization_name,
-  company_name: application.organization_name,
-  role: 'program_holder',
-  roles: ['program_holder'],
-  program_holder_id: holder.id,
-  status: 'active',
-  enrollment_status: 'active',
-  is_active: true,
-  verified: true,
-  program: program.title,
-  updated_at: new Date().toISOString(),
-}, { onConflict: 'id' });
+const { error: profileError } = await db.from('profiles').upsert(
+  {
+    id: user.id,
+    email,
+    full_name: application.contact_name,
+    first_name: application.contact_name?.split(/\s+/)[0] || null,
+    last_name: application.contact_name?.split(/\s+/).slice(1).join(' ') || null,
+    company: application.organization_name,
+    company_name: application.organization_name,
+    role: 'program_holder',
+    roles: ['program_holder'],
+    program_holder_id: holder.id,
+    status: 'active',
+    enrollment_status: 'active',
+    is_active: true,
+    verified: true,
+    program: program.title,
+    updated_at: new Date().toISOString(),
+  },
+  { onConflict: 'id' },
+);
 if (profileError) throw profileError;
 
-const { error: assignmentError } = await db.from('program_holder_programs').upsert({
-  program_holder_id: holder.id,
-  program_id: program.id,
-  program_slug: program.slug,
-  role_in_program: 'owner',
-  is_primary: true,
-  status: 'active',
-}, { onConflict: 'program_holder_id,program_id' });
+const { error: assignmentError } = await db.from('program_holder_programs').upsert(
+  {
+    program_holder_id: holder.id,
+    program_id: program.id,
+    program_slug: program.slug,
+    role_in_program: 'owner',
+    is_primary: true,
+    status: 'active',
+  },
+  { onConflict: 'program_holder_id,program_id' },
+);
 if (assignmentError) throw assignmentError;
 
-const { error: applicationUpdateError } = await db.from('program_holder_applications').update({
-  user_id: user.id,
-  status: 'approved',
-  updated_at: new Date().toISOString(),
-}).eq('id', application.id);
+const { error: applicationUpdateError } = await db
+  .from('program_holder_applications')
+  .update({
+    user_id: user.id,
+    status: 'approved',
+    updated_at: new Date().toISOString(),
+  })
+  .eq('id', application.id);
 if (applicationUpdateError) throw applicationUpdateError;
 
-const { error: providerUpdateError } = await db.from('provider_applications').update({
-  status: 'approved',
-  reviewed_at: new Date().toISOString(),
-  review_notes: 'Provisioned as Program Holder for CDL Training.',
-  updated_at: new Date().toISOString(),
-}).ilike('contact_email', email);
+const { error: providerUpdateError } = await db
+  .from('provider_applications')
+  .update({
+    status: 'approved',
+    reviewed_at: new Date().toISOString(),
+    review_notes: 'Provisioned as Program Holder for CDL Training.',
+    updated_at: new Date().toISOString(),
+  })
+  .ilike('contact_email', email);
 if (providerUpdateError) throw providerUpdateError;
 
 if (!holder.welcome_email_sent) {
@@ -183,10 +210,26 @@ if (!holder.welcome_email_sent) {
     email,
     options: { redirectTo: PORTAL_URL },
   });
-  if (linkError || !linkData?.properties?.action_link) throw linkError || new Error('Portal link generation failed');
-  await sendWelcomeEmail({ email, contactName: application.contact_name, actionLink: linkData.properties.action_link });
-  const { error: sentError } = await db.from('program_holders').update({ welcome_email_sent: true, updated_at: new Date().toISOString() }).eq('id', holder.id);
+  if (linkError || !linkData?.properties?.action_link)
+    throw linkError || new Error('Portal link generation failed');
+  await sendWelcomeEmail({
+    email,
+    contactName: application.contact_name,
+    actionLink: linkData.properties.action_link,
+  });
+  const { error: sentError } = await db
+    .from('program_holders')
+    .update({ welcome_email_sent: true, updated_at: new Date().toISOString() })
+    .eq('id', holder.id);
   if (sentError) throw sentError;
 }
 
-console.log(JSON.stringify({ success: true, userId: user.id, programHolderId: holder.id, programId: program.id, welcomeEmailSent: true }));
+console.log(
+  JSON.stringify({
+    success: true,
+    userId: user.id,
+    programHolderId: holder.id,
+    programId: program.id,
+    welcomeEmailSent: true,
+  }),
+);

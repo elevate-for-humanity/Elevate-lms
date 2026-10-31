@@ -34,9 +34,12 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const currentSection = NAV.find((section) => section.items.some((item) => item.href === pathname))
-    ?? NAV.find((section) => section.items.some((item) => isActive(pathname, item.href)));
-  const [selectedSection, setSelectedSection] = useState(currentSection?.label ?? NAV[0]?.label ?? '');
+  const currentSection =
+    NAV.find((section) => section.items.some((item) => item.href === pathname)) ??
+    NAV.find((section) => section.items.some((item) => isActive(pathname, item.href)));
+  const [selectedSection, setSelectedSection] = useState(
+    currentSection?.label ?? NAV[0]?.label ?? '',
+  );
   const section = NAV.find((item) => item.label === selectedSection) ?? currentSection ?? NAV[0];
   const notifRef = useRef<HTMLDivElement>(null);
   const unread = notifs.filter((n) => n.unread).length;
@@ -219,12 +222,14 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
-
           </div>
         </div>
 
-        <nav aria-label="Admin workspace" className="grid min-w-0 grid-cols-2 gap-2 border-t border-slate-200 bg-slate-50 px-2 py-2 sm:flex sm:items-center sm:px-4 lg:px-6">
-          <label className="min-w-0 sm:w-48">
+        <nav
+          aria-label="Admin workspace"
+          className="grid min-w-0 grid-cols-1 gap-2 border-t border-slate-200 bg-slate-50 px-2 py-2 sm:flex sm:items-center sm:px-4 lg:px-6"
+        >
+          <label className="min-w-0 sm:w-64">
             <span className="sr-only">Admin section</span>
             <select
               aria-label="Admin section"
@@ -232,20 +237,35 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               onChange={(event) => setSelectedSection(event.target.value)}
               className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
             >
-              {NAV.map((item) => <option key={item.label} value={item.label}>{item.label}</option>)}
+              {NAV.map((item) => (
+                <option key={item.label} value={item.label}>
+                  {item.label}
+                </option>
+              ))}
             </select>
           </label>
           <label className="min-w-0 sm:w-80">
             <span className="sr-only">Admin page</span>
             <select
               aria-label="Admin page"
-              value={section?.items.find((item) => item.href === pathname)?.href
-                ?? section?.items.find((item) => isActive(pathname, item.href))?.href ?? ''}
-              onChange={(event) => { if (event.target.value) router.push(event.target.value); }}
+              value={
+                section?.items.find((item) => item.href === pathname)?.href ??
+                section?.items.find((item) => isActive(pathname, item.href))?.href ??
+                ''
+              }
+              onChange={(event) => {
+                if (event.target.value) router.push(event.target.value);
+              }}
               className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
             >
-              <option value="" disabled>Choose a page</option>
-              {section?.items.map((item) => <option key={item.href} value={item.href}>{item.label}</option>)}
+              <option value="" disabled>
+                Choose a page
+              </option>
+              {section?.items.map((item) => (
+                <option key={item.href} value={item.href}>
+                  {item.label}
+                </option>
+              ))}
             </select>
           </label>
         </nav>

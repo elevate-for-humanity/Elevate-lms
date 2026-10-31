@@ -1,5 +1,6 @@
 'use client';
 
+import { PortalToolSearch } from './PortalToolSearch';
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
@@ -22,7 +23,11 @@ import type {
   BreadcrumbItem,
   ActionItem,
 } from '@/lib/navigation/navigation-config';
-import { getNavigationForRole, getDashboardHref, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
+import {
+  getNavigationForRole,
+  getDashboardHref,
+  ROLE_DISPLAY_NAMES,
+} from '@/lib/navigation/navigation-config';
 import { ProfileImage } from '@/components/profile/ProfileImage';
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
 
@@ -58,6 +63,7 @@ export function PlatformShell({
   user,
   role,
   actions = [],
+  breadcrumbs = [],
   children,
   paris,
   showLanguageSwitcher = true,
@@ -223,20 +229,24 @@ export function PlatformShell({
           </div>
 
           <div className="mx-4 hidden max-w-md flex-1 md:flex">
-            <form
-              action={isWorkforce ? '/workforce/participants' : undefined}
-              onSubmit={isWorkforce ? undefined : (event) => event.preventDefault()}
-              className="relative w-full"
-            >
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="search"
-                name="q"
-                aria-label={isWorkforce ? 'Search workforce participants' : 'Search your portal'}
-                placeholder="Search your portal..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm font-medium text-slate-950 transition-all placeholder:text-slate-500 focus:bg-white focus:ring-2 focus:ring-brand-blue-500"
-              />
-            </form>
+            {!isWorkforce ? (
+              <PortalToolSearch sections={sections} />
+            ) : (
+              <form
+                action={isWorkforce ? '/workforce/participants' : undefined}
+                onSubmit={isWorkforce ? undefined : (event) => event.preventDefault()}
+                className="relative w-full"
+              >
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="search"
+                  name="q"
+                  aria-label={isWorkforce ? 'Search workforce participants' : 'Search your portal'}
+                  placeholder="Search your portal..."
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm font-medium text-slate-950 transition-all placeholder:text-slate-500 focus:bg-white focus:ring-2 focus:ring-brand-blue-500"
+                />
+              </form>
+            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
@@ -367,6 +377,11 @@ export function PlatformShell({
               </button>
             </div>
 
+            {!isWorkforce ? (
+              <div className="p-3 md:hidden">
+                <PortalToolSearch sections={sections} onNavigate={() => setSidebarOpen(false)} />
+              </div>
+            ) : null}
             <nav
               className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
               aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation links`}
@@ -421,6 +436,23 @@ export function PlatformShell({
         </aside>
 
         <main data-elevate-dashboard-content className="min-w-0 w-full flex-1 overflow-x-clip">
+          {breadcrumbs.length ? (
+            <nav
+              aria-label="Breadcrumb"
+              className="flex flex-wrap gap-2 px-4 py-3 text-sm text-slate-700"
+            >
+              {breadcrumbs.map((item, index) => (
+                <React.Fragment key={`${item.label}-${index}`}>
+                  {index ? <span aria-hidden="true">/</span> : null}
+                  {item.href ? (
+                    <Link href={item.href}>{item.label}</Link>
+                  ) : (
+                    <span aria-current="page">{item.label}</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </nav>
+          ) : null}
           {actions.length > 0 && (
             <div className="max-w-full overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-3 py-2 lg:hidden">
               <div className="inline-flex gap-2">

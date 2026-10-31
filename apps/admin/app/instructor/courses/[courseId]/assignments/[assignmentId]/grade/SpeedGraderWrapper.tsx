@@ -16,7 +16,8 @@ interface SubmissionData {
   attachments: string[];
   status: 'submitted' | 'graded' | 'returned' | 'late';
   isLate: boolean;
-  existingGrade: any;
+  existingGrade: number | null;
+  existingFeedback?: string | null;
 }
 
 interface Props {
@@ -68,6 +69,9 @@ export default function SpeedGraderWrapper({ courseId, assignment, submissions }
     id: s.id,
     assignmentId: s.assignmentId,
     studentId: s.studentId,
+    studentName: s.studentName,
+    existingGrade: s.existingGrade,
+    existingFeedback: s.existingFeedback,
     submittedAt: new Date(s.submittedAt),
     content: s.content,
     attachments: s.attachments,

@@ -27,6 +27,14 @@ export async function requireAuth() {
     redirect('/login');
   }
 
+  const { data: account, error: accountError } = await supabase
+    .from('profiles')
+    .select('is_active, suspended')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (accountError) throw new Error('PROFILE_LOOKUP_UNAVAILABLE');
+  if (account?.is_active === false || account?.suspended === true) redirect('/unauthorized');
+
   // Get session for backward compatibility (tokens, etc.)
   const {
     data: { session },
@@ -55,6 +63,12 @@ export async function getAuthSession() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
+  const { data: account, error: accountError } = await supabase
+    .from('profiles')
+    .select('is_active, suspended')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (accountError || account?.is_active === false || account?.suspended === true) return null;
 
   const {
     data: { session },
@@ -108,9 +122,11 @@ export async function requirePartnerIdentity() {
   // Check profiles row
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, full_name')
+    .select('id, role, full_name, is_active, suspended')
     .eq('id', user.id)
     .maybeSingle();
+
+  if (profile?.is_active === false || profile?.suspended === true) redirect('/unauthorized');
 
   if (!profile) {
     // Auto-heal: create minimal profile from auth metadata

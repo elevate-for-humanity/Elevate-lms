@@ -90,6 +90,7 @@ async function _POST(request: NextRequest) {
       email: contactEmail,
       password: tempPassword,
       email_confirm: true,
+      app_metadata: { role: 'admin', tenant_id: tenant.id },
       user_metadata: {
         full_name: contactName,
         organization: organizationName,
@@ -102,13 +103,16 @@ async function _POST(request: NextRequest) {
     }
 
     // 4. Create profile
-    await supabase.from('profiles').insert({
+    const { error: profileError } = await supabase.from('profiles').upsert({
       id: authUser.user.id,
       email: contactEmail,
       full_name: contactName,
       role: 'admin',
       tenant_id: tenant.id,
     });
+
+    if (profileError)
+      return NextResponse.json({ error: 'Failed to provision admin profile' }, { status: 500 });
 
     // 5. Create tenant branding (default)
     await supabase.from('tenant_branding').insert({

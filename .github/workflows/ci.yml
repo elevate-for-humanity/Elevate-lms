@@ -32,6 +32,10 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Canonical dashboard PostgreSQL authorization regressions
+        run: |
+          node tests/integration/auth-provisioning-postgres.mjs
+          node tests/integration/practical-authorization-postgres.mjs
       - name: Student funding and permission regression tests
         run: >-
           pnpm exec vitest run

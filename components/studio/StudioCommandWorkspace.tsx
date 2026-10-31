@@ -1,5 +1,7 @@
 'use client';
 
+import { coursePreviewTarget } from '@/lib/studio/course-preview-target';
+
 import dynamic from 'next/dynamic';
 import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
@@ -611,6 +613,10 @@ export default function StudioCommandWorkspace({
                 attachmentInputId={attachmentInputId}
                 onOpenPreview={() => openPreview()}
                 onPreviewTarget={openPreview}
+                onCourseResult={(courseId, lessonId) => {
+                  const target = coursePreviewTarget(courseId, lessonId);
+                  if (target) openPreview(target);
+                }}
                 onTaskCheckpoint={setActiveTask}
                 onCommandStart={handleCommandStart}
                 onOpenTasks={() => openCapability('tasks')}

@@ -1,3 +1,4 @@
+import { scheduleFollowUps } from '@/lib/compliance/follow-up-dates';
 /**
  * WIOA/ETPL Automated Reporting System
  *
@@ -330,13 +331,7 @@ export async function scheduleWageFollowUp(enrollmentId: string) {
 
   const completionDate = new Date(enrollment.completion_date);
 
-  // Schedule 2nd quarter follow-up (6 months after completion)
-  const followUp2nd = new Date(completionDate);
-  followUp2nd.setMonth(followUp2nd.getMonth() + 6);
-
-  // Schedule 4th quarter follow-up (12 months after completion)
-  const followUp4th = new Date(completionDate);
-  followUp4th.setMonth(followUp4th.getMonth() + 12);
+  const { q2: followUp2nd, q4: followUp4th } = scheduleFollowUps(completionDate);
 
   await supabase.from('followup_schedule').insert([
     {

@@ -573,7 +573,7 @@ export default async function HostShopDashboardView() {
                 board.unconfiguredPrograms.length === 0,
               ].filter(Boolean).length
             }
-            /4 core checks clear
+            /4 record checks clear
           </span>
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
@@ -631,14 +631,12 @@ export default async function HostShopDashboardView() {
               <span
                 className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}
               >
-                {item.done ? '✓' : '!'}
+                →
               </span>
               <span className="min-w-0">
                 <span className="block font-black text-slate-950">{item.label}</span>
                 <span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span>
-                <span className="mt-2 block text-xs font-black text-blue-800">
-                  {item.done ? 'Review record' : 'Open weekly action'} →
-                </span>
+                <span className="mt-2 block text-xs font-black text-blue-800">Open records →</span>
               </span>
             </Link>
           ))}

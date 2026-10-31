@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';
 import { createClient } from '@/lib/supabase/server';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { submitCoursePractical } from '@/lib/lms/course-practical-workflow';
 
 export const runtime = 'nodejs';
@@ -48,10 +49,21 @@ export async function POST(request: NextRequest) {
     );
   const db = await createClient();
   try {
+    await assertLessonAccess(user.id, parsed.data.lessonId);
     const submission = await submitCoursePractical(db, user.id, parsed.data);
     return NextResponse.json({ success: true, submission }, { status: 201 });
   } catch (cause) {
+    if (
+      cause instanceof Error &&
+      ['ACCESS_DENIED', 'LESSON_NOT_FOUND', 'MODULE_LOCKED'].includes(cause.message)
+    ) {
+      const denied = accessErrorResponse(cause);
+      return NextResponse.json(denied.body, { status: denied.status });
+    }
     const message = cause instanceof Error ? cause.message : 'Unable to submit practical evidence';
-    return NextResponse.json({ error: message }, { status: message.startsWith('PRACTICAL_') ? 409 : 500 });
+    return NextResponse.json(
+      { error: message },
+      { status: message.startsWith('PRACTICAL_') ? 409 : 500 },
+    );
   }
 }

@@ -37,8 +37,14 @@ const HOST_SHOP_MEMBERSHIP_ROLES = new Set([
 ]);
 
 function membershipDerivedRoles(rows: any[] | null | undefined): UserRole[] {
-  const hasActiveHostShopMembership = (rows || []).some((row: any) =>
-    row?.status === 'active' && HOST_SHOP_MEMBERSHIP_ROLES.has(String(row?.role || '').trim().toLowerCase()),
+  const hasActiveHostShopMembership = (rows || []).some(
+    (row: any) =>
+      row?.status === 'active' &&
+      HOST_SHOP_MEMBERSHIP_ROLES.has(
+        String(row?.role || '')
+          .trim()
+          .toLowerCase(),
+      ),
   );
   return hasActiveHostShopMembership ? ['host_shop'] : [];
 }
@@ -71,7 +77,9 @@ async function resolveCurrentPath(): Promise<string> {
   return '';
 }
 
-export async function requireRole(allowedRoles: readonly (UserRole | string)[]): Promise<AuthResult> {
+export async function requireRole(
+  allowedRoles: readonly (UserRole | string)[],
+): Promise<AuthResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -86,7 +94,11 @@ export async function requireRole(allowedRoles: readonly (UserRole | string)[]):
   const [profileResult, rolesResult, membershipResult] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
-    supabase.from('partner_users').select('partner_id, role, status').eq('user_id', user.id).eq('status', 'active'),
+    supabase
+      .from('partner_users')
+      .select('partner_id, role, status')
+      .eq('user_id', user.id)
+      .eq('status', 'active'),
   ]);
 
   // A transient Data API failure must not be mistaken for a missing profile or
@@ -99,6 +111,7 @@ export async function requireRole(allowedRoles: readonly (UserRole | string)[]):
   const partnerMembershipRows = membershipResult.data;
 
   if (!profile) redirect('/unauthorized');
+  if (profile.is_active === false || profile.suspended === true) redirect('/unauthorized');
 
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
@@ -130,11 +143,22 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
   } = await supabase.auth.getUser();
   if (!user) return false;
 
-  const [{ data: profile }, { data: userRoleRows }, { data: partnerMembershipRows }] = await Promise.all([
-    supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+  const [profileResult, rolesResult, membershipResult] = await Promise.all([
+    supabase.from('profiles').select('role, is_active, suspended').eq('id', user.id).maybeSingle(),
     supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
-    supabase.from('partner_users').select('partner_id, role, status').eq('user_id', user.id).eq('status', 'active'),
+    supabase
+      .from('partner_users')
+      .select('partner_id, role, status')
+      .eq('user_id', user.id)
+      .eq('status', 'active'),
   ]);
+
+  if (profileResult.error || rolesResult.error || membershipResult.error) return false;
+  const profile = profileResult.data;
+  const userRoleRows = rolesResult.data;
+  const partnerMembershipRows = membershipResult.data;
+
+  if (!profile || profile.is_active === false || profile.suspended === true) return false;
 
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)

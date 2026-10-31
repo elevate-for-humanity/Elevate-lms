@@ -1,3 +1,4 @@
+import { loadTrustedLearnerCourse } from '@/lib/paris/trusted-learner-course';
 import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import {
   authenticatePartnerPortalGuidance,
@@ -110,51 +111,7 @@ async function loadTrustedLearnerContext(): Promise<TrustedLearnerContext | null
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: enrollment } = await supabase
-    .from('course_enrollments')
-    .select('course_id,status,created_at')
-    .eq('student_id', user.id)
-    .in('status', ['active', 'enrolled', 'in_progress'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (!enrollment?.course_id) return null;
-
-  const [{ data: course }, { data: lessons }, { data: progress }] = await Promise.all([
-    supabase.from('courses').select('id,title').eq('id', enrollment.course_id).maybeSingle(),
-    supabase
-      .from('course_lessons')
-      .select('id,title,order_index')
-      .eq('course_id', enrollment.course_id)
-      .eq('is_published', true)
-      .order('order_index', { ascending: true }),
-    supabase
-      .from('lesson_progress')
-      .select('lesson_id,completed')
-      .eq('user_id', user.id)
-      .eq('course_id', enrollment.course_id),
-  ]);
-  if (!course) return null;
-
-  const completed = new Set(
-    (progress ?? [])
-      .filter((row) => row.completed === true && row.lesson_id)
-      .map((row) => String(row.lesson_id)),
-  );
-  const lessonList = lessons ?? [];
-  const nextLesson = lessonList.find((lesson) => !completed.has(String(lesson.id))) ?? null;
-  const completedLessons = lessonList.filter((lesson) => completed.has(String(lesson.id))).length;
-  const totalLessons = lessonList.length;
-
-  return {
-    courseId: String(course.id),
-    courseTitle: String(course.title || 'Current course'),
-    nextLessonTitle: nextLesson?.title ? String(nextLesson.title) : null,
-    courseProgress:
-      totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0,
-    completedLessons,
-    totalLessons,
-  };
+  return loadTrustedLearnerCourse(supabase, user.id);
 }
 
 function getSmartFallback(

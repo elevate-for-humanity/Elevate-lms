@@ -18,8 +18,11 @@ interface SpeedGraderProps {
 
 export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedGraderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [points, setPoints] = useState(assignment.points);
-  const [feedback, setFeedback] = useState('');
+  const [savedValues, setSavedValues] = useState<
+    Record<string, { points: number; feedback: string }>
+  >({});
+  const [points, setPoints] = useState<number | ''>(submissions[0]?.existingGrade ?? '');
+  const [feedback, setFeedback] = useState(submissions[0]?.existingFeedback ?? '');
   const [rubricScores, setRubricScores] = useState<RubricScore[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -31,22 +34,23 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
     if (!(await saveGrade())) return;
     if (currentIndex < submissions.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      resetForm();
+      resetForm(currentIndex + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      resetForm();
+      resetForm(currentIndex - 1);
     }
   };
 
-  const resetForm = () => {
+  const resetForm = (index: number) => {
     setSaveError('');
     setSaved(false);
-    setPoints(assignment.points);
-    setFeedback('');
+    const savedValue = savedValues[submissions[index]?.id];
+    setPoints(savedValue?.points ?? submissions[index]?.existingGrade ?? '');
+    setFeedback(savedValue?.feedback ?? submissions[index]?.existingFeedback ?? '');
     setRubricScores([]);
   };
 
@@ -58,6 +62,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
     setSaveError('');
     try {
       if (
+        points === '' ||
         !Number.isFinite(points) ||
         points < 0 ||
         points > assignment.points ||
@@ -74,6 +79,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
         rubricScores: rubricScores.length > 0 ? rubricScores : undefined,
         gradedAt: new Date(),
       });
+      setSavedValues((previous) => ({ ...previous, [currentSubmission.id]: { points, feedback } }));
       setSaved(true);
       return true;
     } catch (error) {
@@ -85,19 +91,12 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
   };
 
   const handleRubricScore = (criterionId: string, levelId: string, points: number) => {
-    setRubricScores((prev) => {
-      const existing = prev.find((s) => s.criterionId === criterionId);
-      if (existing) {
-        return prev.map((s) => (s.criterionId === criterionId ? { ...s, levelId, points } : s));
-      }
-      return [...prev, { criterionId, levelId, points }];
-    });
-
-    // Au total from rubric
-    if (assignment.rubric) {
-      const total = rubricScores.reduce((sum, s) => sum + s.points, 0) + points;
-      setPoints(total);
-    }
+    const next = [
+      ...rubricScores.filter((score) => score.criterionId !== criterionId),
+      { criterionId, levelId, points },
+    ];
+    setRubricScores(next);
+    if (assignment.rubric) setPoints(next.reduce((sum, score) => sum + score.points, 0));
   };
 
   if (!currentSubmission) {
@@ -191,7 +190,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                     e: React.ChangeEvent<
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
-                  ) => setPoints(Number(e.target.value))}
+                  ) => setPoints(e.target.value === '' ? '' : Number(e.target.value))}
                   max={assignment.points}
                   min={0}
                   step={0.5}
@@ -200,7 +199,9 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                 <span className="text-sm text-black">/ {assignment.points}</span>
               </div>
               <p className="mt-1 text-sm text-black">
-                {((points / assignment.points) * 100).toFixed(1)}%
+                {points === ''
+                  ? 'Not graded'
+                  : `${((points / assignment.points) * 100).toFixed(1)}%`}
               </p>
             </div>
 

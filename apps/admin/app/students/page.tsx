@@ -1,3 +1,7 @@
+import {
+  loadStudentDirectory,
+  directoryEnrollmentState,
+} from '@/lib/admin/student-directory-enrollments';
 import { Metadata } from 'next';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
@@ -36,12 +40,19 @@ function EnrollmentBadge({
   // Enrollment and LMS provisioning are independent. Do not turn active,
   // completed, suspended, or revoked records into a misleading approval state.
   const style = ['active', 'enrolled'].includes(normalized)
-    ? { bg: 'bg-green-100', text: 'text-green-800', label: accessGranted ? 'Enrolled · Access granted' : 'Enrolled · Access pending' }
-    : styles[normalized] ?? (normalized
-      ? { bg: 'bg-slate-100', text: 'text-slate-700', label: normalized.replace(/_/g, ' ') }
-      : { bg: 'bg-slate-100', text: 'text-slate-600', label: 'No enrollment' });
+    ? {
+        bg: 'bg-green-100',
+        text: 'text-green-800',
+        label: accessGranted ? 'Enrolled · Access granted' : 'Enrolled · Access pending',
+      }
+    : (styles[normalized] ??
+      (normalized
+        ? { bg: 'bg-slate-100', text: 'text-slate-700', label: normalized.replace(/_/g, ' ') }
+        : { bg: 'bg-slate-100', text: 'text-slate-600', label: 'No enrollment' }));
   return (
-    <span className={`inline-block max-w-full break-words rounded-lg px-2 py-1 text-xs font-semibold leading-tight ${style.bg} ${style.text}`}>
+    <span
+      className={`inline-block max-w-full break-words rounded-lg px-2 py-1 text-xs font-semibold leading-tight ${style.bg} ${style.text}`}
+    >
       {style.label}
     </span>
   );
@@ -54,6 +65,7 @@ function isTestOrAuditProfile(student: { email?: string | null; full_name?: stri
     email.endsWith('.test') ||
     email.endsWith('@qa.invalid') ||
     email.endsWith('@elevate-test.dev') ||
+    email.endsWith('@elevatetest.com') ||
     email.endsWith('@test.elevateforhumanity.org') ||
     email.endsWith('@example.com') ||
     name.startsWith('[qa') ||
@@ -72,92 +84,48 @@ export default async function StudentsPage({
   const includeTest = params.include_test === '1';
   const search = (params.search ?? '').trim();
 
-  // Load students with their most recent enrollment
-  const { data: operationalStudents, error: profilesError } = await db
-    .from('profiles')
-    .select('id, full_name, first_name, last_name, email, phone, created_at, role')
-    .eq('role', 'student')
-    .like('email', '%@%')
-    .not('email', 'ilike', '%@qa.invalid')
-    .not('full_name', 'ilike', '[QA%')
-    .order('created_at', { ascending: false })
-    .limit(1000);
-
-  // The directory previously truncated to the 50 newest profiles, which hid
-  // valid active students such as older HVAC enrollments. The operational set
-  // is already bounded to 1,000 and filtered above, so render the full set.
-  const allStudents = operationalStudents ?? [];
+  const { profiles: allStudents, enrollments } = await loadStudentDirectory(db);
+  const profilesError = null;
+  const enrollmentError = null;
+  const activeError = null;
+  const pendingError = null;
+  const completedError = null;
   const testRecordCount = allStudents.filter(isTestOrAuditProfile).length;
   const eligibleStudents = includeTest
     ? allStudents
     : allStudents.filter((student) => !isTestOrAuditProfile(student));
   const students = eligibleStudents.filter((student) => studentMatchesSearch(student, search));
-  const totalStudents = allStudents.length - testRecordCount;
-  const operationalStudentIds = allStudents
-    .filter((student) => !isTestOrAuditProfile(student))
-    .map((student: any) => student.id);
-
-  // Load enrollments for displayed students to show real state.
-  const studentIds = students.map((student: any) => student.id);
-  const { data: enrollments, error: enrollmentError } =
-    studentIds.length > 0
-      ? await db
-          .from('program_enrollments')
-          .select('user_id, enrollment_state, access_granted_at, program_slug')
-          .in('user_id', studentIds)
-          .order('enrolled_at', { ascending: false })
-      : { data: [], error: null };
-
-  // Index: user_id → most recent enrollment
-  const enrollmentByUser: Record<string, any> = {};
-  for (const e of enrollments ?? []) {
-    if (!enrollmentByUser[e.user_id]) enrollmentByUser[e.user_id] = e;
+  const operationalStudents = allStudents.filter((student) => !isTestOrAuditProfile(student));
+  const totalStudents = operationalStudents.length;
+  const operationalStudentIds = new Set(operationalStudents.map((student) => student.id));
+  const enrollmentByUser: Record<string, (typeof enrollments)[number]> = {};
+  for (const enrollment of enrollments) {
+    const userId = enrollment.user_id ?? enrollment.student_id;
+    if (userId && !enrollmentByUser[userId])
+      enrollmentByUser[userId] = {
+        ...enrollment,
+        enrollment_state: directoryEnrollmentState(enrollment),
+      };
   }
-
-  // Real counts — access_granted_at is the canonical "active" gate
-  const { count: activeEnrollments, error: activeError } = await db
-    .from('program_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .in('enrollment_state', ['active', 'enrolled'])
-    .in(
-      'user_id',
-      operationalStudentIds.length
-        ? operationalStudentIds
-        : ['00000000-0000-0000-0000-000000000000'],
-    );
-
-  const { count: pendingApproval, error: pendingError } = await db
-    .from('program_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .in('enrollment_state', ['applied', 'pending_approval', 'onboarding', 'orientation'])
-    .in(
-      'user_id',
-      operationalStudentIds.length
-        ? operationalStudentIds
-        : ['00000000-0000-0000-0000-000000000000'],
-    );
-
-  const { count: completedEnrollments, error: completedError } = await db
-    .from('program_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .eq('enrollment_state', 'completed')
-    .in(
-      'user_id',
-      operationalStudentIds.length
-        ? operationalStudentIds
-        : ['00000000-0000-0000-0000-000000000000'],
-    );
-
+  const countStudents = (states: string[], access = false) =>
+    new Set(
+      enrollments
+        .filter(
+          (e) =>
+            operationalStudentIds.has(e.user_id ?? e.student_id) &&
+            states.includes(directoryEnrollmentState(e) ?? '') &&
+            (!access || e.access_granted_at),
+        )
+        .map((e) => e.user_id ?? e.student_id),
+    ).size;
+  const activeEnrollments = countStudents(['active', 'enrolled', 'in_progress', 'confirmed'], true);
+  const pendingApproval = countStudents(['applied', 'pending_approval']);
+  const completedEnrollments = countStudents(['completed', 'graduated']);
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const { count: recentStudents } = await db
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('role', 'student')
-    .like('email', '%@%')
-    .not('email', 'ilike', '%@qa.invalid')
-    .not('full_name', 'ilike', '[QA%')
-    .gte('created_at', weekAgo.toISOString());
+  const recentStudents = operationalStudents.filter(
+    (student) => student.created_at && new Date(student.created_at) >= weekAgo,
+  ).length;
 
   return (
     <AdminPageShell
@@ -227,119 +195,140 @@ export default async function StudentsPage({
       <AdminCard>
         {students && students.length > 0 ? (
           <>
-          <div className="space-y-3 p-3 sm:hidden">
-            {students.map((student: any) => {
-              const enr = enrollmentByUser[student.id];
-              return (
-                <article key={student.id} className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                  <div className="flex min-w-0 items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="break-words font-semibold text-slate-900">
-                        {student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Unnamed'}
-                      </h3>
-                      <p className="mt-1 break-words text-sm text-slate-600">{student.email}</p>
-                      {student.phone && <p className="mt-1 text-sm text-slate-600">{student.phone}</p>}
-                    </div>
-                    <div className="shrink-0">
-                      {enrollmentError
-                        ? <span className="text-xs text-amber-700">Enrollment unavailable</span>
-                        : <EnrollmentBadge state={enr?.enrollment_state ?? null} accessGranted={Boolean(enr?.access_granted_at)} />}
-                    </div>
-                  </div>
-                  <p className="mt-3 break-words text-sm capitalize text-slate-700">
-                    {enr?.program_slug?.replace(/-/g, ' ') || 'Program not assigned'}
-                  </p>
-                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
-                    <span className="text-xs text-slate-500">Joined {new Date(student.created_at).toLocaleDateString()}</span>
-                    <Link href={`/students/${student.id}`} className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-semibold text-brand-blue-700">View student →</Link>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-          <div className="hidden overflow-x-auto sm:block">
-            <div className="min-w-[600px]">
-              {/* Table header */}
-              <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-600">
-                <div className="col-span-3">Student</div>
-                <div className="col-span-3">Contact</div>
-                <div className="col-span-2">Program</div>
-                <div className="col-span-2">Enrollment</div>
-                <div className="col-span-1">Joined</div>
-                <div className="col-span-1"></div>
-              </div>
+            <div className="space-y-3 p-3 sm:hidden">
               {students.map((student: any) => {
                 const enr = enrollmentByUser[student.id];
                 return (
-                  <div
+                  <article
                     key={student.id}
-                    className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-slate-50 transition-colors border-t border-slate-100"
+                    className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
                   >
-                    <div className="col-span-3 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-brand-blue-700 font-bold text-xs">
-                          {(student.full_name || student.first_name || '?').charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 leading-tight truncate">
+                    <div className="flex min-w-0 items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="break-words font-semibold text-slate-900">
                           {student.full_name ||
                             `${student.first_name || ''} ${student.last_name || ''}`.trim() ||
                             'Unnamed'}
-                        </p>
+                        </h3>
+                        <p className="mt-1 break-words text-sm text-slate-600">{student.email}</p>
+                        {student.phone && (
+                          <p className="mt-1 text-sm text-slate-600">{student.phone}</p>
+                        )}
+                      </div>
+                      <div className="shrink-0">
+                        {enrollmentError ? (
+                          <span className="text-xs text-amber-700">Enrollment unavailable</span>
+                        ) : (
+                          <EnrollmentBadge
+                            state={enr?.enrollment_state ?? null}
+                            accessGranted={Boolean(enr?.access_granted_at)}
+                          />
+                        )}
                       </div>
                     </div>
-                    <div className="col-span-3 space-y-0.5 min-w-0">
-                      {student.email && (
-                        <p className="text-xs text-slate-600 flex items-center gap-1 truncate">
-                          <Mail className="w-3 h-3 flex-shrink-0" />
-                          {student.email}
-                        </p>
-                      )}
-                      {student.phone && (
-                        <p className="text-xs text-slate-500 flex items-center gap-1">
-                          <Phone className="w-3 h-3 flex-shrink-0" />
-                          {student.phone}
-                        </p>
-                      )}
-                    </div>
-                    <div className="col-span-2 min-w-0">
-                      {enr?.program_slug ? (
-                        <p className="text-xs text-slate-600 truncate">
-                          {enr.program_slug.replace(/-/g, ' ')}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-slate-400">—</p>
-                      )}
-                    </div>
-                    <div className="col-span-2">
-                      {enrollmentError ? (
-                        <span className="text-xs text-amber-700">Enrollment unavailable</span>
-                      ) : (
-                        <EnrollmentBadge
-                          state={enr?.enrollment_state ?? null}
-                          accessGranted={Boolean(enr?.access_granted_at)}
-                        />
-                      )}
-                    </div>
-                    <div className="col-span-1">
-                      <p className="text-xs text-slate-500">
-                        {new Date(student.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="col-span-1 text-right">
+                    <p className="mt-3 break-words text-sm capitalize text-slate-700">
+                      {enr?.program_slug?.replace(/-/g, ' ') || 'Program not assigned'}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
+                      <span className="text-xs text-slate-500">
+                        Joined {new Date(student.created_at).toLocaleDateString()}
+                      </span>
                       <Link
                         href={`/students/${student.id}`}
-                        className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
+                        className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-semibold text-brand-blue-700"
                       >
-                        View →
+                        View student →
                       </Link>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
-          </div>
+            <div className="hidden overflow-x-auto sm:block">
+              <div className="min-w-[600px]">
+                {/* Table header */}
+                <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+                  <div className="col-span-3">Student</div>
+                  <div className="col-span-3">Contact</div>
+                  <div className="col-span-2">Program</div>
+                  <div className="col-span-2">Enrollment</div>
+                  <div className="col-span-1">Joined</div>
+                  <div className="col-span-1"></div>
+                </div>
+                {students.map((student: any) => {
+                  const enr = enrollmentByUser[student.id];
+                  return (
+                    <div
+                      key={student.id}
+                      className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-slate-50 transition-colors border-t border-slate-100"
+                    >
+                      <div className="col-span-3 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-brand-blue-700 font-bold text-xs">
+                            {(student.full_name || student.first_name || '?')
+                              .charAt(0)
+                              .toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 leading-tight truncate">
+                            {student.full_name ||
+                              `${student.first_name || ''} ${student.last_name || ''}`.trim() ||
+                              'Unnamed'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-span-3 space-y-0.5 min-w-0">
+                        {student.email && (
+                          <p className="text-xs text-slate-600 flex items-center gap-1 truncate">
+                            <Mail className="w-3 h-3 flex-shrink-0" />
+                            {student.email}
+                          </p>
+                        )}
+                        {student.phone && (
+                          <p className="text-xs text-slate-500 flex items-center gap-1">
+                            <Phone className="w-3 h-3 flex-shrink-0" />
+                            {student.phone}
+                          </p>
+                        )}
+                      </div>
+                      <div className="col-span-2 min-w-0">
+                        {enr?.program_slug ? (
+                          <p className="text-xs text-slate-600 truncate">
+                            {enr.program_slug.replace(/-/g, ' ')}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-slate-400">—</p>
+                        )}
+                      </div>
+                      <div className="col-span-2">
+                        {enrollmentError ? (
+                          <span className="text-xs text-amber-700">Enrollment unavailable</span>
+                        ) : (
+                          <EnrollmentBadge
+                            state={enr?.enrollment_state ?? null}
+                            accessGranted={Boolean(enr?.access_granted_at)}
+                          />
+                        )}
+                      </div>
+                      <div className="col-span-1">
+                        <p className="text-xs text-slate-500">
+                          {new Date(student.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="col-span-1 text-right">
+                        <Link
+                          href={`/students/${student.id}`}
+                          className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
+                        >
+                          View →
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </>
         ) : (
           <AdminEmptyState

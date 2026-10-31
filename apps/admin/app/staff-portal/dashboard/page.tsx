@@ -1,3 +1,4 @@
+import { LEARNER_ROSTER_ROLES } from '@/lib/program-holder/roster-eligibility';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
@@ -45,47 +46,53 @@ export default async function StaffDashboard() {
   const supabase = await createClient();
 
   // Get student counts
-  const { count: totalStudents } = await supabase
+  const { count: totalStudents, error: studentError } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
-    .eq('role', 'student');
+    .in('role', [...LEARNER_ROSTER_ROLES]);
 
   // Get active enrollments
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments, error: activeError } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Get at-risk students
-  const { count: atRiskCount } = await supabase
+  const { count: atRiskCount, error: riskError } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('at_risk', true);
 
   // Get pending enrollments
-  const { count: pendingEnrollments } = await supabase
+  const { count: pendingEnrollments, error: pendingError } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
   // Get recent enrollments for activity feed
-  const { data: recentEnrollments } = await supabase
+  const { data: recentEnrollments, error: recentError } = await supabase
     .from('program_enrollments')
-    .select('id, status, created_at, user_id, program_id, programs ( title )')
+    .select('id, status, created_at, user_id, student_id, program_id, programs ( title )')
     .order('created_at', { ascending: false })
     .limit(10);
 
+  if (studentError || activeError || riskError || pendingError || recentError)
+    throw new Error('STAFF_DASHBOARD_LOOKUP_UNAVAILABLE');
+
   // Hydrate user profiles separately (program_enrollments.user_id has no FK to profiles)
   const staffUserIds = [
-    ...new Set((recentEnrollments || []).map((e: any) => e.user_id).filter(Boolean)),
+    ...new Set(
+      (recentEnrollments || []).map((e: any) => e.user_id || e.student_id).filter(Boolean),
+    ),
   ];
-  const { data: staffProfiles } = staffUserIds.length
+  const { data: staffProfiles, error: staffProfilesError } = staffUserIds.length
     ? await supabase.from('profiles').select('id, full_name, email').in('id', staffUserIds)
-    : { data: [] };
+    : { data: [], error: null };
+  if (staffProfilesError) throw new Error('STAFF_PROFILE_LOOKUP_UNAVAILABLE');
   const staffProfileMap = Object.fromEntries((staffProfiles || []).map((p: any) => [p.id, p]));
   const recentEnrollmentsWithProfiles = (recentEnrollments || []).map((e: any) => ({
     ...e,
-    profiles: staffProfileMap[e.user_id] ?? null,
+    profiles: staffProfileMap[e.user_id || e.student_id] ?? null,
   }));
 
   return (
@@ -110,7 +117,7 @@ export default async function StaffDashboard() {
       {/* Main Content */}
       <div className="w-full max-w-none px-4 py-8">
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
               <Users className="h-11 w-11 text-brand-blue-600" />

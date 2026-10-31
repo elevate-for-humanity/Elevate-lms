@@ -350,6 +350,7 @@ export default async function StudentDashboard() {
         .from('course_lessons')
         .select('id, title, duration_minutes')
         .eq('course_id', activeCourseId)
+        .eq('is_published', true)
         .order('order_index', { ascending: true }),
       supabase
         .from('lesson_progress')
@@ -365,7 +366,12 @@ export default async function StudentDashboard() {
     lessons = (lessonsRes.data ?? []) as LessonRow[];
     completedLessonIds = new Set(
       (progressRes.data ?? [])
-        .filter((row: any) => row.completed === true && row.lesson_id)
+        .filter(
+          (row: any) =>
+            row.completed === true &&
+            row.lesson_id &&
+            lessons.some((lesson) => lesson.id === row.lesson_id),
+        )
         .map((row: any) => String(row.lesson_id)),
     );
   }
@@ -1239,7 +1245,7 @@ export default async function StudentDashboard() {
                   <div className="mt-4 space-y-3 text-sm">
                     <PathStep label="Complete all lessons" done={isComplete} />
                     <PathStep
-                      label="Complete assessments"
+                      label="Pass a knowledge check"
                       done={recentQuizAttempts.some((attempt: any) => attempt.passed)}
                     />
                     <PathStep label="Earn certification" done={certifications.length > 0} />

@@ -7,10 +7,23 @@
   text-align: left;
 }
 .reader :is(p, li, td, th, label, input, select, textarea, button, a, summary) {
-  font-size: 1.125rem;
   line-height: 1.75;
   text-align: left;
   overflow-wrap: anywhere;
+}
+/* Enlarge small labels without shrinking headings or dashboard metrics. */
+.reader :global(.text-xs),
+.reader :global(.text-sm),
+.reader :global(.text-base),
+.reader :global([class~='text-[10px]']),
+.reader :global([class~='text-[11px]']),
+.reader :global([class~='text-[12px]']),
+.reader :global([class~='text-[13px]']),
+.reader :global([class~='text-[14px]']),
+.reader :global([class~='text-[15px]']),
+.reader :global([class~='text-[16px]']) {
+  font-size: 1.125rem;
+  line-height: 1.75;
 }
 .reader :is(h1, h2, h3, h4) {
   line-height: 1.4;

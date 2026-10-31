@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { practicalServiceKey } from '@/lib/apprenticeship/practical-service-progress.mjs';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 type Apprentice = { enrollmentId: string; name: string; standard: { occupationTitle: string } };
 type Entry = {
@@ -85,6 +86,10 @@ export default function PracticalProgressEntry() {
   const [apprentices, setApprentices] = useState<Apprentice[]>([]);
   const [selected, setSelected] = useState('');
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [serviceCounts, setServiceCounts] = useState<Array<{
+    service_name: string;
+    recorded_count: number;
+  }> | null>(null);
   const [service, setService] = useState('');
   const [subject, setSubject] = useState('patron');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -136,6 +141,7 @@ export default function PracticalProgressEntry() {
     let current = true;
     setCanRecord(false);
     setEntries([]);
+    setServiceCounts(null);
     setService('');
     setNotes('');
     setMessage('');
@@ -153,6 +159,7 @@ export default function PracticalProgressEntry() {
         if (!response.ok) throw Error(data.error || 'Unable to load practical progress.');
         if (!current) return;
         setEntries(data.entries || []);
+        setServiceCounts(Array.isArray(data.serviceCounts) ? data.serviceCounts : null);
         setCanRecord(data.canRecord === true);
         setPractice(
           data.practice || {
@@ -202,6 +209,7 @@ export default function PracticalProgressEntry() {
           'Service saved, but the updated progress could not be loaded. Refresh before recording it again.',
         );
       setEntries(data.entries || []);
+      setServiceCounts(Array.isArray(data.serviceCounts) ? data.serviceCounts : null);
       setPractice(data.practice || practice);
       setNotes('');
       setMessage('Practical service saved. Student progress is updated.');
@@ -212,7 +220,13 @@ export default function PracticalProgressEntry() {
     }
   }
   const totals = new Map<string, number>();
-  entries.forEach((e) => totals.set(e.service_name, (totals.get(e.service_name) || 0) + 1));
+  const countedServices =
+    serviceCounts ??
+    entries.map((entry) => ({ service_name: entry.service_name, recorded_count: 1 }));
+  countedServices.forEach((entry) => {
+    const key = practicalServiceKey(entry.service_name);
+    totals.set(key, (totals.get(key) || 0) + Math.max(0, Number(entry.recorded_count) || 0));
+  });
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <h2 className="text-2xl font-black">Record student progress</h2>
@@ -369,7 +383,7 @@ export default function PracticalProgressEntry() {
                 <thead>
                   <tr className="border-b">
                     <th className="p-2">Activity</th>
-                    <th className="p-2">Recorded</th>
+                    <th className="p-2">Verified services</th>
                     <th className="p-2">Mark completed</th>
                   </tr>
                 </thead>
@@ -377,7 +391,7 @@ export default function PracticalProgressEntry() {
                   {options.map((v) => (
                     <tr key={v} className="border-b">
                       <td className="p-2">{v}</td>
-                      <td className="p-2">{totals.get(v) || 0}</td>
+                      <td className="p-2">{totals.get(practicalServiceKey(v)) || 0}</td>
                       <td className="p-2">
                         {canRecord ? (
                           <button

@@ -189,6 +189,7 @@ it('persists an owner observation against the actual placement and returns its u
   const data = await (await read()).json();
   expect(data.canRecord).toBe(true);
   expect(data.practice.recordedCount).toBe(1);
+  expect(data.serviceCounts).toEqual([{ service_name: 'Fade', recorded_count: 1 }]);
   expect(data.entries).toHaveLength(1);
 });
 it('cannot write as the student or as an unrelated shop member', async () => {

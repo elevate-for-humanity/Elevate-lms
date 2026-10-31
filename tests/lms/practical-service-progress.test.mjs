@@ -28,3 +28,11 @@ test('read-only student progress sums the same service across active enrollments
   assert.equal(result.items[0].recordedCount,3);
   assert.equal(result.complete,true);
 });
+
+test('combines capitalization and spacing variants without rewriting the observed service',()=>{
+  const result=practicalServiceProgress([{service_name:'Haircut',required_count:3}],[{service_name:' haircut ',recorded_count:1},{service_name:'HAIRCUT',recorded_count:2}]);
+  assert.equal(result.items[0].recordedCount,3);
+  assert.equal(result.items[0].service_name,'Haircut');
+  assert.equal(result.percent,100);
+  assert.equal(result.complete,true);
+});

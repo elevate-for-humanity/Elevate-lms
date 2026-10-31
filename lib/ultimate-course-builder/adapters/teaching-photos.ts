@@ -1,3 +1,4 @@
+import {coursePhotoPicker,rememberCoursePhoto,teachingPhotoPrompt,teachingPhotoRequests} from './course-photo-library.mjs';
 import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
@@ -10,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { describeWorkerError, optionalStorageCacheMiss } from '../core/worker-error.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-/** Private, reusable photographs tied to exact spoken teaching points.
+/** Private, reusable photographs relevant to the course subject.
  * These are illustrations, never evidence of a performed practical skill. */
 export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const premium = input.lessonPresentation === 'approved-premium-v1';
@@ -24,12 +25,17 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const scenes = input.artifacts?.storyboard?.storyboard?.scenes;
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
+  const relatedPhoto=input.courseId ? await coursePhotoPicker(input,db.storage.from('course_videos'),async()=>{
+    const {data,error}=await db.from('ultimate_course_builds').select('canonicalLessonIds:profile->canonicalLessonIds,title:profile->>title,ultimate_lesson_builds(competency_id,scenes:artifacts->storyboard->storyboard->scenes)').eq('course_id',input.courseId);
+    if(error)throw error;
+    return (data??[]).flatMap((build:any)=>(build.ultimate_lesson_builds??[]).filter((lesson:any)=>build.canonicalLessonIds?.[lesson.competency_id]&&Array.isArray(lesson.scenes)).map((lesson:any)=>({courseId:input.courseId,courseTitle:build.title,lessonId:build.canonicalLessonIds[lesson.competency_id],artifacts:{storyboard:{storyboard:{scenes:lesson.scenes}}}})));
+  }) : null;
   const approvedReference=premium ? await approvedReferencePhotoPicker(input,db) : null;
   let placedPhotos: any[] | undefined;
   const usedPhotoHashes=new Set<string>();
   const usedSelections=new Set<string>();
   const assignPhoto=(sceneId:string,photo:any,cueIndex:number)=>{
-    if(!photo.sha256||usedPhotoHashes.has(photo.sha256))return false;
+    if(!photo.sha256||(!photo.courseRelated && usedPhotoHashes.has(photo.sha256)))return false;
     usedPhotoHashes.add(photo.sha256);
     photos[sceneId][cueIndex]=photo;
     return true;
@@ -39,12 +45,9 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     if (!premium && !requestedScenes.has(scene.id)) continue;
     const steps = scene.teachingVisual?.steps;
     if (!steps?.length) throw new Error('TEACHING_PHOTO_SCRIPT_CUES_REQUIRED');
-    const requests = steps.length === 1 ? [
-      {...steps[0], view:'full workstation view'}, {...steps[0], view:'close detail view with complete hands and tools'},
-    ] : steps.map((step: any) => ({...step,view:'complete action view'}));
+    const requests = teachingPhotoRequests(scene);
     if(premium && !scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
-    const recapIndex = scene.recapText?.trim() ? requests.length : -1;
-    if (recapIndex !== -1) requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
+    const recapIndex = scene.recapText?.trim() ? requests.length-1 : -1;
     photos[scene.id] = [];
     const batch=new TeachingPhotoBatch();
     for (const [index, step] of requests.entries()) {
@@ -100,15 +103,15 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
+      const contextual=relatedPhoto ? await relatedPhoto({...scene,previousPhotoHash:photos[scene.id][index-1]?.sha256},index,step) : null;
+      if(contextual){
+        assignPhoto(scene.id,{...contextual,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index);
+        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+        continue;
+      }
       await batch.add(async()=>{
        try {
-      const prompt = [
-        'Generate a camera-realistic professional training photograph with natural skin texture, lifelike materials and photographic lighting. No cartoons, anime, drawings, vector art, clip art or 3D-rendered characters.',
-        'This synthetic photograph is an educational illustration, not evidence of a performed practical procedure.',
-        'Show complete hands, tools and relevant subject, uncropped, no printed text, no logos, no invented measurements.',
-        'Use a realistic professional training setting. No unsafe actions or invented numbered guards.',
-        String(input.courseTitle), String(scene.visualRequirement), String(step.narrationQuote), step.view,
-      ].join('\n');
+      const prompt = teachingPhotoPrompt(input,scene,step);
       // Keep content-addressed images while recording a durable cue-to-image
       // index. A resumed worker must reuse the saved asset before paid inference.
       const requestHash=createHash('sha256').update(JSON.stringify({
@@ -180,6 +183,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const indexed=await bucket.upload(indexPath,Buffer.from(JSON.stringify(saved)),{contentType:'application/json',upsert:true});
         if(indexed.error)throw new Error('TEACHING_PHOTO_INDEX_SAVE_FAILED');
       }
+      if(input.courseId)await rememberCoursePhoto(input,bucket,saved,[scene.visualRequirement,step.narrationQuote].join(' '));
       const signed=await bucket.createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl)throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       if(!assignPhoto(scene.id,{imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,

@@ -257,7 +257,17 @@ function parseAction(value: Record<string, unknown>): AgentAction {
   throw new Error(`Unsupported engineering action: ${type || 'missing'}`);
 }
 
-export async function stageParisCodeRepair(task: string, repairId?: string, actorId?: string) {
+export type ParisRepairCheckpoint = {
+  version: 1; branch: string; baseSha: string; headSha: string; nextTurn: number;
+  observations: string[]; changedFiles: string[]; newRegressionTests: string[];
+  commits: string[]; writes: number; summary: string; complete: boolean;
+};
+type RepairContinuation = {
+  checkpoint?: ParisRepairCheckpoint;
+  save: (checkpoint: ParisRepairCheckpoint) => Promise<void>;
+};
+
+export async function stageParisCodeRepair(task: string, repairId?: string, actorId?: string, continuation?: RepairContinuation) {
   await hydrateProcessEnv().catch(() => undefined);
 
   if(!actorId)return NextResponse.json({error:'PARIS repair actor is required.'},{status:403});
@@ -268,21 +278,45 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     if (!owned.verified) return NextResponse.json({error:'Owned model connection is unavailable. Verify the selected private CPU endpoint before retrying.'},{status:503});
   }
   const taskId = repairId ?? crypto.randomUUID();
-  const { branch, baseSha } = await createTaskBranch(taskId);
-  const observations: string[] = [
-    `Repository: ${REPOSITORY}`,
-    `Base: ${BASE_BRANCH}@${baseSha}`,
-    `Working branch: ${branch}`,
+  const saved = continuation?.checkpoint;
+  if (saved && (saved.version !== 1 || !/^studio\/[a-z0-9-]+$/.test(saved.branch) ||
+    !/^[a-f0-9]{40}$/.test(saved.baseSha) || !/^[a-f0-9]{40}$/.test(saved.headSha) ||
+    !Number.isInteger(saved.nextTurn) || saved.nextTurn < 0 || saved.nextTurn > MAX_TURNS)) {
+    throw Error('PARIS_REPAIR_CHECKPOINT_INVALID');
+  }
+  const { branch, baseSha } = saved ?? await createTaskBranch(taskId);
+  let headSha = saved?.headSha ?? baseSha;
+  if (saved) {
+    const current = await githubJson(`/git/ref/heads/${encodeURIComponent(branch)}`);
+    if (current.object?.sha !== headSha) throw Error('PARIS_REPAIR_CHECKPOINT_BRANCH_CHANGED');
+  }
+  const observations: string[] = saved?.observations ?? [
+    `Repository: ${REPOSITORY}`, `Base: ${BASE_BRANCH}@${baseSha}`, `Working branch: ${branch}`,
   ];
-  const changedFiles = new Set<string>();
-  const newRegressionTests = new Set<string>();
-  const commits: string[] = [];
-  let writes = 0;
-  let summary = '';
+  const changedFiles = new Set<string>(saved?.changedFiles ?? []);
+  const newRegressionTests = new Set<string>(saved?.newRegressionTests ?? []);
+  const commits: string[] = saved?.commits ?? [];
+  let writes = saved?.writes ?? 0;
+  let summary = saved?.summary ?? '';
+  let complete = saved?.complete ?? false;
+  let nextTurn = saved?.nextTurn ?? 0;
   let usedProvider=provider;
+  const checkpoint = async () => {
+    if (!continuation) return;
+    const ref = await githubJson(`/git/ref/heads/${encodeURIComponent(branch)}`);
+    headSha = String(ref.object?.sha ?? '');
+    if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
+    await continuation.save({version:1,branch,baseSha,headSha,nextTurn,
+      observations:observations.slice(-8),changedFiles:[...changedFiles],
+      newRegressionTests:[...newRegressionTests],commits,writes,summary,complete});
+  };
 
   try {
-    for (let turn = 0; turn < MAX_TURNS; turn += 1) {
+    // Save the task branch before inference; never place job credentials in it.
+    if (continuation && !saved) await checkpoint();
+    const stopTurn = continuation ? Math.min(MAX_TURNS, nextTurn + 1) : MAX_TURNS;
+    for (let turn = nextTurn; !complete && turn < stopTurn; turn += 1) {
+      try {
       const inferenceOptions = {
         messages: [
           {
@@ -317,6 +351,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         temperature: 0.1,
         maxTokens: 2400,
         jsonMode: true,
+        signal: AbortSignal.timeout(90_000),
       } as Parameters<typeof aiChat>[0];
       const infer=()=>aiChat(inferenceOptions);
       const paid=provider==='elevate'?null:await executePaidInference({db,authorize:()=>reservePaidInference(db,{scopeKey:'studio-chat',actorId,runId:taskId,artifactFingerprint:paidArtifactFingerprint({taskId,turn,task}),idempotencyKey:`paris-repair:${taskId}:${turn}`,provider,model:'canonical',operation:'paris-code-repair',projectedCostMicros:Math.max(0,Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS??'100000'))}),dispatch:infer});
@@ -414,7 +449,15 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       }
 
       summary = action.summary;
+      complete = true;
       break;
+      } finally {
+        nextTurn = turn + 1;
+        await checkpoint();
+      }
+    }
+    if (continuation && !complete && nextTurn < MAX_TURNS) {
+      return NextResponse.json({pending:true,turn:nextTurn}, {status:202});
     }
 
     const ref = await githubJson(`/git/ref/heads/${encodeURIComponent(branch)}`);

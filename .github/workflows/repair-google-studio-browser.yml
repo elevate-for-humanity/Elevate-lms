@@ -11,6 +11,7 @@ on:
       - 'Dockerfile.studio-browser'
       - 'scripts/gcp/preflight-studio-browser-permissions.mjs'
       - 'scripts/test-studio-browser-cutover.mjs'
+      - 'scripts/gcp/verify-studio-connected-runtime*'
   workflow_dispatch:
     inputs:
       candidate_only:
@@ -29,7 +30,7 @@ jobs:
       - name: Dispatch through trusted Google workflow identity
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches" -f ref=main
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches" -f ref=main -f 'inputs[candidate_only]=false'
   repair:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (vars.GOOGLE_RELEASE_HOLD != 'true' || inputs.candidate_only == true)
     runs-on: ubuntu-24.04
@@ -147,3 +148,8 @@ jobs:
           path: reports/studio-browser
           if-no-files-found: ignore
           retention-days: 7
+      - name: Verify the serving Studio and Admin connection after cutover
+        if: ${{ success() && !inputs.candidate_only }}
+        run: |
+          node --test scripts/gcp/verify-studio-connected-runtime.test.mjs
+          node scripts/gcp/verify-studio-connected-runtime.mjs

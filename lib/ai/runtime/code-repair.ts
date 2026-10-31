@@ -66,12 +66,27 @@ export async function prepareParisRepair(id:string,runId:number){
  if(run.path!==`.github/workflows/${REPAIR_WORKFLOW}`||run.event!=='workflow_dispatch'||run.head_branch!=='main'||run.status!=='in_progress')throw Error('REPAIR_WORKFLOW_AUTHORITY_REQUIRED');
  const db=await requireAdminClient();
  const {data:row,error}=await db.from('paris_code_repairs').update({status:'patching',workflow_run_id:runId,updated_at:new Date().toISOString()}).eq('id',id).in('status',['queued','dispatched']).select('*').maybeSingle();
- if(error)throw error;if(!row)throw Error('REPAIR_ALREADY_CLAIMED');
+ if(error)throw error;
+ let claimed=row;
+ if(!claimed){
+  const existing=await db.from('paris_code_repairs').select('*').eq('id',id).eq('workflow_run_id',runId).eq('status','patching').maybeSingle();
+  if(existing.error)throw existing.error;
+  claimed=existing.data;
+ }
+ if(!claimed)throw Error('REPAIR_ALREADY_CLAIMED');
  try{
-  let candidate=row.candidate;
-  if(!candidate){
+  let candidate=claimed.candidate;
+  if(!candidate || candidate.kind==='planner-checkpoint') {
    const {stageParisCodeRepair}=await import('@/lib/devstudio/paris-code-engineer');
-   const response=await stageParisCodeRepair(row.goal,id,row.actor_id);candidate=await response.json();
+   const response=await stageParisCodeRepair(claimed.goal,id,claimed.actor_id,{
+    checkpoint:candidate?.kind==='planner-checkpoint'?candidate.checkpoint:undefined,
+    save:async checkpoint=>{
+     const saved=await db.from('paris_code_repairs').update({candidate:{kind:'planner-checkpoint',checkpoint},updated_at:new Date().toISOString()}).eq('id',id).eq('workflow_run_id',runId).eq('status','patching').select('id').maybeSingle();
+     if(saved.error)throw saved.error;
+     if(!saved.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
+    },
+   });candidate=await response.json();
+   if(response.status===202 && candidate.pending===true)return {pending:true,turn:candidate.turn};
    if(!response.ok)throw Error('PARIS_PATCH_FAILED: '+String(candidate.error??'no patch').slice(0,300));
   }
   if(!/^[a-f0-9]{40}$/.test(candidate.branch?.sha??'')||!/^[a-f0-9]{40}$/.test(candidate.base_sha??''))throw Error('REPAIR_CANDIDATE_EVIDENCE_REQUIRED');

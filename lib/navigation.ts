@@ -223,6 +223,11 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { id: 'store', name: 'Store', href: ROUTES.store },
   {
+    id: 'curvature-body-sculpting',
+    name: 'Curvature Body Sculpting',
+    href: ROUTES.curvatureBodySculpting,
+  },
+  {
     id: 'foundation',
     name: 'Foundation',
     href: '/rise-forward-foundation',

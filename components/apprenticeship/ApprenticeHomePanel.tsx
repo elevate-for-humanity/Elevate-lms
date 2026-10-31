@@ -3,6 +3,9 @@ import {
   APPRENTICE_POLICY_KEYS,
   APPRENTICE_POLICY_VERSION,
 } from '@/lib/apprenticeship/apprentice-policy';
+import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
+import { courseOverviewPath } from '@/lib/lms/routes';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -73,6 +76,19 @@ export default async function ApprenticeHomePanel({
     (documents || []) as any[],
     Boolean(verification),
   );
+  const courseId = runtime.enrollment.course_id;
+  const learning = courseId
+    ? await loadPublishedLessonProgress(db, courseId, userId)
+    : null;
+  const paidInFull = runtime.enrollment.payment_status === 'paid_in_full';
+  const learningTools = [
+    { title: 'Workbook & reading', text: 'Review instruction and continue your saved workbook.', href: '/apprentice/workbook' },
+    { title: 'Assignments', text: 'Open assigned work and review submission requirements.', href: '/lms/assignments' },
+    { title: 'Quizzes & exams', text: 'Open your assigned knowledge checks and exams.', href: '/lms/quizzes' },
+    { title: 'Grades & feedback', text: 'Review recorded results and instructor feedback.', href: '/lms/grades' },
+    { title: 'Practical skills', text: 'Submit evidence and review supervisor-verified competencies.', href: '/apprentice/competencies' },
+    { title: 'Class calendar', text: 'Check sessions, due dates and training milestones.', href: '/lms/calendar' },
+  ];
   const actions: Array<{ title: string; text: string; href: string }> = [];
   const approved = new Set(
     ((documents || []) as any[])
@@ -142,11 +158,11 @@ export default async function ApprenticeHomePanel({
             <p className="text-sm font-semibold text-teal-800">Your apprentice dashboard</p>
             <h1 className="mt-2 text-3xl font-bold text-slate-950">Welcome, {name}</h1>
             <p className="mt-4 text-base leading-7 text-slate-700">
-              Start with any alerts below. Choose <strong>Theory / My Lessons</strong> in the menu
-              for class, or <strong>Timeclock</strong> for work. Your selected page opens here.
+              Continue your course, open your workbook, or review feedback below.
+              Record supervised shop work separately with the timeclock.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              On your phone, tap the menu button to find the same tools.
+              Lesson completion, approved work hours and verified practical skills are tracked separately.
             </p>
           </div>
           <div className="relative min-h-56 bg-neutral-200">
@@ -161,6 +177,41 @@ export default async function ApprenticeHomePanel({
           </div>
         </div>
       </section>
+      <section aria-labelledby="apprentice-learning-title" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 id="apprentice-learning-title" className="text-2xl font-bold text-slate-950">Your learning</h2>
+            <p className="mt-2 max-w-2xl leading-7 text-slate-700">Study the lesson, complete its activities, review feedback, and submit practical evidence when required.</p>
+          </div>
+          <Link href={APPRENTICE_TIMECLOCK_URL} className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 px-4 py-3 font-semibold">Open timeclock</Link>
+        </div>
+        {learning && courseId ? (
+          <div className="mt-5 rounded-2xl border border-teal-200 bg-teal-50 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-950">Your assigned course</h3>
+                <p className="mt-1 text-slate-700">{learning.completedLessons} of {learning.totalLessons} published lessons complete · {learning.percent}%</p>
+              </div>
+              <Link href={courseOverviewPath(courseId)} className="inline-flex min-h-12 items-center rounded-xl bg-teal-800 px-5 py-3 font-bold text-white">
+                {learning.totalLessons > 0 && learning.completedLessons === learning.totalLessons ? 'Review course' : learning.completedLessons > 0 ? 'Continue course' : 'Open course'} →
+              </Link>
+            </div>
+            <progress className="mt-4 h-3 w-full accent-teal-800" max={100} value={learning.percent} aria-label="Published lesson completion" />
+            <p className="mt-3 text-sm leading-6 text-slate-700">Open the course outline to choose your available lesson. Required assessments and practical approvals still apply.</p>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-xl bg-slate-50 p-4 text-slate-700">Your course assignment is not available yet. Contact program staff to confirm your training access.</p>
+        )}
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {learningTools.map((tool) => (
+            <Link key={tool.href} href={tool.href} className="rounded-2xl border border-slate-200 p-4 transition hover:border-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800">
+              <h3 className="font-bold text-slate-950">{tool.title} →</h3>
+              <p className="mt-2 leading-6 text-slate-700">{tool.text}</p>
+            </Link>
+          ))}
+        </div>
+        {paidInFull ? <p className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-950">Tuition paid in full. No payment setup is required.</p> : null}
+      </section>
       <section aria-labelledby="apprentice-alerts-title" className="space-y-3">
         <h2 id="apprentice-alerts-title" className="text-xl font-bold text-slate-950">
           Alerts & next steps
@@ -170,6 +221,7 @@ export default async function ApprenticeHomePanel({
             Some alerts could not load. Refresh this page or contact support.
           </p>
         ) : null}
+        <div className="grid gap-3 md:grid-cols-2">
         {actions.map((action) => (
           <Link
             key={action.title}
@@ -181,6 +233,7 @@ export default async function ApprenticeHomePanel({
             <span className="mt-2 inline-block font-semibold underline">Review this step →</span>
           </Link>
         ))}
+        </div>
         {currentNotices.map((notice) => (
           <article key={notice.id} className="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="font-bold text-slate-950">{notice.title}</h3>

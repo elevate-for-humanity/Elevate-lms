@@ -1,9 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import {
-  ACTIVE_ENROLLMENT_STATES,
-  portalPathForProgramSlug,
-  portalTypeForProgramSlug,
-} from '@/lib/portal/apprenticeship-portal-paths';
+import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
 import { PORTAL_PATHS, PORTAL_FALLBACK, type PortalKey } from '@/lib/portal/router';
 import { LMS_HOST } from '@/lib/routing/portal-map';
 
@@ -37,42 +33,8 @@ export async function resolveStudentHomePath(
   userId: string,
   cachedPortalType?: string | null,
 ): Promise<string> {
-  const { data: enrollment } = await supabase
-    .from('program_enrollments')
-    .select('program_slug, program_id')
-    .eq('user_id', userId)
-    .or(`enrollment_state.in.(${[...ACTIVE_ENROLLMENT_STATES].join(',')}),status.in.(${[...ACTIVE_ENROLLMENT_STATES].join(',')})`)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  let slugPath = portalPathForProgramSlug(enrollment?.program_slug);
-  if (slugPath) {
-    const portalType = portalTypeForProgramSlug(enrollment?.program_slug);
-    if (portalType) {
-      await supabase.from('profiles').update({ portal_type: portalType }).eq('id', userId);
-    }
-    return appUrl(slugPath);
-  }
-
-  if (enrollment?.program_id) {
-    const { data: program } = await supabase
-      .from('programs')
-      .select('slug')
-      .eq('id', enrollment.program_id)
-      .maybeSingle();
-
-    if (program?.slug) {
-      slugPath = portalPathForProgramSlug(program.slug);
-      if (slugPath) {
-        const portalType = portalTypeForProgramSlug(program.slug);
-        if (portalType) {
-          await supabase.from('profiles').update({ portal_type: portalType }).eq('id', userId);
-        }
-        return appUrl(slugPath);
-      }
-    }
-  }
+  const assignedHome = await resolveAssignedLearnerHome(supabase, userId);
+  if (assignedHome) return appUrl(assignedHome);
 
   const cached = String(cachedPortalType || '').trim().toLowerCase();
   if (cached) {

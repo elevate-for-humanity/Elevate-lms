@@ -1,3 +1,4 @@
+import { loadLearnerProgramContact } from '@/lib/learner/program-contact';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import type { Metadata } from 'next';
@@ -42,17 +43,14 @@ export default async function CalendarPage() {
     .select('id,program_holder_id')
     .eq('user_id', user.id)
     .in('status', ['applied', 'pending', 'active', 'enrolled', 'completed']);
-  const holderIds = [...new Set((links || []).map((row) => row.program_holder_id))];
-  const { data: contactBoxes } = holderIds.length
-    ? await db
-        .from('communication_email_mailboxes')
-        .select('address')
-        .in('program_holder_id', holderIds)
-        .eq('active', true)
-        .eq('mailbox_kind', 'program_holder')
-    : { data: [] };
-  const requestAddress =
-    contactBoxes?.length === 1 ? contactBoxes[0].address : 'admissions@elevateforhumanity.org';
+  let requestAddress = 'admissions@elevateforhumanity.org';
+  let contactError = false;
+  try {
+    requestAddress = await loadLearnerProgramContact(db, user.id);
+  } catch (error) {
+    contactError = true;
+    logger.error('[calendar] program contact load failed', error);
+  }
   const requestHref = `/communications/email?to=${encodeURIComponent(requestAddress)}&subject=${encodeURIComponent('Appointment request: course support')}`;
   const { data: meetings, error: meetingError } = links?.length
     ? await db
@@ -169,6 +167,11 @@ export default async function CalendarPage() {
           </div>
         </header>
 
+        {contactError ? (
+          <p role="alert" className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+            Your assigned contact could not load. Appointment requests will go to Admissions.
+          </p>
+        ) : null}
         <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
           <CalendarWidget
             readOnly={subject.previewing}

@@ -1,3 +1,4 @@
+import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
 import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -26,13 +27,11 @@ export default async function WorkbookPage() {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice/workbook');
 
-  const { data: enrollment } = await db
-    .from('program_enrollments')
-    .select('id,course_id,program_slug')
-    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const runtime = await resolveApprenticeshipRuntimeContext(db, {
+    userId: subject.userId,
+    requireRegisteredStandard: false,
+  });
+  const enrollment = runtime?.enrollment;
 
   let courseTitle = 'No course assigned yet';
   let totalLessons = 0;

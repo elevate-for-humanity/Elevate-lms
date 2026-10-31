@@ -1,4 +1,6 @@
 import 'server-only';
+import { OPERATIONAL_ENROLLMENT_STATUSES } from '@/lib/enrollment/enrollment-flow';
+import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
@@ -14,7 +16,6 @@ export type ApprenticeshipRuntimeContext = {
   contract: Awaited<ReturnType<typeof resolveRegisteredProgramContract>>;
 };
 
-const ACTIVE_ENROLLMENT_STATES = ['active', 'enrolled', 'in_progress', 'confirmed'];
 
 export async function resolveApprenticeshipRuntimeContext(
   db: SupabaseClient,
@@ -40,7 +41,7 @@ export async function resolveApprenticeshipRuntimeContext(
   if (input.programSlug) enrollmentQuery = enrollmentQuery.eq('program_slug', input.programSlug);
   if (!input.enrollmentId) {
     enrollmentQuery = enrollmentQuery
-      .in('status', ACTIVE_ENROLLMENT_STATES)
+      .in('status', [...OPERATIONAL_ENROLLMENT_STATUSES])
       .order('created_at', { ascending: false })
       .limit(1);
   }
@@ -115,8 +116,13 @@ export async function resolveApprenticeshipRuntimeContext(
     throw new Error(`REGISTERED_PROGRAM_CONTRACT_MISSING:${programSlug}`);
   }
 
+  const courseId = enrollment.course_id || await resolveCourseIdFromDb(
+    db,
+    enrollment.program_id || programSlug,
+  );
+
   return {
-    enrollment,
+    enrollment: { ...enrollment, course_id: courseId },
     studentId,
     programSlug,
     placement: placement || null,

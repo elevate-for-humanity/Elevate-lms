@@ -1,3 +1,4 @@
+import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
 import { CareerPlan } from '@/components/career/CareerPlan';
 import { loadCareerPlan } from '@/lib/career/plan';
 import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
@@ -119,6 +120,8 @@ export default async function StudentDashboard() {
   // Old bookmarks and installed Student app shortcuts must not create a second
   // home for apprentices. Shared course routes remain available with apprentice chrome.
   if (isApprenticeWorkspaceRole(subjectProfile?.role)) redirect(PortalRouter.get('apprentice'));
+  const assignedHome = await resolveAssignedLearnerHome(db, subjectId);
+  if (assignedHome?.startsWith('/apprentice')) redirect(assignedHome);
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling

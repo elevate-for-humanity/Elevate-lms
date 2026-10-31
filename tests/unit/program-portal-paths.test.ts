@@ -6,21 +6,26 @@ import {
   apprenticeshipWorkbookHref,
   isWorkoneChecklistEligibleApplication,
 } from '@/lib/portal/program-portal-paths';
-import { BARBER_COURSE_ID } from '@/lib/barber/pricing';
 
 describe('program-portal-paths', () => {
+  it('uses the same assignment-aware course launch for all beauty programs and future apprenticeships', () => {
+    for (const slug of ['barber-apprenticeship', 'cosmetology-apprenticeship', 'esthetician-apprenticeship', 'nail-technician-apprenticeship', 'future-apprenticeship']) {
+      expect(apprenticeshipLmsCoursePath(slug)).toBe('/apprentice/theory');
+    }
+    expect(apprenticeshipLmsCoursePath('bookkeeping')).toBeNull();
+  });
   it('routes barber orientation to program page', () => {
     expect(apprenticeshipOrientationPath('barber-apprenticeship')).toBe(
       '/apprentice/orientation?program=barber-apprenticeship',
     );
   });
 
-  it('routes barber RTI to Prestige Elevation LMS course', () => {
+  it('routes barber RTI through the current enrollment', () => {
     expect(apprenticeshipLmsCoursePath('barber-apprenticeship')).toBe(
-      `/lms/courses/${BARBER_COURSE_ID}`,
+      '/apprentice/theory',
     );
     expect(apprenticeshipRtiLabel('barber-apprenticeship')).toBe(
-      'Prestige Elevation Barber Curriculum',
+      'Barber theory course',
     );
     expect(apprenticeshipWorkbookHref('barber-apprenticeship')).toBe(
       '/workbooks',

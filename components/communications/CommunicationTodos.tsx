@@ -1,4 +1,5 @@
 'use client';
+import { actionableNoticeFilter, actionableNotices } from '@/lib/notifications/actionable-notices';
 import { PwaAlertListener } from '@/components/notifications/PwaAlertListener';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -13,7 +14,7 @@ export function CommunicationTodos({
   const pathname = usePathname();
   const authPage = /\/(login|signup|reset-password|auth)(\/|$)/.test(pathname);
   const holderPage = /^\/program-holder(\/|$)/.test(pathname);
-  const learnerPage = /^\/(lms|learner|student)(\/|$)/.test(pathname);
+  const learnerPage = /^\/(lms|learner|student|apprentice)(\/|$)/.test(pathname);
   const [signedIn, setSignedIn] = useState(false);
   const [activeUserId, setActiveUserId] = useState('');
   const [items, setItems] = useState<any[]>([]);
@@ -38,14 +39,15 @@ export function CommunicationTodos({
       }
       const { data } = await db
         .from('notifications')
-        .select('id,title,message,action_url,action_label')
+        .select('id,title,message,action_url,action_label,created_at,idempotency_key,metadata')
         .eq('user_id', user.id)
         .eq('read', false)
+        .or(actionableNoticeFilter())
         .in('type', ['message', 'announcement', 'reminder'])
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(50);
       if (active) {
-        setItems(data || []);
+        setItems(actionableNotices(data || []).slice(0, 5));
         setSignedIn(true);
         setActiveUserId(user.id);
       }

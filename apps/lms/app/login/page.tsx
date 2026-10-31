@@ -181,6 +181,8 @@ export default function LoginPage() {
           userId,
           typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
         );
+      } else if (['student', 'learner'].includes(String(profile.role)) && !safeRedirect) {
+        destination = await resolveStudentHomePath(supabase, userId, profile.portal_type);
       } else if (safeRedirect) {
         destination = requestedDestination;
       } else {

@@ -108,7 +108,7 @@
     "html2canvas": "1.4.1",
     "ioredis": "5.11.1",
     "isomorphic-dompurify": "^2.35.0",
-    "joi": "18.2.6",
+    "joi": "18.3.1",
     "jose": "^6.2.3",
     "js-yaml": "^5.2.2",
     "jsonwebtoken": "^9.0.3",

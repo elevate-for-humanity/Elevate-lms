@@ -1,3 +1,4 @@
+import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -49,7 +50,10 @@ export default async function LearnerWorkspaceLayout({
   const isAdmin =
     subject.previewing || ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
   const subjectRole = subjectProfile.role;
-  const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole);
+  const assignedHome = ['student', 'learner'].includes(String(subjectRole))
+    ? await resolveAssignedLearnerHome(db, subject.userId)
+    : null;
+  const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole) || assignedHome?.startsWith('/apprentice') === true;
   const showBilling =
     (!isAdmin || subject.previewing) &&
     (await learnerCanSeeBilling(db, subject.userId, subjectRole));

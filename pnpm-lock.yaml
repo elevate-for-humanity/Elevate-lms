@@ -40,10 +40,10 @@ overrides:
   fast-uri@>=3.0.0 <3.1.9: 3.1.9
   fast-xml-parser: ^5.10.1
   flatted: ^3.4.2
-  follow-redirects: 1.16.1
+  follow-redirects: 1.16.2
   ip-address: ^10.3.1
   ip-address@<=10.7.3: '>=10.7.4'
-  joi@>=18.0.0 <18.2.9: '>=18.2.9'
+  joi@>=18.0.0 <18.3.1: 18.3.1
   js-yaml@3: 4.3.2
   js-yaml@>=4.0.0 <5.0.0: 4.3.2
   nanoid: ^3.3.18
@@ -361,8 +361,8 @@ importers:
         specifier: ^2.35.0
         version: 2.36.0(@noble/hashes@1.8.0)
       joi:
-        specifier: '>=18.2.9'
-        version: 18.3.0
+        specifier: 18.3.1
+        version: 18.3.1
       jose:
         specifier: ^6.2.3
         version: 6.2.12
@@ -6432,8 +6432,8 @@ packages:
   fn.name@1.1.0:
     resolution: {integrity: sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==}
 
-  follow-redirects@1.16.1:
-    resolution: {integrity: sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==}
+  follow-redirects@1.16.2:
+    resolution: {integrity: sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -7164,8 +7164,8 @@ packages:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
 
-  joi@18.3.0:
-    resolution: {integrity: sha512-/RwAK4BAfzcdbdFg073tzq4/xhY6Q7lMd5AmjqTL6pu0QFJdEmtswgm8BvgwXvOKuPNYQ8XrdQrrW/gF65LiNw==}
+  joi@18.3.1:
+    resolution: {integrity: sha512-mV9M4Llh4va3NT90p7KBtQhoZqjs8xLX7EWYE4y/GG3yLF6REbIBEHSUb0UX1JXRht2w5tiLSsvmpYc5akiqIw==}
     engines: {node: '>= 20'}
 
   jose@5.10.0:
@@ -14838,7 +14838,7 @@ snapshots:
 
   axios@1.20.0:
     dependencies:
-      follow-redirects: 1.16.1
+      follow-redirects: 1.16.2
       form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
@@ -16221,7 +16221,7 @@ snapshots:
 
   fn.name@1.1.0: {}
 
-  follow-redirects@1.16.1: {}
+  follow-redirects@1.16.2: {}
 
   fontkit@2.0.4:
     dependencies:
@@ -17037,7 +17037,7 @@ snapshots:
 
   jiti@1.21.7: {}
 
-  joi@18.3.0:
+  joi@18.3.1:
     dependencies:
       '@hapi/address': 5.1.1
       '@hapi/formula': 3.0.2

@@ -1,3 +1,4 @@
+import {teachingPhotoPrompt,teachingPhotoRequests,coursePhotoPicker,rememberCoursePhoto} from '../../lib/ultimate-course-builder/adapters/course-photo-library.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -20,6 +21,7 @@ function prepare(generate,overrides={}) {
     generateTeachingPhoto: generate,
     recoverTeachingPhoto,
     TeachingPhotoBatch,
+    teachingPhotoPrompt,teachingPhotoRequests,coursePhotoPicker,rememberCoursePhoto,
     createHash,
     describeWorkerError: error => error.message,
     optionalStorageCacheMiss: error => error.status === 404,
@@ -129,4 +131,22 @@ test('text-card cache from the retired v3 path cannot satisfy a photographic req
   assert.equal(calls, 6);
   assert.ok(result.teachingPhotos.core.every(photo => photo.provider === 'google' && photo.sha256 !== sha256));
   assert.ok(db.files.has(storagePath));
+});
+test('course-context restart recovers saved cue pictures and completes different scenes without inference',async()=>{
+ const db=database();const scoped={...structuredClone(input),courseId:'bookkeeping'};
+ const first=scoped.artifacts.storyboard.storyboard.scenes[0];
+ const requests=teachingPhotoRequests(first);
+ for(let index=0;index<2;index++){
+  const bytes=Buffer.from('saved-bookkeeping-'+index),sha256=createHash('sha256').update(bytes).digest('hex');
+  const prompt=teachingPhotoPrompt(scoped,first,requests[index]);
+  const requestHash=createHash('sha256').update(JSON.stringify({version:'photographic-course-cues-v4',lesson:scoped.lessonId,scene:first.id,index,prompt})).digest('hex');
+  const storagePath='approved-teaching-photos/'+sha256+'.png';db.files.set(storagePath,bytes);
+  db.files.set('approved-teaching-photo-index/'+requestHash+'.json',Buffer.from(JSON.stringify({sha256,storagePath,provider:'google'})));
+ }
+ const bucket=db.storage.from('course_videos');bucket.list=async(prefix,{limit,offset})=>({data:[...db.files.keys()].filter(k=>k.startsWith(prefix+'/')).map(k=>({name:k.slice(prefix.length+1)})).slice(offset,offset+limit)});
+ scoped.artifacts.storyboard.storyboard.scenes.push({...structuredClone(first),id:'different-topic',visualRequirement:'Review financial statements'});
+ const run=prepare(async()=>{throw Error('SHOULD_NOT_GENERATE_AN_EXACT_PICTURE');});
+ const result=await run(scoped,db);
+ assert.equal(Object.values(result.teachingPhotos).flat().length,6);
+ assert.ok(Object.values(result.teachingPhotos).flat().every(p=>p.courseRelated===true));
 });

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
@@ -108,62 +108,14 @@ export default function Page() {
                     </li>
                   </ul>
                 </div>
-                <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:flex-wrap">
-                  <Link
-                    href="/programs/financial-literacy"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 font-extrabold text-white hover:bg-brand-red-700"
-                  >
-                    Explore the Financial Empowerment Program
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                  <a
-                    href="/images/pages/team-collaboration.webp"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3.5 font-extrabold text-slate-800 hover:border-slate-500"
-                  >
-                    View Financial Empowerment Program Document
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </a>
-                </div>
+
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-slate-200 bg-slate-50 px-4 py-14 sm:py-16">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">
-                Program Resource
-              </p>
-              <h2 className="mt-2 text-3xl font-black text-slate-950">
-                Financial Literacy Program Flyer
-              </h2>
-            </div>
-            <a
-              href="/images/pages/team-collaboration.webp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-extrabold text-white hover:bg-slate-800"
-            >
-              Open Full Flyer <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-          </div>
-          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-            <Image
-              src="/images/pages/team-collaboration.webp"
-              alt="Elevate Financial Empowerment Program — 8-week practical financial literacy course led by Dr. Carlina A. Wilkes"
-              width={1189}
-              height={1536}
-              className="h-auto w-full"
-              sizes="(max-width: 768px) 100vw, 768px"
-            />
-          </div>
-        </div>
-      </section>
+
     </div>
   );
 }

@@ -79,12 +79,10 @@ const PROGRAMS = [
   { value: 'barber-apprenticeship', label: 'Barber Apprenticeship' },
   { value: 'cosmetology-apprenticeship', label: 'Cosmetology Apprenticeship' },
   { value: 'esthetician-apprenticeship', label: 'Esthetician Apprenticeship' },
-  { value: 'financial-literacy', label: 'Financial Literacy' },
   { value: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship' },
   { value: 'phlebotomy', label: 'Phlebotomy Technician' },
   { value: 'qma', label: 'Qualified Medication Aide (QMA)' },
   { value: 'it-help-desk', label: 'IT Help Desk' },
-  { value: 'bookkeeping', label: 'Bookkeeping & QuickBooks' },
   { value: 'welding', label: 'Welding' },
   { value: 'other', label: 'Other / Not sure yet' },
 ];

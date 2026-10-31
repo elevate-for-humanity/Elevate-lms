@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminHostShopApprenticesPage() {
-  redirect('/host-shop/dashboard/apprentices');
+  redirect('/apprenticeships');
 }

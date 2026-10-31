@@ -409,7 +409,9 @@ export function PlatformShell({
                         }`}
                       >
                         <Icon className="h-5 w-5 shrink-0" />
-                        <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                        <span className="min-w-0 flex-1 whitespace-normal break-words leading-6">
+                          {item.label}
+                        </span>
                         {item.badge && (
                           <span className="shrink-0 rounded-full bg-brand-red-600 px-2 py-0.5 text-xs">
                             {item.badge}

@@ -38,3 +38,11 @@ The instructional presenter is the existing Angela Thompson AI configuration, ra
 - Targeted instructor-component ESLint and TypeScript syntax checks passed. A full typecheck was requested through the shared memory lock; do not record it as passed without the actual result.
 - The final-release transaction was attempted while the build was queued and correctly rejected with `Instructional production is not fully released`; no final was published.
 - Database readback confirmed all 18 draft lessons, 25 final questions, archived old course and the unchanged one active program enrollment.
+
+## Contextual-picture repair continuation
+
+The owner authorized related course pictures instead of exact picture-to-sentence matching. Course-scoped saved photographs now replace paid exact-image generation. A second renderer issue required timing contextual photographs over the measured primary narration interval while preserving real word captions and the recap boundary. The timing repair is in worker source `99d90bbd0641a788d9413dc4ed7a019c6676d80b` (35 relevant tests passed).
+
+While that worker deploys, unstarted media jobs are held with `available_at=infinity`. The monitor records `awaitingRepairImage` and the original retry budget in `restartRetryLimit`; current owned attempts may finish, but old-binary retries were capped. After the registered runtime verifies the new worker, execute `scripts/courses/resume-bookkeeping-timing-repair.sql`. It restores held media work and retry budgets without resetting completed lessons, changing the frozen source profile, or approving unfinished media. It intentionally rejects an older runtime. Keep the build profile equal to the immutable autopilot-pool profile; changing presentation instructions in only the build profile causes source-revision rejection.
+
+Then verify real media/quality jobs and canonical publication. Only after all 17 instructional competencies are published and verified should `scripts/courses/finalize-bookkeeping-rebuild.sql` publish the separately authored 25-question final and restore the complete 18-lesson count. Do not equate successfully deployed code or running workers with a finished/published course.

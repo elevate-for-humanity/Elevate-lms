@@ -130,10 +130,10 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'tax-services',
-    name: 'Get Your Taxes Prepared',
-    href: '/tax',
+    name: 'Supersonic Fast Cash',
+    href: ROUTES.supersonicFastCash,
     subItems: [
-      { name: 'Supersonic Fast Cash', href: '/tax', isSectionLink: true },
+      { name: 'Supersonic Fast Cash', href: ROUTES.supersonicFastCash, isSectionLink: true },
       { name: 'Prepare My Taxes', href: '/tax-software/self-file', isSectionLink: true },
       { name: 'Get Professional Tax Help', href: '/tax-software/contact', isSectionLink: true },
     ],
@@ -222,6 +222,11 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   { id: 'store', name: 'Store', href: ROUTES.store },
+  {
+    id: 'platinum-cleaning',
+    name: '2Exclusive Platinum Cleaning',
+    href: ROUTES.platinumCleaning,
+  },
   {
     id: 'curvature-body-sculpting',
     name: 'Curvature Body Sculpting',

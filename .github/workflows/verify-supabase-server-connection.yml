@@ -1,0 +1,42 @@
+name: Verify Supabase server connection
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-supabase-server-connection.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        include:
+          - project_ref: cuxzzpsyufcewtmicszk
+            secret_name: SUPABASE_SERVICE_ROLE_KEY
+          - project_ref: liwxpxhccbaxwylpnapo
+            secret_name: COURSE_BUILDER_SUPABASE_SERVICE_ROLE_KEY
+    env:
+      PROJECT_REF: ${{ matrix.project_ref }}
+      SERVER_KEY: ${{ secrets[matrix.secret_name] }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: '24' }
+      - name: Verify project identity and authenticated server connection
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const ref=process.env.PROJECT_REF,key=process.env.SERVER_KEY;
+          assert.ok(key,'Server credential is not configured');
+          const headers={apikey:key};
+          if(!key.startsWith('sb_secret_')){
+            let claims;try{claims=JSON.parse(Buffer.from(key.split('.')[1],'base64url').toString());}catch{throw new Error('Unsupported server credential format');}
+            assert.equal(claims.role,'service_role','Credential must be a server key');
+            assert.equal(claims.ref,ref,'Credential belongs to a different Supabase project');
+            headers.Authorization='Bearer '+key;
+          }
+          const r=await fetch('https://'+ref+'.supabase.co/rest/v1/',{headers,signal:AbortSignal.timeout(30000)});
+          assert.equal(r.status,200,'Supabase API rejected the configured server credential');
+          console.log(JSON.stringify({project:ref,serverCredentialConfigured:true,authenticatedRestConnection:true}));
+          NODE

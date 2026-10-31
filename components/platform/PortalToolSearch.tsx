@@ -39,7 +39,7 @@ export function PortalToolSearch({
         onKeyDown={(event) => {
           if (event.key === 'Escape') setQuery('');
         }}
-        aria-controls={`${id}-results`}
+        aria-controls={term ? `${id}-results` : undefined}
         placeholder="Find a dashboard tool…"
         className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-slate-950"
       />

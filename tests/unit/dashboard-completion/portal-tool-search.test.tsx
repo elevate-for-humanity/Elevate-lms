@@ -20,7 +20,9 @@ it('finds canonical role tools, deduplicates destinations and clears after navig
     />,
   );
   const input = screen.getByRole('searchbox');
+  expect(input.hasAttribute('aria-controls')).toBe(false);
   fireEvent.change(input, { target: { value: 'students' } });
+  expect(document.getElementById(input.getAttribute('aria-controls')!)).toBeTruthy();
   const links = screen.getAllByRole('link');
   expect(links).toHaveLength(1);
   expect(links[0]).toHaveAttribute('href', '/program-holder/students');

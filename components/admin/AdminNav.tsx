@@ -229,7 +229,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           aria-label="Admin workspace"
           className="grid min-w-0 grid-cols-1 gap-2 border-t border-slate-200 bg-slate-50 px-2 py-2 sm:flex sm:items-center sm:px-4 lg:px-6"
         >
-          <label className="min-w-0 sm:w-48">
+          <label className="min-w-0 sm:w-64">
             <span className="sr-only">Admin section</span>
             <select
               aria-label="Admin section"

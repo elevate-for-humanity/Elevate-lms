@@ -18,6 +18,10 @@ def selected_lessons(value,request):
 if __name__=='__main__':
     root=Path(__file__).parent
     request=json.loads((root/'film-request.json').read_text())
+    if os.environ['LESSON_ID']=='barber-copy-request':
+        if request.get('mode')!='copy-reviewed-barber-media':raise ValueError('MANUAL_REQUEST_MODE_INVALID')
+        subprocess.run([sys.executable,str(root/'copy_reviewed_barber_media.py')],env={**os.environ,'MANUAL_CANONICAL_LESSON_IDS':json.dumps(request.get('lessonIds',[]))},check=True)
+        sys.exit(0)
     if os.environ['LESSON_ID']=='sources-request':
         if request.get('mode')!='prepare-source-frames':raise ValueError('MANUAL_REQUEST_MODE_INVALID')
         subprocess.run([sys.executable,str(root/'prepare_source_frames.py')],env={**os.environ,'MANUAL_SOURCE_IDS':json.dumps(request.get('sourceVideoIds',[]))},check=True)

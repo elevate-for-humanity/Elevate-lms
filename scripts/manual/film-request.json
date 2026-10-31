@@ -1,18 +1,14 @@
 {
-  "mode": "encode-review-candidate",
+  "mode": "copy-reviewed-barber-media",
   "lessonIds": [
-    "31483a14-8965-42c2-98b5-2ee7afc7fc7e",
-    "9e472ac0-b6c2-496f-97a0-87d64dc379ea",
-    "ccbb06ed-a235-4959-8d2f-be15eca9687c",
-    "507999e3-aef0-4a7e-a6ec-9ed515029668",
-    "38150e5f-6f6a-40cd-b470-ba64bda30068",
-    "bc337d93-4442-48e2-a8cd-f09b5304a226",
-    "7510fa16-bb60-4225-88c9-68ba86bef36f",
-    "37dc5c53-baa3-4217-a953-d60ba3dd3cae",
-    "5f7519b9-f488-4752-a211-eb41a933ed78",
-    "c1f09cd1-a901-4c40-b8ff-84ef3b25bdf5",
-    "4cb4bcd1-1467-4bd2-bef7-dd3aa0caad9f",
-    "7bc40513-eeae-4fdd-9b5b-bb26dd139bc3",
-    "e18bf654-f40f-4894-9f37-2478e5c0471d"
+    "320aed93-7e5e-49cc-911b-0001399d8e2f",
+    "07946ab8-4e21-45a6-9dc7-369b7bf95772",
+    "28c6289a-b7a5-457a-b3be-fd232b15629a",
+    "f0bddca8-5f15-4833-a7bc-96f56299fd3f",
+    "c8690f1f-9618-4de8-88dd-eba8d68ecdf8",
+    "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+    "287ddc2e-a3b1-4afe-9cde-54e3a6204418",
+    "3db8e953-649c-466e-8957-3e8e0a704f04",
+    "aafa58a3-d731-4189-a82a-8f6c53c60f36"
   ]
 }

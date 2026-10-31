@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useWebsiteConfig } from '@/components/website-builder/WebsiteConfigProvider';
 import { ExternalLink, Loader2, Mic, MicOff, Monitor, Save, Send, Smartphone, Sparkles, Tablet, Volume2 } from 'lucide-react';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
@@ -39,7 +40,7 @@ export function AutonomousWebsiteBuilder({
   initiallyPublished: boolean;
   initialConfig: TenantSiteConfig;
 }) {
-  const [config, setConfig] = useState(() => ensureComposableSiteConfig(initialConfig));
+  const [config, setConfig] = useWebsiteConfig(initialConfig);
   const [siteName, setSiteName] = useState(initialSiteName);
   const [subdomain, setSubdomain] = useState(initialSubdomain || '');
   const [published, setPublished] = useState(initiallyPublished);

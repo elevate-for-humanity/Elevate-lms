@@ -2,7 +2,7 @@ name: Dispatch and recover Google course work
 on:
   push:
     branches: [main]
-    paths: ['scripts/gcp/dispatch-lesson-autopilots.mjs', 'scripts/gcp/dispatch-lesson-autopilots.test.mjs', 'scripts/gcp/course-worker-stop-diagnostics.mjs', 'scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', 'scripts/gcp/paris-course-monitor.mjs', 'lib/ultimate-course-builder/worker/paris-monitor.mjs', '.github/workflows/dispatch-google-course-job.yml']
+    paths: ['data/courses/intuit-bookkeeping-professional.mjs', 'data/courses/intuit-bookkeeping-assessment.mjs', 'scripts/courses/prepare-bookkeeping-rebuild.mjs', 'scripts/gcp/dispatch-lesson-autopilots.mjs', 'scripts/gcp/dispatch-lesson-autopilots.test.mjs', 'scripts/gcp/course-worker-stop-diagnostics.mjs', 'scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', 'scripts/gcp/paris-course-monitor.mjs', 'lib/ultimate-course-builder/worker/paris-monitor.mjs', '.github/workflows/dispatch-google-course-job.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]

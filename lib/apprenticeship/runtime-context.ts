@@ -1,4 +1,5 @@
 import 'server-only';
+import { OPERATIONAL_ENROLLMENT_STATUSES } from '@/lib/enrollment/enrollment-flow';
 import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -15,7 +16,6 @@ export type ApprenticeshipRuntimeContext = {
   contract: Awaited<ReturnType<typeof resolveRegisteredProgramContract>>;
 };
 
-const ACTIVE_ENROLLMENT_STATES = ['active', 'enrolled', 'in_progress', 'confirmed'];
 
 export async function resolveApprenticeshipRuntimeContext(
   db: SupabaseClient,
@@ -41,7 +41,7 @@ export async function resolveApprenticeshipRuntimeContext(
   if (input.programSlug) enrollmentQuery = enrollmentQuery.eq('program_slug', input.programSlug);
   if (!input.enrollmentId) {
     enrollmentQuery = enrollmentQuery
-      .in('status', ACTIVE_ENROLLMENT_STATES)
+      .in('status', [...OPERATIONAL_ENROLLMENT_STATUSES])
       .order('created_at', { ascending: false })
       .limit(1);
   }

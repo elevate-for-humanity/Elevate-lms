@@ -170,7 +170,15 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
     programSlug,
     requireRegisteredStandard: false,
   });
-  if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
+  if (!runtime) {
+    return (
+      <main className="mx-auto max-w-3xl p-6">
+        <h1 className="text-2xl font-semibold">Complete your enrollment setup</h1>
+        <p className="mt-3 text-slate-600">Your apprenticeship workspace will be available when your enrollment is ready. Review your remaining setup steps or contact Admissions for help.</p>
+        <a href="/enrollment/confirmed" className="mt-5 inline-block rounded-lg bg-brand-red-600 px-4 py-3 text-white">Review enrollment setup</a>
+      </main>
+    );
+  }
   const beautyProgram = getBeautyApprenticeshipConfig(programSlug);
   const registeredStandard = getRegisteredProgramStandard(programSlug);
 

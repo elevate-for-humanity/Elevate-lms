@@ -41,6 +41,17 @@ describe('one enrollment-based learner home across login, API, and dashboard', (
     const { db } = database([{ program_id: 'future-program', status: 'active' }], '', { slug: 'new-program', program_type: 'apprenticeship' });
     expect(await resolveAssignedLearnerHome(db, 'learner')).toBe('/apprentice');
   });
+  for (const status of ['payment_required', 'onboarding', 'orientation', 'applied']) {
+    it(`does not send ${status} enrollment into the operational workspace`, async () => {
+      const { db, calls } = database([{ program_slug: 'barber-apprenticeship', status, enrollment_state: 'active' }]);
+      expect(await resolveAssignedLearnerHome(db, 'learner')).toBeNull();
+      expect(calls).toContainEqual(['program_enrollments', 'in', 'status', ['active', 'enrolled', 'in_progress', 'confirmed']]);
+    });
+  }
+  it('uses operational status even while workflow onboarding is unfinished', async () => {
+    const { db } = database([{ program_slug: 'barber-apprenticeship', status: 'active', enrollment_state: 'onboarding' }]);
+    expect(await resolveAssignedLearnerHome(db, 'learner')).toBe('/apprentice?program=barber-apprenticeship');
+  });
   it('keeps no-enrollment fallback behavior but surfaces failed assignment reads', async () => {
     expect(await resolveAssignedLearnerHome(database([]).db, 'learner')).toBeNull();
     await expect(resolveAssignedLearnerHome(database([], '', null, 'program_enrollments').db, 'learner')).rejects.toThrow('Unavailable');

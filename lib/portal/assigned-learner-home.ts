@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { APPRENTICESHIP_PORTAL_ENROLLMENT_STATES } from '@/lib/enrollment/enrollment-flow';
+import { OPERATIONAL_ENROLLMENT_STATUSES } from '@/lib/enrollment/enrollment-flow';
 import { portalPathForProgramSlug } from '@/lib/portal/apprenticeship-portal-paths';
 import { PORTAL_MAP } from '@/lib/routing/portal-map';
 
@@ -9,17 +9,16 @@ const STOPPED = new Set(['withdrawn', 'cancelled', 'rejected', 'revoked', 'suspe
  * Resolves navigation only; every destination retains its authorization gate.
  */
 export async function resolveAssignedLearnerHome(db: SupabaseClient, userId: string): Promise<string | null> {
-  const states = [...APPRENTICESHIP_PORTAL_ENROLLMENT_STATES, 'in_progress'].join(',');
   const { data, error } = await db
     .from('program_enrollments')
     .select('program_slug,program_id,status,enrollment_state')
     .or(`user_id.eq.${userId},student_id.eq.${userId}`)
-    .or(`enrollment_state.in.(${states}),status.in.(${states})`)
+    .in('status', [...OPERATIONAL_ENROLLMENT_STATUSES])
     .order('created_at', { ascending: false })
     .limit(20);
   if (error) throw error;
   const enrollment = (data || []).find(row =>
-    !STOPPED.has(String(row.status || '').toLowerCase()) &&
+    (OPERATIONAL_ENROLLMENT_STATUSES as readonly string[]).includes(String(row.status || '').toLowerCase()) &&
     !STOPPED.has(String(row.enrollment_state || '').toLowerCase()),
   );
   if (!enrollment) return null;

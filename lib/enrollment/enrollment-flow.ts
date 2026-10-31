@@ -88,6 +88,9 @@ export const APPRENTICESHIP_PORTAL_ENROLLMENT_STATES = [
   'documents_complete',
 ] as const;
 
+/** Operational access status shared by portal routing and apprentice runtime. */
+export const OPERATIONAL_ENROLLMENT_STATUSES = ['active', 'enrolled', 'in_progress', 'confirmed'] as const;
+
 /** States eligible for document submission APIs. */
 export const PRE_DOCUMENTS_STATES: readonly ValidEnrollmentState[] = [
   'enrolled',

@@ -117,3 +117,8 @@ test('related course pictures use actual primary speech intervals without requir
 test('context pictures cannot invent a missing speech timeline',()=>{
  assert.throws(()=>pictureTimeline(photos.map(p=>({...p,courseRelated:true})),[],12,8),/NOT_ALIGNED/);
 });
+test('partially matching contextual cues do not create a brief flash near the recap',()=>{
+ const related=photos.map((p,i)=>({...p,courseRelated:true,isRecap:i===2,narrationQuote:i===0?'Check the neck strip':'A general course picture'}));
+ const timeline=pictureTimeline(related,[{text:'Inspect the clean cape',startSeconds:0},{text:'Check the neck strip',startSeconds:7.99}],12,8);
+ assert.deepEqual(timeline.map(p=>[p.startSeconds,p.endSeconds]),[[0,4],[4,8],[8,12]]);
+});

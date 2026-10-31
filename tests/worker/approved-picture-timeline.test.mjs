@@ -104,3 +104,16 @@ test('barber consultation teaching pictures use primary speech rather than a clo
  const unsupported=pictures.map((p,i)=>i===0?{...p,narrationQuote:'securing consent and logging notes'}:p);
  assert.throws(()=>pictureTimeline(unsupported,recorded,17.976,9.648),/NOT_ALIGNED/);
 });
+test('related course pictures use actual primary speech intervals without requiring exact cue wording',()=>{
+ const related=photos.map((p,i)=>({...p,courseRelated:true,narrationQuote:'A related bookkeeping context '+i,isRecap:i===2}));
+ const timeline=pictureTimeline(related,cues,12,8);
+ assert.equal(timeline[0].startSeconds,0);
+ assert.equal(timeline[1].startSeconds,4);
+ assert.equal(timeline[2].startSeconds,8);
+ assert.equal(timeline[2].endSeconds,12);
+ assert.ok(timeline.slice(0,2).every(p=>p.timingMethod==='primary-speech-interval'));
+ for(let at=0;at<12;at+=0.1)assert.ok(activePictureCue(timeline,at));
+});
+test('context pictures cannot invent a missing speech timeline',()=>{
+ assert.throws(()=>pictureTimeline(photos.map(p=>({...p,courseRelated:true})),[],12,8),/NOT_ALIGNED/);
+});

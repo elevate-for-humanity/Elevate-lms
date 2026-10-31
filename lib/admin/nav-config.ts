@@ -299,3 +299,29 @@ export function isNavSections(v: unknown): v is NavSection[] {
       ),
   );
 }
+
+/** Required portal entry points survive saved navigation customizations. */
+export function withPortalNavigation(sections: NavSection[]): NavSection[] {
+  const portalSection: NavSection = {
+    label: 'Dashboards & Portals',
+    href: '/portals',
+    items: [
+      { label: 'Learner Dashboards', href: '/students' },
+      { label: 'Apprentice Dashboards', href: '/apprenticeships' },
+      { label: 'Host Shop Dashboards', href: '/partners' },
+      { label: 'Program Holder Dashboards', href: '/program-holders' },
+      { label: 'All Portals', href: '/portals' },
+    ],
+  };
+  const portalHrefs = new Set(portalSection.items.map((item) => item.href));
+  return [
+    portalSection,
+    ...sections
+      .filter((section) => section.label !== portalSection.label)
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => !portalHrefs.has(item.href)),
+      }))
+      .filter((section) => section.items.length > 0),
+  ];
+}

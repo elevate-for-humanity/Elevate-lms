@@ -161,8 +161,8 @@ export default async function CourseLandingPage({
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           {courseCover ? (
-            <figure className="mb-8 max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
-              <Image src={courseCover} alt={`${course.title} course cover`} width={1024} height={1536} sizes="(max-width: 640px) 100vw, 384px" className="h-auto w-full" priority />
+            <figure className="mb-5 max-w-24 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
+              <Image src={courseCover} alt={`${course.title} course cover`} width={1024} height={1536} sizes="96px" className="h-auto w-full" priority />
             </figure>
           ) : null}
           {heroVisual?.media_type === 'video' ? (
@@ -201,7 +201,7 @@ export default async function CourseLandingPage({
           ) : heroVisual?.media_type === 'image' ? (
             <figure className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-xl">
               <img
-                className="aspect-[8/3] w-full object-cover"
+                className="h-40 w-full object-contain sm:h-48"
                 src={heroVisual.asset_url}
                 alt={heroVisual.alt_text || course.title}
               />

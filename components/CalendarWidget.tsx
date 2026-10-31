@@ -19,9 +19,11 @@ type CalendarEvent = {
 export function CalendarWidget({
   userId,
   additionalEvents = [],
+  readOnly = false,
 }: {
   userId: string;
   additionalEvents?: CalendarEvent[];
+  readOnly?: boolean;
 }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -36,13 +38,25 @@ export function CalendarWidget({
     setError('');
     setGoogleError('');
     const google = (async () => {
+      if (readOnly) {
+        setGoogleEvents([]);
+        return;
+      }
       try {
-        const range = new URLSearchParams({ start: new Date(year, month - 1, 1).toISOString(), end: new Date(year, month, 1).toISOString() });
+        const range = new URLSearchParams({
+          start: new Date(year, month - 1, 1).toISOString(),
+          end: new Date(year, month, 1).toISOString(),
+        });
         const response = await fetch(`/api/calendar/google?${range}`, { cache: 'no-store' });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Google Calendar could not be checked.');
         setGoogleEvents(Array.isArray(result.events) ? result.events : []);
-      } catch { setGoogleEvents([]); setGoogleError('Google busy times could not be checked. Refresh or reconnect Google Calendar before booking.'); }
+      } catch {
+        setGoogleEvents([]);
+        setGoogleError(
+          'Google busy times could not be checked. Refresh or reconnect Google Calendar before booking.',
+        );
+      }
     })();
     try {
       const res = await fetch(
@@ -50,7 +64,30 @@ export function CalendarWidget({
       );
       if (!res.ok) throw new Error('Calendar unavailable');
       const data = await res.json();
-      setEvents(Array.isArray(data.events) ? data.events : []);
+      const savedEvents: CalendarEvent[] = Array.isArray(data.events) ? data.events : [];
+      const schedule = data.theorySchedule;
+      if (schedule) {
+        const daysInMonth = new Date(year, month, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(year, month - 1, day);
+          const localDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          if (
+            (schedule.days_of_week || []).includes(date.getDay() || 7) &&
+            (!schedule.starts_on || localDate >= schedule.starts_on)
+          ) {
+            savedEvents.push({
+              id: `theory-${localDate}`,
+              title: schedule.learner_confirmed_at
+                ? 'My theory study time'
+                : 'Assigned theory time — confirm in My Study Times',
+              date: localDate,
+              type: 'class',
+              time: `${String(schedule.start_time).slice(0, 5)}–${String(schedule.end_time).slice(0, 5)} (${schedule.timezone})`,
+            });
+          }
+        }
+      }
+      setEvents(savedEvents);
     } catch {
       setEvents([]);
       setError(
@@ -58,7 +95,7 @@ export function CalendarWidget({
       );
     }
     await google;
-  }, [currentDate, userId]);
+  }, [currentDate, userId, readOnly]);
 
   useEffect(() => {
     void loadEvents();
@@ -88,9 +125,13 @@ export function CalendarWidget({
             }
           : event,
       ),
-    ].filter((event) => event.startsAt && event.endsAt
-      ? Date.parse(event.startsAt) < new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime() && Date.parse(event.endsAt) > date.getTime()
-      : event.date === dateKey(date));
+    ].filter((event) =>
+      event.startsAt && event.endsAt
+        ? Date.parse(event.startsAt) <
+            new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime() &&
+          Date.parse(event.endsAt) > date.getTime()
+        : event.date === dateKey(date),
+    );
   const eventColor = (type: CalendarEvent['type']) =>
     ({
       assignment: 'bg-blue-500',
@@ -103,8 +144,12 @@ export function CalendarWidget({
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
-      <GoogleCalendarConnection onRefresh={loadEvents} />
-      {googleError ? <p role="alert" className="mb-4 text-sm font-bold text-amber-900">{googleError}</p> : null}
+      {!readOnly ? <GoogleCalendarConnection onRefresh={loadEvents} /> : null}
+      {googleError ? (
+        <p role="alert" className="mb-4 text-sm font-bold text-amber-900">
+          {googleError}
+        </p>
+      ) : null}
       {error ? (
         <p role="alert" className="mb-4 text-sm text-red-800">
           {error}

@@ -79,9 +79,9 @@ export default function TheoryScheduleEditor() {
           <form onSubmit={save} className="mt-6 space-y-5">
             <fieldset disabled={data.readOnly}>
               <legend className="font-semibold text-slate-950">1. Choose your days</legend>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-3 grid grid-cols-7 gap-1 overflow-x-auto">
                 {labels.map((label, i) => (
-                  <label key={label} className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm font-semibold ${days.includes(i + 1) ? 'border-teal-800 bg-teal-50 text-teal-950' : 'border-slate-200 text-slate-600'}`}>
+                  <label key={label} className={`flex min-h-20 min-w-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border px-1 py-3 text-xs font-semibold ${days.includes(i + 1) ? 'border-teal-800 bg-teal-50 text-teal-950' : 'border-slate-200 text-slate-600'}`}>
                     <input
                       type="checkbox"
                       checked={days.includes(i + 1)}
@@ -91,7 +91,7 @@ export default function TheoryScheduleEditor() {
                         )
                       }
                     />
-                    {label}
+                    <span className="sm:hidden">{label.slice(0, 3)}</span><span className="hidden sm:inline">{label}</span>
                   </label>
                 ))}
               </div>

@@ -358,7 +358,7 @@ export default async function LessonPage({
               <img
                 src={lessonVisual.asset_url}
                 alt={lessonVisual.alt_text || lesson.title}
-                className="aspect-video w-full object-contain bg-slate-50"
+                className="h-40 w-full object-contain bg-slate-50 sm:h-48"
               />
               {lessonVisual.caption ? (
                 <figcaption className="border-t border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700">
@@ -443,9 +443,14 @@ export default async function LessonPage({
           ) : null}
 
           {lessonHtml ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-950">Lesson reading</h2>
+              <p className="mt-1 text-sm text-slate-600">Scroll inside this panel to continue reading.</p>
               <div
-                className="prose prose-slate max-w-none prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium"
+                role="region"
+                aria-label="Lesson reading text"
+                tabIndex={0}
+                className="prose prose-slate mt-4 max-h-[28rem] max-w-none overflow-y-auto overscroll-contain pr-3 prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700"
                 dangerouslySetInnerHTML={{ __html: lessonHtml }}
               />
             </section>

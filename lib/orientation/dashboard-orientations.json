@@ -363,7 +363,7 @@
         "narration": "Your apprenticeship combines related technical instruction, or RTI, with supervised on-the-job learning, or OJL. Use the assigned course for theory, examples, and knowledge checks. Your approved shop and qualified supervisor provide practical training. Pictures and videos explain procedures, but they do not replace supervised practice or a competency sign-off. Read your own registered program plan and syllabus so you understand the hours, competencies, and evidence that apply to your occupation.",
         "href": "/apprentice/orientation",
         "action": "Review my program plan",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
         "title": "Your daily apprentice routine",
@@ -375,7 +375,7 @@
         "narration": "Open your apprentice dashboard each training day. Review announcements and your next theory lesson. At the approved shop, allow the location permissions the timeclock needs and clock in before supervised work starts. Record only the actual activity and time you completed. Clock out before you leave. Do not overlap theory study and supervised work entries. If a location or timeclock error occurs, tell your supervisor and request a correction with accurate dates, times, and evidence.",
         "href": "/apprentice/timeclock",
         "action": "Open my timeclock",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/generations-hair/salon-service.webp"
       },
       {
         "title": "Skill practice and verification",
@@ -387,7 +387,7 @@
         "narration": "Your competency checklist shows the skills your registered apprenticeship requires. Ask your supervisor which skill you should practice next. Demonstrate it safely under the required supervision, then ask the supervisor to record the observed evidence and sign-off. A self-reported completion, printed checklist, or watched video is not a verified practical competency. Review feedback and repeat practice when needed. Use the dashboard to check which records are submitted, approved, or returned for correction.",
         "href": "/apprentice",
         "action": "Review my progress",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
       },
       {
         "title": "Your weekly review",
@@ -399,7 +399,7 @@
         "narration": "Before the week ends, compare your clock entries, approved training hours, theory progress, and competency checklist. Follow the limits and targets shown in your program plan; do not invent extra hours to reach a target. Ask about a pending or returned entry before it becomes a reporting problem. Check your schedule and agree on the next week’s practical training with your shop supervisor. Contact Elevate if you cannot reach your shop or the assigned course is unavailable.",
         "href": "/apprentice",
         "action": "Review this week",
-        "image": "/images/pages/office-admin-desk.jpg"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
         "title": "Documents, payments, and support",
@@ -411,7 +411,7 @@
         "narration": "Keep required agreements, documents, and contact information current. Review any invoice or payment-plan terms in your own account. A displayed amount or due date should match your signed agreement; report a mismatch rather than paying an unfamiliar request. Do not send card details or identity documents through chat. A document submission may still need staff review. Use the dashboard support and communication tools to report an access hold, disputed hour, safety concern, or schedule problem.",
         "href": "/apprentice/billing",
         "action": "Review billing and records",
-        "image": "/images/pages/office-admin-desk.jpg"
+        "image": "/images/partners/generations-hair/salon-service.webp"
       },
       {
         "title": "Messages, meetings, and getting help",
@@ -423,7 +423,7 @@
         "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
         "href": "/lms/support",
         "action": "Contact learner support",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
       },
       {
         "title": "Finish training and prepare for work",
@@ -435,11 +435,11 @@
         "narration": "A finished video is one part of learning. Program completion can also require quizzes, assignments, attendance, supervised competencies, and verified credential evidence. Check your completion checklist with your program contact. Certification testing and a course completion certificate can be separate steps. Upload credentials you earn outside Elevate for verification. Start your résumé while you train and add only skills and credentials you can support. Use the career tools to prepare for applications and next steps.",
         "href": "/lms/career",
         "action": "Open career tools",
-        "image": "/images/pages/career-services-page-5.webp"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
         "title": "Inter-office email: contact your Elevate team",
-        "image": "/images/pages/contact-hero.jpg",
+        "image": "/images/partners/generations-hair/salon-service.webp",
         "points": [
           "Open your mailbox and choose Compose.",
           "Use your assigned staff contact and a clear subject.",
@@ -451,7 +451,7 @@
       },
       {
         "title": "Community: learn with your peers",
-        "image": "/images/pages/training-classroom.webp",
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp",
         "points": [
           "Browse groups for your program or study interests.",
           "Join a group, ask a question, and reply respectfully.",
@@ -463,7 +463,7 @@
       },
       {
         "title": "Career services: explore your job feed",
-        "image": "/images/pages/career-services-page-5.webp",
+        "image": "/images/partners/j-noelle/official-salon-2026.webp",
         "points": [
           "Start career services while you are training.",
           "Review job requirements, location, and closing dates.",
@@ -475,7 +475,7 @@
       },
       {
         "title": "Résumé builder: save, preview, and download",
-        "image": "/images/pages/office-admin-desk.jpg",
+        "image": "/images/partners/generations-hair/salon-service.webp",
         "points": [
           "Enter your contact details, experience, education, and skills.",
           "Save your résumé and reopen it to check your changes.",
@@ -487,7 +487,7 @@
       },
       {
         "title": "Credential uploads: submit and track review",
-        "image": "/images/pages/comp-home-highlight-success.webp",
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp",
         "points": [
           "Choose your program and the appropriate credential.",
           "Upload a clear supported file and submit it.",
@@ -498,7 +498,7 @@
         "action": "Upload an earned credential"
       }
     ],
-    "hero": "/images/barber-hero.jpg"
+    "hero": "/images/partners/j-noelle/official-salon-2026.webp"
   },
   "host-shop": {
     "title": "Help your apprentices grow with confidence",
@@ -904,5 +904,321 @@
       }
     ],
     "hero": "/images/pages/career-counseling.jpg"
+  },
+  "cosmetology-apprentice": {
+    "title": "Your cosmetology dashboard, step by step",
+    "subtitle": "Learn where to find your cosmetology lessons, workbook, study times, shop hours, and support.",
+    "hero": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp",
+    "slides": [
+      {
+        "title": "Find your lessons and workbook",
+        "points": [
+          "Open Theory / My Lessons in the menu",
+          "My Workbook is directly underneath",
+          "Return to Dashboard for alerts"
+        ],
+        "narration": "This is your cosmetology apprenticeship guide. Start from your apprentice dashboard. Read any alert that needs your attention, then choose Theory / My Lessons from the left menu. That page opens the course assigned to your enrollment. My Workbook is directly underneath the theory link. On a phone, open the menu button to find the same tools. The dashboard is your starting point; you do not need to search through payment panels or program advertising to begin class.",
+        "href": "/apprentice/theory",
+        "action": "Open my lessons",
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
+      },
+      {
+        "title": "Complete one course lesson",
+        "points": [
+          "Read the assigned topic and watch its instruction",
+          "Submit your own work and required assessment",
+          "Check saved completion and feedback"
+        ],
+        "narration": "This is your cosmetology apprenticeship guide. Choose a chapter in your assigned course. Read the lesson instructions before starting its video, practice activity, or knowledge check. Your course explains which work is required and when the next lesson becomes available. Use Assignments for submitted work, My Quizzes and Exams for assessments, and My Grades and Feedback for your recorded results. These tools belong to your learning record. Your supervisor and program staff manage approval and grading from their own portals.",
+        "href": "/apprentice/theory",
+        "action": "Open course chapters",
+        "image": "/images/partners/generations-hair/salon-service.webp"
+      },
+      {
+        "title": "Use your workbook and syllabus",
+        "points": [
+          "Open My Workbook beside your lessons",
+          "Use Course Syllabus to understand the program plan",
+          "Scroll the reading panel at your own pace"
+        ],
+        "narration": "This is your cosmetology apprenticeship guide. Open My Workbook from the menu when the lesson asks you to read, practice, or record an answer. The workbook supports your assigned course; it does not replace supervised practice at your approved Host Shop. Course Syllabus explains how the theory topics and shop practice fit together. Open that menu item and scroll inside the reading panel. Your program holder can open the same published syllabus from their Programs page to coordinate your instruction.",
+        "href": "/apprentice/workbook",
+        "action": "Open my workbook",
+        "image": "/images/courses/prestige-cosmetology.webp"
+      },
+      {
+        "title": "Plan your theory study times",
+        "points": [
+          "Use My Study Times to choose your days",
+          "Read your assigned target and timezone",
+          "Open Class Calendar for dates and appointments"
+        ],
+        "narration": "This is your cosmetology apprenticeship guide. Choose My Study Times in the menu to review the schedule assigned to you. Select study days outside your shop work hours, then enter a start and end time. Read your weekly target and timezone before saving. The week is shown across the page so you can compare days without a long list. Class Calendar shows your saved events, due dates, and appointments. In an administrator preview these records are read-only; the student saves their own availability.",
+        "href": "/apprentice/theory-schedule",
+        "action": "Choose my study times",
+        "image": "/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
+      },
+      {
+        "title": "Record supervised shop training",
+        "points": [
+          "Use Timeclock for your approved Host Shop",
+          "Use Work Hours to review saved sessions",
+          "Your supervisor verifies skills and eligible hours"
+        ],
+        "narration": "This is your cosmetology apprenticeship guide. Your theory learning and your supervised shop work have separate records. At your approved Host Shop, use Timeclock and follow the clock and location rules in the menu. Review Work Hours to check that your session saved correctly. A saved session is not automatically approved credit. Your Host Shop supervisor verifies the hands-on work and demonstrated skills from the shop portal. Never mark another person’s work or create hours that were not actually worked.",
+        "href": "/apprentice/timeclock",
+        "action": "Open my timeclock",
+        "image": "/images/partners/generations-hair/salon-service.webp"
+      },
+      {
+        "title": "Documents, alerts, and getting help",
+        "points": [
+          "Open Documents for requested uploads and status",
+          "Use Billing and Payments for your own account",
+          "Use Inter-office Email to contact program staff"
+        ],
+        "narration": "This is your cosmetology apprenticeship guide. Return to Dashboard to see current alerts and next steps. Documents shows what has been requested, submitted, and verified. All required documents verified means there are no remaining required items; it is different from the number of course lessons completed. Payment setup and invoices belong under Billing and Payments in the menu. If a link opens the wrong program or a record looks incorrect, use Inter-office Email to contact program staff and describe what happened.",
+        "href": "/communications/email",
+        "action": "Open inter-office email",
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
+      }
+    ]
+  },
+  "barber-apprentice": {
+    "title": "Your barber dashboard, step by step",
+    "subtitle": "Learn where to find your barber lessons, workbook, study times, shop hours, and support.",
+    "hero": "/images/beauty/program-barber-training.webp",
+    "slides": [
+      {
+        "title": "Find your lessons and workbook",
+        "points": [
+          "Open Theory / My Lessons in the menu",
+          "My Workbook is directly underneath",
+          "Return to Dashboard for alerts"
+        ],
+        "narration": "This is your barber apprenticeship guide. Start from your apprentice dashboard. Read any alert that needs your attention, then choose Theory / My Lessons from the left menu. That page opens the course assigned to your enrollment. My Workbook is directly underneath the theory link. On a phone, open the menu button to find the same tools. The dashboard is your starting point; you do not need to search through payment panels or program advertising to begin class.",
+        "href": "/apprentice/theory",
+        "action": "Open my lessons",
+        "image": "/images/beauty/program-barber-training.webp"
+      },
+      {
+        "title": "Complete one course lesson",
+        "points": [
+          "Read the assigned topic and watch its instruction",
+          "Submit your own work and required assessment",
+          "Check saved completion and feedback"
+        ],
+        "narration": "This is your barber apprenticeship guide. Choose a chapter in your assigned course. Read the lesson instructions before starting its video, practice activity, or knowledge check. Your course explains which work is required and when the next lesson becomes available. Use Assignments for submitted work, My Quizzes and Exams for assessments, and My Grades and Feedback for your recorded results. These tools belong to your learning record. Your supervisor and program staff manage approval and grading from their own portals.",
+        "href": "/apprentice/theory",
+        "action": "Open course chapters",
+        "image": "/images/beauty/program-barber-training.webp"
+      },
+      {
+        "title": "Use your workbook and syllabus",
+        "points": [
+          "Open My Workbook beside your lessons",
+          "Use Course Syllabus to understand the program plan",
+          "Scroll the reading panel at your own pace"
+        ],
+        "narration": "This is your barber apprenticeship guide. Open My Workbook from the menu when the lesson asks you to read, practice, or record an answer. The workbook supports your assigned course; it does not replace supervised practice at your approved Host Shop. Course Syllabus explains how the theory topics and shop practice fit together. Open that menu item and scroll inside the reading panel. Your program holder can open the same published syllabus from their Programs page to coordinate your instruction.",
+        "href": "/apprentice/workbook",
+        "action": "Open my workbook",
+        "image": "/images/courses/prestige-barbering.webp"
+      },
+      {
+        "title": "Plan your theory study times",
+        "points": [
+          "Use My Study Times to choose your days",
+          "Read your assigned target and timezone",
+          "Open Class Calendar for dates and appointments"
+        ],
+        "narration": "This is your barber apprenticeship guide. Choose My Study Times in the menu to review the schedule assigned to you. Select study days outside your shop work hours, then enter a start and end time. Read your weekly target and timezone before saving. The week is shown across the page so you can compare days without a long list. Class Calendar shows your saved events, due dates, and appointments. In an administrator preview these records are read-only; the student saves their own availability.",
+        "href": "/apprentice/theory-schedule",
+        "action": "Choose my study times",
+        "image": "/images/beauty/program-barber-training.webp"
+      },
+      {
+        "title": "Record supervised shop training",
+        "points": [
+          "Use Timeclock for your approved Host Shop",
+          "Use Work Hours to review saved sessions",
+          "Your supervisor verifies skills and eligible hours"
+        ],
+        "narration": "This is your barber apprenticeship guide. Your theory learning and your supervised shop work have separate records. At your approved Host Shop, use Timeclock and follow the clock and location rules in the menu. Review Work Hours to check that your session saved correctly. A saved session is not automatically approved credit. Your Host Shop supervisor verifies the hands-on work and demonstrated skills from the shop portal. Never mark another person’s work or create hours that were not actually worked.",
+        "href": "/apprentice/timeclock",
+        "action": "Open my timeclock",
+        "image": "/images/beauty/program-barber-training.webp"
+      },
+      {
+        "title": "Documents, alerts, and getting help",
+        "points": [
+          "Open Documents for requested uploads and status",
+          "Use Billing and Payments for your own account",
+          "Use Inter-office Email to contact program staff"
+        ],
+        "narration": "This is your barber apprenticeship guide. Return to Dashboard to see current alerts and next steps. Documents shows what has been requested, submitted, and verified. All required documents verified means there are no remaining required items; it is different from the number of course lessons completed. Payment setup and invoices belong under Billing and Payments in the menu. If a link opens the wrong program or a record looks incorrect, use Inter-office Email to contact program staff and describe what happened.",
+        "href": "/communications/email",
+        "action": "Open inter-office email",
+        "image": "/images/beauty/program-barber-training.webp"
+      }
+    ]
+  },
+  "esthetician-apprentice": {
+    "title": "Your esthetician dashboard, step by step",
+    "subtitle": "Learn where to find your esthetician lessons, workbook, study times, shop hours, and support.",
+    "hero": "/images/courses/prestige-esthetics.webp",
+    "slides": [
+      {
+        "title": "Find your lessons and workbook",
+        "points": [
+          "Open Theory / My Lessons in the menu",
+          "My Workbook is directly underneath",
+          "Return to Dashboard for alerts"
+        ],
+        "narration": "This is your esthetician apprenticeship guide. Start from your apprentice dashboard. Read any alert that needs your attention, then choose Theory / My Lessons from the left menu. That page opens the course assigned to your enrollment. My Workbook is directly underneath the theory link. On a phone, open the menu button to find the same tools. The dashboard is your starting point; you do not need to search through payment panels or program advertising to begin class.",
+        "href": "/apprentice/theory",
+        "action": "Open my lessons",
+        "image": "/images/courses/prestige-esthetics.webp"
+      },
+      {
+        "title": "Complete one course lesson",
+        "points": [
+          "Read the assigned topic and watch its instruction",
+          "Submit your own work and required assessment",
+          "Check saved completion and feedback"
+        ],
+        "narration": "This is your esthetician apprenticeship guide. Choose a chapter in your assigned course. Read the lesson instructions before starting its video, practice activity, or knowledge check. Your course explains which work is required and when the next lesson becomes available. Use Assignments for submitted work, My Quizzes and Exams for assessments, and My Grades and Feedback for your recorded results. These tools belong to your learning record. Your supervisor and program staff manage approval and grading from their own portals.",
+        "href": "/apprentice/theory",
+        "action": "Open course chapters",
+        "image": "/images/courses/prestige-esthetics.webp"
+      },
+      {
+        "title": "Use your workbook and syllabus",
+        "points": [
+          "Open My Workbook beside your lessons",
+          "Use Course Syllabus to understand the program plan",
+          "Scroll the reading panel at your own pace"
+        ],
+        "narration": "This is your esthetician apprenticeship guide. Open My Workbook from the menu when the lesson asks you to read, practice, or record an answer. The workbook supports your assigned course; it does not replace supervised practice at your approved Host Shop. Course Syllabus explains how the theory topics and shop practice fit together. Open that menu item and scroll inside the reading panel. Your program holder can open the same published syllabus from their Programs page to coordinate your instruction.",
+        "href": "/apprentice/workbook",
+        "action": "Open my workbook",
+        "image": "/images/courses/prestige-esthetics.webp"
+      },
+      {
+        "title": "Plan your theory study times",
+        "points": [
+          "Use My Study Times to choose your days",
+          "Read your assigned target and timezone",
+          "Open Class Calendar for dates and appointments"
+        ],
+        "narration": "This is your esthetician apprenticeship guide. Choose My Study Times in the menu to review the schedule assigned to you. Select study days outside your shop work hours, then enter a start and end time. Read your weekly target and timezone before saving. The week is shown across the page so you can compare days without a long list. Class Calendar shows your saved events, due dates, and appointments. In an administrator preview these records are read-only; the student saves their own availability.",
+        "href": "/apprentice/theory-schedule",
+        "action": "Choose my study times",
+        "image": "/images/courses/prestige-esthetics.webp"
+      },
+      {
+        "title": "Record supervised shop training",
+        "points": [
+          "Use Timeclock for your approved Host Shop",
+          "Use Work Hours to review saved sessions",
+          "Your supervisor verifies skills and eligible hours"
+        ],
+        "narration": "This is your esthetician apprenticeship guide. Your theory learning and your supervised shop work have separate records. At your approved Host Shop, use Timeclock and follow the clock and location rules in the menu. Review Work Hours to check that your session saved correctly. A saved session is not automatically approved credit. Your Host Shop supervisor verifies the hands-on work and demonstrated skills from the shop portal. Never mark another person’s work or create hours that were not actually worked.",
+        "href": "/apprentice/timeclock",
+        "action": "Open my timeclock",
+        "image": "/images/courses/prestige-esthetics.webp"
+      },
+      {
+        "title": "Documents, alerts, and getting help",
+        "points": [
+          "Open Documents for requested uploads and status",
+          "Use Billing and Payments for your own account",
+          "Use Inter-office Email to contact program staff"
+        ],
+        "narration": "This is your esthetician apprenticeship guide. Return to Dashboard to see current alerts and next steps. Documents shows what has been requested, submitted, and verified. All required documents verified means there are no remaining required items; it is different from the number of course lessons completed. Payment setup and invoices belong under Billing and Payments in the menu. If a link opens the wrong program or a record looks incorrect, use Inter-office Email to contact program staff and describe what happened.",
+        "href": "/communications/email",
+        "action": "Open inter-office email",
+        "image": "/images/courses/prestige-esthetics.webp"
+      }
+    ]
+  },
+  "nail-technician-apprentice": {
+    "title": "Your nail technician dashboard, step by step",
+    "subtitle": "Learn where to find your nail technician lessons, workbook, study times, shop hours, and support.",
+    "hero": "/images/courses/prestige-nail-technology.webp",
+    "slides": [
+      {
+        "title": "Find your lessons and workbook",
+        "points": [
+          "Open Theory / My Lessons in the menu",
+          "My Workbook is directly underneath",
+          "Return to Dashboard for alerts"
+        ],
+        "narration": "This is your nail technician apprenticeship guide. Start from your apprentice dashboard. Read any alert that needs your attention, then choose Theory / My Lessons from the left menu. That page opens the course assigned to your enrollment. My Workbook is directly underneath the theory link. On a phone, open the menu button to find the same tools. The dashboard is your starting point; you do not need to search through payment panels or program advertising to begin class.",
+        "href": "/apprentice/theory",
+        "action": "Open my lessons",
+        "image": "/images/courses/prestige-nail-technology.webp"
+      },
+      {
+        "title": "Complete one course lesson",
+        "points": [
+          "Read the assigned topic and watch its instruction",
+          "Submit your own work and required assessment",
+          "Check saved completion and feedback"
+        ],
+        "narration": "This is your nail technician apprenticeship guide. Choose a chapter in your assigned course. Read the lesson instructions before starting its video, practice activity, or knowledge check. Your course explains which work is required and when the next lesson becomes available. Use Assignments for submitted work, My Quizzes and Exams for assessments, and My Grades and Feedback for your recorded results. These tools belong to your learning record. Your supervisor and program staff manage approval and grading from their own portals.",
+        "href": "/apprentice/theory",
+        "action": "Open course chapters",
+        "image": "/images/courses/prestige-nail-technology.webp"
+      },
+      {
+        "title": "Use your workbook and syllabus",
+        "points": [
+          "Open My Workbook beside your lessons",
+          "Use Course Syllabus to understand the program plan",
+          "Scroll the reading panel at your own pace"
+        ],
+        "narration": "This is your nail technician apprenticeship guide. Open My Workbook from the menu when the lesson asks you to read, practice, or record an answer. The workbook supports your assigned course; it does not replace supervised practice at your approved Host Shop. Course Syllabus explains how the theory topics and shop practice fit together. Open that menu item and scroll inside the reading panel. Your program holder can open the same published syllabus from their Programs page to coordinate your instruction.",
+        "href": "/apprentice/workbook",
+        "action": "Open my workbook",
+        "image": "/images/courses/prestige-nail-technology.webp"
+      },
+      {
+        "title": "Plan your theory study times",
+        "points": [
+          "Use My Study Times to choose your days",
+          "Read your assigned target and timezone",
+          "Open Class Calendar for dates and appointments"
+        ],
+        "narration": "This is your nail technician apprenticeship guide. Choose My Study Times in the menu to review the schedule assigned to you. Select study days outside your shop work hours, then enter a start and end time. Read your weekly target and timezone before saving. The week is shown across the page so you can compare days without a long list. Class Calendar shows your saved events, due dates, and appointments. In an administrator preview these records are read-only; the student saves their own availability.",
+        "href": "/apprentice/theory-schedule",
+        "action": "Choose my study times",
+        "image": "/images/courses/prestige-nail-technology.webp"
+      },
+      {
+        "title": "Record supervised shop training",
+        "points": [
+          "Use Timeclock for your approved Host Shop",
+          "Use Work Hours to review saved sessions",
+          "Your supervisor verifies skills and eligible hours"
+        ],
+        "narration": "This is your nail technician apprenticeship guide. Your theory learning and your supervised shop work have separate records. At your approved Host Shop, use Timeclock and follow the clock and location rules in the menu. Review Work Hours to check that your session saved correctly. A saved session is not automatically approved credit. Your Host Shop supervisor verifies the hands-on work and demonstrated skills from the shop portal. Never mark another person’s work or create hours that were not actually worked.",
+        "href": "/apprentice/timeclock",
+        "action": "Open my timeclock",
+        "image": "/images/courses/prestige-nail-technology.webp"
+      },
+      {
+        "title": "Documents, alerts, and getting help",
+        "points": [
+          "Open Documents for requested uploads and status",
+          "Use Billing and Payments for your own account",
+          "Use Inter-office Email to contact program staff"
+        ],
+        "narration": "This is your nail technician apprenticeship guide. Return to Dashboard to see current alerts and next steps. Documents shows what has been requested, submitted, and verified. All required documents verified means there are no remaining required items; it is different from the number of course lessons completed. Payment setup and invoices belong under Billing and Payments in the menu. If a link opens the wrong program or a record looks incorrect, use Inter-office Email to contact program staff and describe what happened.",
+        "href": "/communications/email",
+        "action": "Open inter-office email",
+        "image": "/images/courses/prestige-nail-technology.webp"
+      }
+    ]
   }
 }

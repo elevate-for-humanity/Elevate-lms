@@ -1,3 +1,4 @@
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -32,12 +33,13 @@ export default async function AssignmentsPage() {
   const supabase = await createClient();
 
   const {
-    data: { user },
+    data: { user: authenticatedUser },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
+  const previewDb = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(previewDb, authenticatedUser?.id);
+  if (!subject.userId) redirect('/login');
+  // The signed preview subject, or the authenticated learner, owns every read.
+  const user = { id: subject.userId };
 
   // Assignment tables are server-only. Every read below is scoped to this
   // authenticated learner or their enrolled course IDs; do not grant public reads.

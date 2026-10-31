@@ -11,7 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import AdminNav, { type AdminNavNotif } from '@/components/admin/AdminNav';
-import { type NavSection } from '@/lib/admin/nav-config';
+import { withPortalNavigation, isNavSections, type NavSection } from '@/lib/admin/nav-config';
 
 interface AdminNavShellProps {
   /** Nav sections from DB — passed from server layout, no client fetch needed. */
@@ -23,7 +23,7 @@ export function AdminNavShell({ navSections }: AdminNavShellProps) {
   const [notifs, setNotifs] = useState<AdminNavNotif[]>([]);
   const [headerStatus, setHeaderStatus] = useState<'loading' | 'ok' | 'degraded' | 'unavailable'>('loading');
   const [headerRetry, setHeaderRetry] = useState(0);
-  const [resolvedNavSections, setResolvedNavSections] = useState(navSections);
+  const [resolvedNavSections, setResolvedNavSections] = useState(() => withPortalNavigation(navSections));
 
   useEffect(() => {
     let cancelled = false;
@@ -42,8 +42,8 @@ export function AdminNavShell({ navSections }: AdminNavShellProps) {
     fetch('/api/admin/nav-config', { credentials: 'same-origin' })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (cancelled || !Array.isArray(data?.sections) || data.sections.length === 0) return;
-        setResolvedNavSections(data.sections);
+        if (cancelled || !isNavSections(data?.sections)) return;
+        setResolvedNavSections(withPortalNavigation(data.sections));
       })
       .catch(() => {/* non-critical — server-provided defaults remain available */});
     return () => { cancelled = true; };

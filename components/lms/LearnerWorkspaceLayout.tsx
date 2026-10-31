@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { isApprenticeWorkspaceRole } from '@/lib/navigation/navigation-config';
 import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
 
 export default async function LearnerWorkspaceLayout({
@@ -13,28 +14,42 @@ export default async function LearnerWorkspaceLayout({
   children: React.ReactNode;
   showLearnerNotices?: boolean;
 }) {
-  const { user, profile } = await requireRole([
-    'student',
-    'learner',
-    'apprentice',
-    'barber_apprentice',
-    'cosmetology_apprentice',
-    'admin',
-    'staff',
-  ]);
   const supabase = await createClient();
-  const { data: photoProfile } = await supabase
-    .from('profiles')
-    .select('avatar_url')
-    .eq('id', user.id)
-    .maybeSingle();
-
+  const {
+    data: { user: authenticatedUser },
+  } = await supabase.auth.getUser();
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
-  const isAdmin = ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
-  const subjectRole = subject.previewing
-    ? (await db.from('profiles').select('role').eq('id', subject.userId).maybeSingle()).data?.role
-    : profile?.role;
+  const subject = await resolvePortalPreviewSubject(db, authenticatedUser?.id);
+  // Only the verified, administrator-signed handoff can render without a learner session.
+  // Ordinary requests still pass the full role and membership authorization below.
+  const authorized = subject.previewing
+    ? null
+    : await requireRole([
+        'student',
+        'learner',
+        'apprentice',
+        'barber_apprentice',
+        'cosmetology_apprentice',
+        'admin',
+        'staff',
+      ]);
+  const user = authorized?.user || { id: subject.userId, email: undefined };
+  const profile = authorized?.profile;
+  const subjectProfile = subject.previewing
+    ? (
+        await db
+          .from('profiles')
+          .select('role,email,full_name,first_name,last_name,avatar_url')
+          .eq('id', subject.userId)
+          .maybeSingle()
+      ).data
+    : profile;
+  if (!subjectProfile) throw new Error('Learner workspace profile could not be loaded.');
+  const photoProfile = { avatar_url: subjectProfile.avatar_url };
+  const isAdmin =
+    subject.previewing || ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
+  const subjectRole = subjectProfile.role;
+  const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole);
   const showBilling =
     (!isAdmin || subject.previewing) &&
     (await learnerCanSeeBilling(db, subject.userId, subjectRole));
@@ -42,17 +57,19 @@ export default async function LearnerWorkspaceLayout({
   return (
     <PlatformShell
       user={{
-        id: user.id,
-        email: user.email || '',
-        full_name: profile?.full_name || undefined,
-        first_name: profile?.first_name || undefined,
-        last_name: profile?.last_name || undefined,
-        avatar_url: photoProfile?.avatar_url || undefined,
+        id: subject.userId,
+        email: subjectProfile?.email || user.email || '',
+        full_name: subjectProfile?.full_name || undefined,
+        first_name: subjectProfile?.first_name || undefined,
+        last_name: subjectProfile?.last_name || undefined,
+        avatar_url: subject.previewing
+          ? subjectProfile?.avatar_url || undefined
+          : photoProfile?.avatar_url || undefined,
       }}
-      role="student"
+      role={apprenticeWorkspace ? 'apprentice' : 'student'}
       paris={{ autoOpenOnDashboard: false }}
     >
-      {showLearnerNotices && !isAdmin && !photoProfile?.avatar_url ? (
+      {showLearnerNotices && !isAdmin && !photoProfile?.avatar_url && !apprenticeWorkspace ? (
         <div className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6">
           <details className="rounded-xl border border-slate-200 bg-white p-3">
             <summary className="cursor-pointer text-sm font-bold text-slate-700">
@@ -81,7 +98,7 @@ export default async function LearnerWorkspaceLayout({
           </details>
         </div>
       ) : null}
-      {showLearnerNotices && showBilling ? (
+      {showLearnerNotices && showBilling && !apprenticeWorkspace ? (
         <section
           className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6"
           aria-label="Your payment plan"

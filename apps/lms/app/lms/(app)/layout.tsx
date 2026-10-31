@@ -19,15 +19,35 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
   } = await userDb.auth.getUser();
   const pathname = (await headers()).get('x-pathname') || '/lms/dashboard';
 
-  if (user) {
+  {
     const db = await requireAdminClient();
-    const [{ data: actor }, subject] = await Promise.all([
-      db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
-      resolvePortalPreviewSubject(db, user.id),
-    ]);
-    const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
+    const subject = await resolvePortalPreviewSubject(db, user?.id);
+    const actor = user
+      ? (await db.from('profiles').select('role').eq('id', user.id).maybeSingle()).data
+      : null;
+    const isAdmin =
+      subject.previewing || ['admin', 'super_admin'].includes(String(actor?.role || ''));
     const isDashboard = pathname === '/lms' || pathname === '/lms/dashboard';
-    if (isAdmin && !isDashboard) {
+    const hasReadOnlyModule =
+      subject.previewing &&
+      ['/lms/calendar', '/lms/assignments', '/lms/grades', '/lms/quizzes'].includes(pathname);
+    if (hasReadOnlyModule) {
+      return (
+        <CanonicalLearnerWorkspaceLayout showLearnerNotices={false}>
+          <div
+            role="status"
+            className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"
+          >
+            <span>Administrator preview — learner records are read-only.</span>
+            <a href="/api/admin/preview?end=1" className="font-semibold underline">
+              Exit administrator preview
+            </a>
+          </div>
+          {children}
+        </CanonicalLearnerWorkspaceLayout>
+      );
+    }
+    if (isAdmin && !isDashboard && !hasReadOnlyModule) {
       return (
         <CanonicalLearnerWorkspaceLayout>
           <AdminModulePreview pathname={pathname} previewing={subject.previewing} />

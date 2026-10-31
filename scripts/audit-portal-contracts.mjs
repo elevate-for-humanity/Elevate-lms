@@ -150,6 +150,10 @@ for (const retired of ['/portal/barber', '/portal/cosmetology', '/portal/estheti
 if (/subdomain:\s*['\"]marketing['\"]/.test(blockFor(portalMap, 'programholder'))) fail('Program Holder still owned by Marketing');
 
 if (!failures) {
+  const regression = spawnSync(process.execPath, ['--test', join(ROOT, 'tests/portal-workspace-routing.node.test.mjs')], { cwd: ROOT, stdio: 'inherit' });
+  if (regression.status !== 0) failures += 1;
+}
+if (!failures) {
   console.log('\n── Portal function integrity ──');
   const child = spawnSync(process.execPath, [join(ROOT, 'scripts/audit-portal-functions.mjs')], { cwd: ROOT, stdio: 'inherit' });
   if (child.status !== 0) failures += 1;

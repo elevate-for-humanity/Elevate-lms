@@ -141,7 +141,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </a>
         </div>
       )}
-      {!profile?.onboarding_completed && (
+      {!profile?.onboarding_completed && !isDashboard && (
         <section
           className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
           role="status"

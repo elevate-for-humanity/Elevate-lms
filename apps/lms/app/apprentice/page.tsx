@@ -1,6 +1,5 @@
-import VisualDashboardOrientation from '@/components/orientation/VisualDashboardOrientation';
+import ApprenticeHomePanel from '@/components/apprenticeship/ApprenticeHomePanel';
 import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
-import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { formatTheoryStartDate } from '@/lib/apprenticeship/theory-start-date';
 import type { Metadata } from 'next';
@@ -90,7 +89,8 @@ function readPriorLearningImport(draftData: unknown): PriorLearningImport | null
   };
 }
 
-export default async function ApprenticePortalPage() {
+export default async function ApprenticePortalPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+  const view = (await searchParams).view;
   const supabase = await createClient();
   const {
     data: { user },
@@ -173,6 +173,10 @@ export default async function ApprenticePortalPage() {
   if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
   const beautyProgram = getBeautyApprenticeshipConfig(programSlug);
   const registeredStandard = getRegisteredProgramStandard(programSlug);
+
+  if (view !== 'records') {
+    return <ApprenticeHomePanel userId={subject.userId} programSlug={programSlug} runtime={runtime} billing={billingRequirement} />;
+  }
 
   const dashboardResults = await Promise.all([
     db
@@ -511,8 +515,6 @@ export default async function ApprenticePortalPage() {
         {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
           <TrainingReadyNotice courseHref={courseHref} />
         ) : null}
-        <ProgramGuideResources />
-        <VisualDashboardOrientation audience="apprentice" compact />
 
         <TimeclockAttendanceNotice />
 
@@ -570,7 +572,7 @@ export default async function ApprenticePortalPage() {
           <Metric
             label="Required documents"
             value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`}
-            detail={`${missingDocumentCount} incomplete`}
+            detail={missingDocumentCount ? `${missingDocumentCount} still needed` : 'All required documents verified'}
             icon={FileText}
           />
           <Metric
@@ -658,8 +660,6 @@ export default async function ApprenticePortalPage() {
       {programSlug === 'cosmetology-apprenticeship' && totalLessons === 40 ? (
         <TrainingReadyNotice courseHref={courseHref} />
       ) : null}
-      <ProgramGuideResources />
-      <VisualDashboardOrientation audience="apprentice" compact />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">

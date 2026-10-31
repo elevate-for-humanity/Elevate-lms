@@ -187,6 +187,16 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
       id: 'apprenticeship',
       items: [
         { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
+        { id: 'theory', label: 'Theory / My Lessons', href: p('apprentice', 'theory'), icon: BookOpen },
+        { id: 'class-assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: FileText },
+        { id: 'class-quizzes', label: 'My Quizzes & Exams', href: p('lms', 'quizzes'), icon: ClipboardCheck },
+        { id: 'class-grades', label: 'My Grades & Feedback', href: p('lms', 'grades'), icon: Award },
+        { id: 'theory-schedule', label: 'My Study Times', href: p('apprentice', 'theory-schedule'), icon: Calendar },
+        { id: 'syllabus', label: 'Course Syllabus', href: p('apprentice', 'syllabus'), icon: FileText },
+        { id: 'class-calendar', label: 'Class Calendar', href: p('lms', 'calendar'), icon: Calendar },
+        { id: 'workbook', label: 'My Workbook', href: p('apprentice', 'workbook'), icon: BookOpen },
+        { id: 'training-records', label: 'Progress & Setup', href: `${p('apprentice')}?view=records`, icon: BarChart3 },
+        { id: 'profile', label: 'My Profile', href: p('apprentice', 'profile'), icon: Users },
         {
           id: 'orientation',
           label: 'Orientation',
@@ -230,7 +240,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
           href: p('apprentice', 'policies/payments'),
           icon: Shield,
         },
-        { id: 'rti', label: 'RTI', href: p('apprentice', 'rti'), icon: BookOpen },
+        { id: 'rti', label: 'RTI Hours & Evidence', href: p('apprentice', 'rti'), icon: BookOpen },
         {
           id: 'handbook',
           label: 'Handbook',
@@ -689,10 +699,66 @@ export function getNavigationRole(role: UserRole): NavigationRole {
   return ROLE_TO_NAVIGATION[role] ?? 'student';
 }
 export function getNavigationForRole(role: UserRole): NavSection[] {
-  return ROLE_NAVIGATION[getNavigationRole(role)];
+  const navigationRole = getNavigationRole(role);
+  const sections = ROLE_NAVIGATION[navigationRole];
+  const groups = WORKSPACE_GROUPS[navigationRole];
+  if (!groups) return sections;
+  const items = sections.flatMap((section) => section.items);
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const used = new Set<string>();
+  const grouped = groups.map(([id, label, ids]) => ({
+    id,
+    label,
+    items: ids.flatMap((itemId) => {
+      const item = byId.get(itemId);
+      if (!item || used.has(itemId)) return [];
+      used.add(itemId);
+      return [item];
+    }),
+  })).filter((section) => section.items.length > 0);
+  const remaining = items.filter((item) => !used.has(item.id));
+  return remaining.length
+    ? [...grouped, { id: 'more-tools', label: 'More tools', items: remaining }]
+    : grouped;
 }
 export function getFlatNavItems(role: UserRole): NavItem[] {
   return getNavigationForRole(role).flatMap((section) => section.items);
+}
+
+
+/** Group existing tools without maintaining a second set of URLs or hiding tools. */
+const WORKSPACE_GROUPS: Partial<Record<NavigationRole, Array<[string, string, string[]]>>> = {
+  student: [
+    ['today', 'Start here', ['dashboard', 'courses', 'assignments', 'calendar', 'learner-support']],
+    ['learning', 'Learning & progress', ['workbooks', 'progress', 'certificates', 'upload-credential']],
+    ['records', 'Documents & setup', ['onboarding', 'documents', 'agreements', 'handbook', 'profile', 'dashboard-orientation']],
+    ['connect', 'Messages & career', ['learner-messages', 'interoffice-email', 'community', 'career', 'resume']],
+  ],
+  apprentice: [
+    ['today', 'Daily training', ['dashboard', 'theory', 'workbook', 'timeclock', 'hours']],
+    ['learning', 'Theory & progress', ['class-assignments', 'class-quizzes', 'class-grades', 'class-calendar', 'theory-schedule', 'syllabus', 'rti', 'competencies', 'training-records']],
+    ['setup', 'Documents & requirements', ['profile', 'orientation', 'documents', 'handbook', 'timeclock-policy', 'state-board']],
+    ['billing', 'Payments', ['billing', 'payment-policy']],
+    ['connect', 'Messages & career', ['email', 'community', 'credentials', 'career', 'resume']],
+  ],
+  host_shop: [
+    ['today', 'Daily training', ['dashboard', 'apprentices', 'hours', 'attendance', 'practical-log', 'schedule']],
+    ['training', 'Training & compliance', ['competencies', 'wages', 'programs', 'reports', 'match-requests']],
+    ['connect', 'Communication', ['email', 'messages', 'communications', 'phone', 'community']],
+    ['setup', 'Documents & setup', ['documents', 'resources', 'orientation', 'mou', 'profile', 'settings', 'store']],
+  ],
+};
+
+/** Header and sidebar share the same host-qualified portal destination. */
+export function getDashboardHref(role: UserRole): string {
+  const items = getFlatNavItems(role);
+  const home = items.find((item) => item.id === 'dashboard') || items[0];
+  if (!home) throw new Error(`No portal home configured for ${role}`);
+  return home.href;
+}
+
+export function isApprenticeWorkspaceRole(role: string | null | undefined): boolean {
+  return Boolean(role && getNavigationRole(role as UserRole) === 'apprentice');
 }
 
 export function isActiveNavItem(href: string, pathname: string): boolean {

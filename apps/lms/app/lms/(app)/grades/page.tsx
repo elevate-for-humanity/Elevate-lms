@@ -1,3 +1,4 @@
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { loadLessonAssessmentResults } from '@/lib/lms/lesson-assessment-results';
@@ -32,18 +33,19 @@ export default async function GradesPage() {
   const supabase = await createClient();
 
   const {
-    data: { user },
+    data: { user: authenticatedUser },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
+  const previewDb = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(previewDb, authenticatedUser?.id);
+  if (!subject.userId) redirect('/login');
+  // The signed preview subject, or the authenticated learner, owns every read.
+  const user = { id: subject.userId };
 
   // Assignment tables are server-only. Every read below is scoped to this
   // authenticated learner or their enrolled course IDs; do not grant public reads.
   const recordsDb = await requireAdminClient();
 
-  const { data: profile } = await supabase
+  const { data: profile } = await (subject.previewing ? previewDb : supabase)
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -53,7 +55,7 @@ export default async function GradesPage() {
   const gradeCourseIds = await loadLearnerCourseIds(recordsDb, user.id, true);
   const lessonAssessments = await loadLessonAssessmentResults(recordsDb, user.id, gradeCourseIds);
   const { data: gradeCourses, error: courseError } = gradeCourseIds.length
-    ? await supabase
+    ? await (subject.previewing ? previewDb : supabase)
         .from('courses')
         .select('id, title, description, thumbnail_url')
         .in('id', gradeCourseIds)
@@ -81,7 +83,7 @@ export default async function GradesPage() {
   if (assignmentError) throw assignmentError;
 
   // Fetch quiz attempts with scores
-  const { data: quizAttempts, error: quizError } = await supabase
+  const { data: quizAttempts, error: quizError } = await (subject.previewing ? previewDb : supabase)
     .from('quiz_attempts')
     .select(
       `

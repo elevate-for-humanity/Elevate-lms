@@ -1,3 +1,4 @@
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -27,10 +28,14 @@ function formatDate(dateString: string) {
 export default async function CalendarPage() {
   const supabase = await createClient();
   const {
-    data: { user },
+    data: { user: authenticatedUser },
   } = await supabase.auth.getUser();
+  const previewDb = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(previewDb, authenticatedUser?.id);
+  if (!subject.userId) redirect('/login');
+  // The signed preview subject, or the authenticated learner, owns every read.
+  const user = { id: subject.userId };
 
-  if (!user) redirect('/login');
   const db = await requireAdminClient();
   const { data: links, error: linkError } = await db
     .from('program_holder_students')
@@ -93,7 +98,10 @@ export default async function CalendarPage() {
           .gte('due_date', new Date().toISOString())
           .order('due_date', { ascending: true })
           .limit(8),
-        supabase.from('courses').select('id, title').in('id', courseIds),
+        (subject.previewing ? previewDb : supabase)
+          .from('courses')
+          .select('id, title')
+          .in('id', courseIds),
       ]);
 
       if (assignmentsError) throw assignmentsError;
@@ -121,6 +129,15 @@ export default async function CalendarPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 py-8">
+      {subject.previewing ? (
+        <p
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"
+        >
+          Administrator preview: viewing this learner’s saved records. Changes and submissions are
+          disabled.
+        </p>
+      ) : null}
       <div className="mx-auto max-w-7xl px-4">
         <Breadcrumbs
           items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Calendar' }]}
@@ -153,7 +170,11 @@ export default async function CalendarPage() {
         </header>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-          <CalendarWidget userId={user.id} additionalEvents={meetingEvents} />
+          <CalendarWidget
+            readOnly={subject.previewing}
+            userId={user.id}
+            additionalEvents={meetingEvents}
+          />
 
           <aside className="space-y-6" aria-label="Calendar details">
             <section className="rounded-xl border border-slate-200 bg-white p-6">
@@ -175,7 +196,7 @@ export default async function CalendarPage() {
                         })}{' '}
                         Eastern · {meeting.duration_minutes} minutes
                       </p>
-                      {meeting.communication_room_id ? (
+                      {meeting.communication_room_id && !subject.previewing ? (
                         <Link
                           href={`/lms/meetings/${meeting.communication_room_id}`}
                           className="mt-2 inline-flex min-h-11 items-center font-bold text-blue-800 underline"

@@ -4,7 +4,7 @@ import {readFileSync,existsSync} from 'node:fs';
 import {orientationKeyForGuide,orientationCaptionGroups} from '../../lib/orientation/media-contract.mjs';
 const guides=JSON.parse(readFileSync(new URL('../../lib/orientation/dashboard-orientations.json',import.meta.url),'utf8'));
 test('every dashboard audience has illustrated, actionable instruction and a detailed transcript',()=>{
- assert.deepEqual(Object.keys(guides).sort(),['apprentice','host-shop','hvac','learner','program-holder','site-coordinator']);
+ assert.deepEqual(Object.keys(guides).sort(),['apprentice','barber-apprentice','cosmetology-apprentice','esthetician-apprentice','host-shop','hvac','learner','nail-technician-apprentice','program-holder','site-coordinator']);
  for(const [audience,guide] of Object.entries(guides)) {
   assert.ok(guide.slides.length>=6,audience);
   for(const slide of guide.slides) {

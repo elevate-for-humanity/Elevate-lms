@@ -13,18 +13,29 @@ export async function resolveHostShopAdminPreview() {
 
   const db = await requireAdminClient();
   const [{ data: actor }, { data: partner }] = await Promise.all([
-    db.from('profiles').select('id,role,email').eq('id', handoff.actorId).maybeSingle(),
-    db.from('partners').select('id,status,approval_status,is_active').eq('id', handoff.targetId).maybeSingle(),
+    db
+      .from('profiles')
+      .select('id,role,email,is_active,suspended')
+      .eq('id', handoff.actorId)
+      .maybeSingle(),
+    db
+      .from('partners')
+      .select('id,status,approval_status,is_active')
+      .eq('id', handoff.targetId)
+      .maybeSingle(),
   ]);
 
   if (
     !actor?.id ||
+    actor.is_active === false ||
+    actor.suspended === true ||
     !ADMIN_ROLES.has(String(actor.role || '')) ||
     !partner?.id ||
     partner.status !== 'active' ||
     partner.approval_status !== 'approved' ||
     partner.is_active === false
-  ) return null;
+  )
+    return null;
 
   return {
     actorId: actor.id as string,

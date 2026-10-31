@@ -12,13 +12,26 @@ export async function resolvePortalPreviewSubject(
   authenticatedUserId?: string | null,
 ): Promise<{ userId: string; previewing: boolean }> {
   const cookieStore = await cookies();
-  const previewSession = verifyPortalPreviewHandoff(cookieStore.get(PORTAL_PREVIEW_SESSION_COOKIE)?.value || '');
+  const previewSession = verifyPortalPreviewHandoff(
+    cookieStore.get(PORTAL_PREVIEW_SESSION_COOKIE)?.value || '',
+  );
   if (previewSession) {
     const [{ data: actor }, { data: target }] = await Promise.all([
-      db.from('profiles').select('id,role').eq('id', previewSession.actorId).maybeSingle(),
+      db
+        .from('profiles')
+        .select('id,role,is_active,suspended')
+        .eq('id', previewSession.actorId)
+        .maybeSingle(),
       db.from('profiles').select('id,role').eq('id', previewSession.targetId).maybeSingle(),
     ]);
-    if (actor?.id && ADMIN_ROLES.has(String(actor.role || '')) && target?.id && !ADMIN_ROLES.has(String(target.role || ''))) {
+    if (
+      actor?.id &&
+      actor.is_active !== false &&
+      actor.suspended !== true &&
+      ADMIN_ROLES.has(String(actor.role || '')) &&
+      target?.id &&
+      !ADMIN_ROLES.has(String(target.role || ''))
+    ) {
       return { userId: target.id, previewing: true };
     }
   }
@@ -27,8 +40,16 @@ export async function resolvePortalPreviewSubject(
   // selectors are honored only after independently authenticating an admin.
   const targetUserId = cookieStore.get(PORTAL_PREVIEW_COOKIE)?.value?.trim();
   if (!authenticatedUserId) return { userId: '', previewing: false };
-  const { data: actor } = await db.from('profiles').select('role').eq('id', authenticatedUserId).maybeSingle();
-  if (!ADMIN_ROLES.has(String(actor?.role || ''))) {
+  const { data: actor } = await db
+    .from('profiles')
+    .select('role,is_active,suspended')
+    .eq('id', authenticatedUserId)
+    .maybeSingle();
+  if (
+    actor?.is_active === false ||
+    actor?.suspended === true ||
+    !ADMIN_ROLES.has(String(actor?.role || ''))
+  ) {
     return { userId: authenticatedUserId, previewing: false };
   }
 
@@ -36,7 +57,11 @@ export async function resolvePortalPreviewSubject(
     return { userId: authenticatedUserId, previewing: false };
   }
 
-  const { data: target } = await db.from('profiles').select('id,role').eq('id', targetUserId).maybeSingle();
+  const { data: target } = await db
+    .from('profiles')
+    .select('id,role')
+    .eq('id', targetUserId)
+    .maybeSingle();
   if (!target?.id || ADMIN_ROLES.has(String(target.role || ''))) {
     return { userId: authenticatedUserId, previewing: false };
   }

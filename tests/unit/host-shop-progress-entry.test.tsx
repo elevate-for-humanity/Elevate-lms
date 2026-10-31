@@ -181,3 +181,33 @@ it('counts an older lowercase service under its displayed checklist label', asyn
   render(<PracticalProgressEntry />);
   expect(await screen.findByRole('row', { name: 'Updo 1 Owner checkoff' })).toBeInTheDocument();
 });
+
+it('uses the full verified aggregate instead of counting only recent entries', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) =>
+      response(
+        url === '/api/host-shop/competencies'
+          ? { apprentices: [{ ...apprentice, standard: { occupationTitle: 'Hair Stylist' } }] }
+          : {
+              entries: [
+                {
+                  id: 'recent',
+                  service_name: 'Updo',
+                  performed_on: '2026-01-01',
+                  subject_type: 'mannequin',
+                },
+              ],
+              serviceCounts: [
+                { service_name: ' updo ', recorded_count: 600 },
+                { service_name: 'UPDO', recorded_count: 2 },
+              ],
+              canRecord: false,
+              practice,
+            },
+      ),
+    ),
+  );
+  render(<PracticalProgressEntry />);
+  expect(await screen.findByRole('row', { name: 'Updo 602 Owner checkoff' })).toBeInTheDocument();
+});

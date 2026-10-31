@@ -117,6 +117,7 @@ export async function GET(req: NextRequest) {
     );
   return NextResponse.json({
     entries: data || [],
+    serviceCounts: progressRows || [],
     canRecord: (runtime as any).canRecord,
     practice: practicalServiceProgress(requirements || [], progressRows || []),
   });

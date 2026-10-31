@@ -86,6 +86,10 @@ export default function PracticalProgressEntry() {
   const [apprentices, setApprentices] = useState<Apprentice[]>([]);
   const [selected, setSelected] = useState('');
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [serviceCounts, setServiceCounts] = useState<Array<{
+    service_name: string;
+    recorded_count: number;
+  }> | null>(null);
   const [service, setService] = useState('');
   const [subject, setSubject] = useState('patron');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
@@ -137,6 +141,7 @@ export default function PracticalProgressEntry() {
     let current = true;
     setCanRecord(false);
     setEntries([]);
+    setServiceCounts(null);
     setService('');
     setNotes('');
     setMessage('');
@@ -154,6 +159,7 @@ export default function PracticalProgressEntry() {
         if (!response.ok) throw Error(data.error || 'Unable to load practical progress.');
         if (!current) return;
         setEntries(data.entries || []);
+        setServiceCounts(Array.isArray(data.serviceCounts) ? data.serviceCounts : null);
         setCanRecord(data.canRecord === true);
         setPractice(
           data.practice || {
@@ -203,6 +209,7 @@ export default function PracticalProgressEntry() {
           'Service saved, but the updated progress could not be loaded. Refresh before recording it again.',
         );
       setEntries(data.entries || []);
+      setServiceCounts(Array.isArray(data.serviceCounts) ? data.serviceCounts : null);
       setPractice(data.practice || practice);
       setNotes('');
       setMessage('Practical service saved. Student progress is updated.');
@@ -213,9 +220,12 @@ export default function PracticalProgressEntry() {
     }
   }
   const totals = new Map<string, number>();
-  entries.forEach((entry) => {
+  const countedServices =
+    serviceCounts ??
+    entries.map((entry) => ({ service_name: entry.service_name, recorded_count: 1 }));
+  countedServices.forEach((entry) => {
     const key = practicalServiceKey(entry.service_name);
-    totals.set(key, (totals.get(key) || 0) + 1);
+    totals.set(key, (totals.get(key) || 0) + Math.max(0, Number(entry.recorded_count) || 0));
   });
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
@@ -373,7 +383,7 @@ export default function PracticalProgressEntry() {
                 <thead>
                   <tr className="border-b">
                     <th className="p-2">Activity</th>
-                    <th className="p-2">Recorded</th>
+                    <th className="p-2">Verified services</th>
                     <th className="p-2">Mark completed</th>
                   </tr>
                 </thead>

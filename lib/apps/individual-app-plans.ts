@@ -38,7 +38,14 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
     name: 'Starter',
     priceMonthly: 29,
     priceLabel: '$29/mo',
-    features: ['1 website', '5 pages', 'Basic templates', 'Curated licensed photos and graphics in finished sites', 'Elevate subdomain', 'Email support'],
+    features: [
+      '1 website',
+      '5 pages',
+      'Basic templates',
+      'Curated licensed photos and graphics in finished sites',
+      'Elevate subdomain',
+      'Email support',
+    ],
   },
   {
     id: 'professional',
@@ -87,14 +94,24 @@ const SAM_GOV_PLANS: IndividualPlanDefinition[] = [
     priceMonthly: 149,
     priceLabel: '$149/mo',
     popular: true,
-    features: ['Up to 5 entity records', 'Compliance dashboard', 'Document organization', 'Priority support'],
+    features: [
+      'Up to 5 entity records',
+      'Compliance dashboard',
+      'Document organization',
+      'Priority support',
+    ],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     priceMonthly: 399,
     priceLabel: '$399/mo',
-    features: ['Unlimited entity records for the licensed user', 'Advanced compliance workspace', 'Priority support', 'Organization licensing available through procurement review'],
+    features: [
+      'Unlimited entity records for the licensed user',
+      'Renewal reminders and private document organization',
+      'Priority support',
+      'Organization licensing available through procurement review',
+    ],
   },
 ];
 
@@ -104,7 +121,12 @@ const GRANTS_PLANS: IndividualPlanDefinition[] = [
     name: 'Starter',
     priceMonthly: 79,
     priceLabel: '$79/mo',
-    features: ['50 grant searches/mo', 'Basic matching workflow', 'Deadline visibility', 'Saved-grant organization'],
+    features: [
+      '50 grant searches/mo',
+      'Basic matching workflow',
+      'Deadline visibility',
+      'Saved-grant organization',
+    ],
   },
   {
     id: 'professional',
@@ -112,14 +134,24 @@ const GRANTS_PLANS: IndividualPlanDefinition[] = [
     priceMonthly: 199,
     priceLabel: '$199/mo',
     popular: true,
-    features: ['Expanded discovery capacity', 'Application tracking', 'Budget workflow tools where enabled', 'Priority support'],
+    features: [
+      '500 grant searches/mo',
+      'Application tracking',
+      'Budget and notes workspace',
+      'Priority support',
+    ],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     priceMonthly: 499,
     priceLabel: '$499/mo',
-    features: ['Advanced grants workspace', 'Compliance workflow support', 'Priority support', 'Organization licensing available through procurement review'],
+    features: [
+      '2,000 grant searches/mo',
+      'Application tracking and budget workspace',
+      'Priority support',
+      'Organization licensing available through procurement review',
+    ],
   },
 ];
 
@@ -155,7 +187,7 @@ export const INDIVIDUAL_APP_CATALOG: Record<IndividualAppSlug, IndividualAppCata
 };
 
 export function getIndividualAppCatalog(slug: string): IndividualAppCatalog | null {
-  if (slug in INDIVIDUAL_APP_CATALOG) {
+  if (Object.hasOwn(INDIVIDUAL_APP_CATALOG, slug)) {
     return INDIVIDUAL_APP_CATALOG[slug as IndividualAppSlug];
   }
   return null;

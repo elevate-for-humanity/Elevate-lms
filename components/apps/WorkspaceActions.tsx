@@ -1,5 +1,6 @@
 'use client';
-import { useState, type FormEvent } from 'react';
+import { useContext, useState, type FormEvent } from 'react';
+import { WorkspaceDemoContext } from '@/components/apps/WorkspaceDemoContext';
 import { useRouter } from 'next/navigation';
 
 type Row = Record<string, any>;
@@ -28,6 +29,9 @@ export function SamWorkspaceActions({
   alerts: Row[];
 }) {
   const router = useRouter();
+  const demo = useContext(WorkspaceDemoContext);
+  const send = demo?.request || workspaceRequest;
+  const refresh = demo?.refresh || router.refresh;
   const [selected, setSelected] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -39,10 +43,10 @@ export function SamWorkspaceActions({
     setBusy(true);
     setNotice('');
     try {
-      await workspaceRequest('sam-gov', { ...values, entity_id: selected || null });
+      await send('sam-gov', { ...values, entity_id: selected || null });
       if (!selected) form.reset();
       setNotice('Entity record saved.');
-      router.refresh();
+      refresh();
     } catch (error) {
       setNotice((error as Error).message);
     } finally {
@@ -55,10 +59,12 @@ export function SamWorkspaceActions({
     setBusy(true);
     setNotice('');
     try {
-      await workspaceRequest('sam-gov', new FormData(form));
+      await send('sam-gov', new FormData(form));
       form.reset();
-      setNotice('Private document uploaded.');
-      router.refresh();
+      setNotice(
+        demo ? 'Demo document added to this browser session.' : 'Private document uploaded.',
+      );
+      refresh();
     } catch (error) {
       setNotice((error as Error).message);
     } finally {
@@ -185,7 +191,11 @@ export function SamWorkspaceActions({
               {doc.storage_path ? (
                 <a
                   className="font-semibold underline"
-                  href={`/api/apps/sam-gov/workspace?document=${encodeURIComponent(doc.id)}`}
+                  href={
+                    demo
+                      ? demo.documentHref(doc.id)
+                      : `/api/apps/sam-gov/workspace?document=${encodeURIComponent(doc.id)}`
+                  }
                 >
                   {doc.file_name}
                 </a>
@@ -210,8 +220,8 @@ export function SamWorkspaceActions({
                 onClick={async () => {
                   setBusy(true);
                   try {
-                    await workspaceRequest('sam-gov', { action: 'read-alert', id: alert.id });
-                    router.refresh();
+                    await send('sam-gov', { action: 'read-alert', id: alert.id });
+                    refresh();
                   } catch (error) {
                     setNotice((error as Error).message);
                   } finally {
@@ -234,11 +244,15 @@ export function SamWorkspaceActions({
   );
 }
 export function GrantsSearchActions({ onResults }: { onResults: (rows: Row[]) => void }) {
+  const demo = useContext(WorkspaceDemoContext);
+  const send = demo?.request || workspaceRequest;
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   return (
     <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6">
-      <h2 className="text-xl font-black">Search current federal opportunities</h2>
+      <h2 className="text-xl font-black">
+        {demo ? 'Explore the federal opportunity snapshot' : 'Search current federal opportunities'}
+      </h2>
       <form
         className="mt-4 flex flex-wrap items-end gap-3"
         onSubmit={async (event) => {
@@ -247,7 +261,7 @@ export function GrantsSearchActions({ onResults }: { onResults: (rows: Row[]) =>
           setBusy(true);
           setNotice('');
           try {
-            const data = await workspaceRequest('grants', { action: 'search', keyword });
+            const data = await send('grants', { action: 'search', keyword });
             onResults(data.opportunities);
             setNotice(
               `${data.total} matching opportunities. ${data.remaining} searches remain this month.`,
@@ -271,7 +285,7 @@ export function GrantsSearchActions({ onResults }: { onResults: (rows: Row[]) =>
           />
         </label>
         <button disabled={busy} className={buttonClass}>
-          {busy ? 'Searching Grants.gov…' : 'Search Grants.gov'}
+          {busy ? 'Searching…' : demo ? 'Search demo snapshot' : 'Search Grants.gov'}
         </button>
       </form>
       {notice && (
@@ -292,12 +306,15 @@ export function GrantRecordActions({
   tracking?: boolean;
 }) {
   const router = useRouter();
+  const demo = useContext(WorkspaceDemoContext);
+  const send = demo?.request || workspaceRequest;
+  const refresh = demo?.refresh || router.refresh;
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   async function act(action: string) {
     setBusy(true);
     try {
-      await workspaceRequest('grants', { action, grant_id: grantId });
+      await send('grants', { action, grant_id: grantId });
       setNotice(
         action === 'draft'
           ? 'Application tracker created.'
@@ -305,7 +322,7 @@ export function GrantRecordActions({
             ? 'Grant saved.'
             : 'Grant removed from saved items.',
       );
-      router.refresh();
+      refresh();
     } catch (error) {
       setNotice((error as Error).message);
     } finally {
@@ -332,6 +349,9 @@ export function GrantRecordActions({
 }
 export function GrantApplicationActions({ application }: { application: Row }) {
   const router = useRouter();
+  const demo = useContext(WorkspaceDemoContext);
+  const send = demo?.request || workspaceRequest;
+  const refresh = demo?.refresh || router.refresh;
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   return (
@@ -344,13 +364,13 @@ export function GrantApplicationActions({ application }: { application: Row }) {
           const values = Object.fromEntries(new FormData(event.currentTarget));
           setBusy(true);
           try {
-            await workspaceRequest('grants', {
+            await send('grants', {
               ...values,
               action: 'application',
               id: application.id,
             });
             setNotice('Tracker saved.');
-            router.refresh();
+            refresh();
           } catch (error) {
             setNotice((error as Error).message);
           } finally {

@@ -4,7 +4,9 @@ const baseUrl = String(process.argv[2] || '').replace(/\/$/, '');
 const expectedSha = String(process.argv[3] || '').trim();
 
 if (!/^https:\/\//.test(baseUrl)) {
-  console.error('Usage: node scripts/verify-store-runtime.mjs https://store-runtime.example <40-char-sha>');
+  console.error(
+    'Usage: node scripts/verify-store-runtime.mjs https://store-runtime.example <40-char-sha>',
+  );
   process.exit(2);
 }
 
@@ -31,7 +33,10 @@ try {
   const version = await json('/version.json', { headers: { 'cache-control': 'no-cache' } });
   assert(version.response.ok, `version.json returned ${version.response.status}`);
   if (expectedSha) {
-    assert(version.body?.commit === expectedSha, `Store SHA ${version.body?.commit || 'missing'} != ${expectedSha}`);
+    assert(
+      version.body?.commit === expectedSha,
+      `Store SHA ${version.body?.commit || 'missing'} != ${expectedSha}`,
+    );
   }
 
   for (const path of ['/store', '/store/proof', '/store/apps/website-builder']) {
@@ -46,14 +51,19 @@ try {
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       mode: 'builder',
-      message: 'Build a modern dental website called Runtime Proof Dental in Indianapolis with booking.',
+      message:
+        'Build a modern dental website called Runtime Proof Dental in Indianapolis with booking.',
       current: {},
     }),
   });
   assert(build.response.ok, `public Website Builder demo returned ${build.response.status}`);
-  assert(build.body?.actions?.generated === true, 'public Website Builder demo did not generate a site state');
   assert(
-    typeof build.body?.actions?.heroHeadline === 'string' && build.body.actions.heroHeadline.length > 5,
+    build.body?.actions?.generated === true,
+    'public Website Builder demo did not generate a site state',
+  );
+  assert(
+    typeof build.body?.actions?.heroHeadline === 'string' &&
+      build.body.actions.heroHeadline.length > 5,
     'public Website Builder demo did not generate visible website content',
   );
 
@@ -66,21 +76,59 @@ try {
       current: build.body.actions,
     }),
   });
-  assert(publish.response.ok, `public Website Builder publish demo returned ${publish.response.status}`);
-  assert(publish.body?.actions?.published === true, 'public Website Builder demo did not accept publish intent');
+  assert(
+    publish.response.ok,
+    `public Website Builder publish demo returned ${publish.response.status}`,
+  );
+  assert(
+    publish.body?.actions?.published === true,
+    'public Website Builder demo did not accept publish intent',
+  );
 
   const protectedCreate = await json('/api/apps/website-builder/sites', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ siteName: 'Unauthorized runtime probe' }),
   });
-  assert(protectedCreate.response.status === 401, 'production Website Builder creation is not protected by authentication');
-  assert(protectedCreate.body?.error === 'Authentication required', 'production Website Builder returned the wrong anonymous-access contract');
+  assert(
+    protectedCreate.response.status === 401,
+    'production Website Builder creation is not protected by authentication',
+  );
+  assert(
+    protectedCreate.body?.error === 'Authentication required',
+    'production Website Builder returned the wrong anonymous-access contract',
+  );
 
+  const ledger = await fetch(
+    'https://ebnbeqdsuxygopetptlv.supabase.co/functions/v1/quickbooks-payment-receipt',
+    { redirect: 'error', signal: AbortSignal.timeout(15000) },
+  );
+  const ledgerHealth = await ledger.json();
+  assert(
+    ledger.ok &&
+      ledgerHealth.service === 'store-commerce-ledger' &&
+      ledgerHealth.ready === true &&
+      ledgerHealth.databaseProject === 'ebnbeqdsuxygopetptlv',
+    'Separate Store commerce database is not ready',
+  );
+  for (const slug of ['website-builder', 'sam-gov', 'grants']) {
+    const demo = await request(`/store/demo/apps/${slug}`);
+    const html = await demo.text();
+    assert(
+      demo.ok && html.includes('Try it before you choose'),
+      `${slug} plan demo did not render`,
+    );
+  }
   console.log('[store-runtime] PASS');
-  console.log(`Store ${version.body?.commit || 'unknown'} serves the proof index and Website Builder product.`);
-  console.log('Public Builder generated visible site content and accepted publish intent; production site creation rejected anonymous access.');
+  console.log(
+    `Store ${version.body?.commit || 'unknown'} serves the proof index and Website Builder product.`,
+  );
+  console.log(
+    'Public Builder generated visible site content and accepted publish intent; production site creation rejected anonymous access.',
+  );
 } catch (error) {
-  console.error(`[store-runtime] FAILED: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(
+    `[store-runtime] FAILED: ${error instanceof Error ? error.message : String(error)}`,
+  );
   process.exit(1);
 }

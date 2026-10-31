@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', schedule.id)
-        .eq('next_invoice_date', schedule.next_invoice_date);
+        .eq('next_invoice_date', schedule.next_invoice_date)
+        .eq('status', 'active');
       if (update.error) throw new Error(update.error.message);
       results.push({ scheduleId: schedule.id, ok: true });
     } catch (cause) {

@@ -1,3 +1,4 @@
+import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
 /**
  * Portal Router
  * Single source of truth for field-based learner portal routing.
@@ -80,6 +81,9 @@ export async function resolvePortalForUser(
       .eq('id', userId)
       .maybeSingle();
 
+    const assignedHome = await resolveAssignedLearnerHome(supabase, userId);
+    if (assignedHome) return assignedHome;
+
     const cachedPortalType = String(profile?.portal_type || '').trim().toLowerCase();
     if (cachedPortalType) {
       if (LEGACY_APPRENTICE_PORTAL_TYPES.has(cachedPortalType)) return PORTAL_PATHS.apprentice;
@@ -91,34 +95,7 @@ export async function resolvePortalForUser(
       return PORTAL_PATHS.apprentice;
     }
 
-    const { data: enrollment } = await supabase
-      .from('program_enrollments')
-      .select('program_id')
-      .eq('user_id', userId)
-      .in('enrollment_state', ['active', 'enrolled', 'onboarding', 'confirmed', 'orientation_complete', 'documents_complete'])
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!enrollment?.program_id) return PORTAL_FALLBACK;
-
-    const { data: program } = await supabase
-      .from('programs')
-      .select('program_type, category')
-      .eq('id', enrollment.program_id)
-      .maybeSingle();
-
-    if (!program) return PORTAL_FALLBACK;
-
-    const portalKey = derivePortalKey(program.program_type, program.category);
-    if (!portalKey) return PORTAL_FALLBACK;
-
-    await supabase
-      .from('profiles')
-      .update({ portal_type: portalKey })
-      .eq('id', userId);
-
-    return PORTAL_PATHS[portalKey];
+    return PORTAL_FALLBACK;
   } catch {
     return PORTAL_FALLBACK;
   }

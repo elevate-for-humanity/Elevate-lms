@@ -89,6 +89,9 @@ export const ROUTES = {
   faq: '/faq',
   contact: '/contact',
 
+  // Curvature's published storefront remains reachable while its custom domain is restored.
+  curvatureBodySculpting: '/sites/meri-gold-round',
+
   // Store / Trials
   store: '/store',
   storeDemo: '/store/demo',

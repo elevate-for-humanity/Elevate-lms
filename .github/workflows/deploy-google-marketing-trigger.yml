@@ -169,7 +169,8 @@ jobs:
           const trust=readFileSync('components/home/HomeTrustBar.tsx','utf8');
           const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','Find or become a Host Shop'];
           for(const name of required) if(!shops.includes(name)) throw new Error('Missing homepage content: '+name);
-          for(const name of ['HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
+          for(const name of ['HVAC Technician','CDL Training','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
+          if(cards.includes("slug: 'bookkeeping'")) throw new Error('Withdrawn Bookkeeping promotion remains');
           if(page.includes('<HomeNetworks') || trust.includes('Workforce systems and public-sector alignment')) throw new Error('Retired homepage section still enabled');
           const imagePattern = new RegExp("image: '(/images/[^']+)'", 'g');
           for(const src of [...cards.matchAll(imagePattern),...shops.matchAll(imagePattern)]) {
@@ -367,7 +368,7 @@ jobs:
           node --input-type=module <<'NODE'
           import { normalizeHomepageText } from './scripts/gcp/homepage-content.mjs';
           const root='https://www.elevateforhumanity.org';
-          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship','Find or become a Host Shop'];
+          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Business & Entrepreneurship','Find or become a Host Shop'];
           const forbidden=['Workforce systems and public-sector alignment'];
           const deadline=Date.now()+180000;
           let last='';
@@ -384,6 +385,11 @@ jobs:
               last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
               console.log(last);
               if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) {
+                if(html.includes('href="/programs/bookkeeping"')) throw new Error('Withdrawn Bookkeeping navigation remains');
+                for(const path of ['/programs/bookkeeping','/programs/financial-literacy','/apply/student?program=bookkeeping']) {
+                  const response=await fetch(root+path,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+                  if(response.status!==410) throw new Error('Withdrawn program entry remains: '+path+' HTTP '+response.status);
+                }
                 const paths=['/programs/esthetician-apprenticeship','/programs/barber-apprenticeship','/barber-beauty-network','/jobs','/partners/host-shops'];
                 const results=await Promise.all(paths.map(async path => {
                   const response=await fetch(root+path+'?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});

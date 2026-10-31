@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { TenantHiringReview } from '@/components/tenant/TenantHiringReview';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -32,7 +33,7 @@ export default async function WebsiteLeadsPage({ params }: Props) {
 
   const { data: leads } = await admin
     .from('tenant_site_leads')
-    .select('id, name, email, phone, message, source_path, status, created_at')
+    .select('id, name, email, phone, message, source_path, status, created_at, intake_type, hiring_data')
     .eq('website_id', websiteId)
     .order('created_at', { ascending: false })
     .limit(200);
@@ -44,7 +45,7 @@ export default async function WebsiteLeadsPage({ params }: Props) {
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-brand-red-700">Website Builder</p>
             <h1 className="mt-1 text-3xl font-black text-slate-950">Leads · {site.site_name || 'Website'}</h1>
-            <p className="mt-2 text-slate-600">Messages submitted through the published website contact form.</p>
+            <p className="mt-2 text-slate-600">Customer messages and hiring applications submitted through this website.</p>
           </div>
           <Link href={`/apps/website-builder/edit/${websiteId}`} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-bold text-slate-800">Back to editor</Link>
         </div>
@@ -70,6 +71,7 @@ export default async function WebsiteLeadsPage({ params }: Props) {
                     </div>
                   </div>
                   <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-700">{lead.message}</p>
+                  {lead.intake_type === 'hiring' ? <TenantHiringReview websiteId={websiteId} applicationId={lead.id} value={lead.hiring_data} /> : null}
                   <p className="mt-3 text-xs font-semibold text-slate-400">Source: {lead.source_path || '/contact'}</p>
                 </article>
               ))}

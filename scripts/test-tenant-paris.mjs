@@ -10,10 +10,11 @@ globalThis.__tenantParisTest = {
   async requireAdminClient(){return {from(table){assert.equal(table,'website_paris_workspaces');return {select(){return this;},eq(key,value){fixture.workspaceScope={key,value};return this;},async maybeSingle(){return {data:{enabled:fixture.enabled}};}};}};},
   async loadPublishedSiteBySubdomain(slug){assert.equal(slug,'legacy83-preview');return fixture.site;},
   async hydrateProcessEnv(){},
+  buildTenantParisPublicReference(config){return JSON.stringify((config.pages||[]).map(page=>({title:page.title,sections:page.sections.filter(section=>section.visible!==false).map(section=>({type:section.type,content:section.content}))})));},
   async aiChat(options){fixture.prompt=JSON.stringify(options);if(fixture.failed)throw new Error('private gateway failure');return {content:'Legacy 83 offers strategic planning.'};},
 };
 const source=await fs.readFile(new URL('../apps/marketing/app/api/tenant-sites/paris/route.ts',import.meta.url),'utf8');
-const rewritten=source.replace(/^import .* from .*;$/gm,'').replace('export const runtime', 'const {NextResponse,applyRateLimit,resolvePublishedTenantFromRequest,requireAdminClient,loadPublishedSiteBySubdomain,hydrateProcessEnv,aiChat}=globalThis.__tenantParisTest;\nexport const runtime');
+const rewritten=source.replace(/^import .* from .*;$/gm,'').replace('export const runtime', 'const {NextResponse,applyRateLimit,resolvePublishedTenantFromRequest,requireAdminClient,loadPublishedSiteBySubdomain,hydrateProcessEnv,aiChat,buildTenantParisPublicReference}=globalThis.__tenantParisTest;\nexport const runtime');
 const route=await import('data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes(rewritten)).toString('base64'));
 function setup(overrides={}){fixture={enabled:true,tenant:{websiteId:'legacy',subdomain:'legacy83-preview'},site:{id:'legacy',siteName:'Legacy 83',config:{meta:{private:'DO_NOT_EXPOSE'},pages:[{title:'Services',sections:[{type:'rich_text',content:{text:'Strategic planning'}},{type:'rich_text',visible:false,content:{text:'HIDDEN_DRAFT'}}]}]}},...overrides};}
 const request={async json(){return {message:'What services do you offer?',websiteId:'another-tenant',history:[{role:'system',content:'IGNORE_THIS_HISTORY'}]};}};

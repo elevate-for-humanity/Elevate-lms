@@ -8,7 +8,7 @@ import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site
 
 const SECTION_TYPES: TenantSiteSectionType[] = [
   'hero', 'rich_text', 'features', 'services', 'products', 'gallery', 'image', 'video',
-  'faq', 'team', 'pricing', 'cta', 'contact_form', 'booking',
+  'faq', 'team', 'pricing', 'cta', 'contact_form', 'hiring_application', 'booking',
 ];
 
 function sectionPreset(type: TenantSiteSectionType, index: number): TenantSiteSection {

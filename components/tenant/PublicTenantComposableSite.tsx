@@ -6,6 +6,7 @@ import './legacy83-premium.css';
 import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
 import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantParis } from '@/components/tenant/TenantParis';
+import { TenantHiringApplication } from '@/components/tenant/TenantHiringApplication';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
 import type { PublishedTenantSite, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
@@ -84,12 +85,14 @@ function ActionLink({
   );
 }
 
-function Section({ section, primary, secondary, basePath, isPageHeading = false }: { section: TenantSiteSection; primary: string; secondary: string; basePath: string; isPageHeading?: boolean }) {
+function Section({ section, primary, secondary, basePath, websiteId, businessName, isPageHeading = false }: { section: TenantSiteSection; primary: string; secondary: string; basePath: string; websiteId: string; businessName: string; isPageHeading?: boolean }) {
   if (section.visible === false) return null;
   const c = section.content || {};
   const align = text(section.settings?.align) || 'left';
   const centered = align === 'center';
   const variant = text(section.settings?.variant);
+
+  if (section.type === 'hiring_application') return <TenantHiringApplication websiteId={websiteId} businessName={businessName} accent={primary} />;
 
   if (section.type === 'hero') {
     const image = text(c.image);
@@ -237,7 +240,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
         </div>
       </header>
       {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
-      <main>{page.sections.map((section, index) => <Section key={section.id} section={section} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
+      <main>{page.sections.map((section, index) => <Section key={section.id} section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
     </div>

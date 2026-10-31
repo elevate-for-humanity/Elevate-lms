@@ -44,7 +44,7 @@ export function TenantParis({business,accent,basePath=''}:{business:string;accen
   return <aside className="fixed bottom-5 right-4 z-40 max-w-[calc(100vw-2rem)] font-sans">
     {open&&<section id="tenant-paris-panel" aria-label={'PARIS for '+business} className="mb-3 w-80 max-w-full rounded-2xl border border-black/10 bg-white p-5 text-slate-950 shadow-2xl">
       <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-bold">PARIS · {business}</h2><button type="button" aria-label="Close PARIS" onClick={()=>{recognition.current?.stop();setListening(false);setOpen(false);}}>✕</button></div>
-      <p className="mt-3 text-sm">Ask about our services, G.R.O.W.S. framework, Academy, or requesting a consultation.</p>
+      <p className="mt-3 text-sm">Ask about this business, its published services, or how to get in touch.</p>
       <div role="log" aria-live="polite" className="mt-3 max-h-52 space-y-3 overflow-y-auto text-sm">{messages.map((message,i)=><p key={i}><strong>{message.role}: </strong>{message.text}</p>)}</div>
       {error&&<p role="status" className="mt-3 text-sm text-red-800">{error}</p>}
       <form onSubmit={send} className="mt-4 space-y-3"><label className="block text-sm font-bold">Your question<input value={input} onChange={event=>setInput(event.target.value)} maxLength={1500} className="mt-1 w-full rounded-lg border border-slate-400 p-2 font-normal"/></label>

@@ -91,6 +91,8 @@ export const ROUTES = {
 
   // Curvature's published storefront remains reachable while its custom domain is restored.
   curvatureBodySculpting: '/sites/meri-gold-round',
+  platinumCleaning: '/sites/2exclusive-platinum-cleaning',
+  supersonicFastCash: '/tax',
 
   // Store / Trials
   store: '/store',

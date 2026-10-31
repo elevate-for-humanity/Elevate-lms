@@ -99,6 +99,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
             : ('submitted' as const),
       isLate: s.is_late,
       existingGrade: s.grade,
+      existingFeedback: s.feedback,
     })),
   );
 

@@ -45,6 +45,9 @@ export type Assignment = {
 };
 
 export type Submission = {
+  studentName?: string;
+  existingGrade?: number | null;
+  existingFeedback?: string | null;
   id: string;
   assignmentId: string;
   studentId: string;

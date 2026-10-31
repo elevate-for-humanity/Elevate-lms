@@ -1,3 +1,4 @@
+import { trainingHoursDisplay } from '@/lib/program-holder/training-hours-display';
 import ProgramSyllabusReader from '@/components/learner/ProgramSyllabusReader';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 import { payoutSetupLabel } from '@/lib/program-holder/payout-summary';
@@ -828,10 +829,7 @@ function EnrollmentTable({
                   label="Next action"
                   value={completionAlert(row) || row.next_required_action || 'Continue training'}
                 />
-                <Row
-                  label="WorkOne hours"
-                  value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
-                />
+                <Row label="Recorded training hours" value={trainingHoursDisplay(row)} />
               </dl>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
@@ -934,9 +932,7 @@ function EnrollmentTable({
                     )}
                   </td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
-                  <td className="px-3 py-4 font-bold">
-                    {Math.min(48, Number(row.total_hours_completed || 0))} / 48
-                  </td>
+                  <td className="px-3 py-4 font-bold">{trainingHoursDisplay(row)}</td>
                   <td className="px-3 py-4 text-xs">
                     <span className="block">Start: {row.training_start_date || 'Missing'}</span>
                     <span className="block">
@@ -1271,7 +1267,13 @@ function Programs({ data }: { data: any }) {
       />
       {data.programs.map((program: any) => {
         const syllabus = getBeautyApprenticeshipConfig(program.slug);
-        return syllabus ? <ProgramSyllabusReader key={program.id} title={`${syllabus.label} apprenticeship syllabus`} path={syllabus.syllabusHref} /> : null;
+        return syllabus ? (
+          <ProgramSyllabusReader
+            key={program.id}
+            title={`${syllabus.label} apprenticeship syllabus`}
+            path={syllabus.syllabusHref}
+          />
+        ) : null;
       })}
       <SyllabusUploadStatus documents={data.documents} courseAssignments={data.courseAssignments} />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />

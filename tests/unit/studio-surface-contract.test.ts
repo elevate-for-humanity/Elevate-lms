@@ -128,8 +128,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
   it('preflights the isolated browser runtime before enabling Chromium', () => {
     const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
-    expect(workspace).toContain(
-      "fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })",
+    expect(workspace).toMatch(
+      /fetch\('\/api\/admin\/dev-studio\/browser\/session',\s*\{\s*cache: 'no-store',\s*signal: AbortSignal\.any\(\[controller\.signal, AbortSignal\.timeout\(25000\)\]\),\s*\}\)/,
     );
     expect(workspace).toContain('disabled={runtimeReady !== true || !target.trim()}');
     expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');

@@ -47,15 +47,15 @@ function formatSlugTitle(slug: string): string {
 function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
   const program = Array.isArray(row?.programs) ? (row.programs[0] ?? null) : row?.programs;
   const programSlug = row.program_slug ?? program?.slug ?? null;
-  const programTitle = program?.title ?? program?.name ?? (programSlug ? formatSlugTitle(programSlug) : null);
+  const programTitle =
+    program?.title ?? program?.name ?? (programSlug ? formatSlugTitle(programSlug) : null);
 
   const rawStatus = row.status ?? 'pending';
   const rawState = row.enrollment_state ?? null;
 
   // Pending approval is not authorization to access courses.
 
-  const isBookkeeping = programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting';
-  const courseId = row.course_id ?? (isBookkeeping ? '566e2ef7-6861-4736-9807-b4ff868fc908' : null);
+  const courseId = row.course_id ?? null;
 
   return {
     id: row.id,
@@ -91,7 +91,8 @@ export async function resolveLatestEnrollment({
 
   if (enrollmentId) {
     query = query.eq('id', enrollmentId);
-    const { data } = await query.limit(1).maybeSingle();
+    const { data, error } = await query.limit(1).maybeSingle();
+    if (error) throw error;
     if (!data) return null;
     const resolved = normalizeProgramEnrollment(data);
     if (!resolved.courseId && resolved.programSlug) {
@@ -100,10 +101,9 @@ export async function resolveLatestEnrollment({
     return resolved;
   }
 
-  const { data } = await query
-    .order('created_at', { ascending: false })
-    .limit(20);
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(20);
 
+  if (error) throw error;
   if (!data || data.length === 0) return null;
 
   const normalized = data.map(normalizeProgramEnrollment);
@@ -112,14 +112,19 @@ export async function resolveLatestEnrollment({
   let candidate: ResolvedEnrollment | undefined;
   if (programSlug) {
     const target = programSlug.toLowerCase().trim();
-    candidate = normalized.find(
-      (e) => e.programSlug?.toLowerCase().trim() === target,
-    );
+    candidate = normalized.find((e) => e.programSlug?.toLowerCase().trim() === target);
   }
 
   if (!candidate) {
     // Prioritize active / enrolled states over pending or withdrawn
-    const activeStates = ['active', 'enrolled', 'in_progress', 'confirmed', 'orientation_complete', 'documents_complete'];
+    const activeStates = [
+      'active',
+      'enrolled',
+      'in_progress',
+      'confirmed',
+      'orientation_complete',
+      'documents_complete',
+    ];
     candidate = normalized.find((e) =>
       activeStates.includes(String(e.enrollmentState || e.status).toLowerCase()),
     );
@@ -142,13 +147,13 @@ export async function listUnifiedEnrollments(
 ): Promise<ResolvedEnrollment[]> {
   await requireEnrollmentOwner(client, userId);
   const programResp = await client
-      .from('program_enrollments')
-      .select(
-        'id, user_id, student_id, status, enrollment_state, program_slug, program_id, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
-      )
-      .or(`user_id.eq.${userId},student_id.eq.${userId}`)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    .from('program_enrollments')
+    .select(
+      'id, user_id, student_id, status, enrollment_state, program_slug, program_id, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
+    )
+    .or(`user_id.eq.${userId},student_id.eq.${userId}`)
+    .order('created_at', { ascending: false })
+    .limit(limit);
 
   const normalized = (programResp.data ?? []).map(normalizeProgramEnrollment);
 
@@ -165,14 +170,7 @@ export function hasLmsAccess(enrollment: ResolvedEnrollment | null): boolean {
   // A status label alone cannot authorize LMS access.
   if (!enrollment.accessGrantedAt) return false;
 
-  const blocked = new Set([
-    'withdrawn',
-    'revoked',
-    'rejected',
-    'suspended',
-  ]);
+  const blocked = new Set(['withdrawn', 'revoked', 'rejected', 'suspended']);
 
-  return !blocked.has(
-    String(enrollment.enrollmentState ?? enrollment.status).toLowerCase()
-  );
+  return !blocked.has(String(enrollment.enrollmentState ?? enrollment.status).toLowerCase());
 }

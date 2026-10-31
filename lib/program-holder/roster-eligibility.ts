@@ -1,3 +1,11 @@
+export const LEARNER_ROSTER_ROLES = [
+  'student',
+  'learner',
+  'apprentice',
+  'barber_apprentice',
+  'cosmetology_apprentice',
+] as const;
+
 const TEST_EMAIL_DOMAINS = new Set([
   'qa.invalid',
   'elevatetest.com',
@@ -27,6 +35,11 @@ export function isProductionRosterProfile(profile: {
   );
 }
 
-export function isLearnerRosterProfile(profile: Parameters<typeof isProductionRosterProfile>[0]): boolean {
-  return isProductionRosterProfile(profile) && ['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(String(profile.role || '').toLowerCase());
+export function isLearnerRosterProfile(
+  profile: Parameters<typeof isProductionRosterProfile>[0],
+): boolean {
+  return (
+    isProductionRosterProfile(profile) &&
+    (LEARNER_ROSTER_ROLES as readonly string[]).includes(String(profile.role || '').toLowerCase())
+  );
 }

@@ -31,7 +31,7 @@ type HealthPayload = Record<string, unknown> & {
 };
 
 function flag(ok: boolean | undefined) {
-  return ok ? 'configured' : 'missing';
+  return ok === undefined ? 'not reported' : ok ? 'configured' : 'missing';
 }
 
 export default function DevStudioHealthPanel() {
@@ -43,7 +43,10 @@ export default function DevStudioHealthPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/admin/dev-studio/health');
+      const res = await fetch('/api/admin/dev-studio/health', {
+        signal: AbortSignal.timeout(15000),
+        cache: 'no-store',
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { error?: string }).error ?? `HTTP ${res.status}`);
       setHealth(data as HealthPayload);
@@ -63,7 +66,15 @@ export default function DevStudioHealthPanel() {
     ? [
         [
           'Container GitHub token',
-          !health.hasGitHub ? 'missing' : health.githubTokenValid ? 'valid' : 'invalid',
+          health.hasGitHub === undefined
+            ? 'not reported'
+            : !health.hasGitHub
+              ? 'missing'
+              : health.githubTokenValid === undefined
+                ? 'not verified'
+                : health.githubTokenValid
+                  ? 'valid'
+                  : 'invalid',
         ],
         ['Groq', flag(health.hasGroq)],
         ['Grok / xAI', flag(health.hasXAI)],

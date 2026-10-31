@@ -105,7 +105,9 @@ export async function provisionTenant(
 
     // Check if user already exists in auth
     const { data: userListData } = await supabase.auth.admin.listUsers();
-    const userListAny = userListData as { users?: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }> } | null;
+    const userListAny = userListData as {
+      users?: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }>;
+    } | null;
     const existingUser = { user: userListAny?.users?.find((u) => u.email === email) ?? null };
 
     let adminUserId: string;
@@ -130,6 +132,7 @@ export async function provisionTenant(
         email,
         password: temporaryPassword,
         email_confirm: true,
+        app_metadata: { tenant_id: tenant.id, role: 'admin' },
         user_metadata: {
           tenant_id: tenant.id,
           role: 'admin',

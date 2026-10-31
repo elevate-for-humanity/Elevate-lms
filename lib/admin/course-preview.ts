@@ -15,14 +15,28 @@ export async function resolveCoursePreview(courseId?: string) {
     const db = await requireAdminClient();
     const subject = await resolvePortalPreviewSubject(db, null);
     if (!subject.previewing) return { active: false as const, db: null };
-    const { data: enrollment, error } = await db.from('course_enrollments')
-      .select('id').eq('student_id', subject.userId).eq('course_id', courseId)
-      .eq('status', 'active').is('revoked_at', null).maybeSingle();
+    const { data: enrollment, error } = await db
+      .from('course_enrollments')
+      .select('id')
+      .eq('student_id', subject.userId)
+      .eq('course_id', courseId)
+      .eq('status', 'active')
+      .is('revoked_at', null)
+      .maybeSingle();
     if (error || !enrollment) return { active: false as const, db: null };
     return { active: true as const, db, courseId };
   }
   const db = await requireAdminClient();
-  const { data: actor } = await db.from('profiles').select('role').eq('id', handoff.actorId).maybeSingle();
-  if (!ADMIN_ROLES.has(String(actor?.role || ''))) return { active: false as const, db: null };
+  const { data: actor } = await db
+    .from('profiles')
+    .select('role,is_active,suspended')
+    .eq('id', handoff.actorId)
+    .maybeSingle();
+  if (
+    actor?.is_active === false ||
+    actor?.suspended === true ||
+    !ADMIN_ROLES.has(String(actor?.role || ''))
+  )
+    return { active: false as const, db: null };
   return { active: true as const, db, courseId: handoff.targetId };
 }

@@ -85,6 +85,13 @@ export async function getSession() {
       return null;
     }
 
+    const { data: account, error: accountError } = await supabase
+      .from('profiles')
+      .select('is_active, suspended')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (accountError || account?.is_active === false || account?.suspended === true) return null;
+
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -119,6 +126,7 @@ export async function getCurrentUser() {
     .eq('id', session.user.id)
     .maybeSingle();
 
+  if (profile?.is_active === false || profile?.suspended === true) return null;
   if (error) {
     logger.error('Error fetching profile', error as Error, { userId: session.user.id });
     return null;
@@ -156,12 +164,12 @@ export async function getAuthUser(): Promise<AuthUser | null> {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role, first_name, last_name')
+      .select('role, first_name, last_name, is_active, suspended')
       .eq('id', session.user.id)
       .maybeSingle();
 
     const role = normalizeRole(profile?.role);
-    if (!profile || !role) return null;
+    if (!profile || !role || profile.is_active === false || profile.suspended === true) return null;
 
     return {
       id: session.user.id,

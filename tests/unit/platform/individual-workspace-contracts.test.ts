@@ -54,7 +54,7 @@ beforeAll(async () => {
   await db.exec(schema);
   await db.exec(
     readFileSync(
-      'supabase/migrations/20261031171500_individual_app_workspace_contracts.sql',
+      'supabase/migrations/20261031193843_individual_app_workspace_contracts.sql',
       'utf8',
     ),
   );

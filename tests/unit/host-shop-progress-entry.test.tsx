@@ -155,3 +155,29 @@ it('ignores a late progress response after another apprentice has been selected'
   expect(screen.getByRole('combobox', { name: 'Select apprentice' })).toHaveValue('second');
   expect(screen.getByRole('button', { name: 'Save student progress' })).toBeDisabled();
 });
+
+it('counts an older lowercase service under its displayed checklist label', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) =>
+      response(
+        url === '/api/host-shop/competencies'
+          ? { apprentices: [{ ...apprentice, standard: { occupationTitle: 'Hair Stylist' } }] }
+          : {
+              entries: [
+                {
+                  id: 'old-entry',
+                  service_name: ' updo ',
+                  performed_on: '2026-01-01',
+                  subject_type: 'mannequin',
+                },
+              ],
+              canRecord: false,
+              practice,
+            },
+      ),
+    ),
+  );
+  render(<PracticalProgressEntry />);
+  expect(await screen.findByRole('row', { name: 'Updo 1 Owner checkoff' })).toBeInTheDocument();
+});

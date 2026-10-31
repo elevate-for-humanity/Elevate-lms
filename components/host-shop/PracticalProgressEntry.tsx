@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { practicalServiceKey } from '@/lib/apprenticeship/practical-service-progress.mjs';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 type Apprentice = { enrollmentId: string; name: string; standard: { occupationTitle: string } };
 type Entry = {
@@ -212,7 +213,10 @@ export default function PracticalProgressEntry() {
     }
   }
   const totals = new Map<string, number>();
-  entries.forEach((e) => totals.set(e.service_name, (totals.get(e.service_name) || 0) + 1));
+  entries.forEach((entry) => {
+    const key = practicalServiceKey(entry.service_name);
+    totals.set(key, (totals.get(key) || 0) + 1);
+  });
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <h2 className="text-2xl font-black">Record student progress</h2>
@@ -377,7 +381,7 @@ export default function PracticalProgressEntry() {
                   {options.map((v) => (
                     <tr key={v} className="border-b">
                       <td className="p-2">{v}</td>
-                      <td className="p-2">{totals.get(v) || 0}</td>
+                      <td className="p-2">{totals.get(practicalServiceKey(v)) || 0}</td>
                       <td className="p-2">
                         {canRecord ? (
                           <button

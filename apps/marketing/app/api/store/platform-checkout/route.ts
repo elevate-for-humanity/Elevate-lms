@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { nextInvoiceDate } from '@/lib/billing/schedule';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
@@ -19,10 +20,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function nextPeriod(interval: BillingInterval): string {
-  const now = new Date();
-  if (interval === 'annual') now.setUTCFullYear(now.getUTCFullYear() + 1);
-  else now.setUTCMonth(now.getUTCMonth() + 1);
-  return now.toISOString().slice(0, 10);
+  return nextInvoiceDate(
+    new Date().toISOString().slice(0, 10),
+    interval === 'annual' ? 'annual' : 'monthly',
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -63,21 +64,40 @@ export async function POST(request: NextRequest) {
 
   const admin = await requireAdminClient();
   // Verify delivery can resolve the selected catalog before taking payment.
-  const deliveryPlan = await admin.from('subscription_plans')
-    .select('id').eq('slug', plan.id).eq('active', true).maybeSingle();
+  const deliveryPlan = await admin
+    .from('subscription_plans')
+    .select('id')
+    .eq('slug', plan.id)
+    .eq('active', true)
+    .maybeSingle();
   if (deliveryPlan.error || !deliveryPlan.data?.id)
-    return NextResponse.json({ error: 'This plan is not ready for access activation.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'This plan is not ready for access activation.' },
+      { status: 503 },
+    );
   const addonCodes = addonSlugs.map(normalizeAddonCode);
   if (addonCodes.length) {
-    const deliveryAddons = await admin.from('saas_addon_catalog')
-      .select('code').in('code', addonCodes).eq('active', true);
-    if (deliveryAddons.error || addonCodes.some((code) => !deliveryAddons.data?.some((row) => row.code === code)))
-      return NextResponse.json({ error: 'A selected add-on is not ready for access activation.' }, { status: 503 });
+    const deliveryAddons = await admin
+      .from('saas_addon_catalog')
+      .select('code')
+      .in('code', addonCodes)
+      .eq('active', true);
+    if (
+      deliveryAddons.error ||
+      addonCodes.some((code) => !deliveryAddons.data?.some((row) => row.code === code))
+    )
+      return NextResponse.json(
+        { error: 'A selected add-on is not ready for access activation.' },
+        { status: 503 },
+      );
   }
   const tenantId = await resolveTenantIdForUser(user.id);
   if (!tenantId)
     return NextResponse.json(
-      { error: 'Set up the organization workspace before purchasing a subscription.', trialUrl: '/store/trial' },
+      {
+        error: 'Set up the organization workspace before purchasing a subscription.',
+        trialUrl: '/store/trial',
+      },
       { status: 409 },
     );
   const billingOrganizationId = await resolveBillingOrganizationId(tenantId, admin);
@@ -89,9 +109,7 @@ export async function POST(request: NextRequest) {
 
   const { data: existing } = await admin
     .from('organization_subscriptions')
-    .select(
-      'status,billing_provider,provider_subscription_id,current_period_end',
-    )
+    .select('status,billing_provider,provider_subscription_id,current_period_end')
     .eq('organization_id', billingOrganizationId)
     .maybeSingle();
   if (
@@ -107,14 +125,14 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(
       {
-        error: 'This organization already has an active subscription with another billing provider. Duplicate billing was prevented.',
+        error:
+          'This organization already has an active subscription with another billing provider. Duplicate billing was prevented.',
         cutoverRequired: true,
         currentPeriodEnd: existing.current_period_end,
       },
       { status: 409 },
     );
   }
-
 
   const baseAmount = priceCents(plan, interval);
   const addonLines = addons.filter(Boolean).map((addon) => ({
@@ -125,7 +143,10 @@ export async function POST(request: NextRequest) {
     unitAmountCents: interval === 'annual' ? addonPriceCents(addon!) * 12 : addonPriceCents(addon!),
   }));
   const totalCents = baseAmount + addonLines.reduce((sum, line) => sum + line.unitAmountCents, 0);
-  const configurationKey = createHash('sha256').update(JSON.stringify({ addonCodes: [...addonCodes].sort(), totalCents })).digest('hex').slice(0, 16);
+  const configurationKey = createHash('sha256')
+    .update(JSON.stringify({ addonCodes: [...addonCodes].sort(), totalCents }))
+    .digest('hex')
+    .slice(0, 16);
   const invoiceKey = `platform:${billingOrganizationId}:${plan.id}:${interval}:${new Date().toISOString().slice(0, 7)}:${configurationKey}`;
   const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
     idempotencyKey: invoiceKey,
@@ -148,6 +169,8 @@ export async function POST(request: NextRequest) {
     fulfillment: {
       type: 'platform_subscription',
       payload: {
+        user_id: user.id,
+        customer_email: user.email,
         organization_id: billingOrganizationId,
         tenant_id: tenantId,
         plan_id: plan.id,
@@ -173,6 +196,8 @@ export async function POST(request: NextRequest) {
       status: 'active',
       fulfillment_type: 'platform_subscription',
       fulfillment_payload: {
+        user_id: user.id,
+        customer_email: user.email,
         organization_id: billingOrganizationId,
         tenant_id: tenantId,
         plan_id: plan.id,

@@ -1,4 +1,6 @@
 import { logger } from '@/lib/logger';
+import { BASE_PLANS, licenseTierForPlan } from '@/lib/store/platform-pricing';
+import type { BasePlanId } from '@/lib/store/platform-pricing';
 /**
  * Billing Authority Rules
  *
@@ -22,6 +24,11 @@ import { logger } from '@/lib/logger';
 
 // Subscription tiers (provider-authoritative)
 const SUBSCRIPTION_TIERS = new Set([
+  ...Object.keys(BASE_PLANS).flatMap((plan) =>
+    (['monthly', 'annual'] as const).map((interval) =>
+      licenseTierForPlan(plan as BasePlanId, interval),
+    ),
+  ),
   'managed_monthly',
   'managed_annual',
   'pro_monthly',
@@ -212,10 +219,14 @@ export function isLicenseActiveNow(
     // MUST have a provider subscription id
     const subscriptionId = license.provider_subscription_id || license.stripe_subscription_id;
     if (!subscriptionId) {
-      logger.error('[billing-authority] Subscription tier missing provider subscription id', undefined, {
-        tier,
-        licenseId: license.id,
-      });
+      logger.error(
+        '[billing-authority] Subscription tier missing provider subscription id',
+        undefined,
+        {
+          tier,
+          licenseId: license.id,
+        },
+      );
       return {
         ok: false,
         reason: 'missing_subscription_id',

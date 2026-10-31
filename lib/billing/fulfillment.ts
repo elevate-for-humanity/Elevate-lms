@@ -1,7 +1,7 @@
 import 'server-only';
 import { randomBytes } from 'node:crypto';
-import { getOrganizationFeatures } from '@/lib/platform/organization-features';
-import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
+import { nextInvoiceDate } from '@/lib/billing/schedule';
+import { fulfillPlatformSaasSubscription } from '@/lib/platform/fulfillment';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
@@ -18,7 +18,7 @@ function confirmationCode(): string {
 
 export async function fulfillPaidBillingInvoice(
   db: Database,
-  job: { billing_invoice_id: string; fulfillment_type: string; payload: any },
+  job: { billing_invoice_id: string; fulfillment_type: string; payload: any; paid_at?: string; customer_email?: string },
 ) {
   const payload = job.payload || {};
   if (job.fulfillment_type === 'tuition_payment') {
@@ -494,9 +494,12 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'individual_app_subscription') {
-    const now = new Date();
-    const periodEnd = new Date(now);
-    periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+    if (!job.paid_at || !Number.isFinite(Date.parse(job.paid_at))) {
+      throw new Error('Verified payment timestamp is required for subscription delivery');
+    }
+    const now = new Date(job.paid_at);
+    const periodEnd =
+      nextInvoiceDate(now.toISOString().slice(0, 10), 'monthly') + now.toISOString().slice(10);
     const result = await db.from('user_app_subscriptions').upsert(
       {
         user_id: payload.user_id,
@@ -505,7 +508,7 @@ export async function fulfillPaidBillingInvoice(
         status: 'active',
         trial_ends_at: null,
         current_period_start: now.toISOString(),
-        current_period_end: periodEnd.toISOString(),
+        current_period_end: periodEnd,
         billing_provider: 'quickbooks',
         provider_subscription_id: `schedule:user:${payload.user_id}:individual-app-${payload.app_slug}`,
         updated_at: now.toISOString(),
@@ -517,79 +520,31 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'platform_subscription') {
-    const now = new Date();
-    const interval = payload.billing_interval as BillingInterval;
-    const periodEnd = new Date(now);
-    if (interval === 'annual') periodEnd.setUTCFullYear(periodEnd.getUTCFullYear() + 1);
-    else periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
-    const plan = await db
-      .from('subscription_plans')
-      .select('id,slug')
-      .eq('slug', payload.plan_id)
-      .eq('active', true)
-      .maybeSingle();
-    if (!plan.data?.id) throw new Error('The platform subscription plan is not active.');
-    const subscription = await db.from('organization_subscriptions').upsert(
-      {
-        organization_id: payload.organization_id,
-        plan_id: plan.data.id,
-        plan_type: payload.plan_id,
-        billing_interval: interval,
-        status: 'active',
-        current_period_start: now.toISOString(),
-        current_period_end: periodEnd.toISOString(),
-        billing_provider: 'quickbooks',
-        provider_subscription_id: `schedule:${payload.organization_id}:platform-subscription`,
-        metadata: {
-          tenant_id: payload.tenant_id,
-          addon_codes: payload.addon_codes || [],
-          billing_access: true,
-        },
-        updated_at: now.toISOString(),
-      },
-      { onConflict: 'organization_id' },
-    );
-    if (subscription.error) throw new Error(subscription.error.message);
-    await db
-      .from('addon_subscriptions')
-      .update({ active: false, canceled_at: now.toISOString(), updated_at: now.toISOString() })
-      .eq('organization_id', payload.organization_id);
-    for (const code of payload.addon_codes || []) {
-      const addon = await db
-        .from('saas_addon_catalog')
-        .select('monthly_price')
-        .eq('code', code)
-        .eq('active', true)
-        .maybeSingle();
-      if (!addon.data) throw new Error(`Unknown platform add-on: ${code}`);
-      const saved = await db.from('addon_subscriptions').upsert(
-        {
-          organization_id: payload.organization_id,
-          addon_code: code,
-          monthly_price: addon.data.monthly_price,
-          active: true,
-          activated_at: now.toISOString(),
-          canceled_at: null,
-          updated_at: now.toISOString(),
-          metadata: { billing_provider: 'quickbooks' },
-        },
-        { onConflict: 'organization_id,addon_code' },
-      );
-      if (saved.error) throw new Error(saved.error.message);
+    if (!job.paid_at || !Number.isFinite(Date.parse(job.paid_at))) {
+      throw new Error('Verified payment timestamp is required for subscription delivery');
     }
-    const entitlements = await getOrganizationFeatures(payload.organization_id, db);
-    await syncLicenseFromSaasEntitlements(db, payload.organization_id, entitlements, {
-      planSlug: payload.plan_id as BasePlanId,
-      billingInterval: interval,
-      active: true,
+    const now = new Date(job.paid_at);
+    const interval = payload.billing_interval as BillingInterval;
+    const periodEnd =
+      nextInvoiceDate(
+        now.toISOString().slice(0, 10),
+        interval === 'annual' ? 'annual' : 'monthly',
+      ) + now.toISOString().slice(10);
+    const result = await fulfillPlatformSaasSubscription(db, {
+      user_id: payload.user_id || '',
+      delivery_key: `invoice:${job.billing_invoice_id}`,
+      tenant_id: payload.tenant_id,
+      billing_organization_id: payload.organization_id,
+      customer_email: payload.customer_email || job.customer_email,
+      plan_id: payload.plan_id as BasePlanId,
+      billing_interval: interval,
+      addon_slugs: (payload.addon_codes || []).join(','),
+      billing_provider: 'quickbooks',
+      provider_subscription_id: `schedule:${payload.organization_id}:platform-subscription`,
+      current_period_start: now.toISOString(),
+      current_period_end: periodEnd,
     });
-    await db
-      .from('licenses')
-      .update({
-        billing_provider: 'quickbooks',
-        provider_subscription_id: `schedule:${payload.organization_id}:platform-subscription`,
-      })
-      .eq('tenant_id', payload.organization_id);
+    if (!result.ok) throw new Error(result.error || 'Platform subscription delivery failed');
     return;
   }
 

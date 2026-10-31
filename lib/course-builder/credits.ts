@@ -54,7 +54,19 @@ export async function getCourseBuilderCreditOwner(input: {
   return { tenantId: data?.tenant_id ?? null, operator };
 }
 
+async function refreshSubscriptionAllowance(db: SupabaseClient, tenantId: string) {
+  const { error } = await db.rpc('refresh_course_builder_subscription_credits', {
+    p_tenant_id: tenantId,
+  });
+  if (error)
+    throw new CourseBuilderCreditsError(
+      'Unable to refresh purchased Course Builder credits',
+      'CREDIT_SERVICE_ERROR',
+    );
+}
+
 export async function getCourseBuilderCreditBalance(db: SupabaseClient, tenantId: string) {
+  await refreshSubscriptionAllowance(db, tenantId);
   const { data, error } = await db
     .from('tenant_course_builder_credit_wallets')
     .select('balance,lifetime_granted,lifetime_used,current_period_start,current_period_end')
@@ -85,6 +97,7 @@ export async function reserveCourseBuilderCredits(input: {
   idempotencyKey: string;
   metadata?: Record<string, unknown>;
 }) {
+  await refreshSubscriptionAllowance(input.db, input.tenantId);
   const cost = COURSE_BUILDER_CREDIT_COSTS[input.operation];
   const { data, error } = await input.db.rpc('consume_tenant_course_builder_credits', {
     p_tenant_id: input.tenantId,

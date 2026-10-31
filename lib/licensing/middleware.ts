@@ -46,11 +46,17 @@ export async function validateLicenseForAPI(
     };
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('organization_id')
     .eq('id', user.id)
     .maybeSingle();
+
+  if (profileError)
+    return {
+      valid: false,
+      error: NextResponse.json({ error: 'Unable to verify account' }, { status: 503 }),
+    };
 
   if (!profile?.organization_id) {
     // Direct learners without an organization do not consume organization
@@ -63,17 +69,32 @@ export async function validateLicenseForAPI(
   // server-side so ordinary organization members do not need SELECT access to
   // the managed license table itself.
   const billingDb = await requireAdminClient();
-  const { data: managedLicense, error: managedLicenseError } = await billingDb
-    .from('managed_licenses')
-    .select('*')
+  const { data: recurring, error: subscriptionError } = await billingDb
+    .from('organization_subscriptions')
+    .select('id')
     .eq('organization_id', profile.organization_id)
     .maybeSingle();
-
-  if (managedLicenseError) {
+  if (subscriptionError)
     return {
       valid: false,
-      error: NextResponse.json({ error: 'Unable to verify organization license' }, { status: 503 }),
+      error: NextResponse.json({ error: 'Unable to verify subscription' }, { status: 503 }),
     };
+  let managedLicense: any = null;
+  if (!recurring) {
+    const result = await billingDb
+      .from('managed_licenses')
+      .select('*')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+    if (result.error)
+      return {
+        valid: false,
+        error: NextResponse.json(
+          { error: 'Unable to verify organization license' },
+          { status: 503 },
+        ),
+      };
+    managedLicense = result.data;
   }
 
   let license = managedLicense;
@@ -89,7 +110,10 @@ export async function validateLicenseForAPI(
     if (legacyLicenseError) {
       return {
         valid: false,
-        error: NextResponse.json({ error: 'Unable to verify organization license' }, { status: 503 }),
+        error: NextResponse.json(
+          { error: 'Unable to verify organization license' },
+          { status: 503 },
+        ),
       };
     }
     license = legacyLicense;
@@ -112,6 +136,8 @@ export async function validateLicenseForAPI(
       current_period_end: license.current_period_end,
       stripe_subscription_id: license.stripe_subscription_id,
       stripe_customer_id: license.stripe_customer_id,
+      billing_provider: license.billing_provider,
+      provider_subscription_id: license.provider_subscription_id,
       canceled_at: license.canceled_at,
       suspended_at: license.suspended_at,
     });

@@ -114,6 +114,8 @@ jobs:
         run: |
           node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
           pnpm run typecheck:marketing
+      - name: Verify paid Store delivery, tenant isolation, and rollback
+        run: pnpm run test:store-delivery
       - name: Verify Store and Marketing identity contracts
         run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs scripts/gcp/preflight-web-rollout.test.mjs
       - name: Verify rejected rollout leaves no phantom candidate

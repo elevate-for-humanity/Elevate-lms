@@ -227,6 +227,7 @@
     "web-vitals": "5.3.0"
   },
   "scripts": {
+    "test:store-delivery": "node scripts/run-bounded-build.mjs -- node node_modules/vitest/vitest.mjs run tests/unit/platform/subscription-transaction.test.ts tests/unit/platform/subscription-delivery-boundaries.test.ts tests/unit/platform/subscription-expiry.test.ts tests/unit/platform/subscription-trial-precedence.test.ts tests/unit/store-invoice-platform-delivery.test.ts tests/unit/store-paid-fulfillment.test.ts tests/unit/store-subscription-delivery.test.ts tests/unit/licensing/billing-authority.test.ts tests/unit/licensing/license-access-mode-policy.test.ts --maxWorkers=1",
     "test": "vitest run --passWithNoTests",
     "gen:types": "node scripts/gen-db-types.cjs",
     "lint:migrations": "node scripts/lint-migrations.cjs",

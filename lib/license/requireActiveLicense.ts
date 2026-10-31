@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
-import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
+import { checkLicenseAccess, type BillingAuthority } from '@/lib/licensing/billing-authority';
 
 /**
  * STEP 5B: License Enforcement Middleware
@@ -30,6 +30,10 @@ export interface License {
   current_period_end: string | null;
   stripe_subscription_id: string | null;
   stripe_customer_id: string | null;
+  billing_provider?: 'quickbooks' | 'stripe' | null;
+  provider_subscription_id?: string | null;
+  canceled_at?: string | null;
+  suspended_at?: string | null;
   features: Record<string, boolean>;
   max_users: number | null;
   max_students: number | null;
@@ -97,6 +101,10 @@ function validateLicense(license: License | null): void {
     current_period_end: license.current_period_end,
     stripe_subscription_id: license.stripe_subscription_id,
     stripe_customer_id: license.stripe_customer_id,
+    billing_provider: license.billing_provider,
+    provider_subscription_id: license.provider_subscription_id,
+    canceled_at: license.canceled_at,
+    suspended_at: license.suspended_at,
   });
 
   if (!accessResult.hasAccess) {

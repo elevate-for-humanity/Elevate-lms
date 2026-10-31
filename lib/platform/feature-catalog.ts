@@ -5,6 +5,7 @@
  * values are normalized here so older rows continue to unlock the same feature.
  */
 
+import { BASE_PLANS } from '@/lib/store/platform-pricing';
 import { PlatformFeature, type PlatformFeatureKey } from '@/lib/platform/features';
 
 export const FEATURES = {
@@ -137,7 +138,11 @@ export const ADDON_SLUG_TO_CATALOG_CODE: Record<string, string> = {
  * still win when present.
  */
 export const ADDON_FEATURE_FALLBACK: Record<string, FeatureCode[]> = {
-  'ai-assistant': [PlatformFeature.AI_ADVANCED, PlatformFeature.AI_CONTENT, PlatformFeature.AI_CHAT_WIDGET],
+  'ai-assistant': [
+    PlatformFeature.AI_ADVANCED,
+    PlatformFeature.AI_CONTENT,
+    PlatformFeature.AI_CHAT_WIDGET,
+  ],
   'paris-assistant': [PlatformFeature.AI_PARIS],
   'ellie-assistant': [PlatformFeature.AI_ELLIE],
   'lizzy-assistant': [PlatformFeature.AI_LIZZY],
@@ -165,7 +170,11 @@ export const ADDON_FEATURE_FALLBACK: Record<string, FeatureCode[]> = {
     PlatformFeature.COMMUNITY_MEMBERSHIPS,
   ],
   'course-builder': [PlatformFeature.COURSE_BUILDER],
-  'ai-course-factory': [PlatformFeature.COURSE_FACTORY, PlatformFeature.COURSE_BUILDER, PlatformFeature.AI_CONTENT],
+  'ai-course-factory': [
+    PlatformFeature.COURSE_FACTORY,
+    PlatformFeature.COURSE_BUILDER,
+    PlatformFeature.AI_CONTENT,
+  ],
   sms: [PlatformFeature.SMS],
   'student-management': [PlatformFeature.STUDENT_MANAGEMENT],
   'workforce-development': [PlatformFeature.WORKFORCE],
@@ -188,51 +197,20 @@ export interface PlanLimits {
   custom_branding?: boolean;
 }
 
-/** Static plan feature sets (fallback when DB unavailable) */
-export const PLAN_FEATURE_FALLBACK: Record<string, FeatureCode[]> = {
-  solo: [
-    FEATURES.CRM,
-    FEATURES.WEBSITE,
-    FEATURES.BOOKINGS,
-    FEATURES.FORMS,
-    FEATURES.EMAIL_MARKETING,
-    FEATURES.AI_BASIC,
-  ],
-  business: [
-    FEATURES.CRM,
-    FEATURES.WEBSITE,
-    FEATURES.BOOKINGS,
-    FEATURES.FORMS,
-    FEATURES.EMAIL_MARKETING,
-    FEATURES.AI_BASIC,
-    FEATURES.AUTOMATION,
-    FEATURES.INVOICING,
-    FEATURES.LEAD_FUNNELS,
-    FEATURES.CLIENT_PORTAL,
-    FEATURES.SMS,
-  ],
-  professional: [
-    FEATURES.CRM,
-    FEATURES.WEBSITE,
-    FEATURES.BOOKINGS,
-    FEATURES.FORMS,
-    FEATURES.EMAIL_MARKETING,
-    FEATURES.AI_BASIC,
-    FEATURES.AUTOMATION,
-    FEATURES.INVOICING,
-    FEATURES.LEAD_FUNNELS,
-    FEATURES.CLIENT_PORTAL,
-    FEATURES.SMS,
-    FEATURES.LMS,
-    FEATURES.CERTIFICATES,
-    FEATURES.WORKFLOW_AUTOMATION,
-    FEATURES.REPORTING,
-    FEATURES.CUSTOM_BRANDING,
-  ],
-};
+/** Store pricing and runtime fallbacks share one plan definition. */
+export const PLAN_FEATURE_FALLBACK: Record<string, FeatureCode[]> = Object.fromEntries(
+  Object.values(BASE_PLANS).map((plan) => [plan.id, [...plan.features]]),
+);
 
-export const PLAN_LIMITS_FALLBACK: Record<string, PlanLimits> = {
-  solo: { users: 1, contacts: 100, locations: 1 },
-  business: { users: 3, contacts: 5000, locations: 1, automation: true },
-  professional: { users: 10, contacts: null, locations: 1, automation: true, custom_branding: true },
-};
+export const PLAN_LIMITS_FALLBACK: Record<string, PlanLimits> = Object.fromEntries(
+  Object.values(BASE_PLANS).map((plan) => [
+    plan.id,
+    {
+      users: plan.maxUsers,
+      contacts: plan.maxContacts,
+      locations: plan.maxLocations,
+      ...(plan.features.includes(PlatformFeature.AUTOMATIONS) ? { automation: true } : {}),
+      ...(plan.features.includes(PlatformFeature.CUSTOM_BRANDING) ? { custom_branding: true } : {}),
+    },
+  ]),
+);

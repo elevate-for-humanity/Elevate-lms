@@ -5,7 +5,7 @@ import {
   getOrganizationFeatures,
   resolveBillingOrganizationId,
 } from '@/lib/platform/organization-features';
-import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
+import { fulfillPlatformSaasSubscription } from '@/lib/platform/fulfillment';
 import { normalizeAddonCode } from '@/lib/platform/feature-catalog';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
 import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
@@ -13,23 +13,27 @@ import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestrati
 const ACCESS_STATUSES = new Set<Stripe.Subscription.Status>(['active', 'trialing']);
 
 function periodStart(subscription: Stripe.Subscription): string | null {
-  const raw = subscription as unknown as { current_period_start?: number };
-  return raw.current_period_start
-    ? new Date(raw.current_period_start * 1000).toISOString()
-    : null;
+  const raw = subscription as unknown as {
+    current_period_start?: number;
+    items?: { data?: Array<{ current_period_start?: number }> };
+  };
+  const start = raw.current_period_start ?? raw.items?.data?.[0]?.current_period_start;
+  return start ? new Date(start * 1000).toISOString() : null;
 }
 
 function periodEnd(subscription: Stripe.Subscription): string | null {
-  const raw = subscription as unknown as { current_period_end?: number };
-  return raw.current_period_end
-    ? new Date(raw.current_period_end * 1000).toISOString()
-    : null;
+  const raw = subscription as unknown as {
+    current_period_end?: number;
+    items?: { data?: Array<{ current_period_end?: number }> };
+  };
+  const end = raw.current_period_end ?? raw.items?.data?.[0]?.current_period_end;
+  return end ? new Date(end * 1000).toISOString() : null;
 }
 
 function customerId(subscription: Stripe.Subscription): string | null {
   return typeof subscription.customer === 'string'
     ? subscription.customer
-    : subscription.customer?.id ?? null;
+    : (subscription.customer?.id ?? null);
 }
 
 function organizationStatus(status: Stripe.Subscription.Status): string {
@@ -52,10 +56,6 @@ function codeBillingInterval(raw: string | undefined): BillingInterval {
     : 'monthly';
 }
 
-function databaseBillingInterval(interval: BillingInterval): 'month' | 'year' {
-  return interval === 'annual' ? 'year' : 'month';
-}
-
 function lifecycleEventType(status: Stripe.Subscription.Status): string {
   if (status === 'active' || status === 'trialing') {
     return PlatformEventType.BILLING_SUBSCRIPTION_ACTIVATED;
@@ -70,86 +70,15 @@ function lifecycleEventType(status: Stripe.Subscription.Status): string {
 }
 
 function purchasedAddonCodes(metadata: Stripe.Metadata): string[] {
-  return [...new Set(
-    String(metadata.addon_slugs || '')
-      .split(',')
-      .map((value) => value.trim())
-      .filter(Boolean)
-      .map(normalizeAddonCode),
-  )];
-}
-
-async function syncPlatformAddons(
-  db: SupabaseClient,
-  tenantId: string,
-  addonCodes: string[],
-  hasAccess: boolean,
-  now: string,
-): Promise<void> {
-  await db
-    .from('addon_subscriptions')
-    .update({ active: false, canceled_at: now, updated_at: now })
-    .eq('organization_id', tenantId);
-
-  await db
-    .from('organization_addons')
-    .update({ status: 'inactive' })
-    .eq('tenant_id', tenantId);
-
-  if (!hasAccess || !addonCodes.length) return;
-
-  const { data: catalogRows, error: catalogError } = await db
-    .from('saas_addon_catalog')
-    .select('code, monthly_price, active')
-    .in('code', addonCodes)
-    .eq('active', true);
-
-  if (catalogError) {
-    logger.error('platform subscription add-on catalog lookup failed', catalogError, {
-      tenantId,
-      addonCodes,
-    });
-    return;
-  }
-
-  const catalog = new Map((catalogRows ?? []).map((row) => [row.code, row]));
-  for (const code of addonCodes) {
-    const row = catalog.get(code);
-    if (!row) {
-      logger.warn('platform subscription ignored unknown/inactive add-on', { tenantId, code });
-      continue;
-    }
-
-    const { error: addonError } = await db.from('addon_subscriptions').upsert(
-      {
-        organization_id: tenantId,
-        addon_code: code,
-        monthly_price: row.monthly_price ?? null,
-        active: true,
-        activated_at: now,
-        canceled_at: null,
-        updated_at: now,
-      },
-      { onConflict: 'organization_id,addon_code' },
-    );
-    if (addonError) {
-      logger.error('platform subscription add-on upsert failed', addonError, { tenantId, code });
-      continue;
-    }
-
-    const { error: legacyError } = await db.from('organization_addons').upsert(
-      {
-        tenant_id: tenantId,
-        addon_slug: code,
-        status: 'active',
-        activated_at: now,
-      },
-      { onConflict: 'tenant_id,addon_slug' },
-    );
-    if (legacyError) {
-      logger.warn('platform subscription legacy add-on sync failed', { tenantId, code, legacyError });
-    }
-  }
+  return [
+    ...new Set(
+      String(metadata.addon_slugs || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .map(normalizeAddonCode),
+    ),
+  ];
 }
 
 export async function syncPlatformSubscriptionLifecycle(
@@ -162,11 +91,15 @@ export async function syncPlatformSubscriptionLifecycle(
 
   const billingOrganizationId = await resolveBillingOrganizationId(tenantId, db);
   if (!billingOrganizationId) {
-    logger.error('platform subscription lifecycle could not resolve billing organization', undefined, {
-      tenantId,
-      subscriptionId: subscription.id,
-    });
-    return;
+    logger.error(
+      'platform subscription lifecycle could not resolve billing organization',
+      undefined,
+      {
+        tenantId,
+        subscriptionId: subscription.id,
+      },
+    );
+    throw new Error('No billing organization linked to subscription workspace');
   }
 
   const planSlug = metadata.plan_id || metadata.plan_slug || 'professional';
@@ -184,67 +117,47 @@ export async function syncPlatformSubscriptionLifecycle(
       subscriptionId: subscription.id,
       planSlug,
     });
-    return;
+    throw new Error('Subscription plan is unavailable');
   }
 
   const canonicalPlan = planRow.slug as BasePlanId;
-  const { data: previous } = await db
+  const { data: previous, error: previousError } = await db
     .from('organization_subscriptions')
-    .select('status, stripe_subscription_id, plan_type')
+    .select('status, stripe_subscription_id, plan_type, billing_provider, provider_subscription_id')
     .eq('organization_id', billingOrganizationId)
     .maybeSingle();
 
-  const status = organizationStatus(subscription.status);
+  if (previousError) throw new Error(previousError.message);
+  // Archived provider events must not overwrite a workspace moved to current billing.
+  if (previous?.billing_provider && previous.billing_provider !== 'stripe') return;
+  if (previous?.provider_subscription_id && previous.provider_subscription_id !== subscription.id)
+    return;
+  const status = organizationStatus(subscription.status) as
+    | 'active'
+    | 'trialing'
+    | 'past_due'
+    | 'unpaid'
+    | 'canceled';
   const hasAccess = ACCESS_STATUSES.has(subscription.status);
   const interval = codeBillingInterval(metadata.billing_interval);
   const addonCodes = purchasedAddonCodes(metadata);
-  const now = new Date().toISOString();
-
-  const { error } = await db
-    .from('organization_subscriptions')
-    .upsert(
-      {
-        organization_id: billingOrganizationId,
-        stripe_subscription_id: subscription.id,
-        stripe_customer_id: customerId(subscription),
-        plan_id: planRow.id,
-        plan_type: canonicalPlan,
-        billing_interval: databaseBillingInterval(interval),
-        status,
-        current_period_start: periodStart(subscription),
-        current_period_end: periodEnd(subscription),
-        cancel_at_period_end: subscription.cancel_at_period_end ?? false,
-        metadata: {
-          tenant_id: tenantId,
-          plan_slug: canonicalPlan,
-          addon_codes: addonCodes,
-          stripe_status: subscription.status,
-        },
-        updated_at: now,
-      },
-      { onConflict: 'organization_id' },
-    );
-
-  if (error) {
-    logger.error('platform subscription lifecycle upsert failed', error, {
-      tenantId,
-      billingOrganizationId,
-      subscriptionId: subscription.id,
-      status,
-    });
-    return;
-  }
-
-  await syncPlatformAddons(db, tenantId, addonCodes, hasAccess, now);
-
-  const entitlements = await getOrganizationFeatures(tenantId, db);
-  await syncLicenseFromSaasEntitlements(db, tenantId, entitlements, {
-    planSlug: canonicalPlan,
-    billingInterval: interval,
-    stripeSubscriptionId: subscription.id,
-    stripeCustomerId: customerId(subscription) ?? undefined,
-    active: hasAccess,
+  const result = await fulfillPlatformSaasSubscription(db, {
+    user_id: metadata.user_id || '',
+    tenant_id: tenantId,
+    billing_organization_id: billingOrganizationId,
+    plan_id: canonicalPlan,
+    billing_interval: interval,
+    addon_slugs: addonCodes.join(','),
+    billing_provider: 'stripe',
+    provider_subscription_id: subscription.id,
+    provider_customer_id: customerId(subscription) ?? undefined,
+    current_period_start: periodStart(subscription) ?? undefined,
+    current_period_end: periodEnd(subscription) ?? undefined,
+    subscription_status: status,
+    cancel_at_period_end: subscription.cancel_at_period_end ?? false,
   });
+  if (!result.ok) throw new Error(result.error || 'Subscription lifecycle persistence failed');
+  const entitlements = await getOrganizationFeatures(tenantId, db);
 
   const eventKey = `${subscription.id}:${subscription.status}:${periodEnd(subscription) ?? 'none'}:${canonicalPlan}:${addonCodes.join(',')}`;
   await emitPlatformEvent(db, {

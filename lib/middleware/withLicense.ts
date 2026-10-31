@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { createAdminClient, requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { TenantContext } from './withTenant';
-import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
+import { checkLicenseAccess, type BillingAuthority } from '@/lib/licensing/billing-authority';
 import { setAuditContext } from '@/lib/audit-context';
 
 export interface LicenseContext extends TenantContext {
@@ -25,6 +25,10 @@ interface LicenseRecord {
   current_period_end: string | null;
   stripe_subscription_id: string | null;
   stripe_customer_id: string | null;
+  billing_provider: 'quickbooks' | 'stripe' | null;
+  provider_subscription_id: string | null;
+  canceled_at: string | null;
+  suspended_at: string | null;
   status: string;
 }
 
@@ -50,7 +54,7 @@ export async function withLicense(
     const { data: license, error } = await adminSupabase
       .from('licenses')
       .select(
-        'id, tier, features, max_users, max_deployments, expires_at, current_period_end, stripe_subscription_id, stripe_customer_id, status',
+        'id, tier, features, max_users, max_deployments, expires_at, current_period_end, stripe_subscription_id, stripe_customer_id, billing_provider, provider_subscription_id, canceled_at, suspended_at, status',
       )
       .eq('tenant_id', tenant.tenantId)
       .maybeSingle();
@@ -71,6 +75,10 @@ export async function withLicense(
       current_period_end: typedLicense.current_period_end,
       stripe_subscription_id: typedLicense.stripe_subscription_id,
       stripe_customer_id: typedLicense.stripe_customer_id,
+      billing_provider: typedLicense.billing_provider,
+      provider_subscription_id: typedLicense.provider_subscription_id,
+      canceled_at: typedLicense.canceled_at,
+      suspended_at: typedLicense.suspended_at,
     });
 
     if (!accessResult.hasAccess) {

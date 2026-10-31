@@ -91,7 +91,8 @@ export function normalizeRoles(values: unknown[]): UserRole[] {
 }
 
 export const ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'advisor', 'staff'];
-export const API_ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'staff'];
+// Organization owners use tenant-scoped feature endpoints, never platform-wide APIs.
+export const API_ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'staff'];
 export const INSTRUCTOR_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'instructor'];
 export const TESTING_CENTER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'test_admin', 'proctor'];
 export const EMPLOYER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'employer', 'sponsor', 'recruiter', 'org_admin'];

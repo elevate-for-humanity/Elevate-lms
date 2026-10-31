@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@/lib/supabase';
+import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   ADDON_FEATURE_FALLBACK,
@@ -69,8 +70,16 @@ function applyCapacityAddons(base: PlanLimits, addonCodes: string[]): PlanLimits
   return limits;
 }
 
-function subscriptionAccessState(status: string | null | undefined, currentPeriodEnd: string | null | undefined) {
-  if (status === 'active') return { hasAccess: true, effectiveStatus: 'active' };
+function subscriptionAccessState(
+  status: string | null | undefined,
+  currentPeriodEnd: string | null | undefined,
+) {
+  if (status === 'active') {
+    const end = currentPeriodEnd ? new Date(currentPeriodEnd).getTime() : NaN;
+    return Number.isFinite(end) && end > Date.now()
+      ? { hasAccess: true, effectiveStatus: 'active' }
+      : { hasAccess: false, effectiveStatus: 'expired' };
+  }
   if (status !== 'trialing') return { hasAccess: false, effectiveStatus: status ?? null };
 
   const end = currentPeriodEnd ? new Date(currentPeriodEnd).getTime() : NaN;
@@ -94,11 +103,12 @@ export async function resolveOrganizationIdentity(
     return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
   }
 
-  const { data: byTenant } = await supabase
+  const { data: byTenant, error: tenantError } = await supabase
     .from('organizations')
     .select('id, tenant_id')
     .eq('tenant_id', tenantOrOrganizationId)
     .maybeSingle();
+  if (tenantError) throw new Error(tenantError.message);
   if (byTenant?.id) {
     return {
       tenantId: (byTenant.tenant_id as string | null) ?? tenantOrOrganizationId,
@@ -106,11 +116,12 @@ export async function resolveOrganizationIdentity(
     };
   }
 
-  const { data: byOrganization } = await supabase
+  const { data: byOrganization, error: organizationError } = await supabase
     .from('organizations')
     .select('id, tenant_id')
     .eq('id', tenantOrOrganizationId)
     .maybeSingle();
+  if (organizationError) throw new Error(organizationError.message);
   if (byOrganization?.id) {
     return {
       tenantId: (byOrganization.tenant_id as string | null) ?? tenantOrOrganizationId,
@@ -149,13 +160,14 @@ export async function getOrganizationFeatures(
 
   let orgSub: any = null;
   if (billingOrganizationId) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('organization_subscriptions')
       .select(
         'status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )',
       )
       .eq('organization_id', billingOrganizationId)
       .maybeSingle();
+    if (error) throw new Error(error.message);
     orgSub = data;
   }
 
@@ -169,11 +181,12 @@ export async function getOrganizationFeatures(
   const featureSet = new Set<FeatureCode>();
 
   if (subscriptionHasAccess && planId) {
-    const { data: planFeatureRows } = await supabase
+    const { data: planFeatureRows, error: planFeatureRowsError } = await supabase
       .from('plan_features')
       .select('features ( code )')
       .eq('plan_id', planId);
 
+    if (planFeatureRowsError) throw new Error(planFeatureRowsError.message);
     if (planFeatureRows?.length) {
       for (const row of planFeatureRows) {
         const f = row.features as { code: string } | { code: string }[] | null;
@@ -198,12 +211,13 @@ export async function getOrganizationFeatures(
   const activeAddonCodes: string[] = [];
   const allowStandaloneOrBaseAddons = !orgSub || subscriptionHasAccess;
   if (allowStandaloneOrBaseAddons) {
-    const { data: addonRows } = await supabase
+    const { data: addonRows, error: addonRowsError } = await supabase
       .from('addon_subscriptions')
       .select('addon_code, saas_addon_catalog ( feature_codes )')
       .eq('organization_id', tenantId)
       .eq('active', true);
 
+    if (addonRowsError) throw new Error(addonRowsError.message);
     for (const row of addonRows ?? []) {
       const addonCode = normalizeAddonCode(row.addon_code);
       activeAddonCodes.push(addonCode);
@@ -217,20 +231,22 @@ export async function getOrganizationFeatures(
       if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);
     }
 
-    const { data: legacyAddons } = await supabase
+    const { data: legacyAddons, error: legacyAddonsError } = await supabase
       .from('organization_addons')
       .select('addon_slug')
       .eq('tenant_id', tenantId)
       .eq('status', 'active');
 
+    if (legacyAddonsError) throw new Error(legacyAddonsError.message);
     for (const leg of legacyAddons ?? []) {
       const code = normalizeAddonCode(leg.addon_slug);
       if (!activeAddonCodes.includes(code)) activeAddonCodes.push(code);
-      const { data: cat } = await supabase
+      const { data: cat, error: catError } = await supabase
         .from('saas_addon_catalog')
         .select('feature_codes')
         .eq('code', code)
         .maybeSingle();
+      if (catError) throw new Error(catError.message);
       const dbFeatureCodes = cat?.feature_codes ?? [];
       for (const c of dbFeatureCodes) addFeature(featureSet, c);
       if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
@@ -241,13 +257,16 @@ export async function getOrganizationFeatures(
   // recurring organization subscription. It must never resurrect features for
   // a canceled, past-due, or expired Stripe subscription/trial.
   if (featureSet.size === 0 && !orgSub) {
-    const { data: license } = await supabase
+    const { data: license, error: licenseError } = await supabase
       .from('licenses')
-      .select('features')
+      .select('*')
       .eq('tenant_id', tenantId)
       .eq('status', 'active')
       .maybeSingle();
-    for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
+    if (licenseError) throw new Error(licenseError.message);
+    if (license && checkLicenseAccess(license).hasAccess) {
+      for (const f of (license.features as string[]) ?? []) addFeature(featureSet, f);
+    }
   }
 
   const baseLimits: PlanLimits = subscriptionHasAccess

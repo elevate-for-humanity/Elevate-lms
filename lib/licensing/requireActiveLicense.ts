@@ -1,140 +1,48 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
 
-/**
- * Require Active License
- *
- * Server-side guard to enforce license state.
- * Redirects to billing/account page if license is not active.
- *
- * Usage:
- * ```typescript
- * await requireActiveLicense(tenantId);
- * ```
- */
+async function loadLicense(tenantId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('licenses')
+    .select('*')
+    .eq('tenant_id', tenantId)
+    .maybeSingle();
+  return error ? null : data;
+}
+
+function permitsFeature(license: any, feature: string): boolean {
+  if (!license || !checkLicenseAccess(license).hasAccess) return false;
+  return Array.isArray(license.features)
+    ? license.features.includes(feature)
+    : license.features?.[feature] === true;
+}
+
 export async function requireActiveLicense(tenantId: string): Promise<void> {
-  const supabase = await createClient();
-
-  const { data: license, error } = await supabase
-    .from('licenses')
-    .select('status, ends_at')
-    .eq('tenant_id', tenantId)
-    .maybeSingle();
-
-  if (error || !license) {
-    // No license found - redirect to account
-    redirect('/account?error=no_license');
-  }
-
-  // Check if license is active
-  if (license.status === 'suspended') {
-    redirect('/account?error=suspended');
-  }
-
-  if (license.status === 'cancelled') {
-    redirect('/account?error=cancelled');
-  }
-
-  // Check if license has expired
-  if (license.ends_at && new Date(license.ends_at) < new Date()) {
-    redirect('/account?error=expired');
-  }
-
-  // License is active
-  return;
+  const license = await loadLicense(tenantId);
+  if (!license) redirect('/account?error=no_license');
+  const access = checkLicenseAccess(license);
+  if (!access.hasAccess) redirect(`/account?error=${encodeURIComponent(access.reason)}`);
 }
 
-/**
- * Require Feature Access
- *
- * Server-side guard to enforce feature gating.
- * Redirects to upgrade page if feature is not available.
- *
- * Usage:
- * ```typescript
- * await requireFeatureAccess(tenantId, 'advanced_analytics');
- * ```
- */
 export async function requireFeatureAccess(tenantId: string, feature: string): Promise<void> {
-  const supabase = await createClient();
-
-  const { data: license, error } = await supabase
-    .from('licenses')
-    .select('features')
-    .eq('tenant_id', tenantId)
-    .maybeSingle();
-
-  if (error || !license) {
-    redirect('/account?error=no_license');
-  }
-
-  const hasAccess = license.features?.[feature] === true;
-
-  if (!hasAccess) {
-    redirect(`/account/upgrade?feature=${feature}`);
-  }
-
-  return;
+  const license = await loadLicense(tenantId);
+  if (!permitsFeature(license, feature))
+    redirect(`/account/upgrade?feature=${encodeURIComponent(feature)}`);
 }
 
-/**
- * Check License Status (non-blocking)
- *
- * Returns license status without redirecting.
- * Use for conditional UI rendering.
- *
- * Usage:
- * ```typescript
- * const status = await checkLicenseStatus(tenantId);
- * if (status === 'active') { ... }
- * ```
- */
 export async function checkLicenseStatus(
   tenantId: string,
 ): Promise<'active' | 'trial' | 'suspended' | 'cancelled' | 'expired' | 'none'> {
-  const supabase = await createClient();
-
-  const { data: license, error } = await supabase
-    .from('licenses')
-    .select('status, ends_at')
-    .eq('tenant_id', tenantId)
-    .maybeSingle();
-
-  if (error || !license) {
-    return 'none';
-  }
-
-  // Check expiration
-  if (license.ends_at && new Date(license.ends_at) < new Date()) {
-    return 'expired';
-  }
-
-  return license.status as 'active' | 'trial' | 'suspended' | 'cancelled';
+  const license = await loadLicense(tenantId);
+  if (!license) return 'none';
+  if (license.status === 'suspended') return 'suspended';
+  if (license.status === 'canceled' || license.status === 'cancelled') return 'cancelled';
+  if (!checkLicenseAccess(license).hasAccess) return 'expired';
+  return license.status === 'trial' ? 'trial' : 'active';
 }
 
-/**
- * Check Feature Access (non-blocking)
- *
- * Returns boolean indicating feature access.
- * Use for conditional UI rendering.
- *
- * Usage:
- * ```typescript
- * const hasAnalytics = await checkFeatureAccess(tenantId, 'advanced_analytics');
- * ```
- */
 export async function checkFeatureAccess(tenantId: string, feature: string): Promise<boolean> {
-  const supabase = await createClient();
-
-  const { data: license, error } = await supabase
-    .from('licenses')
-    .select('features')
-    .eq('tenant_id', tenantId)
-    .maybeSingle();
-
-  if (error || !license) {
-    return false;
-  }
-
-  return license.features?.[feature] === true;
+  return permitsFeature(await loadLicense(tenantId), feature);
 }

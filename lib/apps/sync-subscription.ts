@@ -1,8 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getAdminClient } from '@/lib/supabase/admin';
 
-const ACCESSIBLE_STRIPE_STATUSES = new Set(['active', 'trialing']);
-
 export function appSubscriptionUpgradeUrl(appSlug: string, reason = 'subscription-required') {
   const params = new URLSearchParams({ reason });
   return `/store/apps/${appSlug}?${params.toString()}`;
@@ -10,7 +8,10 @@ export function appSubscriptionUpgradeUrl(appSlug: string, reason = 'subscriptio
 
 export function hasIndividualAppAccess(subscription: any): boolean {
   if (!subscription) return false;
-  if (subscription.status === 'active') return true;
+  if (subscription.status === 'active') {
+    const end = subscription.current_period_end ? Date.parse(subscription.current_period_end) : NaN;
+    return Number.isFinite(end) && end > Date.now();
+  }
   if (subscription.status !== 'trial') return false;
   if (!subscription.trial_ends_at) return false;
   return new Date(subscription.trial_ends_at).getTime() > Date.now();
@@ -35,7 +36,20 @@ export async function syncIndividualAppSubscription(
     .eq('app_slug', appSlug)
     .maybeSingle();
 
-  if (error || !row) return row ?? null;
+  if (error)
+    return {
+      status: 'billing_verification_unavailable',
+      access_reason: 'billing_verification_unavailable',
+    };
+  if (!row) return null;
+  if (row.status === 'active' && !hasIndividualAppAccess(row)) {
+    return {
+      ...row,
+      status: 'inactive',
+      access_reason: 'subscription_expired',
+      upgrade_url: appSubscriptionUpgradeUrl(appSlug, 'subscription-expired'),
+    };
+  }
 
   // Free/manual trials are authoritative locally. Once the deadline passes,
   // transition the record immediately so every page/API using this shared gate

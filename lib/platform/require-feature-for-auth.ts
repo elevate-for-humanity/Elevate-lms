@@ -40,6 +40,12 @@ export async function requireFeatureForAuth(
     return { userId, tenantId };
   }
 
+  // A recurring subscription is authoritative, including missing features and expired periods.
+  // An older trial must never restore access after cancellation or downgrade.
+  if (entitlements.status !== null) {
+    return safeError('Feature is not available on the current subscription', 403);
+  }
+
   const db = await requireAdminClient();
   const { data: org } = await db
     .from('organizations')

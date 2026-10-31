@@ -84,6 +84,10 @@ export async function validateLicense(organizationId: string): Promise<LicenseVa
     current_period_end: license.current_period_end,
     stripe_subscription_id: license.stripe_subscription_id,
     stripe_customer_id: license.stripe_customer_id,
+    billing_provider: license.billing_provider,
+    provider_subscription_id: license.provider_subscription_id,
+    canceled_at: license.canceled_at,
+    suspended_at: license.suspended_at,
   });
 
   // Calculate days remaining

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { OpenAIProvider } from '@/lib/ai/providers/openai';
+import { aiChat } from '@/lib/ai/ai-service';
+import { requireIndividualWorkspace } from '@/lib/apps/workspaces/access';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -18,9 +18,7 @@ function stripControlCharacters(value: string): string {
 }
 
 function cleanText(value: unknown, max = 1200): string {
-  return typeof value === 'string'
-    ? stripControlCharacters(value.trim()).slice(0, max)
-    : '';
+  return typeof value === 'string' ? stripControlCharacters(value.trim()).slice(0, max) : '';
 }
 
 function cleanContext(value: unknown): Record<string, string> {
@@ -37,10 +35,6 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-
   let body: { appSlug?: string; question?: string; context?: unknown };
   try {
     body = await request.json();
@@ -48,6 +42,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
   }
 
+  if (!body || typeof body !== 'object' || Array.isArray(body))
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
   const appSlug = cleanText(body.appSlug, 50);
   const question = cleanText(body.question, 2000);
   const context = cleanContext(body.context);
@@ -55,30 +51,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'App and question are required.' }, { status: 400 });
   }
 
-  const { data: subscription } = await supabase
-    .from('user_app_subscriptions')
-    .select('status')
-    .eq('user_id', user.id)
-    .eq('app_slug', appSlug)
-    .maybeSingle();
-  if (!subscription || !['trial', 'active'].includes(subscription.status)) {
-    return NextResponse.json({ error: 'Active app access is required.' }, { status: 403 });
-  }
+  const access = await requireIndividualWorkspace(
+    request,
+    appSlug === 'grants' ? 'grants' : 'sam-gov',
+  );
+  if (access instanceof NextResponse) return access;
 
-  const provider = new OpenAIProvider();
-  if (!provider.isAvailable()) {
-    return NextResponse.json({ error: 'AI advisor is temporarily unavailable.' }, { status: 503 });
-  }
-
-  const productInstruction = appSlug === 'grants'
-    ? 'Help the user reason about grant discovery, fit, application planning, and reporting. Never invent an award, eligibility decision, deadline, or funding source. Distinguish user-provided context from verified opportunity records.'
-    : 'Help the user organize SAM.gov registration and federal contractor compliance work. Never claim to replace SAM.gov, issue federal approval, or invent a UEI, CAGE code, registration status, or deadline.';
+  const productInstruction =
+    appSlug === 'grants'
+      ? 'Help the user reason about grant discovery, fit, application planning, and reporting. Never invent an award, eligibility decision, deadline, or funding source. Distinguish user-provided context from verified opportunity records.'
+      : 'Help the user organize SAM.gov registration and federal contractor compliance work. Never claim to replace SAM.gov, issue federal approval, or invent a UEI, CAGE code, registration status, or deadline.';
 
   const contextBlock = Object.keys(context).length ? JSON.stringify(context, null, 2) : '{}';
 
   try {
-    const result = await provider.chat({
-      model: 'gpt-4.1-mini',
+    const result = await aiChat({
+      providerPolicy: 'owned-only',
       temperature: 0.2,
       maxTokens: 900,
       messages: [
@@ -90,7 +78,13 @@ export async function POST(request: NextRequest) {
       ],
     });
 
-    return NextResponse.json({ answer: result.content, model: result.model, contextApplied: context });
+    if (!result.content?.trim())
+      throw new Error('The workspace advisor returned an empty response');
+    return NextResponse.json({
+      answer: result.content,
+      model: result.model,
+      contextApplied: context,
+    });
   } catch {
     return NextResponse.json({ error: 'Unable to generate an advisor response.' }, { status: 502 });
   }

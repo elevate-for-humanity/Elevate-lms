@@ -143,6 +143,8 @@ jobs:
         run: node scripts/verify-store-commerce-contract.mjs
       - name: Store source-backed offer proof
         run: pnpm exec tsx scripts/verify-store-proof-contract.ts
+      - name: Store paid delivery and private app workspace regressions
+        run: pnpm run test:store-delivery
       - name: Canonical platform route and auth doctor
         run: node scripts/platform-doctor-static.mjs
       - name: Canonical portal contracts

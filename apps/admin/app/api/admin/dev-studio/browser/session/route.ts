@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   try {
     const response = await fetch(`${config.internalUrl}/health`, {
       cache: 'no-store',
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(20000),
     });
     const health = await response.json();
     return NextResponse.json({ configured: true, ready: response.ok && health?.ready === true, health });

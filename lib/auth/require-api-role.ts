@@ -11,6 +11,7 @@ export interface ApiAuthResult {
     full_name?: string;
     tenant_id?: string;
     is_active?: boolean;
+    suspended?: boolean;
   };
   /** RLS-respecting client scoped to the authenticated user. */
   db: Awaited<ReturnType<typeof createClient>>;
@@ -55,18 +56,20 @@ export async function requireApiRole(
   const admin = await requireAdminClient();
   const profileDb = admin;
 
-  const { data: profile } = await profileDb
+  const { data: profile, error: profileError } = await profileDb
     .from('profiles')
-    .select('id, role, full_name, tenant_id, is_active')
+    .select('id, role, full_name, tenant_id, is_active, suspended')
     .eq('id', user.id)
     .maybeSingle();
 
+  if (profileError)
+    return NextResponse.json({ error: 'PROFILE_LOOKUP_UNAVAILABLE' }, { status: 503 });
   if (!profile) {
     return NextResponse.json({ error: 'Unauthorized — no profile' }, { status: 401 });
   }
 
   // Deactivated accounts are denied regardless of role
-  if (profile.is_active === false) {
+  if (profile.is_active === false || profile.suspended === true) {
     return NextResponse.json({ error: 'Account deactivated' }, { status: 401 });
   }
 

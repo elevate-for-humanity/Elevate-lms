@@ -44,7 +44,8 @@ export function requireSensitiveFeatureAccess(role: string | null | undefined): 
 
 export function getEnvironmentLabel(): { label: string; color: string } {
   if (isProd) return { label: 'PRODUCTION', color: 'bg-red-100 text-red-800 border-red-200' };
-  if (isPreview) return { label: 'PREVIEW', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+  if (isPreview)
+    return { label: 'PREVIEW', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
   return { label: 'DEVELOPMENT', color: 'bg-blue-100 text-blue-800 border-blue-200' };
 }
 
@@ -128,7 +129,11 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
     }
 
     const [profileResult, roleResult] = await Promise.all([
-      supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+      supabase
+        .from('profiles')
+        .select('role, is_active, suspended')
+        .eq('id', user.id)
+        .maybeSingle(),
       supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
     ]);
 
@@ -152,6 +157,10 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
       );
     }
 
+    if (profileResult.data?.is_active === false || profileResult.data?.suspended === true) {
+      return guardedIdentity('', null, null, [], unauthorized());
+    }
+
     const secondaryRoles = (roleResult.data ?? [])
       .map((row: any) => row?.roles?.name)
       .filter((value: unknown): value is string => typeof value === 'string');
@@ -160,7 +169,8 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
 
     return guardedIdentity(user.id, user.email ?? null, role, effectiveRoles);
   } catch (error) {
-    if (isAuthRetryableFetchError(error)) return guardedIdentity('', null, null, [], authProviderUnavailable());
+    if (isAuthRetryableFetchError(error))
+      return guardedIdentity('', null, null, [], authProviderUnavailable());
     return guardedIdentity('', null, null, [], unauthorized());
   }
 }

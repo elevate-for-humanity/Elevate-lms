@@ -24,7 +24,9 @@ async function resolveProgramId(
 ): Promise<{ id: string | null; error?: string }> {
   if (!programSlug) return { id: null };
 
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(programSlug);
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    programSlug,
+  );
   if (isUuid) {
     const { data: byId } = await db
       .from('programs')
@@ -57,10 +59,6 @@ export async function resolveCourseIdFromDb(
   db: SupabaseClient,
   programSlug: string,
 ): Promise<string | null> {
-  if (programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting') {
-    return '566e2ef7-6861-4736-9807-b4ff868fc908';
-  }
-
   const program = await resolveProgramId(db, programSlug);
   if (program.error) {
     logger.error('[program-resolver] failed to resolve program', undefined, {
@@ -215,7 +213,8 @@ export async function unregisterProgramCourse(
   if (mappings.length > 1) {
     return {
       ok: false,
-      error: 'Program has multiple course mappings; specify a course before removing a relationship.',
+      error:
+        'Program has multiple course mappings; specify a course before removing a relationship.',
     };
   }
 

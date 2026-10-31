@@ -37,7 +37,7 @@ export type AppRole =
   | 'workforce_board'
   | 'case_manager'
   | 'provider_admin'
-  | 'grant_client'
+  | 'grant_client';
 
 export type AuthUser = {
   id: string;
@@ -98,7 +98,14 @@ export async function requireUser(options?: {
   }
 
   const db = await requireAdminClient();
-  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  const { data: profile, error: profileError } = await db
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError) throw new Error('PROFILE_LOOKUP_UNAVAILABLE');
+  if (profile?.is_active === false || profile?.suspended === true) redirect('/unauthorized');
 
   const role = (profile?.role ?? null) as AppRole | null;
 

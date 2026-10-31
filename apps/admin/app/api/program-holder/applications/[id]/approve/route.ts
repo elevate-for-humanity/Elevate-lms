@@ -31,18 +31,21 @@ function escapeHtml(value: unknown) {
     .replaceAll("'", '&#039;');
 }
 
-function accountRoleForApprovedRole(
-  value: unknown,
-): 'program_holder' | 'site_coordinator' {
-  const normalized = String(value ?? '').trim().toLowerCase();
+function accountRoleForApprovedRole(value: unknown): 'program_holder' | 'site_coordinator' {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
   return normalized.includes('site coordinator') ? 'site_coordinator' : 'program_holder';
 }
 
 async function requireAdminActor() {
   const auth = await createClient();
   const db = await requireAdminClient();
-  const { data: { user } } = await auth.auth.getUser();
-  if (!user) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) } as const;
+  const {
+    data: { user },
+  } = await auth.auth.getUser();
+  if (!user)
+    return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) } as const;
 
   const { data: profile } = await db
     .from('profiles')
@@ -89,6 +92,7 @@ async function findOrCreateUser(
     email: normalizedEmail,
     password: tempPassword,
     email_confirm: true,
+    app_metadata: { role: accountRole },
     user_metadata: { full_name: fullName, role: accountRole },
   });
   if (error || !data.user?.id) {
@@ -112,7 +116,10 @@ async function secureAccessLink(
     options: { redirectTo },
   });
   if (error) {
-    logger.warn('[program-holder/approve] secure access link failed', { email, error: error.message });
+    logger.warn('[program-holder/approve] secure access link failed', {
+      email,
+      error: error.message,
+    });
     return null;
   }
   return data?.properties?.action_link || null;
@@ -120,30 +127,45 @@ async function secureAccessLink(
 
 async function auditEmail(
   db: Awaited<ReturnType<typeof requireAdminClient>>,
-  params: { recipient: string; subject: string; applicationId: string; success: boolean; error?: string },
+  params: {
+    recipient: string;
+    subject: string;
+    applicationId: string;
+    success: boolean;
+    error?: string;
+  },
 ) {
-  await db.from('email_logs').insert({
-    action: 'program_holder_approval_notification',
-    recipient_email: params.recipient,
-    recipient: params.recipient,
-    to: params.recipient,
-    subject: params.subject,
-    provider: 'sendgrid',
-    status: params.success ? 'sent' : 'failed',
-    error_message: params.error || null,
-    error: params.error || null,
-    sent_at: params.success ? new Date().toISOString() : null,
-    details: { application_id: params.applicationId, application_type: 'program_holder', event: 'approved' },
-    metadata: { application_id: params.applicationId, application_type: 'program_holder', event: 'approved' },
-  }).then(({ error }) => {
-    if (error) logger.warn('[program-holder/approve] email audit failed', { error: error.message });
-  });
+  await db
+    .from('email_logs')
+    .insert({
+      action: 'program_holder_approval_notification',
+      recipient_email: params.recipient,
+      recipient: params.recipient,
+      to: params.recipient,
+      subject: params.subject,
+      provider: 'sendgrid',
+      status: params.success ? 'sent' : 'failed',
+      error_message: params.error || null,
+      error: params.error || null,
+      sent_at: params.success ? new Date().toISOString() : null,
+      details: {
+        application_id: params.applicationId,
+        application_type: 'program_holder',
+        event: 'approved',
+      },
+      metadata: {
+        application_id: params.applicationId,
+        application_type: 'program_holder',
+        event: 'approved',
+      },
+    })
+    .then(({ error }) => {
+      if (error)
+        logger.warn('[program-holder/approve] email audit failed', { error: error.message });
+    });
 }
 
-export async function POST(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const actor = await requireAdminActor();
     if ('error' in actor) return actor.error;
@@ -157,14 +179,23 @@ export async function POST(
       .maybeSingle();
 
     if (applicationError) throw applicationError;
-    if (!application) return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
+    if (!application)
+      return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
     if (application.status === 'rejected') {
-      return NextResponse.json({ error: 'Rejected applications must be reopened before approval.' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'Rejected applications must be reopened before approval.' },
+        { status: 409 },
+      );
     }
 
-    const email = String(application.email || '').toLowerCase().trim();
-    const contactName = String(application.contact_name || application.organization_name || 'Program Holder').trim();
-    if (!email) return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
+    const email = String(application.email || '')
+      .toLowerCase()
+      .trim();
+    const contactName = String(
+      application.contact_name || application.organization_name || 'Program Holder',
+    ).trim();
+    if (!email)
+      return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
 
     const existingData =
       application.data && typeof application.data === 'object' && !Array.isArray(application.data)
@@ -172,7 +203,13 @@ export async function POST(
         : {};
     const accountRole = accountRoleForApprovedRole(existingData.approved_role);
     const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
-      ? [...new Set(existingData.requested_program_slugs.map((value) => String(value || '').trim()).filter(Boolean))]
+      ? [
+          ...new Set(
+            existingData.requested_program_slugs
+              .map((value) => String(value || '').trim())
+              .filter(Boolean),
+          ),
+        ]
       : [];
 
     let activePrograms: Array<{ id: string; slug: string }> = [];
@@ -184,17 +221,20 @@ export async function POST(
       if (programsError) throw programsError;
 
       activePrograms = (requestedPrograms ?? []).filter(
-        (program) => program.is_active !== false && !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
+        (program) =>
+          program.is_active !== false &&
+          !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
       );
       const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
       const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));
       if (missingSlugs.length > 0) {
         return NextResponse.json(
-          { error: `Cannot approve: requested program is unavailable (${missingSlugs.join(', ')}).` },
+          {
+            error: `Cannot approve: requested program is unavailable (${missingSlugs.join(', ')}).`,
+          },
           { status: 409 },
         );
       }
-
     }
 
     const identity = await findOrCreateUser(db, email, contactName, accountRole);
@@ -215,7 +255,10 @@ export async function POST(
       .maybeSingle();
 
     const now = new Date().toISOString();
-    const alreadySigned = Boolean(existingHolder?.mou_signed || (existingHolder?.id && priorMou?.document_version === `3.0-${existingHolder.id}`));
+    const alreadySigned = Boolean(
+      existingHolder?.mou_signed ||
+      (existingHolder?.id && priorMou?.document_version === `3.0-${existingHolder.id}`),
+    );
     const holderPayload = {
       user_id: identity.userId,
       organization_name: application.organization_name,
@@ -231,12 +274,16 @@ export async function POST(
       mou_status: alreadySigned ? 'signed' : 'pending_signature',
       mou_type: existingHolder?.mou_type || 'universal',
       features: {
-        ...((existingHolder?.features && typeof existingHolder.features === 'object') ? existingHolder.features : {}),
+        ...(existingHolder?.features && typeof existingHolder.features === 'object'
+          ? existingHolder.features
+          : {}),
         approved_role: existingData.approved_role || 'Program Holder',
         regional_assignment: existingData.regional_assignment || null,
         custom_mou: existingData.custom_mou || null,
         training_required: existingData.training_required === true,
-        training_topics: Array.isArray(existingData.training_topics) ? existingData.training_topics : [],
+        training_topics: Array.isArray(existingData.training_topics)
+          ? existingData.training_topics
+          : [],
         payout_provider: 'quickbooks',
         onboarding_contract_version: '2026-09-role-scoped-program-holder',
       },
@@ -258,8 +305,14 @@ export async function POST(
     }
 
     const { firstName, lastName } = splitName(contactName);
-    const privilegedRole = ['admin', 'super_admin', 'staff', 'org_admin'].includes(identity.existingRole);
-    const { data: profile } = await db.from('profiles').select('id').eq('id', identity.userId).maybeSingle();
+    const privilegedRole = ['admin', 'super_admin', 'staff', 'org_admin'].includes(
+      identity.existingRole,
+    );
+    const { data: profile } = await db
+      .from('profiles')
+      .select('id')
+      .eq('id', identity.userId)
+      .maybeSingle();
     if (profile?.id) {
       const { error } = await db
         .from('profiles')
@@ -301,7 +354,10 @@ export async function POST(
 
       const { error: holderProgramError } = await db
         .from('program_holders')
-        .update({ primary_program_id: primaryProgram.id, status: alreadySigned ? 'active' : 'approved_pending_mou' })
+        .update({
+          primary_program_id: primaryProgram.id,
+          status: alreadySigned ? 'active' : 'approved_pending_mou',
+        })
         .eq('id', holderId);
       if (holderProgramError) throw holderProgramError;
     }
@@ -323,14 +379,16 @@ export async function POST(
       .eq('id', id);
     if (appUpdateError) throw appUpdateError;
 
-    const contractorSync = await ensureProgramHolderQuickBooksContractor(db, holderId)
-      .catch(() => ({ linked: false, reason: 'QuickBooks contractor setup is pending reconciliation.' }));
+    const contractorSync = await ensureProgramHolderQuickBooksContractor(db, holderId).catch(
+      () => ({ linked: false, reason: 'QuickBooks contractor setup is pending reconciliation.' }),
+    );
 
     const accessLink = await secureAccessLink(db, email, identity.isNewUser);
     const portalUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent('/program-holder/dashboard')}`;
     const fallbackPath = alreadySigned ? '/program-holder/dashboard' : '/program-holder/sign-mou';
     const nextUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent(fallbackPath)}`;
-    const subject = 'Approved: Gary Regional Site Coordinator — Dashboard Access & Required Onboarding | Elevate for Humanity';
+    const subject =
+      'Approved: Gary Regional Site Coordinator — Dashboard Access & Required Onboarding | Elevate for Humanity';
     const result = await sendEmail({
       to: email,
       subject,
@@ -352,7 +410,12 @@ export async function POST(
         title: `Program Holder approved but onboarding email failed: ${application.organization_name}`,
         message: `Application ${id} was approved and account provisioned, but the onboarding email to ${email} failed: ${result.error || 'unknown error'}`,
         severity: 'error',
-        metadata: { application_id: id, program_holder_id: holderId, email, error: result.error || null },
+        metadata: {
+          application_id: id,
+          program_holder_id: holderId,
+          email,
+          error: result.error || null,
+        },
       });
     }
 
@@ -366,9 +429,15 @@ export async function POST(
       emailStatus: result.success ? 'sent' : 'failed',
     });
   } catch (error) {
-    logger.error('[admin/program-holder/approve] failed', error instanceof Error ? error : undefined);
+    logger.error(
+      '[admin/program-holder/approve] failed',
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unable to approve Program Holder application.' },
+      {
+        error:
+          error instanceof Error ? error.message : 'Unable to approve Program Holder application.',
+      },
       { status: 500 },
     );
   }

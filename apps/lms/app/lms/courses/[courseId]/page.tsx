@@ -1,3 +1,4 @@
+import { loadLessonAvailability } from '@/lib/lms/lesson-availability';
 import Image from 'next/image';
 import { getPrestigeCourseCover } from '@/lib/lms/prestige-course-covers';
 import type { Metadata } from 'next';
@@ -61,38 +62,57 @@ export default async function CourseLandingPage({
   courseQuery = isUuid(courseId)
     ? courseQuery.eq('id', courseId)
     : courseQuery.eq('slug', courseId);
-  const { data: course } = await courseQuery.maybeSingle();
+  const { data: course, error: courseError } = await courseQuery.maybeSingle();
+  if (courseError) throw new Error('COURSE_LOOKUP_UNAVAILABLE');
   if (!course) notFound();
 
-  const [{ data: modules }, { data: lessons }, { data: heroVisual }, { data: readinessData }] =
-    await Promise.all([
-      db
-        .from('course_modules')
-        .select('id,title,description,order_index,is_published')
-        .eq('course_id', course.id)
-        .match(preview.active ? {} : { is_published: true })
-        .order('order_index'),
-      db
-        .from('course_lessons')
-        .select(
-          'id,module_id,slug,title,lesson_type,order_index,duration_minutes,is_published,learning_objectives',
-        )
-        .eq('course_id', course.id)
-        .match(preview.active ? {} : { is_published: true })
-        .order('order_index'),
-      db
-        .from('course_visual_assets')
-        .select('asset_url,poster_url,alt_text,caption,media_type,metadata')
-        .eq('course_id', course.id)
-        .eq('placement', 'hero')
-        .eq('is_active', true)
-        .order('sort_order')
-        .limit(1)
-        .maybeSingle(),
-      preview.active
-        ? Promise.resolve({ data: [] })
-        : supabase.rpc('get_my_course_readiness', { p_course_id: course.id }),
-    ]);
+  const [moduleResult, lessonResult, heroResult, readinessResult] = await Promise.all([
+    db
+      .from('course_modules')
+      .select('id,title,description,order_index,is_published')
+      .eq('course_id', course.id)
+      .match(preview.active ? {} : { is_published: true })
+      .order('order_index'),
+    db
+      .from('course_lessons')
+      .select(
+        'id,module_id,slug,title,lesson_type,order_index,duration_minutes,is_published,learning_objectives',
+      )
+      .eq('course_id', course.id)
+      .match(preview.active ? {} : { is_published: true })
+      .order('order_index'),
+    db
+      .from('course_visual_assets')
+      .select('asset_url,poster_url,alt_text,caption,media_type,metadata')
+      .eq('course_id', course.id)
+      .eq('placement', 'hero')
+      .eq('is_active', true)
+      .order('sort_order')
+      .limit(1)
+      .maybeSingle(),
+    preview.active
+      ? Promise.resolve({ data: [] })
+      : supabase.rpc('get_my_course_readiness', { p_course_id: course.id }),
+  ]);
+
+  if (
+    moduleResult.error ||
+    lessonResult.error ||
+    heroResult.error ||
+    ('error' in readinessResult && readinessResult.error)
+  )
+    throw new Error('COURSE_CONTENT_UNAVAILABLE');
+  const modules = moduleResult.data;
+  const lessons = lessonResult.data;
+  const heroVisual = heroResult.data;
+  const readinessData = readinessResult.data;
+  const availability = preview.active
+    ? new Map<string, boolean>()
+    : await loadLessonAvailability(
+        supabase,
+        user!.id,
+        (lessons ?? []).map((lesson) => lesson.id),
+      );
 
   const { data: pacingData, error: pacingError } = preview.active
     ? { data: null, error: null }
@@ -115,6 +135,10 @@ export default async function CourseLandingPage({
       available: boolean;
     }>;
   } | null;
+  if (pacing && !preview.active)
+    pacing.lessons.forEach((lesson) => {
+      lesson.available = lesson.available && availability.get(lesson.id) === true;
+    });
   const readiness = (readinessData ?? []) as ReadinessRow[];
   const publishedModules = modules ?? [];
   const publishedLessons = lessons ?? [];
@@ -131,7 +155,7 @@ export default async function CourseLandingPage({
         published: lesson.is_published,
         releaseWeek: null,
         opensAt: null,
-        available: true,
+        available: preview.active || availability.get(lesson.id) === true,
       }));
   const firstLesson = publishedLessons[0] ?? null;
   const heroMetadata =
@@ -162,7 +186,15 @@ export default async function CourseLandingPage({
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           {courseCover ? (
             <figure className="mb-5 max-w-24 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
-              <Image src={courseCover} alt={`${course.title} course cover`} width={1024} height={1536} sizes="96px" className="h-auto w-full" priority />
+              <Image
+                src={courseCover}
+                alt={`${course.title} course cover`}
+                width={1024}
+                height={1536}
+                sizes="96px"
+                className="h-auto w-full"
+                priority
+              />
             </figure>
           ) : null}
           {heroVisual?.media_type === 'video' ? (

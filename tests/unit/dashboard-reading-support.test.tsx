@@ -15,6 +15,10 @@ describe('universal dashboard reading view', () => {
       'aria-pressed',
       'true',
     );
+    expect(screen.getByText('Text size: Larger')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Reading view' }).textContent).toBe(
+      'Use standard text',
+    );
     expect(screen.getByRole('link', { name: 'My students' })).toHaveAttribute('href', '/students');
   });
   it('leaves public marketing pages unchanged when dashboard-only mode is used', () => {

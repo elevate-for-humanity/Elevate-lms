@@ -68,6 +68,8 @@ export default function InteractiveLessonExperience({
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 12000);
     setLoading(true);
+    setPayload(null);
+    setError('');
     fetch(
       `/api/learner/interactions?courseId=${encodeURIComponent(courseId)}&lessonId=${encodeURIComponent(lessonId)}`,
       { cache: 'no-store', signal: controller.signal },
@@ -107,7 +109,8 @@ export default function InteractiveLessonExperience({
     !!payload?.visualPrompt ||
     !!payload?.practicalTask ||
     !!payload?.interactiveVideo ||
-    !!payload?.instructionalTimeline;
+    !!payload?.instructionalTimeline ||
+    !!payload?.experience;
   const timeline = payload?.instructionalTimeline;
 
   if (loading)
@@ -116,7 +119,13 @@ export default function InteractiveLessonExperience({
         <Loader2 className="h-4 w-4 animate-spin" /> Loading interactive lesson activities…
       </div>
     );
-  if (error || !hasExperience) return null;
+  if (error)
+    return (
+      <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-900">
+        Activities could not load: {error}. Refresh to try again.
+      </p>
+    );
+  if (!hasExperience) return null;
 
   return (
     <section className="space-y-6" aria-label="Interactive learning activities">
@@ -743,40 +752,69 @@ function PracticalActivity({
   const [done, setDone] = useState<Set<number>>(new Set());
   const [evidence, setEvidence] = useState('');
   const [attested, setAttested] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'saving' | 'submitted' | 'approved' | 'revision_required' | 'rejected' | 'error'>('idle');
+  const [status, setStatus] = useState<
+    'idle' | 'saving' | 'submitted' | 'approved' | 'revision_required' | 'rejected' | 'error'
+  >('idle');
   const [reviewComments, setReviewComments] = useState('');
+  const [statusKnown, setStatusKnown] = useState(false);
   useEffect(() => {
     let active = true;
-    void fetch(`/api/learner/practical-submissions?lessonId=${encodeURIComponent(lessonId)}&interactionId=${encodeURIComponent(interaction.id)}`)
-      .then(async response => { if (!response.ok) throw new Error('Practical status unavailable'); return response.json(); })
+    setStatusKnown(false);
+    setStatus('idle');
+    setReviewComments('');
+    setDone(new Set());
+    setEvidence('');
+    setAttested(false);
+    void fetch(
+      `/api/learner/practical-submissions?lessonId=${encodeURIComponent(lessonId)}&interactionId=${encodeURIComponent(interaction.id)}`,
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Practical status unavailable');
+        return response.json();
+      })
       .then(({ submission }) => {
-        if (!active || !submission) return;
+        if (!active) return;
+        setStatusKnown(true);
+        if (!submission) return;
         setStatus(submission.status === 'in_review' ? 'submitted' : submission.status);
-        const review = [...(submission.course_practical_reviews ?? [])].sort((a, b) => Date.parse(b.reviewed_at) - Date.parse(a.reviewed_at))[0];
+        const review = [...(submission.course_practical_reviews ?? [])].sort(
+          (a, b) => Date.parse(b.reviewed_at) - Date.parse(a.reviewed_at),
+        )[0];
         setReviewComments(review?.comments || '');
-      }).catch(() => { if (active) setReviewComments('Current review status could not be loaded. Refresh before submitting again.'); });
-    return () => { active = false; };
-  }, [lessonId, interaction.id]);
+      })
+      .catch(() => {
+        if (active)
+          setReviewComments(
+            'Current review status could not be loaded. Refresh before submitting again.',
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, [courseId, lessonId, interaction.id]);
   const competencyKeys = Array.isArray(data.competencyKeys)
     ? data.competencyKeys.map(String)
     : [String(data.competencyKey ?? interaction.id)];
   async function submitEvidence() {
+    if (!statusKnown) return;
     setStatus('saving');
     try {
-    const response = await fetch('/api/learner/practical-submissions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        courseId,
-        lessonId,
-        interactionId: interaction.id,
-        competencyKeys,
-        evidence: [{ type: 'text', value: evidence }],
-        learnerAttestation: attested,
-      }),
-    });
-    setStatus(response.ok ? 'submitted' : 'error');
-    } catch { setStatus('error'); }
+      const response = await fetch('/api/learner/practical-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseId,
+          lessonId,
+          interactionId: interaction.id,
+          competencyKeys,
+          evidence: [{ type: 'text', value: evidence }],
+          learnerAttestation: attested,
+        }),
+      });
+      setStatus(response.ok ? 'submitted' : 'error');
+    } catch {
+      setStatus('error');
+    }
   }
   return (
     <div className="rounded-2xl border border-teal-300 bg-teal-50 p-5">
@@ -856,21 +894,29 @@ function PracticalActivity({
           type="button"
           onClick={submitEvidence}
           disabled={
+            !statusKnown ||
             done.size < steps.length ||
             !evidence.trim() ||
             !attested ||
             status === 'saving' ||
-            status === 'submitted' || status === 'approved'
+            status === 'submitted' ||
+            status === 'approved'
           }
           className="rounded-lg bg-teal-800 px-4 py-2 font-bold text-white disabled:opacity-40"
         >
-          {status === 'approved' ? 'Practical approved' : status === 'saving'
-            ? 'Submitting…'
-            : status === 'submitted'
-              ? 'Submitted for expert review'
-              : 'Submit evidence'}
+          {status === 'approved'
+            ? 'Practical approved'
+            : status === 'saving'
+              ? 'Submitting…'
+              : status === 'submitted'
+                ? 'Submitted for expert review'
+                : 'Submit evidence'}
         </button>
-        {reviewComments ? <p role="status">{status.replaceAll('_', ' ')}: {reviewComments}</p> : null}
+        {reviewComments ? (
+          <p role="status">
+            {status.replaceAll('_', ' ')}: {reviewComments}
+          </p>
+        ) : null}
         {status === 'error' ? (
           <p className="text-sm font-semibold text-red-700">
             Evidence could not be submitted. Check the required fields and retry.

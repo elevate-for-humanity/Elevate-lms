@@ -170,6 +170,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
+    "@electric-sql/pglite": "0.5.13",
     "@eslint/js": "^10.0.1",
     "@next/bundle-analyzer": "15.5.28",
     "@next/eslint-plugin-next": "^16.2.4",

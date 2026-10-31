@@ -1,3 +1,4 @@
+import { scheduleFollowUps } from '@/lib/compliance/follow-up-dates';
 /**
  * D: FSSA exit interview — form validation, body builder, follow-up scheduling
  *
@@ -62,51 +63,44 @@ function validateExitForm(data: {
 
 // ── Extracted: PATCH body builder ─────────────────────────────────────────────
 
-function buildExitPatchBody(participantId: string, data: {
-  exitReason: string;
-  exitNotes: string;
-  employed: boolean;
-  employerName: string;
-  jobTitle: string;
-  hourlyWage: string;
-  hoursPerWeek: string;
-  employmentStartDate: string;
-  credentialAttained: boolean;
-  credentialName: string;
-  credentialIssuedDate: string;
-  abawdExempt: boolean;
-  abawdReason: string;
-}) {
+function buildExitPatchBody(
+  participantId: string,
+  data: {
+    exitReason: string;
+    exitNotes: string;
+    employed: boolean;
+    employerName: string;
+    jobTitle: string;
+    hourlyWage: string;
+    hoursPerWeek: string;
+    employmentStartDate: string;
+    credentialAttained: boolean;
+    credentialName: string;
+    credentialIssuedDate: string;
+    abawdExempt: boolean;
+    abawdReason: string;
+  },
+) {
   return {
-    id:                     participantId,
-    enrollment_status:      'exited',
-    exit_reason:            data.exitReason,
-    exit_notes:             data.exitNotes.trim(),
-    employed_at_exit:       data.employed,
-    employer_name:          data.employed ? data.employerName || null : null,
-    job_title:              data.employed ? data.jobTitle || null : null,
-    hourly_wage:            data.employed && data.hourlyWage ? parseFloat(data.hourlyWage) : null,
-    hours_per_week:         data.employed && data.hoursPerWeek ? parseInt(data.hoursPerWeek, 10) : null,
-    employment_start_date:  data.employed ? data.employmentStartDate || null : null,
-    credential_attained:    data.credentialAttained,
-    credential_name:        data.credentialAttained ? data.credentialName || null : null,
+    id: participantId,
+    enrollment_status: 'exited',
+    exit_reason: data.exitReason,
+    exit_notes: data.exitNotes.trim(),
+    employed_at_exit: data.employed,
+    employer_name: data.employed ? data.employerName || null : null,
+    job_title: data.employed ? data.jobTitle || null : null,
+    hourly_wage: data.employed && data.hourlyWage ? parseFloat(data.hourlyWage) : null,
+    hours_per_week: data.employed && data.hoursPerWeek ? parseInt(data.hoursPerWeek, 10) : null,
+    employment_start_date: data.employed ? data.employmentStartDate || null : null,
+    credential_attained: data.credentialAttained,
+    credential_name: data.credentialAttained ? data.credentialName || null : null,
     credential_issued_date: data.credentialAttained ? data.credentialIssuedDate || null : null,
-    abawd_exempt:           data.abawdExempt,
+    abawd_exempt: data.abawdExempt,
     abawd_exemption_reason: data.abawdExempt ? data.abawdReason || null : null,
   };
 }
 
 // ── Extracted: follow-up scheduling trigger logic ─────────────────────────────
-
-function scheduleFollowUps(exitDate: Date): { q2: Date; q4: Date } {
-  const q2 = new Date(exitDate);
-  q2.setMonth(q2.getMonth() + 6);
-
-  const q4 = new Date(exitDate);
-  q4.setMonth(q4.getMonth() + 12);
-
-  return { q2, q4 };
-}
 
 function formatFollowUpDate(d: Date): string {
   return d.toISOString().split('T')[0];
@@ -231,7 +225,7 @@ describe('buildExitPatchBody', () => {
 
   it('parses hourly_wage as float', () => {
     const body = buildExitPatchBody('pid-1', base);
-    expect(body.hourly_wage).toBe(22.50);
+    expect(body.hourly_wage).toBe(22.5);
   });
 
   it('parses hours_per_week as int', () => {
@@ -360,4 +354,13 @@ describe('Exit reason enum', () => {
     expect(EXIT_REASONS).toContain('ineligible');
     expect(EXIT_REASONS).toContain('other');
   });
+});
+
+it('clamps month ends instead of overflowing into the following month', () => {
+  expect(scheduleFollowUps(new Date('2025-08-31')).q2.toISOString().slice(0, 10)).toBe(
+    '2026-02-28',
+  );
+  expect(scheduleFollowUps(new Date('2024-02-29')).q4.toISOString().slice(0, 10)).toBe(
+    '2025-02-28',
+  );
 });

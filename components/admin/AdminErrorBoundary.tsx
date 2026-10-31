@@ -29,8 +29,13 @@ export default function AdminErrorBoundary({
     const assetKey = assetMatch?.[1] ?? error.digest ?? 'unknown';
     const recoveryKey = `admin-stale-asset-recovery:${assetKey}`;
 
-    if (sessionStorage.getItem(recoveryKey) === '1') return;
-    sessionStorage.setItem(recoveryKey, '1');
+    try {
+      if (sessionStorage.getItem(recoveryKey) === '1') return;
+      sessionStorage.setItem(recoveryKey, '1');
+    } catch {
+      // Without a durable recovery fence, use the explicit refresh button.
+      return;
+    }
 
     const url = new URL(window.location.href);
     url.searchParams.set('__recover', Date.now().toString());
@@ -38,16 +43,18 @@ export default function AdminErrorBoundary({
   }, [error, staleDeploymentAsset]);
 
   return (
-    <div className="p-8 flex items-center justify-center min-h-[400px]">
+    <div role="alert" className="p-8 flex items-center justify-center min-h-[400px]">
       <div className="max-w-md w-full bg-white rounded-xl border border-red-200 p-8 text-center">
         <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-3" />
         <h2 className="text-lg font-semibold text-slate-900 mb-2">
-          {staleDeploymentAsset ? 'Refreshing the latest admin version' : 'Failed to load'}
+          {staleDeploymentAsset
+            ? 'Refreshing the latest admin version'
+            : 'Dashboard records could not load'}
         </h2>
         <p className="text-sm text-slate-700 mb-4">
           {staleDeploymentAsset
             ? 'A new version was deployed. This page is reconnecting automatically.'
-            : 'An unexpected error occurred.'}
+            : 'Your records could not be loaded. Try again to reconnect.'}
         </p>
         <button
           onClick={() => {
@@ -59,9 +66,9 @@ export default function AdminErrorBoundary({
             }
             reset();
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
+          className="inline-flex min-h-12 items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
         >
-          <RefreshCw className="w-4 h-4" /> {staleDeploymentAsset ? 'Refresh now' : 'Retry'}
+          <RefreshCw className="w-4 h-4" /> {staleDeploymentAsset ? 'Refresh now' : 'Try again'}
         </button>
       </div>
     </div>

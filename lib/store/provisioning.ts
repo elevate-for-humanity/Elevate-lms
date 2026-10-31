@@ -136,26 +136,32 @@ export async function provisionLicense(
     const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
       email: input.contactEmail,
       email_confirm: true,
+      app_metadata: { role: 'org_admin', tenant_id: tenantId },
       user_metadata: {
         full_name: input.contactName,
         tenant_id: tenantId,
-        role: 'tenant_admin',
+        role: 'org_admin',
       },
     });
 
     if (authError) {
       // User might already exist - try to get them
       const { data: existingUsers } = await adminSupabase.auth.admin.listUsers();
-      const existingUser = (existingUsers as { users?: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }> } | null)?.users?.find((u) => u.email === input.contactEmail);
+      const existingUser = (
+        existingUsers as {
+          users?: Array<{ id: string; email?: string; user_metadata?: Record<string, unknown> }>;
+        } | null
+      )?.users?.find((u) => u.email === input.contactEmail);
 
       if (existingUser) {
         adminUserId = existingUser.id;
         // Update their metadata to include this tenant
         await adminSupabase.auth.admin.updateUserById(existingUser.id, {
+          app_metadata: { role: 'org_admin', tenant_id: tenantId },
           user_metadata: {
             ...existingUser.user_metadata,
             tenant_id: tenantId,
-            role: 'tenant_admin',
+            role: 'org_admin',
           },
         });
       } else {
@@ -170,7 +176,7 @@ export async function provisionLicense(
       id: adminUserId,
       email: input.contactEmail,
       full_name: input.contactName,
-      role: 'tenant_admin',
+      role: 'org_admin',
       tenant_id: tenantId,
     });
 

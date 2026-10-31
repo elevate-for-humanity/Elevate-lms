@@ -48,9 +48,7 @@ export function DashboardReadingSupport({
         aria-label="Reading settings"
         className="flex min-w-0 flex-wrap items-center justify-between gap-3 border-b border-slate-300 bg-white px-4 py-3 text-slate-950"
       >
-        <span className="font-bold">
-          {enabled ? 'Reading view: larger text and spacing' : 'Compact view'}
-        </span>
+        <span className="font-bold">{enabled ? 'Text size: Larger' : 'Text size: Standard'}</span>
         <button
           type="button"
           aria-pressed={enabled}
@@ -58,7 +56,7 @@ export function DashboardReadingSupport({
           onClick={toggle}
           className="min-h-12 rounded-lg border-2 border-slate-700 px-4 py-2 font-bold focus-visible:outline focus-visible:outline-4 focus-visible:outline-blue-700"
         >
-          {enabled ? 'Use compact view' : 'Use reading view'}
+          {enabled ? 'Use standard text' : 'Use larger text'}
         </button>
       </div>
       {children}

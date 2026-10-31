@@ -219,6 +219,7 @@ export default function ParisChat({
   }, [isListening]);
 
   useEffect(() => {
+    if (surface !== 'public' && surface !== 'store') return;
     try {
       const saved = window.sessionStorage.getItem(`${STORAGE_PREFIX}${surface}`);
       if (!saved) return;
@@ -235,6 +236,7 @@ export default function ParisChat({
   }, [surface]);
 
   useEffect(() => {
+    if (surface !== 'public' && surface !== 'store') return;
     try {
       window.sessionStorage.setItem(
         `${STORAGE_PREFIX}${surface}`,

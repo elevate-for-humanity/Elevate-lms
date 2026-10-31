@@ -80,10 +80,17 @@ async function loadEffectiveAuth() {
     return { supabase, user: null, profile: null, role: null, effectiveRoles: [] as UserRole[] };
   }
 
-  const [{ data: profile }, { data: roleRows }] = await Promise.all([
+  const [profileResult, roleResult] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
   ]);
+
+  if (profileResult.error || roleResult.error) throw new Error('ROLE_LOOKUP_UNAVAILABLE');
+  const profile = profileResult.data;
+  const roleRows = roleResult.data;
+  if (profile?.is_active === false || profile?.suspended === true) {
+    return { supabase, user: null, profile, role: null, effectiveRoles: [] as UserRole[] };
+  }
 
   const secondaryRoles = (roleRows ?? [])
     .map((row: any) => row?.roles?.name)
@@ -142,8 +149,7 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
   if (requireEmailVerified && !user.email_confirmed_at) redirect('/verify-email');
 
   const isAuthorized =
-    allowedRoles.length === 0 ||
-    hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
+    allowedRoles.length === 0 || hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
   if (requireAuth && !isAuthorized) redirect('/unauthorized');
 
@@ -290,7 +296,7 @@ export async function canAccessStudentData(studentId: string): Promise<boolean> 
     .in('status', ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'])
     .not('course_id', 'is', null);
   if (error) throw new Error('Student enrollment lookup unavailable');
-  const ids = [...new Set((enrollments ?? []).map(row => row.course_id).filter(Boolean))];
+  const ids = [...new Set((enrollments ?? []).map((row) => row.course_id).filter(Boolean))];
   if (!ids.length) return false;
   const { data: assignment, error: assignmentError } = await supabase
     .from('instructor_assignments')
@@ -353,8 +359,7 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
   }
 
   const isAuthorized =
-    allowedRoles.length === 0 ||
-    hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
+    allowedRoles.length === 0 || hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
   if (
     isAuthorized &&

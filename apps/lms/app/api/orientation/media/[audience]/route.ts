@@ -28,6 +28,32 @@ export async function GET(req:NextRequest,{params}:{params:Promise<{audience:str
       if(!response.ok)throw Error('ORIENTATION_CAPTIONS_UNAVAILABLE');
       return new Response(await response.text(),{headers:{'Content-Type':'text/vtt; charset=utf-8','Cache-Control':'private, no-store'}});
     }
-    return NextResponse.redirect(signed,{status:307,headers:{'Cache-Control':'private, no-store','Referrer-Policy':'no-referrer'}});
+    // Keep private playback on the authenticated application origin. Redirects
+    // to storage can be blocked by device/network policies and expose signed URLs.
+    const range=req.headers.get('range');
+    if(range&&!/^bytes=(?:\d+-\d*|-\d+)$/.test(range))
+      return NextResponse.json({error:'Invalid video range.'},{status:400});
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),15000);
+    let response:Response;
+    try {
+      response=await fetch(signed,{
+        cache:'no-store',
+        headers:range?{Range:range}:{},
+        signal:AbortSignal.any([req.signal,controller.signal]),
+      });
+    } finally { clearTimeout(timer); }
+    if(!response.ok&&response.status!==416)throw Error('ORIENTATION_VIDEO_UNAVAILABLE');
+    const headers=new Headers({
+      'Content-Type':'video/mp4',
+      'Cache-Control':'private, no-store',
+      'Accept-Ranges':'bytes',
+      'X-Content-Type-Options':'nosniff',
+    });
+    for(const name of ['content-length','content-range']) {
+      const value=response.headers.get(name);
+      if(value)headers.set(name,value);
+    }
+    return new Response(response.body,{status:response.status,headers});
   }catch{return NextResponse.json({error:'Video is being prepared. Use the visual slides and transcript.'},{status:503});}
 }

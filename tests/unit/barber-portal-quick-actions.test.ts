@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { BARBER_COURSE_ID } from '@/lib/barber/pricing';
 import { BARBER_STUDENT_APP_HOME } from '@/lib/barber/student-app';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import {
@@ -15,7 +14,7 @@ const SLUG = 'barber-apprenticeship';
 /** Canonical hrefs for the authenticated barber apprentice workspace. */
 export const BARBER_PORTAL_QUICK_ACTION_HREFS = {
   clockIn: APPRENTICE_TIMECLOCK_URL,
-  rtiCourse: `/lms/courses/${BARBER_COURSE_ID}`,
+  rtiCourse: '/apprentice/theory',
   logHours: '/apprentice/hours/log',
   logService: '/apprentice/competencies/log',
   uploadDocument: '/apprentice/documents',
@@ -29,13 +28,13 @@ export const BARBER_PORTAL_QUICK_ACTION_HREFS = {
 } as const;
 
 describe('barber apprentice portal quick actions', () => {
-  it('uses Elevate/Prestige learner-facing labels without third-party vendor branding', () => {
-    expect(apprenticeshipRtiLabel(SLUG)).toBe('Prestige Elevation Barber Curriculum');
-    expect(apprenticeshipRtiLabel(SLUG, true)).toBe('Barber Curriculum');
+  it('uses a clear course label without a former holder name', () => {
+    expect(apprenticeshipRtiLabel(SLUG)).toBe('Barber theory course');
+    expect(apprenticeshipRtiLabel(SLUG, true)).toBe('Barber theory course');
   });
 
-  it('keeps the RTI launch bound to the canonical barber course ID', () => {
-    expect(apprenticeshipLmsCoursePath(SLUG)).toBe(`/lms/courses/${BARBER_COURSE_ID}`);
+  it('resolves the RTI launch from the current enrollment', () => {
+    expect(apprenticeshipLmsCoursePath(SLUG)).toBe('/apprentice/theory');
   });
 
   it('resolves operational actions inside the canonical apprentice workspace', () => {

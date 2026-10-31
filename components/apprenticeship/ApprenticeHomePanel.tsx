@@ -103,7 +103,7 @@ export default async function ApprenticeHomePanel({
       text: 'Read the clock and location rules before recording shop work.',
       href: '/apprentice/policies/timeclock',
     });
-  if (!failed && !acceptedPolicies.has(APPRENTICE_POLICY_KEYS.payment))
+  if (!failed && billing.required && !acceptedPolicies.has(APPRENTICE_POLICY_KEYS.payment))
     actions.push({
       title: 'Review and sign your payment rules',
       text: 'Read the payment and communication policy. Once signed, it stays in your menu.',

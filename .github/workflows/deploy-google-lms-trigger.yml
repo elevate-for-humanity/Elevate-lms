@@ -1,4 +1,5 @@
 name: Deploy LMS automatically on Google
+run-name: "${{ github.event_name == 'push' && 'Request' || 'Execute' }} LMS release · ${{ github.sha }}"
 on:
   push:
     branches: [main]
@@ -114,3 +115,30 @@ jobs:
         run: |
           node --test scripts/gcp/production-acceptance.test.mjs
           node scripts/gcp/production-acceptance.mjs dispatch
+
+  release-result:
+    name: Confirm LMS release jobs completed
+    needs: [validate, build, deploy, acceptance]
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require build, deployment and acceptance handoff
+        env:
+          RELEASE_JOBS: ${{ toJSON(needs) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          jobs = json.loads(os.environ['RELEASE_JOBS'])
+          incomplete = {name: job['result'] for name, job in jobs.items() if job['result'] != 'success'}
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## LMS release execution\n')
+              summary.write('Commit: ' + os.environ['GITHUB_SHA'] + '\n\n')
+              for name, job in jobs.items():
+                  summary.write('- ' + name + ': ' + job['result'] + '\n')
+              summary.write('\nAcceptance handoff is a separate request; inspect its downstream run for final production acceptance.\n')
+          if incomplete:
+              raise SystemExit('Release incomplete; required jobs failed or were skipped: ' + json.dumps(incomplete))
+          PY

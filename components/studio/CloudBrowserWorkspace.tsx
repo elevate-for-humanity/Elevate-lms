@@ -86,6 +86,7 @@ export default function CloudBrowserWorkspace({
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
+  const [runtimeCheckRevision, setRuntimeCheckRevision] = useState(0);
   const [checkingBrowser, setCheckingBrowser] = useState(false);
   const [foundationChecks, setFoundationChecks] = useState<
     { name: string; passed: boolean; reason?: string }[]
@@ -131,11 +132,14 @@ export default function CloudBrowserWorkspace({
   const navigationRevisionRef = useRef(0);
   const navigatingRef = useRef(false);
   const autoStartedRef = useRef(false);
-  useEffect(() => () => {
-    // A superseded conversation or unmounted view cannot restart admission.
-    lifecycleRef.current += 1;
-    autoStartedRef.current = false;
-  }, [conversationId, unifiedTask?.taskId]);
+  useEffect(
+    () => () => {
+      // A superseded conversation or unmounted view cannot restart admission.
+      lifecycleRef.current += 1;
+      autoStartedRef.current = false;
+    },
+    [conversationId, unifiedTask?.taskId],
+  );
   const autoRunCommandRef = useRef('');
 
   useEffect(() => {
@@ -224,18 +228,22 @@ export default function CloudBrowserWorkspace({
 
   useEffect(() => {
     let cancelled = false;
-    void fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })
-      .then(async (response) => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    const check = async (attempt = 0) => {
+      let retry = false;
+      try {
+        const response = await fetch('/api/admin/dev-studio/browser/session', {
+          cache: 'no-store',
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25000)]),
+        });
         const raw = await response.text();
-        let payload: Record<string, any> = {};
+        let payload: Record<string, unknown> = {};
         try {
           payload = raw ? JSON.parse(raw) : {};
         } catch {
           payload = { error: raw.slice(0, 500) || `HTTP ${response.status}` };
         }
-        return { response, payload };
-      })
-      .then(({ response, payload }) => {
         if (cancelled) return;
         const ready = response.ok && payload.configured === true && payload.ready === true;
         setRuntimeReady(ready);
@@ -250,30 +258,39 @@ export default function CloudBrowserWorkspace({
                   ? 'Runtime is offline'
                   : 'Runtime is not configured',
         );
-        if (!ready) {
+        if (ready) setError('');
+        else
           setError(
-            payload.error ||
-              (payload.configured
+            typeof payload.error === 'string'
+              ? payload.error
+              : payload.configured
                 ? 'The isolated browser service is configured but is not responding.'
-                : 'Configure STUDIO_BROWSER_URL, STUDIO_BROWSER_PUBLIC_URL, and STUDIO_BROWSER_SECRET in Containers before starting Chromium.'),
+                : 'Configure STUDIO_BROWSER_URL, STUDIO_BROWSER_PUBLIC_URL, and STUDIO_BROWSER_SECRET in Containers before starting Chromium.',
           );
-        }
-      })
-      .catch((cause) => {
-        if (!cancelled) {
-          setRuntimeReady(false);
-          setStatus('Runtime check failed');
-          setError(
-            cause instanceof Error
-              ? cause.message
-              : 'Could not verify the isolated browser runtime.',
-          );
-        }
-      });
+        // Retry reads only, never session creation, commands or authentication.
+        retry =
+          !ready &&
+          ((response.ok && payload.configured === true) ||
+            [502, 503, 504].includes(response.status));
+      } catch (cause) {
+        if (cancelled) return;
+        setRuntimeReady(false);
+        setStatus('Runtime check failed');
+        setError(
+          cause instanceof Error ? cause.message : 'Could not verify the isolated browser runtime.',
+        );
+        retry = true;
+      }
+      if (retry && !cancelled && attempt < 2)
+        timer = setTimeout(() => void check(attempt + 1), 3000);
+    };
+    void check();
     return () => {
       cancelled = true;
+      controller.abort();
+      if (timer) clearTimeout(timer);
     };
-  }, []);
+  }, [runtimeCheckRevision]);
 
   async function verifyBrowser() {
     setCheckingBrowser(true);
@@ -787,7 +804,9 @@ export default function CloudBrowserWorkspace({
             blocked = true;
             setCdpConnected(false);
             setStatus('Admin session expired');
-            setError('Your Admin session could not authorize browser controls. Reopen Studio from the Admin dashboard.');
+            setError(
+              'Your Admin session could not authorize browser controls. Reopen Studio from the Admin dashboard.',
+            );
             return;
           }
           if (!response?.ok && response?.status !== 410) {
@@ -847,7 +866,9 @@ export default function CloudBrowserWorkspace({
             blocked = true;
             setCdpConnected(false);
             setStatus('Admin session expired');
-            setError('Your Admin session could not authorize browser controls. Reopen Studio from the Admin dashboard.');
+            setError(
+              'Your Admin session could not authorize browser controls. Reopen Studio from the Admin dashboard.',
+            );
             return;
           }
           if (downloadsResponse?.ok) {
@@ -999,13 +1020,27 @@ export default function CloudBrowserWorkspace({
           aria-label="Browser URL"
         />
         {!session ? (
-          <button
-            onClick={() => void start()}
-            disabled={runtimeReady !== true || !target.trim()}
-            className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Start Chromium
-          </button>
+          <>
+            <button
+              onClick={() => void start()}
+              disabled={runtimeReady !== true || !target.trim()}
+              className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Start Chromium
+            </button>
+            {runtimeReady === false && (
+              <button
+                type="button"
+                onClick={() => {
+                  setRuntimeReady(null);
+                  setRuntimeCheckRevision((value) => value + 1);
+                }}
+                className="min-h-11 rounded border border-slate-300 px-3 text-sm"
+              >
+                Reconnect runtime
+              </button>
+            )}
+          </>
         ) : (
           <>
             <button

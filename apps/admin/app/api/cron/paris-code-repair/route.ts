@@ -18,7 +18,7 @@ export async function POST(request:NextRequest){
    return NextResponse.json({...await diagnoseParisGitHubCredential(headers),credentialSource:'github-app-installation',writeAuthority:'not_exercised'},{headers:{'Cache-Control':'no-store'}});
   }
   if(body.phase==='auth-diagnostic'){
-   const diagnostic=async()=>NextResponse.json({...await diagnoseParisGitHubCredential(),workflowAuthorization:'temporary-job-v1'},{headers:{'Cache-Control':'no-store'}});
+   const diagnostic=async()=>NextResponse.json({...await diagnoseParisGitHubCredential(),workflowAuthorization:'temporary-job-v1',plannerContinuation:'durable-turn-v1'},{headers:{'Cache-Control':'no-store'}});
    const token=request.headers.get('x-paris-github-token');
    return token?await withWorkflowGitHubToken(token,diagnostic):await diagnostic();
   }

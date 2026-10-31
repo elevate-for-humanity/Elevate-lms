@@ -7,6 +7,7 @@ on:
       - 'scripts/gcp/audit-studio-browser.mjs'
       - 'scripts/gcp/audit-studio-backend-end-to-end.mjs'
       - 'scripts/gcp/audit-studio-backend-end-to-end.test.mjs'
+      - 'scripts/gcp/verify-studio-connected-runtime*'
   workflow_dispatch:
 permissions:
   actions: write
@@ -25,7 +26,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -74,3 +75,7 @@ jobs:
               errorClass:(body.match(/(?:TypeError|ReferenceError|MODULE_NOT_FOUND|Unauthorized|Internal Server Error)/)||[])[0]}));
           }
           NODE
+      - name: Prove serving Studio, Admin binding, storage and browser controls together
+        run: |
+          node --test scripts/gcp/verify-studio-connected-runtime.test.mjs
+          node scripts/gcp/verify-studio-connected-runtime.mjs

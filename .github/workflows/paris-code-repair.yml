@@ -54,7 +54,7 @@ jobs:
           headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}
           preflight=urllib.request.Request(endpoint,data=json.dumps({'phase':'auth-diagnostic'}).encode(),headers=headers)
           capability=json.load(urllib.request.urlopen(preflight,timeout=60))
-          if capability.get('workflowAuthorization')!='temporary-job-v1' or capability.get('diagnosticVersion')!=2:
+          if capability.get('workflowAuthorization')!='temporary-job-v1' or capability.get('diagnosticVersion')!=2 or capability.get('plannerContinuation')!='durable-turn-v1':
             print('Repair monitor deferred until the compatible Admin runtime is deployed.')
             raise SystemExit(0)
           if not all(capability.get(key,{}).get('ok') is True for key in ['repository','contents','workflow']):
@@ -78,7 +78,7 @@ jobs:
       id-token: write
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 40
     outputs:
       sha: ${{ steps.patch.outputs.sha }}
       base: ${{ steps.patch.outputs.base }}
@@ -112,7 +112,16 @@ jobs:
           if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
           body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
           req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
-          result=json.load(urllib.request.urlopen(req,timeout=330))
+          # Each request advances one durable planner turn. Do not retry an
+          # ambiguous failed mutation; the failure report keeps it blocked.
+          for turn in range(15):
+            result=json.load(urllib.request.urlopen(req,timeout=240))
+            if result.get('pending') is True:
+              print('Saved PARIS planner turn',result.get('turn'))
+              continue
+            break
+          else:
+            raise SystemExit('PARIS planner exceeded its bounded continuation limit')
           if not all(re.fullmatch(r'[a-f0-9]{40}',result.get(k,'')) for k in ['sha','baseSha']): raise SystemExit('Missing candidate evidence')
           with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('sha='+result['sha']+'\nbase='+result['baseSha']+'\n')
           PY

@@ -9,7 +9,7 @@ const STOPPED = new Set(['withdrawn', 'cancelled', 'rejected', 'revoked', 'suspe
  * Resolves navigation only; every destination retains its authorization gate.
  */
 export async function resolveAssignedLearnerHome(db: SupabaseClient, userId: string): Promise<string | null> {
-  const states = APPRENTICESHIP_PORTAL_ENROLLMENT_STATES.join(',');
+  const states = [...APPRENTICESHIP_PORTAL_ENROLLMENT_STATES, 'in_progress'].join(',');
   const { data, error } = await db
     .from('program_enrollments')
     .select('program_slug,program_id,status,enrollment_state')

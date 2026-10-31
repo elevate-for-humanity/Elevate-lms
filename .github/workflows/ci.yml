@@ -7,7 +7,8 @@ on:
     branches: [main, work, 'fix/unified-paris-acceptance-20261023']
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.sha }}
+  # Superseded PR commits must release runners; preserve each main release check.
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'pull_request' && 'latest' || github.sha }}
   cancel-in-progress: true
 
 jobs:

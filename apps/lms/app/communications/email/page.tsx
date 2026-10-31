@@ -1,3 +1,4 @@
+import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
@@ -34,6 +35,10 @@ export default async function InterofficeEmail({
     normalizeRole(profile.role) ||
     (Object.hasOwn(ROLE_DISPLAY_NAMES, profile.role) ? (profile.role as UserRole) : null);
   if (!role) throw new Error('Email account role could not be resolved.');
+  const assignedHome = ['student', 'learner'].includes(role)
+    ? await resolveAssignedLearnerHome(admin, subject.userId)
+    : null;
+  const shellRole = assignedHome?.startsWith('/apprentice') ? 'apprentice' : role;
   return (
     <PlatformShell
       user={{
@@ -42,7 +47,7 @@ export default async function InterofficeEmail({
         full_name: profile.full_name || undefined,
         avatar_url: profile.avatar_url || undefined,
       }}
-      role={role}
+      role={shellRole}
     >
       <main className="p-4">
         <EmailWorkspace

@@ -1,4 +1,5 @@
 import 'server-only';
+import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
@@ -115,8 +116,13 @@ export async function resolveApprenticeshipRuntimeContext(
     throw new Error(`REGISTERED_PROGRAM_CONTRACT_MISSING:${programSlug}`);
   }
 
+  const courseId = enrollment.course_id || await resolveCourseIdFromDb(
+    db,
+    enrollment.program_id || programSlug,
+  );
+
   return {
-    enrollment,
+    enrollment: { ...enrollment, course_id: courseId },
     studentId,
     programSlug,
     placement: placement || null,

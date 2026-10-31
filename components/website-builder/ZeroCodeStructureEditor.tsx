@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useWebsiteConfig } from '@/components/website-builder/WebsiteConfigProvider';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from 'lucide-react';
 import type { TenantSiteConfig, TenantSitePage, TenantSiteSection, TenantSiteSectionType } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
@@ -34,7 +35,7 @@ function sectionPreset(type: TenantSiteSectionType, index: number): TenantSiteSe
 function pageId() { return `page_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`; }
 
 export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteId: string; initialConfig: TenantSiteConfig }) {
-  const [config, setConfig] = useState(() => ensureComposableSiteConfig(initialConfig));
+  const [config, setConfig] = useWebsiteConfig(initialConfig);
   const [selectedPage, setSelectedPage] = useState('/');
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [newPageTitle, setNewPageTitle] = useState('');

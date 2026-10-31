@@ -1,12 +1,11 @@
 import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { apiRequireRoles } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin']);
 // Program Holder pages are served by the LMS app, not the public marketing site.
 // Keeping auth callback and destination on the same app domain is especially
 // important on mobile browsers, where cross-domain cookies are often blocked.
@@ -38,24 +37,11 @@ function accountRoleForApprovedRole(value: unknown): 'program_holder' | 'site_co
   return normalized.includes('site coordinator') ? 'site_coordinator' : 'program_holder';
 }
 
-async function requireAdminActor() {
-  const auth = await createClient();
+async function requireAdminActor(request: Request) {
+  const actor = await apiRequireRoles(request, ['admin', 'super_admin', 'staff', 'org_admin']);
+  if (actor.error) return { error: actor.error } as const;
   const db = await requireAdminClient();
-  const {
-    data: { user },
-  } = await auth.auth.getUser();
-  if (!user)
-    return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) } as const;
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('id, role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || !ADMIN_ROLES.has(String(profile.role || ''))) {
-    return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) } as const;
-  }
-  return { db, user } as const;
+  return { db, user: { id: actor.id, email: actor.email } } as const;
 }
 
 async function findOrCreateUser(
@@ -167,7 +153,7 @@ async function auditEmail(
 
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const actor = await requireAdminActor();
+    const actor = await requireAdminActor(_request);
     if ('error' in actor) return actor.error;
     const { db, user: adminUser } = actor;
     const { id } = await params;
@@ -435,8 +421,8 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     );
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : 'Unable to approve Program Holder application.',
+        error: 'Unable to approve Program Holder application.',
+        code: 'PROGRAM_HOLDER_APPROVAL_FAILED',
       },
       { status: 500 },
     );

@@ -6,6 +6,12 @@ import type {
   IndividualAppCatalog,
   IndividualPlanDefinition,
 } from '@/lib/apps/individual-app-plans';
+const COMMERCIAL_POSTERS: Record<IndividualAppCatalog['slug'], string> = {
+  'sam-gov': '/images/store-commercials/sam-gov.webp',
+  grants: '/images/store-commercials/grants.webp',
+  'website-builder': '/images/store-commercials/website-builder.webp',
+};
+
 export default function SubscriptionCommercialPlayer({
   catalog,
   plan,
@@ -20,7 +26,7 @@ export default function SubscriptionCommercialPlayer({
     return (
       <div className="relative mt-6 aspect-[21/8] overflow-hidden rounded-2xl">
         <Image
-          src={`/images/store-commercials/${catalog.slug}.webp`}
+          src={COMMERCIAL_POSTERS[catalog.slug]}
           alt={`Illustrative scene for ${catalog.displayName} business owners`}
           fill
           sizes="(max-width: 1280px) 100vw, 1280px"

@@ -10,6 +10,16 @@ export async function verifyOwnedModel(env, options={}) {
   return probeOwnedModel({env, ...options});
 }
 
+/** Report binding presence only; never serialize endpoint or credential values. */
+export function consumerModelBindings(resource) {
+  const entries=resource?.spec?.containers?.[0]?.env ?? resource?.spec?.template?.spec?.containers?.[0]?.env ?? [];
+  const entry=name=>entries.find(item=>item.name===name);
+  const present=name=>Boolean(entry(name)?.value || entry(name)?.valueFrom);
+  return {endpointPresent:present('ELEVATE_LLM_URL'),cpuEndpointPresent:present('ELEVATE_LLM_CPU_URL'),
+    applicationTokenPresent:present('ELEVATE_LLM_SECRET'),cpuTokenPresent:present('ELEVATE_LLM_CPU_SECRET'),
+    privateGoogleInvocation:entry('ELEVATE_LLM_GOOGLE_IAM')?.value==='true'};
+}
+
 /** Read-only permission check for this exact private model service. */
 export async function inspectModelServicePermissions(accessToken,{request=fetch}={}) {
   try {
@@ -67,7 +77,8 @@ async function main() {
       const env = loadGoogleConfig(component).runtimeEnvironment;
       const connection = resolveOwnedModelConnection(env);
       return {component, configured:connection.configured, endpointAccepted:Boolean(connection.base), tier:connection.tier,
-        cpuEndpointPresent:Boolean(env.ELEVATE_LLM_CPU_URL), privateGoogleInvocation:env.ELEVATE_LLM_GOOGLE_IAM==='true', provider:env.AI_PROVIDER || 'unset'};
+        cpuEndpointPresent:Boolean(env.ELEVATE_LLM_CPU_URL), privateGoogleInvocation:env.ELEVATE_LLM_GOOGLE_IAM==='true', provider:env.AI_PROVIDER || 'unset',
+        ...(['admin','marketing'].includes(component)?{deployedBindings:consumerModelBindings(services.find(service=>service.metadata?.name===`elevate-${component}-migration`))}:{})};
     } catch(error) { return {component, status:error.code || 'configuration_unavailable'}; }
   });
   const modelIdentity = `elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`;
@@ -95,8 +106,8 @@ async function main() {
       };
       const policy=JSON.parse(google(['run','services','get-iam-policy','elevate-owned-cpu-llm','--project',PROJECT,'--region','us-east1','--format=json']));
       const invokers=(policy.bindings??[]).filter(binding=>binding.role==='roles/run.invoker'&&!binding.condition).flatMap(binding=>binding.members??[]);
-      const adminIdentity=services.find(service=>service.metadata?.name==='elevate-admin-migration')?.spec?.template?.spec?.serviceAccountName;
-      const required=[`elevate-github-deploy@${PROJECT}.iam.gserviceaccount.com`,adminIdentity].filter(Boolean);
+      const consumerIdentities=services.filter(service=>['elevate-admin-migration','elevate-marketing-migration'].includes(service.metadata?.name)).map(service=>service.spec?.template?.spec?.serviceAccountName);
+      const required=[...new Set([`elevate-github-deploy@${PROJECT}.iam.gserviceaccount.com`,...consumerIdentities].filter(Boolean))];
       report.cpuReleasePrerequisites.deploymentPermissions=await inspectModelServicePermissions(google(['auth','print-access-token']));
       report.cpuReleasePrerequisites.invocation={
         private:!(policy.bindings??[]).some(binding=>binding.members?.some(member=>['allUsers','allAuthenticatedUsers'].includes(member))),
@@ -125,6 +136,10 @@ async function main() {
     const entries=JSON.parse(google(['logging','read','resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND severity>=ERROR','--project',PROJECT,'--freshness=20m','--limit=15','--format=json']));
     report.runtimeErrors=classifyRuntimeErrors(entries);
   } catch { report.failures.push('admin_error_logs_unavailable'); }
+  try {
+    const entries=JSON.parse(google(['logging','read','resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-marketing-migration" AND severity>=ERROR','--project',PROJECT,'--freshness=20m','--limit=15','--format=json']));
+    report.marketingRuntimeErrors=classifyRuntimeErrors(entries);
+  } catch { report.failures.push('marketing_error_logs_unavailable'); }
   try {
     const policy=JSON.parse(google(['projects','get-iam-policy',PROJECT,'--format=json']));
     let accounts;

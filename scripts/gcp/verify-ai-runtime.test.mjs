@@ -1,8 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyOwnedModel, classifyRuntimeErrors, isReadyStudioCloudRun, inspectModelServicePermissions } from './verify-ai-runtime.mjs';
+import { verifyOwnedModel, classifyRuntimeErrors, isReadyStudioCloudRun, inspectModelServicePermissions, consumerModelBindings } from './verify-ai-runtime.mjs';
 const env={ELEVATE_LLM_URL:'https://elevate-model-123.us-central1.run.app',ELEVATE_LLM_SECRET:'private-fixture'};
 const studio={metadata:{name:'elevate-studio-browser'},status:{url:'https://elevate-studio-browser-aabnh2y32a-uc.a.run.app',conditions:[{type:'Ready',status:'True'}]}};
+test('consumer readback detects inline and Secret Manager bindings without exposing either value',()=>{
+ const result=consumerModelBindings({spec:{template:{spec:{containers:[{env:[
+  {name:'ELEVATE_LLM_CPU_URL',value:'https://private-endpoint.run.app'},
+  {name:'ELEVATE_LLM_CPU_SECRET',valueFrom:{secretKeyRef:{name:'private-model-key',key:'latest'}}},
+  {name:'ELEVATE_LLM_GOOGLE_IAM',value:'true'},
+ ]}]}}}});
+ assert.equal(result.cpuEndpointPresent,true);assert.equal(result.cpuTokenPresent,true);assert.equal(result.privateGoogleInvocation,true);
+ assert.ok(!JSON.stringify(result).includes('private-'));
+ assert.deepEqual(consumerModelBindings(undefined),{endpointPresent:false,cpuEndpointPresent:false,applicationTokenPresent:false,cpuTokenPresent:false,privateGoogleInvocation:false});
+});
 test('recognizes the ready canonical Cloud Run Studio without requiring a VM',()=>{
   assert.equal(isReadyStudioCloudRun(studio),true);
 });

@@ -199,7 +199,9 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                 <span className="text-sm text-black">/ {assignment.points}</span>
               </div>
               <p className="mt-1 text-sm text-black">
-                {((points / assignment.points) * 100).toFixed(1)}%
+                {points === ''
+                  ? 'Not graded'
+                  : `${((points / assignment.points) * 100).toFixed(1)}%`}
               </p>
             </div>
 

@@ -86,6 +86,22 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     `${target} must settle to one canonical dashboard shell`,
   ).toHaveCount(1, { timeout: 15_000 });
 
+  // The shell can be visible while Next streams the authenticated Studio page
+  // inside a hidden Suspense segment. Measure the workspace only after it is
+  // actually displayed; a loading screen is not production acceptance.
+  if (new URL(target).pathname === '/studio') {
+    await expect(
+      page.locator('#admin-ai-workspace'),
+      `${target} must display the authenticated Studio workspace`,
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(
+      page.locator('#admin-ai-workspace [data-studio-root="unified"]'),
+    ).toBeVisible({ timeout: 30_000 });
+    await expect(
+      page.locator('textarea[aria-label="Tell Paris what you need done..."]'),
+    ).toBeVisible({ timeout: 30_000 });
+  }
+
   const geometry = await page.evaluate(() => {
     const doc = document.documentElement;
     const body = document.body;

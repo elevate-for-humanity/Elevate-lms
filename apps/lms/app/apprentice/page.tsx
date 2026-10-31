@@ -597,7 +597,7 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
         {priorLearning ? (
           <PriorLearningPanel priorLearning={priorLearning} nativePercent={digitalCoursePercent} />
         ) : null}
-        <LearningCenter tools={learningTools} />
+        <LearningCenter tools={learningTools} image={getProgramHeroImage(programSlug)} />
       </main>
     );
   }
@@ -858,7 +858,7 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
         <PriorLearningPanel priorLearning={priorLearning} nativePercent={digitalCoursePercent} />
       ) : null}
 
-      <LearningCenter tools={learningTools} />
+      <LearningCenter tools={learningTools} image={getProgramHeroImage(programSlug)} />
 
       <TheorySchedulePanel
         schedule={theorySchedule}
@@ -1032,7 +1032,9 @@ function PriorLearningPanel({
 
 function LearningCenter({
   tools,
+  image,
 }: {
+  image: string;
   tools: ReadonlyArray<{
     title: string;
     text: string;
@@ -1057,14 +1059,19 @@ function LearningCenter({
           <Link
             key={title}
             href={href}
-            className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-red-300 hover:shadow-md"
+            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-red-300 hover:shadow-md"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-brand-red-700 transition group-hover:bg-brand-red-50">
-              <Icon className="h-5 w-5" />
+            <div className="relative h-28 overflow-hidden bg-slate-100">
+              <Image src={image} alt="" fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw" className="object-cover object-top transition-transform group-hover:scale-105" />
+              <span className="absolute bottom-2 left-3 rounded-lg bg-white p-2 text-brand-red-700">
+                <Icon className="h-5 w-5" />
+              </span>
             </div>
-            <h3 className="mt-4 font-semibold text-slate-950">{title}</h3>
-            <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{text}</p>
-            <span className="mt-4 inline-flex text-sm font-semibold text-brand-red-700">Open →</span>
+            <div className="p-5">
+              <h3 className="font-semibold text-slate-950">{title}</h3>
+              <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{text}</p>
+              <span className="mt-4 inline-flex text-sm font-semibold text-brand-red-700">Open →</span>
+            </div>
           </Link>
         ))}
       </div>

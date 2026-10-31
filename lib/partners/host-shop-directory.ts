@@ -15,7 +15,23 @@ export function isCurrentHostShopPartner(partner: DirectoryPartner): boolean {
     .trim()
     .toLowerCase();
   // A provider's assigned beauty programs do not make the provider a Host Shop.
-  if (['program_holder', 'site_coordinator'].includes(type)) return false;
+  if (
+    [
+      'program_holder',
+      'site_coordinator',
+      'internal_site',
+      'website_business',
+      'employer',
+      'training_provider',
+      'certification_provider',
+      'credentialing_body',
+      'certification',
+      'government',
+      'workforce',
+      'workforce_agency',
+    ].includes(type)
+  )
+    return false;
   const typeText = [
     type,
     partner.program_type,

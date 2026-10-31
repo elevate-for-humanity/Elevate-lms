@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { ArrowRight, Building2, Users, Handshake, Award, Globe } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { VerifiedVendorLogos } from '@/components/marketing/VerifiedVendorLogos';
 
 export const metadata: Metadata = {
   title: `Our Partners | ${PLATFORM_DEFAULTS.orgName}`,
@@ -87,6 +88,8 @@ export default function PartnersPage() {
           </div>
         </div>
       </section>
+
+      <VerifiedVendorLogos />
 
       {/* Partner Types */}
       <section className="py-20">

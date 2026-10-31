@@ -40,7 +40,7 @@ describe('Host Shop directory classification', () => {
   });
   it('requires approval before showing an operationally ready shop', () => {
     const page = readFileSync('apps/admin/app/partners/page.tsx', 'utf8');
-    expect(page).toContain("const complete = partner.approval_status === 'approved' &&");
+    expect(page).toMatch(/const complete =\s*partner\.approval_status === 'approved' &&/);
   });
   it('does not classify unrelated employers as host shops', () => {
     expect(
@@ -50,5 +50,13 @@ describe('Host Shop directory classification', () => {
         programs: ['hvac-technician'],
       }),
     ).toBe(false);
+  });
+  it.each(['internal_site', 'website_business', 'training_provider', 'certification_provider'])(
+    'excludes %s records even when beauty programs were assigned', (partner_type) => {
+      expect(isCurrentHostShopPartner({ status: 'active', partner_type, programs: ['barber'] })).toBe(false);
+    },
+  );
+  it('preserves a dual-role salon as a host shop', () => {
+    expect(isCurrentHostShopPartner({ status: 'active', partner_type: 'salon', programs: ['cosmetology'] })).toBe(true);
   });
 });

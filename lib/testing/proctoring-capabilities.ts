@@ -118,7 +118,7 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     name: 'EPA Section 608 (ESCO Institute)',
     capability: 'IN_PERSON_ONLY',
     description:
-      'Federal refrigerant handling certification required by the EPA Clean Air Act. It is illegal to purchase or handle refrigerants without this certification. Elevate is a nationally authorized proctor site for both ESCO Group and Mainstream Engineering. Required for any HVAC technician who services, maintains, or disposes of equipment containing refrigerants.',
+      'Federal refrigerant handling certification required by the EPA Clean Air Act. Elevate has documented ESCO proctor approval. Mainstream Engineering approval is still being verified. Required for HVAC technicians whose work involves regulated refrigerants.',
     exams: [
       {
         name: 'Core',
@@ -427,9 +427,12 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
   nha: {
     key: 'nha',
     name: 'NHA — National Healthcareer Association',
+    // Live portal 2026-10-31: proctor profile complete; tutorial and oath incomplete.
+    // Keep student exam checkout hidden until onsite proctor readiness is verified.
+    publicVisible: false,
     capability: 'IN_PERSON_ONLY',
     description:
-      'NHA Authorized Testing Center. NHA is one of the largest allied health certification bodies in the United States. Credentials are nationally recognized by hospitals, clinics, physician offices, and long-term care facilities. All exams are computer-based and proctored in person.',
+      'NHA institutional account with CCMA, CET and CPT exam inventory configured. Matching preparation courses are ready for future student assignment. Onsite exam delivery requires completion of the proctor tutorial and oath; additional certification programs require vendor setup confirmation.',
     exams: [
       {
         name: 'Certified Phlebotomy Technician (CPT)',
@@ -811,6 +814,8 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
   midland: {
     key: 'midland',
     name: 'Midland Testing — HVAC/R Certifications',
+    // An internal catalog entry and estimated pricing are not an authorization record.
+    publicVisible: false,
     capability: 'IN_PERSON_ONLY',
     description:
       'Elevate is an authorized Midland testing partner for HVAC/R trade certifications. Midland provides nationally recognized written and practical assessments for heating, ventilation, air conditioning, and refrigeration technicians. Credentials are issued by Midland upon passing and are recognized by employers, contractors, and state licensing boards across the country.',

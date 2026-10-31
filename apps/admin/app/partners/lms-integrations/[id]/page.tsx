@@ -7,9 +7,16 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import LmsIntegrationClientShell from './LmsIntegrationClientShell';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'LMS Integration Details | Admin', robots: { index: false, follow: false } };
+export const metadata: Metadata = {
+  title: 'LMS Integration Details | Admin',
+  robots: { index: false, follow: false },
+};
 
-export default async function LMSIntegrationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function LMSIntegrationDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { user } = await requireRole(['admin', 'staff']);
   const { id } = await params;
   const db = await requireAdminClient();
@@ -25,11 +32,15 @@ export default async function LMSIntegrationDetailPage({ params }: { params: Pro
     .from('partner_lms_courses')
     .select('id, course_name, course_url:scorm_package_url, is_active, created_at')
     .eq('provider_id', id)
+    .eq('is_active', true)
     .order('course_name');
 
   const courseIds = (courses ?? []).map((course: any) => course.id).filter(Boolean);
   const { count: enrollmentCount } = courseIds.length
-    ? await db.from('partner_lms_enrollments').select('id', { count: 'exact', head: true }).in('course_id', courseIds)
+    ? await db
+        .from('partner_lms_enrollments')
+        .select('id', { count: 'exact', head: true })
+        .in('course_id', courseIds)
     : { count: 0 };
 
   const { data: syncLogs } = await db
@@ -46,14 +57,28 @@ export default async function LMSIntegrationDetailPage({ params }: { params: Pro
     <main className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-r from-sky-700 via-blue-700 to-indigo-800 px-6 py-8 text-white">
         <div className="mx-auto max-w-6xl">
-          <Link href="/partners/lms-integrations" className="inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white"><ArrowLeft className="h-4 w-4" />Back to LMS integrations</Link>
+          <Link
+            href="/partners/lms-integrations"
+            className="inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to LMS integrations
+          </Link>
           <div className="mt-5 flex flex-wrap items-end justify-between gap-5">
             <div>
-              <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-sky-100"><Globe className="h-5 w-5" />Partner LMS</div>
+              <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-sky-100">
+                <Globe className="h-5 w-5" />
+                Partner LMS
+              </div>
               <h1 className="mt-2 text-3xl font-black">{providerName}</h1>
-              <p className="mt-2 max-w-2xl text-sm font-medium text-sky-50">Review provider status, available courses, enrollment volume, and recent sync activity.</p>
+              <p className="mt-2 max-w-2xl text-sm font-medium text-sky-50">
+                Review provider status, available courses, enrollment volume, and recent sync
+                activity.
+              </p>
             </div>
-            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase">{provider.status || 'configured'}</span>
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase">
+              {provider.active ? 'Enabled in Elevate' : 'Disabled in Elevate'}
+            </span>
           </div>
         </div>
       </section>
@@ -66,7 +91,18 @@ export default async function LMSIntegrationDetailPage({ params }: { params: Pro
             ['Recent sync events', String(syncLogs?.length ?? 0), Activity],
           ].map(([label, value, Icon]) => {
             const CardIcon = Icon as typeof BookOpen;
-            return <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><CardIcon className="h-5 w-5 text-blue-700" /><div className="mt-3 text-xs font-black uppercase tracking-wide text-slate-500">{String(label)}</div><div className="mt-1 text-2xl font-black text-slate-950">{String(value)}</div></div>;
+            return (
+              <div
+                key={String(label)}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              >
+                <CardIcon className="h-5 w-5 text-blue-700" />
+                <div className="mt-3 text-xs font-black uppercase tracking-wide text-slate-500">
+                  {String(label)}
+                </div>
+                <div className="mt-1 text-2xl font-black text-slate-950">{String(value)}</div>
+              </div>
+            );
           })}
         </section>
 
@@ -74,19 +110,59 @@ export default async function LMSIntegrationDetailPage({ params }: { params: Pro
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-black text-slate-950">Courses</h2>
             <div className="mt-4 space-y-3">
-              {(courses ?? []).length ? (courses ?? []).map((course: any) => (
-                <div key={course.id} className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div><div className="font-black text-slate-950">{course.course_name || 'Untitled course'}</div><div className="mt-1 text-xs font-semibold text-slate-500">{course.status || 'active'}</div></div>
-                  {course.course_url && <a href={course.course_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-black text-blue-700"><ExternalLink className="h-4 w-4" />Open</a>}
+              {(courses ?? []).length ? (
+                (courses ?? []).map((course: any) => (
+                  <div
+                    key={course.id}
+                    className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div>
+                      <div className="font-black text-slate-950">
+                        {course.course_name || 'Untitled course'}
+                      </div>
+                      <div className="mt-1 text-xs font-semibold text-slate-500">
+                        {course.status || 'active'}
+                      </div>
+                    </div>
+                    {course.course_url && (
+                      <a
+                        href={course.course_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-sm font-black text-blue-700"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Open
+                      </a>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-500">
+                  No partner courses configured.
                 </div>
-              )) : <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-500">No partner courses configured.</div>}
+              )}
             </div>
           </div>
 
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-lg font-black text-slate-950">Sync history</h2>
             <div className="mt-4 space-y-3">
-              {(syncLogs ?? []).length ? (syncLogs ?? []).map((log: any) => <div key={log.id} className="rounded-xl bg-slate-50 p-3"><div className="text-sm font-black text-slate-900">{log.status || 'Sync event'}</div><div className="mt-1 text-xs font-medium text-slate-500">{log.message || 'No message'}{log.created_at ? ` · ${new Date(log.created_at).toLocaleString()}` : ''}</div></div>) : <p className="text-sm font-semibold text-slate-500">No sync activity recorded.</p>}
+              {(syncLogs ?? []).length ? (
+                (syncLogs ?? []).map((log: any) => (
+                  <div key={log.id} className="rounded-xl bg-slate-50 p-3">
+                    <div className="text-sm font-black text-slate-900">
+                      {log.status || 'Sync event'}
+                    </div>
+                    <div className="mt-1 text-xs font-medium text-slate-500">
+                      {log.message || 'No message'}
+                      {log.created_at ? ` · ${new Date(log.created_at).toLocaleString()}` : ''}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm font-semibold text-slate-500">No sync activity recorded.</p>
+              )}
             </div>
           </aside>
         </section>

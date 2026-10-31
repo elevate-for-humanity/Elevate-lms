@@ -201,6 +201,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Employers', href: '/employers' },
       { label: 'Employers — Onboarding', href: '/employers/onboarding' },
       { label: 'Partners', href: '/partners' },
+      { label: 'Vendor Partnerships', href: '/partners/vendors' },
       { label: 'Partner Enrollments', href: '/partner-enrollments' },
       { label: 'Program Holders', href: '/program-holders' },
       { label: 'Program Holders — Verification', href: '/program-holders/verification' },
@@ -310,6 +311,7 @@ export function withPortalNavigation(sections: NavSection[]): NavSection[] {
       { label: 'Apprentice Dashboards', href: '/apprenticeships' },
       { label: 'Host Shop Dashboards', href: '/partners' },
       { label: 'Program Holder Dashboards', href: '/program-holders' },
+      { label: 'Vendor Partnerships', href: '/partners/vendors' },
       { label: 'All Portals', href: '/portals' },
     ],
   };

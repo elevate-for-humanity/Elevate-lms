@@ -12,19 +12,25 @@ WITH release_rank AS (
     count(*) FILTER (WHERE b.status = 'blocked') AS blocked_builds
   FROM public.ultimate_course_builds b GROUP BY b.course_id
 ), lesson_rollup AS (
-  SELECT course_id, count(*) AS actual_lessons
+  SELECT course_id, count(*) AS actual_lessons,
+    count(*) FILTER (WHERE status = 'published' AND is_published = true) AS published_lessons,
+    count(*) FILTER (WHERE status = 'draft' AND is_published = false) AS draft_lessons
   FROM public.course_lessons GROUP BY course_id
 )
 SELECT c.id AS course_id, c.title, c.status AS lms_status, c.is_active,
   c.published_at, c.total_lessons, coalesce(l.actual_lessons,0) AS actual_lessons,
+  coalesce(l.published_lessons,0) AS published_lessons,
+  coalesce(l.draft_lessons,0) AS draft_lessons,
   coalesce(b.build_count,0) AS build_count,
   coalesce(b.published_builds,0) AS published_builds,
   coalesce(b.running_builds,0) AS running_builds,
   coalesce(b.blocked_builds,0) AS blocked_builds,
   r.id AS latest_release_id, r.build_id AS released_build_id, r.version AS release_version,
   CASE
-    WHEN c.total_lessons IS DISTINCT FROM coalesce(l.actual_lessons,0)
-      THEN 'LESSON_COUNT_MISMATCH'
+    WHEN c.status = 'published' AND c.total_lessons IS DISTINCT FROM coalesce(l.published_lessons,0)
+      THEN 'PUBLISHED_LESSON_COUNT_MISMATCH'
+    WHEN c.status <> 'published' AND c.total_lessons IS DISTINCT FROM coalesce(l.actual_lessons,0)
+      THEN 'DRAFT_LESSON_COUNT_MISMATCH'
     WHEN c.status = 'published' AND c.is_active IS DISTINCT FROM true
       THEN 'PUBLISHED_INACTIVE'
     WHEN c.status = 'published' AND r.id IS NULL

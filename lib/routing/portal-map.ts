@@ -1,3 +1,4 @@
+import { resolveLmsHost } from './lms-host';
 import {
   ADMIN_ROLES,
   ALL_AUTHENTICATED_ROLES,
@@ -30,7 +31,7 @@ export const MARKETING_HOST = normalizeHost(
   'https://www.elevateforhumanity.org',
 );
 export const ADMIN_HOST = normalizeHost(process.env.NEXT_PUBLIC_ADMIN_URL, 'https://admin.elevateforhumanity.org');
-export const LMS_HOST = normalizeHost(process.env.NEXT_PUBLIC_APP_URL, 'https://app.elevateforhumanity.org');
+export const LMS_HOST = resolveLmsHost(process.env.NEXT_PUBLIC_LMS_URL, process.env.NEXT_PUBLIC_APP_URL);
 
 export type PortalSubdomain = 'marketing' | 'admin' | 'app';
 export type PortalAuthSurface = 'lms' | 'admin';

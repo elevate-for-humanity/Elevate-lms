@@ -30,10 +30,10 @@ describe('portal routing', () => {
 
   it('keeps timeclock navigation on the canonical LMS host', () => {
     expect(APPRENTICE_TIMECLOCK_URL).toBe(
-      'https://app.elevateforhumanity.org/apprentice/timeclock',
+      'https://lms.elevateforhumanity.org/apprentice/timeclock',
     );
     expect(APPRENTICE_TIMECLOCK_HISTORY_URL).toBe(
-      'https://app.elevateforhumanity.org/apprentice/timeclock/history',
+      'https://lms.elevateforhumanity.org/apprentice/timeclock/history',
     );
   });
 });

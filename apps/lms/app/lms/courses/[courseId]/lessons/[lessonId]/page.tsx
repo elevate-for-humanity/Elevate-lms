@@ -15,6 +15,7 @@ import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
 import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
 import { TheoryWindowBoundary } from '@/components/apprenticeship/TheoryWindowBoundary';
+import { lessonKeyTerms } from '@/lib/lms/lesson-key-terms';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -266,7 +267,7 @@ export default async function LessonPage({
     currentIndex >= 0 && currentIndex < lessonList.length - 1 ? lessonList[currentIndex + 1] : null;
   const objectives = Array.isArray(lesson.learning_objectives) ? lesson.learning_objectives : [];
   const questions = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions : [];
-  const keyTerms = Array.isArray(lesson.key_terms) ? lesson.key_terms : [];
+  const keyTerms = lessonKeyTerms(lesson.key_terms);
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
   const experience = lessonExperience(lesson.content_json, lesson.content);
   const interactiveVideo = experience?.interactiveVideo as Record<string, any> | undefined;
@@ -464,16 +465,17 @@ export default async function LessonPage({
           {keyTerms.length ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-extrabold">Key terms</h2>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <dl className="mt-4 space-y-4">
                 {keyTerms.map((term, index) => (
-                  <span
+                  <div
                     key={index}
-                    className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800"
+                    className="rounded-xl bg-slate-100 p-4 text-slate-800"
                   >
-                    {typeof term === 'string' ? term : JSON.stringify(term)}
-                  </span>
+                    <dt className="font-bold">{term.term}</dt>
+                    {term.definition ? <dd className="mt-2 leading-relaxed break-words">{term.definition}</dd> : null}
+                  </div>
                 ))}
-              </div>
+              </dl>
             </section>
           ) : null}
 

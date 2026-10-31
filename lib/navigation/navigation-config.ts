@@ -304,7 +304,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         { id: 'hours', label: 'Work Hours', href: `${p('hostshop')}/hours`, icon: Clock },
         {
           id: 'practical-log',
-          label: 'Practical Service Log',
+          label: 'Record Student Progress',
           href: `${p('hostshop')}/practical-log`,
           icon: ClipboardList,
         },

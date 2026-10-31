@@ -220,7 +220,7 @@ export default async function HostShopDashboardView() {
               href="/host-shop/dashboard/practical-log"
               className="min-h-11 rounded-xl bg-neutral-950 px-4 py-3 font-bold text-white"
             >
-              Record a salon service
+              Record student progress
             </Link>
             <Link
               href="/host-shop/dashboard/schedule"

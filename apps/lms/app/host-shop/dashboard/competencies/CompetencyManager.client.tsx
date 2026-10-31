@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import PracticalLog from '@/components/host-shop/PracticalProgressEntry';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
@@ -108,7 +109,9 @@ export default function CompetencyManager() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+      <PracticalLog />
+      <details className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+        <summary className="cursor-pointer font-bold">How to record practical training</summary>
         <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">
           Supervisor workflow
         </p>
@@ -137,7 +140,7 @@ export default function CompetencyManager() {
             </p>
           </div>
         </div>
-      </section>
+      </details>
       <div className="flex flex-col gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-brand-blue-700">

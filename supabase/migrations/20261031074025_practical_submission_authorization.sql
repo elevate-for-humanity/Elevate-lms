@@ -10,7 +10,7 @@ DECLARE
   v_full_name text;
   v_role text;
   v_metadata_tenant text;
-  v_allowed_roles text[] := ARRAY['student','staff','partner','employer','program_holder','instructor','admin','super_admin','apprentice','mentor','case_manager','creator','sponsor','host_shop','guest','org_admin','site_coordinator'];
+  v_allowed_roles text[] := ARRAY['super_admin','admin','org_admin','advisor','staff','instructor','test_admin','proctor','student','learner','user','delegate','grant_client','apprentice','barber_apprentice','cosmetology_apprentice','sponsor','employer','recruiter','partner','host_shop','host_shop_admin','workforce_partner','parent','creator','case_manager','workforce_board','workforce_board_admin','program_holder','site_coordinator','provider','provider_admin','mentor','guest','applicant'];
 BEGIN
   v_metadata_tenant := NEW.raw_app_meta_data ->> 'tenant_id';
 

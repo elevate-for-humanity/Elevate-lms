@@ -48,6 +48,14 @@ try {
   });
   equal((await create({}, { role: 'site_coordinator' })).role, 'site_coordinator');
   equal((await create({}, { role: 'org_admin', tenant_id: tenant })).role, 'org_admin');
+  for (const role of [
+    'workforce_board',
+    'host_shop_admin',
+    'provider_admin',
+    'barber_apprentice',
+  ]) {
+    equal((await create({}, { role })).role, role);
+  }
   equal(
     (await create({ first_name: 'First', last_name: 'Last' }, { role: 'not_a_role' })).full_name,
     'First Last',

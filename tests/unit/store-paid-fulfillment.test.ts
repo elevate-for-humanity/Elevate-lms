@@ -5,7 +5,15 @@ const state = vi.hoisted(() => ({
   type: 'platform_subscription',
   completeError: false,
   claimed: true,
+  ledgerError: false,
+  ledgerCalls: [] as string[],
   calls: [] as any[],
+}));
+vi.mock('@/lib/store/subscription-ledger', () => ({
+  recordStoreSubscriptionPayment: async (id: string) => {
+    state.ledgerCalls.push(id);
+    if (state.ledgerError) throw Error('Store ledger unavailable');
+  },
 }));
 vi.mock('@/lib/billing/fulfillment', () => ({
   fulfillPaidBillingInvoice: async (_db: unknown, job: any) => {
@@ -72,8 +80,17 @@ beforeEach(() => {
   state.completeError = false;
   state.claimed = true;
   state.calls.length = 0;
+  state.ledgerCalls.length = 0;
+  state.ledgerError = false;
 });
 describe('Paid subscription delivery', () => {
+  it('keeps delivery retryable when the separate Store database does not acknowledge payment', async () => {
+    state.ledgerError = true;
+    const response = await POST(request());
+    expect(response.status).toBe(207);
+    expect(await response.json()).toMatchObject({ completed: 0, failed: 1 });
+    expect(state.ledgerCalls).toEqual(['invoice']);
+  });
   it('uses the authoritative paid invoice snapshot rather than queue payload', async () => {
     const response = await POST(request());
     expect(response.status).toBe(200);

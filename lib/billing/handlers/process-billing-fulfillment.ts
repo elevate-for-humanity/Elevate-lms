@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fulfillPaidBillingInvoice } from '@/lib/billing/fulfillment';
+import { recordStoreSubscriptionPayment } from '@/lib/store/subscription-ledger';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
@@ -61,6 +62,9 @@ export async function POST(request: NextRequest) {
         paid_at: invoice.data.paid_at,
         customer_email: invoice.data.customer_email,
       });
+      if (['platform_subscription', 'individual_app_subscription'].includes(job.fulfillment_type)) {
+        await recordStoreSubscriptionPayment(job.billing_invoice_id);
+      }
       const saved = await db
         .from('billing_fulfillment_jobs')
         .update({ status: 'completed', last_error: null, updated_at: new Date().toISOString() })

@@ -20,6 +20,7 @@ type GrantsSetupContext = {
 };
 
 interface Props {
+  demo?: boolean;
   user: { id: string; email?: string | null };
   subscription: Row;
   opportunities: Row[];
@@ -44,6 +45,7 @@ function deadlineLabel(value: unknown): string {
 }
 
 export function GrantsApp({
+  demo = false,
   subscription,
   opportunities,
   savedGrants,
@@ -120,7 +122,7 @@ export function GrantsApp({
           </section>
         )}
 
-        <ContextAwareAdvisor appSlug="grants" context={setupContext} />
+        {!demo && <ContextAwareAdvisor appSlug="grants" context={setupContext} />}
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
           <Stat icon={Search} label="Open opportunities" value={visibleOpportunities.length} />
@@ -135,7 +137,9 @@ export function GrantsApp({
             <div>
               <h2 className="text-xl font-black text-slate-900">Open opportunities</h2>
               <p className="mt-1 text-sm text-slate-600">
-                Review current opportunities, or search Grants.gov for more.
+                {demo
+                  ? 'This is a public Grants.gov snapshot. Demo searches filter these records; account searches query the live service.'
+                  : 'Review current opportunities, or search Grants.gov for more.'}
               </p>
             </div>
           </div>

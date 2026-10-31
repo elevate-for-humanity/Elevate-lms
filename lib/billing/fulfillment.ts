@@ -18,7 +18,13 @@ function confirmationCode(): string {
 
 export async function fulfillPaidBillingInvoice(
   db: Database,
-  job: { billing_invoice_id: string; fulfillment_type: string; payload: any; paid_at?: string; customer_email?: string },
+  job: {
+    billing_invoice_id: string;
+    fulfillment_type: string;
+    payload: any;
+    paid_at?: string;
+    customer_email?: string;
+  },
 ) {
   const payload = job.payload || {};
   if (job.fulfillment_type === 'tuition_payment') {
@@ -242,34 +248,51 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'testing_enforcement') {
-    const result = await db.from('testing_enforcement').update({
-      fee_paid: true,
-      paid_at: new Date().toISOString(),
-      billing_provider: 'quickbooks',
-      billing_invoice_id: job.billing_invoice_id,
-    }).eq('id', payload.enforcement_id).eq('email', payload.email).eq('fee_paid', false);
+    const result = await db
+      .from('testing_enforcement')
+      .update({
+        fee_paid: true,
+        paid_at: new Date().toISOString(),
+        billing_provider: 'quickbooks',
+        billing_invoice_id: job.billing_invoice_id,
+      })
+      .eq('id', payload.enforcement_id)
+      .eq('email', payload.email)
+      .eq('fee_paid', false);
     if (result.error) throw new Error(result.error.message);
     return;
   }
 
   if (job.fulfillment_type === 'testing_booking') {
-    const reserved = await db.rpc('fulfill_paid_testing_booking', { p_invoice_id: job.billing_invoice_id });
+    const reserved = await db.rpc('fulfill_paid_testing_booking', {
+      p_invoice_id: job.billing_invoice_id,
+    });
     if (reserved.error) throw new Error(reserved.error.message);
     const booking = reserved.data?.booking;
     if (!booking) throw new Error('Testing reservation was not returned.');
     if (!reserved.data.created) return;
-    const slot = await db.from('testing_slots').select('start_time,end_time,location').eq('id', booking.slot_id).single();
+    const slot = await db
+      .from('testing_slots')
+      .select('start_time,end_time,location')
+      .eq('id', booking.slot_id)
+      .single();
     if (slot.error) throw new Error(slot.error.message);
     const appointment = testingAppointmentLabel(slot.data.start_time);
     const calendar = testingCalendarUrl({
-      examName: booking.exam_name, confirmationCode: booking.confirmation_code,
-      start: slot.data.start_time, end: slot.data.end_time,
+      examName: booking.exam_name,
+      confirmationCode: booking.confirmation_code,
+      start: slot.data.start_time,
+      end: slot.data.end_time,
       location: slot.data.location || TESTING_CENTER.address,
     });
     const confirmation = new URL('/testing/book', PLATFORM_DEFAULTS.siteUrl);
     confirmation.searchParams.set('invoice_id', job.billing_invoice_id);
     confirmation.searchParams.set('booking_token', String(payload.booking_token || ''));
-    const escape = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
+    const escape = (value: unknown) =>
+      String(value ?? '').replace(
+        /[&<>"']/g,
+        (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!,
+      );
     if (booking.email) {
       await sendEmail({
         to: booking.email,
@@ -282,17 +305,35 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'apprenticeship_deposit') {
-    const email = String(payload.customer_email || '').toLowerCase().trim();
+    const email = String(payload.customer_email || '')
+      .toLowerCase()
+      .trim();
     const programSlug = String(payload.program_slug || '');
-    if (!email || !programSlug) throw new Error('Apprenticeship deposit requires customer_email and program_slug.');
+    if (!email || !programSlug)
+      throw new Error('Apprenticeship deposit requires customer_email and program_slug.');
 
-    const profile = await db.from('profiles').select('id,full_name').ilike('email', email).maybeSingle();
-    if (profile.error || !profile.data?.id) throw new Error(profile.error?.message || 'Apprentice profile was not found.');
+    const profile = await db
+      .from('profiles')
+      .select('id,full_name')
+      .ilike('email', email)
+      .maybeSingle();
+    if (profile.error || !profile.data?.id)
+      throw new Error(profile.error?.message || 'Apprentice profile was not found.');
 
-    const program = await db.from('programs').select('id,organization_id,tenant_id,title').eq('slug', programSlug).maybeSingle();
-    if (program.error || !program.data?.id) throw new Error(program.error?.message || 'Apprenticeship program was not found.');
+    const program = await db
+      .from('programs')
+      .select('id,organization_id,tenant_id,title')
+      .eq('slug', programSlug)
+      .maybeSingle();
+    if (program.error || !program.data?.id)
+      throw new Error(program.error?.message || 'Apprenticeship program was not found.');
 
-    const existing = await db.from('program_enrollments').select('id').eq('user_id', profile.data.id).eq('program_id', program.data.id).maybeSingle();
+    const existing = await db
+      .from('program_enrollments')
+      .select('id')
+      .eq('user_id', profile.data.id)
+      .eq('program_id', program.data.id)
+      .maybeSingle();
     if (existing.error) throw new Error(existing.error.message);
 
     const enrollmentValues = {
@@ -318,31 +359,46 @@ export async function fulfillPaidBillingInvoice(
 
     let enrollmentId = existing.data?.id as string | undefined;
     if (enrollmentId) {
-      const updated = await db.from('program_enrollments').update(enrollmentValues).eq('id', enrollmentId);
+      const updated = await db
+        .from('program_enrollments')
+        .update(enrollmentValues)
+        .eq('id', enrollmentId);
       if (updated.error) throw new Error(updated.error.message);
     } else {
-      const created = await db.from('program_enrollments').insert(enrollmentValues).select('id').single();
-      if (created.error || !created.data?.id) throw new Error(created.error?.message || 'Enrollment was not created.');
+      const created = await db
+        .from('program_enrollments')
+        .insert(enrollmentValues)
+        .select('id')
+        .single();
+      if (created.error || !created.data?.id)
+        throw new Error(created.error?.message || 'Enrollment was not created.');
       enrollmentId = created.data.id;
     }
 
-    const app = await db.from('applications').update({
-      status: 'approved',
-      payment_status: 'paid',
-      payment_provider: 'quickbooks',
-      payment_amount_cents: Number(payload.amount_cents || 0),
-      payment_received_at: new Date().toISOString(),
-      enrollment_id: enrollmentId,
-      user_id: profile.data.id,
-      updated_at: new Date().toISOString(),
-    }).ilike('email', email).eq('program_slug', programSlug);
+    const app = await db
+      .from('applications')
+      .update({
+        status: 'approved',
+        payment_status: 'paid',
+        payment_provider: 'quickbooks',
+        payment_amount_cents: Number(payload.amount_cents || 0),
+        payment_received_at: new Date().toISOString(),
+        enrollment_id: enrollmentId,
+        user_id: profile.data.id,
+        updated_at: new Date().toISOString(),
+      })
+      .ilike('email', email)
+      .eq('program_slug', programSlug);
     if (app.error) throw new Error(app.error.message);
 
-    const portal = await db.from('profiles').update({
-      enrollment_status: 'active',
-      portal_type: 'apprentice',
-      updated_at: new Date().toISOString(),
-    }).eq('id', profile.data.id);
+    const portal = await db
+      .from('profiles')
+      .update({
+        enrollment_status: 'active',
+        portal_type: 'apprentice',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', profile.data.id);
     if (portal.error) throw new Error(portal.error.message);
     return;
   }
@@ -365,7 +421,8 @@ export async function fulfillPaidBillingInvoice(
     if (result.error) throw new Error(result.error.message);
     await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
     if (schoolOrder) {
-      const { sendSchoolRegistrationEmail } = await import('@/lib/billing/school-registration-email');
+      const { sendSchoolRegistrationEmail } =
+        await import('@/lib/billing/school-registration-email');
       await sendSchoolRegistrationEmail(db, job.billing_invoice_id, payload);
     }
     return;
@@ -456,39 +513,71 @@ export async function fulfillPaidBillingInvoice(
 
   if (job.fulfillment_type === 'website_domain_purchase') {
     const { checkDomainPurchase, buyDomain } = await import('@/lib/domainee/client');
-    const { data: row, error } = await db.from('website_domains')
-      .select('id,website_id,user_id,hostname,status,retail_cents,origin_url,customer_reference,metadata')
-      .eq('id', payload.domain_record_id).eq('user_id', payload.user_id).maybeSingle();
+    const { data: row, error } = await db
+      .from('website_domains')
+      .select(
+        'id,website_id,user_id,hostname,status,retail_cents,origin_url,customer_reference,metadata',
+      )
+      .eq('id', payload.domain_record_id)
+      .eq('user_id', payload.user_id)
+      .maybeSingle();
     if (error || !row) throw new Error(error?.message || 'Domain purchase record was not found.');
     if (row.status === 'active' || row.status === 'processing') return;
-    if (Number(row.retail_cents) !== Number(payload.amount_cents)) throw new Error('Domain invoice does not match the order amount.');
+    if (Number(row.retail_cents) !== Number(payload.amount_cents))
+      throw new Error('Domain invoice does not match the order amount.');
     const quote = await checkDomainPurchase(row.hostname);
     if (!quote.available) {
-      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', error: 'Domain became unavailable after payment.' }).eq('id', row.id);
+      await db
+        .from('website_domains')
+        .update({
+          status: 'failed',
+          payment_status: 'paid_refund_required',
+          error: 'Domain became unavailable after payment.',
+        })
+        .eq('id', row.id);
       throw new Error('Domain became unavailable after payment; refund review is required.');
     }
     if (quote.pricing.totalCents > Number(row.retail_cents)) {
-      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', provider_cost_cents: quote.pricing.totalCents, error: 'Registrar cost exceeds collected amount.' }).eq('id', row.id);
+      await db
+        .from('website_domains')
+        .update({
+          status: 'failed',
+          payment_status: 'paid_refund_required',
+          provider_cost_cents: quote.pricing.totalCents,
+          error: 'Registrar cost exceeds collected amount.',
+        })
+        .eq('id', row.id);
       throw new Error('Registrar cost changed after payment; refund review is required.');
     }
     const registrant = row.metadata?.registrant;
     const years = Number(row.metadata?.years || 1);
-    if (!registrant || !row.origin_url) throw new Error('Domain registrant or origin data is missing.');
-    await db.from('website_domains').update({ status: 'processing', payment_status: 'paid', provider_cost_cents: quote.pricing.totalCents }).eq('id', row.id);
+    if (!registrant || !row.origin_url)
+      throw new Error('Domain registrant or origin data is missing.');
+    await db
+      .from('website_domains')
+      .update({
+        status: 'processing',
+        payment_status: 'paid',
+        provider_cost_cents: quote.pricing.totalCents,
+      })
+      .eq('id', row.id);
     const result = await buyDomain(row.hostname, years, registrant, {
       originUrl: row.origin_url,
       customerReference: row.customer_reference || `elevate-${row.user_id}-${row.website_id}`,
       idempotencyKey: `billing-invoice-${job.billing_invoice_id}`,
     });
     const purchase = result.purchase;
-    const saved = await db.from('website_domains').update({
-      domainee_domain_id: purchase.connectedDomainId || null,
-      domainee_purchase_id: purchase.id,
-      status: purchase.status === 'completed' ? 'active' : 'processing',
-      payment_status: 'paid',
-      provider_cost_cents: purchase.totalCents,
-      updated_at: new Date().toISOString(),
-    }).eq('id', row.id);
+    const saved = await db
+      .from('website_domains')
+      .update({
+        domainee_domain_id: purchase.connectedDomainId || null,
+        domainee_purchase_id: purchase.id,
+        status: purchase.status === 'completed' ? 'active' : 'processing',
+        payment_status: 'paid',
+        provider_cost_cents: purchase.totalCents,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', row.id);
     if (saved.error) throw new Error(saved.error.message);
     return;
   }
@@ -497,24 +586,9 @@ export async function fulfillPaidBillingInvoice(
     if (!job.paid_at || !Number.isFinite(Date.parse(job.paid_at))) {
       throw new Error('Verified payment timestamp is required for subscription delivery');
     }
-    const now = new Date(job.paid_at);
-    const periodEnd =
-      nextInvoiceDate(now.toISOString().slice(0, 10), 'monthly') + now.toISOString().slice(10);
-    const result = await db.from('user_app_subscriptions').upsert(
-      {
-        user_id: payload.user_id,
-        app_slug: payload.app_slug,
-        plan: payload.plan_id,
-        status: 'active',
-        trial_ends_at: null,
-        current_period_start: now.toISOString(),
-        current_period_end: periodEnd,
-        billing_provider: 'quickbooks',
-        provider_subscription_id: `schedule:user:${payload.user_id}:individual-app-${payload.app_slug}`,
-        updated_at: now.toISOString(),
-      },
-      { onConflict: 'user_id,app_slug' },
-    );
+    const result = await db.rpc('apply_paid_individual_app_subscription', {
+      p_invoice_id: job.billing_invoice_id,
+    });
     if (result.error) throw new Error(result.error.message);
     return;
   }

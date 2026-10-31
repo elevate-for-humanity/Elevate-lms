@@ -95,7 +95,7 @@ describe('Admin UI route consolidation', () => {
     expect(lmsPreviewRoute).toContain('new URL(destination, LMS_URL)');
     expect(lmsPreviewRoute).not.toContain('new URL(destination, request.url)');
     expect(lmsCoursesLayout).toContain('resolveCoursePreview()');
-    expect(lmsCoursesLayout).toContain('if (isAdmin && !coursePreview.active)');
+    expect(lmsCoursesLayout).toContain('if (isAdmin && !coursePreview.active && !subject.previewing)');
   });
 
   it('routes direct course and lifecycle URLs back into the master builder', () => {

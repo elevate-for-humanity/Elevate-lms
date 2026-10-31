@@ -1,13 +1,10 @@
 name: Deploy isolated Curvature backend
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/deploy-curvature-google.yml']
   workflow_dispatch:
     inputs:
       image:
-        description: Optional tested Curvature image with immutable sha256 digest; otherwise build current main
-        required: false
+        description: Tested Curvature image with immutable sha256 digest
+        required: true
         type: string
 permissions:
   contents: read
@@ -17,14 +14,6 @@ concurrency:
   group: curvature-production
   cancel-in-progress: false
 jobs:
-  dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dispatch dedicated release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-curvature-google.yml/dispatches" -f ref=main
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -48,18 +37,6 @@ jobs:
           fi
       - name: Verify Curvature backend
         run: npm test
-      - name: Build and smoke-test dedicated image
-        if: inputs.image == ''
-        run: |
-          set -euo pipefail
-          docker build -t curvature-release .
-          docker run -d --name curvature-smoke -p 8080:8080 curvature-release
-          trap 'docker rm -f curvature-smoke >/dev/null 2>&1 || true' EXIT
-          for attempt in $(seq 1 20); do
-            if curl -fsS http://127.0.0.1:8080/healthz >/dev/null; then exit 0; fi
-            sleep 1
-          done
-          exit 1
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -77,15 +54,6 @@ jobs:
           WEBSITE_IMAGE: ${{ inputs.image }}
         run: |
           set -euo pipefail
-          if [ -z "$WEBSITE_IMAGE" ]; then
-            gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-            TAG="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/curvature-body-sculpting:$GITHUB_SHA"
-            docker tag curvature-release "$TAG"
-            docker push "$TAG"
-            DIGEST="$(gcloud artifacts docker images describe "$TAG" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
-            [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-            WEBSITE_IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/curvature-body-sculpting@$DIGEST"
-          fi
           gcloud artifacts docker images describe "$WEBSITE_IMAGE" --project=elegant-racer-299721 >/dev/null
           echo "image=$WEBSITE_IMAGE" >> "$GITHUB_OUTPUT"
       - name: Deploy isolated service

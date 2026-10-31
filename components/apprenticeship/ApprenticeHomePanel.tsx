@@ -1,3 +1,4 @@
+import { actionableNoticeFilter, actionableNotices } from '@/lib/notifications/actionable-notices';
 import {
   APPRENTICE_POLICY_KEYS,
   APPRENTICE_POLICY_VERSION,
@@ -26,11 +27,12 @@ export default async function ApprenticeHomePanel({
     db.from('profiles').select('first_name,full_name').eq('id', userId).maybeSingle(),
     db
       .from('notifications')
-      .select('id,title,message')
+      .select('id,title,message,created_at,idempotency_key,metadata')
       .eq('user_id', userId)
       .eq('read', false)
+      .or(actionableNoticeFilter())
       .order('created_at', { ascending: false })
-      .limit(5),
+      .limit(50),
     db
       .from('apprentices')
       .select('created_at')
@@ -63,6 +65,7 @@ export default async function ApprenticeHomePanel({
   const failed = results.some((result) => result.error);
   const [profile, notifications, apprentice, documents, verification, requirements, policies] =
     results.map((result) => result.data);
+  const currentNotices = actionableNotices((notifications || []) as any[]).slice(0, 5);
   const name =
     (profile as any)?.first_name || (profile as any)?.full_name?.split(' ')[0] || 'Apprentice';
   const identity = evaluateIdentityClockEligibility(
@@ -178,13 +181,13 @@ export default async function ApprenticeHomePanel({
             <span className="mt-2 inline-block font-semibold underline">Review this step →</span>
           </Link>
         ))}
-        {((notifications || []) as any[]).map((notice) => (
+        {currentNotices.map((notice) => (
           <article key={notice.id} className="rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="font-bold text-slate-950">{notice.title}</h3>
             <p className="mt-1 whitespace-pre-line leading-6 text-slate-700">{notice.message}</p>
           </article>
         ))}
-        {!failed && !actions.length && !(notifications as any[])?.length ? (
+        {!failed && !actions.length && !currentNotices.length ? (
           <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
             No new alerts. Choose your next training task from the menu.
           </p>

@@ -5,7 +5,7 @@ vi.mock('@/components/notifications/PwaAlertListener', () => ({ PwaAlertListener
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => {
     const query: Record<string, unknown> = {};
-    for (const method of ['select', 'eq', 'in', 'order']) query[method] = () => query;
+    for (const method of ['select', 'eq', 'in', 'or', 'order']) query[method] = () => query;
     query.limit = async () => ({
       data: [{ id: 'notice', title: 'Course reminder', message: 'Review your assignment' }],
     });

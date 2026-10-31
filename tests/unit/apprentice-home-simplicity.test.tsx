@@ -4,7 +4,7 @@ import { APPRENTICE_POLICY_KEYS, APPRENTICE_POLICY_VERSION } from '@/lib/apprent
 const state = vi.hoisted(() => ({ tables: {} as Record<string, any[]>, fail: '' }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from: (table: string) => {
   const q: any = {};
-  for (const op of ['select','eq','in','order','limit']) q[op] = () => q;
+  for (const op of ['select','eq','in','or','order','limit']) q[op] = () => q;
   const result = () => ({ data: state.tables[table] || [], error: table === state.fail ? { message: 'Unavailable' } : null });
   q.then = (resolve: any) => resolve(result());
   q.maybeSingle = async () => ({ ...result(), data: state.tables[table]?.[0] || null });

@@ -1,3 +1,2 @@
-Release current main after production database normalization and funding-checkout hardening.
-Includes canonical program catalog records, public funding/RAPIDS flag cleanup, checkout authorization from verified registry, and separation of enrollment availability from funding confirmation.
-Triggered 2026-10-19 production acceptance pass.
+Release Curvature website editor isolation guard with corrected container-build admission.
+Source includes 4532b6225a6aa0cc215e309b05aa8ac7f1fe4cf1 and 824381442a5fc4611840f5e6398ba6f0bbc19bb9.

@@ -1,11 +1,6 @@
 name: Provision CDL Academy Program Holder
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/ops/provision-cdl-academy-program-holder.mjs'
-      - '.github/workflows/provision-cdl-academy-program-holder.yml'
   workflow_dispatch:
 
 permissions:
@@ -17,6 +12,7 @@ concurrency:
 
 jobs:
   provision:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

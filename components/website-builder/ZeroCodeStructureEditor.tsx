@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from 'lucide-react';
 import type { TenantSiteConfig, TenantSitePage, TenantSiteSection, TenantSiteSectionType } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
@@ -122,7 +122,7 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
     await persist(replacePage({ ...page, sections }), 'Section order updated.');
   }
 
-  async function updateSectionField(key: string, value: string) {
+  async function updateSectionField(key: string, value: string | Record<string, unknown>[]) {
     if (!page || !selectedSection) return;
     const nextSection = { ...selectedSection, content: { ...selectedSection.content, [key]: value } };
     const nextPage = { ...page, sections: page.sections.map((section) => section.id === selectedSection.id ? nextSection : section) };
@@ -163,8 +163,9 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
               <div className="mt-4 grid gap-4 xl:grid-cols-[260px_1fr]">
                 <div className="space-y-2">{page?.sections.map((section, index) => <button key={section.id} type="button" onClick={() => setSelectedSectionId(section.id)} className={`w-full rounded-xl border px-3 py-3 text-left text-sm ${selectedSection?.id === section.id ? 'border-indigo-300 bg-indigo-50 font-black text-indigo-950' : 'border-slate-200 bg-slate-50 font-bold text-slate-700'}`}><span>{index + 1}. {section.type.replaceAll('_', ' ')}</span></button>)}</div>
 
-                {selectedSection ? <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wider text-indigo-700">Selected section</p><h3 className="font-black capitalize">{selectedSection.type.replaceAll('_', ' ')}</h3></div><div className="flex gap-1"><button type="button" disabled={busy || selectedSectionIndex <= 0} onClick={() => void moveSection(-1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section up"><ArrowUp className="h-4 w-4" /></button><button type="button" disabled={busy || selectedSectionIndex >= (page?.sections.length || 0) - 1} onClick={() => void moveSection(1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section down"><ArrowDown className="h-4 w-4" /></button><button type="button" disabled={busy} onClick={() => void removeSection()} className="rounded-lg border border-red-200 bg-white p-2 text-red-700" aria-label="Delete section"><Trash2 className="h-4 w-4" /></button></div></div>
+                {selectedSection ? <div key={selectedSection.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wider text-indigo-700">Selected section</p><h3 className="font-black capitalize">{selectedSection.type.replaceAll('_', ' ')}</h3></div><div className="flex gap-1"><button type="button" disabled={busy || selectedSectionIndex <= 0} onClick={() => void moveSection(-1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section up"><ArrowUp className="h-4 w-4" /></button><button type="button" disabled={busy || selectedSectionIndex >= (page?.sections.length || 0) - 1} onClick={() => void moveSection(1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section down"><ArrowDown className="h-4 w-4" /></button><button type="button" disabled={busy} onClick={() => void removeSection()} className="rounded-lg border border-red-200 bg-white p-2 text-red-700" aria-label="Delete section"><Trash2 className="h-4 w-4" /></button></div></div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2"><QuickField label="Title" value={fieldValues.title} onSave={(value) => updateSectionField('title', value)} /><QuickField label="Text" value={fieldValues.text} onSave={(value) => updateSectionField('text', value)} multiline /><QuickField label="Image URL" value={fieldValues.image} onSave={(value) => updateSectionField('image', value)} /><QuickField label="Image alt text" value={fieldValues.imageAlt} onSave={(value) => updateSectionField(selectedSection.type === 'image' ? 'alt' : 'imageAlt', value)} /><QuickField label="Button text" value={fieldValues.buttonText} onSave={(value) => updateSectionField('buttonText', value)} /><QuickField label="Button destination" value={fieldValues.buttonHref} onSave={(value) => updateSectionField('buttonHref', value)} /></div>
+                  {selectedSection.type === 'products' ? <ProductItemsEditor key={JSON.stringify(selectedSection.content.items)} items={Array.isArray(selectedSection.content.items) ? selectedSection.content.items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item)) : []} busy={busy} onSave={(items) => updateSectionField('items', items)} /> : null}
                 </div> : <div className="rounded-xl border border-dashed border-slate-300 p-6 text-sm text-slate-500">Select a section to edit it without code.</div>}
               </div>
             </div>
@@ -178,6 +179,40 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
 
 function QuickField({ label, value, onSave, multiline = false }: { label: string; value: string; onSave: (value: string) => Promise<unknown>; multiline?: boolean }) {
   const [draft, setDraft] = useState(value);
+  useEffect(() => { setDraft(value); }, [value]);
   const common = { value: draft, onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft(e.target.value), onBlur: () => { if (draft !== value) void onSave(draft); }, className: 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm' };
   return <label className="block"><span className="mb-1 block text-xs font-black text-slate-600">{label}</span>{multiline ? <textarea {...common} rows={4} /> : <input {...common} />}</label>;
+}
+
+function ProductItemsEditor({ items, busy, onSave }: {
+  items: Record<string, unknown>[];
+  busy: boolean;
+  onSave: (items: Record<string, unknown>[]) => Promise<unknown>;
+}) {
+  const [draft, setDraft] = useState(() => items.map(item => ({ ...item })));
+  const fields = [
+    ['name', 'Product name'], ['description', 'Description'], ['price', 'Displayed price'],
+    ['image', 'Product image URL'], ['imageAlt', 'Image description'],
+    ['href', 'Product page or checkout URL'], ['buttonText', 'Button text'],
+  ] as const;
+  function change(index: number, field: string, value: string) {
+    setDraft(current => current.map((item, i) => i === index ? { ...item, [field]: value } : item));
+  }
+  return <fieldset disabled={busy} className="mt-5 space-y-4">
+    <legend className="font-black">Products</legend>
+    <p className="text-sm text-slate-600">Edit the products displayed in this section. Purchase links must point to your configured checkout.</p>
+    {draft.map((item, index) => <div key={index} className="rounded-xl border border-slate-200 bg-white p-4">
+      <h4 className="mb-3 font-bold">Product {index + 1}</h4>
+      <div className="grid gap-3 sm:grid-cols-2">{fields.map(([field, label]) => <label key={field} className="block">
+        <span className="mb-1 block text-xs font-black text-slate-600">{label}</span>
+        {field === 'description'
+          ? <textarea aria-label={`${label} ${index + 1}`} value={typeof item[field] === 'string' ? item[field] as string : ''} onChange={event => change(index, field, event.target.value)} rows={3} className="w-full rounded-lg border border-slate-300 p-2 text-sm" />
+          : <input aria-label={`${label} ${index + 1}`} value={typeof item[field] === 'string' ? item[field] as string : ''} onChange={event => change(index, field, event.target.value)} className="w-full rounded-lg border border-slate-300 p-2 text-sm" />}
+      </label>)}</div>
+    </div>)}
+    <div className="flex flex-wrap gap-3">
+      <button type="button" disabled={busy || draft.length >= 60} onClick={() => setDraft(current => [...current, { name: '', description: '' }])} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">Add product</button>
+      <button type="button" disabled={busy || draft.some(item => typeof item.name !== 'string' || !item.name.trim())} onClick={() => void onSave(draft)} className="rounded-lg bg-indigo-700 px-3 py-2 text-sm font-black text-white disabled:opacity-40">Save products</button>
+    </div>
+  </fieldset>;
 }

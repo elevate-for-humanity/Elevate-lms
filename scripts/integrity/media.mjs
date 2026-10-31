@@ -184,7 +184,8 @@ console.log('\n── Portal picture coverage ──');
 const portalRequirements = [
   ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'learningTools']],
   ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Apprentice tools']],
-  ['Host Shop', 'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
+  ['Host Shop', 'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', ['<Image', '<HostShopWelcome', 'shopName']],
+  ['Host Shop welcome', 'components/host-shop/HostShopWelcome.tsx', ['<Image', 'Start visual orientation', 'Open my dashboard']],
   // The page delegates every holder mode to the shared workspace component;
   // validate the implementation owner instead of the thin route entrypoint.
   ['Program Holder', 'components/program-holder/ProgramHolderWorkspaceView.tsx', ['<Image', 'getProgramCardImage', 'function ProgramCards', 'courseAssignments']],

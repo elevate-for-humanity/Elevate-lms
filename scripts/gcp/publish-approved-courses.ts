@@ -21,7 +21,7 @@ async function main() {
     verify: async (build: any) => {
       const [course, version] = await Promise.all([
         db.from('courses').select('status,is_active,total_lessons').eq('id', build.course_id).single(),
-        db.from('ultimate_release_versions').select('id').eq('build_id', build.id).eq('status', 'released').maybeSingle(),
+        db.from('ultimate_release_versions').select('id,course_id').eq('build_id', build.id).eq('course_id', build.course_id).eq('status', 'released').maybeSingle(),
       ]);
       if (course.error || version.error) throw course.error ?? version.error;
       return course.data?.status === 'published' && course.data.is_active === true &&
@@ -51,11 +51,11 @@ async function main() {
     builds: successors,
     dependencyReleased: async (id: string) => {
       const [course, version] = await Promise.all([
-        db.from('courses').select('status').eq('id', id).single(),
+        db.from('courses').select('status,is_active').eq('id', id).single(),
         db.from('ultimate_release_versions').select('id').eq('course_id', id).eq('status', 'released').maybeSingle(),
       ]);
       if (course.error || version.error) throw course.error ?? version.error;
-      return course.data?.status === 'published' && Boolean(version.data);
+      return course.data?.status === 'published' && course.data?.is_active === true && Boolean(version.data);
     },
     enqueue: async (build: any) => {
       const now = new Date().toISOString();

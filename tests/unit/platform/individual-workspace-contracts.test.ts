@@ -159,6 +159,21 @@ describe('Individual subscriptions and workspaces against PostgreSQL', () => {
       'Active Grants subscription',
     );
   });
+  it.each(['active', 'trial'])(
+    'fails closed when a %s subscription has no verified deadline',
+    async (status) => {
+      await subscribe(first, 'sam-gov', 'starter', status);
+      await subscribe(first, 'grants', 'starter', status);
+      await db.query(
+        'UPDATE user_app_subscriptions SET current_period_end=NULL,trial_ends_at=NULL',
+      );
+      await expect(save()).rejects.toThrow('Active SAM.gov subscription');
+      await expect(db.query('SELECT * FROM reserve_grants_search($1)', [first])).rejects.toThrow(
+        'Active Grants subscription',
+      );
+      expect((await db.query('SELECT * FROM individual_app_usage')).rows).toEqual([]);
+    },
+  );
   it('does not expose one subscriber private records to another or allow direct browser mutations', async () => {
     await subscribe();
     await subscribe(second);

@@ -83,8 +83,8 @@ DECLARE v_subscription public.user_app_subscriptions%ROWTYPE; v_limit integer; v
 BEGIN
   IF auth.role() IS DISTINCT FROM 'service_role' THEN RAISE EXCEPTION 'service role required'; END IF;
   SELECT * INTO v_subscription FROM public.user_app_subscriptions WHERE user_id=p_user_id AND app_slug='grants' FOR UPDATE;
-  IF NOT FOUND OR NOT ((v_subscription.status='active' AND v_subscription.current_period_end>now()) OR
-    (v_subscription.status='trial' AND v_subscription.trial_ends_at>now())) THEN RAISE EXCEPTION 'Active Grants subscription required'; END IF;
+  IF NOT FOUND OR NOT COALESCE((v_subscription.status='active' AND v_subscription.current_period_end>now()) OR
+    (v_subscription.status='trial' AND v_subscription.trial_ends_at>now()),false) THEN RAISE EXCEPTION 'Active Grants subscription required'; END IF;
   v_limit:=CASE v_subscription.plan WHEN 'starter' THEN 50 WHEN 'professional' THEN 500 WHEN 'enterprise' THEN 2000 ELSE 0 END;
   INSERT INTO public.individual_app_usage(user_id,app_slug,period_start) VALUES(p_user_id,'grants',v_month) ON CONFLICT DO NOTHING;
   UPDATE public.individual_app_usage u SET searches=u.searches+1 WHERE u.user_id=p_user_id AND u.app_slug='grants'
@@ -101,8 +101,8 @@ DECLARE v_subscription public.user_app_subscriptions%ROWTYPE; v_limit integer; v
 BEGIN
   IF auth.role() IS DISTINCT FROM 'service_role' THEN RAISE EXCEPTION 'service role required'; END IF;
   SELECT * INTO v_subscription FROM public.user_app_subscriptions WHERE user_id=p_user_id AND app_slug='sam-gov' FOR UPDATE;
-  IF NOT FOUND OR NOT ((v_subscription.status='active' AND v_subscription.current_period_end>now()) OR
-    (v_subscription.status='trial' AND v_subscription.trial_ends_at>now())) THEN RAISE EXCEPTION 'Active SAM.gov subscription required'; END IF;
+  IF NOT FOUND OR NOT COALESCE((v_subscription.status='active' AND v_subscription.current_period_end>now()) OR
+    (v_subscription.status='trial' AND v_subscription.trial_ends_at>now()),false) THEN RAISE EXCEPTION 'Active SAM.gov subscription required'; END IF;
   v_limit:=CASE v_subscription.plan WHEN 'starter' THEN 1 WHEN 'professional' THEN 5 WHEN 'enterprise' THEN 2147483647 ELSE 0 END;
   IF length(trim(COALESCE(p_values->>'legal_business_name','')))<2 THEN RAISE EXCEPTION 'Business name is required'; END IF;
   IF p_entity_id IS NULL THEN

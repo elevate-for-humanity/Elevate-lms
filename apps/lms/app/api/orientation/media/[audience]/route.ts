@@ -1,3 +1,5 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSignedElevateMediaUrl } from '@/lib/storage/elevate-media-storage';
@@ -9,7 +11,11 @@ export const dynamic='force-dynamic';
 export async function GET(req:NextRequest,{params}:{params:Promise<{audience:string}>}) {
   const db=await createClient();
   const {data:{user}}=await db.auth.getUser();
-  if(!user)return NextResponse.json({error:'Sign in to view your orientation.'},{status:401});
+  if(!user) {
+    const admin=await requireAdminClient();
+    const subject=await resolvePortalPreviewSubject(admin,null);
+    if(!subject.previewing||!subject.userId)return NextResponse.json({error:'Sign in to view your orientation.'},{status:401});
+  }
   const {audience}=await params;
   const format=req.nextUrl.searchParams.get('format')??'mp4';
   const key=orientationKeyForGuide(audience,format,orientations[audience as keyof typeof orientations]);

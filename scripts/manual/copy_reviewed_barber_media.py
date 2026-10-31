@@ -4,6 +4,7 @@ No authoring, synthesis, primary-job changes, assessment changes, or publication
 """
 import base64,json,os,re,subprocess,tempfile,uuid
 from pathlib import Path
+from datetime import datetime,timezone
 from urllib.parse import quote
 from render_saved_lesson import request,digest,PROJECT,BUCKET
 
@@ -98,7 +99,7 @@ def main():
         db('course_videos?on_conflict=id',{'id':candidate,'lesson_id':target_id,'course_id':DESTINATION,'title':destination['title']+' — identical reviewed film attached to original course, awaiting canonical publication','video_url':url,'storage_path':key,'thumbnail_url':'data:image/jpeg;base64,'+base64.b64encode(sheet).decode(),'duration_seconds':round(m['durationSeconds']),'transcript':text,'generated_by':'manual','asset_role':'reference','status':'ready'})
         latest=db('course_lessons?select=*&id=eq.'+target_id+'&course_id=eq.'+DESTINATION)[0];validated_identity(source,latest)
         content=latest['content_json'];content['manualMediaDraft']['encodedReview']=copied_manifest
-        changed=db('course_lessons?id=eq.'+target_id+'&course_id=eq.'+DESTINATION+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content},'PATCH')
+        changed=db('course_lessons?id=eq.'+target_id+'&course_id=eq.'+DESTINATION+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content,'updated_at':datetime.now(timezone.utc).isoformat()},'PATCH')
         if len(changed)!=1:raise RuntimeError('MANUAL_CANONICAL_DESTINATION_CHANGED')
         print(json.dumps({'lessonId':target_id,'candidateVideoId':candidate,'state':'canonical-copy-reviewed-source-awaiting-publication','sha256':digest(copied),'bytes':len(copied)}))
 

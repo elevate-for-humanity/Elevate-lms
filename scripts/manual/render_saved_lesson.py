@@ -1,6 +1,7 @@
 """Explicit encoder of owner-reviewed saved instruction/photos. No authoring or publication."""
 import base64, hashlib, json, os, re, subprocess, sys, tempfile, urllib.request, urllib.error, uuid
 from pathlib import Path
+from datetime import datetime,timezone
 
 PROJECT='https://cuxzzpsyufcewtmicszk.supabase.co'
 COURSES={'e9a2547c-ae03-418e-97fc-51377d438f8c','580f7eeb-aa36-4b2a-8526-bbfa6899bb14','d48c61c4-8880-4d9d-9ab5-fab4dd51b201'}
@@ -92,7 +93,7 @@ def main():
             evidence={'candidateVideoId':candidate['id'],'mediaSha256':digest(data),'bytes':len(data),'durationSeconds':float(probe['format']['duration']),'storedBytesHashMatchesUploadInput':True,'fullDecode':True,'method':'Actual authenticated Backblaze readback, SHA-256 comparison with the authenticated upload audit and full-file ffmpeg decode','nativeLmsReview':'pending'}
             latest=db('course_lessons?select=content_json,updated_at&id=eq.'+lesson+'&course_id=eq.'+COURSE)[0];canonical_source(latest)
             content=latest['content_json'];content['manualMediaDraft']['storedFileVerification']=evidence
-            changed=db('course_lessons?id=eq.'+lesson+'&course_id=eq.'+COURSE+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content},'PATCH')
+            changed=db('course_lessons?id=eq.'+lesson+'&course_id=eq.'+COURSE+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content,'updated_at':datetime.now(timezone.utc).isoformat()},'PATCH')
             if len(changed)!=1: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_VERIFY_SAVE')
             print(json.dumps({'lessonId':lesson,'state':'stored-upload-verified',**evidence}));return
         raise RuntimeError('MANUAL_UPLOADED_CANDIDATE_NOT_FOUND')
@@ -107,7 +108,7 @@ def main():
         canonical_source(latest)
         if latest['content_json']['manualMediaDraft']['sourceTranscriptSha256']!=source_hash: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_REVIEW')
         content=latest['content_json'];content['manualMediaDraft']['encodedReview']=manifest
-        changed=db('course_lessons?id=eq.'+lesson+'&course_id=eq.'+COURSE+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content},'PATCH')
+        changed=db('course_lessons?id=eq.'+lesson+'&course_id=eq.'+COURSE+'&updated_at=eq.'+quote(latest['updated_at'],safe=''),{'content_json':content,'updated_at':datetime.now(timezone.utc).isoformat()},'PATCH')
         if len(changed)!=1: raise RuntimeError('MANUAL_SOURCE_CHANGED_DURING_REVIEW_SAVE')
     old=get(manifest_key)
     if old:

@@ -1,3 +1,4 @@
+import { loadLearnerQuizGrades } from '@/lib/lms/learner-quiz-grades';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { loadLearnerCourseIds } from '@/lib/lms/learner-course-ids';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -82,24 +83,7 @@ export default async function GradesPage() {
 
   if (assignmentError) throw assignmentError;
 
-  // Fetch quiz attempts with scores
-  const { data: quizAttempts, error: quizError } = await (subject.previewing ? previewDb : supabase)
-    .from('quiz_attempts')
-    .select(
-      `
-      *,
-      quizzes (
-        id,
-        title,
-        course_id
-      )
-    `,
-    )
-    .eq('user_uuid', user.id)
-    .eq('status', 'completed')
-    .order('completed_at', { ascending: false });
-
-  if (quizError) throw quizError;
+  const quizAttempts = await loadLearnerQuizGrades(recordsDb, user.id);
 
   const checkpointResults = lessonAssessments.filter((result) => result.bestScore !== null);
 

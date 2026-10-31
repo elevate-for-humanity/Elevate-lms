@@ -13,6 +13,7 @@
 import type { ProgramSchema } from './program-schema';
 import { getPublishedProgramBySlug } from './getProgramBySlug';
 import { logger } from '@/lib/logger';
+import { isWithdrawnProgram } from './withdrawn-programs.mjs';
 
 // Slugs fully migrated to DB — no static data/programs/<slug>.ts file exists.
 // For these, a minimal ProgramSchema is synthesized from the DB record.
@@ -54,6 +55,7 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<ProgramModuleShape>> = {
 };
 
 export async function getProgramBySlug(slug: string): Promise<ProgramSchema | null> {
+  if (isWithdrawnProgram(slug)) return null;
   // DB-migrated programs: synthesize a minimal ProgramSchema from the DB record.
   // These slugs have no static file — DB is the only source. Throw on failure.
   if (DB_MIGRATED_SLUGS.has(slug)) {

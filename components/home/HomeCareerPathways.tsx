@@ -34,16 +34,6 @@ const PATHWAYS = [
     cta: 'View CDL Program',
   },
   {
-    slug: 'bookkeeping',
-    title: 'Bookkeeping',
-    description:
-      'Learn practical bookkeeping, QuickBooks, payroll, financial records, and business-office workflows.',
-    image: '/images/bookkeeping-training-vibrant-2026.webp',
-    imageAlt: 'Illustrative bookkeeping learner and mentor',
-    ctaHref: '/programs/bookkeeping',
-    cta: 'View Bookkeeping Program',
-  },
-  {
     slug: 'business',
     title: 'Business & Entrepreneurship',
     description: 'Learn how to organize, launch, market, operate, and grow a business.',
@@ -103,8 +93,6 @@ export function HomeCareerPathways() {
                         Business & <span className="sm:hidden">Entrepre&shy;neurship</span>
                         <span className="hidden sm:inline">Entrepreneurship</span>
                       </>
-                    ) : p.slug === 'bookkeeping' ? (
-                      <span className="whitespace-nowrap">Bookkeeping</span>
                     ) : (
                       p.title
                     )}

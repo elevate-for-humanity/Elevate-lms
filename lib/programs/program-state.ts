@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@/lib/supabase';
+import { isWithdrawnProgram } from './withdrawn-programs.mjs';
 
 export type ProgramEnrollmentState = 'open' | 'waitlist' | 'closed';
 
@@ -16,6 +17,7 @@ export async function getProgramEnrollmentState(
   supabase: SupabaseClient,
   programSlug: string,
 ): Promise<ProgramEnrollmentState> {
+  if (isWithdrawnProgram(programSlug)) return 'closed';
   const { data, error } = await supabase
     .from('programs')
     .select('enrollment_state')
@@ -40,6 +42,7 @@ export async function isProgramWaitlistEnabled(
   supabase: SupabaseClient,
   programSlug: string,
 ): Promise<boolean> {
+  if (isWithdrawnProgram(programSlug)) return false;
   const { data, error } = await supabase
     .from('programs')
     .select('enrollment_state, waitlist_enabled')

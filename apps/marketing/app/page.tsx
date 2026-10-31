@@ -95,7 +95,7 @@ export default function HomePage() {
                 Explore training funding
               </h2>
               <p className="mt-2 max-w-2xl text-base leading-6 text-slate-700">
-                CDL, bookkeeping, business and HVAC. Free to those who qualify; eligibility and
+                CDL, business and HVAC. Free to those who qualify; eligibility and
                 program requirements apply.
               </p>
             </div>

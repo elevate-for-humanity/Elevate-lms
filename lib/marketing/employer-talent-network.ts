@@ -39,26 +39,6 @@ export const EMPLOYER_TALENT_PATHWAYS: EmployerTalentPathway[] = [
     accent: 'from-blue-950 to-slate-950',
   },
   {
-    slug: 'bookkeeping',
-    programSlug: 'bookkeeping',
-    name: 'Bookkeeping & QuickBooks',
-    audience: 'Accounting firms, nonprofits, small businesses, and finance teams',
-    summary:
-      'Meet candidates trained in bookkeeping fundamentals, QuickBooks Online, reconciliation, reporting, payroll basics, and Excel.',
-    training: [
-      'Double-entry bookkeeping',
-      'QuickBooks Online workflows',
-      'Reconciliation and financial reports',
-    ],
-    roles: [
-      'Bookkeeping assistant',
-      'Accounts payable/receivable clerk',
-      'Administrative finance support',
-    ],
-    industry: 'bookkeeping',
-    accent: 'from-emerald-950 to-slate-950',
-  },
-  {
     slug: 'business-administration',
     programSlug: 'business-administration',
     name: 'Business Administration',

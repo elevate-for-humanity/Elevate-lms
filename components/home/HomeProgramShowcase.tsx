@@ -34,15 +34,6 @@ const PROGRAMS = [
       'Build practical skills for business planning, operations, customer service, marketing, and responsible growth.',
   },
   {
-    title: 'Bookkeeping',
-    href: '/programs/bookkeeping',
-    image: '/images/bookkeeping-training-vibrant-2026.webp',
-    alt: 'Bookkeeping learner reviewing financial records',
-    field: 'Business & Finance',
-    summary:
-      'Develop job-ready skills in bookkeeping, payroll, financial records, QuickBooks, and business reporting.',
-  },
-  {
     title: 'Information Technology',
     href: '/programs/it-help-desk',
     image: '/images/pages/about-career-training.webp',
@@ -87,7 +78,7 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             Train for your next career.
           </Heading>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
-            Explore HVAC, CDL, business, bookkeeping, technology, healthcare, and more. Funding is
+            Explore HVAC, CDL, business, technology, healthcare, and more. Funding is
             limited and is never guaranteed. Eligible participants may receive workforce funding
             only after the responsible agency approves the participant, program, and covered costs
             in writing.

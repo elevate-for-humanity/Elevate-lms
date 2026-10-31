@@ -6,10 +6,9 @@ import {
 } from '@/lib/marketing/employer-talent-network';
 
 describe('employer talent network architecture', () => {
-  it('publishes each requested employer pathway', () => {
+  it('publishes the available employer pathways', () => {
     expect(EMPLOYER_TALENT_PATHWAYS.map((item) => item.slug)).toEqual([
       'cdl',
-      'bookkeeping',
       'business-administration',
       'web-development',
       'it-help-desk',

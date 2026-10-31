@@ -46,4 +46,9 @@ describe('public program page availability', () => {
 
     await expect(loadProgramForPage('not-a-governed-program')).resolves.toBeNull();
   });
+
+  it('never resurrects withdrawn bookkeeping through the static outage fallback', async () => {
+    createPublicClient.mockReturnValue(null);
+    await expect(loadProgramForPage('bookkeeping')).resolves.toBeNull();
+  });
 });

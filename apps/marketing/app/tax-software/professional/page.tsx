@@ -6,7 +6,7 @@ import { TaxHero } from '../_components/TaxHero';
 export const metadata: Metadata = {
   title: 'Tax Preparation Training & Starting a Tax Business | Supersonic Fast Cash',
   description:
-    'Choose bookkeeping and accounting with tax preparation, or business administration for starting a tax business. Ask about WorkOne funding and enrollment.',
+    'Explore business administration for starting a tax business. Ask about current enrollment and funding options.',
   alternates: { canonical: '/tax-software/professional' },
 };
 export default function ProfessionalPage() {
@@ -35,41 +35,13 @@ export default function ProfessionalPage() {
         </TaxHero>
         <section id="training-paths" className="scroll-mt-6 px-6 py-14 sm:px-10 lg:px-14">
           <p className="text-xs font-extrabold uppercase tracking-widest text-[#c8102e]">
-            Two goals. Two education pathways.
+            Business education pathway.
           </p>
           <h2 className="mt-3 text-3xl font-black sm:text-4xl">What do you want to do?</h2>
           <p className="mt-4 max-w-3xl leading-8 text-slate-600">
-            Tax preparation is the career focus. Your full program depends on whether you want to
-            learn the financial work or learn how to establish and operate a business.
+            Tax preparation is the career focus. Explore how to establish and operate a business.
           </p>
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <article className="flex flex-col rounded-2xl border border-slate-200 p-7 sm:p-8">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#073ca2]">
-                Learn to do taxes
-              </p>
-              <h3 className="mt-3 text-2xl font-black">Bookkeeping & accounting</h3>
-              <p className="mt-4 leading-8 text-slate-600">
-                Complete the full bookkeeping and accounting program, with tax preparation included.
-                Build the financial foundation behind accurate records and client tax work.
-              </p>
-              <ul className="my-6 space-y-3 text-sm leading-7">
-                <li>Bookkeeping and financial recordkeeping</li>
-                <li>Accounting fundamentals and business documents</li>
-                <li>Tax preparation as part of the learning pathway</li>
-              </ul>
-              <Link
-                href="/programs/bookkeeping"
-                className={taxButton + ' mt-auto self-start bg-[#082b66] !text-white'}
-              >
-                View bookkeeping program →
-              </Link>
-              <Link
-                href="/apply/student?program=bookkeeping"
-                className="mt-5 font-bold text-[#073ca2] underline underline-offset-4"
-              >
-                Apply for this pathway →
-              </Link>
-            </article>
+          <div className="mt-8 grid max-w-3xl gap-6">
             <article className="flex flex-col rounded-2xl border border-slate-200 p-7 sm:p-8">
               <p className="text-xs font-bold uppercase tracking-widest text-[#073ca2]">
                 Start your own tax business
@@ -192,15 +164,9 @@ export default function ProfessionalPage() {
           <h2 className="text-3xl font-black !text-white">Ready to choose your pathway?</h2>
           <p className="mt-5 max-w-2xl leading-8 !text-white">
             Apply for the program that matches your goal, or ask the enrollment team to help you
-            compare the two.
+            review the available options.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/apply/student?program=bookkeeping"
-              className={taxButton + ' bg-white !text-[#082b66]'}
-            >
-              Apply: bookkeeping & accounting →
-            </Link>
             <Link
               href="/apply/student?program=business-administration"
               className={taxButton + ' bg-[#c8102e] !text-white'}

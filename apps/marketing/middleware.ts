@@ -7,6 +7,7 @@ import {
 } from '@/lib/tenant/middleware-tenant-routing';
 import { ADMIN_HOST, LMS_HOST, MARKETING_HOST, getPortalKeyFromPath, PORTAL_MAP } from '@/lib/routing/portal-map';
 import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
+import { isWithdrawnProgramRequest } from '@/lib/programs/withdrawn-programs.mjs';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -142,6 +143,12 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+  if (isWithdrawnProgramRequest(pathname, req.nextUrl.searchParams.get('program'))) {
+    return new NextResponse('This program is no longer available.', {
+      status: 410,
+      headers: {'Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow','Content-Type':'text/plain; charset=utf-8'},
+    });
+  }
   // Infrastructure probes use internal hosts as well as public domains. These
   // exact service endpoints must never enter tenant, auth or canonical routing.
   if (['/api/ping', '/api/ready', '/api/health'].includes(pathname)) {

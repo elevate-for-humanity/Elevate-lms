@@ -13,7 +13,6 @@ import {
 } from '@/lib/programs/funding-registry';
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
 import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
-import { BOOKKEEPING } from './bookkeeping';
 import { BUSINESS_ADMIN } from './business-administration';
 import { CAD_DRAFTING } from './cad-drafting';
 import { CONSTRUCTION_TRADES } from './construction-trades-certification';
@@ -66,7 +65,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   PHLEBOTOMY,
   HOSPITALITY,
   TECHNOLOGY,
-  BOOKKEEPING,
   BUSINESS_ADMIN,
   CAD_DRAFTING,
   CONSTRUCTION_TRADES,

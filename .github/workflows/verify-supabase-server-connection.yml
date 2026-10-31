@@ -17,6 +17,10 @@ jobs:
             secret_name: SUPABASE_SERVICE_ROLE_KEY
           - project_ref: liwxpxhccbaxwylpnapo
             secret_name: COURSE_BUILDER_SUPABASE_SERVICE_ROLE_KEY
+          - project_ref: pztctqvzvsitcsvdolqr
+            secret_name: CURVATURE_SUPABASE_SERVICE_ROLE_KEY
+          - project_ref: ebnbeqdsuxygopetptlv
+            secret_name: STORE_SUPABASE_SERVICE_ROLE_KEY
     env:
       PROJECT_REF: ${{ matrix.project_ref }}
       SERVER_KEY: ${{ secrets[matrix.secret_name] }}

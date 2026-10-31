@@ -1,11 +1,10 @@
-import { logger } from '@/lib/logger';
 /**
  * Grants.gov API Integration
  * Federal grant opportunities search and retrieval
  *
- * API Documentation: https://www.grants.gov/web/grants/s2s/applicant/web-services.html
+ * API Documentation: https://www.grants.gov/api/api-guide
  *
- * Required env var: GRANTS_GOV_API_KEY (optional for search, required for apply)
+ * Search and opportunity retrieval use the public Grants.gov REST APIs.
  */
 
 export interface GrantsGovOpportunity {
@@ -66,184 +65,115 @@ export interface GrantsGovSearchResponse {
   searchParams: GrantsGovSearchParams;
 }
 
-const GRANTS_GOV_BASE_URL = 'https://www.grants.gov/grantsws/rest';
+const GRANTS_GOV_BASE_URL = 'https://api.grants.gov/v1/api';
 
-/**
- * Search for grant opportunities on Grants.gov
- */
+function descriptions(values: any): string[] {
+  return Array.isArray(values)
+    ? values.map((v) => (typeof v === 'string' ? v : v.description || v.id)).filter(Boolean)
+    : [];
+}
+function amount(value: unknown): number | undefined {
+  if (value === null || value === undefined || value === '') return undefined;
+  const result = Number(String(value).replace(/[$,]/g, ''));
+  return Number.isFinite(result) ? result : undefined;
+}
+function normalizeOpportunity(opp: any): GrantsGovOpportunity {
+  const synopsis = opp.synopsis || opp.forecast;
+  const id = String(opp.id || opp.oppId || '');
+  if (!/^\d+$/.test(id)) throw new Error('Grants.gov returned an invalid opportunity identity');
+  return {
+    id,
+    number: opp.number || opp.opportunityNumber || '',
+    title: opp.title || opp.opportunityTitle || '',
+    agency: {
+      code: opp.agencyCode || opp.owningAgencyCode || synopsis?.agencyCode || '',
+      name: opp.agencyName || synopsis?.agencyName || opp.agencyDetails?.agencyName || '',
+    },
+    cfdaList: (opp.alnist || opp.alns || []).map((v: any) => ({
+      cfdaNumber: typeof v === 'string' ? v : v.alnNumber,
+      cfdaTitle: v.programTitle || '',
+    })),
+    synopsis: synopsis
+      ? {
+          synopsisDesc: synopsis.synopsisDesc || synopsis.forecastDesc || '',
+          applicantTypes: descriptions(synopsis.applicantTypes),
+          fundingActivityCategories: descriptions(synopsis.fundingActivityCategories),
+          fundingInstruments: descriptions(synopsis.fundingInstruments),
+        }
+      : undefined,
+    dates: {
+      postDate: opp.openDate || synopsis?.postingDate || '',
+      closeDate: opp.closeDate || synopsis?.responseDate || synopsis?.responseDateDesc || '',
+      archiveDate: opp.archiveDate || undefined,
+    },
+    award: synopsis
+      ? {
+          ceiling: amount(synopsis.awardCeiling),
+          floor: amount(synopsis.awardFloor),
+          estimatedTotalProgramFunding: amount(synopsis.estimatedFunding),
+          expectedNumberOfAwards: amount(synopsis.numberOfAwards),
+        }
+      : undefined,
+    eligibility: synopsis
+      ? {
+          applicantTypes: descriptions(synopsis.applicantTypes),
+          additionalInfo: synopsis.applicantEligibilityDesc,
+        }
+      : undefined,
+    status: opp.oppStatus || opp.status || (opp.forecast ? 'forecasted' : 'posted'),
+    opportunityCategory:
+      typeof opp.opportunityCategory === 'object'
+        ? opp.opportunityCategory.description || ''
+        : opp.opportunityCategory || '',
+    opportunityUrl: `https://www.grants.gov/search-results-detail/${id}`,
+  };
+}
+async function requestGrants(endpoint: string, body: Record<string, unknown>) {
+  const response = await fetch(`${GRANTS_GOV_BASE_URL}/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error(`Grants.gov is unavailable (${response.status})`);
+  const result = await response.json();
+  if (result.errorcode !== 0 || !result.data)
+    throw new Error('Grants.gov could not complete this request');
+  return result.data;
+}
+
+/** Public Grants.gov Search2 API; no account credentials or API key are sent. */
 export async function searchOpportunities(
   params: GrantsGovSearchParams,
 ): Promise<GrantsGovSearchResponse> {
-  const apiKey = process.env.GRANTS_GOV_API_KEY;
-
-  const searchBody: Record<string, any> = {
+  const data = await requestGrants('search2', {
     keyword: params.keyword || '',
-    rows: params.rows || 25,
-    startRecordNum: params.startRecordNum || 0,
+    rows: Math.min(100, Math.max(1, params.rows || 25)),
+    startRecordNum: Math.max(0, params.startRecordNum || 0),
+    oppNum: params.oppNum || '',
+    aln: params.cfda || '',
+    agencies: params.agency || '',
+    eligibilities: (params.eligibilities || []).join('|'),
+    fundingCategories: (params.fundingCategories || []).join('|'),
+    fundingInstruments: (params.fundingInstruments || []).join('|'),
+    oppStatuses: (params.oppStatuses || ['forecasted', 'posted']).join('|'),
+    sortBy: `${params.sortBy || 'closeDate'}|asc`,
+  });
+  if (!Array.isArray(data.oppHits))
+    throw new Error('Grants.gov returned an invalid search response');
+  return {
+    totalCount: Number(data.hitCount ?? data.oppHits.length),
+    opportunities: data.oppHits.map(normalizeOpportunity),
+    searchParams: params,
   };
-
-  if (params.oppNum) searchBody.oppNum = params.oppNum;
-  if (params.cfda) searchBody.cfda = params.cfda;
-  if (params.agency) searchBody.agency = params.agency;
-  if (params.eligibilities?.length) searchBody.eligibilities = params.eligibilities;
-  if (params.fundingCategories?.length) searchBody.fundingCategories = params.fundingCategories;
-  if (params.fundingInstruments?.length) searchBody.fundingInstruments = params.fundingInstruments;
-  if (params.oppStatuses?.length) searchBody.oppStatuses = params.oppStatuses;
-  if (params.sortBy) searchBody.sortBy = params.sortBy;
-
-  try {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    };
-
-    if (apiKey) {
-      headers['Authorization'] = `Bearer ${apiKey}`;
-    }
-
-    const response = await fetch(`${GRANTS_GOV_BASE_URL}/opportunities/search`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(searchBody),
-    });
-
-    if (!response.ok) {
-      logger.error('Grants.gov API error:', response.status, await response.text());
-      return {
-        totalCount: 0,
-        opportunities: [],
-        searchParams: params,
-      };
-    }
-
-    const data = await response.json();
-
-    const opportunities: GrantsGovOpportunity[] = (data.oppHits || []).map((opp: any) => ({
-      id: opp.id || opp.oppId,
-      number: opp.number || opp.oppNumber,
-      title: opp.title || opp.oppTitle,
-      agency: {
-        code: opp.agencyCode || opp.agency?.code || '',
-        name: opp.agencyName || opp.agency?.name || '',
-      },
-      cfdaList: opp.cfdaList || [],
-      synopsis: opp.synopsis
-        ? {
-            synopsisDesc: opp.synopsis.synopsisDesc || '',
-            applicantTypes: opp.synopsis.applicantTypes || [],
-            fundingActivityCategories: opp.synopsis.fundingActivityCategories || [],
-            fundingInstruments: opp.synopsis.fundingInstruments || [],
-          }
-        : undefined,
-      dates: {
-        postDate: opp.openDate || opp.postDate || '',
-        closeDate: opp.closeDate || '',
-        archiveDate: opp.archiveDate || undefined,
-      },
-      award: opp.award
-        ? {
-            ceiling: opp.award.ceiling,
-            floor: opp.award.floor,
-            estimatedTotalProgramFunding: opp.award.estimatedTotalProgramFunding,
-            expectedNumberOfAwards: opp.award.expectedNumberOfAwards,
-          }
-        : undefined,
-      eligibility: opp.eligibility
-        ? {
-            applicantTypes: opp.eligibility.applicantTypes || [],
-            additionalInfo: opp.eligibility.additionalInfo,
-          }
-        : undefined,
-      status: opp.oppStatus || opp.status || 'posted',
-      opportunityCategory: opp.opportunityCategory || '',
-      opportunityUrl: `https://www.grants.gov/search-results-detail/${opp.id || opp.oppId}`,
-    }));
-
-    return {
-      totalCount: data.totalCount || data.hitCount || opportunities.length,
-      opportunities,
-      searchParams: params,
-    };
-  } catch (error) {
-    logger.error('Error searching Grants.gov:', error);
-    return {
-      totalCount: 0,
-      opportunities: [],
-      searchParams: params,
-    };
-  }
 }
 
-/**
- * Get detailed information about a specific opportunity
- */
 export async function getOpportunityDetails(oppId: string): Promise<GrantsGovOpportunity | null> {
-  const apiKey = process.env.GRANTS_GOV_API_KEY;
-
-  try {
-    const headers: Record<string, string> = {
-      Accept: 'application/json',
-    };
-
-    if (apiKey) {
-      headers['Authorization'] = `Bearer ${apiKey}`;
-    }
-
-    const response = await fetch(`${GRANTS_GOV_BASE_URL}/opportunity/details/${oppId}`, {
-      headers,
-    });
-
-    if (!response.ok) {
-      logger.error('Grants.gov API error:', response.status);
-      return null;
-    }
-
-    const opp = await response.json();
-
-    return {
-      id: opp.id || opp.oppId,
-      number: opp.number || opp.oppNumber,
-      title: opp.title || opp.oppTitle,
-      agency: {
-        code: opp.agencyCode || '',
-        name: opp.agencyName || '',
-      },
-      cfdaList: opp.cfdaList || [],
-      synopsis: opp.synopsis
-        ? {
-            synopsisDesc: opp.synopsis.synopsisDesc || '',
-            applicantTypes: opp.synopsis.applicantTypes || [],
-            fundingActivityCategories: opp.synopsis.fundingActivityCategories || [],
-            fundingInstruments: opp.synopsis.fundingInstruments || [],
-          }
-        : undefined,
-      dates: {
-        postDate: opp.openDate || opp.postDate || '',
-        closeDate: opp.closeDate || '',
-        archiveDate: opp.archiveDate || undefined,
-      },
-      award: opp.award
-        ? {
-            ceiling: opp.award.ceiling,
-            floor: opp.award.floor,
-            estimatedTotalProgramFunding: opp.award.estimatedTotalProgramFunding,
-            expectedNumberOfAwards: opp.award.expectedNumberOfAwards,
-          }
-        : undefined,
-      eligibility: opp.eligibility
-        ? {
-            applicantTypes: opp.eligibility.applicantTypes || [],
-            additionalInfo: opp.eligibility.additionalInfo,
-          }
-        : undefined,
-      status: opp.oppStatus || opp.status || 'posted',
-      opportunityCategory: opp.opportunityCategory || '',
-      opportunityUrl: `https://www.grants.gov/search-results-detail/${opp.id || opp.oppId}`,
-    };
-  } catch (error) {
-    logger.error('Error fetching Grants.gov opportunity:', error);
-    return null;
-  }
+  if (!/^\d+$/.test(oppId)) throw new Error('Invalid Grants.gov opportunity ID');
+  return normalizeOpportunity(
+    await requestGrants('fetchOpportunity', { opportunityId: Number(oppId) }),
+  );
 }
 
 /**

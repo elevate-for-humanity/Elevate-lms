@@ -83,8 +83,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
             </p>
             <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
             <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-              Select a Host Shop in Admin to view its apprentices, hours, wages, documents,
-              and messages. No shop is selected in this session.
+              Select a Host Shop in Admin to view its apprentices, hours, wages, documents, and
+              messages. No shop is selected in this session.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
@@ -117,8 +117,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
         }}
         role="host_shop"
       >
-        {readinessItems ? <HostShopReadinessBanner items={readinessItems} /> : null}
         {children}
+        {readinessItems ? <HostShopReadinessBanner items={readinessItems} /> : null}
       </PlatformShell>
     );
   }
@@ -165,53 +165,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
       }}
       role="host_shop"
     >
-      <section
-        className="mb-4 rounded-2xl border-2 border-blue-300 bg-blue-50 px-5 py-4 text-blue-950 shadow-sm"
-        role="status"
-        aria-label="Host Shop action notice"
-      >
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-800">
-          Host Shop action required
-        </p>
-        <h2 className="mt-1 text-lg font-black">Your production Host Shop portal is ready.</h2>
-        <p className="mt-1 text-sm font-semibold leading-6">
-          Sign in now and complete every required onboarding, agreement, and compliance document
-          shown in your readiness checklist.
-        </p>
-        <a
-          href="/host-shop/dashboard/documents"
-          className="mt-3 inline-flex rounded-xl bg-blue-950 px-4 py-2 text-sm font-black text-white hover:bg-blue-900"
-        >
-          Complete required documents
-        </a>
-      </section>
-      <HostShopReadinessBanner items={readinessItems} />
-      <section role="alert" aria-label="Updated apprenticeship host shop procedures" className="mb-5 rounded-2xl border-2 border-amber-400 bg-amber-50 p-5 text-amber-950">
-        <p className="text-xs font-black uppercase tracking-widest">Important Host Shop Notice — October 16, 2026</p>
-        <h2 className="mt-2 text-xl font-black">Apprenticeship training, geofence, timekeeping and RTI rollout</h2>
-        <p className="mt-2 text-sm leading-6">Existing apprentices may continue supervised workplace training from their verified progress.</p>
-        <p className="mt-2 text-sm leading-6"><strong>Clock-in/out:</strong> Apprentices must clock in when arriving at their approved training site, clock out when leaving, and clock out for unpaid meal breaks. They must clock back in when returning to compensable training. Time outside the approved geofence is flagged or blocked for review; never invent hours or bypass location checks. Report technical or location errors to Elevate for documented correction.</p>
-        <p className="mt-2 text-sm leading-6"><strong>Host responsibilities:</strong> Provide qualified supervision, safe hands-on occupational training, wages according to the approved wage progression (including any applicable $10/hour starting rate or compliant commission equivalent), and accurate OJL/competency verification. Confirm weekly hours with the apprentice's approved employment and training schedule; there is no universal weekly-hours requirement stated in this notice. Follow applicable break, wage and overtime laws.</p>
-        <p className="mt-2 text-sm leading-6"><strong>RTI:</strong> Elevate coordinates theory instruction and is preparing its progressive rollout. Host Shops do not develop or teach RTI unless separately authorized. Apprentices can continue eligible supervised OJL while individual prerequisite and RTI schedules are finalized under their approved standards.</p>
-        <div className="mt-4 rounded-xl border-2 border-blue-300 bg-blue-50 p-4">
-          <h3 className="text-lg font-black">Required reading: What your Host Shop is responsible for</h3>
-          <p className="mt-2 text-sm leading-6"><strong>Your job is hands-on training (OJL).</strong> Provide a qualified supervisor, safe and licensed worksite, paid supervised practical training, and accurate attendance, wage and service records. Record each haircut, style, color, facial or nail service in the Practical Service Log when available. Review actual hours weekly, review progress monthly, and report training, safety or employment concerns promptly.</p>
-          <p className="mt-2 text-sm leading-6"><strong>Elevate's job is RTI (theory).</strong> Elevate develops, assigns, delivers and records theory lessons and assessments. Host Shops are not expected to create or teach Elevate's RTI, or approve formal Appendix A competencies. Apprentices can continue authorized hands-on training while RTI is rolled out, subject to required prerequisite safety instruction and their approved standards.</p>
-          <p className="mt-2 text-sm leading-6"><strong>Action:</strong> Read the complete operating handbook, check your assigned apprentices, confirm their clock-in/out and geofence procedures, and keep practical training records current. Existing apprentices continue from verified progress; existing partners do not need to sign the new 12-month agreement.</p>
-          <a href="/host-shop/dashboard/resources" className="mt-3 inline-flex rounded-lg bg-blue-900 px-4 py-3 text-sm font-bold text-white">Read Host Shop responsibilities and instructions</a>
-        </div>
-        <div className="mt-4 rounded-xl border border-amber-300 bg-white p-4">
-          <h3 className="font-black">Review your apprenticeship dashboard tools</h3>
-          <p className="mt-2 text-sm leading-6">Review supervised practical-service logging, workplace hours, wages, and host shop resources. Host Shops record hands-on activities and do not sign off on official Appendix A competencies. The new service log and student progress pages still require production verification; practical scheduling is not yet confirmed live.</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/host-shop/dashboard/competencies" className="rounded-lg border border-amber-700 px-3 py-2 text-sm font-bold">Practical training progress</a>
-            <a href="/host-shop/dashboard/hours" className="rounded-lg border border-amber-700 px-3 py-2 text-sm font-bold">Review OJL hours</a>
-            <a href="/host-shop/dashboard/wages" className="rounded-lg border border-amber-700 px-3 py-2 text-sm font-bold">Wage requirements</a>
-          </div>
-        </div>
-        <a href="/host-shop/dashboard/resources" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-amber-950 px-5 py-3 text-sm font-black text-white">Read the Host Shop operating guide</a>
-      </section>
       {children}
+      <HostShopReadinessBanner items={readinessItems} />
     </PlatformShell>
   );
 }

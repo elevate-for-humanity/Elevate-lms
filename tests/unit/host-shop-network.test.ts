@@ -41,13 +41,20 @@ describe('host shop network architecture', () => {
   });
 
   it('supports network media and a privacy-safe personalized email campaign', () => {
-    const dashboard = readFileSync('apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', 'utf8');
+    const dashboard = readFileSync(
+      'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx',
+      'utf8',
+    );
     const upload = readFileSync('apps/lms/app/api/host-shop/profile-media/route.ts', 'utf8');
     const campaign = readFileSync('lib/email/host-shop-network-launch.ts', 'utf8');
-    expect(dashboard).toContain('Complete My Network Profile');
+    const navigation = readFileSync('lib/navigation/navigation-config.ts', 'utf8');
+    expect(dashboard).toContain('<HostShopWelcome');
+    expect(navigation).toContain("label: 'Shop Profile'");
     expect(upload).toContain("kind !== 'video'");
     expect(campaign).toContain('pending-contact+');
-    expect(campaign).toContain('Search visibility, inquiries, placements, and revenue are not guaranteed.');
+    expect(campaign).toContain(
+      'Search visibility, inquiries, placements, and revenue are not guaranteed.',
+    );
     expect(campaign).not.toContain('bcc:');
   });
 });

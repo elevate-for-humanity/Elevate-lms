@@ -318,7 +318,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         { id: 'orientation', label: 'Orientation', href: '/host-shop/orientation', icon: BookOpen },
         {
           id: 'community',
-          label: 'Community & Networks',
+          label: 'Barber & Beauty Network',
           href: `${p('hostshop')}/community`,
           icon: Users,
         },

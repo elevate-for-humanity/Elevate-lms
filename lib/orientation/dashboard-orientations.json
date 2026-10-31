@@ -240,11 +240,7 @@
       },
       {
         "title": "Contact David to schedule practical training",
-        "points": [
-          "David Nazaire",
-          "(215) 214-9355",
-          "indyondemandservices@gmail.com"
-        ],
+        "points": ["David Nazaire", "(215) 214-9355", "indyondemandservices@gmail.com"],
         "narration": "Contact David Nazaire to arrange the hands-on portion of your HVAC program. His saved program contact number is two one five, two one four, nine three five five. His email is indyondemandservices at gmail dot com. Tell him your full name, that you are an Elevate HVAC learner, your online-study progress, and the dates you are available. Ask him to confirm the training dates, times, location, required clothing, tools, and safety equipment. Wait for confirmation before attending.",
         "href": "mailto:indyondemandservices@gmail.com?subject=Elevate%20HVAC%20hands-on%20training%20schedule",
         "action": "Email David",
@@ -501,32 +497,32 @@
     "hero": "/images/partners/j-noelle/official-salon-2026.webp"
   },
   "host-shop": {
-    "title": "Help your apprentices grow with confidence",
-    "subtitle": "Plan supervision, verify training, and keep your shop records together.",
+    "title": "Welcome to your salon training workspace",
+    "subtitle": "A visual guide to cosmetology training, your students, and the Barber & Beauty Network.",
     "slides": [
       {
-        "title": "Welcome to your Host Shop workspace",
+        "title": "Your salon and your students",
         "points": [
-          "Your shop, apprentices, and supervisor",
-          "Training evidence in one place",
-          "One clear next action at a time"
+          "Open Apprentices to see your students",
+          "Use the sidebar for shop tools",
+          "Ask Elevate about an incorrect placement"
         ],
-        "narration": "Your Host Shop dashboard is the working record for your approved apprenticeship site. Confirm your shop name, assigned apprentices, and supervisor. Review the next required actions first. An assigned apprentice still needs the correct registered program, schedule, supervision, and documentation. Use the dashboard to coordinate training, review actual hours, record competency evidence, and communicate with Elevate. If the wrong apprentice or shop appears, stop and ask Administration to correct the assignment.",
+        "narration": "Welcome to your Host Shop workspace for cosmetology and beauty training. Open Apprentices to see the students assigned to your salon. On a phone, tap the menu at the top to open the same sidebar tools. Your shop provides supervised hands-on learning, while Elevate coordinates assigned theory lessons. Check that the student and supervising stylist are correct before recording services. If a placement is wrong, contact Elevate through your shop email.",
         "href": "/host-shop/dashboard",
         "action": "Open shop dashboard",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/j-noelle/official-salon-2026.webp"
       },
       {
-        "title": "Plan safe supervised training",
+        "title": "Demonstrate, supervise, and give feedback",
         "points": [
-          "Review the registered work process",
-          "Assign a qualified supervisor",
-          "Match practical work to the apprentice’s progress"
+          "Prepare and disinfect the workstation",
+          "Demonstrate the assigned salon technique",
+          "Supervise practice and explain corrections"
         ],
-        "narration": "Open the apprentice’s assigned program and review the work process, supervision requirements, and current progress. Plan safe practical work that fits the apprentice’s training stage. Confirm who will supervise the session and what tools and supplies are needed. Explain the task, observe performance, and give feedback. Theory coursework and shop practice are connected, but one does not replace the other. Report an unsafe task, missing supervisor, or incorrect program assignment before training continues.",
+        "narration": "Begin a cosmetology training session by checking the workstation, tools, supplies, and qualified supervisor. Connect the practical task to the student’s current lesson and approved training plan. For example, demonstrate safe sectioning before supervising a cutting technique, or explain product handling before a color service. Watch the student practice and give a clear correction. Record only work you actually observed. Elevate provides the assigned theory lessons and assessments; shop practice is recorded separately.",
         "href": "/host-shop/dashboard/apprentices",
         "action": "Review apprentices",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/generations-hair/salon-service.webp"
       },
       {
         "title": "Review hours and location exceptions",
@@ -538,46 +534,58 @@
         "narration": "Review each apprentice’s time entries against the work you supervised. Confirm dates, start and finish times, breaks, activity, and supporting evidence. Approve accurate entries and return incorrect entries with a clear correction note. A geofence exception is a reason to investigate; it is not proof that all claimed time was supervised. Ask for the actual facts and use the correction process. Do not estimate, duplicate, or approve hours you cannot support.",
         "href": "/host-shop/dashboard/hours",
         "action": "Review training hours",
-        "image": "/images/barber-hero.jpg"
+        "image": "/images/partners/generations-hair/cutting.webp"
       },
       {
-        "title": "Record competency sign-offs",
+        "title": "Record practical salon services",
         "points": [
-          "Select the correct apprentice and skill",
-          "Observe the required performance",
-          "Save the evidence and verification"
+          "Choose the student and service",
+          "Record the work you personally observed",
+          "Save feedback for the next practice session"
         ],
-        "narration": "Open Competencies and select the assigned apprentice and registered skill. Observe the required performance and record the date, task, outcome, and supporting evidence. Sign only after the apprentice has demonstrated the skill at the required standard. If more practice is needed, record useful feedback and the next practice step. A printed checklist, watched video, or student request alone is not a completed electronic verification. Confirm the saved sign-off appears in the record.",
-        "href": "/host-shop/dashboard/competencies",
-        "action": "Open competencies",
-        "image": "/images/barber-hero.jpg"
+        "narration": "Open Practical Service Log and select the correct student. Record the actual supervised haircut, styling, color, facial, or nail service that fits the student’s approved program and your supervision authorization. Include the date, activity, and useful feedback. A service entry documents hands-on practice. It does not automatically approve formal competencies or complete a course. Elevate handles formal program verification. Review the saved entry and contact staff if a correction is needed.",
+        "href": "/host-shop/dashboard/practical-log",
+        "action": "Open practical service log",
+        "image": "/images/partners/generations-hair/salon-service.webp"
       },
       {
-        "title": "Keep shop documents and agreements current",
+        "title": "Keep your salon documents together",
         "points": [
-          "Read your assigned MOU",
-          "Upload requested licenses and insurance",
-          "Respond to correction or expiry notices"
+          "Open Documents for requested items",
+          "Check review and expiration status",
+          "Use Guides & Agreements for shop instructions"
         ],
         "narration": "Open Documents and Guides and Agreements. Read the agreement assigned to your shop and the responsibilities it creates. Upload only the requested current records, such as applicable licenses, insurance, and supervisor evidence. Check whether each submission is pending review, approved, or returned. Replace an expired or rejected item with the correct file and explanation. Uploading a document does not certify its authenticity or automatically approve the shop. Ask Administration about a requirement that does not fit your occupation.",
         "href": "/host-shop/dashboard/documents",
         "action": "Review shop documents",
-        "image": "/images/pages/office-admin-desk.jpg"
+        "image": "/images/partners/salon-saloon/team-studio.webp"
       },
       {
-        "title": "Communicate, report, and close the week",
+        "title": "Plan the next salon training session",
         "points": [
-          "Check shop messages and meetings",
-          "Resolve missing evidence before deadlines",
-          "Report safety and attendance concerns"
+          "Review the student’s progress",
+          "Choose the next supervised practice task",
+          "Contact Elevate about support needs"
         ],
-        "narration": "Use the shop’s dashboard communication tools for apprentice and Elevate coordination. Check announcements, messages, and confirmed appointments. Keep a written next action and follow-up date when a learner is absent or struggling. Before a reporting deadline, review attendance, RTI, OJL, wages, competencies, and exceptions. Report safety incidents or supervision problems promptly. Closeout requires the applicable verified records; do not mark a learner complete just because the scheduled training period ended.",
+        "narration": "At the end of the week, review each student’s shop attendance, saved practical services, and current theory lesson. Ask what went well and which technique needs more practice. Plan the next supervised salon task using the individual training plan. Review submitted work hours and return inaccurate entries with a correction note. Use shop email for absences, safety concerns, or questions about progress. Elevate reviews formal completion requirements; a finished schedule alone does not mean a student has graduated.",
         "href": "/host-shop/dashboard/reports",
         "action": "Open reporting center",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/partners/generations-hair/special-event-styling.webp"
+      },
+      {
+        "title": "Meet the Barber & Beauty Network",
+        "points": [
+          "Introduce your salon and services",
+          "Share your own portfolio photos and videos",
+          "Connect with other beauty professionals"
+        ],
+        "narration": "The Barber and Beauty Network is your place to connect with participating salons, barbers, stylists, and other beauty professionals. Open Barber and Beauty Network from the sidebar. Use the available groups to find the relevant community and review your membership status. Introduce your business and share your own work using the post attachment tools. Add business contact and booking information to your shop profile. Share client images only with the appropriate permission. Network posts do not replace a student’s private training record.",
+        "href": "/host-shop/dashboard/community",
+        "action": "Open Barber & Beauty Network",
+        "image": "/images/partners/salon-saloon/team-studio.webp"
       }
     ],
-    "hero": "/images/barber-hero.jpg"
+    "hero": "/images/partners/generations-hair/salon-service.webp"
   },
   "program-holder": {
     "title": "A clear path for every learner you support",

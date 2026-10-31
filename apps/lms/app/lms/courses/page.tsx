@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, Play, Scissors } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { getUserEnrollments } from '@/lib/enrollments/getUserEnrollments';
 
@@ -11,11 +13,12 @@ export const dynamic = 'force-dynamic';
 export default async function LMSCoursesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const subject = await resolvePortalPreviewSubject(await requireAdminClient(), user?.id);
   if (!user) {
     return <div className="flex min-h-screen items-center justify-center bg-slate-50"><div className="text-center"><BookOpen className="mx-auto mb-4 h-16 w-16 text-slate-300" /><h1 className="mb-2 text-xl font-bold">Sign in to view your courses</h1><Link href="/login?redirect=/lms/courses" className="mt-4 inline-flex rounded-lg bg-blue-600 px-6 py-3 font-medium text-white">Sign In</Link></div></div>;
   }
 
-  const { enrollments, error } = await getUserEnrollments(user.id);
+  const { enrollments, error } = await getUserEnrollments(subject.userId);
 
   return (
     <main className="min-h-screen bg-slate-50">

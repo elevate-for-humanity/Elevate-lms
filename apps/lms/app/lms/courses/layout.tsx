@@ -29,7 +29,7 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
     const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
     isAdminCoursePreview = isAdmin && coursePreview.active;
 
-    if (isAdmin && !coursePreview.active) {
+    if (isAdmin && !coursePreview.active && !subject.previewing) {
       return (
         <CanonicalLearnerWorkspaceLayout showLearnerNotices={false}>
           <main className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

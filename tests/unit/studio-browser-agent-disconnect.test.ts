@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 
-const fixture = vi.hoisted(() => ({ db: null as any, plan: vi.fn() }));
+const fixture = vi.hoisted(() => ({ db: null as any, plan: vi.fn(), launch: vi.fn() }));
+vi.mock('@/apps/admin/app/api/admin/dev-studio/browser/session/route', () => ({ POST: (...args: unknown[]) => fixture.launch(...args) }));
 vi.mock('@/lib/devstudio/api-auth', () => ({ apiRequireDevStudio: async () => ({ id: 'admin', effectiveRoles: ['admin'] }) }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: async () => {} }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => fixture.db }));
@@ -45,6 +46,34 @@ function setup() {
   return { updates, task, request, aborted };
 }
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.restoreAllMocks(); });
+
+it('launches an owner-authenticated session for a plain-language command and keeps its token out of results', async () => {
+  const {request} = setup();
+  request.url = 'http://admin.test/api/admin/dev-studio/browser/agent';
+  request.headers.set('cookie', 'owner-cookie');
+  request.json = async () => ({task:'Review course'});
+  fixture.launch.mockResolvedValue(response({id:'created-session',token:'ephemeral-secret'}));
+  fixture.plan.mockResolvedValue({status:'complete',summary:'Actual page inspected',actions:[],provider:'fixture',model:'fixture'});
+  const fetch = vi.fn(async (url:string) => {
+    if (url.endsWith('/identity')) return response({ownerId:'admin'});
+    return response({url:'http://fixture.test/lesson',controls:[]});
+  });
+  vi.stubGlobal('fetch',fetch);
+  const result = await POST(request);
+  const output = await result.text();
+  expect(fixture.launch.mock.calls.at(-1)?.[0].headers.get('cookie')).toBe('owner-cookie');
+  expect(fetch.mock.calls[0][0]).toContain('/sessions/created-session/identity');
+  expect(output).toContain('"type":"done"');
+  expect(output).toContain('"sessionId":"created-session"');
+  expect(output).not.toContain('ephemeral-secret');
+});
+
+it('rejects incomplete supplied identities instead of silently replacing them',async()=>{
+  const {request} = setup();
+  request.json = async()=>({task:'Review course',sessionId:'foreign'});
+  const result=await POST(request);
+  expect(result.status).toBe(400);
+});
 
 it('checkpoints an in-flight worker action after reader cancellation and queues the same task without another inference', async () => {
   const { updates, request } = setup();

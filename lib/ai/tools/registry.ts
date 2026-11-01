@@ -832,7 +832,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   {
     name: 'browser.execute',
     description:
-      'Execute an interactive command in an authenticated Studio browser. Launch an owner-scoped session first; the browser task requires its session ID and token.',
+      'Execute an interactive command in an authenticated Studio browser. Creates an owner-scoped session when no existing session is supplied.',
     method: 'POST',
     path: '/api/admin/dev-studio/browser/agent',
     classification: 'write',
@@ -840,7 +840,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     scope: 'platform',
     allowedAgents: DEVSTUDIO_AGENTS,
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
-    requiredInput: ['task', 'sessionId', 'sessionToken'],
+    requiredInput: ['task'],
     approvalRequired: false,
     idempotent: false,
     timeoutMs: 120_000,

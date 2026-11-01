@@ -157,6 +157,11 @@ async function dispatchToolRequest(
     const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/session/route');
     return POST(new NextRequest(url, init));
   }
+  if (tool.name === 'browser.execute') {
+    const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/agent/route');
+    const { browserToolResponse } = await import('@/lib/devstudio/browser-tool-response');
+    return browserToolResponse(await POST(new NextRequest(url, init)));
+  }
   if (tool.name === 'workflows.runTests') {
     return dispatchGithubWorkflow('ci.yml');
   }

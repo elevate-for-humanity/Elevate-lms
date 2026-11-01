@@ -36,13 +36,31 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error;
   const body = await req.json().catch(() => ({}));
   const command = String(body.task || '').trim();
-  const sessionId = String(body.sessionId || '');
-  const sessionToken = String(body.sessionToken || '');
+  let sessionId = String(body.sessionId || '');
+  let sessionToken = String(body.sessionToken || '');
   let requestedTaskId = String(body.taskId || '');
   const conversationId = String(body.conversationId || '').trim();
   const acquisitionRunId = String(body.acquisitionRunId || '').trim();
-  if (!command || !sessionId || !sessionToken) {
+  if (!command || Boolean(sessionId) !== Boolean(sessionToken)) {
     return NextResponse.json({ error: 'Task and browser session are required' }, { status: 400 });
+  }
+
+  // Plain-language commands have no panel-created browser identity. Launch
+  // through the same authenticated owner-scoped route, keeping its token only
+  // in request memory. Existing sessions still undergo the ownership check below.
+  if (!sessionId) {
+    const { POST: launch } = await import('../session/route');
+    const launched = await launch(new NextRequest(new URL('../session', req.url), {
+      method: 'POST', headers: req.headers,
+      body: JSON.stringify({ conversationId }),
+    }));
+    const session = await launched.json().catch(() => null);
+    if (!launched.ok || !session?.id || !session?.token) {
+      return NextResponse.json({ error: 'Studio browser session could not be created' },
+        { status: launched.ok ? 502 : launched.status });
+    }
+    sessionId = String(session.id);
+    sessionToken = String(session.token);
   }
 
   await hydrateProcessEnv();
@@ -474,6 +492,7 @@ export async function POST(req: NextRequest) {
               emit({
                 type: 'done',
                 ok: true,
+                sessionId,
                 output: plan.summary,
                 steps,
                 provider: plan.provider,

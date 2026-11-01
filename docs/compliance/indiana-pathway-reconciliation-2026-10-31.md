@@ -45,3 +45,16 @@ Existing source files and live schema/function definitions were inspected throug
 ## Shared Hair Stylist operational settings
 
 RAPIDS metadata, beauty enrollment, and canonical program data now read lib/apprenticeship/hair-stylist-program.ts. The canonical record's zero OJT hours were replaced with the existing 2,000-hour minimum hybrid work term. This consolidates existing operational settings and does not manufacture a signed Hair Stylist appendix or change its approval status.
+
+## Source repairs completed in the follow-up
+
+- Corrected the false 320/400 RTI audit claims; verified 260/300/210 against the signed source and ran the automated subject-sum/competency checks successfully.
+- Added a source manifest with the signed-document SHA-256, retrieval reference, occupation/page identities, and original RTI-provider names.
+- Linked all three live standard-version records to the signed source; preserved their correct totals and competency counts.
+- Corrected the Nail syllabus to identify Grace Beauty College as the provider named in the signed source, rather than treating Elevate's workbook as proof of a provider change.
+- Centralized existing Hair Stylist settings and corrected canonical OJT from zero to the shared 2,000 minimum. No approval has been inferred from the January 5, 2026 DOL email, which says approval was expected the following week rather than confirming issuance.
+- Corrected the Indiana barber school-route threshold from 2,000 to the PLA-published 1,500 hours. Removed an unsupported 1,500-practical plus 500-theory split and stopped using the school threshold as a fixed apprenticeship OJL denominator. Existing transfer settings remain institutional compatibility policy, not newly verified legal requirements.
+- Corrected Business Start-Up total_hours from legacy 640 to 32, consistent with training_hours, estimated_hours, and the 32-hour syllabus.
+- Isolated-module runtime tests passed for shared Hair Stylist consumer values, all three approved RTI sums/counts, and separation of the 1,500 school threshold from competency-based barber OJL. Full application build and deployment are not claimed.
+
+Unresolved source evidence: the current Bookkeeping delivery schedule (640/150/85-hour representations), actual signed Hair Stylist occupation attachment, and authority for any change from Grace Beauty College as nail RTI provider. Do not reconcile these by inventing hours, signatures, provider amendments, or approval dates.

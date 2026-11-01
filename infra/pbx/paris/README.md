@@ -1,155 +1,158 @@
-# Independent PARIS ARI media gateway — staged integration
+# PARIS phone receptionist and ARI media gateway
 
-This is **not a completed, deployable PARIS receptionist**. The ARI/RTP gateway
-has been added to the repository to establish the media transport boundary.
-It is intentionally disconnected from the production dialplan and public
-Telnyx route. It MUST NOT be enabled for existing extensions until the
-remaining integration and live acceptance work is complete.
+## Current deployment (November 1, 2026)
 
-## Transport and security
+The Google PBX is connected to the verified Twilio business number
+**+1 463-240-1404** through the dedicated
+`elevate-4632401404.pstn.twilio.com` trunk. The incoming dialplan answers and
+enters `Stasis(elevate-paris)` before its existing operator fallback. Telnyx
+and `elevate-standalone.pstn.twilio.com` are retired; do not restore them.
 
-### Configured opening greeting
+Repair commit `4e4ee047562c4e452c17aaa8f79be039e7b6d7b3` passed protected
+activation run `41341890130`: trusted SIP TLS, exact carrier source identity,
+Twilio number/trunk/destination readback, saved greeting/instruction parity,
+all 22 enabled extension routes, synthesized greeting audio, spoken operator
+routing, and synthesized operator reply. The voicemail worker was active with
+no recent retry errors. These checks did not place a call or deliver voicemail.
 
-The gateway now requests an authenticated `event:'greeting'` at sequence zero
-when the ARI bridge and its RTP peer are ready. Caller speech is not required;
-silent RTP can establish the peer. A missing media peer returns the caller to
-the owning dialplan after ten seconds. Duplicate media packets do not repeat
-the greeting, and operator keypad handoff suppresses stale greeting audio.
+A separate manually dispatched workflow, `exercise-paris-self-call.yml`, makes
+one bounded call to this owned business number. It verifies the saved greeting
+on its own recording channel, then asks PARIS to repeat a harmless test phrase.
+Timed speech on the same channel must confirm the reply; the caller-side test
+announcement cannot pass either check. It does not certify handset transfers,
+acoustic conversation quality, or voicemail delivery. Do not infer those
+outcomes from successful configuration checks.
 
-Set `PARIS_GREETING` in the existing root-owned `paris.conf` to the approved
-business greeting before activating the new gateway. The turn adapter uses
-real Google TTS for this configured text; it does not invent caller speech or
-ask the language model to generate an unapproved greeting. Missing configuration
-fails back to the owning dialplan. Each spoken reply is bounded to eighty
-seconds, with a 900 KB private response envelope; validate the actual synthesized
-greeting before activation. After the opening, caller speech uses the existing ASR,
-conversation and TTS path beginning at sequence one.
+## SIP TLS trust store
 
-Install the compatible turn adapter before the gateway. Retain both previous
-files and configuration for rollback, verify no active calls before restarting
-either service, and do not activate public routing until real audio and the
-reviewed fallback have passed acceptance. This source change does not select a
-carrier, migrate provider assignments, or alter the live Asterisk dialplan.
+The running Asterisk image is `mlan/asterisk:xtra-1.1.13` (Asterisk 20.15.2).
+In an isolated copy of that exact image, a valid RSA certificate with
+`ca_list_file=/etc/ssl/certs/ca-certificates.crt` caused TLS handshakes to stall
+after ClientHello. The same certificate and network passed direct OpenSSL TLS
+1.2 checks. Changing only the trust-store access to
+`ca_list_path=/etc/ssl/certs` allowed trusted Asterisk TLS 1.2 handshakes.
 
-The runtime uses Asterisk ARI on loopback (HTTP and WS), a mixing bridge, and
-an externalMedia channel carrying PCMU RTP over a loopback-only UDP socket. A
-Stasis application named `elevate-paris` must be registered. The independent
-PBX must route only a dedicated authorized test call into that application
-following dialplan review. Do not alter the public carrier trunk.
+The managed transport now uses the hashed system CA directory, retains
+`verify_server=yes` and `method=tlsv1_2`, and installs the hostname-verified RSA
+certificate/key under `/etc/asterisk/tls/`. Do not disable certificate validation
+or replace the trusted certificate with a self-signed one. The ingress repair
+script checks for idle calls/channels, backs up owned files, restarts the same
+container only when necessary, and rolls back if trusted TLS or route readback
+fails. Retiring the old outbound contact is independent of TLS rollback.
 
-External media channels use a preallocated `paris-media-` channel ID. The event
-handler accepts only PJSIP/Local caller channels and excludes that namespace,
-including when the media channel's `StasisStart` arrives before its HTTP creation
-response. Asterisk 20 externalMedia does not support the `appArgs` parameter;
-using an argument marker alone would let media channels recursively create more
-bridges. The channel-ID response is verified before bridging.
+`scripts/gcp/diagnose-pbx-sip-tls.py` compares the running transport with a
+private container using the same image and copied configuration. It publishes
+no ports, uses an internal-only network, materializes only links that resolve
+inside the reviewed configuration root, and removes its own test resources.
+It emits allowlisted results rather than credentials, certificates, raw logs,
+or caller audio. It does not modify live configuration or call routing.
 
-The gateway answers caller legs that are not already answered. Failed voice
-processing or ARI disconnection returns the caller to the next priority after
-its original Stasis application; the reviewed dialplan must provide the fallback
-there. If that continuation fails, only that caller leg is hung up. A successful
-operator handoff is not hung up by media cleanup. Sessions are bounded to 16
-concurrent calls and 15 minutes each; capacity/time limits use the same fallback.
-Resource creation completed after caller hangup is cleaned up on response.
+## Audio NAT and private speech routing
 
-Required server-side environment: `PARIS_ARI_USER`, `PARIS_ARI_PASSWORD`,
-`PARIS_ARI_URL`, `PARIS_ARI_WS`, `PARIS_TURN_URL`, `PARIS_TURN_TOKEN`.
-The endpoint URL must be private HTTPS. Credentials must be supplied at runtime
-from Google Secret Manager; never commit or print them. The turn processor must
-accept `{callId,sessionId,sequence,encoding:'PCMU',sampleRate:8000,audioBase64}`
-and return `{replyAudioUlawBase64,endCall?}` where the reply is 8 kHz PCMU.
-The Google ASR/TTS turn adapter implementing this contract is described below.
-Its required private TLS route, identity, secrets and running processes must be
-verified before enabling a controlled test extension.
+The managed carrier transport classifies the verified VM private interface as
+local using only its `/32`, alongside loopback. Asterisk rewrites that internal
+SDP media address to the established public media address. The repair obtains
+the address from Compute metadata, verifies it against the host interfaces,
+and checks the loaded transport after an idle restart. This NAT classification
+does not broaden carrier-source authorization.
 
-## Next gates before release
+The greeting must also pass through the exact deployed `private-turn.mjs`
+HTTPS helper. A direct adapter test is insufficient: the private HTTPS route returned 404 despite direct adapter speech returning
+audio. `repair-paris-turn-proxy.py` restores only the owned
+loopback POST route, preserves the existing trusted gateway configuration and
+bind-mounted inode, validates Caddy, verifies application authentication, and
+rolls back on failure. External requests to that path receive 403. The phone
+readiness audit now gates on actual audio through this deployed HTTPS helper.
 
-1. Verify the running Asterisk ARI and externalMedia transport on an isolated
-   clone of the production container, including module and format compatibility.
-2. Implement and test authenticated, low-latency PARIS speech recognition,
-   dialogue, authorized actions and audio synthesis for this turn protocol.
-3. Add bounded sessions, audio privacy/recording consent, call transfer and
-   voicemail fallback; test WebSocket reconnect and RTP loss/jitter/timeout.
-4. Install with least-privileged Google identity and network isolation.
-5. Validate one real SIP registered test extension with two-way audio, PARIS
-   multi-turn interview, operator 0 and voicemail; store redacted evidence.
-6. Only after those gates pass consider an explicitly approved staged route
-   activation. Existing Telnyx PSTN routing remains unchanged throughout.
+## Media and speech path
 
-Contract smoke tests: `node --test infra/pbx/paris/ari-media.test.mjs`.
-These tests verify packet/boundary behavior only; they do NOT certify a live call.
+Asterisk ARI remains on loopback. The gateway joins a PJSIP/Local caller to a
+`mixing,proxy_media` bridge and a preallocated `paris-media-` externalMedia
+channel. The private leg uses AudioSocket TCP with signed 16-bit little-endian
+mono 8 kHz PCM. Each connection binds only to `127.0.0.1`, checks the independent
+per-call UUID handshake before processing audio, bounds message sizes, handles
+fragmented TCP data, and converts between PCM and the adapter's PCMU format.
+ExternalMedia events are excluded by namespace and channel technology to avoid
+recursive bridges. Owned resources are released on hangup or handoff.
 
-## Phase 2: real Google voice turns (source implemented, NOT deployed)
+The former UDP externalMedia receive path failed a controlled test on the same
+running Asterisk: two channels each sent 100 synthetic tone frames and received
+zero audible frames, under both simple and full mixing. The full mixer emitted
+silence only. The private AudioSocket comparison returned all 100 audible frames
+in both directions, with verified UUID handshakes (run `41349706692`). Carrier
+TLS/SRTP, source authorization, global ICE, and browser phone configuration were
+preserved. No video mixer workaround or additional call participant is used.
 
-`turn-adapter.mjs` implements Google Speech-to-Text recognition for
-MULAW/8000 caller audio, a constrained Vertex Gemini conversational response,
-and Google Text-to-Speech synthesis of 8 kHz PCM converted to PCMU RTP payload.
-The adapter binds **127.0.0.1:8091** and exposes only
-`POST /internal/paris/turn`. It requires a 32+ byte `PARIS_TURN_TOKEN`
-from Secret Manager; the gateway requires the same secret and a **private HTTPS**
-proxy destination in `PARIS_TURN_URL`. ARI credentials are independent of this
-secret. No plain HTTP/public turn service is authorized.
+The gateway starts the saved greeting after its private handshake, owned Stasis
+registration, and bridge join. Caller speech is not required. Google speech
+recognition and TTS remain behind the authenticated private HTTPS helper; the
+configured conversation provider and saved receptionist instructions govern
+voice replies. Both running services must match the authoritative greeting,
+instructions, and all 22 enabled extension routes.
 
-## Runtime startup wiring
+Protected deployment run `41350044816` installed gateway SHA-256
+`04965211e167a7895df38bcacad67d58adb81046c248a94f4a05534e05a0dd87`.
+Live acceptance passed in run `41350265030` on November 1 at 21:07 UTC:
+- The verified business self-call completed in 41 seconds.
+- Recorded PARIS speech matched the saved greeting with a 1.00 word score.
+- PARIS heard the spoken prompt and repeated the test phrase on its own
+  recording channel after the prompt: greeting PASS, conversation PASS.
+- The carrier sent and received audio, the media channel used TCP, and the
+  gateway reported one completed greeting and one completed spoken turn.
+- Staff-device transfers and voicemail delivery remain NOT_TESTED.
 
-`Stage independent PBX runtime prerequisites` stages the same Node 22 binary used
-by protected CI plus the reviewed provisioner/PARIS source and systemd units. Its
-bundle has a strict file allowlist, per-file SHA-256 hashes and source commit;
-the VM verifies hashes, executable compatibility and JavaScript syntax before
-installation. Existing different files, symlinks, active units or insecure parent
-directories require review. It creates an unprivileged PARIS service account,
-validates units, and leaves them **inactive**. No credentials or environment files
-are packaged, no Asterisk/Caddy configuration is changed, and no service is enabled
-or started. It verifies existing PBX container identities and start times afterward.
+This is a successful public-number audio test, not certification of every
+phone workflow or of conversational answer quality.
 
-This is installation evidence only. The full post-install audit must still fail
-until real secret references, reviewed runtime includes/routes and functional
-acceptance are present. A failed installation removes only newly created,
-hash-matching files while units remain inactive. Existing files are never replaced.
-For later rollback, stop and verify any activated service first; use the retained
-source commit/file manifest to identify only this runtime's files. Never remove
-existing PBX configuration, recordings or Supabase phone records.
+Spoken three-digit extension requests are limited to that authorized list.
+Transfers resume the existing `elevate-pwa-extensions` dialplan rather than
+constructing arbitrary SIP destinations. Operator 0 uses the reviewed operator
+route. Failed speech processing and failed transfers return to the existing
+dialplan fallback. Sessions are limited to 16 concurrent calls and 15 minutes.
 
-The systemd units run as a dedicated `elevate-paris` OS account. Install the two
-units, `paris/*.mjs`, and `runtime-secrets.mjs` under `/opt/elevate-pbx/`, keeping
-the same directory layout. They require `/usr/bin/node` version 22 or later.
-`launch.mjs` loads role-specific secrets from Compute workload identity before
-importing the gateway or adapter; no password belongs in the unit or config file.
-The root-owned `/etc/elevate-pbx/paris.conf` supplies these nonsecret settings:
+## Runtime and change controls
 
-- `PARIS_ARI_USER=elevate-paris` (must match a reviewed runtime ARI user)
-- `PARIS_ARI_PASSWORD_SECRET`: pinned GSM version resource from the bootstrap report
-- `PARIS_TURN_TOKEN_SECRET`: pinned GSM version resource from the bootstrap report
-- `PARIS_TURN_URL=https://phone.elevateforhumanity.org/internal/paris/turn`
+The turn adapter and gateway run as the dedicated `elevate-paris` OS account
+under systemd, using Node 22 or later and Google workload identity. Runtime
+secrets are loaded from Google Secret Manager; never commit or print them.
+`/etc/elevate-pbx/paris.conf` contains the reviewed secret references and
+nonsecret settings. ARI credentials and the turn bearer token are separate.
 
-Merge `Caddyfile.fragment` into the existing hostname block, validate the complete
-Caddy configuration, and reload without recreating its container. `private-turn.mjs`
-connects directly to 127.0.0.1:443, retaining the public hostname for TLS certificate
-verification and SNI. The proxy route accepts loopback clients only; the adapter
-retains its independent bearer-token check. No external turn endpoint is opened.
+The adapter binds `127.0.0.1:8091`; its HTTPS proxy accepts loopback clients only
+and retains bearer-token authentication. The gateway connects directly to
+loopback 443 while retaining `phone.elevateforhumanity.org` for SNI and trusted
+certificate verification. Do not expose ARI, private media, or the turn endpoint
+to public clients. Preserve existing recordings, phone records, configuration
+backups, and voicemail history during repairs.
 
-`scripts/gcp/prepare-pbx-secrets.mjs --apply` creates/reuses four owned GSM secrets,
-copies the existing LMS Supabase service key in memory, and grants per-secret
-runtime access. It checks required permissions before writing anything and never
-rotates existing enabled versions. Run it from the repository root using Node 22+
-and an authorized project administrator's gcloud session when the WIF identity
-reports missing permissions. Do not grant project-wide Secret Manager Admin as a
-shortcut. This preparation does not change Telnyx, select extensions, install
-mailboxes, or claim live call acceptance.
+Use main-branch protected Google workflows for deployment. Verify idle state
+before service restarts, retain the previous compatible runtime, and keep
+carrier cutover behind trusted TLS and actual speech-readiness checks.
 
-Required prerequisites: Google VM service identity has only the needed Speech,
-Vertex AI and Text-to-Speech permissions; those APIs are enabled; the private TLS
-reverse proxy is configured; audio retention/consent and transcripts are reviewed.
-Run: `node --test infra/pbx/paris/*.test.mjs`. The mocked adapter tests are
-contract checks and cannot establish an actual call.
+Focused checks:
 
-**Remaining blockers:** Turn-taking/echo cancellation needs live acoustic tuning,
-caller speech recording consent is not implemented, transcripts/call outcomes do
-not yet persist to Supabase, the model is not yet grounded in the approved live
-program catalog, and tool-mediated booking/transfer/voicemail are not implemented.
-Neither file is wired into the production dialplan; no existing Telnyx numbers
-or existing extensions have been changed. DO NOT activate in production yet.
+- `python3 scripts/gcp/test-repair-paris-turn-proxy.py`
+- `python3 scripts/gcp/test-connect-pbx-paris-ingress.py`
+- `node --test scripts/gcp/connect-twilio-paris.test.mjs scripts/gcp/retire-standalone-trunk.test.mjs`
+- `node --test scripts/gcp/exercise-paris-self-call.test.mjs`
+- `node --test infra/pbx/paris/*.test.mjs`
 
-## Reviewed extension directory routing (2026-10-26)
+Mocked tests establish contracts. A real greeting call, actual registered-device
+transfer, two-way conversation, and delivered voicemail require their own
+separate evidence.
 
-PARIS may recognize a caller's explicit spoken three-digit extension only when that extension is present in `PARIS_ALLOWED_EXTENSIONS`, a comma-separated list of active, authorized PWA extension numbers. Configure the identical list for both the private turn adapter and the ARI media gateway through the reviewed root-owned runtime environment; the default empty list disables nonoperator transfers. Do not add an extension before its provisioned `elevate-pwa-extensions` dialplan route, owner authorization, and reachability are verified. The gateway resumes the existing `elevate-pwa-extensions` context rather than constructing a SIP URI. Failed transfers return to the owning dialplan fallback. This code is not evidence of successful live calls or a carrier cutover.
+## Diagnostics
+
+`diagnose-pbx-sip-tls.yml` defaults to configuration and speech readiness reads.
+Its optional local-media inputs create only uniquely owned temporary loopback
+channels with synthetic audio and verify their cleanup; they place no phone
+call. Their results are diagnostic fields, not proof of public phone acceptance.
+
+`exercise-paris-self-call.yml` is manual-only. It verifies the owned DID,
+dedicated secure trunk, exact destination and idle account before making exactly
+one call (45-second maximum). It never retries uncertain call creation. Its
+recording and transcription are scoped to that test call and emit scores and
+status only, without audio, transcript, credentials or unrelated caller details.
+Keep operator transfers and voicemail delivery marked NOT_TESTED until each has
+independent real evidence. Configuration parity and synthesized speech alone
+cannot authorize a claim that a caller heard the receptionist.

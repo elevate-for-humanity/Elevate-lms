@@ -834,6 +834,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const isSuperAdmin = profileRes.data?.role === 'super_admin';
 
   return {
+    enrollmentSummary: {totalRecords: enrollments.filter((row: any) => !row.revoked_at).length, available: !enrollmentsRes.error},
     counts,
     revenueAllTimeCents,
     paidInvoiceSummary: {allTimeAvailable:invoiceTotals.allTimeAvailable,monthAvailable:invoiceTotals.monthAvailable,paidCount:invoiceTotals.paidCount},

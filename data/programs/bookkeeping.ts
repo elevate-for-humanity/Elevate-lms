@@ -1,3 +1,4 @@
+import { BOOKKEEPING_MODULE_HOURS } from '@/lib/programs/bookkeeping-schedule';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -17,16 +18,14 @@ export const BOOKKEEPING: ProgramSchema = {
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 8,
-  hoursPerWeekMin: 15,
+  hoursPerWeekMin: 20,
   hoursPerWeekMax: 20,
+  // Instructor master syllabus v2.0 and updated eight-week guide, October 24, 2026.
+  // Neither source allocates hours by online/lab/support mode; preserve its module allocation.
   hoursBreakdown: {
-    onlineInstruction: 30,
-    handsOnLab: 40,
-    examPrep: 10,
-    careerPlacement: 5,
+    modules: BOOKKEEPING_MODULE_HOURS.map(module => ({ ...module })),
   },
-  schedule: '8-week hybrid pathway, 15–20 hours per week',
-  eveningSchedule: 'Evening sessions available Tue/Thu 6–9 PM.',
+  schedule: '8 weeks, 20 instructional hours per week; 160 instructional hours total',
   cohortSize: '10–15 participants per cohort',
   fundingStatement: 'Self-pay is available. To explore workforce funding, schedule a WorkOne orientation and eligibility assessment. Funding for this specific program is not guaranteed and requires written agency authorization.',
   selfPayCost: '$1,500',
@@ -57,7 +56,7 @@ export const BOOKKEEPING: ProgramSchema = {
   outcomes: [
     {
       statement: 'Record transactions using double-entry bookkeeping principles',
-      assessedAt: 'Week 1',
+      assessedAt: 'Week 2',
     },
     {
       statement: 'Set up a company file in QuickBooks Online with chart of accounts',
@@ -65,13 +64,13 @@ export const BOOKKEEPING: ProgramSchema = {
     },
     {
       statement: 'Reconcile bank and credit card accounts within $0.01 accuracy',
-      assessedAt: 'Week 3',
+      assessedAt: 'Weeks 5–6',
     },
     {
       statement: 'Generate profit & loss, balance sheet, and cash flow statements',
-      assessedAt: 'Week 3',
+      assessedAt: 'Weeks 5–6',
     },
-    { statement: 'Process payroll and calculate employer tax obligations', assessedAt: 'Week 4' },
+    { statement: 'Process payroll and calculate employer tax obligations', assessedAt: 'Week 7' },
   ],
 
   careerPathway: [
@@ -103,31 +102,46 @@ export const BOOKKEEPING: ProgramSchema = {
 
   weeklySchedule: [
     {
-      week: 'Week 1',
-      title: 'Bookkeeping Fundamentals',
-      competencyMilestone: 'Record debits and credits using T-accounts',
+        "week": "Week 1",
+        "title": "Accounting and Bookkeeping Foundations (15 hours); Debits, Credits, Journals and Ledgers (5 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
     },
     {
-      week: 'Week 2',
-      title: 'QuickBooks Online Setup',
-      competencyMilestone: 'Create a company file with chart of accounts and opening balances',
+        "week": "Week 2",
+        "title": "Debits, Credits, Journals and Ledgers (15 hours); Cash, Assets and Sales Transactions (5 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
     },
     {
-      week: 'Week 3',
-      title: 'Transactions & Reconciliation',
-      competencyMilestone: 'Reconcile bank accounts and generate financial statements',
+        "week": "Week 3",
+        "title": "Cash, Assets and Sales Transactions (15 hours); Purchases, Liabilities and Equity (5 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
     },
     {
-      week: 'Week 4',
-      title: 'Payroll & Tax Basics',
-      competencyMilestone: 'Process a payroll cycle and calculate employer tax obligations',
+        "week": "Week 4",
+        "title": "Purchases, Liabilities and Equity (15 hours); Adjustments and the Accounting Cycle (5 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
     },
     {
-      week: 'Weeks 5–8',
-      title: 'Financial Empowerment, Excel, Exam Prep & Career Placement',
-      competencyMilestone: 'Pass QuickBooks Certified User practice exam with 80%+ score',
+        "week": "Week 5",
+        "title": "Adjustments and the Accounting Cycle (10 hours); Reconciliation and Error Correction (10 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
     },
-  ],
+    {
+        "week": "Week 6",
+        "title": "Reconciliation and Error Correction (5 hours); Financial Statements and Analysis (15 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
+    },
+    {
+        "week": "Week 7",
+        "title": "Payroll, Controls and Bookkeeping Operations (10 hours); Excel for Accounting Laboratories (10 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
+    },
+    {
+        "week": "Week 8",
+        "title": "Excel for Accounting Laboratories (5 hours); Capstone, Remediation and Exam Preparation (15 hours)",
+        "competencyMilestone": "Complete assigned reading, practical files and assessments in the instructor eight-week guide; 20 instructional hours."
+    }
+],
 
   curriculum: [
     {
@@ -187,55 +201,6 @@ export const BOOKKEEPING: ProgramSchema = {
       standard: 'GAAP Fundamentals',
       description:
         'Program teaches Generally Accepted Accounting Principles at the bookkeeping level.',
-    },
-  ],
-
-  trainingPhases: [
-    {
-      phase: 1,
-      title: 'Accounting Fundamentals',
-      weeks: 'Week 1',
-      focus:
-        'Double-entry bookkeeping, chart of accounts, journal entries, and accrual vs cash basis.',
-      labCompetencies: [
-        'Record 20 transactions using T-accounts with zero errors',
-        'Classify accounts as asset, liability, equity, revenue, or expense',
-        'Prepare a trial balance from journal entries',
-      ],
-    },
-    {
-      phase: 2,
-      title: 'QuickBooks Online Mastery',
-      weeks: 'Weeks 2–3',
-      focus: 'Company setup, invoicing, expense tracking, bank reconciliation, and reporting.',
-      labCompetencies: [
-        'Set up a company file with chart of accounts and opening balances',
-        'Create and send invoices, record payments, and track receivables',
-        'Reconcile a bank account to $0.00 difference',
-        'Generate profit & loss and balance sheet reports',
-      ],
-    },
-    {
-      phase: 3,
-      title: 'Payroll & Tax Compliance',
-      weeks: 'Week 4',
-      focus: 'Payroll processing, tax withholding, W-2/1099 preparation, and quarterly filings.',
-      labCompetencies: [
-        'Process a complete payroll cycle for 5 employees',
-        'Calculate federal and state tax withholding',
-        'Prepare W-2 and 1099 forms from payroll data',
-      ],
-    },
-    {
-      phase: 4,
-      title: 'Certification Exam & Career Prep',
-      weeks: 'Weeks 5–8',
-      focus: 'Personal financial empowerment, QuickBooks Certified User exam preparation, Excel skills, and career placement.',
-      labCompetencies: [
-        'Score 80%+ on QuickBooks Certified User practice exam',
-        'Build a budget spreadsheet with formulas and pivot tables in Excel',
-        'Complete a mock bookkeeping interview',
-      ],
     },
   ],
 

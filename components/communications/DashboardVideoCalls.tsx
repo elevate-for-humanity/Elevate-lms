@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PlatformVideoRoom } from './PlatformVideoRoom';
 
 type Call = { roomId: string; title: string; direction: 'incoming' | 'outgoing'; state: 'ringing' | 'accepted' };
@@ -10,6 +10,7 @@ export function DashboardVideoCalls({ extension, disabled = false, dialPad = fal
   const [current, setCurrent] = useState<Call | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const revision = useRef(0);
   const destination = extension ?? number;
 
   useEffect(() => {
@@ -19,12 +20,13 @@ export function DashboardVideoCalls({ extension, disabled = false, dialPad = fal
     async function poll() {
       if (running || stopped) return;
       running = true;
+      const version = revision.current;
       try {
         const response = await fetch('/api/communications/video-calls', { cache: 'no-store', signal: controller.signal });
         if ([401, 403].includes(response.status)) { stopped = true; return; }
         if (!response.ok) return;
         const body = await response.json();
-        if (!Array.isArray(body.calls)) return;
+        if (!Array.isArray(body.calls) || version !== revision.current || stopped) return;
         setCalls(body.calls);
         setCurrent(previous => previous ? body.calls.find((call: Call) => call.roomId === previous.roomId) || null : null);
       } catch { /* A transient polling failure does not end a connected room. */ }
@@ -44,6 +46,7 @@ export function DashboardVideoCalls({ extension, disabled = false, dialPad = fal
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || 'The video call could not be updated.');
+      revision.current += 1;
       if (action === 'start') {
         if (!body.roomId) throw new Error('The video invitation was not confirmed.');
         setCurrent({ ...body, direction: 'outgoing' });

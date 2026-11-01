@@ -1,0 +1,37 @@
+{
+  "name": "Elevate Admin",
+  "short_name": "Admin",
+  "description": "Unified Admin AI Studio for managing programs, students, content, workflows, and operations",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#f97316",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {"src":"/icon-72.png","sizes":"72x72","type":"image/png","purpose":"any"},
+    {"src":"/icon-96.png","sizes":"96x96","type":"image/png","purpose":"any"},
+    {"src":"/icon-128.png","sizes":"128x128","type":"image/png","purpose":"any"},
+    {"src":"/icon-144.png","sizes":"144x144","type":"image/png","purpose":"any"},
+    {"src":"/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/icon-192-maskable.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Interoffice Email","short_name":"Email","url":"/phone/email"},
+    {"name":"Text Messages","short_name":"Texts","url":"/phone/texts"},
+    {"name":"Admin Dashboard","short_name":"Dashboard","url":"/dashboard","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
+    {"name":"Phone System","short_name":"Phone","url":"/phone","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
+    {"name":"Admin AI Studio","short_name":"Studio","url":"/studio","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
+    {"name":"Students","short_name":"Students","url":"/students","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
+    {"name":"Applications","short_name":"Apps","url":"/applications","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]}
+  ],
+  "id": "org.elevateforhumanity.admin",
+  "launch_handler": {"client_mode":"navigate-existing"},
+  "screenshots": [
+    {"src":"https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-narrow.jpg","sizes":"1080x1920","type":"image/jpeg","form_factor":"narrow","label":"Home screen"},
+    {"src":"https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-wide.jpg","sizes":"1920x1080","type":"image/jpeg","form_factor":"wide","label":"Dashboard view"}
+  ]
+}

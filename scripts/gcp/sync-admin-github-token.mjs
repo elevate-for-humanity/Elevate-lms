@@ -12,7 +12,7 @@ export async function syncAdminGitHubToken({run=google,request=fetch,config=()=>
  const response=await request(BASE+'/rest/v1/rpc/get_platform_secret',{method:'POST',headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_key:'GITHUB_TOKEN'}),redirect:'error',signal:AbortSignal.timeout(15000)});
  if(!response.ok)failure('ADMIN_GITHUB_SOURCE_READ_FAILED');
  const token=await response.json();
- if(typeof token!=='string'||!token.trim()||!/^(github_pat_|ghp_|ghs_)/.test(token.trim()))failure('ADMIN_GITHUB_TOKEN_FORMAT_INVALID');
+ if(typeof token!=='string'||!token.trim()||!/^(github_pat_|ghp_)/.test(token.trim()))failure('ADMIN_GITHUB_TOKEN_FORMAT_INVALID');
  const check=await request(REPO,{headers:{Authorization:'Bearer '+token.trim(),Accept:'application/vnd.github+json'},redirect:'error',signal:AbortSignal.timeout(15000)});
  if(!check.ok)failure('ADMIN_GITHUB_TOKEN_REJECTED');
  const read=args=>JSON.parse(run([...args,'--project='+PROJECT,'--format=json']));
@@ -27,12 +27,21 @@ export async function syncAdminGitHubToken({run=google,request=fetch,config=()=>
  const metadata=read(['secrets','describe',SECRET]);
  if(metadata.labels?.elevate_component!=='admin'||metadata.labels?.elevate_key!=='github_token')failure('ADMIN_GITHUB_SECRET_OWNER_MISMATCH');
  const evidence={source:'admin-encrypted-platform-secrets:GITHUB_TOKEN',destination:SECRET,key:'GITHUB_TOKEN',repositoryHttp:check.status,appSigningKeyChanged:false};
+ if(apply){
+ // Repository reads do not establish Actions write. Prove dispatch before storing
+ // a replacement; never persist a short-lived Actions/installation token.
+ const dispatch=await request('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/actions/workflows/verify-paris-credential-storage.yml/dispatches',{
+  method:'POST',headers:{Authorization:'Bearer '+token.trim(),Accept:'application/vnd.github+json','Content-Type':'application/json'},
+  body:JSON.stringify({ref:'main'}),redirect:'error',signal:AbortSignal.timeout(15000)});
+ if(dispatch.status!==204)failure('ADMIN_GITHUB_WORKFLOW_DISPATCH_REJECTED');
+ evidence.workflowDispatchVerified=true;
+ }
  const existingBinding=state.spec.template.spec.containers[0].env?.find(e=>e.name==='GITHUB_TOKEN')?.valueFrom?.secretKeyRef;
  if(env.GITHUB_TOKEN?.trim()===token.trim()&&existingBinding?.name===SECRET&&/^[1-9][0-9]*$/.test(String(existingBinding.key))){
   const stored=run(['secrets','versions','access',String(existingBinding.key),'--secret',SECRET,'--project='+PROJECT]);
-  if(stored.trim()===token.trim())return {...evidence,stateChanged:false,alreadySynchronized:true,revision:body.revision,secretVersion:String(existingBinding.key)};
+  if(stored.trim()===token.trim())return {...evidence,stateChanged:false,alreadySynchronized:true,workflowDispatchVerified:apply,revision:body.revision,secretVersion:String(existingBinding.key)};
  }
- if(!apply)return {...evidence,stateChanged:false};
+ if(!apply)return {...evidence,stateChanged:false,workflowDispatchVerified:false};
  const add=(name,value)=>{
   try{return readVersion(run(['secrets','versions','add',name,'--project='+PROJECT,'--data-file=-','--format=json(name,state)'],value),name);}
   catch(error){error.phase=name===SECRET?'token-secret-write':'runtime-config-write';throw error;}

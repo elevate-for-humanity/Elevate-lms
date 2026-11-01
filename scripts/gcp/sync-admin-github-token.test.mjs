@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {syncAdminGitHubToken} from './sync-admin-github-token.mjs';
 const token='github_pat_fixture_never_log',bootstrap='bootstrap_fixture';
-function fixture({reject=false,owner=true,deny=false,concurrent=false}={}){
+function fixture({reject=false,owner=true,deny=false,concurrent=false,dispatchDenied=false,sourceToken=token}={}){
  const writes=[],requests=[],activations=[];let reads=0,changed=false;
  const cfg={version:1,component:'admin',runtimeEnvironment:{NEXT_PUBLIC_SUPABASE_URL:'https://cuxzzpsyufcewtmicszk.supabase.co',SUPABASE_SERVICE_ROLE_KEY:bootstrap,GITHUB_TOKEN:'expired',UNCHANGED:'preserved'},runtimeFiles:{},volumes:[]};
  const state=()=>({metadata:{generation:changed?'2':'1'},spec:{template:{spec:{containers:[{image:'image@sha256:'+'b'.repeat(64),env:changed?[{name:'GITHUB_TOKEN',valueFrom:{secretKeyRef:{name:'elevate-admin-github-token',key:'7'}}}]:[]}]}}},status:{latestReadyRevisionName:'elevate-admin-migration-old',latestCreatedRevisionName:changed?'elevate-admin-migration-new':'elevate-admin-migration-old',traffic:[{revisionName:'elevate-admin-migration-old',percent:100}]}});
  const deps={config:()=>{reads++;return structuredClone(concurrent&&reads>1?{...cfg,extra:'concurrent'}:cfg);},
-  request:async(url,init)=>{requests.push({url,init});if(url.includes('/rpc/'))return Response.json(token);if(url.includes('api.github.com'))return Response.json({}, {status:reject?401:200});return Response.json({service:'admin',healthy:true,revision:'elevate-admin-migration-old',commit:'a'.repeat(40)});},
+  request:async(url,init)=>{requests.push({url,init});if(url.includes('/rpc/'))return Response.json(sourceToken);if(url.endsWith('/dispatches'))return new Response(null,{status:dispatchDenied?403:204});if(url.includes('api.github.com'))return Response.json({}, {status:reject?401:200});return Response.json({service:'admin',healthy:true,revision:'elevate-admin-migration-old',commit:'a'.repeat(40)});},
   run:(args,input)=>{
    if(args[0]==='secrets'&&args[1]==='describe')return JSON.stringify({labels:{elevate_component:owner?'admin':'other',elevate_key:'github_token'}});
    if(args[0]==='secrets'&&args[1]==='versions'){writes.push({args,input});if(deny)throw Object.assign(Error(token),{code:'permission_denied'});return JSON.stringify({name:'projects/484736877039/secrets/'+args[3]+'/versions/7',state:'ENABLED'});}
@@ -34,3 +34,6 @@ test('an already verified binding is idempotent and creates no secret versions o
  };
  const result=await syncAdminGitHubToken({...f.deps,apply:true});assert.equal(result.alreadySynchronized,true);assert.equal(f.writes.length,0);assert.equal(f.activations.length,0);
 });
+
+test('Actions permission rejection prevents every secret and runtime write',async()=>{const f=fixture({dispatchDenied:true});await assert.rejects(syncAdminGitHubToken({...f.deps,apply:true}),/WORKFLOW_DISPATCH_REJECTED/);assert.equal(f.writes.length,0);assert.equal(f.activations.length,0);});
+test('short-lived workflow tokens cannot be persisted as runtime credentials',async()=>{const f=fixture({sourceToken:'ghs_transient_workflow_fixture'});await assert.rejects(syncAdminGitHubToken({...f.deps,apply:true}),/TOKEN_FORMAT_INVALID/);assert.equal(f.writes.length,0);});

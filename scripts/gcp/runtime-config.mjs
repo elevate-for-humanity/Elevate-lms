@@ -7,6 +7,7 @@ export function configSecret(component) {
   return `elevate-${component}-runtime-config`;
 }
 export function googleFailureCode(stderr = '') {
+  if (/BILLING_DISABLED|billing (?:account )?(?:is |has been )?disabled|requires billing to be enabled|billing must be enabled/i.test(stderr)) return 'billing_disabled';
   if (/SERVICE_DISABLED|API .*not enabled|has not been used.*before|is disabled/i.test(stderr)) return 'api_disabled';
   if (/PERMISSION_DENIED|permission denied|does not have permission|Permission .* denied/i.test(stderr)) return 'permission_denied';
   if (/NOT_FOUND|was not found|does not exist|cannot find (?:job|service|execution)\b/i.test(stderr)) return 'not_found';

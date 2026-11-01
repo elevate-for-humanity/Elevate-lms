@@ -186,12 +186,14 @@ test('capacity and immutable-image checks remain mandatory for every worker',asy
  assert.deepEqual(result.assignments.map(a=>a.jobId),['ready']);
  });
 
-test('slow startup returns immediately and rechecks never launch duplicate workers',async()=>{
+test('slow startup uses bounded claim polling and rechecks never launch duplicate workers',async()=>{
  const s=fixture([waiting('media')]);s.controls.noClaim=true;
  delete s.options.assignmentAttempts;
- s.options.delay=async()=>{throw Error('startup must not hold the coordinator for five minutes');};
+ const waits=[];
+ s.options.delay=async(ms)=>{waits.push(ms);};
  const first=await dispatchLessonAutopilots(s.options);
  assert.equal(first.reason,'awaiting_worker_assignment');assert.equal(first.assignments.length,0);
+ assert.deepEqual(waits,[5000,5000]);
  const next=await dispatchLessonAutopilots(s.options);
  assert.equal(next.status,'busy');assert.equal(launches(s).length,1);
 });

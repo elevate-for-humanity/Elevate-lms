@@ -30,6 +30,11 @@ export async function dispatchApprovedRegionalCourses({env=process.env}={}) {
   request:(url,options)=>fetch(scopedCourseQueueUrl(url),options),
  }); } catch(error) {
   await monitorCourseQueue({env,dispatchState:{status:'dispatch_failed',reason:'Google worker dispatch failed: '+(error.code??'assignment_unconfirmed')}});
+  // Independent lesson-role jobs must still be admitted when the general
+  // Course Builder lane fails. The role dispatcher enforces its own claims,
+  // immutable image, leases and quota boundaries.
+  const pool=await dispatchLessonAutopilots({env});
+  if(['assigned','busy','retry_wait','capacity_wait'].includes(pool.status))return pool;
   throw error;
  }
  const pool=await dispatchLessonAutopilots({env});

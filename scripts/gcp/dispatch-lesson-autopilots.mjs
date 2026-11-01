@@ -38,7 +38,7 @@ function reserveCapacity(capacity,task,reserved){
 /** All callers share the runtime-operation lane. Claims and prerequisites are
  * rechecked by Postgres; launch/readback is not counted as a completed lesson. */
 export async function dispatchLessonAutopilots({run=google,request=fetch,env=process.env,now=new Date(),
- delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),assignmentAttempts=1,capacityCheck=inspectRegionalCapacity,clock=Date.now}={}){
+ delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),assignmentAttempts=3,capacityCheck=inspectRegionalCapacity,clock=Date.now}={}){
  const token=env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
  const headers={apikey:token,Authorization:'Bearer '+token};
  const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';

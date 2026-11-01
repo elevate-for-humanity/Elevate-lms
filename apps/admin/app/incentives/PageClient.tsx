@@ -24,6 +24,7 @@ type Incentive = {
 export default function IncentivesPage() {
   const [incentives, setIncentives] = useState<Incentive[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState('');
   const [filter, setFilter] = useState<'all' | 'WEX' | 'OJT'>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -32,14 +33,16 @@ export default function IncentivesPage() {
   }, []);
 
   const loadIncentives = async () => {
+    setLoading(true);
+    setLoadError('');
     try {
       const response = await fetch('/api/admin/incentives');
-      if (response.ok) {
-        const data = await response.json();
-        setIncentives(data.incentives || []);
-      }
-    } catch (err) {
-      // Error: $1
+      if (!response.ok) throw new Error('Connection unavailable');
+      const data = await response.json();
+      if (!Array.isArray(data.incentives)) throw new Error('Invalid response');
+      setIncentives(data.incentives);
+    } catch {
+      setLoadError('Employer incentives could not be loaded. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -60,6 +63,13 @@ export default function IncentivesPage() {
     approved: incentives.filter((i) => i.status === 'approved').length,
     paid: incentives.filter((i) => i.status === 'paid').length,
   };
+
+  if (loadError) return (
+    <div role="alert" className="p-6">
+      <p>{loadError}</p>
+      <button type="button" onClick={()=>void loadIncentives()}>Retry</button>
+    </div>
+  );
 
   if (loading) {
     return (

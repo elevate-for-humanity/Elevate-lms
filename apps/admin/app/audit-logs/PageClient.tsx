@@ -24,6 +24,7 @@ type AuditLog = {
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError,setLoadError]=useState('');
   const [actionFilter, setActionFilter] = useState('');
   const [resourceFilter, setResourceFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +32,8 @@ export default function AuditLogsPage() {
   const [dateTo, setDateTo] = useState('');
 
   const loadLogs = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
     try {
       const params = new URLSearchParams();
       if (actionFilter) params.append('action', actionFilter);
@@ -39,12 +42,12 @@ export default function AuditLogsPage() {
       if (dateTo) params.append('end_date', dateTo);
 
       const response = await fetch(`/api/admin/audit-logs?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setLogs(data.logs || []);
-      }
-    } catch (err) {
-      // silent
+      if (!response.ok) throw new Error('Connection unavailable');
+      const data = await response.json();
+      if (!Array.isArray(data.logs)) throw new Error('Invalid response');
+      setLogs(data.logs);
+    } catch {
+      setLoadError('Audit logs could not be loaded. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -92,6 +95,13 @@ export default function AuditLogsPage() {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   };
+
+  if (loadError) return (
+    <div role="alert" className="p-6">
+      <p>{loadError}</p>
+      <button type="button" onClick={()=>void loadLogs()}>Retry</button>
+    </div>
+  );
 
   if (loading) {
     return (

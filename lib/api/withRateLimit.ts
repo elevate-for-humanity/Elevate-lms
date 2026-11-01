@@ -70,6 +70,8 @@ function tooManyRequests(result: {
       headers: {
         ...createRateLimitHeaders(result),
         'Retry-After': String(getRetryAfterSeconds(result.reset)),
+        'X-Elevate-Rate-Limit-Source': 'application',
+        'Cache-Control': 'private, no-store',
       },
     },
   );

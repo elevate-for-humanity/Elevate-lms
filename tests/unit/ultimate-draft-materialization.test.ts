@@ -1,3 +1,4 @@
+import { UltimatePlatformInstructionalGenerator } from '@/lib/ultimate-course-builder/adapters/platform-instructional-generator';
 import { describe, expect, it } from 'vitest';
 import { materializeUltimateDraft } from '@/lib/ultimate-course-builder/worker/materialize-draft';
 import { UltimateAppendixAStandardsSource } from '@/lib/ultimate-course-builder/credential/appendix-a-source';
@@ -27,17 +28,21 @@ function database(initialLessons: any[] = []) {
 }
 
 describe('canonical source-backed draft materialization', () => {
-  it('reserves parallel lesson drafts before authoring, without inventing teaching or approval', async () => {
+  it('reserves source-backed parallel drafts that satisfy the credential guard without claiming approval', async () => {
     const loaded = await new UltimateAppendixAStandardsSource().load({ programSlug: 'barber-apprenticeship' });
-    const profile = {...loaded, instructionalSources: [], lessonBlueprints: {}};
+    const profile = {...loaded, instructionalAuthoring:{provider:'google' as const,model:'gemini-test',version:'source-grounded-teaching-1'},lessonPresentation:'approved-premium-v1' as const,lessonBlueprints:{}};
     const {db,rows}=database();
     const seeded=await materializeUltimateDraft(db,'course',profile,undefined,{deferInstruction:true});
     expect(Object.keys(seeded.canonicalLessonIds!)).toHaveLength(profile.competencies.length);
     expect(Object.values(seeded.canonicalLessonIds!).every(Boolean)).toBe(true);
     for(const row of rows.course_lessons){
-      expect(row).toMatchObject({status:'draft',is_published:false,approved:false,generation_status:'queued',content:'',learning_objectives:[]});
-      expect(row.content_json).toMatchObject({instructionPending:true,releasePending:true});
-      expect(row.content_json.blueprint).toBeUndefined();
+      expect(row).toMatchObject({status:'draft',is_published:false,approved:false,generation_status:'generating'});
+      expect(row.content.length).toBeGreaterThan(180);
+      expect(row.learning_objectives.length).toBeGreaterThan(0);
+      expect(row.content_json).toMatchObject({instructionPending:true,sourceBlueprintOnly:true,releasePending:true});
+      expect(row.content_json.blueprint.segments.length).toBeGreaterThanOrEqual(13);
+      expect(row.content_json.blueprint.competencyId).toBe(row.content_json.competencyId);
+      expect(row.content_json.blueprint.authoringEvidence).toBeUndefined();
     }
     expect(await materializeUltimateDraft(db,'course',seeded,undefined,{deferInstruction:true})).toEqual(seeded);
     expect(rows.course_lessons).toHaveLength(profile.competencies.length);
@@ -57,6 +62,18 @@ describe('canonical source-backed draft materialization', () => {
     expect(await materializeUltimateDraft(db, 'course', seeded)).toEqual(seeded);
     expect(rows.course_lessons).toHaveLength(profile.competencies.length);
   });
+  it('retains a supplied valid authored blueprint without requiring a duplicate text source', async () => {
+    const profile = await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
+    const competency = profile.competencies[0];
+    const authored = await new UltimatePlatformInstructionalGenerator().blueprint({profile,competency});
+    const supplied = {...profile,instructionalSources:[],lessonBlueprints:{[competency.id]:authored}};
+    const {db,rows}=database();
+    await materializeUltimateDraft(db,'course',supplied,[competency.id],{deferInstruction:true});
+    expect(rows.course_lessons).toHaveLength(1);
+    expect(rows.course_lessons[0].content_json.blueprint.competencyId).toBe(competency.id);
+    expect(rows.course_lessons[0].approved).toBe(false);
+    expect(supplied.lessonBlueprints[competency.id]).toBe(authored);
+  });
   it('retains existing canonical lessons and their publication fields', async () => {
     const profile = await new UltimateAppendixAStandardsSource().load({ programSlug: 'barber-apprenticeship' });
     profile.competencies = [{ ...profile.competencies[0], id: 'existing-id' }];
@@ -71,6 +88,8 @@ describe('canonical source-backed draft materialization', () => {
     const profile = await new UltimateAppendixAStandardsSource().load({ programSlug: 'barber-apprenticeship' });
     const { db, rows } = database();
     await expect(materializeUltimateDraft(db, 'course', { ...profile, instructionalSources: [], lessonBlueprints: {} }))
+      .rejects.toThrow('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
+    await expect(materializeUltimateDraft(db, 'course', { ...profile, instructionalSources: [], lessonBlueprints: {} },undefined,{deferInstruction:true}))
       .rejects.toThrow('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
     expect(rows.course_lessons).toEqual([]);
   });

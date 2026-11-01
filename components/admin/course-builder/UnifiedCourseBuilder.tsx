@@ -157,6 +157,7 @@ export default function UnifiedCourseBuilder({
   const [suggestedPrompt,setSuggestedPrompt]=useState('');
   const [currentBuildId,setCurrentBuildId]=useState('');
   const [requestedLessonId,setRequestedLessonId]=useState('');
+  const [previewRevision,setPreviewRevision]=useState(0);
   const onBuild=useCallback((id:string,courseId?:string,status?:string)=>{
     setCurrentBuildId(id);
     if(courseId && status==='published')setCourses(previous=>
@@ -333,7 +334,7 @@ export default function UnifiedCourseBuilder({
               setTaskStatus(checkpoint ? (checkpoint.title||'Course task')+' · '+checkpoint.status.replaceAll('_',' ') : '');
               if(checkpoint?.status==='done')void loadCourses();
             }}
-            onCourseResult={(id,lessonId)=>{setCurrentBuildId('');setRequestedLessonId(lessonId??'');void loadCourses(id);openUltimate(id);setBrowserOpen(true);}}
+            onCourseResult={(id,lessonId)=>{setPreviewRevision(value=>value+1);setCurrentBuildId('');setRequestedLessonId(lessonId??'');void loadCourses(id);openUltimate(id);setBrowserOpen(true);}}
           />
         </div>
         {taskStatus && <p role="status" className="text-sm text-cyan-200">{taskStatus}</p>}
@@ -421,7 +422,7 @@ export default function UnifiedCourseBuilder({
           </header>
           <div ref={setPreviewTarget} className="min-h-0 flex-1 overflow-auto">
             {!currentBuildId && selectedCourse && <iframe title={selectedCourse.title+' — learner preview'}
-              src={'/api/admin/course-builder/preview?'+new URLSearchParams({courseId:selectedCourse.id,...(requestedLessonId?{lessonId:requestedLessonId}:{})})}
+              src={'/api/admin/course-builder/preview?'+new URLSearchParams({courseId:selectedCourse.id,revision:String(previewRevision),...(requestedLessonId?{lessonId:requestedLessonId}:{})})}
               className="h-full min-h-[36rem] w-full border-0 bg-white" allow="autoplay; fullscreen" />}
           </div>
         </section>}

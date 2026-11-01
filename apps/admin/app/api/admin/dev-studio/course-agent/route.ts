@@ -104,6 +104,16 @@ export async function POST(req: NextRequest) {
   if (!goal) return NextResponse.json({ error: 'A course build goal is required.' }, { status: 400 });
 
   const db = await requireAdminClient();
+  if (!courseId && programSlug) {
+    // Explicit program targets resolve by exact canonical slug, never by a
+    // competing course name in a compound request or saved sidebar context.
+    const {data: target, error} = await db.from('courses').select('id,program_id,slug')
+      .eq('slug', programSlug).maybeSingle();
+    if (error) throw error;
+    if (!target) return NextResponse.json({error:'Canonical course for the requested program was not found.'},{status:404});
+    courseId = target.id;
+    programId = text(target.program_id);
+  }
   if (courseId && !programId && !programSlug) {
     const { data: selectedCourse, error } = await db
       .from('courses')

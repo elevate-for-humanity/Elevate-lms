@@ -91,6 +91,9 @@ export async function POST(req: NextRequest) {
         authCookies,
         // Identity comes from verified Admin auth, never from the request body.
         ownerId: auth.user?.id,
+        // Only server-controlled Auth app metadata may shorten fixture lifetime.
+        // Neither request JSON nor user-editable user_metadata is trusted.
+        disposableQa: auth.user?.app_metadata?.qa_e2e === true,
       }),
       cache: 'no-store',
       signal: AbortSignal.timeout(35_000),
@@ -131,3 +134,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

@@ -19,8 +19,9 @@ import {GcsWorkspaceObjects} from './gcs-workspace-objects.mjs';
 import {BrowserWorkspaceStore} from './browser-workspace-store.mjs';
 import {TerminalSessions,TerminalSessionError} from './terminal-sessions.mjs';
 import { retireBrowserSession } from './session-retirement.mjs';
+import { browserSessionExpired } from './session-expiration.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
-import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
+import { prepareCourseVideoDownload } from './course-video-download.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -488,13 +489,14 @@ function authorized(req, session, requestUrl) {
   return supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
 }
 
-async function destroySession(id, {force=false} = {}) {
+async function destroySession(id, {force=false, canRetire=()=>true} = {}) {
   const session = sessions.get(id);
   if (!session) return;
   if(session.retirement) return force
     ? session.retirement.catch(()=>destroySession(id,{force:true})) : session.retirement;
   session.retirement = retireBrowserSession(session, {
     force,
+    canRetire,
     saveState:()=>saveBrowserWorkspace(session),
     onForcedFailure:()=>console.warn('Provider checkpoint failed during forced browser shutdown'),
     retire:async()=>{
@@ -938,7 +940,7 @@ export function createSessionCapacityGuard(limit, activeCount) {
 }
 const admitSession = createSessionCapacityGuard(maxSessions, () => sessions.size);
 
-async function createSession(target, viewport, authCookies = [], ownerId) {
+async function createSession(target, viewport, authCookies = [], ownerId, disposableQa = false) {
   const providerScope = providerSessions.scope(ownerId, target);
   const persistentOwner=typeof ownerId==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(ownerId)?ownerId:null;
   // Reuse the live worker session, including its workspace and downloads.
@@ -955,6 +957,9 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
   if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
   const state = browserManager.health().browserState;
   if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
+  // Cancelled acceptance jobs cannot run client-side DELETE cleanup. Reclaim
+  // only verified disposable fixtures that have disconnected and become idle.
+  await cleanupExpiredBrowserSessions();
   return admitSession(async () => {
   let restored;
   try{
@@ -1025,6 +1030,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         target,
         providerScope,
         ownerId: String(ownerId || ''),
+        disposableQa: disposableQa === true,
         restored:Boolean(restored),
         restoring:true,
         viewport,
@@ -1278,13 +1284,18 @@ export function sessionRequiresAuthentication(session, now = Date.now()) {
 }
 
 export function runActions(session, payload) {
+  session.activeActions = (session.activeActions || 0) + 1;
   if (payload?.actor === 'human') {
     session.manualControl = true;
     session.controlRevision = (session.controlRevision || 0) + 1;
   }
   // Serialize whole batches across all dashboard/worker HTTP connections.
   const queued = (session.actionQueue || Promise.resolve()).catch(() => undefined)
-    .then(() => executeActions(session, payload));
+    .then(() => executeActions(session, payload))
+    .finally(() => {
+      session.activeActions -= 1;
+      session.lastSeen = Date.now();
+    });
   session.actionQueue = queued;
   return queued;
 }
@@ -1735,7 +1746,7 @@ const server = http.createServer(async (req, res) => {
       const scope = typeof body.ownerId==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(body.ownerId)?'browser:'+body.ownerId:providerSessions.scope(body.ownerId,target);
       let creation = scope && providerSessionCreations.get(scope);
       if (!creation) {
-        creation = createSession(target, { width, height }, body.authCookies, body.ownerId);
+        creation = createSession(target, { width, height }, body.authCookies, body.ownerId, body.disposableQa === true);
         if (scope) providerSessionCreations.set(scope, creation);
       }
       let session;
@@ -1819,11 +1830,19 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-const cleanupTimer = setInterval(() => {
-  const cutoff = Date.now() - sessionTtlMs;
+async function cleanupExpiredBrowserSessions() {
+  const pending = [];
   for (const [id, session] of sessions)
-    if (session.lastSeen < cutoff && !hasActiveMediaTransfer(session.downloads))
-      void destroySession(id).catch(()=>console.warn('Idle browser session retained because checkpoint failed'));
+    if (browserSessionExpired(session, { ttlMs: sessionTtlMs }))
+      pending.push(destroySession(id, {
+        // A reconnect or action during the durable checkpoint cancels expiry.
+        canRetire: () => browserSessionExpired(session, { ttlMs: sessionTtlMs }),
+      }).catch(()=>console.warn('Idle browser session retained because checkpoint failed')));
+  await Promise.all(pending);
+}
+
+const cleanupTimer = setInterval(() => {
+  void cleanupExpiredBrowserSessions();
   for (const [id, test] of learnerTests) if (test.state !== 'running' && test.createdAt < Date.now() - 2 * 60 * 60_000) learnerTests.delete(id);
 }, 30_000).unref();
 
@@ -1870,3 +1889,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       );
   });
 }
+

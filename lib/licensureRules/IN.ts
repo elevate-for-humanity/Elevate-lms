@@ -13,18 +13,18 @@
 import type { LicensureRules } from './types';
 
 export const INDIANA_RULES: LicensureRules = {
-  rule_set_id: 'IN_2025_1',
+  rule_set_id: 'IN_BARBER_SCHOOL_2026_10_31',
   state_code: 'IN',
-  version: '2025.1',
-  effective_date: '2025-01-01',
+  version: '2026.10.31',
+  effective_date: '2026-10-31',
 
   // Total hours required for Indiana barber license
-  required_total_hours: 2000,
+  required_total_hours: 1500,
 
-  // Maximum hours that can be transferred (50% of total)
+  // Existing institutional transfer-policy compatibility value; not a verified PLA statutory cap.
   max_transfer_hours: 1000,
 
-  // At least 50% must be completed in Indiana
+  // Existing institutional in-state policy; not represented as a verified PLA requirement.
   min_in_state_percentage: 50,
 
   // Accepted sources for transfer credit
@@ -42,22 +42,12 @@ export const INDIANA_RULES: LicensureRules = {
   exam_required: true,
 
   // Must have all hours before exam
-  exam_eligibility_hours: 2000,
+  exam_eligibility_hours: 1500,
 
-  // Category-specific requirements (Indiana tracks these)
-  category_requirements: {
-    practical_training: {
-      min_hours: 1500,
-      max_transfer_hours: 750,
-    },
-    theory_instruction: {
-      min_hours: 500,
-      max_transfer_hours: 250,
-    },
-  },
+  // Do not invent a 1,500-practical + 500-theory allocation for the 1,500-hour school route.
 
   notes:
-    'Indiana requires completion of a USDOL Registered Apprenticeship or licensed barber school program. Final licensure approval is determined by the Indiana Professional Licensing Agency (IPLA).',
+    'PLA school-route minimum: 1,500 barber education hours. Source verified 2026-10-31: https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/ . Registered-apprenticeship completion is an alternative pathway, governed by its approved standard, not this school-hour threshold. Existing transfer-policy fields are institutional compatibility settings requiring case-specific review; final licensing approval rests with PLA.',
 };
 
 export default INDIANA_RULES;

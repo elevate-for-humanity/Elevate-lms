@@ -26,7 +26,9 @@ jobs:
     steps:
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/integration-connection-acceptance.yml/dispatches -f ref=main
+        run: |
+          gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/integration-connection-acceptance.yml/dispatches -f ref=main
+          gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-oauth-locations.yml/dispatches -f ref=main
   verify:
     needs: test
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'

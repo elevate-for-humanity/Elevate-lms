@@ -56,7 +56,18 @@ export class GoogleProvider implements AIProvider {
         if (!response.ok) {
           const body = await response.text().catch(() => '');
           lastError = new Error(`Google ${model} returned ${response.status}${body ? `: ${body.slice(0, 240)}` : ''}`);
-          if (response.status === 429) throw lastError;
+          // Google 429 is capacity/quota pressure: do not fan out to more models.
+          // Respect Retry-After for the caller and let the upstream circuit
+          // breaker schedule a bounded retry instead of amplifying traffic.
+          if (response.status === 429) {
+            const retryAfter = response.headers.get('retry-after');
+            const seconds = retryAfter && /^\d+$/.test(retryAfter.trim())
+              ? Math.min(300, Math.max(1, Number(retryAfter.trim())))
+              : 60;
+            const limited = new Error('GOOGLE_RATE_LIMITED: retry after ' + seconds + ' seconds');
+            Object.assign(limited, { status: 429, retryAfterSeconds: seconds, retryable: true });
+            throw limited;
+          }
           if ([404, 503].includes(response.status)) continue;
           throw lastError;
         }
@@ -83,7 +94,7 @@ export class GoogleProvider implements AIProvider {
         };
       } catch (error) {
         lastError = error as Error;
-        if (lastError.message.includes(' returned 429')) throw lastError;
+        if ((lastError as Error & { status?: number }).status === 429) throw lastError;
       }
     }
 

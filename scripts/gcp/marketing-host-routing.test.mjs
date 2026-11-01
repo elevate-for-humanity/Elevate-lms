@@ -17,9 +17,13 @@ const tenantSlugFromAppHost=()=>null;
 `;
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes(source)).toString('base64');
 const rolesUrl=moduleUrl(readFileSync(new URL('../../lib/rbac/role-matrix.ts',import.meta.url),'utf8'));
-const portalUrl=moduleUrl(readFileSync(new URL('../../lib/routing/portal-map.ts',import.meta.url),'utf8').replace("'@/lib/rbac/role-matrix'",JSON.stringify(rolesUrl)));
+const lmsHostUrl=moduleUrl(readFileSync(new URL('../../lib/routing/lms-host.ts',import.meta.url),'utf8'));
+const portalUrl=moduleUrl(readFileSync(new URL('../../lib/routing/portal-map.ts',import.meta.url),'utf8')
+  .replace("'@/lib/rbac/role-matrix'",JSON.stringify(rolesUrl))
+  .replace("'./lms-host'",JSON.stringify(lmsHostUrl)));
 const runtimeUrl=moduleUrl(readFileSync(new URL('../../lib/health/public-runtime-service.ts',import.meta.url),'utf8'));
-const routingImports=`import {ADMIN_HOST,LMS_HOST,MARKETING_HOST,getPortalKeyFromPath,PORTAL_MAP} from ${JSON.stringify(portalUrl)};\nimport {getPublicRuntimeService} from ${JSON.stringify(runtimeUrl)};\n`;
+const withdrawalsUrl=moduleUrl(readFileSync(new URL('../../lib/programs/withdrawn-programs.mjs',import.meta.url),'utf8'));
+const routingImports=`import {ADMIN_HOST,LMS_HOST,MARKETING_HOST,getPortalKeyFromPath,PORTAL_MAP} from ${JSON.stringify(portalUrl)};\nimport {getPublicRuntimeService} from ${JSON.stringify(runtimeUrl)};\nimport {isWithdrawnProgramRequest} from ${JSON.stringify(withdrawalsUrl)};\n`;
 const { middleware } = await import(moduleUrl(routingImports+boundaries+source));
 
 function request(host, path) {
@@ -35,7 +39,7 @@ for (const host of ['elevate-marketing-migration-aabnh2y32a-uc.a.run.app','eleva
   test(host + ' still authenticates protected portals', async () => {
     const result=await middleware(request(host,'/case-manager'));
     assert.equal(result.kind,'redirect');
-    assert.equal(new URL(result.url).hostname,'app.elevateforhumanity.org');
+    assert.equal(new URL(result.url).hostname,'lms.elevateforhumanity.org');
     assert.equal(new URL(result.url).pathname,'/login');
   });
 }

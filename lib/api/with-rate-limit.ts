@@ -84,6 +84,8 @@ export function withRateLimit<T = any>(
             headers: {
               ...headers,
               'Retry-After': retryAfter.toString(),
+              'X-Elevate-Rate-Limit-Source': 'application-custom',
+              'Cache-Control': 'private, no-store',
             },
           },
         );

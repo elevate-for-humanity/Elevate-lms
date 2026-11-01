@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function ApprenticeshipProgramsPage() {
-  redirect('/barber-and-beauty-apprenticeships');
+  redirect('/apprenticeships');
 }

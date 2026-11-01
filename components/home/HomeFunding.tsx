@@ -1,3 +1,4 @@
+import HomeSectionNarration from './HomeSectionNarration';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, CalendarDays, ClipboardList } from 'lucide-react';
@@ -12,10 +13,10 @@ export function HomeFunding() {
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div className="relative aspect-[3/2] overflow-hidden rounded-3xl bg-white">
           <Image
-            src="/images/pages/workone-packet-2.webp"
-            alt="Career training participant studying at a computer workstation"
+            src="/images/programs/refresh-20261101/employers.webp"
+            alt="Illustrative advisor discussing training options with adult learners"
             fill
-            className="object-contain object-center"
+            className="object-cover object-center"
             sizes="(max-width: 1024px) 100vw, 48vw"
             loading="lazy"
           />
@@ -29,8 +30,9 @@ export function HomeFunding() {
             id="funding-heading"
             className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
           >
-            Not sure how you will pay? Start here.
+            Complete your orientation, then connect it to Elevate.
           </h2>
+          <HomeSectionNarration section="funding" />
           <div className="mt-5 inline-flex rounded-full bg-emerald-100 px-5 py-2 text-sm font-black uppercase tracking-wide text-emerald-900">
             FREE to those who qualify
           </div>
@@ -61,9 +63,7 @@ export function HomeFunding() {
             <p className="text-xs font-black uppercase tracking-widest text-orange-800">
               Using WorkOne?
             </p>
-            <h3 className="mt-2 text-2xl font-black text-slate-950">
-              Complete your orientation, then connect it to Elevate.
-            </h3>
+            <h3 className="mt-2 text-2xl font-black text-slate-950">Your WorkOne next steps</h3>
             <p className="mt-2 text-sm leading-6 text-slate-700">
               Schedule the official Indianapolis WorkOne orientation, then complete Elevate&apos;s
               funding intake so we know where you are in the process.

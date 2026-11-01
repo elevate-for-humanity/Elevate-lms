@@ -57,10 +57,13 @@ export function HomeFeaturedHostShop() {
     return true;
   });
   return (
-    <section className="bg-white px-4 py-8 sm:py-12" aria-labelledby="featured-host-shop-heading"
+    <section
+      className="bg-white px-4 py-8 sm:py-12"
+      aria-labelledby="featured-host-shop-heading"
       data-scroll-narration
       data-narration="Host Shops are working barbershops and salons where apprentices build hands-on skills with licensed supervision. Elevate supports instruction and training records. Explore a shop or join the network. Placement and availability are confirmed during enrollment."
-      data-narration-style="instructor">
+      data-narration-style="instructor"
+    >
       <div className="mx-auto max-w-6xl">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-red-700">
           Earn while you learn
@@ -91,7 +94,7 @@ export function HomeFeaturedHostShop() {
                 href={shop.shopHref}
                 className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
               >
-                <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-white">
+                <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
                   <Image
                     src={shop.image}
                     alt={shop.imageAlt}
@@ -142,7 +145,7 @@ export function HomeFeaturedHostShop() {
             {
               name: 'Nail Technician Apprenticeship',
               label: 'Nail careers',
-              image: '/images/pexels/nail-tech.webp',
+              image: '/images/refresh-20261014/nail.webp',
               alt: 'Illustrative nail technician training',
               href: '/programs/nail-technician-apprenticeship',
               text: 'Explore nail services, manicuring, sanitation and professional client care.',
@@ -151,7 +154,7 @@ export function HomeFeaturedHostShop() {
             {
               name: 'Find your next pathway',
               label: 'Career training',
-              image: '/images/pexels/hero-workforce.webp',
+              image: '/images/programs/refresh-20261101/home.webp',
               alt: 'Adult professionals discussing career pathways',
               href: '/programs',
               text: 'Discover hands-on programs and the support to take your next step.',
@@ -166,7 +169,7 @@ export function HomeFeaturedHostShop() {
                 href={card.href}
                 className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
               >
-                <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-white">
+                <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
                   <Image
                     src={card.image}
                     alt={card.alt}

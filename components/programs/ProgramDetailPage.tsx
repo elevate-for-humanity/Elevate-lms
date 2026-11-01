@@ -18,12 +18,14 @@ import Image from 'next/image';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import HeroPicture from '@/components/marketing/HeroPicture';
-import HeroVideo from '@/components/marketing/HeroVideo';
+import NarratedProgramIntro, {
+  ProgramLearningPreview,
+  ProgramIntroductionAudio,
+} from './NarratedProgramIntro';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
-import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
+import { type HeroBannerConfig } from '@/content/heroBanners';
 import {
   BookOpen,
   Clock,
@@ -52,10 +54,6 @@ import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
-import {
-  sanitizePublicFundingList,
-  sanitizePublicFundingText,
-} from '@/lib/programs/public-funding-copy';
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
@@ -79,7 +77,7 @@ interface Props {
 
 export default function ProgramDetailPage({
   program: p,
-  banner: bannerProp,
+  banner,
   heroOverride,
   afterHero,
   visualContent,
@@ -210,77 +208,14 @@ export default function ProgramDetailPage({
         data-narration-rate="0.82"
         data-narration-style="instructor"
       >
-        {heroOverride ??
-          (() => {
-            // bannerProp is passed from the server page.tsx — use it first.
-            // heroBanners Proxy returns {} on the client (loadJsonOnce is server-only).
-            // Check pageKey to distinguish a real banner from the empty fallback object.
-            const banner = bannerProp ?? heroBanners[p.slug];
-            if (banner?.pageKey) {
-              const safeHeadline = sanitizePublicFundingText(
-                banner.belowHeroHeadline,
-                p.slug,
-                p.title,
-              );
-              const safeSubheadline = sanitizePublicFundingText(
-                banner.belowHeroSubheadline,
-                p.slug,
-                p.subtitle,
-              );
-              const safeTrustIndicators = sanitizePublicFundingList(banner.trustIndicators, p.slug);
-              const safeTranscript = sanitizePublicFundingText(
-                programHeroNarration,
-                p.slug,
-                safeSubheadline,
-              );
-              // Only use a recorded track when it was authored for this exact script.
-              // Otherwise the site-wide homepage narrator reads the current page-specific copy.
-              const voiceoverSrc =
-                safeTranscript === banner.transcript ? banner.voiceoverSrc : undefined;
-              const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
-                (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
-              );
-              // Keep configured motion on every shared program route. A real
-              // photograph stays beneath the video if delivery or autoplay fails.
-              if (banner.videoSrcDesktop || banner.videoSrcMobile) {
-                return (
-                  <HeroVideo
-                    videoSrcDesktop={banner.videoSrcDesktop}
-                    videoSrcMobile={banner.videoSrcMobile}
-                    posterImage={heroPosterSrc}
-                    microLabel={banner.microLabel}
-                    analyticsName={banner.analyticsName}
-                    heightClassName="h-[clamp(260px,42svh,480px)]"
-                    overlayMode="none"
-                    narrateTranscript={false}
-                    preloadTranscriptVoice={false}
-                  />
-                );
-              }
-              return (
-                <HeroPicture
-                  src={heroPosterSrc}
-                  alt={heroAlt}
-                  preserveAspectRatio={p.slug === 'bookkeeping'}
-                  microLabel={banner.microLabel}
-                  analyticsName={banner.analyticsName}
-                />
-              );
-            }
-            // Fallback: plain image hero for programs without a banner entry
-            return (
-              <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-                        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
-                  src={heroPosterSrc}
-                  alt={heroAlt}
-                  fill
-                  className="object-contain object-center"
-                  priority
-                  sizes="100vw"
-                />
-              </div>
-            );
-          })()}
+        {heroOverride ?? <NarratedProgramIntro program={p} banner={banner} />}
+        {heroOverride && p.slug !== 'hvac-technician' ? (
+          <div className="bg-slate-950 px-5 py-4 text-white">
+            <div className="mx-auto max-w-6xl">
+              <ProgramIntroductionAudio program={p} />
+            </div>
+          </div>
+        ) : null}
 
         {isWorkforceFunded ? (
           <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
@@ -346,7 +281,10 @@ export default function ProgramDetailPage({
         <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
-            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-slate-600 mb-5">
+            <nav
+              aria-label="Breadcrumb"
+              className="flex flex-wrap items-center gap-1.5 text-xs text-slate-600 mb-5"
+            >
               {(p.breadcrumbs ?? [])
                 .filter((b) => Boolean(b?.label))
                 .map((b, i) => (
@@ -501,7 +439,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {visualContent ? <div>{visualContent}</div> : null}
+      {visualContent ? <div>{visualContent}</div> : <ProgramLearningPreview program={p} />}
 
       <section
         id="program-overview"

@@ -8,10 +8,16 @@ const pathways = fs.readFileSync(path.resolve('components/home/HomeCareerPathway
 const funding = fs.readFileSync(path.resolve('components/home/HomeFunding.tsx'), 'utf8');
 
 describe('homepage platform introduction', () => {
-  it('features HVAC first and keeps the compact introduction and employer paths near the top', () => {
-    expect(page.indexOf('<HvacTrainingShowcase compact />')).toBeLessThan(page.indexOf('<PlatformHubHero compact />'));
-    expect(page.indexOf('<PlatformHubHero compact />')).toBeLessThan(page.indexOf('<HomeEmployerStrip />'));
-    expect(page.indexOf('<HomeEmployerStrip />')).toBeLessThan(page.indexOf('<HomeCareerPathways />'));
+  it('preserves the main hero and keeps HVAC and employer paths near the top', () => {
+    expect(page.indexOf('<PlatformHubHero />')).toBeLessThan(
+      page.indexOf('<HvacTrainingShowcase compact />'),
+    );
+    expect(page.indexOf('<HvacTrainingShowcase compact />')).toBeLessThan(
+      page.indexOf('<HomeEmployerStrip />'),
+    );
+    expect(page.indexOf('<HomeEmployerStrip />')).toBeLessThan(
+      page.indexOf('<HomeCareerPathways />'),
+    );
     expect(page).not.toContain('<HomeFunding />');
     expect(page).not.toContain('Get your taxes prepared. Start your own tax office.');
     expect(pathways).not.toContain("slug: 'hvac-technician'");
@@ -23,7 +29,9 @@ describe('homepage platform introduction', () => {
     expect(hero).toContain('career training, state and workforce funding pathways');
     expect(hero).toContain('Employers & Partners');
     expect(hero).toContain('Check Funding Options');
-    expect(pathways).toContain('programs; eligibility and authorization are determined individually.');
-    expect(funding).toContain('Not sure how you will pay? Start here.');
+    expect(pathways).toContain(
+      'programs; eligibility and authorization are determined individually.',
+    );
+    expect(funding).toContain('Complete your orientation, then connect it to Elevate.');
   });
 });

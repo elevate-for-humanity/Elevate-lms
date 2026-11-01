@@ -1,3 +1,4 @@
+import HomeSectionNarration from './HomeSectionNarration';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
@@ -8,24 +9,24 @@ const STEPS = [
     label: 'Apply',
     detail: 'Start with a short application so we know your program interest and next step.',
     href: '/apply',
-    img: '/images/business-training-vibrant-2026.webp',
-    imgAlt: 'Student completing application',
+    img: '/images/programs/refresh-20261101/home.webp',
+    imgAlt: 'Illustrative adult learners working with an instructor',
   },
   {
     n: '02',
     label: 'Review Funding',
     detail: 'Explore potential workforce funding and eligibility requirements before enrollment.',
     href: '/check-eligibility',
-    img: '/images/bookkeeping-training-vibrant-2026.webp',
-    imgAlt: 'Funding advisor reviewing eligibility with student',
+    img: '/images/programs/refresh-20261101/employers.webp',
+    imgAlt: 'Illustrative advisor reviewing a training plan',
   },
   {
     n: '03',
     label: 'Train',
     detail: 'Complete credential-aligned instruction and required hands-on learning.',
     href: '/programs',
-    img: '/images/programs/hvac/elevate-20261029/group-learning.webp',
-    imgAlt: 'Students in workforce training classroom',
+    img: '/images/programs/refresh-20261101/home.webp',
+    imgAlt: 'Illustrative adult learners studying together',
   },
   {
     n: '04',
@@ -33,8 +34,8 @@ const STEPS = [
     detail:
       'Eligible apprenticeship pathways combine structured training with employer-based learning.',
     href: '/apprenticeships',
-    img: '/images/partners/host-shop-mentoring-premium-2026.webp',
-    imgAlt: 'Apprentice working on-site with employer supervisor',
+    img: '/images/programs/refresh-20261101/beauty.webp',
+    imgAlt: 'Illustrative beauty instructor guiding salon practice',
   },
   {
     n: '05',
@@ -42,8 +43,8 @@ const STEPS = [
     detail:
       'Prepare for the credential, certification, or license requirement connected to your pathway.',
     href: '/credentials',
-    img: '/images/programs/hvac/elevate-20261029/instructor-demo.webp',
-    imgAlt: 'Career credential certificate',
+    img: '/images/programs/refresh-20261101/home.webp',
+    imgAlt: 'Illustrative learners reviewing their training materials',
   },
   {
     n: '06',
@@ -51,8 +52,8 @@ const STEPS = [
     detail:
       'Use career services, employer connections, and work-based learning support as you advance.',
     href: '/employment-support',
-    img: '/images/business-collaboration-vibrant-2026.webp',
-    imgAlt: 'Career advancement and employer connection',
+    img: '/images/programs/refresh-20261101/employers.webp',
+    imgAlt: 'Illustrative workforce advisor meeting business owners',
   },
 ] as const;
 
@@ -76,6 +77,7 @@ export function HomeHowItWorks() {
           </p>
         </div>
 
+        <HomeSectionNarration section="journey" />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {STEPS.map((step) => (
             <Link

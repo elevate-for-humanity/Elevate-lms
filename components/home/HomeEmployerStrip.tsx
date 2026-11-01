@@ -1,3 +1,4 @@
+import HomeSectionNarration from './HomeSectionNarration';
 /**
  * HomeEmployerStrip
  *
@@ -12,9 +13,9 @@ import { ROUTES } from '@/lib/navigation/routes';
 
 const EMPLOYER_PATHS = [
   {
-    accent: 'border-t-4 border-brand-green-500',
-    img: '/images/business-collaboration-vibrant-2026.webp',
-    imgAlt: 'Employer reviewing credentialed graduate candidates',
+    accent: 'border-t-4 border-orange-500',
+    img: '/images/programs/refresh-20261101/employers.webp',
+    imgAlt: 'Illustrative workforce advisor discussing hiring and training',
     title: 'Hire Credentialed Graduates',
     desc: 'Connect with trained candidates across healthcare, skilled trades, technology, and business pathways.',
     bullets: [
@@ -26,9 +27,9 @@ const EMPLOYER_PATHS = [
     cta: { label: 'Hiring & Employer Services', href: ROUTES.employersHireGraduates },
   },
   {
-    accent: 'border-t-4 border-blue-500',
-    img: '/images/partners/host-shop-mentoring-premium-2026.webp',
-    imgAlt: 'Apprentice working on-site with an employer supervisor',
+    accent: 'border-t-4 border-orange-500',
+    img: '/images/programs/refresh-20261101/beauty.webp',
+    imgAlt: 'Illustrative beauty apprentice learning under salon supervision',
     title: 'Become an Apprenticeship Host Site',
     desc: 'Approved businesses provide supervised on-the-job learning while Elevate manages Registered Apprenticeship sponsor governance, RTI, tracking, and compliance workflows.',
     bullets: [
@@ -40,9 +41,9 @@ const EMPLOYER_PATHS = [
     cta: { label: 'Host Site Program', href: ROUTES.apprenticeshipsHostShop },
   },
   {
-    accent: 'border-t-4 border-purple-500',
-    img: '/images/programs/hvac/elevate-20261029/group-learning.webp',
-    imgAlt: 'Custom employer training cohort in session',
+    accent: 'border-t-4 border-orange-500',
+    img: '/images/programs/refresh-20261101/home.webp',
+    imgAlt: 'Illustrative adult learners working with an instructor',
     title: 'Co-Design a Training Cohort',
     desc: 'Work with Elevate to structure a training cohort around job requirements, scheduling, credentials, and available workforce funding.',
     bullets: [
@@ -76,7 +77,8 @@ export function HomeEmployerStrip() {
               Three clear ways to work with Elevate.
             </h2>
             <p className="mb-4 max-w-3xl text-base font-medium leading-7 text-slate-700">
-              Connect with trained graduates, host an apprentice, or build a training cohort with Elevate.
+              Connect with trained graduates, host an apprentice, or build a training cohort with
+              Elevate.
             </p>
             <div className="flex flex-wrap gap-3">
               <a
@@ -93,16 +95,30 @@ export function HomeEmployerStrip() {
               </Link>
             </div>
           </div>
-
-
         </div>
 
         <div className="mb-8 flex flex-wrap gap-3">
-          <Link href="/apply/program-holder" className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-800">Apply as a Program Holder</Link>
-          <Link href="/partners/apply" className="inline-flex min-h-11 items-center rounded-lg border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-bold text-brand-blue-900 hover:bg-sky-50">Apply as a Partner</Link>
-          <Link href="/apply/employer" className="inline-flex min-h-11 items-center rounded-lg border-2 border-slate-900 px-5 py-2.5 text-sm font-bold text-slate-950 hover:bg-white">Apply as an Employer</Link>
+          <Link
+            href="/apply/program-holder"
+            className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-800"
+          >
+            Apply as a Program Holder
+          </Link>
+          <Link
+            href="/partners/apply"
+            className="inline-flex min-h-11 items-center rounded-lg border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-bold text-brand-blue-900 hover:bg-sky-50"
+          >
+            Apply as a Partner
+          </Link>
+          <Link
+            href="/apply/employer"
+            className="inline-flex min-h-11 items-center rounded-lg border-2 border-slate-900 px-5 py-2.5 text-sm font-bold text-slate-950 hover:bg-white"
+          >
+            Apply as an Employer
+          </Link>
         </div>
 
+        <HomeSectionNarration section="employers" />
         <div className="grid gap-6 md:grid-cols-3">
           {EMPLOYER_PATHS.map((path) => (
             <article
@@ -123,7 +139,9 @@ export function HomeEmployerStrip() {
 
               <div className="flex flex-1 flex-col p-4">
                 <h3 className="mb-2 text-lg font-black text-slate-950">{path.title}</h3>
-                <p className="mb-4 flex-1 text-sm font-medium leading-6 text-slate-700">{path.desc}</p>
+                <p className="mb-4 flex-1 text-sm font-medium leading-6 text-slate-700">
+                  {path.desc}
+                </p>
                 <Link
                   href={path.cta.href}
                   className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-slate-800"

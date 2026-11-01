@@ -10,10 +10,8 @@ import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
-import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
-import { HomeInstitutionalGateway } from '@/components/home/HomeInstitutionalGateway';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 
@@ -59,30 +57,36 @@ export default function HomePage() {
         data-homepage-curation="20261004"
         className="[&_a]:no-underline [&_a:hover]:no-underline"
       >
+        <PlatformHubHero />
         <HvacTrainingShowcase compact />
-        <PlatformHubHero compact />
         <HomeEmployerStrip />
         <HomeCareerPathways />
         <HomeHowItWorks />
         <HomeFeaturedHostShop />
-        <section className="border-y border-slate-200 bg-slate-50 px-5 py-8" aria-labelledby="tax-home-cta">
+        <section
+          className="border-y border-slate-200 bg-slate-50 px-5 py-8"
+          aria-labelledby="tax-home-cta"
+        >
           <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-sky-800">Supersonic Fast Cash</p>
-              <h2 id="tax-home-cta" className="mt-2 text-2xl font-bold text-slate-950">Tax preparation classes and in-office filing</h2>
+              <h2 id="tax-home-cta" className="mt-2 text-2xl font-bold text-slate-950">
+                Tax preparation classes and in-office filing
+              </h2>
               <p className="mt-3 max-w-2xl leading-7 text-slate-700">
-                Learn how to start your own tax preparation business through our business class,
-                or get help filing your tax return in our office.
+                Learn how to start your own tax preparation business through our business class, or
+                get help filing your tax return in our office.
               </p>
             </div>
-            <Link href="/tax" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-sky-800 px-5 py-3 font-semibold text-white hover:bg-sky-900">
+            <Link
+              href="/tax"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-sky-800 px-5 py-3 font-semibold text-white hover:bg-sky-900"
+            >
               Explore tax classes &amp; services
             </Link>
           </div>
         </section>
-        <HomeInstitutionalGateway />
         <HomeWebsiteBuilderSales />
-        <HomePlatformOverview />
         <div className="mx-auto max-w-6xl px-5">
           <ProgramGuideResources />
         </div>

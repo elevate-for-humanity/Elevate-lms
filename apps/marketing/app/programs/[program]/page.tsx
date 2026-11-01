@@ -145,25 +145,11 @@ export default async function PublicProgramPage({
         program={resolved}
         banner={banner}
         heroOverride={
-          isBusinessProgram ? (
-            <Link
-              href={resolved.cta.applyHref}
-              aria-label="Apply for the Business Administration October 15, 2026 cohort"
-              className="block w-full overflow-hidden bg-slate-950"
-            >
-              <Image
-                src="/images/cohorts/business-october-15-cohort-flyer.jpg"
-                alt="Business Administration applications open. Next cohort starts October 15, 2026. New cohorts start the 15th of every month."
-                width={1600}
-                height={900}
-                priority
-                sizes="100vw"
-                className="h-auto w-full"
-              />
-            </Link>
-          ) : isBookkeepingProgram ? (
+          isBookkeepingProgram ? (
             <div className="w-full overflow-hidden bg-white">
-              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+              <Image
+                placeholder="blur"
+                blurDataURL={IMAGE_LOADING_BLUR}
                 src="/images/heroes/bookkeeping-accounting-financial-empowerment.png"
                 alt="Accounting and Financial Empowerment Career Pathway Program led by Dr. Carlina A. Wilkes"
                 width={1536}

@@ -29,7 +29,6 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const pool=job.payload?.autopilot?.version==='three-role-v1';
   const key=job.build_id+':'+job.payload?.autopilot?.competencyId;
   if(!job.build_id||(pool?seenLessons.has(key):seenBuilds.has(job.build_id)))continue;
-  if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
   if(job.status!=='failed'||(!pool&&!COURSES.has(job.build?.course_id))||job.build?.profile?.ownerPaused===true||
    ['published','archived','cancelled'].includes(job.build?.status)||job.monitor?.enabled!==true||
    job.monitor?.lastRepairDeployment?.imageSha===imageSha||
@@ -68,7 +67,10 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    throw Error('REPAIR_RESUME_WRITE_HTTP_'+changed.status);
   }
   const saved=await changed.json();if(!Array.isArray(saved))throw Error('REPAIR_RESUME_READBACK_INVALID');
-  if(saved.length===1&&saved[0].id===job.id&&saved[0].status==='queued'&&saved[0].execution_generation===job.execution_generation+1)resumed.push(job.id);
+  if(saved.length===1&&saved[0].id===job.id&&saved[0].status==='queued'&&saved[0].execution_generation===job.execution_generation+1){
+   if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
+   resumed.push(job.id);
+  }
   else if(saved.length)throw Error('REPAIR_RESUME_READBACK_INVALID');
  }
  return {status:'repair_resume_checked',jobIds:resumed};

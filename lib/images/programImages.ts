@@ -84,9 +84,9 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Drug and alcohol specimen collector following a documented collection process',
   },
   'nha-ekg-technician': {
-    card: '/images/program-media-20261016/medical-assistant.webp',
+    card: '/images/pages/medical-assistant-lab.webp',
     hero: '/hero-images/healthcare-category.webp',
-    alt: 'EKG technician learner preparing equipment for a cardiac test',
+    alt: 'Healthcare professionals in a clinical care setting',
   },
   'nha-ehr': {
     card: `${P}/admin-docs-detail.webp`,

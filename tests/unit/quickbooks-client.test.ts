@@ -30,7 +30,7 @@ describe('QuickBooks runtime authorization', () => {
     const upsert = vi.fn();
     const fetchMock = vi.fn().mockResolvedValueOnce({ status: 401 }).mockResolvedValueOnce({ ok: true, json: async () => ({ refresh_token: 'new-refresh' }) });
     vi.stubGlobal('fetch', fetchMock);
-    await expect(quickBooksRequest({ from: () => ({ upsert }) }, config, 'companyinfo/company')).rejects.toThrow('invalid authorization response');
+    await expect(quickBooksRequest({ from: () => ({ upsert }), rpc: upsert }, config, 'companyinfo/company')).rejects.toThrow('invalid authorization response');
     expect(upsert).not.toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
@@ -39,18 +39,18 @@ describe('QuickBooks runtime authorization', () => {
     const upsert = vi.fn().mockResolvedValue({ error: { message: 'private-storage-error' } });
     const fetchMock = vi.fn().mockResolvedValueOnce({ status: 401 }).mockResolvedValueOnce({ ok: true, json: async () => ({ access_token: 'new-access', refresh_token: 'new-refresh' }) });
     vi.stubGlobal('fetch', fetchMock);
-    await expect(quickBooksRequest({ from: () => ({ upsert }) }, config, 'companyinfo/company')).rejects.toThrow('could not be saved');
-    expect(upsert).toHaveBeenCalledWith([expect.objectContaining({ key: 'QB_ACCESS_TOKEN', value: 'new-access' }), expect.objectContaining({ key: 'QB_REFRESH_TOKEN', value: 'new-refresh' })], { onConflict: 'key' });
+    await expect(quickBooksRequest({ from: () => ({ upsert }), rpc: upsert }, config, 'companyinfo/company')).rejects.toThrow('could not be saved');
+    expect(upsert).toHaveBeenCalledWith('rotate_quickbooks_authorization', {p_expected_refresh:'old-refresh',p_realm:'company',p_access:'new-access',p_refresh:'new-refresh'});
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it('retries a read with the refreshed token after durable storage succeeds', async () => {
-    const upsert = vi.fn().mockResolvedValue({ error: null });
+    const upsert = vi.fn().mockResolvedValue({ data: true, error: null });
     const fetchMock = vi.fn().mockResolvedValueOnce({ status: 401 })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ access_token: 'new-access', refresh_token: 'new-refresh' }) })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ CompanyInfo: { Id: 'company' } }) });
     vi.stubGlobal('fetch', fetchMock);
-    expect(await quickBooksRequest({ from: () => ({ upsert }) }, config, 'companyinfo/company')).toEqual({ CompanyInfo: { Id: 'company' } });
+    expect(await quickBooksRequest({ from: () => ({ upsert }), rpc: upsert }, config, 'companyinfo/company')).toEqual({ CompanyInfo: { Id: 'company' } });
     expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(fetchMock.mock.calls[2][1].headers.authorization).toBe('Bearer new-access');
     expect(upsert).toHaveBeenCalledOnce();
@@ -68,4 +68,29 @@ it.each([
   vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({status:401}).mockResolvedValueOnce(Response.json({error}, {status})));
   await expect(quickBooksRequest({from:()=>({upsert})}, config, 'companyinfo/company')).rejects.toMatchObject({reason});
   expect(upsert).not.toHaveBeenCalled();
+});
+
+it('shares concurrent refreshes instead of rotating the same grant twice', async () => {
+  const rpc = vi.fn().mockResolvedValue({data:true,error:null});
+  const request = vi.fn().mockImplementation(async (_url, init) => {
+    if (init.method === 'POST') return Response.json({access_token:'new-access',refresh_token:'new-refresh'});
+    return init.headers.authorization === 'Bearer old-access'
+      ? Response.json({}, {status:401}) : Response.json({CompanyInfo:{Id:'company'}});
+  });
+  vi.stubGlobal('fetch',request);
+  await Promise.all([quickBooksRequest({rpc},config,'companyinfo/company'),quickBooksRequest({rpc},config,'companyinfo/company')]);
+  expect(request.mock.calls.filter(([,init])=>init.method==='POST')).toHaveLength(1);
+  expect(rpc).toHaveBeenCalledTimes(1);
+});
+
+it('uses newer saved consent when a stale refresh loses its compare-and-set', async () => {
+  const latest = {...config,accessToken:'consented-access',refreshToken:'consented-refresh'};
+  const rpc=vi.fn().mockResolvedValue({data:false,error:null});
+  const db={rpc,from:()=>({select:()=>({in:async()=>({data:[['QB_ACCESS_TOKEN',latest.accessToken],['QB_REFRESH_TOKEN',latest.refreshToken],['QB_REALM_ID','company']].map(([key,value])=>({key,value})),error:null})})})};
+  const request=vi.fn().mockResolvedValueOnce(Response.json({}, {status:401}))
+    .mockResolvedValueOnce(Response.json({access_token:'stale-access',refresh_token:'stale-refresh'}))
+    .mockResolvedValueOnce(Response.json({CompanyInfo:{Id:'company'}}));
+  vi.stubGlobal('fetch',request);
+  await quickBooksRequest(db,config,'companyinfo/company');
+  expect(request.mock.calls[2][1].headers.authorization).toBe('Bearer consented-access');
 });

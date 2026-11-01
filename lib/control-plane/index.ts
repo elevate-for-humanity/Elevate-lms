@@ -6,6 +6,7 @@
  * Supabase, Cloudflare, GitHub, deployments, AI agents, and workflows.
  */
 
+import { probePlatformService } from './service-probe';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { setAuditContext } from '@/lib/audit-context';
@@ -58,6 +59,12 @@ export interface ControlAction {
   description: string;
 }
 
+function inventoryScope(tenantId: string | null): string {
+  if (tenantId === null) return 'tenant_id.is.null';
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tenantId)) throw new Error('Valid tenant identity required');
+  return `tenant_id.is.null,tenant_id.eq.${tenantId}`;
+}
+
 // Get platform map
 export async function getPlatformMap(tenantId: string): Promise<{
   services: PlatformService[];
@@ -66,11 +73,12 @@ export async function getPlatformMap(tenantId: string): Promise<{
   degraded: number;
   down: number;
 }> {
-  const { data: services } = await (await getSupabaseClient())
+  const { data: services, error } = await (await getSupabaseClient())
     .from('platform_services')
     .select('*')
-    .eq('tenant_id', tenantId)
+    .or(inventoryScope(tenantId))
     .order('service_name');
+  if (error) throw new Error('Platform service inventory is unavailable');
 
   const mappedServices: PlatformService[] = (services || []).map(s => ({
     id: s.id,
@@ -79,7 +87,7 @@ export async function getPlatformMap(tenantId: string): Promise<{
     url: s.url,
     provider: s.provider,
     environment: s.environment,
-    status: s.status,
+    status: s.last_health_check && Date.parse(s.last_health_check) <= Date.now() && Date.now() - Date.parse(s.last_health_check) < 10 * 60 * 1000 ? s.status : 'unknown',
     uptime_percent: s.uptime_percent,
     last_health_check: s.last_health_check,
     related_env_vars: s.related_env_vars || [],
@@ -94,81 +102,34 @@ export async function getPlatformMap(tenantId: string): Promise<{
   };
 }
 
-// Health Monitor - Check all services
-export async function checkAllHealth(tenantId: string): Promise<{
+// Health evidence is recorded for failed and unverified checks as well as passes.
+export async function checkAllHealth(tenantId: string | null): Promise<{
   checks: HealthCheck[];
   overall_status: 'healthy' | 'degraded' | 'down';
 }> {
-  const { data: services } = await (await getSupabaseClient())
-    .from('platform_services')
-    .select('*')
-    .eq('tenant_id', tenantId);
-
+  const db = await getSupabaseClient();
+  const { data: services, error } = await db.from('platform_services').select('*').or(inventoryScope(tenantId));
+  if (error) throw new Error('Platform service inventory is unavailable');
+  const results = await Promise.allSettled((services || []).map(async (service: any) => {
+    const result = await probePlatformService(service);
+    const { error: receiptError } = await db.from('platform_health_checks').insert({
+      ...result, tenant_id: service.tenant_id, service_id: service.id, check_type: 'api',
+    });
+    if (receiptError) throw new Error('Platform health receipt could not be saved');
+    const { error: updateError } = await db.from('platform_services').update({
+      status: result.status === 'pass' ? 'healthy' : result.status === 'fail' ? 'down' : 'unknown',
+      last_health_check: result.checked_at,
+    }).eq('id', service.id);
+    if (updateError) throw new Error('Platform health status could not be saved');
+    return { ...result, service_id: service.id, service_name: service.service_name };
+  }));
   const checks: HealthCheck[] = [];
-  const now = new Date().toISOString();
-
-  for (const service of services || []) {
-    try {
-      const startTime = Date.now();
-      const response = await fetch(service.url, {
-        method: 'HEAD',
-        signal: AbortSignal.timeout(10000),
-      });
-      const responseTime = Date.now() - startTime;
-
-      const status = response.ok ? 'pass' : response.status >= 500 ? 'fail' : 'warning';
-
-      checks.push({
-        service_id: service.id,
-        service_name: service.service_name,
-        status,
-        response_time_ms: responseTime,
-        checked_at: now,
-      });
-
-      // Update service status
-      await (await getSupabaseClient())
-        .from('platform_services')
-        .update({ 
-          status: status === 'pass' ? 'healthy' : status === 'warning' ? 'degraded' : 'down',
-          last_health_check: now,
-        })
-        .eq('id', service.id);
-
-      // Log health check
-      await (await getSupabaseClient()).from('platform_health_checks').insert({
-        tenant_id: tenantId,
-        service_id: service.id,
-        check_type: 'uptime',
-        status,
-        response_time_ms: responseTime,
-        status_code: response.status,
-        checked_at: now,
-      });
-    } catch (error) {
-      checks.push({
-        service_id: service.id,
-        service_name: service.service_name,
-        status: 'fail',
-        response_time_ms: 0,
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-        checked_at: now,
-      });
-
-      await (await getSupabaseClient())
-        .from('platform_services')
-        .update({ status: 'down', last_health_check: now })
-        .eq('id', service.id);
-    }
+  for (const result of results) {
+    if (result.status === 'rejected') throw new Error('Platform health persistence failed');
+    checks.push(result.value);
   }
-
-  const hasFailures = checks.some(c => c.status === 'fail');
-  const hasWarnings = checks.some(c => c.status === 'warning');
-
-  return {
-    checks,
-    overall_status: hasFailures ? 'down' : hasWarnings ? 'degraded' : 'healthy',
-  };
+  return { checks, overall_status: !checks.length ? 'degraded' : checks.some(c => c.status === 'fail') ? 'down'
+    : checks.some(c => c.status === 'warning') ? 'degraded' : 'healthy' };
 }
 
 // Control Actions
@@ -454,23 +415,20 @@ export async function getPlatformLogs(
   return { logs: data || [], total: count || 0 };
 }
 
-// Get integration status
+// Read shared runtime observations as well as the tenant's integrations.
 export async function getIntegrations(tenantId: string): Promise<{
-  integrations: unknown[];
-  connected: number;
-  disconnected: number;
+  integrations: unknown[]; connected: number; disconnected: number;
 }> {
-  const { data } = await (await getSupabaseClient())
-    .from('platform_integrations')
-    .select('*')
-    .eq('tenant_id', tenantId);
-
-  const integrations = data || [];
-  return {
-    integrations,
-    connected: integrations.filter((i: unknown) => (i as { status: string }).status === 'connected').length,
-    disconnected: integrations.filter((i: unknown) => (i as { status: string }).status !== 'connected').length,
-  };
+  const { data, error } = await (await getSupabaseClient()).from('platform_integrations')
+    .select('*').or(inventoryScope(tenantId));
+  if (error) throw new Error('Integration inventory is unavailable');
+  const integrations = (data || []).map((row: any) => {
+    const checked = Date.parse(row.metadata?.checked_at || '');
+    const fresh = Number.isFinite(checked) && checked <= Date.now() && Date.now() - checked < 600_000;
+    return { ...row, status: row.status === 'connected' && !fresh ? 'testing' : row.status };
+  });
+  return { integrations, connected: integrations.filter((row: any) => row.status === 'connected').length,
+    disconnected: integrations.filter((row: any) => row.status !== 'connected').length };
 }
 
 // Approve control action

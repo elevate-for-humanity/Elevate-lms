@@ -11,8 +11,9 @@ function concurrency(role,env,demand){
  if(value===undefined || value==='')return demand;
  const count=Number(value);
  if(!Number.isSafeInteger(count)||count<1)throw Error('ULTIMATE_AUTOPILOT_CONCURRENCY_INVALID:'+role);
- if(count<demand)throw Error('ULTIMATE_ACTIVE_WORKER_CONTRACT_VIOLATION:'+role+':required='+demand+':configured='+count);
- return demand;
+ // A smaller configured ceiling is backpressure, not a fatal dispatcher error.
+ // Admit available slots and report uncovered work for the next coordinated pass.
+ return Math.min(count,demand);
 }
 
 // Cloud inventory can lag a just-acknowledged asynchronous launch. Retain its

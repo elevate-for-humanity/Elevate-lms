@@ -83,6 +83,25 @@ def tls_endpoint(text):
   body=re.sub(r'^'+key+r'=.*\n?', '',body,flags=re.M)
   body=body.rstrip()+'\n'+key+'='+value+'\n'
  return text[:match.start(2)]+body+text[match.end(2):]
+def attempted_tls_evidence():
+ # Capture the failed candidate before rollback. Emit booleans only, never raw
+ # Asterisk logs, certificates, private keys, or command output.
+ settings=cli('pjsip show transport elevate-twilio-tls')
+ paths={key:match[1] for key in ['cert_file','priv_key_file']
+  if (match:=re.search(r'^\s*'+key+r'\s*:\s*(/etc/asterisk/[A-Za-z0-9_./-]+)\s*$',settings,re.M))}
+ readable={key:run(['docker','exec','--user','asterisk','pbx_asterisk_1','sh','-c','if test -r "$1"; then echo yes; else echo no; fi','check',path]).strip()=='yes'
+  for key,path in paths.items()}
+ logs=''
+ for args in [['docker','logs','--since','5m','--tail','300','pbx_asterisk_1'],
+              ['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/full']]:
+  result=subprocess.run(args,capture_output=True,text=True,timeout=20)
+  logs+=result.stdout+result.stderr
+ patterns={'certificateLoadError':r'Unable to load.*(?:cert|key)|SSL.*(?:cert|key).*error',
+  'noSharedCipher':r'no shared cipher','keyMismatch':r'key values mismatch',
+  'permissionDenied':r'Permission denied','bindError':r'Unable to bind|Address already in use',
+  'tlsFailure':r'TLS|SSL'}
+ return {'candidateCertificateConfigured':'cert_file' in paths,'candidateKeyConfigured':'priv_key_file' in paths,
+  'candidateFilesReadable':readable,'candidateLogSignals':{key:bool(re.search(pattern,logs,re.I)) for key,pattern in patterns.items()}}
 def apply():
  state=cli('core show channels count')
  if not idle_state(state):raise ValueError('PBX_ACTIVE_CALLS_OR_UNKNOWN')
@@ -136,7 +155,9 @@ def apply():
     transport=cli('pjsip show transport elevate-twilio-tls')
     settings={key:match[1] for key in ['method','verify_client','require_client_cert','verify_server','protocol']
      if (match:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_.-]+)\s*$',transport,re.M))}
-    print(json.dumps({'sipTlsFailure':TLS_FAILURE,'transportSettings':settings}),flush=True)
+    try:diagnostics=attempted_tls_evidence()
+    except Exception:diagnostics={'candidateDiagnosticsUnavailable':True}
+    print(json.dumps({'sipTlsFailure':TLS_FAILURE,'transportSettings':settings,**diagnostics}),flush=True)
     raise ValueError('PBX_TRUSTED_SIP_TLS_FAILED')
   for attempt in range(30):
    if re.search(r'\belevate-paris\b',cli('ari show apps')):break

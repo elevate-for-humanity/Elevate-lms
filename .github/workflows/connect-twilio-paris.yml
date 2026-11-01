@@ -2,10 +2,10 @@ name: Connect active Twilio number to PARIS answering
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['scripts/gcp/connect-twilio-paris*', 'scripts/gcp/*connect-pbx-paris-ingress.py', '.github/workflows/connect-twilio-paris.yml']
+    paths: ['scripts/gcp/connect-twilio-paris*', 'scripts/gcp/retire-standalone-trunk*', 'scripts/gcp/stage-twilio-trunk.py', 'scripts/gcp/*connect-pbx-paris-ingress.py', '.github/workflows/connect-twilio-paris.yml']
   push:
     branches: [main]
-    paths: ['scripts/gcp/connect-twilio-paris.mjs', 'scripts/gcp/connect-pbx-paris-ingress.py', '.github/workflows/connect-twilio-paris.yml']
+    paths: ['scripts/gcp/connect-twilio-paris.mjs', 'scripts/gcp/retire-standalone-trunk.mjs', 'scripts/gcp/stage-twilio-trunk.py', 'scripts/gcp/connect-pbx-paris-ingress.py', '.github/workflows/connect-twilio-paris.yml']
 permissions: {contents: read, actions: write, id-token: write}
 concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('paris-ingress-checks-{0}', github.ref) }}
@@ -20,7 +20,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --test scripts/gcp/connect-twilio-paris.test.mjs
+      - run: node --test scripts/gcp/connect-twilio-paris.test.mjs scripts/gcp/retire-standalone-trunk.test.mjs
       - run: python3 scripts/gcp/test-connect-pbx-paris-ingress.py
   dispatch:
     if: github.event_name == 'push'
@@ -38,7 +38,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --test scripts/gcp/connect-twilio-paris.test.mjs && python3 scripts/gcp/test-connect-pbx-paris-ingress.py
+      - run: node --test scripts/gcp/connect-twilio-paris.test.mjs scripts/gcp/retire-standalone-trunk.test.mjs && python3 scripts/gcp/test-connect-pbx-paris-ingress.py
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -46,6 +46,14 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
+      - name: Remove the retired PBX contact without making TLS rollback restore it
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 - --retire-standalone' < scripts/gcp/connect-pbx-paris-ingress.py
+      - name: Permanently retire the verified empty standalone trunk at Twilio
+        env: {AUTHORIZED_RETIRED_TRUNK: 'elevate-standalone.pstn.twilio.com'}
+        run: node scripts/gcp/retire-standalone-trunk.mjs
       - name: Verify target, prepare trusted idle PBX ingress and PARIS fallback
         run: |
           set -euo pipefail

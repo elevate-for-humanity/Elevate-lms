@@ -11,6 +11,7 @@ import ssl
 import socket
 import time
 import hashlib
+import sys
 # Official Twilio signaling gateways: https://www.twilio.com/docs/sip-trunking/ip-addresses
 SIGNALING=['54.172.60.0/30','54.244.51.0/30','54.171.127.192/30','35.156.191.128/30','54.65.63.192/30','54.169.127.128/30','54.252.254.64/30','177.71.206.192/30']
 ROOT=Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
@@ -18,7 +19,7 @@ MARKER='; Managed Elevate PARIS business-number ingress'
 def run(args):
  result=subprocess.run(args,capture_output=True,text=True,timeout=30)
  if result.returncode:raise ValueError('PBX_INGRESS_COMMAND_FAILED')
- return result.stdout
+ return re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', result.stdout)
 def cli(value):return run(['docker','exec','pbx_asterisk_1','asterisk','-rx',value])
 def idle_state(text):return all(re.search(r'^0 active '+kind+r's?$',text,re.M) for kind in ['call','channel'])
 def ingress_plan():
@@ -34,6 +35,15 @@ def update_endpoint(text):
  if len(re.findall(r'^context=.*$',body,re.M))!=1:raise ValueError('PBX_CARRIER_CONTEXT_AMBIGUOUS')
  body=re.sub(r'^context=.*$', 'context=elevate-paris-inbound',body,flags=re.M)
  return text[:match.start(2)]+body+text[match.end(2):]
+def update_outbound_aor(text):
+ pattern=r'(?ms)(^\[twilio-aor\]\s*\n)(.*?)(?=^\[|\Z)'
+ match=re.search(pattern,text)
+ if not match or not re.search(r'^type=aor\s*$',match[2],re.M):raise ValueError('PBX_CARRIER_AOR_UNVERIFIED')
+ contacts=re.findall(r'^contact=(.*)$',match[2],re.M)
+ allowed=['sip:elevate-standalone.pstn.twilio.com:5061;transport=tls','sip:elevate-4632401404.pstn.twilio.com:5061;transport=tls']
+ if len(contacts)!=1 or contacts[0].replace('\\;', ';') not in allowed:raise ValueError('PBX_CARRIER_CONTACT_REQUIRES_REVIEW')
+ body=re.sub(r'^contact=.*$', lambda _: 'contact='+allowed[1].replace(';', r'\;'),match[2],flags=re.M)
+ return text[:match.start(2)]+body+text[match.end(2):]
 def verified_identity(text):
  networks=set()
  for raw in re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}/(?:[0-9]{1,3}\.){3}[0-9]{1,3}|\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}\b',text):
@@ -41,11 +51,17 @@ def verified_identity(text):
   except ValueError:pass
  return set(SIGNALING).issubset(networks)
 TLS_FAILURE='not_checked'
+def sip_tls_context():
+ context=ssl.create_default_context()
+ context.minimum_version=ssl.TLSVersion.TLSv1_2
+ context.maximum_version=ssl.TLSVersion.TLSv1_2
+ context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384')
+ return context
 def trusted_sip_tls():
  global TLS_FAILURE
  try:
   with socket.create_connection(('127.0.0.1',5061),timeout=5) as raw:
-   with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
+   with sip_tls_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
     TLS_FAILURE='none'
     return bool(secure.getpeercert())
  except ssl.SSLCertVerificationError as error:
@@ -100,8 +116,27 @@ def attempted_tls_evidence():
   'noSharedCipher':r'no shared cipher','keyMismatch':r'key values mismatch',
   'permissionDenied':r'Permission denied','bindError':r'Unable to bind|Address already in use',
   'tlsFailure':r'TLS|SSL'}
- return {'candidateCertificateConfigured':'cert_file' in paths,'candidateKeyConfigured':'priv_key_file' in paths,
+ certificate=run(['openssl','x509','-in',str(ROOT/'tls/phone.crt'),'-noout','-text'])
+ return {'candidateCertificateUsesRsa':bool(re.search(r'Public Key Algorithm:\s*rsaEncryption\b',certificate)),
+  'candidateCertificateConfigured':'cert_file' in paths,'candidateKeyConfigured':'priv_key_file' in paths,
   'candidateFilesReadable':readable,'candidateLogSignals':{key:bool(re.search(pattern,logs,re.I)) for key,pattern in patterns.items()}}
+def retire_standalone_contact():
+ # This migration commits the new AOR independently of TLS activation. A later
+ # TLS rollback must never restore the retired standalone contact.
+ if not idle_state(cli('core show channels count')):raise ValueError('PBX_ACTIVE_CALLS_OR_UNKNOWN')
+ fragment=ROOT/'elevate-twilio.conf'
+ if fragment.is_symlink():raise ValueError('PBX_INGRESS_SYMLINK_REJECTED')
+ before=fragment.read_text();after=update_outbound_aor(before)
+ try:
+  if after!=before:fragment.write_text(after);cli('module reload res_pjsip.so')
+  for attempt in range(12):
+   if 'sip:elevate-4632401404.pstn.twilio.com:5061;transport=tls' in cli('pjsip show aor twilio-aor'):
+    return {'retiredContactRemoved':True,'dedicatedTrunkContactVerified':True,'liveCallAcceptance':'NOT_TESTED'}
+   time.sleep(0.25)
+  raise ValueError('PBX_CARRIER_CONTACT_READBACK_FAILED')
+ except Exception:
+  if after!=before:fragment.write_text(before);cli('module reload res_pjsip.so')
+  raise
 def apply():
  state=cli('core show channels count')
  if not idle_state(state):raise ValueError('PBX_ACTIVE_CALLS_OR_UNKNOWN')
@@ -116,7 +151,7 @@ def apply():
  for p in files[3:5]:
   if p.exists() and not p.read_text().startswith(MARKER):raise ValueError('PBX_INGRESS_FILE_OWNERSHIP_UNVERIFIED')
  previous={p:p.read_text() if p.exists() else None for p in files}
- new_endpoint=update_endpoint(previous[files[0]] or '')
+ new_endpoint=update_outbound_aor(update_endpoint(previous[files[0]] or ''))
  if repair_tls:new_endpoint=tls_endpoint(new_endpoint)
  gid=run(['docker','exec','pbx_asterisk_1','id','-g','asterisk']).strip()
  if not gid.isdigit():raise ValueError('PBX_GROUP_UNVERIFIED')
@@ -163,6 +198,8 @@ def apply():
    if re.search(r'\belevate-paris\b',cli('ari show apps')):break
    time.sleep(1)
   if not re.search(r'\belevate-paris\b',cli('ari show apps')):raise ValueError('PBX_PARIS_NOT_REGISTERED_AFTER_RELOAD')
+  aor=cli('pjsip show aor twilio-aor')
+  if 'sip:elevate-4632401404.pstn.twilio.com:5061;transport=tls' not in aor:raise ValueError('PBX_CARRIER_CONTACT_READBACK_FAILED')
   endpoint=cli('pjsip show endpoint twilio')
   plan=cli('dialplan show +14632401404@elevate-paris-inbound')
   identity=cli('pjsip show identify elevate-twilio-carrier-identity')
@@ -183,5 +220,7 @@ def failure_evidence(error):
   reason='PBX_COMMAND_TIMEOUT' if isinstance(error,subprocess.TimeoutExpired) else 'PBX_UNEXPECTED_FAILURE'
  return {'result':'FAIL','code':'PBX_PARIS_INGRESS_NOT_CONFIRMED','reason':reason}
 if __name__=='__main__':
- try:print(json.dumps(apply()))
+ try:
+  if sys.argv[1:] not in [[],['--retire-standalone']]:raise ValueError('PBX_OPERATION_UNRECOGNIZED')
+  print(json.dumps(retire_standalone_contact() if sys.argv[1:] else apply()))
  except Exception as error:print(json.dumps(failure_evidence(error)));raise SystemExit(1)

@@ -4,6 +4,34 @@ import {verifiedTwilioBindings} from './bind-twilio-runtime.mjs';
 const NUMBER='+14632401404';
 const DOMAIN='elevate-4632401404.pstn.twilio.com';
 const SIP='sip:phone.elevateforhumanity.org:5061;transport=tls';
+const PBX_IP='107.178.216.162';
+const ACL_NAME='Elevate PBX 4632401404 only';
+async function configureTermination(api,accountBase,trunkBase,account) {
+ const url=accountBase+'/SIP/IpAccessControlLists.json';
+ const inventory=await api(url+'?PageSize=100');
+ if(!Array.isArray(inventory.ip_access_control_lists)||inventory.next_page_uri)throw Error('VOICE_ACL_INVENTORY_INCOMPLETE');
+ const matches=inventory.ip_access_control_lists.filter(item=>item.friendly_name===ACL_NAME);
+ if(matches.length>1)throw Error('VOICE_ACL_AMBIGUOUS');
+ let acl=matches[0];
+ if(!acl)acl=await api(url,{FriendlyName:ACL_NAME});
+ if(acl.account_sid!==account||acl.friendly_name!==ACL_NAME||!/^AL[a-f0-9]{32}$/i.test(acl.sid||''))throw Error('VOICE_ACL_OWNERSHIP_UNVERIFIED');
+ const addresses=accountBase+'/SIP/IpAccessControlLists/'+acl.sid+'/IpAddresses.json';
+ const valid=entry=>entry.account_sid===account&&entry.ip_access_control_list_sid===acl.sid&&entry.ip_address===PBX_IP&&entry.cidr_prefix_length===32;
+ const before=await api(addresses+'?PageSize=100');
+ if(!Array.isArray(before.ip_addresses)||before.next_page_uri||before.ip_addresses.length>1||before.ip_addresses.some(item=>!valid(item)))throw Error('VOICE_ACL_SOURCE_REQUIRES_REVIEW');
+ if(!before.ip_addresses.length) {
+  const created=await api(addresses,{FriendlyName:'Owned Google PBX only',IpAddress:PBX_IP,CidrPrefixLength:'32'});
+  if(!valid(created))throw Error('VOICE_ACL_SOURCE_NOT_CONFIRMED');
+ }
+ const credentials=await api(trunkBase+'/CredentialLists?PageSize=100');
+ if(!Array.isArray(credentials.credential_lists)||credentials.meta?.next_page_url||credentials.credential_lists.length)throw Error('VOICE_TRUNK_CREDENTIALS_REQUIRES_REVIEW');
+ const linkedUrl=trunkBase+'/IpAccessControlLists';
+ const links=await api(linkedUrl+'?PageSize=100');
+ if(!Array.isArray(links.ip_access_control_lists)||links.meta?.next_page_url||links.ip_access_control_lists.some(item=>item.sid!==acl.sid||item.account_sid!==account))throw Error('VOICE_TRUNK_ACL_REQUIRES_REVIEW');
+ if(!links.ip_access_control_lists.length)await api(linkedUrl,{IpAccessControlListSid:acl.sid});
+ const [verifiedAddresses,verifiedLinks]=await Promise.all([api(addresses+'?PageSize=100'),api(linkedUrl+'?PageSize=100')]);
+ if(verifiedAddresses.next_page_uri||verifiedAddresses.ip_addresses?.length!==1||!valid(verifiedAddresses.ip_addresses[0])||verifiedLinks.meta?.next_page_url||verifiedLinks.ip_access_control_lists?.length!==1||verifiedLinks.ip_access_control_lists[0].sid!==acl.sid||verifiedLinks.ip_access_control_lists[0].account_sid!==account)throw Error('VOICE_TERMINATION_AUTH_NOT_CONFIRMED');
+}
 export async function connectTwilioParis(bindings,request=fetch) {
  const account=bindings.TWILIO_ACCOUNT_SID;
  if(bindings.TWILIO_PHONE_NUMBER!==NUMBER||!/^AC[a-f0-9]{32}$/i.test(account||''))throw Error('VOICE_ACCOUNT_IDENTITY_INVALID');
@@ -39,6 +67,7 @@ export async function connectTwilioParis(bindings,request=fetch) {
  if(!origin)origin=await api(base+'/OriginationUrls',{FriendlyName:'Elevate Google PBX',SipUrl:SIP,Priority:'10',Weight:'10',Enabled:'true'});
  else if(origin.enabled!==true)origin=await api(base+'/OriginationUrls/'+origin.sid,{Enabled:'true'});
  if(origin.sip_url!==SIP||origin.enabled!==true)throw Error('VOICE_ORIGINATION_UNVERIFIED');
+ await configureTermination(api,accountBase,base,account);
  const url=accountBase+'/IncomingPhoneNumbers/'+number.sid+'.json';
  let changed=false;
  try {
@@ -50,7 +79,7 @@ export async function connectTwilioParis(bindings,request=fetch) {
   if(verified.account_sid!==account||verified.phone_number!==NUMBER||verified.trunk_sid!==trunk.sid||verified.voice_application_sid)throw Error('VOICE_NUMBER_ROUTE_NOT_CONFIRMED');
   const finalOrigins=await api(base+'/OriginationUrls?PageSize=100');
   if(!finalOrigins.origination_urls?.some(u=>u.sip_url===SIP&&u.enabled===true))throw Error('VOICE_ORIGINATION_READBACK_FAILED');
-  return {numberOwnershipVerified:true,secureTrunkVerified:true,ownedPbxDestinationVerified:true,carrierRouteChanged:changed,liveCallAcceptance:'NOT_TESTED'};
+  return {numberOwnershipVerified:true,secureTrunkVerified:true,terminationPbxIpVerified:true,ownedPbxDestinationVerified:true,carrierRouteChanged:changed,liveCallAcceptance:'NOT_TESTED'};
  } catch(error) {
   if(changed) {
    try {

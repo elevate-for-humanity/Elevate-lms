@@ -23,7 +23,7 @@ CONTAINER = 'pbx_asterisk_1'
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
 NAME = 'elevate-twilio-validation'
 NETWORK = NAME + '-internal'
-CONFIG = '''; Managed Elevate Twilio carrier endpoint
+CONFIG = r'''; Managed Elevate Twilio carrier endpoint
 [elevate-twilio-tls]
 type=transport
 protocol=tls
@@ -39,7 +39,7 @@ local_net=127.0.0.0/8
 
 [twilio-aor]
 type=aor
-contact=sip:elevate-standalone.pstn.twilio.com:5061;transport=tls
+contact=sip:elevate-4632401404.pstn.twilio.com:5061\;transport=tls
 
 [twilio]
 type=endpoint
@@ -132,7 +132,7 @@ def validate():
             run(['docker', 'network', 'create', '--internal', '--driver=bridge', NETWORK])
             network_created = True
             run(['docker', 'run', '-d', '--name', NAME, '--network=' + NETWORK, '--restart=no',
-                 '--add-host', 'elevate-standalone.pstn.twilio.com:127.0.0.1',
+                 '--add-host', 'elevate-4632401404.pstn.twilio.com:127.0.0.1',
                  '-v', str(staging) + ':/etc/asterisk:ro', '--entrypoint', 'asterisk',
                  live['Image'], '-f', '-C', '/etc/asterisk/asterisk.conf'])
             created = True

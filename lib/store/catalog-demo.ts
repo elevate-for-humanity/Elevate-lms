@@ -11,9 +11,14 @@ export function catalogDemo(item: CommerceCatalogItem) {
   return capability ? `/store/demo/capability/${capability}` : `/store/demo/offer/${item.id}`;
 }
 
+const APP_POSTERS: Record<string, string> = {
+  'website-builder': '/images/store-commercials/website-builder.webp',
+  'sam-gov': '/images/store-commercials/sam-gov.webp',
+  grants: '/images/store-commercials/grants.webp',
+};
+
 export function catalogPoster(item: CommerceCatalogItem) {
-  if (['website-builder', 'sam-gov', 'grants'].includes(item.id))
-    return `/images/store-commercials/${item.id}.webp`;
+  if (APP_POSTERS[item.id]) return APP_POSTERS[item.id];
   if (item.category === 'education') return '/images/programs/refresh-20261101/home.webp';
   if (item.category === 'workforce') return '/images/programs/refresh-20261101/employers.webp';
   return '/images/programs/refresh-20261101/business.webp';

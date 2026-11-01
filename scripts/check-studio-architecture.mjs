@@ -493,7 +493,7 @@ for (const invariant of ['startCanonicalCourse', "body.action === 'queue-course'
     fail(`Ultimate Course Builder API is missing: ${invariant}`);
 }
 const legacyCourseBuilderApi = read('apps/admin/app/api/admin/course-builder/route.ts');
-for (const invariant of ['requestCanonicalGeneration', 'archivedGenerationActions.includes(action)', '202']) {
+for (const invariant of ['requestCanonicalGeneration', 'canonicalGenerationActions.includes(action)', '202']) {
   if (!legacyCourseBuilderApi.includes(invariant))
     fail(`generation entry point bypasses Ultimate: ${invariant}`);
 }

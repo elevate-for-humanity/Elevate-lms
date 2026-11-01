@@ -80,3 +80,69 @@ The connected Supabase tools expose SQL metadata but no authenticated Storage do
 Durable Drive copy of the signed July 10 source: https://drive.google.com/file/d/1l3e7hmyQQDM5CvQfYZzDv1g2vR23vrVR/view . Filename and 784,906-byte size match the earlier Gmail source; the Drive copy was not independently rehashed.
 
 Closure requires: (1) inspect both instructor syllabi and the separately assigned course, establish which cohort each applies to, and reconcile instructional, independent-study, and support hours without double counting; (2) obtain the issued signed Hair Stylist occupation attachment or authoritative RAPIDS approval record; (3) obtain an approved provider-change record before changing the nail provider named in the signed source. These three items remain open; no hours, signatures, or amendment evidence were invented.
+
+
+## Barber and esthetics RTI verification — November 1, 2026
+
+### Governing evidence and signature inspection
+
+Independently downloaded the [existing Drive PDF](https://drive.google.com/file/d/1l3e7hmyQQDM5CvQfYZzDv1g2vR23vrVR/view) (784,906 bytes). SHA-256 independently reproduced: `66fb85fb01aa92fae959e32840f48319ac1b4f59853962b66b887b3968497c34`. Cover visually identifies registration 2025-IN-132301, registration January 14, 2025, revision July 10, 2025, adding 0030CB, 2089CB and 2090CB. A sponsor signature is visible; handwriting identity was not independently authenticated.
+
+Poppler pdfsig reports TIFFANIE CLAWSON, U.S. Government / Department of Labor / Employment Training Administration; July 10, 2025 signing time; SHA-256; total document signed; signature valid. Certificate issuer is not trusted by this environment, so independent certificate-chain/revocation validation is not claimed. The cover's visible signature time is 15:41:22 -04:00. The later signed revision is the controlling retrieved evidence for these occupations, consistent with both active database standard-version records. A current RAPIDS export or authority confirmation is still needed to exclude any later unlocated amendments.
+
+The [June 12, 2025 Barber DOCX](https://docs.google.com/document/d/1uQ9Kickve1l-cZIfK_o77F7WGHYdfZrb/edit) has blank occupation codes, term, ratio, wages and RTI provider fields, and an unallocated 144-hour template outline. It is not used to override the signed revision.
+
+### Exact subject comparison
+
+PDF pages 7 and 13 (both printed A-6) were rendered and visually inspected. Every subject title and hour below matches `lib/compliance/appendix-a-standards.ts` and live `apprenticeship_rti_requirements`, in display order. Main project: `cuxzzpsyufcewtmicszk`.
+
+| Occupation | Signed instructional subject | PDF hours | TypeScript hours | Database hours |
+| --- | --- | ---: | ---: | ---: |
+| Barber | Barbering History and Professional Development | 10 | 10 | 10 |
+| Barber | Anatomy, Physiology & Skin/Nail Disorders | 60 | 60 | 60 |
+| Barber | Hair & Scalp Theory, Disorders, and Treatments | 60 | 60 | 60 |
+| Barber | Infection Control & Bloodborne Pathogens (OSHA) | 40 | 40 | 40 |
+| Barber | Hair Cutting Theory, Tool Safety, and Techniques | 60 | 60 | 60 |
+| Barber | State Board Laws, Rules, and Regulations | 10 | 10 | 10 |
+| Barber | Business Practices | 10 | 10 | 10 |
+| Barber | Preparation for State Licensing Examination | 10 | 10 | 10 |
+| Esthetician | Esthetics History & Professional Ethics | 10 | 10 | 10 |
+| Esthetician | Anatomy, Physiology & Skin Disorders | 60 | 60 | 60 |
+| Esthetician | Skin Types, Conditions & Product Selection | 60 | 60 | 60 |
+| Esthetician | Facial Techniques & Equipment Usage | 40 | 40 | 40 |
+| Esthetician | Methods & Safety | 40 | 40 | 40 |
+| Esthetician | Makeup Fundamentals | 60 | 60 | 60 |
+| Esthetician | State Laws & Licensing Requirements | 10 | 10 | 10 |
+| Esthetician | Retailing, Client Care & Business Practices | 10 | 10 | 10 |
+| Esthetician | State Licensing Exam Preparation | 10 | 10 | 10 |
+
+| Verified measure | Barber | Esthetician |
+| --- | ---: | ---: |
+| Sum of subject hours | 260 | 300 |
+| Declared TypeScript RTI | 260 | 300 |
+| Active standard-version RTI | 260 | 300 |
+| Program min_rti_hours | 260 | 300 |
+| Required database competencies | 14 | 20 |
+| Signed competency count | 14 | 20 |
+
+The 320/400 assertions are arithmetic errors, not conflicting approved allocations. No RTI database correction was necessary. A program's training_hours field is not automatically its registered RTI field: inspected values are 260 for barber and 2,000 for esthetician; the latter has no verified RTI meaning and was not relabeled or changed. Likewise, the canonical totalOjlHours value of 2,000 is not established as a fixed completion requirement by these competency-based appendices. The registered-program contract correctly exposes fixedOjlCompletionHours as null. Retain separate operational and approved-standard meanings pending delivery evidence.
+
+Configuration tracing: RAPIDS metadata and enrollment generation use getRegisteredProgramStandard; the registered-program contract reads the canonical RTI values. The active database revisions are July 10, 2025. The syllabus router points to the two files below.
+
+### Corrections and verification
+
+- Added exact source subject titles and contact-hour allocations, source links/page references, and the signed annual 144-hour instruction provision to `public/docs/syllabi/barber-apprenticeship.md` and `public/docs/syllabi/professional-esthetician.md`.
+- Commits: barber `5e8859c4adf7520c986395cc9157995898f9a36b`; esthetician `bf86f9d7a5802e163cd10f528dac896e3fe24fa8`.
+- Read both updated files back from main; contents match the intended replacements exactly. Automated ordered subject-title/hour comparison passed for all 17 database rows against TypeScript; totals independently computed as 260/300.
+- Final read-only database query confirms active revision, totals, program minimums, and required competency counts match. No database writes, learner progress changes, recorded-hour changes, signed-standard edits, or approved requirement changes were made.
+- Changes are Markdown documentation only. No application code/build change was made; full build and live website deployment verification are not claimed.
+
+### Evidence still required before submission readiness
+
+1. Current RAPIDS occupation export or DOL confirmation of the governing revision and any subsequent amendments; independent trusted certificate validation if required by the submission reviewer.
+2. A dated delivery schedule allocating the complete 260/300 contact hours to actual instruction, instructors, lessons/workbooks, attendance and assessments; show how the signed annual 144-hour provision is met without double counting OJL.
+3. Subject-level delivery and mastery evidence, individual practical signoffs, qualified instructors and supervisors, approved sites, signed agreements, and applicable wage progression. Matching required-hour records does not prove completed instruction.
+4. A competency-by-competency crosswalk to the applicable **2026–2027** Indiana NLPS pathway/course standards, with course sequence, prerequisites, assessment and practical evidence, instructor assignment eligibility and any required school/CTE adoption or credit arrangements. The [official CHE pathway resources](https://www.in.gov/che/cte/career-pathways-programs-of-study/) identify the July 6, 2026 NLPS review version, assignment codes and adoption process. The full current review document could not be retrieved through the web tool in this pass due to its size; no detailed current NLPS equivalency is claimed.
+5. Document the specific submission route and obtain the relevant Indiana authority's determination of licensing eligibility and education/provider requirements. DOL apprenticeship approval does not alone establish secondary CTE equivalency, state licensure, funding eligibility, or DOE program approval.
+
+Disposition: **RTI source/TypeScript/database requirement alignment verified; syllabus allocations corrected. Program delivery, current state pathway equivalency and overall submission readiness remain unverified.**

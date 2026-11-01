@@ -88,3 +88,9 @@ test('stale approved speech repairs narration before attempting another render',
   assert.deepEqual(routeSelectiveRepairs([{code,message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]),[{step:'natural_narration',codes:[code],rebuildOnlyThisStage:true}]);
  }
 });
+
+
+test('nested render asset failure repairs the saved visual assignment, not the film', () => {
+ const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:scene-2'}];
+ assert.deepEqual(routeSelectiveRepairs(findings),[{step:'visual_assignment',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+});

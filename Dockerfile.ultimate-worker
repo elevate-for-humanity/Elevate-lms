@@ -2,8 +2,15 @@
 # Source changes replace the complete builder; no lesson output/checkpoint is copied.
 FROM us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:c3ff77f903eeb1621312d295fa05cb380b60ccc513028955fa00f98ca4159d35
 WORKDIR /app
+# Resolve aliases from this release, independent of the pinned runtime's config.
+COPY tsconfig.ultimate-worker.json ./tsconfig.json
+ENV TSX_TSCONFIG_PATH=/app/tsconfig.json
 COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
+COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
+COPY lib/compliance/appendix-a-standards.ts ./lib/compliance/appendix-a-standards.ts
+COPY lib/curriculum/blueprints ./lib/curriculum/blueprints
+COPY lib/curriculum/registered-beauty ./lib/curriculum/registered-beauty
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
 COPY lib/video ./lib/video
 COPY remotion-src ./remotion-src

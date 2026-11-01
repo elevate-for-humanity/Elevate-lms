@@ -28,6 +28,8 @@ jobs:
         with: {skip_install: true}
       - name: Read transport listener and handshake evidence
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/diagnose-pbx-sip-tls.py
+      - name: Exercise and clean up two private loopback media channels without dialing
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/probe-paris-local-media.py
       - name: Read redacted recent media failure reasons
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-paris-call-signals.py
       - name: Verify the exact deployed private HTTPS greeting helper

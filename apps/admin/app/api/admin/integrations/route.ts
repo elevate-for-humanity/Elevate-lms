@@ -4,6 +4,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { summarizeSyncEvidence } from '@/lib/integrations/sync-evidence';
 
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const provider = new URL(request.url).searchParams.get('provider');
+  if (!provider) return safeError('Provider is required', 400);
 
   const db = await requireAdminClient();
   if (!db) return safeError('Service unavailable', 503);
@@ -25,12 +27,22 @@ export async function GET(request: NextRequest) {
 
   if (error) return safeDbError(error, 'Failed to fetch integration status');
 
+  const { data: syncRows, error: syncError } = await db
+    .from('integration_sync_log')
+    .select('action,status,records,created_at')
+    .eq('provider', provider)
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (syncError) return safeDbError(syncError, 'Failed to fetch synchronization evidence');
+
   return NextResponse.json({
-    connected: data?.is_active ?? false,
-    status: data?.status ?? 'not_configured',
-    last_sync: data?.updated_at ?? null,
-    contacts: 0,
-    leads: 0,
+    // This legacy table contains configuration only, never live provider proof.
+    connected: false,
+    connection_verified: false,
+    enabled: data?.is_active ?? false,
+    status: data ? 'unverified' : 'not_configured',
+    configuration_updated_at: data?.updated_at ?? null,
+    ...summarizeSyncEvidence(syncRows ?? []),
   });
 }
 

@@ -76,7 +76,7 @@ describe('anonymous portal request boundary', () => {
   });
   it.each(['/student', '/student-portal', '/student/dashboard'])('sends legacy %s to the actual student workspace', async (path) => {
     const response = await marketing(new NextRequest(`https://www.elevateforhumanity.org${path}`));
-    expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/lms/dashboard');
+    expect(response.headers.get('location')).toBe('https://lms.elevateforhumanity.org/lms/dashboard');
   });
   it.each(['/apprenticeships', '/employers', '/partners/host-shops', '/platform/student-portal'])('preserves public %s', async (path) => {
     const response = await marketing(new NextRequest(`https://www.elevateforhumanity.org${path}`));

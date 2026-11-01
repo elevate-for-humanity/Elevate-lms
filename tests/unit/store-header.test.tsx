@@ -31,6 +31,7 @@ describe('standalone Store navigation', () => {
       expect(markup).toContain(`href="${href}"`);
     }
     expect(markup).not.toContain('app.elevateforhumanity.org');
+    expect(markup).not.toContain('lms.elevateforhumanity.org');
     expect(markup).not.toContain('href="/programs"');
   });
 
@@ -40,7 +41,7 @@ describe('standalone Store navigation', () => {
     vi.stubEnv('STORE_ONLY_RUNTIME', 'true');
     const markup = renderToStaticMarkup(<Header />);
     expect(markup).toContain('href="/programs"');
-    expect(markup).toContain('app.elevateforhumanity.org/login');
+    expect(markup).toContain('lms.elevateforhumanity.org/login');
   });
 
   it('prerenders the Store header using the validated image component', () => {

@@ -24,14 +24,14 @@ describe('one enrollment-based learner home across login, API, and dashboard', (
     it(`${slug} overrides a cached generic dashboard in both login resolvers`, async () => {
       const { db, calls } = database([{ program_slug: slug, status: 'active', enrollment_state: 'active' }]);
       expect(await resolvePortalForUser(db, 'learner')).toBe(`/apprentice?program=${slug}`);
-      expect(await resolveStudentHomePath(db, 'learner', 'beauty')).toBe(`https://app.elevateforhumanity.org/apprentice?program=${slug}`);
+      expect(await resolveStudentHomePath(db, 'learner', 'beauty')).toBe(`https://lms.elevateforhumanity.org/apprentice?program=${slug}`);
       expect(calls).toContainEqual(['program_enrollments', 'or', 'user_id.eq.learner,student_id.eq.learner']);
     });
   }
   it('does not let an old apprentice cache override a current standard learner enrollment', async () => {
     const { db } = database([{ program_slug: 'hvac-technician', status: 'active' }], 'barber');
     expect(await resolvePortalForUser(db, 'learner')).toBe('/lms/dashboard');
-    expect(await resolveStudentHomePath(db, 'learner', 'barber')).toBe('https://app.elevateforhumanity.org/lms/dashboard');
+    expect(await resolveStudentHomePath(db, 'learner', 'barber')).toBe('https://lms.elevateforhumanity.org/lms/dashboard');
   });
   it('ignores withdrawn records even when an old workflow field still says active', async () => {
     const { db } = database([{ program_slug: 'barber-apprenticeship', status: 'withdrawn', enrollment_state: 'active' }, { program_slug: 'bookkeeping', status: 'active' }]);

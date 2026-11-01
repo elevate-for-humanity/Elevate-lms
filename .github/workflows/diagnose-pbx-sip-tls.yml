@@ -4,14 +4,24 @@ on:
     branches: [main]
     paths: ['scripts/gcp/audit-live-phone-configuration.py', 'scripts/gcp/audit-paris-call-signals.py', 'scripts/gcp/diagnose-pbx-sip-tls.py', '.github/workflows/diagnose-pbx-sip-tls.yml']
   workflow_dispatch:
+    inputs:
+      local_media_probe:
+        description: Exercise temporary owned loopback media channels without dialing
+        type: boolean
+        default: false
 permissions: {contents: read, actions: write, id-token: write}
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('paris-diagnostics-{0}', github.ref) }}
+  cancel-in-progress: false
 jobs:
   dispatch:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
-      - env: {GH_TOKEN: '${{ github.token }}'}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-pbx-sip-tls.yml/dispatches" -f ref=main
+      - env:
+          GH_TOKEN: '${{ github.token }}'
+          LOCAL_MEDIA_PROBE: ${{ github.event.head_commit.message == 'Probe PARIS simple and softmix RTP with local controls' && 'true' || 'false' }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-pbx-sip-tls.yml/dispatches" -f ref=main -f "inputs[local_media_probe]=$LOCAL_MEDIA_PROBE"
   diagnose:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -28,7 +38,8 @@ jobs:
         with: {skip_install: true}
       - name: Read transport listener and handshake evidence
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/diagnose-pbx-sip-tls.py
-      - name: Exercise and clean up two private loopback media channels without dialing
+      - name: Exercise and clean up temporary private loopback media channels without dialing
+        if: inputs.local_media_probe
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/probe-paris-local-media.py
       - name: Read redacted recent media failure reasons
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-paris-call-signals.py

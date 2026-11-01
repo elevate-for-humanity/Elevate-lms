@@ -97,7 +97,7 @@ export function LivePreviewIframe({
       )}
       {constrainedWidth ? (
         <div className="flex h-full justify-center overflow-auto bg-slate-100 p-2">
-          <div className="h-full bg-white shadow-lg ring-1 ring-slate-200" style={{ width: constrainedWidth }}>
+          <div className="h-full bg-white shadow-lg ring-1 ring-slate-200" style={{ width: constrainedWidth, maxWidth: '100%', height: device === 'mobile' ? 'min(640px, 70dvh)' : undefined }}>
             {iframe}
           </div>
         </div>

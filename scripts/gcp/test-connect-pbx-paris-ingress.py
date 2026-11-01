@@ -30,11 +30,41 @@ class Tests(unittest.TestCase):
   from types import SimpleNamespace
   import json
   transport='cert_file : /etc/asterisk/tls/phone.crt\npriv_key_file : /etc/asterisk/tls/phone.key\n'
-  with patch.object(m,'cli',return_value=transport),patch.object(m,'run',side_effect=['yes\n','no\n']) as access,patch.object(m.subprocess,'run',return_value=SimpleNamespace(stdout='Permission denied secret=private',stderr='no shared cipher')):
+  with patch.object(m,'cli',return_value=transport),patch.object(m,'run',side_effect=['yes\n','no\n','Public Key Algorithm: rsaEncryption']) as access,patch.object(m.subprocess,'run',return_value=SimpleNamespace(stdout='Permission denied secret=private',stderr='no shared cipher')):
    evidence=m.attempted_tls_evidence()
   self.assertEqual(evidence['candidateFilesReadable'],{'cert_file':True,'priv_key_file':False})
   self.assertTrue(evidence['candidateLogSignals']['noSharedCipher'])
   self.assertTrue(evidence['candidateLogSignals']['permissionDenied'])
   self.assertNotIn('private',json.dumps(evidence));self.assertNotIn('/etc/',json.dumps(evidence))
-  self.assertTrue(all(call.args[0][2:4]==['--user','asterisk'] for call in access.call_args_list))
+  self.assertTrue(all(call.args[0][2:4]==['--user','asterisk'] for call in access.call_args_list[:2]))
+ def test_outbound_aor_uses_the_owned_dedicated_trunk(self):
+  original='[before]\nkeep=yes\n[twilio-aor]\ntype=aor\ncontact=sip:elevate-standalone.pstn.twilio.com:5061;transport=tls\n[twilio]\ntype=endpoint\n'
+  changed=m.update_outbound_aor(original)
+  self.assertIn(r'contact=sip:elevate-4632401404.pstn.twilio.com:5061\;transport=tls',changed)
+  self.assertIn('[before]\nkeep=yes',changed)
+  self.assertEqual(changed,m.update_outbound_aor(changed))
+ def test_unreviewed_aor_is_rejected(self):
+  with self.assertRaisesRegex(ValueError,'CONTACT_REQUIRES_REVIEW'):
+   m.update_outbound_aor('[twilio-aor]\ntype=aor\ncontact=sip:other.example\n')
+ def test_sip_probe_preserves_trust_and_uses_carrier_rsa_ciphers(self):
+  context=m.sip_tls_context()
+  self.assertEqual(context.minimum_version,m.ssl.TLSVersion.TLSv1_2)
+  self.assertEqual(context.maximum_version,m.ssl.TLSVersion.TLSv1_2)
+  self.assertTrue(context.check_hostname);self.assertEqual(context.verify_mode,m.ssl.CERT_REQUIRED)
+  ciphers=[c for c in context.get_ciphers() if c['protocol']=='TLSv1.2']
+  self.assertTrue(ciphers);self.assertTrue(all(c['auth']=='auth-rsa' for c in ciphers))
+ def test_retirement_commits_new_contact_before_any_tls_changes(self):
+  from unittest.mock import patch
+  import tempfile
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);fragment=root/'elevate-twilio.conf'
+   fragment.write_text('[twilio-aor]\ntype=aor\ncontact=sip:elevate-standalone.pstn.twilio.com:5061;transport=tls\n')
+   def command(value):
+    if value=='core show channels count':return '0 active calls\n0 active channels'
+    if value=='module reload res_pjsip.so':return 'Module reloaded'
+    if value=='pjsip show aor twilio-aor':return fragment.read_text().replace('\\;', ';')
+    self.fail('Unexpected command '+value)
+   with patch.object(m,'ROOT',root),patch.object(m,'cli',side_effect=command),patch.object(m,'trusted_sip_tls',side_effect=AssertionError('TLS activation must remain separate')):
+    self.assertTrue(m.retire_standalone_contact()['retiredContactRemoved'])
+   self.assertNotIn('elevate-standalone',fragment.read_text())
 if __name__=='__main__':unittest.main()

@@ -48,6 +48,8 @@ on:
       - 'supabase/migrations/*_lesson_autopilot_runtime.sql'
       - 'scripts/gcp/prepare-course-authoring-access.mjs'
       - 'scripts/gcp/prepare-course-authoring-access.test.mjs'
+      - 'scripts/audits/october-course-builder-diff-inventory.mjs'
+      - 'scripts/gcp/verify-course-runtime-contract.mjs'
       - 'scripts/gcp/audit-course-production.mjs'
       - 'scripts/gcp/audit-course-production.test.mjs'
       - 'workers/admin-speech-cache.mjs'
@@ -117,6 +119,15 @@ jobs:
         with:
           node-version: '22'
       # .dockerignore excludes federation credential files from the build context.
+      - name: Inventory every October Course Builder first-parent change
+        run: |
+          git fetch --unshallow origin || git fetch --depth=10000 origin main
+          node scripts/audits/october-course-builder-diff-inventory.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: october-course-builder-diff-inventory
+          path: audit-output/october-course-builder-changes.json
+          retention-days: 30
       - name: Show federated identity claim context
         run: |
           echo "repository=$GITHUB_REPOSITORY"
@@ -210,6 +221,10 @@ jobs:
         run: |
           node --test scripts/gcp/deploy-lesson-autopilots.test.mjs scripts/gcp/dispatch-lesson-autopilots.test.mjs
           node scripts/gcp/deploy-lesson-autopilots.mjs
+      - name: Verify all five deployed worker image digests and runtime identities
+        env:
+          IMAGE_SHA: ${{ github.sha }}
+        run: node scripts/gcp/verify-course-runtime-contract.mjs
       - name: Resume repaired saved lessons after verified image deployment
         env:
           IMAGE_SHA: ${{ github.sha }}

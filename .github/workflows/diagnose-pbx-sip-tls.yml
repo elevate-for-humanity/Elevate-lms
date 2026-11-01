@@ -2,7 +2,7 @@ name: Diagnose PBX SIP TLS without changing routing
 on:
   push:
     branches: [main]
-    paths: ['scripts/gcp/audit-paris-call-signals.py', 'scripts/gcp/diagnose-pbx-sip-tls.py', '.github/workflows/diagnose-pbx-sip-tls.yml']
+    paths: ['scripts/gcp/audit-live-phone-configuration.py', 'scripts/gcp/audit-paris-call-signals.py', 'scripts/gcp/diagnose-pbx-sip-tls.py', '.github/workflows/diagnose-pbx-sip-tls.yml']
   workflow_dispatch:
 permissions: {contents: read, actions: write, id-token: write}
 jobs:
@@ -38,3 +38,5 @@ jobs:
           SELF_CALL_MODE: inspect
           INSPECT_SELF_CALL_SID: CA916df45179d3b62b4e9d2c3cae6a226d
         run: node scripts/gcp/exercise-paris-self-call.mjs
+      - name: Verify the exact deployed private HTTPS greeting helper
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py

@@ -100,7 +100,7 @@ def voice_probe(token, google_token, send=request):
         except Exception:
             return False
     status, reply = send(url, headers, {**base, 'event': 'greeting'})
-    report = {'greetingHttpStatus': status, 'greetingAudioReturned': status == 200 and audible(reply)}
+    report = {'greetingHttpStatus': status, 'greetingAudioReturned': status == 200 and audible(reply), 'greetingAudioDurationSeconds':round(len(base64.b64decode(reply.get('replyAudioUlawBase64','')))/8000,2) if status==200 and audible(reply) else 0}
     tts_status, tts = send('https://texttospeech.googleapis.com/v1/text:synthesize',
         {'Authorization': 'Bearer ' + google_token, 'Content-Type': 'application/json'},
         {'input': {'text': 'Please connect me to the operator.'},
@@ -118,6 +118,20 @@ def voice_probe(token, google_token, send=request):
                    'operatorReplyAudioReturned': status == 200 and audible(reply)})
     return report
 
+
+def private_gateway_probe(token):
+    # Exercise the exact deployed Node HTTPS helper; direct adapter HTTP does
+    # not verify proxy routing, Node trust, or the deployed response envelope.
+    program="""import fs from 'node:fs';
+import {privateTurn} from '/opt/elevate-pbx/paris/private-turn.mjs';
+const input=JSON.parse(fs.readFileSync(0,'utf8'));
+try{const reply=await privateTurn('https://phone.elevateforhumanity.org/internal/paris/turn',input.body,input.token);const audio=Buffer.from(reply.replyAudioUlawBase64||'','base64');console.log(JSON.stringify({audioReturned:audio.length>=160&&audio.length%160===0,audioDurationSeconds:audio.length/8000}));}
+catch(e){const allowed=['PARIS_TURN_RESPONSE_TOO_LARGE','PARIS_TURN_TRANSPORT_FAILED','PARIS_TURN_INVALID_RESPONSE','PARIS_TURN_RESPONSE_FAILED','PARIS_TURN_TIMEOUT'];const reason=allowed.includes(e.message)||/^PARIS_TURN_HTTP_[0-9]{3}$/.test(e.message)?e.message:'PARIS_PRIVATE_GATEWAY_FAILED';console.log(JSON.stringify({audioReturned:false,reason}));}
+"""
+    body={'callId':'synthetic-private-gateway-'+secrets.token_hex(8),'sessionId':secrets.token_hex(12),'sequence':0,'event':'greeting','encoding':'PCMU','sampleRate':8000}
+    result=subprocess.run(['/usr/bin/node','--input-type=module','-e',program],input=json.dumps({'token':token,'body':body}),capture_output=True,text=True,timeout=40)
+    if result.returncode:return {'audioReturned':False,'reason':'PARIS_PRIVATE_GATEWAY_PROBE_UNAVAILABLE'}
+    return json.loads(result.stdout)
 
 def main():
     config = file_environment('/etc/elevate-pbx/provisioner.conf')
@@ -157,11 +171,15 @@ def main():
               'enabledExtensionCount': len(extensions), 'callsPlaced': 0, 'messagesDelivered': 0,
               'liveCallAcceptance': 'NOT_TESTED', 'configurationChanged': False,
               'provisionerSourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/provisioner/server.mjs').read_bytes()).hexdigest(),
-              'turnSourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/paris/turn-adapter.mjs').read_bytes()).hexdigest()}
+              'turnSourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/paris/turn-adapter.mjs').read_bytes()).hexdigest(),
+              'gatewaySourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/paris/ari-media.mjs').read_bytes()).hexdigest(),
+              'privateTurnSourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/paris/private-turn.mjs').read_bytes()).hexdigest()}
     # Emit configuration evidence even if a speech provider is unavailable.
     print(json.dumps({'livePhoneConfiguration': report}), flush=True)
-    report['speech'] = voice_probe(secret(paris.get('PARIS_TURN_TOKEN_SECRET', '')), identity['access_token'])
-    report['result'] = 'PASS' if all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
+    token=secret(paris.get('PARIS_TURN_TOKEN_SECRET', ''))
+    report['speech'] = voice_probe(token, identity['access_token'])
+    report['privateGatewayGreeting']=private_gateway_probe(token)
+    report['result'] = 'PASS' if report['privateGatewayGreeting'].get('audioReturned') is True and all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
     return report
 
 

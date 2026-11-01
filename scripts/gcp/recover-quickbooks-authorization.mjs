@@ -32,7 +32,11 @@ export async function recoverQuickBooksAuthorization({run=google,request=fetch}=
   const realm=current.QB_REALM_ID;
   const company=await request('https://quickbooks.api.intuit.com/v3/company/'+realm+'/companyinfo/'+realm+'?minorversion=75',{headers:{Authorization:'Bearer '+body.access_token,Accept:'application/json'},redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
   const info=await company.json().catch(()=>null);
-  if(!company.ok||String(info?.CompanyInfo?.Id||'')!==realm)throw Error('COMPANY_VERIFICATION_FAILED');
+  if(!company.ok||String(info?.CompanyInfo?.Id||'')!==realm){
+   const code=String(info?.Fault?.Error?.[0]?.code||'');
+   attempts.push({source,status:company.status,error:'company_verification_failed',providerFaultCode:/^\d{1,6}$/.test(code)?code:undefined,realmMatched:String(info?.CompanyInfo?.Id||'')===realm});
+   continue;
+  }
   const stored=await database('rpc/save_verified_quickbooks_authorization',{p_expected_refresh_token:current.QB_REFRESH_TOKEN,p_client_id:id,p_client_secret:secret,p_realm_id:realm,p_tokens:body});
   if(stored!==true)throw Error('NEWER_AUTHORIZATION_PRESERVED');
   const directory=mkdtempSync(join(tmpdir(),'qb-verified-'));

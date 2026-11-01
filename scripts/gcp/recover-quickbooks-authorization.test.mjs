@@ -34,7 +34,8 @@ test('does not overwrite settings or configurations if every existing client fai
  assert(!f.calls.some(row=>row.url.endsWith('/save_verified_quickbooks_authorization')));
 });
 test('refuses a different company and preserves newer consent',async()=>{
- for(const options of [{company:'999'},{saved:false}]){
-  const f=fixture(options);await assert.rejects(()=>recoverQuickBooksAuthorization(f));assert.equal(f.writes.length,0);
- }
+ const wrong=fixture({company:'999'}),result=await recoverQuickBooksAuthorization(wrong);
+ assert.equal(result.recovered,false);assert.equal(wrong.writes.length,0);
+ assert.equal(result.attempts.at(-1).realmMatched,false);
+ const newer=fixture({saved:false});await assert.rejects(()=>recoverQuickBooksAuthorization(newer));assert.equal(newer.writes.length,0);
 });

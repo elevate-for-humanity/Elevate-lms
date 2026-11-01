@@ -108,14 +108,29 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       throw error;
     }
   }
-  private async generate(e: Evidence): Promise<LessonBlueprint> {
+  /** Canonical reservation only: derive a structural draft from supplied text.
+   * Never call a model, mint authoring evidence or treat this as release QA. */
+  async sourceDraft(value: unknown): Promise<LessonBlueprint> {
+    const evidence = value as Evidence;
+    if (!evidence?.competency?.id || !evidence.profile?.authority)
+      throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
+    const authored = evidence.profile.lessonBlueprints?.[evidence.competency.id];
+    if (authored) {
+      validateLessonBlueprint(authored, evidence.competency);
+      const draft = { ...authored } as LessonBlueprint & {authoringEvidence?: unknown};
+      delete draft.authoringEvidence;
+      return draft;
+    }
+    return this.generate(evidence, true);
+  }
+  private async generate(e: Evidence, sourceOnly = false): Promise<LessonBlueprint> {
     // Course-wide source arrays contain many different lessons. Never narrate
     // the first lesson's source for every competency in a course.
     const sources: Array<{id:string;text:string}> = lessonInstructionalSources(e.profile, e.competency);
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
 
-    if (e.profile.instructionalAuthoring?.provider === 'google') {
+    if (!sourceOnly && e.profile.instructionalAuthoring?.provider === 'google') {
       const config = e.profile.instructionalAuthoring;
       if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
       const author = (repairDirective: any) => authorGoogleLesson(
@@ -263,7 +278,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       },
     };
     validateLessonBlueprint(blueprint, e.competency);
-    return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(blueprint,e.profile,sources) : blueprint;
+    return !sourceOnly && e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(blueprint,e.profile,sources) : blueprint;
   }
   async objectives(input: unknown) {
     return (await this.blueprint(input)).objectives;

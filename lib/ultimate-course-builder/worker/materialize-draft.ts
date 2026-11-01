@@ -7,8 +7,9 @@ const slug = (key: string) => key.toLowerCase().replace(/[^a-z0-9]+/g, '-')
   .replace(/^-|-$/g, '').slice(0, 120) || 'lesson';
 
 /** Media recommendation needs canonical lesson rows before publication.
- * Parallel plans reserve unpublished rows; their instruction jobs author the
- * content. Sequential callers still seed from a validated blueprint. */
+ * Parallel plans reserve unpublished, source-bound structural drafts; their
+ * instruction jobs still own generated instruction and acceptance. No empty
+ * credential row or model-generated acceptance is manufactured by reservation. */
 export async function materializeUltimateDraft(db: SupabaseClient, courseId: string,
   profile: UltimateCredentialProfile, competencyIds?: string[],
   options: {deferInstruction?: boolean} = {}): Promise<UltimateCredentialProfile> {
@@ -23,10 +24,12 @@ export async function materializeUltimateDraft(db: SupabaseClient, courseId: str
     const lessonSlug = slug(competency.id);
     const existing = (lessons ?? []).find(l => l.id === competency.id || l.slug === lessonSlug);
     if (existing) { canonicalLessonIds[competency.id] = existing.id; continue; }
-    // Parallel instruction jobs own authoring. The coordinator only reserves
-    // canonical unpublished rows, so a later lesson cannot block team creation.
-    const blueprint = options.deferInstruction ? undefined : await instructional.blueprint({ profile, competency });
-    if (blueprint) validateLessonBlueprint(blueprint, competency);
+    // The credential-row trigger requires a real source-bound 13-stage draft.
+    // The coordinator does not call Google or claim a reviewed/finished lesson.
+    const blueprint = options.deferInstruction
+      ? await instructional.sourceDraft({ profile, competency })
+      : await instructional.blueprint({ profile, competency });
+    validateLessonBlueprint(blueprint, competency);
     if (!moduleId) {
       const { data: modules, error: modulesError } = await db.from('course_modules')
         .select('order_index').eq('course_id', courseId);
@@ -49,12 +52,12 @@ export async function materializeUltimateDraft(db: SupabaseClient, courseId: str
       .upsert({ id: canonicalLessonIds[competency.id], course_id: courseId, module_id: moduleId, slug: lessonSlug,
         title: competency.title, order_index: index + 1, lesson_type: 'lesson',
         status: 'draft', is_published: false, approved: false, is_required: true,
-        generation_status: options.deferInstruction ? 'queued' : 'generating', practical_required: competency.requiresPracticalEvidence,
+        generation_status: 'generating', practical_required: competency.requiresPracticalEvidence,
         learning_objectives: blueprint?.objectives.map(o => o.text) ?? [],
         content: blueprint?.segments.map(s => s.text).join('\n\n') ?? '',
         content_json: { ultimateDraft: true, competencyId: competency.id,
           sourceRequirementIds: competency.authorityRequirementIds,
-          ...(options.deferInstruction ? {instructionPending: true} : {}),
+          ...(options.deferInstruction ? {instructionPending: true, sourceBlueprintOnly: true} : {}),
           blueprint, releasePending: true } },
       { onConflict: 'course_id,slug', ignoreDuplicates: true }).select('id').maybeSingle();
     if (lessonError) throw lessonError;

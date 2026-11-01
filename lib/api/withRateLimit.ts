@@ -106,8 +106,15 @@ export async function applyRateLimit(
         ? 'auth'
         : tier;
 
-  const identifier = scope ? scope.key : getIdentifier(request);
-  if (!scope && isInternalIP(identifier)) return null;
+  const visitor = scope ? scope.key : getIdentifier(request);
+  if (!scope && isInternalIP(visitor)) return null;
+  // A busy read-only endpoint must not exhaust the entire public site's
+  // visitor allowance. Keep sensitive/write tiers aggregated per visitor.
+  const routeBucket = ['public', 'pageLoad'].includes(effectiveTier)
+    ? pathname.replace(/\\/[0-9a-f]{8}-[0-9a-f-]{27,}/gi, '/:id')
+        .replace(/\\/\\d+(?=\\/|$)/g, '/:id').slice(0, 160)
+    : '';
+  const identifier = routeBucket ? visitor + ':route:' + routeBucket : visitor;
 
   const limiter = limiters[effectiveTier]?.get();
 

@@ -15,6 +15,7 @@ import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
 import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
 import { TheoryWindowBoundary } from '@/components/apprenticeship/TheoryWindowBoundary';
+import WorkbookLessonInstruction from '@/components/lms/WorkbookLessonInstruction';
 import { lessonKeyTerms } from '@/lib/lms/lesson-key-terms';
 
 export const dynamic = 'force-dynamic';
@@ -223,7 +224,7 @@ export default async function LessonPage({
   let lessonQuery = db
     .from('course_lessons')
     .select(
-      'id,module_id,title,slug,content,content_json,rendered_html,video_url,video_config,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index',
+      'id,module_id,title,slug,content,content_json,rendered_html,video_url,video_config,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index,resources',
     )
     .eq('id', lessonId)
     .eq('course_id', course.id);
@@ -461,6 +462,8 @@ export default async function LessonPage({
               complete.
             </section>
           )}
+
+          <WorkbookLessonInstruction resources={lesson.resources} />
 
           {keyTerms.length ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

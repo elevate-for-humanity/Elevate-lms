@@ -1,0 +1,1083 @@
+{
+  "course_id": "2c723bfa-8c40-4acc-b961-98d917710ffc",
+  "workbook_id": "2796d4d5-8dbc-4223-aec0-17cf640c2918",
+  "workbook_slug": "prestige-elevation-barbering",
+  "version": 1,
+  "alignment": "50 workbook sections to 50 distinct instructional anchors within 14 existing competency lessons",
+  "sections": [
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "b894ff86-924f-494d-ad9e-2720b67f4697",
+      "section_number": 1,
+      "title": "Introduction to Barbering",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "84c6bc0b-e1f7-4bde-b0b9-2e225f380f4d",
+      "previous_lesson_id": null,
+      "teaching": "Barber training combines theory, observed practice, feedback and accurate records. The learner prepares and asks for help; the instructor teaches and assesses; the host trainer supervises authorized workplace tasks; the sponsor maintains the registered training plan. A lesson video or workbook answer shows study, not independent permission to perform a service. Keep related instruction and on-the-job learning records separate and use the approved program documents for current requirements.",
+      "example": "A learner watches a tool demonstration and then practices on a mannequin with a trainer. Record the theory session and supervised practice in their appropriate systems; do not record both as the same hours.",
+      "prompts": [
+        "Identify the responsibilities of the learner, instructor, sponsor and host trainer in a mannequin practice session.",
+        "Explain why finishing a workbook page does not establish practical competence or authorize independent service.",
+        "Write a weekly study and supervised-practice plan with separate RTI and OJL records."
+      ],
+      "recap": "Barber training combines theory, observed practice, feedback and accurate records.",
+      "source_blueprint_lesson": "barber-lesson-1",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "9ff57e12-b380-484b-863c-3f83269a8227",
+      "section_number": 2,
+      "title": "Professional Conduct & Ethics",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "84c6bc0b-e1f7-4bde-b0b9-2e225f380f4d",
+      "previous_lesson_id": null,
+      "teaching": "Professional conduct means giving accurate information, protecting private records, obtaining agreement and respecting the client's choices. Use the shop's approved systems for appointment notes and images. Discuss a mistake promptly with the trainer and client rather than hiding it. A client may decline a suggested style or product. When a request exceeds your authorization or demonstrated skill, pause and arrange qualified supervision instead of promising a result.",
+      "example": "A client declines a photograph. Complete the service without taking or posting an identifiable image, and document only the information necessary for the authorized service.",
+      "prompts": [
+        "Explain how to respond when a client declines use of their photograph.",
+        "Write a respectful response to a service request outside your current training authorization.",
+        "Describe how you would report a service error while protecting the client's privacy."
+      ],
+      "recap": "Professional conduct means giving accurate information, protecting private records, obtaining agreement and respecting the client's choices.",
+      "source_blueprint_lesson": "barber-lesson-2",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "c025987f-ed23-4005-b4f2-819dca73975f",
+      "section_number": 3,
+      "title": "Tools & Equipment",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "0e045552-909f-4266-bd43-acc70dfedda5",
+      "previous_lesson_id": null,
+      "teaching": "Choose equipment by its task, safe operating condition and actual manufacturer instructions. Clippers remove bulk, trimmers refine an outline, shears remove selected length and combs control sections and tension. Guards must fit the tool securely; their length markings matter more than assumptions about numbering. Inspect cords, blades and attachments before use. Keep usable stock separate from damaged items, and clean, process and store tools according to their materials and instructions.",
+      "example": "An inventory contains six combs but two are cracked. Count four usable combs when planning a purchase and remove the damaged items from service.",
+      "prompts": [
+        "Compare a clipper, trimmer, shears and comb by their intended tasks.",
+        "Make a pre-use inspection checklist covering attachments, cutting edges, cords and operating instructions.",
+        "Calculate an order to reach ten usable combs when four are usable and two are already on order."
+      ],
+      "recap": "Choose equipment by its task, safe operating condition and actual manufacturer instructions.",
+      "source_blueprint_lesson": "barber-lesson-3",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "a6d0c319-31c0-4450-8a57-255bec9fa249",
+      "section_number": 4,
+      "title": "Infection Control & Safety",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "c8690f1f-9618-4de8-88dd-eba8d68ecdf8",
+      "previous_lesson_id": "c8690f1f-9618-4de8-88dd-eba8d68ecdf8",
+      "teaching": "Cleaning removes visible soil and hair; disinfection is a separate process intended to inactivate specified microorganisms on suitable surfaces. Read the product label for approved use, dilution, precautions and wet contact time. A quick wipe is not evidence that the required time was achieved. Process tools between clients, separate used and processed items and protect clean storage. Electrical tools require the maker's compatible method; do not immerse electrical equipment unless explicitly permitted.",
+      "example": "A comb looks clean after brushing but has not completed the labeled disinfectant process. Keep it out of clean storage until the entire required process is finished.",
+      "prompts": [
+        "Distinguish cleaning, disinfection and protected storage using a comb example.",
+        "Identify the label information needed before preparing a disinfectant.",
+        "Describe how to respond when a used implement touches a clean storage area."
+      ],
+      "recap": "Cleaning removes visible soil and hair; disinfection is a separate process intended to inactivate specified microorganisms on suitable surfaces.",
+      "source_blueprint_lesson": "barber-lesson-4",
+      "sources": [
+        {
+          "title": "EPA: cleaning and disinfection label directions",
+          "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "7bdfc0f1-5ebc-4b42-bba5-97aede44e9ee",
+      "section_number": 5,
+      "title": "Workplace Safety",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "287ddc2e-a3b1-4afe-9cde-54e3a6204418",
+      "previous_lesson_id": "287ddc2e-a3b1-4afe-9cde-54e3a6204418",
+      "teaching": "Prepare the work area to prevent slips, trips, cross-contamination and unplanned exposure. Remove hair and spills promptly using the site procedure, manage cords away from walkways and keep exits clear. Know where safety data sheets, first-aid supplies and exposure procedures are located. Stop work when a hazard cannot be controlled safely. Cleaning and disinfecting surfaces must follow compatible product instructions rather than improvised mixtures.",
+      "example": "A wet patch forms beside a chair. Pause nearby work, keep people clear, control the source and clean the area under the site's spill procedure before reopening it.",
+      "prompts": [
+        "Identify three trip or slip hazards in a barber station and a control for each.",
+        "Explain where you would find the procedure for a product exposure or spill.",
+        "Describe a safe station-turnover sequence before seating the next client."
+      ],
+      "recap": "Prepare the work area to prevent slips, trips, cross-contamination and unplanned exposure.",
+      "source_blueprint_lesson": "barber-lesson-5",
+      "sources": [
+        {
+          "title": "EPA: cleaning and disinfection label directions",
+          "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "71e19a77-9fa0-4944-8928-9ac0e135a988",
+      "section_number": 6,
+      "title": "Client Consultation",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "previous_lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "teaching": "Start consultation with the result the client wants, the length to retain, their maintenance routine and relevant previous reactions. Ask open questions, listen and repeat the plan in plain language. Inspect observable conditions without diagnosing a disease. Explain limitations and alternatives before removing length. Obtain agreement on the outline and expected result, and involve the qualified trainer if the requested service is unsafe, unclear or beyond your authorization.",
+      "example": "A client asks for a fade but wants the temple area retained. Repeat both requests and agree on the transition and outline before selecting tools.",
+      "prompts": [
+        "Write three open questions about retained length, maintenance and prior service reactions.",
+        "Restate a client's requested fade while preserving their agreed temple outline.",
+        "Identify an observation or uncertainty that would require pausing for the trainer."
+      ],
+      "recap": "Start consultation with the result the client wants, the length to retain, their maintenance routine and relevant previous reactions.",
+      "source_blueprint_lesson": "barber-lesson-6",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "ded94ae5-c386-4ef7-af52-0f0a62440523",
+      "section_number": 7,
+      "title": "Module 1 Checkpoint - Foundations & Safety",
+      "unit": "Module 1: Infection Control & Safety",
+      "lesson_id": "287ddc2e-a3b1-4afe-9cde-54e3a6204418",
+      "previous_lesson_id": null,
+      "teaching": "Review foundations as one connected workflow: understand your role, inspect equipment, consult, protect the client, control hazards and prepare clean materials. A checkpoint should require a decision and supporting explanation, not just vocabulary recall. Use the earlier workbook sections to identify the evidence behind your answer. If a safety step is missing, revisit that instruction and discuss the correction before practice resumes.",
+      "example": "A station has clean towels but a used comb on the tray and a cord across the walkway. The station is not ready; correct both hazards before seating the client.",
+      "prompts": [
+        "Audit the example station and identify both contamination and trip hazards.",
+        "Explain how role limits, consultation and equipment checks work together before a service.",
+        "Choose two foundation topics to revisit and state what evidence will show improvement."
+      ],
+      "recap": "Review foundations as one connected workflow: understand your role, inspect equipment, consult, protect the client, control hazards and prepare clean materials.",
+      "source_blueprint_lesson": "barber-module-1-checkpoint",
+      "sources": [
+        {
+          "title": "EPA: cleaning and disinfection label directions",
+          "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "07a95f2b-a1d8-4c9a-9b3f-4138806d1207",
+      "section_number": 8,
+      "title": "Structure of the Hair and Scalp",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "The visible hair shaft consists of an outer cuticle, an underlying cortex and, in some hairs, a central medulla. The follicle sits within the skin and produces the hair. These structures help explain why surface damage, chemical history and tool handling can affect appearance and strength. Scalp observations guide consultation and whether service should pause. They do not establish a medical diagnosis or justify treatment of a suspected disorder.",
+      "example": "A client has roughened ends and a visibly irritated scalp. Record the observations separately; do not label a disease or assume a conditioning service makes irritation safe to work over.",
+      "prompts": [
+        "Describe the cuticle, cortex and follicle in your own words.",
+        "Explain how visible shaft damage can change a consultation about retaining length.",
+        "Separate a factual scalp observation from an unsupported diagnosis."
+      ],
+      "recap": "The visible hair shaft consists of an outer cuticle, an underlying cortex and, in some hairs, a central medulla.",
+      "source_blueprint_lesson": "barber-lesson-8",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "0049d87b-7a0b-4627-874a-207590999b2a",
+      "section_number": 9,
+      "title": "Hair Growth Cycle",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Hair follicles cycle through growth, transition and resting or shedding phases, commonly described as anagen, catagen and telogen. Follicles are not all in the same phase at the same time. Growth pattern and shedding history may help a client describe a concern, but a barber cannot identify its medical cause from a haircut consultation. Avoid promising that a cosmetic service will change the growth cycle or cure hair loss.",
+      "example": "A client asks whether a shorter haircut will cure recent shedding. Explain that a haircut changes appearance and length, and refer medical questions to an appropriate health professional.",
+      "prompts": [
+        "Compare the growth, transition and resting phases without diagnosing a client's condition.",
+        "Write an accurate response to a claim that frequent cutting makes follicles grow faster.",
+        "List factual observations to record when a client reports a change in shedding."
+      ],
+      "recap": "Hair follicles cycle through growth, transition and resting or shedding phases, commonly described as anagen, catagen and telogen.",
+      "source_blueprint_lesson": "barber-lesson-9",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "ebd2fafd-89fc-4540-af14-3aceb9072313",
+      "section_number": 10,
+      "title": "Hair Texture, Density & Porosity",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "previous_lesson_id": null,
+      "teaching": "Texture describes the diameter of individual strands; density describes how many strands occupy an area; porosity describes how the fiber takes up and retains moisture or products. These are different observations. Assess more than one area and consider previous services before recommending a product or technique. Use manufacturer directions and an instructor-approved assessment rather than relying on one informal test to justify a chemical service.",
+      "example": "Two clients have fine strands, but one has much greater density. They may need different section sizes and service time even though their strand texture is similar.",
+      "prompts": [
+        "Distinguish texture, density and porosity using two contrasting client examples.",
+        "Explain why fine texture does not automatically mean low density.",
+        "Record the consultation information needed before choosing a product for previously treated hair."
+      ],
+      "recap": "Texture describes the diameter of individual strands; density describes how many strands occupy an area; porosity describes how the fiber takes up and retains moisture or products.",
+      "source_blueprint_lesson": "barber-lesson-10",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "ed09b41a-c35c-4deb-abfe-4dcf97dd3d2b",
+      "section_number": 11,
+      "title": "Scalp Conditions & Disorders",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "previous_lesson_id": null,
+      "teaching": "Observe the scalp for visible redness, broken skin, unusual scaling or other changes that could make a service unsafe. Describe what you see and ask relevant, respectful questions. Do not diagnose infection, prescribe treatment or work over a questionable area simply to finish an appointment. Follow the shop's deferral procedure and obtain qualified guidance. If service is postponed, document the reason factually and protect the client's private information.",
+      "example": "You notice an open area near the planned clipper path. Stop the planned work and consult the trainer instead of cutting around it without assessing the risk.",
+      "prompts": [
+        "Write a factual description of redness and scaling without naming a disease.",
+        "Explain when you would defer a service and who you would contact.",
+        "Draft a respectful explanation to a client whose service must be paused."
+      ],
+      "recap": "Observe the scalp for visible redness, broken skin, unusual scaling or other changes that could make a service unsafe.",
+      "source_blueprint_lesson": "barber-lesson-11",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "aa7d3afe-b1d8-401b-9c2b-cf11dc30635f",
+      "section_number": 12,
+      "title": "Client Consultation",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "previous_lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "teaching": "A consultation record connects the agreed plan to the service actually performed. Record authorized contact details, relevant observations, retained length, outline, products used, changes agreed during service and aftercare discussed. Use factual, concise notes that another authorized barber can understand. Collect only information required for the service and protect access. A photograph is not a substitute for a written plan or client permission to use the image.",
+      "example": "The client changes from an outline-only beard tidy to a shorter trim. Record the new agreement before continuing, then document the final service without deleting the original history.",
+      "prompts": [
+        "Create a consultation note with agreed length, outline and maintenance goals.",
+        "Document a change requested during a service while preserving the original plan.",
+        "Explain how access to client notes and photographs should be controlled."
+      ],
+      "recap": "A consultation record connects the agreed plan to the service actually performed.",
+      "source_blueprint_lesson": "barber-lesson-12",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "cd9b6c9b-9434-4a50-9205-6fbd0ae5ee22",
+      "section_number": 13,
+      "title": "Shampoo & Scalp Massage",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "previous_lesson_id": null,
+      "teaching": "Shampoo service begins with consultation, scalp observation and a product suitable for the intended cosmetic purpose. Confirm comfort, support the neck and protect clothing and the face. Check water comfort with the client before continuing and avoid scratching the scalp with fingernails. Scalp massage is a comfort service performed only when appropriate; pain, broken skin or concerning conditions require a pause and trainer guidance. Follow product instructions for use and removal.",
+      "example": "A client reports discomfort at the bowl before shampoo begins. Adjust support and reassess comfort with the trainer rather than continuing to keep the appointment on time.",
+      "prompts": [
+        "List consultation and comfort checks before shampooing.",
+        "Explain how you would protect the client at the shampoo bowl.",
+        "Describe how you would respond to pain or visible irritation during preparation."
+      ],
+      "recap": "Shampoo service begins with consultation, scalp observation and a product suitable for the intended cosmetic purpose.",
+      "source_blueprint_lesson": "barber-lesson-13",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "93bb7848-1533-41e3-9c39-98234d5337a5",
+      "section_number": 14,
+      "title": "Hair Science Checkpoint",
+      "unit": "Module 2: Hair Science & Scalp Analysis",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Bring hair science observations together before choosing a service. Distinguish strand structure, growth cycle, texture, density and porosity, then explain how the observations affect a conservative plan. State what the observation cannot establish. Review scalp-safety decisions and consultation records as well as terminology. Use the checkpoint to identify an uncertainty that requires an instructor demonstration or a referral rather than guessing at a cause.",
+      "example": "A client has dense hair with fine strands and previously lightened ends. Explain each observation separately before discussing section size, handling and product limitations.",
+      "prompts": [
+        "Compare texture, density and porosity in the worked example.",
+        "Explain why observing shedding does not establish its medical cause.",
+        "Create a hair-science review plan covering one knowledge gap and one consultation decision."
+      ],
+      "recap": "Bring hair science observations together before choosing a service.",
+      "source_blueprint_lesson": "barber-module-2-checkpoint",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "91aab97f-4c48-4716-8d95-b22432c92eaa",
+      "section_number": 15,
+      "title": "Clippers & Trimmers - Types and Guards",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "teaching": "Clippers and trimmers serve different cutting and detail tasks. Compare the tool's intended use, blade condition, secure attachments and actual length markings before selecting it. A guard number is not a universal guarantee across manufacturers. Establish a conservative guide on the mannequin and reassess before reducing length. If the tool pulls, becomes uncomfortably hot or behaves unpredictably, stop and inspect it under the manufacturer's instructions.",
+      "example": "Two guard sets have the same number but different marked lengths. Choose by the actual tool-compatible length required for the agreed design, not by the number alone.",
+      "prompts": [
+        "Compare clipper and trimmer tasks in a planned haircut.",
+        "Explain how you would verify the length and secure fit of a guard.",
+        "Describe your response to pulling or uncomfortable blade heat during practice."
+      ],
+      "recap": "Clippers and trimmers serve different cutting and detail tasks.",
+      "source_blueprint_lesson": "barber-lesson-15",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "8af2d34d-c3a4-4580-aa50-167af14999e7",
+      "section_number": 16,
+      "title": "Scissors & Shears",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "teaching": "Shears remove selected hair presented by the fingers or comb. Their edge, alignment, grip and safe storage affect control. Use the instructor's demonstrated hand position and maintain clearance from skin, ears and fingers. Work with a consistent guide and controlled sections; do not compensate for a dull or damaged tool by forcing it closed. Different shear designs have different purposes, and texturizing tools do not replace a planned haircut shape.",
+      "example": "A learner is taking inconsistent amounts from adjacent sections. Stop and re-establish the guide and comb tension before continuing, then have the trainer check the result.",
+      "prompts": [
+        "Describe the safety checks for shears before mannequin practice.",
+        "Explain how consistent sections and a guide support an even cut.",
+        "Identify when you would stop using a shear and ask for inspection."
+      ],
+      "recap": "Shears remove selected hair presented by the fingers or comb.",
+      "source_blueprint_lesson": "barber-lesson-16",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "c2e01f6a-a943-44e6-b513-5a5e1890a1bb",
+      "section_number": 17,
+      "title": "Straight Razor & Safety Razor",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "previous_lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "teaching": "A razor places a sharp edge close to skin and requires an instructor-approved setup and direct demonstration. Compare disposable-blade and reusable designs using their actual handling and processing instructions. Keep a protected route for opening, changing and disposing of blades; never leave an exposed edge on a shared tray. Do not perform razor work over broken, irritated or questionable skin. A written description cannot establish practical razor competence.",
+      "example": "A blade change is needed during preparation. Pause the task and follow the demonstrated replacement and sharps-disposal sequence rather than improvising a grip around the exposed edge.",
+      "prompts": [
+        "Compare two razor designs by handling and blade-disposal requirements.",
+        "Describe how you would prepare a protected razor work area.",
+        "Identify the observed safety evidence a trainer must verify before practical razor work."
+      ],
+      "recap": "A razor places a sharp edge close to skin and requires an instructor-approved setup and direct demonstration.",
+      "source_blueprint_lesson": "barber-lesson-17",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "1f82115f-f363-4f87-8630-e5b6a4602c17",
+      "section_number": 18,
+      "title": "Clipper Maintenance & Blade Care",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "c8690f1f-9618-4de8-88dd-eba8d68ecdf8",
+      "previous_lesson_id": "c8690f1f-9618-4de8-88dd-eba8d68ecdf8",
+      "teaching": "Maintenance and infection control are related but separate responsibilities. Remove debris and process tools between clients according to compatible product and manufacturer instructions. Inspect cutting edges, attachments, cords and housings; service or remove damaged equipment from use. Follow the maker's directions for lubrication, cooling and power isolation. Keep processed equipment protected in storage, and do not treat lubrication as a substitute for cleaning and disinfection.",
+      "example": "A clipper has debris beneath a detachable blade and a damaged cord. Remove it from service; cleaning the blade does not correct the electrical damage.",
+      "prompts": [
+        "Separate cleaning, disinfection, lubrication and inspection in a maintenance plan.",
+        "Explain why a damaged cord requires action even when the blade is clean.",
+        "Create a tool-care log with the inspection result and corrective action."
+      ],
+      "recap": "Maintenance and infection control are related but separate responsibilities.",
+      "source_blueprint_lesson": "barber-lesson-18",
+      "sources": [
+        {
+          "title": "EPA: cleaning and disinfection label directions",
+          "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "d0a57102-0795-4df1-8120-888018fff804",
+      "section_number": 19,
+      "title": "Ergonomics & Body Mechanics",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "287ddc2e-a3b1-4afe-9cde-54e3a6204418",
+      "previous_lesson_id": null,
+      "teaching": "Arrange the station so you can work with stable footing, comfortable reach and neutral joint positions. Adjust the chair and your position rather than repeatedly bending or twisting to reach the same area. Keep frequently used tools within a safe reach and manage cords. Alternate tasks and use appropriate brief pauses according to the work plan. Pain or persistent discomfort calls for adjustment and appropriate advice, not simply working faster.",
+      "example": "A learner repeatedly raises one shoulder to reach the crown. Reposition the chair and stance, then have the trainer observe whether the new setup improves control.",
+      "prompts": [
+        "Identify a station adjustment that reduces repeated bending or shoulder elevation.",
+        "Describe how cord placement affects both posture and trip risk.",
+        "Plan a practice session with position checks and appropriate pauses."
+      ],
+      "recap": "Arrange the station so you can work with stable footing, comfortable reach and neutral joint positions.",
+      "source_blueprint_lesson": "barber-lesson-19",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "41bc683d-4563-45c1-9bbf-1da8e64f39aa",
+      "section_number": 20,
+      "title": "Draping & Client Preparation",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "f0bddca8-5f15-4833-a7bc-96f56299fd3f",
+      "previous_lesson_id": "f0bddca8-5f15-4833-a7bc-96f56299fd3f",
+      "teaching": "Draping protects clothing and supports sanitation when a clean cape is paired with the appropriate fresh neck barrier. Confirm that the covering is suitable for the planned service and comfortable for the client. Keep reusable haircloth from direct neck contact. Do not reuse a soiled covering or let used materials contaminate a clean supply. Explain any adjustment to the client and preserve access to the face and breathing comfort.",
+      "example": "A neck strip slips while the cape remains in place. Pause and replace or reposition the barrier using clean materials rather than continuing with direct haircloth contact.",
+      "prompts": [
+        "Describe the purpose of the neck barrier and cape.",
+        "Explain how you would check draping comfort and fit.",
+        "Respond to a covering that becomes contaminated during service preparation."
+      ],
+      "recap": "Draping protects clothing and supports sanitation when a clean cape is paired with the appropriate fresh neck barrier.",
+      "source_blueprint_lesson": "barber-lesson-20",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "bdda11b2-64f3-46d1-8d85-ae4a5ffac8e9",
+      "section_number": 21,
+      "title": "Tools & Equipment Checkpoint",
+      "unit": "Module 3: Tools, Equipment & Ergonomics",
+      "lesson_id": "c8690f1f-9618-4de8-88dd-eba8d68ecdf8",
+      "previous_lesson_id": null,
+      "teaching": "Audit equipment readiness through selection, inspection, safe handling, processing and storage. Include posture and client protection in the audit rather than checking tools alone. Explain why a suitable guard, a sharp edge and a clean surface do not remove the need for supervision. Document the defect and corrective action when an item fails inspection, then verify a usable replacement before practice resumes.",
+      "example": "The learner has suitable shears but a loose guard and a used cape. Identify each item that fails readiness and explain how to obtain a safe setup.",
+      "prompts": [
+        "Complete a readiness audit for a loose guard, used cape and inspected shears.",
+        "Explain the difference between a maintenance defect and a processing failure.",
+        "List the evidence your trainer should observe before practice restarts."
+      ],
+      "recap": "Audit equipment readiness through selection, inspection, safe handling, processing and storage.",
+      "source_blueprint_lesson": "barber-module-3-checkpoint",
+      "sources": [
+        {
+          "title": "EPA: cleaning and disinfection label directions",
+          "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "e29287ff-11e1-47d0-a1d7-2cece9e0c961",
+      "section_number": 22,
+      "title": "Head Shape & Sectioning",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "teaching": "Head shape and growth patterns affect how a haircut sits. Identify the major changes in curvature, natural parting and hairline before planning sections. Sectioning separates the work into manageable areas and helps maintain a consistent guide. Follow the instructor-approved pattern rather than copying lines without understanding their purpose. Recheck how the hair falls naturally and protect the client's agreed retained length.",
+      "example": "A crown growth pattern pushes hair in a different direction from the sides. Comb it into natural fall and discuss the plan with the trainer before applying the same guide everywhere.",
+      "prompts": [
+        "Identify how a crown growth pattern can affect sectioning.",
+        "Explain how a guide helps compare neighboring sections.",
+        "Draw or describe an instructor-approved sectioning plan and its checkpoints."
+      ],
+      "recap": "Head shape and growth patterns affect how a haircut sits.",
+      "source_blueprint_lesson": "barber-lesson-22",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "d8d1ae51-b686-4fca-8412-86d79a95cdd1",
+      "section_number": 23,
+      "title": "The Fade - Low, Mid & High",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": null,
+      "teaching": "A fade blends shorter hair into longer hair across a planned transition. Low, mid and high describe the placement of that transition relative to the head and design; they are not universal measurements. Confirm the client\u2019s intended outline and retained length, select compatible tools and establish a conservative guide. On a mannequin, remove small amounts and assess the blend from several angles. Do not chase a line by repeatedly shortening the entire haircut.",
+      "example": "A visible line remains at the transition. Recheck guard selection, growth direction and comb position, then obtain a demonstrated small correction from the trainer.",
+      "prompts": [
+        "Compare low, mid and high transition placement in an agreed design.",
+        "Explain how you would establish a conservative fade plan on a mannequin.",
+        "Describe a controlled correction for a visible weight line without shortening the whole cut."
+      ],
+      "recap": "A fade blends shorter hair into longer hair across a planned transition.",
+      "source_blueprint_lesson": "barber-lesson-23",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "8c2a99e7-6aef-4062-96f1-d566b4a518b1",
+      "section_number": 24,
+      "title": "Clipper Over Comb",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "teaching": "In clipper-over-comb work, the comb presents the hair and helps control the length removed. Its angle and distance from the head affect the result. The instructor must demonstrate coordinated comb and clipper movement with clearance from skin and ears before practice. Work in small sections and reassess the transition. Keep the tool aligned to the intended cutting plane rather than forcing it into the comb or scalp.",
+      "example": "A comb is tilted inconsistently between passes. Stop and reset the guide with the trainer, then compare a small corrected area before continuing.",
+      "prompts": [
+        "Explain how comb angle changes the length presented to clippers.",
+        "Describe the hand-position and skin-clearance checks needed before practice.",
+        "Identify a correction when adjacent passes leave an uneven transition."
+      ],
+      "recap": "In clipper-over-comb work, the comb presents the hair and helps control the length removed.",
+      "source_blueprint_lesson": "barber-lesson-24",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "9a885b53-83f5-49cf-9354-f59c6410b6e2",
+      "section_number": 25,
+      "title": "Scissor Over Comb",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "teaching": "Scissor-over-comb uses the comb to lift and present hair while shears remove only the intended projection. Consistent tension, comb angle and a visible guide support control. The trainer should demonstrate safe finger placement and movement before the learner works. Compare the result frequently and remove small amounts. If a guide is lost, pause and re-establish it instead of cutting repeatedly until the area appears shorter.",
+      "example": "One side appears heavier. Comb both sides into comparable positions, identify the specific difference and ask the trainer to demonstrate a limited correction.",
+      "prompts": [
+        "Compare the roles of comb and shears in scissor-over-comb work.",
+        "Explain how to protect fingers, ears and skin during a demonstrated pass.",
+        "Describe how you would assess asymmetry before removing more length."
+      ],
+      "recap": "Scissor-over-comb uses the comb to lift and present hair while shears remove only the intended projection.",
+      "source_blueprint_lesson": "barber-lesson-25",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "13e92b2d-0622-4143-bafe-e29e0e4a2249",
+      "section_number": 26,
+      "title": "Lineup & Edging",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": null,
+      "teaching": "Lineup and edging refine the agreed perimeter of a haircut. Consult about the natural hairline, desired outline and how maintenance will look as hair grows. Do not push a hairline back simply to make an artificial shape symmetrical. Inspect skin and tools, maintain light controlled contact under demonstration and stop if irritation or an unsafe condition appears. Recheck from the front and sides before making further changes.",
+      "example": "One temple has a naturally different outline. Discuss a realistic finish with the client and trainer instead of removing additional hair to force identical corners.",
+      "prompts": [
+        "Explain how natural hairline differences affect a lineup plan.",
+        "Write a consultation statement about retaining the client\u2019s existing hairline.",
+        "Identify the skin and tool checks needed before supervised edging practice."
+      ],
+      "recap": "Lineup and edging refine the agreed perimeter of a haircut.",
+      "source_blueprint_lesson": "barber-lesson-26",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "d0bc492c-a22f-4a96-907b-67d66f27891e",
+      "section_number": 27,
+      "title": "Flat Top & Classic Cuts",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": null,
+      "teaching": "Classic cuts and flat-top designs depend on a clear silhouette, consistent guides and controlled transitions. Begin with consultation about shape and retained length. Assess growth patterns and density before promising a specific outline. On a mannequin, have the trainer demonstrate how the guide and comb position support the intended shape. Inspect the result from more than one angle; styling can help display the shape but does not correct an uneven cut.",
+      "example": "A top looks level from the front but uneven from the side. Pause, compare the guide and have the trainer demonstrate the smallest necessary correction.",
+      "prompts": [
+        "Describe the intended silhouette of a chosen classic cut.",
+        "Explain why front and side checks are both needed for a flat-top shape.",
+        "Identify a conservative correction when styling reveals an uneven guide."
+      ],
+      "recap": "Classic cuts and flat-top designs depend on a clear silhouette, consistent guides and controlled transitions.",
+      "source_blueprint_lesson": "barber-lesson-27",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "add41aaa-eeb2-4b28-a06c-e11f32c828d2",
+      "section_number": 28,
+      "title": "Haircutting Checkpoint",
+      "unit": "Module 4: Haircutting Techniques",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "teaching": "Review haircutting as a sequence: confirm the design, observe head shape and growth, inspect tools, establish sections and guides, cut conservatively, refine transitions and assess the result. Explain the reason for each decision. A photograph alone cannot verify safe tool handling or sanitation. Record the trainer\u2019s observed feedback and repeat a specific weak area before progressing to a more complex task.",
+      "example": "A mannequin has an acceptable outline but an uneven blend and poor station control. Separate the finished-look issue from the safety issue and address both with the trainer.",
+      "prompts": [
+        "Explain the complete preparation-to-assessment sequence for a mannequin haircut.",
+        "Distinguish evidence of finished appearance from evidence of safe tool control.",
+        "Create a correction plan for one blend issue and one station-control issue."
+      ],
+      "recap": "Review haircutting as a sequence: confirm the design, observe head shape and growth, inspect tools, establish sections and guides, cut conservatively, refine transitions and assess the result.",
+      "source_blueprint_lesson": "barber-module-4-checkpoint",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "3a7df2ad-c9eb-460f-b7d5-e409c1170cba",
+      "section_number": 29,
+      "title": "Shave Preparation & Hot Towel Service",
+      "unit": "Module 5: Shaving & Beard Services",
+      "lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "previous_lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "teaching": "Shave preparation includes consultation, skin observation, clean materials and a supervised plan for sharp-edge work. Hot towels must be appropriate to the client and checked for comfortable temperature; heat is not a substitute for sanitation. Keep materials away from the eyes and protect breathing comfort. Follow product directions and defer the service when skin condition, discomfort or uncertain authorization makes the plan unsuitable.",
+      "example": "A client reports the towel feels too hot. Remove it promptly and reassess the preparation with the trainer instead of asking the client to tolerate it.",
+      "prompts": [
+        "List the consultation and skin checks before shave preparation.",
+        "Explain how you would confirm towel comfort and protect the face.",
+        "Describe when a planned shave should be paused before a blade is used."
+      ],
+      "recap": "Shave preparation includes consultation, skin observation, clean materials and a supervised plan for sharp-edge work.",
+      "source_blueprint_lesson": "barber-lesson-29",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "1caaa238-233e-486b-935a-f78062e5a238",
+      "section_number": 30,
+      "title": "Straight Razor Shaving Technique",
+      "unit": "Module 5: Shaving & Beard Services",
+      "lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "previous_lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "teaching": "Straight-razor technique requires direct instruction and observed practice in an approved setting. The trainer demonstrates skin support, hand position, working direction and safe blade control using the actual equipment. Do not infer competence from reading a description of an angle or stroke. Maintain the agreed design, avoid questionable skin and stop whenever control or comfort is uncertain. Handle used blades through the approved sharps procedure.",
+      "example": "The learner cannot maintain a stable hand position on the mannequin. Stop and repeat the demonstrated control exercise before attempting a larger area.",
+      "prompts": [
+        "Identify what a trainer must directly demonstrate before razor practice.",
+        "Explain why memorizing an angle does not prove safe blade control.",
+        "Describe the safe response to loss of control or client discomfort."
+      ],
+      "recap": "Straight-razor technique requires direct instruction and observed practice in an approved setting.",
+      "source_blueprint_lesson": "barber-lesson-30",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "f66d2dfe-7038-4968-8a7e-fa13eed95563",
+      "section_number": 31,
+      "title": "Beard Design & Shaping",
+      "unit": "Module 5: Shaving & Beard Services",
+      "lesson_id": "07946ab8-4e21-45a6-9dc7-369b7bf95772",
+      "previous_lesson_id": "07946ab8-4e21-45a6-9dc7-369b7bf95772",
+      "teaching": "Beard design begins with the client\u2019s desired fullness, retained length and outline. Observe growth direction, density and asymmetry without treating face-shape suggestions as rules. Comb the hair into an appropriate natural position before assessing length. Work conservatively with inspected tools and frequent comparison. An accidental short area cannot be made longer by removing more hair elsewhere; discuss the options before changing the agreed design.",
+      "example": "A client wants a tidy beard while retaining fullness. Plan a light trim and confirmed outline rather than automatically choosing a much shorter guard.",
+      "prompts": [
+        "Record a beard consultation that preserves fullness and confirms the outline.",
+        "Explain how natural growth direction affects your assessment.",
+        "Describe how to respond to a short area before changing the overall design."
+      ],
+      "recap": "Beard design begins with the client\u2019s desired fullness, retained length and outline.",
+      "source_blueprint_lesson": "barber-lesson-31",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "d1f8e5b1-7748-4e53-8f5b-05de44217e5b",
+      "section_number": 32,
+      "title": "Post-Shave Care & Skin Treatment",
+      "unit": "Module 5: Shaving & Beard Services",
+      "lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "previous_lesson_id": null,
+      "teaching": "Post-shave care starts with checking the result and the client\u2019s comfort. Remove residue using clean materials and choose only products appropriate to the client and their directions. Do not apply a product to conceal an unexpected reaction or claim that a cosmetic product treats a medical condition. If skin is broken, painful or reacting unexpectedly, stop the cosmetic service and follow the site response procedure with qualified guidance. Record the actual observation and action.",
+      "example": "A client reports stinging after product application. Stop using the product and follow its directions and the site's response process rather than layering another cosmetic over it.",
+      "prompts": [
+        "Describe the comfort and skin checks after a shave.",
+        "Explain how you would choose an appropriate finishing product without unsupported treatment claims.",
+        "Write a factual record of an unexpected reaction and your response."
+      ],
+      "recap": "Post-shave care starts with checking the result and the client\u2019s comfort.",
+      "source_blueprint_lesson": "barber-lesson-32",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "d521f4c2-99a1-470b-bdc7-4e710da50a7c",
+      "section_number": 33,
+      "title": "Mustache Trimming & Styling",
+      "unit": "Module 5: Shaving & Beard Services",
+      "lesson_id": "07946ab8-4e21-45a6-9dc7-369b7bf95772",
+      "previous_lesson_id": "07946ab8-4e21-45a6-9dc7-369b7bf95772",
+      "teaching": "Mustache trimming requires agreement about length, outline and how the hair rests near the lip. Comb into natural position, inspect tools and ask the trainer to demonstrate safe control around the mouth. Remove small amounts and recheck the result without stretching hair into an unrealistic position. Keep cutting edges clear of lips and skin. If the client moves or control becomes uncertain, pause and reset the position before continuing.",
+      "example": "A mustache looks even while stretched but uneven in natural fall. Reassess its natural position with the trainer before making a conservative correction.",
+      "prompts": [
+        "Write the consultation questions needed for a mustache trim.",
+        "Explain why the final natural position matters when assessing length.",
+        "Describe how you would respond if the client moves during a trimming pass."
+      ],
+      "recap": "Mustache trimming requires agreement about length, outline and how the hair rests near the lip.",
+      "source_blueprint_lesson": "barber-lesson-33",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "2bac5fd8-dadd-4944-bc42-2e9301b7c970",
+      "section_number": 34,
+      "title": "Shaving & Beard Checkpoint",
+      "unit": "Module 5: Shaving & Beard Services",
+      "lesson_id": "28c6289a-b7a5-457a-b3be-fd232b15629a",
+      "previous_lesson_id": null,
+      "teaching": "Compare the decisions in shave preparation, razor work and beard trimming. They share consultation, processed tools and client protection, but the hazards and practical controls differ. Explain which parts require direct observation and how the agreed outline is maintained. Review aftercare and documentation as part of the service. A passing workbook review does not replace a trainer\u2019s assessment of sharp-edge control or authorize independent practice.",
+      "example": "A learner explains a shave sequence correctly but has not demonstrated blade handling. Credit the knowledge review separately and arrange observed practical assessment.",
+      "prompts": [
+        "Compare the principal risks in beard trimming and straight-razor shaving.",
+        "Explain the difference between a knowledge check and observed practical competence.",
+        "Create a review plan covering preparation, safe execution and post-service records."
+      ],
+      "recap": "Compare the decisions in shave preparation, razor work and beard trimming.",
+      "source_blueprint_lesson": "barber-module-5-checkpoint",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "e4fb4d02-d079-4179-b1d1-82d4a3f84570",
+      "section_number": 35,
+      "title": "Hair Color Theory",
+      "unit": "Module 6: Chemical Services",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Color theory describes hue, lightness or depth, and tonal relationships. A color wheel helps explain how tones relate, but it is not a product-mixing instruction. Consider current color, previous chemical services, hair condition and the realistic result before a recommendation. Product compatibility, testing and application must follow the actual manufacturer directions and qualified instruction. Never choose a chemical formula solely from a photograph or a generic color-wheel rule.",
+      "example": "A client presents a filtered photograph and has previously treated ends. Discuss the uncertainty, record the history and seek a qualified assessment before promising the pictured result.",
+      "prompts": [
+        "Distinguish hue, depth and tone in a color description.",
+        "Explain why a color wheel alone cannot determine a safe product formula.",
+        "List the client history and product information needed before a color recommendation."
+      ],
+      "recap": "Color theory describes hue, lightness or depth, and tonal relationships.",
+      "source_blueprint_lesson": "barber-lesson-35",
+      "sources": [
+        {
+          "title": "FDA: hair dye and hair relaxer safety",
+          "url": "https://www.fda.gov/consumers/free-publications-women/hair-dye-and-hair-relaxers"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "5de35197-1cf7-415d-b579-2e71bd412ec1",
+      "section_number": 36,
+      "title": "Chemical Safety & Patch Testing",
+      "unit": "Module 6: Chemical Services",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Chemical-service preparation begins with the exact product instructions, labeled warnings, relevant history and the authorized trainer\u2019s assessment. Hair-dye skin testing and strand testing answer different questions; neither is a universal guarantee against a reaction. Do not mix products, change processing directions or use a test to override a warning. Protect eyes and skin, use required protective equipment and stop for pain, burning or an unexpected reaction using the product and site response instructions.",
+      "example": "A client reports a previous reaction to a dye. Record it and pause for qualified guidance instead of assuming a brief test or a different shade removes the concern.",
+      "prompts": [
+        "Compare the purpose of a product-directed skin test and a strand assessment.",
+        "Identify the instructions and protective measures to review before a chemical service.",
+        "Explain your response to a history of reaction or burning during preparation."
+      ],
+      "recap": "Chemical-service preparation begins with the exact product instructions, labeled warnings, relevant history and the authorized trainer\u2019s assessment.",
+      "source_blueprint_lesson": "barber-lesson-36",
+      "sources": [
+        {
+          "title": "FDA: hair dye and hair relaxer safety",
+          "url": "https://www.fda.gov/consumers/free-publications-women/hair-dye-and-hair-relaxers"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "acd60de6-47c7-4a18-9413-37a228437fbe",
+      "section_number": 37,
+      "title": "Relaxers & Texturizers",
+      "unit": "Module 6: Chemical Services",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Relaxers and texturizers are chemical services that alter hair structure; a marketing name does not remove chemical risk. Previous services, compatibility, scalp condition and product directions matter. A learner studies selection and contraindication decisions with a qualified instructor before practical application. Do not invent mixing ratios, timing or neutralization steps from a general lesson. Avoid overlapping or combining processes contrary to instructions, and stop if comfort or safety changes.",
+      "example": "The client cannot identify a previous chemical service. Record the uncertainty and seek a qualified assessment rather than assuming a new product will be compatible.",
+      "prompts": [
+        "Explain why the term texturizer does not establish that a product is risk-free.",
+        "List the history and compatibility information needed before a recommendation.",
+        "Describe how to respond when previous chemical use is unknown."
+      ],
+      "recap": "Relaxers and texturizers are chemical services that alter hair structure; a marketing name does not remove chemical risk.",
+      "source_blueprint_lesson": "barber-lesson-37",
+      "sources": [
+        {
+          "title": "FDA: hair dye and hair relaxer safety",
+          "url": "https://www.fda.gov/consumers/free-publications-women/hair-dye-and-hair-relaxers"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "90a625a6-6628-40f9-8028-eef2d5d9bb1b",
+      "section_number": 38,
+      "title": "Scalp Treatments",
+      "unit": "Module 6: Chemical Services",
+      "lesson_id": "335cd31f-cf50-4609-88d8-8ef0f5e501ab",
+      "previous_lesson_id": null,
+      "teaching": "A cosmetic scalp service must be selected for its intended purpose, observable conditions and product instructions. Consultation distinguishes a request for comfort or cleansing from a request to treat a medical concern. Do not diagnose scalp disease or promise hair regrowth. Broken, painful or apparently infected skin requires deferral and qualified guidance. Document the observations and communicate the limits of a cosmetic service before beginning any supervised practice.",
+      "example": "A client requests a scalp product to cure unexplained hair loss. Explain the cosmetic scope and refer the medical question rather than promising a treatment result.",
+      "prompts": [
+        "Separate a cosmetic scalp-care request from a medical-treatment request.",
+        "Identify observations that require pausing a scalp service.",
+        "Write a truthful explanation of the limits of a proposed cosmetic scalp product."
+      ],
+      "recap": "A cosmetic scalp service must be selected for its intended purpose, observable conditions and product instructions.",
+      "source_blueprint_lesson": "barber-lesson-38",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "325c22f9-a33a-4bc8-b2e4-75316cd10af7",
+      "section_number": 39,
+      "title": "Chemical Services Checkpoint",
+      "unit": "Module 6: Chemical Services",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Review chemical-service decisions before considering performance: client history, scope and supervision, product identification, compatibility, required testing, protection, directions and response to a concern. Explain why a patch or strand assessment cannot override an explicit warning. Use a scenario to identify what is known, what is missing and who must decide. Practical chemical competence requires appropriate instruction and observation beyond this written checkpoint.",
+      "example": "A product label is unreadable and the client has unknown previous treatment. Do not proceed; identify both missing evidence items and obtain qualified guidance.",
+      "prompts": [
+        "Audit a proposed service with an unreadable label and unknown treatment history.",
+        "Explain why a favorable test cannot cancel a product warning.",
+        "List the evidence needed before supervised chemical practice can be considered."
+      ],
+      "recap": "Review chemical-service decisions before considering performance: client history, scope and supervision, product identification, compatibility, required testing, protection, directions and response to a concern.",
+      "source_blueprint_lesson": "barber-module-6-checkpoint",
+      "sources": [
+        {
+          "title": "FDA: hair dye and hair relaxer safety",
+          "url": "https://www.fda.gov/consumers/free-publications-women/hair-dye-and-hair-relaxers"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "a896b471-2bc0-43e2-a2d8-328657143fc9",
+      "section_number": 40,
+      "title": "Building Your Clientele",
+      "unit": "Module 7: Professional & Business Skills",
+      "lesson_id": "5e74e26b-31d6-4b83-85f4-21b9e47a1336",
+      "previous_lesson_id": null,
+      "teaching": "Building clientele depends on consistent service, clear communication and reliable follow-through. Describe an actual service, authorized price and booking method accurately. Request permission for identifiable before-and-after images and honor a refusal. Keep contact preferences in the approved system, avoid misleading credential or outcome claims and use client feedback to improve the service. Measure appropriate outcomes such as rebooking and satisfaction rather than promising a guaranteed income.",
+      "example": "A shop promotes available weekday appointments. State the real service and booking times and confirm capacity before advertising an offer.",
+      "prompts": [
+        "Draft an accurate weekday service offer with price terms and booking method.",
+        "Explain how to obtain and respect permission for client images.",
+        "Choose two truthful indicators for evaluating a client-retention effort."
+      ],
+      "recap": "Building clientele depends on consistent service, clear communication and reliable follow-through.",
+      "source_blueprint_lesson": "barber-lesson-40",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "3613f78c-0eec-4480-9c57-11cc44c117a4",
+      "section_number": 41,
+      "title": "Booth Rental vs. Commission vs. Ownership",
+      "unit": "Module 7: Professional & Business Skills",
+      "lesson_id": "3db8e953-649c-466e-8957-3e8e0a704f04",
+      "previous_lesson_id": null,
+      "teaching": "Booth rental, commission work and ownership allocate costs, responsibilities and risk differently. Compare rent, supplies, scheduling, records, insurance and agreement terms rather than comparing gross revenue alone. The label in an agreement does not by itself settle worker classification or legal responsibilities. Review the actual arrangement with qualified business or legal advice as needed before committing. Use a documented budget to compare expected receipts with operating costs.",
+      "example": "One arrangement has higher receipts but also rent and supply costs. Compare the remaining amount after identified costs rather than assuming the larger sales total is the better option.",
+      "prompts": [
+        "Compare who bears supplies, scheduling and premises costs in two sample arrangements.",
+        "Create a simple receipts-minus-listed-costs comparison without treating it as guaranteed income.",
+        "Identify agreement or classification questions that require qualified advice before signing."
+      ],
+      "recap": "Booth rental, commission work and ownership allocate costs, responsibilities and risk differently.",
+      "source_blueprint_lesson": "barber-lesson-41",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "dc9d9271-6fbd-4c7d-8b8a-d60cb680987c",
+      "section_number": 42,
+      "title": "Pricing, Tipping & Financial Basics",
+      "unit": "Module 7: Professional & Business Skills",
+      "lesson_id": "3db8e953-649c-466e-8957-3e8e0a704f04",
+      "previous_lesson_id": "3db8e953-649c-466e-8957-3e8e0a704f04",
+      "teaching": "Financial records should distinguish service revenue, gratuities, payment method, refunds and business expenses. Quote authorized prices and disclose applicable offer conditions before service. Reconcile actual receipts to the sales log and document discrepancies without changing history to force a match. Do not store card numbers or passwords in a workbook. Use qualified tax or accounting advice for requirements that depend on the actual business arrangement.",
+      "example": "Four services at $25 create $100 service revenue. With $50 cash sales, a $40 opening float and a documented $5 cash purchase, expected closing cash is $85 before other movements.",
+      "prompts": [
+        "Reconcile the worked cash example and show each movement.",
+        "Explain why gratuities, revenue and expense records should remain distinguishable.",
+        "Describe how to document a discrepancy without falsifying the log."
+      ],
+      "recap": "Financial records should distinguish service revenue, gratuities, payment method, refunds and business expenses.",
+      "source_blueprint_lesson": "barber-lesson-42",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "5a3a2745-9c95-422f-b92a-1b5dbb28cfd3",
+      "section_number": 43,
+      "title": "Professionalism & Ethics",
+      "unit": "Module 7: Professional & Business Skills",
+      "lesson_id": "84c6bc0b-e1f7-4bde-b0b9-2e225f380f4d",
+      "previous_lesson_id": null,
+      "teaching": "Professional ethics are demonstrated in decisions: tell the truth about skills and results, respect the agreed service, protect private information and accept responsibility for errors. Supervisors should set clear boundaries and give specific feedback without humiliation. Pressure to complete a service does not justify ignoring a hazard or asking a learner to work beyond demonstrated ability. Record who verified practical work rather than signing for an observation that never occurred.",
+      "example": "A supervisor is asked to sign a skill they did not observe. Arrange a genuine observation and record the actual evaluator instead of signing an assumed result.",
+      "prompts": [
+        "Explain why a practical sign-off requires genuine observed evidence.",
+        "Write feedback that identifies a specific behavior and a safe correction.",
+        "Respond to pressure to conceal a service error or unsafe practice."
+      ],
+      "recap": "Professional ethics are demonstrated in decisions: tell the truth about skills and results, respect the agreed service, protect private information and accept responsibility for errors.",
+      "source_blueprint_lesson": "barber-lesson-43",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "1c29b612-2520-4042-aab5-5331357e3a05",
+      "section_number": 44,
+      "title": "Styling Products & Finishing",
+      "unit": "Module 7: Professional & Business Skills",
+      "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+      "previous_lesson_id": null,
+      "teaching": "Finishing products influence appearance, hold, shine and texture but do not substitute for an agreed haircut shape. Discuss the client's desired finish, routine and relevant product history. Read the label, use appropriate hygienic dispensing and avoid contact that contaminates the container. Demonstrate a manageable routine using the selected product and explain limitations without medical or guaranteed-outcome claims. Reassess comfort and the finished appearance before concluding.",
+      "example": "A client wants a light finish that can be maintained quickly. Compare appropriate labeled options with the trainer rather than applying a heavy product solely because it is on hand.",
+      "prompts": [
+        "Compare two finishing options by intended appearance and client routine.",
+        "Describe a dispensing method that protects the product from contamination.",
+        "Explain aftercare in plain language without claiming a product repairs every type of damage."
+      ],
+      "recap": "Finishing products influence appearance, hold, shine and texture but do not substitute for an agreed haircut shape.",
+      "source_blueprint_lesson": "barber-lesson-44",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "a8ac3ea3-71cb-4aa5-a3d4-5ab97b7c2a73",
+      "section_number": 45,
+      "title": "Professional Skills Checkpoint",
+      "unit": "Module 7: Professional & Business Skills",
+      "lesson_id": "aafa58a3-d731-4189-a82a-8f6c53c60f36",
+      "previous_lesson_id": null,
+      "teaching": "Professional operations connect booking, service agreement, documentation, payment records, privacy and follow-up. A checkpoint should trace a client visit from the first inquiry to the authorized handoff. Check for conflicts, missing information and unsupported promises. If a record is wrong, correct it through the approved history-preserving process. Assign an owner and due time to the next action so a shift change does not lose the task.",
+      "example": "A booking changes time after a price quote. Confirm the change with the client, update the approved system and leave a clear handoff instead of creating two conflicting appointments.",
+      "prompts": [
+        "Trace a booking change through confirmation, record update and staff handoff.",
+        "Identify privacy and price-communication checks in a client visit.",
+        "Write a handoff naming the outstanding task, responsible person and due time."
+      ],
+      "recap": "Professional operations connect booking, service agreement, documentation, payment records, privacy and follow-up.",
+      "source_blueprint_lesson": "barber-module-7-checkpoint",
+      "sources": []
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "3567af2f-5215-404c-b98d-c403e97b6146",
+      "section_number": 46,
+      "title": "Indiana State Board Exam Overview",
+      "unit": "Module 8: State Board Exam Preparation",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Exam preparation starts with the current official licensing and testing instructions for the candidate's actual pathway. Verify eligibility, application steps, required assessments, identification rules, scheduling and allowed materials with the responsible authority. A workbook checklist is an internal study aid and is not an official authorization to test. Do not rely on remembered fees, provider names, passing scores or exam formats when official instructions may have changed.",
+      "example": "A candidate finds two conflicting test checklists. Identify their dates and issuing authority, then obtain the current official instructions before scheduling or buying a kit.",
+      "prompts": [
+        "List the official information you must verify before scheduling a licensing assessment.",
+        "Explain how you would resolve conflicting or outdated testing checklists.",
+        "Separate program completion evidence from official permission to test."
+      ],
+      "recap": "Exam preparation starts with the current official licensing and testing instructions for the candidate's actual pathway.",
+      "source_blueprint_lesson": "barber-lesson-46",
+      "sources": [
+        {
+          "title": "Indiana PLA: current barber licensing information",
+          "url": "https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "6f398d86-167e-481b-9bc9-19f79cc1e6cc",
+      "section_number": 47,
+      "title": "Written Exam Review - Sanitation & Science",
+      "unit": "Module 8: State Board Exam Preparation",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Review sanitation and hair science by explaining decisions in a scenario. Distinguish cleaning from disinfection, identify label-dependent steps and connect scalp observations with a safe consultation response. Use the source instruction to justify the answer and explain why alternatives are unsuitable. Track errors by topic and revisit the relevant section. Practice questions are internal review; their wording and results do not predict an official exam score.",
+      "example": "A tool has been brushed clean and placed in storage before disinfection. Identify the missing step and explain why a clean appearance does not establish readiness.",
+      "prompts": [
+        "Explain the missing process in the worked tool-storage scenario.",
+        "Compare texture, density and porosity without diagnosing a client condition.",
+        "Create an error log with the missed concept, corrected reasoning and next review date."
+      ],
+      "recap": "Review sanitation and hair science by explaining decisions in a scenario.",
+      "source_blueprint_lesson": "barber-lesson-47",
+      "sources": [
+        {
+          "title": "EPA: cleaning and disinfection label directions",
+          "url": "https://www.epa.gov/coronavirus-and-disinfectants/whats-difference-between-products-disinfect-sanitize-and-clean"
+        },
+        {
+          "title": "Indiana PLA: current barber licensing information",
+          "url": "https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "7cf75186-a43a-40a2-999a-b37021ca3857",
+      "section_number": 48,
+      "title": "Written Exam Review - Techniques & Laws",
+      "unit": "Module 8: State Board Exam Preparation",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Review techniques and professional rules separately, then connect them in a service decision. Explain consultation, tool selection, supervision and documentation using the actual lesson evidence. For legal or licensing questions, use the current official source rather than a remembered statement. Identify whether a question asks about theory, observed competence or administrative eligibility. An internal quiz is preparation and does not issue a license or replace an external assessment.",
+      "example": "A learner can explain an edging technique but has no observed practical sign-off. Record the theory result accurately and arrange the required observation rather than treating the quiz as practical evidence.",
+      "prompts": [
+        "Distinguish theory knowledge, practical verification and licensing eligibility in the worked example.",
+        "Explain how you would verify a current rule through the official source.",
+        "Review a missed technique question and justify the corrected decision using lesson evidence."
+      ],
+      "recap": "Review techniques and professional rules separately, then connect them in a service decision.",
+      "source_blueprint_lesson": "barber-lesson-48",
+      "sources": [
+        {
+          "title": "Indiana PLA: current barber licensing information",
+          "url": "https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "f1dfeaa9-346c-403a-94d9-b5665a56ef60",
+      "section_number": 49,
+      "title": "Practical Exam Preparation",
+      "unit": "Module 8: State Board Exam Preparation",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "Practical preparation requires an observed rehearsal against the current authorized criteria. Verify permitted tools and materials with the responsible testing authority, then organize a clean setup and demonstrate safe handling, client or mannequin protection, sequence and cleanup. The instructor should record observed strengths and corrections. Do not fabricate examiner approval or treat a workbook checklist as a practical pass. Repeat the weak task under supervision before claiming readiness.",
+      "example": "A rehearsal produces the intended haircut shape but includes unsafe handling. Record both results, correct the handling and repeat an observed rehearsal before a readiness decision.",
+      "prompts": [
+        "Build a preparation checklist from the current authorized practical instructions.",
+        "Explain why an acceptable finished look cannot cancel unsafe handling.",
+        "Write an observed-rehearsal record with the correction and planned reassessment."
+      ],
+      "recap": "Practical preparation requires an observed rehearsal against the current authorized criteria.",
+      "source_blueprint_lesson": "barber-lesson-49",
+      "sources": [
+        {
+          "title": "Indiana PLA: current barber licensing information",
+          "url": "https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/"
+        }
+      ]
+    },
+    {
+      "type": "workbook_instruction",
+      "workbook_slug": "prestige-elevation-barbering",
+      "section_id": "85f25ad6-161a-4e6c-99c1-4ffac238961d",
+      "section_number": 50,
+      "title": "Program Final Exam",
+      "unit": "Module 8: State Board Exam Preparation",
+      "lesson_id": "78939b29-61bf-4638-b107-d2780ee799b9",
+      "previous_lesson_id": null,
+      "teaching": "This section is the program's cumulative workbook review and readiness record. Review evidence across all eight workbook units and use actual course assessments for recorded knowledge results. Practical competencies, hours and instructor sign-offs remain separate requirements. Identify outstanding evidence honestly and assign a next action. Completing this review is not an official licensing examination, a license, or permission to practice independently; those outcomes require the responsible authority's process.",
+      "example": "A learner has passing knowledge results but one unverified practical task. Record the outstanding task and arrange assessment; do not mark the program or licensing process complete from the workbook alone.",
+      "prompts": [
+        "Summarize your evidence across the eight workbook units and identify any gaps.",
+        "Explain the next action for an unverified practical task despite passing knowledge results.",
+        "Create a readiness checklist separating knowledge results, practical sign-offs, hours and official licensing steps."
+      ],
+      "recap": "This section is the program's cumulative workbook review and readiness record.",
+      "source_blueprint_lesson": "barber-indiana-state-board-exam",
+      "sources": [
+        {
+          "title": "Indiana PLA: current barber licensing information",
+          "url": "https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/"
+        }
+      ]
+    }
+  ]
+}

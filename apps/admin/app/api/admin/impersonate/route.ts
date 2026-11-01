@@ -21,6 +21,7 @@ import { logAuditEvent } from '@/lib/audit';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { cookies } from 'next/headers';
 import { createPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,11 +33,15 @@ export async function POST(req: NextRequest) {
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
-  const rateLimited = await applyRateLimit(req, 'strict');
-  if (rateLimited) return rateLimited;
-
   const auth = await apiRequireRoles(req, ['admin', 'super_admin'], { adminOverride: false });
   if (auth.error) return auth.error;
+
+  // Previewing several shops is normal support work. Authenticate first and
+  // isolate this bounded allowance from public forms and other administrators.
+  const rateLimited = await applyRateLimit(req, 'auth', {
+    key: `admin-portal-preview:${auth.id}`,
+  });
+  if (rateLimited) return rateLimited;
 
   const body = await req.json().catch(() => null);
   if (!body?.target_user_id) {
@@ -122,8 +127,8 @@ export async function POST(req: NextRequest) {
     // referrer headers, and avoids security filters that reject credential-like
     // query parameters during the cross-subdomain transition.
     preview_url: hostShopPartnerId
-      ? 'https://app.elevateforhumanity.org/api/admin/select-host-shop'
-      : 'https://app.elevateforhumanity.org/api/admin/preview',
+      ? `${LMS_HOST}/api/admin/select-host-shop`
+      : `${LMS_HOST}/api/admin/preview`,
     preview_handoff: createPortalPreviewHandoff(
       auth.id,
       hostShopPartnerId || target_user_id,

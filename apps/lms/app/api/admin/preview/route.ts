@@ -11,6 +11,8 @@ import {
   verifyPortalPreviewHandoff,
 } from '@/lib/admin/portal-preview-handoff';
 import { portalPreviewDestination } from '@/lib/admin/portal-preview-destination';
+import { canonicalPreviewUrl } from '@/lib/admin/preview-origin';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 
 import {
   clearHostShopPreviewCookies,
@@ -25,10 +27,7 @@ async function startHandoffPreview(handoffToken: string) {
     return NextResponse.json({ error: 'Invalid or expired preview handoff' }, { status: 403 });
   }
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(
-    /\/$/,
-    '',
-  );
+  const appUrl = LMS_HOST;
   const db = await requireAdminClient();
   const [{ data: actor }, { data: target }] = await Promise.all([
     db.from('profiles').select('id,role').eq('id', handoff.actorId).maybeSingle(),
@@ -74,6 +73,8 @@ async function startHandoffPreview(handoffToken: string) {
 }
 
 export async function POST(request: NextRequest) {
+  const canonical = canonicalPreviewUrl(request);
+  if (canonical) return NextResponse.redirect(canonical, 307);
   const contentType = request.headers.get('content-type') || '';
   const handoffToken = contentType.includes('application/json')
     ? String((await request.json().catch(() => null))?.handoff || '').trim()
@@ -86,10 +87,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(
-    /\/$/,
-    '',
-  );
+  const canonical = canonicalPreviewUrl(request);
+  if (canonical) return NextResponse.redirect(canonical, 307);
+  const appUrl = LMS_HOST;
   const targetUserId = request.nextUrl.searchParams.get('user_id')?.trim();
   const handoffToken = request.nextUrl.searchParams.get('handoff')?.trim();
   const handoff = handoffToken ? verifyPortalPreviewHandoff(handoffToken) : null;

@@ -29,6 +29,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPushNotificationClient } from '@/lib/notifications/push-client';
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
+import { phonePresenceDisplay } from '@/lib/phone/presence-display';
 
 type RingMode = 'ring' | 'vibrate' | 'silent' | 'do_not_disturb' | 'offline';
 type Schedule = Record<string, [string, string]>;
@@ -715,6 +716,8 @@ export function ProgramHolderPhone({
       current ? { ...current, extension: { ...current.extension, ...patch } } : current,
     );
 
+  const presence = phonePresenceDisplay(data.readOnly, connected, data.extension.presenceStatus);
+
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
@@ -761,13 +764,13 @@ export function ProgramHolderPhone({
             </p>
           </div>
           <div
-            className={`rounded-2xl border px-5 py-4 ${connected ? 'border-emerald-300 bg-emerald-500/20' : 'border-white/30 bg-white/10'}`}
+            className={`rounded-2xl border px-5 py-4 ${presence.online ? 'border-emerald-300 bg-emerald-500/20' : 'border-white/30 bg-white/10'}`}
           >
             <p className="flex items-center gap-2 font-black">
               <span
-                className={`h-3 w-3 rounded-full ${connected ? 'bg-emerald-300' : 'bg-slate-300'}`}
+                className={`h-3 w-3 rounded-full ${presence.online ? 'bg-emerald-300' : 'bg-slate-300'}`}
               />
-              {connected ? 'Online for calls' : 'Phone offline'}
+              {presence.label}
             </p>
             <button
               onClick={connected ? disconnect : connect}

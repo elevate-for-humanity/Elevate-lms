@@ -124,3 +124,12 @@ describe('dial pad call behavior',()=>{
   await waitFor(()=>expect(mock.newCall).toHaveBeenCalledWith(expect.objectContaining({destinationNumber:'sip:verified_phone@sip.telnyx.com'})));
  });
 });
+
+it('shows a connected owner device in admin preview without opening a second phone connection',async()=>{
+ mock.create.mockClear();
+ vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({...data,readOnly:true,extension:{...data.extension,presenceStatus:'available'}}));
+ render(<ProgramHolderPhone/>);
+ expect(await screen.findByText("Online on owner's device")).toBeTruthy();
+ expect(screen.getByRole('button',{name:'Connect phone'})).toBeDisabled();
+ expect(mock.create).not.toHaveBeenCalled();
+});

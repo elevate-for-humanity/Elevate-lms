@@ -15,13 +15,13 @@ import {
 } from '@/lib/admin/portal-preview';
 
 import { clearUserPreviewCookies } from '@/lib/admin/preview-cookie-cleanup';
+import { canonicalPreviewUrl } from '@/lib/admin/preview-origin';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const APP_ORIGIN = (
-  process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org'
-).replace(/\/$/, '');
+const APP_ORIGIN = LMS_HOST;
 
 async function selectHostShop(request: NextRequest, postedHandoff = '') {
   const handoffToken = postedHandoff || request.nextUrl.searchParams.get('handoff')?.trim() || '';
@@ -173,6 +173,8 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
 }
 
 export async function POST(request: NextRequest) {
+  const canonical = canonicalPreviewUrl(request);
+  if (canonical) return NextResponse.redirect(canonical, 307);
   const contentType = request.headers.get('content-type') || '';
   const handoffToken = contentType.includes('application/json')
     ? String((await request.json().catch(() => null))?.handoff || '').trim()
@@ -182,5 +184,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const canonical = canonicalPreviewUrl(request);
+  if (canonical) return NextResponse.redirect(canonical, 307);
   return selectHostShop(request);
 }

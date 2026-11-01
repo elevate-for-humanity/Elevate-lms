@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
@@ -148,7 +149,7 @@ function isPending(row: HourRow) {
   return pending.has(approval) || pending.has(status);
 }
 
-async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
+export async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
   // Platform administrators audit a specifically selected Host Shop. Resolve
   // that selection before ordinary memberships so an admin's unrelated partner
   // membership cannot capture the request and send the session into onboarding.
@@ -156,7 +157,10 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
   const role = normalizeRole(profile?.role);
   if (role && ['admin', 'super_admin', 'org_admin'].includes(role)) {
     const cookieStore = await cookies();
-    const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    const preview = await resolveHostShopAdminPreview();
+    const selectedPartnerId = preview?.actorId === userId
+      ? preview.partnerId
+      : cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
     if (!selectedPartnerId) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
 
     const { data: selectedPartner, error: selectedPartnerError } = await db

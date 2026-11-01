@@ -43,3 +43,19 @@ it('keeps entry usable when browser storage is unavailable', () => {
   expect(screen.getByText('Daily operations')).toBeTruthy();
   spy.mockRestore();
 });
+
+it('uses the selected account photo instead of a shared salon hero', () => {
+ const view = render(<HostShopWelcome partnerId="a" shopName="Salon A" ownerName="Owner A" profileImageUrl="/photos/owner-a.webp"><div>Tools</div></HostShopWelcome>);
+ expect(screen.getByRole('img', {name:'Owner A profile photo'}).getAttribute('src')).toBe('/photos/owner-a.webp');
+ fireEvent.click(screen.getByRole('button', {name:'Open my dashboard →'}));
+ expect(screen.getByRole('img', {name:'Owner A profile photo'})).toBeTruthy();
+ view.rerender(<HostShopWelcome partnerId="b" shopName="Salon B" ownerName="Owner B" profileImageUrl="/photos/owner-b.webp"><div>Tools B</div></HostShopWelcome>);
+ expect(screen.getByRole('img', {name:'Owner B profile photo'}).getAttribute('src')).toBe('/photos/owner-b.webp');
+ expect(screen.queryByRole('img', {name:'Owner A profile photo'})).toBeNull();
+});
+it('uses that account initials when no profile photo exists', () => {
+ render(<HostShopWelcome partnerId="no-photo" shopName="Styles" ownerName="Corienne Meid"><div>Tools</div></HostShopWelcome>);
+ expect(screen.getByText('CM')).toBeTruthy();
+ expect(screen.getByText('Corienne Meid')).toBeTruthy();
+ expect(screen.queryByRole('img')).toBeNull();
+});

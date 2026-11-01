@@ -1,4 +1,5 @@
 import { resolveHostShopDocuments } from '@/lib/partners/host-shop-document-status';
+import { hostShopOnboardingLabel } from '@/lib/partners/host-shop-onboarding-label';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -279,9 +280,7 @@ export default async function PartnersPage() {
                       </td>
                       <td className="px-5 py-4">
                         <StatusLine ok={partner.onboarding_completed === true}>
-                          {partner.onboarding_completed
-                            ? 'Complete'
-                            : `Incomplete${partner.onboarding_step ? ` — ${partner.onboarding_step}` : ''}`}
+                          {hostShopOnboardingLabel(partner, requirements.length, missing.length)}
                         </StatusLine>
                       </td>
                       <td className="px-5 py-4">
@@ -366,7 +365,7 @@ export default async function PartnersPage() {
                       <b>MOU / onboarding</b>
                       <br />
                       {partner.mou_signed ? 'MOU signed' : 'MOU missing'} ·{' '}
-                      {partner.onboarding_completed ? 'Complete' : 'Incomplete'}
+                      {hostShopOnboardingLabel(partner, requirements.length, missing.length)}
                     </div>
                   </div>
                   {missing.length ? (

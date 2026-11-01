@@ -25,8 +25,8 @@ const partnersPage = readFileSync('apps/admin/app/partners/page.tsx', 'utf8');
 
 describe('portal preview POST handoff contract', () => {
   it('keeps the signed handoff out of newly issued preview URLs', () => {
-    expect(adminRoute).toContain("'https://app.elevateforhumanity.org/api/admin/preview'");
-    expect(adminRoute).toContain("'https://app.elevateforhumanity.org/api/admin/select-host-shop'");
+    expect(adminRoute).toContain("`${LMS_HOST}/api/admin/preview`");
+    expect(adminRoute).toContain("`${LMS_HOST}/api/admin/select-host-shop`");
     expect(adminRoute).toContain('preview_handoff: createPortalPreviewHandoff');
     expect(adminRoute).not.toContain('preview?handoff=');
   });

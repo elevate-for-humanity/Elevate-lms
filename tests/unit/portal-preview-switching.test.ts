@@ -69,7 +69,7 @@ import { POST as selectShop } from '@/apps/lms/app/api/admin/select-host-shop/ro
 const userCookie = 'elevate_portal_preview_user';
 const sessionCookie = 'elevate_portal_preview_session';
 function request(query: string) {
-  return new NextRequest(`https://app.elevateforhumanity.org/api/admin/preview?${query}`, {
+  return new NextRequest(`https://lms.elevateforhumanity.org/api/admin/preview?${query}`, {
     headers: {
       cookie: `${userCookie}=old-user; ${sessionCookie}=admin:old-user; elevate_host_shop_preview_session=admin:old-shop; __efh_host_shop_partner=old-shop`,
     },
@@ -90,7 +90,7 @@ describe('switching signed portal previews', () => {
     async (target, path) => {
       const response = await GET(request(`user_id=${target}`));
       expect(response.status).toBe(303);
-      expect(response.headers.get('location')).toBe(`https://app.elevateforhumanity.org${path}`);
+      expect(response.headers.get('location')).toBe(`https://lms.elevateforhumanity.org${path}`);
       expect(response.cookies.get(userCookie)?.value).toBe(target);
       expect(response.cookies.get(sessionCookie)?.value).toBe(`admin:${target}`);
       expect(response.cookies.get('elevate_portal_preview_actor')?.value).toBe('admin');
@@ -100,7 +100,7 @@ describe('switching signed portal previews', () => {
   );
   it('POST also clears stale shop scope without changing the requested user', async () => {
     const response = await POST(
-      new NextRequest('https://app.elevateforhumanity.org/api/admin/preview', {
+      new NextRequest('https://lms.elevateforhumanity.org/api/admin/preview', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ handoff: 'admin:apprentice' }),
@@ -123,7 +123,7 @@ describe('switching signed portal previews', () => {
   });
   it('rejects a handoff whose actor is not an administrator', async () => {
     const response = await POST(
-      new NextRequest('https://app.elevateforhumanity.org/api/admin/preview', {
+      new NextRequest('https://lms.elevateforhumanity.org/api/admin/preview', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ handoff: 'learner:apprentice' }),
@@ -153,7 +153,7 @@ describe('switching signed portal previews', () => {
     async (member) => {
       state.member = member;
       const response = await selectShop(
-        new NextRequest('https://app.elevateforhumanity.org/api/admin/select-host-shop', {
+        new NextRequest('https://lms.elevateforhumanity.org/api/admin/select-host-shop', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ handoff: 'admin:shop' }),
@@ -165,4 +165,19 @@ describe('switching signed portal previews', () => {
       expect(response.cookies.get(sessionCookie)?.value).toBe(member ? `admin:${member}` : '');
     },
   );
+});
+
+it.each([
+  ['/api/admin/preview', POST],
+  ['/api/admin/select-host-shop', selectShop],
+])('legacy %s preserves the POST body and sets no preview cookies before moving hosts', async (path, handler) => {
+  const req = new NextRequest(`https://app.elevateforhumanity.org${path}`, {
+    method: 'POST', body: 'handoff=admin%3Ashop',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+  });
+  const response = await handler(req);
+  expect(response.status).toBe(307);
+  expect(response.headers.get('location')).toBe(`https://lms.elevateforhumanity.org${path}`);
+  expect(response.cookies.getAll()).toHaveLength(0);
+  expect(req.bodyUsed).toBe(false);
 });

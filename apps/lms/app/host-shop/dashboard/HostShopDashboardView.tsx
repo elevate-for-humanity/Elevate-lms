@@ -165,9 +165,19 @@ export default async function HostShopDashboardView() {
   }
 
   const shopName = board.partner?.name || board.shops[0]?.name || 'Your Host Shop';
+  // Display the selected shop account, never the administrator's photo or
+  // another shop's training image. Missing photos retain a named initials banner.
+  const { data: heroMember } = isPlatformAdmin
+    ? await db.from('partner_users').select('user_id')
+        .eq('partner_id', board.partner.id).eq('status', 'active')
+        .order('created_at', { ascending: true }).limit(1).maybeSingle()
+    : { data: { user_id: user.id } };
+  const { data: heroProfile } = heroMember?.user_id
+    ? await db.from('profiles').select('full_name,avatar_url').eq('id', heroMember.user_id).maybeSingle()
+    : { data: null };
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-1 py-4 sm:px-4">
-      <HostShopWelcome shopName={shopName} partnerId={board.partner.id}>
+      <HostShopWelcome shopName={shopName} partnerId={board.partner.id} ownerName={heroProfile?.full_name} profileImageUrl={heroProfile?.avatar_url}>
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black text-slate-950">{shopName}</h1>

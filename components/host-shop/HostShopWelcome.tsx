@@ -7,13 +7,30 @@ import { useEffect, useState, type ReactNode } from 'react';
 export default function HostShopWelcome({
   shopName,
   partnerId,
+  profileImageUrl,
+  ownerName,
   children,
 }: {
   shopName: string;
   partnerId: string;
+  profileImageUrl?: string | null;
+  ownerName?: string | null;
   children: ReactNode;
 }) {
   const [entered, setEntered] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  useEffect(() => setPhotoFailed(false), [profileImageUrl, partnerId]);
+  const displayName = ownerName || shopName;
+  const initials = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  const profileHero = (
+    <div className="relative flex aspect-[16/7] items-center justify-center overflow-hidden rounded-3xl bg-neutral-950 text-white" aria-label={`${displayName} dashboard banner`}>
+      {profileImageUrl && !photoFailed ? (
+        <Image src={profileImageUrl} alt={`${displayName} profile photo`} fill priority sizes="(max-width: 1024px) 100vw, 75vw" className="object-contain object-top" onError={() => setPhotoFailed(true)} />
+      ) : (
+        <div className="p-6 text-center"><p className="text-6xl font-black sm:text-8xl">{initials}</p><p className="mt-3 text-lg font-bold">{displayName}</p><p className="mt-2 text-sm text-neutral-300">{profileImageUrl ? 'Profile photo is unavailable' : 'Profile photo has not been added'}</p></div>
+      )}
+    </div>
+  );
   const key = `host-shop-welcome-v2:${partnerId}`;
   useEffect(() => {
     try {
@@ -33,6 +50,7 @@ export default function HostShopWelcome({
   if (entered)
     return (
       <div className="space-y-6">
+        {profileHero}
         <button
           type="button"
           onClick={() => setEntered(false)}
@@ -48,16 +66,7 @@ export default function HostShopWelcome({
       aria-label="Welcome to your Host Shop"
       className="overflow-hidden rounded-3xl bg-neutral-950 text-white"
     >
-      <div className="relative aspect-[16/7]">
-        <Image
-          src="/images/partners/generations-hair/salon-service.webp"
-          alt="A stylist working with a client in a participating salon"
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 75vw"
-          className="object-cover"
-        />
-      </div>
+      {profileHero}
       <div className="space-y-5 p-5 sm:p-8">
         <p className="text-xs font-bold uppercase tracking-widest text-amber-200">
           Welcome, {shopName}

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read RTP counters only for the owned business self-call; never emit caller data."""
-import base64,ipaddress,json,re,time,urllib.request,urllib.parse
+import base64,ipaddress,json,re,time,urllib.request,urllib.parse,socket,struct
 from pathlib import Path
 
 def fetch(url,headers):
@@ -38,20 +38,51 @@ def main():
     if port.isdigit():result['destinationPort']=int(port)
    except Exception:result['destinationUnavailable']=True
   return result
+ def loopback_flow(media):
+  # Receive only Ethernet/IP/UDP headers, never RTP headers or audio payload.
+  pairs=[]
+  for c in media:
+   cid=c.get('id','')
+   name=c.get('name','')
+   match=re.match(r'^UnicastRTP/127[.]0[.]0[.]1:(\d+)-',name)
+   if not match:continue
+   try:
+    port=ari('/channels/'+urllib.parse.quote(cid,safe='')+'/variable?variable=UNICASTRTP_LOCAL_PORT').get('value','')
+    if str(port).isdigit():pairs.append((int(match[1]),int(port)))
+   except Exception:pass
+  counts={'ownedPortPairs':len(pairs),'gatewayToAsterisk':0,'asteriskToGateway':0}
+  if not pairs:return counts
+  try:
+   with socket.socket(socket.AF_PACKET,socket.SOCK_RAW,socket.htons(0x0800)) as capture:
+    capture.bind(('lo',0));capture.settimeout(.1)
+    deadline=time.monotonic()+2.5
+    while time.monotonic()<deadline:
+     try:header=capture.recv(42)
+     except socket.timeout:continue
+     if len(header)!=42 or header[14]!=0x45 or header[23]!=17 or header[26:34]!=bytes([127,0,0,1,127,0,0,1]):continue
+     source,destination=struct.unpack('!HH',header[34:38])
+     for gateway,asterisk in pairs:
+      if (source,destination)==(gateway,asterisk):counts['gatewayToAsterisk']+=1
+      elif (source,destination)==(asterisk,gateway):counts['asteriskToGateway']+=1
+  except Exception:counts['headerCountersUnavailable']=True
+  return counts
  samples=[]
  for sample in range(5):
   channels=ari('/channels')
   own=[c for c in channels if str(c.get('name','')).startswith('PJSIP/twilio-') and re.sub(r'[^0-9]','',str(c.get('caller',{}).get('number',''))) in ['14632401404','4632401404']]
   sample_data={'offset':sample*3,'ownedCarrierCount':len(own),'totalCarrierCount':sum(str(c.get('name','')).startswith('PJSIP/twilio-') for c in channels),'carrier':[stats(c,'carrier') for c in own],'bridges':[],'media':[]}
+  owned_media=[]
   if own:
    ids={c['id'] for c in own}
    for bridge in ari('/bridges'):
     if ids.intersection(bridge.get('channels',[])):
      sample_data['bridges'].append({'technology':bridge.get('technology'),'type':bridge.get('bridge_type'),'channelCount':len(bridge.get('channels',[]))})
      for c in channels:
-      if c['id'] in bridge.get('channels',[]) and c['id'].startswith('paris-media-'):sample_data['media'].append(stats(c,'media'))
+      if c['id'] in bridge.get('channels',[]) and c['id'].startswith('paris-media-'):
+       sample_data['media'].append(stats(c,'media'));owned_media.append(c)
+  sample_data['loopbackHeaderCounters']=loopback_flow(owned_media)
   samples.append(sample_data)
-  if sample<4:time.sleep(3)
+  if sample<4:time.sleep(.5)
  print(json.dumps({'readOnlyRtpMonitor':True,'callsPlaced':0,'samples':samples}))
 if __name__=='__main__':
  try:main()

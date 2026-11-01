@@ -46,8 +46,16 @@ export async function verifyLiveMeetingDelivery({run=google}={}){
      const video=track.attach();video.autoplay=true;video.muted=true;document.body.appendChild(video);
      video.requestVideoFrameCallback(()=>{window.delivery[publication.source===sdk.Track.Source.ScreenShare?'screenShare':'video']=true;});
     }else if(track.kind==='audio'){
-     const context=new AudioContext();const source=context.createMediaStreamSource(new MediaStream([track.mediaStreamTrack]));const analyser=context.createAnalyser();source.connect(analyser);context.resume();
+     const audio=track.attach();audio.autoplay=true;audio.volume=0;document.body.appendChild(audio);audio.play().catch(()=>{});
+     const context=new AudioContext();const source=context.createMediaStreamSource(new MediaStream([track.mediaStreamTrack]));const analyser=context.createAnalyser();source.connect(analyser);analyser.connect(context.destination);context.resume();
      const samples=new Float32Array(analyser.fftSize);const timer=setInterval(()=>{analyser.getFloatTimeDomainData(samples);if(samples.some(sample=>Math.abs(sample)>0.005)){window.delivery.audio=true;clearInterval(timer);}},20);
+     const statsTimer=setInterval(async()=>{
+      const report=await track.getRTCStatsReport().catch(()=>undefined);
+      report?.forEach(stat=>{if(stat.type==='inbound-rtp'&&(stat.kind==='audio'||stat.mediaType==='audio')){
+       window.audioEvidence={bytesReceived:stat.bytesReceived||0,totalAudioEnergy:stat.totalAudioEnergy||0,totalSamplesReceived:stat.totalSamplesReceived||0};
+       if(stat.bytesReceived>0&&stat.totalAudioEnergy>0&&stat.totalSamplesReceived>0){window.delivery.audio=true;clearInterval(statsTimer);clearInterval(timer);}
+      }});
+     },250);
     }
    });
    room.on(sdk.RoomEvent.DataReceived,data=>{if(new TextDecoder().decode(data)==='EFH_SYNTHETIC_DELIVERY')window.delivery.data=true;});
@@ -67,10 +75,10 @@ export async function verifyLiveMeetingDelivery({run=google}={}){
   },{url,jwt:await token('synthetic-publisher')});
   phase='received_media_assertions';await receiver.bringToFront();await receiver.waitForFunction(()=>Object.values(window.delivery).every(Boolean),undefined,{timeout:45000});
   const delivery=await receiver.evaluate(()=>window.delivery);
-  return result={passed:true,syntheticDelivery:delivery,physicalDevicesCertified:false,participants:2,valuesExposed:false};
+  return result={passed:true,syntheticDelivery:delivery,audioEvidence:await receiver.evaluate(()=>window.audioEvidence),physicalDevicesCertified:false,participants:2,valuesExposed:false};
  }catch{
   const delivery=receiver?await receiver.evaluate(()=>window.delivery).catch(()=>undefined):undefined;
-  return result={passed:false,phase,syntheticDelivery:delivery,physicalDevicesCertified:false,valuesExposed:false};
+  return result={passed:false,phase,syntheticDelivery:delivery,audioEvidence:receiver?await receiver.evaluate(()=>window.audioEvidence).catch(()=>undefined):undefined,physicalDevicesCertified:false,valuesExposed:false};
  }
  finally{
   if(browser)await browser.close().catch(()=>{});

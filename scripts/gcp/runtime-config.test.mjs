@@ -69,6 +69,8 @@ test('unavailable volume attachment inventory prevents secret creation', async (
 test('Google failures expose only a fixed diagnosis, never raw credentials', () => {
   assert.equal(googleFailureCode('API [secretmanager.googleapis.com] not enabled; TOKEN=private'), 'api_disabled');
   assert.equal(googleFailureCode('PERMISSION_DENIED: TOKEN=private'), 'permission_denied');
+  assert.equal(googleFailureCode('PERMISSION_DENIED reason: BILLING_DISABLED TOKEN=private'), 'billing_disabled');
+  assert.equal(googleFailureCode('This API method requires billing to be enabled.'), 'billing_disabled');
   assert.equal(googleFailureCode('arbitrary credential output'), 'command_failed');
 });
 

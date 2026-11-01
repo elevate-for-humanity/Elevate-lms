@@ -22,6 +22,7 @@ export async function parisGitHubAppBinding({ run = google, request = fetch, dis
   } catch (error) {
     const codes = {
       permission_denied: 'PARIS_APP_SECRET_ACCESS_DENIED',
+      billing_disabled: 'PARIS_APP_GOOGLE_BILLING_DISABLED',
       not_found: 'PARIS_APP_SECRET_NOT_FOUND',
       authentication_failed: 'PARIS_APP_GOOGLE_AUTHENTICATION_FAILED',
       api_disabled: 'PARIS_APP_SECRET_API_DISABLED',

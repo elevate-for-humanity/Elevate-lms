@@ -18,6 +18,12 @@ export function addReader(policy,member){
 }
 export async function repairAdminSecretAccess({token,request=fetch,apply=false}={}){
  const results=[];
+ let billing={verified:false};
+ try{
+  const response=await request(`https://cloudbilling.googleapis.com/v1/projects/${PROJECT}/billingInfo`,{headers:{Authorization:`Bearer ${token}`},redirect:'error',signal:AbortSignal.timeout(15000)});
+  const body=await response.json();
+  billing={http:response.status,verified:response.ok,billingEnabled:response.ok&&typeof body.billingEnabled==='boolean'?body.billingEnabled:null,accountLinked:response.ok?Boolean(body.billingAccountName):null};
+ }catch{billing={verified:false};}
  async function call(resource,payload){
   const response=await request(`https://secretmanager.googleapis.com/v1/projects/${PROJECT}/secrets/${resource}`,{method:payload?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:payload?JSON.stringify(payload):undefined,redirect:'error',signal:AbortSignal.timeout(15000)});
   const body=await response.json();
@@ -27,7 +33,7 @@ export async function repairAdminSecretAccess({token,request=fetch,apply=false}=
  for(const secret of TARGETS){
   const probe=await call(secret+':testIamPermissions',{permissions:PERMISSIONS});
   const granted=probe.response.ok?probe.body.permissions||[]:[];
-  const row={secret,permissionProbe:probe.safe,permissions:Object.fromEntries(PERMISSIONS.map(p=>[p,granted.includes(p)])),changes:[]};
+  const row={secret,permissionProbe:probe.safe,permissions:Object.fromEntries(PERMISSIONS.map(p=>[p,probe.response.ok?granted.includes(p):null])),changes:[]};
   if(apply&&granted.includes('secretmanager.secrets.getIamPolicy')&&granted.includes('secretmanager.secrets.setIamPolicy')){
    // No project-wide grant; no new identity or credential. Preserve conditions and etag.
    for(const member of secret==='paris-engineer-github-private-key'?[DEPLOY,ADMIN]:[DEPLOY]){
@@ -44,10 +50,10 @@ export async function repairAdminSecretAccess({token,request=fetch,apply=false}=
   // Never emit payload.data, raw Google bodies, tokens, or policy members.
   row.access=access.safe;row.accessVerified=access.response.ok;
   const after=await call(secret+':testIamPermissions',{permissions:PERMISSIONS});
-  row.permissionsAfter=Object.fromEntries(PERMISSIONS.map(p=>[p,after.response.ok&&(after.body.permissions||[]).includes(p)]));
+  row.permissionsAfter=Object.fromEntries(PERMISSIONS.map(p=>[p,after.response.ok?(after.body.permissions||[]).includes(p):null]));
   results.push(row);
  }
- return {project:PROJECT,identity:DEPLOY,results,allAccessible:results.every(x=>x.accessVerified)};
+ return {project:PROJECT,identity:DEPLOY,billing,results,allAccessible:results.every(x=>x.accessVerified)};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  repairAdminSecretAccess({token:google(['auth','print-access-token']),apply:process.argv.includes('--apply')}).then(r=>{console.log(JSON.stringify(r));if(!r.allAccessible)process.exitCode=1;}).catch(()=>{console.error('ADMIN_SECRET_ACCESS_REPAIR_FAILED');process.exitCode=1;});

@@ -175,7 +175,7 @@ export default async function CourseLandingPage({
     progressRows.map((row) => row.lesson_id).filter((id) => publishedIds.has(id)),
   );
   const nextLesson = syllabusLessons.find(
-    (lesson) => lesson.published && lesson.available && !completedIds.has(lesson.id),
+    (lesson) => (preview.active || lesson.published) && lesson.available && !completedIds.has(lesson.id),
   );
   const firstLesson = nextLesson ?? null;
   const heroMetadata =
@@ -198,8 +198,8 @@ export default async function CourseLandingPage({
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       {preview.active ? (
-        <div className="sticky top-0 z-50 bg-amber-300 px-4 py-2 text-center text-sm font-black text-slate-950">
-          Admin draft preview · Learner progress is not recorded
+        <div className="border-b border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+          Administrator course view · All saved lessons are available
         </div>
       ) : null}
       <section className="border-b border-slate-200 bg-white">
@@ -275,7 +275,7 @@ export default async function CourseLandingPage({
               {pacing
                 ? pacing.lessons.filter((lesson) => lesson.published).length
                 : publishedLessons.length}{' '}
-              published lessons
+              {preview.active ? 'saved lessons' : 'published lessons'}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
               <Clock3 className="h-4 w-4" /> {Math.round((totalMinutes / 60) * 10) / 10} scheduled
@@ -475,7 +475,7 @@ export default async function CourseLandingPage({
                         ) : null}
                         <p className="mt-1 text-sm font-medium text-slate-600">
                           {!lesson.published
-                            ? 'In production · Available after completion and verification'
+                            ? preview.active ? 'Unpublished · Open for administrator review' : 'In production · Available after completion and verification'
                             : completedIds.has(lesson.id) && !preview.active
                               ? 'Completed'
                               : !lesson.available && !preview.active

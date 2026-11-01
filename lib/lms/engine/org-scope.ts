@@ -110,14 +110,25 @@ export async function getOrgCohorts(organizationId: string): Promise<OrgCohort[]
     .select(
       `
       id, name, program_id, start_date, end_date,
-      delivery_mode, status,
-      cohort_enrollments ( id )
+      delivery_mode, status
     `,
     )
     .eq('organization_id', organizationId)
     .order('start_date', { ascending: false });
 
   if (error) throw new Error(`getOrgCohorts: ${error.message}`);
+
+  const cohortIds = (data ?? []).map((row: any) => row.id);
+  const enrollmentResult = cohortIds.length
+    ? await db.from('program_enrollments').select('cohort_id,user_id').in('cohort_id', cohortIds).is('revoked_at', null)
+    : { data: [], error: null };
+  if (enrollmentResult.error) throw new Error(`getOrgCohorts/enrollments: ${enrollmentResult.error.message}`);
+  const learners = new Map<string, Set<string>>();
+  for (const row of enrollmentResult.data ?? []) {
+    if (!row.user_id) continue;
+    if (!learners.has(row.cohort_id)) learners.set(row.cohort_id, new Set());
+    learners.get(row.cohort_id)!.add(row.user_id);
+  }
 
   return (data ?? []).map((row: any) => ({
     cohortId: row.id,
@@ -127,7 +138,7 @@ export async function getOrgCohorts(organizationId: string): Promise<OrgCohort[]
     endDate: row.end_date ?? null,
     deliveryMode: row.delivery_mode ?? null,
     status: row.status,
-    enrolledCount: Array.isArray(row.cohort_enrollments) ? row.cohort_enrollments.length : 0,
+    enrolledCount: learners.get(row.id)?.size ?? 0,
   }));
 }
 
@@ -139,31 +150,26 @@ export async function getOrgLearners(
 ): Promise<OrgLearner[]> {
   const db = await requireDb('getOrgLearners');
 
-  let query = db
-    .from('cohort_enrollments')
-    .select(
-      `
-      learner_id,
-      enrollment_status,
-      enrolled_at,
-      cohorts!inner ( id, name, organization_id ),
-      profiles:learner_id ( full_name, email )
-    `,
-    )
-    .eq('cohorts.organization_id', organizationId);
-
-  if (cohortId) query = query.eq('cohort_id', cohortId);
+  let cohortQuery = db.from('cohorts').select('id,name').eq('organization_id', organizationId);
+  if (cohortId) cohortQuery = cohortQuery.eq('id', cohortId);
+  const cohortResult = await cohortQuery;
+  if (cohortResult.error) throw new Error(`getOrgLearners/cohorts: ${cohortResult.error.message}`);
+  const cohorts = new Map<string, string>((cohortResult.data ?? []).map((row: any) => [row.id, row.name]));
+  if (!cohorts.size) return [];
+  const query = db.from('program_enrollments')
+    .select('user_id,full_name,email,cohort_id,status,enrolled_at')
+    .in('cohort_id', [...cohorts.keys()]).is('revoked_at', null);
 
   const { data, error } = await query;
   if (error) throw new Error(`getOrgLearners: ${error.message}`);
 
   return (data ?? []).map((row: any) => ({
-    userId: row.learner_id,
-    fullName: row.profiles?.full_name ?? null,
-    email: row.profiles?.email ?? '',
-    cohortId: row.cohorts.id,
-    cohortName: row.cohorts.name,
-    enrollmentStatus: row.enrollment_status,
+    userId: row.user_id,
+    fullName: row.full_name ?? null,
+    email: row.email ?? '',
+    cohortId: row.cohort_id,
+    cohortName: cohorts.get(row.cohort_id) ?? '',
+    enrollmentStatus: row.status,
     enrolledAt: row.enrolled_at,
   }));
 }
@@ -173,7 +179,7 @@ export async function getOrgLearners(
 // Aggregated — does NOT loop per learner. Query count is fixed at 5 regardless
 // of cohort or learner count:
 //   1. cohorts (filter)
-//   2. cohort_enrollments (filter)
+//   2. program_enrollments (filter)
 //   3. courses (course_id lookup)
 //   4. course_lessons (total published count)
 //   5. lesson_progress + program_completion_certificates (parallel)

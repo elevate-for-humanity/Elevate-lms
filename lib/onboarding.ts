@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export interface OnboardingStep {
   id: string;
@@ -260,7 +261,7 @@ export const ONBOARDING_FLOWS: Record<string, OnboardingFlow> = {
 
 // Check if user has completed an onboarding flow
 export async function hasCompletedOnboarding(userId: string, flowId: string): Promise<boolean> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error }: any = await supabase
     .from('user_onboarding')
@@ -282,7 +283,7 @@ export async function getOnboardingProgress(
   completedSteps: string[];
   completed: boolean;
 } | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error }: any = await supabase
     .from('user_onboarding')
@@ -302,7 +303,7 @@ export async function getOnboardingProgress(
 
 // Start an onboarding flow
 export async function startOnboarding(userId: string, flowId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase.from('user_onboarding').upsert({
     user_id: userId,
@@ -321,7 +322,7 @@ export async function updateOnboardingProgress(
   stepId: string,
   stepIndex: number,
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get current progress
   const { data: current } = await supabase
@@ -349,7 +350,7 @@ export async function updateOnboardingProgress(
 
 // Complete an onboarding flow
 export async function completeOnboarding(userId: string, flowId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase
     .from('user_onboarding')
@@ -366,14 +367,14 @@ export async function completeOnboarding(userId: string, flowId: string): Promis
     if (flow.completionReward.type === 'badge') {
       await awardBadge(userId, flow.completionReward.value as string);
     } else if (flow.completionReward.type === 'points') {
-      await awardPoints(userId, flow.completionReward.value as number);
+      await awardPoints(userId, flowId, flow.completionReward.value as number);
     }
   }
 }
 
 // Skip an onboarding flow
 export async function skipOnboarding(userId: string, flowId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase
     .from('user_onboarding')
@@ -388,14 +389,14 @@ export async function skipOnboarding(userId: string, flowId: string): Promise<vo
 
 // Reset onboarding (for testing or user request)
 export async function resetOnboarding(userId: string, flowId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase.from('user_onboarding').delete().eq('user_id', userId).eq('flow_id', flowId);
 }
 
 // Helper functions for rewards
 async function awardBadge(userId: string, badgeId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase.from('user_achievements').insert({
     user_id: userId,
@@ -404,13 +405,17 @@ async function awardBadge(userId: string, badgeId: string): Promise<void> {
   });
 }
 
-async function awardPoints(userId: string, points: number): Promise<void> {
-  const supabase = createClient();
-
-  await supabase.rpc('increment_user_points', {
-    user_id: userId,
-    points_to_add: points,
+async function awardPoints(userId: string, flowId: string, points: number): Promise<void> {
+  const supabase = await requireAdminClient();
+  const { error } = await supabase.rpc('award_gamification_points', {
+    p_user_id: userId,
+    p_event_type: 'manual',
+    p_source_id: `onboarding:${flowId}`,
+    p_course_id: null,
+    p_points: points,
+    p_metadata: { onboarding_flow: flowId },
   });
+  if (error) throw new Error('Onboarding reward could not be recorded.');
 }
 
 // Get recommended onboarding flows for a user
@@ -418,7 +423,7 @@ export async function getRecommendedOnboarding(
   userId: string,
   userRole: 'student' | 'instructor' | 'admin',
 ): Promise<OnboardingFlow[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get completed flows
   const { data: completed } = await supabase
@@ -623,7 +628,7 @@ export async function getTutorialProgress(
   completedSteps: string[];
   completed: boolean;
 } | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error }: any = await supabase
     .from('user_tutorials')
@@ -648,7 +653,7 @@ export async function updateTutorialProgress(
   stepId: string,
   stepIndex: number,
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: current } = await supabase
     .from('user_tutorials')
@@ -673,7 +678,7 @@ export async function updateTutorialProgress(
 
 // Complete tutorial
 export async function completeTutorial(userId: string, tutorialId: string): Promise<void> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase
     .from('user_tutorials')

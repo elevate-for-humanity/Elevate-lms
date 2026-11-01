@@ -10,7 +10,10 @@ export function verifyQuickBooksWebhook(rawBody: string, signature: string | nul
 
 export function normalizeQuickBooksInvoiceStatus(invoice: { Balance?: number; TxnStatus?: string; EmailStatus?: string }): 'open' | 'paid' | 'void' {
   if (invoice.TxnStatus?.toLowerCase() === 'voided') return 'void';
-  return Number(invoice.Balance ?? 0) <= 0 ? 'paid' : 'open';
+  if (typeof invoice.Balance !== 'number' || !Number.isFinite(invoice.Balance) || invoice.Balance < 0) {
+    throw new Error('A verified QuickBooks invoice balance is required.');
+  }
+  return invoice.Balance === 0 ? 'paid' : 'open';
 }
 
 export function invoiceIdsFromWebhook(payload: any): string[] {

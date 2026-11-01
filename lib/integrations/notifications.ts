@@ -202,13 +202,14 @@ export async function sendWorkflowNotification(
   try {
     // Email via enqueueNotification -> Resend
     if (channels.includes('email') && isEmail) {
-      await enqueueNotification({
+      const receipt = await enqueueNotification({
         toEmail: input.recipient,
         templateKey: 'inquiry_received',
         templateData: { ...variables, body, subject },
         entityType: 'application',
         entityId: input.applicationId,
       });
+      if (!receipt) return { success: false, error: 'Notification could not be queued.' };
     }
 
     // SMS via Twilio
@@ -216,6 +217,7 @@ export async function sendWorkflowNotification(
       const smsResult = await smsService.send({
         to: input.recipient,
         message: body.substring(0, 160),
+        metadata: { entity_id: input.applicationId, template: input.template },
       });
 
       if (!smsResult.success) {
@@ -223,10 +225,16 @@ export async function sendWorkflowNotification(
           to: input.recipient,
           error: smsResult.error,
         });
+        return { success: false, error: smsResult.error || 'SMS delivery was not accepted.' };
       }
     }
 
-    logger.info('[notifications-adapter] Notification sent', {
+    if (!(channels.includes('email') && isEmail) &&
+        !(channels.includes('sms') && !isEmail && input.recipient.length >= 10)) {
+      return { success: false, error: 'No requested channel matches the recipient.' };
+    }
+
+    logger.info('[notifications-adapter] Notification accepted or queued', {
       template: input.template,
       recipient: input.recipient,
       channels,
@@ -275,7 +283,7 @@ export async function getNotificationHistory(
     template: NotificationTemplate;
     channel: 'email' | 'sms';
     sentAt: string;
-    status: 'sent' | 'failed';
+    status: 'sent' | 'failed' | 'pending';
   }>
 > {
   const { createClient } = await import('@/lib/supabase/server');
@@ -285,14 +293,15 @@ export async function getNotificationHistory(
     template: NotificationTemplate;
     channel: 'email' | 'sms';
     sentAt: string;
-    status: 'sent' | 'failed';
+    status: 'sent' | 'failed' | 'pending';
   }> = [];
 
-  const { data: emailLogs } = await supabase
-    .from('email_notification_log')
+  const { data: emailLogs, error: emailError } = await supabase
+    .from('notification_outbox')
     .select('template_key, created_at, status')
     .eq('entity_id', applicationId)
     .order('created_at', { ascending: false });
+  if (emailError) throw new Error('Notification history is unavailable.');
 
   if (emailLogs) {
     for (const log of emailLogs) {
@@ -300,16 +309,18 @@ export async function getNotificationHistory(
         template: (log.template_key as NotificationTemplate) ?? 'APPLICATION_RECEIVED',
         channel: 'email',
         sentAt: log.created_at,
-        status: log.status === 'sent' ? 'sent' : 'failed',
+        status: ['sent', 'delivered'].includes(log.status) ? 'sent' : ['failed', 'bounced'].includes(log.status) ? 'failed' : 'pending',
       });
     }
   }
 
-  const { data: smsLogs } = await supabase
-    .from('sms_logs')
-    .select('message, created_at, status')
-    .eq('entity_id', applicationId)
+  const { data: smsLogs, error: smsError } = await supabase
+    .from('delivery_logs')
+    .select('created_at, status')
+    .eq('channel', 'sms')
+    .contains('metadata', { entity_id: applicationId })
     .order('created_at', { ascending: false });
+  if (smsError) throw new Error('SMS history is unavailable.');
 
   if (smsLogs) {
     for (const log of smsLogs) {
@@ -317,7 +328,7 @@ export async function getNotificationHistory(
         template: 'REMINDER',
         channel: 'sms',
         sentAt: log.created_at,
-        status: log.status === 'sent' ? 'sent' : 'failed',
+        status: ['sent', 'delivered'].includes(log.status) ? 'sent' : ['failed', 'undelivered'].includes(log.status) ? 'failed' : 'pending',
       });
     }
   }

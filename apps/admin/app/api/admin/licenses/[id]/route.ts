@@ -1,4 +1,4 @@
-import { requireAdmin } from '@/lib/auth';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext, logAdminAccess } from '@/lib/tenant';
@@ -29,10 +29,10 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: 
 
     const { id: licenseId } = await params;
     const tenantContext = await getTenantContext();
-    const supabase = await createClient();
+    const sessionClient = await createClient();
 
     // Verify admin role
-    const { data: profile } = await supabase
+    const { data: profile } = await sessionClient
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
@@ -41,6 +41,7 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: 
     if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+    const supabase = await requireAdminClient();
 
     const body = await request.json();
     const { action, reason, features, limits } = body;
@@ -63,8 +64,9 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: 
         if (!reason) {
           return NextResponse.json({ error: 'Reason required for suspension' }, { status: 400 });
         }
-        result = await supabase.rpc('suspend_license', {
+        result = await supabase.rpc('set_license_lifecycle', {
           p_license_id: licenseId,
+          p_action: 'suspend',
           p_reason: reason,
           p_admin_user_id: tenantContext.userId,
         });
@@ -119,6 +121,9 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: 
       logger.error('Admin license action failed', result.error);
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
+    if (result?.data?.success === false) {
+      return NextResponse.json({ error: result.data.message || 'License action rejected' }, { status: 409 });
+    }
 
     const auditActionMap: Record<string, string> = {
       suspend: AdminAction.LICENSE_SUSPENDED,
@@ -156,10 +161,10 @@ async function _DELETE(request: NextRequest, { params }: { params: Promise<{ id:
 
     const { id: licenseId } = await params;
     const tenantContext = await getTenantContext();
-    const supabase = await createClient();
+    const sessionClient = await createClient();
 
     // Verify admin role
-    const { data: profile } = await supabase
+    const { data: profile } = await sessionClient
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
@@ -168,6 +173,7 @@ async function _DELETE(request: NextRequest, { params }: { params: Promise<{ id:
     if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+    const supabase = await requireAdminClient();
 
     const { searchParams } = new URL(request.url);
     const reason = searchParams.get('reason');
@@ -185,6 +191,9 @@ async function _DELETE(request: NextRequest, { params }: { params: Promise<{ id:
     if (error) {
       logger.error('License revocation failed', error);
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+    if (data?.success === false) {
+      return NextResponse.json({ error: data.message || 'Revocation rejected' }, { status: 409 });
     }
 
     await logAdminAudit({

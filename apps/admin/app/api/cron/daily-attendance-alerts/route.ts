@@ -14,9 +14,10 @@ export const dynamic = 'force-dynamic';
 // Cron expression: 0 11 * * * (11:00 UTC = 6:00 AM EST)
 async function _POST(request: NextRequest) {
   try {
+    await hydrateProcessEnv();
     // Verify cron secret to prevent unauthorized calls
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -24,8 +25,9 @@ async function _POST(request: NextRequest) {
     const supabase = await requireAdminClient();
 
     // Calculate yesterday's date
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
+    const localDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Indiana/Indianapolis' }).format(new Date());
+    const yesterday = new Date(localDate + 'T12:00:00Z');
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
     const ymd = yesterday.toISOString().slice(0, 10);
 
     // Call the database function

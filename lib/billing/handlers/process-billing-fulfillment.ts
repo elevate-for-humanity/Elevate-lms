@@ -56,15 +56,17 @@ export async function POST(request: NextRequest) {
         invoice.data?.fulfillment_type !== job.fulfillment_type
       )
         throw new Error('Paid invoice delivery could not be verified.');
+      if (['platform_subscription', 'individual_app_subscription'].includes(job.fulfillment_type)) {
+        // Confirm the independent commerce ledger before granting application
+        // access. A failed destination delivery stays retryable in this outbox.
+        await recordStoreSubscriptionPayment(job.billing_invoice_id);
+      }
       await fulfillPaidBillingInvoice(db, {
         ...job,
         payload: invoice.data.fulfillment_payload,
         paid_at: invoice.data.paid_at,
         customer_email: invoice.data.customer_email,
       });
-      if (['platform_subscription', 'individual_app_subscription'].includes(job.fulfillment_type)) {
-        await recordStoreSubscriptionPayment(job.billing_invoice_id);
-      }
       const saved = await db
         .from('billing_fulfillment_jobs')
         .update({ status: 'completed', last_error: null, updated_at: new Date().toISOString() })

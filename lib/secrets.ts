@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 /**
@@ -69,7 +70,7 @@ async function readRuntimeSecrets(
 }
 
 function getBootstrapClient(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const { url } = resolveServerSupabaseRawEnv();
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
 

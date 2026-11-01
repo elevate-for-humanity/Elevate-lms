@@ -120,12 +120,14 @@ export async function GET(request: NextRequest) {
         'QuickBooks production authorization is unavailable. Check connection settings.',
         503,
       );
+    const reason = quickBooksFailureReason(error);
     return NextResponse.json({
       connected: false,
       credentials_configured: credentialsConfigured,
-      reason: quickBooksFailureReason(error),
-      message:
-        'QuickBooks connection could not be verified. Check the connection diagnostics before retrying.',
+      reason,
+      message: reason === 'oauth_reauthorization_required'
+        ? 'Intuit authorization expired or was revoked. Reconnect QuickBooks to restore accounting and payment reconciliation.'
+        : 'QuickBooks connection could not be verified. Check the connection diagnostics before retrying.',
     });
   }
 }

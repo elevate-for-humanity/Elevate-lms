@@ -16,7 +16,10 @@ const matrix = evaluate('lib/rbac/role-matrix.ts', {}, [
   'HOST_SHOP_ROLES', 'INSTRUCTOR_ROLES', 'PROGRAM_HOLDER_ROLES', 'STAFF_ROLES',
   'TESTING_CENTER_ROLES', 'WORKFORCE_ROLES',
 ]);
-const { PORTAL_MAP } = evaluate('lib/routing/portal-map.ts', { ...matrix, process: { env: {} } }, ['PORTAL_MAP']);
+// The VM intentionally strips imports; bind the real resolver instead of
+// silently evaluating portal-map with a missing production dependency.
+const { resolveLmsHost } = evaluate('lib/routing/lms-host.ts', {}, ['resolveLmsHost']);
+const { PORTAL_MAP } = evaluate('lib/routing/portal-map.ts', { ...matrix, resolveLmsHost, process: { env: {} } }, ['PORTAL_MAP']);
 const PortalRouter = {
   get: (key) => PORTAL_MAP[key].host + PORTAL_MAP[key].defaultPath,
   getPath: (key, path) => PORTAL_MAP[key].host + PORTAL_MAP[key].basePath + '/' + path,

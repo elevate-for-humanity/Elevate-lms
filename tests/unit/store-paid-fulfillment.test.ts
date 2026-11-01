@@ -84,12 +84,14 @@ beforeEach(() => {
   state.ledgerError = false;
 });
 describe('Paid subscription delivery', () => {
-  it('keeps delivery retryable when the separate Store database does not acknowledge payment', async () => {
+  it('keeps delivery retryable and does not grant access when the Store rejects the receipt', async () => {
     state.ledgerError = true;
     const response = await POST(request());
     expect(response.status).toBe(207);
+    expect(state.calls).toHaveLength(0);
     expect(await response.json()).toMatchObject({ completed: 0, failed: 1 });
     expect(state.ledgerCalls).toEqual(['invoice']);
+
   });
   it('uses the authoritative paid invoice snapshot rather than queue payload', async () => {
     const response = await POST(request());

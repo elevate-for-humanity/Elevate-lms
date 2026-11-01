@@ -9,7 +9,7 @@ export class CalendarConflictError extends Error {}
 
 export async function calendarOAuth(origin: string) {
   await hydrateProcessEnv();
-  if (!['https://app.elevateforhumanity.org', 'https://admin.elevateforhumanity.org'].includes(origin)) throw new Error('Calendar connection is unavailable on this host.');
+  if (!['https://lms.elevateforhumanity.org', 'https://app.elevateforhumanity.org', 'https://admin.elevateforhumanity.org'].includes(origin)) throw new Error('Calendar connection is unavailable on this host.');
   const credentials = googleCalendarCredentials(process.env);
   if (!credentials) throw new Error('Google Calendar connection needs administrator setup.');
   return new googleAuth.OAuth2(credentials.clientId, credentials.clientSecret, `${origin}/api/calendar/google/callback`);

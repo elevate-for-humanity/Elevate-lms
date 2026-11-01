@@ -1,4 +1,5 @@
 import { timedFetch } from '@/lib/supabase/timed-fetch';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 import { logger } from '@/lib/logger';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -33,7 +34,7 @@ export function createAdminClient(): SupabaseClient<any> {
     );
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
+  const { url } = resolveServerSupabaseRawEnv();
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url) {

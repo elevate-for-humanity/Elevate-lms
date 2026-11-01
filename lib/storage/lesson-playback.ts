@@ -1,5 +1,6 @@
 import 'server-only';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 import { getSignedElevateMediaUrl, getElevateMediaStorageConfig } from './elevate-media-storage';
 
 function ownedB2ObjectKey(source: string, bucket: string): string | null {
@@ -18,7 +19,7 @@ function ownedB2ObjectKey(source: string, bucket: string): string | null {
 }
 
 export function managedLessonPlaybackUrl(source: string, courseId: string, lessonId: string) {
-  const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
+  const supabase = resolveServerSupabaseRawEnv().url;
   const config = getElevateMediaStorageConfig();
   const media = config.publicUrl.replace(/\/$/, '');
   const privatePrefixes: string[] = [];
@@ -43,7 +44,7 @@ export async function signedLessonPlayback(db: any, source: string) {
   await hydrateProcessEnv();
   const validKey = (key: string) => key && !key.split('/').some(part => part === '..' || part === '.') &&
     ![...key].some(character => character.charCodeAt(0) < 32 || character === '\\');
-  const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
+  const supabase = resolveServerSupabaseRawEnv().url;
   const reference = supabase ? ['course-videos', 'course_videos'].flatMap(bucket =>
     ['public', 'sign', 'authenticated'].map(mode => ({ bucket, prefix: `${supabase}/storage/v1/object/${mode}/${bucket}/` })))
     .find(value => source.startsWith(value.prefix)) : undefined;

@@ -1,0 +1,139 @@
+import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { assertQuickBooksProductionEnvironment } from '@/lib/integrations/quickbooks-client';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
+
+/**
+ * QuickBooks OAuth 2.0 callback.
+ * Exchanges the authorization code for access + refresh tokens,
+ * then persists them to Supabase app_settings for runtime use.
+ *
+ * AUTH_EXEMPT: OAuth callback — Intuit redirects here before any session exists.
+ * Security: state param validated, rate-limited by IP, tokens never returned to client.
+ */
+export async function GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'auth');
+  if (rateLimited) return rateLimited;
+
+  // The OAuth app credentials live in the canonical runtime secret store.
+  // Hydrate them before state verification and the authorization-code
+  // exchange; otherwise a reconnect can start in Admin but fail here.
+  await hydrateProcessEnv();
+
+  const { searchParams } = request.nextUrl;
+  const code = searchParams.get('code');
+  const realmId = searchParams.get('realmId');
+  const error = searchParams.get('error');
+  const state = searchParams.get('state');
+
+  const base = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const adminBase = (process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
+  const redirect = (msg: string) =>
+    NextResponse.redirect(`${adminBase}/integrations/quickbooks?${msg}`);
+
+  if (error) return redirect('error=authorization_declined');
+  if (!code) return redirect('error=no_code');
+  if (!state) return redirect('error=invalid_state');
+
+  let stored: Record<string, string> = {};
+  try {
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const supabase = await getAdminClient();
+    if (supabase) {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_REDIRECT_URI']);
+      stored = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
+    }
+  } catch (err) {
+    logger.error('[QB callback] failed to load Admin OAuth settings:', err);
+  }
+
+  // Deployment secrets are authoritative for OAuth app credentials.
+  // app_settings may contain legacy values and is used only as a fallback.
+  const clientId = process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID;
+  const clientSecret = process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET;
+  const redirectUri =
+    process.env.QB_REDIRECT_URI || stored.QB_REDIRECT_URI || `${base}/api/auth/quickbooks/callback`;
+
+  try { assertQuickBooksProductionEnvironment(); }
+  catch { return redirect('error=production_environment_unverified'); }
+  if (!clientId || !clientSecret) return redirect('error=not_configured');
+  if (!verifyQuickBooksOAuthState(state, clientSecret)) {
+    return redirect('error=invalid_state');
+  }
+
+  try {
+    // Exchange code for tokens
+    const tokenRes = await fetch(QB_TOKEN_URL, {
+      method: 'POST',
+      redirect: 'error',
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+      }),
+    });
+
+    if (!tokenRes.ok) {
+      logger.error('[QB callback] token exchange failed', { status: tokenRes.status });
+      return redirect('error=token_failed');
+    }
+
+    const tokens = await tokenRes.json();
+    const { access_token, refresh_token, expires_in } = tokens;
+
+    if (typeof access_token !== 'string' || !access_token.trim() || typeof refresh_token !== 'string' || !refresh_token.trim() || (expires_in !== undefined && (!Number.isFinite(expires_in) || expires_in <= 0))) return redirect('error=invalid_token_response');
+
+    const expiresAt = new Date(Date.now() + (expires_in ?? 3600) * 1000).toISOString();
+    const realm = realmId ?? process.env.QB_REALM_ID ?? '';
+    if (!/^\d+$/.test(realm)) return redirect('error=no_company');
+
+    const company = await fetch(`https://quickbooks.api.intuit.com/v3/company/${realm}/companyinfo/${realm}?minorversion=75`, {
+      headers: { Authorization: `Bearer ${access_token}`, Accept: 'application/json' },
+      redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(10000),
+    });
+    const companyBody = await company.json().catch(() => null);
+    if (!company.ok || String(companyBody?.CompanyInfo?.Id || '') !== realm) return redirect('error=company_verification_failed');
+
+    await persistToSupabase({
+      QB_ACCESS_TOKEN: access_token,
+      QB_REFRESH_TOKEN: refresh_token,
+      QB_REALM_ID: realm,
+      QB_TOKEN_EXPIRES: expiresAt,
+    });
+
+    return NextResponse.redirect(
+      `${adminBase}/integrations/quickbooks?success=connected&company=${realm}`,
+    );
+  } catch (err) {
+    logger.error('[QB callback] authorization could not be completed');
+    return redirect('error=unexpected');
+  }
+}
+
+async function persistToSupabase(params: Record<string, string>) {
+  const { getAdminClient } = await import('@/lib/supabase/admin');
+  const supabase = await getAdminClient();
+  if (!supabase) throw new Error('Admin database connection is unavailable.');
+
+  const rows = Object.entries(params)
+    .filter(([, value]) => Boolean(value))
+    .map(([key, value]) => ({ key, value, updated_at: new Date().toISOString() }));
+  const { error } = await supabase.from('app_settings').upsert(rows, { onConflict: 'key' });
+  if (error) throw new Error(`QuickBooks token storage failed: ${error.message}`);
+}

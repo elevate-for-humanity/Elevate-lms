@@ -39,7 +39,7 @@ export async function verifyProctoringSession(
   provider: ProctoringProvider,
   sessionId: string,
 ): Promise<boolean> {
-  // This would integrate with the actual proctoring provider's API
-  // For now, return true as a placeholder
-  return true;
+  // A launch URL is not provider evidence. Fail closed until a signed provider
+  // session/result adapter is configured; never certify an unverified attempt.
+  return false;
 }

@@ -18,4 +18,9 @@ describe('QuickBooks webhook normalization', () => {
     expect(normalizeQuickBooksInvoiceStatus({ Balance: 5 })).toBe('open');
     expect(normalizeQuickBooksInvoiceStatus({ Balance: 0, TxnStatus: 'Voided' })).toBe('void');
   });
+  it('never grants paid access from a missing or invalid balance', () => {
+    for (const Balance of [undefined, NaN, Infinity, -1]) {
+      expect(() => normalizeQuickBooksInvoiceStatus({ Balance })).toThrow('verified');
+    }
+  });
 });

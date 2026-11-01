@@ -23,18 +23,21 @@ export async function processLicenseSuspend(job: ProvisioningJob): Promise<void>
     });
 
     if (error) throw error;
+    if (data?.success !== true) throw new Error(data?.message || 'License reactivation rejected');
 
     logger.info('License reactivated', {
       licenseId,
       correlationId: job.correlation_id,
     });
   } else {
-    const { data, error } = await supabase.rpc('suspend_license', {
+    const { data, error } = await supabase.rpc('set_license_lifecycle', {
       p_license_id: licenseId,
+      p_action: 'suspend',
       p_reason: reason || 'Automated suspension',
     });
 
     if (error) throw error;
+    if (data?.success !== true) throw new Error(data?.message || 'License suspension rejected');
 
     logger.info('License suspended', {
       licenseId,

@@ -6,6 +6,10 @@ vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: async () => {} }));
 vi.mock('googleapis/build/src/apis/calendar/index.js', () => ({ auth: { OAuth2: class { credentials = mocks.credentials; setCredentials() {} getAccessToken() { return mocks.token(); } } } }));
 import { assertGoogleCalendarAvailable, calendarConfigured, calendarOAuth, googleBusyEvents } from '@/lib/calendar/google-calendar';
 beforeEach(() => { vi.stubEnv('GOOGLE_CLIENT_ID', 'client'); vi.stubEnv('GOOGLE_CLIENT_SECRET', 'secret'); mocks.rpc.mockReset().mockResolvedValue({ data: mocks.credentials, error: null }); mocks.token.mockReset().mockResolvedValue({ token: 'private-access' }); });
+it('accepts the current LMS domain for its own OAuth callback', async () => {
+  await expect(calendarOAuth('https://lms.elevateforhumanity.org')).resolves.toBeDefined();
+  await expect(calendarOAuth('https://untrusted.example')).rejects.toThrow('unavailable on this host');
+});
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 function provider(busy: any, errors?: unknown[]) {
   return vi.fn().mockResolvedValueOnce({ ok: true, json: async () => ({ items: [{ id: 'primary', primary: true }, { id: 'work', selected: true }, { id: 'hidden', selected: false }] }) })

@@ -26,7 +26,8 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const user = (await requireApiAuth()) as User;
+    const session = await requireApiAuth();
+    const user = session.user as User;
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
     const flowId = searchParams.get('flowId');
@@ -60,7 +61,8 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const user = (await requireApiAuth()) as User;
+    const session = await requireApiAuth();
+    const user = session.user as User;
     const body = await parseBody<{ action?: string; flowId?: string }>(request);
     const { action, flowId } = body;
 

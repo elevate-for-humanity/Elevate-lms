@@ -1,11 +1,11 @@
 // @vitest-environment node
 import { beforeEach, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-const mocks = vi.hoisted(() => ({ account: { id: 'owner' } as any, store: vi.fn(), exchange: vi.fn(), authorize: vi.fn(() => 'https://accounts.google.com/o/oauth2/v2/auth?state=test') }));
+const mocks = vi.hoisted(() => ({ account: { id: 'owner' } as any, configured: vi.fn(), busy: vi.fn(), grant: {updated_at:'2026-10-31'} as any, verify: vi.fn(), store: vi.fn(), exchange: vi.fn(), authorize: vi.fn(() => 'https://accounts.google.com/o/oauth2/v2/auth?state=test') }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: mocks.account } }) } }) }));
-vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: vi.fn() }));
-vi.mock('@/lib/calendar/google-calendar', () => ({ GOOGLE_CALENDAR_SCOPE: 'https://www.googleapis.com/auth/calendar.readonly', calendarOAuth: async () => ({ generateAuthUrl: mocks.authorize, getToken: mocks.exchange }), calendarConfigured: vi.fn(), googleBusyEvents: vi.fn(), storeCalendarTokens: mocks.store }));
-import { googleCalendarCallback, googleCalendarConnect } from '@/lib/calendar/google-calendar-routes';
+vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:mocks.grant,error:null})})})})}) }));
+vi.mock('@/lib/calendar/google-calendar', () => ({ GOOGLE_CALENDAR_SCOPE: 'https://www.googleapis.com/auth/calendar.readonly', calendarOAuth: async () => ({ generateAuthUrl: mocks.authorize, getToken: mocks.exchange }), calendarConfigured: mocks.configured, googleBusyEvents: mocks.busy, storeCalendarTokens: mocks.store, verifyGoogleCalendarToken: mocks.verify }));
+import { googleCalendarCallback, googleCalendarConnect, googleCalendarGet } from '@/lib/calendar/google-calendar-routes';
 beforeEach(() => { vi.clearAllMocks(); mocks.account = { id: 'owner' }; mocks.exchange.mockResolvedValue({ tokens: { access_token: 'private', refresh_token: 'refresh', scope: 'https://www.googleapis.com/auth/calendar.readonly' } }); });
 function callback(overrides: any = {}, supplied = 'nonce') {
   const state = { nonce: 'nonce', verifier: 'verifier', userId: 'owner', returnTo: '/program-holder/meetings', expires: Date.now() + 60000, ...overrides };
@@ -39,4 +39,24 @@ it('clears malformed state instead of failing the callback page', async () => {
   expect(response.status).toBe(307);
   expect(response.headers.get('location')).toContain('calendarConnection=failed');
   expect(mocks.exchange).not.toHaveBeenCalled();
+});
+
+it('does not save or claim a connection when Google rejects the calendar grant', async () => {
+  mocks.verify.mockRejectedValueOnce(new Error('scope rejected'));
+  const response = await googleCalendarCallback(callback());
+  expect(mocks.store).not.toHaveBeenCalled();
+  expect(response.headers.get('location')).toContain('calendarConnection=failed');
+});
+
+it('verifies an existing calendar grant instead of trusting a database row', async () => {
+  mocks.configured.mockResolvedValue(true);mocks.busy.mockRejectedValueOnce(new Error('revoked'));
+  const response = await googleCalendarGet(new NextRequest('https://lms.elevateforhumanity.org/api/calendar/google'));
+  expect(response.status).toBe(503);
+  expect(await response.json()).not.toMatchObject({connected:true});
+});
+it('does not report an existing grant connected when application configuration is missing', async () => {
+  mocks.configured.mockResolvedValue(false);
+  const response = await googleCalendarGet(new NextRequest('https://lms.elevateforhumanity.org/api/calendar/google'));
+  expect(await response.json()).toMatchObject({configured:false,connected:false});
+  expect(mocks.busy).not.toHaveBeenCalled();
 });

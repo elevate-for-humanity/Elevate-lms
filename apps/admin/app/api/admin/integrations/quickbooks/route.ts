@@ -127,7 +127,11 @@ export async function GET(request: NextRequest) {
       reason,
       message: reason === 'oauth_reauthorization_required'
         ? 'Intuit authorization expired or was revoked. Reconnect QuickBooks to restore accounting and payment reconciliation.'
-        : 'QuickBooks connection could not be verified. Check the connection diagnostics before retrying.',
+        : reason === 'oauth_client_rejected'
+          ? 'Intuit rejected the application credentials. Check the production client ID and secret before reconnecting.'
+          : ['provider_rate_limited', 'provider_unavailable', 'provider_timeout'].includes(reason)
+            ? 'Intuit is temporarily unavailable or limiting requests. Retry the connection check; your saved authorization has been preserved.'
+            : 'QuickBooks connection could not be verified. Check the connection diagnostics before retrying.',
     });
   }
 }

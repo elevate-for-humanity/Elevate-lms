@@ -50,14 +50,23 @@ export async function loadQuickBooksConfig(db: Database): Promise<QuickBooksConf
 }
 
 async function refreshQuickBooksToken(db: Database, config: QuickBooksConfig): Promise<string> {
-  if (!config.clientId || !config.clientSecret || !config.refreshToken) throw new QuickBooksError('oauth_reauthorization_required', 'QuickBooks authorization expired. Reconnect QuickBooks.');
+  if (!config.clientId || !config.clientSecret) throw new QuickBooksError('oauth_configuration_missing', 'QuickBooks application credentials are missing.');
+  if (!config.refreshToken) throw new QuickBooksError('oauth_reauthorization_required', 'QuickBooks authorization expired. Reconnect QuickBooks.');
   const response = await fetch(QB_TOKEN_URL, {
     method: 'POST',
+    redirect: 'error', cache: 'no-store',
     signal: AbortSignal.timeout(10_000),
     headers: { authorization: `Basic ${Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64')}`, 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: config.refreshToken }),
   });
-  if (!response.ok) throw new QuickBooksError('oauth_reauthorization_required', 'QuickBooks authorization expired. Reconnect QuickBooks.');
+  if (!response.ok) {
+    const failure = await response.json().catch(() => null);
+    const reason = failure?.error === 'invalid_grant' ? 'oauth_reauthorization_required'
+      : ['invalid_client', 'unauthorized_client'].includes(failure?.error) ? 'oauth_client_rejected'
+      : response.status === 429 ? 'provider_rate_limited'
+      : response.status >= 500 ? 'provider_unavailable' : 'oauth_refresh_failed';
+    throw new QuickBooksError(reason, 'QuickBooks token refresh could not be verified.');
+  }
   const token = await response.json();
   if (typeof token.access_token !== 'string' || !token.access_token.trim() ||
       (token.refresh_token !== undefined && (typeof token.refresh_token !== 'string' || !token.refresh_token.trim()))) {
@@ -76,6 +85,7 @@ async function rawRequest(config: QuickBooksConfig, token: string, path: string,
   const separator = path.includes('?') ? '&' : '?';
   return fetch(`${QB_BASE}/${config.realmId}/${path}${separator}minorversion=75`, {
     ...init,
+    redirect: 'error', cache: 'no-store',
     signal: init?.signal ? AbortSignal.any([init.signal, AbortSignal.timeout(10_000)]) : AbortSignal.timeout(10_000),
     headers: { authorization: `Bearer ${token}`, accept: 'application/json', 'content-type': 'application/json', ...(init?.headers || {}) },
   });

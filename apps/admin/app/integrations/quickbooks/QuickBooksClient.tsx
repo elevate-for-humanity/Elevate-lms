@@ -25,6 +25,7 @@ interface QBStatus {
   message?: string;
   error?: string;
   auth_url?: string;
+  reason?: string;
 }
 
 export default function QuickBooksClient() {
@@ -146,7 +147,7 @@ export default function QuickBooksClient() {
             )}
             <div>
               <p className="font-semibold text-slate-800">
-                {status.connected ? 'Connected' : 'Not connected'}
+                {loading ? 'Checking connection…' : status.connected ? 'Connected' : 'Not connected'}
               </p>
               {status.company_name && (
                 <p className="text-sm text-slate-500">{status.company_name}</p>
@@ -195,7 +196,6 @@ export default function QuickBooksClient() {
             ) : (
               <a
                 href={authUrl}
-                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full bg-[#2CA01C] hover:bg-[#248016] text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
               >

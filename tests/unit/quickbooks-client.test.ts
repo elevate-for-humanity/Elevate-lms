@@ -56,3 +56,16 @@ describe('QuickBooks runtime authorization', () => {
     expect(upsert).toHaveBeenCalledOnce();
   });
 });
+
+it.each([
+  [400, 'invalid_grant', 'oauth_reauthorization_required'],
+  [401, 'invalid_client', 'oauth_client_rejected'],
+  [429, 'rate_limit', 'provider_rate_limited'],
+  [503, 'server_error', 'provider_unavailable'],
+  [400, 'invalid_request', 'oauth_refresh_failed'],
+])('classifies Intuit refresh failure %s/%s without falsely requesting consent', async (status, error, reason) => {
+  const upsert = vi.fn();
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({status:401}).mockResolvedValueOnce(Response.json({error}, {status})));
+  await expect(quickBooksRequest({from:()=>({upsert})}, config, 'companyinfo/company')).rejects.toMatchObject({reason});
+  expect(upsert).not.toHaveBeenCalled();
+});

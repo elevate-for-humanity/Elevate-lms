@@ -15,8 +15,7 @@ export async function GET() {
     const configured = Boolean(
       config.clientId &&
       config.clientSecret &&
-      config.accessToken &&
-      config.refreshToken &&
+      (config.accessToken || config.refreshToken) &&
       config.realmId,
     );
     const webhookVerifierConfigured = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN || process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN);

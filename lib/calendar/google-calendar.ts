@@ -54,6 +54,16 @@ async function googleRequest(token: string, path: string, body?: unknown) {
   return response.json();
 }
 
+/** Verify the granted scope against the provider before reporting a new connection. */
+export async function verifyGoogleCalendarToken(accessToken: string) {
+  const now = new Date();
+  const result = await googleRequest(accessToken, 'freeBusy', {
+    timeMin: now.toISOString(), timeMax: new Date(now.getTime() + 60000).toISOString(), items: [{ id: 'primary' }],
+  });
+  const primary = result.calendars?.primary;
+  if (!primary || primary.errors?.length || !Array.isArray(primary.busy)) throw new Error('Google Calendar access could not be verified.');
+}
+
 export type GoogleBusyEvent = { id: string; title: string; startsAt: string; endsAt: string; date: string; type: 'event'; source: 'google' };
 
 /** Fetch fresh busy blocks from the user's primary and selected Google calendars; never import private event text. */

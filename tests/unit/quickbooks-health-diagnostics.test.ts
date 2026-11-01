@@ -39,3 +39,10 @@ describe('QuickBooks health reason codes', () => {
     expect((await r.json()).reason).toBe('provider_timeout');
   });
 });
+
+it('allows a saved refresh token to recover a missing access token during a live health probe', async () => {
+  load.mockResolvedValue({clientId:'id',clientSecret:'secret',realmId:'company',accessToken:'',refreshToken:'refresh'});
+  const response = await GET();
+  expect(response.status).toBe(200);
+  expect(request).toHaveBeenCalledOnce();
+});

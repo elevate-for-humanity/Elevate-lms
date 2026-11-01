@@ -2,7 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { calendarOAuth, calendarConfigured, GOOGLE_CALENDAR_SCOPE, googleBusyEvents, storeCalendarTokens } from './google-calendar';
+import { calendarOAuth, calendarConfigured, GOOGLE_CALENDAR_SCOPE, googleBusyEvents, storeCalendarTokens, verifyGoogleCalendarToken } from './google-calendar';
 
 const cookieName = 'elevate_google_calendar_state';
 const cookieOptions = { httpOnly: true, secure: true, sameSite: 'lax' as const, path: '/api/calendar/google', maxAge: 600 };
@@ -40,6 +40,7 @@ export async function googleCalendarCallback(request: NextRequest) {
     const client = await calendarOAuth(request.nextUrl.origin);
     const { tokens } = await client.getToken({ code, codeVerifier: state.verifier });
     if (!tokens.access_token || !tokens.refresh_token || !tokens.scope?.split(' ').some(scope => scope === GOOGLE_CALENDAR_SCOPE || scope === 'https://www.googleapis.com/auth/calendar')) throw new Error('Calendar access was not granted');
+    await verifyGoogleCalendarToken(tokens.access_token);
     await storeCalendarTokens(account.id, tokens as Record<string, unknown>);
     target.searchParams.set('calendarConnection', 'connected');
   } catch { /* Never disclose provider tokens or authorization codes. */ }
@@ -56,7 +57,14 @@ export async function googleCalendarGet(request: NextRequest) {
     if (error) throw new Error('Calendar connection could not be loaded.');
     const start = request.nextUrl.searchParams.get('start');
     const end = request.nextUrl.searchParams.get('end');
-    if (!start && !end) return NextResponse.json({ configured, connected: Boolean(data), updatedAt: data?.updated_at }, { headers: noStore });
+    if (!start && !end) {
+      let connected = false;
+      if (data && configured) {
+        const now = new Date();
+        connected = (await googleBusyEvents(account.id, now.toISOString(), new Date(now.getTime() + 60000).toISOString())).connected;
+      }
+      return NextResponse.json({ configured, connected, updatedAt: data?.updated_at }, { headers: noStore });
+    }
     if (!start || !end || !Number.isFinite(Date.parse(start)) || !Number.isFinite(Date.parse(end)) || Date.parse(end) <= Date.parse(start) || Date.parse(end) - Date.parse(start) > 32 * 86400000) return NextResponse.json({ error: 'Choose a valid calendar range of up to 32 days.' }, { status: 400, headers: noStore });
     if (!data) return NextResponse.json({ connected: false, events: [] }, { headers: noStore });
     return NextResponse.json(await googleBusyEvents(account.id, start, end), { headers: noStore });

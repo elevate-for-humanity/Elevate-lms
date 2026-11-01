@@ -7,12 +7,14 @@ def run(args):
  r=subprocess.run(args,capture_output=True,text=True,timeout=20)
  return (r.stdout+(r.stderr if args[:2]==['docker','logs'] else '')) if r.returncode==0 else ''
 
-def probe(host,port=5061):
+def probe(host,port=5061,tls12=False):
  stage='tcp_connect'
  try:
   with socket.create_connection((host,port),timeout=5) as raw:
    stage='tls_handshake'
-   with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
+   context=ssl.create_default_context()
+   if tls12:context.minimum_version=context.maximum_version=ssl.TLSVersion.TLSv1_2;context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384')
+   with context.wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
     return {'trusted':bool(secure.getpeercert()),'protocol':secure.version()}
  except ssl.SSLCertVerificationError as e:return {'stage':stage,'error':'certificate_verification','verifyCode':e.verify_code}
  except ssl.SSLError as e:return {'stage':stage,'error':'tls_handshake_failed','reason':e.reason if re.fullmatch(r'[A-Z0-9_]{1,100}',str(e.reason)) else 'unclassified'}
@@ -94,14 +96,17 @@ def isolated_diagnosis():
    result['uptimeAvailable']='System uptime:' in required(['docker','exec',name,'asterisk','-rx','core show uptime'])
    def inside_probe():
     try:
-     check=subprocess.run(['docker','exec',name,'openssl','s_client','-connect','127.0.0.1:5061','-servername','phone.elevateforhumanity.org','-verify_hostname','phone.elevateforhumanity.org','-verify_return_error','-CAfile','/etc/ssl/certs/ca-certificates.crt'],input='',capture_output=True,text=True,timeout=8)
+     check=subprocess.run(['docker','exec',name,'openssl','s_client','-connect','127.0.0.1:5061','-servername','phone.elevateforhumanity.org','-verify_hostname','phone.elevateforhumanity.org','-verify_return_error','-CAfile','/etc/ssl/certs/ca-certificates.crt','-state'],input='',capture_output=True,text=True,timeout=8)
      output=check.stdout+check.stderr
      return {'trusted':check.returncode==0 and bool(re.search(r'Verification: OK|Verify return code: 0 \(ok\)',output)), 'completed':True, 'handshakeFailure':bool(re.search(r'handshake failure|no shared cipher',output,re.I))}
-    except subprocess.TimeoutExpired:return {'trusted':False,'error':'timeout'}
+    except subprocess.TimeoutExpired as e:
+     partial=(e.stderr or b'').decode(errors='replace') if isinstance(e.stderr,bytes) else (e.stderr or '')
+     states=re.findall(r'SSL_connect:([A-Za-z0-9 /_.-]{1,100})',partial)
+     return {'trusted':False,'error':'timeout','lastState':states[-1] if states else 'not_observed'}
    result['insideHandshake']=inside_probe()
    started=subprocess.run(['docker','exec','-d',name,'openssl','s_server','-accept','5062','-cert','/etc/asterisk/tls/phone.crt','-key','/etc/asterisk/tls/phone.key','-cert_chain','/etc/asterisk/tls/phone.crt','-quiet'],capture_output=True,timeout=5)
    if started.returncode==0:
-    time.sleep(1);result['opensslServerHandshake']=probe(ip,5062)
+    time.sleep(1);result['opensslServerHandshake']=probe(ip,5062);result['opensslServerTls12Handshake']=probe(ip,5062,True)
    logs=subprocess.run(['docker','logs','--tail','300',name],capture_output=True,text=True,timeout=10)
    message_log=subprocess.run(['docker','exec',name,'tail','-n','300','/var/log/asterisk/messages'],capture_output=True,text=True,timeout=5)
 
@@ -119,6 +124,19 @@ def isolated_diagnosis():
     time.sleep(1)
    result['transportOnlyHandshake']=probe(ip) if minimal_ready else {'error':'transport_not_loaded'}
    result['transportOnlyInsideHandshake']=inside_probe() if minimal_ready else {'error':'transport_not_loaded'}
+   result['protocolVariants']={}
+   for variant,method in [('defaultProtocol','default'),('explicitTls12Ciphers','tlsv1_2')]:
+    config=re.sub(r'^method=.*$', 'method='+method,transport[0],flags=re.M)
+    config=re.sub(r'^cipher=.*\n?', '',config,flags=re.M).rstrip()+'\ncipher=ECDHE-RSA-AES128-GCM-SHA256,ECDHE-RSA-AES256-GCM-SHA384\n'
+    (staging/'pjsip.conf').write_text(config)
+    required(['docker','restart',name])
+    variant_ready=False
+    for _ in range(15):
+     check=subprocess.run(['docker','exec',name,'asterisk','-rx','pjsip show transport elevate-twilio-tls'],capture_output=True,text=True,timeout=5)
+     if check.returncode==0 and re.search(r'protocol\s*:\s*tls\b',check.stdout):variant_ready=True;break
+     time.sleep(1)
+    result['protocolVariants'][variant]=probe(ip,tls12=True) if variant_ready else {'error':'transport_not_loaded'}
+   result['straceAvailable']=bool(shutil.which('strace'))
    return result
   finally:
    if created:required(['docker','rm','-f',name])

@@ -31,6 +31,7 @@ export function ProgramHolderDocumentUpload({
     ['textbook', 'Textbook — PDF or Word document'],
     ['testing_evidence', 'Student completion and testing evidence — PDF or image'],
   ] as const;
+  const [invoiceMode, setInvoiceMode] = useState('form');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [selectedType, setSelectedType] = useState(invoiceOnly ? 'provider_invoice' : '');
@@ -81,7 +82,7 @@ export function ProgramHolderDocumentUpload({
         {materialsOnly
           ? 'Lab tracker: XLSX, XLS, or CSV up to 10 MB. Textbook: PDF or DOCX up to 50 MB. Files stay protected; uploading does not publish them to students.'
           : invoiceOnly
-            ? 'PDF, JPG, or PNG up to 10 MB. Include the student, training dates, amount, and invoice number. Submission does not mark the invoice paid.'
+            ? 'Fill out and submit your invoice below, or upload an existing invoice. Submission sends it for review and does not mark it paid.'
             : 'PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected storage.'}
       </p>
       {!materialsOnly && !invoiceOnly && (
@@ -125,6 +126,32 @@ export function ProgramHolderDocumentUpload({
           </select>
         </label>
       )}
+      {invoiceOnly && (
+        <div className="mt-4 space-y-4">
+          <label className="grid gap-1 text-sm font-bold">Invoice method
+            <select name="invoiceMode" value={invoiceMode} onChange={event => setInvoiceMode(event.target.value)} className="min-h-11 rounded-xl border bg-white p-2">
+              <option value="form">Fill out an invoice</option>
+              <option value="upload">Upload an existing invoice</option>
+            </select>
+          </label>
+          {invoiceMode === 'form' && <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
+            {[
+              ['providerName', 'Provider / business name', 'text'],
+              ['invoiceNumber', 'Invoice number', 'text'],
+              ['studentName', 'Student name', 'text'],
+              ['trainingStart', 'Training start date', 'date'],
+              ['trainingEnd', 'Training end date', 'date'],
+              ['amount', 'Amount requested (USD)', 'number'],
+            ].map(([name, label, type]) => <label key={name} className="grid gap-1 text-sm font-bold">{label}
+              <input name={name} type={type} required maxLength={200} min={type === 'number' ? '0.01' : undefined} max={type === 'number' ? '9999999.99' : undefined} step={type === 'number' ? '0.01' : undefined} className="min-h-11 min-w-0 rounded-xl border bg-white p-2" />
+            </label>)}
+            <label className="grid gap-1 text-sm font-bold sm:col-span-2">Training / services provided
+              <textarea name="serviceDescription" required maxLength={2000} rows={4} className="rounded-xl border bg-white p-2" />
+            </label>
+            <label className="flex gap-2 text-sm sm:col-span-2"><input name="invoiceAttested" type="checkbox" value="yes" required />I certify that these services and the requested amount are accurate.</label>
+          </fieldset>}
+        </div>
+      )}
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <select
           name="documentType"
@@ -162,7 +189,7 @@ export function ProgramHolderDocumentUpload({
             </option>
           ))}
         </select>
-        <input
+        {(!invoiceOnly || invoiceMode === 'upload') && <input
           name="file"
           type="file"
           required
@@ -180,7 +207,7 @@ export function ProgramHolderDocumentUpload({
                 : 'application/pdf,image/jpeg,image/png,video/mp4'
           }
           className="min-h-11 rounded-xl border border-blue-200 bg-white p-2 text-sm"
-        />
+        />}
         <button
           disabled={busy}
           className="min-h-11 rounded-xl bg-blue-700 px-5 font-bold text-white disabled:opacity-50"
@@ -204,7 +231,7 @@ export function ProgramHolderDocumentUpload({
                 : []),
             ].find(([value]) => value === selectedType)?.[1]
           }
-          . Choose the matching file from your device, then press Upload.
+          {invoiceOnly && invoiceMode === 'form' ? '. Complete the fields above, then press Submit invoice.' : '. Choose the matching file from your device, then submit.'}
         </p>
       ) : (
         <p className="mt-3 text-sm font-semibold text-amber-900">

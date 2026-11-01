@@ -27,6 +27,7 @@ def main():
  listeners=run(['ss','-H','-lnt','sport = :5061'])
  binds=[line.split()[3] for line in listeners.splitlines() if len(line.split())>=4]
  logs=run(['docker','logs','--since','10m','--tail','300','pbx_asterisk_1'])
+ logs+=run(['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/messages'])
  logs+=run(['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/full'])
  file_checks={}
  for key in ['cert_file','priv_key_file','ca_list_file']:

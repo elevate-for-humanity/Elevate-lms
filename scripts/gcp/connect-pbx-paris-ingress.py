@@ -34,6 +34,7 @@ def update_endpoint(text):
  body=match[2]
  if len(re.findall(r'^context=.*$',body,re.M))!=1:raise ValueError('PBX_CARRIER_CONTEXT_AMBIGUOUS')
  body=re.sub(r'^context=.*$', 'context=elevate-paris-inbound',body,flags=re.M)
+ body=re.sub(r'^identify_by=.*\n?', '',body,flags=re.M).rstrip()+'\nidentify_by=ip\n'
  return text[:match.start(2)]+body+text[match.end(2):]
 def update_outbound_aor(text):
  pattern=r'(?ms)(^\[twilio-aor\]\s*\n)(.*?)(?=^\[|\Z)'
@@ -49,7 +50,7 @@ def verified_identity(text):
  for raw in re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}/(?:[0-9]{1,3}\.){3}[0-9]{1,3}|\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}\b',text):
   try:networks.add(str(ipaddress.ip_network(raw,strict=False)))
   except ValueError:pass
- return set(SIGNALING).issubset(networks)
+ return set(SIGNALING)==networks
 TLS_FAILURE='not_checked'
 def sip_tls_context():
  context=ssl.create_default_context()
@@ -109,6 +110,7 @@ def attempted_tls_evidence():
   for key,path in paths.items()}
  logs=''
  for args in [['docker','logs','--since','5m','--tail','300','pbx_asterisk_1'],
+              ['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/messages'],
               ['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/full']]:
   result=subprocess.run(args,capture_output=True,text=True,timeout=20)
   logs+=result.stdout+result.stderr
@@ -203,7 +205,7 @@ def apply():
   endpoint=cli('pjsip show endpoint twilio')
   plan=cli('dialplan show +14632401404@elevate-paris-inbound')
   identity=cli('pjsip show identify elevate-twilio-carrier-identity')
-  if not re.search(r'context\s*:\s*elevate-paris-inbound\b',endpoint) or 'Stasis(elevate-paris)' not in plan or not verified_identity(identity):
+  if not re.search(r'context\s*:\s*elevate-paris-inbound\b',endpoint) or not re.search(r'^\s*identify_by\s*:\s*ip\s*$',endpoint,re.M) or 'Stasis(elevate-paris)' not in plan or not verified_identity(identity):
    raise ValueError('PBX_INGRESS_READBACK_FAILED')
  except Exception:
   for index,p in enumerate(files):

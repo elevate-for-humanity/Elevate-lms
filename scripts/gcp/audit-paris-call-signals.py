@@ -20,6 +20,18 @@ def main():
   'missingFormat':r'Unable to find.{0,100}(?:codec|format|translation)',
   'dialplanMissing':r'Invalid extension|sent to invalid extension|No application.*Stasis',
   'callCongestion':r'Everyone is busy/congested'}.items()}
- print(json.dumps({'readOnly':True,'callsPlaced':0,'gatewayActive':run(['systemctl','is-active','elevate-paris-gateway.service']).strip()=='active',
+ srtp_reasons={label:bool(re.search(pattern,logs,re.I)) for label,pattern in {
+  'authenticationFailure':r'SRTP.{0,100}auth(?:entication)?(?:entication)? fail',
+  'replayFailure':r'SRTP.{0,100}replay','cryptoNegotiationFailure':r'(?:SRTP|crypto).{0,100}negotiat|negotiate.{0,100}(?:SRTP|crypto)',
+  'srtpModuleMissing':r'No SRTP module loaded|SRTP support.*not|No SRTP support',
+  'sessionInitializationFailed':r'(?:initialize|create).{0,50}SRTP|SRTP.{0,100}(?:initializ|session).{0,100}fail',
+  'unprotectFailure':r'SRTP unprotect failed','protectFailure':r'SRTP protect failed',
+  'unsuitableCryptoSuite':r'(?:SRTP|crypto).{0,100}(?:suite|unsupported|not supported)',
+  'badKeyLength':r'(?:SRTP|crypto).{0,100}(?:key length|master key)',
+  'sdpNegotiationFailure':r'Couldn.t negotiate stream|No compatible codecs|Couldn.t negotiate audio',
+  'sdpNoCrypto':r'(?:SDP|crypto).{0,100}(?:missing|no usable|not acceptable)'}.items()}
+ endpoint=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','pjsip show endpoint twilio'])
+ endpoint_settings={key:match[1] for key in ['media_encryption','media_encryption_optimistic','direct_media','rtp_symmetric','rtp_keepalive','use_avpf','dtmf_mode','force_rport'] if (match:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_]+)\s*$',endpoint,re.M))}
+ print(json.dumps({'srtpReasonSignals':srtp_reasons,'carrierEndpointSettings':endpoint_settings,'readOnly' :True,'callsPlaced':0,'gatewayActive':run(['systemctl','is-active','elevate-paris-gateway.service']).strip()=='active',
   'gatewayFailureMarkers':{marker:gateway.count(marker) for marker in ['PARIS_BRIDGE_FAILED','PARIS_GREETING_FAILED','PARIS_TURN_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_RUNTIME_STARTUP_FAILED']},'asteriskSignals':signals}))
 if __name__=='__main__':main()

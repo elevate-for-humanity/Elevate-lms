@@ -65,7 +65,11 @@ export async function inspectSelfCall(bindings,sid,{request=fetch}={}){
  if(call.account_sid!==ACCOUNT||call.to!==NUMBER||call.from!==NUMBER)throw Error('SELF_CALL_INSPECTION_IDENTITY_INVALID');
  const records=await get('/Calls/'+sid+'/Recordings.json?PageSize=100');
  const notifications=await get('/Calls/'+sid+'/Notifications.json?PageSize=100');
- return {readOnly:true,callsPlaced:0,callSid:sid,status:call.status,durationSeconds:Number(call.duration),direction:call.direction,
+ let insights={available:false};
+ const summary=await request('https://insights.twilio.com/v1/Voice/'+sid+'/Summary',{headers,redirect:'error',signal:AbortSignal.timeout(15000)});
+ if(summary.ok){const data=await summary.json();if(data.call_sid!==sid||data.account_sid!==ACCOUNT)throw Error('SELF_CALL_INSIGHTS_SCOPE_INVALID');insights={available:true,callState:data.call_state,callType:data.call_type,lastSipResponse:data.properties?.last_sip_response_num,disconnectedBy:data.properties?.disconnected_by,tags:(data.tags||[]).filter(t=>/^[a-z_]{1,40}$/.test(t)),sipEdgeMetrics:data.sip_edge?.metrics,carrierEdgeMetrics:data.carrier_edge?.metrics};}
+ else insights.httpStatus=summary.status;
+ return {insights,readOnly:true,callsPlaced:0,callSid:sid,status:call.status,durationSeconds:Number(call.duration),direction:call.direction,
   recordingStatuses:(records.recordings||[]).map(r=>({status:r.status,duration:Number(r.duration),channels:r.channels,source:r.source})),
   providerNotifications:(notifications.notifications||[]).map(n=>({errorCode:Number(n.error_code),messageSignals:Object.fromEntries(['SIP','TLS','certificate','SRTP','busy','timeout','media','audio','registration','routing'].map(label=>[label,new RegExp(label,'i').test(String(n.message_text||''))]))}))};
 }

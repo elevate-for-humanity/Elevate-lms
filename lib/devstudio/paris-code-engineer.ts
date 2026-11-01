@@ -136,6 +136,25 @@ function rejectedSourceRead(error: unknown): boolean {
     / is not a (?:file|directory)\.$/.test(message);
 }
 
+async function rejectedReadFeedback(path: string, branch: string): Promise<string> {
+  const message = `READ_REJECTED ${path}: use list to discover an allowed application path. No source was read or changed.`;
+  // Protected paths remain opaque. Only discover ancestors of allowed paths.
+  if (blockedPath(path)) return message;
+  let directory = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const entries = await listDirectory(directory, branch);
+      return `${message}\nLIST ${directory || '/'}: ${JSON.stringify(entries)}`;
+    } catch (error) {
+      // Authorization, timeouts and provider failures must still fail closed.
+      if (!rejectedSourceRead(error)) throw error;
+      if (!directory) return message;
+      directory = directory.includes('/') ? directory.slice(0, directory.lastIndexOf('/')) : '';
+    }
+  }
+  return message;
+}
+
 async function writeFile(input: {
   path: string;
   content: string;
@@ -383,7 +402,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           // A guessed, missing or protected source path is planner feedback.
           // Credential/network failures still stop; protected writes stay blocked.
           if (!rejectedSourceRead(error)) throw error;
-          observations.push(`READ_REJECTED ${action.path}: use list to discover an allowed application path. No source was read or changed.`);
+          observations.push(await rejectedReadFeedback(action.path, branch));
         }
         continue;
       }

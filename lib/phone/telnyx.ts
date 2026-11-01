@@ -1,6 +1,6 @@
 import 'server-only';
 
-import Telnyx from 'telnyx';
+import type Telnyx from 'telnyx';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { resolveSendingNumber } from './sending-number';
 
@@ -32,11 +32,10 @@ export type TelnyxCallEvent = {
   };
 };
 
-export async function telnyxClient() {
-  await hydrateProcessEnv();
-  const apiKey = process.env.TELNYX_API_KEY;
-  if (!apiKey) throw new Error('TELNYX_API_KEY is not configured.');
-  return new Telnyx({ apiKey, publicKey: process.env.TELNYX_PUBLIC_KEY });
+export async function telnyxClient(): Promise<Telnyx> {
+  // Retain types and historical evidence, but never instantiate the retired SDK,
+  // even if legacy credentials are still present in the secret store.
+  throw new Error('Telnyx is retired. Use Twilio and Elevate PBX.');
 }
 
 export async function verifyTelnyxWebhook(body: string, headers: Headers) {

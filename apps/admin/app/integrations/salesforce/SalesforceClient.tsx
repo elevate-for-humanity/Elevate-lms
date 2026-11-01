@@ -15,21 +15,22 @@ import {
 } from 'lucide-react';
 
 interface SyncStatus {
-  contacts: number;
-  leads: number;
+  contacts: number | null;
+  leads: number | null;
   lastSync: string | null;
   connected: boolean;
 }
 
 export default function SalesforceClient() {
   const [status, setStatus] = useState<SyncStatus>({
-    contacts: 0,
-    leads: 0,
+    contacts: null,
+    leads: null,
     lastSync: null,
     connected: false,
   });
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     checkStatus();
@@ -42,14 +43,16 @@ export default function SalesforceClient() {
       if (res.ok) {
         const data = await res.json();
         setStatus({
-          contacts: data.contacts ?? 0,
-          leads: data.leads ?? 0,
+          contacts: data.contacts ?? null,
+          leads: data.leads ?? null,
           lastSync: data.last_sync ?? null,
           connected: data.connected ?? false,
         });
+      } else {
+        setError('Integration status could not be verified.');
       }
     } catch {
-      // API may not exist yet — show disconnected state
+      setError('Integration status could not be verified.');
     } finally {
       setLoading(false);
     }
@@ -57,11 +60,17 @@ export default function SalesforceClient() {
 
   async function triggerSync() {
     setSyncing(true);
+    setError(null);
     try {
-      await fetch('/api/admin/integrations?provider=salesforce', { method: 'POST' });
+      const response = await fetch('/api/admin/integrations?provider=salesforce', { method: 'POST' });
+      const result = await response.json();
+      if (!response.ok || result.success !== true) {
+        setError(result.error || 'Synchronization was not confirmed.');
+        return;
+      }
       await checkStatus();
     } catch {
-      // handle error
+      setError('Synchronization was not confirmed.');
     } finally {
       setSyncing(false);
     }
@@ -80,6 +89,7 @@ export default function SalesforceClient() {
 
   return (
     <div className="min-h-screen bg-white p-6">
+      {error && <p role="alert" className="mb-4 text-red-700">{error}</p>}
       {/* Hero Image */}
       <div className="max-w-4xl mx-auto">
         <div className="mb-4">
@@ -136,11 +146,11 @@ export default function SalesforceClient() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600">Synced Contacts</span>
-                <span className="text-sm font-medium text-slate-900">{status.contacts}</span>
+                <span className="text-sm font-medium text-slate-900">{status.contacts ?? 'Unverified'}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600">Synced Leads</span>
-                <span className="text-sm font-medium text-slate-900">{status.leads}</span>
+                <span className="text-sm font-medium text-slate-900">{status.leads ?? 'Unverified'}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600">Last Sync</span>

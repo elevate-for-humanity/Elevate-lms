@@ -34,16 +34,31 @@ export const RUNTIME_INTEGRATIONS: readonly RuntimeIntegration[] = [
   { id: 'google', required: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'] },
   { id: 'teams', required: ['TEAMS_WEBHOOK_URL'], webhook: true },
   { id: 'zoom', required: ['ZOOM_ACCOUNT_ID', 'ZOOM_CLIENT_ID', 'ZOOM_CLIENT_SECRET'] },
+  { id: 'paypal', required: ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_BILLING_WEBHOOK_ID'], webhook: true },
+  { id: 'twilio', required: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN'], webhook: true },
+  { id: 'backblaze-b2', required: ['ELEVATE_MEDIA_ENDPOINT', 'ELEVATE_MEDIA_ACCESS_KEY_ID', 'ELEVATE_MEDIA_SECRET_ACCESS_KEY', 'ELEVATE_MEDIA_BUCKET'] },
+  { id: 'paris', required: ['PBX_PROVISIONING_TOKEN'] },
+  { id: 'course-builder-workers', required: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] },
+  { id: 'google-cloud', required: ['GOOGLE_CLOUD_PROJECT'] },
+  { id: 'pbx-asterisk', required: ['PBX_PROVISIONING_TOKEN'] },
+  { id: 'livekit', required: ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'] },
+  { id: 'student-enrollment-delivery', required: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'RESEND_API_KEY'] },
 ] as const;
 
 export function runtimeRequirementPresent(name: string): boolean {
+  if (name === 'TWILIO_ACCOUNT_SID') {
+    return Boolean((process.env.TWILIO_ACCOUNT_SID || process.env.TWILIO_SID)?.trim());
+  }
+  if (name === 'GOOGLE_CLOUD_PROJECT') {
+    return Boolean((process.env.GOOGLE_CLOUD_PROJECT || process.env.GCP_PROJECT || process.env.K_SERVICE)?.trim());
+  }
   if (name === 'AFFIRM_PRIVATE_KEY') {
     return Boolean(process.env.AFFIRM_PRIVATE_KEY || process.env.AFFIRM_PRIVATE_API_KEY);
   }
   if (name === 'SEZZLE_MERCHANT_ID') {
     return Boolean(process.env.SEZZLE_MERCHANT_ID || process.env.NEXT_PUBLIC_SEZZLE_MERCHANT_ID);
   }
-  return Boolean(process.env[name]);
+  return Boolean(process.env[name]?.trim());
 }
 
 export function runtimeConfiguration(id: string) {

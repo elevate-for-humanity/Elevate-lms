@@ -139,6 +139,7 @@ def ensure_rsa_gateway_certificate(pair):
  try:
   config.write_text(after)
   run(['docker','exec',name,'caddy','validate','--config','/etc/caddy/Caddyfile','--adapter','caddyfile'])
+  if not idle_state(cli('core show channels count')):raise ValueError('PBX_CALL_STARTED_BEFORE_GATEWAY_RESTART')
   # Caddy otherwise retains its cached ECDSA certificate despite key_type.
   # Stage only this hostname's resources privately, preserving account state.
   for index,resource in enumerate(resources):
@@ -162,6 +163,7 @@ def ensure_rsa_gateway_certificate(pair):
   config.write_text(before)
   for resource,snapshot in saved:shutil.copy2(snapshot,resource)
   if restarted:
+   if not idle_state(cli('core show channels count')):raise ValueError('PBX_GATEWAY_ROLLBACK_DEFERRED_ACTIVE_CALLS')
    try:
     run(['docker','restart',name])
     certificate_pair()

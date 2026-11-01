@@ -84,7 +84,7 @@ class Tests(unittest.TestCase):
  def test_gateway_mount_requires_the_existing_owned_file(self):
   with self.assertRaisesRegex(ValueError,'MOUNT_UNVERIFIED'):
    m.require_gateway_mount({'State':{'Running':True},'Mounts':[{'Destination':'/etc/caddy/Caddyfile','Source':'/other','Type':'bind'}]},Path('/owned/Caddyfile'))
- def exercise_gateway_rotation(self,success):
+ def exercise_gateway_rotation(self,success,busy=False):
   from unittest.mock import patch
   import tempfile,json
   real_path=Path
@@ -108,8 +108,11 @@ class Tests(unittest.TestCase):
      return args[2]
     if 'validate' in args:return ''
     self.fail('Unexpected command '+str(args))
-   with patch.object(m,'Path',side_effect=mapped),patch.object(m,'certificate_uses_rsa',side_effect=[False,True] if success else [False]),patch.object(m,'cli',return_value='0 active calls\n0 active channels'),patch.object(m,'gateway_ws_ready',return_value=True),patch.object(m,'run',side_effect=execute),patch.object(m,'certificate_pair',return_value=(cert,key)),patch.object(m.tempfile,'mkdtemp',return_value=str(backup)),patch.object(m.time,'monotonic',side_effect=[0,1] if success else [0,100]),patch('builtins.print') as output:
-    if success:
+   with patch.object(m,'Path',side_effect=mapped),patch.object(m,'certificate_uses_rsa',side_effect=[False,True] if success else [False]),patch.object(m,'cli',return_value='0 active calls\n0 active channels',side_effect=['0 active calls\n0 active channels','1 active call\n1 active channel'] if busy else None),patch.object(m,'gateway_ws_ready',return_value=True),patch.object(m,'run',side_effect=execute),patch.object(m,'certificate_pair',return_value=(cert,key)),patch.object(m.tempfile,'mkdtemp',return_value=str(backup)),patch.object(m.time,'monotonic',side_effect=[0,1] if success else [0,100]),patch('builtins.print') as output:
+    if busy:
+     with self.assertRaisesRegex(ValueError,'CALL_STARTED_BEFORE_GATEWAY_RESTART'):m.ensure_rsa_gateway_certificate((cert,key))
+     self.assertEqual(config.read_text(),before);self.assertEqual(key.read_text(),'old-.key');self.assertEqual(len(restarts),0)
+    elif success:
      self.assertEqual(m.ensure_rsa_gateway_certificate((cert,key)),(cert,key))
      self.assertIn('key_type rsa2048',config.read_text());self.assertEqual(key.read_text(),'issued-.key');self.assertEqual(len(restarts),1)
      self.assertNotIn('unrelated-private-key',str(output.call_args_list))
@@ -119,4 +122,5 @@ class Tests(unittest.TestCase):
    self.assertEqual((other/'keep.key').read_text(),'unrelated-private-key');self.assertFalse(backup.exists())
  def test_rsa_issuance_preserves_gateway_identity_and_unrelated_certificates(self):self.exercise_gateway_rotation(True)
  def test_failed_rsa_issuance_restores_the_previous_working_gateway(self):self.exercise_gateway_rotation(False)
+ def test_a_call_starting_during_preflight_prevents_gateway_restart(self):self.exercise_gateway_rotation(False,True)
 if __name__=='__main__':unittest.main()

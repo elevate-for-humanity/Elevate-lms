@@ -46,6 +46,7 @@ type=endpoint
 transport=elevate-twilio-tls
 aors=twilio-aor
 context=elevate-twilio-in
+identify_by=ip
 disallow=all
 allow=ulaw,alaw
 media_encryption=sdes

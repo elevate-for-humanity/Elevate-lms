@@ -6,13 +6,13 @@ class Tests(unittest.TestCase):
  def test_enters_paris_before_operator_fallback(self):
   text=m.ingress_plan();self.assertIn('exten => +14632401404,1,Answer()',text);self.assertLess(text.index('Stasis(elevate-paris)'),text.index('Goto(internal,0,1)'));self.assertNotIn('exten => _',text)
  def test_only_carrier_context_is_changed(self):
-  source='[before]\ncontext=other\n[twilio]\ntype=endpoint\ncontext=elevate-twilio-in\n[after]\ncontext=keep\n';result=m.update_endpoint(source);self.assertIn('context=other',result);self.assertIn('context=keep',result);self.assertEqual(result.count('context=elevate-paris-inbound'),1)
+  source='[before]\ncontext=other\n[twilio]\ntype=endpoint\ncontext=elevate-twilio-in\n[after]\ncontext=keep\n';result=m.update_endpoint(source);self.assertIn('context=other',result);self.assertIn('context=keep',result);self.assertEqual(result.count('context=elevate-paris-inbound'),1);self.assertIn('identify_by=ip',result)
  def test_ambiguous_endpoint_is_rejected(self):
   with self.assertRaises(ValueError):m.update_endpoint('[twilio]\ntype=endpoint\ncontext=a\ncontext=b\n')
  def test_netmask_readback_is_normalized(self):
   import ipaddress
   text='\n'.join(str(ipaddress.ip_network(x).network_address)+'/'+str(ipaddress.ip_network(x).netmask) for x in m.SIGNALING)
-  self.assertTrue(m.verified_identity(text));self.assertFalse(m.verified_identity('Match:0.0.0.0/0'))
+  self.assertTrue(m.verified_identity(text));self.assertFalse(m.verified_identity('Match:0.0.0.0/0'));self.assertFalse(m.verified_identity(text+'\nMatch:0.0.0.0/0'))
  def test_restart_guard_rejects_pending_channels(self):
   self.assertTrue(m.idle_state('0 active calls\n0 active channels\n'))
   self.assertFalse(m.idle_state('0 active calls\n1 active channel\n'))

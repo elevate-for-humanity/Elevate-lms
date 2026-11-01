@@ -29,6 +29,7 @@ def main():
   result={'kind':kind,'state':channel.get('state') if channel.get('state') in ['Up','Down','Ring','Ringing'] else 'other'}
   for key in ['txcount','rxcount','txoctetcount','rxoctetcount','txploss','rxploss']:
    if isinstance(data.get(key),(int,float)):result[key]=data[key]
+  if kind=='media':result['transport']='tcp' if str(channel.get('name','')).startswith('AudioSocket/') else 'udp'
   if kind=='carrier':
    try:
     value=ari(path+'/variable?'+urllib.parse.urlencode({'variable':'CHANNEL(rtp,dest)'})).get('value','')
@@ -67,10 +68,12 @@ def main():
   except Exception:counts['headerCountersUnavailable']=True
   return counts
  samples=[]
+ started=time.monotonic()
  for sample in range(5):
+  sample_started=time.monotonic()
   channels=ari('/channels')
   own=[c for c in channels if str(c.get('name','')).startswith('PJSIP/twilio-') and re.sub(r'[^0-9]','',str(c.get('caller',{}).get('number',''))) in ['14632401404','4632401404']]
-  sample_data={'offset':sample*3,'ownedCarrierCount':len(own),'totalCarrierCount':sum(str(c.get('name','')).startswith('PJSIP/twilio-') for c in channels),'carrier':[stats(c,'carrier') for c in own],'bridges':[],'media':[]}
+  sample_data={'offset':round(sample_started-started,1),'ownedCarrierCount':len(own),'totalCarrierCount':sum(str(c.get('name','')).startswith('PJSIP/twilio-') for c in channels),'carrier':[stats(c,'carrier') for c in own],'bridges':[],'media':[]}
   owned_media=[]
   if own:
    ids={c['id'] for c in own}
@@ -82,7 +85,7 @@ def main():
        sample_data['media'].append(stats(c,'media'));owned_media.append(c)
   sample_data['loopbackHeaderCounters']=loopback_flow(owned_media)
   samples.append(sample_data)
-  if sample<4:time.sleep(.5)
+  if sample<4:time.sleep(max(0,3-(time.monotonic()-sample_started)))
  print(json.dumps({'readOnlyRtpMonitor':True,'callsPlaced':0,'samples':samples}))
 if __name__=='__main__':
  try:main()

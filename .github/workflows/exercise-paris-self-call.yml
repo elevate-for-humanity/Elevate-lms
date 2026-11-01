@@ -1,5 +1,8 @@
 name: Verify PARIS greeting with one authorized business self-call
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/exercise-paris-self-call.yml']
   workflow_dispatch:
     inputs:
       mode:
@@ -11,13 +14,19 @@ on:
         description: Prior self-call SID to inspect; required in inspect mode
         type: string
         default: ''
-permissions: {contents: read, id-token: write}
+permissions: {contents: read, actions: write, id-token: write}
 concurrency:
   group: google-pbx-infrastructure
   cancel-in-progress: false
 jobs:
+  dispatch-once:
+    if: github.event_name == 'push' && github.event.head_commit.message == 'Run authorized PARIS AudioSocket phone verification'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/exercise-paris-self-call.yml/dispatches" -f ref=main -f 'inputs[mode]=greeting-call'
   self-call:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 8
@@ -36,7 +45,7 @@ jobs:
         with: {skip_install: true}
       - name: Verify current PARIS configuration and real speech readiness
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py
-      - name: Place one bounded self-call and compare recorded audio with saved greeting
+      - name: Place one bounded self-call and verify saved greeting and a spoken response
         env:
           AUTHORIZED_SELF_TEST_DID: '+14632401404'
           SELF_CALL_MODE: '${{ inputs.mode }}'

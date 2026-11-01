@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {exerciseSelfCall,greetingMatch} from './exercise-paris-self-call.mjs';
+import {exerciseSelfCall,greetingMatch,summarizeSpeech} from './exercise-paris-self-call.mjs';
 const account='AC75bcca01e19767614252902185ed948f',number='+14632401404',sid='CA'+'a'.repeat(32),trunk='TK'+'b'.repeat(32),recording='RE'+'c'.repeat(32);
 const greeting='Thank you for calling Elevate for Humanity. I am Paris your virtual assistant. How can I help you with your career training today?';
 const bindings={TWILIO_ACCOUNT_SID:account,TWILIO_PHONE_NUMBER:number,TWILIO_AUTH_TOKEN:'private-test-token'};
@@ -49,4 +49,12 @@ test('known caller-side test speech alone cannot certify the PARIS greeting',asy
 });
 test('an absent recording reports its provider code without repeated polling or transcription',async()=>{
  const f=fixture({absent:true});let waits=0;await assert.rejects(exerciseSelfCall(bindings,{...options(f),wait:async()=>{waits++;},transcribe:async()=>assert.fail('absent recording must not be heard')}),/RECORDING_ABSENT_16101/);assert.equal(waits,0);
+});
+
+test('spoken response must be on the PARIS greeting channel after the caller prompt, never the caller track',()=>{
+ const heard={text:greeting+' audio test complete',segments:[{channel:1,text:greeting,lateWords:[]},{channel:2,text:'Please say audio test complete',lateWords:['audio','test','complete']}]};
+ assert.equal(summarizeSpeech(greeting,heard).replyMarkerMatched,false);
+ heard.segments.push({channel:1,text:'Audio test complete.',lateWords:['Audio','test','complete']});
+ assert.equal(summarizeSpeech(greeting,heard).replyMarkerMatched,true);
+ heard.segments[2].lateWords=[];assert.equal(summarizeSpeech(greeting,heard).replyMarkerMatched,false);
 });

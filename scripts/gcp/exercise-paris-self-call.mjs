@@ -11,7 +11,20 @@ export function greetingMatch(expected,actual){
  const wanted=words(expected),heard=new Set(words(actual));
  return wanted.length>=10?wanted.filter(word=>heard.has(word)).length/wanted.length:0;
 }
-export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,request=fetch,wait=ms=>new Promise(r=>setTimeout(r,ms)),report=()=>{},monitor=async()=>null}){
+export function summarizeSpeech(expected,recognition){
+ const text=typeof recognition==='string'?recognition:String(recognition?.text||'');
+ const segments=Array.isArray(recognition?.segments)?recognition.segments:[];
+ const channels=[1,2].map(channel=>{
+  const own=segments.filter(s=>s.channel===channel);
+  const ratio=greetingMatch(expected,own.map(s=>s.text).join(' '));
+  const late=own.flatMap(s=>Array.isArray(s.lateWords)?s.lateWords:[]).flatMap(words);
+  const marker=['audio','test','complete'].filter(w=>late.includes(w)).length;
+  return {ratio,marker};
+ }).sort((a,b)=>b.ratio-a.ratio);
+ const best=channels[0];
+ return {ratio:segments.length?best.ratio:greetingMatch(expected,text),wordCount:words(text).length,replyMarkerMatched:best.ratio>=.75&&best.marker>=2};
+}
+export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,request=fetch,wait=ms=>new Promise(r=>setTimeout(r,ms)),report=()=>{},monitor=async()=>null,expectConversation=false}){
  if(bindings.TWILIO_ACCOUNT_SID!==ACCOUNT||bindings.TWILIO_PHONE_NUMBER!==NUMBER||!bindings.TWILIO_AUTH_TOKEN||words(expectedGreeting).length<10)throw Error('SELF_CALL_IDENTITY_REQUIRED');
  const base=`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT}`;
  const headers={Authorization:'Basic '+Buffer.from(ACCOUNT+':'+bindings.TWILIO_AUTH_TOKEN).toString('base64')};
@@ -28,8 +41,9 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  const origins=await api('https://trunking.twilio.com/v1/Trunks/'+number.trunk_sid+'/OriginationUrls?PageSize=100');
  if(trunk.account_sid!==ACCOUNT||trunk.domain_name!==DOMAIN||trunk.secure!==true||origins.meta?.next_page_url||origins.origination_urls?.length!==1||origins.origination_urls[0].enabled!==true||origins.origination_urls[0].sip_url!=='sip:phone.elevateforhumanity.org:5061;transport=tls')throw Error('SELF_CALL_ROUTE_UNVERIFIED');
  for(const status of ['queued','ringing','in-progress']){const active=await api(base+'/Calls.json?Status='+status+'&PageSize=100');if(active.next_page_uri||!Array.isArray(active.calls)||active.calls.length)throw Error('SELF_CALL_ACTIVE_CALLS_PRESENT');}
+ const twiml=expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
  // Exactly one bounded call to the verified business number. Never retry creation.
- const created=await api(base+'/Calls.json',{To:NUMBER,From:NUMBER,Timeout:'15',TimeLimit:'45',Record:'true',RecordingChannels:'dual',RecordingTrack:'both',Twiml:'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>'});
+ const created=await api(base+'/Calls.json',{To:NUMBER,From:NUMBER,Timeout:'15',TimeLimit:'45',Record:'true',RecordingChannels:'dual',RecordingTrack:'both',Twiml:twiml});
  if(!/^CA[a-f0-9]{32}$/i.test(created.sid||'')||created.account_sid!==ACCOUNT||created.to!==NUMBER||created.from!==NUMBER)throw Error('SELF_CALL_CREATION_UNVERIFIED');
  const sid=created.sid;report({selfCallCreated:true,callSid:sid,onlyVerifiedBusinessNumber:true,maxDurationSeconds:45});
  let call;
@@ -60,8 +74,8 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  if(!audio.ok||Number(audio.headers.get('content-length')||0)>2000000)throw Error('SELF_CALL_MEDIA_UNAVAILABLE');
  const wav=Buffer.from(await audio.arrayBuffer());
  if(wav.length>2000000||wav.subarray(0,4).toString()!=='RIFF'||wav.subarray(8,12).toString()!=='WAVE')throw Error('SELF_CALL_AUDIO_INVALID');
- const transcript=await transcribe(wav),ratio=greetingMatch(expectedGreeting,transcript);
- return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),recordingDurationSeconds:Number(recording.duration),receivedAudioBytes:wav.length,speechWordCount:words(transcript).length,savedGreetingWordMatch:Math.round(ratio*100)/100,savedGreetingAudioMatched:ratio>=0.75,liveGreetingAcceptance:ratio>=0.75?'PASS':'FAIL',operatorTransferAcceptance:'NOT_TESTED',voicemailDeliveryAcceptance:'NOT_TESTED'};
+ const recognition=await transcribe(wav),summary=summarizeSpeech(expectedGreeting,recognition),ratio=summary.ratio;
+ return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),recordingDurationSeconds:Number(recording.duration),receivedAudioBytes:wav.length,speechWordCount:summary.wordCount,savedGreetingWordMatch:Math.round(ratio*100)/100,savedGreetingAudioMatched:ratio>=0.75,liveGreetingAcceptance:ratio>=0.75?'PASS':'FAIL',liveConversationAcceptance:expectConversation?(summary.replyMarkerMatched?'PASS':'FAIL'):'NOT_TESTED',operatorTransferAcceptance:'NOT_TESTED',voicemailDeliveryAcceptance:'NOT_TESTED'};
 }
 export async function inspectSelfCall(bindings,sid,{request=fetch}={}){
  if(bindings.TWILIO_ACCOUNT_SID!==ACCOUNT||bindings.TWILIO_PHONE_NUMBER!==NUMBER||!/^CA[a-f0-9]{32}$/i.test(sid||''))throw Error('SELF_CALL_INSPECTION_SCOPE_INVALID');
@@ -94,11 +108,17 @@ try:
  if not fmt or fmt[1] not in [1,2] or fmt[2] not in [8000,16000,24000,32000,44100,48000]:raise ValueError('audio_format_unverified')
  encoding='LINEAR16' if fmt[0]==1 and fmt[3]==16 else 'MULAW' if fmt[0]==7 and fmt[3]==8 else None
  if not encoding:raise ValueError('audio_encoding_unverified')
- config={'encoding':encoding,'sampleRateHertz':fmt[2],'audioChannelCount':fmt[1],'enableSeparateRecognitionPerChannel':fmt[1]>1,'languageCode':'en-US','model':'phone_call'}
+ config={'encoding':encoding,'sampleRateHertz':fmt[2],'audioChannelCount':fmt[1],'enableSeparateRecognitionPerChannel':fmt[1]>1,'languageCode':'en-US','model':'phone_call','enableWordTimeOffsets':True}
  body={'config':config,'audio':{'content':data['audio']}}
  req=urllib.request.Request('https://speech.googleapis.com/v1/speech:recognize',data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'})
  reply=json.load(urllib.request.urlopen(req,timeout=60))
- print(json.dumps({'text':' '.join(r['alternatives'][0]['transcript'] for r in reply.get('results',[]) if r.get('alternatives'))}))
+ segments=[]
+ for r in reply.get('results',[]):
+  if not r.get('alternatives'):continue
+  alt=r['alternatives'][0]
+  late=[w.get('word','') for w in alt.get('words',[]) if float(w.get('startTime','0s').rstrip('s'))>=30]
+  segments.append({'channel':r.get('channelTag',0),'text':alt.get('transcript',''),'lateWords':late})
+ print(json.dumps({'text':' '.join(s['text'] for s in segments),'segments':segments}))
 except Exception:print(json.dumps({'error':'self_call_speech_unavailable'}));sys.exit(1)
 `;
 function transcribeOnPbx(wav){
@@ -106,7 +126,7 @@ function transcribeOnPbx(wav){
  const result=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command','sudo python3 -c '+quote(recognitionProgram)],{input:JSON.stringify({audio:wav.toString('base64')}),encoding:'utf8',timeout:90000,maxBuffer:1000000});
  if(result.status!==0)throw Error('SELF_CALL_SPEECH_UNAVAILABLE');
  let body;try{body=JSON.parse(result.stdout.trim());}catch{throw Error('SELF_CALL_SPEECH_UNAVAILABLE');}
- if(typeof body.text!=='string')throw Error('SELF_CALL_SPEECH_UNAVAILABLE');return body.text;
+ if(typeof body.text!=='string'||!Array.isArray(body.segments))throw Error('SELF_CALL_SPEECH_UNAVAILABLE');return body;
 }
 function monitorOnPbx(){
  const result=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command','sudo python3 -'],{input:readFileSync(new URL('./observe-paris-self-call.py',import.meta.url),'utf8'),encoding:'utf8',timeout:35000,maxBuffer:1000000});
@@ -121,6 +141,6 @@ async function main(){
  if(db!=='https://cuxzzpsyufcewtmicszk.supabase.co'||!env.SUPABASE_SERVICE_ROLE_KEY)throw Error('SELF_CALL_SETTINGS_SCOPE_INVALID');
  const response=await fetch(db+'/rest/v1/phone_systems?id=eq.'+SYSTEM+'&select=greeting',{headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY},redirect:'error'});
  const rows=response.ok?await response.json():[];if(rows.length!==1)throw Error('SELF_CALL_SETTINGS_UNAVAILABLE');
- const result=await exerciseSelfCall(bindings,{expectedGreeting:rows[0].greeting,transcribe:transcribeOnPbx,monitor:monitorOnPbx,report:v=>console.log(JSON.stringify(v))});console.log(JSON.stringify(result));if(result.liveGreetingAcceptance!=='PASS')process.exitCode=1;
+ const result=await exerciseSelfCall(bindings,{expectedGreeting:rows[0].greeting,transcribe:transcribeOnPbx,monitor:monitorOnPbx,expectConversation:true,report:v=>console.log(JSON.stringify(v))});console.log(JSON.stringify(result));if(result.liveGreetingAcceptance!=='PASS'||result.liveConversationAcceptance!=='PASS')process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(e=>{console.error(/^SELF_CALL_[A-Z_0-9]+$/.test(e.message)?e.message:'SELF_CALL_FAILED');process.exitCode=1;});

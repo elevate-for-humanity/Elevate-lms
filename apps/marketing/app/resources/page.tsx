@@ -1,8 +1,16 @@
+import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { GraduationCap, DollarSign, Shield, Briefcase, ExternalLink, ArrowRight } from 'lucide-react';
+import {
+  GraduationCap,
+  DollarSign,
+  Shield,
+  Briefcase,
+  ExternalLink,
+  ArrowRight,
+} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Resources | Elevate for Humanity',
@@ -29,7 +37,11 @@ const sections = [
       { label: 'Workforce Ready Grant', href: '/funding/wioa' },
       { label: 'Job-Ready Incentive', href: '/funding/jri' },
       { label: 'DOL Registered Apprenticeship', href: '/funding/dol' },
-      { label: 'Indiana Career Connect', href: 'https://www.indianacareerconnect.com', external: true },
+      {
+        label: 'Indiana Career Connect',
+        href: 'https://www.indianacareerconnect.com',
+        external: true,
+      },
     ],
   },
   {
@@ -39,7 +51,11 @@ const sections = [
       { label: 'Employer Portal', href: '/employer/dashboard' },
       { label: 'Post a Job', href: '/employer/post-job' },
       { label: 'Apprenticeship Partnerships', href: '/partners/host-shops' },
-      { label: 'WOTC Tax Credits Info', href: 'https://www.dol.gov/agencies/eta/wotc', external: true },
+      {
+        label: 'WOTC Tax Credits Info',
+        href: 'https://www.dol.gov/agencies/eta/wotc',
+        external: true,
+      },
     ],
   },
   {
@@ -70,23 +86,30 @@ export default function ResourcesPage() {
   return (
     <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Resources' }]} />
-      
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-black mb-4">Resources</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Career resources, funding information, and links to our partner organizations.
-          </p>
-        </div>
-      </section>
 
+      <PublicEditorialHero
+        eyebrow="Student & partner resources"
+        title="Find the help you need, in one place."
+        description="Choose application help, funding information, career services, or partner resources. Start with the topic that matches your next step."
+        image="/images/licensed-envato/resources-study-378c48c4.webp"
+        imageAlt="Learner reviewing printed study guides alongside a laptop"
+      >
+        <Link
+          href="#resource-topics"
+          className="inline-flex min-h-11 items-center rounded-xl bg-brand-red-700 px-5 py-3 font-bold text-white"
+        >
+          Browse resources
+        </Link>
+      </PublicEditorialHero>
       {/* Resources Grid */}
-      <section className="py-16">
+      <section id="resource-topics" className="scroll-mt-24 py-10">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sections.map((section) => (
-              <div key={section.title} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <div
+                key={section.title}
+                className="bg-slate-50 rounded-xl p-6 border border-slate-200"
+              >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                     <section.icon className="w-5 h-5 text-brand-blue-600" />
@@ -96,7 +119,7 @@ export default function ResourcesPage() {
                 <ul className="space-y-2">
                   {section.links.map((link) => (
                     <li key={link.label}>
-                      <Link 
+                      <Link
                         href={link.href}
                         className="flex items-center gap-2 text-slate-600 hover:text-brand-blue-600 transition-colors group"
                         target={link.external ? '_blank' : undefined}
@@ -122,7 +145,10 @@ export default function ResourcesPage() {
           <p className="text-slate-600 mb-6">
             Our team is here to help you find the right resources.
           </p>
-          <Link href="/contact" className="inline-block bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">
+          <Link
+            href="/contact"
+            className="inline-block bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700"
+          >
             Contact Us
           </Link>
         </div>

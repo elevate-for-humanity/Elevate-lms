@@ -1,3 +1,4 @@
+import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 import { getBlogImage } from '@/lib/blog/images';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/pages/social-media-1.webp',
+        url: '/images/licensed-envato/blog-learning-08e3d270.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate For Humanity blog',
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     title: 'Blog | Elevate For Humanity',
     description:
       'Workforce development insights, funding guides, credential explainers, and career training tips from Elevate for Humanity.',
-    images: ['/images/pages/certifications-page-1.webp'],
+    images: ['/images/licensed-envato/blog-learning-08e3d270.webp'],
   },
 };
 
@@ -77,16 +78,27 @@ export default async function BlogPage() {
           <Breadcrumbs items={[{ label: 'Blog' }]} />
         </div>
       </div>
-      <div className="bg-brand-blue-700 text-white py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-3">Blog</h1>
-          <p className="text-lg text-slate-200 max-w-2xl">
-            Workforce funding guides, credential explainers, and career training insights from
-            Elevate for Humanity.
-          </p>
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto px-6 py-14">
+      <PublicEditorialHero
+        eyebrow="Career resources & insights"
+        title="Practical guidance for your next step."
+        description="Explore funding guides, apprenticeship advice, credential explainers, and career-training insights from Elevate."
+        image="/images/licensed-envato/blog-learning-08e3d270.webp"
+        imageAlt="Adult professionals sharing notes and discussing learning resources"
+      >
+        <Link
+          href="#articles"
+          className="inline-flex min-h-11 items-center rounded-xl bg-brand-red-700 px-5 py-3 font-bold text-white"
+        >
+          Explore articles
+        </Link>
+        <Link
+          href="/resources"
+          className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-900"
+        >
+          Find student resources
+        </Link>
+      </PublicEditorialHero>
+      <div id="articles" className="max-w-6xl mx-auto scroll-mt-24 px-6 py-10">
         {featured && (
           <div className="mb-14">
             <Link

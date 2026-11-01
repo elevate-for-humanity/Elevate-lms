@@ -1,3 +1,4 @@
+import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 export const revalidate = 300;
 
 import type { Metadata } from 'next';
@@ -15,7 +16,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
 import { TESTING_PROVIDER_IMAGES } from '@/lib/testing/provider-images';
 import TestingCart, { AddExamToCartButton } from '@/components/testing/TestingCart';
-import ImageMetadata from '@/components/marketing/ImageMetadata';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import {
   ACTIVE_PROVIDERS,
@@ -65,55 +65,34 @@ export default function TestingPage() {
         </div>
       </div>
 
-      <section className="relative aspect-video sm:aspect-auto sm:h-[clamp(220px,34svh,420px)] overflow-hidden bg-slate-100">
-        <ImageMetadata
-          src="/images/refresh-20261014/testing.webp"
-          description="Illustrative proctor welcoming adults to a computer-based credential exam"
-        />
-        <Image
-          src="/images/refresh-20261014/testing.webp"
-          alt="Illustrative proctor welcoming adults to a computer-based credential exam"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[center_30%]"
-        />
-      </section>
-
-      <section className="border-b border-slate-100 bg-white py-10">
-        <div className="mx-auto max-w-5xl px-4">
-          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-brand-red-600">
-            Elevate Testing Center
-          </p>
-          <h1 className="max-w-4xl text-4xl font-black leading-tight text-slate-950 sm:text-5xl">
-            Choose the credential exam. See the price. Check out securely.
-          </h1>
-          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-600">
-            Compare available credential exams, delivery options, and published prices. Select the
-            exact exam you need before continuing to secure checkout.
-          </p>
-
-          <div className="mt-7 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
-            <Link
-              href="/testing/book"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
-            >
-              <CalendarDays className="h-5 w-5" /> Choose exam & testing date
-            </Link>
-            <Link
-              href="#providers"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-900 hover:bg-slate-50"
-            >
-              Browse exams & prices
-            </Link>
-            <Link
-              href="/testing/for-employers"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-200 bg-brand-blue-50 px-6 py-3 font-black text-brand-blue-900"
-            >
-              Employer / group testing
-            </Link>
-          </div>
-
+      <PublicEditorialHero
+        eyebrow="Elevate Testing Center"
+        title="Choose your exam. Take your next step."
+        description="Compare credential exams, review prices and delivery options, then choose your testing date. You will see the exact exam and total before payment."
+        image="/images/licensed-envato/testing-exam-291b8cff.webp"
+        imageAlt="Adult learners concentrating on a written classroom exam"
+      >
+        <Link
+          href="/testing/book"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+        >
+          <CalendarDays className="h-5 w-5" /> Choose exam & testing date
+        </Link>
+        <Link
+          href="#providers"
+          className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-900 hover:bg-slate-50"
+        >
+          Browse exams & prices
+        </Link>
+        <Link
+          href="/testing/for-employers"
+          className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-200 bg-brand-blue-50 px-6 py-3 font-black text-brand-blue-900"
+        >
+          Employer / group testing
+        </Link>
+      </PublicEditorialHero>
+      <section className="border-b border-slate-100 bg-white py-6">
+        <div className="mx-auto max-w-6xl px-4">
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <ShieldCheck className="h-5 w-5 text-emerald-600" />

@@ -21,11 +21,11 @@ export const TESTING_PROVIDER_IMAGES: Record<string, { src: string; alt: string 
     alt: 'Illustrative allied health learner practicing on an artificial training arm',
   },
   workkeys: {
-    src: '/images/refresh-20261014/business.webp',
-    alt: 'Illustrative adult learners practicing workplace skills at computers',
+    src: '/images/licensed-envato/testing-workkeys-0adce9d3.webp',
+    alt: 'Worker using a calculator and reviewing workplace spreadsheets',
   },
   careersafe: {
-    src: '/images/refresh-20261014/trades.webp',
-    alt: 'Illustrative supervised workplace training with protective equipment',
+    src: '/images/licensed-envato/testing-safety-874c8488.webp',
+    alt: 'Workers in hard hats and high-visibility vests attending a safety briefing',
   },
 };

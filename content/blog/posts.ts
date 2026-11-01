@@ -34,7 +34,7 @@ const ELEVATE_POSTS: BlogPost[] = [
     author_name: 'Elizabeth Greene',
     category: 'Funding',
     tags: ['WIOA', 'Funding', 'Workforce Development'],
-    image: '/images/pages/funding-hero.webp',
+    image: '/images/licensed-envato/blog-funding-c6f603b0.webp',
     published: true,
     content: `## What Is WIOA?
 
@@ -187,7 +187,7 @@ Prepare the business license, supervising professional license, liability covera
     author_name: 'Elizabeth Greene',
     category: 'Workforce',
     tags: ['WorkOne', 'OJT', 'Indiana Salons', 'Wage Reimbursement'],
-    image: '/images/pages/funding-hero.webp',
+    image: '/images/licensed-envato/blog-employer-funding-ba2ff192.webp',
     published: true,
     content: `## Reimbursement Is Conditional—not Automatic
 

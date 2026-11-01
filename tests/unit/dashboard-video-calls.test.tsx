@@ -32,6 +32,11 @@ describe('dashboard video call controls', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Decline video call' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull()); expect(screen.queryByTestId('video-room')).toBeNull();
   });
+  it('rejects HTTP 200 without a confirmed invitation', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options?: RequestInit) => options?.method === 'POST' ? Response.json({}) : Response.json({ calls: [] })));
+    render(<DashboardVideoCalls extension="102" />); fireEvent.click(screen.getByRole('button', { name: 'Video call extension' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('not confirmed'); expect(screen.queryByTestId('video-room')).toBeNull();
+  });
   it('shows provider failure without reporting a connected call', async () => {
     vi.stubGlobal('fetch', vi.fn(async (_url: unknown, options?: RequestInit) => options?.method === 'POST' ? Response.json({ error: 'Provider unavailable' }, { status: 503 }) : Response.json({ calls: [] })));
     render(<DashboardVideoCalls extension="102" />); fireEvent.click(screen.getByRole('button', { name: 'Video call extension' }));

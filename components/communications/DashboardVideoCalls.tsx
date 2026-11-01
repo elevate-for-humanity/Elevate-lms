@@ -46,6 +46,7 @@ export function DashboardVideoCalls({ extension, disabled = false, dialPad = fal
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || 'The video call could not be updated.');
+      if (action !== 'start' && body.ok !== true) throw new Error('The video call action was not confirmed.');
       revision.current += 1;
       if (action === 'start') {
         if (!body.roomId) throw new Error('The video invitation was not confirmed.');

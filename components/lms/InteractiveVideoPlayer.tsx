@@ -97,6 +97,7 @@ interface InteractiveVideoPlayerProps {
   transcript?: TranscriptSegment[];
   validationErrors?: string[];
   readOnly?: boolean;
+  adminReview?: boolean;
   learnerId?: string;
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
@@ -115,6 +116,7 @@ export default function InteractiveVideoPlayer({
   transcript = [],
   validationErrors = [],
   readOnly = false,
+  adminReview = false,
   onProgress,
   onComplete,
 }: InteractiveVideoPlayerProps) {
@@ -546,7 +548,7 @@ export default function InteractiveVideoPlayer({
         .map((checkpoint) => checkpoint.timestamp)
         .filter((timestamp) => timestamp > currentTime && timestamp < time)
         .sort((left, right) => left - right)[0];
-      const allowedTime = blockingCheckpoint ?? time;
+      const allowedTime = readOnly && adminReview ? time : blockingCheckpoint ?? time;
       videoRef.current.currentTime = allowedTime;
       setCurrentTime(allowedTime);
     }
@@ -747,7 +749,7 @@ export default function InteractiveVideoPlayer({
 
   return (
     <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
-      {readOnly && <p role="status" className="bg-amber-100 p-3 text-sm text-amber-950">Read-only preview. Playback, notes and answers do not change learner records.</p>}
+      {readOnly && <p role="status" className="bg-amber-100 p-3 text-sm text-amber-950">{adminReview ? 'Administrator playback · Seek freely to inspect any scene. Learner records are unchanged.' : 'Read-only preview. Playback, notes and answers do not change learner records.'}</p>}
       {validationErrors.length > 0 && (
         <div
           className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"

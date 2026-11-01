@@ -74,3 +74,22 @@ for(const status of [401,403])for(const method of ['GET','POST'])test(`private r
  }finally{backendStatus=200;}
 });
 
+
+test('unrelated public routes cannot consume each other rate-limit budget',async()=>{
+ const ip='198.51.100.147';
+ const a=new Request('https://www.elevateforhumanity.org/api/public/catalog',{headers:{'x-forwarded-for':ip}});
+ const b=new Request('https://www.elevateforhumanity.org/api/public/programs',{headers:{'x-forwarded-for':ip}});
+ for(let i=0;i<20;i++)assert.equal(await applyRateLimit(a,'public'),null);
+ const blocked=await applyRateLimit(a,'public');
+ assert.equal(blocked.status,429);
+ assert.equal(blocked.headers.get('X-Elevate-Rate-Limit-Source'),'application');
+ assert.equal(blocked.headers.get('Cache-Control'),'private, no-store');
+ assert.equal(await applyRateLimit(b,'public'),null);
+});
+test('sensitive rate limits cannot be bypassed by changing API paths',async()=>{
+ const ip='198.51.100.148';
+ const first=new Request('https://www.elevateforhumanity.org/api/auth/step-one',{headers:{'x-forwarded-for':ip}});
+ const second=new Request('https://www.elevateforhumanity.org/api/auth/step-two',{headers:{'x-forwarded-for':ip}});
+ for(let i=0;i<20;i++)assert.equal(await applyRateLimit(first,'auth'),null);
+ assert.equal((await applyRateLimit(second,'auth')).status,429);
+});

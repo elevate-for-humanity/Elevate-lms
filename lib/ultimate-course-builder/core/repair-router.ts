@@ -52,6 +52,7 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
   const targets = new Map<UltimateBuildStep, string[]>();
   for (const f of findings) {
     if (isDurableExternalBlocker(f)) continue;
+    const renderAssignmentFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED|ULTIMATE_RENDER_VISUAL_ASSETS_MISSING|ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED/.test(f.message);
     const renderNarrationFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED/.test(f.message);
     const renderInputFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/.test(f.message);
     // The finished-film gate can report two *independent* defects in one
@@ -66,7 +67,7 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
       continue;
     }
     // Cue quotations originate in the storyboard, not the deterministic timeline.
-    const target = renderNarrationFailure ? 'natural_narration' : renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    const target = renderAssignmentFailure ? 'visual_assignment' : renderNarrationFailure ? 'natural_narration' : renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

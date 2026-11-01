@@ -91,8 +91,8 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   const slots=Math.min(Math.max(0,concurrency(role,env,candidates.length+leased)-active.length),Math.max(0,candidates.length-unclaimed));
   if(!slots)continue;
   const job=read(['run','jobs','describe',config.name]),envelope=job.spec?.template?.spec,task=envelope?.template?.spec;
-  if(envelope?.parallelism!==1 || envelope?.taskCount!==1 || task?.containers?.[0]?.image!==expectedImage ||
-    task.containers[0].env?.find(e=>e.name==='ULTIMATE_AUTOPILOT_ROLE')?.value!==role)
+  if(Number(envelope?.parallelism)!==1 || Number(envelope?.taskCount)!==1 || task?.containers?.[0]?.image!==expectedImage ||
+    task?.containers?.[0]?.env?.find(e=>e.name==='ULTIMATE_AUTOPILOT_ROLE')?.value!==role)
    throw Error('ULTIMATE_AUTOPILOT_APPROVED_TEMPLATE_REQUIRED:'+role);
   for(let slot=0;slot<slots;slot++){
    const capacity=await capacityCheck({region:LESSON_ROLE_REGION,task,taskCount:1,run,request});

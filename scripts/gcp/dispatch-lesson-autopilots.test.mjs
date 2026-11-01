@@ -5,7 +5,7 @@ import {lessonRoleDefinition,LESSON_ROLE_JOBS} from './deploy-lesson-autopilots.
 const now=new Date('2026-10-27T18:00:00Z'),Gi=2**30;
 const source={spec:{template:{spec:{taskCount:1,parallelism:1,template:{spec:{serviceAccountName:'elevate-worker-runtime@elegant-racer-299721.iam.gserviceaccount.com',maxRetries:0,
  containers:[{image:'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'4',memory:'8Gi'}},env:[]}]}}}}}};
-const waiting=(role,id='job-'+role)=>({id,status:'queued',available_at:'2026-10-27T17:59:00Z',attempts:0,max_attempts:5,execution_generation:0,payload:{autopilot:{role}}});
+const waiting=(role,id='job-'+role)=>({id,status:'queued',available_at:'2026-10-27T17:59:00Z',attempts:0,max_attempts:5,execution_generation:0,payload:{autopilot:{role}},build:{status:'running',owner_paused:false}});
 function fixture(rows){
  const calls=[],trace=[],active=new Map(),history=[],controls={};
  const records=new Map(rows.map(row=>[row.id,structuredClone(row)]));
@@ -190,4 +190,14 @@ test('slow startup returns immediately and rechecks never launch duplicate worke
  assert.equal(first.reason,'awaiting_worker_assignment');assert.equal(first.assignments.length,0);
  const next=await dispatchLessonAutopilots(s.options);
  assert.equal(next.status,'busy');assert.equal(launches(s).length,1);
+});
+
+
+test('archived and published builds cannot consume a worker execution',async()=>{
+ const rows=[{...waiting('media','archived'),build:{status:'archived',owner_paused:false}},
+  {...waiting('media','published'),build:{status:'published',owner_paused:false}}];
+ const s=fixture(rows);
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.status,'empty');
+ assert.equal(launches(s).length,0);
 });

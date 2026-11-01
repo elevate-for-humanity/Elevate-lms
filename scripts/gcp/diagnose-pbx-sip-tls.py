@@ -124,18 +124,39 @@ def isolated_diagnosis():
     time.sleep(1)
    result['transportOnlyHandshake']=probe(ip) if minimal_ready else {'error':'transport_not_loaded'}
    result['transportOnlyInsideHandshake']=inside_probe() if minimal_ready else {'error':'transport_not_loaded'}
-   result['protocolVariants']={}
-   for variant,method in [('defaultProtocol','default'),('explicitTls12Ciphers','tlsv1_2')]:
-    config=re.sub(r'^method=.*$', 'method='+method,transport[0],flags=re.M)
-    config=re.sub(r'^cipher=.*\n?', '',config,flags=re.M).rstrip()+'\ncipher=ECDHE-RSA-AES128-GCM-SHA256,ECDHE-RSA-AES256-GCM-SHA384\n'
+   result['credentialVariants']={}
+   for variant in ['hashedCaDirectory','noExplicitCaFile','leafOnlyCertificate']:
+    config=transport[0]
+    if variant in ['hashedCaDirectory','noExplicitCaFile']:
+     config=re.sub(r'^ca_list_file=.*\n?', '',config,flags=re.M)
+    if variant=='hashedCaDirectory':config=config.rstrip()+'\nca_list_path=/etc/ssl/certs\n'
+    if variant=='leafOnlyCertificate':
+     pem=re.search(r'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----',pair[0].read_text(),re.S)
+     if not pem:raise ValueError('trusted_pair_unverified')
+     (staging/'tls/phone.crt').write_text(pem[0]+'\n')
     (staging/'pjsip.conf').write_text(config)
+    (staging/'logger.conf').write_text('[general]\n[logfiles]\nconsole=>debug,verbose,notice,warning,error\nmessages=>debug,verbose,notice,warning,error\n')
     required(['docker','restart',name])
     variant_ready=False
     for _ in range(15):
      check=subprocess.run(['docker','exec',name,'asterisk','-rx','pjsip show transport elevate-twilio-tls'],capture_output=True,text=True,timeout=5)
      if check.returncode==0 and re.search(r'protocol\s*:\s*tls\b',check.stdout):variant_ready=True;break
      time.sleep(1)
-    result['protocolVariants'][variant]=probe(ip,tls12=True) if variant_ready else {'error':'transport_not_loaded'}
+    if variant_ready:
+     for command in ['pjproject set log level 6','core set debug 5']:required(['docker','exec',name,'asterisk','-rx',command])
+    result['credentialVariants'][variant]=probe(ip,tls12=True) if variant_ready else {'error':'transport_not_loaded'}
+    logs=subprocess.run(['docker','logs','--tail','400',name],capture_output=True,text=True,timeout=10)
+    log=logs.stdout+logs.stderr
+    result['credentialVariants'][variant]['debugSignals']={label:bool(re.search(pattern,log,re.I)) for label,pattern in {
+     'ecdhInitialized':'SSL ECDH initialized','caLoaded':'CA certificates loaded','caReadError':'Error reading CA certificates','certificateReadError':'Error.*(?:certificate|private key)',
+     'handshakeError':'SSL_ERROR|handshake.*fail','connectionAccepted':'Accepted.*(?:TLS|connection)|new TCP connection','tlsLogPresent':'TLS|SSL'}.items()}
+    process=json.loads(required(['docker','inspect',name]))[0]['State']['Pid']
+    waits={}
+    for task in Path('/proc/'+str(process)+'/task').iterdir():
+     try:wait=(task/'wchan').read_text().strip()
+     except OSError:continue
+     if re.fullmatch(r'[a-zA-Z0-9_]{1,80}',wait):waits[wait]=waits.get(wait,0)+1
+    result['credentialVariants'][variant]['threadWaitCounts']=waits
    result['straceAvailable']=bool(shutil.which('strace'))
    return result
   finally:

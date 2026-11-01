@@ -1678,8 +1678,7 @@ function SyllabusUploadStatus({
     >
       <h2 className="text-xl font-black">Your syllabus and course status</h2>
       <p className="mt-2 text-sm text-slate-700">
-        A syllabus upload is submitted for review. A course must be created, checked, and published
-        separately before students can use it.
+        A syllabus upload is submitted for review. Course Builder creates secondary instruction from a saved syllabus. Students receive it after the completed course passes publication checks.
       </p>
       <div className="mt-4 space-y-3">
         {syllabi.map((row) => {
@@ -1723,7 +1722,7 @@ function SyllabusUploadStatus({
                   </p>
                 </div>
               ))}
-              {row.description?.includes('"kind":"holder_syllabus"') && <SyllabusBuildRetry documentId={row.id} />}
+              {!linked.some((course) => course.build?.published) && row.status !== 'rejected' && <SyllabusBuildRetry documentId={row.id} needsProgram={!row.description?.includes('"kind":"holder_syllabus"')} />}
               {row.rejection_reason && (
                 <p className="mt-2 text-amber-900">Reviewer feedback: {row.rejection_reason}</p>
               )}
@@ -1740,8 +1739,7 @@ function SyllabusUploadStatus({
         })}
       </div>
       <p className="mt-3 text-sm text-slate-700">
-        An existing program course does not mean your uploaded syllabus was converted. Contact
-        Office Mail for the review or course creation update.
+        An existing program course does not mean your uploaded syllabus was converted. Use Build secondary course from saved syllabus above to start it, or retry a saved build.
       </p>
     </section>
   );

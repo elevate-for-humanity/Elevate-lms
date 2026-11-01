@@ -184,7 +184,8 @@ export default async function PartnersPage() {
               <p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-300">
                 Production source of truth
               </p>
-              <h1 className="mt-1 text-2xl font-black">Host Shop readiness and onboarding</h1>
+              <Link href="/host-shop-finance" className="mb-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 font-bold text-white">Review Host Shop finance requests</Link>
+            <h1 className="mt-1 text-2xl font-black">Host Shop readiness and onboarding</h1>
               <p className="mt-1 max-w-3xl text-sm text-slate-300">
                 Completion is calculated from account links, canonical shop records, accepted
                 documents, MOU, and onboarding. Database flags alone cannot mark a shop complete.

@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function GET() {
   const { db, partner } = await requireCurrentHostShopPartner();
-  const result = await db.from('partner_documents').select('id,document_type,file_name,status,created_at')
+  const result = await db.from('partner_documents').select('id,document_type,file_name,status,notes,created_at')
     .eq('partner_id', partner.id).in('document_type', TYPES).order('created_at', { ascending: false }).limit(30);
   if (result.error) return NextResponse.json({error:'Finance requests could not load.'},{status:503});
   return NextResponse.json({requests:result.data});

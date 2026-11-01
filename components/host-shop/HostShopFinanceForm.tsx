@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, type FormEvent } from 'react';
-type RequestRow = {id:string; file_name:string; status:string};
+type RequestRow = {id:string; file_name:string; status:string; notes?:string|null};
 export default function HostShopFinanceForm() {
   const [rows,setRows]=useState<RequestRow[]>([]),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
   async function load(){
@@ -50,7 +50,7 @@ export default function HostShopFinanceForm() {
     <h3 className="font-bold">Saved finance requests</h3>
     {!rows.length?<p className="text-sm text-slate-600">No saved requests.</p>:<ul className="divide-y">{rows.map(row=><li key={row.id} className="flex flex-wrap justify-between gap-3 py-3">
       <button type="button" onClick={()=>void view(row.id)} className="min-h-11 break-all font-bold underline">{row.file_name}</button>
-      <span className="text-sm capitalize">{row.status}</span>
+      <div className="text-sm"><span className="capitalize">{row.status}</span>{row.notes && <p className="mt-1">Review note: {row.notes}</p>}</div>
     </li>)}</ul>}
   </section>;
 }

@@ -16,6 +16,7 @@ export default async function PartnerInvoicesPage() {
   const byUser = new Map((holders || []).map((holder: any) => [holder.user_id, holder]));
   return <main className="space-y-5 p-4 sm:p-8">
     <Link href="/payout-queue" className="font-bold text-blue-800 underline">Payment queue</Link>
+    <Link href="/host-shop-finance" className="inline-flex min-h-11 items-center font-bold text-blue-800 underline">Host Shop invoices, reimbursements &amp; billing corrections</Link>
     <h1 className="text-3xl font-black">Partner invoices</h1>
     <p>Review the invoice, student completion, agreement, scheduled amount and previous payments before paying. An approved document is not a payment confirmation.</p>
     {error || holderError ? <p role="alert">Invoice records could not load. Refresh before reviewing payments.</p> :

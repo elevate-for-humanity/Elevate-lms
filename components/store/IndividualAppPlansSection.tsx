@@ -1,5 +1,6 @@
 'use client';
 
+import InlineStoreDemo from './InlineStoreDemo';
 import { useState } from 'react';
 import { storeSignInHref } from '@/lib/store/sign-in-return.mjs';
 import Link from 'next/link';
@@ -148,6 +149,17 @@ export function IndividualAppPlansSection({ catalog }: Props) {
                   <span className="text-4xl font-bold">${plan.priceMonthly}</span>
                   <span className={popular ? 'text-brand-blue-100' : 'text-slate-600'}>/mo</span>
                 </div>
+                <InlineStoreDemo
+                  name={`${catalog.displayName} · ${plan.name}`}
+                  href={`/store/demo/apps/${catalog.slug}?plan=${plan.id}`}
+                  poster={
+                    catalog.slug === 'grants'
+                      ? '/images/store-commercials/grants.webp'
+                      : catalog.slug === 'sam-gov'
+                        ? '/images/store-commercials/sam-gov.webp'
+                        : '/images/store-commercials/website-builder.webp'
+                  }
+                />
                 <ul className="mb-8 flex-1 space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">

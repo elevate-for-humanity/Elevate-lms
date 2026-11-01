@@ -45,14 +45,7 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4">{addon.description}</p>
-                <InlineStoreDemo
-                  name={addon.name}
-                  href={
-                    capability
-                      ? `/store/demo/capability/${capability.key}`
-                      : `/store/demo/offer/${addon.slug}`
-                  }
-                />
+                <InlineStoreDemo name={addon.name} href={`/store/demo/offer/${addon.slug}`} />
                 {addon.usageNote && (
                   <p className="text-xs text-slate-500 mb-3">{addon.usageNote}</p>
                 )}

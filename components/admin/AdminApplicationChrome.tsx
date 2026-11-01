@@ -1,5 +1,7 @@
 'use client';
 
+import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
+
 import { usePathname, useSearchParams } from 'next/navigation';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
 import { AdminMobileDock } from '@/components/admin/AdminMobileDock';
@@ -52,6 +54,7 @@ export function AdminApplicationChrome({
       >
         {children}
       </main>
+      {!pathname.endsWith('/phone') ? <DashboardVideoCalls /> : null}
       {!studioOwnsViewport ? <AdminMobileDock /> : null}
     </div>
   );

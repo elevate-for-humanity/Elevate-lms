@@ -1,5 +1,7 @@
 'use client';
 
+import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
+
 import { PortalToolSearch } from './PortalToolSearch';
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -486,6 +488,7 @@ export function PlatformShell({
           </div>
         </main>
       </div>
+      {!['program_holder', 'site_coordinator', 'student', 'apprentice'].includes(role) ? <DashboardVideoCalls /> : null}
       {paris !== false ? (
         /* PlatformShell is the single PARIS owner for authenticated dashboards. */
         <ParisFloatingWrapper

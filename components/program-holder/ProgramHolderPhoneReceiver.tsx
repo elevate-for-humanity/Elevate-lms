@@ -1,5 +1,7 @@
 'use client';
 
+import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
+
 import {
   createPhoneClient,
   type PhoneCall as BrowserPhoneCall,
@@ -228,6 +230,7 @@ export function ProgramHolderPhoneReceiver() {
   if (phonePage) return null;
   return (
     <>
+      <DashboardVideoCalls />
       <audio ref={audioRef} autoPlay playsInline />
       {online && state === 'idle' ? (
         <Link

@@ -39,6 +39,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
     (workspaceTenantId === tenantId || (platformAdmin && workspaceTenantId === null));
   if (
     !room ||
+    room.room_key.startsWith('direct-video-') ||
     !canAccessWorkspace ||
     workspace?.status !== 'active' ||
     room.status === 'cancelled'

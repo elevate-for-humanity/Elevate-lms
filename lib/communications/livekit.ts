@@ -83,3 +83,10 @@ export async function createMeetingToken(input: {
   });
   return { token: await token.toJwt(), serverUrl: config.url, canShare: input.canPublish && input.canShare };
 }
+
+/** Disconnect all participants when a direct dashboard call ends. */
+export async function endLiveKitRoom(roomName: string) {
+  const config = credentials();
+  const service = new RoomServiceClient(config.url, config.apiKey, config.apiSecret);
+  await service.deleteRoom(roomName);
+}

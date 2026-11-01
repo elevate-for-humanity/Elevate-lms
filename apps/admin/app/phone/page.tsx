@@ -1,3 +1,4 @@
+import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 import { DestinationControls } from './DestinationControls';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -206,6 +207,7 @@ export default async function PhonePage() {
 
   return (
     <main className="space-y-6 bg-slate-50 p-4 sm:p-6">
+      <DashboardVideoCalls dialPad />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-black uppercase tracking-widest text-orange-600">

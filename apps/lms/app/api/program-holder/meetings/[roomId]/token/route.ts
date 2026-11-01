@@ -28,6 +28,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
     : { data: null };
   if (
     !room ||
+    room.room_key.startsWith('direct-video-') ||
     room.status === 'cancelled' ||
     (room.host_profile_id !== ctx.user.id && !participant)
   ) {

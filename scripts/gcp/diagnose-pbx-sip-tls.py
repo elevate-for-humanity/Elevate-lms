@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Read-only transport diagnosis. Never emit certificates, keys or raw logs."""
-import json,re,socket,ssl,subprocess
+import json,re,socket,ssl,subprocess,hashlib,os,tempfile,shutil,time
+from pathlib import Path
 
 def run(args):
  r=subprocess.run(args,capture_output=True,text=True,timeout=20)
@@ -18,6 +19,74 @@ def probe(host):
  except TimeoutError:return {'stage':stage,'error':'timeout'}
  except ConnectionRefusedError:return {'stage':stage,'error':'refused'}
  except OSError:return {'stage':stage,'error':'network_unavailable'}
+
+def trusted_gateway_pair():
+ with socket.create_connection(('127.0.0.1',443),timeout=5) as raw:
+  with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
+   fingerprint=hashlib.sha256(secure.getpeercert(binary_form=True)).hexdigest()
+ matches=[]
+ for cert in Path('/var/lib/elevate-pbx-tls/data/caddy/certificates').glob('*/phone.elevateforhumanity.org/phone.elevateforhumanity.org.crt'):
+  pem=re.search(r'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----',cert.read_text(),re.S)
+  key=cert.with_suffix('.key')
+  if pem and key.is_file() and not cert.is_symlink() and not key.is_symlink() and hashlib.sha256(ssl.PEM_cert_to_DER_cert(pem[0])).hexdigest()==fingerprint:
+   matches.append((cert,key))
+ if len(matches)!=1:raise ValueError('trusted_pair_unverified')
+ return matches[0]
+
+def isolated_config(text):
+ pattern=r'(?ms)(^\[elevate-twilio-tls\]\s*\n)(.*?)(?=^\[|\Z)'
+ match=re.search(pattern,text)
+ if not match:raise ValueError('transport_unverified')
+ body=match[2]
+ for key,value in [('cert_file','/etc/asterisk/tls/phone.crt'),('priv_key_file','/etc/asterisk/tls/phone.key')]:
+  body=re.sub(r'^'+key+r'=.*\n?', '',body,flags=re.M).rstrip()+'\n'+key+'='+value+'\n'
+ return text[:match.start(2)]+body+text[match.end(2):]
+
+def isolated_diagnosis():
+ name='elevate-sip-tls-readonly-probe';network=name+'-internal'
+ root=Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
+ inspect=subprocess.run(['docker','inspect','pbx_asterisk_1'],capture_output=True,text=True,timeout=10)
+ live=json.loads(inspect.stdout)[0]
+ mounts=[m for m in live.get('Mounts',[]) if m.get('Destination')=='/etc/asterisk']
+ if not live.get('State',{}).get('Running') or len(mounts)!=1 or mounts[0].get('Source')!=str(root) or mounts[0].get('Type')!='bind':raise ValueError('mount_unverified')
+ if any(p.is_symlink() for p in root.rglob('*')):raise ValueError('config_symlink_rejected')
+ for kind,target in [('container',name),('network',network)]:
+  if subprocess.run(['docker',kind,'inspect',target],capture_output=True,timeout=10).returncode==0:raise ValueError('prior_probe_requires_review')
+ pair=trusted_gateway_pair()
+ with tempfile.TemporaryDirectory(prefix='elevate-isolated-sip-',dir='/var/tmp') as directory:
+  staging=Path(directory)/'asterisk';shutil.copytree(root,staging)
+  for copied in [staging,*staging.rglob('*')]:
+   source=root/copied.relative_to(staging);info=source.stat();os.chown(copied,info.st_uid,info.st_gid)
+  fragment=staging/'elevate-twilio.conf';fragment.write_text(isolated_config(fragment.read_text()))
+  gid=int(subprocess.run(['docker','exec','pbx_asterisk_1','id','-g','asterisk'],capture_output=True,text=True,check=True,timeout=10).stdout.strip())
+  (staging/'tls').mkdir(exist_ok=True)
+  os.chown(staging/'tls',0,gid);os.chmod(staging/'tls',0o750)
+  for source,filename in zip(pair,['phone.crt','phone.key']):
+   target=staging/'tls'/filename;shutil.copy2(source,target);os.chown(target,0,gid);os.chmod(target,0o640)
+  created=False;network_created=False
+  def required(args):
+   result=subprocess.run(args,capture_output=True,text=True,timeout=25)
+   if result.returncode:raise ValueError('isolated_command_failed')
+   return result.stdout
+  try:
+   required(['docker','network','create','--internal','--driver=bridge',network]);network_created=True
+   required(['docker','run','-d','--name',name,'--network='+network,'--restart=no','--add-host','elevate-4632401404.pstn.twilio.com:127.0.0.1','-v',str(staging)+':/etc/asterisk:ro','--entrypoint','asterisk',live['Image'],'-f','-C','/etc/asterisk/asterisk.conf']);created=True
+   ready=False
+   for _ in range(15):
+    result=subprocess.run(['docker','exec',name,'asterisk','-rx','pjsip show transport elevate-twilio-tls'],capture_output=True,text=True,timeout=5)
+    if result.returncode==0 and re.search(r'protocol\s*:\s*tls\b',result.stdout):ready=True;break
+    time.sleep(1)
+   instance=json.loads(required(['docker','inspect',name]))[0]
+   ip=instance['NetworkSettings']['Networks'][network]['IPAddress']
+   import ipaddress
+   if not ipaddress.ip_address(ip).is_private:raise ValueError('probe_network_unverified')
+   result={'sameRunningImage':instance['Image']==live['Image'],'internalNetworkOnly':True,'publishedPorts':bool(instance.get('HostConfig',{}).get('PortBindings')),'transportLoaded':ready,'handshake':probe(ip) if ready else {'error':'transport_not_loaded'}}
+   logs=subprocess.run(['docker','logs','--tail','200',name],capture_output=True,text=True,timeout=10)
+   result['logSignals']={key:bool(re.search(pattern,logs.stdout+logs.stderr,re.I)) for key,pattern in {'noSharedCipher':'no shared cipher','certificateLoadError':'Unable to load.*(?:cert|key)','permissionDenied':'Permission denied','configLoadError':'Could not create an object|Error parsing'}.items()}
+   return result
+  finally:
+   if created:required(['docker','rm','-f',name])
+   if network_created:required(['docker','network','rm',network])
 
 def main():
  cli=lambda v:run(['docker','exec','pbx_asterisk_1','asterisk','-rx',v])
@@ -43,7 +112,9 @@ def main():
  patterns={**patterns_extra,'certificateLoadError':r'Unable to load.*(?:cert|key)|SSL.*(?:cert|key).*error',
   'handshakeTimeout':r'TLS.*(?:timeout|timed out)|SSL.*(?:timeout|timed out)',
   'bindError':r'Unable to bind|Address already in use', 'tlsError':r'TLS|SSL'}
- print(json.dumps({'readOnly':True,'configurationChanged':False,'transportSettings':settings,
+ try:isolated=isolated_diagnosis()
+ except Exception as error:isolated={'error':str(error) if isinstance(error,ValueError) and re.fullmatch('[a-z_]+',str(error)) else 'isolated_diagnosis_unavailable'}
+ print(json.dumps({'isolatedTls':isolated,'readOnly':True,'configurationChanged':False,'transportSettings':settings,
   'tlsFileChecks':file_checks,'tcpListeners':binds,'loopback':probe('127.0.0.1'),
   'logSignals':{key:bool(re.search(pattern,logs,re.I)) for key,pattern in patterns.items()}}))
 if __name__=='__main__':main()

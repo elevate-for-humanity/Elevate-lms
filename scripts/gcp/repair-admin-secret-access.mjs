@@ -23,12 +23,16 @@ export async function repairAdminSecretAccess({token,request=fetch,apply=false}=
   const response=await request(`https://cloudbilling.googleapis.com/v1/projects/${PROJECT}/billingInfo`,{headers:{Authorization:`Bearer ${token}`},redirect:'error',signal:AbortSignal.timeout(15000)});
   const body=await response.json();
   billing={http:response.status,verified:response.ok,billingEnabled:response.ok&&typeof body.billingEnabled==='boolean'?body.billingEnabled:null,accountLinked:response.ok?Boolean(body.billingAccountName):null};
+  if(response.ok&&/^billingAccounts\/[A-Za-z0-9-]+$/.test(body.billingAccountName||'')){
+   const account=await request(`https://cloudbilling.googleapis.com/v1/${body.billingAccountName}`,{headers:{Authorization:`Bearer ${token}`},redirect:'error',signal:AbortSignal.timeout(15000)});
+   const details=await account.json();billing.accountReadHttp=account.status;billing.accountOpen=account.ok&&typeof details.open==='boolean'?details.open:null;
+  }
  }catch{billing={verified:false};}
  async function call(resource,payload){
   const response=await request(`https://secretmanager.googleapis.com/v1/projects/${PROJECT}/secrets/${resource}`,{method:payload?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:payload?JSON.stringify(payload):undefined,redirect:'error',signal:AbortSignal.timeout(15000)});
   const body=await response.json();
   const info=body.error?.details?.find(d=>d['@type']==='type.googleapis.com/google.rpc.ErrorInfo');
-  return {response,body,safe:{http:response.status,status:body.error?.status,reason:/^[A-Z_]{1,100}$/.test(info?.reason||'')?info.reason:undefined,permission:PERMISSIONS.includes(info?.metadata?.permission)?info.metadata.permission:undefined}};
+  return {response,body,safe:{http:response.status,status:body.error?.status,reason:/^[A-Z_]{1,100}$/.test(info?.reason||'')?info.reason:undefined,permission:PERMISSIONS.includes(info?.metadata?.permission)?info.metadata.permission:undefined,consumer:/^projects\/[0-9]+$/.test(info?.metadata?.consumer||'')?info.metadata.consumer:undefined,service:/^[a-z]+\.googleapis\.com$/.test(info?.metadata?.service||'')?info.metadata.service:undefined}};
  }
  for(const secret of TARGETS){
   const probe=await call(secret+':testIamPermissions',{permissions:PERMISSIONS});

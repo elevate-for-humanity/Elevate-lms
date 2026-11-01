@@ -10,6 +10,7 @@ import { probePlatformService } from './service-probe';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { setAuditContext } from '@/lib/audit-context';
+import { purgeCloudflareCache } from './cloudflare';
 
 const execAsync = promisify(exec);
 
@@ -331,30 +332,7 @@ async function runGapScan(): Promise<Record<string, unknown>> {
 }
 
 async function clearCloudflareCache(): Promise<Record<string, unknown>> {
-  const cloudflareToken = process.env.CLOUDFLARE_API_TOKEN;
-  if (!cloudflareToken) {
-    throw new Error('Cloudflare API token not configured');
-  }
-
-  try {
-    const response = await fetch('https://api.cloudflare.com/client/v4/purge_cache', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${cloudflareToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ purge_everything: true }),
-    });
-
-    const data = await response.json();
-    if (!data.success) {
-      throw new Error(data.errors?.[0]?.message || 'Cache clear failed');
-    }
-
-    return { status: 'success', message: 'Cache cleared' };
-  } catch (error) {
-    const e = new Error(`Cloudflare cache clear failed: ${error instanceof Error ? error.message : 'Unknown'}`); (e as { cause?: unknown }).cause = error; throw e;
-  }
+  return purgeCloudflareCache();
 }
 
 async function createGitHubPR(parameters: Record<string, unknown>): Promise<Record<string, unknown>> {

@@ -409,7 +409,11 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
     try{return JSON.parse(line)?.workspace==='course';}catch{return false;}
   }) && !/\b(code|repository|github|component|typescript|route|layout|api endpoint)\b/i.test(
     goal.split('\n').filter(line=>{try{return JSON.parse(line)?.workspace!=='course';}catch{return true;}}).join('\n'));
-  const g = affirmativeActionText(goal).toLowerCase();
+  const instruction = goal.split('\n').filter(line => {
+    try { return JSON.parse(line)?.workspace !== 'course'; } catch { return true; }
+  }).join('\n');
+  const g = affirmativeActionText(instruction).toLowerCase();
+  const requestedPrograms = [...new Set(instruction.toLowerCase().match(/\b[a-z0-9]+(?:-[a-z0-9]+)*-apprenticeship\b/g) ?? [])];
   const explicitReadOnly = isReadOnlyRequest(goal);
   const explicitReadOnlyStudioDiagnostic =
     explicitReadOnly &&
@@ -432,7 +436,16 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       ? /\b(audit|inspect|diagnostic|status|health)\b/.test(g)
       : /\b(audit|inspect|diagnose)\b/.test(g) &&
         !/\b(fix|repair|start|resume|publish|generate|create|build)\b/.test(g));
-  if (courseAudit && scopedCourseGoal) {
+  if (!explicitReadOnly && requestedPrograms.length > 1 &&
+      /\b(build|create|generate|start|resume|complete|finish)\b/.test(g)) {
+    // Each explicit program receives its own durable result. Never send a
+    // multi-course request to the one-course adapter or inherit sidebar IDs.
+    steps = requestedPrograms.map((slug, index) => ({
+      id: `s${index + 1}`, order: index + 1, title: `Build ${slug}`,
+      command: `Build course. Target programSlug=${slug}. Apply the following requirements only to this target; other named programs have separate steps.\n${instruction}`,
+      status: 'pending' as const, expected_output: 'Saved build and actual worker admission for this program', max_attempts: 1,
+    }));
+  } else if (courseAudit && scopedCourseGoal) {
     steps=[{id:'s1',order:1,title:'Inspect selected course',command:goal,status:'pending',expected_output:'Selected course execution evidence',max_attempts:1}];
   } else if (courseAudit) {
     steps = GOAL_TEMPLATES.read_only_course_audit!({});

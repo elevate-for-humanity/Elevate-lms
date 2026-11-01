@@ -135,7 +135,10 @@ export function planAIToolFromCommand(
     context={...context,courseId:context.courseId??validId(workspace.courseId),
       lessonId:context.lessonId??validId(workspace.lessonId),buildId:context.buildId??validId(workspace.buildId)};
   }
-  const lower = command.toLowerCase();
+  const instruction = command.split('\n').filter(line => {
+    try { return JSON.parse(line)?.workspace !== 'course'; } catch { return true; }
+  }).join('\n');
+  const lower = instruction.toLowerCase();
   if (lower.trim() === 'inspect course builder health checks') {
     return { name: 'courses.health', input: {} };
   }
@@ -150,7 +153,7 @@ export function planAIToolFromCommand(
     return { name: 'system.health', input: {} };
   }
   const contextId = typeof context.id === 'string' ? context.id : null;
-  const id = contextId ?? extractUuid(command);
+  const id = contextId ?? extractUuid(instruction);
 
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
@@ -187,7 +190,6 @@ export function planAIToolFromCommand(
   const selectedCourseId = typeof context.courseId==='string' ? context.courseId : workspace?.courseId;
   const selectedLessonId = typeof context.lessonId==='string' ? context.lessonId : workspace?.lessonId;
   const selectedBuildId = typeof context.buildId==='string' ? context.buildId : workspace?.buildId;
-  const instruction=command.split('\n').filter(line=>{try{return JSON.parse(line)?.workspace!=='course';}catch{return true;}}).join('\n');
   if(selectedCourseId && !isReadOnlyRequest(instruction) &&
     /\b(change|update|edit|rewrite|revise|improve)\b/i.test(instruction) &&
     !/\b(code|repository|github|component|typescript|route|layout|api endpoint)\b/i.test(instruction)) {
@@ -430,8 +432,11 @@ export function planAIToolFromCommand(
       input: {
         ...asAIRecord(context.toolInput),
         action: 'start',
-        goal: command,
-        ...(id ? { courseId: id } : {}),
+        goal: instruction,
+        ...(instruction.match(/\bTarget programSlug=([a-z0-9-]+)\b/)?.[1]
+          ? {programSlug: instruction.match(/\bTarget programSlug=([a-z0-9-]+)\b/)![1]} : {}),
+        ...((id ?? (/\b(?:this|selected|current|open|same)\s+course\b/i.test(instruction) ? selectedCourseId : null))
+          ? { courseId: id ?? selectedCourseId } : {}),
       },
     };
   }

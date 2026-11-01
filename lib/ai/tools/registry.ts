@@ -268,8 +268,9 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     allowedAgents: ['PARIS', 'ELLIE', 'LIZZY'],
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
     requiredInput: ['goal'],
-    approvalRequired: true,
-    confirmationPhrase: 'CONFIRM BUILD COURSE',
+    // An authenticated privileged administrator's build command authorizes
+    // draft generation; publication retains its separate release approval.
+    approvalRequired: false,
     idempotent: true,
     timeoutMs: 120_000,
     retryAttempts: 1,

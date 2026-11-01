@@ -18,7 +18,10 @@ const { middleware } = compile('apps/marketing/middleware.ts', {
   '@/lib/programs/withdrawn-programs.mjs': compile('lib/programs/withdrawn-programs.mjs'),
   '@/lib/health/public-runtime-service': identity,
   '@/lib/tenant/middleware-tenant-routing': routing,
-  '@/lib/routing/portal-map': compile('lib/routing/portal-map.ts', { '@/lib/rbac/role-matrix': compile('lib/rbac/role-matrix.ts') }),
+  '@/lib/routing/portal-map': compile('lib/routing/portal-map.ts', {
+    './lms-host': compile('lib/routing/lms-host.ts'),
+    '@/lib/rbac/role-matrix': compile('lib/rbac/role-matrix.ts'),
+  }),
   '@/lib/supabase/middleware': { createMiddlewareSupabaseClient: () => { throw new Error('Probe must not use authentication'); } },
 });
 for (const path of ['/programs/bookkeeping','/programs/financial-literacy','/apply/student?program=bookkeeping']) {

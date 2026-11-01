@@ -52,7 +52,9 @@ export async function HostShopPortalLauncher() {
     ((partnerData ?? []) as PartnerRow[]).map((partner) => [partner.id, partner]),
   );
   const isTestShop = (shop: ShopRow) => /^\[qa\b|\btest\b/i.test(String(shop.name || ''));
-  const operationalShops = shops.filter((shop) => !isTestShop(shop));
+  const isArchived = (shop: ShopRow) => shop.active === false || (shop.partner_id ? partners.get(shop.partner_id)?.is_active === false : false);
+  const operationalShops = shops.filter((shop) => !isTestShop(shop) && !isArchived(shop));
+  const archivedShops = shops.filter((shop) => !isTestShop(shop) && isArchived(shop));
   const testShops = shops.filter(isTestShop);
 
   const renderShop = (shop: ShopRow) => {
@@ -67,7 +69,7 @@ export async function HostShopPortalLauncher() {
       Boolean(partner) &&
       partner?.is_active !== false;
     const status =
-      shop.active === false
+      isArchived(shop)
         ? 'Archived'
         : !shop.partner_id
           ? 'Not connected'
@@ -101,9 +103,9 @@ export async function HostShopPortalLauncher() {
           {canOpen ? (
             <OpenHostShopPortalButton shopId={shop.id} />
           ) : (
-            <span className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-center text-sm font-bold text-slate-500">
-              Open shop portal to complete connection
-            </span>
+            <a href="/partners" className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-center text-sm font-bold text-slate-700">
+              Review shop connection
+            </a>
           )}
         </div>
       </article>
@@ -142,6 +144,12 @@ export async function HostShopPortalLauncher() {
           {operationalShops.map(renderShop)}
         </div>
       )}
+      {archivedShops.length ? (
+        <details className="border-t border-slate-200 p-4 sm:px-8">
+          <summary className="cursor-pointer text-sm font-black text-slate-700">Archived shops ({archivedShops.length})</summary>
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">{archivedShops.map(renderShop)}</div>
+        </details>
+      ) : null}
       {testShops.length ? (
         <details className="border-t border-slate-200 p-4 sm:px-8">
           <summary className="cursor-pointer text-sm font-black text-slate-700">

@@ -43,15 +43,16 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  const headers={apikey:token,Authorization:'Bearer '+token};
  const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
  const query=new URL(root);
- query.searchParams.set('select','id,status,available_at,heartbeat_at,lease_expires_at,execution_generation,attempts,max_attempts,last_error,payload,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
+ query.searchParams.set('select','id,status,available_at,heartbeat_at,lease_expires_at,execution_generation,attempts,max_attempts,last_error,payload,build:ultimate_course_builds!inner(status,owner_paused:profile->>ownerPaused)');
  query.searchParams.set('job_type','like.lesson_autopilot:*');
  query.searchParams.set('or','(and(status.eq.queued,available_at.lte.'+new Date(now.getTime()+300000).toISOString()+'),status.eq.running)');
  query.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
+ query.searchParams.set('build.status','in.(running,queued)');
  query.searchParams.set('order','priority.asc,available_at.asc,created_at.asc,id.asc');query.searchParams.set('limit','1000');
  const response=await request(query,{headers,signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw Error('ULTIMATE_AUTOPILOT_QUEUE_HTTP_'+response.status);
  const rows=await response.json();if(!Array.isArray(rows))throw Error('ULTIMATE_AUTOPILOT_QUEUE_INVALID');
- const eligible=rows.filter(j=>j.attempts<j.max_attempts && j.build?.owner_paused!==true && j.build?.owner_paused!=='true' &&
+ const eligible=rows.filter(j=>j.attempts<j.max_attempts && ['running','queued'].includes(j.build?.status) && j.build?.owner_paused!==true && j.build?.owner_paused!=='true' &&
   !/storage cap exceeded|COURSE_OBJECT_STORAGE_UPLOAD_FAILED|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED/i.test(j.last_error??''));
  // An empty queue needs no Google inventory calls. Infinite prerequisite waits
  // are excluded by available_at and cannot trigger a paid execution.

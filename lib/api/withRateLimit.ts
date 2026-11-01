@@ -111,8 +111,9 @@ export async function applyRateLimit(
   // A busy read-only endpoint must not exhaust the entire public site's
   // visitor allowance. Keep sensitive/write tiers aggregated per visitor.
   const routeBucket = ['public', 'pageLoad'].includes(effectiveTier)
-    ? pathname.replace(/\\/[0-9a-f]{8}-[0-9a-f-]{27,}/gi, '/:id')
-        .replace(/\\/\\d+(?=\\/|$)/g, '/:id').slice(0, 160)
+    ? pathname.split('/').map(segment =>
+        /^[0-9]{1,12}$/.test(segment) || /^[0-9a-f-]{36}$/i.test(segment) ? ':id' : segment
+      ).join('/').slice(0, 160)
     : '';
   const identifier = routeBucket ? visitor + ':route:' + routeBucket : visitor;
 

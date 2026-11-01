@@ -92,6 +92,7 @@ export default async function PendingHoursPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <Link href="/host-shop/dashboard/hours" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950"><ArrowLeft className="h-4 w-4" /> Back to hours</Link>
+      <Link href="/host-shop/dashboard/hours" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-5 py-3 font-bold text-white">Enter hours manually</Link>
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">{board.partner?.name || 'Host Shop'}</p><h1 className="mt-2 text-3xl font-black text-slate-950">Hours Awaiting Supervisor Review</h1><p className="mt-2 text-slate-600">Review submitted work hours for apprentices actively assigned to your salon. Confirm the work date, actual hours and supporting records before approval.</p></div><div className="rounded-full bg-amber-100 px-4 py-2 text-sm font-black text-amber-900">{rows.length} pending</div></div>
       {error ? <div className="mt-6 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /> Unable to load pending hour entries.</div> : null}
       {!error && rows.length === 0 ? (

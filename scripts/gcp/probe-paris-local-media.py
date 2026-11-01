@@ -34,7 +34,7 @@ def main():
   result=run_command(['iptables','-S',chain])
   iptables[chain]={'readable':result.returncode==0,'acceptPolicy':('-P '+chain+' ACCEPT') in result.stdout,'loopbackAccept':run_command(['iptables','-C',chain,flag,'lo','-j','ACCEPT']).returncode==0,'dropRuleCount':result.stdout.count('-j DROP')}
  rtp_settings=cli('rtp show settings')
- runtime={'firewall':iptables,'rtpSettings':{key:match[1].strip() for key in ['Strict RTP','Probation','Checksums'] if (match:=re.search(r'^\s*'+key+r':\s*(.+)$',rtp_settings,re.M))}}
+ runtime={'modulesLoaded':{name:bool(re.search(r'^'+re.escape(name)+r'\s',cli('module show like '+name),re.M)) for name in ['bridge_softmix.so','codec_ulaw.so','chan_rtp.so','res_rtp_asterisk.so']},'firewall':iptables,'rtpSettings':{key:match[1].strip() for key in ['Strict RTP','Probation','Checksums'] if (match:=re.search(r'^\s*'+key+r':\s*(.+)$',rtp_settings,re.M))}}
  try:
   pid=run_command(['docker','inspect','-f','{{.State.Pid}}','pbx_asterisk_1']).stdout.strip()
   runtime['asteriskUsesHostNetwork']=os.readlink('/proc/'+pid+'/ns/net')==os.readlink('/proc/self/ns/net')
@@ -77,12 +77,20 @@ def main():
   report={'localMediaProbe':True,'phoneCallsPlaced':0,'loopbackOnly':True,'framesSentPerChannel':100,'framesReceived':counts,'bridgeTechnology':ari('/bridges/'+bridge_id).get('technology'),'result':'PASS' if min(counts)>=80 else 'FAIL','runtime':runtime}
   print(json.dumps({'localMediaProbeStage':'simple','report':report}),flush=True)
   # Adding one exclusively owned loopback channel selects Asterisk's soft mixer.
-  phase='soft_media'
+  try:
+   ari('/channels/'+ids[0]+'/play','POST',media='sound:beep',playbackId=prefix+'-control')
+   print(json.dumps({'localMediaProbeStage':'playback','framesReceived':receive(sockets[0])}),flush=True)
+  except Exception:print(json.dumps({'localMediaProbeStage':'playback','unavailable':True}),flush=True)
+  phase='soft_create'
   cid=prefix+'-c';ids.append(cid)
   sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);sock.bind(('127.0.0.1',0));sock.settimeout(.1);sockets.append(sock)
   external=ari('/channels/externalMedia','POST',channelId=cid,app='elevate-paris',external_host='127.0.0.1:'+str(sock.getsockname()[1]),format='ulaw',direction='both',transport='udp',encapsulation='rtp',connection_type='client')
   created.append(cid)
   if external.get('id')!=cid:raise ValueError('PROBE_CHANNEL_MISMATCH')
+  phase='soft_add'
+  for _ in range(20):
+   if cid in ari('/applications/elevate-paris').get('channel_ids',[]):break
+   time.sleep(.1)
   ari('/bridges/'+bridge_id+'/addChannel','POST',channel=cid)
   with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
    results=[pool.submit(receive,s) for s in sockets[:2]]
@@ -119,5 +127,11 @@ def main():
 if __name__=='__main__':
  try:main()
  except Exception as error:
+  detail={}
+  if isinstance(error,urllib.error.HTTPError):
+   try:
+    body=error.read(4096).decode(errors='replace')
+    detail={'errorSignals':{key:key.lower() in body.lower() for key in ['Stasis','bridge','channel','transport','format','encapsulation','capacity','mixing','add','allocated']}}
+   except Exception:pass
   code=str(error) if isinstance(error,ValueError) and re.fullmatch('PROBE_[A-Z_]+',str(error)) else 'PROBE_UNAVAILABLE'
-  print(json.dumps({'localMediaProbe':True,'phoneCallsPlaced':0,'error':code,'phase':phase,**({'httpStatus':error.code} if isinstance(error,urllib.error.HTTPError) else {})}));raise SystemExit(1)
+  print(json.dumps({'localMediaProbe':True,'phoneCallsPlaced':0,'error':code,'phase':phase,**detail,**({'httpStatus':error.code} if isinstance(error,urllib.error.HTTPError) else {})}));raise SystemExit(1)

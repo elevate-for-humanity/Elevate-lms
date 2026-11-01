@@ -13,6 +13,7 @@ def main():
  for path in ['/var/log/asterisk/messages','/var/log/asterisk/messages.log','/var/log/asterisk/full','/var/log/asterisk/full.log']:
   logs+=run(['docker','exec','pbx_asterisk_1','tail','-n','500',path])
  signals={label:len(re.findall(pattern,logs,re.I)) for label,pattern in {
+  'iceReceiveFailure':r'PJ ICE Rx error|ICE PJ Rx error','rtpUnknownCodec':r'Unknown RTP codec','rtpUnsupportedMedia':r'Unknown or unsupported media type',
   'srtpFailure':r'(?:SRTP|crypto).{0,100}(?:fail|error|not|unable)',
   'tlsFailure':r'(?:TLS|SSL).{0,100}(?:fail|error|timeout)',
   'endpointUnmatched':r'No matching endpoint','authenticationFailure':r'Failed to authenticate',

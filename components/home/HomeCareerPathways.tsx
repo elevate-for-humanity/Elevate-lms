@@ -5,14 +5,13 @@ import { ArrowRight } from 'lucide-react';
 
 const PATHWAYS = [
   {
-    slug: 'beauty-barber-network',
-    title: 'Beauty & Barber Network',
-    description:
-      'Train in real professional environments and explore barber, cosmetology, esthetics, and nail pathways.',
-    image: '/images/programs/refresh-20261101/beauty.webp',
-    imageAlt: 'Illustrative beauty instructor guiding supervised salon practice',
-    ctaHref: '/apprenticeships',
-    cta: 'Explore Beauty & Barber',
+    slug: 'all-programs',
+    title: 'Find your next pathway',
+    description: 'Discover hands-on programs and the support to take your next step.',
+    image: '/images/programs/hvac/training-20261029/career.webp',
+    imageAlt: 'Illustrative HVAC technician prepared for hands-on work',
+    ctaHref: '/programs',
+    cta: 'View all programs',
   },
   {
     slug: 'cdl-training',
@@ -68,12 +67,19 @@ export function HomeCareerPathways() {
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-2xl"
             >
               <Link href={p.ctaHref} className="flex h-full flex-col">
-                <div data-home-card-image className="relative aspect-[16/9] shrink-0 overflow-hidden bg-slate-100">
+                <div
+                  data-home-card-image
+                  className="relative aspect-[16/9] shrink-0 overflow-hidden bg-slate-100"
+                >
                   <Image
                     src={p.image}
                     alt={p.imageAlt}
                     fill
-                    className="object-cover object-center transition duration-500 "
+                    className={
+                      p.slug === 'all-programs'
+                        ? 'object-contain object-center'
+                        : 'object-cover object-center transition duration-500'
+                    }
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                     loading="lazy"
                   />

@@ -59,6 +59,7 @@ export function HomeFeaturedHostShop() {
   return (
     <section
       className="bg-white px-4 py-8 sm:py-12"
+      id="barber-beauty-network"
       aria-labelledby="featured-host-shop-heading"
       data-scroll-narration
       data-narration="Host Shops are working barbershops and salons where apprentices build hands-on skills with licensed supervision. Elevate supports instruction and training records. Explore a shop or join the network. Placement and availability are confirmed during enrollment."
@@ -72,13 +73,113 @@ export function HomeFeaturedHostShop() {
           id="featured-host-shop-heading"
           className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-4xl"
         >
-          Real shops. Real experience.
+          Barber &amp; Beauty Apprenticeships
         </h2>
         <p className="mt-3 max-w-2xl text-base leading-6 text-slate-700">
           Host Shops are working barbershops and salons where apprentices build hands-on skills with
           licensed supervision. Elevate supports instruction and training records. Explore a shop or
           join the network; placement and availability are confirmed during enrollment.
         </p>
+        <div
+          data-beauty-programs
+          className="mt-6 grid grid-cols-1 auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          {[
+            {
+              name: 'Barber Apprenticeship',
+              label: 'Barber careers',
+              image: '/images/partners/host-shop-mentoring-premium-2026.webp',
+              alt: 'Illustrative barber instructor mentoring an apprentice',
+              href: '/programs/barber-apprenticeship',
+              text: 'Build barbering, sanitation and client care skills with supervised shop experience.',
+              action: 'Explore barbering',
+            },
+            {
+              name: 'Cosmetology Apprenticeship',
+              label: 'Hair and beauty careers',
+              image: '/images/programs/refresh-20261101/beauty.webp',
+              alt: 'Illustrative cosmetology instructor guiding salon practice',
+              href: '/programs/cosmetology-apprenticeship',
+              text: 'Connect related instruction with supervised hair and beauty training in a host salon.',
+              action: 'Explore cosmetology',
+            },
+            {
+              name: 'Esthetics Apprenticeship',
+              label: 'Skincare careers',
+              image: '/images/programs/esthetician-host-recruitment-2026.webp',
+              alt: 'Illustrative esthetics instructor mentoring adult apprentices',
+              href: '/programs/esthetician-apprenticeship',
+              text: 'Build skincare, sanitation and client care skills through supervised practice.',
+              action: 'Explore esthetics',
+            },
+            {
+              name: 'Nail Technician Apprenticeship',
+              label: 'Nail careers',
+              image: '/images/refresh-20261014/nail.webp',
+              alt: 'Illustrative nail technician training',
+              href: '/programs/nail-technician-apprenticeship',
+              text: 'Explore nail services, manicuring, sanitation and professional client care.',
+              action: 'Explore nail technology',
+            },
+          ].map((card) => (
+            <article
+              key={card.name}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-sky-50"
+            >
+              <Link
+                href={card.href}
+                className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
+              >
+                <div
+                  data-home-card-image
+                  className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white"
+                >
+                  <Image
+                    src={card.image}
+                    alt={card.alt}
+                    fill
+                    sizes="(min-width: 1024px) 368px, (min-width: 640px) 50vw, 100vw"
+                    loading="lazy"
+                    className="object-contain object-center"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-3 sm:p-4">
+                  <p className="text-xs font-semibold text-brand-red-700">{card.label}</p>
+                  <h3 className="mt-1 text-base font-bold leading-snug text-slate-950 sm:text-lg">
+                    {card.name}
+                  </h3>
+                  <p className="mt-3 text-sm leading-5 text-slate-700">{card.text}</p>
+                  <span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm font-bold text-brand-red-700">
+                    {card.action} <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            </article>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-slate-950">Own a barbershop or salon?</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-700">
+              Mentor an apprentice and join our Barber &amp; Beauty Host Shop network.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <Link
+              href="/partners/host-shops"
+              className="inline-flex min-h-11 items-center rounded-xl bg-brand-red-700 px-5 py-3 text-sm font-bold text-white hover:bg-brand-red-800"
+            >
+              Join as a Host Shop
+            </Link>
+            <Link
+              href="/barber-and-beauty-apprenticeship"
+              className="inline-flex min-h-11 items-center px-3 py-3 text-sm font-bold text-brand-red-700"
+            >
+              Explore Barber &amp; Beauty <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+        <h3 className="mt-8 text-xl font-bold text-slate-950">Meet our Host Shops</h3>
         <div
           data-featured-shops
           className="mt-6 grid grid-cols-1 auto-rows-fr items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6"
@@ -93,7 +194,10 @@ export function HomeFeaturedHostShop() {
                 href={shop.shopHref}
                 className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
               >
-                <div data-home-card-image className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
+                <div
+                  data-home-card-image
+                  className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white"
+                >
                   <Image
                     src={shop.image}
                     alt={shop.imageAlt}
@@ -120,89 +224,7 @@ export function HomeFeaturedHostShop() {
               </Link>
             </article>
           ))}
-          {[
-            {
-              name: 'Become a Host Shop',
-              label: 'For shop owners',
-              image: '/images/partners/generations-hair/salon-service.webp',
-              alt: 'Stylist working with a client in a salon',
-              href: '/partners/host-shops',
-              text: 'Grow your team by mentoring an apprentice. Apply free to join the network.',
-              action: 'Join the network',
-            },
-            {
-              name: 'Esthetics Apprenticeship',
-              label: 'Skincare careers',
-              image: '/images/programs/esthetician-host-recruitment-2026.webp',
-              alt: 'Illustrative esthetics instructor mentoring adult apprentices',
-              href: '/programs/esthetician-apprenticeship',
-              text: 'Build skincare, sanitation and client care skills through supervised practice.',
-              action: 'Explore esthetics',
-            },
-            {
-              name: 'Nail Technician Apprenticeship',
-              label: 'Nail careers',
-              image: '/images/refresh-20261014/nail.webp',
-              alt: 'Illustrative nail technician training',
-              href: '/programs/nail-technician-apprenticeship',
-              text: 'Explore nail services, manicuring, sanitation and professional client care.',
-              action: 'Explore nail technology',
-            },
-            {
-              name: 'Find your next pathway',
-              label: 'Career training',
-              image: '/images/programs/hvac/training-20261029/career.webp',
-              alt: 'Illustrative HVAC technician prepared for hands-on work',
-              href: '/programs',
-              text: 'Discover hands-on programs and the support to take your next step.',
-              action: 'View all programs',
-            },
-          ].map((card) => (
-            <article
-              key={card.name}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-sky-50"
-            >
-              <Link
-                href={card.href}
-                className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
-              >
-                <div data-home-card-image className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
-                  <Image
-                    src={card.image}
-                    alt={card.alt}
-                    fill
-                    sizes="(min-width: 1024px) 368px, (min-width: 640px) 50vw, 100vw"
-                    loading="lazy"
-                    className="object-cover object-center"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col p-3 sm:p-4">
-                  <p className="text-xs font-semibold text-brand-red-700">{card.label}</p>
-                  <h3 className="mt-1 text-base font-bold leading-snug text-slate-950 sm:text-lg">
-                    {card.name}
-                  </h3>
-                  <p className="mt-3 text-sm leading-5 text-slate-700">{card.text}</p>
-                  <span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm font-bold text-brand-red-700">
-                    {card.action} <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  </span>
-                </div>
-              </Link>
-            </article>
-          ))}
         </div>
-        <Link
-          href="/partners/host-shops"
-          className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand-red-700"
-        >
-          Find or become a Host Shop <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
-        <div />
-        <Link
-          href="/apprenticeships"
-          className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand-red-700"
-        >
-          Explore apprenticeships <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
       </div>
     </section>
   );

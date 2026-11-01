@@ -4,6 +4,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
+import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
+import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { ResponsiveDetails } from '@/components/ui/ResponsiveDetails';
 
 const source = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
@@ -14,6 +16,37 @@ afterEach(() => {
 });
 
 describe('homepage curation', () => {
+  it('groups beauty programs and Host Shop recruitment while keeping the complete career photo visible', () => {
+    const root = document.createElement('div');
+    root.innerHTML = renderToStaticMarkup(
+      <>
+        <HomeCareerPathways />
+        <HomeFeaturedHostShop />
+        <HomeEmployerStrip />
+      </>,
+    );
+    const beauty = root.querySelector('#barber-beauty-network')!;
+    for (const program of ['barber', 'cosmetology', 'esthetician', 'nail-technician']) {
+      expect(beauty.querySelector(`a[href="/programs/${program}-apprenticeship"]`)).not.toBeNull();
+    }
+    const recruit = [...root.querySelectorAll('a[href="/partners/host-shops"]')];
+    expect(recruit).toHaveLength(1);
+    expect(beauty.contains(recruit[0])).toBe(true);
+    expect(beauty.querySelector('a[href="/programs"]')).toBeNull();
+    expect(
+      beauty.querySelector('[data-beauty-programs]')!.compareDocumentPosition(recruit[0]) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    const photo = root.querySelector(
+      'img[alt="Illustrative HVAC technician prepared for hands-on work"]',
+    )!;
+    expect(beauty.contains(photo)).toBe(false);
+    expect(photo.className).toContain('object-contain');
+    for (const photo of beauty.querySelectorAll('[data-beauty-programs] img')) {
+      expect(photo.className).toContain('object-contain');
+    }
+  });
+
   it('renders the current featured shops once with one photo and the correct destination each', () => {
     const root = document.createElement('div');
     root.innerHTML = renderToStaticMarkup(<HomeFeaturedHostShop />);

@@ -2,8 +2,8 @@ import HomeSectionNarration from './HomeSectionNarration';
 /**
  * HomeEmployerStrip
  *
- * Three canonical employer paths: hire graduates, become an apprenticeship
- * Host Site, or co-design a training cohort.
+ * General employer paths: hire graduates or co-design a training cohort.
+ * Beauty Host Shop recruitment lives with the Barber & Beauty network.
  */
 
 import Link from 'next/link';
@@ -25,20 +25,6 @@ const EMPLOYER_PATHS = [
       'Business and administrative pathways',
     ],
     cta: { label: 'Hiring & Employer Services', href: ROUTES.employersHireGraduates },
-  },
-  {
-    accent: 'border-t-4 border-orange-500',
-    img: '/images/partners/host-shop-mentoring-premium-2026.webp',
-    imgAlt: 'Illustrative beauty apprentice learning under salon supervision',
-    title: 'Become an Apprenticeship Host Site',
-    desc: 'Approved businesses provide supervised on-the-job learning while Elevate manages Registered Apprenticeship sponsor governance, RTI, tracking, and compliance workflows.',
-    bullets: [
-      'Barber, Cosmetology, Esthetics, and Nail Technician pathways',
-      'Digital hour and competency verification',
-      'One universal Host Site application',
-      'Dedicated Host Site portal after approval',
-    ],
-    cta: { label: 'Host Site Program', href: ROUTES.apprenticeshipsHostShop },
   },
   {
     accent: 'border-t-4 border-orange-500',
@@ -72,13 +58,12 @@ export function HomeEmployerStrip() {
               id="employer-strip-heading"
               className="mb-4 text-2xl font-black text-slate-950 sm:text-3xl"
             >
-              Hire. Host. Train.
+              Hire. Train.
               <br />
-              Three clear ways to work with Elevate.
+              Two clear ways to work with Elevate.
             </h2>
             <p className="mb-4 max-w-3xl text-base font-medium leading-7 text-slate-700">
-              Connect with trained graduates, host an apprentice, or build a training cohort with
-              Elevate.
+              Connect with trained graduates or build a training cohort with Elevate.
             </p>
             <div className="flex flex-wrap gap-3">
               <a
@@ -119,7 +104,7 @@ export function HomeEmployerStrip() {
         </div>
 
         <HomeSectionNarration section="employers" />
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2">
           {EMPLOYER_PATHS.map((path) => (
             <article
               key={path.title}

@@ -35,7 +35,8 @@ describe('public information architecture regressions', () => {
     expect(showcase.replace(/\s+/g, ' ')).toContain('Funding is limited and is never guaranteed');
     expect(read('apps/marketing/app/page.tsx')).not.toContain('<HomeProgramShowcase />');
     expect(read('apps/marketing/app/page.tsx')).toContain('<HomeCareerPathways />');
-    expect(read('apps/marketing/app/page.tsx')).toContain('<HomeFunding />');
+    expect(read('apps/marketing/app/page.tsx')).not.toContain('<HomeFunding />');
+    expect(read('components/programs/HvacTrainingShowcase.tsx')).toContain('WorkOne reviews funding eligibility; funding is not guaranteed.');
   });
 
   it('limits registered claims to the approved sponsor standards', () => {

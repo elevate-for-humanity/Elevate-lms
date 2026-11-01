@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 import { HvacVideoAssistanceDock } from './HvacVideoAssistanceDock';
 
 const imageRoot = '/images/programs/hvac/elevate-20261029';
@@ -87,54 +88,58 @@ export function HvacLabHero() {
 }
 
 export default function HvacTrainingShowcase({ compact = false }: { compact?: boolean }) {
+  const Heading = compact ? 'h1' : 'h2';
   const headingId = compact ? 'hvac-home-showcase' : 'hvac-training-gallery';
   const selectedScenes = compact ? scenes.slice(0, 3) : scenes;
   return (
     <section
       aria-labelledby={headingId}
       data-hvac-training-showcase="20261029"
-      className="border-y-4 border-orange-500 bg-blue-950 px-4 py-14 text-white sm:px-6 sm:py-20"
+      className={`border-y-4 border-orange-500 bg-blue-950 px-4 text-white sm:px-6 ${compact ? 'py-7 sm:py-10' : 'py-14 sm:py-20'}`}
     >
       <div className="mx-auto max-w-7xl">
         <p className="text-sm font-bold uppercase tracking-widest text-orange-300">
-          Sponsored by Elevate for Humanity
+          {compact ? 'Featured program · HVAC Technician' : 'Sponsored by Elevate for Humanity'}
         </p>
         <div className="mt-3 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <h2
+            <Heading
               id={headingId}
               className="text-3xl font-black tracking-tight text-white sm:text-4xl"
             >
               {compact
                 ? 'Build your next chapter in HVAC.'
                 : 'See the skills you can start building.'}
-            </h2>
+            </Heading>
             <p className="mt-4 text-lg leading-8 text-slate-200">
               Six-week hybrid HVAC training combines self-paced coursework, scheduled hands-on
               learning, and preparation for EPA Section 608 Core and Types I, II, and III.
             </p>
           </div>
+          {!compact && (
           <Link
             href={compact ? '/programs/hvac-technician' : applyHref}
             className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-orange-500 px-6 py-3 text-center font-bold text-slate-950 hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300"
           >
             {compact ? 'Explore HVAC training' : 'Apply for HVAC training'}
           </Link>
+          )}
         </div>
         <p className="mt-5 text-sm leading-6 text-slate-300">
           AI-generated lab concept, training demonstrations, and career illustrations.
         </p>
         <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {selectedScenes.map((scene) => (
+          {selectedScenes.map((scene, index) => (
             <figure
               key={scene.image}
               className="overflow-hidden rounded-2xl border border-blue-800 bg-white shadow-xl"
             >
-              <div className="relative aspect-[4/5] bg-slate-100">
+              <div className={`relative bg-slate-100 ${compact ? 'aspect-[4/3]' : 'aspect-[4/5]'}`}>
                 <Image
                   src={`${imageRoot}/${scene.image}.webp`}
                   alt={scene.alt}
                   fill
+                  priority={compact && index === 0}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px"
                   className="object-contain"
                 />
@@ -146,6 +151,16 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
             </figure>
           ))}
         </div>
+        {compact && (
+          <div className="mt-6 border-t border-blue-800 pt-6">
+            <div className="flex flex-wrap gap-3">
+              <Link href="/programs/hvac-technician" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-5 py-3 font-bold text-slate-950 hover:bg-orange-400">View HVAC program →</Link>
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-5 py-3 text-center font-bold text-slate-950 hover:bg-slate-100">Sign up to see if you qualify — WorkOne</a>
+              <Link href="/onboarding/learner/orientation" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white px-5 py-3 font-bold text-white hover:bg-blue-900">Complete your orientation</Link>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-slate-300">WorkOne reviews funding eligibility; funding is not guaranteed. Start your orientation to get ready and connect with Elevate.</p>
+          </div>
+        )}
         {!compact && (
           <div className="mt-10 grid gap-7 rounded-2xl border border-blue-800 bg-blue-900 p-6 text-white sm:p-8 lg:grid-cols-2">
             <div>

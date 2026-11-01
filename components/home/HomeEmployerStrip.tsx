@@ -8,13 +8,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ROUTES } from '@/lib/navigation/routes';
 
 const EMPLOYER_PATHS = [
   {
     accent: 'border-t-4 border-brand-green-500',
-    img: '/images/pages/employer-page-1.webp',
+    img: '/images/business-collaboration-vibrant-2026.webp',
     imgAlt: 'Employer reviewing credentialed graduate candidates',
     title: 'Hire Credentialed Graduates',
     desc: 'Connect with trained candidates across healthcare, skilled trades, technology, and business pathways.',
@@ -28,7 +27,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-blue-500',
-    img: '/images/pages/apprenticeship-sponsor-page-1.webp',
+    img: '/images/partners/host-shop-mentoring-premium-2026.webp',
     imgAlt: 'Apprentice working on-site with an employer supervisor',
     title: 'Become an Apprenticeship Host Site',
     desc: 'Approved businesses provide supervised on-the-job learning while Elevate manages Registered Apprenticeship sponsor governance, RTI, tracking, and compliance workflows.',
@@ -42,7 +41,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-purple-500',
-    img: '/images/pages/training-cohort.webp',
+    img: '/images/programs/hvac/elevate-20261029/group-learning.webp',
     imgAlt: 'Custom employer training cohort in session',
     title: 'Co-Design a Training Cohort',
     desc: 'Work with Elevate to structure a training cohort around job requirements, scheduling, credentials, and available workforce funding.',
@@ -59,11 +58,11 @@ const EMPLOYER_PATHS = [
 export function HomeEmployerStrip() {
   return (
     <section
-      className="border-t border-slate-200 bg-slate-50 px-4 py-16"
+      className="border-t border-slate-200 bg-slate-50 px-4 py-8 sm:py-10"
       aria-labelledby="employer-strip-heading"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-14 grid items-center gap-10 lg:grid-cols-2">
+        <div className="mb-6">
           <div>
             <p className="mb-3 text-xs font-black uppercase tracking-widest text-brand-red-700">
               For Employers
@@ -76,8 +75,8 @@ export function HomeEmployerStrip() {
               <br />
               Three clear ways to work with Elevate.
             </h2>
-            <p className="mb-6 max-w-lg text-base font-medium leading-7 text-slate-700">
-              Use the employer pathway that matches your goal. Public information stays on the main website; authenticated employer and Host Site work stays in the LMS portal.
+            <p className="mb-4 max-w-3xl text-base font-medium leading-7 text-slate-700">
+              Connect with trained graduates, host an apprentice, or build a training cohort with Elevate.
             </p>
             <div className="flex flex-wrap gap-3">
               <a
@@ -95,17 +94,7 @@ export function HomeEmployerStrip() {
             </div>
           </div>
 
-          <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48 lg:h-52">
-            <Image
-              src="/images/pages/for-employers-page-1.webp"
-              alt={`Employer partner meeting with ${PLATFORM_DEFAULTS.orgName} team`}
-              fill
-              className="object-contain object-top"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              loading="lazy"
-              placeholder="empty"
-            />
-          </div>
+
         </div>
 
         <div className="mb-8 flex flex-wrap gap-3">
@@ -120,29 +109,21 @@ export function HomeEmployerStrip() {
               key={path.title}
               className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${path.accent}`}
             >
-              <div className="relative h-36 w-full overflow-hidden sm:h-40">
+              <div className="relative h-32 w-full overflow-hidden sm:h-36">
                 <Image
                   src={path.img}
                   alt={path.imgAlt}
                   fill
-                  className="object-contain object-top transition-transform duration-500 "
+                  className="object-cover object-center transition-transform duration-500 "
                   sizes="(max-width: 768px) 100vw, 33vw"
                   loading="lazy"
                   placeholder="empty"
                 />
               </div>
 
-              <div className="flex flex-1 flex-col p-6">
+              <div className="flex flex-1 flex-col p-4">
                 <h3 className="mb-2 text-lg font-black text-slate-950">{path.title}</h3>
                 <p className="mb-4 flex-1 text-sm font-medium leading-6 text-slate-700">{path.desc}</p>
-                <ul className="mb-5 space-y-2">
-                  {path.bullets.map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-2 text-sm font-medium leading-5 text-slate-700">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-700" aria-hidden="true" />
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
                 <Link
                   href={path.cta.href}
                   className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-slate-800"

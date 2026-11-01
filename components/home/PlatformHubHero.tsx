@@ -6,7 +6,8 @@ import ImageMetadata from '@/components/marketing/ImageMetadata';
 
 const HOME_IMAGE = '/images/refresh-20261014/home-signed-20261017.webp';
 
-export function PlatformHubHero() {
+export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
+  const Heading = compact ? 'h2' : 'h1';
   return (
     <section
       className="relative w-full overflow-hidden bg-slate-950 text-white"
@@ -19,14 +20,14 @@ export function PlatformHubHero() {
         src={HOME_IMAGE}
         description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
       />
-      <div className={`${HERO_IMAGE_FRAME} bg-sky-100`}>
+      <div className={`${compact ? 'relative h-28 w-full overflow-hidden sm:h-36' : HERO_IMAGE_FRAME} bg-sky-100`}>
         <Image
           placeholder="blur"
           blurDataURL={IMAGE_LOADING_BLUR}
           src={HOME_IMAGE}
           alt="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
           fill
-          priority
+          priority={!compact}
           sizes="100vw"
           className="object-cover object-center"
         />
@@ -36,13 +37,13 @@ export function PlatformHubHero() {
           <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">
             Career training • Workforce development • Registered apprenticeship • Business growth
           </p>
-          <h1
+          <Heading
             id="home-hero-heading"
-            className="mt-3 text-3xl font-black leading-[1.1] tracking-tight sm:text-5xl"
+            className="mt-3 text-3xl font-black leading-[1.1] tracking-tight sm:text-3xl"
           >
             Build a career. Build a workforce. Build a business.
-          </h1>
-          <p className="mt-4 max-w-3xl text-lg font-semibold leading-8 text-slate-100 sm:text-xl">
+          </Heading>
+          <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-100">
             Elevate for Humanity connects individuals, employers, workforce partners, and businesses
             through career training, state and workforce funding pathways for eligible participants,
             Registered Apprenticeship, employer services, and practical business technology.
@@ -54,6 +55,7 @@ export function PlatformHubHero() {
             >
               Explore Career Training
             </Link>
+            {!compact && (<>
             <Link
               href="/check-eligibility"
               className="inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
@@ -66,6 +68,7 @@ export function PlatformHubHero() {
             >
               Employers & Partners
             </Link>
+            </>)}
             <Link
               href="/store/apps/website-builder"
               className="inline-flex min-h-12 items-center rounded-xl border-2 border-cyan-300 px-6 py-3 font-black text-cyan-100 hover:bg-cyan-50 hover:text-cyan-950"
@@ -73,6 +76,7 @@ export function PlatformHubHero() {
               Business & Website Builder
             </Link>
           </div>
+          {!compact && (
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-200">
             <span>Registered Apprenticeship</span>
             <span>Workforce training</span>
@@ -80,6 +84,7 @@ export function PlatformHubHero() {
             <span>Industry credentials</span>
             <span>Compliance & reporting</span>
           </div>
+          )}
         </div>
       </div>
     </section>

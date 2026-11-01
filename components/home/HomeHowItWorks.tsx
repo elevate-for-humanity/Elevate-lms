@@ -8,7 +8,7 @@ const STEPS = [
     label: 'Apply',
     detail: 'Start with a short application so we know your program interest and next step.',
     href: '/apply',
-    img: '/images/pages/apply-page-1.jpg',
+    img: '/images/business-training-vibrant-2026.webp',
     imgAlt: 'Student completing application',
   },
   {
@@ -16,7 +16,7 @@ const STEPS = [
     label: 'Review Funding',
     detail: 'Explore potential workforce funding and eligibility requirements before enrollment.',
     href: '/check-eligibility',
-    img: '/images/pages/funding-impact-1.webp',
+    img: '/images/bookkeeping-training-vibrant-2026.webp',
     imgAlt: 'Funding advisor reviewing eligibility with student',
   },
   {
@@ -24,7 +24,7 @@ const STEPS = [
     label: 'Train',
     detail: 'Complete credential-aligned instruction and required hands-on learning.',
     href: '/programs',
-    img: '/images/pages/comp-pathway-classroom.webp',
+    img: '/images/programs/hvac/elevate-20261029/group-learning.webp',
     imgAlt: 'Students in workforce training classroom',
   },
   {
@@ -33,7 +33,7 @@ const STEPS = [
     detail:
       'Eligible apprenticeship pathways combine structured training with employer-based learning.',
     href: '/apprenticeships',
-    img: '/images/pages/apprenticeship-hero.webp',
+    img: '/images/partners/host-shop-mentoring-premium-2026.webp',
     imgAlt: 'Apprentice working on-site with employer supervisor',
   },
   {
@@ -42,7 +42,7 @@ const STEPS = [
     detail:
       'Prepare for the credential, certification, or license requirement connected to your pathway.',
     href: '/credentials',
-    img: '/images/pages/certifications-page-1.webp',
+    img: '/images/programs/hvac/elevate-20261029/instructor-demo.webp',
     imgAlt: 'Career credential certificate',
   },
   {
@@ -51,16 +51,16 @@ const STEPS = [
     detail:
       'Use career services, employer connections, and work-based learning support as you advance.',
     href: '/employment-support',
-    img: '/images/pages/employment-support-page-1.webp',
+    img: '/images/business-collaboration-vibrant-2026.webp',
     imgAlt: 'Career advancement and employer connection',
   },
 ] as const;
 
 export function HomeHowItWorks() {
   return (
-    <section className="bg-slate-950 px-4 py-8 sm:py-12" aria-labelledby="how-it-works-heading">
+    <section className="bg-slate-950 px-4 py-8 sm:py-8" aria-labelledby="how-it-works-heading">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-10 max-w-3xl">
+        <div className="mb-6 max-w-3xl">
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-orange-300">
             The Elevate Pathway
           </p>
@@ -83,7 +83,7 @@ export function HomeHowItWorks() {
               href={step.href}
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 transition hover:-translate-y-1 hover:border-slate-500 hover:shadow-2xl"
             >
-              <div className="relative aspect-[4/3] shrink-0 overflow-hidden">
+              <div className="relative aspect-[2/1] shrink-0 overflow-hidden">
                 <Image
                   src={step.img}
                   alt={step.imgAlt}
@@ -96,10 +96,10 @@ export function HomeHowItWorks() {
                   {step.n}
                 </span>
               </div>
-              <div className="flex flex-1 flex-col p-4 sm:p-5">
-                <h3 className="text-2xl font-black text-white">{step.label}</h3>
-                <p className="mt-3 text-base leading-7 text-slate-300">{step.detail}</p>
-                <span className="mt-auto pt-5 inline-flex items-center gap-2 text-base font-extrabold text-orange-300">
+              <div className="flex flex-1 flex-col p-4">
+                <h3 className="text-lg font-black text-white">{step.label}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{step.detail}</p>
+                <span className="mt-auto pt-3 inline-flex items-center gap-2 text-base font-extrabold text-orange-300">
                   Learn more{' '}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </span>
@@ -108,7 +108,7 @@ export function HomeHowItWorks() {
           ))}
         </div>
 
-        <div className="mt-10">
+        <div className="mt-6">
           <Link
             href="/how-it-works"
             className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-extrabold text-slate-950 hover:bg-slate-100"

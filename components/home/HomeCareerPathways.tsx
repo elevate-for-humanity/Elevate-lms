@@ -14,16 +14,6 @@ const PATHWAYS = [
     cta: 'Explore Beauty & Barber',
   },
   {
-    slug: 'hvac-technician',
-    title: 'HVAC Technician',
-    description:
-      'Build hands-on heating, cooling, safety, diagnostics, installation, and service skills.',
-    image: '/images/hvac-training-vibrant-2026.webp',
-    imageAlt: 'Illustrative HVAC training scene with a trainee and mentor',
-    ctaHref: '/programs/hvac-technician',
-    cta: 'View HVAC Program',
-  },
-  {
     slug: 'cdl-training',
     title: 'CDL Training',
     description:
@@ -58,25 +48,25 @@ export function HomeCareerPathways() {
           </p>
           <h2
             id="featured-pathways-heading"
-            className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl"
+            className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-3xl"
           >
             Choose a path that can move you forward.
           </h2>
-          <p className="mt-5 text-lg leading-8 text-slate-700">
+          <p className="mt-3 text-base leading-7 text-slate-700">
             Career-training program pages show current tuition, duration, delivery format,
             credentials, requirements, funding information, payment options, and enrollment steps.
             State or workforce funding may cover tuition for eligible participants in approved
             programs; eligibility and authorization are determined individually.
           </p>
         </div>
-        <div className="mt-10 grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
             <article
               key={p.slug}
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-2xl"
             >
               <Link href={p.ctaHref} className="flex h-full flex-col">
-                <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-100">
+                <div className="relative aspect-[16/9] shrink-0 overflow-hidden bg-slate-100">
                   <Image
                     src={p.image}
                     alt={p.imageAlt}

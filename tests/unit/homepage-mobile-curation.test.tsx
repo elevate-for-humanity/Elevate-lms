@@ -42,14 +42,15 @@ describe('homepage curation', () => {
     }
     expect(source('components/home/HomeFinalCTA.tsx')).toContain('/images/hero/hero-hands-on-training.webp');
     const pathways = source('components/home/HomeCareerPathways.tsx');
-    for (const image of ['hvac-training-vibrant-2026.webp', 'cdl-training-vibrant-2026.webp', 'business-training-vibrant-2026.webp']) {
+    for (const image of ['cdl-training-vibrant-2026.webp', 'business-training-vibrant-2026.webp']) {
       expect(pathways).toContain(image);
     }
     expect(pathways).not.toContain('/programs/bookkeeping');
     const page = source('apps/marketing/app/page.tsx');
     expect(page.match(/<HomePlatformOverview/g)).toHaveLength(1);
-    expect(page).toContain('WORKONE_INDY_BOOKING_URL');
-    expect(page.replace(/\s+/g, ' ')).toContain('eligibility and program requirements apply');
+    expect(source('components/programs/HvacTrainingShowcase.tsx')).toContain('WORKONE_INDY_BOOKING_URL');
+    expect(pathways).not.toContain("slug: 'hvac-technician'");
+    expect(source('components/programs/HvacTrainingShowcase.tsx')).toContain('WorkOne reviews funding eligibility; funding is not guaranteed.');
   });
 
   it('keeps mobile overrides scoped away from operational dashboards', () => {

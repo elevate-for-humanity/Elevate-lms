@@ -1,9 +1,19 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { HvacLabHero } from '@/components/programs/HvacTrainingShowcase';
+import HvacTrainingShowcase, { HvacLabHero } from '@/components/programs/HvacTrainingShowcase';
 
 describe('server-rendered HVAC hero source', () => {
+  it('connects the homepage feature to the program, official WorkOne signup and existing orientation', () => {
+    const root=document.createElement('div');
+    root.innerHTML=renderToStaticMarkup(<HvacTrainingShowcase compact />);
+    expect(root.querySelector('h1')).toHaveTextContent('HVAC');
+    expect(root.querySelector('a[href="/programs/hvac-technician"]')).toHaveTextContent('View HVAC program');
+    const workone=root.querySelector('a[href="https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838"]');
+    expect(workone).toHaveTextContent('Sign up to see if you qualify');
+    expect(workone).toHaveAttribute('rel','noopener noreferrer');
+    expect(root.querySelector('a[href="/onboarding/learner/orientation"]')).toHaveTextContent('Complete your orientation');
+  });
   it('puts the original MP4 directly on the autoplay element and buffers the complete film', () => {
     const root = document.createElement('div');
     root.innerHTML = renderToStaticMarkup(<HvacLabHero />);

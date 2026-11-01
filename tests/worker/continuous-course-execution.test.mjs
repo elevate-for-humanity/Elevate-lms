@@ -8,7 +8,7 @@ import {createCourseProgressWatch,reportCourseProgress} from '../../lib/ultimate
 // Exercise the production control flow with providers and database transport
 // substituted. No Google execution or generated media is needed for this test.
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/worker/process-job.ts',import.meta.url),'utf8'))
-  .split('\n').filter(line=>!line.startsWith('import ')).join('\n').replace('export async function','async function');
+  .split('\n').filter(line=>!line.startsWith('import ')).join('\n').replace(/^export (?=(?:async )?function )/gm,'');
 async function run({pauseAfterAttachment=false,checkpointAccepted=true}={}){
  const calls=[],fences=[],writes=[];let paused=false,claims=0,yields=0,waits=0;
  const job={id:'job',build_id:'build',execution_generation:7,payload:{nextCompetencyIndex:0}};

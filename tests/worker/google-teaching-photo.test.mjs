@@ -102,8 +102,10 @@ test('US capacity 429 switches to authenticated global endpoint without restarti
   return {ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:Buffer.from('global image').toString('base64')}}]}}]})};
  }});
  assert.equal(calls.length,3);
- assert.match(calls[1].url,/aiplatform\\.us\\.rep\\.googleapis\\.com.*locations\\/us\\//);
- assert.match(calls[2].url,/aiplatform\\.googleapis\\.com.*locations\\/global\\//);
+ assert.equal(new URL(calls[1].url).hostname,'aiplatform.us.rep.googleapis.com');
+ assert.match(new URL(calls[1].url).pathname,/\/locations\/us\//);
+ assert.equal(new URL(calls[2].url).hostname,'aiplatform.googleapis.com');
+ assert.match(new URL(calls[2].url).pathname,/\/locations\/global\//);
  assert.equal(calls[2].options.headers.Authorization,'Bearer test-token');
  assert.equal(result.bytes.toString(),'global image');
 });

@@ -23,6 +23,10 @@ describe('Plan-specific Store demos use the subscriber controls without producti
     });
     fireEvent.click(screen.getByRole('button', { name: 'Save entity record' }));
     await screen.findAllByRole('option', { name: 'Demo training business' });
+    await waitFor(() => {
+      expect(screen.getByRole('status').textContent).toBe('Entity record saved.');
+      expect((screen.getByRole('button', { name: 'Save entity record' }) as HTMLButtonElement).disabled).toBe(false);
+    });
     expect(network).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText('Legal business name'), {
       target: { value: 'Second example' },

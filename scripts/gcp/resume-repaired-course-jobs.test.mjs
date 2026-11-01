@@ -86,3 +86,20 @@ test('ineligible furthest cursor does not suppress an eligible saved repair',asy
  assert.match(writes[0],/id=eq.eligible/);
  assert.deepEqual(result.jobIds,['eligible']);
 });
+
+test('missing authored instructional source cannot be fixed by repeating an exhausted worker',async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:esthetician-a:FINDINGS=[{"code":"ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED"}]';
+ assert.equal((await run({...base,last_error:error})).writes.length,0);
+});
+test('skipped historical candidate does not prevent a later eligible repair',async()=>{
+ const stale={...base,id:'stale',payload:{nextCompetencyIndex:30},last_error:'OWNER_PAUSED_REFERENCE_BUILD'};
+ const eligible={...base,id:'eligible',payload:{nextCompetencyIndex:18}};
+ const writes=[];
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options?.method==='PATCH'){writes.push(String(url));return {ok:true,json:async()=>[{id:'eligible',status:'queued',execution_generation:9}]};}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[stale,eligible]};
+ }});
+ assert.equal(writes.length,1);
+ assert.match(writes[0],/id=eq.eligible/);
+ assert.deepEqual(result.jobIds,['eligible']);
+});

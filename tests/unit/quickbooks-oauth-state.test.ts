@@ -15,6 +15,8 @@ describe('QuickBooks OAuth state', () => {
 
   it('rejects tampering and the wrong secret', () => {
     const state = createQuickBooksOAuthState(secret, now);
+    expect(verifyQuickBooksOAuthState(`${state}!`, secret, now)).toBe(false);
+    expect(verifyQuickBooksOAuthState(`${state}.extra`, secret, now)).toBe(false);
     expect(verifyQuickBooksOAuthState(`${state}x`, secret, now)).toBe(false);
     expect(verifyQuickBooksOAuthState(state, 'wrong-secret', now)).toBe(false);
   });

@@ -13,8 +13,10 @@ export function verifyQuickBooksOAuthState(
   secret: string,
   now = Date.now(),
 ): boolean {
-  const [timestampText, nonce, signature] = state.split('.');
-  if (!timestampText || !nonce || !signature || !/^\d+$/.test(timestampText)) return false;
+  const parts = state.split('.');
+  if (parts.length !== 3) return false;
+  const [timestampText, nonce, signature] = parts;
+  if (!timestampText || !nonce || !signature || !/^\d+$/.test(timestampText) || !/^[A-Za-z0-9_-]{32}$/.test(nonce) || !/^[A-Za-z0-9_-]{43}$/.test(signature)) return false;
 
   const timestamp = Number(timestampText);
   if (!Number.isSafeInteger(timestamp) || timestamp > now || now - timestamp > STATE_TTL_MS) {

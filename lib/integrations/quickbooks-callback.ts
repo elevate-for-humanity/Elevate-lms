@@ -4,7 +4,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { assertQuickBooksProductionEnvironment } from '@/lib/integrations/quickbooks-client';
+import { assertQuickBooksProductionEnvironment, resolveQuickBooksCredentials } from '@/lib/integrations/quickbooks-client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -60,8 +60,9 @@ export async function GET(request: NextRequest) {
 
   // Deployment secrets are authoritative for OAuth app credentials.
   // app_settings may contain legacy values and is used only as a fallback.
-  const clientId = process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID;
-  const clientSecret = process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET;
+  let clientId: string, clientSecret: string;
+  try { ({clientId, clientSecret} = resolveQuickBooksCredentials(stored)); }
+  catch { return redirect('error=not_configured'); }
   const redirectUri =
     process.env.QB_REDIRECT_URI || stored.QB_REDIRECT_URI || `${base}/api/auth/quickbooks/callback`;
 

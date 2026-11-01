@@ -34,3 +34,25 @@ it('keeps the learner watermark in the fullscreen container and suppresses downl
  fireEvent.click(screen.getByRole('button',{name:/fullscreen/i}));
  expect(requestFullscreen).toHaveBeenCalledTimes(1);
 });
+
+it('lets authenticated admin review seek past checkpoints without recording learner evidence',()=>{
+ const {container}=render(<InteractiveVideoPlayer videoUrl="/film.mp4" title="Admin inspection"
+  readOnly adminReview checkpoints={[{type:'key-concept',timestamp:10,concept:'Review this step'}]}/>);
+ const video=container.querySelector('video')!;
+ Object.defineProperty(video,'duration',{configurable:true,value:100});
+ Object.defineProperty(video,'currentTime',{configurable:true,writable:true,value:0});
+ fireEvent.loadedMetadata(video);
+ fireEvent.change(screen.getAllByRole('slider')[0],{target:{value:'50'}});
+ expect(video.currentTime).toBe(50);
+ expect(mocks.client).not.toHaveBeenCalled();
+});
+it('keeps checkpoint seeking restrictions outside admin inspection',()=>{
+ const {container}=render(<InteractiveVideoPlayer videoUrl="/film.mp4" title="Ordinary preview"
+  readOnly checkpoints={[{type:'key-concept',timestamp:10,concept:'Review this step'}]}/>);
+ const video=container.querySelector('video')!;
+ Object.defineProperty(video,'duration',{configurable:true,value:100});
+ Object.defineProperty(video,'currentTime',{configurable:true,writable:true,value:0});
+ fireEvent.loadedMetadata(video);
+ fireEvent.change(screen.getAllByRole('slider')[0],{target:{value:'50'}});
+ expect(video.currentTime).toBe(10);
+});

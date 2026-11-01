@@ -69,7 +69,23 @@ function googleClient(dependencies: Dependencies) {
     try {
       response = await request(url, { ...init, redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(Math.min(15000, remaining)) });
     } catch { return fail('request_failed', phase); }
-    if (!response.ok) fail(response.status === 403 ? 'permission_denied' : response.status === 404 ? 'resource_missing' : response.status === 409 || response.status === 412 ? 'concurrent_update' : 'request_rejected', phase);
+    if (!response.ok) {
+      // Preserve Google's safe classification; 403 does not always mean IAM.
+      // Never include upstream messages or metadata containing credentials.
+      let reason: string | undefined;
+      try {
+        const body = await response.json();
+        reason = body?.error?.details?.find((detail: { '@type'?: string }) =>
+          detail['@type'] === 'type.googleapis.com/google.rpc.ErrorInfo')?.reason;
+      } catch { /* Retain the HTTP fallback for non-JSON errors. */ }
+      const code = reason === 'BILLING_DISABLED' ? 'billing_disabled'
+        : reason === 'SERVICE_DISABLED' ? 'api_disabled'
+        : reason === 'ACCESS_TOKEN_SCOPE_INSUFFICIENT' ? 'insufficient_oauth_scope'
+        : response.status === 403 ? 'permission_denied'
+        : response.status === 404 ? 'resource_missing'
+        : response.status === 409 || response.status === 412 ? 'concurrent_update' : 'request_rejected';
+      fail(code, phase);
+    }
     return response;
   }
   async function metadata(path: string, text = false) {

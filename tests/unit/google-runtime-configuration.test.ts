@@ -232,3 +232,23 @@ describe('independent commerce configuration', () => {
     ])).not.toThrow();
   });
 });
+
+
+describe('Google structured authorization errors', () => {
+  it.each([
+    ['BILLING_DISABLED', 'billing_disabled'],
+    ['SERVICE_DISABLED', 'api_disabled'],
+    ['ACCESS_TOKEN_SCOPE_INSUFFICIENT', 'insufficient_oauth_scope'],
+    ['IAM_PERMISSION_DENIED', 'permission_denied'],
+  ])('reports %s without exposing the upstream error', async (reason, code) => {
+    const request = vi.fn(async (input: string | URL | Request) => {
+      if (String(input).includes('metadata.google.internal')) return Response.json(
+        { access_token: 'fixture' }, { headers: { 'Metadata-Flavor': 'Google' } });
+      return Response.json({ error: { message: 'private-token-fixture', details: [
+        { '@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason },
+      ] } }, { status: 403 });
+    });
+    await expect(saveGoogleRuntimeConfiguration('admin', [{ key: 'GITHUB_TOKEN', value: 'github_pat_fixture' }], { request }))
+      .rejects.toMatchObject({ code, phase: 'runtime_inventory' });
+  });
+});

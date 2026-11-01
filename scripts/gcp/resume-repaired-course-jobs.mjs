@@ -43,7 +43,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const renewableStoredMediaRead =
    /FINDINGS=.*finished_media_qa.*MP4 returned HTTP 401/i.test(error);
   const durableExternalBlocker =
-   (/OWNER_|AUTHORIZ|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
+   (/OWNER_|AUTHORIZ|ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
     !renewableStoredMediaRead) ||
    /\b(?:LICENSE_APPROVAL_REQUIRED|MEDIA_LICENSE_REQUIRED|MEDIA_SOURCE_APPROVAL_REQUIRED)\b/i.test(error);
   // Per-scene license metadata and saved-assignment findings are internal
@@ -60,7 +60,6 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    monitor:{...job.monitor,lastRepairDeployment:{imageSha,imageDigest,at:now.toISOString(),previousError:error}}};
   // Once an eligible cursor is selected, a lost admission race must not
   // reopen an older historical attempt from the same build or lesson.
-  if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
   const changed=await request(target,{method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
    body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
   if(!changed.ok){
@@ -71,6 +70,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   }
   const saved=await changed.json();if(!Array.isArray(saved))throw Error('REPAIR_RESUME_READBACK_INVALID');
   if(saved.length===1&&saved[0].id===job.id&&saved[0].status==='queued'&&saved[0].execution_generation===job.execution_generation+1){
+   if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
    resumed.push(job.id);
   }
   else if(saved.length)throw Error('REPAIR_RESUME_READBACK_INVALID');

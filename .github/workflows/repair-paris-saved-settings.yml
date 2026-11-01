@@ -1,0 +1,66 @@
+name: Repair PARIS saved answering settings
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/repair-paris-settings.py', 'infra/pbx/paris/turn-adapter.mjs', '.github/workflows/repair-paris-saved-settings.yml']
+  pull_request:
+    paths: ['scripts/gcp/*repair-paris-settings.py', 'infra/pbx/paris/**', '.github/workflows/repair-paris-saved-settings.yml']
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('paris-settings-checks-{0}', github.ref) }}
+  cancel-in-progress: false
+jobs:
+  contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python3 scripts/gcp/test-repair-paris-settings.py
+      - run: node --test infra/pbx/paris/*.test.mjs
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-paris-saved-settings.yml/dispatches" -f ref=main
+  repair:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python3 scripts/gcp/test-repair-paris-settings.py && node --test infra/pbx/paris/*.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Apply saved settings only while idle, with rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          target="/tmp/elevate-paris-settings-$GITHUB_SHA-$GITHUB_RUN_ID"
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="mkdir -m 0700 '$target'"
+          gcloud compute scp infra/pbx/paris/launch.mjs infra/pbx/paris/turn-adapter.mjs infra/pbx/paris/ari-media.mjs "elevate-pbx:$target/" --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="sudo python3 - '$target'" < scripts/gcp/repair-paris-settings.py
+      - name: Verify running settings and synthetic speech without dialing
+        run: |
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py
+      - name: Verify public phone transport
+        run: node scripts/gcp/verify-pbx-transport.mjs

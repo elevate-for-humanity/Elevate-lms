@@ -1,0 +1,61 @@
+name: Connect active Twilio number to PARIS answering
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['scripts/gcp/connect-twilio-paris*', 'scripts/gcp/*connect-pbx-paris-ingress.py', '.github/workflows/connect-twilio-paris.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/connect-twilio-paris.mjs', 'scripts/gcp/connect-pbx-paris-ingress.py', '.github/workflows/connect-twilio-paris.yml']
+permissions: {contents: read, actions: write, id-token: write}
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('paris-ingress-checks-{0}', github.ref) }}
+  cancel-in-progress: false
+jobs:
+  contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/connect-twilio-paris.test.mjs
+      - run: python3 scripts/gcp/test-connect-pbx-paris-ingress.py
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/connect-twilio-paris.yml/dispatches" -f ref=main
+  connect:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/connect-twilio-paris.test.mjs && python3 scripts/gcp/test-connect-pbx-paris-ingress.py
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify target, prepare trusted idle PBX ingress and PARIS fallback
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/connect-pbx-paris-ingress.py
+      - name: Verify live PARIS speech before switching carrier ingress
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py
+      - name: Route the verified active number to the owned secure PBX
+        env: {AUTHORIZED_ACTIVE_PHONE: '+14632401404'}
+        run: node scripts/gcp/connect-twilio-paris.mjs
+      - name: Read back the final PBX call entry and voicemail worker
+        if: always()
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py

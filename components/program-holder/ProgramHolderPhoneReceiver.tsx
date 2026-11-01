@@ -29,8 +29,8 @@ function friendlyNumber(value: string) {
     : value || 'Unknown caller';
 }
 
-export function ProgramHolderPhoneReceiver() {
-  const phonePage = usePathname() === '/program-holder/phone';
+export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone' }: { phoneHref?: string } = {}) {
+  const phonePage = usePathname() === phoneHref;
   const [online, setOnline] = useState(false);
   const [number, setNumber] = useState('');
   const [state, setState] = useState<'idle' | 'ringing' | 'active'>('idle');
@@ -50,7 +50,9 @@ export function ProgramHolderPhoneReceiver() {
     let reconnecting = false;
     let client: PhoneClient | null = null;
     let ready = false;
-    const id = currentDeviceId();
+    // Separate the receiver lease from the full phone page: delayed cleanup
+    // during navigation must never disconnect the newly opened dial pad.
+    const id = `${currentDeviceId()}_receiver`;
 
     async function ping() {
       if (!ready) return;
@@ -63,7 +65,7 @@ export function ProgramHolderPhoneReceiver() {
           inCall: Boolean(callRef.current),
         }),
       }).catch(() => undefined);
-      if (active) setOnline(Boolean(response?.ok));
+      if (active && ready) setOnline(Boolean(response?.ok));
     }
 
     async function start() {
@@ -78,6 +80,7 @@ export function ProgramHolderPhoneReceiver() {
         return;
       }
       const settings = await settingsResponse.json();
+      if (settings.readOnly) return;
       const ringMode = String(settings?.extension?.ringMode || 'offline');
       if (['offline', 'do_not_disturb'].includes(ringMode)) return;
       const tokenResponse = await fetch('/api/program-holder/phone/token', {
@@ -90,7 +93,7 @@ export function ProgramHolderPhoneReceiver() {
       if (!tokenResponse.ok) throw new Error('phone_enrollment_unavailable');
       const token = await tokenResponse.json();
       if (!audioRef.current) throw new Error('phone_audio_unavailable');
-      client = await createPhoneClient(token, audioRef.current);
+      client = await createPhoneClient(token, audioRef.current, { signal: controller.signal });
       if (!active) { await client.disconnect(); return; }
       clientRef.current = client;
       client.on('ready', () => {
@@ -179,6 +182,7 @@ export function ProgramHolderPhoneReceiver() {
     void start().catch(recover);
     return () => {
       active = false;
+      ready = false;
       controller.abort();
       if (heartbeat) clearInterval(heartbeat);
       if (retry) clearTimeout(retry);
@@ -194,7 +198,7 @@ export function ProgramHolderPhoneReceiver() {
         keepalive: true,
       }).catch(() => undefined);
     };
-  }, [phonePage]);
+  }, [phonePage, phoneHref]);
 
   async function answer() {
     const call = callRef.current;
@@ -234,7 +238,7 @@ export function ProgramHolderPhoneReceiver() {
       <audio ref={audioRef} autoPlay playsInline />
       {online && state === 'idle' ? (
         <Link
-          href="/program-holder/phone"
+          href={phoneHref}
           className="fixed bottom-4 left-4 z-50 inline-flex min-h-11 items-center gap-2 rounded-full border border-emerald-300 bg-emerald-950 px-4 py-2 text-sm font-black text-white shadow-xl"
         >
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />

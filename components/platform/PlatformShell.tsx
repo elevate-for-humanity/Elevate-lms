@@ -488,7 +488,7 @@ export function PlatformShell({
           </div>
         </main>
       </div>
-      {!['program_holder', 'site_coordinator', 'student', 'apprentice'].includes(role) ? <DashboardVideoCalls /> : null}
+      {!pathname.endsWith('/phone') && !['program_holder', 'site_coordinator', 'student', 'apprentice'].includes(role) ? <DashboardVideoCalls /> : null}
       {paris !== false ? (
         /* PlatformShell is the single PARIS owner for authenticated dashboards. */
         <ParisFloatingWrapper

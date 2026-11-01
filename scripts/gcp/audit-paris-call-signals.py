@@ -44,5 +44,5 @@ def main():
  gateway_pid=run(['systemctl','show','elevate-paris-gateway.service','--property=MainPID','--value']).strip()
  gateway_process={'matchingLaunchProcessCount':len(processes),'servicePidMatchesSingleProcess':len(processes)==1 and processes[0].name==gateway_pid}
  print(json.dumps({'gatewayProcess':gateway_process,'srtpReasonSignals':srtp_reasons,'carrierEndpointSettings':endpoint_settings,'readOnly' :True,'callsPlaced':0,'gatewayActive':run(['systemctl','is-active','elevate-paris-gateway.service']).strip()=='active',
-  'gatewayFailureMarkers':{marker:gateway.count(marker) for marker in ['PARIS_GREETING_REQUESTED','PARIS_GREETING_AUDIO_READY','PARIS_GREETING_SENT','PARIS_BRIDGE_FAILED','PARIS_GREETING_FAILED','PARIS_TURN_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_RUNTIME_STARTUP_FAILED']},'asteriskSignals':signals}))
+  'gatewayFailureMarkers':{marker:gateway.count(marker) for marker in ['PARIS_TURN_REQUESTED','PARIS_TURN_AUDIO_READY','PARIS_TURN_SENT','PARIS_GREETING_REQUESTED','PARIS_GREETING_AUDIO_READY','PARIS_GREETING_SENT','PARIS_BRIDGE_FAILED','PARIS_GREETING_FAILED','PARIS_TURN_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_RUNTIME_STARTUP_FAILED']},'asteriskSignals':signals}))
 if __name__=='__main__':main()

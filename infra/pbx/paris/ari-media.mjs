@@ -1,16 +1,17 @@
 /**
- * Independent PARIS media gateway (staged; not a public-number cutover).
+ * PARIS media gateway for the existing Elevate business phone number.
  *
- * Asterisk Stasis(elevate-paris) -> ARI bridge -> externalMedia RTP (PCMU/8k)
- * -> authenticated PARIS_TURN_URL -> RTP reply. The turn processor must return
+ * Asterisk Stasis(elevate-paris) -> ARI bridge -> loopback AudioSocket PCM/8k
+ * -> authenticated PARIS_TURN_URL -> private PCM reply. The turn processor must return
  * real ulaw 8k audio and a conversation response; it is NOT provided by this file.
  * The service fails closed if its AI adapter is missing.
  *
- * Requires Node 22+, private ARI loopback, private RTP host, and a dedicated
+ * Requires Node 22+, private ARI loopback, private media host, and a dedicated
  * least-privileged runtime identity. Do not expose ARI on the public internet.
  */
-import { createSocket } from 'node:dgram';
-import { randomBytes } from 'node:crypto';
+import { createServer } from 'node:net';
+import {pcm16ToUlaw} from './turn-adapter.mjs';
+import { randomBytes,randomUUID } from 'node:crypto';
 import { setTimeout as sleep } from 'node:timers/promises';
 import {privateTurn,privateTurnOptions} from './private-turn.mjs';
 
@@ -42,13 +43,25 @@ export function isCallerStart(event){
     /^(PJSIP|Local)\//.test(event.channel?.name||'');
 }
 export async function createExternalChannel(session,host,request=ari){
+  const peer=/^127[.]0[.]0[.]1:([0-9]{4,5})$/.exec(host);
+  if(!peer || Number(peer[1])<1024 || Number(peer[1])>65535)throw Error('EXTERNAL_MEDIA_HOST_NOT_LOOPBACK');
   session.externalId=EXTERNAL_PREFIX+session.id;
+  session.audioSocketId ||= randomUUID();
   const external=await request('/channels/externalMedia','POST',{
-    channelId:session.externalId,app:config.app,external_host:host,format:'ulaw',
-    direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client',
+    channelId:session.externalId,app:config.app,external_host:host,format:'slin',
+    direction:'both',transport:'tcp',encapsulation:'audiosocket',connection_type:'client',data:session.audioSocketId,
   });
   if(external.id!==session.externalId)throw Error('EXTERNAL_CHANNEL_ID_MISMATCH');
   return external;
+}
+export async function waitForOwnedMedia(session,request=ari,wait=sleep){
+  if(!session.externalId?.startsWith(EXTERNAL_PREFIX) || !UUIDISH.test(session.externalId))throw Error('EXTERNAL_CHANNEL_ID_MISMATCH');
+  for(let attempt=0;attempt<20;attempt++){
+    const app=await request('/applications/'+config.app);
+    if(app.channel_ids?.includes(session.externalId))return;
+    await wait(50);
+  }
+  throw Error('EXTERNAL_CHANNEL_STASIS_NOT_READY');
 }
 export async function ownedMediaPeer(session,external,request=ari){
   if(!session.externalId?.startsWith(EXTERNAL_PREFIX) || !UUIDISH.test(session.externalId) || external?.id!==session.externalId)throw Error('EXTERNAL_CHANNEL_ID_MISMATCH');
@@ -63,6 +76,68 @@ export async function ownedMediaPeer(session,external,request=ari){
   const port=Number(rawPort);
   if(!['127.0.0.1','0.0.0.0'].includes(address) || !/^[0-9]{4,5}$/.test(String(rawPort)) || !Number.isInteger(port) || port<1024 || port>65535)throw Error('EXTERNAL_MEDIA_PEER_NOT_LOOPBACK');
   return {address:'127.0.0.1',port};
+}
+// AudioSocket keeps the media leg on loopback without the UDP receive failure
+// reproduced in this Asterisk image. Public carrier TLS/SRTP and WebRTC ICE stay
+// independently configured. Authenticate the per-call UUID before accepting PCM.
+export class AudioSocketParser {
+  constructor(uuid,onAudio,onReady=()=>{}){
+    if(!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(uuid))throw Error('AUDIO_SOCKET_ID_INVALID');
+    this.expected=Buffer.from(uuid.replaceAll('-',''),'hex');this.onAudio=onAudio;this.onReady=onReady;
+    this.pending=Buffer.alloc(0);this.voice=Buffer.alloc(0);this.ready=false;
+  }
+  push(chunk){
+    if(this.pending.length+chunk.length>65536)throw Error('AUDIO_SOCKET_BUFFER_LIMIT');
+    this.pending=Buffer.concat([this.pending,chunk]);
+    while(this.pending.length>=3){
+      const type=this.pending[0],size=this.pending.readUInt16BE(1);
+      if(size>6400)throw Error('AUDIO_SOCKET_FRAME_LIMIT');
+      if(this.pending.length<3+size)return;
+      const body=this.pending.subarray(3,3+size);this.pending=this.pending.subarray(3+size);
+      if(!this.ready){
+        if(type!==1 || size!==16 || !body.equals(this.expected))throw Error('AUDIO_SOCKET_ID_MISMATCH');
+        this.ready=true;this.onReady();continue;
+      }
+      if(type===0 || type===255)throw Error('AUDIO_SOCKET_PEER_ENDED');
+      if(type===3 && size===1)continue; // Caller keypad routing remains ARI-owned.
+      if(type!==16 || !size || size%2)throw Error('AUDIO_SOCKET_PCM_INVALID');
+      const voice=Buffer.alloc(size/2);
+      for(let i=0;i<voice.length;i++)voice[i]=pcm16ToUlaw(body.readInt16LE(i*2));
+      this.voice=Buffer.concat([this.voice,voice]);
+      while(this.voice.length>=FRAME){
+        const frame=Buffer.from(this.voice.subarray(0,FRAME));this.voice=this.voice.subarray(FRAME);this.onAudio(frame);
+      }
+    }
+  }
+}
+export function audioSocketFrame(ulaw){
+  if(ulaw.length!==FRAME)throw Error('AUDIO_SOCKET_FRAME_SIZE');
+  const frame=Buffer.alloc(3+FRAME*2);frame[0]=16;frame.writeUInt16BE(FRAME*2,1);
+  for(let i=0;i<FRAME;i++)frame.writeInt16LE(ulawDecode(ulaw[i]),3+i*2);
+  return frame;
+}
+export async function listenAudioSocket(session,onAudio,{finish=end}={}){
+  session.audioSocketId ||= randomUUID();
+  let accept,reject;
+  const connected=new Promise((resolve,fail)=>{accept=resolve;reject=fail;});
+  connected.catch(()=>{}); // Setup can fail before the caller awaits the handshake.
+  const timer=setTimeout(()=>reject(Error('AUDIO_SOCKET_HANDSHAKE_TIMEOUT')),10000);timer.unref();
+  session.mediaDeadline=timer;
+  const fail=()=>{reject(Error('AUDIO_SOCKET_CONNECTION_FAILED'));if(!session.closed&&!session.transferring)void finish(session,'continue');};
+  const server=createServer(socket=>{
+    if(socket.remoteAddress!=='127.0.0.1' || session.socket || session.closed){socket.destroy();return;}
+    session.socket=socket;socket.setNoDelay(true);server.close();
+    const parser=new AudioSocketParser(session.audioSocketId,onAudio,()=>{
+      clearTimeout(timer);session.remote={address:'127.0.0.1',port:socket.remotePort};
+      session.writeAudio=payload=>new Promise((resolve,failWrite)=>socket.write(audioSocketFrame(payload),error=>error?failWrite(Error('AUDIO_SOCKET_WRITE_FAILED')):resolve()));
+      accept();
+    });
+    socket.on('data',chunk=>{try{parser.push(chunk);}catch{socket.destroy();fail();}});
+    socket.on('error',fail);socket.on('close',fail);
+  });
+  session.server=server;server.on('error',fail);
+  await new Promise((resolve,failListen)=>{server.once('error',failListen);server.listen(0,'127.0.0.1',resolve);});
+  return {host:'127.0.0.1:'+server.address().port,connected};
 }
 function required(){
   if (!config.user || !config.password || !config.token || !config.adapter) throw Error('PARIS_RUNTIME_CONFIG_INCOMPLETE');
@@ -164,8 +239,12 @@ export async function speak(session,encoded,{clock=()=>performance.now(),wait=sl
   const startedAt=clock();
   try{
     for(let i=0;i<bytes.length&&!session.closed&&!session.transferring;i+=FRAME){
-      const part=rtp(bytes.subarray(i,i+FRAME),session);
-      await new Promise((resolve,reject)=>session.socket.send(part,session.remote.port,session.remote.address,e=>e?reject(e):resolve()));
+      const payload=bytes.subarray(i,i+FRAME);
+      if(session.writeAudio)await session.writeAudio(payload);
+      else { // Retained UDP codec harness; production sessions use authenticated TCP.
+        const part=rtp(payload,session);
+        await new Promise((resolve,reject)=>session.socket.send(part,session.remote.port,session.remote.address,e=>e?reject(e):resolve()));
+      }
       // Send complete 20ms audio frames against a monotonic timeline. Socket
       // callbacks and event-loop work must not add delay to every frame.
       const delay=startedAt+(i/FRAME+1)*RATE_MS-clock();
@@ -195,11 +274,14 @@ export async function turn(session,{request=privateTurn,play=speak,finish=end}={
   const voice=Buffer.concat(session.frames);session.frames=[];session.quiet=0;session.heard=false;
   if(voice.length<config.minFrames*FRAME)return;
   session.busy=true;
+  process.stderr.write('PARIS_TURN_REQUESTED\n');
   try{
     const body=await request(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
     if(session.closed || session.transferring)return;
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
+    process.stderr.write('PARIS_TURN_AUDIO_READY\n');
     await play(session,body.replyAudioUlawBase64);
+    if(!session.closed)process.stderr.write('PARIS_TURN_SENT\n');
     if(session.closed || session.transferring)return;
     if(body.requestedRoute?.type==='operator' || body.requestedRoute?.type==='extension') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
@@ -224,8 +306,9 @@ async function cleanupMedia(s){
 async function end(s,disposition='released'){
   if(s.closed)return;s.closed=true;sessions.delete(s.callId);
   clearTimeout(s.deadline);
-  clearTimeout(s.greetingDeadline);
-  try{s.socket.close();}catch{ /* Binding may have failed before cleanup. */ }
+  clearTimeout(s.greetingDeadline);clearTimeout(s.mediaDeadline);
+  try{s.server?.close();}catch{}
+  try{if(s.socket?.destroy)s.socket.destroy();else s.socket?.close();}catch{ /* Binding may have failed before cleanup. */ }
   await cleanupMedia(s);
   if(disposition!=='released'){
     try{await releaseCaller(s.callId,disposition);}
@@ -239,8 +322,7 @@ async function begin(call){
     try{await releaseCaller(callId,'continue');}catch{process.stderr.write('PARIS_CALL_RELEASE_FAILED\n');}
     return;
   }
-  const socket=createSocket('udp4');
-  const session={id:randomBytes(12).toString('hex'),callId,socket,closed:false,busy:false,playing:false,
+  const session={id:randomBytes(12).toString('hex'),callId,socket:null,closed:false,busy:false,playing:false,
     frames:[],quiet:0,heard:false,remote:null,seq:randomBytes(2).readUInt16BE(0),
     timestamp:randomBytes(4).readUInt32BE(0),ssrc:randomBytes(4).readUInt32BE(0),turn:0};
   sessions.set(callId,session);
@@ -249,34 +331,27 @@ async function begin(call){
   try{
     if(call.state!=='Up')await ari('/channels/'+encode(callId)+'/answer','POST');
     if(session.closed)return;
-    await new Promise((resolve,reject)=>{socket.once('error',reject);socket.bind(0,config.bind,resolve);});
-    socket.on('message',(packet,rinfo)=>{
-      if(session.closed || session.transferring)return;
-      // Only accept packets from the established Asterisk loopback interface.
-      if(rinfo.address!=='127.0.0.1')return;
-      const frame=parseRtp(packet);if(!frame)return;
-      if(!session.remote || rinfo.port!==session.remote.port)return;
-      if(!session.greetingStarted){void greet(session);return;}
-      if(session.playing || session.busy)return;
-      const speech=isSpeech(frame.payload);
+    const media=await listenAudioSocket(session,payload=>{
+      if(session.closed || session.transferring || session.playing || session.busy || !session.bridgeReady)return;
+      const speech=isSpeech(payload);
       if(speech)session.heard=true;
       if(!session.heard)return;
-      session.frames.push(Buffer.from(frame.payload));
+      session.frames.push(payload);
       session.quiet=speech?0:session.quiet+1;
       if(session.frames.length>=config.maxFrames || (session.frames.length>=config.minFrames && session.quiet>=config.silenceFrames))void turn(session);
     });
     const bridge=await ari('/bridges','POST',{type:'mixing,proxy_media',name:'paris-'+session.id});
     session.bridgeId=bridge.id;
     if(session.closed){await cleanupMedia(session);return;}
-    const host=config.advertised+':'+socket.address().port;
-    const external=await createExternalChannel(session,host);
-    session.remote=await ownedMediaPeer(session,external);
+    const external=await createExternalChannel(session,media.host);
+    await media.connected;
+    await waitForOwnedMedia(session);
     if(session.closed){await cleanupMedia(session);return;}
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
     if(session.closed){await cleanupMedia(session);return;}
     session.bridgeReady=true;
-    // ARI provides the allocated local RTP peer. Start the approved greeting
-    // without waiting for caller audio or the carrier's symmetric-RTP latch.
+    // Start after the authenticated private media handshake and bridge join.
+    // No caller speech is required to start the saved greeting.
     void greet(session);
   }catch(e){
     process.stderr.write('PARIS_BRIDGE_FAILED\n');

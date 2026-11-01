@@ -18,6 +18,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { liveKitReadiness } from '@/lib/communications/livekit';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -178,7 +179,7 @@ export default async function PhonePage() {
   // A database row or legacy Telnyx probe cannot certify live Twilio/PBX calling.
   // Keep the dashboard fail-closed until independent carrier and audio acceptance.
   const carrierReady = false;
-  const meetingReady = workspaceResult.data?.status === 'active';
+  const meetingReady = workspaceResult.data?.status === 'active' && liveKitReadiness().ready;
   const primaryNumber = numbers.find(
     (number: any) =>
       number.source === 'provider' && number.status === 'active' && number.is_primary,
@@ -311,12 +312,12 @@ export default async function PhonePage() {
         >
           <div className="flex items-center gap-2 font-black">
             <Video className="h-4 w-4" />
-            Meeting service: {meetingReady ? 'Connected' : 'Infrastructure pending'}
+            Meeting service: {meetingReady ? 'Configured' : 'Configuration required'}
           </div>
           <p className="mt-1">
             {meetingReady
-              ? 'Elevate-owned browser rooms are available.'
-              : 'The dashboard model is ready; the self-hosted WebRTC service must be provisioned before live rooms are enabled.'}
+              ? 'Video calling is configured. Each call must establish a live connection before it is shown as connected.'
+              : 'An active communications workspace and LiveKit configuration are required before video calls can be initiated.'}
           </p>
         </div>
       </div>

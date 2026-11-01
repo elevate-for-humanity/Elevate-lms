@@ -1,8 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { searchOpportunities, getOpportunityDetails } from '@/lib/integrations/grants-gov';
-import { grantRecord, visibleGrantRecords } from '@/lib/apps/workspaces/grants';
+import { grantDate, grantRecord, visibleGrantRecords } from '@/lib/apps/workspaces/grants';
 afterEach(() => vi.unstubAllGlobals());
 describe('Grants.gov public API contract', () => {
+  it('preserves date-only deadlines and rejects impossible calendar dates', () => {
+    expect(grantDate('12/31/2099')).toBe('2099-12-31');
+    expect(grantDate('2028-02-29')).toBe('2028-02-29');
+    expect(grantDate('02/29/2027')).toBeNull();
+    expect(grantDate('2026-13-01')).toBeNull();
+  });
   it('uses Search2 without transmitting credentials and reads its nested data envelope', async () => {
     const fetcher = vi.fn().mockResolvedValue(
       new Response(

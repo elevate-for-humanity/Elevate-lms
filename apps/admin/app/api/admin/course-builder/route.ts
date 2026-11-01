@@ -313,7 +313,7 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
-  const archivedGenerationActions: CourseBuilderAction[] = [
+  const canonicalGenerationActions: CourseBuilderAction[] = [
     'generate',
     'generate-from-blueprint',
     'queue-media',
@@ -321,7 +321,7 @@ export async function POST(req: NextRequest) {
     'generate-missing',
     'start-existing',
   ];
-  if (archivedGenerationActions.includes(action)) {
+  if (canonicalGenerationActions.includes(action)) {
     try {
       const db = await requireAdminClient();
       await assertCourseBuilderGenerationEnabled(db, body.courseId);

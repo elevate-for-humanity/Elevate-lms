@@ -3,6 +3,15 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import StudioCommandWorkspace from '@/components/studio/StudioCommandWorkspace';
 
+// This workspace test has no signed-in notification account. Keep the real
+// notification component mounted without depending on a live database client.
+vi.mock('@/lib/supabase/client', () => ({
+  createClient: () => ({ auth: {
+    getUser: async () => ({ data: { user: null }, error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: vi.fn() } } }),
+  } }),
+}));
+
 vi.mock('next/dynamic', () => ({
   default: (loader: () => unknown) =>
     String(loader).includes('CloudBrowserWorkspace')

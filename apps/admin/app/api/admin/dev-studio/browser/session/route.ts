@@ -4,6 +4,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 import { browserConfiguration } from '@/lib/devstudio/browser-configuration';
 import { retryableBrowserSessionRejection } from '@/lib/devstudio/studio-browser-session-start';
+import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,6 +82,11 @@ export async function POST(req: NextRequest) {
     .slice(0, 12)
     .map(({ name, value }) => ({ name, value }));
   try {
+    // The role guard intentionally returns a minimal identity. Read the current
+    // server-verified Auth record rather than trusting JWT/body metadata.
+    const supabase = await createClient();
+    const { data: { user }, error: identityError } = await supabase.auth.getUser();
+    const disposableQa = !identityError && user?.id === auth.user?.id && user?.app_metadata?.qa_e2e === true;
     const response = await fetch(`${config.internalUrl}/sessions`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-studio-browser-secret': config.secret },
@@ -93,7 +99,7 @@ export async function POST(req: NextRequest) {
         ownerId: auth.user?.id,
         // Only server-controlled Auth app metadata may shorten fixture lifetime.
         // Neither request JSON nor user-editable user_metadata is trusted.
-        disposableQa: auth.user?.app_metadata?.qa_e2e === true,
+        disposableQa,
       }),
       cache: 'no-store',
       signal: AbortSignal.timeout(35_000),

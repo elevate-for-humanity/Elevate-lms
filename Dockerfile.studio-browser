@@ -25,6 +25,7 @@ COPY services/studio-browser/browser-file-store.mjs ./browser-file-store.mjs
 COPY services/studio-browser/browser-workspace-store.mjs ./browser-workspace-store.mjs
 COPY services/studio-browser/provider-session-store.mjs ./provider-session-store.mjs
 COPY services/studio-browser/session-retirement.mjs ./session-retirement.mjs
+COPY services/studio-browser/session-expiration.mjs ./session-expiration.mjs
 COPY services/studio-browser/terminal-sessions.mjs ./terminal-sessions.mjs
 COPY services/studio-browser/terminal-init.sh ./terminal-init.sh
 COPY services/studio-browser/provider-verification.mjs ./provider-verification.mjs

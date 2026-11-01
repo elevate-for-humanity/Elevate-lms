@@ -227,20 +227,24 @@
         "image": "/images/pages/office-admin-desk.jpg"
       },
       {
-        "title": "Track attendance and learning evidence",
+        "title": "Clock in for hands-on training only",
         "points": [
-          "Use the correct attendance tool",
-          "Check saved hours and feedback",
-          "Request corrections with actual dates"
+          "Use the clock only during supervised practical training",
+          "Clock out for breaks and when training ends",
+          "Online theory does not use this clock"
         ],
-        "narration": "When your program requires attendance or a study clock, open Attendance and follow the instructions for that activity. Online study time and supervised work time are different records. Record only time you actually completed and do not run overlapping clocks. At the end of a session, confirm the entry saved. If an entry is missing or incorrect, report the date, actual start and finish times, and what you were doing. Staff must review corrections before hours are credited.",
+        "narration": "Use the HVAC hands-on training clock only when you are attending supervised practical training with your instructor. At your confirmed appointment, open Attendance, select your HVAC enrollment, confirm that you are attending hands-on training, and clock in when the instructor starts. Clock out for every break and when training ends. Online theory, lessons, videos, quizzes, and study at home do not use a manual clock. Hands-on time remains pending until your instructor verifies it. Report missed clock actions with the actual date and times.",
         "href": "/lms/attendance",
-        "action": "Review attendance",
-        "image": "/images/pages/office-admin-desk.jpg"
+        "action": "Open hands-on attendance",
+        "image": "/images/hvac-training-vibrant-2026.webp"
       },
       {
         "title": "Contact David to schedule practical training",
-        "points": ["David Nazaire", "(215) 214-9355", "indyondemandservices@gmail.com"],
+        "points": [
+          "David Nazaire",
+          "(215) 214-9355",
+          "indyondemandservices@gmail.com"
+        ],
         "narration": "Contact David Nazaire to arrange the hands-on portion of your HVAC program. His saved program contact number is two one five, two one four, nine three five five. His email is indyondemandservices at gmail dot com. Tell him your full name, that you are an Elevate HVAC learner, your online-study progress, and the dates you are available. Ask him to confirm the training dates, times, location, required clothing, tools, and safety equipment. Wait for confirmation before attending.",
         "href": "mailto:indyondemandservices@gmail.com?subject=Elevate%20HVAC%20hands-on%20training%20schedule",
         "action": "Email David",

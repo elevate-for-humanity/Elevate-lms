@@ -3,8 +3,8 @@
     "label": "Welcome to HVAC",
     "title": "Your six-week training plan",
     "items": [
-      "Weeks 1\u20134: online HVAC instruction.",
-      "Weeks 5\u20136: supervised training at the facility.",
+      "Weeks 1–4: online HVAC instruction.",
+      "Weeks 5–6: supervised training at the facility.",
       "Your enrollment date and your first training date may differ. Confirm your dates with staff."
     ]
   },
@@ -73,28 +73,28 @@
   },
   {
     "label": "Attendance",
-    "title": "Online study clock",
+    "title": "Hands-on training clock only",
     "items": [
-      "Open Attendance and select your active HVAC enrollment.",
-      "Clock in when you begin online study. Clock out when you stop or take a break.",
-      "Return and clock in for the next study session. Confirm each saved session."
+      "Use Attendance only for supervised, hands-on HVAC training.",
+      "Clock in when your instructor starts practical training. Clock out for breaks and when training ends.",
+      "Do not clock in for online theory, videos, quizzes, or study at home."
     ]
   },
   {
     "label": "Attendance review",
     "title": "Accurate hours",
     "items": [
-      "Record time spent actively completing assigned training.",
+      "Record only supervised, hands-on training in the time clock.",
       "A recorded session remains pending until staff verify it.",
       "Report a missed clock-out promptly. Staff must review unusually long sessions."
     ]
   },
   {
     "label": "At the facility",
-    "title": "A separate attendance process",
+    "title": "Your hands-on appointment",
     "items": [
-      "Follow the facility attendance instructions during weeks 5\u20136.",
-      "An online study session does not count as facility attendance.",
+      "Use the hands-on clock during your confirmed facility training session.",
+      "Theory study does not use a manual clock.",
       "Confirm arrival time, address, safety requirements and needed supplies with David."
     ]
   },
@@ -175,7 +175,7 @@
     "label": "Before you leave",
     "title": "Your daily checklist",
     "items": [
-      "Clock out when you finish online study or pause for a break.",
+      "Clock out when hands-on training ends or you take a break. Theory study does not require clocking in.",
       "Confirm saved work and check messages.",
       "Tell staff about missing access or hours. Keep your next training date handy."
     ]

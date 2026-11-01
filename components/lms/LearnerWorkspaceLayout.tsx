@@ -50,10 +50,12 @@ export default async function LearnerWorkspaceLayout({
   const isAdmin =
     subject.previewing || ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
   const subjectRole = subjectProfile.role;
-  const assignedHome = ['student', 'learner'].includes(String(subjectRole))
+  const assignedHome = !['admin', 'super_admin', 'staff'].includes(String(subjectRole))
     ? await resolveAssignedLearnerHome(db, subject.userId)
     : null;
-  const apprenticeWorkspace = isApprenticeWorkspaceRole(subjectRole) || assignedHome?.startsWith('/apprentice') === true;
+  const apprenticeWorkspace = assignedHome
+    ? assignedHome.startsWith('/apprentice')
+    : isApprenticeWorkspaceRole(subjectRole);
   const showBilling =
     (!isAdmin || subject.previewing) &&
     (await learnerCanSeeBilling(db, subject.userId, subjectRole));

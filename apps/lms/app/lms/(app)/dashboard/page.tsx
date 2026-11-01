@@ -5,7 +5,7 @@ import ProgramGuideResources from '@/components/resources/ProgramGuideResources'
 import CourseSyllabus, { type CourseSyllabusRecord } from '@/components/learner/CourseSyllabus';
 import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTasks';
 import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
-import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
+import HvacHandsOnClock from '@/components/learner/HvacHandsOnClock';
 import HvacStartHere from '@/components/learner/HvacStartHere';
 import { loadQwikStudyCode } from '@/lib/learner/qwik-study-access';
 import type { Metadata } from 'next';
@@ -120,11 +120,11 @@ export default async function StudentDashboard() {
     : { data: profile };
   // Old bookmarks and installed Student app shortcuts must not create a second
   // home for apprentices. Shared course routes remain available with apprentice chrome.
-  if (isApprenticeWorkspaceRole(subjectProfile?.role)) redirect(PortalRouter.get('apprentice'));
   const assignedHome = await resolveAssignedLearnerHome(db, subjectId);
   if (assignedHome?.startsWith('/apprentice')) redirect(assignedHome);
+  if (!assignedHome && isApprenticeWorkspaceRole(subjectProfile?.role)) redirect(PortalRouter.get('apprentice'));
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
-  const hasHvacEnrollment = workspace.enrollments.some(row => row.program_slug === 'hvac-technician');
+  const hasHvacEnrollment = workspace.enrollments.some(row => ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(row.program_slug || '') && ['active', 'enrolled', 'in_progress', 'confirmed'].includes(row.status));
   const qwikStudyCode = hasHvacEnrollment ? await loadQwikStudyCode(db, subjectId) : null;
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling
@@ -742,13 +742,13 @@ export default async function StudentDashboard() {
         ) : null}
         <details className="rounded-2xl border border-slate-200 bg-white p-4">
           <summary className="min-h-11 cursor-pointer font-bold text-slate-950">
-            Training dates, documents, and study clock
+            Training dates, documents, and hands-on attendance
           </summary>
           <StudentCompletionTasks userId={subjectId} />
           {programEnrollments.some((row: any) =>
-            ['hvac-technician'].includes(String(row.programs?.slug || row.program_slug || '')),
+            ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(String(row.programs?.slug || row.program_slug || '')),
           ) ? (
-            <OnlineStudyClock />
+            <HvacHandsOnClock />
           ) : null}
         </details>
         <CareerPlan plan={careerPlan} readOnly={subject.previewing} />

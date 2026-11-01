@@ -7,13 +7,13 @@ export function ProgramHolderOnlineStudy({
 }) {
   return (
     <section
-      aria-label="Online study clock records"
+      aria-label="Hands-on training clock records"
       className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
-      <h2 className="text-xl font-black">Online study clock records</h2>
+      <h2 className="text-xl font-black">Hands-on training clock records</h2>
       <p className="mt-2 text-sm text-slate-600">
-        These are the learner’s saved online clock-in and clock-out sessions. Online study is
-        separate from hands-on training. Open sessions and unverified time do not count as approved
+        These are saved HVAC hands-on clock-in and clock-out sessions. Students do not use
+        a manual clock for online theory. Open sessions and unverified time do not count as approved
         hours. Elevate staff verify attendance in Admin.
       </p>
       <div className="mt-4 overflow-x-auto">
@@ -67,7 +67,7 @@ export function ProgramHolderOnlineStudy({
             ) : (
               <tr>
                 <td colSpan={5} className="p-6 text-slate-500">
-                  No online study clock sessions recorded for this roster.
+                  No hands-on training clock sessions recorded for this roster.
                 </td>
               </tr>
             )}

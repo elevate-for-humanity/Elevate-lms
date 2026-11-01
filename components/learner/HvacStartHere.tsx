@@ -34,9 +34,9 @@ export default function HvacStartHere({ studyCode = null }: { studyCode?: string
     {
       title: 'Record attendance accurately',
       href: '/lms/attendance',
-      action: 'Open attendance & study clock',
-      instructions: 'For assigned online study, select your HVAC enrollment and choose Clock in for online study when you begin. Choose Clock out for every break and when you finish. Check the saved session before leaving. Follow the facility’s separate attendance instructions for hands-on training.',
-      confirmation: 'Recorded hours remain pending until staff verify them. Do not clock study time while only waiting for access, and do not use the online clock as a substitute for facility attendance. Report a missed clock-out with your actual start and stop times.',
+      action: 'Open hands-on attendance',
+      instructions: 'Use the time clock only for supervised, hands-on HVAC training. At your confirmed practical session, select your HVAC enrollment, confirm that you are attending hands-on training, then clock in when your instructor starts. Clock out for every break and when training ends. Online theory lessons, videos, quizzes, and studying at home do not use this clock.',
+      confirmation: 'Hands-on attendance remains pending until your instructor verifies it. Complete your theory lessons and assessments in the LMS. Report a missed practical clock-out with the actual start, break, and end times; never guess hours.',
     },
     {
       title: 'Get help with the exact step that is blocked',
@@ -98,7 +98,7 @@ export default function HvacStartHere({ studyCode = null }: { studyCode?: string
         <summary className="min-h-11 cursor-pointer font-bold text-slate-950">Your daily routine and status labels</summary>
         <ul className="mt-3 list-disc space-y-3 pl-5 text-sm leading-7 text-slate-800">
           <li>When you sign in: check messages, read your next required action, and check your calendar.</li>
-          <li>Before you leave: save your work, clock out if a study session is open, check submission status, and note your next task.</li>
+          <li>Before you leave: save your work, clock out if a hands-on training session is open, check submission status, and note your next task.</li>
           <li>Access granted means your account has access approval. It does not mean documents, lessons, attendance, or certification are completed.</li>
           <li>Pending review means staff action is still needed. Correction requested means read the note and fix that item. A completed upload does not automatically earn training hours.</li>
           <li>Self-paced study still follows your assigned deadlines. Contact staff before a deadline if you cannot meet it.</li>

@@ -1,4 +1,4 @@
-import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
+import HvacHandsOnClock from '@/components/learner/HvacHandsOnClock';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -63,7 +63,7 @@ export default async function AttendancePage() {
           <h1 className="text-3xl font-bold text-slate-900">My Attendance</h1>
           <p className="text-slate-700 mt-2">Track your course attendance</p>
         </div>
-        <OnlineStudyClock />
+        <HvacHandsOnClock />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-sm font-medium text-slate-700">Total Hours Logged</h3>

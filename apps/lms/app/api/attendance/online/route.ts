@@ -69,6 +69,8 @@ export async function POST(request: NextRequest) {
       { error: 'Select an enrollment and a valid action.' },
       { status: 400 },
     );
+  if (body.action === 'clock_in')
+    return NextResponse.json({ error: 'HVAC theory does not use a manual time clock. Use Hands-on training attendance only during supervised practical training.' }, { status: 409 });
   const db = await requireAdminClient();
   const { data, error } = await db.rpc('record_hvac_online_study', {
     p_user_id: user.id,

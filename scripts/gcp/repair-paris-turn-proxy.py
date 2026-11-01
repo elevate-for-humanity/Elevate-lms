@@ -50,8 +50,11 @@ def render(original):
 def require_mount(container):
  if not container.get('State',{}).get('Running') or not any(m.get('Type')=='bind' and m.get('Source')==str(FILE) and m.get('Destination')=='/etc/caddy/Caddyfile' for m in container.get('Mounts',[])):raise ValueError('PARIS_PROXY_MOUNT_UNVERIFIED')
 
+def require_file_ownership(filename):
+ if filename.is_symlink() or not filename.is_file() or filename.stat().st_uid!=0 or filename.stat().st_mode & 0o022:raise ValueError('PARIS_PROXY_FILE_OWNERSHIP_UNVERIFIED')
+
 def repair():
- if FILE.is_symlink() or not FILE.is_file() or FILE.stat().st_uid!=0 or FILE.stat().st_mode & 0o022:raise ValueError('PARIS_PROXY_FILE_OWNERSHIP_UNVERIFIED')
+ require_file_ownership(FILE)
  require_mount(json.loads(run(['docker','inspect','elevate-pbx-wss-proxy']))[0])
  state=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','core show channels count'])
  if not all(re.search(r'^0 active '+kind+r's?\s*$',state,re.M) for kind in ['call','channel']):raise ValueError('PARIS_PROXY_ACTIVE_CALLS_OR_UNKNOWN')

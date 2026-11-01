@@ -19,6 +19,14 @@ class Tests(unittest.TestCase):
   container={'State':{'Running':True},'Mounts':[{'Type':'bind','Source':str(m.FILE),'Destination':'/etc/caddy/Caddyfile'}]};m.require_mount(container)
   container['Mounts'][0]['Source']='/unrelated/Caddyfile'
   with self.assertRaisesRegex(ValueError,'MOUNT_UNVERIFIED'):m.require_mount(container)
+ def test_root_ownership_and_nonwritable_config_are_required(self):
+  from unittest.mock import Mock
+  from types import SimpleNamespace
+  filename=Mock();filename.is_symlink.return_value=False;filename.is_file.return_value=True;filename.stat.return_value=SimpleNamespace(st_uid=0,st_mode=0o600)
+  m.require_file_ownership(filename)
+  for change in ['symlink','owner','writable']:
+   filename.is_symlink.return_value=change=='symlink';filename.stat.return_value=SimpleNamespace(st_uid=1000 if change=='owner' else 0,st_mode=0o622 if change=='writable' else 0o600)
+   with self.assertRaisesRegex(ValueError,'OWNERSHIP_UNVERIFIED'):m.require_file_ownership(filename)
  def test_failed_auth_readback_restores_the_same_bind_mounted_inode(self):
   import tempfile,json
   from unittest.mock import patch
@@ -30,7 +38,7 @@ class Tests(unittest.TestCase):
     if 'reload' in args:reloads.append(config.read_text());return ''
     if 'validate' in args:return ''
     self.fail('Unexpected command')
-   with patch.object(m,'FILE',config),patch.object(m,'BACKUPS',root/'backups'),patch.object(m,'run',side_effect=command),patch.object(m,'private_status',side_effect=[404,500]),patch('builtins.print'):
+   with patch.object(m,'require_file_ownership'),patch.object(m,'FILE',config),patch.object(m,'BACKUPS',root/'backups'),patch.object(m,'run',side_effect=command),patch.object(m,'private_status',side_effect=[404,500]),patch('builtins.print'):
     with self.assertRaisesRegex(ValueError,'AUTH_READBACK_FAILED'):m.repair()
    self.assertEqual(config.read_text(),original);self.assertEqual(config.stat().st_ino,inode)
    self.assertEqual(len(reloads),2);self.assertIn(m.BLOCK,reloads[0]);self.assertEqual(reloads[1],original)
@@ -43,7 +51,7 @@ class Tests(unittest.TestCase):
     if args[:2]==['docker','inspect']:return json.dumps([{'State':{'Running':True},'Mounts':[{'Type':'bind','Source':str(config),'Destination':'/etc/caddy/Caddyfile'}]}])
     if args[-1]=='core show channels count':return '0 active calls\n1 active channel\n'
     self.fail('Unexpected mutation')
-   with patch.object(m,'FILE',config),patch.object(m,'run',side_effect=command),patch.object(m,'private_status',side_effect=AssertionError('Must refuse before network calls')):
+   with patch.object(m,'require_file_ownership'),patch.object(m,'FILE',config),patch.object(m,'run',side_effect=command),patch.object(m,'private_status',side_effect=AssertionError('Must refuse before network calls')):
     with self.assertRaisesRegex(ValueError,'ACTIVE_CALLS_OR_UNKNOWN'):m.repair()
    self.assertEqual(config.read_text(),original)
 if __name__=='__main__':unittest.main()

@@ -180,7 +180,45 @@ def tls_endpoint(text):
   body=re.sub(r'^'+key+r'=.*\n?', '',body,flags=re.M)
   body=body.rstrip()+'\n'+key+'='+value+'\n'
  return text[:match.start(2)]+body+text[match.end(2):]
-def attempted_tls_evidence():
+def messages_cursor():
+ result=subprocess.run(['docker','exec','pbx_asterisk_1','stat','-c','%i %s','/var/log/asterisk/messages'],capture_output=True,text=True,timeout=10)
+ match=re.fullmatch(r'(\d+) (\d+)\s*',result.stdout) if result.returncode==0 else None
+ return tuple(map(int,match.groups())) if match else None
+def current_attempt_messages(cursor):
+ after=messages_cursor()
+ if cursor is None or after is None:return '',False
+ start=cursor[1]+1 if after[0]==cursor[0] and after[1]>=cursor[1] else 1
+ result=subprocess.run(['docker','exec','pbx_asterisk_1','sh','-c','set -o pipefail; tail -c +"$1" /var/log/asterisk/messages | head -c 131072','check',str(start)],capture_output=True,text=True,timeout=10)
+ return (result.stdout,True) if result.returncode==0 else ('',False)
+def listener_ownership(listeners,processes):
+ owners=set(re.findall(r'pid=(\d+)',listeners))
+ asterisk={match[1] for line in processes.splitlines() if (match:=re.fullmatch(r'\s*(\d+)\s+asterisk\s*',line))}
+ return {'listenerPresent':bool(listeners.strip()),'listenerOwnerVerified':bool(owners) and owners.issubset(asterisk),
+  'asteriskProcessCount':len(asterisk),'listenerProcessNames':sorted(set(re.findall(r'users:\(\("([A-Za-z0-9_-]{1,40})"',listeners)))}
+def diagnostic_tls_probe(ciphers):
+ stage='tcp_connect'
+ try:
+  context=ssl.create_default_context();context.minimum_version=ssl.TLSVersion.TLSv1_2;context.maximum_version=ssl.TLSVersion.TLSv1_2;context.set_ciphers(ciphers)
+  with socket.create_connection(('127.0.0.1',5061),timeout=5) as raw:
+   stage='tls_handshake'
+   with context.wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
+    return {'trusted':bool(secure.getpeercert()),'cipher':secure.cipher()[0],'protocol':secure.version()}
+ except ssl.SSLCertVerificationError:return {'trusted':False,'stage':stage,'reason':'certificate_verification'}
+ except ssl.SSLError as error:
+  reason=str(error.reason)
+  return {'trusted':False,'stage':stage,'reason':reason if re.fullmatch(r'[A-Z0-9_]{1,80}',reason) else 'tls_failure'}
+ except (TimeoutError,socket.timeout):return {'trusted':False,'stage':stage,'reason':'timeout'}
+ except OSError:return {'trusted':False,'stage':stage,'reason':'socket_unavailable'}
+def transport_runtime_evidence():
+ evidence=listener_ownership(run(['ss','-H','-lntp','sport = :5061']),run(['docker','top','pbx_asterisk_1','-eo','pid,comm']))
+ available=cli('pjsip list ciphers')
+ allowed=['ECDHE-RSA-AES128-GCM-SHA256','ECDHE-RSA-AES256-GCM-SHA384','AES128-GCM-SHA256','AES256-GCM-SHA384']
+ evidence['providerCiphersSupported']=[name for name in allowed if re.search(r'(?<![A-Za-z0-9_-])'+re.escape(name)+r'(?![A-Za-z0-9_-])',available)]
+ evidence['cipherInventoryVerified']=not bool(re.search(r'no such command|not found',available,re.I))
+ evidence['forwardSecrecyProbe']=diagnostic_tls_probe(':'.join(allowed[:2]))
+ evidence['rsaGcmProbe']=diagnostic_tls_probe(':'.join(allowed[2:]))
+ return evidence
+def attempted_tls_evidence(cursor=None):
  # Capture the failed candidate before rollback. Emit booleans only, never raw
  # Asterisk logs, certificates, private keys, or command output.
  settings=cli('pjsip show transport elevate-twilio-tls')
@@ -188,19 +226,14 @@ def attempted_tls_evidence():
   if (match:=re.search(r'^\s*'+key+r'\s*:\s*(/etc/asterisk/[A-Za-z0-9_./-]+)\s*$',settings,re.M))}
  readable={key:run(['docker','exec','--user','asterisk','pbx_asterisk_1','sh','-c','if test -r "$1"; then echo yes; else echo no; fi','check',path]).strip()=='yes'
   for key,path in paths.items()}
- logs=''
- for args in [['docker','logs','--since','5m','--tail','300','pbx_asterisk_1'],
-              ['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/messages'],
-              ['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/full']]:
-  result=subprocess.run(args,capture_output=True,text=True,timeout=20)
-  logs+=result.stdout+result.stderr
+ logs,fresh=current_attempt_messages(cursor)
  patterns={'certificateLoadError':r'Unable to load.*(?:cert|key)|SSL.*(?:cert|key).*error',
   'noSharedCipher':r'no shared cipher','keyMismatch':r'key values mismatch',
   'permissionDenied':r'Permission denied','bindError':r'Unable to bind|Address already in use',
   'tlsFailure':r'TLS|SSL'}
  certificate=run(['openssl','x509','-in',str(ROOT/'tls/phone.crt'),'-noout','-text'])
  return {'candidateCertificateUsesRsa':bool(re.search(r'Public Key Algorithm:\s*rsaEncryption\b',certificate)),
-  'candidateCertificateConfigured':'cert_file' in paths,'candidateKeyConfigured':'priv_key_file' in paths,
+  'candidateLogFresh':fresh,'candidateCertificateConfigured':'cert_file' in paths,'candidateKeyConfigured':'priv_key_file' in paths,
   'candidateFilesReadable':readable,'candidateLogSignals':{key:bool(re.search(pattern,logs,re.I)) for key,pattern in patterns.items()}}
 def retire_standalone_contact():
  # This migration commits the new AOR independently of TLS activation. A later
@@ -261,6 +294,7 @@ def apply():
    # An existing transport without allow_reload needs one idle restart before
    # its trusted server certificate can take effect. Never restart active calls.
    if not idle_state(cli('core show channels count')):raise ValueError('PBX_CALL_STARTED_BEFORE_RESTART')
+   cursor=messages_cursor()
    run(['docker','restart','pbx_asterisk_1'])
    restarted=True
    for attempt in range(30):
@@ -272,8 +306,10 @@ def apply():
     transport=cli('pjsip show transport elevate-twilio-tls')
     settings={key:match[1] for key in ['method','verify_client','require_client_cert','verify_server','protocol']
      if (match:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_.-]+)\s*$',transport,re.M))}
-    try:diagnostics=attempted_tls_evidence()
+    try:diagnostics=attempted_tls_evidence(cursor)
     except Exception:diagnostics={'candidateDiagnosticsUnavailable':True}
+    try:diagnostics.update(transport_runtime_evidence())
+    except Exception:diagnostics['runtimeDiagnosticsUnavailable']=True
     print(json.dumps({'sipTlsFailure':TLS_FAILURE,'transportSettings':settings,**diagnostics}),flush=True)
     raise ValueError('PBX_TRUSTED_SIP_TLS_FAILED')
   for attempt in range(30):

@@ -30,7 +30,7 @@ class Tests(unittest.TestCase):
   from types import SimpleNamespace
   import json
   transport='cert_file : /etc/asterisk/tls/phone.crt\npriv_key_file : /etc/asterisk/tls/phone.key\n'
-  with patch.object(m,'cli',return_value=transport),patch.object(m,'run',side_effect=['yes\n','no\n','Public Key Algorithm: rsaEncryption']) as access,patch.object(m.subprocess,'run',return_value=SimpleNamespace(stdout='Permission denied secret=private',stderr='no shared cipher')):
+  with patch.object(m,'cli',return_value=transport),patch.object(m,'run',side_effect=['yes\n','no\n','Public Key Algorithm: rsaEncryption']) as access,patch.object(m,'current_attempt_messages',return_value=('Permission denied secret=private no shared cipher',True)):
    evidence=m.attempted_tls_evidence()
   self.assertEqual(evidence['candidateFilesReadable'],{'cert_file':True,'priv_key_file':False})
   self.assertTrue(evidence['candidateLogSignals']['noSharedCipher'])
@@ -123,4 +123,21 @@ class Tests(unittest.TestCase):
  def test_rsa_issuance_preserves_gateway_identity_and_unrelated_certificates(self):self.exercise_gateway_rotation(True)
  def test_failed_rsa_issuance_restores_the_previous_working_gateway(self):self.exercise_gateway_rotation(False)
  def test_a_call_starting_during_preflight_prevents_gateway_restart(self):self.exercise_gateway_rotation(False,True)
+ def test_listener_owner_must_be_the_current_containers_asterisk(self):
+  ss='LISTEN 0 128 0.0.0.0:5061 0.0.0.0:* users:(("asterisk",pid=123,fd=5))'
+  self.assertTrue(m.listener_ownership(ss,'PID COMMAND\n123 asterisk')['listenerOwnerVerified'])
+  self.assertFalse(m.listener_ownership(ss,'PID COMMAND\n456 asterisk')['listenerOwnerVerified'])
+  self.assertFalse(m.listener_ownership('','PID COMMAND\n123 asterisk')['listenerOwnerVerified'])
+ def test_only_new_messages_are_classified_for_the_candidate(self):
+  from unittest.mock import patch
+  from types import SimpleNamespace
+  with patch.object(m,'messages_cursor',return_value=(7,200)),patch.object(m.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='fresh TLS error')) as command:
+   self.assertEqual(m.current_attempt_messages((7,100)),('fresh TLS error',True))
+   self.assertEqual(command.call_args.args[0][-1],'101')
+ def test_log_rotation_starts_the_new_file_and_unknown_offsets_are_not_evidence(self):
+  from unittest.mock import patch
+  from types import SimpleNamespace
+  with patch.object(m,'messages_cursor',return_value=(8,20)),patch.object(m.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='new file')) as command:
+   self.assertEqual(m.current_attempt_messages((7,100)),('new file',True));self.assertEqual(command.call_args.args[0][-1],'1')
+   self.assertEqual(m.current_attempt_messages(None),('',False))
 if __name__=='__main__':unittest.main()

@@ -156,7 +156,7 @@ function normalizeSystemHealth(
       FALLBACK_SYSTEM_HEALTH.missingCertifications,
     ),
     unresolvedFlags: asCount(raw.unresolvedFlags, FALLBACK_SYSTEM_HEALTH.unresolvedFlags),
-    alerts: alerts.length ? alerts : FALLBACK_SYSTEM_HEALTH.alerts,
+    alerts: Array.isArray(raw.alerts) ? alerts : [...FALLBACK_SYSTEM_HEALTH.alerts],
   };
 }
 
@@ -243,6 +243,7 @@ function normalizeTopPrograms(programs: TopProgramPoint[] | null | undefined): T
       return {
         id,
         title,
+        slug: typeof program.slug === 'string' ? program.slug : undefined,
         learners: asCount(program.learners),
         completed: asCount(program.completed),
         completionRate: asCount(program.completionRate),
@@ -336,6 +337,7 @@ export function normalizeAdminDashboardData(
   const recentApplications = normalizeRecentApplications(input.recentApplications);
 
   return {
+    enrollmentSummary: input.enrollmentSummary ? {totalRecords: asCount(input.enrollmentSummary.totalRecords), available: input.enrollmentSummary.available === true} : undefined,
     counts: normalizeCounts(input.counts, pendingApplications.length || recentApplications.length),
     revenueAllTimeCents: asCount(input.revenueAllTimeCents, 0),
     totalStudents: asCount(input.totalStudents, 0),

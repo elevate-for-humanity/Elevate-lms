@@ -92,3 +92,28 @@ test('JPEG and WebP responses retain their actual format instead of being report
   assert.equal(result.mimeType,mimeType);assert.equal(result.bytes.toString(),'supported image');
  }
 });
+
+test('US capacity 429 switches to authenticated global endpoint without restarting identity',async()=>{
+ const calls=[];
+ const result=await generateTeachingPhoto('instructional photo',{env:{GOOGLE_CLOUD_PROJECT:'global-smoke-contract-test',ULTIMATE_PHOTO_REGION:'us'},delay:async()=>{},request:async(url,options)=>{
+  calls.push({url,options});
+  if(calls.length===1)return {ok:true,json:async()=>({access_token:'test-token'})};
+  if(calls.length===2)return {ok:false,status:429,headers:{get:()=>null}};
+  return {ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:Buffer.from('global image').toString('base64')}}]}}]})};
+ }});
+ assert.equal(calls.length,3);
+ assert.match(calls[1].url,/aiplatform\\.us\\.rep\\.googleapis\\.com.*locations\\/us\\//);
+ assert.match(calls[2].url,/aiplatform\\.googleapis\\.com.*locations\\/global\\//);
+ assert.equal(calls[2].options.headers.Authorization,'Bearer test-token');
+ assert.equal(result.bytes.toString(),'global image');
+});
+test('US-only processing disables global failover on capacity 429',async()=>{
+ const calls=[];
+ await assert.rejects(generateTeachingPhoto('instructional photo',{env:{GOOGLE_CLOUD_PROJECT:'us-only-smoke-test',ULTIMATE_PHOTO_REGION:'us',ULTIMATE_PHOTO_GLOBAL_FAILOVER:'false'},delay:async()=>{},request:async(url)=>{
+  calls.push(url);
+  if(calls.length===1)return {ok:true,json:async()=>({access_token:'token'})};
+  return {ok:false,status:429,headers:{get:()=>null},json:async()=>({error:{message:'capacity'}})};
+ }}),/HTTP_429/);
+ assert.equal(calls.length,4);
+ assert.ok(calls.slice(1).every(url=>url.includes('aiplatform.us.rep.googleapis.com')));
+});

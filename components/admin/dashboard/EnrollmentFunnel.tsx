@@ -20,7 +20,7 @@ export function EnrollmentFunnel({ data }: {data: AdminDashboardData}) {
       <Link href="/analytics" className="text-xs font-semibold text-blue-700">Analytics →</Link>
     </div>
     <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-4">
-      {steps.map(step=><Link key={step.label} href={step.href} className="flex flex-col items-center rounded-lg border border-slate-200 bg-slate-50 p-3">
+      {steps.map(step=><Link key={step.label} href={step.href} aria-label={`${step.value} ${step.label}`} className="flex flex-col items-center rounded-lg border border-slate-200 bg-slate-50 p-3">
         <span className="text-xl font-bold text-slate-950">{step.value}</span>
         <span className="mt-1 text-center text-xs text-slate-600">{step.label}</span>
       </Link>)}

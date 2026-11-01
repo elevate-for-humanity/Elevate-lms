@@ -91,22 +91,50 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const approvedScript = (artifacts.instructor_script as any)?.script?.segments;
     const recordedScript = (artifacts.natural_narration as any)?.narration?.segments;
     const recordedBoard = (artifacts.storyboard as any)?.storyboard?.scenes;
+    // Older failed renders persisted the finding but no repair state. Without
+    // reconstructing its bounded diagnosis, every resumed media role repeats
+    // the same mismatch and consumes another attempt. Use only the current
+    // saved failure, never an unrelated or superseded historical observation.
+    const savedRenderFailure = (steps ?? []).find((row: any) =>
+      row.step === 'lesson_film_render' && row.state === 'failed');
+    const savedErrors = Array.isArray(lesson?.findings)
+      ? lesson.findings.filter((finding: any) => finding.severity === 'error') : [];
+    const sourceSteps = ['instructor_script', 'natural_narration', 'storyboard'].map(step =>
+      passed.find((row: any) => row.step === step));
+    const savedFailureIsCurrent = savedRenderFailure?.completed_at &&
+      Number.isFinite(Date.parse(savedRenderFailure.completed_at)) &&
+      sourceSteps.every((row: any) => row?.completed_at &&
+        Number.isFinite(Date.parse(row.completed_at)) &&
+        Date.parse(row.completed_at) <= Date.parse(savedRenderFailure.completed_at));
+    const recoverMissingAudioDirective = !artifacts.__repairState && savedFailureIsCurrent &&
+      savedErrors.length > 0 && savedErrors.every((finding: any) =>
+        finding.step === 'lesson_film_render' && finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        finding.message === 'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED');
+    const approvedRecordingHasDivergentBoard =
+      currentEvidence(artifacts.instructor_script as any) &&
+      currentEvidence(artifacts.natural_narration as any) &&
+      currentEvidence(artifacts.storyboard as any) &&
+      Array.isArray(approvedScript) && approvedScript.length > 0 &&
+      Array.isArray(recordedScript) && approvedScript.length === recordedScript.length &&
+      approvedScript.every((segment: any, index: number) => segment.text === recordedScript[index]?.text) &&
+      Array.isArray(recordedBoard) &&
+      (recordedBoard.length !== approvedScript.length || recordedBoard.some((scene: any, index: number) =>
+        String(scene.dialogue ?? '').trim() !== String(approvedScript[index]?.text ?? '').trim()));
+    if (recoverMissingAudioDirective && approvedRecordingHasDivergentBoard) {
+      artifacts.__repairState = {status:'diagnosed', directive:{
+        version:'verified-repair-v1', failedStep:'lesson_film_render', target:'storyboard',
+        previousTarget:'natural_narration', attempt:1, previous:artifacts.storyboard,
+        requirements:savedErrors.map((finding: any) => ({code:finding.code,message:finding.message})),
+        instructions:'Restore the storyboard from the approved source that owns the saved script and recording. Preserve authorized sources and competency IDs. Rendering and independent media QA must pass again.',
+      }};
+    }
     const storyboardAudioRetry = audioDirective?.failedStep === 'lesson_film_render' &&
       audioDirective?.target === 'natural_narration' &&
       Array.isArray(audioDirective.requirements) && audioDirective.requirements.length > 0 &&
       audioDirective.requirements.every((finding: any) =>
         finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
         finding.message === 'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED') &&
-      currentEvidence(artifacts.instructor_script as any) &&
-      currentEvidence(artifacts.natural_narration as any) &&
-      currentEvidence(artifacts.storyboard as any) &&
-      Array.isArray(approvedScript) && approvedScript.length > 0 &&
-      Array.isArray(recordedScript) && approvedScript.length === recordedScript.length &&
-      approvedScript.every((segment: any, index: number) =>
-        segment.text === recordedScript[index]?.text) &&
-      Array.isArray(recordedBoard) &&
-      (recordedBoard.length !== approvedScript.length || recordedBoard.some((scene: any, index: number) =>
-        String(scene.dialogue ?? '').trim() !== String(approvedScript[index]?.text ?? '').trim()));
+      approvedRecordingHasDivergentBoard;
     if (storyboardAudioRetry) {
       artifacts.__repairState = {
         ...(artifacts.__repairState as any), status: 'diagnosed',

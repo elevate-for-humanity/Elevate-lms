@@ -127,7 +127,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
       .select('id', { count: 'exact', head: true })
       .eq('status', 'skipped')
       .gte('received_at', last24h),
-  ]));
+  ] as const));
 
   const providerHealth: ProviderHealth[] = [];
   const alerts: string[] = [];
@@ -160,7 +160,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
         .order('received_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
-    ]));
+    ] as const));
 
     const statusBreakdown: Record<string, number> = {};
     for (const row of statusRows || []) {
@@ -216,7 +216,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
       .from('payment_integrity_flags')
       .select('id', { count: 'exact', head: true })
       .is('resolved_at', null),
-  ]));
+  ] as const));
 
   const integrityAlerts: string[] = [];
   if ((paidNotEnrolled.count ?? 0) > 0)

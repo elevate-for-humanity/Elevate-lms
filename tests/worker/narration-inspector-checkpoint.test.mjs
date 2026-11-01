@@ -125,3 +125,37 @@ test('repeated Client Consultation question gets a unique exact source quotation
  assert.throws(()=>quoteStartSeconds(clarify('unsupported invented words',text),cues),/NOT_ALIGNED/);
  assert.equal(clarify('Choosing How do you typically style your hair',text),'Choosing How do you typically style your hair');
 });
+
+test('a current saved render finding reconstructs a missing storyboard repair without regenerating approved audio', async () => {
+ function fixture() {
+  const script={certified:true,script:{segments:[{text:'Approved instruction'}]}};
+  const narration={certified:true,narration:{segments:[{text:'Approved instruction'}]}};
+  const board={certified:true,storyboard:{scenes:[{dialogue:'Divergent instruction'}]}};
+  const artifacts={instructor_script:script,natural_narration:narration,storyboard:board};
+  const findings=[{step:'lesson_film_render',severity:'error',code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}];
+  const rows=[['instructor_script',script],['natural_narration',narration],['storyboard',board]].map(([step,artifacts])=>({step,state:'passed',completed_at:'2026-11-01T01:00:00Z',artifacts}));
+  rows.push({step:'lesson_film_render',state:'failed',completed_at:'2026-11-01T01:01:00Z',artifacts:{}});
+  const db={from:()=>{const q={select:()=>q,eq:()=>q,single:async()=>({data:{artifacts,findings}}),then:resolve=>resolve({data:rows})};return q;}};
+  return {script,narration,board,artifacts,findings,rows,load:()=>new Persistence(db).loadLessonCheckpoint({lessonBuildId:'lesson'})};
+ }
+ const f=fixture(),saved=await f.load();
+ assert.equal(saved.artifacts.__repairState.directive.target,'storyboard');
+ assert.equal(saved.artifacts.__repairState.status,'diagnosed');
+ assert.equal(saved.artifacts.__repairState.directive.previous,f.board);
+ assert.equal(saved.artifacts.natural_narration,f.narration);
+ assert.equal(f.artifacts.__repairState,undefined,'loading diagnosis must not mutate the database snapshot');
+ assert.ok(!saved.passedSteps.includes('lesson_film_render'));
+ assert.ok(!saved.passedSteps.includes('finished_media_qa'));
+ for(const mutate of [
+  f=>{f.script.certified=false;},
+  f=>{f.narration.narration.segments[0].text='Different recording';},
+  f=>{f.rows[0].completed_at='2026-11-01T01:02:00Z';},
+  f=>{f.rows[0].completed_at=null;},
+  f=>{f.rows.pop();},
+  f=>{f.findings.push({step:'finished_media_qa',severity:'error',code:'OTHER',message:'Other defect'});},
+  f=>{f.board.storyboard.scenes[0].dialogue='Approved instruction';},
+ ]) {
+  const rejected=fixture();mutate(rejected);
+  assert.equal((await rejected.load()).artifacts.__repairState,undefined);
+ }
+});

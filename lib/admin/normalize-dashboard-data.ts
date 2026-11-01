@@ -236,7 +236,7 @@ function normalizeInactiveLearners(
 
 function normalizeTopPrograms(programs: TopProgramPoint[] | null | undefined): TopProgramPoint[] {
   return asObjectArray(programs)
-    .map((program) => {
+    .map((program): TopProgramPoint | null => {
       const id = String(program.id ?? '').trim();
       const title = typeof program.title === 'string' ? program.title : 'Program';
       if (!id) return null;

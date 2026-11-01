@@ -31,3 +31,17 @@ This audit distinguishes repository access, application runtime identity, saved 
 - PARIS settings, 22 extension routes, source parity, synthetic speech, DNS/TLS and SIP transport passed the latest inspected PBX audit. Actual registration, incoming calls, two-way audio, transcription and delivered voicemail remain separate acceptance tests.
 - Course queue supervision is active, but historical failures, paused/archived/published attempts and current repair failures must remain distinct. Do not restart every failed row or clear error evidence to improve totals.
 - Other providers still need their own authenticated handshake and committed operation evidence; registry membership is not activation.
+
+## Follow-up: missing audio-render repair state
+
+Live checkpoint inspection found current failed renders with the exact `ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED` finding but no `__repairState`. Their certified scripts and recordings match, while the certified storyboards differ. Repeated media attempts therefore cannot select the existing storyboard correction path.
+
+`UltimateSupabasePersistence.loadLessonCheckpoint` now reconstructs only that missing diagnosis when all three saved source artifacts are current, the entire recording matches the approved script, the board differs, the saved render really failed, and its timestamp is not older than any source producer. Mixed failures, newer source writes, missing timestamps, stale certificates and divergent recordings do not qualify. It preserves the recording and delegates a storyboard correction; it does not certify rendering, quality, publication or completed recovery.
+
+The expanded checkpoint/router/source-refresh/self-repair suite passed 51 tests, including rejection cases for stale or unrelated findings. Production worker-image verification and actual completed lesson delivery remain required.
+
+The first repair commit's production supervisor ran successfully: all 29 completed attempts retaining errors were classified as 18 `checkpoint_complete_with_prior_error` and 11 `published`; their error history was preserved. Both migration readbacks passed. Marketing production compilation and generated-route typecheck passed; Admin/LMS validation and exact production rollout evidence are recorded separately from these source repairs.
+
+## Final-build type and accessibility corrections
+
+Admin compiled and prerendered, then its required final typecheck exposed tuple widening in the new webhook evidence wrapper and an optional `slug` predicate mismatch from a concurrently merged dashboard repair. The query groups now retain `as const` tuple types; the dashboard mapper declares its actual `TopProgramPoint | null` return contract. The existing dashboard regression also exposed concatenated accessible link names; metric links now have an explicit value-and-label accessible name. Assertions were preserved. These corrections require a fresh successful final typecheck; compilation alone is not sufficient.

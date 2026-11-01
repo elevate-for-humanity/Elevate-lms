@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const CULINARY: ProgramSchema = {
   slug: 'culinary-apprenticeship',
-  title: 'Culinary Apprenticeship',
+  title: 'Youth Culinary / Production Cook Apprenticeship',
   subtitle:
     'Earn ServSafe certification and culinary skills through a registered apprenticeship. Hands-on training in a professional kitchen.',
   sector: 'personal-services',
@@ -161,7 +161,7 @@ export const CULINARY: ProgramSchema = {
     },
     {
       standard: 'Federal registration disclosure',
-      description: 'Culinary is not included in Elevate’s current canonical Registered Apprenticeship occupation standards.',
+      description: 'Youth Culinary / Production Cook (3010CB V1) is an active registered competency-based occupation under 2Exclusive llc-s, program 2025-IN-132301, verified directly in RAPIDS on November 1, 2026. The instructional outline on this page is separate from the full signed occupation requirements.',
     },
     {
       standard: 'WIOA Title I',
@@ -242,6 +242,6 @@ export const CULINARY: ProgramSchema = {
     fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'FSSA IMPACT or other support may be available only after individual eligibility and written authorization. No federal Registered Apprenticeship claim is made for this pathway.',
+    fundingNotes: 'FSSA IMPACT or other support may be available only after individual eligibility and written authorization. Federal occupation registration is verified separately in RAPIDS; it does not establish participant funding eligibility.',
   },
 };

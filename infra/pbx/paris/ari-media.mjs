@@ -307,7 +307,7 @@ async function end(s,disposition='released'){
   if(s.closed)return;s.closed=true;sessions.delete(s.callId);
   clearTimeout(s.deadline);
   clearTimeout(s.greetingDeadline);clearTimeout(s.mediaDeadline);
-  try{s.server?.close();}catch{}
+  try{s.server?.close();}catch{ /* Close is best-effort; continue call cleanup. */ }
   try{if(s.socket?.destroy)s.socket.destroy();else s.socket?.close();}catch{ /* Binding may have failed before cleanup. */ }
   await cleanupMedia(s);
   if(disposition!=='released'){

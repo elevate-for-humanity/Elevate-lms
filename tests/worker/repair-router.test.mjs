@@ -94,3 +94,14 @@ test('nested render asset failure repairs the saved visual assignment, not the f
  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:scene-2'}];
  assert.deepEqual(routeSelectiveRepairs(findings),[{step:'visual_assignment',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
 });
+
+test('all course builds inherit repeated resolved visual repair instead of unchanged rendering retries', () => {
+ for (const detail of ['MEDIA_RESOLVED_VISUALS_REPEATED:9:13', 'MEDIA_RESOLVED_VISUALS_MISSING:3,7']) {
+  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:'+detail}];
+  assert.deepEqual(routeSelectiveRepairs(findings),[
+   {step:'visual_assignment',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true},
+  ]);
+ }
+ assert.deepEqual(routeSelectiveRepairs([{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}]).map(x=>x.step),['lesson_film_render']);
+ assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_LICENSE_REQUIRED',message:'license unavailable'}]),[]);
+});

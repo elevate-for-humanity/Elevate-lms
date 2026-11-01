@@ -1,3 +1,4 @@
+import { HAIR_STYLIST_PROGRAM as HAIR_STYLIST } from '@/lib/apprenticeship/hair-stylist-program';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
 const BARBER_CONTRACT = getRegisteredProgramStandard('barber-apprenticeship');
@@ -5,21 +6,7 @@ if (!BARBER_CONTRACT) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
 const BARBER = BARBER_CONTRACT.standard;
 const SPONSOR = BARBER_CONTRACT.sponsor;
 
-const HAIR_STYLIST = {
-  slug: 'cosmetology-apprenticeship',
-  name: 'Hair Stylist Apprenticeship',
-  occupation: 'Hair Stylist',
-  existingTitle: 'Cosmetologist',
-  onetSocCode: '39-5012.00',
-  rapidsCode: '0096HY',
-  rapidsVersion: 'V1',
-  approach: 'hybrid' as const,
-  minimumTermHours: 2000,
-  maximumTermHours: 2500,
-  relatedInstructionHours: 154,
-  probationaryHours: 500,
-  apprenticeToMentorRatio: '1:1',
-} as const;
+
 
 /**
  * Static RAPIDS/public registration metadata only.

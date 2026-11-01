@@ -146,11 +146,11 @@ export function JobBoardPanel() {
                 <span className="text-slate-300">—</span>
               ) : configured ? (
                 <span className="flex items-center gap-1 text-brand-green-600 font-semibold">
-                  <CheckCircle className="w-3 h-3" /> Connected
+                  <CheckCircle className="w-3 h-3" /> API configured
                 </span>
               ) : (
                 <span title={note} className="flex items-center gap-1 text-amber-600 font-semibold cursor-help">
-                  <AlertCircle className="w-3 h-3" /> Needs approval
+                  <AlertCircle className="w-3 h-3" /> {stats ? 'API not configured' : 'Status unavailable'}
                 </span>
               )}
             </div>

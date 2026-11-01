@@ -23,6 +23,9 @@ import { isDurableExternalBlocker } from '../core/repair-router';
 import { liveCheckpointRepairReader } from './live-checkpoint-repair';
 import { verifyNewCourseAssessmentContract } from '../instructional/new-course-contract.mjs';
 import {coordinateLessonAutopilots, processLessonAutopilot} from './lesson-autopilot';
+export function isTargetedCourseJob(payload: Record<string, unknown> = {}) {
+  return Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance || payload.ownerPreview);
+}
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -85,7 +88,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     if (job.payload?.autopilot) return await processLessonAutopilot({db,job,workerId,generation,build,queue,assertActive});
-    if (job.payload?.parallelAutopilotStart === true || build.profile?.parallelAutopilot === 'three-role-v1') {
+    if (!isTargetedCourseJob(job.payload) && (job.payload?.parallelAutopilotStart === true || build.profile?.parallelAutopilot === 'three-role-v1')) {
       const coordinated = await coordinateLessonAutopilots({db,job,workerId,generation,build,assertActive});
       if (coordinated) return coordinated;
     }
@@ -163,7 +166,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
     const runtime = await createUltimateRuntime(db, fence);
     console.info('[UltimateWorker] runtime ready', { jobId: job.id });
-    const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance || payload.ownerPreview);
+    const targeted = isTargetedCourseJob(payload);
     const publishAsYouGo = profile.publishCompletedLessons === true && !targeted;
     const lessonReleases = publishAsYouGo ? new UltimateReleaseService(db) : null;
     const lessonReleaseActor = publishAsYouGo
@@ -337,7 +340,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     }
     assertActive();
     await queue.complete(job.id, workerId, generation);
-    if (profile.parallelAutopilot === 'three-role-v1') {
+    if (!targeted && profile.parallelAutopilot === 'three-role-v1') {
       const closed = await db.rpc('finish_ultimate_autopilot_pool',{p_build:build.id});
       if (closed.error) throw closed.error;
       if (closed.data !== true) throw Error('ULTIMATE_AUTOPILOT_COURSE_RELEASE_READBACK_REQUIRED');

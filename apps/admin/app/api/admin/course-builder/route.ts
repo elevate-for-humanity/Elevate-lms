@@ -1,4 +1,5 @@
 import { requestCanonicalGeneration } from '@/lib/ultimate-course-builder/core/generation-request';
+import { queueCanonicalLessonMedia, LessonMediaRequestError } from '@/lib/ultimate-course-builder/core/lesson-media-request';
 /**
  * /api/admin/course-builder
  *
@@ -313,6 +314,21 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
+  if (action === 'queue-media' && !(body.scope === 'course' && body.confirmCourseBatch === true)) {
+    try {
+      const db = await requireAdminClient();
+      const result = await queueCanonicalLessonMedia(db, {
+        courseId: body.courseId, lessonId: body.lessonId,
+        validateOnly: body.validateOnly === true, force: body.force === true,
+      }, auth.id);
+      return NextResponse.json(result, { status: result.ok ? (result.status === 'queued' ? 202 : 200) : 503 });
+    } catch (error) {
+      if (error instanceof LessonMediaRequestError)
+        return NextResponse.json({ ok: false, charged: false, error: error.message }, { status: error.status });
+      logger.error('[course-builder] Lesson media handoff failed', error);
+      return NextResponse.json({ ok: false, charged: false, error: 'Lesson media could not be queued.' }, { status: 503 });
+    }
+  }
   const canonicalGenerationActions: CourseBuilderAction[] = [
     'generate',
     'generate-from-blueprint',
@@ -325,7 +341,7 @@ export async function POST(req: NextRequest) {
     try {
       const db = await requireAdminClient();
       await assertCourseBuilderGenerationEnabled(db, body.courseId);
-      const result = await requestCanonicalGeneration(db, body, auth.id);
+      const result = await requestCanonicalGeneration(db, action === 'queue-media' ? { ...body, dryRun: body.validateOnly === true } : body, auth.id);
       return NextResponse.json(result, { status: result.ok ? (result.dryRun ? 200 : 202) : 503 });
     } catch (error) {
       logger.error('[course-builder] Canonical generation failed', error);

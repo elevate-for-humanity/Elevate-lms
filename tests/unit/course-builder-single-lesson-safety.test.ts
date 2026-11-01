@@ -17,12 +17,12 @@ describe('Course Builder single-lesson safety', () => {
   });
 
   it('validates the exact scope before reserving generation credits', () => {
-    const validation = canonicalRoute.indexOf('const validation = await queueCourseMedia');
-    const reservation = canonicalRoute.indexOf('reservation = await reserveCredits', validation);
-    expect(validation).toBeGreaterThan(-1);
-    expect(reservation).toBeGreaterThan(validation);
-    expect(canonicalRoute).toContain("status: validateOnly ? 'validated' : 'already_active'");
-    expect(canonicalRoute).toContain('charged: false');
+    const helper = readFileSync('lib/ultimate-course-builder/core/lesson-media-request.ts', 'utf8');
+    expect(canonicalRoute).toContain('queueCanonicalLessonMedia(db,');
+    expect(helper.indexOf('if (input.validateOnly || active.data)')).toBeLessThan(helper.indexOf('new UltimateJobQueue(db).enqueue'));
+    expect(helper).toContain("status: input.validateOnly ? 'validated' : 'already_active'");
+    expect(helper).toContain('charged: false');
+    expect(helper).toContain('competencyId: competency.id');
   });
 
   it('keeps validation side-effect free and reports already active work', () => {

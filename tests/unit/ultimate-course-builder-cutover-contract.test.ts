@@ -52,7 +52,7 @@ describe('Ultimate Course Builder production cutover', () => {
       "redirect('https://admin.elevateforhumanity.org/studio/courses?tab=ultimate')",
     );
     expect(marketing).toContain("getAdminUrl('/studio/courses?tab=ultimate')");
-    expect(legacyRoute).toContain('requestCanonicalGeneration(db, body, auth.id)');
+    expect(legacyRoute).toContain('requestCanonicalGeneration(db,');
     expect(legacyRoute).not.toContain('courseFactory(');
     expect(read('lib/ultimate-course-builder/core/generation-request.ts')).toContain('startCanonicalCourse(db,');
   });

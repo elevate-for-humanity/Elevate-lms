@@ -50,15 +50,6 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
     }
     if (body.syllabusPlan && !validateSyllabusPlan(body.syllabusPlan))
       return NextResponse.json({error:'Review a valid syllabus curriculum before starting.'},{status:400});
-    let generatedProfile = await buildUltimateProfile(db, {
-      courseId: course.id,
-      programSlug,
-      title: String(body.title || course.title),
-      topic: String(body.topic || course.description || ''),
-      audience: String(body.audience || ''),
-      state: String(body.state || ''),
-    });
-    if (body.syllabusPlan) generatedProfile = applySyllabusPlan(generatedProfile,body.syllabusPlan);
     const authoring = body.instructionalAuthoring;
     if (
       authoring &&
@@ -70,21 +61,12 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
         { error: 'Google authoring requires an explicitly selected Gemini model' },
         { status: 400 },
       );
-    const profile = {
-      ...generatedProfile,
-      mediaAcquisitionOwnerId: actorId,
-      publicationPolicy: 'automatic-quality-verified',
-      ...(authoring
-        ? {
-            instructionalAuthoring: {
-              provider: 'google' as const,
-              model: authoring.model,
-              ...(authoring.location ? { location: authoring.location } : {}),
-              version: GOOGLE_LESSON_AUTHOR_VERSION,
-            },
-          }
-        : {}),
-    };
+    const instructionalAuthoring = authoring ? {
+      provider: 'google' as const,
+      model: authoring.model,
+      ...(authoring.location ? { location: authoring.location } : {}),
+      version: GOOGLE_LESSON_AUTHOR_VERSION,
+    } : undefined;
 
     if (body.acceptanceBuild === true && !authoring)
       return NextResponse.json(
@@ -99,7 +81,7 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
       .order('created_at', { ascending: false })
       .limit(1);
     if (body.acceptanceBuild === true)
-      activeQuery.contains('profile', { instructionalAuthoring: profile.instructionalAuthoring });
+      activeQuery.contains('profile', { instructionalAuthoring });
     const { data: activeBuild, error: activeError } = await activeQuery.maybeSingle();
     if (activeError) throw activeError;
     if (activeBuild && body.syllabusPlan &&
@@ -110,7 +92,7 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
       activeBuild &&
       authoring &&
       JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !==
-        JSON.stringify(profile.instructionalAuthoring)
+        JSON.stringify(instructionalAuthoring)
     )
       return NextResponse.json(
         {
@@ -124,6 +106,22 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
       return NextResponse.json({ error: 'This build is paused. Use its authenticated Resume action.' }, { status: 409 });
     let build = activeBuild;
     if (!build) {
+      let generatedProfile = await buildUltimateProfile(db, {
+        courseId: course.id,
+        programSlug,
+        title: String(body.title || course.title),
+        topic: String(body.topic || course.description || ''),
+        audience: String(body.audience || ''),
+        state: String(body.state || ''),
+      });
+      if (body.syllabusPlan) generatedProfile = applySyllabusPlan(generatedProfile, body.syllabusPlan);
+      const profile = {
+        ...generatedProfile,
+        mediaAcquisitionOwnerId: actorId,
+        publicationPolicy: 'automatic-quality-verified',
+        ...(instructionalAuthoring ? { instructionalAuthoring } : {}),
+      };
+
       const created = await db
         .from('ultimate_course_builds')
         .insert({

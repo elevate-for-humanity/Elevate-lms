@@ -1,6 +1,6 @@
 # Nail Technician Apprenticeship Theory Syllabus
 
-Elevate provides theory/RTI; the Host Nail Salon provides qualified supervised practical training. Use the individual approved training plan and assigned course. This outline follows the existing nail-technician curriculum blueprint; LMS publication status determines available instruction.
+The signed July 10, 2025 Manicurist Appendix A specifies 19 competencies, 210 RTI hours, a 1:1 mentor ratio, and 500 hours of probation. It names Grace Beauty College as the RTI provider. Elevate's nail theory lessons and workbook support learning; accepted RTI must be documented under the approved provider assignment and any authorized amendments. The Host Nail Salon provides qualified supervised practical training. Use the individual approved training plan and assigned course. This outline follows the existing nail-technician curriculum blueprint; LMS publication status determines available instruction.
 
 ## Lesson sequence
 

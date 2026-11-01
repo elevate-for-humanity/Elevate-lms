@@ -111,6 +111,7 @@ def isolated_diagnosis():
    message_log=subprocess.run(['docker','exec',name,'tail','-n','300','/var/log/asterisk/messages'],capture_output=True,text=True,timeout=5)
 
    result['logSignals']={key:bool(re.search(pattern,logs.stdout+logs.stderr+message_log.stdout,re.I)) for key,pattern in {'noSharedCipher':'no shared cipher','certificateLoadError':'Unable to load.*(?:cert|key)','permissionDenied':'Permission denied','configLoadError':'Could not create an object|Error parsing'}.items()}
+   if result['handshake'].get('trusted') is True:return result
    # Restart only the private probe with a transport-only PJSIP configuration.
    # The live process, configuration and call routes remain untouched.
    transport=re.search(r'(?ms)^\[elevate-twilio-tls\]\s*\n.*?(?=^\[|\Z)',fragment.read_text())

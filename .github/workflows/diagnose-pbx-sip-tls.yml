@@ -32,11 +32,11 @@ jobs:
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-paris-call-signals.py
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Read the existing post-repair self-call without placing another call
+      - name: Read the final self-call recording failure without placing another call
         env:
           AUTHORIZED_SELF_TEST_DID: '+14632401404'
           SELF_CALL_MODE: inspect
-          INSPECT_SELF_CALL_SID: CA916df45179d3b62b4e9d2c3cae6a226d
+          INSPECT_SELF_CALL_SID: CA047104e2ffa0ce47fa400832debb5275
         run: node scripts/gcp/exercise-paris-self-call.mjs
       - name: Verify the exact deployed private HTTPS greeting helper
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py

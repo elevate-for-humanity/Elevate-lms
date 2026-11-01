@@ -40,12 +40,24 @@ def verified_identity(text):
   try:networks.add(str(ipaddress.ip_network(raw,strict=False)))
   except ValueError:pass
  return set(SIGNALING).issubset(networks)
+TLS_FAILURE='not_checked'
 def trusted_sip_tls():
+ global TLS_FAILURE
  try:
   with socket.create_connection(('127.0.0.1',5061),timeout=5) as raw:
    with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
+    TLS_FAILURE='none'
     return bool(secure.getpeercert())
- except Exception:return False
+ except ssl.SSLCertVerificationError as error:
+  TLS_FAILURE='certificate_verification_'+str(error.verify_code);return False
+ except ssl.SSLError:
+  TLS_FAILURE='tls_handshake_failed';return False
+ except (TimeoutError,socket.timeout):
+  TLS_FAILURE='socket_timeout';return False
+ except ConnectionRefusedError:
+  TLS_FAILURE='connection_refused';return False
+ except Exception:
+  TLS_FAILURE='transport_unavailable';return False
 def certificate_pair():
  # Reuse only the certificate actually served by the existing trusted gateway.
  with socket.create_connection(('127.0.0.1',443),timeout=5) as raw:
@@ -118,7 +130,14 @@ def apply():
    for attempt in range(30):
     if trusted_sip_tls():break
     time.sleep(1)
-   if not trusted_sip_tls():raise ValueError('PBX_TRUSTED_SIP_TLS_FAILED')
+   if not trusted_sip_tls():
+    # Read only allowlisted non-secret transport settings while the attempted
+    # configuration is still loaded, before rollback restores the old one.
+    transport=cli('pjsip show transport elevate-twilio-tls')
+    settings={key:match[1] for key in ['method','verify_client','require_client_cert','verify_server','protocol']
+     if (match:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_.-]+)\s*$',transport,re.M))}
+    print(json.dumps({'sipTlsFailure':TLS_FAILURE,'transportSettings':settings}),flush=True)
+    raise ValueError('PBX_TRUSTED_SIP_TLS_FAILED')
   for attempt in range(30):
    if re.search(r'\belevate-paris\b',cli('ari show apps')):break
    time.sleep(1)

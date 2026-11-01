@@ -28,15 +28,15 @@ function servingCredentials(run){
  return env;
 }
 export async function verifyLiveMeetingDelivery({run=google}={}){
- let browser,service,result,created=false,phase='configuration';
+ let browser,receiver,service,result,created=false,phase='configuration';
  const name='efh-integration-'+randomUUID();
  try{
   const env=servingCredentials(run),url=meetingEndpoint(env.LIVEKIT_URL);
-  service=new RoomServiceClient(url.replace('wss:','https:'),env.LIVEKIT_API_KEY,env.LIVEKIT_API_SECRET);
+  service=new RoomServiceClient(url.replace('wss:','https:'),env.LIVEKIT_API_KEY,env.LIVEKIT_API_SECRET,{requestTimeout:15});
   phase='isolated_test_room';await service.createRoom({name,maxParticipants:2,emptyTimeout:30,departureTimeout:10});created=true;
   async function token(identity){const t=new AccessToken(env.LIVEKIT_API_KEY,env.LIVEKIT_API_SECRET,{identity,ttl:'2m'});t.addGrant({roomJoin:true,room:name,canPublish:true,canSubscribe:true,canPublishData:true});return t.toJwt();}
-  phase='browser_start';browser=await chromium.launch({headless:true,args:['--autoplay-policy=no-user-gesture-required','--use-gl=angle','--use-angle=swiftshader']});
-  const receiver=await browser.newPage(),sender=await browser.newPage();
+  phase='browser_start';browser=await chromium.launch({headless:true,args:['--autoplay-policy=no-user-gesture-required','--use-gl=angle','--use-angle=swiftshader','--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows']});
+  receiver=await browser.newPage();const sender=await browser.newPage();
   for(const page of [receiver,sender]){await page.setContent('<!doctype html><html><body><p>Synthetic meeting verification</p></body></html>');await page.addScriptTag({path:resolve('node_modules/livekit-client/dist/livekit-client.umd.js')});}
   phase='receiver_join';
   await receiver.evaluate(async({url,jwt})=>{
@@ -51,11 +51,11 @@ export async function verifyLiveMeetingDelivery({run=google}={}){
     }
    });
    room.on(sdk.RoomEvent.DataReceived,data=>{if(new TextDecoder().decode(data)==='EFH_SYNTHETIC_DELIVERY')window.delivery.data=true;});
-   await room.connect(url,jwt,{autoSubscribe:true});
+   await room.connect(url,jwt,{autoSubscribe:true,peerConnectionTimeout:15000,websocketTimeout:15000});
   },{url,jwt:await token('synthetic-receiver')});
   phase='publisher_join';
   await sender.evaluate(async({url,jwt})=>{
-   const sdk=window.LivekitClient,room=new sdk.Room();window.testRoom=room;await room.connect(url,jwt,{autoSubscribe:true});
+   const sdk=window.LivekitClient,room=new sdk.Room();window.testRoom=room;await room.connect(url,jwt,{autoSubscribe:true,peerConnectionTimeout:15000,websocketTimeout:15000});
    const context=new AudioContext();await context.resume();const oscillator=context.createOscillator(),gain=context.createGain(),destination=context.createMediaStreamDestination();gain.gain.value=0.1;oscillator.frequency.value=440;oscillator.connect(gain);gain.connect(destination);oscillator.start();
    await room.localParticipant.publishTrack(destination.stream.getAudioTracks()[0],{source:sdk.Track.Source.Microphone,name:'synthetic-audio'});
    for(const [source,label] of [[sdk.Track.Source.Camera,'synthetic-video'],[sdk.Track.Source.ScreenShare,'synthetic-screen']]){
@@ -65,10 +65,13 @@ export async function verifyLiveMeetingDelivery({run=google}={}){
    }
    await room.localParticipant.publishData(new TextEncoder().encode('EFH_SYNTHETIC_DELIVERY'),{reliable:true});
   },{url,jwt:await token('synthetic-publisher')});
-  phase='received_media_assertions';await receiver.waitForFunction(()=>Object.values(window.delivery).every(Boolean),undefined,{timeout:45000});
+  phase='received_media_assertions';await receiver.bringToFront();await receiver.waitForFunction(()=>Object.values(window.delivery).every(Boolean),undefined,{timeout:45000});
   const delivery=await receiver.evaluate(()=>window.delivery);
   return result={passed:true,syntheticDelivery:delivery,physicalDevicesCertified:false,participants:2,valuesExposed:false};
- }catch{return result={passed:false,phase,physicalDevicesCertified:false,valuesExposed:false};}
+ }catch{
+  const delivery=receiver?await receiver.evaluate(()=>window.delivery).catch(()=>undefined):undefined;
+  return result={passed:false,phase,syntheticDelivery:delivery,physicalDevicesCertified:false,valuesExposed:false};
+ }
  finally{
   if(browser)await browser.close().catch(()=>{});
   if(created){

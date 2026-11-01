@@ -1,3 +1,4 @@
+vi.mock('@/components/communications/DashboardVideoCalls', () => ({ DashboardVideoCalls: () => null }));
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), handlers:{} as Record<string,(value?: any)=>void> }));

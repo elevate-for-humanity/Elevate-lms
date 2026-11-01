@@ -1,4 +1,6 @@
 'use client';
+
+import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 import { AudioOutputControl } from '@/components/communications/AudioOutputControl';
 import { TranscriptPanel } from '@/components/communications/TranscriptPanel';
 
@@ -837,6 +839,7 @@ export function ProgramHolderPhone({
             <span className="sr-only">Call</span>
           </button>
         </div>
+        <DashboardVideoCalls extension={returnNumber} disabled={data.readOnly || callState !== 'idle'} />
         <div className="mt-2 flex gap-2">
           <button
             type="button"

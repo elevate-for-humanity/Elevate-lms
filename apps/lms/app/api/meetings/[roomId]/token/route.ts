@@ -26,7 +26,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
   const room = Array.isArray(participant?.communication_rooms)
     ? participant.communication_rooms[0]
     : participant?.communication_rooms;
-  if (!participant || !room || room.status === 'cancelled' || room.status === 'ended') {
+  if (!participant || !room || room.room_key.startsWith('direct-video-') || room.status === 'cancelled' || room.status === 'ended') {
     return NextResponse.json({ error: 'Meeting is unavailable.' }, { status: 403 });
   }
 

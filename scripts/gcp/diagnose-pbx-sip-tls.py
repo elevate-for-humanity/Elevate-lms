@@ -7,10 +7,10 @@ def run(args):
  r=subprocess.run(args,capture_output=True,text=True,timeout=20)
  return (r.stdout+(r.stderr if args[:2]==['docker','logs'] else '')) if r.returncode==0 else ''
 
-def probe(host):
+def probe(host,port=5061):
  stage='tcp_connect'
  try:
-  with socket.create_connection((host,5061),timeout=5) as raw:
+  with socket.create_connection((host,port),timeout=5) as raw:
    stage='tls_handshake'
    with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
     return {'trusted':bool(secure.getpeercert()),'protocol':secure.version()}
@@ -91,8 +91,34 @@ def isolated_diagnosis():
    import ipaddress
    if not ipaddress.ip_address(ip).is_private:raise ValueError('probe_network_unverified')
    result={'sameRunningImage':instance['Image']==live['Image'],'internalNetworkOnly':True,'publishedPorts':bool(instance.get('HostConfig',{}).get('PortBindings')),'transportLoaded':ready,'handshake':probe(ip) if ready else {'error':'transport_not_loaded'}}
-   logs=subprocess.run(['docker','logs','--tail','200',name],capture_output=True,text=True,timeout=10)
-   result['logSignals']={key:bool(re.search(pattern,logs.stdout+logs.stderr,re.I)) for key,pattern in {'noSharedCipher':'no shared cipher','certificateLoadError':'Unable to load.*(?:cert|key)','permissionDenied':'Permission denied','configLoadError':'Could not create an object|Error parsing'}.items()}
+   result['uptimeAvailable']='System uptime:' in required(['docker','exec',name,'asterisk','-rx','core show uptime'])
+   def inside_probe():
+    try:
+     check=subprocess.run(['docker','exec',name,'openssl','s_client','-connect','127.0.0.1:5061','-servername','phone.elevateforhumanity.org','-verify_hostname','phone.elevateforhumanity.org','-verify_return_error','-CAfile','/etc/ssl/certs/ca-certificates.crt'],input='',capture_output=True,text=True,timeout=8)
+     output=check.stdout+check.stderr
+     return {'trusted':check.returncode==0 and bool(re.search(r'Verification: OK|Verify return code: 0 \(ok\)',output)), 'completed':True, 'handshakeFailure':bool(re.search(r'handshake failure|no shared cipher',output,re.I))}
+    except subprocess.TimeoutExpired:return {'trusted':False,'error':'timeout'}
+   result['insideHandshake']=inside_probe()
+   started=subprocess.run(['docker','exec','-d',name,'openssl','s_server','-accept','5062','-cert','/etc/asterisk/tls/phone.crt','-key','/etc/asterisk/tls/phone.key','-cert_chain','/etc/asterisk/tls/phone.crt','-quiet'],capture_output=True,timeout=5)
+   if started.returncode==0:
+    time.sleep(1);result['opensslServerHandshake']=probe(ip,5062)
+   logs=subprocess.run(['docker','logs','--tail','300',name],capture_output=True,text=True,timeout=10)
+   message_log=subprocess.run(['docker','exec',name,'tail','-n','300','/var/log/asterisk/messages'],capture_output=True,text=True,timeout=5)
+
+   result['logSignals']={key:bool(re.search(pattern,logs.stdout+logs.stderr+message_log.stdout,re.I)) for key,pattern in {'noSharedCipher':'no shared cipher','certificateLoadError':'Unable to load.*(?:cert|key)','permissionDenied':'Permission denied','configLoadError':'Could not create an object|Error parsing'}.items()}
+   # Restart only the private probe with a transport-only PJSIP configuration.
+   # The live process, configuration and call routes remain untouched.
+   transport=re.search(r'(?ms)^\[elevate-twilio-tls\]\s*\n.*?(?=^\[|\Z)',fragment.read_text())
+   if not transport:raise ValueError('transport_unverified')
+   (staging/'pjsip.conf').write_text(transport[0])
+   required(['docker','restart',name])
+   minimal_ready=False
+   for _ in range(15):
+    check=subprocess.run(['docker','exec',name,'asterisk','-rx','pjsip show transport elevate-twilio-tls'],capture_output=True,text=True,timeout=5)
+    if check.returncode==0 and re.search(r'protocol\s*:\s*tls\b',check.stdout):minimal_ready=True;break
+    time.sleep(1)
+   result['transportOnlyHandshake']=probe(ip) if minimal_ready else {'error':'transport_not_loaded'}
+   result['transportOnlyInsideHandshake']=inside_probe() if minimal_ready else {'error':'transport_not_loaded'}
    return result
   finally:
    if created:required(['docker','rm','-f',name])

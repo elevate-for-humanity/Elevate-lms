@@ -52,7 +52,7 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
   const targets = new Map<UltimateBuildStep, string[]>();
   for (const f of findings) {
     if (isDurableExternalBlocker(f)) continue;
-    const renderAssignmentFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED|ULTIMATE_RENDER_VISUAL_ASSETS_MISSING|ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED/.test(f.message);
+    const renderAssignmentFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED|ULTIMATE_RENDER_VISUAL_ASSETS_MISSING|ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED|MEDIA_RESOLVED_VISUALS_(?:REPEATED|MISSING)/.test(f.message);
     const renderNarrationFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED/.test(f.message);
     const renderInputFailure = f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && /PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED/.test(f.message);
     // The finished-film gate can report two *independent* defects in one

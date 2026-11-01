@@ -13,15 +13,22 @@ The signed approved Appendix A and the apprentice's training agreement govern. T
 
 ## Related instruction subjects
 
-- Esthetics history and professional ethics
-- Anatomy, physiology, and skin disorders
-- Skin types, conditions, and product selection
-- Facial techniques and equipment usage
-- Methods and safety
-- Makeup fundamentals
-- State laws and licensing requirements
-- Retailing, client care, and business practices
-- State licensing examination preparation
+Source: [signed July 10, 2025 Appendix A](https://drive.google.com/file/d/1l3e7hmyQQDM5CvQfYZzDv1g2vR23vrVR/view), PDF page 13 (printed A-6).
+
+| Instructional subject | Contact hours |
+| --- | ---: |
+| Esthetics History & Professional Ethics | 10 |
+| Anatomy, Physiology & Skin Disorders | 60 |
+| Skin Types, Conditions & Product Selection | 60 |
+| Facial Techniques & Equipment Usage | 40 |
+| Methods & Safety | 40 |
+| Makeup Fundamentals | 60 |
+| State Laws & Licensing Requirements | 10 |
+| Retailing, Client Care & Business Practices | 10 |
+| State Licensing Exam Preparation | 10 |
+| **Total** | **300** |
+
+The signed outline also states that 144 hours of related instruction are required for each apprentice for each year. Retain that provision when preparing the individual delivery schedule; the occupation total does not replace the annual requirement. These allocations are instructional requirements, not automatically credited learner hours.
 
 The complete RTI plan must account for 300 verified instructional hours. Follow the assigned esthetics theory lessons and workbook alongside supervised practical instruction. An introductory certificate or unlinked workbook does not substitute for the complete RTI plan.
 
@@ -51,4 +58,4 @@ Use the signed training agreement and approved individual schedule for pacing, r
 
 Completion of Elevate instruction does not itself issue a state license. The licensing authority determines eligibility and any additional requirements. This syllabus does not establish Indiana secondary CTE course equivalency or funding approval.
 
-**Revision:** October 31, 2026 — reconciled to the existing registered-program records; signed source authority remains controlling.
+**Revision:** November 1, 2026 — subject allocations verified against the signed July 10, 2025 Appendix A, canonical TypeScript and live RTI requirement records; signed source authority remains controlling.

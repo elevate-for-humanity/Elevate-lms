@@ -8,7 +8,6 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   const headers={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY};
   const url=new URL(root);
   url.searchParams.set('select','id,build_id,status,available_at,payload,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,findings,ownerPaused:profile->ownerPaused)');
-  url.searchParams.set('monitor->>enabled','eq.true');
   url.searchParams.set('order','id.asc');
   if(jobIds)url.searchParams.set('id','in.('+jobIds.join(',')+')');
   const rows=[];
@@ -35,7 +34,14 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
       observation={state:'capacity_wait',action:'wait_for_capacity',reason:dispatchState.reason || 'Google regional capacity is unavailable; saved work is preserved'};
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='dispatch_failed')
       observation={state:'dispatch_failed',action:'none',reason:dispatchState.reason || 'Worker assignment failed; no execution is confirmed'};
-    if(observation.state==='disabled')continue;
+    // Surface disabled jobs to PARIS rather than silently hiding failures.
+    // Do not enable or requeue historical/paused work without explicit authority.
+    if(observation.state==='disabled'){
+      if(job.status==='failed' || job.status==='running' || job.status==='queued')
+        observations.push({jobId:job.id,state:'unmonitored',action:'none',saved:false,
+          reason:'PARIS monitoring is disabled; inspect build ownership and authorization before recovery'});
+      continue;
+    }
     // A dispatch request is not a confirmed recovery. Persist verifiable worker
     // assignment evidence only after the database shows a fresh heartbeat and lease.
     const heartbeatMs=Date.parse(job.heartbeat_at ?? '');

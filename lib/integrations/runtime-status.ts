@@ -1,3 +1,5 @@
+import { googleCalendarCredentials } from '@/lib/google/calendar-settings';
+
 export type RuntimeIntegration = {
   id: string;
   required: readonly string[];
@@ -42,10 +44,14 @@ export const RUNTIME_INTEGRATIONS: readonly RuntimeIntegration[] = [
   { id: 'google-cloud', required: ['GOOGLE_CLOUD_PROJECT'] },
   { id: 'pbx-asterisk', required: ['PBX_PROVISIONING_TOKEN'] },
   { id: 'livekit', required: ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'] },
-  { id: 'student-enrollment-delivery', required: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'RESEND_API_KEY'] },
+  { id: 'student-enrollment-delivery', required: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SENDGRID_API_KEY'] },
 ] as const;
 
 export function runtimeRequirementPresent(name: string): boolean {
+  if (name === 'GOOGLE_CLIENT_ID' || name === 'GOOGLE_CLIENT_SECRET') {
+    return googleCalendarCredentials(process.env) !== null;
+  }
+  if (name === 'SEZZLE_PUBLIC_KEY') return Boolean((process.env.SEZZLE_PUBLIC_KEY || process.env.NEXT_PUBLIC_SEZZLE_PUBLIC_KEY)?.trim());
   if (name === 'TWILIO_ACCOUNT_SID') {
     return Boolean((process.env.TWILIO_ACCOUNT_SID || process.env.TWILIO_SID)?.trim());
   }

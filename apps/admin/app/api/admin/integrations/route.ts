@@ -4,6 +4,8 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { RUNTIME_INTEGRATIONS } from '@/lib/integrations/runtime-status';
+import { runtimeComponent } from '@/lib/integrations/runtime-evidence';
 import { summarizeSyncEvidence } from '@/lib/integrations/sync-evidence';
 import { ClassroomSyncError, readConnectedClassroomCourses, synchronizeGoogleClassroom } from '@/lib/integrations/google-classroom-sync';
 
@@ -38,7 +40,16 @@ export async function GET(request: NextRequest) {
     .limit(100);
   if (syncError) return safeDbError(syncError, 'Failed to fetch synchronization evidence');
 
-  let verified = false;
+  let runtimeEvidence: { status: string; is_enabled: boolean; metadata: Record<string, unknown> } | null = null;
+  if (RUNTIME_INTEGRATIONS.some(item => item.id === provider)) {
+    const result = await db.from('platform_integrations').select('status,is_enabled,metadata')
+      .is('tenant_id', null).eq('provider', provider).eq('integration_type', runtimeComponent()).maybeSingle();
+    if (result.error) return safeDbError(result.error, 'Failed to read runtime connection evidence');
+    runtimeEvidence = result.data;
+  }
+  const checkedAt = runtimeEvidence?.metadata?.checked_at;
+  const age = typeof checkedAt === 'string' ? Date.now() - Date.parse(checkedAt) : NaN;
+  let verified = runtimeEvidence?.status === 'connected' && runtimeEvidence.metadata.authenticated === true && age >= 0 && age < 600_000;
   if (provider === 'google-classroom') {
     try { await readConnectedClassroomCourses(db, auth.id); verified = true; }
     catch (error) {
@@ -51,8 +62,10 @@ export async function GET(request: NextRequest) {
     // This legacy table contains configuration only, never live provider proof.
     connected: verified,
     connection_verified: verified,
-    enabled: data?.is_active ?? false,
-    status: verified ? 'connected' : data ? 'unverified' : 'not_configured',
+    enabled: runtimeEvidence?.is_enabled ?? data?.is_active ?? false,
+    connection_checked_at: typeof checkedAt === 'string' ? checkedAt : null,
+    delivery_verified: false,
+    status: verified ? 'connected' : runtimeEvidence || data ? 'unverified' : 'not_configured',
     configuration_updated_at: data?.updated_at ?? null,
     ...summarizeSyncEvidence(syncRows ?? []),
   });

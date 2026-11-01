@@ -15,6 +15,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { getSiteHealthSnapshot } from '@/lib/admin/get-site-health';
+import { recordRuntimeIntegrationEvidence } from '@/lib/integrations/runtime-evidence';
+import { checkAllHealth } from '@/lib/control-plane';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -35,8 +38,10 @@ const REQUIRED_ENV_VARS = [
 ] as const;
 
 export async function GET(request: NextRequest) {
+  const { hydrateProcessEnv } = await import('@/lib/secrets');
+  await hydrateProcessEnv();
   const auth = request.headers.get('authorization');
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -48,7 +53,7 @@ export async function GET(request: NextRequest) {
     checks.push({
       name: `env:${key}`,
       ok: Boolean(val && val.length > 0),
-      detail: val ? `${val.slice(0, 8)}…` : 'MISSING',
+      detail: val ? 'configured' : 'MISSING',
     });
   }
 
@@ -136,6 +141,18 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  let monitoring: { recorded: number; serviceChecks: number } | null = null;
+  try {
+    const db = await requireAdminClient();
+    const [integrations, serviceHealth] = await Promise.all([
+      getSiteHealthSnapshot().then(snapshot => recordRuntimeIntegrationEvidence(db, snapshot)),
+      checkAllHealth(null),
+    ]);
+    monitoring = { recorded: integrations.recorded, serviceChecks: serviceHealth.checks.length };
+    checks.push({ name: 'monitoring:durable_receipts', ok: true, detail: 'Connection and service checks saved' });
+  } catch {
+    checks.push({ name: 'monitoring:durable_receipts', ok: false, detail: 'Monitoring could not be recorded' });
+  }
   const allOk = checks.every((c) => c.ok);
 
   if (!allOk) {
@@ -144,6 +161,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     ok: allOk,
+    monitoring,
     timestamp: new Date().toISOString(),
     checks,
   });

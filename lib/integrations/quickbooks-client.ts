@@ -49,7 +49,7 @@ export async function loadQuickBooksConfig(db: Database): Promise<QuickBooksConf
   return { clientId: process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID || '', clientSecret: process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET || '', accessToken: value('QB_ACCESS_TOKEN'), refreshToken: value('QB_REFRESH_TOKEN'), realmId: value('QB_REALM_ID') };
 }
 
-async function refreshQuickBooksToken(db: Database, config: QuickBooksConfig): Promise<string> {
+async function refreshQuickBooksTokenOnce(db: Database, config: QuickBooksConfig): Promise<string> {
   if (!config.clientId || !config.clientSecret) throw new QuickBooksError('oauth_configuration_missing', 'QuickBooks application credentials are missing.');
   if (!config.refreshToken) throw new QuickBooksError('oauth_reauthorization_required', 'QuickBooks authorization expired. Reconnect QuickBooks.');
   const response = await fetch(QB_TOKEN_URL, {
@@ -72,13 +72,29 @@ async function refreshQuickBooksToken(db: Database, config: QuickBooksConfig): P
       (token.refresh_token !== undefined && (typeof token.refresh_token !== 'string' || !token.refresh_token.trim()))) {
     throw new QuickBooksError('oauth_response_invalid', 'QuickBooks returned an invalid authorization response.');
   }
-  const rows = [
-    { key: 'QB_ACCESS_TOKEN', value: token.access_token, updated_at: new Date().toISOString() },
-    ...(token.refresh_token ? [{ key: 'QB_REFRESH_TOKEN', value: token.refresh_token, updated_at: new Date().toISOString() }] : []),
-  ];
-  const { error } = await db.from('app_settings').upsert(rows, { onConflict: 'key' });
+  const { data: saved, error } = await db.rpc('rotate_quickbooks_authorization', {
+    p_expected_refresh: config.refreshToken, p_realm: config.realmId,
+    p_access: token.access_token, p_refresh: token.refresh_token || config.refreshToken,
+  });
   if (error) throw new QuickBooksError('token_persistence_failed', 'QuickBooks authorization refreshed, but could not be saved. Reconnect QuickBooks before retrying.');
+  if (saved !== true) {
+    const latest = await loadQuickBooksConfig(db);
+    if (latest.realmId !== config.realmId || !latest.accessToken || latest.refreshToken === config.refreshToken)
+      throw new QuickBooksError('authorization_changed', 'QuickBooks authorization changed. Retry with the current connection.');
+    return latest.accessToken;
+  }
   return token.access_token;
+}
+
+const refreshes = new Map<string, Promise<string>>();
+async function refreshQuickBooksToken(db: Database, config: QuickBooksConfig): Promise<string> {
+  const identity = `${config.clientId}:${config.realmId}`;
+  const existing = refreshes.get(identity);
+  if (existing) return existing;
+  const pending = refreshQuickBooksTokenOnce(db, config);
+  refreshes.set(identity, pending);
+  try { return await pending; }
+  finally { if (refreshes.get(identity) === pending) refreshes.delete(identity); }
 }
 
 async function rawRequest(config: QuickBooksConfig, token: string, path: string, init?: RequestInit) {

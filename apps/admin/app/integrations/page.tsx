@@ -19,6 +19,8 @@ import {
   ExternalLink,
   Settings,
 } from 'lucide-react';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { runtimeComponent } from '@/lib/integrations/runtime-evidence';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import {
   RUNTIME_INTEGRATIONS,
@@ -229,7 +231,7 @@ const statusConfig: Record<
   { label: string; color: string; Icon: typeof CheckCircle2 }
 > = {
   configured: {
-    label: 'Configured',
+    label: 'Configuration present',
     color: 'bg-brand-green-100 text-brand-green-700',
     Icon: CheckCircle2,
   },
@@ -250,11 +252,23 @@ export default async function AdminIntegrationsPage() {
   await requireRole(['admin', 'staff']);
   await hydrateProcessEnv();
   const canonicalIds = new Set(RUNTIME_INTEGRATIONS.map((item) => item.id));
-  const integrations = INTEGRATIONS.map((i) => {
-    if (!canonicalIds.has(i.slug)) {
+  const aliases: Record<string, string> = { 'google-calendar': 'google', sendgrid: 'sendgrid-inbound' };
+  const providerId = (slug: string) => aliases[slug] || slug;
+  const existing = INTEGRATIONS.filter(item => item.slug !== 'stripe');
+  const missing = RUNTIME_INTEGRATIONS.filter(item => !existing.some(row => providerId(row.slug) === item.id));
+  const catalog: Integration[] = [...existing, ...missing.map(item => ({
+    name: item.id.replace(/-/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase()), slug: item.id,
+    description: 'Runtime configuration and verified connection evidence for this platform service.',
+    icon: Database, category: 'data' as const, envVars: [...item.required], status: 'not_configured' as const,
+  }))];
+  const db = await requireAdminClient();
+  const { data: evidence, error: evidenceError } = await db.from('platform_integrations')
+    .select('provider,status,metadata').is('tenant_id', null).eq('integration_type', runtimeComponent());
+  const integrations = catalog.map((i) => {
+    if (!canonicalIds.has(providerId(i.slug))) {
       return { ...i, status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status };
     }
-    const runtime = runtimeConfiguration(i.slug);
+    const runtime = runtimeConfiguration(providerId(i.slug));
     const status: IntegrationStatus = runtime.configured
       ? 'configured'
       : runtime.partial
@@ -304,7 +318,7 @@ export default async function AdminIntegrationsPage() {
             <p className="text-3xl font-bold text-slate-900">{integrations.length}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <p className="text-sm text-slate-500 mb-1">Configured</p>
+            <p className="text-sm text-slate-500 mb-1">Configuration present</p>
             <p className="text-3xl font-bold text-brand-green-600">{configuredCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -345,6 +359,16 @@ export default async function AdminIntegrationsPage() {
                       </span>
                     </div>
                     <p className="text-sm text-slate-600 mb-4 flex-1">{integration.description}</p>
+                    {(() => {
+                      const row = evidenceError ? null : evidence?.find(item => item.provider === providerId(integration.slug));
+                      const checked = typeof row?.metadata?.checked_at === 'string' ? row.metadata.checked_at : null;
+                      const age = checked ? Date.now() - Date.parse(checked) : NaN;
+                      const connected = row?.status === 'connected' && row.metadata?.authenticated === true && age >= 0 && age < 600_000;
+                      return <div className="mb-4 text-sm text-slate-700">
+                        <p>{connected ? 'API authentication verified' : evidenceError ? 'Connection monitoring unavailable' : 'Connection unverified'}</p>
+                        {checked && <p className="text-xs">Last checked: <time dateTime={checked}>{checked}</time></p>}
+                      </div>;
+                    })()}
                     <div className="flex gap-2 mt-auto">
                       {integration.configUrl && (
                         <Link

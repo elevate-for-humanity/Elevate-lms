@@ -2,7 +2,7 @@ name: Diagnose PBX SIP TLS without changing routing
 on:
   push:
     branches: [main]
-    paths: ['scripts/gcp/audit-live-phone-configuration.py', 'scripts/gcp/audit-paris-call-signals.py', 'scripts/gcp/diagnose-pbx-sip-tls.py', '.github/workflows/diagnose-pbx-sip-tls.yml']
+    paths: ['scripts/gcp/probe-paris-local-media.py', 'scripts/gcp/audit-live-phone-configuration.py', 'scripts/gcp/audit-paris-call-signals.py', 'scripts/gcp/diagnose-pbx-sip-tls.py', '.github/workflows/diagnose-pbx-sip-tls.yml']
   workflow_dispatch:
     inputs:
       local_media_probe:

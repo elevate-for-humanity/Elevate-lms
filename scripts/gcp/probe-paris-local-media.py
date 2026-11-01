@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Exercise two ephemeral loopback-only ARI media channels; never place a phone call."""
-import base64,concurrent.futures,json,re,socket,struct,time,urllib.request,urllib.parse,uuid,subprocess,os
+import base64,concurrent.futures,json,re,socket,struct,time,urllib.request,urllib.parse,uuid,subprocess,os,types,urllib.error
 from pathlib import Path
 
+phase='preflight'
 def main():
+ global phase
  values={}
  for line in Path('/etc/elevate-pbx/paris.conf').read_text().splitlines():
   match=re.fullmatch(r'([A-Z_0-9]+)=(.*)',line.strip())
@@ -24,7 +26,9 @@ def main():
  ids=[prefix+'-a',prefix+'-b'];bridge_id=prefix+'-bridge';sockets=[];peers=[];created=[];bridged=False
  def cli(command):
   return subprocess.run(['docker','exec','pbx_asterisk_1','asterisk','-rx',command],capture_output=True,text=True,timeout=8).stdout
- def command(args):return subprocess.run(args,capture_output=True,text=True,timeout=8)
+ def command(args):
+  try:return subprocess.run(args,capture_output=True,text=True,timeout=8)
+  except (OSError,subprocess.TimeoutExpired):return types.SimpleNamespace(returncode=127,stdout='',stderr='')
  iptables={}
  for chain,flag in [('INPUT','-i'),('OUTPUT','-o')]:
   result=command(['iptables','-S',chain])
@@ -37,6 +41,7 @@ def main():
  except Exception:runtime['asteriskNetworkNamespaceUnavailable']=True
  debug_enabled=False
  try:
+  phase='create_channels'
   for cid in ids:
    sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);sock.bind(('127.0.0.1',0));sock.settimeout(.1);sockets.append(sock)
    external=ari('/channels/externalMedia','POST',channelId=cid,app='elevate-paris',external_host='127.0.0.1:'+str(sock.getsockname()[1]),format='ulaw',direction='both',transport='udp',encapsulation='rtp',connection_type='client')
@@ -47,6 +52,7 @@ def main():
     if key not in data:data[key]=ari('/channels/'+cid+'/variable',variable=key)['value']
    if data['UNICASTRTP_LOCAL_ADDRESS'] not in ['127.0.0.1','0.0.0.0'] or not str(data['UNICASTRTP_LOCAL_PORT']).isdigit() or not 1024<=int(data['UNICASTRTP_LOCAL_PORT'])<=65535:raise ValueError('PROBE_NONLOOPBACK_PEER')
    peers.append(('127.0.0.1',int(data['UNICASTRTP_LOCAL_PORT'])))
+  phase='create_bridge'
   bridge=ari('/bridges','POST',bridgeId=bridge_id,type='mixing,proxy_media',name=prefix)
   if bridge.get('id')!=bridge_id:raise ValueError('PROBE_BRIDGE_MISMATCH')
   bridged=True;ari('/bridges/'+bridge_id+'/addChannel','POST',channel=','.join(ids))
@@ -57,6 +63,7 @@ def main():
     except socket.timeout:continue
     if source[0]=='127.0.0.1' and len(packet)>=172 and packet[0]>>6==2 and packet[1]&127==0:count+=1
    return count
+  phase='simple_media'
   debug_enabled=True;cli('rtp set debug ip 127.0.0.1')
   with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
    results=[pool.submit(receive,s) for s in sockets]
@@ -69,6 +76,7 @@ def main():
    counts=[r.result() for r in results]
   report={'localMediaProbe':True,'phoneCallsPlaced':0,'loopbackOnly':True,'framesSentPerChannel':100,'framesReceived':counts,'bridgeTechnology':ari('/bridges/'+bridge_id).get('technology'),'result':'PASS' if min(counts)>=80 else 'FAIL','runtime':runtime}
   # Adding one exclusively owned loopback channel selects Asterisk's soft mixer.
+  phase='soft_media'
   cid=prefix+'-c';ids.append(cid)
   sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);sock.bind(('127.0.0.1',0));sock.settimeout(.1);sockets.append(sock)
   external=ari('/channels/externalMedia','POST',channelId=cid,app='elevate-paris',external_host='127.0.0.1:'+str(sock.getsockname()[1]),format='ulaw',direction='both')
@@ -83,12 +91,14 @@ def main():
     time.sleep(max(0,start+(frame-99)*.02-time.monotonic()))
    report['softMixFramesReceived']=[r.result() for r in results]
   report['softMixTechnology']=ari('/bridges/'+bridge_id).get('technology')
+  phase='playback_control'
   # A built-in playback is a positive control for local outbound RTP.
   try:
    ari('/channels/'+ids[0]+'/play','POST',media='sound:beep',playbackId=prefix+'-playback')
    report['builtinPlaybackFramesReceived']=receive(sockets[0])
   except Exception:report['builtinPlaybackUnavailable']=True
   cli('rtp set debug off');debug_enabled=False
+  phase='read_signals'
   logs=command(['docker','logs','--since','20s','--tail','3000','pbx_asterisk_1']).stdout
   for path in ['/var/log/asterisk/messages','/var/log/asterisk/messages.log','/var/log/asterisk/full','/var/log/asterisk/full.log']:
    logs+=command(['docker','exec','pbx_asterisk_1','tail','-n','3000',path]).stdout
@@ -109,4 +119,4 @@ if __name__=='__main__':
  try:main()
  except Exception as error:
   code=str(error) if isinstance(error,ValueError) and re.fullmatch('PROBE_[A-Z_]+',str(error)) else 'PROBE_UNAVAILABLE'
-  print(json.dumps({'localMediaProbe':True,'phoneCallsPlaced':0,'error':code}));raise SystemExit(1)
+  print(json.dumps({'localMediaProbe':True,'phoneCallsPlaced':0,'error':code,'phase':phase,**({'httpStatus':error.code} if isinstance(error,urllib.error.HTTPError) else {})}));raise SystemExit(1)

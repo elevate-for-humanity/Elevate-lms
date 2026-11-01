@@ -21,4 +21,8 @@ class Tests(unittest.TestCase):
   self.assertIn('cert_file=/etc/asterisk/tls/phone.crt',text)
   self.assertIn('allow_reload=yes',text)
   self.assertIn('[other]\nkeep=yes',text)
+ def test_failure_evidence_never_emits_arbitrary_exception_text(self):
+  self.assertEqual(m.failure_evidence(ValueError('secret=private'))['reason'],'PBX_UNEXPECTED_FAILURE')
+  self.assertEqual(m.failure_evidence(ValueError('PBX_INGRESS_READBACK_FAILED'))['reason'],'PBX_INGRESS_READBACK_FAILED')
+  self.assertEqual(m.failure_evidence(m.subprocess.TimeoutExpired(['private'],30))['reason'],'PBX_COMMAND_TIMEOUT')
 if __name__=='__main__':unittest.main()

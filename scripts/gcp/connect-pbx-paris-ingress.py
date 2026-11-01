@@ -136,6 +136,12 @@ def apply():
   if restarted and idle_state(cli('core show channels count')):run(['docker','restart','pbx_asterisk_1'])
   raise
  return {'pbxIngressVerified':True,'parisEntryConfigured':True,'carrierSourceIdentityConfigured':True,'sipTlsVerified':trusted_sip_tls(),'liveCallAcceptance':'NOT_TESTED'}
+def failure_evidence(error):
+ # Never print command output, certificates, provider credentials, or arbitrary exceptions.
+ reason=str(error)
+ if not re.fullmatch(r'PBX_[A-Z_]+',reason):
+  reason='PBX_COMMAND_TIMEOUT' if isinstance(error,subprocess.TimeoutExpired) else 'PBX_UNEXPECTED_FAILURE'
+ return {'result':'FAIL','code':'PBX_PARIS_INGRESS_NOT_CONFIRMED','reason':reason}
 if __name__=='__main__':
  try:print(json.dumps(apply()))
- except Exception:print(json.dumps({'result':'FAIL','code':'PBX_PARIS_INGRESS_NOT_CONFIRMED'}));raise SystemExit(1)
+ except Exception as error:print(json.dumps(failure_evidence(error)));raise SystemExit(1)

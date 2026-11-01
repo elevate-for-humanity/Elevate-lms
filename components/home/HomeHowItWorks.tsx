@@ -1,6 +1,5 @@
 import HomeSectionNarration from './HomeSectionNarration';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 
 const STEPS = [
@@ -9,24 +8,18 @@ const STEPS = [
     label: 'Apply',
     detail: 'Start with a short application so we know your program interest and next step.',
     href: '/apply',
-    img: '/images/refresh-20261014/admissions.webp',
-    imgAlt: 'Illustrative student discussing an application with an advisor',
   },
   {
     n: '02',
     label: 'Review Funding',
     detail: 'Explore potential workforce funding and eligibility requirements before enrollment.',
     href: '/check-eligibility',
-    img: '/images/bookkeeping-training-vibrant-2026.webp',
-    imgAlt: 'Illustrative advisor reviewing financial paperwork with a student',
   },
   {
     n: '03',
     label: 'Train',
     detail: 'Complete credential-aligned instruction and required hands-on learning.',
     href: '/programs',
-    img: '/images/programs/hvac/training-20261029/group-learning.webp',
-    imgAlt: 'Illustrative HVAC instructor guiding students through a training plan',
   },
   {
     n: '04',
@@ -34,8 +27,6 @@ const STEPS = [
     detail:
       'Eligible apprenticeship pathways combine structured training with employer-based learning.',
     href: '/apprenticeships',
-    img: '/images/hero/hero-hands-on-training.webp',
-    imgAlt: 'Learner practicing technical skills with safety equipment',
   },
   {
     n: '05',
@@ -43,8 +34,6 @@ const STEPS = [
     detail:
       'Prepare for the credential, certification, or license requirement connected to your pathway.',
     href: '/credentials',
-    img: '/images/pexels/graduation.webp',
-    imgAlt: 'Illustrative graduates at a completion ceremony',
   },
   {
     n: '06',
@@ -52,8 +41,6 @@ const STEPS = [
     detail:
       'Use career services, employer connections, and work-based learning support as you advance.',
     href: '/employment-support',
-    img: '/images/career-coaching-new.webp',
-    imgAlt: 'Career advisor reviewing next steps with a learner',
   },
 ] as const;
 
@@ -85,20 +72,8 @@ export function HomeHowItWorks() {
               href={step.href}
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 transition hover:-translate-y-1 hover:border-slate-500 hover:shadow-2xl"
             >
-              <div className="relative aspect-[2/1] shrink-0 overflow-hidden">
-                <Image
-                  src={step.img}
-                  alt={step.imgAlt}
-                  fill
-                  className="object-cover object-center transition-transform duration-500 "
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  loading="lazy"
-                />
-                <span className="absolute left-4 top-4 rounded-full bg-slate-950/85 px-3 py-1.5 text-sm font-black text-white backdrop-blur-sm">
-                  {step.n}
-                </span>
-              </div>
               <div className="flex flex-1 flex-col p-4">
+                <span className="mb-3 w-fit rounded-full bg-slate-800 px-3 py-1 text-sm font-black text-orange-300">{step.n}</span>
                 <h3 className="text-lg font-black text-white">{step.label}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{step.detail}</p>
                 <span className="mt-auto pt-3 inline-flex items-center gap-2 text-base font-extrabold text-orange-300">

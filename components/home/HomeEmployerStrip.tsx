@@ -42,8 +42,8 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-orange-500',
-    img: '/images/programs/hvac/elevate-20261029/group-learning.webp',
-    imgAlt: 'Illustrative adult learners working with an instructor',
+    img: '/images/business-collaboration-vibrant-2026.webp',
+    imgAlt: 'Illustrative business partners planning a training cohort',
     title: 'Co-Design a Training Cohort',
     desc: 'Work with Elevate to structure a training cohort around job requirements, scheduling, credentials, and available workforce funding.',
     bullets: [

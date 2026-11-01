@@ -22,15 +22,27 @@ def probe(host):
 def main():
  cli=lambda v:run(['docker','exec','pbx_asterisk_1','asterisk','-rx',v])
  transport=cli('pjsip show transport elevate-twilio-tls')
- settings={key:m[1] for key in ['method','verify_client','require_client_cert','verify_server','protocol','bind']
-  if (m:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_.:\[\]-]+)\s*$',transport,re.M))}
+ settings={key:m[1] for key in ['method','verify_client','require_client_cert','verify_server','protocol','bind','cert_file','priv_key_file','ca_list_file','cipher']
+  if (m:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_./:\[\]-]+)\s*$',transport,re.M))}
  listeners=run(['ss','-H','-lnt','sport = :5061'])
  binds=[line.split()[3] for line in listeners.splitlines() if len(line.split())>=4]
  logs=run(['docker','logs','--since','10m','--tail','300','pbx_asterisk_1'])
- patterns={'certificateLoadError':r'Unable to load.*(?:cert|key)|SSL.*(?:cert|key).*error',
+ logs+=run(['docker','exec','pbx_asterisk_1','tail','-n','300','/var/log/asterisk/full'])
+ file_checks={}
+ for key in ['cert_file','priv_key_file','ca_list_file']:
+  path=settings.get(key)
+  if path and path.startswith('/etc/asterisk/'):
+   readable=run(['docker','exec','--user','asterisk','pbx_asterisk_1','sh','-c','test -r "$1" && echo readable','check',path]).strip()=='readable'
+   file_checks[key]={'readableByAsterisk':readable}
+   if key=='cert_file':
+    certificate=run(['docker','exec','pbx_asterisk_1','openssl','x509','-in',path,'-noout','-checkhost','phone.elevateforhumanity.org'])
+    file_checks[key]['hostMatches']='does match' in certificate and 'does NOT match' not in certificate
+ patterns_extra={'noSharedCipher':r'no shared cipher','keyMismatch':r'key values mismatch','certificateMissing':r'No such file|Permission denied','sslContextFailure':r'Unable to (?:create|set up|load).*SSL|SSL_CTX|SSL_ERROR'}
+
+ patterns={**patterns_extra,'certificateLoadError':r'Unable to load.*(?:cert|key)|SSL.*(?:cert|key).*error',
   'handshakeTimeout':r'TLS.*(?:timeout|timed out)|SSL.*(?:timeout|timed out)',
   'bindError':r'Unable to bind|Address already in use', 'tlsError':r'TLS|SSL'}
  print(json.dumps({'readOnly':True,'configurationChanged':False,'transportSettings':settings,
-  'tcpListeners':binds,'loopback':probe('127.0.0.1'),
+  'tlsFileChecks':file_checks,'tcpListeners':binds,'loopback':probe('127.0.0.1'),
   'logSignals':{key:bool(re.search(pattern,logs,re.I)) for key,pattern in patterns.items()}}))
 if __name__=='__main__':main()

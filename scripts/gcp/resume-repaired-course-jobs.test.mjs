@@ -70,3 +70,19 @@ test('business saved-render repair resumes once after a verified image without r
  for(const course_id of ['0ba9a61c-1f1b-4019-be6f-90e92eba2bc0','511aefe6-15fe-47b2-8eca-d55da4f31c51'])
   assert.equal((await run({...business,build:{...business.build,course_id}})).writes.length,0);
 });
+
+test('ineligible furthest cursor does not suppress an eligible saved repair',async()=>{
+ const stale={...base,id:'stale',payload:{nextCompetencyIndex:30},last_error:'OWNER_PAUSED_REFERENCE_BUILD'};
+ const eligible={...base,id:'eligible',payload:{nextCompetencyIndex:18}};
+ const writes=[];
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options?.method==='PATCH'){
+   writes.push(String(url));
+   return {ok:true,json:async()=>[{id:'eligible',status:'queued',execution_generation:9}]};
+  }
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[stale,eligible]};
+ }});
+ assert.equal(writes.length,1);
+ assert.match(writes[0],/id=eq.eligible/);
+ assert.deepEqual(result.jobIds,['eligible']);
+});

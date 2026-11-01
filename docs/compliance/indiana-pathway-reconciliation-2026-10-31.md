@@ -146,3 +146,38 @@ Configuration tracing: RAPIDS metadata and enrollment generation use getRegister
 5. Document the specific submission route and obtain the relevant Indiana authority's determination of licensing eligibility and education/provider requirements. DOL apprenticeship approval does not alone establish secondary CTE equivalency, state licensure, funding eligibility, or DOE program approval.
 
 Disposition: **RTI source/TypeScript/database requirement alignment verified; syllabus allocations corrected. Program delivery, current state pathway equivalency and overall submission readiness remain unverified.**
+
+## Bookkeeping schedule resolved from instructor attachments — November 1, 2026
+
+This section supersedes the earlier bookkeeping “source not inspected” and unresolved 640/150/85-hour dispositions.
+
+Authenticated admin email attachment links opened both private PDFs. The original **Elevate-Bookkeeping Syllabus.pdf**, master syllabus v2.0 (2026), page 2 states 160 instructional hours and ten curriculum modules; pages 3–4 provide the module allocation. The later **Bookkeeping Syllabus - Weekly Guide.pdf**, page 4 reproduces the same allocation and page 8 specifies eight weeks of 20 instructional hours each. Both are instructor-issued sources by Dr. Carlina A. Wilkes, not DOL or Indiana approval documents.
+
+| Module | Instructional hours |
+| --- | ---: |
+| Accounting and Bookkeeping Foundations | 15 |
+| Debits, Credits, Journals and Ledgers | 20 |
+| Cash, Assets and Sales Transactions | 20 |
+| Purchases, Liabilities and Equity | 20 |
+| Adjustments and the Accounting Cycle | 15 |
+| Reconciliation and Error Correction | 15 |
+| Financial Statements and Analysis | 15 |
+| Payroll, Controls and Bookkeeping Operations | 10 |
+| Excel for Accounting Laboratories | 15 |
+| Capstone, Remediation and Exam Preparation | 15 |
+| Total | 160 |
+
+Weekly allocation by module: W1 M1:15 + M2:5; W2 M2:15 + M3:5; W3 M3:15 + M4:5; W4 M4:15 + M5:5; W5 M5:10 + M6:10; W6 M6:5 + M7:15; W7 M8:10 + M9:10; W8 M9:5 + M10:15. Each week sums to 20, and allocations across weeks reproduce every module total.
+
+Repairs:
+- Added lib/programs/bookkeeping-schedule.ts as the reusable module/weekly source.
+- Program schema now accepts source-documented module allocations as an alternative to delivery-mode allocations. Existing online/lab/exam/career breakdowns retain their existing computation.
+- data/programs/bookkeeping.ts uses ten source modules totaling 160, eight weeks at 20 hours, and the source weekly sequence. Removed the unverified Tue/Thu evening promise and the conflicting older four-phase schedule. No invented online/lab/support split was substituted.
+- Saved and applied scripts/sql/reconcile-bookkeeping-instructor-schedule.sql. The exact bookkeeping program now has training_hours, total_hours, estimated_hours, duration_hours and hours = 160, duration_weeks = 8, and an explicit schedule. Source identifiers, allocation and prior values are retained in lms_config.instructional_schedule_source.
+- Program archived/inactive status is preserved. Course video/lesson durations, required_hours, learner attendance/progress, credential awards and enrollments were not changed.
+
+Verification: fetched every changed source file back from main and compared exact contents; independent database readback confirms the five 160-hour fields and eight-week schedule. Isolated Node module tests passed for total/range, all eight weekly sums, all ten module-column sums, program hour validation, a deliberately mismatched range, and legacy delivery-mode calculation. Full application typecheck/lint/build and production website deployment are not established by these scoped checks.
+
+PDFs were inspected in the authenticated browser viewer; browser download synchronization failed, so no new byte hash or independently extracted full-text copy is claimed.
+
+Remaining approval evidence: RAPIDS opens at the external-user sign-in screen. Automatic approval review rejected clicking “I am an external user – Login.gov,” stating that explicit permission to initiate Login.gov authentication was required. No further authentication action or workaround was attempted. Hair Stylist's issued occupation approval and any approved nail RTI-provider amendment remain unverified pending that access. Grace Beauty College remains the provider established by the retrieved signed July 10, 2025 source.

@@ -1,7 +1,17 @@
 import type { GrantsGovOpportunity } from '@/lib/integrations/grants-gov';
 export function grantDate(value: unknown): string | null {
   if (!value) return null;
-  const parsed = Date.parse(String(value));
+  const text=String(value).trim();
+  // Provider calendar deadlines have no time zone. Parsing MM/DD/YYYY as a
+  // local midnight and converting to UTC can move the deadline back one day.
+  const us=text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const iso=text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(us || iso) {
+    const day=us?`${us[3]}-${us[1].padStart(2,'0')}-${us[2].padStart(2,'0')}`:text;
+    const parsed=Date.parse(day+'T00:00:00Z');
+    return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0,10)===day ? day : null;
+  }
+  const parsed = Date.parse(text);
   return Number.isFinite(parsed) ? new Date(parsed).toISOString().slice(0, 10) : null;
 }
 export function grantRecord(opportunity: GrantsGovOpportunity) {

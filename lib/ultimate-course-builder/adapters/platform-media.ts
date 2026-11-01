@@ -75,10 +75,17 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     if (workspaceAssetUrl && workspaceLicensed) {
       const response = await fetch(workspaceAssetUrl, { signal: AbortSignal.timeout(60000) });
       if (!response.ok) throw new Error(`ULTIMATE_ENVATO_WORKSPACE_ASSET_HTTP_${response.status}`);
+      const contentType = (response.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
+      if (!/^(video\/(mp4|quicktime|webm)|image\/(jpeg|png|webp))$/.test(contentType))
+        throw new Error('ULTIMATE_ENVATO_WORKSPACE_ASSET_INVALID_MEDIA_TYPE');
+      const contentLength = Number(response.headers.get('content-length') ?? 0);
+      if (contentLength > 500 * 1024 * 1024) throw new Error('ULTIMATE_ENVATO_WORKSPACE_ASSET_TOO_LARGE');
+      const payload = new Uint8Array(await response.arrayBuffer());
+      if (payload.byteLength > 500 * 1024 * 1024) throw new Error('ULTIMATE_ENVATO_WORKSPACE_ASSET_TOO_LARGE');
       acquired = {
         download: {
-          bytes: new Uint8Array(await response.arrayBuffer()),
-          mimeType: response.headers.get('content-type') ?? metadata.mime_type ?? 'application/octet-stream',
+          bytes: payload,
+          mimeType: contentType,
         },
         licenseEvidence: {
           provider: 'envato',

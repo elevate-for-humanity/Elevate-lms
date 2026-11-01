@@ -141,12 +141,12 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'LMS Overview',
-        href: 'https://app.elevateforhumanity.org/lms',
+        href: ROUTES.lmsOverview,
         description: 'Learning management system',
       },
       {
         label: 'Student Login',
-        href: 'https://app.elevateforhumanity.org/learner/dashboard',
+        href: ROUTES.studentPortal,
         description: 'Access your courses',
       },
     ],
@@ -176,7 +176,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Employer Login',
-        href: 'https://app.elevateforhumanity.org/employer/dashboard',
+        href: ROUTES.employerPortal,
         description: 'Access your portal',
       },
     ],
@@ -201,7 +201,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Program Holder Portal',
-        href: 'https://app.elevateforhumanity.org/program-holder/dashboard',
+        href: ROUTES.programHolderPortal,
         description: 'Manage your programs',
       },
       {
@@ -325,15 +325,15 @@ export const headerNavigation: NavGroup[] = [
       { label: 'Barber & Beauty Network', href: '/barber-beauty-network', description: 'Meet shops and beauty professionals' },
       {
         label: 'Career Discussions',
-        href: 'https://app.elevateforhumanity.org/community',
+        href: ROUTES.lmsCommunity,
         description: 'Career talk',
       },
       {
         label: 'General Discussions',
-        href: 'https://app.elevateforhumanity.org/community',
+        href: ROUTES.lmsCommunity,
         description: 'General forum',
       },
-      { label: 'Leaderboard', href: 'https://app.elevateforhumanity.org/community', description: 'Top contributors' },
+      { label: 'Leaderboard', href: ROUTES.lmsLeaderboard, description: 'Top contributors' },
       {
         label: 'Business Network',
         href: '/business-network',

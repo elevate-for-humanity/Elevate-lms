@@ -9,7 +9,7 @@
       "disclosures": "/disclosures",
       "partners": "/partners",
       "hostSites": "/partners/host-shops",
-      "employers": "/employer",
+      "employers": "/employers",
       "testing": "/testing",
       "about": "/about",
       "approvals": "/approvals",
@@ -63,7 +63,7 @@
     },
     "partners": {
       "index": "/partners",
-      "employers": "/employer",
+      "employers": "/employers",
       "hostSites": "/partners/host-shops",
       "workforceAgencies": "/for-agencies"
     }

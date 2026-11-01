@@ -8,6 +8,7 @@ import {
 import { ADMIN_HOST, LMS_HOST, MARKETING_HOST, getPortalKeyFromPath, PORTAL_MAP } from '@/lib/routing/portal-map';
 import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { isWithdrawnProgramRequest } from '@/lib/programs/withdrawn-programs.mjs';
+import { resolvePublicEntryAlias } from '@/lib/routing/public-entry-aliases.mjs';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -165,7 +166,7 @@ export async function middleware(req: NextRequest) {
   // Redirect unauthenticated entry at the edge: do not rely on a page render
   // or client navigation to return the canonical login redirect status.
   if (pathname === '/login' && getPublicRuntimeService() !== 'store') {
-    const target = new URL('/login', 'https://app.elevateforhumanity.org');
+    const target = new URL('/login', LMS_HOST);
     for (const key of ['next', 'redirect', 'reason']) {
       const value = req.nextUrl.searchParams.get(key);
       if (value) target.searchParams.set(key, value);
@@ -226,6 +227,21 @@ export async function middleware(req: NextRequest) {
     const response = NextResponse.redirect(destination, 307);
     response.headers.set('Cache-Control', 'private, no-store, max-age=0');
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
+  }
+
+  // Exact public aliases must precede the portal prefix registry. Nested
+  // employer/testing paths retain their operational ownership and auth gates.
+  const publicEntry = resolvePublicEntryAlias({
+    host, pathname, search, method: req.method,
+    marketingHost: MARKETING_HOST, lmsHost: LMS_HOST,
+  });
+  if (publicEntry) {
+    const response = NextResponse.redirect(publicEntry, 307);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    if (pathname.replace(/\/$/, '') === '/learner/dashboard') {
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    }
     return response;
   }
 

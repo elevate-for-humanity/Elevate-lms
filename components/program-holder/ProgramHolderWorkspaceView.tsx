@@ -1,3 +1,4 @@
+import SyllabusBuildRetry from '@/components/program-holder/SyllabusBuildRetry';
 import { trainingHoursDisplay } from '@/lib/program-holder/training-hours-display';
 import ProgramSyllabusReader from '@/components/learner/ProgramSyllabusReader';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
@@ -1722,6 +1723,7 @@ function SyllabusUploadStatus({
                   </p>
                 </div>
               ))}
+              {row.description?.includes('"kind":"holder_syllabus"') && <SyllabusBuildRetry documentId={row.id} />}
               {row.rejection_reason && (
                 <p className="mt-2 text-amber-900">Reviewer feedback: {row.rejection_reason}</p>
               )}

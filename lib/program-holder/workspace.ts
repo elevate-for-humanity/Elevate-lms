@@ -346,6 +346,15 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
   }
 
+  const secondaryCourses = await db.from('courses')
+    .select('id,metadata')
+    .contains('metadata', { assignment_kind: 'secondary', program_holder_id: holderId });
+  if (secondaryCourses.error) throw new Error('Secondary syllabus courses could not load.');
+  coursesRes.data = [...(coursesRes.data ?? []), ...(secondaryCourses.data ?? []).map((course: any) => ({
+    id: course.id, course_id: course.id, program_id: course.metadata.holder_program_id,
+    custom_syllabus_path: course.metadata.syllabus_path, status: 'under_review',
+    term_name: 'Secondary assignment',
+  }))] as any;
   // Holder-specific course rows override the canonical program/course catalog.
   const canonicalCourseIds = [
     ...new Set(

@@ -1,4 +1,5 @@
 // pre-auth-registry: exempt - requireProgramHolder verifies the authenticated user and active holder relationship before any protected document write.
+import { extractHolderSyllabus, startHolderSyllabus } from '@/lib/program-holder/syllabus-course';
 import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -119,6 +120,15 @@ export async function POST(request: NextRequest) {
     if (!student || !ctx.programIds.includes(student.program_id))
       return NextResponse.json({ error: 'Student is not assigned to you.' }, { status: 403 });
   }
+  const isSyllabus = ['training_plan', 'hvac_training_plan'].includes(documentType);
+  const programId = String(form.get('programId') || (ctx.programIds.length === 1 ? ctx.programIds[0] : ''));
+  let syllabusText = '';
+  if (isSyllabus) {
+    if (!ctx.programIds.includes(programId))
+      return NextResponse.json({ error: 'Select one of your assigned programs for this syllabus.' }, { status: 400 });
+    try { syllabusText = await extractHolderSyllabus(file, String(form.get('syllabusText') || '')); }
+    catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : 'Syllabus could not be read.' }, { status: 422 }); }
+  }
   const material = materialUploadPolicy(documentType, file);
   const maxBytes = file.type === 'video/mp4' ? MAX_VIDEO_BYTES : MAX_BYTES;
   if (
@@ -165,7 +175,10 @@ export async function POST(request: NextRequest) {
       storage_bucket: 'documents',
       file_size: file.size,
       mime_type: material?.contentType || file.type,
-      description: invoiceDetails
+      ocr_text: isSyllabus ? syllabusText : null,
+      description: isSyllabus
+        ? JSON.stringify({ kind: 'holder_syllabus', program_holder_id: ctx.holderId, program_id: programId })
+        : invoiceDetails
         ? JSON.stringify({ kind: 'provider_invoice', ...invoiceDetails, certified_by: ctx.user.id })
         : enrollmentId
         ? JSON.stringify({ enrollment_id: enrollmentId, kind: 'student_evidence' })
@@ -183,6 +196,20 @@ export async function POST(request: NextRequest) {
   if (error) {
     await ctx.db.storage.from('documents').remove([path]);
     return NextResponse.json({ error: 'The document record could not be saved.' }, { status: 500 });
+  }
+  if (isSyllabus) {
+    try {
+      const build = await startHolderSyllabus(ctx.db, {
+        documentId: data.id, holderId: ctx.holderId, programId, actorId: ctx.user.id,
+        title: file.name.replace(/\.[^.]+$/, '') + ' — Secondary assignment',
+        text: syllabusText, storagePath: path,
+      });
+      const courseBuild = await build.json();
+      return NextResponse.json({ document: data, courseBuild, buildStarted: build.ok }, { status: 201 });
+    } catch {
+      return NextResponse.json({ document: data, buildStarted: false,
+        courseBuild: { error: 'Syllabus saved. Course Builder could not start; use Retry syllabus build in Documents.' } }, { status: 201 });
+    }
   }
   return NextResponse.json({ document: data }, { status: 201 });
 }

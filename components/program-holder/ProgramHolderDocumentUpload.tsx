@@ -1,5 +1,5 @@
 'use client';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 const commonOptions = [
   ['government_id', 'Government-issued photo ID'],
@@ -35,6 +35,18 @@ export function ProgramHolderDocumentUpload({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [selectedType, setSelectedType] = useState(invoiceOnly ? 'provider_invoice' : '');
+  const isSyllabus = ['training_plan', 'hvac_training_plan'].includes(selectedType);
+  const [programOptions, setProgramOptions] = useState<Array<{id: string; title?: string; name?: string}>>([]);
+  useEffect(() => {
+    if (!isSyllabus) return;
+    const controller = new AbortController();
+    fetch('/api/program-holder/syllabus', { signal: controller.signal })
+      .then(response => response.json()).then(data => {
+        if (Array.isArray(data.programs)) setProgramOptions(data.programs);
+        else setMessage(data.error || 'Programs could not be loaded.');
+      }).catch(error => { if (error.name !== 'AbortError') setMessage('Programs could not be loaded. Reload to retry.'); });
+    return () => controller.abort();
+  }, [isSyllabus]);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -51,7 +63,12 @@ export function ProgramHolderDocumentUpload({
         setMessage(data.error || 'Upload failed.');
         return;
       }
+      if (isSyllabus && data.buildStarted !== true) {
+        setMessage(data.courseBuild?.error || 'Syllabus saved, but Course Builder did not start. Use Retry syllabus build below.');
+        return;
+      }
       setMessage(
+        isSyllabus ? 'Syllabus saved and Course Builder started. The quality-verified course will appear as a secondary student assignment.' :
         invoiceOnly
           ? 'Invoice submitted to Elevate for review.'
           : materialsOnly
@@ -109,6 +126,18 @@ export function ProgramHolderDocumentUpload({
           </p>
         </div>
       )}
+      {isSyllabus && <div className="mt-4 grid gap-3">
+        <label className="grid gap-1 text-sm font-bold">Assigned program
+          <select name="programId" required className="min-h-11 rounded-xl border bg-white p-2">
+            <option value="">Choose the program for this syllabus</option>
+            {programOptions.map(program => <option key={program.id} value={program.id}>{program.title || program.name || 'Assigned program'}</option>)}
+          </select>
+        </label>
+        <label className="grid gap-1 text-sm font-bold">Syllabus text (optional for readable PDFs; required if the file cannot be read)
+          <textarea name="syllabusText" maxLength={250000} rows={5} className="rounded-xl border bg-white p-2" />
+        </label>
+        <p className="text-sm">Course Builder uses this syllabus to create secondary training for your assigned students. Your primary Elevate curriculum remains in place.</p>
+      </div>}
       {materialsOnly && (
         <label className="mt-4 block text-sm font-bold">
           Student for supporting evidence

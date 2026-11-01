@@ -1,3 +1,4 @@
+import { syncHolderSecondaryAssignments } from '@/lib/program-holder/syllabus-course';
 /**
  * Unified enrollment resolver for learner dashboards.
  *
@@ -19,6 +20,7 @@ import {
 } from '@/lib/delivery/resolveDeliveryMode';
 
 export type NormalizedEnrollment = {
+  assignment_kind?: 'secondary';
   source_table: EnrollmentSource;
   enrollment_id: string;
   user_key: string;
@@ -60,6 +62,7 @@ type CourseRow = {
   description: string | null;
   short_description: string | null;
   duration_hours: number | null;
+  metadata?: { assignment_kind?: string } | null;
 };
 
 export async function getUserEnrollments(userId: string): Promise<EnrollmentQueryResult> {
@@ -108,7 +111,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     courseIds.length
       ? reader
           .from('courses')
-          .select('id,title,course_name,description,short_description,duration_hours')
+          .select('id,title,course_name,description,short_description,duration_hours,metadata')
           .in('id', courseIds)
       : Promise.resolve({ data: [] as CourseRow[], error: null }),
     programHolderIds.length
@@ -165,6 +168,9 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     results.push(enrollment);
   }
 
+  // Reconcile supplemental access only after verifying this learner or secured preview.
+  try { await syncHolderSecondaryAssignments(await requireAdminClient(), userId); }
+  catch { return { enrollments: results, error: 'Secondary syllabus assignments could not be synchronized.' }; }
   const { data: courseEnrollments, error: courseEnrollmentError } = await reader
     .from('course_enrollments')
     .select('id,student_id,course_id,status,progress,created_at,updated_at')
@@ -177,7 +183,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   if (missingCourseIds.length) {
     const { data: directCourses, error: directCoursesError } = await reader
       .from('courses')
-      .select('id,title,course_name,description,short_description,duration_hours')
+      .select('id,title,course_name,description,short_description,duration_hours,metadata')
       .in('id', missingCourseIds);
     if (directCoursesError) return { enrollments: results, error: directCoursesError.message };
     for (const course of (directCourses ?? []) as CourseRow[]) coursesById.set(course.id, course);
@@ -188,6 +194,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     if (!row.course_id || representedCourseIds.has(row.course_id)) continue;
     const course = coursesById.get(row.course_id) ?? null;
     results.push({
+      ...(course?.metadata?.assignment_kind === 'secondary' ? { assignment_kind: 'secondary' as const } : {}),
       source_table: 'course_enrollments', enrollment_id: row.id, user_key: row.student_id,
       program_id: null, program_slug: null, program_title: null, course_id: row.course_id,
       course_title: course?.title ?? course?.course_name ?? null,
@@ -232,7 +239,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   if (internalFallbackCourseIds.length) {
     const { data: partnerCourseFallbacks } = await reader
       .from('courses')
-      .select('id,title,course_name,description,short_description,duration_hours')
+      .select('id,title,course_name,description,short_description,duration_hours,metadata')
       .in('id', internalFallbackCourseIds);
     for (const course of (partnerCourseFallbacks ?? []) as CourseRow[]) coursesById.set(course.id, course);
   }
@@ -267,7 +274,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     results.push(enrollment);
   }
 
-  results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  results.sort((a, b) => Number(a.assignment_kind === 'secondary') - Number(b.assignment_kind === 'secondary') || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   return { enrollments: results, error: null };
 }
 

@@ -7,10 +7,13 @@ import { Briefcase, Loader2 } from 'lucide-react';
 export default function JobMatchClient() {
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState('');
+  const [errorMessage,setErrorMessage]=useState('');
   const [matches, setMatches] = useState<any[]>([]);
 
   const handleMatch = async () => {
     setLoading(true);
+    setErrorMessage('');
+    setMatches([]);
     try {
       const response = await fetch('/api/ai/job-match', {
         method: 'POST',
@@ -18,9 +21,11 @@ export default function JobMatchClient() {
         body: JSON.stringify({ skills }),
       });
       const data = await response.json();
-      setMatches(data.matches || []);
+      if (!response.ok) throw new Error('Job matching is temporarily unavailable. Please try again.');
+      if (!Array.isArray(data.matches)) throw new Error('The job matching response could not be verified.');
+      setMatches(data.matches);
     } catch (error) {
-      // Error handled silently
+      setErrorMessage(error instanceof Error ? error.message : 'Job matching could not connect. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -43,6 +48,7 @@ export default function JobMatchClient() {
           </p>
         </div>
 
+        {errorMessage && <p role="alert" className="mb-4 text-red-700">{errorMessage}</p>}
         <div className="bg-white rounded-xl shadow-sm p-8">
           <label className="block text-sm font-semibold text-black mb-2">
             What skills do you have?

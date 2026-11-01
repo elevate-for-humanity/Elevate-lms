@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          count="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$DEPLOY_RUN_ID/jobs" --paginate --jq '[.jobs[] | select(.name == "Build and deploy Admin on Google" and .conclusion == "success")] | length' | awk '{sum+=$1} END{print sum+0}')"
+          count="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$DEPLOY_RUN_ID/jobs" --paginate --jq '[.jobs[] | select(.name == "Deploy and verify Admin on Google" and .conclusion == "success")] | length' | awk '{sum+=$1} END{print sum+0}')"
           test "$count" -ge 1 || { echo '::error::Successful dispatcher is not a successful Admin deployment'; exit 1; }
       - uses: actions/checkout@v4
         with:

@@ -16,6 +16,11 @@ const PROVIDERS = RUNTIME_INTEGRATIONS.filter((provider) => provider.webhook).ma
 const VOLUME_DROP_THRESHOLD = 0.5;
 const PAGE_SIZE = 50;
 
+function requireDatabaseEvidence<T extends readonly { error: unknown }[]>(results: T): T {
+  if (results.some(result => result.error)) throw new Error('Webhook health evidence is unavailable');
+  return results;
+}
+
 interface ProviderHealth {
   provider: string;
   configured: boolean;
@@ -77,8 +82,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const mode = searchParams.get('mode');
 
-    if (mode === 'events') return handleEventsList(adminDb, searchParams);
-    return handleSummary(adminDb);
+    if (mode === 'events') return await handleEventsList(adminDb, searchParams);
+    return await handleSummary(adminDb);
   } catch (error) {
     logger.error('Webhook health check failed', error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Health check failed' }, { status: 500 });
@@ -97,7 +102,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
     { count: failed24h },
     { count: errored24h },
     { count: skipped24h },
-  ] = await Promise.all([
+  ] = requireDatabaseEvidence(await Promise.all([
     adminDb
       .from('webhook_events_processed')
       .select('id', { count: 'exact', head: true })
@@ -122,7 +127,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
       .select('id', { count: 'exact', head: true })
       .eq('status', 'skipped')
       .gte('received_at', last24h),
-  ]);
+  ]));
 
   const providerHealth: ProviderHealth[] = [];
   const alerts: string[] = [];
@@ -132,7 +137,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
       { count: baselineCount },
       { data: statusRows },
       { data: lastEvent },
-    ] = await Promise.all([
+    ] = requireDatabaseEvidence(await Promise.all([
       adminDb
         .from('webhook_events_processed')
         .select('id', { count: 'exact', head: true })
@@ -155,7 +160,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
         .order('received_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
-    ]);
+    ]));
 
     const statusBreakdown: Record<string, number> = {};
     for (const row of statusRows || []) {
@@ -204,19 +209,19 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
     });
   }
 
-  const [paidNotEnrolled, enrolledNotPaid, openFlags] = await Promise.all([
+  const [paidNotEnrolled, enrolledNotPaid, openFlags] = requireDatabaseEvidence(await Promise.all([
     adminDb.from('v_paid_not_enrolled').select('session_id', { count: 'exact', head: true }),
     adminDb.from('v_enrolled_not_paid').select('enrollment_id', { count: 'exact', head: true }),
     adminDb
       .from('payment_integrity_flags')
       .select('id', { count: 'exact', head: true })
       .is('resolved_at', null),
-  ]);
+  ]));
 
   const integrityAlerts: string[] = [];
   if ((paidNotEnrolled.count ?? 0) > 0)
     integrityAlerts.push(
-      `REVIEW: ${paidNotEnrolled.count} paid sessions are not linked to an enrollment`,
+      `REVIEW: ${paidNotEnrolled.count} unmatched paid sessions need program, learner, or enrollment identification; do not enroll automatically`,
     );
   if ((enrolledNotPaid.count ?? 0) > 0)
     integrityAlerts.push(
@@ -230,7 +235,7 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
   return NextResponse.json({
     // Payment reconciliation is reported independently and must not make a
     // webhook endpoint appear unhealthy.
-    healthy: alerts.length === 0,
+    healthy: providerHealth.every(provider => provider.healthy),
     checkedAt: now.toISOString(),
     threshold: VOLUME_DROP_THRESHOLD,
     summary: {

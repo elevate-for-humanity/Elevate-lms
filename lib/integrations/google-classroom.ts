@@ -65,10 +65,11 @@ export async function exchangeGoogleClassroomCode(
       redirect_uri: credentials.redirectUri,
       grant_type: 'authorization_code',
     }),
-    cache: 'no-store',
+    cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10000),
   });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok || typeof body.access_token !== 'string')
+  if (!response.ok || typeof body.access_token !== 'string' || !body.access_token.trim() ||
+      !Number.isFinite(body.expires_in) || body.expires_in <= 0 || body.expires_in > 86400)
     throw new Error('GOOGLE_CLASSROOM_TOKEN_EXCHANGE_FAILED');
   return body as GoogleTokenResponse;
 }
@@ -86,16 +87,19 @@ export async function refreshGoogleClassroomAccessToken(
       client_secret: credentials.clientSecret,
       grant_type: 'refresh_token',
     }),
-    cache: 'no-store',
+    cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10000),
   });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok || typeof body.access_token !== 'string')
+  if (!response.ok || typeof body.access_token !== 'string' || !body.access_token.trim() ||
+      !Number.isFinite(body.expires_in) || body.expires_in <= 0 || body.expires_in > 86400)
     throw new Error('GOOGLE_CLASSROOM_TOKEN_REFRESH_FAILED');
   return { ...body, refresh_token: refreshToken } as GoogleTokenResponse;
 }
 
 export async function listGoogleClassroomCourses(accessToken: string) {
   const courses: Array<Record<string, unknown>> = [];
+  const seenPages = new Set<string>();
+  const seenCourses = new Set<string>();
   let pageToken = '';
   do {
     const url = new URL('https://classroom.googleapis.com/v1/courses');
@@ -104,12 +108,21 @@ export async function listGoogleClassroomCourses(accessToken: string) {
     if (pageToken) url.searchParams.set('pageToken', pageToken);
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
-      cache: 'no-store',
+      cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(10000),
     });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error('GOOGLE_CLASSROOM_COURSE_LIST_FAILED');
-    courses.push(...(Array.isArray(body.courses) ? body.courses : []));
+    const body = await response.json();
+    if (!response.ok || !body || typeof body !== 'object' || Array.isArray(body) ||
+        (body.courses !== undefined && !Array.isArray(body.courses)))
+      throw new Error('GOOGLE_CLASSROOM_COURSE_LIST_FAILED');
+    for (const course of body.courses ?? []) {
+      if (!course || typeof course.id !== 'string' || !course.id.trim())
+        throw new Error('GOOGLE_CLASSROOM_COURSE_RESPONSE_INVALID');
+      if (!seenCourses.has(course.id)) { seenCourses.add(course.id); courses.push(course); }
+    }
     pageToken = typeof body.nextPageToken === 'string' ? body.nextPageToken : '';
-  } while (pageToken && courses.length < 1000);
+    if (pageToken && (seenPages.has(pageToken) || seenPages.size >= 9 || courses.length >= 1000))
+      throw new Error('GOOGLE_CLASSROOM_PAGINATION_INCOMPLETE');
+    if (pageToken) seenPages.add(pageToken);
+  } while (pageToken);
   return courses;
 }

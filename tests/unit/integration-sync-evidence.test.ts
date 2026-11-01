@@ -31,6 +31,14 @@ describe('integration evidence boundaries', () => {
       expect(summarizeSyncEvidence([{ action: 'sync', status: 'success', records: { operation: 'synchronize', committed: true, contacts, leads: 0 }, created_at: timestamp }]).last_sync).toBeNull();
     }
   });
+  it('never exposes malformed optional fields on an otherwise valid receipt', () => {
+    expect(summarizeSyncEvidence([{ action: 'sync', status: 'success', created_at: timestamp,
+      records: { operation: 'synchronize', committed: true, contacts: 3, leads: 2,
+        resources: { private: 'must-not-leak' } } }])).toEqual({ last_sync: timestamp, contacts: 3, leads: 2 });
+    expect(summarizeSyncEvidence([{ action: 'sync', status: 'success', created_at: timestamp,
+      records: { operation: 'synchronize', committed: true, contacts: 'must-not-leak', resources: { courses: 1 } } }]))
+      .toEqual({ last_sync: timestamp, contacts: null, leads: null, resources: { courses: 1 } });
+  });
   it('cannot execute Telnyx, even when legacy credentials exist', async () => {
     await expect(telnyxClient()).rejects.toThrow('Telnyx is retired');
     const response = await GET();

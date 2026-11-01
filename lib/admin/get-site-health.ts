@@ -2,6 +2,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
 import { loadPayPalConfig, verifyPayPalConnection } from '@/lib/integrations/paypal-client';
+import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export type HealthStatus = 'healthy' | 'degraded' | 'down';
 
@@ -94,6 +95,7 @@ export async function getSiteHealthSnapshot(): Promise<SiteHealthSnapshot> {
       const { latencyMs, error } = await timeCheck(async () => {
         const res = await fetch('https://api.sendgrid.com/v3/user/account', {
           headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` },
+          redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(8000),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
       });
@@ -119,7 +121,7 @@ export async function getSiteHealthSnapshot(): Promise<SiteHealthSnapshot> {
       if (configError || !config) {
         return { name: 'QuickBooks', status: 'degraded' as HealthStatus, latencyMs: configLatency, detail: 'QuickBooks configuration unavailable' };
       }
-      const configured = Boolean(config.clientId && config.clientSecret && config.accessToken && config.refreshToken && config.realmId);
+      const configured = Boolean(config.clientId && config.clientSecret && (config.accessToken || config.refreshToken) && config.realmId);
       if (!configured) {
         return {
           name: 'QuickBooks',
@@ -188,6 +190,7 @@ export async function getSiteHealthSnapshot(): Promise<SiteHealthSnapshot> {
           headers: {
             Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
           },
+          redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(8000),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
       });
@@ -207,55 +210,39 @@ export async function getSiteHealthSnapshot(): Promise<SiteHealthSnapshot> {
       };
     })(),
 
-    // Resend (inbound key check only)
+    // Read-only authentication does not certify email delivery. Sending-only
+    // keys cannot list domains; report that as unverified, never as healthy.
     (async () => {
-      const configured = Boolean(process.env.RESEND_API_KEY);
+      const key = process.env.RESEND_API_KEY?.trim();
+      if (!key) return { name: 'Resend', status: 'down' as HealthStatus,
+        latencyMs: null, detail: 'Resend is not configured.' };
+      const { latencyMs, error } = await timeCheck(async () => {
+        const response = await fetch('https://api.resend.com/domains?limit=1', {
+          headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+          redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(8000),
+        });
+        const body = response.ok ? await response.json() : null;
+        if (!response.ok || body?.object !== 'list' || !Array.isArray(body.data))
+          throw new Error('Resend authentication could not be verified.');
+      });
       return {
-        name: 'Resend (inbound)',
-        status: (configured ? 'healthy' : 'degraded') as HealthStatus,
-        latencyMs: null,
-        detail: configured
-          ? 'RESEND_API_KEY present'
-          : 'RESEND_API_KEY not set — inbound email disabled',
+        name: 'Resend', status: (error ? 'degraded' : 'healthy') as HealthStatus, latencyMs,
+        detail: error
+          ? 'Read-only authentication is unverified. A sending-only key requires delivery evidence.'
+          : 'Read-only API authentication verified; message delivery is not certified.',
       };
     })(),
 
-    // AI provider — devstudio, AI assistant, and onboarding flows depend on this.
-    // Groq is primary (free tier); Gemini is fallback. At least one must be set.
+    // Resolve the actual selected provider rather than a historical key order.
     (async () => {
-      const hasGroq = Boolean(process.env.GROQ_API_KEY);
-      const hasGemini = Boolean(process.env.GEMINI_API_KEY);
-      const hasOpenAI = Boolean(process.env.OPENAI_API_KEY);
-
-      if (hasGroq) {
-        return {
-          name: 'AI Provider',
-          status: 'healthy' as HealthStatus,
-          latencyMs: null,
-          detail: 'Groq (primary)',
-        };
-      }
-      if (hasGemini) {
-        return {
-          name: 'AI Provider',
-          status: 'healthy' as HealthStatus,
-          latencyMs: null,
-          detail: 'Gemini (fallback)',
-        };
-      }
-      if (hasOpenAI) {
-        return {
-          name: 'AI Provider',
-          status: 'healthy' as HealthStatus,
-          latencyMs: null,
-          detail: 'OpenAI',
-        };
-      }
+      const { latencyMs, result, error } = await timeCheck(resolveAIRuntimeState);
+      const verified = result?.activeProvider === 'elevate' && result.elevate;
       return {
-        name: 'AI Provider',
-        status: 'down' as HealthStatus,
-        latencyMs: null,
-        detail: 'No AI key set — set GROQ_API_KEY or GEMINI_API_KEY in Integrations → AI Providers',
+        name: 'AI Provider', latencyMs,
+        status: (verified ? 'healthy' : !error && result?.anyConfigured ? 'degraded' : 'down') as HealthStatus,
+        detail: verified
+          ? 'Selected Elevate model authenticated discovery passed; inference completion is separate.'
+          : 'Selected provider is unverified. Saved API keys do not prove working inference.',
       };
     })(),
   ];

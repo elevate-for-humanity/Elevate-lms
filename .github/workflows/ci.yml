@@ -36,6 +36,10 @@ jobs:
         run: |
           node tests/integration/auth-provisioning-postgres.mjs
           node tests/integration/practical-authorization-postgres.mjs
+          node tests/integration/classroom-conflict-index-postgres.mjs
+          node tests/integration/payment-integrity-evidence-postgres.mjs
+      - name: Verify voicemail release hook and PARIS terminal-state regressions
+        run: node --test scripts/gcp/voicemail-acceptance-workflow.test.mjs scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/supervise-course-queue.test.mjs
       - name: Student funding and permission regression tests
         run: >-
           pnpm exec vitest run

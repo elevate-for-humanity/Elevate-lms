@@ -48,11 +48,13 @@ describe('institutional integration truth', () => {
       'apps/admin/app/api/admin/integrations/google-classroom/callback/route.ts',
     );
     const sync = read('apps/admin/app/api/admin/integrations/google-classroom/sync/route.ts');
+    const syncService = read('lib/integrations/google-classroom-sync.ts');
     expect(authorize).toContain('apiRequireAdmin');
     expect(authorize).toContain('google_classroom_oauth_state');
     expect(callback).toContain("provider: 'google-classroom'");
     expect(callback).toContain("onConflict: 'user_id,provider'");
-    expect(sync).toContain('listGoogleClassroomCourses');
-    expect(sync).toContain("onConflict: 'user_id,course_id'");
+    expect(sync).toContain('synchronizeGoogleClassroom');
+    expect(syncService).toContain('listGoogleClassroomCourses');
+    expect(syncService).toContain("onConflict: 'user_id,course_id'");
   });
 });

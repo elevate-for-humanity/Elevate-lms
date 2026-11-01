@@ -16,6 +16,19 @@ test('saved pause never attributes an actor and finished revisions have distinct
  assert.equal(inspectCourseAutopilot(job(),{status:'published',profile:{ownerPaused:true}},+now).state,'published');
  assert.equal(inspectCourseAutopilot(job(),{status:'archived'},+now).state,'archived');
 });
+test('completed attempts retain their terminal state despite old storage failures and a later build pause',()=>{
+ for(const last_error of ['storage cap exceeded','COURSE_OBJECT_STORAGE_UPLOAD_FAILED','timeout']) {
+  const state=inspectCourseAutopilot(job({status:'completed',last_error}),{status:'running',profile:{ownerPaused:true}},+now);
+  assert.equal(state.state,'checkpoint_complete_with_prior_error');
+  assert.equal(state.action,'none');
+ }
+});
+test('cancelled builds never request another worker or retry historical failure',()=>{
+ for(const status of ['queued','running','failed','completed']) {
+  const state=inspectCourseAutopilot(job({status,last_error:'timeout'}),{status:'cancelled'},+now);
+  assert.equal(state.state,'cancelled');assert.equal(state.action,'none');
+ }
+});
 test('a future heartbeat cannot certify a live worker',()=>{
  const state=inspectCourseAutopilot(job({status:'running',heartbeat_at:'2027-10-14T18:00:00Z',lease_expires_at:'2027-10-14T18:05:00Z'}),{},+now);
  assert.equal(state.state,'heartbeat_stale');

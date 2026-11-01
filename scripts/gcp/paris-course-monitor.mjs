@@ -58,7 +58,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     const recoveryRequested = ['dispatch','requeue'].includes(observation.action);
     const priorRequest = job.monitor?.recoveryRequest;
     const requestAge = now.getTime() - Date.parse(priorRequest?.requestedAt ?? '');
-    const recoveryClosed = ['published','archived','paused','checkpoint_complete','checkpoint_complete_with_prior_error','attention_required'].includes(observation.state);
+    const recoveryClosed = ['published','archived','cancelled','paused','checkpoint_complete','checkpoint_complete_with_prior_error','attention_required'].includes(observation.state);
     const activeRequest = !recoveryClosed && Number.isFinite(requestAge) && requestAge >= 0 && requestAge <= 15 * 60_000 ? priorRequest : null;
     const confirmedRecovery = confirmedAssignment &&
       activeRequest?.executionGeneration != null &&

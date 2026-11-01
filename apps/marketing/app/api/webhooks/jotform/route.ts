@@ -4,6 +4,7 @@ import { timingSafeEqual } from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getSecret } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
   // ── 1. Verify shared secret ───────────────────────────────────────────────
   const secret = request.nextUrl.searchParams.get('secret');
-  const expectedSecret = process.env.JOTFORM_WEBHOOK_SECRET;
+  const expectedSecret = await getSecret('JOTFORM_WEBHOOK_SECRET');
 
   if (!expectedSecret) {
     // If the env var is not set, reject all incoming webhooks to avoid
@@ -83,9 +84,12 @@ export async function POST(request: NextRequest) {
   let answers: Record<string, unknown> = {};
   if (rawRequest) {
     try {
-      answers = JSON.parse(rawRequest);
+      const parsed: unknown = JSON.parse(rawRequest);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+        return NextResponse.json({ error: 'Invalid submission answers' }, { status: 400 });
+      answers = parsed as Record<string, unknown>;
     } catch {
-      logger.warn('[jotform-webhook] Could not parse rawRequest JSON', { submissionID });
+      return NextResponse.json({ error: 'Invalid submission answers' }, { status: 400 });
     }
   }
 
@@ -101,13 +105,30 @@ export async function POST(request: NextRequest) {
   });
 
   if (insertErr) {
-    // Table may not exist yet — log and continue; don't fail the webhook
-    // response so JotForm does not retry indefinitely.
-    logger.error('[jotform-webhook] Failed to persist submission (non-fatal):', insertErr.message);
+    // A repeated submission may be acknowledged only after verifying its
+    // immutable original record. Never overwrite answers or processing state.
+    if (insertErr.code !== '23505') {
+      logger.error('[jotform-webhook] Submission persistence failed');
+      return NextResponse.json({ error: 'Submission could not be saved' },
+        { status: 503, headers: { 'Retry-After': '30' } });
+    }
+    const { data: existing, error: readError } = await db.from('jotform_submissions')
+      .select('form_id').eq('submission_id', submissionID).maybeSingle();
+    if (readError || existing?.form_id !== formID)
+      return NextResponse.json({ error: 'Existing submission could not be verified' }, { status: 503 });
   }
+
+  const { error: receiptError } = await db.from('webhook_events_processed').upsert({
+    provider: 'jotform', event_id: submissionID, event_type: 'submission.received',
+    status: 'processed', processed_at: new Date().toISOString(),
+    metadata: { form_id: formID, submission_saved: true },
+  }, { onConflict: 'provider,event_id' });
+  if (receiptError)
+    return NextResponse.json({ error: 'Submission saved, but delivery receipt could not be saved' },
+      { status: 503, headers: { 'Retry-After': '30' } });
 
   logger.info('[jotform-webhook] Received submission', { formID, submissionID });
 
-  // ── 5. Return 200 immediately so JotForm stops retrying ──────────────────
+  // ── 5. Acknowledge only durable submission and delivery evidence ─────────
   return NextResponse.json({ received: true });
 }

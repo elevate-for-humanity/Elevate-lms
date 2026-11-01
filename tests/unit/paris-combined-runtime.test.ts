@@ -13,7 +13,8 @@ describe('combined PARIS execution',()=>{
  it('combines capability tool access while preserving protected tool definitions',()=>{
   for(const id of ['PARIS','ELLIE','LIZZY','ZORA'] as const)
    for(const tool of listAIToolsForAgent(id)) expect(canAgentUseTool(tool,'PARIS')).toBe(true);
-  expect(getAITool('courses.generate')).toMatchObject({approvalRequired:true});
+  expect(getAITool('courses.generate')).toMatchObject({approvalRequired:false,allowedRoles:['admin','super_admin']});
+  expect(getAITool('courses.publish')).toMatchObject({approvalRequired:true});
   expect(getAITool('paris.supervision')?.allowedRoles).not.toContain('student');
   expect(canAgentUseTool(getAITool('studio.runtime.files')!,'ROUTER')).toBe(false);
  });

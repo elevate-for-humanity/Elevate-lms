@@ -19,7 +19,8 @@ it('uses the real feed status contract for counts and provider connection', asyn
   responses(json({}));
   render(<JobBoardPanel />);
   expect(await screen.findByText('12')).toBeVisible();
-  expect(screen.getAllByText('Connected')).toHaveLength(2);
+  expect(screen.getAllByText('API configured')).toHaveLength(2);
+  expect(screen.queryByText('Connected')).toBeNull();
   expect(screen.queryByText('Never')).toBeNull();
 });
 it('reports an HTTP failure and leaves the import available for retry without claiming success', async () => {

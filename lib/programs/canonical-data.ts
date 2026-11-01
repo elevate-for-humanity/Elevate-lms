@@ -76,7 +76,8 @@ export const PROGRAMS: Record<string, ProgramData> = {
     name: 'Barber Apprenticeship',
     shortName: 'Barber',
     totalHours: INDIANA_RULES.required_total_hours,
-    ojtHours: INDIANA_RULES.required_total_hours,
+    // Competency-based completion has no fixed OJL-hour denominator.
+    ojtHours: 0,
     durationRange: 'Varies by competency progression, RTI completion, approved work schedule, and applicable licensing requirements',
     durationMonths: { min: 12, max: 24 },
     credential: 'Indiana Barber License',

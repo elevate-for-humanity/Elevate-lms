@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Exercise two ephemeral loopback-only ARI media channels; never place a phone call."""
-import base64,concurrent.futures,json,re,socket,struct,time,urllib.request,urllib.parse,uuid,subprocess,os,types,urllib.error
+import base64,concurrent.futures,json,re,socket,struct,time,urllib.request,urllib.parse,uuid,subprocess,os,types,urllib.error,math
 from pathlib import Path
 
 phase='preflight'
@@ -56,63 +56,54 @@ def main():
   bridge=ari('/bridges','POST',bridgeId=bridge_id,type='mixing,proxy_media',name=prefix)
   if bridge.get('id')!=bridge_id:raise ValueError('PROBE_BRIDGE_MISMATCH')
   bridged=True;ari('/bridges/'+bridge_id+'/addChannel','POST',channel=','.join(ids))
+  def decode(byte):
+   byte=(~byte)&255;value=(((byte&15)*8+132) << ((byte>>4)&7))-132
+   return -value if byte&128 else value
+  def encode(sample):
+   negative=sample<0;magnitude=min(32635,abs(sample))+132;exponent=7;mask=0x4000
+   while exponent>0 and not magnitude&mask:exponent-=1;mask>>=1
+   return (~((0x80 if negative else 0)|(exponent<<4)|((magnitude>>(exponent+3))&15)))&255
   def receive(sock):
-   count=0;deadline=time.monotonic()+3
+   count=audible=0;deadline=time.monotonic()+3
    while time.monotonic()<deadline:
     try:packet,source=sock.recvfrom(2048)
     except socket.timeout:continue
-    if source[0]=='127.0.0.1' and len(packet)>=172 and packet[0]>>6==2 and packet[1]&127==0:count+=1
-   return count
+    if source[0]!='127.0.0.1' or len(packet)<172 or packet[0]>>6!=2 or packet[1]&127!=0:continue
+    count+=1;payload=packet[12:]
+    if sum(abs(decode(v)) for v in payload)/len(payload)>400:audible+=1
+   return {'frames':count,'audibleFrames':audible}
+  def exercise(start_frame):
+   with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+    results=[pool.submit(receive,s) for s in sockets]
+    start=time.monotonic()
+    for frame in range(start_frame,start_frame+100):
+     for i,sock in enumerate(sockets):
+      tone=bytes(encode(round(5000*math.sin(2*math.pi*(440+i*110)*(frame*160+k)/8000))) for k in range(160))
+      packet=struct.pack('!BBHII',0x80,0,frame,frame*160,123456+i)+tone
+      sock.sendto(packet,peers[i])
+     time.sleep(max(0,start+(frame-start_frame+1)*.02-time.monotonic()))
+    return [r.result() for r in results]
   phase='simple_media'
-  debug_enabled=True;cli('rtp set debug ip 127.0.0.1')
-  with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-   results=[pool.submit(receive,s) for s in sockets]
-   start=time.monotonic()
-   for frame in range(100):
-    for i,sock in enumerate(sockets):
-     packet=struct.pack('!BBHII',0x80,0,frame,frame*160,123456+i)+bytes([0x20])*160
-     sock.sendto(packet,peers[i])
-    time.sleep(max(0,start+(frame+1)*.02-time.monotonic()))
-   counts=[r.result() for r in results]
-  report={'localMediaProbe':True,'phoneCallsPlaced':0,'loopbackOnly':True,'framesSentPerChannel':100,'framesReceived':counts,'bridgeTechnology':ari('/bridges/'+bridge_id).get('technology'),'result':'PASS' if min(counts)>=80 else 'FAIL','runtime':runtime}
+  counts=exercise(0)
+  report={'localMediaProbe':True,'phoneCallsPlaced':0,'loopbackOnly':True,'framesSentPerChannel':100,'simpleFramesReceived':counts,'simpleTechnology':ari('/bridges/'+bridge_id).get('technology'),'runtime':runtime}
   print(json.dumps({'localMediaProbeStage':'simple','report':report}),flush=True)
-  # Adding one exclusively owned loopback channel selects Asterisk's soft mixer.
-  try:
-   ari('/channels/'+ids[0]+'/play','POST',media='sound:beep',playbackId=prefix+'-control')
-   print(json.dumps({'localMediaProbeStage':'playback','framesReceived':receive(sockets[0])}),flush=True)
-  except Exception:print(json.dumps({'localMediaProbeStage':'playback','unavailable':True}),flush=True)
-  phase='soft_create'
-  cid=prefix+'-c';ids.append(cid)
-  sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);sock.bind(('127.0.0.1',0));sock.settimeout(.1);sockets.append(sock)
-  external=ari('/channels/externalMedia','POST',channelId=cid,app='elevate-paris',external_host='127.0.0.1:'+str(sock.getsockname()[1]),format='ulaw',direction='both',transport='udp',encapsulation='rtp',connection_type='client')
-  created.append(cid)
-  if external.get('id')!=cid:raise ValueError('PROBE_CHANNEL_MISMATCH')
-  phase='soft_add'
+  # The supported SFU attribute scopes Asterisk's full mixer to this bridge.
+  # Only audio channels are created; no video media or third participant exists.
+  phase='full_mixer'
+  ari('/bridges/'+bridge_id,'DELETE');bridged=False
+  bridge_id=prefix+'-full'
+  bridge=ari('/bridges','POST',bridgeId=bridge_id,type='mixing,proxy_media,video_sfu',name=prefix)
+  if bridge.get('id')!=bridge_id:raise ValueError('PROBE_BRIDGE_MISMATCH')
+  bridged=True
   for _ in range(20):
-   if cid in ari('/applications/elevate-paris').get('channel_ids',[]):break
+   if all(cid in ari('/applications/elevate-paris').get('channel_ids',[]) for cid in ids):break
    time.sleep(.1)
-  ari('/bridges/'+bridge_id+'/addChannel','POST',channel=cid)
-  with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-   results=[pool.submit(receive,s) for s in sockets[:2]]
-   start=time.monotonic()
-   for frame in range(100,200):
-    for i,sock in enumerate(sockets[:2]):sock.sendto(struct.pack('!BBHII',0x80,0,frame,frame*160,123456+i)+bytes([0x20])*160,peers[i])
-    time.sleep(max(0,start+(frame-99)*.02-time.monotonic()))
-   report['softMixFramesReceived']=[r.result() for r in results]
-  report['softMixTechnology']=ari('/bridges/'+bridge_id).get('technology')
-  phase='playback_control'
-  # A built-in playback is a positive control for local outbound RTP.
-  try:
-   ari('/channels/'+ids[0]+'/play','POST',media='sound:beep',playbackId=prefix+'-playback')
-   report['builtinPlaybackFramesReceived']=receive(sockets[0])
-  except Exception:report['builtinPlaybackUnavailable']=True
-  cli('rtp set debug off');debug_enabled=False
-  phase='read_signals'
-  logs=run_command(['docker','logs','--since','20s','--tail','3000','pbx_asterisk_1']).stdout
-  for path in ['/var/log/asterisk/messages','/var/log/asterisk/messages.log','/var/log/asterisk/full','/var/log/asterisk/full.log']:
-   logs+=run_command(['docker','exec','pbx_asterisk_1','tail','-n','3000',path]).stdout
-  report['rtpSignals']={name:len(re.findall(pattern,logs,re.I)) for name,pattern in {'loopbackPacketsRead':r'Got  RTP packet from\s+127[.]0[.]0[.]1','loopbackPacketsSent':r'Sent RTP packet to\s+127[.]0[.]0[.]1','unknownCodec':r'Unknown RTP codec','shortRtp':r'RTP Read too short','unsupportedMedia':r'Unknown or unsupported media type','missingTranslation':r'No translator path|Unable to find a codec translation path'}.items()}
-  print(json.dumps(report))
+  ari('/bridges/'+bridge_id+'/addChannel','POST',channel=','.join(ids))
+  report['fullMixerFramesReceived']=exercise(100)
+  report['fullMixerTechnology']=ari('/bridges/'+bridge_id).get('technology')
+  report['fullMixerAudioPassed']=min(c['audibleFrames'] for c in report['fullMixerFramesReceived'])>=80
+  print(json.dumps(report),flush=True)
+
  finally:
   if debug_enabled:cli('rtp set debug off')
   for cid in created:

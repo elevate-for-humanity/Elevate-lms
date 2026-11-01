@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseRtp,rtp,isSpeech,routeOperator,routeApprovedExtension,isCallerStart,createExternalChannel,releaseCaller,handleDtmf,greet} from './ari-media.mjs';
+import {createSocket} from 'node:dgram';
+import {ownedMediaPeer,speak,parseRtp,rtp,isSpeech,routeOperator,routeApprovedExtension,isCallerStart,createExternalChannel,releaseCaller,handleDtmf,greet} from './ari-media.mjs';
 
 test('configured greeting starts once on a media peer without caller speech',async()=>{
  const session={callId:'call-greeting',id:'c'.repeat(24),turn:0,bridgeReady:true,remote:{address:'127.0.0.1',port:12345}};
@@ -161,4 +162,27 @@ test('a completed caller utterance resets speech detection before listening agai
  let requested=false;
  await turn(session,{request:async()=>{requested=true;assert.equal(session.heard,false);return {replyAudioUlawBase64:Buffer.alloc(160,0xff).toString('base64')};},play:async()=>{},finish:async()=>{}});
  assert.equal(requested,true);assert.equal(session.heard,false);assert.equal(session.frames.length,0);assert.equal(session.busy,false);
+});
+
+test('the first greeting RTP frame is injected using ARI metadata without any incoming media',async(t)=>{
+ const receiver=createSocket('udp4'),sender=createSocket('udp4');t.after(()=>{receiver.close();sender.close();});
+ await new Promise(resolve=>receiver.bind(0,'127.0.0.1',resolve));await new Promise(resolve=>sender.bind(0,'127.0.0.1',resolve));
+ const session={externalId:'paris-media-'+ 'e'.repeat(24),callId:'no-first-packet',id:'e'.repeat(24),bridgeReady:true,turn:0,seq:0,timestamp:0,ssrc:1,socket:sender};
+ session.remote=await ownedMediaPeer(session,{id:session.externalId,channelvars:{UNICASTRTP_LOCAL_ADDRESS:'127.0.0.1',UNICASTRTP_LOCAL_PORT:String(receiver.address().port)}},async()=>assert.fail('must use the owned response'));
+ let timeout;const packet=new Promise((resolve,reject)=>{timeout=setTimeout(()=>reject(Error('No greeting RTP')),2000);receiver.once('message',resolve);});t.after(()=>clearTimeout(timeout));
+ const audio=Buffer.alloc(160,0x42);
+ await greet(session,{request:async()=>({replyAudioUlawBase64:audio.toString('base64')}),play:speak,finish:async()=>assert.fail('unexpected fallback')});
+ assert.deepEqual(parseRtp(await packet).payload,audio);
+});
+test('missing RTP variables are read only from the owned external channel',async()=>{
+ const session={externalId:'paris-media-'+ 'f'.repeat(24)},paths=[];
+ const peer=await ownedMediaPeer(session,{id:session.externalId},async path=>{paths.push(path);return {value:path.endsWith('_ADDRESS')?'127.0.0.1':'12345'};});
+ assert.deepEqual(peer,{address:'127.0.0.1',port:12345});assert.equal(paths.length,2);assert.ok(paths.every(path=>path.startsWith('/channels/'+session.externalId+'/variable?variable=UNICASTRTP_LOCAL_')));
+});
+test('ARI media metadata cannot redirect greeting audio to public or privileged destinations',async()=>{
+ const session={externalId:'paris-media-'+ 'a'.repeat(24)};
+ for(const [address,port] of [['198.51.100.5','12345'],['10.128.0.2','12345'],['127.0.0.1','53'],['127.0.0.1','70000']]){
+  await assert.rejects(ownedMediaPeer(session,{id:session.externalId,channelvars:{UNICASTRTP_LOCAL_ADDRESS:address,UNICASTRTP_LOCAL_PORT:port}}),/PEER_NOT_LOOPBACK/);
+ }
+ await assert.rejects(ownedMediaPeer(session,{id:'different'}),/CHANNEL_ID_MISMATCH/);
 });

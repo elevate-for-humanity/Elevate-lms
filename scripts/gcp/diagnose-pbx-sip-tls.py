@@ -4,7 +4,7 @@ import json,re,socket,ssl,subprocess
 
 def run(args):
  r=subprocess.run(args,capture_output=True,text=True,timeout=20)
- return r.stdout if r.returncode==0 else ''
+ return (r.stdout+(r.stderr if args[:2]==['docker','logs'] else '')) if r.returncode==0 else ''
 
 def probe(host):
  stage='tcp_connect'
@@ -14,7 +14,7 @@ def probe(host):
    with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
     return {'trusted':bool(secure.getpeercert()),'protocol':secure.version()}
  except ssl.SSLCertVerificationError as e:return {'stage':stage,'error':'certificate_verification','verifyCode':e.verify_code}
- except ssl.SSLError:return {'stage':stage,'error':'tls_handshake_failed'}
+ except ssl.SSLError as e:return {'stage':stage,'error':'tls_handshake_failed','reason':e.reason if re.fullmatch(r'[A-Z0-9_]{1,100}',str(e.reason)) else 'unclassified'}
  except TimeoutError:return {'stage':stage,'error':'timeout'}
  except ConnectionRefusedError:return {'stage':stage,'error':'refused'}
  except OSError:return {'stage':stage,'error':'network_unavailable'}

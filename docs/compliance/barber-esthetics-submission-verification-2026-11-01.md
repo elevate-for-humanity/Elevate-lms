@@ -1,5 +1,9 @@
 # Barber and esthetics submission verification — November 1, 2026
 
+## Development status confirmed by owner
+
+Elizabeth Greene clarified during this verification that **esthetics and nails have not yet been completed and are the next curriculum builds**. Missing esthetics delivery is therefore unfinished development, not evidence of a completed course regression. Do not represent either program as having completed curriculum delivery. Build targets remain the signed standards: Esthetician 300 RTI hours / 20 competencies; Manicurist 210 RTI hours / 19 competencies. The signed nail source names Grace Beauty College; supplementary Elevate materials do not establish an approved provider amendment.
+
 ## Decision
 
 **Not yet verified submission-ready.** Registered RTI requirements align, but instructional delivery, course resolution, instructor/provider assignments, production syllabus deployment and current agency evidence have open gaps. This verification covers barber and esthetics in the preceding RTI reconciliation, not certification of every Elevate program.

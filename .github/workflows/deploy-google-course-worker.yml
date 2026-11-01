@@ -125,8 +125,10 @@ jobs:
           node scripts/audits/october-course-builder-diff-inventory.mjs
       - uses: actions/upload-artifact@v4
         with:
-          name: october-course-builder-diff-inventory
-          path: audit-output/october-course-builder-changes.json
+          name: october-course-builder-full-diff-evidence
+          path: |
+            audit-output/october-course-builder-changes.json
+            audit-output/october-course-builder-full-diffs.patch
           retention-days: 30
       - name: Show federated identity claim context
         run: |

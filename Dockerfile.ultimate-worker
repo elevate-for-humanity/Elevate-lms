@@ -17,7 +17,7 @@ RUN find lib -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
 RUN node --test lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs && node --import=tsx --test tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts
 RUN node --test tests/worker/narration-storage-reference.test.mjs
 RUN node --test tests/worker/hvac-saved-safety-role.test.mjs
-RUN node --input-type=module -e "await import('./workers/direct-database-fetch.mjs')"
+RUN node --input-type=module -e "import assert from 'node:assert/strict'; const guards=await import('./lib/ultimate-course-builder/worker/runtime-guards.mjs'); assert.equal(typeof guards.createWorkerSupabaseFetch,'function'); assert.equal(typeof guards.createLeaseDeadline,'function');"
 # Compile the actual copied composition so an inherited renderer cannot silently
 # survive a source release. This is compilation, not learner/media approval.
 RUN node --input-type=module -e "import {bundle} from '@remotion/bundler'; import {rm} from 'node:fs/promises'; const output=await bundle({entryPoint:'/app/remotion-src/index.ts',publicDir:'/app/public'}); await rm(output,{recursive:true,force:true});"

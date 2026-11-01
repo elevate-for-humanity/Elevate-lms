@@ -154,8 +154,8 @@ export function HomeFeaturedHostShop() {
             {
               name: 'Find your next pathway',
               label: 'Career training',
-              image: '/images/programs/refresh-20261101/home.webp',
-              alt: 'Adult professionals discussing career pathways',
+              image: '/images/programs/hvac/training-20261029/career.webp',
+              alt: 'Illustrative HVAC technician prepared for hands-on work',
               href: '/programs',
               text: 'Discover hands-on programs and the support to take your next step.',
               action: 'View all programs',

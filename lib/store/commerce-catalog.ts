@@ -1,8 +1,5 @@
 import { ADD_ON_MARKETPLACE, BASE_PLANS } from '@/lib/store/platform-pricing';
-import {
-  INDIVIDUAL_APP_CATALOG,
-  type IndividualAppSlug,
-} from '@/lib/apps/individual-app-plans';
+import { INDIVIDUAL_APP_CATALOG, type IndividualAppSlug } from '@/lib/apps/individual-app-plans';
 import { PlatformFeature, type PlatformFeatureKey } from '@/lib/platform/features';
 import type { StoreProductProofId } from '@/lib/store/offer-proof';
 
@@ -69,14 +66,16 @@ const addOns: CommerceCatalogItem[] = ADD_ON_MARKETPLACE.filter(
         : addon.slug.includes('ai')
           ? 'ai'
           : 'operations',
-  href: '/store/plans',
+  href:
+    addon.slug === 'credential-testing-center'
+      ? '/store/testing'
+      : `/store/plans?addon=${encodeURIComponent(addon.slug)}`,
   priceLabel: `$${addon.priceMonthly}/mo`,
   billingType: 'addon',
   status: 'sellable',
   keywords: [addon.slug, addon.name.toLowerCase()],
   proofFeatureKeys: addon.features,
-  proofProductId:
-    addon.features.length === 0 ? (addon.slug as StoreProductProofId) : undefined,
+  proofProductId: addon.features.length === 0 ? (addon.slug as StoreProductProofId) : undefined,
 }));
 
 const platformPlans: CommerceCatalogItem[] = Object.values(BASE_PLANS).map((plan) => ({
@@ -96,7 +95,8 @@ const platformProducts: CommerceCatalogItem[] = [
   {
     id: 'prestige-elevation-cosmetology',
     name: 'Prestige Elevation Cosmetology Course',
-    description: '40 video lessons, assessments and a matching digital workbook for your organization.',
+    description:
+      '40 video lessons, assessments and a matching digital workbook for your organization.',
     category: 'education',
     href: '/store/courses/prestige-elevation-cosmetology',
     priceLabel: '$275 per student',
@@ -180,18 +180,6 @@ const platformProducts: CommerceCatalogItem[] = [
     status: 'enterprise',
     keywords: ['dev studio', 'deployments', 'containers', 'workflows'],
     proofFeatureKeys: [PlatformFeature.DEV_STUDIO],
-  },
-  {
-    id: 'testing-center',
-    name: 'Testing Center',
-    description:
-      'Testing operations, scheduling, credential tracking, and related testing workflows.',
-    category: 'education',
-    href: '/store/testing',
-    billingType: 'addon',
-    status: 'sellable',
-    keywords: ['testing center', 'proctoring', 'credentials', 'exam scheduling'],
-    proofFeatureKeys: [PlatformFeature.TESTING_CENTER],
   },
   {
     id: 'integrations',

@@ -21,8 +21,8 @@ export function HomeWebsiteBuilderSales() {
       <div className="mx-auto grid max-w-6xl gap-9 rounded-[2rem] border border-orange-200 bg-orange-50/50 p-6 shadow-xl shadow-cyan-950/5 sm:p-10 lg:grid-cols-[.92fr_1.08fr] lg:items-center">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white bg-white shadow-2xl ring-1 ring-cyan-900/10">
           <Image
-            src="/images/programs/refresh-20261101/business.webp"
-            alt="Illustrative business owners planning a website"
+            src="/images/store-commercials/website-builder.webp"
+            alt="Illustrative salon business owner working on her website"
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 45vw"

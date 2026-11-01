@@ -28,7 +28,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-orange-500',
-    img: '/images/programs/refresh-20261101/beauty.webp',
+    img: '/images/partners/host-shop-mentoring-premium-2026.webp',
     imgAlt: 'Illustrative beauty apprentice learning under salon supervision',
     title: 'Become an Apprenticeship Host Site',
     desc: 'Approved businesses provide supervised on-the-job learning while Elevate manages Registered Apprenticeship sponsor governance, RTI, tracking, and compliance workflows.',
@@ -42,7 +42,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-orange-500',
-    img: '/images/programs/refresh-20261101/home.webp',
+    img: '/images/programs/hvac/elevate-20261029/group-learning.webp',
     imgAlt: 'Illustrative adult learners working with an instructor',
     title: 'Co-Design a Training Cohort',
     desc: 'Work with Elevate to structure a training cohort around job requirements, scheduling, credentials, and available workforce funding.',

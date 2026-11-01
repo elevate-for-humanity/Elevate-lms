@@ -9,24 +9,24 @@ const STEPS = [
     label: 'Apply',
     detail: 'Start with a short application so we know your program interest and next step.',
     href: '/apply',
-    img: '/images/programs/refresh-20261101/home.webp',
-    imgAlt: 'Illustrative adult learners working with an instructor',
+    img: '/images/refresh-20261014/admissions.webp',
+    imgAlt: 'Illustrative student discussing an application with an advisor',
   },
   {
     n: '02',
     label: 'Review Funding',
     detail: 'Explore potential workforce funding and eligibility requirements before enrollment.',
     href: '/check-eligibility',
-    img: '/images/programs/refresh-20261101/employers.webp',
-    imgAlt: 'Illustrative advisor reviewing a training plan',
+    img: '/images/bookkeeping-training-vibrant-2026.webp',
+    imgAlt: 'Illustrative advisor reviewing financial paperwork with a student',
   },
   {
     n: '03',
     label: 'Train',
     detail: 'Complete credential-aligned instruction and required hands-on learning.',
     href: '/programs',
-    img: '/images/programs/refresh-20261101/home.webp',
-    imgAlt: 'Illustrative adult learners studying together',
+    img: '/images/programs/hvac/training-20261029/group-learning.webp',
+    imgAlt: 'Illustrative HVAC instructor guiding students through a training plan',
   },
   {
     n: '04',
@@ -34,8 +34,8 @@ const STEPS = [
     detail:
       'Eligible apprenticeship pathways combine structured training with employer-based learning.',
     href: '/apprenticeships',
-    img: '/images/programs/refresh-20261101/beauty.webp',
-    imgAlt: 'Illustrative beauty instructor guiding salon practice',
+    img: '/images/hero/hero-hands-on-training.webp',
+    imgAlt: 'Learner practicing technical skills with safety equipment',
   },
   {
     n: '05',
@@ -43,8 +43,8 @@ const STEPS = [
     detail:
       'Prepare for the credential, certification, or license requirement connected to your pathway.',
     href: '/credentials',
-    img: '/images/programs/refresh-20261101/home.webp',
-    imgAlt: 'Illustrative learners reviewing their training materials',
+    img: '/images/pexels/graduation.webp',
+    imgAlt: 'Illustrative graduates at a completion ceremony',
   },
   {
     n: '06',
@@ -52,8 +52,8 @@ const STEPS = [
     detail:
       'Use career services, employer connections, and work-based learning support as you advance.',
     href: '/employment-support',
-    img: '/images/programs/refresh-20261101/employers.webp',
-    imgAlt: 'Illustrative workforce advisor meeting business owners',
+    img: '/images/career-coaching-new.webp',
+    imgAlt: 'Career advisor reviewing next steps with a learner',
   },
 ] as const;
 

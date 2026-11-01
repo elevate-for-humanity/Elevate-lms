@@ -165,11 +165,14 @@ jobs:
           import {readFileSync,existsSync} from 'node:fs';
           const page=readFileSync('apps/marketing/app/page.tsx','utf8');
           const cards=readFileSync('components/home/HomeCareerPathways.tsx','utf8');
+          const hvac=readFileSync('components/programs/HvacTrainingShowcase.tsx','utf8');
           const shops=readFileSync('components/home/HomeFeaturedHostShop.tsx','utf8');
           const trust=readFileSync('components/home/HomeTrustBar.tsx','utf8');
           const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','Find or become a Host Shop'];
           for(const name of required) if(!shops.includes(name)) throw new Error('Missing homepage content: '+name);
-          for(const name of ['HVAC Technician','CDL Training','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
+          for(const name of ['CDL Training','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
+          if(!page.includes('<HvacTrainingShowcase compact />') || !hvac.includes('HVAC Technician')) throw new Error('Missing featured HVAC program');
+          if((page.match(/<PlatformHubHero \/>/g) || []).length !== 1) throw new Error('The main homepage hero must be preserved exactly once');
           if(cards.includes("slug: 'bookkeeping'")) throw new Error('Withdrawn Bookkeeping promotion remains');
           if(page.includes('<HomeNetworks') || trust.includes('Workforce systems and public-sector alignment')) throw new Error('Retired homepage section still enabled');
           const imagePattern = new RegExp("image: '(/images/[^']+)'", 'g');

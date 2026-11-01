@@ -13,14 +13,21 @@ The signed approved Appendix A and the apprentice's training agreement govern th
 
 ## Related instruction subjects
 
-- Barbering history and professional development
-- Anatomy, physiology, and skin/nail disorders
-- Hair and scalp theory, disorders, and treatments
-- Infection control and bloodborne pathogens
-- Haircutting theory, tool safety, and techniques
-- State board laws, rules, and regulations
-- Business practices
-- Preparation for the state licensing examination
+Source: [signed July 10, 2025 Appendix A](https://drive.google.com/file/d/1l3e7hmyQQDM5CvQfYZzDv1g2vR23vrVR/view), PDF page 7 (printed A-6).
+
+| Instructional subject | Contact hours |
+| --- | ---: |
+| Barbering History and Professional Development | 10 |
+| Anatomy, Physiology & Skin/Nail Disorders | 60 |
+| Hair & Scalp Theory, Disorders, and Treatments | 60 |
+| Infection Control & Bloodborne Pathogens (OSHA) | 40 |
+| Hair Cutting Theory, Tool Safety, and Techniques | 60 |
+| State Board Laws, Rules, and Regulations | 10 |
+| Business Practices | 10 |
+| Preparation for State Licensing Examination | 10 |
+| **Total** | **260** |
+
+The signed outline also states that 144 hours of related instruction are required for each apprentice for each year. Retain that provision when preparing the individual delivery schedule; the occupation total does not replace the annual requirement. These allocations are instructional requirements, not automatically credited learner hours.
 
 The complete RTI plan must account for 260 verified instructional hours. The assigned short online lessons form part of that instruction; their publication does not establish completion of the entire RTI requirement.
 
@@ -63,4 +70,4 @@ Use the signed training agreement and approved individual schedule for pacing, r
 
 Completion of Elevate instruction does not itself issue a state license. The licensing authority determines eligibility and any additional requirements. This syllabus does not establish Indiana secondary CTE course equivalency or funding approval.
 
-**Revision:** October 31, 2026 — reconciled to the existing registered-program records; signed source authority remains controlling.
+**Revision:** November 1, 2026 — subject allocations verified against the signed July 10, 2025 Appendix A, canonical TypeScript and live RTI requirement records; signed source authority remains controlling.

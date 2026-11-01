@@ -31,9 +31,12 @@ export function prepareEnvManager(component = 'admin', run = google) {
   const operator = role('elevateRuntimeConfigOperatorV1', OPERATOR);
   for (const key of destination.keys) {
     const secret = `elevate-${component}-${key.toLowerCase().replaceAll('_', '-')}`;
-    const listed = JSON.parse(run(['secrets', 'list', '--project', PROJECT, '--filter', `name:/${secret}`, '--format=json']));
-    const existing = listed.find(item => item.name.split('/').at(-1) === secret);
-    if (existing && (existing.labels?.elevate_component !== component || existing.labels?.elevate_key !== key.toLowerCase())) throw new Error('Existing secret has different ownership. No payloads changed.');
+    let existing;
+    // Resource-scoped credentials need no project-wide secret inventory.
+    // Only a confirmed missing exact destination permits creation; denial is fatal.
+    try { existing = JSON.parse(run(['secrets', 'describe', secret, '--project', PROJECT, '--format=json'])); }
+    catch (error) { if (error.code !== 'not_found') throw error; }
+    if (existing && (existing.name?.split('/').at(-1) !== secret || existing.labels?.elevate_component !== component || existing.labels?.elevate_key !== key.toLowerCase())) throw new Error('Existing secret has different ownership. No payloads changed.');
     if (!existing) run(['secrets', 'create', secret, '--project', PROJECT, '--replication-policy=automatic', '--labels', `elevate_component=${component},elevate_key=${key.toLowerCase()}`, '--quiet']);
     run(['secrets', 'add-iam-policy-binding', secret, '--project', PROJECT, '--member', `serviceAccount:${manager}`, '--role', writer, '--condition=None', '--quiet']);
     run(['secrets', 'add-iam-policy-binding', secret, '--project', PROJECT, '--member', `serviceAccount:${destination.identity}`, '--role', 'roles/secretmanager.secretAccessor', '--condition=None', '--quiet']);

@@ -13,10 +13,12 @@ function harness(options = {}) {
       if (options.roleMismatch) return JSON.stringify({includedPermissions:['secretmanager.versions.access']});
       const error = new Error('Exact role not found'); error.code = options.roleDenied ? 'permission_denied' : 'not_found'; throw error;
     }
-    if (args[0] === 'secrets' && args[1] === 'list') {
+    if (args[0] === 'secrets' && args[1] === 'list') throw new Error('Broad secret inventory is not authorized');
+    if (args[0] === 'secrets' && args[1] === 'describe') {
       if (options.inventoryDenied) { const error = new Error('Google operation failed'); error.code = 'permission_denied'; throw error; }
-      if (options.wrongSecret) return JSON.stringify([{ name: args[args.indexOf('--filter') + 1].replace('name:/', 'projects/example/secrets/'), labels: { elevate_component: 'marketing' } }]);
-      return '[]';
+      if (options.wrongSecret) return JSON.stringify({ name: 'projects/example/secrets/'+args[2], labels: { elevate_component: 'marketing' } });
+      if (options.existingSecret) return JSON.stringify({name:'projects/example/secrets/'+args[2],labels:{elevate_component:'admin',elevate_key:args[2].replace('elevate-admin-','').replaceAll('-','_')}});
+      const error = new Error('Exact secret not found'); error.code='not_found'; throw error;
     }
     return '';
   }
@@ -30,6 +32,7 @@ test('prepares per-service resources without credential transfer, runtime deploy
   assert.equal(result.runtimeChanged, false);
   assert.equal(result.projectWideSecretAccess, false);
   assert.equal(h.calls.some(args => args.includes('versions') || args.includes('deploy') || args[0] === 'projects'), false);
+  assert.equal(h.calls.some(args => args[0]==='secrets' && args[1]==='list'),false);
   const customRole = h.calls.find(args => args.includes('elevateRuntimeSecretWriterV1') && args[2] === 'create');
   assert.equal(customRole[customRole.indexOf('--permissions') + 1].includes('secretmanager.versions.access'), false);
   const accessors = h.calls.filter(args => args.includes('roles/secretmanager.secretAccessor'));
@@ -61,6 +64,12 @@ test('does not treat denied secret inventory as an empty destination', () => {
   const h = harness({ inventoryDenied: true });
   assert.throws(() => prepareEnvManager('admin', h.run), /Google operation failed/);
   assert.equal(h.calls.some(args => args[0] === 'secrets' && args[1] === 'create'), false);
+});
+test('uses exact existing destinations without requesting inventory or recreating secrets',()=>{
+  const h=harness({existingSecret:true});
+  prepareEnvManager('admin',h.run);
+  assert.equal(h.calls.some(args=>args[0]==='secrets'&&['list','create'].includes(args[1])),false);
+  assert.ok(h.calls.some(args=>args[0]==='secrets'&&args[1]==='describe'));
 });
 test('refuses a secret whose ownership belongs to another component', () => {
   const h = harness({ wrongSecret: true });

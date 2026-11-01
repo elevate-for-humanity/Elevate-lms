@@ -33,5 +33,5 @@ def main():
  endpoint=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','pjsip show endpoint twilio'])
  endpoint_settings={key:match[1] for key in ['media_encryption','media_encryption_optimistic','direct_media','rtp_symmetric','rtp_keepalive','use_avpf','dtmf_mode','force_rport'] if (match:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_]+)\s*$',endpoint,re.M))}
  print(json.dumps({'srtpReasonSignals':srtp_reasons,'carrierEndpointSettings':endpoint_settings,'readOnly' :True,'callsPlaced':0,'gatewayActive':run(['systemctl','is-active','elevate-paris-gateway.service']).strip()=='active',
-  'gatewayFailureMarkers':{marker:gateway.count(marker) for marker in ['PARIS_BRIDGE_FAILED','PARIS_GREETING_FAILED','PARIS_TURN_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_RUNTIME_STARTUP_FAILED']},'asteriskSignals':signals}))
+  'gatewayFailureMarkers':{marker:gateway.count(marker) for marker in ['PARIS_GREETING_REQUESTED','PARIS_GREETING_AUDIO_READY','PARIS_GREETING_SENT','PARIS_BRIDGE_FAILED','PARIS_GREETING_FAILED','PARIS_TURN_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_RUNTIME_STARTUP_FAILED']},'asteriskSignals':signals}))
 if __name__=='__main__':main()

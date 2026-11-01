@@ -176,12 +176,15 @@ export async function speak(session,encoded,{clock=()=>performance.now(),wait=sl
 export async function greet(session,{request=privateTurn,play=speak,finish=end}={}){
   if(session.closed || session.transferring || session.greetingStarted || !session.bridgeReady || !session.remote)return;
   session.greetingStarted=true;session.busy=true;
+  process.stderr.write('PARIS_GREETING_REQUESTED\n');
   clearTimeout(session.greetingDeadline);
   try{
     const body=await request(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,event:'greeting',encoding:'PCMU',sampleRate:8000},config.token);
     if(session.closed || session.transferring)return;
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_GREETING_AUDIO_MISSING');
+    process.stderr.write('PARIS_GREETING_AUDIO_READY\n');
     await play(session,body.replyAudioUlawBase64);
+    if(!session.closed)process.stderr.write('PARIS_GREETING_SENT\n');
   }catch{
     process.stderr.write('PARIS_GREETING_FAILED\n');
     if(!session.closed && !session.transferring)await finish(session,'continue');

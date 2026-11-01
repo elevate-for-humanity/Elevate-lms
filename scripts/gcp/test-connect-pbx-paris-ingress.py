@@ -25,4 +25,16 @@ class Tests(unittest.TestCase):
   self.assertEqual(m.failure_evidence(ValueError('secret=private'))['reason'],'PBX_UNEXPECTED_FAILURE')
   self.assertEqual(m.failure_evidence(ValueError('PBX_INGRESS_READBACK_FAILED'))['reason'],'PBX_INGRESS_READBACK_FAILED')
   self.assertEqual(m.failure_evidence(m.subprocess.TimeoutExpired(['private'],30))['reason'],'PBX_COMMAND_TIMEOUT')
+ def test_candidate_diagnostics_are_redacted_and_check_actual_asterisk_access(self):
+  from unittest.mock import patch
+  from types import SimpleNamespace
+  import json
+  transport='cert_file : /etc/asterisk/tls/phone.crt\npriv_key_file : /etc/asterisk/tls/phone.key\n'
+  with patch.object(m,'cli',return_value=transport),patch.object(m,'run',side_effect=['yes\n','no\n']) as access,patch.object(m.subprocess,'run',return_value=SimpleNamespace(stdout='Permission denied secret=private',stderr='no shared cipher')):
+   evidence=m.attempted_tls_evidence()
+  self.assertEqual(evidence['candidateFilesReadable'],{'cert_file':True,'priv_key_file':False})
+  self.assertTrue(evidence['candidateLogSignals']['noSharedCipher'])
+  self.assertTrue(evidence['candidateLogSignals']['permissionDenied'])
+  self.assertNotIn('private',json.dumps(evidence));self.assertNotIn('/etc/',json.dumps(evidence))
+  self.assertTrue(all(call.args[0][2:4]==['--user','asterisk'] for call in access.call_args_list))
 if __name__=='__main__':unittest.main()

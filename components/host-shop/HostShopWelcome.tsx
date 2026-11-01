@@ -24,11 +24,10 @@ export default function HostShopWelcome({
   const identity = (value: string) => value.toLowerCase().replace(/&/g, 'and')
     .replace(/\b(llc|inc)\b/g, '').replace(/[^a-z0-9]/g, '');
   const aliases: Record<string, string> = {
+    styleandscissorssalon: 'style-and-scissor-salon',
     stylesandscissors: 'style-and-scissor-salon',
     stylesandscissorssalon: 'style-and-scissor-salon',
     stylesandscissorssalonandbarber: 'style-and-scissor-salon',
-    countrycuts: 'kountry-kutz-barbershop',
-    countrycutsbarbershop: 'kountry-kutz-barbershop',
     topshelfbarbershop: 'top-shelf-barber-lounge',
   };
   const shopIdentity = identity(shopName);

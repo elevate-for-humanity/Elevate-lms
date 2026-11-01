@@ -175,9 +175,12 @@ def tls_endpoint(text):
  pattern=r'(?ms)(^\[elevate-twilio-tls\]\s*\n)(.*?)(?=^\[|\Z)'
  match=re.search(pattern,text)
  if not match:raise ValueError('PBX_TLS_TRANSPORT_UNVERIFIED')
- body=match[2]
- for key,value in [('cert_file','/etc/asterisk/tls/phone.crt'),('priv_key_file','/etc/asterisk/tls/phone.key'),('allow_reload','yes')]:
-  body=re.sub(r'^'+key+r'=.*\n?', '',body,flags=re.M)
+ # The bundled CA file stalls server handshakes in this deployed PJProject.
+ # Use the same system trust store through its hashed directory; verification
+ # remains enabled for outbound carrier connections.
+ body=re.sub(r'^\s*ca_list_file\s*=.*\n?', '',match[2],flags=re.M)
+ for key,value in [('ca_list_path','/etc/ssl/certs'),('cert_file','/etc/asterisk/tls/phone.crt'),('priv_key_file','/etc/asterisk/tls/phone.key'),('allow_reload','yes')]:
+  body=re.sub(r'^\s*'+key+r'\s*=.*\n?', '',body,flags=re.M)
   body=body.rstrip()+'\n'+key+'='+value+'\n'
  return text[:match.start(2)]+body+text[match.end(2):]
 def messages_cursor():

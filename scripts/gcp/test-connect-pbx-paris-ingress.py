@@ -21,6 +21,15 @@ class Tests(unittest.TestCase):
   self.assertIn('cert_file=/etc/asterisk/tls/phone.crt',text)
   self.assertIn('allow_reload=yes',text)
   self.assertIn('[other]\nkeep=yes',text)
+ def test_system_trust_directory_replaces_bundle_without_disabling_verification(self):
+  source='[elevate-twilio-tls]\ntype=transport\nprotocol=tls\nmethod=tlsv1_2\nverify_server=yes\n ca_list_file = /etc/ssl/certs/ca-certificates.crt\nca_list_path=/unreviewed\n[other]\nca_list_file=/preserve\n'
+  result=m.tls_endpoint(source);body=result.split('[other]')[0]
+  self.assertNotIn('ca_list_file',body)
+  self.assertEqual(body.count('ca_list_path=/etc/ssl/certs'),1)
+  self.assertNotIn('/unreviewed',body)
+  self.assertIn('verify_server=yes',body);self.assertIn('method=tlsv1_2',body)
+  self.assertIn('[other]\nca_list_file=/preserve',result)
+  self.assertEqual(result,m.tls_endpoint(result))
  def test_failure_evidence_never_emits_arbitrary_exception_text(self):
   self.assertEqual(m.failure_evidence(ValueError('secret=private'))['reason'],'PBX_UNEXPECTED_FAILURE')
   self.assertEqual(m.failure_evidence(ValueError('PBX_INGRESS_READBACK_FAILED'))['reason'],'PBX_INGRESS_READBACK_FAILED')

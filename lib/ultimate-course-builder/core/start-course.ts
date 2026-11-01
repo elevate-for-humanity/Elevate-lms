@@ -7,6 +7,7 @@ import { UltimateJobQueue } from '../worker/job-queue';
 import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { recordCourseDispatch } from '../worker/dispatch-evidence';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '../instructional/google-lesson-author';
+import { resolveCourseProgramSlug } from './course-program-identity';
 
 export type StartCourseInput = {
   courseId?: string; programSlug?: string; title?: string; topic?: string;
@@ -43,7 +44,7 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
       if (reactivateError) throw reactivateError;
     }
 
-    const programSlug = String(body.programSlug || course.slug || '').trim();
+    const programSlug = await resolveCourseProgramSlug(db, course, body.programSlug);
     if (!programSlug) {
       return NextResponse.json({ error: 'programSlug is required' }, { status: 400 });
     }
@@ -101,7 +102,10 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
       activeQuery.contains('profile', { instructionalAuthoring: profile.instructionalAuthoring });
     const { data: activeBuild, error: activeError } = await activeQuery.maybeSingle();
     if (activeError) throw activeError;
-    if (activeBuild && body.syllabusPlan) return NextResponse.json({error:'This course already has an active build. Attach sources in its production workspace.'},{status:409});
+    if (activeBuild && body.syllabusPlan &&
+      !activeBuild.profile?.instructionalSources?.some((source: {id: string; text: string}) =>
+        source.id === 'syllabus:uploaded' && source.text === body.syllabusPlan?.text))
+      return NextResponse.json({error:'This course already has an active build. Attach sources in its production workspace.'},{status:409});
     if (
       activeBuild &&
       authoring &&

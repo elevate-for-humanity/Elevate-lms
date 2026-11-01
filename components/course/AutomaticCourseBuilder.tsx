@@ -252,14 +252,14 @@ export default function AutomaticCourseBuilder() {
         modules_inserted: published.modulesGenerated,
         lessons_published: published.lessonsGenerated,
         curriculum_lessons_inserted: published.lessonsGenerated,
-        compliance_status: published.governance ? 'governance report available' : 'draft generated',
+        compliance_status: 'production queued',
         generation_attempt: 1,
         videos_queued: published.videosQueued,
         completion_state: published.completionState,
         governance: published.governance,
       });
       speak(
-        `${published.lessonsGenerated} draft lessons were created. Human review and media completion remain visible as separate statuses.`,
+        'The production job is queued. Open the course workspace for generation, media and release progress.',
       );
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Request failed';
@@ -660,7 +660,7 @@ export default function AutomaticCourseBuilder() {
             <>
               <div className="flex items-center gap-2 mb-3">
                 <CheckCircle className="w-5 h-5 text-brand-green-600" />
-                <span className="font-bold text-brand-green-800">Draft generation completed</span>
+                <span className="font-bold text-brand-green-800">Production job queued</span>
               </div>
               <dl className="text-sm space-y-1 text-brand-green-900">
                 <div className="flex justify-between">
@@ -676,7 +676,7 @@ export default function AutomaticCourseBuilder() {
                   <dd className="font-medium">{result.lessons_published}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt>Curriculum lessons archived</dt>
+                  <dt>Curriculum lessons generated</dt>
                   <dd className="font-medium">{result.curriculum_lessons_inserted}</dd>
                 </div>
                 <div className="flex justify-between">
@@ -698,7 +698,7 @@ export default function AutomaticCourseBuilder() {
               </dl>
               <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
                 {[
-                  ['Draft generated', true],
+                  ['Production job queued', true],
                   ['Lessons validated', Boolean(result.governance)],
                   ['Human review completed', false],
                   ['Videos rendered', result.completion_state === 'ready_for_review'],

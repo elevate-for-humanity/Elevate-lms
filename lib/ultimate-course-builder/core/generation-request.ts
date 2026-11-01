@@ -5,6 +5,8 @@ import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import { resolveCanonicalSlug } from '@/lib/programs/slug';
 import { startCanonicalCourse } from './start-course';
 import { validateSyllabusPlan, type SyllabusPlan } from '../authoring/syllabus-plan';
+import { resolveCourseProgramSlug } from './course-program-identity';
+import { isRegisteredProgramSlug } from '@/lib/apprenticeship/registered-program-contract';
 
 export type GenerationRequest = {
   courseId?: string; programId?: string; programSlug?: string;
@@ -30,6 +32,9 @@ export function blueprintSourcePlan(blueprint: CredentialBlueprint): SyllabusPla
 /** Resolve existing identity before writing. This never replaces courses or learner records. */
 export async function requestCanonicalGeneration(db: SupabaseClient, input: GenerationRequest, actorId: string) {
   await assertCourseBuilderGenerationEnabled(db, input.courseId);
+  for (const count of [input.moduleCount, input.lessonsPerModule])
+    if (count !== undefined && (!Number.isInteger(count) || count < 1 || count > 100))
+      throw new Error('INVALID_REQUESTED_CURRICULUM_SIZE');
   let slug = resolveCanonicalSlug(input.programSlug || input.blueprint?.programSlug || '');
   const programId = input.programId;
   let programTitle: string | undefined;
@@ -44,10 +49,31 @@ export async function requestCanonicalGeneration(db: SupabaseClient, input: Gene
     blueprint = await getBlueprintById(input.blueprintId) ?? undefined;
     if (!blueprint) throw new Error('BLUEPRINT_NOT_FOUND');
   }
+  if (!slug && blueprint) slug = resolveCanonicalSlug(blueprint.programSlug);
   if (!blueprint && slug && !input.courseId) blueprint = await getBlueprintByProgramSlug(slug) ?? undefined;
   if (blueprint && slug && resolveCanonicalSlug(blueprint.programSlug) !== slug)
     throw new Error('BLUEPRINT_PROGRAM_IDENTITY_MISMATCH');
-  const syllabusPlan = blueprint ? blueprintSourcePlan(blueprint) : undefined;
+  const lessonDraft = input.buildScope === 'lesson';
+  if (lessonDraft && (!blueprint || input.courseId))
+    throw new Error('SINGLE_LESSON_DRAFT_REQUIRES_BLUEPRINT_AND_SEPARATE_COURSE');
+  let syllabusPlan = blueprint ? blueprintSourcePlan(blueprint) : undefined;
+  const registered = isRegisteredProgramSlug(slug);
+  if (syllabusPlan && !registered && !lessonDraft && (input.moduleCount || input.lessonsPerModule)) {
+    const modules = syllabusPlan.modules.slice(0, input.moduleCount ?? syllabusPlan.modules.length)
+      .map(module => ({ ...module, lessons: module.lessons.slice(0, input.lessonsPerModule ?? module.lessons.length) }));
+    syllabusPlan = { text: JSON.stringify(modules), modules };
+  }
+  if (lessonDraft && syllabusPlan) {
+    const firstModule = syllabusPlan.modules[0];
+    const firstLesson = firstModule?.lessons[0];
+    if (!firstLesson) throw new Error('SOURCE_BLUEPRINT_INCOMPLETE');
+    const draftTitle = input.title?.trim() || firstLesson.title;
+    const draftKey = draftTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (!draftKey) throw new Error('COURSE_TITLE_REQUIRED');
+    slug = `${slug}-${draftKey}-draft`;
+    const modules = [{ title: firstModule.title, lessons: [{ ...firstLesson, title: draftTitle }] }];
+    syllabusPlan = { text: JSON.stringify(modules), modules };
+  }
   if (syllabusPlan && !validateSyllabusPlan(syllabusPlan)) throw new Error('SOURCE_BLUEPRINT_INCOMPLETE');
   if (!input.courseId && !slug) throw new Error('COURSE_ID_OR_PROGRAM_REQUIRED');
   let query = db.from('courses').select('id,title,slug,description,program_id,status');
@@ -55,6 +81,13 @@ export async function requestCanonicalGeneration(db: SupabaseClient, input: Gene
   const existing = await query.maybeSingle();
   if (existing.error) throw existing.error;
   if (input.courseId && !existing.data) throw new Error('COURSE_NOT_FOUND');
+  if (existing.data) {
+    if (programId && existing.data.program_id && programId !== existing.data.program_id)
+      throw new Error('COURSE_PROGRAM_IDENTITY_MISMATCH');
+    slug = await resolveCourseProgramSlug(db, existing.data, slug);
+    if (blueprint && !lessonDraft && resolveCanonicalSlug(blueprint.programSlug) !== slug)
+      throw new Error('BLUEPRINT_PROGRAM_IDENTITY_MISMATCH');
+  }
   const title = input.title || existing.data?.title || programTitle || blueprint?.title || blueprint?.credentialTitle;
   if (!title?.trim()) throw new Error('COURSE_TITLE_REQUIRED');
   if (input.dryRun) return { ok: true, dryRun: true, courseId: existing.data?.id, courseSlug: slug,
@@ -62,7 +95,7 @@ export async function requestCanonicalGeneration(db: SupabaseClient, input: Gene
   let course = existing.data;
   if (!course) {
     const created = await db.from('courses').insert({
-      slug, title, description: input.topic || '', program_id: programId || null,
+      slug, title, description: input.topic || '', program_id: lessonDraft ? null : programId || null,
       status: 'draft', is_active: true, created_by: actorId,
     }).select('id,title,slug,description,program_id,status').single();
     if (created.error?.code === '23505') {

@@ -14,6 +14,10 @@ export function isSupabaseConfigured(): boolean {
 }
 
 export async function createClient(): Promise<SupabaseClient<any>> {
+  // Establish the request boundary before reading runtime configuration. Next
+  // must not prerender an authenticated page while build-time secrets are absent.
+  const cookieStore = await cookies();
+  const hostname = (await headers()).get('host') ?? '';
   const config = getServerPublicSupabaseConfig();
   if (!config) {
     throw new Error('SUPABASE_CONFIGURATION_MISSING: Server database configuration is unavailable.');
@@ -22,9 +26,6 @@ export async function createClient(): Promise<SupabaseClient<any>> {
   const { url: supabaseUrl, anonKey: supabaseAnonKey } = config;
 
   try {
-    const cookieStore = await cookies();
-    const hostname = (await headers()).get('host') ?? '';
-
     return createServerClient(supabaseUrl, supabaseAnonKey, {
       global: { fetch: createBrowserAuthFetch(supabaseUrl, { fetchImpl: timedFetch }) },
       cookies: {

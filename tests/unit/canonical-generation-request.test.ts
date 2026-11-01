@@ -4,6 +4,7 @@ const start = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/ultimate-course-builder/core/generation-control', () => ({ assertCourseBuilderGenerationEnabled: vi.fn() }));
 vi.mock('@/lib/ultimate-course-builder/core/start-course', () => ({ startCanonicalCourse: start }));
 import { requestCanonicalGeneration } from '@/lib/ultimate-course-builder/core/generation-request';
+import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 
 function database(result: { data: unknown; error: unknown }) {
   const query = {
@@ -42,6 +43,27 @@ describe('canonical generation handoff', () => {
     const error = new Error('DATABASE_OFFLINE');
     const { db, query } = database({ data: null, error });
     await expect(requestCanonicalGeneration(db, { courseId: course.id }, 'actor')).rejects.toBe(error);
+    expect(query.insert).not.toHaveBeenCalled();
+    expect(start).not.toHaveBeenCalled();
+  });
+  it('keeps a single-lesson draft separate from the full registered program', async () => {
+    const { db, query } = database({ data: null, error: null });
+    query.single.mockResolvedValue({ data: { ...course, slug: 'barber-apprenticeship-safe-tools-draft' }, error: null });
+    const blueprint = { programSlug: 'barber-apprenticeship', title: 'Barber', modules: [{ title: 'Tools', lessons: [
+      { title: 'Tool safety', objective: 'Handle tools safely', content: 'Inspect each tool before use.' },
+      { title: 'Cleaning', objective: 'Clean tools', content: 'Follow the approved disinfection procedure.' },
+    ] }] } as unknown as CredentialBlueprint;
+    start.mockResolvedValue(Response.json({ ok: true, buildId: 'build', dispatched: true }, { status: 202 }));
+    await requestCanonicalGeneration(db, { blueprint, buildScope: 'lesson', title: 'Safe tools' }, 'actor');
+    expect(query.insert).toHaveBeenCalledWith(expect.objectContaining({ program_id: null, slug: 'barber-apprenticeship-safe-tools-draft' }));
+    const request = start.mock.calls[0][1];
+    expect(request.programSlug).toBe('barber-apprenticeship-safe-tools-draft');
+    expect(request.syllabusPlan.modules).toHaveLength(1);
+    expect(request.syllabusPlan.modules[0].lessons).toHaveLength(1);
+  });
+  it('rejects invalid curriculum limits before writing or dispatching', async () => {
+    const { db, query } = database({ data: course, error: null });
+    await expect(requestCanonicalGeneration(db, { courseId: course.id, moduleCount: -1 }, 'actor')).rejects.toThrow('INVALID_REQUESTED_CURRICULUM_SIZE');
     expect(query.insert).not.toHaveBeenCalled();
     expect(start).not.toHaveBeenCalled();
   });

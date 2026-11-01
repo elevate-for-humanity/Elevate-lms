@@ -40,6 +40,6 @@ it('rejects build placeholders instead of constructing an unusable authenticatio
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://placeholder.supabase.co');
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'build-placeholder');
   expect(isSupabaseConfigured()).toBe(false);
-  await createClient();
+  await expect(createClient()).rejects.toThrow('SUPABASE_CONFIGURATION_MISSING');
   expect(state.server).not.toHaveBeenCalled();
 });

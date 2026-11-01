@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['scripts/gcp/repair-paris-settings.py', 'infra/pbx/paris/turn-adapter.mjs', '.github/workflows/repair-paris-saved-settings.yml']
+    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'infra/pbx/paris/turn-adapter.mjs', '.github/workflows/repair-paris-saved-settings.yml']
   pull_request:
     paths: ['scripts/gcp/*repair-paris-settings.py', 'infra/pbx/paris/**', '.github/workflows/repair-paris-saved-settings.yml']
 permissions:
@@ -23,7 +23,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: python3 scripts/gcp/test-repair-paris-settings.py
+      - run: python3 scripts/gcp/test-repair-paris-turn-proxy.py && python3 scripts/gcp/test-repair-paris-settings.py
       - run: node --test infra/pbx/paris/*.test.mjs
   dispatch:
     if: github.event_name == 'push'
@@ -42,7 +42,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: python3 scripts/gcp/test-repair-paris-settings.py && node --test infra/pbx/paris/*.test.mjs
+      - run: python3 scripts/gcp/test-repair-paris-turn-proxy.py && python3 scripts/gcp/test-repair-paris-settings.py && node --test infra/pbx/paris/*.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -50,6 +50,15 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
+      - name: Restore authenticated loopback PARIS speech route without changing public ingress
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/repair-paris-turn-proxy.py
+      - name: Verify the private turn route remains unavailable to external clients
+        run: |
+          node --input-type=module <<'NODE'
+          const response=await fetch('https://phone.elevateforhumanity.org/internal/paris/turn',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',redirect:'error',signal:AbortSignal.timeout(10000)});
+          if(response.status!==403)throw Error('PARIS_PUBLIC_TURN_ROUTE_NOT_DENIED');
+          console.log(JSON.stringify({publicTurnRouteDenied:true,httpStatus:response.status}));
+          NODE
       - name: Apply saved settings only while idle, with rollback
         shell: bash
         run: |

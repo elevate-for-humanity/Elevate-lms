@@ -7,14 +7,24 @@
 - Commit b39b99e6a775009bdfec6caa115eb54e13d9093d: current barber lesson slugs exactly match the 14 apprenticeship_standard_competencies keys. Replaced the missing connection by inserting 14 instructional mapping records, with an exact-match cardinality assertion and duplicate avoidance. No learner competency completion or hour credits were inserted.
 - Commits d6712a91c374ded8228972b67ec138bb53d37b51 and c18caae9100544b3d0f28e20cc33c7f18e9a48cb: barber and esthetician syllabus files now describe the existing competency-based registry completion model and 260/300 RTI totals. Removed conflicting fixed-term introductory completion claims and blanket funding/approval claims. Both files were fetched back and matched exactly.
 
-## Source discrepancy requiring primary-document reconciliation
+## Approved-source reconciliation — corrected audit
 
-The immutable-looking TypeScript source itself contains conflicting hour totals:
-- Barber relatedInstruction items sum to 320, but relatedInstructionHours and the database standard say 260.
-- Esthetician relatedInstruction items sum to 400, but relatedInstructionHours and the database standard say 300.
-- Manicurist items sum to 210, matching its declared 210.
+The earlier assertions that Barber subjects sum to 320 and Esthetician subjects sum to 400 were audit arithmetic errors. The correct sums are 260 and 300. Do not alter the registered requirements to compensate for the audit errors.
 
-Do not edit signed-standard representations to force these sums to agree. Locate the actual signed approved Appendix A, validate its revision and subject allocations, then reconcile the mirrored records. Updated syllabi intentionally do not invent subject-hour allocations.
+Primary evidence has now been retrieved: the July 10, 2025 digitally signed approval attached by George Hutchinson (U.S. DOL) to Gmail message 19857620e2ca201c, July 29, 2025. Document SHA-256: 66fb85fb01aa92fae959e32840f48319ac1b4f59853962b66b887b3968497c34.
+- Barber: PDF pages 3–7; 14 competencies; 260 RTI hours. Subject sum = 260.
+- Esthetician: PDF pages 9–13; 20 competencies; 300 RTI hours. Subject sum = 300.
+- Manicurist: PDF pages 15–20; 19 competencies; 210 RTI hours. Subject sum = 210.
+- The signed Manicurist outline names Grace Beauty College as RTI provider. Provider changes require documented authority; Elevate's supplementary workbook does not establish an RTI provider amendment.
+
+The older occupation-add attachment contains different proposed competency counts and totals; it must not override the later signed July 10 approval.
+
+## Distinguish hours before declaring conflicts
+
+Course duration is the aggregate of required, nonarchived lesson durations. Program delivery totals, registered RTI, work terms, state school education minimums, and minimum clinical requirements are different measures.
+- HVAC: the existing delivery outline is 60 online + 120 lab + 30 exam preparation + 20 career support = 230. Its 180 online/lab hours are a subtotal, not a competing total. The replacement's 0.2-hour course summary equals its current required/nonarchived lesson aggregate; summing archived lessons produced the misleading 21.17-hour comparison.
+- CNA: 75 minimum hours versus a 105-hour program target is not intrinsically a conflict. Verify the actual cohort schedule and clinical breakdown before changing either.
+- Bookkeeping: the 640-hour training field, 150-hour program total, 85-hour published component breakdown, and weekly schedule require an authoritative delivery schedule; no arbitrary duration has been selected.
 
 ## Remaining implementation
 
@@ -31,3 +41,7 @@ Do not edit signed-standard representations to force these sums to agree. Locate
 ## Scope
 
 Existing source files and live schema/function definitions were inspected through connected GitHub and Supabase tools. The full catalog has not been certified submission-ready. Preserve all existing learner progress, signed records, workbooks, and source documents.
+
+## Shared Hair Stylist operational settings
+
+RAPIDS metadata, beauty enrollment, and canonical program data now read lib/apprenticeship/hair-stylist-program.ts. The canonical record's zero OJT hours were replaced with the existing 2,000-hour minimum hybrid work term. This consolidates existing operational settings and does not manufacture a signed Hair Stylist appendix or change its approval status.

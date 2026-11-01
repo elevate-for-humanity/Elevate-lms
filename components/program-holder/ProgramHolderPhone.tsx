@@ -719,7 +719,7 @@ export function ProgramHolderPhone({
   const presence = phonePresenceDisplay(data.readOnly, connected, data.extension.presenceStatus);
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
+    <main className="mx-auto w-full min-w-0 max-w-4xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
       <AudioOutputControl audio={remoteAudioRef} />
       <nav aria-label="Phone communication tools" className="flex gap-2 overflow-x-auto">
@@ -804,7 +804,7 @@ export function ProgramHolderPhone({
         </p>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="mx-auto w-full min-w-0 max-w-[26rem] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <h2 className="text-xl font-black text-slate-950">Dial pad</h2>
         <p className="mt-1 text-sm text-slate-600">
           {data.extension.provider === 'asterisk'
@@ -893,7 +893,7 @@ export function ProgramHolderPhone({
       </section>
 
       {callState !== 'idle' && (
-        <section className="rounded-3xl border-2 border-cyan-300 bg-slate-950 p-7 text-center text-white shadow-2xl">
+        <section className="mx-auto w-full max-w-md rounded-3xl border-2 border-cyan-300 bg-slate-950 p-5 text-center text-white shadow-2xl">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
             <PhoneCall className="h-10 w-10 text-cyan-300" />
           </div>

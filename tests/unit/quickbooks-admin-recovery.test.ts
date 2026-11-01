@@ -21,6 +21,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }));
+import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 import { GET, POST } from '../../apps/admin/app/api/admin/integrations/quickbooks/route';
 
 const statusRequest = () =>
@@ -102,4 +103,25 @@ describe('Admin QuickBooks recovery through the production client', () => {
     expect(await result.json()).toMatchObject({ ok: true, synced: 1 });
     expect(fetch).toHaveBeenCalledTimes(3);
   });
+});
+
+it('creates fresh uncached authorization at the moment Connect is followed', async () => {
+  vi.stubEnv('QB_CLIENT_ID', 'fixture-QB_CLIENT_ID');
+  vi.stubEnv('QB_CLIENT_SECRET', 'fixture-QB_CLIENT_SECRET');
+  const request = () => new NextRequest('https://admin.elevateforhumanity.org/api/admin/integrations/quickbooks?action=connect');
+  const first = await GET(request()), second = await GET(request());
+  expect(first.status).toBe(303);
+  expect(first.headers.get('cache-control')).toBe('private, no-store');
+  const a = new URL(first.headers.get('location')!), b = new URL(second.headers.get('location')!);
+  expect(a.origin).toBe('https://appcenter.intuit.com');
+  expect(a.searchParams.get('scope')).toBe('com.intuit.quickbooks.accounting');
+  expect(a.searchParams.get('state')).not.toBe(b.searchParams.get('state'));
+  expect(verifyQuickBooksOAuthState(a.searchParams.get('state')!, 'fixture-QB_CLIENT_SECRET')).toBe(true);
+  expect(fetch).not.toHaveBeenCalled();
+});
+it('returns failed connection starts to the dashboard with a safe visible cause', async () => {
+  state.settingsError = {message:'private database detail'};
+  const result = await GET(new NextRequest('https://admin.elevateforhumanity.org/api/admin/integrations/quickbooks?action=connect'));
+  expect(result.status).toBe(303);
+  expect(result.headers.get('location')).toBe('https://admin.elevateforhumanity.org/integrations/quickbooks?error=authorization_unavailable');
 });

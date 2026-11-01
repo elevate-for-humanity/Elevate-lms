@@ -33,9 +33,23 @@ export default function QuickBooksClient() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
-  const [authUrl, setAuthUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    const messages: Record<string, string> = {
+      invalid_state: 'This authorization attempt expired or could not be validated. Select Connect QuickBooks to start a fresh attempt.',
+      authorization_declined: 'Intuit authorization was declined. Select Connect QuickBooks to try again.',
+      no_code: 'Intuit did not return an authorization code. Start a fresh connection.',
+      production_environment_unverified: 'The production QuickBooks application configuration needs administrator verification.',
+      not_configured: 'QuickBooks application credentials are missing.',
+      token_failed: 'Intuit rejected the authorization-code exchange. Check the application credentials and registered callback address.',
+      invalid_token_response: 'Intuit returned an incomplete authorization response. The previous connection was preserved.',
+      no_company: 'No valid QuickBooks company was selected.',
+      company_verification_failed: 'Authorization returned, but access to the selected production company could not be verified.',
+      authorization_unavailable: 'QuickBooks authorization could not be started. Check the application settings and retry.',
+      unexpected: 'QuickBooks authorization could not be saved. The connection is not complete.',
+    };
+    const error = new URLSearchParams(window.location.search).get('error');
+    if (error) setResult(messages[error] || 'QuickBooks authorization did not complete. Start a fresh connection.');
     checkStatus();
   }, []);
 
@@ -54,21 +68,6 @@ export default function QuickBooksClient() {
       setResult('QuickBooks status could not be checked.');
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function getAuthUrl() {
-    setResult(null);
-    try {
-      const res = await fetch('/api/admin/integrations/quickbooks?action=auth_url');
-      const d = await res.json();
-      if (res.ok) {
-        setAuthUrl(d.auth_url);
-      } else {
-        setResult(d.error || 'QuickBooks authorization could not be started.');
-      }
-    } catch {
-      setResult('QuickBooks authorization could not be started.');
     }
   }
 
@@ -186,22 +185,12 @@ export default function QuickBooksClient() {
                   : 'Checking Intuit application credentials. Retry the connection check if it cannot complete.'}{' '}
               Payroll-run sync requires separate Intuit Payroll API access.
             </p>
-            {!authUrl ? (
-              <button
-                onClick={getAuthUrl}
-                className="w-full bg-[#2CA01C] hover:bg-[#248016] text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
-              >
-                Connect QuickBooks
-              </button>
-            ) : (
-              <a
-                href={authUrl}
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full bg-[#2CA01C] hover:bg-[#248016] text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
-              >
-                Authorize with Intuit <ExternalLink className="w-4 h-4" />
-              </a>
-            )}
+            <a
+              href="/api/admin/integrations/quickbooks?action=connect"
+              className="flex items-center justify-center gap-2 w-full bg-[#2CA01C] hover:bg-[#248016] text-white font-semibold py-2.5 rounded-xl transition-colors text-sm"
+            >
+              Connect QuickBooks <ExternalLink className="w-4 h-4" />
+            </a>
             <p className="text-xs text-slate-400">
               {status.credentials_configured
                 ? 'Application credentials detected. Company authorization is still required.'

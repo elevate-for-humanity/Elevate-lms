@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     const config = await getQuickBooksConfig();
     credentialsConfigured = Boolean(config.clientId && config.clientSecret);
     assertQuickBooksProductionEnvironment();
-    if (action === 'auth_url') {
+    if (action === 'auth_url' || action === 'connect') {
       const { clientId, clientSecret, redirectUri } = config;
       if (!clientId || !clientSecret)
         return safeError('QuickBooks OAuth credentials are not configured', 503);
@@ -89,7 +89,9 @@ export async function GET(request: NextRequest) {
       url.searchParams.set('response_type', 'code');
       url.searchParams.set('scope', SCOPES);
       url.searchParams.set('state', state);
-      return NextResponse.json({ auth_url: url.toString() });
+      const headers = { 'Cache-Control': 'private, no-store' };
+      if (action === 'connect') return NextResponse.redirect(url, { status: 303, headers });
+      return NextResponse.json({ auth_url: url.toString() }, { headers });
     }
 
     if (!config.realmId || (!config.accessToken && !config.refreshToken)) {
@@ -115,6 +117,7 @@ export async function GET(request: NextRequest) {
       message: 'Connected',
     });
   } catch (error) {
+    if (action === 'connect') return NextResponse.redirect('https://admin.elevateforhumanity.org/integrations/quickbooks?error=authorization_unavailable', { status: 303, headers: { 'Cache-Control': 'private, no-store' } });
     if (action === 'auth_url')
       return safeError(
         'QuickBooks production authorization is unavailable. Check connection settings.',

@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   rows: [] as { key: string; value: string }[],
   settingsError: null as null | { message: string },
   upsert: vi.fn(),
+  rpc: vi.fn(),
 }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('@/lib/admin/guards', () => ({
@@ -14,6 +15,7 @@ vi.mock('@/lib/admin/guards', () => ({
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: vi.fn().mockResolvedValue(null) }));
 vi.mock('@/lib/supabase/admin', () => ({
   requireAdminClient: async () => ({
+    rpc: state.rpc,
     from: () => ({
       select: () => ({ in: async () => ({ data: state.rows, error: state.settingsError }) }),
       upsert: state.upsert,
@@ -39,6 +41,7 @@ beforeEach(() => {
   ].map((key) => ({ key, value: 'fixture-' + key }));
   state.settingsError = null;
   state.upsert.mockReset().mockResolvedValue({ error: null });
+  state.rpc.mockReset().mockResolvedValue({ data: true, error: null });
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -55,10 +58,14 @@ describe('Admin QuickBooks recovery through the production client', () => {
       connected: true,
       company_name: 'Verified company',
     });
-    expect(state.upsert).toHaveBeenCalledOnce();
+    expect(state.rpc).toHaveBeenCalledExactlyOnceWith('rotate_quickbooks_authorization', {
+      p_expected_refresh: 'fixture-QB_REFRESH_TOKEN', p_realm: 'fixture-QB_REALM_ID',
+      p_access: 'fresh', p_refresh: 'rotated',
+    });
+    expect(state.upsert).not.toHaveBeenCalled();
   });
   it('does not report connection success when rotated tokens cannot be saved', async () => {
-    state.upsert.mockResolvedValue({ error: { message: 'storage failed' } });
+    state.rpc.mockResolvedValue({ data: null, error: { message: 'storage failed' } });
     vi.mocked(fetch)
       .mockResolvedValueOnce(response({}, 401))
       .mockResolvedValueOnce(response({ access_token: 'fresh', refresh_token: 'rotated' }))
@@ -77,6 +84,7 @@ describe('Admin QuickBooks recovery through the production client', () => {
     });
     expect(fetch).toHaveBeenCalledOnce();
     expect(state.upsert).not.toHaveBeenCalled();
+    expect(state.rpc).not.toHaveBeenCalled();
   });
   it('surfaces settings read failures without using stale deployment tokens', async () => {
     state.settingsError = { message: 'private database details' };

@@ -13,7 +13,8 @@ it('saved video is present in preview without a diagnostic request and is not fa
 it('all four agents inspect the same course state and PARIS uses the governed builder and container',()=>{
  expect(getAITool('courses.status')?.allowedAgents).toEqual(expect.arrayContaining(['PARIS','ELLIE','LIZZY','ZORA']));
  expect(getAITool('courses.generate')?.allowedAgents).toContain('PARIS');
- expect(getAITool('courses.generate')?.approvalRequired).toBe(true);
+ expect(getAITool('courses.generate')).toMatchObject({approvalRequired:false,allowedRoles:['admin','super_admin'],audit:true});
+ expect(getAITool('courses.publish')?.approvalRequired).toBe(true);
  expect(getAITool('studio.runtime.files')?.allowedAgents).toContain('PARIS');
  expect(planAIToolFromCommand('check course builder progress',{buildId:'build'})).toEqual({name:'courses.status',input:{buildId:'build'}});
 });

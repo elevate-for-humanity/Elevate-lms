@@ -179,10 +179,13 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Cloudflare — legacy R2 / AI / Stream',
+    label: 'Cloudflare — AI, zone control, R2 / Stream',
     keys: [
       'CLOUDFLARE_ACCOUNT_ID',
+      'CLOUDFLARE_AI_API_TOKEN',
+      'CLOUDFLARE_AI_MODEL',
       'CLOUDFLARE_API_TOKEN',
+      'CLOUDFLARE_ZONE_ID',
       'CLOUDFLARE_R2_ACCESS_KEY_ID',
       'CLOUDFLARE_R2_SECRET_ACCESS_KEY',
       'CLOUDFLARE_R2_BUCKET',

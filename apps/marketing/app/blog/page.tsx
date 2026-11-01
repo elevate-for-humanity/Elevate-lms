@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/licensed-envato/blog-learning-08e3d270.jpg',
+        url: '/images/licensed-envato/blog-learning-08e3d270.webp',
         width: 1200,
         height: 630,
         alt: 'Elevate For Humanity blog',

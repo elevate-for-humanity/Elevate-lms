@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
  * Supabase Browser Client
  * For use in Client Components only
  *
- * Returns a safe no-op proxy when env vars are missing so that
+ * Returns a chainable failure proxy when env vars are missing so that
  * callers never crash on `.from()` / `.auth` etc.
  */
 
@@ -12,10 +12,10 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 import { getBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 
-// Chainable stub that returns empty data for every query method.
+// Chainable failure response: missing configuration must never acknowledge a write.
 // Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
-const EMPTY_RESPONSE = { data: null, error: null, count: null, status: 200, statusText: 'OK' };
-const SUPABASE_NOT_CONFIGURED = { message: 'Supabase not configured' };
+const SUPABASE_NOT_CONFIGURED = { message: 'Supabase not configured', code: 'SUPABASE_NOT_CONFIGURED' };
+const EMPTY_RESPONSE = { data: null, error: SUPABASE_NOT_CONFIGURED, count: null, status: 503, statusText: 'Service Unavailable' };
 
 function noOpChain(): any {
   const chain: any = new Proxy(() => chain, {
@@ -51,8 +51,8 @@ const noOpMfa = {
 };
 
 const noOpAuth = {
-  getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-  getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+  getUser: () => Promise.resolve({ data: { user: null }, error: SUPABASE_NOT_CONFIGURED }),
+  getSession: () => Promise.resolve({ data: { session: null }, error: SUPABASE_NOT_CONFIGURED }),
   signOut: () => Promise.resolve({ error: null }),
   signInWithPassword: () =>
     Promise.resolve({
@@ -70,18 +70,18 @@ const noOpAuth = {
       error: SUPABASE_NOT_CONFIGURED,
     }),
   onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-  resetPasswordForEmail: () => Promise.resolve({ data: null, error: null }),
-  updateUser: () => Promise.resolve({ data: { user: null }, error: null }),
+  resetPasswordForEmail: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+  updateUser: () => Promise.resolve({ data: { user: null }, error: SUPABASE_NOT_CONFIGURED }),
   mfa: noOpMfa,
 };
 
 const noOpStorage = {
   from: () => ({
-    upload: () => Promise.resolve({ data: null, error: null }),
-    download: () => Promise.resolve({ data: null, error: null }),
+    upload: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+    download: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
     getPublicUrl: () => ({ data: { publicUrl: '' } }),
-    list: () => Promise.resolve({ data: [], error: null }),
-    remove: () => Promise.resolve({ data: null, error: null }),
+    list: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+    remove: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
   }),
 };
 

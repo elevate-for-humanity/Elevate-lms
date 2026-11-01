@@ -8,41 +8,52 @@
 
 set -euo pipefail
 
-# Extract all process.env.VAR_NAME references from source
-# Search apps/*/app, app-legacy, and lib (root app/ no longer exists after split)
-# grep -r with non-existent dir exits 2; suppress with subshell guard
-(grep -rh "process\.env\." apps/ app-legacy/ lib/ --include="*.ts" --include="*.tsx" 2>/dev/null \
+audit_dir=$(mktemp -d)
+trap 'rm -rf "$audit_dir"' EXIT
+code_env_file="$audit_dir/code-env.txt"
+example_env_file="$audit_dir/example-env.txt"
+
+# Scan tracked application source. Installed dependencies and generated Next
+# output are not application configuration authorities, even when beneath apps/.
+git grep -I -h 'process\.env\.' -- \
+  ':(glob)apps/**/*.ts' ':(glob)apps/**/*.tsx' \
+  ':(glob)app-legacy/**/*.ts' ':(glob)app-legacy/**/*.tsx' \
+  ':(glob)lib/**/*.ts' ':(glob)lib/**/*.tsx' > "$audit_dir/references.txt" || {
+  status=$?
+  if [ "$status" -ne 1 ]; then exit "$status"; fi
+}
+(cat "$audit_dir/references.txt" \
   | grep -v "^\s*//" \
   | grep -oP "process\.env\.[A-Z][A-Z0-9_]+" \
   | sed 's/process\.env\.//' \
   | grep -vE "^NODE_ENV$|^NEXT_PUBLIC_|^NEXT_PHASE$|^NEXT_RUNTIME$" \
-  | sort -u) > /tmp/_code_env.txt || true
+  | sort -u) > "$code_env_file" || true
 
 # Extract keys from the canonical env examples. Keep the small required-runtime
 # bundle separate so new server-only dependencies can be documented without
 # turning .env.example into an even larger merge hotspot.
-: > /tmp/_example_env.txt
+: > "$example_env_file"
 for file in .env.example .env.required.example; do
   if [ -f "$file" ]; then
     grep -v "^#" "$file" 2>/dev/null \
       | grep "=" \
       | awk -F= '{print $1}' \
-      | sed 's/[[:space:]]//g' >> /tmp/_example_env.txt
+      | sed 's/[[:space:]]//g' >> "$example_env_file"
   fi
 done
-sort -u -o /tmp/_example_env.txt /tmp/_example_env.txt
+sort -u -o "$example_env_file" "$example_env_file"
 
-GAPS=$(bash -c "comm -23 <(sort /tmp/_code_env.txt) <(sort /tmp/_example_env.txt)" | wc -l)
+GAPS=$(comm -23 "$code_env_file" "$example_env_file" | wc -l)
 
 echo "=== Elevate LMS - Env Var Audit ==="
-echo "Referenced in code: $(wc -l < /tmp/_code_env.txt)"
-echo "Documented in env examples: $(wc -l < /tmp/_example_env.txt)"
+echo "Referenced in code: $(wc -l < "$code_env_file")"
+echo "Documented in env examples: $(wc -l < "$example_env_file")"
 echo "Undocumented (in code, not in env examples): $GAPS"
 echo ""
 
 if [ "$GAPS" -gt 0 ]; then
   echo "--- Undocumented env vars ---"
-  bash -c "comm -23 <(sort /tmp/_code_env.txt) <(sort /tmp/_example_env.txt)"
+  comm -23 "$code_env_file" "$example_env_file"
   echo ""
   echo "ACTION: Add these to .env.example or .env.required.example with placeholder values."
   exit 1

@@ -207,3 +207,13 @@ test('archived and published builds cannot consume a worker execution',async()=>
  assert.equal(result.status,'empty');
  assert.equal(launches(s).length,0);
 });
+
+
+test('Cloud Run numeric string readback is accepted without relaxing image or role checks',async()=>{
+ const s=fixture([waiting('instruction')]);
+ const template=s.templates.get(LESSON_ROLE_JOBS.instruction.name).spec.template.spec;
+ template.parallelism='1';template.taskCount='1';
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.equal(result.status,'assigned');
+ assert.equal(result.assignments.length,1);
+});

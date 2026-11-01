@@ -69,6 +69,7 @@ jobs:
           gcloud compute scp infra/pbx/paris/launch.mjs infra/pbx/paris/turn-adapter.mjs infra/pbx/paris/ari-media.mjs "elevate-pbx:$target/" --project=elegant-racer-299721 --zone=us-central1-a --quiet
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="sudo python3 - '$target'" < scripts/gcp/repair-paris-settings.py
       - name: Verify running settings and synthetic speech without dialing
+        if: always()
         run: |
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py
       - name: Verify public phone transport

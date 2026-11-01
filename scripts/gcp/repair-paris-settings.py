@@ -179,6 +179,7 @@ if __name__ == '__main__':
     import sys
     try:
         print(json.dumps(repair(sys.argv[1])))
-    except Exception:
-        print(json.dumps({'result': 'FAIL', 'code': 'PARIS_SETTINGS_REPAIR_NOT_CONFIRMED'}))
+    except Exception as error:
+        reason=str(error) if isinstance(error,ValueError) and re.fullmatch(r'PARIS_[A-Z_]+',str(error)) else 'PARIS_SETTINGS_REPAIR_NOT_CONFIRMED'
+        print(json.dumps({'result': 'FAIL', 'code': reason}))
         sys.exit(1)

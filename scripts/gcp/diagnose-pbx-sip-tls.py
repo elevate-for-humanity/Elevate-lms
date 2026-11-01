@@ -42,6 +42,19 @@ def isolated_config(text):
   body=re.sub(r'^'+key+r'=.*\n?', '',body,flags=re.M).rstrip()+'\n'+key+'='+value+'\n'
  return text[:match.start(2)]+body+text[match.end(2):]
 
+def copy_internal_config(source,target,root,ancestors=frozenset()):
+ resolved=source.resolve(strict=True)
+ if not resolved.is_relative_to(root):raise ValueError('external_config_symlink_rejected')
+ info=resolved.stat()
+ if resolved.is_dir():
+  if resolved in ancestors:raise ValueError('config_symlink_cycle_rejected')
+  target.mkdir(mode=info.st_mode & 0o777)
+  for child in resolved.iterdir():copy_internal_config(child,target/child.name,root,ancestors|{resolved})
+  shutil.copystat(resolved,target)
+ elif resolved.is_file():shutil.copy2(resolved,target)
+ else:raise ValueError('config_special_file_rejected')
+ os.chown(target,info.st_uid,info.st_gid)
+
 def isolated_diagnosis():
  name='elevate-sip-tls-readonly-probe';network=name+'-internal'
  root=Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
@@ -49,14 +62,11 @@ def isolated_diagnosis():
  live=json.loads(inspect.stdout)[0]
  mounts=[m for m in live.get('Mounts',[]) if m.get('Destination')=='/etc/asterisk']
  if not live.get('State',{}).get('Running') or len(mounts)!=1 or mounts[0].get('Source')!=str(root) or mounts[0].get('Type')!='bind':raise ValueError('mount_unverified')
- if any(p.is_symlink() for p in root.rglob('*')):raise ValueError('config_symlink_rejected')
  for kind,target in [('container',name),('network',network)]:
   if subprocess.run(['docker',kind,'inspect',target],capture_output=True,timeout=10).returncode==0:raise ValueError('prior_probe_requires_review')
  pair=trusted_gateway_pair()
  with tempfile.TemporaryDirectory(prefix='elevate-isolated-sip-',dir='/var/tmp') as directory:
-  staging=Path(directory)/'asterisk';shutil.copytree(root,staging)
-  for copied in [staging,*staging.rglob('*')]:
-   source=root/copied.relative_to(staging);info=source.stat();os.chown(copied,info.st_uid,info.st_gid)
+  staging=Path(directory)/'asterisk';copy_internal_config(root,staging,root.resolve(strict=True))
   fragment=staging/'elevate-twilio.conf';fragment.write_text(isolated_config(fragment.read_text()))
   gid=int(subprocess.run(['docker','exec','pbx_asterisk_1','id','-g','asterisk'],capture_output=True,text=True,check=True,timeout=10).stdout.strip())
   (staging/'tls').mkdir(exist_ok=True)

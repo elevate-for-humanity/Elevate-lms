@@ -25,18 +25,18 @@ def main():
  prefix='paris-probe-'+uuid.uuid4().hex
  ids=[prefix+'-a',prefix+'-b'];bridge_id=prefix+'-bridge';sockets=[];peers=[];created=[];bridged=False
  def cli(command):
-  return subprocess.run(['docker','exec','pbx_asterisk_1','asterisk','-rx',command],capture_output=True,text=True,timeout=8).stdout
- def command(args):
+  return run_command(['docker','exec','pbx_asterisk_1','asterisk','-rx',command]).stdout
+ def run_command(args):
   try:return subprocess.run(args,capture_output=True,text=True,timeout=8)
   except (OSError,subprocess.TimeoutExpired):return types.SimpleNamespace(returncode=127,stdout='',stderr='')
  iptables={}
  for chain,flag in [('INPUT','-i'),('OUTPUT','-o')]:
-  result=command(['iptables','-S',chain])
-  iptables[chain]={'readable':result.returncode==0,'acceptPolicy':('-P '+chain+' ACCEPT') in result.stdout,'loopbackAccept':command(['iptables','-C',chain,flag,'lo','-j','ACCEPT']).returncode==0,'dropRuleCount':result.stdout.count('-j DROP')}
+  result=run_command(['iptables','-S',chain])
+  iptables[chain]={'readable':result.returncode==0,'acceptPolicy':('-P '+chain+' ACCEPT') in result.stdout,'loopbackAccept':run_command(['iptables','-C',chain,flag,'lo','-j','ACCEPT']).returncode==0,'dropRuleCount':result.stdout.count('-j DROP')}
  rtp_settings=cli('rtp show settings')
  runtime={'firewall':iptables,'rtpSettings':{key:match[1].strip() for key in ['Strict RTP','Probation','Checksums'] if (match:=re.search(r'^\s*'+key+r':\s*(.+)$',rtp_settings,re.M))}}
  try:
-  pid=command(['docker','inspect','-f','{{.State.Pid}}','pbx_asterisk_1']).stdout.strip()
+  pid=run_command(['docker','inspect','-f','{{.State.Pid}}','pbx_asterisk_1']).stdout.strip()
   runtime['asteriskUsesHostNetwork']=os.readlink('/proc/'+pid+'/ns/net')==os.readlink('/proc/self/ns/net')
  except Exception:runtime['asteriskNetworkNamespaceUnavailable']=True
  debug_enabled=False
@@ -75,11 +75,12 @@ def main():
     time.sleep(max(0,start+(frame+1)*.02-time.monotonic()))
    counts=[r.result() for r in results]
   report={'localMediaProbe':True,'phoneCallsPlaced':0,'loopbackOnly':True,'framesSentPerChannel':100,'framesReceived':counts,'bridgeTechnology':ari('/bridges/'+bridge_id).get('technology'),'result':'PASS' if min(counts)>=80 else 'FAIL','runtime':runtime}
+  print(json.dumps({'localMediaProbeStage':'simple','report':report}),flush=True)
   # Adding one exclusively owned loopback channel selects Asterisk's soft mixer.
   phase='soft_media'
   cid=prefix+'-c';ids.append(cid)
   sock=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);sock.bind(('127.0.0.1',0));sock.settimeout(.1);sockets.append(sock)
-  external=ari('/channels/externalMedia','POST',channelId=cid,app='elevate-paris',external_host='127.0.0.1:'+str(sock.getsockname()[1]),format='ulaw',direction='both')
+  external=ari('/channels/externalMedia','POST',channelId=cid,app='elevate-paris',external_host='127.0.0.1:'+str(sock.getsockname()[1]),format='ulaw',direction='both',transport='udp',encapsulation='rtp',connection_type='client')
   created.append(cid)
   if external.get('id')!=cid:raise ValueError('PROBE_CHANNEL_MISMATCH')
   ari('/bridges/'+bridge_id+'/addChannel','POST',channel=cid)
@@ -99,9 +100,9 @@ def main():
   except Exception:report['builtinPlaybackUnavailable']=True
   cli('rtp set debug off');debug_enabled=False
   phase='read_signals'
-  logs=command(['docker','logs','--since','20s','--tail','3000','pbx_asterisk_1']).stdout
+  logs=run_command(['docker','logs','--since','20s','--tail','3000','pbx_asterisk_1']).stdout
   for path in ['/var/log/asterisk/messages','/var/log/asterisk/messages.log','/var/log/asterisk/full','/var/log/asterisk/full.log']:
-   logs+=command(['docker','exec','pbx_asterisk_1','tail','-n','3000',path]).stdout
+   logs+=run_command(['docker','exec','pbx_asterisk_1','tail','-n','3000',path]).stdout
   report['rtpSignals']={name:len(re.findall(pattern,logs,re.I)) for name,pattern in {'loopbackPacketsRead':r'Got  RTP packet from\s+127[.]0[.]0[.]1','loopbackPacketsSent':r'Sent RTP packet to\s+127[.]0[.]0[.]1','unknownCodec':r'Unknown RTP codec','shortRtp':r'RTP Read too short','unsupportedMedia':r'Unknown or unsupported media type','missingTranslation':r'No translator path|Unable to find a codec translation path'}.items()}
   print(json.dumps(report))
  finally:

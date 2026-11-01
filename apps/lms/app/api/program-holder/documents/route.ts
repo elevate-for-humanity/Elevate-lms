@@ -35,8 +35,49 @@ export async function POST(request: NextRequest) {
 
   const form = await request.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: 'Submit a valid file upload.' }, { status: 400 });
-  const file = form.get('file');
+  let file = form.get('file');
   const documentType = String(form.get('documentType') || '');
+  let invoiceDetails: Record<string, string> | null = null;
+  if (documentType === 'provider_invoice' && form.get('invoiceMode') === 'form') {
+    const read = (key: string) => String(form.get(key) || '').trim();
+    const fields = ['providerName', 'invoiceNumber', 'studentName', 'trainingStart', 'trainingEnd', 'serviceDescription', 'amount'] as const;
+    invoiceDetails = Object.fromEntries(fields.map(key => [key, read(key)]));
+    const amount = read('amount');
+    const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+      Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
+    if (fields.some(key => !read(key) || read(key).length > (key === 'serviceDescription' ? 2000 : 200)) ||
+        !validDate(read('trainingStart')) || !validDate(read('trainingEnd')) ||
+        read('trainingEnd') < read('trainingStart') ||
+        !/^\d{1,7}(\.\d{1,2})?$/.test(amount) || Number(amount) <= 0 ||
+        form.get('invoiceAttested') !== 'yes') {
+      return NextResponse.json({ error: 'Complete the invoice fields, valid training dates, positive dollar amount, and certification.' }, { status: 400 });
+    }
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF();
+    pdf.setFontSize(18);
+    pdf.text('Training invoice to Elevate for Humanity', 15, 20);
+    pdf.setFontSize(11);
+    let y = 32;
+    const lines = [
+      'Provider: ' + read('providerName'),
+      'Invoice number: ' + read('invoiceNumber'),
+      'Student: ' + read('studentName'),
+      'Training dates: ' + read('trainingStart') + ' to ' + read('trainingEnd'),
+      'Amount requested (USD): ' + Number(amount).toFixed(2),
+      'Services: ' + read('serviceDescription'),
+      'Certified by authenticated account: ' + ctx.user.id,
+      'Submitted: ' + new Date().toISOString(),
+      'Submitted for review. This invoice is not a payment confirmation.',
+    ];
+    for (const line of lines) {
+      for (const wrapped of pdf.splitTextToSize(line, 180)) {
+        if (y > 275) { pdf.addPage(); y = 20; }
+        pdf.text(wrapped, 15, y); y += 6;
+      }
+      y += 3;
+    }
+    file = new File([pdf.output('arraybuffer')], 'training-invoice.pdf', { type: 'application/pdf' });
+  }
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
   if (
@@ -124,7 +165,9 @@ export async function POST(request: NextRequest) {
       storage_bucket: 'documents',
       file_size: file.size,
       mime_type: material?.contentType || file.type,
-      description: enrollmentId
+      description: invoiceDetails
+        ? JSON.stringify({ kind: 'provider_invoice', ...invoiceDetails, certified_by: ctx.user.id })
+        : enrollmentId
         ? JSON.stringify({ enrollment_id: enrollmentId, kind: 'student_evidence' })
         : documentType === 'provider_invoice'
           ? 'Training invoice submitted to Elevate for payment review'

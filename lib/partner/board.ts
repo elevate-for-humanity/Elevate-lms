@@ -1,3 +1,4 @@
+import { resolveCanonicalSlug } from '@/lib/programs/slug';
 import {
   hostShopStateAliases,
   resolveHostShopDocuments,
@@ -30,30 +31,8 @@ export type TradeTarget = {
   blockingReason?: string;
 };
 
-const REGISTERED_PROGRAM_ALIASES: Record<string, string> = {
-  barber: 'barber-apprenticeship',
-  'barber-apprenticeship': 'barber-apprenticeship',
-  cosmetology: 'cosmetology-apprenticeship',
-  'cosmetology-apprenticeship': 'cosmetology-apprenticeship',
-  esthetician: 'esthetician-apprenticeship',
-  esthetics: 'esthetician-apprenticeship',
-  'esthetician-apprenticeship': 'esthetician-apprenticeship',
-  'esthetics-apprenticeship': 'esthetics-apprenticeship',
-  'nail-tech': 'nail-technician-apprenticeship',
-  nail_tech: 'nail-technician-apprenticeship',
-  nail_technician: 'nail-technician-apprenticeship',
-  nail: 'nail-technician-apprenticeship',
-  'nail-tech-apprenticeship': 'nail-technician-apprenticeship',
-  'nail-technician-apprenticeship': 'nail-technician-apprenticeship',
-  manicurist: 'nail-technician-apprenticeship',
-  'manicurist-apprenticeship': 'nail-technician-apprenticeship',
-};
-
 export function resolveTradeTarget(programSlug: string | null | undefined): TradeTarget {
-  const raw = String(programSlug || '')
-    .trim()
-    .toLowerCase();
-  const canonical = REGISTERED_PROGRAM_ALIASES[raw] || raw;
+  const canonical = resolveCanonicalSlug(String(programSlug ?? ''));
   if (canonical === 'cosmetology-apprenticeship') {
     return {
       programSlug: canonical,
@@ -96,8 +75,8 @@ export function resolveTradeTarget(programSlug: string | null | undefined): Trad
   return {
     programSlug: canonical || null,
     hours: null,
-    label: raw
-      ? `${raw.replaceAll('-', ' ')} — registered standard not configured`
+    label: canonical
+      ? `${canonical.replaceAll('-', ' ')} — registered standard not configured`
       : 'Registered apprenticeship standard not configured',
     progressModel: 'unconfigured',
     registered: false,

@@ -3,7 +3,7 @@ import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
+import { isCourseBuilderGenerationPaused } from '@/lib/ultimate-course-builder/core/generation-control';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
 import { refreshSecrets } from '@/lib/secrets';

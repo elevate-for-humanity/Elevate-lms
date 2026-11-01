@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { synchronizeLessonExperience } from '@/lib/course-factory/factory';
+import { synchronizeLessonExperience } from '@/lib/curriculum/experience-repair';
 import { LearningIntelligenceSchema } from '@/lib/course-factory/learning-intelligence';
 
 describe('Course Factory experience repair', () => {

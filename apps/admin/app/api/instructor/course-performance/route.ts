@@ -21,10 +21,12 @@ async function _GET(request: Request) {
     }
 
     // Get courses and enrollment counts from canonical table
-    const { data: enrollments } = await supabase
+    const { data: enrollments, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .select('program_id, status, programs!program_enrollments_program_id_fkey(title)')
       .limit(200);
+
+    if (enrollmentError) throw enrollmentError;
 
     // Aggregate by program
     const programStats: Record<string, { name: string; students: number; completed: number }> = {};
@@ -48,17 +50,10 @@ async function _GET(request: Request) {
         completion: p.students > 0 ? Math.round((p.completed / p.students) * 100) : 0,
       }));
 
-    // If no data, return placeholder
-    if (courses.length === 0) {
-      return NextResponse.json({
-        courses: [{ name: 'No courses yet', students: 0, completion: 0 }],
-      });
-    }
-
     return NextResponse.json({ courses });
   } catch (error) {
     logger.error('Course performance error:', error);
-    return NextResponse.json({ courses: [] }, { status: 500 });
+    return NextResponse.json({ error: 'Program performance could not be loaded.' }, { status: 503 });
   }
 }
 export const GET = withApiAudit('/api/instructor/course-performance', _GET);

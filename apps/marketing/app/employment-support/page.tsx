@@ -227,7 +227,7 @@ export default function EmploymentSupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="relative h-[200px] rounded-xl overflow-hidden mb-4">
                 <Image
-                  src="/images/pages/hvac-technician.webp"
+                  src="/images/hvac-training-vibrant-2026.webp"
                   alt="Hands-on industry training"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

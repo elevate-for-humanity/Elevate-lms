@@ -8,7 +8,7 @@
 export const LMS_HEROES = {
   dashboard: '/images/pages/adult-learner.webp',
   courses: '/images/pages/training-classroom.webp',
-  progress: '/images/pages/career-counseling.jpg',
+  progress: '/images/pages/resume-building-hero.webp',
   quizzes: '/images/pages/competency-test-hero.webp',
   schedule: '/images/pages/comp-home-highlight-success.webp',
   messages: '/images/pages/contact-hero.webp',
@@ -30,7 +30,7 @@ export const LMS_SECTION_CARDS = {
   programsView: '/images/pages/programs-it-hero.webp',
   funding: '/images/pages/funding-hero.webp',
   courses: '/images/pages/tech-classroom.webp',
-  progress: '/images/pages/hvac-technician.webp',
+  progress: '/images/hvac-training-vibrant-2026.webp',
   certificates: '/images/pages/cpr-mannequin.webp',
   certification: '/images/pages/programs-cpr-hero.webp',
   placement: '/images/business-collaboration-vibrant-2026.webp',
@@ -65,7 +65,7 @@ export const LMS_CATEGORIES = {
 
 // -- Course detail fallback (when no thumbnail_url) --
 export const COURSE_CATEGORY_FALLBACKS: Record<string, string> = {
-  healthcare: '/images/pages/medical-assistant-real.webp',
+  healthcare: '/images/program-media-20261016/medical-assistant.webp',
   trades: '/images/pages/electrical-conduit.webp',
   technology: '/images/pages/networking-hero.webp',
   business: '/images/bookkeeping-training-vibrant-2026.webp',

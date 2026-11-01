@@ -140,7 +140,7 @@ export default function DashboardOrientation({
     },
     {
       title: 'Messages, meetings, and deadlines',
-      image: '/images/pages/career-counseling.jpg',
+      image: '/images/pages/resume-building-hero.webp',
       alt: 'Program guidance and planning',
       text: 'Open Calendar & Appointments in the sidebar. Select Request an appointment, add your preferred dates and time zone, then send the email to your program contact. Check the calendar for confirmed appointments. When your dashboard shows a scheduled video meeting, use its Join link at the scheduled time. Allow camera and microphone access when you choose to join. Ask staff about a missing invitation or a connection problem.',
       action: 'Review my schedule',

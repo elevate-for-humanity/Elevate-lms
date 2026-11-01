@@ -33,10 +33,10 @@ const rootText = readRequired(rootRoute);
 for (const required of [
   "from '@/lib/course-builder/orchestrator'",
   "from '@/lib/course-builder/edit-service'",
-  "from '@/lib/course-builder/persisted-publish-service'",
+  "from '@/lib/ultimate-course-builder/release/release-course'",
   "from '@/lib/course-builder/review-service'",
-  "action === 'generate-from-blueprint'",
-  "action === 'queue-media'",
+  "'generate-from-blueprint'",
+  "'queue-media'",
   "action === 'save-program-config'",
   "action === 'save-module'",
   "action === 'save-lesson'",
@@ -48,7 +48,7 @@ for (const required of [
   "action === 'review-lessons'",
   "action === 'publish'",
   "action === 'publish-persisted'",
-  "action === 'repair'",
+  "'repair'",
   "action === 'audit'",
 ])
   if (!rootText.includes(required))
@@ -60,8 +60,10 @@ if (!index.includes("export { courseFactory } from '../course-builder/orchestrat
     'lib/course-factory/index.ts must expose Course Builder facade instead of raw factory.ts',
   );
 const orchestrator = readRequired('lib/course-builder/orchestrator.ts');
-if (!orchestrator.includes("from '../course-factory/factory'"))
-  failures.push('Course Builder orchestrator does not own private Course Factory execution');
+if (!orchestrator.includes('requestCanonicalGeneration(db, input, actorId)'))
+  failures.push('Course Builder generation bypasses the canonical Ultimate starter');
+if (fs.existsSync(path.join(root, 'lib/course-factory/factory.ts')))
+  failures.push('Superseded Course Factory execution remains deployable');
 if (!orchestrator.includes('saveCourseProgramConfiguration'))
   failures.push(
     'Course Builder orchestrator does not own course program configuration persistence',
@@ -78,7 +80,7 @@ for (const required of ['DevStudioUltimateCourseControl','ultimate_course_builds
 // Standards loading belongs to the shared controller/profile builder, not a
 // duplicate implementation in the chat route. Verify the complete delegation.
 const ultimateControl = readRequired('lib/devstudio/ultimate-course-control.ts');
-for (const required of ['buildUltimateProfile', "from '@/lib/ultimate-course-builder/core/course-profile'", 'UltimateJobQueue']) {
+for (const required of ['startCanonicalCourse', "from '@/lib/ultimate-course-builder/core/start-course'", 'UltimateJobQueue']) {
   if (!ultimateControl.includes(required)) failures.push(`Ultimate Studio controller missing ${required}`);
 }
 const ultimateProfile = readRequired('lib/ultimate-course-builder/core/course-profile.ts');

@@ -2,7 +2,9 @@ import 'server-only';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import {UltimateJobQueue} from '@/lib/ultimate-course-builder/worker/job-queue';
 import {UltimateReleaseService} from '@/lib/ultimate-course-builder/release/release-service';
-import {buildUltimateProfile} from '@/lib/ultimate-course-builder/core/course-profile';
+import {startCanonicalCourse} from '@/lib/ultimate-course-builder/core/start-course';
+import {requestCourseWorker} from '@/lib/gcp/course-worker-launch';
+import {recordCourseDispatch} from '@/lib/ultimate-course-builder/worker/dispatch-evidence';
 
 export class DevStudioUltimateCourseControl {
   constructor(private db:SupabaseClient) {}
@@ -10,27 +12,26 @@ export class DevStudioUltimateCourseControl {
     const {data:course,error:courseError}=await this.db.from('courses').select('id,title')
       .eq('id',input.courseId).single();
     if(courseError || !course)throw courseError ?? new Error('ULTIMATE_COURSE_NOT_FOUND');
-    const {data:existing,error:existingError}=await this.db.from('ultimate_course_builds')
-      .select('id,status,current_step').eq('course_id',course.id).neq('status','published')
-      .order('created_at',{ascending:false}).limit(1).maybeSingle();
-    if(existingError)throw existingError;
-    let build=existing;
-    if(!build) {
-      const profile={...await buildUltimateProfile(this.db,{courseId:course.id,programSlug:input.programSlug,
-        title:input.title || course.title,state:input.state,topic:input.goal}),mediaAcquisitionOwnerId:input.actorId};
-      const created=await this.db.from('ultimate_course_builds').insert({course_id:course.id,profile,
-        status:'initializing',current_step:'standards_lock',findings:[]}).select('id,status,current_step').single();
-      if(created.error || !created.data)throw created.error ?? new Error('ULTIMATE_BUILD_CREATE_FAILED');
-      build=created.data;
-    }
-    const queued=await this.queue(build.id,input.actorId);
-    return {build,job:queued.job,course,reused:Boolean(existing)};
+    const response=await startCanonicalCourse(this.db,{
+      courseId:course.id,programSlug:input.programSlug,title:input.title || course.title,
+      state:input.state,topic:input.goal,
+    },input.actorId);
+    const result=await response.json();
+    if(!response.ok || result.ok!==true)throw new Error(result.error || 'ULTIMATE_DISPATCH_FAILED');
+    const queued=await this.db.from('ultimate_build_jobs').select('*').eq('id',result.jobId).single();
+    if(queued.error || !queued.data)throw queued.error ?? new Error('ULTIMATE_JOB_NOT_PERSISTED');
+    return {build:result.build,job:queued.data,course,reused:result.reused};
   }
+
   async queue(buildId:string,requestedBy?:string|null) {
+    if(!requestedBy)throw new Error('AUTHENTICATED_GENERATION_ACTOR_REQUIRED');
     const {data:build,error}=await this.db.from('ultimate_course_builds').select('id,course_id,status').eq('id',buildId).single();
     if(error || !build)throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const job=await new UltimateJobQueue(this.db).enqueue(build.id,{requestedBy:requestedBy ?? null});
     if(!job?.id)throw new Error('ULTIMATE_JOB_NOT_PERSISTED');
+    const dispatch=await requestCourseWorker();
+    await recordCourseDispatch(this.db,job.id,dispatch,requestedBy);
+    if(!dispatch.dispatched)throw new Error('ULTIMATE_DISPATCH_FAILED');
     return {build,job};
   }
   async status(buildId:string) {

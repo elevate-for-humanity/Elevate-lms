@@ -753,7 +753,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'plumbing-apprenticeship',
     name: 'Plumbing Apprenticeship',
     shortName: 'Plumbing Apprenticeship',
-    heroImage: '/images/pages/hvac-technician.webp',
+    heroImage: '/images/hvac-training-vibrant-2026.webp',
     description:
       'Host plumbing apprentices at your company. Train licensed plumbers through structured on-the-job learning.',
     registeredApprenticeship: true,

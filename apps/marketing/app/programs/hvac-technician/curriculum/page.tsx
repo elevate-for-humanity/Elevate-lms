@@ -47,7 +47,7 @@ export default function HVACCurriculumPage() {
         <Image
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/hvac-technician.webp"
+          src="/images/hvac-training-vibrant-2026.webp"
           alt="HVAC Certification Training"
           fill
           sizes="100vw"

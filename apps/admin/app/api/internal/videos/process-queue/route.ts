@@ -6,7 +6,7 @@ import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
 import { COURSE_MEDIA_RENDER_LEASE_SECONDS, COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
-import { getCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
+import { getCourseBuilderGenerationControl } from '@/lib/ultimate-course-builder/core/generation-control';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

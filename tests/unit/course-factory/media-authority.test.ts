@@ -118,19 +118,14 @@ describe('canonical Course Factory media architecture', () => {
     expect(scheduler).toContain('--max-time 1800');
   });
 
-  it('keeps long course builds alive and resumes completed builds at media finalization', () => {
-    const scheduler = read('.github/workflows/cron-scheduler.yml');
-    const route = read('apps/admin/app/api/cron/process-course-builder-jobs/route.ts');
+  it('hands Studio jobs to the single checkpointed production worker', () => {
     const handler = read('lib/jobs/handlers/course-build.ts');
-    expect(scheduler).toContain('--max-time 3600');
-    expect(route).toContain('export const maxDuration = 3600');
-    expect(handler).toContain('resumableMediaCheckpoint');
-    expect(handler).toContain('Resuming completed build at media finalization');
-    expect(handler).toContain("generation_status: 'generating'");
-    expect(handler).toContain('generation_progress: 95');
-    expect(read('lib/course-builder/build-lifecycle.ts')).toContain(
-      "generation_status: 'completed'",
-    );
+    const runner = read('lib/ultimate-course-builder/core/full-course-runner.ts');
+    expect(handler).toContain('requestCanonicalGeneration');
+    expect(handler).toContain("stage: 'handed_off'");
+    expect(handler).not.toContain('finalizeUnifiedCourseBuildWithClient');
+    expect(runner).toContain('loadLessonCheckpoint');
+    expect(runner).toContain('assertCompleteLesson');
   });
 
   it('claims work atomically and renews an expiring database lease', () => {
@@ -203,21 +198,14 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain('microclipStateMismatches === 0');
   });
 
-  it('publishes the complete course through automated verification from the worker', () => {
-    const factory = read('lib/course-factory/factory.ts');
-    const lifecycle = read('lib/course-builder/build-lifecycle.ts');
-    const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
-    expect(factory).toContain('Creating the canonical draft shell for unified lesson builds.');
-    expect(factory).toContain(
-      "completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'",
-    );
-    expect(lifecycle).toContain('finalizeUnifiedCourseBuildWithClient');
-    expect(lifecycle).toContain('publishPersistedCourseWithClient');
-    expect(lifecycle).toContain('if (!media.completePackage)');
-    expect(lifecycle).toContain('if (!contract.pass)');
-    expect(lifecycle).toContain('actorId: null');
-    expect(worker).toContain('finalizeUnifiedCourseBuildWithClient');
-    expect(worker).not.toContain('finalizeCourseAutomaticallyIfReadyWithClient');
+  it('publishes only through the verified Ultimate lesson contract', () => {
+    const starter = read('lib/ultimate-course-builder/core/start-course.ts');
+    const release = read('lib/ultimate-course-builder/release/release-service.ts');
+    expect(starter).toContain('buildUltimateProfile');
+    expect(starter).toContain('requestCourseWorker');
+    expect(release).toContain('assertCompleteLesson');
+    expect(release).toContain('ULTIMATE_LESSONS_NOT_RELEASE_READY');
+    expect(release).toContain('finished_media_qa');
   });
 
   it('starts the primary video after each locked lesson narration', () => {
@@ -238,7 +226,7 @@ describe('canonical Course Factory media architecture', () => {
     const queue = read('lib/video/job-queue.ts');
     const manager = read('lib/course-factory/media-manager.ts');
     const publisher = read('lib/course-factory/publisher.ts');
-    const factory = read('lib/course-factory/factory.ts');
+    const factory = read('lib/ultimate-course-builder/core/generation-request.ts');
     expect(checkpoints).toContain("generation_status: 'generating'");
     expect(checkpoints).toContain('source_fingerprint: sourceFingerprint');
     expect(media).toContain('has no locked unified-media fingerprint');
@@ -256,9 +244,8 @@ describe('canonical Course Factory media architecture', () => {
     expect(publisher).toContain("purpose === 'practice'");
     expect(publisher).toContain("purpose === 'demonstration' ? 'close-up' : 'medium'");
     expect(publisher).toContain("generation_status: experience ? 'generating' : 'queued'");
-    expect(factory.indexOf('await markCourseMediaPendingWithClient')).toBeLessThan(
-      factory.indexOf("tracker.emit('media'"),
-    );
+    expect(factory).toContain('startCanonicalCourse');
+    expect(factory).toContain("completionState: 'media_pending'");
   });
 
   it('does not let obsolete opt-out microclips block primary lesson readiness', () => {
@@ -429,7 +416,7 @@ describe('canonical Course Factory media architecture', () => {
     const runtimeFiles = [
       'lib/course-builder/orchestrator.ts',
       'lib/course-builder/build-lifecycle.ts',
-      'lib/course-factory/factory.ts',
+      'lib/ultimate-course-builder/core/generation-request.ts',
       'lib/course-factory/publisher.ts',
       'lib/course-factory/canonical-course-gate.ts',
       'lib/course-factory/persisted-authored-upgrade.ts',

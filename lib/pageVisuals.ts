@@ -43,7 +43,7 @@ export const homepageVisuals: PageVisualConfig = {
     },
     {
       id: 'hero-earn',
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Student working while studying on a laptop.',
       eyebrow: 'Earn While You Learn',
       title: 'Work experience, stipends, and employer connections while you train.',
@@ -183,7 +183,7 @@ export const barberVisuals: PageVisualConfig = {
         'In-shop apprenticeship experience with licensed barbers supervising your hours.',
         'Drug-free workplace and professionalism training tailored to barber/beauty environments.',
       ],
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Instructor demonstrating a haircut technique to apprentices.',
     },
     {
@@ -194,7 +194,7 @@ export const barberVisuals: PageVisualConfig = {
         'Paths into chair rental, commission-based work, or eventually shop ownership.',
         'A portable licensed trade that lets you work, travel, and build your own brand.',
       ],
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Barber proudly standing by their station with tools organized.',
     },
   ],
@@ -218,7 +218,7 @@ export const hvacVisuals: PageVisualConfig = {
     },
     {
       id: 'hvac-hero-earn',
-      imageSrc: '/images/pages/hvac-technician.webp',
+      imageSrc: '/images/hvac-training-vibrant-2026.webp',
       imageAlt: 'Technician using tools while working on a building system.',
       eyebrow: 'Earn While You Learn',
       title: 'Earn experience while you build trade skills.',
@@ -273,7 +273,7 @@ export const cdlVisuals: PageVisualConfig = {
     },
     {
       id: 'cdl-hero-earn',
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Truck driver stepping out of a semi truck cab.',
       eyebrow: 'Earn While You Learn',
       title: 'Work-based learning while you prepare for CDL opportunities.',
@@ -292,7 +292,7 @@ export const cdlVisuals: PageVisualConfig = {
         'Transportation and roadway safety concepts via partner content.',
         'Job readiness and professionalism modules focused on transportation work.',
       ],
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Instructor explaining a transportation safety diagram.',
     },
     {
@@ -303,7 +303,7 @@ export const cdlVisuals: PageVisualConfig = {
         'Connections to employer partners seeking reliable transportation staff.',
         'A pathway into higher-paying CDL roles once licensure steps are complete.',
       ],
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Truck fleet parked in a lot with a driver walking by.',
     },
   ],
@@ -372,7 +372,7 @@ export const itSupportVisuals: PageVisualConfig = {
   heroes: [
     {
       id: 'it-hero-main',
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'IT support technician helping a coworker at a computer.',
       eyebrow: 'IT Support Helpdesk',
       title: 'Step Into Tech with IT Support and Helpdesk Skills.',
@@ -383,7 +383,7 @@ export const itSupportVisuals: PageVisualConfig = {
     },
     {
       id: 'it-hero-earn',
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Person working in a modern IT operations center.',
       eyebrow: 'Earn While You Learn',
       title: 'Build your portfolio while gaining IT experience.',
@@ -588,7 +588,7 @@ export const nailsVisuals: PageVisualConfig = {
         'Sanitation, disinfection, and safety standards.',
         'Client experience, consultation, and rebooking.',
       ],
-      imageSrc: '/images/pages/career-counseling.jpg',
+      imageSrc: '/images/pages/resume-building-hero.webp',
       imageAlt: "Close-up of apprentice painting a client's nails.",
     },
   ],

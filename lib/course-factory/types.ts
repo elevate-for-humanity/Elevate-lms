@@ -17,6 +17,7 @@ export type PublishStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'lesson' | 'checkpoint' | 'quiz' | 'exam' | 'lab' | 'assignment';
 
 export interface FactoryInput {
+  requestedBy?: string;
   /** Required when upgrading an already-persisted authored curriculum. */
   courseId?: string;
   programId?: string;
@@ -44,6 +45,10 @@ export interface FactoryInput {
 }
 
 export interface FactoryOutput {
+  authority?: string;
+  buildId?: string;
+  jobId?: string;
+  queued?: boolean;
   ok: boolean;
   courseId?: string;
   courseSlug?: string;

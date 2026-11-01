@@ -47,7 +47,7 @@ export function resolveServerSupabaseRawEnv(): { url?: string; anonKey?: string 
   };
 }
 
-/** Read from process.env (runtime Northflank + optional build-time NEXT_PUBLIC_*). */
+/** Read from process.env (Google runtime + optional build-time NEXT_PUBLIC_*). */
 export function getServerPublicSupabaseConfig(): SupabasePublicConfig | null {
   const { url, anonKey } = resolveServerSupabaseRawEnv();
   if (!url || !anonKey || isPlaceholderSupabaseConfig(url, anonKey)) return null;

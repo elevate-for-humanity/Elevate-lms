@@ -460,7 +460,7 @@ export default async function StudentDashboard() {
       href: '/lms/calendar',
       label: 'Schedule',
       text: 'Review classes, deadlines, and upcoming activity.',
-      image: '/images/pages/career-counseling.jpg',
+      image: '/images/pages/resume-building-hero.webp',
     },
     {
       href: '/communications/email',

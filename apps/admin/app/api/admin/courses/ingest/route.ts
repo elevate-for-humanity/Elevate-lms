@@ -3,12 +3,12 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { ingestCourse } from '@/lib/ai/course-ingestion';
+import { ingestCourse } from '@/lib/ultimate-course-builder/authoring/source-ingestion';
 import { isOpenAIConfigured, getOpenAIClient } from '@/lib/ai/openai-client';
 import { loadIndustryStandards } from '@/lib/industry/standards-loader';
 import { buildBlueprintSystemPrompt } from '@/lib/ai/prompts/course-blueprint';
 import { logger } from '@/lib/logger';
-import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
+import { isCourseBuilderGenerationPaused } from '@/lib/ultimate-course-builder/core/generation-control';
 import {
   SAFE_CHARS,
   MAX_CHARS,

@@ -52,7 +52,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'HVAC Technician at Carrier',
     salary: '$55,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/hvac-unit.webp',
+    thumbnail: '/images/programs/hvac/training-20261029/gauges.webp',
     quote:
       'The hands-on training prepared me for real-world work. I got hired before I even graduated!',
     duration: '3:12',

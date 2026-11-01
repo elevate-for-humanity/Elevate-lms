@@ -271,8 +271,7 @@ export default function UnifiedCourseBuilder({
               assessments, QA, repair, and LMS release.
             </p>
             <p className="mt-2 hidden items-center gap-2 text-sm font-bold text-emerald-300 sm:inline-flex">
-              <ShieldCheck className="h-4 w-4" /> Legacy Course Factory is archived and cannot start
-              production builds.
+              <ShieldCheck className="h-4 w-4" /> All production builds use the same verified execution contract.
             </p>
           </div>
           <div className="flex min-w-0 flex-wrap items-center gap-2">

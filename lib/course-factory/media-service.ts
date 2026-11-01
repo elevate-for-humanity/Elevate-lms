@@ -1,5 +1,5 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/ultimate-course-builder/core/generation-control';
 import { createJob, type VideoJob } from '@/lib/video/job-queue';
 import {
   hasCanonicalMediaQualityEvidence,

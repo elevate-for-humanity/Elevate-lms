@@ -7,7 +7,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { publishCourse } from '@/lib/course-factory/publisher';
 import type { BlueprintModule } from '@/lib/curriculum/blueprints/types';
-import type { CourseBlueprint, LessonBlueprint } from '@/lib/ai/course-ingestion';
+import type { CourseBlueprint, LessonBlueprint } from '@/lib/ultimate-course-builder/authoring/source-ingestion';
 
 export interface SaveBlueprintResult {
   courseId: string;

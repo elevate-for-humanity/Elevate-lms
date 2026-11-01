@@ -1,3 +1,4 @@
+import { requestCanonicalGeneration } from '@/lib/ultimate-course-builder/core/generation-request';
 /**
  * /api/admin/course-builder
  *
@@ -28,7 +29,7 @@ import {
   reorderCourseLessons,
   linkCourseScormPackage,
 } from '@/lib/course-builder/edit-service';
-import { publishPersistedCourse } from '@/lib/course-builder/persisted-publish-service';
+import { releaseCanonicalCourse } from '@/lib/ultimate-course-builder/release/release-course';
 import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-builder/review-service';
 import {
   normalizeManualAssessmentQuestions,
@@ -38,7 +39,7 @@ import {
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
-import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/ultimate-course-builder/core/generation-control';
 import {
   CourseBuilderCreditsError,
   getCourseBuilderCreditBalance,
@@ -321,182 +322,14 @@ export async function POST(req: NextRequest) {
     'start-existing',
   ];
   if (archivedGenerationActions.includes(action)) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'COURSE_FACTORY_ARCHIVED',
-        message:
-          'Course Factory is archived. Start or resume production through Ultimate Course Builder.',
-        ultimateEndpoint: '/api/admin/ultimate-course-builder',
-        ultimateRoute: '/studio/courses?tab=ultimate',
-      },
-      { status: 410 },
-    );
-  }
-  if (
-    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing', 'start-existing'].includes(
-      action,
-    )
-  ) {
-    const db = await requireAdminClient();
-    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : null;
     try {
-      await assertCourseBuilderGenerationEnabled(db, courseId);
+      const db = await requireAdminClient();
+      await assertCourseBuilderGenerationEnabled(db, body.courseId);
+      const result = await requestCanonicalGeneration(db, body, auth.id);
+      return NextResponse.json(result, { status: result.ok ? (result.dryRun ? 200 : 202) : 503 });
     } catch (error) {
-      const code =
-        error instanceof Error && error.message === 'COURSE_GENERATION_PAUSED'
-          ? 'COURSE_GENERATION_PAUSED'
-          : 'COURSE_BUILDER_GENERATION_PAUSED';
-      return NextResponse.json(
-        {
-          error: code,
-          message:
-            code === 'COURSE_GENERATION_PAUSED'
-              ? 'Generation is paused for this course.'
-              : 'Course and video generation are paused during the authority consolidation audit.',
-        },
-        { status: 423 },
-      );
-    }
-  }
-
-  if (action === 'start-existing') {
-    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
-    if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
-    const course = await loadCourse(courseId);
-    if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-    const result = await courseFactory(
-      {
-        courseId,
-        programSlug: course.slug,
-        mode: 'refresh',
-        contentSource: 'curriculum_lessons',
-        videoMode: 'queue',
-      },
-      () => {},
-    );
-    return NextResponse.json({ ok: result.ok, action: 'start-existing', course, result });
-  }
-
-  if (action === 'generate-from-blueprint') {
-    if (!body.blueprintId || !body.programId) {
-      return NextResponse.json(
-        { error: 'blueprintId and programId are required' },
-        { status: 400 },
-      );
-    }
-    let reservation: CreditReservation | null = null;
-    try {
-      reservation = await reserveCredits({
-        req,
-        body,
-        userId: auth.id,
-        effectiveRoles: auth.effectiveRoles,
-        operation: 'generate-from-blueprint',
-      });
-      const blueprints = await loadAllBlueprints();
-      const blueprint = blueprints.find((item) => item.id === body.blueprintId);
-      if (!blueprint) return NextResponse.json({ error: 'Blueprint not found' }, { status: 404 });
-      const progress: Array<{ stage: string; message: string; progress?: number }> = [];
-      const result = await courseFactory(
-        {
-          courseId: typeof body.courseId === 'string' ? body.courseId.trim() : undefined,
-          programId: body.programId,
-          blueprint,
-          mode: ['replace', 'missing-only', 'refresh'].includes(body.mode) ? body.mode : 'refresh',
-          contentSource: ['ai', 'blueprint', 'curriculum_lessons'].includes(body.contentSource)
-            ? body.contentSource
-            : 'ai',
-          videoMode: body.videoMode === 'off' ? 'off' : 'queue',
-          videoQueueLimit:
-            typeof body.videoQueueLimit === 'number' && body.videoQueueLimit > 0
-              ? body.videoQueueLimit
-              : null,
-        },
-        (stage, message, percent) => progress.push({ stage, message, progress: percent }),
-      );
-      if (!result.ok) await refundReservation(reservation, auth.id, 'blueprint_generation_failed');
-      return NextResponse.json({ ...result, progress }, { status: result.ok ? 200 : 422 });
-    } catch (error) {
-      await refundReservation(reservation, auth.id, 'blueprint_generation_exception');
-      const credits = creditErrorResponse(error);
-      if (credits) return credits;
-      logger.error('[course-builder] Blueprint generation failed', error);
-      return NextResponse.json({ error: 'Course generation failed' }, { status: 500 });
-    }
-  }
-
-  if (action === 'queue-media') {
-    if (!body.courseId)
-      return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
-    const lessonId =
-      typeof body.lessonId === 'string' && body.lessonId.trim() ? body.lessonId.trim() : null;
-    const validateOnly = body.validateOnly === true;
-    if (!lessonId && !(body.scope === 'course' && body.confirmCourseBatch === true)) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error:
-            'lessonId is required. Whole-course media generation requires scope="course" and confirmCourseBatch=true.',
-        },
-        { status: 400 },
-      );
-    }
-    let reservation: CreditReservation | null = null;
-    try {
-      const course = await loadCourse(body.courseId);
-      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-      const validation = await queueCourseMedia({
-        courseId: body.courseId,
-        lessonId,
-        onlyMissing: body.onlyMissing !== false,
-        force: body.force === true,
-        limit: typeof body.limit === 'number' ? body.limit : null,
-        validateOnly: true,
-      });
-      if (validation.failed > 0 || validation.attempted === 0) {
-        return NextResponse.json(
-          { ok: false, error: 'Lesson media validation failed', course, result: validation },
-          { status: 422 },
-        );
-      }
-      if (validateOnly || validation.wouldQueue === 0) {
-        return NextResponse.json({
-          ok: true,
-          status: validateOnly ? 'validated' : 'already_active',
-          charged: false,
-          course,
-          instructor: getInstructorForCourse(course.title),
-          result: validation,
-        });
-      }
-      reservation = await reserveCredits({
-        req,
-        body: { ...body, lessonId },
-        userId: auth.id,
-        effectiveRoles: auth.effectiveRoles,
-        operation: 'queue-media',
-      });
-      const result = await queueCourseMedia({
-        courseId: body.courseId,
-        lessonId,
-        onlyMissing: body.onlyMissing !== false,
-        force: body.force === true,
-        limit: typeof body.limit === 'number' ? body.limit : null,
-      });
-      if (result.failed > 0) await refundReservation(reservation, auth.id, 'media_queue_failed');
-      return NextResponse.json({
-        ok: result.failed === 0,
-        course,
-        instructor: getInstructorForCourse(course.title),
-        result,
-      });
-    } catch (error) {
-      await refundReservation(reservation, auth.id, 'media_queue_exception');
-      const credits = creditErrorResponse(error);
-      if (credits) return credits;
-      logger.error('[course-builder] Media queue failed', error);
-      return NextResponse.json({ error: 'Unable to queue course media' }, { status: 500 });
+      logger.error('[course-builder] Canonical generation failed', error);
+      return NextResponse.json({ ok: false, error: 'Course Builder could not start. Check its connection and source configuration.' }, { status: 503 });
     }
   }
 
@@ -682,7 +515,7 @@ export async function POST(req: NextRequest) {
   if (action === 'publish') {
     try {
       const result = await publishGovernedCourse((body.template ?? body) as any);
-      return NextResponse.json(result, { status: result.ok ? 200 : 422 });
+      return NextResponse.json(result, { status: result.ok ? 202 : 422 });
     } catch (error) {
       logger.error('[course-builder] Governed publication failed', error);
       return NextResponse.json({ ok: false, error: 'Course publication failed' }, { status: 500 });
@@ -695,339 +528,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
     }
     try {
-      const result = await publishPersistedCourse({
-        courseId,
-        actorId: auth.id,
-        label: typeof body.label === 'string' ? body.label : undefined,
-        request: req,
-      });
+      const result = await releaseCanonicalCourse(await requireAdminClient(), courseId, auth.id);
       return NextResponse.json(result, { status: result.ok ? 200 : 422 });
     } catch (error) {
       logger.error('[course-builder] Persisted publication failed', error);
       return NextResponse.json(
-        { ok: false, error: 'Failed to publish persisted course' },
-        { status: 500 },
+        { ok: false, error: 'The current Course Builder must finish its verified release checks before publication.' },
+        { status: 409 },
       );
     }
   }
 
-  if (action === 'repair' || action === 'generate-missing') {
-    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
-    if (!courseId) {
-      return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
-    }
-    let reservation: CreditReservation | null = null;
-    try {
-      reservation = await reserveCredits({
-        req,
-        body,
-        userId: auth.id,
-        effectiveRoles: auth.effectiveRoles,
-        operation: action,
-      });
-      const result = await repairCanonicalCourse(courseId);
-      if (!result.ok) await refundReservation(reservation, auth.id, 'course_repair_failed');
-      return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : 422 });
-    } catch (error) {
-      await refundReservation(reservation, auth.id, 'course_repair_exception');
-      const credits = creditErrorResponse(error);
-      if (credits) return credits;
-      logger.error('[course-builder] Course repair failed', error);
-      return NextResponse.json({ ok: false, error: 'Course repair failed' }, { status: 500 });
-    }
-  }
-
-  if (action !== 'generate') {
-    return NextResponse.json(
-      { error: `Unsupported Course Builder action: ${action}` },
-      { status: 400 },
-    );
-  }
-
-  const title = typeof body.title === 'string' ? body.title.trim() : '';
-  const topic = typeof body.topic === 'string' ? body.topic.trim() : '';
-  const programId = typeof body.programId === 'string' ? body.programId.trim() : '';
-  if (!title || !topic || !programId) {
-    return NextResponse.json(
-      { error: 'title, topic, and programId are required' },
-      { status: 400 },
-    );
-  }
-  if (body.moduleCount != null && (body.moduleCount < 1 || body.moduleCount > 40)) {
-    return NextResponse.json({ error: 'moduleCount must be between 1 and 40' }, { status: 400 });
-  }
-  if (body.lessonsPerModule != null && (body.lessonsPerModule < 1 || body.lessonsPerModule > 20)) {
-    return NextResponse.json(
-      { error: 'lessonsPerModule must be between 1 and 20' },
-      { status: 400 },
-    );
-  }
-
-  const requestedModuleCount = body.buildScope === 'lesson' ? 1 : Number(body.moduleCount ?? 1);
-  const requestedLessonsPerModule =
-    body.buildScope === 'lesson' ? 1 : Number(body.lessonsPerModule ?? 1);
-  const requestedLessonCount = requestedModuleCount * requestedLessonsPerModule;
-  const paidProvider = process.env.AI_PROVIDER?.trim() || 'configured';
-  const paidModel = process.env.AI_MODEL?.trim() || 'course-factory-router';
-  const projectedCostMicros = Math.max(
-    0,
-    Number(
-      process.env.COURSE_BUILDER_PROJECTED_COST_MICROS ??
-        String(Math.max(250_000, requestedLessonCount * 250_000)),
-    ),
-  );
-  const artifactFingerprint = paidArtifactFingerprint({
-    operation: 'course-builder-generate',
-    title,
-    topic,
-    programId,
-    moduleCount: requestedModuleCount,
-    lessonsPerModule: requestedLessonsPerModule,
-    buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
-    difficulty: body.difficulty ?? 'intermediate',
-    credentialRegistryKey: body.credentialRegistryKey ?? null,
-    state: body.state ?? null,
-    audience: body.audience ?? null,
-    hours: body.hours ?? null,
-    deliveryFormat: body.deliveryFormat ?? null,
-    additionalRequirements: body.additionalRequirements ?? null,
-  });
-  const db = await requireAdminClient();
-  const creditOwner = await getCourseBuilderCreditOwner({
-    db,
-    userId: auth.id,
-    effectiveRoles: auth.effectiveRoles,
-  });
-  const tenantId = creditOwner.tenantId ?? null;
-  const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
-  const studioConversationId =
-    typeof body.studioConversationId === 'string' && body.studioConversationId.trim()
-      ? body.studioConversationId.trim()
-      : null;
-
-  if (body.dryRun === true) {
-    const { data: cachedArtifact } = await db
-      .from('paid_inference_artifacts')
-      .select('id')
-      .eq('scope_key', scopeKey)
-      .eq('artifact_fingerprint', artifactFingerprint)
-      .eq('validation_status', 'valid')
-      .maybeSingle();
-    return NextResponse.json({
-      ok: true,
-      status: 'preflight',
-      dryRun: true,
-      paidProviderCalls: 0,
-      provider: paidProvider,
-      model: paidModel,
-      requestedModuleCount,
-      requestedLessonCount,
-      buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
-      targetDurationMinutes:
-        body.targetDurationMinutes != null
-          ? Number(body.targetDurationMinutes)
-          : body.hours != null
-            ? Number(body.hours) * 60
-            : 0,
-      estimatedSceneCount: Number(body.estimatedSceneCount ?? requestedLessonCount * 6),
-      cacheHits: cachedArtifact ? 1 : 0,
-      artifactFingerprint,
-      projectedCostMicros,
-      requiresExplicitApproval: projectedCostMicros > 0,
-      videosWillQueue: false,
-    });
-  }
-
-  const paidAuthorization = creditOwner.operator
-    ? null
-    : await reservePaidInference(db, {
-        scopeKey,
-        tenantId,
-        actorId: auth.id,
-        artifactFingerprint,
-        idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
-        provider: paidProvider,
-        model: paidModel,
-        operation: 'course-builder-generate',
-        projectedCostMicros,
-      });
-  if (
-    paidAuthorization &&
-    (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId)
-  ) {
-    return NextResponse.json(
-      {
-        ok: false,
-        status: paidAuthorization.decision,
-        requestId: paidAuthorization.requestId,
-        projectedCostMicros,
-        provider: paidProvider,
-        model: paidModel,
-        message:
-          paidAuthorization.decision === 'approval_required'
-            ? 'Explicit approval is required before this paid generation can run.'
-            : 'Paid course generation is not authorized.',
-      },
-      { status: paidAuthorization.decision === 'budget_exceeded' ? 402 : 409 },
-    );
-  }
-
-  let generationReservation: CreditReservation | null = null;
-  try {
-    generationReservation = await reserveCredits({
-      req,
-      body,
-      userId: auth.id,
-      effectiveRoles: auth.effectiveRoles,
-      operation: 'generate',
-    });
-  } catch (error) {
-    const credits = creditErrorResponse(error);
-    if (credits) return credits;
-    throw error;
-  }
-
-  const taskCorrelationId = crypto.randomUUID();
-  const { data: studioTask } = await db
-    .from('ai_tasks')
-    .insert({
-      task_id: taskCorrelationId,
-      title: `Build course: ${title}`,
-      description: 'Course Builder generation owned by the unified Studio conversation',
-      command: topic,
-      status: 'running',
-      priority: 'medium',
-      requested_by: auth.id,
-      created_by: auth.id,
-      user_id: auth.id,
-      tenant_id: tenantId,
-      agent_type: 'LIZZY',
-      intent: 'course_builder',
-      correlation_id: taskCorrelationId,
-      conversation_id: studioConversationId,
-      tool_name: 'build_course',
-      payload: { title, topic, programId, sourceTaskId: body.studioTaskId || null },
-      metadata: { source: '/api/admin/course-builder', unifiedStudio: true },
-      started_at: new Date().toISOString(),
-    })
-    .select('id')
-    .maybeSingle();
-
-  const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    async start(controller) {
-      const write = (data: object) =>
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-      try {
-        const runFactory = () =>
-          courseFactory(
-            {
-            title,
-            topic,
-            difficulty: body.difficulty ?? 'intermediate',
-            programId,
-            programSlug: body.programSlug,
-            moduleCount: body.moduleCount,
-            lessonsPerModule: body.lessonsPerModule,
-            credential: body.credential,
-            credentialRegistryKey: body.credentialRegistryKey,
-            buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
-            state: body.state,
-            audience: body.audience,
-            hours: body.hours,
-            deliveryFormat: body.deliveryFormat,
-            additionalRequirements: body.additionalRequirements,
-            contentSource: 'ai',
-            mode: 'refresh',
-              // Media has its own approval, metering, and artifact lifecycle.
-              // Never turn a course-drafting approval into an implicit render approval.
-              videoMode: 'off',
-              dryRun: false,
-            },
-            (stage, message, progress) =>
-              write({ stage: toPipelineStage(stage), message, progress }),
-          );
-        const result = creditOwner.operator
-          ? await runFactory()
-          : (
-              await executePaidInference({
-                db,
-                authorize: async () => paidAuthorization!,
-                dispatch: runFactory,
-              })
-            ).value;
-        if (!result) throw new Error('Course generation completed without a result');
-
-        let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
-          null;
-        if (result.ok && result.courseId && !result.dryRun) {
-          write({
-            stage: 'validate',
-            message: 'Normalizing competency traceability and self-paced learning assets.',
-            progress: 96,
-          });
-          governance = await normalizeGeneratedCourseForGovernance(result.courseId);
-        }
-        if (!result.ok) {
-          await refundReservation(generationReservation, auth.id, 'course_generation_failed');
-        }
-        if (studioTask?.id) {
-          await db.from('ai_tasks').update({
-            status: result.ok ? 'completed' : 'failed',
-            result_json: {
-              courseId: result.courseId ?? null,
-              modulesGenerated: result.moduleCount ?? 0,
-              lessonsGenerated: result.lessonCount ?? 0,
-              completionState: result.completionState,
-            },
-            error_message: result.ok ? null : (result.errors ?? []).join('; '),
-            completed_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }).eq('id', studioTask.id);
-        }
-        write({
-          stage: 'complete',
-          result: {
-            success: result.ok,
-            courseId: result.courseId ?? null,
-            title: result.title ?? title,
-            modulesGenerated: result.moduleCount ?? 0,
-            lessonsGenerated: result.lessonCount ?? 0,
-            lessonsWithQuizzes: result.assessmentsGenerated ?? 0,
-            videosQueued: result.videosQueued ?? 0,
-            completionState: result.completionState,
-            governance,
-            errors: result.errors ?? [],
-            dryRun: Boolean(result.dryRun),
-          },
-        });
-      } catch (error) {
-        await refundReservation(generationReservation, auth.id, 'course_generation_exception');
-        if (studioTask?.id) {
-          await db.from('ai_tasks').update({
-            status: 'failed',
-            error_message: error instanceof Error ? error.message : 'Course generation failed',
-            completed_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }).eq('id', studioTask.id);
-        }
-        logger.error('[course-builder] Course Factory error', error);
-        write({
-          stage: 'error',
-          message: 'Course generation failed. Review server logs for details.',
-        });
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-store',
-      Connection: 'keep-alive',
-      'X-Accel-Buffering': 'no',
-    },
-  });
+  return NextResponse.json({ error: `Unsupported Course Builder action: ${action}` }, { status: 400 });
 }

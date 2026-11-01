@@ -3,8 +3,7 @@ import { logger } from '@/lib/logger';
  * Supabase Browser Client
  * For use in Client Components only
  *
- * Returns a safe no-op proxy when env vars are missing so that
- * callers never crash on `.from()` / `.auth` etc.
+ * Requires real configuration; connection failures must never look like empty data.
  */
 
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
@@ -12,93 +11,6 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 import { getBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 
-// Chainable stub that returns empty data for every query method.
-// Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
-const EMPTY_RESPONSE = { data: null, error: null, count: null, status: 200, statusText: 'OK' };
-const SUPABASE_NOT_CONFIGURED = { message: 'Supabase not configured' };
-
-function noOpChain(): any {
-  const chain: any = new Proxy(() => chain, {
-    get(_target, prop) {
-      if (prop === 'then' || prop === 'single' || prop === 'maybeSingle') {
-        if (prop === 'then') {
-          return (resolve: any) => resolve(EMPTY_RESPONSE);
-        }
-        return () => Promise.resolve(EMPTY_RESPONSE);
-      }
-      return () => chain;
-    },
-    apply() {
-      return chain;
-    },
-  });
-  return chain;
-}
-
-const noOpMfa = {
-  listFactors: () =>
-    Promise.resolve({ data: { all: [], totp: [], phone: [] }, error: null }),
-  getAuthenticatorAssuranceLevel: () =>
-    Promise.resolve({
-      data: { currentLevel: null, nextLevel: null, currentAuthenticationMethods: [] },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  enroll: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  challenge: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  verify: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  challengeAndVerify: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  unenroll: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-};
-
-const noOpAuth = {
-  getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-  getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-  signOut: () => Promise.resolve({ error: null }),
-  signInWithPassword: () =>
-    Promise.resolve({
-      data: { user: null, session: null },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  signInWithOAuth: () =>
-    Promise.resolve({
-      data: { url: null, provider: null },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  signUp: () =>
-    Promise.resolve({
-      data: { user: null, session: null },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-  resetPasswordForEmail: () => Promise.resolve({ data: null, error: null }),
-  updateUser: () => Promise.resolve({ data: { user: null }, error: null }),
-  mfa: noOpMfa,
-};
-
-const noOpStorage = {
-  from: () => ({
-    upload: () => Promise.resolve({ data: null, error: null }),
-    download: () => Promise.resolve({ data: null, error: null }),
-    getPublicUrl: () => ({ data: { publicUrl: '' } }),
-    list: () => Promise.resolve({ data: [], error: null }),
-    remove: () => Promise.resolve({ data: null, error: null }),
-  }),
-};
-
-const noOpClient = {
-  from: () => noOpChain(),
-  auth: noOpAuth,
-  storage: noOpStorage,
-  rpc: () => Promise.resolve(EMPTY_RESPONSE),
-  channel: () => ({
-    on: () => ({ subscribe: () => ({}) }),
-    subscribe: () => ({}),
-    unsubscribe: () => {},
-  }),
-  removeChannel: () => {},
-} as unknown as SupabaseClient<any>;
-
-let warnedOnce = false;
 // @supabase/ssr returns a cached browser client. Install listeners and wrappers
 // once per client, rather than stacking another auth layer on every render.
 const initializedBrowserClients = new WeakSet<SupabaseClient<any>>();
@@ -118,13 +30,7 @@ export function createBrowserClient(): SupabaseClient<any> {
     supabaseUrl.includes('placeholder');
 
   if (misconfigured) {
-    if (!warnedOnce) {
-      logger.error(
-        '[Supabase Browser] Auth is misconfigured (missing or placeholder NEXT_PUBLIC_SUPABASE_*). Login and client actions will not work.',
-      );
-      warnedOnce = true;
-    }
-    return noOpClient;
+    throw new Error('SUPABASE_CONFIGURATION_MISSING: Database connection configuration is unavailable.');
   }
 
   try {
@@ -176,8 +82,9 @@ export function createBrowserClient(): SupabaseClient<any> {
 
     initializedBrowserClients.add(client);
     return client;
-  } catch {
-    return noOpClient;
+  } catch (error) {
+    logger.error('[Supabase Browser] Client initialization failed', error);
+    throw error;
   }
 }
 

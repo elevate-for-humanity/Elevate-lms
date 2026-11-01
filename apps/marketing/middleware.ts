@@ -200,6 +200,19 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
+  const adminCanonicalPaths: Record<string, string> = {
+    '/auth/admin/reset-password': '/auth/reset-password',
+    '/instructor/instructors/performance': '/instructors/performance',
+  };
+  const adminDestination = adminCanonicalPaths[pathname];
+  if (adminDestination) {
+    const destination = new URL(adminDestination, ADMIN_HOST);
+    destination.search = search;
+    const response = NextResponse.redirect(destination, 307);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    return response;
+  }
+
   const legacyStudentPaths: Record<string, string> = {
     '/student': '/lms/dashboard',
     '/student-portal': '/lms/dashboard',

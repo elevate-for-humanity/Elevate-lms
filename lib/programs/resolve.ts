@@ -10,8 +10,6 @@
  *   3. Exact title match (case-insensitive) on programs
  *   4. Alias map (common misspellings / legacy names)
  *   5. Partial title match on programs
- *   6. Exact slug match on courses (legacy fallback)
- *   7. Partial title match on courses (legacy fallback)
  *
  * All callers that resolve program_interest → UUID for enrollment or
  * approval must use this function. Do not write ad-hoc ilike queries.
@@ -32,7 +30,7 @@ export interface ResolvedProgram {
   id: string;
   slug: string;
   title: string;
-  source: 'uuid' | 'slug' | 'title' | 'alias' | 'partial' | 'course_slug' | 'course_title';
+  source: 'uuid' | 'slug' | 'title' | 'alias' | 'partial';
 }
 
 async function findProgramBySlug(
@@ -42,11 +40,12 @@ async function findProgramBySlug(
   const dbSlug = toDbSlug(canonicalSlug);
   const slugs = dbSlug === canonicalSlug ? [dbSlug] : [dbSlug, canonicalSlug];
   for (const slug of slugs) {
-    const { data } = await db
+    const { data, error } = await db
       .from('programs')
       .select('id, slug, title')
       .eq('slug', slug)
       .maybeSingle();
+    if (error) throw error;
     if (data) return data;
   }
   return null;
@@ -62,11 +61,12 @@ export async function resolveProgram(
   const normalized = raw.toLowerCase().replace(/-/g, ' ').trim();
 
   if (UUID_RE.test(raw)) {
-    const { data } = await db
+    const { data, error } = await db
       .from('programs')
       .select('id, slug, title')
       .eq('id', raw)
       .maybeSingle();
+    if (error) throw error;
     if (data) return { ...data, source: 'uuid' };
   }
 
@@ -81,11 +81,12 @@ export async function resolveProgram(
   }
 
   {
-    const { data } = await db
+    const { data, error } = await db
       .from('programs')
       .select('id, slug, title')
       .ilike('title', raw)
       .maybeSingle();
+    if (error) throw error;
     if (data) return { ...data, source: 'title' };
   }
 
@@ -96,44 +97,14 @@ export async function resolveProgram(
   }
 
   {
-    const { data } = await db
+    const { data, error } = await db
       .from('programs')
       .select('id, slug, title')
       .ilike('title', `%${raw}%`)
       .limit(1)
       .maybeSingle();
+    if (error) throw error;
     if (data) return { ...data, source: 'partial' };
-  }
-
-  {
-    const { data } = await db
-      .from('courses')
-      .select('id, slug, title')
-      .eq('slug', slugified)
-      .maybeSingle();
-    if (data)
-      return {
-        id: data.id,
-        slug: data.slug ?? slugified,
-        title: data.title,
-        source: 'course_slug',
-      };
-  }
-
-  {
-    const { data } = await db
-      .from('courses')
-      .select('id, slug, title')
-      .ilike('title', `%${raw}%`)
-      .limit(1)
-      .maybeSingle();
-    if (data)
-      return {
-        id: data.id,
-        slug: data.slug ?? slugified,
-        title: data.title,
-        source: 'course_title',
-      };
   }
 
   return null;

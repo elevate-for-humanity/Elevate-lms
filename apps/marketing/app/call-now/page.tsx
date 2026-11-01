@@ -32,7 +32,7 @@ const START_OPTIONS = [
       'Not sure which program is right for you? Submit an inquiry so the admissions team can review your question and respond.',
     href: '/inquiry',
     action: 'Get Info',
-    image: '/images/pages/career-counseling.jpg',
+    image: '/images/pages/resume-building-hero.webp',
     imageAlt: 'Student receiving advising and support',
   },
   {

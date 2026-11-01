@@ -11,7 +11,7 @@ const SLUG_IMAGES: Record<string, string> = {
   cna: '/images/pages/cna-nursing.webp',
   cdl: '/images/pages/cdl-training.webp',
   'barber-apprenticeship': '/images/pages/barber-training.webp',
-  hvac: '/images/pages/hvac-technician.webp',
+  hvac: '/images/hvac-training-vibrant-2026.webp',
   electrical: '/images/pages/electrical.webp',
   welding: '/images/pages/welding.webp',
   'it-help-desk': '/images/pages/it-help-desk.webp',

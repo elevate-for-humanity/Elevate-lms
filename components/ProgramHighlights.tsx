@@ -20,7 +20,7 @@ const defaultHighlights: Highlight[] = [
   {
     title: 'Work-Based Learning Options',
     description: 'Some approved pathways include paid, supervised work. Employment and placement must be confirmed for the applicable program.',
-    image: '/images/pages/hvac-technician.webp',
+    image: '/images/hvac-training-vibrant-2026.webp',
   },
   {
     title: 'Industry Certification',

@@ -47,7 +47,7 @@ const steps: QuizStep[] = [
       {
         id: 'trades',
         label: 'Skilled Trades',
-        image: '/images/pages/hvac-technician.webp',
+        image: '/images/hvac-training-vibrant-2026.webp',
         description: 'Build, fix, and create with your hands',
       },
       {

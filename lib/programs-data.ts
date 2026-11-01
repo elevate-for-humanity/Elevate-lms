@@ -176,7 +176,7 @@ export const PROGRAMS: ProgramData[] = [
       'Start your career in the electrical trades. 12-week evening program covering NEC code, residential and commercial wiring theory, electrical safety, and OSHA 10 certification. Includes employer site days with electrical contractors and apprenticeship pathway guidance. 3-star Indiana Top Jobs demand rating.',
     funding: 'WIOA • Next Level Jobs • Workforce Grants',
     duration: '12 Weeks • 144 Hours • Hybrid (Classroom + LMS + Employer Site Days)',
-    image: '/images/hero/hero-skilled-trades.webp',
+    image: '/images/refresh-20261014/trades.webp',
     etplApproved: true,
   },
   {
@@ -186,7 +186,7 @@ export const PROGRAMS: ProgramData[] = [
       'Start your career in the plumbing trades. 12-week evening program covering Indiana Plumbing Code, pipe materials and joining methods, DWV systems, water supply, fixture installation, and troubleshooting. Includes employer site days with plumbing contractors and apprenticeship pathway guidance.',
     funding: 'WIOA • Next Level Jobs • Workforce Grants',
     duration: '12 Weeks • 144 Hours • Hybrid (Classroom + LMS + Employer Site Days)',
-    image: '/images/hero/hero-skilled-trades.webp',
+    image: '/images/refresh-20261014/trades.webp',
     etplApproved: true,
   },
   {
@@ -196,7 +196,7 @@ export const PROGRAMS: ProgramData[] = [
       'OSHA-compliant forklift operator certification in 1-2 weeks. Covers powered industrial truck operation, safety standards, load handling, warehouse operations, and practical driving evaluation at employer partner site. 3-star Indiana Top Jobs demand rating. Immediate employability at distribution centers.',
     funding: 'WIOA • Workforce Grants',
     duration: '1–2 Weeks • 40 Hours',
-    image: '/images/hero/hero-skilled-trades.webp',
+    image: '/images/refresh-20261014/trades.webp',
     etplApproved: true,
   },
   {

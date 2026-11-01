@@ -358,20 +358,22 @@ const studioController = read('lib/devstudio/course-builder-controller.ts');
 if (!studioController.includes('DevStudioUltimateCourseControl'))
   fail('Studio Course Builder controller is not backed by Ultimate control plane');
 const courseOrchestrator = read('lib/course-builder/orchestrator.ts');
-if (!courseOrchestrator.includes("from '../course-factory/factory'"))
-  fail('Course Builder orchestrator is not the owner of private Course Factory execution');
+if (!courseOrchestrator.includes('requestCanonicalGeneration(db, input, actorId)'))
+  fail('Course Builder entry points must delegate generation to Ultimate');
+if (exists('lib/course-factory/factory.ts'))
+  fail('The superseded Course Factory execution engine must not remain deployable');
 
 const adminAiChat = read('apps/admin/app/api/admin/dev-studio/chat/route.ts');
 const durableCourseWorker = read('lib/jobs/handlers/course-build.ts');
-if (!durableCourseWorker.includes("from '@/lib/course-factory'")) {
+if (!durableCourseWorker.includes("from '@/lib/ultimate-course-builder/core/generation-request'")) {
   fail(
     'Admin AI does not delegate course creation through the canonical Course Builder facade/controller',
   );
 }
 if (adminAiChat.includes('@/lib/course-factory/factory'))
   fail('Admin AI imports the private Course Factory engine directly');
-if (!durableCourseWorker.includes('normalizeGeneratedCourseForGovernance'))
-  fail('Admin AI course creation does not run post-generation governance');
+if (!read('lib/ultimate-course-builder/core/start-course.ts').includes('buildUltimateProfile'))
+  fail('Generation handoff must inherit the verified production contract');
 if (adminAiChat.includes('intake_submissions'))
   fail(
     'Admin AI references retired/nonexistent intake_submissions instead of canonical applications',
@@ -429,7 +431,7 @@ const ultimateControl = read('lib/devstudio/ultimate-course-control.ts');
 const ultimateProfile = read('lib/ultimate-course-builder/core/course-profile.ts');
 for (const [source, invariants] of [
   [buildCourseBlock, ['.queueCourse({']],
-  [ultimateControl, ["from '@/lib/ultimate-course-builder/core/course-profile'", 'buildUltimateProfile(this.db', ".from('ultimate_course_builds')", 'new UltimateJobQueue(this.db).enqueue']],
+  [ultimateControl, ["from '@/lib/ultimate-course-builder/core/start-course'", 'startCanonicalCourse(this.db', ".from('ultimate_course_builds')", 'new UltimateJobQueue(this.db).enqueue']],
   [ultimateProfile, [".from('apprenticeship_standard_versions')", ".from('apprenticeship_standard_competencies')", 'UltimateAppendixAStandardsSource']],
 ]) {
   for (const invariant of invariants) {
@@ -445,8 +447,8 @@ for (const durableFile of [
     fail(`durable Course Builder execution file is missing: ${durableFile}`);
 const courseBuildWorker = read('lib/jobs/handlers/course-build.ts');
 for (const invariant of [
-  'courseFactory(',
-  'normalizeGeneratedCourseForGovernance',
+  'requestCanonicalGeneration(',
+  "stage: 'handed_off'",
   "status: 'completed'",
 ])
   if (!courseBuildWorker.includes(invariant))
@@ -471,7 +473,7 @@ for (const invariant of [
   'UltimateBuildPanel',
   '/api/admin/ultimate-course-builder',
   "action: 'queue-course'",
-  'Legacy Course Factory is archived',
+  'All production builds use the same verified execution contract.',
 ]) {
   if (!courseCatalog.includes(invariant))
     fail(`Ultimate Course Builder surface is missing: ${invariant}`);
@@ -486,14 +488,14 @@ for (const retiredDependency of [
     fail(`Ultimate Course Builder reintroduced retired Course Factory UI: ${retiredDependency}`);
 }
 const ultimateCourseBuilderApi = read('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
-for (const invariant of ['UltimateJobQueue', "body.action === 'queue-course'"]) {
+for (const invariant of ['startCanonicalCourse', "body.action === 'queue-course'"]) {
   if (!ultimateCourseBuilderApi.includes(invariant))
     fail(`Ultimate Course Builder API is missing: ${invariant}`);
 }
 const legacyCourseBuilderApi = read('apps/admin/app/api/admin/course-builder/route.ts');
-for (const invariant of ['COURSE_FACTORY_ARCHIVED', 'status: 410', 'ultimateEndpoint']) {
+for (const invariant of ['requestCanonicalGeneration', 'archivedGenerationActions.includes(action)', '202']) {
   if (!legacyCourseBuilderApi.includes(invariant))
-    fail(`legacy Course Factory generation is not archived: ${invariant}`);
+    fail(`generation entry point bypasses Ultimate: ${invariant}`);
 }
 const legacyCourseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
 if (

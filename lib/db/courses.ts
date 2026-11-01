@@ -595,7 +595,7 @@ export async function deleteApplication(id: string) {
 }
 
 // ============ COURSE BLUEPRINT PERSISTENCE ============
-import type { CourseBlueprint } from '@/lib/ai/course-ingestion';
+import type { CourseBlueprint } from '@/lib/ultimate-course-builder/authoring/source-ingestion';
 
 /**
  * Persist a full AI-generated course blueprint as a draft.

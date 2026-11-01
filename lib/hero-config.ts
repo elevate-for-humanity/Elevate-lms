@@ -54,7 +54,7 @@ export const HERO_IMAGES = {
 
   // Trades family
   trades: {
-    hvac: '/images/pages/hvac-technician.webp',
+    hvac: '/images/hvac-training-vibrant-2026.webp',
     cdl: '/images/pages/cdl-truck-highway.webp',
     welding: '/images/pages/welding-sparks.webp',
     electrical: '/images/pages/electrical.webp',
@@ -97,7 +97,7 @@ export const HERO_IMAGES = {
     homepage: '/images/pages/workforce-training.webp',
     programs: '/images/pages/training-classroom.webp',
     about: '/images/pages/about-hero.webp',
-    careers: '/images/pages/career-counseling.jpg',
+    careers: '/images/pages/resume-building-hero.webp',
     contact: '/images/pages/contact-hero.jpg',
   },
 
@@ -408,7 +408,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     title: 'Career Services',
     subtitle: 'Job placement, resume building, interview prep, and ongoing career support.',
     videoSrc: VIDEO_HEROES.careerServices,
-    videoPoster: '/images/pages/career-counseling.jpg',
+    videoPoster: '/images/pages/resume-building-hero.webp',
     variant: 'video',
     height: 'medium',
     ctaPrimary: { label: 'Get Started', href: '/career-services/contact' },

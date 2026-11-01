@@ -15,7 +15,7 @@ export default function Programs() {
       description:
         'Learn HVAC installation and repair, electrical systems, plumbing, or construction trades. Hands-on training leads to industry certifications and apprenticeship opportunities.',
       href: '/programs/skilled-trades',
-      image: '/images/hero/hero-skilled-trades.webp',
+      image: '/images/refresh-20261014/trades.webp',
     },
     {
       title: 'Barber Apprenticeship',

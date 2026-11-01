@@ -2,28 +2,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 const carrier=vi.hoisted(()=>({retrieve:vi.fn()}));
 vi.mock('@/lib/phone/telnyx',()=>({telnyxClient:async()=>({recordings:{retrieve:carrier.retrieve}})}));
-import { carrierRecordingUrl, loadPhoneRecording, refreshedRecordingUrl } from '@/lib/phone/recordings';
+import { carrierRecordingUrl, loadPhoneRecording } from '@/lib/phone/recordings';
 const recording = 'https://s3.amazonaws.com/telephony-recorder-prod/test.wav?signature=private';
 afterEach(() => vi.unstubAllGlobals());
 describe('private phone recording proxy', () => {
-  it('recovers expired audio only through the matching recording event',async()=>{
-    const id='11111111-1111-4111-8111-111111111111';
-    const fetch=vi.fn().mockResolvedValueOnce(new Response(null,{status:403})).mockResolvedValueOnce(new Response(new Uint8Array([1,2,3]),{headers:{'content-type':'audio/wav','content-length':'3'}}));
-    vi.stubGlobal('fetch',fetch);
-    carrier.retrieve.mockResolvedValueOnce({data:{id,call_session_id:'owned-session',download_urls:{wav:recording.replace('private','fresh')}}});
-    const query:any={select:()=>query,eq:()=>query,order:()=>query,limit:async()=>({data:[{payload:{recording_id:id,call_session_id:'owned-session',recording_urls:{wav:recording}}}],error:null})};
-    const response=await loadPhoneRecording(recording,{db:{from:()=>query},callId:id});
-    expect(carrier.retrieve).toHaveBeenCalledWith(id);
-    expect(fetch).toHaveBeenCalledTimes(2);
-    expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array([1,2,3]));
-  });
-  it('refreshes only the recorded carrier identity and trusted download location', () => {
-    const event={recording_id:'recording-id',call_session_id:'session-id'};
-    const result={id:'recording-id',call_session_id:'session-id',download_urls:{mp3:recording}};
-    expect(refreshedRecordingUrl(event,result)).toBe(recording);
-    expect(()=>refreshedRecordingUrl(event,{...result,id:'other-recording'})).toThrow('identity mismatch');
-    expect(()=>refreshedRecordingUrl(event,{...result,call_session_id:'other-call'})).toThrow('identity mismatch');
-    expect(()=>refreshedRecordingUrl(event,{...result,download_urls:{mp3:'http://169.254.169.254/'}})).toThrow();
+  it('reports unavailable historical audio without invoking a retired provider', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 403 })));
+    await expect(loadPhoneRecording(recording)).rejects.toThrow('Recording unavailable');
+    expect(carrier.retrieve).not.toHaveBeenCalled();
   });
   it('keeps existing signed provider URLs while rejecting metadata, arbitrary hosts and paths', () => {
     expect(carrierRecordingUrl(recording).search).toBe('?signature=private');

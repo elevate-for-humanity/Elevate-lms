@@ -19,7 +19,7 @@ const subjects = [
   {
     title: 'Skilled Trades',
     description: 'Electrical theory, NEC code review, welding technique coaching, HVAC system troubleshooting, plumbing calculations, and blueprint reading.',
-    image: '/images/pages/hvac-technician.webp',
+    image: '/images/hvac-training-vibrant-2026.webp',
   },
   {
     title: 'Technology & IT',
@@ -130,7 +130,7 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
               { step: '1', title: 'Log In to LMS', desc: 'Access the tutoring portal through your student dashboard.', image: '/images/pages/lms-page-1.webp' },
               { step: '2', title: 'Choose Your Subject', desc: 'Select from healthcare, trades, technology, business, or exam prep.', image: '/images/pages/courses-page-1.webp' },
               { step: '3', title: 'Book a Session', desc: 'Pick an available tutor and time slot. Choose 30 or 60 minutes.', image: '/images/pages/calendar-page-1.webp' },
-              { step: '4', title: 'Meet & Learn', desc: 'Join via Zoom or at the training center.', image: '/images/pages/career-counseling.jpg' },
+              { step: '4', title: 'Meet & Learn', desc: 'Join via Zoom or at the training center.', image: '/images/pages/resume-building-hero.webp' },
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="bg-white rounded-2xl overflow-hidden shadow-sm">
                 <div className="relative h-40 overflow-hidden">

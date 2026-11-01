@@ -94,7 +94,7 @@ export const ALL_PRODUCTS: Product[] = [
     price: 1999,
     priceDisplay: '$1,999',
     href: '/store/compliance/wioa',
-    image: '/images/pages/career-counseling.jpg',
+    image: '/images/pages/resume-building-hero.webp',
     category: 'tool',
     tier: 'standalone',
     valueProps: [

@@ -108,7 +108,7 @@ export const secondaryCards: StoreCard[] = [
     subtitle: 'WIOA, FERPA, WCAG',
     description: 'Compliance checklists, templates, and automated reporting tools.',
     href: '/store/compliance',
-    image: '/images/pages/career-counseling.jpg',
+    image: '/images/pages/resume-building-hero.webp',
     icon: 'file-text',
     tourId: 'store-card-compliance',
     tier: 'secondary',

@@ -7,6 +7,7 @@ import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTa
 import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
 import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
 import HvacStartHere from '@/components/learner/HvacStartHere';
+import { loadQwikStudyCode } from '@/lib/learner/qwik-study-access';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -123,6 +124,8 @@ export default async function StudentDashboard() {
   const assignedHome = await resolveAssignedLearnerHome(db, subjectId);
   if (assignedHome?.startsWith('/apprentice')) redirect(assignedHome);
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
+  const hasHvacEnrollment = workspace.enrollments.some(row => row.program_slug === 'hvac-technician');
+  const qwikStudyCode = hasHvacEnrollment ? await loadQwikStudyCode(db, subjectId) : null;
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling
     ? await loadLearnerBillingRequirement(db, subjectId)
@@ -627,8 +630,8 @@ export default async function StudentDashboard() {
           </section>
         )}
 
-        {workspace.enrollments.some((row) => row.program_slug === 'hvac-technician') ? (
-          <HvacStartHere />
+        {hasHvacEnrollment ? (
+          <HvacStartHere studyCode={qwikStudyCode} />
         ) : null}
         <section
           className="rounded-2xl border border-slate-200 bg-white p-5"

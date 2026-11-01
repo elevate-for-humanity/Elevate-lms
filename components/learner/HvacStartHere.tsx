@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 /** Always available alongside the HVAC orientation; no course or approval gate. */
-export default function HvacStartHere() {
+export default function HvacStartHere({ studyCode = null }: { studyCode?: string | null }) {
   const steps = [
     {
       title: 'Finish your onboarding checklist',
@@ -70,6 +70,22 @@ export default function HvacStartHere() {
           </li>
         ))}
       </ol>
+      <aside className="rounded-xl border border-blue-200 bg-white p-5" aria-label="EPA 608 supplemental study materials">
+        <h3 className="text-lg font-bold text-slate-950">QwikStudy · EPA 608 study materials</h3>
+        <p className="mt-2 text-sm leading-7 text-slate-800">Use Mainstream Engineering’s study materials alongside your Elevate HVAC lessons. On the provider’s page, choose Software download codes, sign in or register, then select Downloads and enter your software download code.</p>
+        {studyCode ? (
+          <div className="mt-3 rounded-lg bg-blue-50 p-4">
+            <p className="text-sm font-bold text-slate-900">Your software download code</p>
+            <code className="mt-2 block select-all break-all text-xl font-bold tracking-wide text-blue-950">{studyCode}</code>
+            <p className="mt-2 text-xs leading-6 text-slate-700">Keep this code for later downloads. If the provider does not accept it, contact Elevate staff for help.</p>
+          </div>
+        ) : (
+          <p className="mt-3 text-sm font-medium text-slate-800">Contact Elevate staff for your software download code when your training access is ready.</p>
+        )}
+        <p className="mt-2 text-sm leading-7 text-slate-700">The package product number and barcode are not your software access code. The free download on that page covers Type I only; full EPA 608 study access requires a valid download code. Downloaded training software requires Windows.</p>
+        <a href="https://ww2.epatest.com/software/" target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-blue-800 px-4 py-3 text-sm font-bold text-white hover:bg-blue-900">Open QwikStudy access instructions (new tab)</a>
+        <p className="mt-3 text-xs leading-6 text-slate-700">This link opens an external study resource. Studying there does not automatically update your Elevate lesson progress or award certification.</p>
+      </aside>
       <aside className="rounded-xl border border-blue-200 bg-white p-5" aria-label="Hands-on training contact">
         <h3 className="text-lg font-bold text-slate-950">Hands-on training: David Nazaire</h3>
         <p className="mt-2 text-sm leading-7 text-slate-800">Introduce yourself as an Elevate HVAC learner. Include your full name, online-study progress, and available dates. Ask David to confirm the appointment and what to bring.</p>

@@ -91,6 +91,84 @@ def certificate_pair():
    matches.append((cert,key))
  if len(matches)!=1:raise ValueError('PBX_TRUSTED_CERTIFICATE_AMBIGUOUS')
  return matches[0]
+def certificate_uses_rsa(cert):
+ return bool(re.search(r'Public Key Algorithm:\s*rsaEncryption\b',run(['openssl','x509','-in',str(cert),'-noout','-text'])))
+def rsa_gateway_config(text):
+ if text.count('phone.elevateforhumanity.org {')!=1 or len(re.findall(r'^\s*tls\s*\{\s*$',text,re.M))!=1 or not re.search(r'issuer\s+acme\s*\{',text):
+  raise ValueError('PBX_GATEWAY_CONFIGURATION_REQUIRES_REVIEW')
+ text=re.sub(r'^\s*key_type\s+\S+\s*$', '',text,flags=re.M)
+ return re.sub(r'(^\s*tls\s*\{\s*$)',r'\1\n    key_type rsa2048',text,count=1,flags=re.M)
+def gateway_ws_ready():
+ key='dGhlIHNhbXBsZSBub25jZQ=='
+ with socket.create_connection(('127.0.0.1',443),timeout=5) as raw:
+  with ssl.create_default_context().wrap_socket(raw,server_hostname='phone.elevateforhumanity.org') as secure:
+   secure.sendall(('GET /ws HTTP/1.1\r\nHost: phone.elevateforhumanity.org\r\nConnection: Upgrade\r\nUpgrade: websocket\r\nSec-WebSocket-Key: '+key+'\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Protocol: sip\r\n\r\n').encode())
+   response=b''
+   while b'\r\n\r\n' not in response and len(response)<16384:
+    block=secure.recv(4096)
+    if not block:break
+    response+=block
+ lines=response.decode('latin1').split('\r\n')
+ headers={line.split(':',1)[0].lower():line.split(':',1)[1].strip() for line in lines[1:] if ':' in line}
+ return lines[0].startswith('HTTP/1.1 101 ') and headers.get('sec-websocket-accept')=='s3pPLMBiTxaQ9kYGzzhZRbK+xOo=' and headers.get('sec-websocket-protocol')=='sip'
+def require_gateway_mount(container,config):
+ mounts=[m for m in container.get('Mounts',[]) if m.get('Destination')=='/etc/caddy/Caddyfile']
+ if not container.get('State',{}).get('Running') or len(mounts)!=1 or mounts[0].get('Source')!=str(config) or mounts[0].get('Type')!='bind':
+  raise ValueError('PBX_GATEWAY_MOUNT_UNVERIFIED')
+def ensure_rsa_gateway_certificate(pair):
+ if certificate_uses_rsa(pair[0]):return pair
+ # The current trusted browser certificate is ECDSA. Keep the same hostname,
+ # ACME issuer and gateway; request an RSA key under its existing automation.
+ if not idle_state(cli('core show channels count')):raise ValueError('PBX_ACTIVE_CALLS_OR_UNKNOWN')
+ if not gateway_ws_ready():raise ValueError('PBX_GATEWAY_SIP_WEBSOCKET_UNVERIFIED')
+ config=Path('/opt/elevate-pbx/tls-proxy/Caddyfile')
+ name='elevate-pbx-wss-proxy'
+ container=json.loads(run(['docker','inspect',name]))[0]
+ require_gateway_mount(container,config)
+ if config.is_symlink():raise ValueError('PBX_GATEWAY_CONFIGURATION_SYMLINK_REJECTED')
+ before=config.read_text();after=rsa_gateway_config(before)
+ resources=[]
+ for cert in Path('/var/lib/elevate-pbx-tls/data/caddy/certificates').glob('*/phone.elevateforhumanity.org/phone.elevateforhumanity.org.crt'):
+  for extension in ['.crt','.key','.json']:
+   resource=cert.with_suffix(extension)
+   if resource.is_symlink():raise ValueError('PBX_GATEWAY_CERTIFICATE_SYMLINK_REJECTED')
+   if resource.is_file():resources.append(resource)
+ if pair[0] not in resources or pair[1] not in resources:raise ValueError('PBX_GATEWAY_CERTIFICATE_RESOURCES_UNVERIFIED')
+ backup=Path(tempfile.mkdtemp(prefix='elevate-rsa-gateway-'))
+ restarted=False;saved=[]
+ try:
+  config.write_text(after)
+  run(['docker','exec',name,'caddy','validate','--config','/etc/caddy/Caddyfile','--adapter','caddyfile'])
+  # Caddy otherwise retains its cached ECDSA certificate despite key_type.
+  # Stage only this hostname's resources privately, preserving account state.
+  for index,resource in enumerate(resources):
+   destination=backup/str(index);shutil.move(resource,destination);saved.append((resource,destination))
+  restarted=True
+  run(['docker','restart',name])
+  deadline=time.monotonic()+75
+  while time.monotonic()<deadline:
+   try:
+    candidate=certificate_pair()
+    if certificate_uses_rsa(candidate[0]) and gateway_ws_ready():
+     after_container=json.loads(run(['docker','inspect',name]))[0]
+     if after_container['Id']!=container['Id'] or after_container['Image']!=container['Image']:raise ValueError('PBX_GATEWAY_IDENTITY_CHANGED')
+     shutil.rmtree(backup)
+     print(json.dumps({'trustedRsaGatewayCertificateVerified':True,'gatewaySipWebSocketVerified':True}),flush=True)
+     return candidate
+   except (OSError,ssl.SSLError,ValueError,subprocess.TimeoutExpired):pass
+   time.sleep(2)
+  raise ValueError('PBX_TRUSTED_RSA_CERTIFICATE_NOT_ISSUED')
+ except Exception:
+  config.write_text(before)
+  for resource,snapshot in saved:shutil.copy2(snapshot,resource)
+  if restarted:
+   try:
+    run(['docker','restart',name])
+    certificate_pair()
+    if not gateway_ws_ready():raise ValueError('rollback')
+   except Exception:raise ValueError('PBX_GATEWAY_ROLLBACK_UNCONFIRMED')
+  shutil.rmtree(backup)
+  raise
 def tls_endpoint(text):
  pattern=r'(?ms)(^\[elevate-twilio-tls\]\s*\n)(.*?)(?=^\[|\Z)'
  match=re.search(pattern,text)
@@ -146,7 +224,7 @@ def apply():
  # A registered ARI application is required before any incoming route changes.
  if not re.search(r'\belevate-paris\b',cli('ari show apps')):raise ValueError('PBX_PARIS_APPLICATION_UNREGISTERED')
  repair_tls=not trusted_sip_tls()
- pair=certificate_pair() if repair_tls else None
+ pair=ensure_rsa_gateway_certificate(certificate_pair()) if repair_tls else None
  files=[ROOT/'elevate-twilio.conf',ROOT/'pjsip.conf',ROOT/'extensions.conf',ROOT/'elevate-paris-inbound.conf',ROOT/'elevate-twilio-identity.conf']
  if repair_tls:files += [ROOT/'tls/phone.crt',ROOT/'tls/phone.key']
  if any(p.is_symlink() for p in files):raise ValueError('PBX_INGRESS_SYMLINK_REJECTED')

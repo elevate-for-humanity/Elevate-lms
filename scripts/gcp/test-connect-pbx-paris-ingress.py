@@ -67,4 +67,56 @@ class Tests(unittest.TestCase):
    with patch.object(m,'ROOT',root),patch.object(m,'cli',side_effect=command),patch.object(m,'trusted_sip_tls',side_effect=AssertionError('TLS activation must remain separate')):
     self.assertTrue(m.retire_standalone_contact()['retiredContactRemoved'])
    self.assertNotIn('elevate-standalone',fragment.read_text())
+ def test_rsa_configuration_preserves_routes_and_existing_acme_challenge(self):
+  original='{\n auto_https disable_redirects\n}\nphone.elevateforhumanity.org {\n tls {\n issuer acme {\n disable_http_challenge\n }\n }\n reverse_proxy 127.0.0.1:8088\n}\n'
+  configured=m.rsa_gateway_config(original)
+  self.assertIn('key_type rsa2048',configured)
+  self.assertIn('disable_http_challenge',configured);self.assertIn('reverse_proxy 127.0.0.1:8088',configured)
+  self.assertEqual(configured.count('key_type rsa2048'),1)
+  self.assertEqual(m.rsa_gateway_config(configured).count('key_type rsa2048'),1)
+ def test_unowned_gateway_configuration_cannot_be_replaced(self):
+  with self.assertRaisesRegex(ValueError,'CONFIGURATION_REQUIRES_REVIEW'):m.rsa_gateway_config('other.example { tls internal }')
+ def test_existing_rsa_certificate_does_not_restart_gateway(self):
+  from unittest.mock import patch
+  pair=(Path('/owned/cert'),Path('/owned/key'))
+  with patch.object(m,'certificate_uses_rsa',return_value=True),patch.object(m,'cli',side_effect=AssertionError('No restart needed')):
+   self.assertEqual(m.ensure_rsa_gateway_certificate(pair),pair)
+ def test_gateway_mount_requires_the_existing_owned_file(self):
+  with self.assertRaisesRegex(ValueError,'MOUNT_UNVERIFIED'):
+   m.require_gateway_mount({'State':{'Running':True},'Mounts':[{'Destination':'/etc/caddy/Caddyfile','Source':'/other','Type':'bind'}]},Path('/owned/Caddyfile'))
+ def exercise_gateway_rotation(self,success):
+  from unittest.mock import patch
+  import tempfile,json
+  real_path=Path
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);config=root/'Caddyfile';before='phone.elevateforhumanity.org {\n tls {\n issuer acme {\n disable_http_challenge\n }\n }\n reverse_proxy 127.0.0.1:8088\n}\n';config.write_text(before)
+   storage=root/'certificates';owned=storage/'issuer'/'phone.elevateforhumanity.org';owned.mkdir(parents=True)
+   cert=owned/'phone.elevateforhumanity.org.crt';key=cert.with_suffix('.key');metadata=cert.with_suffix('.json')
+   for resource in [cert,key,metadata]:resource.write_text('old-'+resource.suffix)
+   other=storage/'issuer'/'other.example';other.mkdir();(other/'keep.key').write_text('unrelated-private-key')
+   backup=root/'private-backup';backup.mkdir(mode=0o700)
+   def mapped(value):
+    return config if str(value)=='/opt/elevate-pbx/tls-proxy/Caddyfile' else storage if str(value)=='/var/lib/elevate-pbx-tls/data/caddy/certificates' else real_path(value)
+   container={'Id':'same-container','Image':'same-image','State':{'Running':True},'Mounts':[{'Destination':'/etc/caddy/Caddyfile','Source':str(config),'Type':'bind'}]}
+   restarts=[]
+   def execute(args):
+    if args[:2]==['docker','inspect']:return json.dumps([container])
+    if args[:2]==['docker','restart']:
+     restarts.append(args[2])
+     if success:
+      for resource in [cert,key,metadata]:resource.write_text('issued-'+resource.suffix)
+     return args[2]
+    if 'validate' in args:return ''
+    self.fail('Unexpected command '+str(args))
+   with patch.object(m,'Path',side_effect=mapped),patch.object(m,'certificate_uses_rsa',side_effect=[False,True] if success else [False]),patch.object(m,'cli',return_value='0 active calls\n0 active channels'),patch.object(m,'gateway_ws_ready',return_value=True),patch.object(m,'run',side_effect=execute),patch.object(m,'certificate_pair',return_value=(cert,key)),patch.object(m.tempfile,'mkdtemp',return_value=str(backup)),patch.object(m.time,'monotonic',side_effect=[0,1] if success else [0,100]),patch('builtins.print') as output:
+    if success:
+     self.assertEqual(m.ensure_rsa_gateway_certificate((cert,key)),(cert,key))
+     self.assertIn('key_type rsa2048',config.read_text());self.assertEqual(key.read_text(),'issued-.key');self.assertEqual(len(restarts),1)
+     self.assertNotIn('unrelated-private-key',str(output.call_args_list))
+    else:
+     with self.assertRaisesRegex(ValueError,'TRUSTED_RSA_CERTIFICATE_NOT_ISSUED'):m.ensure_rsa_gateway_certificate((cert,key))
+     self.assertEqual(config.read_text(),before);self.assertEqual(key.read_text(),'old-.key');self.assertEqual(cert.read_text(),'old-.crt');self.assertEqual(metadata.read_text(),'old-.json');self.assertEqual(len(restarts),2)
+   self.assertEqual((other/'keep.key').read_text(),'unrelated-private-key');self.assertFalse(backup.exists())
+ def test_rsa_issuance_preserves_gateway_identity_and_unrelated_certificates(self):self.exercise_gateway_rotation(True)
+ def test_failed_rsa_issuance_restores_the_previous_working_gateway(self):self.exercise_gateway_rotation(False)
 if __name__=='__main__':unittest.main()

@@ -79,7 +79,7 @@ export async function routeApprovedExtension(callId,route,request=ari,allowed=pr
   const permitted=new Set(String(allowed).split(',').map(v=>v.trim()).filter(v=>/^[1-9]\d{2}$/.test(v)));
   if(!UUIDISH.test(callId||'') || route?.type!=='extension' || !permitted.has(route.extension))throw Error('ROUTE_NOT_ALLOWED');
   await request('/channels/'+encode(callId)+'/continue','POST',{
-    context:'elevate-pwa-extensions',extension:route.extension,priority:1,
+    context:'elevate-paris-directory',extension:route.extension,priority:1,
   });
 }
 export async function handleDtmf(event,active=sessions,{route=routeOperator,finish=end}={}){

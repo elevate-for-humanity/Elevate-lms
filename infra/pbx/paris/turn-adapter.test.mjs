@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pcm16ToUlaw,wavToUlaw,makeTurnHandler,callerRouteIntent} from './turn-adapter.mjs';
+import {pcm16ToUlaw,wavToUlaw,makeTurnHandler,callerRouteIntent,converse} from './turn-adapter.mjs';
 function wav(samples){const b=Buffer.alloc(44+samples.length*2);b.write('RIFF',0);b.writeUInt32LE(b.length-8,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(8000,24);b.writeUInt32LE(16000,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(samples.length*2,40);samples.forEach((s,i)=>b.writeInt16LE(s,44+i*2));return b;}
 test('8 kHz 16-bit PCM WAV becomes packet-aligned PCMU',()=>{const out=wavToUlaw(wav(Array(200).fill(0)));assert.equal(out.length,320);assert.equal(out[0],0xff);assert.equal(out[319],0xff);});
 test('rejects audio outside strict mono 8k format',()=>{const bad=wav(Array(160).fill(0));bad.writeUInt32LE(16000,24);assert.throws(()=>wavToUlaw(bad),/FORMAT/);});
@@ -42,4 +42,15 @@ test('explicit extension routing requires the reviewed allowlist',()=>{
  assert.deepEqual(callerRouteIntent('Please connect me to extension 123',{allowedExtensions:'123,456'}),{type:'extension',extension:'123'});
  assert.equal(callerRouteIntent('Please connect me to extension 999',{allowedExtensions:'123,456'}),null);
  assert.equal(callerRouteIntent('Please connect me to extension 123',{allowedExtensions:''}),null);
+});
+
+test('saved receptionist instructions reach the model while retaining base policy', async () => {
+  let sent;
+  await converse([{role:'user',text:'Hello'}], async (_url,body) => {
+    sent=body;
+    return {candidates:[{content:{parts:[{text:'Hello.'}]}}]};
+  }, {env:{PARIS_SYSTEM_INSTRUCTIONS:'Ask which Elevate program the caller needs.'}});
+  const text=sent.systemInstruction.parts[0].text;
+  assert.match(text,/Never solicit SSNs/);
+  assert.match(text,/Ask which Elevate program the caller needs/);
 });

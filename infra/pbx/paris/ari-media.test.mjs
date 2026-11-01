@@ -150,7 +150,7 @@ test('RTP padding cannot exceed payload and zero-length packets are rejected',()
 test('approved PWA extension transfer requires exact allowlist and dialplan',async()=>{
  const calls=[];
  await routeApprovedExtension('call-1',{type:'extension',extension:'123'},async(...args)=>calls.push(args),'123,456');
- assert.deepEqual(calls,[['/channels/call-1/continue','POST',{context:'elevate-pwa-extensions',extension:'123',priority:1}]]);
+ assert.deepEqual(calls,[['/channels/call-1/continue','POST',{context:'elevate-paris-directory',extension:'123',priority:1}]]);
  await assert.rejects(routeApprovedExtension('call-1',{type:'extension',extension:'999'},async()=>assert.fail('must not route'),'123'),/ROUTE_NOT_ALLOWED/);
  await assert.rejects(routeApprovedExtension('call-1',{type:'extension',extension:'123'},async()=>assert.fail('must not route'),''),/ROUTE_NOT_ALLOWED/);
 });

@@ -149,7 +149,8 @@ def main():
     routes = []
     for row in extensions:
         extension = row['extension']
-        plan = cli('dialplan show ' + extension + '@elevate-pwa-extensions')
+        context = 'elevate-pwa-extensions' if extension == '0' else 'elevate-paris-directory'
+        plan = cli('dialplan show ' + extension + '@' + context)
         routes.append({'extension': extension, 'generatedRoutePresent': bool(re.search(r"^\s*'" + extension + r"'\s*=>\s*1\.", plan, re.M)),
                        'savedVoicemailGreetingPresent': bool(row.get('voicemail_greeting'))})
     report = {'configuration': comparison, 'extensions': routes,

@@ -52,6 +52,9 @@ export async function recognize(audioBase64,request=googleJson){
 /** Explicit phone-only opt-in keeps batch work and live voice independently routable.
  * This file is staged standalone on the PBX; it must not import the web app. */
 export async function converse(history,request=googleJson,{env=process.env,request:ownedRequest=fetch}={}){
+  const instructions = typeof env.PARIS_SYSTEM_INSTRUCTIONS === 'string'
+    ? env.PARIS_SYSTEM_INSTRUCTIONS.trim().slice(0,16000) : '';
+  const system = instructions ? `${SYSTEM}\n\nSaved receptionist instructions:\n${instructions}` : SYSTEM;
   if(env.PARIS_PHONE_INFERENCE_PROVIDER==='owned') {
     let url;
     try {url=new URL(env.PARIS_PHONE_LLM_URL);} catch {throw Error('PARIS_PHONE_LLM_ENDPOINT_REQUIRED');}
@@ -64,7 +67,7 @@ export async function converse(history,request=googleJson,{env=process.env,reque
       method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),
       headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
       body:JSON.stringify({model:'elevate-local',stream:false,temperature:0.25,max_tokens:240,
-        messages:[{role:'system',content:SYSTEM},...history.map(h=>({role:h.role==='model'?'assistant':'user',content:h.text}))]}),
+        messages:[{role:'system',content:system},...history.map(h=>({role:h.role==='model'?'assistant':'user',content:h.text}))]}),
     });
     if(!response.ok){await response.body?.cancel();throw Error('PARIS_PHONE_LLM_HTTP_'+response.status);}
     const data=await response.json();
@@ -77,7 +80,7 @@ export async function converse(history,request=googleJson,{env=process.env,reque
   const model=process.env.PARIS_VERTEX_MODEL||'gemini-2.5-flash';
   if(!/^[a-zA-Z0-9._-]+$/.test(model))throw Error('INVALID_MODEL');
   const url='https://us-central1-aiplatform.googleapis.com/v1/projects/'+PROJECT+'/locations/us-central1/publishers/google/models/'+model+':generateContent';
-  const data=await request(url,{systemInstruction:{parts:[{text:SYSTEM}]},contents:history.map(h=>({role:h.role,parts:[{text:h.text}]})),generationConfig:{temperature:0.25,maxOutputTokens:240}});
+  const data=await request(url,{systemInstruction:{parts:[{text:system}]},contents:history.map(h=>({role:h.role,parts:[{text:h.text}]})),generationConfig:{temperature:0.25,maxOutputTokens:240}});
   const result=(data.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('').trim();
   if(!result)throw Error('EMPTY_PARIS_ANSWER');
   return result.slice(0,1200);

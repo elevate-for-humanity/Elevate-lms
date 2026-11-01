@@ -80,6 +80,10 @@ jobs:
         run: |
           node scripts/check-build-memory-policy.mjs
           node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
+      - name: Final production reliability contract regressions
+        run: |
+          node --test scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/supervise-course-queue.test.mjs scripts/gcp/resume-repaired-course-jobs.test.mjs scripts/gcp/dispatch-lesson-autopilots.test.mjs scripts/gcp/deploy-lesson-autopilots.test.mjs scripts/gcp/audit-course-production.test.mjs lib/ai/runtime/code-repair-policy.test.mjs tests/worker/course-release-audit.test.mjs tests/worker/release-database-failures.test.mjs
+          pnpm exec vitest run tests/unit/paris-supervision-classification.test.ts tests/unit/quickbooks-client.test.ts tests/unit/google-calendar-oauth.test.ts --environment node
       - name: Ultimate course builder repair regression tests
         run: node --test tests/worker/narration-inspector-checkpoint.test.mjs tests/worker/independent-speech-windows.test.mjs lib/video/render-checkpoint-contract.test.mjs tests/worker/checkpoint-preview.test.mjs tests/worker/fenced-write-recovery.test.mjs tests/worker/rti-teaching-policy.test.mjs tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs tests/worker/release-database-failures.test.mjs tests/worker/objective-practice.test.mjs tests/worker/authored-practice.test.mjs tests/worker/studio-runtime-rate-limit.test.mjs
       - name: Course database contract version parity

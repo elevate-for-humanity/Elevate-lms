@@ -65,7 +65,12 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   if(!changed.ok){
    // Another coordinator may have queued work after our active scan. The
    // unique active-build index prevents duplication; do not fail deployment.
-   if(changed.status===409)continue;
+   if(changed.status===409){
+    // The active-build uniqueness constraint already admitted a continuation.
+    // Fence every older saved cursor in this scan as well; never race it next.
+    if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
+    continue;
+   }
    throw Error('REPAIR_RESUME_WRITE_HTTP_'+changed.status);
   }
   const saved=await changed.json();if(!Array.isArray(saved))throw Error('REPAIR_RESUME_READBACK_INVALID');

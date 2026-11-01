@@ -1,3 +1,4 @@
+import { RAPIDS_VERIFIED_INVENTORY } from '@/lib/apprenticeship/rapids-verified-inventory';
 import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
 import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
@@ -117,39 +118,38 @@ export default async function ApprovalsPage() {
                 </dd>
               </div>
             </dl>
-            <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {registeredPrograms.map((program) => (
-                <article key={program.standardKey} className="rounded-2xl bg-slate-50 p-5">
-                  <h3 className="text-xl font-black">{program.standard.occupationTitle}</h3>
-                  <p className="mt-2 text-sm font-bold text-slate-600">
-                    RAPIDS occupation {program.standard.rapidsCode}
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-slate-700">
-                    Competency-based: {program.completion.competencyCount} verified competencies and{' '}
-                    {program.completion.requiredRtiHours} verified RTI hours.
-                  </p>
-                  <Link
-                    href={`/programs/${program.canonicalProgramSlug}`}
-                    className="mt-4 inline-flex font-black text-brand-blue-700"
-                  >
-                    View pathway →
-                  </Link>
-                </article>
-              ))}
-              <article className="rounded-2xl bg-slate-50 p-5">
-                <h3 className="text-xl font-black">Hair Stylist / Cosmetologist</h3>
-                <p className="mt-2 text-sm font-bold text-slate-600">RAPIDS occupation 0096HY V1</p>
-                <p className="mt-3 text-sm leading-6 text-slate-700">
-                  Hybrid: 2,000–2,500-hour registered term and 154 verified RTI hours. The 500-hour
-                  figure is probation, not completion.
-                </p>
-                <Link
-                  href="/programs/cosmetology-apprenticeship"
-                  className="mt-4 inline-flex font-black text-brand-blue-700"
-                >
-                  View pathway →
-                </Link>
-              </article>
+            <p className="mt-6 font-bold text-slate-800">
+              {RAPIDS_VERIFIED_INVENTORY.occupations.length} active registered occupations,
+              verified directly in U.S. DOL RAPIDS on November 1, 2026.
+            </p>
+            <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {RAPIDS_VERIFIED_INVENTORY.occupations.map((occupation) => {
+                const standard = getRegisteredProgramStandard(occupation.slug);
+                return (
+                  <article key={occupation.code} className="rounded-2xl bg-slate-50 p-5">
+                    <h3 className="text-xl font-black">{occupation.title}</h3>
+                    <p className="mt-2 text-sm font-bold text-slate-600">
+                      RAPIDS {occupation.code} {occupation.version} · {occupation.status}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-slate-700">
+                      {occupation.approach === 'hybrid' ? 'Hybrid' : 'Competency-based'}.
+                      RAPIDS displays a term of {occupation.displayedTerm}.
+                      Probation: {occupation.probationHours} hours.
+                    </p>
+                    {standard && (
+                      <p className="mt-2 text-sm leading-6 text-slate-700">
+                        Signed outline: {standard.completion.competencyCount} competencies
+                        and {standard.completion.requiredRtiHours} RTI hours.
+                        The displayed term does not replace competency-based completion requirements.
+                      </p>
+                    )}
+                    <Link href={occupation.code === '0688CB' ? '/contact?program=building-services-technician' : `/programs/${occupation.slug}`}
+                      className="mt-4 inline-flex font-black text-brand-blue-700">
+                      {occupation.code === '0688CB' ? 'Ask about this occupation →' : 'View pathway →'}
+                    </Link>
+                  </article>
+                );
+              })}
             </div>
             <p className="mt-6 leading-7 text-slate-700">
               Supervised work, employer wage schedules, RTI records, competency or work-process

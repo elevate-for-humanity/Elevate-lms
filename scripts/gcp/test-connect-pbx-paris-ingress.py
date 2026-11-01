@@ -30,6 +30,20 @@ class Tests(unittest.TestCase):
   self.assertIn('verify_server=yes',body);self.assertIn('method=tlsv1_2',body)
   self.assertIn('[other]\nca_list_file=/preserve',result)
   self.assertEqual(result,m.tls_endpoint(result))
+ def test_nat_classification_adds_only_the_verified_host_and_preserves_authentication(self):
+  source='[elevate-twilio-tls]\ntype=transport\nlocal_net=127.0.0.0/8\nverify_server=yes\n[identify]\nmatch=54.172.60.0/30\n'
+  changed=m.nat_endpoint(source,'10.128.0.2')
+  self.assertIn('local_net=10.128.0.2/32',changed);self.assertIn('local_net=127.0.0.0/8',changed)
+  self.assertIn('[identify]\nmatch=54.172.60.0/30',changed);self.assertIn('verify_server=yes',changed)
+  self.assertEqual(changed,m.nat_endpoint(changed,'10.128.0.2'))
+  self.assertNotIn('local_net=10.0.0.0/8',changed)
+ def test_nat_refuses_public_and_metadata_addresses(self):
+  for address in ['107.178.216.162','169.254.169.254','127.0.0.1']:
+   with self.assertRaisesRegex(ValueError,'PRIVATE_INTERFACE_UNVERIFIED'):m.nat_endpoint('[elevate-twilio-tls]\n',address)
+ def test_runtime_dotted_netmask_readback_covers_only_the_local_interface(self):
+  networks=m.transport_networks('local_net : 127.0.0.0/255.0.0.0,10.128.0.2/255.255.255.255')
+  self.assertTrue(any(m.ipaddress.ip_address('10.128.0.2') in net for net in networks))
+  self.assertFalse(any(m.ipaddress.ip_address('10.128.0.3') in net for net in networks))
  def test_failure_evidence_never_emits_arbitrary_exception_text(self):
   self.assertEqual(m.failure_evidence(ValueError('secret=private'))['reason'],'PBX_UNEXPECTED_FAILURE')
   self.assertEqual(m.failure_evidence(ValueError('PBX_INGRESS_READBACK_FAILED'))['reason'],'PBX_INGRESS_READBACK_FAILED')

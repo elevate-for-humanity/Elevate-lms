@@ -12,6 +12,7 @@ import socket
 import time
 import hashlib
 import sys
+import urllib.request
 # Official Twilio signaling gateways: https://www.twilio.com/docs/sip-trunking/ip-addresses
 SIGNALING=['54.172.60.0/30','54.244.51.0/30','54.171.127.192/30','35.156.191.128/30','54.65.63.192/30','54.169.127.128/30','54.252.254.64/30','177.71.206.192/30']
 ROOT=Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
@@ -183,6 +184,32 @@ def tls_endpoint(text):
   body=re.sub(r'^\s*'+key+r'\s*=.*\n?', '',body,flags=re.M)
   body=body.rstrip()+'\n'+key+'='+value+'\n'
  return text[:match.start(2)]+body+text[match.end(2):]
+def vm_private_address():
+ request=urllib.request.Request('http://169.254.169.254/computeMetadata/v1/instance/network-interfaces/0/ip',headers={'Metadata-Flavor':'Google'})
+ with urllib.request.urlopen(request,timeout=5) as response:address=response.read(64).decode().strip()
+ ip=ipaddress.ip_address(address)
+ interfaces=json.loads(run(['ip','-j','-4','address','show']))
+ local={item.get('local') for interface in interfaces for item in interface.get('addr_info',[])}
+ if ip.version!=4 or not ip.is_private or ip.is_loopback or ip.is_link_local or address not in local:raise ValueError('PBX_PRIVATE_INTERFACE_UNVERIFIED')
+ return address
+def transport_networks(text):
+ networks=[]
+ for raw in re.findall(r'(?<![0-9.])(?:[0-9]{1,3}\.){3}[0-9]{1,3}/(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|[0-9]{1,2})(?![0-9.])',text):
+  try:networks.append(ipaddress.ip_network(raw,strict=False))
+  except ValueError:raise ValueError('PBX_LOCAL_NETWORK_UNVERIFIED')
+ return networks
+def nat_endpoint(text,address):
+ ip=ipaddress.ip_address(address)
+ if ip.version!=4 or not ip.is_private or ip.is_loopback or ip.is_link_local:raise ValueError('PBX_PRIVATE_INTERFACE_UNVERIFIED')
+ match=re.search(r'(?ms)(^\[elevate-twilio-tls\]\s*\n)(.*?)(?=^\[|\Z)',text)
+ if not match:raise ValueError('PBX_TLS_TRANSPORT_UNVERIFIED')
+ body=match[2]
+ local='\n'.join(re.findall(r'^\s*local_net\s*=([^;\n]+)',body,re.M))
+ if any(ip in network for network in transport_networks(local)):return text
+ # Classify only this verified host interface for SDP NAT rewriting. This is
+ # not an endpoint ACL; carrier-source authorization remains unchanged.
+ body=body.rstrip()+'\nlocal_net='+str(ip)+'/32\n'
+ return text[:match.start(2)]+body+text[match.end(2):]
 def messages_cursor():
  result=subprocess.run(['docker','exec','pbx_asterisk_1','stat','-c','%i %s','/var/log/asterisk/messages'],capture_output=True,text=True,timeout=10)
  match=re.fullmatch(r'(\d+) (\d+)\s*',result.stdout) if result.returncode==0 else None
@@ -269,7 +296,12 @@ def apply():
  for p in files[3:5]:
   if p.exists() and not p.read_text().startswith(MARKER):raise ValueError('PBX_INGRESS_FILE_OWNERSHIP_UNVERIFIED')
  previous={p:p.read_text() if p.exists() else None for p in files}
+ private_address=vm_private_address()
  new_endpoint=update_outbound_aor(update_endpoint(previous[files[0]] or ''))
+ nat_configured=nat_endpoint(new_endpoint,private_address)
+ nat_changed=nat_configured!=new_endpoint
+ print(json.dumps({'privateInterfaceVerified':True,'privateAddressMissingFromNatClassification':nat_changed}),flush=True)
+ new_endpoint=nat_configured
  if repair_tls:new_endpoint=tls_endpoint(new_endpoint)
  gid=run(['docker','exec','pbx_asterisk_1','id','-g','asterisk']).strip()
  if not gid.isdigit():raise ValueError('PBX_GROUP_UNVERIFIED')
@@ -293,7 +325,7 @@ def apply():
   import os
   for p in files:os.chmod(p,0o640);os.chown(p,0,int(gid))
   cli('module reload res_pjsip.so');cli('dialplan reload')
-  if repair_tls and not trusted_sip_tls():
+  if (repair_tls and not trusted_sip_tls()) or nat_changed:
    # An existing transport without allow_reload needs one idle restart before
    # its trusted server certificate can take effect. Never restart active calls.
    if not idle_state(cli('core show channels count')):raise ValueError('PBX_CALL_STARTED_BEFORE_RESTART')
@@ -319,6 +351,8 @@ def apply():
    if re.search(r'\belevate-paris\b',cli('ari show apps')):break
    time.sleep(1)
   if not re.search(r'\belevate-paris\b',cli('ari show apps')):raise ValueError('PBX_PARIS_NOT_REGISTERED_AFTER_RELOAD')
+  live_transport=cli('pjsip show transport elevate-twilio-tls')
+  if not any(ipaddress.ip_address(private_address) in network for network in transport_networks(live_transport)):raise ValueError('PBX_PRIVATE_NAT_READBACK_FAILED')
   aor=cli('pjsip show aor twilio-aor')
   if 'sip:elevate-4632401404.pstn.twilio.com:5061;transport=tls' not in aor:raise ValueError('PBX_CARRIER_CONTACT_READBACK_FAILED')
   endpoint=cli('pjsip show endpoint twilio')
@@ -333,7 +367,7 @@ def apply():
   cli('module reload res_pjsip.so');cli('dialplan reload')
   if restarted and idle_state(cli('core show channels count')):run(['docker','restart','pbx_asterisk_1'])
   raise
- return {'pbxIngressVerified':True,'parisEntryConfigured':True,'carrierSourceIdentityConfigured':True,'sipTlsVerified':trusted_sip_tls(),'liveCallAcceptance':'NOT_TESTED'}
+ return {'pbxIngressVerified':True,'parisEntryConfigured':True,'carrierSourceIdentityConfigured':True,'sipTlsVerified':trusted_sip_tls(),'privateMediaNatVerified':True,'liveCallAcceptance':'NOT_TESTED'}
 def failure_evidence(error):
  # Never print command output, certificates, provider credentials, or arbitrary exceptions.
  reason=str(error)

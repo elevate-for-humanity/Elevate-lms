@@ -1,3 +1,4 @@
+import { ROUTES } from '@/lib/navigation/routes';
 import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
@@ -23,8 +24,9 @@ const sections = [
     icon: GraduationCap,
     links: [
       { label: 'Apply for Training', href: '/apply/student' },
-      { label: 'Check Funding Eligibility', href: '/check-eligibility' },
       { label: 'View All Programs', href: '/programs' },
+      { label: 'Registered Apprenticeships', href: '/apprenticeships' },
+      { label: 'Job Ready Indy', href: '/jri' },
       { label: 'Career Services', href: '/career-services' },
       { label: 'Student FAQ', href: '/faq' },
     ],
@@ -34,9 +36,8 @@ const sections = [
     icon: DollarSign,
     links: [
       { label: 'WIOA Funding', href: '/funding/wioa' },
-      { label: 'Workforce Ready Grant', href: '/funding/wioa' },
-      { label: 'Job-Ready Incentive', href: '/funding/jri' },
-      { label: 'DOL Registered Apprenticeship', href: '/funding/dol' },
+      { label: 'Workforce Ready Grant', href: '/funding/wrg' },
+      { label: 'Check Funding Eligibility', href: '/check-eligibility' },
       {
         label: 'Indiana Career Connect',
         href: 'https://www.indianacareerconnect.com',
@@ -48,8 +49,7 @@ const sections = [
     title: 'Employer Resources',
     icon: Briefcase,
     links: [
-      { label: 'Employer Portal', href: '/employer/dashboard' },
-      { label: 'Post a Job', href: '/employer/post-job' },
+      { label: 'Employer Portal & Job Posting', href: ROUTES.employerPortal },
       { label: 'Apprenticeship Partnerships', href: '/partners/host-shops' },
       {
         label: 'WOTC Tax Credits Info',
@@ -73,8 +73,8 @@ const sections = [
     title: 'Legal & Compliance',
     icon: Shield,
     links: [
-      { label: 'Privacy Policy', href: '/legal/privacy' },
-      { label: 'Terms of Service', href: '/legal' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms-of-service' },
       { label: 'Accessibility Statement', href: '/accessibility' },
       { label: 'Disclosures', href: '/legal/disclosures' },
       { label: 'FERPA Policy', href: '/ferpa' },

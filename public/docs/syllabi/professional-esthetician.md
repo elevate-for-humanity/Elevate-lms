@@ -1,128 +1,54 @@
-# Professional Esthetician & Client Services
-
-## Program Syllabus
+# Esthetician Apprenticeship Theory and Practice Syllabus
 
 **Provider:** Elevate for Humanity  
-**ETPL Provider ID:** 10000949  
-**Program Code:** ESTH-PROF  
-**Duration:** 5 Weeks (60 Hours)  
-**Delivery Method:** Hybrid (Theory + Hands-On Lab)  
-**Funding:** WIOA • WRG • Apprenticeship
+**Occupation:** Esthetician — RAPIDS 2089CB  
+**Sponsor registration represented in the program registry:** 2025-IN-132301  
+**Registered-standard revision represented in the program registry:** July 10, 2025  
+**Completion model:** Competency based — 20 verified occupational competencies  
+**Required related instruction:** 300 hours  
+**Apprentice-to-mentor ratio:** 1:1  
+**Probationary period:** 500 hours; probation is not program completion.
 
----
+The signed approved Appendix A and the apprentice's training agreement govern. This apprenticeship is not completed through a five-week, 60-hour introductory course.
 
-## Program Overview
+## Related instruction subjects
 
-DOL Federally Registered Apprenticeship! Master skincare, facial treatments, hair removal, and client services. Earn OSHA 10, Customer Service, and Business of Retail certifications. Hands-on training in professional spa setting with career readiness and business startup support.
+- Esthetics history and professional ethics
+- Anatomy, physiology, and skin disorders
+- Skin types, conditions, and product selection
+- Facial techniques and equipment usage
+- Methods and safety
+- Makeup fundamentals
+- State laws and licensing requirements
+- Retailing, client care, and business practices
+- State licensing examination preparation
 
----
+The complete RTI plan must account for 300 verified instructional hours. Follow the assigned esthetics theory lessons and workbook alongside supervised practical instruction. An introductory certificate or unlinked workbook does not substitute for the complete RTI plan.
 
-## Learning Objectives
+## Occupational competency areas
 
-1. Perform professional facial treatments and skincare services
-2. Apply hair removal techniques (waxing, threading)
-3. Provide client consultations and skin analysis
-4. Maintain sanitation and safety standards
-5. Retail product sales and recommendations
-6. Manage spa operations and client scheduling
-7. Build and maintain client relationships
+The registered work-process schedule contains 20 individual competencies covering work-area and equipment processing; cleansing and product application; permitted extractions, facial treatments, and hair removal; skin observation and product selection; client education and medical referral; makeup instruction; demonstrations and hygiene education; professional development; permitted massage; client records; retailing; and permitted lash/brow services.
 
----
+The individual registered competency entries govern verification. A topic appearing in the work-process schedule does not authorize a procedure beyond the applicable state scope, product directions, or supervisor's authority. Practical services require qualified supervision and appropriate training conditions.
 
-## Course Outline
+## Completion evidence
 
-### Week 1: Esthetics Foundations & Safety (12 hours)
+- All 20 individual registered competencies verified by authorized personnel.
+- 300 documented RTI hours satisfying the governing standard.
+- Signed agreements, qualified supervision, and host-site records.
+- Required assessments and observed practical performance.
+- Applicable employer wage-progression evidence.
 
-- Skin anatomy and physiology
-- Skin types and conditions
-- Sanitation and infection control
-- OSHA 10 safety training
-- Professional ethics and conduct
+Wages follow the applicable registered employer wage schedule and governing requirements. Additional certificates are documented separately when actually earned.
 
-### Week 2: Facial Treatments (12 hours)
+## Instruction, assessment, and records
 
-- Facial massage techniques
-- Product application and removal
-- Steam and extraction procedures
-- Mask application
-- Client consultation and skin analysis
+Follow the assigned LMS lesson sequence and workbook. Complete each lesson's knowledge checks at the passing score shown in the LMS. Practice the corresponding skill under qualified supervision and retain the instructor's feedback and practical evidence.
 
-### Week 3: Hair Removal & Advanced Services (12 hours)
+Record RTI, supervised on-the-job learning, and practical competency verification separately. Video length, a workbook answer, attendance, or a passed quiz alone does not establish all required RTI hours or practical mastery. Credit requires the applicable documented instruction and verification.
 
-- Waxing techniques (face and body)
-- Threading basics
-- Eyebrow shaping and tinting
-- Lash and brow services
-- Post-treatment care
+Use the signed training agreement and approved individual schedule for pacing, required materials, attendance, make-up work, and payment terms. Apprenticeship tuition is self-pay unless the exact program has a separately documented authorized payment source.
 
-### Week 4: Client Services & Retail (12 hours)
+Completion of Elevate instruction does not itself issue a state license. The licensing authority determines eligibility and any additional requirements. This syllabus does not establish Indiana secondary CTE course equivalency or funding approval.
 
-- Customer service excellence
-- Appointment scheduling and management
-- Product knowledge and sales
-- Handling difficult clients
-- Building client loyalty
-
-### Week 5: Business & Career Readiness (12 hours)
-
-- Spa operations and management
-- Pricing and profitability
-- Marketing your services
-- Booth rental vs. employment
-- Starting your own spa business
-- Resume and interview skills
-
----
-
-## Assessment Methods
-
-- Skills demonstrations (facial, waxing, client consultation)
-- OSHA 10 exam (70% passing)
-- Customer service scenarios
-- Final practical exam
-- Written exam (75% passing)
-
----
-
-## Certifications Earned
-
-1. **OSHA 10-Hour General Industry**
-2. **Customer Service Professional**
-3. **Business of Retail Certificate**
-
----
-
-## Career Outcomes
-
-- Esthetician (spa, salon, medical spa)
-- Skincare Specialist
-- Waxing Specialist
-- Spa Receptionist/Coordinator
-- Retail Beauty Advisor
-- Mobile Esthetician
-
-**Average Starting Wage:** $12-$18/hour (plus tips and commissions)
-
----
-
-## Program Completion Requirements
-
-- Complete all 60 hours
-- Pass all skills assessments
-- Pass written exam (75%)
-- Earn all certifications
-- Demonstrate professional conduct
-
----
-
-## Contact Information
-
-**Elevate for Humanity**  
-Website: www.elevateforhumanity.org  
-Phone: (317) 314-3757
-
----
-
-**Last Updated:** November 2024  
-**ETPL Approved:** Yes  
-**DOL Registered Apprenticeship:** Yes
+**Revision:** October 31, 2026 — reconciled to the existing registered-program records; signed source authority remains controlling.

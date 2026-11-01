@@ -1,5 +1,7 @@
 'use client';
 
+import InlineStoreDemo from './InlineStoreDemo';
+import { catalogDemo, catalogPoster } from '@/lib/store/catalog-demo';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Search, ArrowRight, ShieldCheck } from 'lucide-react';
@@ -55,6 +57,7 @@ export default function CommerceCatalogClient({ items }: { items: CommerceCatalo
               key={key}
               type="button"
               onClick={() => setCategory(key)}
+              aria-pressed={category === key}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                 category === key
                   ? 'bg-slate-900 text-white'
@@ -93,31 +96,48 @@ export default function CommerceCatalogClient({ items }: { items: CommerceCatalo
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((item) => (
-            <article key={item.id} className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article
+              key={item.id}
+              className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
               <div className="mb-4 flex items-start justify-between gap-3">
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-600">
                   {CATEGORY_LABELS[item.category]}
                 </span>
                 {item.status === 'preview' && (
-                  <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Preview</span>
+                  <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                    Preview
+                  </span>
                 )}
                 {item.status === 'enterprise' && (
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">Enterprise</span>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">
+                    Enterprise
+                  </span>
                 )}
               </div>
 
+              <InlineStoreDemo
+                name={item.name}
+                href={catalogDemo(item)}
+                poster={catalogPoster(item)}
+              />
               <h2 className="text-xl font-bold text-slate-900">{item.name}</h2>
               <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{item.description}</p>
 
               <div className="mt-5 border-t border-slate-100 pt-4">
                 <div className="mb-3 text-sm font-bold text-slate-900">
-                  {item.priceLabel ?? (item.billingType === 'included' ? 'Included' : 'See details')}
+                  {item.priceLabel ??
+                    (item.billingType === 'included' ? 'Included' : 'See details')}
                 </div>
                 <Link
                   href={item.href}
                   className="inline-flex items-center gap-2 font-bold text-brand-red-700 hover:underline"
                 >
-                  {item.status === 'sellable' ? 'View plans' : item.status === 'preview' ? 'Explore preview' : 'Explore options'}
+                  {item.status === 'sellable'
+                    ? 'View plans'
+                    : item.status === 'preview'
+                      ? 'Explore preview'
+                      : 'Explore options'}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link

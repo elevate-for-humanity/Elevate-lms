@@ -24,9 +24,9 @@ interface ProgramImageEntry {
 
 export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   'business-administration': {
-    card: '/images/pexels/business.webp',
-    hero: '/images/business-collaboration-vibrant-2026.webp',
-    alt: 'Business administration learners collaborating in a professional setting',
+    card: '/images/programs/refresh-20261101/business.webp',
+    hero: '/images/programs/refresh-20261101/business.webp',
+    alt: 'Illustrative business learner and instructor reviewing a cash-flow plan',
   },
   'financial-literacy': {
     card: `${P}/financial-aid-page-1.webp`,

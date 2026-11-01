@@ -1,3 +1,4 @@
+import HomeSectionNarration from '@/components/home/HomeSectionNarration';
 import Image from 'next/image';
 import Link from 'next/link';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -88,7 +89,7 @@ export function HvacLabHero() {
 }
 
 export default function HvacTrainingShowcase({ compact = false }: { compact?: boolean }) {
-  const Heading = compact ? 'h1' : 'h2';
+  const Heading = 'h2';
   const headingId = compact ? 'hvac-home-showcase' : 'hvac-training-gallery';
   const selectedScenes = compact ? scenes.slice(0, 3) : scenes;
   return (
@@ -117,12 +118,12 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
             </p>
           </div>
           {!compact && (
-          <Link
-            href={compact ? '/programs/hvac-technician' : applyHref}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-orange-500 px-6 py-3 text-center font-bold text-slate-950 hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300"
-          >
-            {compact ? 'Explore HVAC training' : 'Apply for HVAC training'}
-          </Link>
+            <Link
+              href={compact ? '/programs/hvac-technician' : applyHref}
+              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-orange-500 px-6 py-3 text-center font-bold text-slate-950 hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300"
+            >
+              {compact ? 'Explore HVAC training' : 'Apply for HVAC training'}
+            </Link>
           )}
         </div>
         <p className="mt-5 text-sm leading-6 text-slate-300">
@@ -153,12 +154,33 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
         </div>
         {compact && (
           <div className="mt-6 border-t border-blue-800 pt-6">
+            <HomeSectionNarration section="funding" />
             <div className="flex flex-wrap gap-3">
-              <Link href="/programs/hvac-technician" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-5 py-3 font-bold text-slate-950 hover:bg-orange-400">View HVAC program →</Link>
-              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-5 py-3 text-center font-bold text-slate-950 hover:bg-slate-100">Sign up to see if you qualify — WorkOne</a>
-              <Link href="/onboarding/learner/orientation" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white px-5 py-3 font-bold text-white hover:bg-blue-900">Complete your orientation</Link>
+              <Link
+                href="/programs/hvac-technician"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-5 py-3 font-bold text-slate-950 hover:bg-orange-400"
+              >
+                View HVAC program →
+              </Link>
+              <a
+                href={WORKONE_INDY_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-5 py-3 text-center font-bold text-slate-950 hover:bg-slate-100"
+              >
+                Sign up to see if you qualify — WorkOne
+              </a>
+              <Link
+                href="/onboarding/learner/orientation"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white px-5 py-3 font-bold text-white hover:bg-blue-900"
+              >
+                Complete your orientation
+              </Link>
             </div>
-            <p className="mt-3 text-sm leading-6 text-slate-300">WorkOne reviews funding eligibility; funding is not guaranteed. Start your orientation to get ready and connect with Elevate.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              WorkOne reviews funding eligibility; funding is not guaranteed. Start your orientation
+              to get ready and connect with Elevate.
+            </p>
           </div>
         )}
         {!compact && (

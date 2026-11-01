@@ -1,3 +1,4 @@
+import HomeSectionNarration from './HomeSectionNarration';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
@@ -8,8 +9,8 @@ const PATHWAYS = [
     title: 'Beauty & Barber Network',
     description:
       'Train in real professional environments and explore barber, cosmetology, esthetics, and nail pathways.',
-    image: '/images/pages/barber-hands-on-bright.webp',
-    imageAlt: 'Barber and beauty professional training in a working shop',
+    image: '/images/programs/refresh-20261101/beauty.webp',
+    imageAlt: 'Illustrative beauty instructor guiding supervised salon practice',
     ctaHref: '/apprenticeships',
     cta: 'Explore Beauty & Barber',
   },
@@ -27,9 +28,9 @@ const PATHWAYS = [
     slug: 'business',
     title: 'Business & Entrepreneurship',
     description: 'Learn how to organize, launch, market, operate, and grow a business.',
-    image: '/images/business-training-vibrant-2026.webp',
+    image: '/images/programs/refresh-20261101/business.webp',
     imageAlt: 'Illustrative business planning collaboration',
-    ctaHref: '/programs/business',
+    ctaHref: '/programs/business-administration',
     cta: 'View Business Program',
   },
 ] as const;
@@ -59,6 +60,7 @@ export function HomeCareerPathways() {
             programs; eligibility and authorization are determined individually.
           </p>
         </div>
+        <HomeSectionNarration section="pathways" />
         <div className="mt-6 grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
             <article

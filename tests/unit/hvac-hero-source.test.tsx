@@ -5,14 +5,20 @@ import HvacTrainingShowcase, { HvacLabHero } from '@/components/programs/HvacTra
 
 describe('server-rendered HVAC hero source', () => {
   it('connects the homepage feature to the program, official WorkOne signup and existing orientation', () => {
-    const root=document.createElement('div');
-    root.innerHTML=renderToStaticMarkup(<HvacTrainingShowcase compact />);
-    expect(root.querySelector('h1')).toHaveTextContent('HVAC');
-    expect(root.querySelector('a[href="/programs/hvac-technician"]')).toHaveTextContent('View HVAC program');
-    const workone=root.querySelector('a[href="https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838"]');
+    const root = document.createElement('div');
+    root.innerHTML = renderToStaticMarkup(<HvacTrainingShowcase compact />);
+    expect(root.querySelector('h2')).toHaveTextContent('HVAC');
+    expect(root.querySelector('a[href="/programs/hvac-technician"]')).toHaveTextContent(
+      'View HVAC program',
+    );
+    const workone = root.querySelector(
+      'a[href="https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838"]',
+    );
     expect(workone).toHaveTextContent('Sign up to see if you qualify');
-    expect(workone).toHaveAttribute('rel','noopener noreferrer');
-    expect(root.querySelector('a[href="/onboarding/learner/orientation"]')).toHaveTextContent('Complete your orientation');
+    expect(workone).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(root.querySelector('a[href="/onboarding/learner/orientation"]')).toHaveTextContent(
+      'Complete your orientation',
+    );
   });
   it('puts the original MP4 directly on the autoplay element and buffers the complete film', () => {
     const root = document.createElement('div');
@@ -24,7 +30,9 @@ describe('server-rendered HVAC hero source', () => {
     for (const attribute of ['autoplay', 'muted', 'loop', 'playsinline', 'controls']) {
       expect(video?.hasAttribute(attribute), attribute).toBe(true);
     }
-    expect(video?.getAttribute('poster')).toBe('/images/programs/hvac/elevate-20261029/lab-overview.webp');
+    expect(video?.getAttribute('poster')).toBe(
+      '/images/programs/hvac/elevate-20261029/lab-overview.webp',
+    );
     expect(video?.className).toContain('object-contain');
     expect(video?.className).not.toContain('object-cover');
   });

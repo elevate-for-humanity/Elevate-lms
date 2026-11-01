@@ -1,3 +1,4 @@
+import HomeSectionNarration from './HomeSectionNarration';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Phone } from 'lucide-react';
@@ -9,11 +10,11 @@ export function HomeFinalCTA() {
       <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-slate-950 text-white sm:grid sm:grid-cols-2">
         <div className="relative aspect-[16/9] sm:aspect-auto sm:min-h-80">
           <Image
-            src="/images/hero/hero-hands-on-training.webp"
-            alt="Hands-on career training at Elevate for Humanity"
+            src="/images/programs/refresh-20261101/home.webp"
+            alt="Illustrative adult learners collaborating in career training"
             fill
             sizes="(max-width: 640px) 100vw, 50vw"
-            className="object-contain"
+            className="object-cover"
           />
         </div>
         <div className="px-5 py-7 sm:px-8 sm:py-9">
@@ -26,6 +27,7 @@ export function HomeFinalCTA() {
           <p className="mt-3 max-w-xl text-base leading-6 text-slate-200">
             Apply for training or talk with our team about your next step.
           </p>
+          <HomeSectionNarration section="final" />
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href="/apply"

@@ -1,3 +1,4 @@
+import { ProgramIntroductionAudio } from '@/components/programs/NarratedProgramIntro';
 import Image from 'next/image';
 import { TUITION_CENTS } from '@/lib/barber/pricing';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
@@ -123,6 +124,7 @@ export default async function BarberApprenticeshipPage() {
               supervised host-shop training, digital progress records, and Indiana licensing
               preparation.
             </p>
+            <ProgramIntroductionAudio program={program} />
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href={program.cta.applyHref}

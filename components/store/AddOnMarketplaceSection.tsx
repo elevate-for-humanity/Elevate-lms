@@ -1,4 +1,5 @@
 'use client';
+import InlineStoreDemo from './InlineStoreDemo';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -21,11 +22,14 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center text-slate-900 mb-2">Subscription Add-Ons</h2>
         <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">
-          Monthly modules you can add to your base plan. Start with the capabilities your organization needs, then expand without creating another disconnected system.
+          Monthly modules you can add to your base plan. Start with the capabilities your
+          organization needs, then expand without creating another disconnected system.
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {PUBLIC_SUBSCRIPTION_ADDONS.map((addon) => {
-            const capability = CAPABILITY_CATALOG.find((item) => addon.features.includes(item.key) && item.status !== 'internal');
+            const capability = CAPABILITY_CATALOG.find(
+              (item) => addon.features.includes(item.key) && item.status !== 'internal',
+            );
             const selected = selectedSlugs.includes(addon.slug);
             return (
               <div
@@ -41,6 +45,14 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 mb-4">{addon.description}</p>
+                <InlineStoreDemo
+                  name={addon.name}
+                  href={
+                    capability
+                      ? `/store/demo/capability/${capability.key}`
+                      : `/store/demo/offer/${addon.slug}`
+                  }
+                />
                 {addon.usageNote && (
                   <p className="text-xs text-slate-500 mb-3">{addon.usageNote}</p>
                 )}
@@ -64,8 +76,18 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
                   <Plus className="w-4 h-4" />
                   {selected ? 'Included at checkout' : 'Add to checkout'}
                 </button>
-                {capability && <Link href={`/store/demo/capability/${capability.key}`} className="mt-3 min-h-11 rounded-lg border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-900">Watch {addon.name} walkthrough</Link>}
-                <Link href={`/store/proof#offer-${addon.slug}`} className="mt-3 text-center text-sm font-black text-emerald-800 underline underline-offset-4">
+                {capability && (
+                  <Link
+                    href={`/store/demo/capability/${capability.key}`}
+                    className="mt-3 min-h-11 rounded-lg border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-900"
+                  >
+                    Watch {addon.name} walkthrough
+                  </Link>
+                )}
+                <Link
+                  href={`/store/proof#offer-${addon.slug}`}
+                  className="mt-3 text-center text-sm font-black text-emerald-800 underline underline-offset-4"
+                >
                   Verify claims and source
                 </Link>
               </div>
@@ -74,9 +96,12 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
         </div>
 
         <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 text-center">
-          <h3 className="text-xl font-bold text-slate-900">Need a managed or custom implementation?</h3>
+          <h3 className="text-xl font-bold text-slate-900">
+            Need a managed or custom implementation?
+          </h3>
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Enterprise deployments, custom integrations and source-use licensing are scoped separately instead of being sold as unsupported lifetime add-ons.
+            Enterprise deployments, custom integrations and source-use licensing are scoped
+            separately instead of being sold as unsupported lifetime add-ons.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <Link

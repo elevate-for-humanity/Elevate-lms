@@ -19,13 +19,21 @@ describe('homepage curation', () => {
     root.innerHTML = renderToStaticMarkup(<HomeFeaturedHostShop />);
     const cards = [...root.querySelectorAll('[data-featured-shop]')];
     expect(cards.map((card) => card.getAttribute('data-featured-shop'))).toEqual([
-      'Cal’s Kutz Studio', 'Kountry Kutz Barbershop', 'Salon Saloon', 'Top Shelf Barber Lounge',
+      'Cal’s Kutz Studio',
+      'Kountry Kutz Barbershop',
+      'Salon Saloon',
+      'Top Shelf Barber Lounge',
     ]);
     expect(cards.map((card) => card.querySelector('a')?.getAttribute('href'))).toEqual([
-      '/host-shops/cals-kutz-studio', '/host-shops/kountry-kutz-barbershop', '/host-shops/salon-saloon', '/host-shops/top-shelf-barber-lounge',
+      '/host-shops/cals-kutz-studio',
+      '/host-shops/kountry-kutz-barbershop',
+      '/host-shops/salon-saloon',
+      '/host-shops/top-shelf-barber-lounge',
     ]);
-    expect(new Set(cards.map(card => card.getAttribute('data-featured-shop'))).size).toBe(4);
-    expect(new Set(cards.map(card => card.querySelector('img')?.getAttribute('src'))).size).toBe(4);
+    expect(new Set(cards.map((card) => card.getAttribute('data-featured-shop'))).size).toBe(4);
+    expect(new Set(cards.map((card) => card.querySelector('img')?.getAttribute('src'))).size).toBe(
+      4,
+    );
     for (const card of cards) {
       expect(card.querySelectorAll('img').length).toBe(1);
       expect(card.querySelector('img')?.getAttribute('alt')).toBeTruthy();
@@ -37,20 +45,29 @@ describe('homepage curation', () => {
   });
 
   it('keeps visual career sections and the program-specific funding notice', () => {
-    for (const file of ['components/home/HomeCareerPathways.tsx', 'components/home/HomeFinalCTA.tsx']) {
+    for (const file of [
+      'components/home/HomeCareerPathways.tsx',
+      'components/home/HomeFinalCTA.tsx',
+    ]) {
       expect(source(file)).toMatch(/<Image\b/);
     }
-    expect(source('components/home/HomeFinalCTA.tsx')).toContain('/images/hero/hero-hands-on-training.webp');
+    expect(source('components/home/HomeFinalCTA.tsx')).toContain(
+      '/images/programs/refresh-20261101/home.webp',
+    );
     const pathways = source('components/home/HomeCareerPathways.tsx');
-    for (const image of ['cdl-training-vibrant-2026.webp', 'business-training-vibrant-2026.webp']) {
+    for (const image of ['cdl-training-vibrant-2026.webp', 'refresh-20261101/business.webp']) {
       expect(pathways).toContain(image);
     }
     expect(pathways).not.toContain('/programs/bookkeeping');
     const page = source('apps/marketing/app/page.tsx');
-    expect(page.match(/<HomePlatformOverview/g)).toHaveLength(1);
-    expect(source('components/programs/HvacTrainingShowcase.tsx')).toContain('WORKONE_INDY_BOOKING_URL');
+    expect(page).not.toContain('<HomePlatformOverview />');
+    expect(source('components/programs/HvacTrainingShowcase.tsx')).toContain(
+      'WORKONE_INDY_BOOKING_URL',
+    );
     expect(pathways).not.toContain("slug: 'hvac-technician'");
-    expect(source('components/programs/HvacTrainingShowcase.tsx')).toContain('WorkOne reviews funding eligibility; funding is not guaranteed.');
+    expect(source('components/programs/HvacTrainingShowcase.tsx')).toContain(
+      'WorkOne reviews funding eligibility; funding is not guaranteed.',
+    );
   });
 
   it('keeps mobile overrides scoped away from operational dashboards', () => {
@@ -58,13 +75,19 @@ describe('homepage curation', () => {
     expect(css).toContain('#main-content.site-main main');
     expect(css).toContain("[data-mobile-grid='2']");
     expect(css).toContain('.responsive-details-panel[hidden]');
-    expect(source('components/site/MarketingChromeBoundary.tsx')).toContain("import '@/styles/marketing-mobile-density.css'");
+    expect(source('components/site/MarketingChromeBoundary.tsx')).toContain(
+      "import '@/styles/marketing-mobile-density.css'",
+    );
   });
 });
 
 describe('responsive details', () => {
   it('keeps the full content in server output for no-JavaScript browsing', () => {
-    const html = renderToStaticMarkup(<ResponsiveDetails title="Enrollment steps"><p>Complete enrollment information</p></ResponsiveDetails>);
+    const html = renderToStaticMarkup(
+      <ResponsiveDetails title="Enrollment steps">
+        <p>Complete enrollment information</p>
+      </ResponsiveDetails>,
+    );
     expect(html).toContain('Complete enrollment information');
     expect(html).not.toMatch(/\shidden[=\s>]/);
   });
@@ -72,26 +95,50 @@ describe('responsive details', () => {
   it('supports mobile disclosure, desktop expansion, resize, and cleanup', () => {
     let desktop = false;
     const listeners = new Set<() => void>();
-    vi.stubGlobal('matchMedia', vi.fn(() => ({
-      get matches() { return desktop; },
-      media: '(min-width: 768px)', onchange: null,
-      addEventListener: (_type: string, listener: () => void) => listeners.add(listener),
-      removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
-      addListener: () => {}, removeListener: () => {}, dispatchEvent: () => true,
-    })));
-    const view = render(<ResponsiveDetails title="Enrollment steps"><p>Complete enrollment information</p></ResponsiveDetails>);
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({
+        get matches() {
+          return desktop;
+        },
+        media: '(min-width: 768px)',
+        onchange: null,
+        addEventListener: (_type: string, listener: () => void) => listeners.add(listener),
+        removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => true,
+      })),
+    );
+    const view = render(
+      <ResponsiveDetails title="Enrollment steps">
+        <p>Complete enrollment information</p>
+      </ResponsiveDetails>,
+    );
     const summary = screen.getByText('Enrollment steps').closest('summary')!;
     const details = summary.parentElement as HTMLDetailsElement;
     const panel = screen.getByText('Complete enrollment information').parentElement!;
     expect(summary.getAttribute('aria-controls')).toBe(panel.id);
     expect(details.open).toBe(false);
-    act(() => { details.open = true; fireEvent(details, new Event('toggle')); });
+    act(() => {
+      details.open = true;
+      fireEvent(details, new Event('toggle'));
+    });
     expect(details.open).toBe(true);
-    act(() => { details.open = false; fireEvent(details, new Event('toggle')); });
+    act(() => {
+      details.open = false;
+      fireEvent(details, new Event('toggle'));
+    });
     expect(details.open).toBe(false);
-    act(() => { desktop = true; listeners.forEach((listener) => listener()); });
+    act(() => {
+      desktop = true;
+      listeners.forEach((listener) => listener());
+    });
     expect(details.open).toBe(true);
-    act(() => { desktop = false; listeners.forEach((listener) => listener()); });
+    act(() => {
+      desktop = false;
+      listeners.forEach((listener) => listener());
+    });
     expect(details.open).toBe(false);
     view.unmount();
     expect(listeners.size).toBe(0);

@@ -1,3 +1,4 @@
+import { HAIR_STYLIST_PROGRAM } from '@/lib/apprenticeship/hair-stylist-program';
 /**
  * Config for the 4 beauty/apprenticeship programs that share a common
  * enrollment flow: apply → orientation → documents → eligibility →
@@ -54,10 +55,10 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     shortTitle: 'Hair Stylist / Cosmetologist',
     color: 'purple',
     licenseTitle: 'Indiana Cosmetology License',
-    ojtHours: 2000,
-    rtiHours: 154,
-    progressModel: 'hybrid',
-    probationHours: 500,
+    ojtHours: HAIR_STYLIST_PROGRAM.minimumTermHours,
+    rtiHours: HAIR_STYLIST_PROGRAM.relatedInstructionHours,
+    progressModel: HAIR_STYLIST_PROGRAM.approach,
+    probationHours: HAIR_STYLIST_PROGRAM.probationaryHours,
     depositCents: 150000,
     fullTuitionCents: 600000,
     stripeDepositLink: 'https://buy.stripe.com/fZu00j2UUdnofsDcfDgIo0a',

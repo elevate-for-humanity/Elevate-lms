@@ -94,7 +94,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '50 Weeks • 125 Hours RTI',
-    image: '/images/pages/hvac-technician.webp',
+    image: '/images/hvac-training-vibrant-2026.webp',
     etplApproved: true,
   },
   {
@@ -166,7 +166,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '45 Days • 180 Hours',
-    image: '/images/pages/career-counseling.jpg',
+    image: '/images/pages/resume-building-hero.webp',
     etplApproved: true,
   },
   {
@@ -333,7 +333,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '10 Hours • 2 Days',
-    image: '/images/pages/hvac-technician.webp',
+    image: '/images/hvac-training-vibrant-2026.webp',
     etplApproved: true,
   },
   {
@@ -383,7 +383,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '6-8 Weeks • 160 Hours',
-    image: '/images/hero/hero-skilled-trades.webp',
+    image: '/images/refresh-20261014/trades.webp',
     etplApproved: true,
   },
   {
@@ -519,7 +519,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Employer Sponsored'],
     duration: '30 Hours • 1-2 Weeks',
-    image: '/images/pages/hvac-technician.webp',
+    image: '/images/hvac-training-vibrant-2026.webp',
     etplApproved: true,
     partnerName: 'CareerSafe',
     partnerUrl: 'https://careersafeonline.com',

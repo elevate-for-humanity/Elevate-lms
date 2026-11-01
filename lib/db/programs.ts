@@ -5,14 +5,7 @@
  * not fall back to static files. Callers must handle errors with notFound()
  * or an explicit error boundary.
  *
- * Table mapping (live DB slugs differ from canonical slugs in some cases):
- *   Canonical slug              → Live DB slug
- *   peer-recovery-specialist    → peer-recovery-specialist-jri
- *   cna                         → cna-cert
- *   cpr-first-aid               → cpr-cert
- *   business                    → business-startup
- *
- * All other canonical slugs match the DB directly.
+ * Program identifiers are normalized by the shared canonical slug resolver.
  *
  * Requires migration 20260503000005 (delivery_model, enrollment_type,
  * has_lms_course, program_funding table).
@@ -25,7 +18,6 @@ import type { DeliveryModel, FundingType, EnrollmentType } from '@/lib/programs/
 import { toDbSlug } from '@/lib/programs/slug';
 
 export {
-  CANONICAL_TO_DB_SLUG,
   toDbSlug,
   toCanonicalSlug,
   resolveCanonicalSlug,

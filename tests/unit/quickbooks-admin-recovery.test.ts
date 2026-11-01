@@ -84,6 +84,7 @@ describe('Admin QuickBooks recovery through the production client', () => {
     });
     expect(fetch).toHaveBeenCalledOnce();
     expect(state.upsert).not.toHaveBeenCalled();
+    expect(state.rpc).not.toHaveBeenCalled();
   });
   it('surfaces settings read failures without using stale deployment tokens', async () => {
     state.settingsError = { message: 'private database details' };

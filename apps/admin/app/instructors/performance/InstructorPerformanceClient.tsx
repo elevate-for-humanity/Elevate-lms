@@ -11,13 +11,14 @@ interface CoursePerf {
 
 export default function InstructorPerformanceClient() {
   const [courses, setCourses] = useState<CoursePerf[]>([]);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/instructor/course-performance')
-      .then(r => r.json())
+      .then(async r => { if (!r.ok) throw new Error('Unable to load program performance. Try again.'); return r.json(); })
       .then(d => setCourses(d.courses ?? []))
-      .catch((err) => console.error('[Performance] Failed to load courses:', err))
+      .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -28,7 +29,7 @@ export default function InstructorPerformanceClient() {
         <h2 className="font-semibold text-slate-800">Program Completion Rates</h2>
       </div>
 
-      {loading ? (
+      {error ? <p role="alert" className="text-sm text-red-700">{error}</p> : loading ? (
         <div className="flex items-center gap-2 text-slate-400 text-sm py-4">
           <Loader2 className="w-4 h-4 animate-spin" /> Loading…
         </div>

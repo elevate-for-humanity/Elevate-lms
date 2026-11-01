@@ -47,7 +47,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Administrative Control Panel',
       description:
         'Manage applications, review enrollments, oversee program compliance, and generate reports for state workforce agencies.',
-      imageSrc: '/images/pages/hvac-technician.webp',
+      imageSrc: '/images/hvac-training-vibrant-2026.webp',
       imageAlt: 'Administrator reviewing applications and compliance reports',
       actions: [
         {

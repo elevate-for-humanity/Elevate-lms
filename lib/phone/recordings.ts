@@ -126,44 +126,5 @@ export async function loadPhoneRecording(
       },
     });
   }
-  try {
-    return await loadCarrierRecording(location);
-  } catch (error) {
-    if (!context || !/^[0-9a-f-]{36}$/i.test(context.callId)) throw error;
-    const { data: events, error: lookupError } = await context.db
-      .from('phone_call_events')
-      .select('payload')
-      .eq('call_id', context.callId)
-      .eq('event_type', 'call.recording.saved')
-      .order('created_at', { ascending: false })
-      .limit(10);
-    if (lookupError) throw new Error('Recording lookup unavailable', { cause: error });
-    const event = (events || [])
-      .map((row: any) => row.payload)
-      .find((payload: any) =>
-        [
-          payload?.recording_urls?.mp3,
-          payload?.recording_urls?.wav,
-          payload?.public_recording_urls?.mp3,
-          payload?.public_recording_urls?.wav,
-        ].includes(location),
-      );
-    if (!event || !/^[0-9a-f-]{36}$/i.test(event.recording_id || ''))
-      throw new Error('Recording recovery reference unavailable', { cause: error });
-    const { telnyxClient } = await import('@/lib/phone/telnyx');
-    const result = await (await telnyxClient()).recordings.retrieve(event.recording_id);
-    const refreshed = refreshedRecordingUrl(event, result.data);
-    return loadCarrierRecording(refreshed);
-  }
-}
-export function refreshedRecordingUrl(event: any, recording: any): string {
-  if (
-    recording?.id !== event.recording_id ||
-    (event.call_session_id && recording.call_session_id !== event.call_session_id)
-  )
-    throw new Error('Recording identity mismatch');
-  const location = recording.download_urls?.mp3 || recording.download_urls?.wav;
-  if (typeof location !== 'string') throw new Error('Recording download unavailable');
-  carrierRecordingUrl(location);
-  return location;
+  return loadCarrierRecording(location);
 }

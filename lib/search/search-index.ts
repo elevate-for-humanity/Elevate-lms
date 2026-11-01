@@ -218,7 +218,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['wioa', 'compliance', 'pirl', 'workforce', 'reporting', 'tracking', 'dol'],
-    image: '/images/pages/career-counseling.jpg',
+    image: '/images/pages/resume-building-hero.webp',
     price: '$1,999',
   },
   {

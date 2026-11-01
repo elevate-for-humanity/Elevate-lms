@@ -28,7 +28,7 @@ import { uploadLessonMediaBuffer } from './upload-lesson-media';
 import { generateLessonScenes } from '@/server/video-generator/generateLessonScenes';
 import type { LessonRenderPlanDraft } from '@/server/video-generator/types';
 import { assertNarrationProviderConfigured } from './edge-tts';
-import { getCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
+import { getCourseBuilderGenerationControl } from '@/lib/ultimate-course-builder/core/generation-control';
 
 const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';

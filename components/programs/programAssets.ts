@@ -19,7 +19,7 @@ export type ProgramCategory =
  */
 export const CATEGORY_HEROES: Record<ProgramCategory, string> = {
   healthcare: '/images/pages/healthcare-hero.webp',
-  'skilled-trades': '/images/hero/hero-skilled-trades.webp',
+  'skilled-trades': '/images/refresh-20261014/trades.webp',
   technology: '/images/hero/hero-tech-careers.webp',
   business: '/images/hero/hero-business.webp',
   beauty: '/images/hero/hero-beauty-wellness.webp',
@@ -56,7 +56,7 @@ export const PROGRAM_HEROES: Record<string, string> = {
   plumbing: '/images/pages/about-hero.webp',
   welding: '/images/pages/about-hero.webp',
   'diesel-mechanic': '/images/cdl-hero.webp',
-  'skilled-trades': '/images/hero/hero-skilled-trades.webp',
+  'skilled-trades': '/images/refresh-20261014/trades.webp',
 
   // Transportation
   'cdl-training': '/images/cdl-hero.webp',

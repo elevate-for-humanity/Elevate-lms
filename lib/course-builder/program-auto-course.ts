@@ -1,7 +1,7 @@
 /**
  * Compatibility adapter for automatic program course creation.
  *
- * Course generation ownership lives in lib/course-factory. Keep this export only
+ * Course generation ownership lives in lib/ultimate-course-builder. Keep this export only
  * so existing enrollment/program provisioning callers do not break while their
  * imports are migrated. Do not add generation logic here.
  */
@@ -40,7 +40,7 @@ export async function autoGenerateCourseForProgram(args: {
 
   return {
     ok: true as const,
-    status: 'generated' as const,
+    status: 'queued' as const,
     courseId: result.courseId,
     moduleCount: result.moduleCount,
     lessonCount: result.lessonCount,

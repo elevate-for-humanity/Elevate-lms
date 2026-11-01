@@ -5,11 +5,11 @@
 
 export * from './types';
 export * from './content-generator';
-export * from './social-publisher';
+export * from '@/lib/social/publisher';
 export * from './video-creator';
 
 import { generateContent, getContentIdeas, optimizeForPlatform } from './content-generator';
-import { publishContent, publishToMultiplePlatforms, getScheduledPosts, bulkSchedule } from './social-publisher';
+import { publishContent, publishToMultiplePlatforms, getScheduledPosts, bulkSchedule } from '@/lib/social/publisher';
 import { generateVideoScript, adaptScriptForPlatform } from './video-creator';
 import type { GeneratedContent, SocialPlatform, VideoScript } from './types';
 

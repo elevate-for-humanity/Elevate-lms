@@ -47,7 +47,7 @@ export default function TutoringPage() {
       title: 'Skilled Trades',
       description:
         'Electrical theory, NEC code review, welding technique coaching, HVAC system troubleshooting, plumbing calculations, and blueprint reading.',
-      image: '/images/pages/hvac-technician.webp',
+      image: '/images/hvac-training-vibrant-2026.webp',
     },
     {
       title: 'Technology & IT',
@@ -174,7 +174,7 @@ export default function TutoringPage() {
                 step: '4',
                 title: 'Meet & Learn',
                 desc: 'Join your session via Zoom or at the training center. Get focused help on exactly what you need.',
-                image: '/images/pages/career-counseling.jpg',
+                image: '/images/pages/resume-building-hero.webp',
               },
             ].map((item, index) => (
               <motion.div

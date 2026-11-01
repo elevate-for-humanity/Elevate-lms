@@ -17,13 +17,16 @@ describe('Course Builder operator preview contract', () => {
     expect(courseLayout).toContain('showLearnerNotices={!isAdminCoursePreview}');
   });
 
-  it('bypasses paid-generation authorization for platform operators', () => {
+  it('uses the authenticated production boundary for platform operator generation', () => {
     const route = read('apps/admin/app/api/admin/course-builder/route.ts');
 
-    expect(route).toContain('const paidAuthorization = creditOwner.operator');
-    expect(route).toContain('const result = creditOwner.operator');
-    expect(route).toContain('? await runFactory()');
-    expect(route).toContain('dispatch: runFactory');
+    expect(route).toContain('const auth = await apiRequireAdmin(req)');
+    expect(route).toContain('assertCourseBuilderGenerationEnabled(db, body.courseId)');
+    expect(route).toContain('requestCanonicalGeneration(db,');
+    expect(route).not.toContain('runFactory(');
+    const starter = read('lib/ultimate-course-builder/core/start-course.ts');
+    expect(starter).toContain('assertCourseBuilderGenerationEnabled(db, body.courseId)');
+    expect(starter).toContain('requestedBy: actorId');
   });
 
   it('routes canonical programs through the Ultimate profile authority', () => {

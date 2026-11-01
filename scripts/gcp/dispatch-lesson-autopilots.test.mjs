@@ -152,12 +152,16 @@ test('a failed claimed lesson does not prevent launching and verifying other les
  assert.equal(result.assignments.length,3);assert.equal(result.assignments.filter(a=>a.state==='running').length,2);
 });
 
-test('explicit concurrency configuration cannot reduce active lesson coverage',async()=>{
+test('configured concurrency admits bounded work and reports the remaining coverage',async()=>{
  const s=fixture(Array.from({length:7},(_,i)=>waiting('instruction','lesson-'+i)));
  s.options.env.COURSE_AUTOPILOT_INSTRUCTION_CONCURRENCY='6';
- await assert.rejects(dispatchLessonAutopilots(s.options),/ACTIVE_WORKER_CONTRACT_VIOLATION/);
- s.options.env.COURSE_AUTOPILOT_INSTRUCTION_CONCURRENCY='8';
- assert.equal((await dispatchLessonAutopilots(s.options)).assignments.length,7);
+ const partial=await dispatchLessonAutopilots(s.options);
+ assert.equal(partial.status,'busy');assert.equal(partial.reason,'active_worker_coverage_pending');
+ assert.equal(partial.assignments.length,6);assert.equal(launches(s).length,6);
+ assert.equal(partial.runnableJobs,7);assert.equal(partial.coveredJobs,6);assert.equal(partial.uncoveredJobs,1);
+ const full=fixture(Array.from({length:7},(_,i)=>waiting('instruction','lesson-'+i)));
+ full.options.env.COURSE_AUTOPILOT_INSTRUCTION_CONCURRENCY='8';
+ assert.equal((await dispatchLessonAutopilots(full.options)).assignments.length,7);
  const invalid=fixture([waiting('media')]);invalid.options.env.COURSE_AUTOPILOT_MEDIA_CONCURRENCY='-1';
  await assert.rejects(dispatchLessonAutopilots(invalid.options),/CONCURRENCY_INVALID/);
 });
@@ -182,12 +186,14 @@ test('capacity and immutable-image checks remain mandatory for every worker',asy
  assert.deepEqual(result.assignments.map(a=>a.jobId),['ready']);
  });
 
-test('slow startup returns immediately and rechecks never launch duplicate workers',async()=>{
+test('slow startup uses bounded claim polling and rechecks never launch duplicate workers',async()=>{
  const s=fixture([waiting('media')]);s.controls.noClaim=true;
  delete s.options.assignmentAttempts;
- s.options.delay=async()=>{throw Error('startup must not hold the coordinator for five minutes');};
+ const waits=[];
+ s.options.delay=async(ms)=>{waits.push(ms);};
  const first=await dispatchLessonAutopilots(s.options);
  assert.equal(first.reason,'awaiting_worker_assignment');assert.equal(first.assignments.length,0);
+ assert.deepEqual(waits,[5000,5000]);
  const next=await dispatchLessonAutopilots(s.options);
  assert.equal(next.status,'busy');assert.equal(launches(s).length,1);
 });

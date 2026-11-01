@@ -17,7 +17,7 @@ const PROGRAMS = [
   },
   {
     title: 'CDL Class A',
-    image: '/images/pages/hvac-technician.webp',
+    image: '/images/hvac-training-vibrant-2026.webp',
     duration: '8 weeks',
     salary: '$55K–$72K',
     placement: '88%',

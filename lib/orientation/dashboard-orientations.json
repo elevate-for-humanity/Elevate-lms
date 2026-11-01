@@ -73,7 +73,7 @@
         "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
         "href": "/lms/support",
         "action": "Contact learner support",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/pages/resume-building-hero.webp"
       },
       {
         "title": "Finish training and prepare for work",
@@ -268,7 +268,7 @@
         "narration": "Use your dashboard messages or support workspace for training questions. Explain your program, page or lesson, what you selected, and the error you saw. A screenshot can help, but hide passwords, payment details, and private identity numbers. Check Sent after sending a message and Inbox for replies. PARIS can help explain navigation; staff must resolve approvals, account access, and record corrections. Ask for accessibility support or an alternative format when you need it.",
         "href": "/lms/support",
         "action": "Contact learner support",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/pages/resume-building-hero.webp"
       },
       {
         "title": "Finish training and prepare for work",
@@ -601,7 +601,7 @@
         "narration": "Your Program Holder dashboard connects applicants, students, training, records, communication, and payment readiness. Confirm your organization, assigned programs, and contact details. Review the next required action and any at-risk learners before starting new work. Applicants are not the same as enrolled students. Open the appropriate record, check its status, and identify who owns the next action. Report an incorrect program, learner, mailbox, or organization before accessing or changing records.",
         "href": "/program-holder/dashboard",
         "action": "Open my dashboard",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/pages/resume-building-hero.webp"
       },
       {
         "title": "Contact applicants and document outcomes",
@@ -673,7 +673,7 @@
         "narration": "Check your assigned phone connection, Inbox, calendar, and required actions each working day. Use the correct From address and extension when contacting applicants or learners. Keep program communication in the official workspace so the record stays connected. For a meeting, confirm the appointment and join link and test your chosen microphone or camera before it starts. PARIS can help explain a page or prepare a draft; review facts and recipients before sending or submitting anything.",
         "href": "/program-holder/how-to-use",
         "action": "Open the detailed office guide",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/pages/resume-building-hero.webp"
       },
       {
         "title": "Check student dates against the source record",
@@ -748,7 +748,7 @@
         "image": "/images/pages/community-page-2.webp"
       }
     ],
-    "hero": "/images/pages/career-counseling.jpg"
+    "hero": "/images/pages/resume-building-hero.webp"
   },
   "site-coordinator": {
     "title": "Bring your regional training team together",
@@ -764,7 +764,7 @@
         "narration": "Your Site Coordinator dashboard connects regional intake, Program Holders, host sites, active learners, reporting, and follow-up. Confirm the regional assignment and responsibilities in your own signed agreement. Use only the organizations, programs, and records assigned to you. A coordinator organizes and documents the next step; the role does not automatically authorize every funding, eligibility, access, or credential decision. Route those decisions to the responsible authorized staff and record the outcome.",
         "href": "/program-holder/dashboard",
         "action": "Open regional workspace",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/pages/resume-building-hero.webp"
       },
       {
         "title": "Move regional applicants to a clear next step",
@@ -836,7 +836,7 @@
         "narration": "Check your assigned phone connection, Inbox, calendar, and required actions each working day. Use the correct From address and extension when contacting applicants or learners. Keep program communication in the official workspace so the record stays connected. For a meeting, confirm the appointment and join link and test your chosen microphone or camera before it starts. PARIS can help explain a page or prepare a draft; review facts and recipients before sending or submitting anything.",
         "href": "/program-holder/how-to-use",
         "action": "Open the detailed office guide",
-        "image": "/images/pages/career-counseling.jpg"
+        "image": "/images/pages/resume-building-hero.webp"
       },
       {
         "title": "Check student dates against the source record",
@@ -911,7 +911,7 @@
         "image": "/images/pages/community-page-2.webp"
       }
     ],
-    "hero": "/images/pages/career-counseling.jpg"
+    "hero": "/images/pages/resume-building-hero.webp"
   },
   "cosmetology-apprentice": {
     "title": "Your cosmetology dashboard, step by step",

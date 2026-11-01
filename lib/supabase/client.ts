@@ -3,8 +3,7 @@ import { logger } from '@/lib/logger';
  * Supabase Browser Client
  * For use in Client Components only
  *
- * Returns a chainable failure proxy when env vars are missing so that
- * callers never crash on `.from()` / `.auth` etc.
+ * Requires real configuration; connection failures must never look like empty data.
  */
 
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
@@ -12,93 +11,6 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 import { getBrowserAuthFetch } from '@/lib/supabase/browser-auth-fetch';
 
-// Chainable failure response: missing configuration must never acknowledge a write.
-// Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
-const SUPABASE_NOT_CONFIGURED = { message: 'Supabase not configured', code: 'SUPABASE_NOT_CONFIGURED' };
-const EMPTY_RESPONSE = { data: null, error: SUPABASE_NOT_CONFIGURED, count: null, status: 503, statusText: 'Service Unavailable' };
-
-function noOpChain(): any {
-  const chain: any = new Proxy(() => chain, {
-    get(_target, prop) {
-      if (prop === 'then' || prop === 'single' || prop === 'maybeSingle') {
-        if (prop === 'then') {
-          return (resolve: any) => resolve(EMPTY_RESPONSE);
-        }
-        return () => Promise.resolve(EMPTY_RESPONSE);
-      }
-      return () => chain;
-    },
-    apply() {
-      return chain;
-    },
-  });
-  return chain;
-}
-
-const noOpMfa = {
-  listFactors: () =>
-    Promise.resolve({ data: { all: [], totp: [], phone: [] }, error: null }),
-  getAuthenticatorAssuranceLevel: () =>
-    Promise.resolve({
-      data: { currentLevel: null, nextLevel: null, currentAuthenticationMethods: [] },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  enroll: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  challenge: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  verify: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  challengeAndVerify: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  unenroll: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-};
-
-const noOpAuth = {
-  getUser: () => Promise.resolve({ data: { user: null }, error: SUPABASE_NOT_CONFIGURED }),
-  getSession: () => Promise.resolve({ data: { session: null }, error: SUPABASE_NOT_CONFIGURED }),
-  signOut: () => Promise.resolve({ error: null }),
-  signInWithPassword: () =>
-    Promise.resolve({
-      data: { user: null, session: null },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  signInWithOAuth: () =>
-    Promise.resolve({
-      data: { url: null, provider: null },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  signUp: () =>
-    Promise.resolve({
-      data: { user: null, session: null },
-      error: SUPABASE_NOT_CONFIGURED,
-    }),
-  onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-  resetPasswordForEmail: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  updateUser: () => Promise.resolve({ data: { user: null }, error: SUPABASE_NOT_CONFIGURED }),
-  mfa: noOpMfa,
-};
-
-const noOpStorage = {
-  from: () => ({
-    upload: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-    download: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-    getPublicUrl: () => ({ data: { publicUrl: '' } }),
-    list: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-    remove: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
-  }),
-};
-
-const noOpClient = {
-  from: () => noOpChain(),
-  auth: noOpAuth,
-  storage: noOpStorage,
-  rpc: () => Promise.resolve(EMPTY_RESPONSE),
-  channel: () => ({
-    on: () => ({ subscribe: () => ({}) }),
-    subscribe: () => ({}),
-    unsubscribe: () => {},
-  }),
-  removeChannel: () => {},
-} as unknown as SupabaseClient<any>;
-
-let warnedOnce = false;
 // @supabase/ssr returns a cached browser client. Install listeners and wrappers
 // once per client, rather than stacking another auth layer on every render.
 const initializedBrowserClients = new WeakSet<SupabaseClient<any>>();
@@ -118,13 +30,7 @@ export function createBrowserClient(): SupabaseClient<any> {
     supabaseUrl.includes('placeholder');
 
   if (misconfigured) {
-    if (!warnedOnce) {
-      logger.error(
-        '[Supabase Browser] Auth is misconfigured (missing or placeholder NEXT_PUBLIC_SUPABASE_*). Login and client actions will not work.',
-      );
-      warnedOnce = true;
-    }
-    return noOpClient;
+    throw new Error('SUPABASE_CONFIGURATION_MISSING: Database connection configuration is unavailable.');
   }
 
   try {
@@ -176,8 +82,9 @@ export function createBrowserClient(): SupabaseClient<any> {
 
     initializedBrowserClients.add(client);
     return client;
-  } catch {
-    return noOpClient;
+  } catch (error) {
+    logger.error('[Supabase Browser] Client initialization failed', error);
+    throw error;
   }
 }
 

@@ -80,10 +80,11 @@ describe('HVAC credential intelligence', () => {
     expect(source).not.toContain('15% for comfort cooling');
   });
 
-  it('versions lesson checkpoints with the governing blueprint', () => {
-    const factory = readFileSync('lib/course-factory/factory.ts', 'utf8');
-    const generator = readFileSync('lib/course-factory/content-generator.ts', 'utf8');
-    expect(factory).toContain('checkpointNamespace: `${enriched.id}:${enriched.version}`');
-    expect(generator).toContain('`${input.lesson.slug}@${input.checkpointNamespace}`');
+  it('versions lesson checkpoints with the governing production inputs', () => {
+    const contract = readFileSync('lib/ultimate-course-builder/core/lesson-contract.ts', 'utf8');
+    const starter = readFileSync('lib/ultimate-course-builder/core/start-course.ts', 'utf8');
+    expect(contract).toContain('stepInputHashes');
+    expect(contract).toContain('currentEvidence');
+    expect(starter).toContain('buildUltimateProfile');
   });
 });

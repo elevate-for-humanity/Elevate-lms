@@ -1,3 +1,4 @@
+import { resolveCanonicalSlug } from '@/lib/programs/slug';
 import type { SupabaseClient } from '@/lib/supabase';
 import { isWithdrawnProgram } from './withdrawn-programs.mjs';
 
@@ -10,8 +11,7 @@ export type ProgramEnrollmentState = 'open' | 'waitlist' | 'closed';
  * All API routes that accept intake (applications, waitlist, enroll) must
  * call this before processing any submission.
  *
- * Falls back to 'open' if the program is not found, to preserve backward
- * compatibility with programs that predate the state engine.
+ * Missing programs are closed; database failures propagate to the caller.
  */
 export async function getProgramEnrollmentState(
   supabase: SupabaseClient,
@@ -21,13 +21,11 @@ export async function getProgramEnrollmentState(
   const { data, error } = await supabase
     .from('programs')
     .select('enrollment_state')
-    .eq('slug', programSlug)
+    .eq('slug', resolveCanonicalSlug(programSlug))
     .maybeSingle();
 
-  if (error || !data) {
-    // Program not found or DB error — default to open for backward compat
-    return 'open';
-  }
+  if (error) throw error;
+  if (!data) return 'closed';
 
   const state = data.enrollment_state as string;
   if (state === 'waitlist' || state === 'closed') return state;
@@ -46,9 +44,10 @@ export async function isProgramWaitlistEnabled(
   const { data, error } = await supabase
     .from('programs')
     .select('enrollment_state, waitlist_enabled')
-    .eq('slug', programSlug)
+    .eq('slug', resolveCanonicalSlug(programSlug))
     .maybeSingle();
 
-  if (error || !data) return false;
+  if (error) throw error;
+  if (!data) return false;
   return data.enrollment_state === 'waitlist' && data.waitlist_enabled === true;
 }

@@ -5,18 +5,6 @@
  * DB slugs: live `programs.slug` when legacy rows differ (e.g. `cna-cert`).
  */
 
-/** Canonical URL/code slug → live `programs.slug` */
-export const CANONICAL_TO_DB_SLUG: Readonly<Record<string, string>> = {
-  'peer-recovery-specialist': 'peer-recovery-specialist-jri',
-  cna: 'cna-cert',
-  'cpr-first-aid': 'cpr-cert',
-  business: 'business-startup',
-};
-
-const DB_TO_CANONICAL: Record<string, string> = Object.fromEntries(
-  Object.entries(CANONICAL_TO_DB_SLUG).map(([canonical, db]) => [db, canonical]),
-);
-
 /** Free-text / legacy program_interest → canonical slug */
 export const SLUG_ALIASES: Readonly<Record<string, string>> = {
   'cna certification': 'cna',
@@ -56,33 +44,59 @@ export const SLUG_ALIASES: Readonly<Record<string, string>> = {
   'emergency health & safety tech': 'emergency-health-safety',
   'public safety reentry specialist': 'public-safety-reentry',
   'direct support professional': 'direct-support-professional',
+  'cna-cert': 'cna',
+  'cna-certification': 'cna',
+  'certified-nursing-assistant': 'cna',
+  'cpr-cert': 'cpr-first-aid',
+  'medical-assistant-program': 'medical-assistant',
+  'nha-phlebotomy': 'phlebotomy',
+  'emergency-health-safety-tech': 'emergency-health-safety',
+  'hvac-tech': 'hvac-technician',
+  'hvac-technician-wrg': 'hvac-technician',
+  'forklift-operator': 'forklift',
+  'cdl-transportation': 'cdl-training',
+  'building-maintenance': 'building-maintenance-wrg',
+  'building-maintenance-tech': 'building-maintenance-wrg',
+  'bookkeeping-fundamentals': 'bookkeeping',
+  'entrepreneurship-small-business': 'entrepreneurship',
+  'peer-recovery-specialist-jri': 'peer-recovery-specialist',
+  'peer-recovery': 'peer-recovery-specialist',
+  'peer-recovery-coach': 'peer-recovery-specialist',
+  'peer-support': 'peer-recovery-specialist',
+  'recovery-coach': 'peer-recovery-specialist',
+  esthetician: 'esthetician-apprenticeship',
+  esthetics: 'esthetician-apprenticeship',
+  'esthetics-apprenticeship': 'esthetician-apprenticeship',
+  'nail-tech': 'nail-technician-apprenticeship',
+  'nail-tech-apprenticeship': 'nail-technician-apprenticeship',
+  'nail-technician': 'nail-technician-apprenticeship',
+  nail: 'nail-technician-apprenticeship',
+  nails: 'nail-technician-apprenticeship',
+  manicurist: 'nail-technician-apprenticeship',
+  'manicurist-apprenticeship': 'nail-technician-apprenticeship',
 };
 
-export function toDbSlug(canonicalOrAliasSlug: string): string {
-  const normalized = canonicalOrAliasSlug.trim().toLowerCase();
-  const aliased = SLUG_ALIASES[normalized] ?? normalized;
-  return CANONICAL_TO_DB_SLUG[aliased] ?? aliased;
+function normalizeProgramInput(value: string): string {
+  return value.trim().toLowerCase().replace(/_/g, '-').replace(/\s+/g, ' ');
 }
 
-export function toCanonicalSlug(dbOrInputSlug: string): string {
-  const normalized = dbOrInputSlug.trim().toLowerCase();
-  return DB_TO_CANONICAL[normalized] ?? normalized;
-}
-
-/** Resolve user input to canonical slug (not DB slug). */
+/** All intake, host-shop, catalog and DB lookups use this exact resolver. */
 export function resolveCanonicalSlug(input: string): string {
-  const raw = input.trim().toLowerCase();
+  const raw = normalizeProgramInput(input);
   if (!raw) return raw;
-  if (SLUG_ALIASES[raw]) return SLUG_ALIASES[raw];
-  if (CANONICAL_TO_DB_SLUG[raw]) return raw;
-  const fromDb = DB_TO_CANONICAL[raw];
-  if (fromDb) return fromDb;
-  return raw;
+  return SLUG_ALIASES[raw] ?? SLUG_ALIASES[raw.replace(/ /g, '-')] ??
+    SLUG_ALIASES[raw.replace(/-/g, ' ')] ?? raw.replace(/ /g, '-');
 }
 
-/** Slugs to try when loading a program row (canonical first, then DB). */
-export function slugLookupVariants(canonicalOrInput: string): string[] {
-  const canonical = resolveCanonicalSlug(canonicalOrInput);
+export function toDbSlug(input: string): string {
+  const canonical = resolveCanonicalSlug(input);
+  return canonical;
+}
+
+export const toCanonicalSlug = resolveCanonicalSlug;
+
+export function slugLookupVariants(input: string): string[] {
+  const canonical = resolveCanonicalSlug(input);
   const db = toDbSlug(canonical);
   return canonical === db ? [canonical] : [canonical, db];
 }

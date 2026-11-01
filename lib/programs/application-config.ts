@@ -1,3 +1,4 @@
+import { resolveCanonicalSlug } from '@/lib/programs/slug';
 /**
  * Central application-routing contract.
  *
@@ -145,21 +146,8 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
   'cpr-first-aid': canonicalProgram('cpr-first-aid', 'CPR / First Aid', 'CPR / First Aid', 'red'),
 };
 
-const PROGRAM_SLUG_ALIASES: Readonly<Record<string, string>> = {
-  esthetician: 'esthetician-apprenticeship',
-  'nail-technician': 'nail-technician-apprenticeship',
-  cosmetology: 'cosmetology-apprenticeship',
-  barber: 'barber-apprenticeship',
-};
-
 function normalizeProgramSlug(value: string): string {
-  const slug = decodeURIComponent(value)
-    .trim()
-    .toLowerCase()
-    .replace(/_/g, '-')
-    .replace(/\s+/g, '-');
-
-  return PROGRAM_SLUG_ALIASES[slug] ?? slug;
+  return resolveCanonicalSlug(decodeURIComponent(value));
 }
 
 export function getProgramApplicationConfig(

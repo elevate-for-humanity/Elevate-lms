@@ -35,7 +35,6 @@ import { CDL_TRAINING } from './cdl-training';
 import { MEDICAL_ASSISTANT } from './medical-assistant';
 import { COSMETOLOGY } from './cosmetology-apprenticeship';
 import { CNA } from './cna';
-import { ESTHETICIAN } from './esthetician';
 import { ESTHETICIAN_APPRENTICESHIP } from './esthetician-apprenticeship';
 import { NAIL_TECH } from './nail-technician-apprenticeship';
 import { CULINARY } from './culinary-apprenticeship';
@@ -55,7 +54,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   MEDICAL_ASSISTANT,
   COSMETOLOGY,
   CNA,
-  ESTHETICIAN,
   ESTHETICIAN_APPRENTICESHIP,
   NAIL_TECH,
   CULINARY,

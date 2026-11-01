@@ -16,7 +16,7 @@ const mustExist = [
   'lib/course-builder/edit-service.ts',
   'lib/course-builder/persisted-publish-service.ts',
   'lib/course-factory/index.ts',
-  'lib/course-factory/factory.ts',
+  'lib/ultimate-course-builder/core/generation-request.ts',
   'lib/course-factory/procurement-gate.ts',
   'lib/course-factory/post-generation-governance.ts',
   'lib/course-factory/experience-contract.ts',
@@ -58,16 +58,16 @@ if (failures.length === 0) {
   const rootRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
   for (const invariant of [
     "from '@/lib/course-builder/orchestrator'",
-    "from '@/lib/course-builder/persisted-publish-service'",
+    "from '@/lib/ultimate-course-builder/release/release-course'",
     "action === 'publish'",
     "action === 'publish-persisted'",
-    "action === 'repair'",
+    "'repair'",
     "action === 'audit'",
-    'moduleCount must be between 1 and 40',
+    'requestCanonicalGeneration',
   ]) if (!rootRoute.includes(invariant)) fail(`canonical Course Builder root missing invariant: ${invariant}`);
 
   const orchestrator = read('lib/course-builder/orchestrator.ts');
-  for (const invariant of ['auditCourseTemplate', 'runGovernmentProcurementGate', 'publishGovernedCourse', "from '../course-factory/factory'"]) {
+  for (const invariant of ['auditCourseTemplate', 'runGovernmentProcurementGate', 'publishGovernedCourse', 'requestCanonicalGeneration']) {
     if (!orchestrator.includes(invariant)) fail(`Course Builder orchestrator missing: ${invariant}`);
   }
 

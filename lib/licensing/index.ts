@@ -3,7 +3,7 @@
  *
  * This is the canonical source for all license-related operations.
  * Use this module instead of:
- * - lib/licenseGuard.ts (deprecated)
+ * - the canonical licensing service
  * - lib/license-guard.ts (deprecated)
  * - lib/license.ts (EFH domain license only)
  *
@@ -319,7 +319,7 @@ const LEGACY_PLAN_LIMITS: Record<LegacyPlan, { max_employers: number; max_appren
 
 /**
  * Upsert a tenant_licenses row.
- * Migrated from lib/licenseGuard.ts (deprecated).
+ * Canonical tenant licensing implementation.
  */
 export async function updateTenantLicense(
   tenantId: string,

@@ -9,7 +9,7 @@ import {
 } from '@/lib/jobs/handlers/course-build';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
-import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
+import { isCourseBuilderGenerationPaused } from '@/lib/ultimate-course-builder/core/generation-control';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

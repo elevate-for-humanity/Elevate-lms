@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { hasGovernedBlueprintLessonFallback } from '@/lib/course-factory/factory';
+import { hasGovernedBlueprintLessonFallback } from '@/lib/curriculum/experience-repair';
 
 describe('registered blueprint enrichment fallback', () => {
   it('rejects legacy HTML that lacks the complete governed experience contract', () => {

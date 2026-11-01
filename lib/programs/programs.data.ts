@@ -581,8 +581,8 @@ export const PROGRAMS: Program[] = [
     tagline: 'Hands-on HVAC training for real residential/light commercial work.',
     shortDescription:
       'Hybrid program for heating, cooling, and refrigeration basics with industry-recognized training.',
-    cardImage: '/images/pages/hvac-technician.webp',
-    heroImage: '/images/pages/hvac-unit.webp',
+    cardImage: '/images/hvac-training-vibrant-2026.webp',
+    heroImage: '/images/programs/hvac/training-20261029/gauges.webp',
     duration: '12-16 weeks',
     cost: 'Funding may cover full cost',
     format: 'In-person',

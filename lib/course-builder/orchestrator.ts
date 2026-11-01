@@ -1,24 +1,21 @@
 /**
  * Canonical Course Builder server orchestration.
  *
- * Application traffic must cross this layer before the private Course Factory
- * execution engine. Studio controls this layer; LMS only consumes published
+ * Application generation delegates to the Ultimate execution engine. Studio controls this layer; LMS only consumes published
  * courses and learner state.
  */
 import { z } from 'zod';
-import { courseFactory as executeCourseFactory } from '../course-factory/factory';
+import { requestCanonicalGeneration } from '@/lib/ultimate-course-builder/core/generation-request';
+import { getCurrentUser } from '@/lib/auth';
 import type { FactoryInput, FactoryOutput, ProgressCallback } from '../course-factory/types';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
 import { queueCourseLessonVideos } from '../course-factory/media-service';
-import { loadBlueprintWithProgram } from '../course-factory/blueprint-loader';
-import { buildAuthoredCoursePackage } from '../course-factory/authored-content-compiler';
-import { upgradePersistedAuthoredCourse } from '../course-factory/persisted-authored-upgrade';
 import { runGovernmentProcurementGate } from '../course-factory/procurement-gate';
 import { auditCourseTemplate } from './audit';
 import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
-import { assertCourseBuilderGenerationEnabled } from './generation-control';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/ultimate-course-builder/core/generation-control';
 import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
 import { REQUIRED_COURSE_GATES, type CourseGate } from '../course-package/readiness';
 import { instructionalLessonSteps, assertInstructionalLessonPipeline, type InstructionalLessonStep } from './instructional-lesson-pipeline';
@@ -136,172 +133,17 @@ const courseProgramConfigSchema = z.object({
   status: z.enum(['draft', 'published']).default('draft'),
 });
 
-async function resolveRegisteredBlueprint(input: FactoryInput) {
-  if (input.blueprint) return input.blueprint;
-  if (!input.programId && !input.programSlug) return null;
-  const db = await requireAdminClient();
-  const loaded = await loadBlueprintWithProgram(db, {
-    programId: input.programId,
-    programSlug: input.programSlug,
-  });
-  return loaded?.blueprint ?? null;
-}
-
-async function verifyUpgradedMediaBoundToLessons(
-  input: FactoryInput,
-  result: FactoryOutput,
-): Promise<FactoryOutput> {
-  if (input.videoMode !== 'queue' || !result.courseId || input.dryRun) return result;
-  const db = await requireAdminClient();
-  const [{ data: lessons, error: lessonError }, { data: jobs, error: jobError }] =
-    await Promise.all([
-      db.from('course_lessons').select('id').eq('course_id', result.courseId),
-      db
-        .from('video_jobs')
-        .select('id,lesson_id,status')
-        .eq('course_id', result.courseId)
-        .eq('asset_kind', 'lesson'),
-    ]);
-  if (lessonError) throw lessonError;
-  if (jobError) throw jobError;
-  const lessonIds = new Set((lessons ?? []).map((lesson) => lesson.id));
-  const jobLessonIds = new Set((jobs ?? []).map((job) => job.lesson_id));
-  const missing = [...lessonIds].filter((lessonId) => !jobLessonIds.has(lessonId));
-  if (missing.length) {
-    return {
-      ...result,
-      ok: false,
-      errors: [
-        ...(result.errors ?? []),
-        `Atomic lesson/media contract failed: ${missing.length} lesson(s) have no canonical primary media job.`,
-      ],
-    };
-  }
-  return {
-    ...result,
-    videosQueued: (jobs ?? []).filter((job) =>
-      ['queued', 'rendering', 'complete'].includes(String(job.status)),
-    ).length,
-    lessonVideosQueued: (jobs ?? []).length,
-  };
-}
-
-/**
- * Public compatibility facade. Raw application callers no longer reach factory.ts directly.
- *
- * There are exactly three explicit content paths:
- * 1. `blueprint` compiles complete authored source already embedded in a blueprint.
- * 2. `curriculum_lessons` upgrades an identified persisted course from its
- *    authored curriculum records without replacing identity or learner state.
- * 3. `ai` generates a complete strict package and fails when inference or the
- *    content contract fails. Generic fallback lessons are never published.
- */
+/** Existing library callers share Ultimate production contracts and execution. */
 export async function courseFactory(
   input: FactoryInput,
   progress?: ProgressCallback,
 ): Promise<FactoryOutput> {
-  const controlDb = await requireAdminClient();
-  await assertCourseBuilderGenerationEnabled(controlDb, input.courseId);
-  if (input.contentSource === 'curriculum_lessons') {
-    if (!input.courseId) {
-      return {
-        ok: false,
-        errors: ['courseId is required for an authored persisted-curriculum upgrade'],
-        videosQueued: 0,
-      };
-    }
-    progress?.('resolve', 'Loading the identified persisted authored curriculum.', 10);
-    const beforeRepair = await evaluatePersistedCredentialCourse(input.courseId);
-    const failedLessonIds = [
-      ...new Set(
-        beforeRepair.findings
-          .filter((finding) =>
-            finding.gate !== 'identity' &&
-            AUTHORING_AUTOMATIC_GATES.has(finding.gate as CourseGate),
-          )
-          .map((finding) => finding.lessonId)
-          .filter((lessonId): lessonId is string => Boolean(lessonId)),
-      ),
-    ];
-    const upgraded =
-      failedLessonIds.length === 0
-        ? {
-            ok: true as const,
-            courseId: input.courseId,
-            courseSlug: input.programSlug,
-            moduleCount: undefined,
-            lessonCount: undefined,
-            repairedLessonCount: 0,
-          }
-        : await upgradePersistedAuthoredCourse(
-            input.courseId,
-            undefined,
-            { lessonIds: failedLessonIds },
-          );
-    // Blueprint selective repair is iterative: only lessons named by failed
-    // gates are recompiled. Passing lessons and learner state are preserved.
-    progress?.('validate', 'Validating repaired components against the Course Builder Blueprint.', 85);
-    const readiness = await evaluatePersistedCredentialCourse(upgraded.courseId);
-    const authoringBlockers = readiness.findings.filter((finding) => {
-      if (finding.gate === 'identity') return true;
-      return !POST_AUTHORING_GATES.has(finding.gate as CourseGate);
-    });
-    if (authoringBlockers.length > 0) {
-      return {
-        ok: false,
-        courseId: upgraded.courseId,
-        courseSlug: upgraded.courseSlug,
-        errors: authoringBlockers.map((finding) => `${finding.gate}: ${finding.message}`),
-        videosQueued: 0,
-        warnings: readiness.findings.map((finding) => `repair_required:${finding.gate}:${finding.message}`),
-      };
-    }
-    const result: FactoryOutput = {
-      ok: true,
-      courseId: upgraded.courseId,
-      courseSlug: upgraded.courseSlug,
-      moduleCount: upgraded.moduleCount,
-      lessonCount: upgraded.lessonCount,
-      assessmentsGenerated: 0,
-      videosQueued: 0,
-    };
-    const withMedia = await verifyUpgradedMediaBoundToLessons(input, result);
-    const remaining = await evaluatePersistedCredentialCourse(upgraded.courseId);
-    const remainingWarnings = remaining.findings.map(
-      (finding) => `repair_required:${finding.gate}:${finding.message}`,
-    );
-    progress?.(
-      remaining.pass ? 'complete' : 'media',
-      remaining.pass
-        ? 'Authored course upgrade completed against the full contract.'
-        : 'Authoring contract passed; media/review gates remain in the production pipeline.',
-      remaining.pass ? 100 : 95,
-    );
-    return {
-      ...withMedia,
-      completionState: remaining.pass ? 'ready_for_review' : 'media_pending',
-      warnings: [...(withMedia.warnings ?? []), ...remainingWarnings],
-    };
-  }
-
-  const registeredBlueprint = await resolveRegisteredBlueprint(input);
-  if (input.contentSource === 'blueprint') {
-    if (!registeredBlueprint) {
-      return { ok: false, errors: ['A complete authored blueprint is required'], videosQueued: 0 };
-    }
-    const courseTitle =
-      input.title || registeredBlueprint.title || registeredBlueprint.credentialTitle;
-    const authoredBlueprint = buildAuthoredCoursePackage(registeredBlueprint, courseTitle);
-    return executeCourseFactory(
-      { ...input, blueprint: authoredBlueprint, contentSource: 'blueprint' },
-      progress,
-    );
-  }
-
-  return executeCourseFactory(
-    registeredBlueprint ? { ...input, blueprint: registeredBlueprint, contentSource: 'ai' } : input,
-    progress,
-  );
+  const db = await requireAdminClient();
+  await assertCourseBuilderGenerationEnabled(db, input.courseId);
+  const actorId = input.requestedBy || (await getCurrentUser())?.id;
+  if (!actorId) throw new Error('AUTHENTICATED_GENERATION_ACTOR_REQUIRED');
+  progress?.('init', 'Starting the canonical checkpointed Course Builder.', 0);
+  return requestCanonicalGeneration(db, input, actorId);
 }
 
 export async function saveCourseProgramConfiguration(input: unknown) {
@@ -370,10 +212,7 @@ export async function publishGovernedCourse(
     progress,
   );
 
-  const governance =
-    result.ok && result.courseId
-      ? await normalizeGeneratedCourseForGovernance(result.courseId)
-      : null;
+  const governance = null;
 
   return { ...gate, ok: gate.ok && result.ok, result, governance };
 }
@@ -428,10 +267,7 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
     progress,
   );
 
-  const governance =
-    result.ok && result.courseId
-      ? await normalizeGeneratedCourseForGovernance(result.courseId)
-      : null;
+  const governance = null;
 
   const after = await validateCourseAgainstContract(courseId);
   return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug, contractValidation: { before, after } };

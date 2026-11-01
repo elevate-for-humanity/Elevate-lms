@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { isPausedSettingValue, parseCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
+import { isPausedSettingValue, parseCourseBuilderGenerationControl } from '@/lib/ultimate-course-builder/core/generation-control';
 
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), 'utf8');
@@ -61,7 +61,8 @@ describe('single Course Builder authority', () => {
     const boundaries = [
       'lib/course-builder/orchestrator.ts',
       'lib/course-factory/media-service.ts',
-      'lib/jobs/handlers/course-build.ts',
+      'lib/ultimate-course-builder/core/generation-request.ts',
+      'lib/ultimate-course-builder/core/start-course.ts',
       'apps/admin/app/api/admin/course-builder/route.ts',
       'apps/admin/app/api/cron/process-course-builder-jobs/route.ts',
       'apps/admin/app/api/internal/videos/process-queue/route.ts',

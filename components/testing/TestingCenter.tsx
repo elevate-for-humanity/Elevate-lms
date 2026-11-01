@@ -35,10 +35,10 @@ const PROVIDER_HERO_IMAGES: Record<string, string> = {
   nha: '/images/pages/medical-assistant.webp',
   certiport: '/images/pages/programs-it-hero.webp',
   workkeys: '/images/pages/career-services-page-4.webp',
-  esco: '/images/pages/hvac-technician.webp',
+  esco: '/images/hvac-training-vibrant-2026.webp',
   nrf: '/images/pages/apply-employer-hero.webp',
   careersafe: '/images/pages/apprenticeships-hero.webp',
-  ase: '/images/pages/hvac-technician.webp',
+  ase: '/images/hvac-training-vibrant-2026.webp',
 };
 
 // Provider data - prices pulled from centralized pricing engine
@@ -150,7 +150,7 @@ const PROVIDERS = [
     name: 'ASE',
     fullName: 'ASE Certification (NISE)',
     logo: '/images/partners/ase-label.svg',
-    heroImage: '/images/pages/hvac-technician.webp',
+    heroImage: '/images/hvac-training-vibrant-2026.webp',
     certifications: [
       { name: 'A1 - Engine Repair', career: 'Auto Technician', salary: '$35,000-$55,000/yr' },
       { name: 'A4 - Suspension & Steering', career: 'Auto Technician', salary: '$35,000-$55,000/yr' },

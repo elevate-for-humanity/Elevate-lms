@@ -7,9 +7,9 @@ import PathwayDisclosure from '@/components/PathwayDisclosure';
 import type { Program } from '@/lib/lms/types';
 
 const programImages: Record<string, string> = {
-  hvac: '/images/pages/hvac-unit.webp',
-  'hvac-tech': '/images/pages/hvac-unit.webp',
-  'hvac-technician-wrg': '/images/pages/hvac-unit.webp',
+  hvac: '/images/programs/hvac/training-20261029/gauges.webp',
+  'hvac-tech': '/images/programs/hvac/training-20261029/gauges.webp',
+  'hvac-technician-wrg': '/images/programs/hvac/training-20261029/gauges.webp',
   cdl: '/images/pages/cdl-truck-highway.webp',
   'cdl-training': '/images/pages/cdl-truck-highway.webp',
   'cdl-training-wrg': '/images/pages/cdl-truck-highway.webp',
@@ -17,12 +17,12 @@ const programImages: Record<string, string> = {
   'barber-apprenticeship-wrg': '/images/beauty/program-barber-training.jpg',
   'barber-apprentice': '/images/beauty/program-barber-training.jpg',
   barber: '/images/beauty/program-barber-training.jpg',
-  'solar-panel-installation': '/images/pages/hvac-unit.webp',
-  'forklift-operator': '/images/pages/hvac-unit.webp',
-  'manufacturing-technician': '/images/pages/hvac-unit.webp',
-  'automotive-technician': '/images/pages/hvac-unit.webp',
-  'building-maintenance-wrg': '/images/pages/hvac-unit.webp',
-  default: '/images/pages/hvac-unit.webp',
+  'solar-panel-installation': '/images/programs/hvac/training-20261029/gauges.webp',
+  'forklift-operator': '/images/programs/hvac/training-20261029/gauges.webp',
+  'manufacturing-technician': '/images/programs/hvac/training-20261029/gauges.webp',
+  'automotive-technician': '/images/programs/hvac/training-20261029/gauges.webp',
+  'building-maintenance-wrg': '/images/programs/hvac/training-20261029/gauges.webp',
+  default: '/images/programs/hvac/training-20261029/gauges.webp',
 };
 
 export default function SkilledTradesPageClient({ programs }: { programs: Program[] }) {

@@ -41,12 +41,13 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
     expect(unified).toContain('/api/admin/ultimate-course-builder');
     expect(unified).toContain("action: 'queue-course'");
-    expect(unified).toContain('Legacy Course Factory is archived');
+    expect(unified).toContain('All production builds use the same verified execution contract.');
     expect(unified).not.toContain('runCourseFactoryPipeline');
-    expect(ultimateRoute).toContain('UltimateJobQueue');
+    expect(ultimateRoute).toContain('startCanonicalCourse');
+    expect(source('lib/ultimate-course-builder/core/start-course.ts')).toContain('UltimateJobQueue');
     expect(ultimateRoute).toContain("body.action === 'queue-course'");
-    expect(legacyRoute).toContain('COURSE_FACTORY_ARCHIVED');
-    expect(legacyRoute).toContain('{ status: 410 }');
+    expect(legacyRoute).toContain('requestCanonicalGeneration');
+    expect(legacyRoute).not.toContain('courseFactory(');
   });
 
   it('provides shared voice control without bypassing course-generation confirmation', () => {

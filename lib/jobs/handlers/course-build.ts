@@ -1,10 +1,6 @@
-import { courseFactory } from '@/lib/course-factory';
-import { normalizeGeneratedCourseForGovernance } from '@/lib/course-factory/post-generation-governance';
-import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
-import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { FactoryInput, FactoryStage } from '@/lib/course-factory/types';
-import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
+import { requestCanonicalGeneration } from '@/lib/ultimate-course-builder/core/generation-request';
+import type { FactoryInput } from '@/lib/course-factory/types';
 
 export interface CourseBuildJob {
   id: string;
@@ -15,209 +11,20 @@ export interface CourseBuildJob {
   result?: Record<string, unknown> | null;
 }
 
-const productionStageMap: Partial<Record<FactoryStage, { worker: string; state: string }>> = {
-  init: { worker: 'orchestrator', state: 'requested' },
-  resolve: { worker: 'orchestrator', state: 'planning' },
-  blueprint: { worker: 'instructional_llm', state: 'planning' },
-  instructional_plan: { worker: 'instructional_llm', state: 'planning' },
-  technical_review: { worker: 'technical_verification', state: 'technical_review' },
-  storyboard: { worker: 'storyboard', state: 'storyboard_ready' },
-  enrich: { worker: 'instructional_llm', state: 'planning' },
-  assess: { worker: 'technical_verification', state: 'technical_review' },
-  validate: { worker: 'technical_verification', state: 'technical_review' },
-  generating_assets: { worker: 'licensed_media', state: 'generating_assets' },
-  generating_narration: { worker: 'narration', state: 'generating_narration' },
-  media: { worker: 'licensed_media_compositor', state: 'rendering' },
-  rendering: { worker: 'licensed_media_compositor', state: 'rendering' },
-  quality_review: { worker: 'quality_control', state: 'quality_review' },
-  human_review: { worker: 'publisher', state: 'human_review' },
-  publish: { worker: 'publisher', state: 'human_review' },
-  complete: { worker: 'quality_control', state: 'human_review' },
-};
-
-function resumableMediaCheckpoint(job: CourseBuildJob): string | null {
-  const checkpoint = job.result;
-  if (!checkpoint || checkpoint.ok !== true || typeof checkpoint.courseId !== 'string') return null;
-  const finalization = checkpoint.finalization;
-  if (!finalization || typeof finalization !== 'object') return null;
-  if ((finalization as { state?: unknown }).state !== 'media_pending') return null;
-  const requestedCourseId = job.tool_args.courseId;
-  return !requestedCourseId || requestedCourseId === checkpoint.courseId
-    ? checkpoint.courseId
-    : null;
-}
-
+/** The Studio job hands off once; Ultimate owns execution, retries, QA and release. */
 export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
+  if (!job.user_id) throw new Error('AUTHENTICATED_GENERATION_ACTOR_REQUIRED');
   const db = await requireAdminClient();
-  await assertCourseBuilderGenerationEnabled(db, job.tool_args.courseId);
-  const progressWrites: PromiseLike<unknown>[] = [];
-  const checkpointCourseId = resumableMediaCheckpoint(job);
-
-  const progress = (stage: FactoryStage, message: string, value = 0) => {
-    const production = productionStageMap[stage];
-    progressWrites.push(
-      db
-        .from('devstudio_jobs')
-        .update({
-          stage,
-          progress: Math.max(0, Math.min(99, Math.round(value))),
-          log_lines: [message],
-          locked_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', job.id)
-        .then(({ error }) => {
-          if (error)
-            logger.warn('[course-build] progress update failed', {
-              jobId: job.id,
-              error: error.message,
-            });
-        }),
-    );
-    if (production) {
-      progressWrites.push(
-        db
-          .rpc('record_course_production_stage', {
-            p_job_id: job.id,
-            p_course_id: job.tool_args.courseId ?? null,
-            p_worker_kind: production.worker,
-            p_run_state: production.state,
-            p_worker_status: 'running',
-            p_evidence: { message, progress: Math.max(0, Math.min(99, Math.round(value))) },
-            p_error: null,
-          })
-          .then(({ error }) => {
-            if (error)
-              logger.warn('[course-build] production-stage update failed', {
-                jobId: job.id,
-                stage,
-                error: error.message,
-              });
-          }),
-      );
-    }
-  };
-
-  // Long provider calls can be quiet for several minutes. Renew the lease on
-  // an independent cadence so healthy builds are not reclaimed mid-request.
-  const heartbeat = setInterval(() => {
-    progressWrites.push(
-      db
-        .from('devstudio_jobs')
-        .update({
-          locked_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', job.id)
-        .eq('status', 'running')
-        .then(({ error }) => {
-          if (error)
-            logger.warn('[course-build] heartbeat failed', {
-              jobId: job.id,
-              error: error.message,
-            });
-        }),
-    );
-  }, 60_000);
-
-  let result;
-  if (checkpointCourseId) {
-    clearInterval(heartbeat);
-    result = job.result as Record<string, unknown> & { ok: true; courseId: string };
-    const { error: resumeError } = await db
-      .from('courses')
-      .update({
-        generation_status: 'generating',
-        generation_progress: 95,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', checkpointCourseId);
-    if (resumeError) throw resumeError;
-    logger.info('[course-build] Resuming completed build at media finalization', {
-      jobId: job.id,
-      courseId: checkpointCourseId,
-    });
-  } else {
-    try {
-      // Course Builder is an authorized production workflow. Provider selection,
-      // metering, and quality controls belong to the individual generation/media
-      // components; the orchestrator itself must never stop on the legacy
-      // paid-inference approval gate.
-      result = await courseFactory(job.tool_args, progress);
-    } finally {
-      clearInterval(heartbeat);
-      await Promise.allSettled(progressWrites);
-    }
-  }
-  if (!result.ok || !result.courseId) {
-    throw new Error(
-      result.errors?.join('; ') ||
-        `Course Factory stopped with status ${result.status ?? 'unknown'}`,
-    );
-  }
-
-  const governance = checkpointCourseId
-    ? (result.governance ?? (await normalizeGeneratedCourseForGovernance(result.courseId)))
-    : await normalizeGeneratedCourseForGovernance(result.courseId);
-  const finalization = await finalizeUnifiedCourseBuildWithClient({
-    db,
-    courseId: result.courseId,
-  });
-  if (!finalization.ok) {
-    await db.rpc('record_course_production_stage', {
-      p_job_id: job.id,
-      p_course_id: result.courseId,
-      p_worker_kind: 'quality_control',
-      p_run_state: 'quality_review',
-      p_worker_status: 'blocked',
-      p_evidence: { media: finalization.media },
-      p_error: 'Required media or quality evidence is incomplete',
-    });
-    const now = new Date();
-    const retryAt = new Date(now.getTime() + 5 * 60_000);
-    const { error: pendingError } = await db
-      .from('devstudio_jobs')
-      .update({
-        status: 'queued',
-        stage: finalization.state,
-        progress: 99,
-        result: { ...result, governance, finalization },
-        error: null,
-        run_at: retryAt.toISOString(),
-        finished_at: null,
-        locked_at: null,
-        locked_by: null,
-        updated_at: now.toISOString(),
-      })
-      .eq('id', job.id);
-    if (pendingError) throw pendingError;
-    return;
-  }
-  const finishedAt = new Date().toISOString();
-  await db.rpc('record_course_production_stage', {
-    p_job_id: job.id,
-    p_course_id: result.courseId,
-    p_worker_kind: 'quality_control',
-    p_run_state: 'human_review',
-    p_worker_status: 'completed',
-    p_evidence: { media: finalization.media, governance },
-    p_error: null,
-  });
-  const { error } = await db
-    .from('devstudio_jobs')
-    .update({
-      status: 'completed',
-      stage: 'complete',
-      progress: 100,
-      result: { ...result, governance, finalization },
-      error: null,
-      finished_at: finishedAt,
-      locked_at: null,
-      locked_by: null,
-      updated_at: finishedAt,
-    })
-    .eq('id', job.id);
-  if (error) throw error;
+  const courseId = typeof job.result?.courseId === 'string' ? job.result.courseId : job.tool_args.courseId;
+  const result = await requestCanonicalGeneration(db, { ...job.tool_args, courseId }, job.user_id);
+  if (!result.ok) throw new Error(result.errors?.join('; ') || 'CANONICAL_GENERATION_NOT_STARTED');
+  const saved = await db.from('devstudio_jobs').update({
+    status: 'completed', stage: 'handed_off', progress: 0,
+    result: { ...result, completionState: 'media_pending' },
+    error: null, finished_at: new Date().toISOString(),
+    locked_at: null, locked_by: null, updated_at: new Date().toISOString(),
+  }).eq('id', job.id).select('id').single();
+  if (saved.error || !saved.data) throw saved.error ?? new Error('GENERATION_HANDOFF_NOT_RECORDED');
 }
 
 export async function failCourseBuild(job: CourseBuildJob, error: unknown): Promise<void> {

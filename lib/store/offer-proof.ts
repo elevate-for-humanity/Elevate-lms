@@ -269,7 +269,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     evidenceHref: '/store/course-builder',
     evidenceLabel: 'Review the AI course workflow',
     access: 'public-product',
-    sourcePaths: ['lib/course-factory/factory.ts', 'lib/course-factory/canonical-course-gate.ts'],
+    sourcePaths: ['lib/ultimate-course-builder/core/generation-request.ts', 'lib/course-factory/canonical-course-gate.ts'],
   },
   [PlatformFeature.STUDENT_MANAGEMENT]: {
     title: 'Student Management',

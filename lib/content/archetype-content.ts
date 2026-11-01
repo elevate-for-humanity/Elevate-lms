@@ -163,7 +163,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'My Dashboard',
       purpose: 'This page shows your current status and next required steps.',
-      image: '/images/pages/hvac-technician.webp',
+      image: '/images/hvac-training-vibrant-2026.webp',
       imageAlt: 'Student dashboard',
     },
     sections: {
@@ -408,7 +408,7 @@ export const authAccountContent: LocalizedContent = {
     hero: {
       title: 'Acceso a cuenta',
       purpose: 'Usa esta página para iniciar sesión, crear una cuenta o administrar tu perfil.',
-      image: '/images/pages/career-counseling.jpg',
+      image: '/images/pages/resume-building-hero.webp',
       imageAlt: 'Inicio de sesión',
     },
     sections: {},

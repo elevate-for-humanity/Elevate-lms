@@ -13,69 +13,19 @@ export function isSupabaseConfigured(): boolean {
   return getServerPublicSupabaseConfig() !== null;
 }
 
-// Supabase fetch with a hard timeout to prevent cold-start hangs on slow container starts.
-// Mock client that returns empty data - prevents crashes when Supabase isn't configured
-const mockQueryBuilder = {
-  select: () => mockQueryBuilder,
-  insert: () => mockQueryBuilder,
-  update: () => mockQueryBuilder,
-  delete: () => mockQueryBuilder,
-  eq: () => mockQueryBuilder,
-  neq: () => mockQueryBuilder,
-  gt: () => mockQueryBuilder,
-  gte: () => mockQueryBuilder,
-  lt: () => mockQueryBuilder,
-  lte: () => mockQueryBuilder,
-  like: () => mockQueryBuilder,
-  ilike: () => mockQueryBuilder,
-  is: () => mockQueryBuilder,
-  in: () => mockQueryBuilder,
-  contains: () => mockQueryBuilder,
-  containedBy: () => mockQueryBuilder,
-  not: () => mockQueryBuilder,
-  or: () => mockQueryBuilder,
-  filter: () => mockQueryBuilder,
-  match: () => mockQueryBuilder,
-  textSearch: () => mockQueryBuilder,
-  order: () => mockQueryBuilder,
-  limit: () => mockQueryBuilder,
-  range: () => mockQueryBuilder,
-  single: () => Promise.resolve({ data: null, error: null }),
-  maybeSingle: () => Promise.resolve({ data: null, error: null }),
-  then: (resolve: any) => resolve({ data: null, error: null, count: 0 }),
-};
-
-const mockClient = {
-  from: () => mockQueryBuilder,
-  auth: {
-    getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-    signOut: () => Promise.resolve({ error: null }),
-  },
-  storage: {
-    from: () => ({
-      upload: () => Promise.resolve({ data: null, error: null }),
-      download: () => Promise.resolve({ data: null, error: null }),
-      getPublicUrl: () => ({ data: { publicUrl: '' } }),
-    }),
-  },
-  rpc: () => Promise.resolve({ data: null, error: null }),
-} as unknown as SupabaseClient<any>;
-
-// Returns a real Supabase client. Returns mockClient if env vars are missing.
-// Never throws, never returns null — callers can safely use .auth and .from.
 export async function createClient(): Promise<SupabaseClient<any>> {
+  // Establish the request boundary before reading runtime configuration. Next
+  // must not prerender an authenticated page while build-time secrets are absent.
+  const cookieStore = await cookies();
+  const hostname = (await headers()).get('host') ?? '';
   const config = getServerPublicSupabaseConfig();
   if (!config) {
-    return mockClient;
+    throw new Error('SUPABASE_CONFIGURATION_MISSING: Server database configuration is unavailable.');
   }
 
   const { url: supabaseUrl, anonKey: supabaseAnonKey } = config;
 
   try {
-    const cookieStore = await cookies();
-    const hostname = (await headers()).get('host') ?? '';
-
     return createServerClient(supabaseUrl, supabaseAnonKey, {
       global: { fetch: createBrowserAuthFetch(supabaseUrl, { fetchImpl: timedFetch }) },
       cookies: {
@@ -107,16 +57,16 @@ export async function createClient(): Promise<SupabaseClient<any>> {
     if (process.env.NODE_ENV === 'development') {
       logger.error('[Supabase Server] Failed to create client:', error);
     }
-    return mockClient;
+    throw error;
   }
 }
 
 // Cookie-free client for public data reads (keeps pages statically renderable).
 // Uses the anon key with no session — do NOT use for auth-gated queries.
-// Returns mockClient if the Supabase constructor fails (e.g. during static prerender).
+// Configuration and initialization failures propagate to the caller.
 export function createPublicClient(): SupabaseClient<any> {
   const config = getServerPublicSupabaseConfig();
-  if (!config) return mockClient;
+  if (!config) throw new Error('SUPABASE_CONFIGURATION_MISSING: Public database configuration is unavailable.');
   const { url: supabaseUrl, anonKey: supabaseAnonKey } = config;
 
   try {
@@ -127,9 +77,9 @@ export function createPublicClient(): SupabaseClient<any> {
       },
       global: { fetch: timedFetch },
     });
-  } catch {
-    // Supabase client constructor can fail during static prerendering
-    return mockClient;
+  } catch (error) {
+    logger.error('[Supabase Public] Client initialization failed', error);
+    throw error;
   }
 }
 

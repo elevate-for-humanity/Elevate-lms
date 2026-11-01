@@ -98,7 +98,7 @@ export function CareerPlan({ plan, readOnly = false }: { plan: Plan; readOnly?: 
         </div>
         <div className="relative hidden min-h-48 sm:block">
           <Image
-            src="/images/pages/career-counseling.jpg"
+            src="/images/pages/resume-building-hero.webp"
             alt="Career preparation and guidance"
             fill
             sizes="220px"

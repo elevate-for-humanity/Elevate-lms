@@ -23,10 +23,11 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(builder).toContain('if (token !== refreshToken.current) return');
     expect(builder).toContain("setBuildsCourseId('')");
     expect(builder).not.toContain('runCourseFactoryPipeline');
-    expect(ultimateRoute).toContain('UltimateJobQueue');
+    expect(ultimateRoute).toContain('startCanonicalCourse');
+    expect(read('lib/ultimate-course-builder/core/start-course.ts')).toContain('UltimateJobQueue');
     expect(ultimateRoute).toContain("body.action === 'queue-course'");
     expect(ultimateRoute).not.toContain('is_published: false');
-    expect(ultimateRoute).toContain('buildUltimateProfile');
+    expect(read('lib/ultimate-course-builder/core/start-course.ts')).toContain('buildUltimateProfile');
     expect(read('lib/ultimate-course-builder/core/course-profile.ts')).toContain('UltimateAppendixAStandardsSource');
     expect(productionHandlers).toContain("ctx.profile.authority === 'course-defined'");
     expect(productionHandlers).toContain("ctx.profile.id.startsWith('course:')");
@@ -42,7 +43,7 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(docker).not.toContain('--conditions=react-server');
   });
 
-  it('retires public Course Factory pages and legacy generation actions', () => {
+  it('retires public Course Factory pages and delegates existing generation URLs to Ultimate', () => {
     const lms = read('apps/lms/app/ai/course-factory/page.tsx');
     const marketing = read('apps/marketing/app/ai/course-factory/page.tsx');
     const legacyRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
@@ -51,7 +52,8 @@ describe('Ultimate Course Builder production cutover', () => {
       "redirect('https://admin.elevateforhumanity.org/studio/courses?tab=ultimate')",
     );
     expect(marketing).toContain("getAdminUrl('/studio/courses?tab=ultimate')");
-    expect(legacyRoute).toContain('COURSE_FACTORY_ARCHIVED');
-    expect(legacyRoute).toContain('status: 410');
+    expect(legacyRoute).toContain('requestCanonicalGeneration(db,');
+    expect(legacyRoute).not.toContain('courseFactory(');
+    expect(read('lib/ultimate-course-builder/core/generation-request.ts')).toContain('startCanonicalCourse(db,');
   });
 });

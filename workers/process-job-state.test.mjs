@@ -17,11 +17,11 @@ const {liveCheckpointRepairReader}=new Function('ULTIMATE_BUILD_STEPS',checkpoin
 
 const productionPath = process.env.PROCESS_JOB_SOURCE || new URL('../lib/ultimate-course-builder/worker/process-job.ts', import.meta.url);
 const source = stripTypeScriptTypes(readFileSync(productionPath, 'utf8'))
-  .replace(/^import .*;\n/gm, '').replace('export async function', 'async function');
+  .replace(/^import .*;\n/gm, '').replace(/^export (?=(?:async )?function )/gm, '');
 
 function scenario(payload, completed = true, options = {}) {
   const events = [];
-  const build = { id: 'build', course_id: 'course', status: 'blocked', profile: { competencies: [{ id: 'competency' }] } };
+  const build = { id: 'build', course_id: 'course', status: 'blocked', profile: { competencies: [{ id: 'competency' }], ...options.profile } };
   const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }), then: resolve => resolve({data:[{competency_id:'competency',status:'built',artifacts:{}}],error:null}) };
   const profileWrites=[];
   const db = { from: () => q, rpc: async (_name,args) => {profileWrites.push(args.p_data.profile);return {error:null};} };
@@ -47,6 +47,13 @@ test('a successful targeted lesson clears course running state before releasing 
     assert.equal(result.completed, true);
     assert.deepEqual(s.events, ['attach', { buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
   }
+});
+
+test('a targeted lesson on a parallel course cannot seed or finish the whole-course pool', async () => {
+  const s = scenario({ competencyId: 'competency' }, true, { profile: { parallelAutopilot: 'three-role-v1' } });
+  const result = await s.run();
+  assert.equal(result.completed, true);
+  assert.deepEqual(s.events, ['attach', { buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
 });
 
 test('an incomplete targeted lesson stays in the existing repair queue instead of being completed', async () => {

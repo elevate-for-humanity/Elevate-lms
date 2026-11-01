@@ -67,13 +67,15 @@ export async function inspectSelfCall(bindings,sid,{request=fetch}={}){
  async function get(path){const r=await request(base+path,{headers,redirect:'error',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('SELF_CALL_INSPECTION_HTTP_'+r.status);return r.json();}
  const call=await get('/Calls/'+sid+'.json');
  if(call.account_sid!==ACCOUNT||call.to!==NUMBER||call.from!==NUMBER)throw Error('SELF_CALL_INSPECTION_IDENTITY_INVALID');
+ const history=await get('/Calls.json?From=%2B14632401404&PageSize=100');
+ const relatedSelfCalls=(history.calls||[]).filter(c=>c.to===NUMBER||String(c.to||'').includes('phone.elevateforhumanity.org')).slice(0,20).map(c=>({sid:c.sid,direction:c.direction,status:c.status,durationSeconds:Number(c.duration),started:c.start_time,trunkAttached:Boolean(c.trunk_sid),parentMatches:c.parent_call_sid===sid}));
  const records=await get('/Calls/'+sid+'/Recordings.json?PageSize=100');
  const notifications=await get('/Calls/'+sid+'/Notifications.json?PageSize=100');
  let insights={available:false};
  const summary=await request('https://insights.twilio.com/v1/Voice/'+sid+'/Summary',{headers,redirect:'error',signal:AbortSignal.timeout(15000)});
  if(summary.ok){const data=await summary.json();if(data.call_sid!==sid||data.account_sid!==ACCOUNT)throw Error('SELF_CALL_INSIGHTS_SCOPE_INVALID');insights={available:true,callState:data.call_state,callType:data.call_type,lastSipResponse:data.properties?.last_sip_response_num,disconnectedBy:data.properties?.disconnected_by,tags:(data.tags||[]).filter(t=>/^[a-z_]{1,40}$/.test(t)),sipEdgeMetrics:data.sip_edge?.metrics,carrierEdgeMetrics:data.carrier_edge?.metrics};}
  else insights.httpStatus=summary.status;
- return {insights,readOnly:true,callsPlaced:0,callSid:sid,status:call.status,durationSeconds:Number(call.duration),direction:call.direction,
+ return {relatedSelfCalls,insights,readOnly:true,callsPlaced:0,callSid:sid,status:call.status,durationSeconds:Number(call.duration),direction:call.direction,
   recordingStatuses:(records.recordings||[]).map(r=>({status:r.status,duration:Number(r.duration),channels:r.channels,source:r.source,errorCode:r.error_code===null?null:Number(r.error_code)})),
   providerNotifications:(notifications.notifications||[]).map(n=>({errorCode:Number(n.error_code),messageSignals:Object.fromEntries(['SIP','TLS','certificate','SRTP','busy','timeout','media','audio','registration','routing'].map(label=>[label,new RegExp(label,'i').test(String(n.message_text||''))]))}))};
 }

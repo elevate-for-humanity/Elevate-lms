@@ -1,0 +1,49 @@
+name: Verify live meeting media delivery
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/verify-live-meeting-delivery*', '.github/workflows/live-meeting-delivery-acceptance.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: live-meeting-delivery-acceptance
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/live-meeting-delivery-acceptance.yml/dispatches -f ref=main
+  verify:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: {version: '10.28.2'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: pnpm}
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node --test scripts/gcp/verify-live-meeting-delivery.test.mjs
+      - run: pnpm exec playwright install --with-deps chromium
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Assert synthetic audio, video, screen share and data receipt in an isolated temporary room
+        run: node scripts/gcp/verify-live-meeting-delivery.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-meeting-delivery-${{ github.sha }}
+          path: live-meeting-delivery.json
+          if-no-files-found: warn

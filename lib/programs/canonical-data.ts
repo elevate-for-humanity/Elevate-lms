@@ -1,3 +1,4 @@
+import { HAIR_STYLIST_PROGRAM } from '@/lib/apprenticeship/hair-stylist-program';
 /**
  * CANONICAL PROGRAM DATA
  *
@@ -94,9 +95,9 @@ export const PROGRAMS: Record<string, ProgramData> = {
     slug: 'cosmetology-apprenticeship',
     name: 'Hair Stylist Apprenticeship',
     shortName: 'Hair Stylist / Cosmetologist',
-    totalHours: 2000,
-    relatedInstructionHours: 154,
-    ojtHours: 0,
+    totalHours: HAIR_STYLIST_PROGRAM.minimumTermHours,
+    relatedInstructionHours: HAIR_STYLIST_PROGRAM.relatedInstructionHours,
+    ojtHours: HAIR_STYLIST_PROGRAM.minimumTermHours,
     durationRange: 'Registered hybrid term: 2,000–2,500 hours',
     durationMonths: { min: 12, max: 24 },
     credential: 'Indiana Cosmetologist License',
@@ -110,10 +111,10 @@ export const PROGRAMS: Record<string, ProgramData> = {
     stateRequirements: 'RAPIDS occupation 0096HY V1 is registered as Hair Stylist (existing title: Cosmetologist) using a hybrid 2,000–2,500-hour term with 154 RTI hours and a 500-hour probationary period. Indiana examination and licensing requirements remain separate.',
     category: 'apprenticeship',
     isRegisteredApprenticeship: true,
-    rapidsCodes: ['0096HY'],
-    apprenticeshipApproach: 'hybrid',
-    probationaryHours: 500,
-    apprenticeToMentorRatio: '1:1',
+    rapidsCodes: [HAIR_STYLIST_PROGRAM.rapidsCode],
+    apprenticeshipApproach: HAIR_STYLIST_PROGRAM.approach,
+    probationaryHours: HAIR_STYLIST_PROGRAM.probationaryHours,
+    apprenticeToMentorRatio: HAIR_STYLIST_PROGRAM.apprenticeToMentorRatio,
     dolProgressStatement: 'DOL progress follows the registered Hair Stylist hybrid standard: 2,000–2,500-hour term, 154 verified RTI hours, required work-process completion, 1:1 supervision, and a 500-hour probationary period. Do not treat 500 hours as program completion.',
   },
 

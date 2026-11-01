@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Read only fixed media failure markers; never emit caller data or raw logs."""
 import json,re,subprocess
+from pathlib import Path
 
 def run(args):
  p=subprocess.run(args,capture_output=True,text=True,timeout=20)
@@ -32,6 +33,15 @@ def main():
   'sdpNoCrypto':r'(?:SDP|crypto).{0,100}(?:missing|no usable|not acceptable)'}.items()}
  endpoint=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','pjsip show endpoint twilio'])
  endpoint_settings={key:match[1] for key in ['media_encryption','media_encryption_optimistic','direct_media','rtp_symmetric','rtp_keepalive','use_avpf','dtmf_mode','force_rport'] if (match:=re.search(r'^\s*'+key+r'\s*:\s*([A-Za-z0-9_]+)\s*$',endpoint,re.M))}
- print(json.dumps({'srtpReasonSignals':srtp_reasons,'carrierEndpointSettings':endpoint_settings,'readOnly' :True,'callsPlaced':0,'gatewayActive':run(['systemctl','is-active','elevate-paris-gateway.service']).strip()=='active',
+ processes=[]
+ for path in Path('/proc').iterdir():
+  if not path.name.isdigit():continue
+  try:
+   args=(path/'cmdline').read_bytes().split(b'\0')
+   if any(a.endswith(b'/paris/launch.mjs') for a in args) and b'gateway' in args:processes.append(path)
+  except (OSError,PermissionError):pass
+ gateway_pid=run(['systemctl','show','elevate-paris-gateway.service','--property=MainPID','--value']).strip()
+ gateway_process={'matchingLaunchProcessCount':len(processes),'servicePidMatchesSingleProcess':len(processes)==1 and processes[0].name==gateway_pid}
+ print(json.dumps({'gatewayProcess':gateway_process,'srtpReasonSignals':srtp_reasons,'carrierEndpointSettings':endpoint_settings,'readOnly' :True,'callsPlaced':0,'gatewayActive':run(['systemctl','is-active','elevate-paris-gateway.service']).strip()=='active',
   'gatewayFailureMarkers':{marker:gateway.count(marker) for marker in ['PARIS_GREETING_REQUESTED','PARIS_GREETING_AUDIO_READY','PARIS_GREETING_SENT','PARIS_BRIDGE_FAILED','PARIS_GREETING_FAILED','PARIS_TURN_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_RUNTIME_STARTUP_FAILED']},'asteriskSignals':signals}))
 if __name__=='__main__':main()

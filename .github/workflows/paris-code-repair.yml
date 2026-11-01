@@ -6,6 +6,8 @@ on:
       - '.github/workflows/paris-code-repair.yml'
       - 'lib/ai/runtime/code-repair.ts'
       - 'lib/devstudio/paris-code-engineer.ts'
+      - 'lib/ai/runtime/supervision.ts'
+      - 'lib/ai/runtime/code-repair-policy.mjs'
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
@@ -180,6 +182,11 @@ jobs:
           pnpm exec tsc -p apps/admin/tsconfig.json --noEmit --incremental false
           pnpm exec tsc -p apps/lms/tsconfig.json --noEmit --incremental false
           pnpm exec tsc -p apps/marketing/tsconfig.json --noEmit --incremental false
+      - name: Enforce production application and runtime repair gates
+        run: |
+          node scripts/check-course-factory-authority.mjs
+          node scripts/check-studio-architecture.mjs
+          node --test lib/ai/runtime/code-repair-policy.test.mjs
       - name: Record exact validated candidate
         env:
           PATCH_SHA: ${{ needs.prepare.outputs.sha }}

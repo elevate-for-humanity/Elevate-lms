@@ -11,15 +11,15 @@ export function classifyParisFailure(error: unknown): FailureDisposition {
   const message = error instanceof Error ? error.message : String(error ?? '');
   if (/billing|\bcredits?\b|payment required|insufficient_quota|HTTP.?402/i.test(message))
     return { category: 'billing', recovery: 'attention_required', nextAction: 'Verify billing and remaining funds before resuming paid work.' };
-  if (/401|403|credential|unauthori[sz]|forbidden|api.?key|permission/i.test(message))
+  if (/401|403|credential|unauthori[sz]|forbidden|api.?key|permission|bad credentials|token rejected|resource not accessible by personal access token/i.test(message))
     return { category: 'credentials', recovery: 'attention_required', nextAction: 'Verify the affected service credential or permission; preserve saved progress.' };
-  if (/licens|missing.source|dependencies.unresolved|source.required/i.test(message))
+  if (/licens|missing.source|dependencies.unresolved|source.required|AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED/i.test(message))
     return { category: 'source', recovery: 'attention_required', nextAction: 'Resolve the missing source or license through the saved workflow checkpoint.' };
   if (/quality|media.qa|frozen|assessment|validation/i.test(message))
     return { category: 'quality', recovery: 'attention_required', nextAction: 'Inspect the failed quality evidence and use the canonical checkpoint repair.' };
   if (/approval|owner.pause|confirmation/i.test(message))
     return { category: 'approval', recovery: 'attention_required', nextAction: 'Wait for the recorded owner approval or resume instruction.' };
-  if (/timeout|timed.out|ECONNRESET|fetch failed|429|\b5\d\d\b|circuit/i.test(message))
+  if (/timeout|timed.out|aborted due to timeout|ECONNRESET|fetch failed|429|\b5\d\d\b|circuit/i.test(message))
     return { category: 'transient', recovery: 'existing_retry_policy', nextAction: 'Use the existing bounded retry or lease recovery policy; never duplicate active work.' };
   return { category: 'unknown', recovery: 'attention_required', nextAction: 'Inspect the correlated execution logs and diagnose the failure before replaying work.' };
 }

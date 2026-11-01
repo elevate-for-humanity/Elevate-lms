@@ -48,6 +48,7 @@ on:
       - 'supabase/migrations/*_lesson_autopilot_runtime.sql'
       - 'scripts/gcp/prepare-course-authoring-access.mjs'
       - 'scripts/gcp/prepare-course-authoring-access.test.mjs'
+      - 'scripts/gcp/verify-course-runtime-contract.mjs'
       - 'scripts/gcp/audit-course-production.mjs'
       - 'scripts/gcp/audit-course-production.test.mjs'
       - 'workers/admin-speech-cache.mjs'
@@ -210,6 +211,10 @@ jobs:
         run: |
           node --test scripts/gcp/deploy-lesson-autopilots.test.mjs scripts/gcp/dispatch-lesson-autopilots.test.mjs
           node scripts/gcp/deploy-lesson-autopilots.mjs
+      - name: Verify all five deployed worker image digests and runtime identities
+        env:
+          IMAGE_SHA: ${{ github.sha }}
+        run: node scripts/gcp/verify-course-runtime-contract.mjs
       - name: Resume repaired saved lessons after verified image deployment
         env:
           IMAGE_SHA: ${{ github.sha }}

@@ -1,3 +1,4 @@
+import HostShopFinanceForm from '@/components/host-shop/HostShopFinanceForm';
 import Link from 'next/link';
 import { AlertCircle, Calendar, CreditCard, ShieldCheck } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
@@ -78,6 +79,7 @@ export default async function SubscriptionPage() {
           <Link href="https://www.elevateforhumanity.org/contact" className="mt-6 inline-flex rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">Contact support about host-shop billing</Link>
         </section>
       )}
+      <div id="finance-requests"><HostShopFinanceForm /></div>
     </main>
   );
 }

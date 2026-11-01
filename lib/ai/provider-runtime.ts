@@ -62,10 +62,17 @@ export async function probeCloudflareWorkersAI(): Promise<CloudflareAIProbe> {
       {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         cache: 'no-store',
+        redirect: 'error',
         signal: AbortSignal.timeout(10_000),
       },
     );
     if (response.ok) {
+      const payload = await response.json().catch(() => null);
+      const models = Array.isArray(payload?.result) ? payload.result : [];
+      if (payload?.success !== true || !models.some((entry: {name?:string}) => entry?.name === model)) {
+        return {configured:true,reachable:false,status:'unreachable',
+          detail:'Cloudflare did not verify the configured Workers AI model.',checkedAt};
+      }
       return {
         configured: true,
         reachable: true,
@@ -83,14 +90,12 @@ export async function probeCloudflareWorkersAI(): Promise<CloudflareAIProbe> {
       detail: `Cloudflare Workers AI probe returned HTTP ${response.status}.`,
       checkedAt,
     };
-  } catch (error) {
+  } catch {
     return {
       configured: true,
       reachable: false,
       status: 'unreachable',
-      detail: error instanceof Error
-        ? `Cloudflare Workers AI probe failed: ${error.message}`
-        : 'Cloudflare Workers AI probe failed.',
+      detail: 'Cloudflare Workers AI probe failed.',
       checkedAt,
     };
   }

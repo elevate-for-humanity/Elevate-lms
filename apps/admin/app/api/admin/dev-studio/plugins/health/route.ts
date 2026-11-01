@@ -5,6 +5,7 @@ import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { probeCloudflareControlPlane } from '@/lib/control-plane/cloudflare';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,9 +17,10 @@ export async function GET(request: NextRequest) {
     const supabaseConfigured = Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
     );
-    const [aiRuntime, cloudflareAI] = await Promise.all([
+    const [aiRuntime, cloudflareAI, cloudflareControlPlane] = await Promise.all([
       resolveAIRuntimeState(),
       probeCloudflareWorkersAI(),
+      probeCloudflareControlPlane(),
     ]);
     const aiConfigured = aiRuntime.anyConfigured;
     const googleConfigured = await isGoogleDeploymentConfigured();
@@ -30,9 +32,6 @@ export async function GET(request: NextRequest) {
     const stripeConfigured = Boolean(
       (process.env.STRIPE_RESTRICTED_KEY || process.env.STRIPE_SECRET_KEY) &&
       process.env.STRIPE_WEBHOOK_SECRET,
-    );
-    const cloudflareControlPlaneConfigured = Boolean(
-      process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ACCOUNT_ID,
     );
     const gpuConfigured = Boolean(process.env.GPU_VIDEO_WORKER_URL && process.env.GPU_WORKER_SECRET);
     const gpuReady = gpuConfigured ? await gpuVideoAvailable() : false;
@@ -103,11 +102,9 @@ export async function GET(request: NextRequest) {
       },
       {
         name: 'cloudflare-control-plane',
-        passed: cloudflareControlPlaneConfigured,
+        passed: cloudflareControlPlane.reachable,
         required: false,
-        message: cloudflareControlPlaneConfigured
-          ? 'Cloudflare control-plane access is configured.'
-          : 'Cloudflare control-plane access is not configured.',
+        message: cloudflareControlPlane.detail,
       },
     ]);
   });

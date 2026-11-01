@@ -57,6 +57,18 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  const transcript=await transcribe(wav),ratio=greetingMatch(expectedGreeting,transcript);
  return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),recordingDurationSeconds:Number(recording.duration),receivedAudioBytes:wav.length,speechWordCount:words(transcript).length,savedGreetingWordMatch:Math.round(ratio*100)/100,savedGreetingAudioMatched:ratio>=0.75,liveGreetingAcceptance:ratio>=0.75?'PASS':'FAIL',operatorTransferAcceptance:'NOT_TESTED',voicemailDeliveryAcceptance:'NOT_TESTED'};
 }
+export async function inspectSelfCall(bindings,sid,{request=fetch}={}){
+ if(bindings.TWILIO_ACCOUNT_SID!==ACCOUNT||bindings.TWILIO_PHONE_NUMBER!==NUMBER||!/^CA[a-f0-9]{32}$/i.test(sid||''))throw Error('SELF_CALL_INSPECTION_SCOPE_INVALID');
+ const base=`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT}`,headers={Authorization:'Basic '+Buffer.from(ACCOUNT+':'+bindings.TWILIO_AUTH_TOKEN).toString('base64')};
+ async function get(path){const r=await request(base+path,{headers,redirect:'error',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('SELF_CALL_INSPECTION_HTTP_'+r.status);return r.json();}
+ const call=await get('/Calls/'+sid+'.json');
+ if(call.account_sid!==ACCOUNT||call.to!==NUMBER||call.from!==NUMBER)throw Error('SELF_CALL_INSPECTION_IDENTITY_INVALID');
+ const records=await get('/Calls/'+sid+'/Recordings.json?PageSize=100');
+ const notifications=await get('/Calls/'+sid+'/Notifications.json?PageSize=100');
+ return {readOnly:true,callsPlaced:0,callSid:sid,status:call.status,durationSeconds:Number(call.duration),direction:call.direction,
+  recordingStatuses:(records.recordings||[]).map(r=>({status:r.status,duration:Number(r.duration),channels:r.channels,source:r.source})),
+  providerNotifications:(notifications.notifications||[]).map(n=>({errorCode:Number(n.error_code),messageSignals:Object.fromEntries(['SIP','TLS','certificate','SRTP','busy','timeout','media','audio','registration','routing'].map(label=>[label,new RegExp(label,'i').test(String(n.message_text||''))]))}))};
+}
 const recognitionProgram=`import json,sys,urllib.request,urllib.error
 try:
  data=json.load(sys.stdin)
@@ -78,6 +90,8 @@ function transcribeOnPbx(wav){
 async function main(){
  if(process.env.AUTHORIZED_SELF_TEST_DID!==NUMBER)throw Error('SELF_CALL_AUTHORIZATION_REQUIRED');
  const config=loadGoogleConfig('admin'),env=config.runtimeEnvironment,bindings=await verifiedTwilioBindings(config);
+ if(process.env.SELF_CALL_MODE==='inspect'){console.log(JSON.stringify(await inspectSelfCall(bindings,process.env.INSPECT_SELF_CALL_SID)));return;}
+ if(process.env.SELF_CALL_MODE!=='greeting-call')throw Error('SELF_CALL_MODE_REQUIRED');
  const db=env.SUPABASE_URL||env.NEXT_PUBLIC_SUPABASE_URL;
  if(db!=='https://cuxzzpsyufcewtmicszk.supabase.co'||!env.SUPABASE_SERVICE_ROLE_KEY)throw Error('SELF_CALL_SETTINGS_SCOPE_INVALID');
  const response=await fetch(db+'/rest/v1/phone_systems?id=eq.'+SYSTEM+'&select=greeting',{headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY},redirect:'error'});

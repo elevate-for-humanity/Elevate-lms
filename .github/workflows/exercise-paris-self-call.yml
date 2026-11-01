@@ -1,6 +1,16 @@
 name: Verify PARIS greeting with one authorized business self-call
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspect a prior self-call, or place exactly one new greeting test
+        type: choice
+        options: [inspect, greeting-call]
+        default: inspect
+      inspect_call_sid:
+        description: Prior self-call SID to inspect; required in inspect mode
+        type: string
+        default: ''
 permissions: {contents: read, id-token: write}
 concurrency:
   group: google-pbx-infrastructure
@@ -27,5 +37,11 @@ jobs:
       - name: Verify current PARIS configuration and real speech readiness
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py
       - name: Place one bounded self-call and compare received audio with saved greeting
-        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404'}
+        env:
+          AUTHORIZED_SELF_TEST_DID: '+14632401404'
+          SELF_CALL_MODE: '${{ inputs.mode }}'
+          INSPECT_SELF_CALL_SID: '${{ inputs.inspect_call_sid }}'
         run: node scripts/gcp/exercise-paris-self-call.mjs
+      - name: Inspect redacted PBX media and gateway failure signals
+        if: always()
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-paris-call-signals.py

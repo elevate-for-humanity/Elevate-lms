@@ -1,5 +1,8 @@
 name: Verify PARIS greeting with one authorized business self-call
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/exercise-paris-self-call.yml']
   workflow_dispatch:
     inputs:
       mode:
@@ -11,14 +14,22 @@ on:
         description: Prior self-call SID to inspect; required in inspect mode
         type: string
         default: ''
-permissions: {contents: read, id-token: write}
+permissions: {contents: read}
 concurrency:
   group: google-pbx-infrastructure
   cancel-in-progress: false
 jobs:
-  self-call:
-    if: github.ref == 'refs/heads/main'
+  dispatch-once:
+    if: github.event_name == 'push' && github.event.head_commit.message == 'Run authorized PARIS greeting acceptance after RTP startup repair'
     runs-on: ubuntu-24.04
+    permissions: {contents: read, actions: write}
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/exercise-paris-self-call.yml/dispatches" -f ref=main -f 'inputs[mode]=greeting-call'
+  self-call:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions: {contents: read, id-token: write}
     environment: production
     timeout-minutes: 8
     steps:

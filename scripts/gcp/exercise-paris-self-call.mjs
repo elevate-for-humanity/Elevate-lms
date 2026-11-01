@@ -38,11 +38,15 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  }finally{
   if(!call||!['completed','failed','busy','no-answer','canceled'].includes(call.status))await api(base+'/Calls/'+sid+'.json',{Status:'completed'});
  }
+ report({selfCallCompleted:true,callSid:sid,status:call.status,durationSeconds:Number(call.duration)});
  let recording;
  for(let n=0;n<12;n++){
   const recordings=await api(base+'/Calls/'+sid+'/Recordings.json?PageSize=20');
   if(recordings.next_page_uri||!Array.isArray(recordings.recordings)||recordings.recordings.some(r=>r.account_sid!==ACCOUNT||r.call_sid!==sid))throw Error('SELF_CALL_RECORDING_SCOPE_INVALID');
-  recording=recordings.recordings.find(r=>r.status==='completed');if(recording)break;await wait(2500);
+  recording=recordings.recordings.find(r=>r.status==='completed');if(recording)break;
+  const absent=recordings.recordings.find(r=>r.status==='absent');
+  if(absent)throw Error('SELF_CALL_RECORDING_ABSENT_'+(/^[0-9]{3,6}$/.test(String(absent.error_code))?absent.error_code:'UNKNOWN'));
+  await wait(2500);
  }
  if(!recording||!/^RE[a-f0-9]{32}$/i.test(recording.sid)||Number(recording.duration)>50)throw Error('SELF_CALL_RECORDING_UNAVAILABLE');
  let audio=await request(base+'/Recordings/'+recording.sid+'.wav',{headers,redirect:'manual',signal:AbortSignal.timeout(20000)});

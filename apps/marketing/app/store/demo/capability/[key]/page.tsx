@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import CapabilitySubscriptionDemo from '@/components/store/CapabilitySubscriptionDemo';
 import { CAPABILITY_CATALOG } from '@/lib/platform/capability-catalog';
 import { ADD_ON_MARKETPLACE, BASE_PLANS } from '@/lib/store/platform-pricing';
@@ -29,12 +29,16 @@ function subscriptionSnapshot(key: string) {
   if (individual) {
     return {
       priceLabel: `Plans from ${individual.plans[0]?.priceLabel ?? 'monthly'}`,
-      details: individual.plans.map((plan) => `${plan.name}: ${plan.priceLabel} — ${plan.features.slice(0, 3).join(', ')}`),
+      details: individual.plans.map(
+        (plan) => `${plan.name}: ${plan.priceLabel} — ${plan.features.slice(0, 3).join(', ')}`,
+      ),
       actionHref: `/store/apps/${individual.slug}`,
     };
   }
 
-  const addon = ADD_ON_MARKETPLACE.find((item) => !item.hiddenFromMarketplace && item.features.includes(key as never));
+  const addon = ADD_ON_MARKETPLACE.find(
+    (item) => !item.hiddenFromMarketplace && item.features.includes(key as never),
+  );
   if (addon) {
     return {
       priceLabel: `$${addon.priceMonthly}/month add-on`,
@@ -71,7 +75,6 @@ function subscriptionSnapshot(key: string) {
   };
 }
 
-
 export default async function CapabilityDemoPage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
   const capability = CAPABILITY_CATALOG.find(
@@ -80,8 +83,14 @@ export default async function CapabilityDemoPage({ params }: { params: Promise<{
 
   if (!capability) notFound();
 
+  const individual = individualCatalogForKey(key);
+  if (individual) redirect(`/store/demo/apps/${individual.slug}`);
   const subscription = subscriptionSnapshot(String(capability.key));
-  const actionHref = capability.storeHref || capability.marketingHref || capability.appHref || subscription.actionHref;
+  const actionHref =
+    capability.storeHref ||
+    capability.marketingHref ||
+    capability.appHref ||
+    subscription.actionHref;
 
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">

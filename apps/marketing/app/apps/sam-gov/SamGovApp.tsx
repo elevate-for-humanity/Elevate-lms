@@ -15,6 +15,7 @@ type SamSetupContext = {
 };
 
 interface Props {
+  demo?: boolean;
   user: { id: string; email?: string | null };
   subscription: Row;
   entities: Row[];
@@ -29,6 +30,7 @@ function entityName(entity: Row): string {
 }
 
 export function SamGovApp({
+  demo = false,
   subscription,
   entities,
   documents,
@@ -100,7 +102,7 @@ export function SamGovApp({
           </section>
         )}
 
-        <ContextAwareAdvisor appSlug="sam-gov" context={setupContext} />
+        {!demo && <ContextAwareAdvisor appSlug="sam-gov" context={setupContext} />}
 
         <SamWorkspaceActions entities={entities} documents={documents} alerts={alerts} />
 

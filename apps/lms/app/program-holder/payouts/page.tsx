@@ -11,7 +11,7 @@ export default function Page() {
   return (
     <>
       <ProgramHolderPaymentAddendum />
-      <ProgramHolderWorkspaceView section="payouts" payoutPanel={<><PayoutAccessPanel /><details className="rounded-2xl border bg-white p-5"><summary className="min-h-11 cursor-pointer font-bold">Submit a training invoice</summary><ProgramHolderDocumentUpload invoiceOnly /></details></>} />
+      <ProgramHolderWorkspaceView section="payouts" payoutPanel={<><PayoutAccessPanel /><details open className="rounded-2xl border bg-white p-5"><summary className="min-h-11 cursor-pointer font-bold">Submit a training invoice</summary><ProgramHolderDocumentUpload invoiceOnly /></details></>} />
     </>
   );
 }

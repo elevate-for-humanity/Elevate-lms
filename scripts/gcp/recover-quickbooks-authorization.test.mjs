@@ -15,6 +15,7 @@ function fixture({allInvalid=false,company='123',saved=true}={}){
   calls.push({url,init});
   if(url.includes('/app_settings?'))return Response.json(Object.entries({QB_CLIENT_ID:'canonical-id',QB_CLIENT_SECRET:'canonical-secret',QB_REFRESH_TOKEN:refresh,QB_REALM_ID:'123'}).map(([key,value])=>({key,value})));
   if(url.endsWith('/get_platform_secret'))return Response.json(JSON.parse(init.body).p_key==='QB_CLIENT_ID'?'canonical-id':'canonical-secret');
+  if(url.endsWith('/set_platform_secret'))return Response.json(null);
   if(url.includes('tokens/bearer'))return allInvalid||init.headers.Authorization===('Basic '+Buffer.from('canonical-id:canonical-secret').toString('base64'))?Response.json({error:'invalid_grant'},{status:400}):Response.json({access_token:'private-access',refresh_token:'private-rotated',expires_in:3600});
   if(url.includes('/companyinfo/'))return Response.json({CompanyInfo:{Id:company}});
   if(url.endsWith('/save_verified_quickbooks_authorization')){if(saved)refresh='private-rotated';return Response.json(saved);}
@@ -37,5 +38,7 @@ test('refuses a different company and preserves newer consent',async()=>{
  const wrong=fixture({company:'999'}),result=await recoverQuickBooksAuthorization(wrong);
  assert.equal(result.recovered,false);assert.equal(wrong.writes.length,0);
  assert.equal(result.attempts.at(-1).realmMatched,false);
+ assert(wrong.calls.some(row=>row.url.endsWith('/set_platform_secret')));
+ assert(!wrong.calls.some(row=>row.url.endsWith('/save_verified_quickbooks_authorization')));
  const newer=fixture({saved:false});await assert.rejects(()=>recoverQuickBooksAuthorization(newer));assert.equal(newer.writes.length,0);
 });

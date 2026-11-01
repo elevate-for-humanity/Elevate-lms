@@ -17,19 +17,25 @@ export async function recoverQuickBooksAuthorization({run=google,request=fetch}=
  }
  async function settings(){return Object.fromEntries((await database('app_settings?select=key,value&key=in.(QB_CLIENT_ID,QB_CLIENT_SECRET,QB_REFRESH_TOKEN,QB_REALM_ID,QB_REDIRECT_URI)')).map(row=>[row.key,row.value]));}
  const saved=await settings();
+ let preserved;
+ try{preserved=JSON.parse(await database('rpc/get_platform_secret',{p_key:'QB_RECOVERY_CANDIDATE'}));}catch{preserved=null;}
+
  const canonical={};for(const key of ['QB_CLIENT_ID','QB_CLIENT_SECRET'])canonical[key]=await database('rpc/get_platform_secret',{p_key:key});
- const candidates=[{source:'canonical-vault',env:canonical},{source:'saved-settings',env:saved},...configs.map(row=>({source:'google-'+row.component,env:row.config.runtimeEnvironment}))];
+ const candidates=[...(preserved?.clientId&&preserved?.clientSecret&&preserved?.refreshToken&&preserved?.realmId===saved.QB_REALM_ID?[{source:'preserved-unverified',env:{QB_CLIENT_ID:preserved.clientId,QB_CLIENT_SECRET:preserved.clientSecret},refreshToken:preserved.refreshToken}]:[]),{source:'canonical-vault',env:canonical},{source:'saved-settings',env:saved},...configs.map(row=>({source:'google-'+row.component,env:row.config.runtimeEnvironment}))];
  const seen=new Set(),attempts=[];
- for(const {source,env} of candidates){
+ for(const {source,env,refreshToken} of candidates){
   const id=env.QB_CLIENT_ID,secret=env.QB_CLIENT_SECRET;
   if(!id||!secret)continue;
-  const identity=JSON.stringify([id,secret]);if(seen.has(identity))continue;seen.add(identity);
   const current=await settings();if(!current.QB_REFRESH_TOKEN||!/^\d+$/.test(current.QB_REALM_ID||''))throw Error('SAVED_AUTHORIZATION_UNAVAILABLE');
-  const response=await request(TOKEN,{method:'POST',headers:{Authorization:'Basic '+Buffer.from(id+':'+secret).toString('base64'),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',refresh_token:current.QB_REFRESH_TOKEN}),redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
+  const identity=JSON.stringify([id,secret,refreshToken||current.QB_REFRESH_TOKEN]);if(seen.has(identity))continue;seen.add(identity);
+  const response=await request(TOKEN,{method:'POST',headers:{Authorization:'Basic '+Buffer.from(id+':'+secret).toString('base64'),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',refresh_token:refreshToken||current.QB_REFRESH_TOKEN}),redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
   const body=await response.json().catch(()=>null);
   if(!response.ok){attempts.push({source,status:response.status,error:allowedErrors.has(body?.error)?body.error:'refresh_rejected'});if(response.status===429||response.status>=500)break;continue;}
   if(typeof body?.access_token!=='string'||!body.access_token||typeof body?.refresh_token!=='string'||!body.refresh_token||!Number.isFinite(body.expires_in)||body.expires_in<=0||body.expires_in>86400)throw Error('INVALID_TOKEN_RESPONSE');
   const realm=current.QB_REALM_ID;
+  // Rotation must remain recoverable even if company validation fails. This
+  // private Vault entry is never consumed by the active accounting client.
+  await database('rpc/set_platform_secret',{p_key:'QB_RECOVERY_CANDIDATE',p_value:JSON.stringify({clientId:id,clientSecret:secret,realmId:realm,refreshToken:body.refresh_token,accessToken:body.access_token}),p_description:'Unverified QuickBooks recovery candidate; not an active connection',p_category:'integration-recovery'});
   const company=await request('https://quickbooks.api.intuit.com/v3/company/'+realm+'/companyinfo/'+realm+'?minorversion=75',{headers:{Authorization:'Bearer '+body.access_token,Accept:'application/json'},redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
   const info=await company.json().catch(()=>null);
   if(!company.ok||String(info?.CompanyInfo?.Id||'')!==realm){

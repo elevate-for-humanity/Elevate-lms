@@ -96,9 +96,9 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
     <section
       aria-labelledby={headingId}
       data-hvac-training-showcase="20261029"
-      className={`border-y-4 border-orange-500 bg-blue-950 px-4 text-white sm:px-6 ${compact ? 'py-7 sm:py-10' : 'py-14 sm:py-20'}`}
+      className={`border-y-4 border-orange-500 bg-blue-950 px-4 text-white ${compact ? "sm:px-4" : "sm:px-6"} ${compact ? 'py-7 sm:py-10' : 'py-14 sm:py-20'}`}
     >
-      <div className="mx-auto max-w-7xl">
+      <div className={compact ? "mx-auto max-w-6xl" : "mx-auto max-w-7xl"}>
         <p className="text-sm font-bold uppercase tracking-widest text-orange-300">
           {compact ? 'Featured program · HVAC Technician' : 'Sponsored by Elevate for Humanity'}
         </p>
@@ -135,14 +135,14 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
               key={scene.image}
               className="overflow-hidden rounded-2xl border border-blue-800 bg-white shadow-xl"
             >
-              <div className={`relative bg-slate-100 ${compact ? 'aspect-[4/3]' : 'aspect-[4/5]'}`}>
+              <div data-home-card-image={compact || undefined} className={`relative overflow-hidden bg-slate-100 ${compact ? 'aspect-[4/3]' : 'aspect-[4/5]'}`}>
                 <Image
                   src={`${imageRoot}/${scene.image}.webp`}
                   alt={scene.alt}
                   fill
                   priority={compact && index === 0}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px"
-                  className="object-contain"
+                  className={compact ? "object-cover object-[center_35%]" : "object-contain"}
                 />
               </div>
               <figcaption className="p-5">

@@ -8,15 +8,21 @@ const pathways = fs.readFileSync(path.resolve('components/home/HomeCareerPathway
 const funding = fs.readFileSync(path.resolve('components/home/HomeFunding.tsx'), 'utf8');
 
 describe('homepage platform introduction', () => {
-  it('preserves the main hero and keeps HVAC and employer paths near the top', () => {
+  it('preserves the main hero and prioritizes programs, apprenticeships and host shops before employer services', () => {
     expect(page.indexOf('<PlatformHubHero />')).toBeLessThan(
       page.indexOf('<HvacTrainingShowcase compact />'),
     );
     expect(page.indexOf('<HvacTrainingShowcase compact />')).toBeLessThan(
-      page.indexOf('<HomeEmployerStrip />'),
-    );
-    expect(page.indexOf('<HomeEmployerStrip />')).toBeLessThan(
       page.indexOf('<HomeCareerPathways />'),
+    );
+    expect(page.indexOf('<HomeCareerPathways />')).toBeLessThan(
+      page.indexOf('<HomeFeaturedHostShop />'),
+    );
+    expect(page.indexOf('<HomeFeaturedHostShop />')).toBeLessThan(
+      page.indexOf('<HomeHowItWorks />'),
+    );
+    expect(page.indexOf('<HomeHowItWorks />')).toBeLessThan(
+      page.indexOf('<HomeEmployerStrip />'),
     );
     expect(page).not.toContain('<HomeFunding />');
     expect(page).not.toContain('Get your taxes prepared. Start your own tax office.');

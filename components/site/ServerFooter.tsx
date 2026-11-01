@@ -235,7 +235,7 @@ export default function ServerFooter() {
               <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">
                 Main: {PLATFORM_DEFAULTS.mainPhone}
               </a>
-              <a href="tel:+14632401404" className="hover:text-white">Technical Support: {PLATFORM_DEFAULTS.supportPhone}</a>
+              <a href={`tel:+1${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">Technical Support: {PLATFORM_DEFAULTS.supportPhone}</a>
               <span className="text-white">|</span>
               <a href="mailto:info@elevateforhumanity.org" className="hover:text-white">
                 info@elevateforhumanity.org

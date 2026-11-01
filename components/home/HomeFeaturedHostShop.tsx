@@ -80,9 +80,8 @@ export function HomeFeaturedHostShop() {
           join the network; placement and availability are confirmed during enrollment.
         </p>
         <div
-          data-mobile-grid="2"
           data-featured-shops
-          className="mt-6 grid grid-cols-2 auto-rows-fr items-stretch gap-3 lg:grid-cols-4 sm:gap-5"
+          className="mt-6 grid grid-cols-1 auto-rows-fr items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6"
         >
           {shops.map((shop) => (
             <article
@@ -94,16 +93,14 @@ export function HomeFeaturedHostShop() {
                 href={shop.shopHref}
                 className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
               >
-                <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
+                <div data-home-card-image className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
                   <Image
                     src={shop.image}
                     alt={shop.imageAlt}
                     fill
-                    sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)"
+                    sizes="(min-width: 1024px) 368px, (min-width: 640px) 50vw, 100vw"
                     loading="lazy"
-                    className={
-                      shop.imageAlt.includes('collage') ? 'object-contain bg-white' : 'object-cover'
-                    }
+                    className="object-cover"
                     style={{ objectPosition: shop.imagePosition }}
                   />
                 </div>
@@ -169,12 +166,12 @@ export function HomeFeaturedHostShop() {
                 href={card.href}
                 className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700"
               >
-                <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
+                <div data-home-card-image className="relative aspect-[16/10] shrink-0 overflow-hidden bg-white">
                   <Image
                     src={card.image}
                     alt={card.alt}
                     fill
-                    sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)"
+                    sizes="(min-width: 1024px) 368px, (min-width: 640px) 50vw, 100vw"
                     loading="lazy"
                     className="object-cover object-center"
                   />

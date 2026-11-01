@@ -14,9 +14,9 @@
   filter: contrast(1.05) saturate(1.1);
 }
 
-#main-content.site-main main .grid > article > div:has(> img.object-cover[data-nimg='fill']),
-#main-content.site-main main .grid > a > div:has(> img.object-cover[data-nimg='fill']),
-#main-content.site-main main .grid > article > a > div:has(> img.object-cover[data-nimg='fill']) {
+#main-content.site-main main .grid > article > div:not([data-home-card-image]):has(> img.object-cover[data-nimg='fill']),
+#main-content.site-main main .grid > a > div:not([data-home-card-image]):has(> img.object-cover[data-nimg='fill']),
+#main-content.site-main main .grid > article > a > div:not([data-home-card-image]):has(> img.object-cover[data-nimg='fill']) {
   aspect-ratio: 4 / 3;
   height: auto;
   flex-shrink: 0;
@@ -106,4 +106,12 @@
 }
 #main-content.site-main img.object-cover {
   image-rendering: auto;
+}
+
+/* Homepage photo cards opt into one frame instead of the generic public grid ratio. */
+#main-content.site-main main[data-homepage-curation] [data-home-card-image] {
+  aspect-ratio: 16 / 10;
+  height: auto;
+  flex-shrink: 0;
+  overflow: hidden;
 }

@@ -15,6 +15,7 @@ function compile(path, imports = {}) {
 const routing = compile('lib/tenant/middleware-tenant-routing.ts');
 const identity = compile('lib/health/public-runtime-service.ts');
 const { middleware } = compile('apps/marketing/middleware.ts', {
+  '@/lib/routing/public-entry-aliases.mjs': compile('lib/routing/public-entry-aliases.mjs'),
   '@/lib/programs/withdrawn-programs.mjs': compile('lib/programs/withdrawn-programs.mjs'),
   '@/lib/health/public-runtime-service': identity,
   '@/lib/tenant/middleware-tenant-routing': routing,

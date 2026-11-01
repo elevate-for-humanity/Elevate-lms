@@ -59,10 +59,10 @@ export default function HomePage() {
       >
         <PlatformHubHero />
         <HvacTrainingShowcase compact />
-        <HomeEmployerStrip />
         <HomeCareerPathways />
-        <HomeHowItWorks />
         <HomeFeaturedHostShop />
+        <HomeHowItWorks />
+        <HomeEmployerStrip />
         <section
           className="border-y border-slate-200 bg-slate-50 px-5 py-8"
           aria-labelledby="tax-home-cta"

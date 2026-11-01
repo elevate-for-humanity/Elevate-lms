@@ -11,7 +11,9 @@ describe('homepage hero slideshow rendering', () => {
     expect(image).toMatch(/^\/images\/.+\.webp$/);
     expect(fs.existsSync(path.resolve('public', image!.slice(1)))).toBe(true);
     expect(hero).toContain('priority');
-    expect(hero).toContain('HERO_IMAGE_FRAME');
+    expect(hero).toContain('h-48');
+    expect(hero).toContain('sm:h-64');
+    expect(hero).toContain('lg:h-80');
     const frame = fs.readFileSync(path.resolve('lib/images/hero-layout.ts'), 'utf8');
     expect(frame).toContain('aspect-video');
     expect(frame).not.toContain('svh');

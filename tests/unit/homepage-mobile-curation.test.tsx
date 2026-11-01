@@ -39,9 +39,10 @@ describe('homepage curation', () => {
       expect(card.querySelector('img')?.getAttribute('alt')).toBeTruthy();
     }
     const grid = root.querySelector('[data-featured-shops]');
-    expect(grid?.getAttribute('data-mobile-grid')).toBe('2');
-    expect(grid?.className).toContain('grid-cols-2');
-    expect(grid?.className).toContain('lg:grid-cols-4');
+    expect(grid?.getAttribute('data-mobile-grid')).toBeNull();
+    expect(grid?.className).toContain('grid-cols-1');
+    expect(grid?.className).toContain('sm:grid-cols-2');
+    expect(grid?.className).toContain('lg:grid-cols-3');
   });
 
   it('keeps visual career sections and the program-specific funding notice', () => {

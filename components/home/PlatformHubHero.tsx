@@ -1,4 +1,3 @@
-import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,7 +19,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
         src={HOME_IMAGE}
         description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
       />
-      <div className={`${compact ? 'relative h-28 w-full overflow-hidden sm:h-36' : HERO_IMAGE_FRAME} bg-sky-100`}>
+      <div className={`${compact ? 'relative h-28 w-full overflow-hidden sm:h-36' : 'relative h-48 w-full overflow-hidden sm:h-64 lg:h-80'} bg-sky-100`}>
         <Image
           placeholder="blur"
           blurDataURL={IMAGE_LOADING_BLUR}

@@ -61,14 +61,14 @@ export function HomeCareerPathways() {
           </p>
         </div>
         <HomeSectionNarration section="pathways" />
-        <div className="mt-6 grid auto-rows-fr items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid auto-rows-fr items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
             <article
               key={p.slug}
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-2xl"
             >
               <Link href={p.ctaHref} className="flex h-full flex-col">
-                <div className="relative aspect-[16/9] shrink-0 overflow-hidden bg-slate-100">
+                <div data-home-card-image className="relative aspect-[16/9] shrink-0 overflow-hidden bg-slate-100">
                   <Image
                     src={p.image}
                     alt={p.imageAlt}

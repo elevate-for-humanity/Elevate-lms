@@ -49,7 +49,7 @@ export const PLATFORM_DEFAULTS = {
   supportEmail:
     process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `elevate4humanityedu@gmail.com`,
   mainPhone: '(463) 240-1404' as string,
-  supportPhone: '(463) 240-1404' as string,
+  supportPhone: '(314) 317-3757' as string,
   emailFromName:
     process.env.NEXT_PUBLIC_EMAIL_FROM_NAME ?? `Elevate for Humanity`,
   emailFromAddress:

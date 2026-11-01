@@ -125,7 +125,7 @@ export function HomeEmployerStrip() {
               key={path.title}
               className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${path.accent}`}
             >
-              <div className="relative h-32 w-full overflow-hidden sm:h-36">
+              <div data-home-card-image className="relative h-32 w-full overflow-hidden sm:h-36">
                 <Image
                   src={path.img}
                   alt={path.imgAlt}

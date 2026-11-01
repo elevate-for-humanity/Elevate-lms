@@ -1,4 +1,5 @@
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { registeredBeautySources } from '@/lib/curriculum/registered-beauty/index.mjs';
 import { barberApprenticeshipBlueprint } from '@/lib/curriculum/blueprints/barber';
 
 const BARBER_SOURCE_LESSONS: Record<string, string[]> = {
@@ -45,7 +46,7 @@ function stripMarkup(value: string) {
 }
 
 export function registeredInstructionalSources(programSlug: string) {
-  if (programSlug !== 'barber-apprenticeship') return [];
+  if (programSlug !== 'barber-apprenticeship') return registeredBeautySources(programSlug);
   const lessons = new Map(
     barberApprenticeshipBlueprint.modules.flatMap((module) =>
       module.lessons.map((lesson) => [lesson.slug, { module: module.title, lesson }] as const),

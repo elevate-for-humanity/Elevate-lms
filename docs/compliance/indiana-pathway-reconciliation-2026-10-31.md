@@ -58,3 +58,25 @@ RAPIDS metadata, beauty enrollment, and canonical program data now read lib/appr
 - Isolated-module runtime tests passed for shared Hair Stylist consumer values, all three approved RTI sums/counts, and separation of the 1,500 school threshold from competency-based barber OJL. Full application build and deployment are not claimed.
 
 Unresolved source evidence: the current Bookkeeping delivery schedule (640/150/85-hour representations), actual signed Hair Stylist occupation attachment, and authority for any change from Grace Beauty College as nail RTI provider. Do not reconcile these by inventing hours, signatures, provider amendments, or approval dates.
+
+## Follow-up evidence search — November 1, 2026
+
+The following are evidence dispositions, not approval or schedule changes.
+
+| Item | Evidence located | Disposition |
+| --- | --- | --- |
+| Bookkeeping delivery schedule | Public program component schedule totals 85 hours (30 online, 40 lab, 10 exam preparation, 5 career support), while 8 weeks at 15–20 hours implies 120–160 hours. Live program training_hours is 640 and total_hours is 150. | No controlling hour total has been established. Do not present these conflicting values as a verified submission schedule. |
+| Instructor bookkeeping sources | Supabase communication_email_messages be8b41ae-76db-4665-a202-aa52b7abe5cb, “Syllabus,” October 24, 2026; and f13aef8e-46bb-4b62-be16-4bda96538db5, “Complete Course Work,” October 25, 2026, from center.of.destiny@elevateforhumanity.org. | Actual instructor-assigned attachments exist; their contents must be inspected before selecting or revising the schedule. The later message explicitly describes its course as additional to the course assigned by Ms. Greene. Do not assume these are duplicate or superseding courses. |
+| Hair Stylist signed attachment | Exact 0096HY Gmail search returns January 5, 2026 DOL correspondence predicting future approval. Later DOL Hair Stylist/Cosmetology search did not locate issued approval. Drive Hair Stylist and 0096HY searches did not locate a separate signed occupation attachment. | Signed occupation authority remains unlocated. Keep shared operational values separate from approved-source evidence. |
+| Nail RTI-provider amendment | Signed July 10, 2025 approval names Grace Beauty College. Gmail amendment/provider search and Drive Manicurist search located the original signed source and earlier draft outlines, not an approved provider-change amendment. | Grace Beauty College remains the provider established by the retrieved signed source. Do not treat an Elevate workbook or earlier draft as amendment evidence. This finding does not prove no amendment exists elsewhere. |
+
+Instructor attachment locations in the private communication-email-attachments bucket:
+
+- be8b41ae-76db-4665-a202-aa52b7abe5cb: ffd70d79-6503-4945-bd9e-6b367d493516/be8b41ae-76db-4665-a202-aa52b7abe5cb/c3d8ff30-ab77-4945-84fc-9becb7adc7b5-Elevate-Bookkeeping Syllabus.pdf
+- f13aef8e-46bb-4b62-be16-4bda96538db5: ffd70d79-6503-4945-bd9e-6b367d493516/f13aef8e-46bb-4b62-be16-4bda96538db5/f797efc3-d0f2-4fd5-8ac5-eabb3700437c-Bookkeeping Syllabus - Weekly Guide.pdf
+
+The connected Supabase tools expose SQL metadata but no authenticated Storage download action. The bucket is private; attachment existence and assignment context were verified, but PDF contents were not retrieved in this follow-up. No bucket permissions were changed.
+
+Durable Drive copy of the signed July 10 source: https://drive.google.com/file/d/1l3e7hmyQQDM5CvQfYZzDv1g2vR23vrVR/view . Filename and 784,906-byte size match the earlier Gmail source; the Drive copy was not independently rehashed.
+
+Closure requires: (1) inspect both instructor syllabi and the separately assigned course, establish which cohort each applies to, and reconcile instructional, independent-study, and support hours without double counting; (2) obtain the issued signed Hair Stylist occupation attachment or authoritative RAPIDS approval record; (3) obtain an approved provider-change record before changing the nail provider named in the signed source. These three items remain open; no hours, signatures, or amendment evidence were invented.

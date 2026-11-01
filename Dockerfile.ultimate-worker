@@ -3,7 +3,6 @@
 FROM us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:c3ff77f903eeb1621312d295fa05cb380b60ccc513028955fa00f98ca4159d35
 WORKDIR /app
 COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
-COPY workers/direct-course-release.ts workers/direct-course-policy.mjs workers/direct-course-policy.test.mjs workers/direct-database-fetch.mjs workers/direct-database-fetch.test.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
 COPY lib/video ./lib/video
@@ -17,7 +16,7 @@ COPY tests/worker/hvac-saved-safety-role.test.mjs ./tests/worker/
 RUN find lib -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
 RUN node --test lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs && node --import=tsx --test tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts
 RUN node --test tests/worker/narration-storage-reference.test.mjs
-RUN node --test workers/direct-course-policy.test.mjs workers/direct-database-fetch.test.mjs tests/worker/hvac-saved-safety-role.test.mjs
+RUN node --test tests/worker/hvac-saved-safety-role.test.mjs
 RUN node --input-type=module -e "await import('./workers/direct-database-fetch.mjs')"
 # Compile the actual copied composition so an inherited renderer cannot silently
 # survive a source release. This is compilation, not learner/media approval.

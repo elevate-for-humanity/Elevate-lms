@@ -38,6 +38,8 @@ export async function queueCanonicalLessonMedia(db: SupabaseClient, input: {
     c.id === lesson.data.id || c.id === lesson.data.content_json?.competencyId ||
     build.profile.canonicalLessonIds?.[c.id] === lesson.data.id);
   if (!competency) throw new LessonMediaRequestError('Lesson is not mapped to this saved production contract.', 409);
+  if (build.profile.canonicalLessonIds?.[competency.id] !== lesson.data.id)
+    throw new LessonMediaRequestError('Complete the canonical lesson mapping in the current Course Builder before requesting media.', 409);
   const active = await db.from('ultimate_build_jobs').select('id,status,payload')
     .eq('build_id', build.id).eq('job_type', 'course_build').in('status', ['queued', 'running']).maybeSingle();
   if (active.error) throw active.error;

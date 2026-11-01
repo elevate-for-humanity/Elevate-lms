@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 import { useEffect, useState, type ReactNode } from 'react';
 
 export default function HostShopWelcome({
@@ -19,15 +20,32 @@ export default function HostShopWelcome({
 }) {
   const [entered, setEntered] = useState(false);
   const [photoFailed, setPhotoFailed] = useState(false);
-  useEffect(() => setPhotoFailed(false), [profileImageUrl, partnerId]);
+  // Match complete verified business identities; never borrow another shop's photo.
+  const identity = (value: string) => value.toLowerCase().replace(/&/g, 'and')
+    .replace(/\b(llc|inc)\b/g, '').replace(/[^a-z0-9]/g, '');
+  const aliases: Record<string, string> = {
+    stylesandscissors: 'style-and-scissor-salon',
+    stylesandscissorssalon: 'style-and-scissor-salon',
+    stylesandscissorssalonandbarber: 'style-and-scissor-salon',
+    countrycuts: 'kountry-kutz-barbershop',
+    countrycutsbarbershop: 'kountry-kutz-barbershop',
+    topshelfbarbershop: 'top-shelf-barber-lounge',
+  };
+  const shopIdentity = identity(shopName);
+  const featured = FEATURED_BEAUTY_HOST_PARTNERS.find(shop =>
+    shop.slug === aliases[shopIdentity] ||
+    [shop.name, shop.dba, shop.slug].some(name => name && identity(name) === shopIdentity));
+  const shopPhoto = featured?.media?.find(item => item.kind === 'photo');
+  const heroImageUrl = shopPhoto?.src || profileImageUrl;
+  useEffect(() => setPhotoFailed(false), [heroImageUrl, partnerId]);
   const displayName = ownerName || shopName;
   const initials = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   const profileHero = (
-    <div className="relative flex aspect-[16/7] items-center justify-center overflow-hidden rounded-3xl bg-neutral-950 text-white" aria-label={`${displayName} dashboard banner`}>
-      {profileImageUrl && !photoFailed ? (
-        <Image src={profileImageUrl} alt={`${displayName} profile photo`} fill priority sizes="(max-width: 1024px) 100vw, 75vw" className="object-contain object-top" onError={() => setPhotoFailed(true)} />
+    <div className="relative flex h-44 sm:h-56 lg:h-64 items-center justify-center overflow-hidden rounded-3xl bg-neutral-950 text-white" aria-label={`${displayName} dashboard banner`}>
+      {heroImageUrl && !photoFailed ? (
+        <Image src={heroImageUrl} alt={shopPhoto?.alt || `${displayName} profile photo`} fill priority sizes="(max-width: 1024px) 100vw, 75vw" className="object-contain object-top" onError={() => setPhotoFailed(true)} />
       ) : (
-        <div className="p-6 text-center"><p className="text-6xl font-black sm:text-8xl">{initials}</p><p className="mt-3 text-lg font-bold">{displayName}</p><p className="mt-2 text-sm text-neutral-300">{profileImageUrl ? 'Profile photo is unavailable' : 'Profile photo has not been added'}</p></div>
+        <div className="p-6 text-center"><p className="text-6xl font-black sm:text-8xl">{initials}</p><p className="mt-3 text-lg font-bold">{displayName}</p><p className="mt-2 text-sm text-neutral-300">{heroImageUrl ? 'Shop photo is unavailable' : 'Profile photo has not been added'}</p></div>
       )}
     </div>
   );

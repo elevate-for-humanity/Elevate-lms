@@ -71,12 +71,17 @@ export interface CareerOutcome {
   salary: string;
 }
 
-export interface HoursBreakdown {
+export interface DeliveryHoursBreakdown {
   onlineInstruction: number;
   handsOnLab: number;
   examPrep: number;
   careerPlacement: number;
 }
+
+/** Use documented module hours when a source does not allocate by delivery mode. */
+export type HoursBreakdown = DeliveryHoursBreakdown | {
+  modules: { label: string; hours: number }[];
+};
 
 export interface TrainingPhase {
   phase: number;
@@ -283,11 +288,7 @@ export function validateProgram(p: ProgramSchema): ValidationError[] {
 
   const minTotal = p.durationWeeks * p.hoursPerWeekMin;
   const maxTotal = p.durationWeeks * p.hoursPerWeekMax;
-  const breakdownTotal =
-    p.hoursBreakdown.onlineInstruction +
-    p.hoursBreakdown.handsOnLab +
-    p.hoursBreakdown.examPrep +
-    p.hoursBreakdown.careerPlacement;
+  const breakdownTotal = getTotalHoursFromBreakdown(p);
 
   if (breakdownTotal < minTotal || breakdownTotal > maxTotal) {
     errors.push({
@@ -413,6 +414,9 @@ export function getTotalHoursRange(p: ProgramSchema): string {
 }
 
 export function getTotalHoursFromBreakdown(p: ProgramSchema): number {
+  if ('modules' in p.hoursBreakdown) {
+    return p.hoursBreakdown.modules.reduce((sum, module) => sum + module.hours, 0);
+  }
   return (
     p.hoursBreakdown.onlineInstruction +
     p.hoursBreakdown.handsOnLab +

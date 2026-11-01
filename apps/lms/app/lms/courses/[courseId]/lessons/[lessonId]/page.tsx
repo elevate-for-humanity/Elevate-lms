@@ -351,8 +351,8 @@ export default async function LessonPage({
       <TheoryWindowBoundary courseId={course.id} readOnly={preview.active}>
         <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
           {preview.active ? (
-            <div className="rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm font-black text-amber-950">
-              Admin draft preview · Completion, assessment, and progress writes are disabled.
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700">
+              Administrator lesson view · Full content, playback and assessment inspection
             </div>
           ) : null}
           {lessonVisual?.media_type === 'image' ? (
@@ -400,6 +400,7 @@ export default async function LessonPage({
                       ? `/api/courses/${course.id}/lessons/${lesson.id}/playback?asset=captions`
                       : captionsUrl
                   }
+                  adminReview={preview.active}
                   readOnly={preview.active}
                   learnerId={preview.active ? undefined : user?.id}
                 />
@@ -421,7 +422,7 @@ export default async function LessonPage({
                 ) : (
                   <p className="mt-3 rounded-xl bg-amber-50 p-4 font-bold text-amber-950">
                     Theory Timeclock — Start and Stop are available in the learner's own lesson
-                    session. Clocking is disabled in this read-only preview.
+                    session. Administrator review does not start a learner timeclock.
                   </p>
                 )}
               </div>
@@ -487,19 +488,33 @@ export default async function LessonPage({
               id="lesson-completion"
               className="rounded-2xl border border-amber-300 bg-amber-50 p-6"
             >
-              <h2 className="text-xl font-bold">Lesson completion — read-only preview</h2>
-              <p className="mt-2">
-                The learner completes required activities, passes any assessment, and selects Mark
-                lesson complete or Submit assessment here. Enrollment, engagement, sequencing and
-                instructor sign-off checks still apply.
-              </p>
-              <button
-                type="button"
-                disabled
-                className="mt-4 rounded-lg bg-slate-300 px-4 py-3 font-bold text-slate-700"
-              >
-                Completion disabled in admin preview
-              </button>
+              <h2 className="text-xl font-bold">Assessment and completion review</h2>
+              <p className="mt-2">Inspect every saved question and answer below. Administrator review does not award learner hours, assessment results or completion.</p>
+              <div className="mt-4 space-y-4">
+                {questions.map((question: any, index: number) => (
+                  <article key={question.id || index} className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="font-bold">{index + 1}. {question.question || question.question_text || question.prompt}</h3>
+                    <ol className="mt-3 list-[upper-alpha] space-y-2 pl-6">
+                      {(question.options || question.choices || []).map((option: any, optionIndex: number) => (
+                        <li key={optionIndex}>{typeof option === 'string' ? option : option.text || option.label || JSON.stringify(option)}</li>
+                      ))}
+                    </ol>
+                    <details className="mt-3">
+                      <summary className="cursor-pointer font-bold">Inspect saved answer and rationale</summary>
+                      <pre className="mt-2 whitespace-pre-wrap break-words text-sm">{JSON.stringify({
+                        answer: question.correctAnswer ?? question.correct_answer ?? question.correct ?? question.answer ?? 'No answer key saved',
+                        explanation: question.explanation ?? question.rationale ?? 'No rationale saved',
+                      }, null, 2)}</pre>
+                    </details>
+                  </article>
+                ))}
+                {!questions.length && <p>No assessment questions have been saved for this lesson yet.</p>}
+              </div>
+              <a href={`https://admin.elevateforhumanity.org/studio/courses?courseId=${course.id}&tab=ultimate`}
+                target="_blank" rel="noopener noreferrer"
+                className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-4 py-3 font-bold text-white">
+                Edit and manage this course in Studio
+              </a>
             </section>
           ) : (
             <>

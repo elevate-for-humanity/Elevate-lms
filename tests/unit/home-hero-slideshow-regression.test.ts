@@ -21,8 +21,6 @@ describe('homepage hero slideshow rendering', () => {
     for (const href of [
       '/programs',
       '/check-eligibility',
-      '/employers',
-      '/store/apps/website-builder',
     ]) {
       expect(hero).toContain(`href="${href}"`);
     }

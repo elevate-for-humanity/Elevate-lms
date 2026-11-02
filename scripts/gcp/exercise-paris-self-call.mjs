@@ -53,11 +53,11 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  const origins=await api('https://trunking.twilio.com/v1/Trunks/'+number.trunk_sid+'/OriginationUrls?PageSize=100');
  if(trunk.account_sid!==ACCOUNT||trunk.domain_name!==DOMAIN||trunk.secure!==true||origins.meta?.next_page_url||origins.origination_urls?.length!==1||origins.origination_urls[0].enabled!==true||origins.origination_urls[0].sip_url!=='sip:phone.elevateforhumanity.org:5061;transport=tls')throw Error('SELF_CALL_ROUTE_UNVERIFIED');
  for(const status of ['queued','ringing','in-progress']){const active=await api(base+'/Calls.json?Status='+status+'&PageSize=100');if(active.next_page_uri||!Array.isArray(active.calls)||active.calls.length)throw Error('SELF_CALL_ACTIVE_CALLS_PRESENT');}
- const timeLimit=operatorTest||menuTest?60:voicemailTest?75:45;
+ const timeLimit=menuTest?80:operatorTest?60:voicemailTest?75:45;
  const operatorTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>Please connect me to the operator.</Say><Pause length="7"/><Say loop="2">Incoming operator audio test. This is a controlled system check.</Say><Pause length="8"/><Hangup/></Response>';
  const voicemailTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Play digits="w0"/><Pause length="12"/><Say loop="3">This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.</Say><Play digits="#"/><Pause length="2"/><Hangup/></Response>';
  const mailboxTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="36"/><Say loop="3">This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.</Say><Play digits="#"/><Pause length="2"/><Hangup/></Response>';
- const twiml=menuTest?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="54"/><Hangup/></Response>':operatorTest?operatorTwiml:voicemailTest?(directMailboxTest?mailboxTwiml:voicemailTwiml):expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
+ const twiml=menuTest?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="74"/><Hangup/></Response>':operatorTest?operatorTwiml:voicemailTest?(directMailboxTest?mailboxTwiml:voicemailTwiml):expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
  // Exactly one bounded call to the verified business number. Never retry creation.
  const created=await api(base+'/Calls.json',{To:NUMBER,From:NUMBER,Timeout:'15',TimeLimit:String(timeLimit),...(voicemailTest?{Record:'false'}:{Record:'true',RecordingChannels:'dual',RecordingTrack:'both'}),Twiml:twiml});
  if(!/^CA[a-f0-9]{32}$/i.test(created.sid||'')||created.account_sid!==ACCOUNT||created.to!==NUMBER||created.from!==NUMBER)throw Error('SELF_CALL_CREATION_UNVERIFIED');
@@ -81,16 +81,17 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
   if(absent)throw Error('SELF_CALL_RECORDING_ABSENT_'+(/^[0-9]{3,6}$/.test(String(absent.error_code))?absent.error_code:'UNKNOWN'));
   await wait(2500);
  }
- if(!recording||!/^RE[a-f0-9]{32}$/i.test(recording.sid)||Number(recording.duration)>(operatorTest||menuTest?60:50))throw Error('SELF_CALL_RECORDING_UNAVAILABLE');
+ if(!recording||!/^RE[a-f0-9]{32}$/i.test(recording.sid)||Number(recording.duration)>(menuTest?80:operatorTest?60:50))throw Error('SELF_CALL_RECORDING_UNAVAILABLE');
  let audio=await request(base+'/Recordings/'+recording.sid+'.wav',{headers,redirect:'manual',signal:AbortSignal.timeout(20000)});
  if([301,302,303,307,308].includes(audio.status)){
   const location=new URL(audio.headers.get('location'));
   if(location.protocol!=='https:'||location.username||location.password||!['twilio.com','twiliocdn.com','amazonaws.com','cloudfront.net'].some(d=>location.hostname===d||location.hostname.endsWith('.'+d)))throw Error('SELF_CALL_MEDIA_ORIGIN_REJECTED');
   audio=await request(location.href,{redirect:'error',signal:AbortSignal.timeout(20000)}); // Never forward provider credentials to storage.
  }
- if(!audio.ok||Number(audio.headers.get('content-length')||0)>2000000)throw Error('SELF_CALL_MEDIA_UNAVAILABLE');
+ const mediaLimit=menuTest?2800000:2000000;
+ if(!audio.ok||Number(audio.headers.get('content-length')||0)>mediaLimit)throw Error('SELF_CALL_MEDIA_UNAVAILABLE');
  const wav=Buffer.from(await audio.arrayBuffer());
- if(wav.length>2000000||wav.subarray(0,4).toString()!=='RIFF'||wav.subarray(8,12).toString()!=='WAVE')throw Error('SELF_CALL_AUDIO_INVALID');
+ if(wav.length>mediaLimit||wav.subarray(0,4).toString()!=='RIFF'||wav.subarray(8,12).toString()!=='WAVE')throw Error('SELF_CALL_AUDIO_INVALID');
  const recognition=await transcribe(wav),summary=summarizeSpeech(expectedGreeting,recognition),ratio=summary.ratio;
  return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),recordingDurationSeconds:Number(recording.duration),receivedAudioBytes:wav.length,speechWordCount:summary.wordCount,savedGreetingWordMatch:Math.round(ratio*100)/100,savedGreetingAudioMatched:ratio>=0.75,liveGreetingAcceptance:ratio>=0.75?'PASS':'FAIL',liveMenuAcceptance:menuTest?(ratio>=0.75&&heardMenuDigits(expectedMenuDigits,recognition,expectedGreeting)?'PASS':'FAIL'):'NOT_TESTED',liveConversationAcceptance:expectConversation?(summary.replyMarkerMatched?'PASS':'FAIL'):'NOT_TESTED',operatorTransferAcceptance:operatorTest?(summary.operatorMarkerMatched?'PASS':'FAIL'):'NOT_TESTED',voicemailDeliveryAcceptance:'NOT_TESTED'};
 }
@@ -112,35 +113,42 @@ export async function inspectSelfCall(bindings,sid,{request=fetch}={}){
   recordingStatuses:(records.recordings||[]).map(r=>({status:r.status,duration:Number(r.duration),channels:r.channels,source:r.source,errorCode:r.error_code===null?null:Number(r.error_code)})),
   providerNotifications:(notifications.notifications||[]).map(n=>({errorCode:Number(n.error_code),messageSignals:Object.fromEntries(['SIP','TLS','certificate','SRTP','busy','timeout','media','audio','registration','routing'].map(label=>[label,new RegExp(label,'i').test(String(n.message_text||''))]))}))};
 }
-const recognitionProgram=`import base64,json,sys,struct,urllib.request,urllib.error
+export const recognitionProgram=`import base64,json,sys,struct,urllib.request,urllib.error
 try:
  data=json.load(sys.stdin)
  req=urllib.request.Request('http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token',headers={'Metadata-Flavor':'Google'})
  token=json.load(urllib.request.urlopen(req,timeout=5))['access_token']
- wav=base64.b64decode(data['audio']);offset=12;fmt=None
+ wav=base64.b64decode(data['audio']);offset=12;fmt=None;audio=None
  while offset+8<=len(wav):
   tag,size=wav[offset:offset+4],struct.unpack_from('<I',wav,offset+4)[0]
-  if tag==b'fmt ':fmt=struct.unpack_from('<HHI',wav,offset+8)+(struct.unpack_from('<H',wav,offset+22)[0],);break
+  if offset+8+size>len(wav):raise ValueError('audio_truncated')
+  if tag==b'fmt ':fmt=struct.unpack_from('<HHI',wav,offset+8)+(struct.unpack_from('<H',wav,offset+22)[0],)
+  if tag==b'data':audio=wav[offset+8:offset+8+size]
   offset+=8+size+(size%2)
  if not fmt or fmt[1] not in [1,2] or fmt[2] not in [8000,16000,24000,32000,44100,48000]:raise ValueError('audio_format_unverified')
  encoding='LINEAR16' if fmt[0]==1 and fmt[3]==16 else 'MULAW' if fmt[0]==7 and fmt[3]==8 else None
- if not encoding:raise ValueError('audio_encoding_unverified')
+ if not encoding or not audio:raise ValueError('audio_encoding_unverified')
  config={'encoding':encoding,'sampleRateHertz':fmt[2],'audioChannelCount':fmt[1],'enableSeparateRecognitionPerChannel':fmt[1]>1,'languageCode':'en-US','model':'phone_call','enableWordTimeOffsets':True}
- body={'config':config,'audio':{'content':data['audio']}}
- req=urllib.request.Request('https://speech.googleapis.com/v1/speech:recognize',data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'})
- reply=json.load(urllib.request.urlopen(req,timeout=60))
+ # Synchronous recognition accepts at most one minute per request. Keep full
+ # interleaved channel frames and original word times across 45-second chunks.
+ bytes_per_second=fmt[2]*fmt[1]*(fmt[3]//8)
+ chunk_bytes=bytes_per_second*45
  segments=[]
- for r in reply.get('results',[]):
-  if not r.get('alternatives'):continue
-  alt=r['alternatives'][0]
-  late=[w.get('word','') for w in alt.get('words',[]) if float(w.get('startTime','0s').rstrip('s'))>=30]
-  segments.append({'channel':r.get('channelTag',0),'text':alt.get('transcript',''),'lateWords':late})
+ for start in range(0,len(audio),chunk_bytes):
+  body={'config':config,'audio':{'content':base64.b64encode(audio[start:start+chunk_bytes]).decode()}}
+  req=urllib.request.Request('https://speech.googleapis.com/v1/speech:recognize',data=json.dumps(body).encode(),headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'})
+  reply=json.load(urllib.request.urlopen(req,timeout=60))
+  for r in reply.get('results',[]):
+   if not r.get('alternatives'):continue
+   alt=r['alternatives'][0]
+   late=[w.get('word','') for w in alt.get('words',[]) if start/bytes_per_second+float(w.get('startTime','0s').rstrip('s'))>=30]
+   segments.append({'channel':r.get('channelTag',0),'text':alt.get('transcript',''),'lateWords':late})
  print(json.dumps({'text':' '.join(s['text'] for s in segments),'segments':segments}))
 except Exception:print(json.dumps({'error':'self_call_speech_unavailable'}));sys.exit(1)
 `;
 export function transcribeOnPbx(wav){
  const quote=value=>"'"+value.replaceAll("'","'\\''")+"'";
- const result=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command','sudo python3 -c '+quote(recognitionProgram)],{input:JSON.stringify({audio:wav.toString('base64')}),encoding:'utf8',timeout:90000,maxBuffer:1000000});
+ const result=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command','sudo python3 -c '+quote(recognitionProgram)],{input:JSON.stringify({audio:wav.toString('base64')}),encoding:'utf8',timeout:150000,maxBuffer:1000000});
  if(result.status!==0)throw Error('SELF_CALL_SPEECH_UNAVAILABLE');
  let body;try{body=JSON.parse(result.stdout.trim());}catch{throw Error('SELF_CALL_SPEECH_UNAVAILABLE');}
  if(typeof body.text!=='string'||!Array.isArray(body.segments))throw Error('SELF_CALL_SPEECH_UNAVAILABLE');return body;

@@ -114,6 +114,14 @@ function authorized(given,expected){
 export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token=process.env.PARIS_TURN_TOKEN,greeting=process.env.PARIS_GREETING,menu=process.env.PARIS_MENU_OPTIONS || '[]',allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || ''}={}){
   if(!token || token.length<32)throw Error('PARIS_TURN_TOKEN_MISSING');
   const options=menuOptions(menu,allowedExtensions);
+  // The approved opening is identical for every caller until settings restart
+  // this service. Share one synthesis so every new call does not begin silently
+  // while the provider regenerates the same minute of greeting/menu audio.
+  let openingAudio;
+  const preparedOpening=()=>{
+    if(!openingAudio)openingAudio=Promise.resolve().then(()=>tts(openingText(greeting,options))).catch(error=>{openingAudio=undefined;throw error;});
+    return openingAudio;
+  };
   return async(req,res)=>{
     const fail=(code,status)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:code}));};
     if(req.method!=='POST'||req.url!=='/internal/paris/turn')return fail('NOT_FOUND',404);
@@ -142,7 +150,7 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
       try{
         if(opening){
           const opening=openingText(greeting,options);
-          const audioReply=await tts(opening);
+          const audioReply=await preparedOpening();
           prior.history=[{role:'model',text:opening}];
           prior.sequence=body.sequence;prior.updated=Date.now();
           res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});

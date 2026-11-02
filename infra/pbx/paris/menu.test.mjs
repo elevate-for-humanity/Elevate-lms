@@ -20,6 +20,30 @@ test('opening reads every saved menu option in order without inventing a destina
   assert.ok(spoken[0].indexOf('press 1.')<spoken[0].indexOf('press 7.'));
 });
 
+test('successive callers reuse the prepared public opening instead of waiting for repeated synthesis',async()=>{
+  let calls=0;
+  const handler=makeTurnHandler({token:'x'.repeat(40),greeting:'Approved greeting.',menu,allowedExtensions,tts:async()=>{calls++;return Buffer.alloc(160).toString('base64');}});
+  for(const id of ['2','3']){
+    const body={callId:'cached-menu-'+id,sessionId:id.repeat(24),sequence:0,event:'greeting',encoding:'PCMU',sampleRate:8000};
+    const response={writeHead(status){this.status=status;},end(){}};
+    await handler({method:'POST',url:'/internal/paris/turn',headers:{authorization:'Bearer '+'x'.repeat(40)},async *[Symbol.asyncIterator](){yield Buffer.from(JSON.stringify(body));}},response);
+    assert.equal(response.status,200);
+  }
+  assert.equal(calls,1);
+});
+
+test('a transient opening synthesis failure is retried for a later caller',async()=>{
+  let calls=0;
+  const handler=makeTurnHandler({token:'x'.repeat(40),greeting:'Approved greeting.',tts:async()=>{if(++calls===1)throw Error('temporary provider error');return Buffer.alloc(160).toString('base64');}});
+  for(const [id,status] of [['4',503],['5',200]]){
+    const body={callId:'retry-menu-'+id,sessionId:id.repeat(24),sequence:0,event:'greeting',encoding:'PCMU',sampleRate:8000};
+    const response={writeHead(code){this.status=code;},end(){}};
+    await handler({method:'POST',url:'/internal/paris/turn',headers:{authorization:'Bearer '+'x'.repeat(40)},async *[Symbol.asyncIterator](){yield Buffer.from(JSON.stringify(body));}},response);
+    assert.equal(response.status,status);
+  }
+  assert.equal(calls,2);
+});
+
 test('each announced keypad choice interrupts the opening and transfers only to its saved extension',async()=>{
   for(const entry of entries){
     const session={callId:'owned-caller',playing:true,busy:true,frames:[]};

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {exerciseSelfCall,greetingMatch,summarizeSpeech,heardMenuDigits} from './exercise-paris-self-call.mjs';
+import {spawnSync} from 'node:child_process';
+import {exerciseSelfCall,greetingMatch,summarizeSpeech,heardMenuDigits,recognitionProgram} from './exercise-paris-self-call.mjs';
 const account='AC75bcca01e19767614252902185ed948f',number='+14632401404',sid='CA'+'a'.repeat(32),trunk='TK'+'b'.repeat(32),recording='RE'+'c'.repeat(32);
 const greeting='Thank you for calling Elevate for Humanity. I am Paris your virtual assistant. How can I help you with your career training today?';
 const bindings={TWILIO_ACCOUNT_SID:account,TWILIO_PHONE_NUMBER:number,TWILIO_AUTH_TOKEN:'private-test-token'};
@@ -21,6 +22,27 @@ function fixture({active=false,secure=true,createError=false,callStatus='complet
  return {requests,request};
 }
 const options=f=>({request:f.request,wait:async()=>{},expectedGreeting:greeting,transcribe:async()=>greeting});
+test('a long stereo menu recording is recognized in bounded chunks with original channel and word timing',()=>{
+ const samples=Buffer.alloc(75*8000*2*2,1),wav=Buffer.alloc(44+samples.length);
+ wav.write('RIFF',0);wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(2,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(32000,28);wav.writeUInt16LE(4,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(samples.length,40);samples.copy(wav,44);
+ const harness=`import urllib.request,io,json,base64
+calls=[]
+def fake_open(req,timeout=None):
+ if 'computeMetadata' in req.full_url:return io.BytesIO(json.dumps({'access_token':'test-token'}).encode())
+ assert req.full_url=='https://speech.googleapis.com/v1/speech:recognize'
+ body=json.loads(req.data);calls.append({'bytes':len(base64.b64decode(body['audio']['content'])),'channels':body['config']['audioChannelCount']})
+ return io.BytesIO(json.dumps({'results':[{'channelTag':1,'alternatives':[{'transcript':'press seven','words':[{'word':'seven','startTime':'1s'}]}]}]}).encode())
+urllib.request.urlopen=fake_open
+exec(${JSON.stringify(recognitionProgram)})
+print(json.dumps(calls))
+`;
+ const result=spawnSync('python3',['-c',harness],{input:JSON.stringify({audio:wav.toString('base64')}),encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ const [recognition,calls]=result.stdout.trim().split('\n').map(JSON.parse);
+ assert.deepEqual(calls,[{bytes:45*32000,channels:2},{bytes:30*32000,channels:2}]);
+ assert.deepEqual(recognition.segments.map(s=>s.channel),[1,1]);
+ assert.deepEqual(recognition.segments.map(s=>s.lateWords),[[],['seven']]);
+});
 test('menu acceptance requires every announced choice on the PARIS greeting channel',()=>{
  const recognition={segments:[{channel:1,text:greeting+' For Administration press zero.'},{channel:2,text:'For Beauty press five.'}]};
  assert.equal(heardMenuDigits(['0','5'],recognition,greeting),false);
@@ -33,8 +55,8 @@ test('menu-only self-call waits for the full opening without dialing staff or cl
  const create=f.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');
  assert.equal(create.length,1);
  const params=new URLSearchParams(create[0].options.body);
- assert.equal(params.get('To'),number);assert.equal(params.get('TimeLimit'),'60');
- assert.ok(params.get('Twiml').includes('Pause length="54"'));
+ assert.equal(params.get('To'),number);assert.equal(params.get('TimeLimit'),'80');
+ assert.ok(params.get('Twiml').includes('Pause length="74"'));
  assert.ok(!params.get('Twiml').includes('digits='));
  assert.equal(result.liveMenuAcceptance,'PASS');
  assert.equal(result.operatorTransferAcceptance,'NOT_TESTED');

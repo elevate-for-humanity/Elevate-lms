@@ -177,13 +177,17 @@ export default async function LessonPage({
     );
   const db = preview.active ? preview.db : supabase;
 
-  let courseQuery = db.from('courses').select('id,title,slug,is_active');
+  let courseQuery = db.from('courses').select('id,title,slug,is_active,program_id');
   if (!preview.active) courseQuery = courseQuery.eq('is_active', true);
   courseQuery = isUuid(courseId)
     ? courseQuery.eq('id', courseId)
     : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
+  const { data: program } = course.program_id
+    ? await db.from('programs').select('slug').eq('id', course.program_id).maybeSingle()
+    : { data: null };
+  const handsOnClockOnly = program?.slug === 'hvac-technician' || /^(hvac(?:-|$)|epa-?608(?:-|$))/i.test(course.slug || '');
 
   if (!preview.active && user) {
     const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', {
@@ -417,7 +421,11 @@ export default async function LessonPage({
                     Go to lesson completion
                   </a>
                 </div>
-                {!preview.active ? (
+                {handsOnClockOnly ? (
+                  <p className="mt-3 rounded-xl bg-amber-50 p-4 font-bold text-amber-950">
+                    Use the timeclock only for supervised hands-on training. Online theory and workbook study do not require clocking in. Your lesson progress saves separately.
+                  </p>
+                ) : !preview.active ? (
                   <div id="theory-timeclock-slot" className="mt-4" />
                 ) : (
                   <p className="mt-3 rounded-xl bg-amber-50 p-4 font-bold text-amber-950">
@@ -524,6 +532,7 @@ export default async function LessonPage({
                 lessonId={lesson.id}
               />
               <LessonProgressClient
+                theoryClockEnabled={!handsOnClockOnly}
                 courseId={course.id}
                 lessonId={lesson.id}
                 lessonType={lessonType}

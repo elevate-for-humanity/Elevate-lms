@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-export function useTheoryTimeclock(courseId: string, lessonId: string) {
+export function useTheoryTimeclock(courseId: string, lessonId: string, enabled = true) {
   const [theoryStatus, setTheoryStatus] = useState<'starting' | 'active' | 'paused' | 'untracked'>(
     'paused',
   );
@@ -14,7 +14,7 @@ export function useTheoryTimeclock(courseId: string, lessonId: string) {
   const startingTheorySession = useRef(false);
 
   const startTheorySession = useCallback(async () => {
-    if (startingTheorySession.current || theorySessionId.current || document.hidden) return;
+    if (!enabled || startingTheorySession.current || theorySessionId.current || document.hidden) return;
     startingTheorySession.current = true;
     setTheoryStatus('starting');
     try {
@@ -44,7 +44,7 @@ export function useTheoryTimeclock(courseId: string, lessonId: string) {
     } finally {
       startingTheorySession.current = false;
     }
-  }, [courseId, lessonId]);
+  }, [courseId, lessonId, enabled]);
 
   const stopTheorySession = useCallback(async (creditFinal = false) => {
     const sessionId = theorySessionId.current;
@@ -63,6 +63,7 @@ export function useTheoryTimeclock(courseId: string, lessonId: string) {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     const noteActivity = () => {
       lastActivityAt.current = Date.now();
       if (clockRequested.current && !theorySessionId.current && !document.hidden)
@@ -139,12 +140,13 @@ export function useTheoryTimeclock(courseId: string, lessonId: string) {
       document.removeEventListener('timeupdate', videoActivity, true);
       void stopTheorySession(true).catch(() => undefined);
     };
-  }, [startTheorySession, stopTheorySession]);
+  }, [startTheorySession, stopTheorySession, enabled]);
   return {
     theoryStatus,
     theoryMessage,
     weeklyTheorySeconds,
     startClock() {
+      if (!enabled) return;
       clockRequested.current = true;
       lastActivityAt.current = Date.now();
       void startTheorySession();
@@ -164,6 +166,7 @@ export function useTheoryTimeclock(courseId: string, lessonId: string) {
       }
     },
     async finalize() {
+      if (!enabled) return;
       clockRequested.current = false;
       await stopTheorySession(true);
       if (theoryStatus !== 'untracked') {

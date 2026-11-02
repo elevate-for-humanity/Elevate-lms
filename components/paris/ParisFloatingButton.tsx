@@ -247,8 +247,8 @@ export function ParisFloatingButton({
           className={`${videoDock ? 'relative' : 'fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 sm:right-4 md:bottom-6 md:right-6'} z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:px-4`}
         >
           <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className={learnerSurface ? '' : 'hidden sm:inline'}>
+          <Mic className={learnerSurface ? "hidden h-5 w-5 shrink-0 sm:block" : "h-5 w-5 shrink-0"} aria-hidden="true" />
+          <span className="hidden sm:inline">
             {learnerSurface
               ? 'Ask PARIS · Course help'
               : portalSurface

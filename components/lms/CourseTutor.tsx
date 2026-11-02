@@ -33,9 +33,9 @@ export default function CourseTutor({ courseId, lessonId }: { courseId: string; 
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-4 sm:px-6" data-course-help="inline">
       {open ? (
-        <section className="mb-3 w-[min(92vw,420px)] rounded-2xl border border-slate-200 bg-white shadow-2xl" aria-label="Course AI tutor">
+        <section className="mb-3 w-full rounded-2xl border border-slate-200 bg-white shadow-2xl" aria-label="Course AI tutor">
           <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5 text-cyan-700" />
@@ -60,7 +60,7 @@ export default function CourseTutor({ courseId, lessonId }: { courseId: string; 
           </form>
         </section>
       ) : null}
-      <button type="button" onClick={() => setOpen((value) => !value)} className="ml-auto flex items-center gap-2 rounded-full bg-cyan-700 px-4 py-3 font-bold text-white shadow-xl hover:bg-cyan-800" aria-expanded={open} aria-label="Open course AI tutor">
+      <button type="button" onClick={() => setOpen((value) => !value)} className="flex min-h-12 items-center gap-2 rounded-full bg-cyan-700 px-4 py-3 font-bold text-white shadow-xl hover:bg-cyan-800" aria-expanded={open} aria-label="Open course AI tutor">
         <MessageCircle className="h-5 w-5" /> Ask Tutor
       </button>
     </div>

@@ -17,6 +17,7 @@ type QuizQuestion = {
 };
 
 interface Props {
+  theoryClockEnabled?: boolean;
   courseId: string;
   lessonId: string;
   lessonType: string;
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function LessonProgressClient({
+  theoryClockEnabled = true,
   courseId,
   lessonId,
   lessonType,
@@ -38,7 +40,7 @@ export default function LessonProgressClient({
   const [result, setResult] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState(false);
-  const clock = useTheoryTimeclock(courseId, lessonId);
+  const clock = useTheoryTimeclock(courseId, lessonId, theoryClockEnabled);
   const [clockTarget, setClockTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
     setClockTarget(document.getElementById('theory-timeclock-slot'));
@@ -132,7 +134,7 @@ export default function LessonProgressClient({
   const clockPanel = <TheoryTimeclockPanel clock={clock} />;
   return (
     <>
-      {clockTarget ? createPortal(clockPanel, clockTarget) : clockPanel}
+      {theoryClockEnabled ? (clockTarget ? createPortal(clockPanel, clockTarget) : clockPanel) : null}
       <section
         id="lesson-completion"
         tabIndex={-1}

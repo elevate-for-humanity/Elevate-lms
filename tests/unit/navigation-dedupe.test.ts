@@ -20,12 +20,11 @@ describe('NAV_ITEMS structure', () => {
     expect(dupes).toEqual([]);
   });
 
-  it('groups program subItems into category columns', () => {
-    const programs = NAV_ITEMS.find((i) => i.id === 'programs');
-    expect(programs?.subItems?.length).toBeGreaterThan(5);
-    const columns = Object.values(groupNavSubItemsByHeader(programs!.subItems!));
-    expect(columns.length).toBeGreaterThan(3);
-    expect(columns.map(getNavCategoryLabel)).toContain('Healthcare');
+  it('keeps program choices flat without nested category accordions', () => {
+    const programs = NAV_ITEMS.find(i => i.id === 'programs');
+    expect(programs?.subItems?.some(item => item.name === 'Healthcare')).toBe(true);
+    expect(programs?.subItems?.some(item => item.isHeader)).toBe(false);
+    expect(programs?.subItems?.length).toBeLessThanOrEqual(7);
   });
 
   it('includes core main menu sections', () => {
@@ -33,9 +32,8 @@ describe('NAV_ITEMS structure', () => {
     expect(names).toContain('Programs');
     expect(names).toContain('Apprenticeships');
     expect(names).toContain('Funding');
-    expect(names).toContain('Employers');
+    expect(names).toContain('Partners');
     expect(names).toContain('Resources');
-    expect(names).toContain('Portals');
     expect(names).toContain('About');
   });
 

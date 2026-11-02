@@ -11,6 +11,7 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const APP_ROOT = path.join(ROOT, 'apps/marketing/app');
 
 async function loadNav() {
   const mod = await import(pathToFileURL(path.join(ROOT, 'lib/navigation.ts')).href);
@@ -31,7 +32,7 @@ function collectPageRoutes() {
         continue;
       }
       if (ent.name !== 'page.tsx' && ent.name !== 'route.ts') continue;
-      const rel = path.relative(path.join(ROOT, 'app'), path.dirname(full));
+      const rel = path.relative(APP_ROOT, path.dirname(full));
       const segments = rel.split(path.sep).filter(Boolean);
       let route = '/';
       for (const seg of segments) {
@@ -45,7 +46,7 @@ function collectPageRoutes() {
       routes.add(route.replace(/\/+$/, '') || '/');
     }
   };
-  walk(path.join(ROOT, 'app'));
+  walk(APP_ROOT);
   return routes;
 }
 
@@ -109,6 +110,7 @@ function normalizeHref(href) {
 }
 
 function resolveHref(href, ctx) {
+  if (/^https?:\/\//.test(href)) return { ok: true, resolved: href, via: 'external portal (not HTTP-tested)' };
   let p = normalizeHref(href);
   const chain = [p];
   while (ctx.redirects.has(p)) {
@@ -124,7 +126,7 @@ function resolveHref(href, ctx) {
   if (prog && !prog[1].includes('[')) {
     const slug = prog[1];
     const hasDynamicProgramRoute = fs.existsSync(
-      path.join(ROOT, 'app/programs/[program]/page.tsx'),
+      path.join(APP_ROOT, 'programs/[program]/page.tsx'),
     );
     if (
       hasDynamicProgramRoute &&
@@ -172,8 +174,9 @@ function resolveHref(href, ctx) {
 function leafHrefs(items) {
   const out = [];
   for (const item of items) {
+    if (item.href) out.push({ section: item.name, name: item.name, href: item.href });
     for (const sub of item.subItems ?? []) {
-      if (sub.isHeader) continue;
+      if (!sub.href) continue;
       out.push({ section: item.name, name: sub.name, href: sub.href });
     }
   }
@@ -219,7 +222,7 @@ async function main() {
     }
     process.exit(1);
   }
-  console.log('\nAll header leaf links resolve.');
+  console.log('\nAll header destinations resolve. External portals require separate live acceptance.');
 }
 
 main().catch((err) => {

@@ -48,6 +48,29 @@ export const metadata: Metadata = {
   },
 };
 
+const founderCredentials = [
+  'U.S. Army Veteran — Unit Supply Specialist',
+  'IRS Enrolled Agent (EA) — Federally Authorized Tax Practitioner',
+  'Electronic Filing Identification Number (EFIN) holder',
+  'Preparer Tax Identification Number (PTIN) holder',
+  'Electronic Return Originator (ERO)',
+  'SBIN-authorized federal tax software submitter',
+  'Indiana Licensed Barber — Indiana Professional Licensing Agency',
+  'Indiana Substitute Teacher License',
+  'OSHA 10-Hour Safety Certification',
+  'EPA Section 608 Certified Proctor — ESCO Group (#358010)',
+  'EPA Section 608 Certified Proctor — Mainstream Engineering',
+  'Certiport Authorized Testing Center (CATC) Owner and Operator',
+  'Microsoft Office Specialist Exam Proctor',
+  'IC3 Digital Literacy Exam Proctor',
+  'Information Technology Specialist Exam Proctor',
+  'Entrepreneurship and Small Business Exam Proctor',
+  'Intuit QuickBooks Certification Exam Proctor',
+  'VITA Free Tax Preparation Site Coordinator',
+  'VITA Free Tax Preparation Center Owner and Operator',
+];
+
+
 const founderJsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -137,9 +160,9 @@ export default function ElizabethGreenePage() {
         </div>
       </div>
 
-      <section className="bg-slate-950 text-white">
+      <section className="border-b border-slate-200 bg-slate-50 text-slate-950">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div className="relative min-h-[420px] overflow-hidden rounded-3xl shadow-2xl sm:min-h-[520px]">
+          <div className="relative min-h-[360px] overflow-hidden rounded-3xl shadow-2xl sm:min-h-[440px]">
             <Image
               src={organization.founder.imagePath}
               alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
@@ -151,16 +174,16 @@ export default function ElizabethGreenePage() {
           </div>
 
           <div>
-            <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-orange-300">
+            <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
               Founder & Leadership
             </p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">
               Elizabeth Greene
             </h1>
-            <p className="mt-4 text-2xl font-bold text-white">
+            <p className="mt-4 text-xl font-bold text-slate-950">
               Founder &amp; Chief Executive Officer, Elevate for Humanity
             </p>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200 sm:text-xl">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-700">
               Elizabeth Greene founded Elevate for Humanity to connect career training with the workforce systems that determine whether participants can successfully move from interest to enrollment, work-based learning, credentials, and employment.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -174,7 +197,7 @@ export default function ElizabethGreenePage() {
                 href={organization.founder.linkedIn}
                 target="_blank"
                 rel="noopener noreferrer me"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/60 px-6 py-3.5 font-extrabold text-white hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3.5 font-extrabold text-white bg-white text-slate-950 hover:bg-slate-100"
               >
                 LinkedIn <ExternalLink className="h-4 w-4" />
               </a>
@@ -271,6 +294,13 @@ export default function ElizabethGreenePage() {
             </Link>
           </aside>
         </div>
+      </section>
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <details className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <summary className="cursor-pointer text-xl font-bold text-slate-950">Professional credentials &amp; authorizations</summary>
+          <ul className="mt-5 grid list-inside list-disc gap-3 text-sm leading-6 text-slate-700 sm:grid-cols-2">{founderCredentials.map(credential => <li key={credential}>{credential}</li>)}</ul>
+        </details>
+        <Link href="/about/team" className="mt-5 inline-flex min-h-11 items-center gap-2 font-bold text-brand-red-700 hover:underline">Meet the rest of our team <ArrowRight className="h-4 w-4" /></Link>
       </section>
     </main>
   );

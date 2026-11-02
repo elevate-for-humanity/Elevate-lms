@@ -24,7 +24,7 @@ export const TEAM: TeamMember[] = [
     title: 'Founder & Chief Executive Officer',
     orgRole: 'Executive Leadership',
     bio: 'U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA), EFIN/PTIN holder, ERO, and SBIN-authorized federal tax software submitter. Elizabeth is also a licensed barber, Indiana substitute teacher, OSHA 10-Hour certified, EPA 608 Certified Proctor (ESCO #358010 and Mainstream Engineering), and Certiport Authorized Testing Center (CATC) operator. She founded Elevate for Humanity — a DOL Registered Apprenticeship Sponsor and Indiana ETPL/WIOA/WRG/JRI-approved workforce provider — and also leads Elevate tax operations and Selfish Inc., a 501(c)(3) nonprofit providing VITA free tax prep and community services.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene-headshot.webp',
+    headshotSrc: '/images/team/elizabeth-greene-headshot.webp',
     email: '',
   },
   {
@@ -33,7 +33,7 @@ export const TEAM: TeamMember[] = [
     title: 'Director of Enrollment & Beauty Industry Programs',
     orgRole: 'Nail & Esthetics Industry Leadership',
     bio: 'Jozanna George is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. Through Mesmerized by Beauty Cosmetology Academy, she leads beauty-industry education and brings hands-on experience in nail care, skincare, sanitation, client consultation, salon and spa professionalism, technical skill development, and student preparation. At Elevate for Humanity, she directs enrollment and beauty-industry programs and supports Nail Technician and Esthetician apprentices from application through career readiness.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/jozanna-george.jpg',
+    headshotSrc: '/images/jozanna-george.jpg',
     email: 'jozanna@elevateforhumanity.org',
   },
   {
@@ -51,7 +51,7 @@ export const TEAM: TeamMember[] = [
     title: 'Director of Community Services',
     orgRole: 'Community & Supportive Services',
     bio: 'Leslie promotes low-barrier housing access and eviction prevention, helping families navigate housing challenges with her "reach one, teach one" philosophy.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/leslie-wafford.webp',
+    headshotSrc: '/images/leslie-wafford.webp',
     email: 'leslie@elevateforhumanity.org',
   },
   {
@@ -60,7 +60,7 @@ export const TEAM: TeamMember[] = [
     title: 'Social Media & Digital Engagement Coordinator',
     orgRole: 'Communications',
     bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from funded training.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/delores-reynolds.jpg',
+    headshotSrc: '/images/delores-reynolds.jpg',
     email: 'delores@elevateforhumanity.org',
   },
   {
@@ -69,7 +69,7 @@ export const TEAM: TeamMember[] = [
     title: 'Program Coordinator',
     orgRole: 'Program Operations',
     bio: 'Clystjah supports program operations and student services, helping participants navigate enrollment and stay on track through their training programs.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/clystjah-woodley.jpg',
+    headshotSrc: '/images/clystjah-woodley.jpg',
     email: 'clystjah@elevateforhumanity.org',
   },
   {

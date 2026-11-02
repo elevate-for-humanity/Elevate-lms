@@ -103,7 +103,7 @@ function MobileSubLink({
 }
 
 const ENTRY_POINTS = [
-  { label: 'Student Dashboard', href: '/learner/dashboard', icon: GraduationCap },
+  { label: 'Student Dashboard', href: ROUTES.studentPortal, icon: GraduationCap },
   { label: 'Apply for Training', href: ROUTES.apply, icon: GraduationCap },
   { label: 'Host Site / Employer', href: ROUTES.employers, icon: Building2 },
   { label: 'Testing Center', href: ROUTES.testing, icon: FlaskConical },

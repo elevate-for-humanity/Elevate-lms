@@ -1,3 +1,6 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { teamProfileHref } from '@/lib/navigation/team-profile';
 import { notFound } from 'next/navigation';
 import { getTeamMembers } from '@/lib/content';
 import { buildMetadata } from '@/lib/cf-seo';
@@ -20,8 +23,8 @@ async function findTeamMember(slug: string) {
   const databaseMembers = await getTeamMembers().catch(() => []);
   return (
     databaseMembers.find((member) =>
-      member.id === slug || teamMemberSlug(member) === slug,
-    ) ?? TEAM.find((member) => member.id === slug || teamMemberSlug(member) === slug)
+      member.id === slug || teamMemberSlug(member) === slug || teamProfileHref(member).endsWith(`/${slug}`),
+    ) ?? TEAM.find((member) => member.id === slug || teamMemberSlug(member) === slug || teamProfileHref(member).endsWith(`/${slug}`))
   );
 }
 
@@ -43,9 +46,11 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ slu
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-16">
+      <Link href="/about/team" className="mb-6 inline-flex min-h-11 items-center font-bold text-brand-red-700 hover:underline">← Back to team</Link>
+      {('headshotSrc' in member && typeof member.headshotSrc === 'string' && member.headshotSrc) ? <Image src={member.headshotSrc} alt={member.name} width={400} height={500} className="mb-6 w-full max-w-sm rounded-2xl object-cover object-top" /> : null}
       <h1 className="text-3xl font-bold">{member.name}</h1>
       <p className="mt-1 text-lg text-slate-600">{member.title}</p>
-      <p className="mt-6 text-slate-700">{member.bio}</p>
+      <div className="mt-6 space-y-4 text-slate-700">{(member.bio ?? '').split(/\n\n/).map((paragraph, index) => <p key={index} className="leading-7">{paragraph}</p>)}</div>
       <div className="mt-10">
         <a
           href={siteConfig.handoff.apply}

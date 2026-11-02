@@ -8,9 +8,9 @@ function isExternal(href: string) {
   return /^https?:\/\//i.test(href);
 }
 
-function DropdownContent({ subItems, embedded = false }: { subItems: NavSubItem[]; embedded?: boolean }) {
+function DropdownContent({ subItems }: { subItems: NavSubItem[] }) {
   return (
-    <div className={embedded ? 'min-w-0 p-1' : 'max-h-[min(78vh,44rem)] min-w-[280px] max-w-[380px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-2xl'}>
+    <div className={'max-h-[min(78vh,44rem)] min-w-[280px] max-w-[380px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-2xl'}>
       {subItems.map((sub) => {
         if (sub.isHeader) {
           return (
@@ -50,42 +50,16 @@ function DropdownContent({ subItems, embedded = false }: { subItems: NavSubItem[
   );
 }
 
-function MoreDropdown({ items }: { items: NavItem[] }) {
-  return (
-    <div className="w-[min(92vw,20rem)] space-y-1 rounded-xl border border-slate-200 bg-white p-3 shadow-2xl">
-      {items.map((item) => (
-        <div key={item.id ?? item.name} className="min-w-0">
-          {item.href ? (
-            <Link href={item.href} prefetch={false} className="block rounded-md px-2 py-2 text-sm font-extrabold text-slate-950 hover:bg-slate-50 hover:text-brand-blue-700">
-              {item.name}
-            </Link>
-          ) : (
-            <p className="px-2 py-2 text-sm font-extrabold text-slate-950">{item.name}</p>
-          )}
-          
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const topLevelClass =
   'rounded-md px-1.5 py-2 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 xl:px-2.5 xl:text-sm';
 
 export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
-  // Platform and Resources are public discovery surfaces, not hidden utilities.
-  // Authenticated portals remain discoverable while authorization still gates data/actions.
-  const primaryItems = items.filter((item) =>
-    ['students', 'programs', 'testing', 'apprenticeships', 'funding', 'resources'].includes(item.id ?? ''),
-  );
-  const secondaryItems = items.filter((item) => !primaryItems.includes(item));
-
   return (
     <nav
       aria-label="Main navigation"
       className="flex w-full min-w-0 flex-row flex-nowrap items-center justify-center gap-2 overflow-visible whitespace-nowrap xl:gap-3"
     >
-      {primaryItems.map((item) => {
+      {items.map((item) => {
         const key = item.id ?? item.name;
         const hasSubItems = Boolean(item.subItems?.length);
 
@@ -129,17 +103,6 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
           </div>
         );
       })}
-      {secondaryItems.length ? (
-        <div className="group relative shrink-0">
-          <button type="button" className={`inline-flex items-center gap-1 ${topLevelClass}`} aria-haspopup="menu">
-            <span>More</span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
-          </button>
-          <div className="pointer-events-none invisible absolute right-0 top-full z-[12000] pt-2 opacity-0 transition-all duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100">
-            <MoreDropdown items={secondaryItems} />
-          </div>
-        </div>
-      ) : null}
     </nav>
   );
 }

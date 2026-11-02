@@ -20,13 +20,36 @@ export const metadata: Metadata = {
 
 const sections = [
   {
+    title: 'Community & Services', icon: GraduationCap,
+    links: [
+      { label: 'Community Hub', href: '/community' },
+      { label: 'Barber & Beauty Network', href: '/barber-beauty-network' },
+      { label: 'Community Services', href: '/services' },
+      { label: 'Rise Forward Foundation', href: '/rise-forward-foundation' },
+      { label: 'Supersonic Fast Cash Tax Services', href: ROUTES.supersonicFastCash },
+    ],
+  },
+  {
+    title: 'Apps, Platforms & Businesses', icon: Briefcase,
+    links: [
+      { label: 'Choose Your Portal', href: '/online-apps' },
+      { label: 'Platform & Licensing', href: '/platform' },
+      { label: 'Store & Products', href: '/store' },
+      { label: '2Exclusive Platinum Cleaning', href: ROUTES.platinumCleaning },
+      { label: 'Curvature Body Sculpting', href: ROUTES.curvatureBodySculpting },
+    ],
+  },
+  {
     title: 'Student Resources',
     icon: GraduationCap,
     links: [
+      { label: 'Student Dashboard', href: ROUTES.studentPortal },
+      { label: 'My Courses', href: ROUTES.lmsPortal },
       { label: 'Apply for Training', href: '/apply/student' },
+      { label: 'Student Support', href: '/student-support' },
       { label: 'View All Programs', href: '/programs' },
       { label: 'Registered Apprenticeships', href: '/apprenticeships' },
-      { label: 'Job Ready Indy', href: '/jri' },
+      { label: 'Job Ready Indy', href: ROUTES.fundingJobReadyIndy },
       { label: 'Career Services', href: '/career-services' },
       { label: 'Student FAQ', href: '/faq' },
     ],
@@ -49,7 +72,10 @@ const sections = [
     title: 'Employer Resources',
     icon: Briefcase,
     links: [
+      { label: 'Partnership Options', href: '/partners' },
       { label: 'Employer Portal & Job Posting', href: ROUTES.employerPortal },
+      { label: 'Browse Jobs', href: '/jobs' },
+      { label: 'Employer Directory', href: '/employers/directory' },
       { label: 'Apprenticeship Partnerships', href: '/partners/host-shops' },
       {
         label: 'WOTC Tax Credits Info',

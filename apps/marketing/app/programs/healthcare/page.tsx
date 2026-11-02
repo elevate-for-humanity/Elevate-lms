@@ -88,7 +88,7 @@ export default function HealthcareProgramsPage() {
           </div>
           <div className="relative min-h-[320px] overflow-hidden rounded-3xl border border-white/15 bg-emerald-900 shadow-2xl sm:min-h-[360px]">
             <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
-              src="/images/beauty/esthetics-hero.webp"
+              src="/images/refresh-20261014/healthcare.webp"
               alt="Healthcare students practicing clinical skills in a supervised classroom"
               fill
               priority

@@ -27,6 +27,9 @@ export type PublicRouteDefinition = {
 const changed = '2026-08-29T00:00:00-04:00';
 
 export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
+  { path: '/about/elizabeth-greene', label: 'Elizabeth Greene — Founder', category: 'About', changeFrequency: 'monthly', priority: 0.8, lastModified: '2026-11-02T00:00:00-05:00', index: true },
+  { path: '/about/team', label: 'Team & Staff', category: 'About', changeFrequency: 'monthly', priority: 0.8, lastModified: '2026-11-02T00:00:00-05:00', index: true },
+  { path: '/resources', label: 'Student & Community Resources', category: 'Main', changeFrequency: 'monthly', priority: 0.7, lastModified: '2026-11-02T00:00:00-05:00', index: true },
   {
     path: '/tax',
     label: 'Supersonic Fast Cash Tax Preparation',

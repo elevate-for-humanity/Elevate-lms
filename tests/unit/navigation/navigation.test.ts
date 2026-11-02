@@ -2,22 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { NAV_ITEMS } from '@/lib/navigation';
 
 describe('public navigation discoverability', () => {
-  it('preserves every established top-level destination', () => {
-    expect(NAV_ITEMS.map((item) => item.id)).toEqual(
-      expect.arrayContaining([
-        'programs',
-        'testing',
-        'apprenticeships',
-        'funding',
-        'platform',
-        'employers',
-        'resources',
-        'portals',
-        'store',
-        'foundation',
-        'about',
-      ]),
-    );
+  it('keeps a compact menu and makes founder and staff discoverable', () => {
+    expect(NAV_ITEMS.length).toBeLessThanOrEqual(8);
+    const about = NAV_ITEMS.find(item => item.id === 'about');
+    expect(about?.subItems).toEqual(expect.arrayContaining([
+      expect.objectContaining({ href: '/about/team' }),
+      expect.objectContaining({ href: '/about/elizabeth-greene' }),
+    ]));
+    const resources = NAV_ITEMS.find(item => item.id === 'resources');
+    expect(resources?.subItems?.some(item => item.href === '/online-apps')).toBe(true);
+    const partners = NAV_ITEMS.find(item => item.id === 'employers');
+    expect(partners?.subItems?.some(item => item.href === '/platform')).toBe(true);
   });
 
   it('keeps microcourses discoverable without replacing programs', () => {
@@ -33,12 +28,7 @@ describe('public navigation discoverability', () => {
     const programs = NAV_ITEMS.find((item) => item.id === 'programs');
     const testing = NAV_ITEMS.find((item) => item.id === 'testing');
     expect(testing?.href).toBe('/testing');
-    expect(testing?.subItems).toEqual(expect.arrayContaining([
-      expect.objectContaining({ name: 'Testing Center', href: '/testing' }),
-      expect.objectContaining({ name: 'Book an Exam', href: '/testing/book' }),
-      expect.objectContaining({ name: 'Certification Testing', href: '/testing/nha' }),
-      expect.objectContaining({ name: 'Testing Products', href: '/store/testing' }),
-    ]));
+    expect(testing?.subItems).toBeUndefined();
     expect(programs?.subItems?.some((item) => /^\/(testing|store\/testing)(\/|$)/.test(item.href ?? ''))).toBe(false);
   });
 });

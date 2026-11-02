@@ -12,7 +12,7 @@ import { ResponsiveDetails } from '@/components/ui/ResponsiveDetails';
 import { Mail, Phone, MapPin, Facebook, Linkedin, Instagram, ExternalLink } from 'lucide-react';
 
 const GROUPS = [
-  { title: 'Programs', links: [[ROUTES.programs, 'All Programs'], [ROUTES.programsHealthcare, 'Healthcare'], ['/programs/skilled-trades', 'Skilled Trades'], [ROUTES.programsTechnology, 'Technology'], [ROUTES.storeDemo, 'Platform Demo']] },
+  { title: 'About Elevate', links: [[ROUTES.about, 'About Us'], ['/about/elizabeth-greene', 'Our Founder'], ['/about/team', 'Team & Staff'], ['/partners', 'Partnerships'], ['/resources', 'Resources']] },
   { title: 'Apprenticeships', links: [[ROUTES.apprenticeships, 'All Apprenticeships'], [ROUTES.programsBarber, 'Barber'], [ROUTES.programsCosmetology, 'Cosmetology'], [ROUTES.programsEsthetician, 'Esthetics'], [ROUTES.programsNailTech, 'Nail Technician']] },
   { title: 'Funding', links: [[ROUTES.funding, 'All Funding Options'], [ROUTES.fundingWIOA, 'WIOA / WorkOne'], ['/funding/wrg', 'Workforce Ready Grant'], [ROUTES.fundingJobReadyIndy, 'Job Ready Indy'], [ROUTES.scholarships, 'Scholarships'], [ROUTES.eligibility, 'Check Eligibility']] },
 ] as const;

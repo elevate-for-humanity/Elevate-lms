@@ -64,7 +64,8 @@ for (const route of routes) {
   test(`${route}: original audit public rendering`, async ({ page }, testInfo) => {
     const response = await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90000 });
     expect(response?.status()).toBeLessThan(400);
-    expect(new URL(page.url()).pathname).toBe(route);
+    const consolidatedDestinations: Record<string, string> = { '/founder': '/about/elizabeth-greene', '/team': '/about/team', '/about/partners': '/partners' };
+    expect(new URL(page.url()).pathname).toBe(consolidatedDestinations[route] ?? route);
     await expect(page.locator('h1').first()).toBeVisible();
     if (route === '/founder') {
       const portrait = page.getByRole('img', { name: 'Elizabeth Greene, Founder and CEO of Elevate for Humanity', exact: true });

@@ -54,12 +54,12 @@ const scenes = [
 
 export function HvacLabHero() {
   return (
-    <figure className="border-b-4 border-orange-500 bg-blue-950 text-white">
+    <figure className="border-b-4 border-orange-500 bg-white text-slate-950">
       <div className="mx-auto max-w-7xl px-4 pb-5 pt-6 sm:px-6">
-        <p className="mb-4 text-sm font-bold tracking-wide text-orange-300">
+        <p className="mb-4 text-sm font-bold tracking-wide text-orange-800">
           Sponsored by Elevate for Humanity
         </p>
-        <div className="relative overflow-hidden rounded-2xl bg-blue-950">
+        <div className="relative overflow-hidden rounded-2xl bg-white">
           <video
             aria-label="Elevate for Humanity HVAC training program introduction"
             data-hvac-hero-video="20261029"
@@ -78,7 +78,7 @@ export function HvacLabHero() {
             Your browser does not support embedded video.{' '}
             <a href="/videos/hvac-recruitment-20261029.mp4">Watch the HVAC program video</a>.
           </video>
-          <p className="px-4 py-3 text-center text-sm text-slate-200">
+          <p className="px-4 py-3 text-center text-sm text-slate-700">
             Watch our HVAC program introduction. Use the video controls to turn on sound or pause.
           </p>
           <HvacVideoAssistanceDock />
@@ -96,23 +96,23 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
     <section
       aria-labelledby={headingId}
       data-hvac-training-showcase="20261029"
-      className={`border-y-4 border-orange-500 bg-blue-950 px-4 text-white ${compact ? "sm:px-4" : "sm:px-6"} ${compact ? 'py-7 sm:py-10' : 'py-14 sm:py-20'}`}
+      className={`border-y-4 border-orange-500 bg-white px-4 text-slate-950 ${compact ? "sm:px-4" : "sm:px-6"} ${compact ? 'py-7 sm:py-10' : 'py-14 sm:py-20'}`}
     >
       <div className={compact ? "mx-auto max-w-6xl" : "mx-auto max-w-7xl"}>
-        <p className="text-sm font-bold uppercase tracking-widest text-orange-300">
+        <p className="text-sm font-bold uppercase tracking-widest text-orange-800">
           {compact ? 'Featured program · HVAC Technician' : 'Sponsored by Elevate for Humanity'}
         </p>
         <div className="mt-3 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
             <Heading
               id={headingId}
-              className="text-3xl font-black tracking-tight text-white sm:text-4xl"
+              className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
             >
               {compact
                 ? 'Build your next chapter in HVAC.'
                 : 'See the skills you can start building.'}
             </Heading>
-            <p className="mt-4 text-lg leading-8 text-slate-200">
+            <p className="mt-4 text-lg leading-8 text-slate-700">
               Six-week hybrid HVAC training combines self-paced coursework, scheduled hands-on
               learning, and preparation for EPA Section 608 Core and Types I, II, and III.
             </p>
@@ -126,14 +126,14 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
             </Link>
           )}
         </div>
-        <p className="mt-5 text-sm leading-6 text-slate-300">
+        <p className="mt-5 text-sm leading-6 text-slate-600">
           AI-generated lab concept, training demonstrations, and career illustrations.
         </p>
         <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {selectedScenes.map((scene, index) => (
             <figure
               key={scene.image}
-              className="overflow-hidden rounded-2xl border border-blue-800 bg-white shadow-xl"
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
             >
               <div data-home-card-image={compact || undefined} className={`relative overflow-hidden bg-slate-100 ${compact ? 'aspect-[4/3]' : 'aspect-[4/5]'}`}>
                 <Image
@@ -153,7 +153,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
           ))}
         </div>
         {compact && (
-          <div className="mt-6 border-t border-blue-800 pt-6">
+          <div className="mt-6 border-t border-slate-200 pt-6">
             <HomeSectionNarration section="funding" />
             <div className="flex flex-wrap gap-3">
               <Link
@@ -172,40 +172,40 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
               </a>
               <Link
                 href="/onboarding/learner/orientation"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white px-5 py-3 font-bold text-white hover:bg-blue-900"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-950 hover:bg-slate-50"
               >
                 Complete your orientation
               </Link>
             </div>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
+            <p className="mt-3 text-sm leading-6 text-slate-600">
               WorkOne reviews funding eligibility; funding is not guaranteed. Start your orientation
               to get ready and connect with Elevate.
             </p>
           </div>
         )}
         {!compact && (
-          <div className="mt-10 grid gap-7 rounded-2xl border border-blue-800 bg-blue-900 p-6 text-white sm:p-8 lg:grid-cols-2">
+          <div className="mt-10 grid gap-7 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-950 sm:p-8 lg:grid-cols-2">
             <div>
               <h3 className="text-2xl font-bold">Know the credential you are preparing for.</h3>
-              <ul className="mt-4 space-y-3 leading-7 text-slate-200">
+              <ul className="mt-4 space-y-3 leading-7 text-slate-700">
                 <li>
-                  <strong className="text-white">Type I:</strong> Small appliances.
+                  <strong className="text-slate-950">Type I:</strong> Small appliances.
                 </li>
                 <li>
-                  <strong className="text-white">Type II:</strong> High- and very-high-pressure
+                  <strong className="text-slate-950">Type II:</strong> High- and very-high-pressure
                   equipment, excluding small appliances and motor-vehicle air conditioners.
                 </li>
                 <li>
-                  <strong className="text-white">Type III:</strong> Low-pressure equipment,
+                  <strong className="text-slate-950">Type III:</strong> Low-pressure equipment,
                   including commercial chillers.
                 </li>
               </ul>
-              <p className="mt-4 leading-7 text-slate-200">
+              <p className="mt-4 leading-7 text-slate-700">
                 Universal certification requires passing Core and all three types in secure,
                 proctored exams through an EPA-approved certifying organization. EPA 608 credentials
                 do not expire.
               </p>
-              <p className="mt-3 leading-7 text-slate-200">
+              <p className="mt-3 leading-7 text-slate-700">
                 Certification permits covered refrigerant work within the certification type. Course
                 completion and EPA certification are separate milestones.
               </p>
@@ -213,7 +213,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
                 href="https://www.epa.gov/section608/section-608-technician-certification-requirements"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex min-h-11 items-center font-semibold text-orange-300 underline underline-offset-4"
+                className="mt-4 inline-flex min-h-11 items-center font-semibold text-orange-800 underline underline-offset-4"
               >
                 Review EPA certification requirements
               </a>
@@ -222,7 +222,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
               <h3 className="text-2xl font-bold">
                 WRG and WIOA funding for eligible participants.
               </h3>
-              <p className="mt-4 leading-7 text-slate-200">
+              <p className="mt-4 leading-7 text-slate-700">
                 Tuition funding may be available through the Workforce Ready Grant or WIOA. WorkOne
                 or the responsible agency determines eligibility, covered costs, availability, and
                 written authorization before funded enrollment.
@@ -251,7 +251,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
           </div>
         )}
         {compact && (
-          <p className="mt-6 max-w-4xl leading-7 text-slate-200">
+          <p className="mt-6 max-w-4xl leading-7 text-slate-700">
             WRG or WIOA tuition funding may be available to eligible participants. Written agency
             authorization is required before funded enrollment.
           </p>

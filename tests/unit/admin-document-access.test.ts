@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isQaDocumentRecord,
   normalizeDocumentReviewStatus,
   resolveDocumentStorageLocator,
 } from '../../lib/admin/document-record';
@@ -45,4 +46,11 @@ describe('admin document access', () => {
     expect(normalizeDocumentReviewStatus('verified')).toBe('approved');
     expect(normalizeDocumentReviewStatus('denied')).toBe('rejected');
   });
+});
+
+it('excludes explicit historical QA identities but preserves real learner files', () => {
+  expect(isQaDocumentRecord({profiles:{full_name:'Final Tester'}})).toBe(true);
+  expect(isQaDocumentRecord({profiles:{full_name:'Upload Tester'}})).toBe(true);
+  expect(isQaDocumentRecord({file_name:'synthetic-id.pdf'})).toBe(true);
+  expect(isQaDocumentRecord({file_name:'Resume.pdf',profiles:{full_name:'Austin Sparks'}})).toBe(false);
 });

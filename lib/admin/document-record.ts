@@ -47,3 +47,10 @@ export function normalizeDocumentReviewStatus(
   if (['rejected', 'denied'].includes(value)) return 'rejected';
   return 'unknown';
 }
+
+/** Explicit synthetic identities stay available for QA without entering the learner queue. */
+export function isQaDocumentRecord(doc: {file_name?: string | null; profiles?: {full_name?: string | null; email?: string | null} | null}): boolean {
+  const fields = [doc.file_name, doc.profiles?.full_name, doc.profiles?.email].filter(Boolean);
+  return fields.some(value => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value)))
+    || /^(Final|Upload) Tester$/i.test(doc.profiles?.full_name?.trim() ?? '');
+}

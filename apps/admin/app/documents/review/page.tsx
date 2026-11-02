@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
 import {
+  isQaDocumentRecord,
   normalizeDocumentReviewStatus,
   resolveDocumentStorageLocator,
 } from '@/lib/admin/document-record';
@@ -35,13 +36,14 @@ export default async function AdminDocumentReviewPage({
     .from('documents')
     .select('*')
     .order('created_at', { ascending: false });
-  if (documentsError) console.error('[Documents] query failed:', documentsError.message);
+  if (documentsError) throw new Error('Document review data is unavailable.');
 
   // Hydrate profiles separately (user_id has no FK to profiles)
   const docUserIds = [...new Set((rawDocuments ?? []).map((d: any) => d.user_id).filter(Boolean))];
-  const { data: docProfiles } = docUserIds.length
+  const { data: docProfiles, error: profilesError } = docUserIds.length
     ? await supabase.from('profiles').select('id, full_name, email, role').in('id', docUserIds)
-    : { data: [] };
+    : { data: [], error: null };
+  if (profilesError) throw new Error('Document owner data is unavailable.');
   const docProfileMap = Object.fromEntries((docProfiles ?? []).map((p: any) => [p.id, p]));
   const hydratedDocuments = (rawDocuments ?? []).map((d: any) => ({
     ...d,
@@ -49,12 +51,8 @@ export default async function AdminDocumentReviewPage({
     review_status: normalizeDocumentReviewStatus(d.status),
     has_storage_locator: Boolean(resolveDocumentStorageLocator(d)),
   }));
-  const isQaDocument = (doc: any) =>
-    [doc.file_name, doc.profiles?.full_name, doc.profiles?.email]
-      .filter(Boolean)
-      .some((value) => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value)));
-  const qaDocuments = hydratedDocuments.filter(isQaDocument);
-  const documents = hydratedDocuments.filter((doc) => includeQa || !isQaDocument(doc));
+  const qaDocuments = hydratedDocuments.filter(isQaDocumentRecord);
+  const documents = hydratedDocuments.filter((doc) => includeQa || !isQaDocumentRecord(doc));
 
   // Document viewing is handled on-demand via SecureDocumentLink,
   // which routes through /api/admin/documents/signed-url with audit logging.

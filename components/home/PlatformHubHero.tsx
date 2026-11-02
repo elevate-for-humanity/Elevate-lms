@@ -55,7 +55,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
             </Link>
             <Link
               href="/check-eligibility"
-              className="inline-flex min-h-12 items-center rounded-xl border border-slate-500 px-5 py-3 font-semibold text-slate-950 hover:bg-slate-50"
+              className="inline-flex min-h-12 items-center rounded-xl border border-slate-500 bg-white px-5 py-3 font-semibold text-slate-950 hover:bg-slate-50"
             >
               Check Funding Options
             </Link>

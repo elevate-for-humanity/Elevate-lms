@@ -22,11 +22,9 @@ jobs:
     steps:
       - env:
           GH_TOKEN: '${{ github.token }}'
-          HEAD_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-          if [ "$HEAD_MESSAGE" = 'Run one authorized owned voicemail delivery acceptance call' ]; then mode=voicemail; fi
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
+                    gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -56,6 +54,8 @@ jobs:
         run: test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
       - name: Read current operator routing and voicemail worker health without dialing
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
+      - name: Inspect operator mailbox permissions, sound prompts, and fixed warning classes
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-voicemail-diagnostics.py
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
       - name: Verify only the approved owner and exercise the selected phone path

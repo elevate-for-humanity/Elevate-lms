@@ -81,6 +81,8 @@ jobs:
         run: |
           node scripts/check-build-memory-policy.mjs
           node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs scripts/gcp/studio-build-boundary.test.mjs scripts/gcp/homepage-content.test.mjs
+      - name: Admin runtime composition packaging regression
+        run: node --test scripts/test-admin-remotion-packaging.mjs
       - name: Final production reliability contract regressions
         run: |
           node --test scripts/gcp/final-production-acceptance-workflow.test.mjs

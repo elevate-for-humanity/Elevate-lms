@@ -1,3 +1,4 @@
+import {narrationSpeechText} from '../../lib/ultimate-course-builder/instructional/narration-numbers.mjs';
 import { narrationRateForRepair } from '../../lib/ultimate-course-builder/instructional/narration-pace.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,16 +9,16 @@ import {fileURLToPath} from 'node:url';
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/adapters/platform-narration.ts',import.meta.url),'utf8'),{mode:'transform'})
  .replace(/^import .*;\n/gm,'').replace('const execute = promisify(execFile);','').replace('const execute=promisify(execFile);','').replace('export class ','class ');
 function harness(fail=false,{alignmentError,recognizerError}={}){
- const progress=[],recognitions=[],rates=[];let cleaned=false;
- const Provider=new Function('narrationRateForRepair','alignRecordedNarration','measureNarrationCaptions','configuredNarrationProvider','EDGE_TTS_VOICES','generateEdgeTTS','uploadLessonMediaBuffer','execute','mkdtemp','writeFile','readFile','rm','tmpdir','join','reportCourseProgress',source+'\nreturn UltimatePlatformNarration;')(
-  narrationRateForRepair,async(_file,text)=>{if(alignmentError)throw alignmentError;return text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2}));},
+ const progress=[],recognitions=[],rates=[],speech=[];let cleaned=false;
+ const Provider=new Function('narrationSpeechText','narrationRateForRepair','alignRecordedNarration','measureNarrationCaptions','configuredNarrationProvider','EDGE_TTS_VOICES','generateEdgeTTS','uploadLessonMediaBuffer','execute','mkdtemp','writeFile','readFile','rm','tmpdir','join','reportCourseProgress',source+'\nreturn UltimatePlatformNarration;')(
+  narrationSpeechText,narrationRateForRepair,async(_file,text)=>{if(alignmentError)throw alignmentError;return text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2}));},
   async(bytes,text,duration,receive)=>{recognitions.push({bytes,text,duration});if(recognizerError)throw recognizerError;
    const words=text.split(' ').map((word,i)=>({word,start:i*.2,end:(i+1)*.2}));receive(words);
    return [{text,startSeconds:words[0].start,endSeconds:words.at(-1).end}];
-  },()=> 'kokoro',{warm:'test-warm-voice'},async(_text,options)=>{assert.equal(options.voice,'test-warm-voice');rates.push(options.rate);if(fail)throw Error('TTS_FAILED');return Buffer.alloc(10);},async()=> 'https://media.example/audio.mp3',
+  },()=> 'kokoro',{warm:'test-warm-voice'},async(_text,options)=>{speech.push(_text);assert.equal(options.voice,'test-warm-voice');rates.push(options.rate);if(fail)throw Error('TTS_FAILED');return Buffer.alloc(10);},async()=> 'https://media.example/audio.mp3',
   async()=>({stdout:'1'}),async()=>'/tmp/narration',async()=>{},async()=>Buffer.alloc(10),async()=>{cleaned=true;},()=>'/tmp',(...parts)=>parts.join('/'),
   (phase,completed,total)=>progress.push({phase,completed,total}));
- return{provider:new Provider(),progress,recognitions,rates,cleaned:()=>cleaned};
+ return{provider:new Provider(),progress,recognitions,rates,speech,cleaned:()=>cleaned};
 }
 const input={lessonId:'lesson',artifacts:{instructor_script:{script:{segments:[{id:'scene',narrationParts:[{text:'Primary recording',isRecap:false},{text:'Fresh recap',isRecap:true}]}]}}}};
 test('long narration exposes real recording, alignment, and stored-segment progress',async()=>{
@@ -115,4 +116,12 @@ test('measured slow speech regenerates every part at a bounded native rate and r
  assert.deepEqual(h.rates,['+15%','+15%']);
  assert.equal(result.rate,'+15%');
  assert.equal(h.progress.filter(p=>p.phase.startsWith('narration:alignment')).length,2);
+});
+
+test('monetary narration speaks exact amounts and aligns recorded words while preserving written teaching',async()=>{
+ const h=harness();const text='Revenue credit $900. Total each side: $5,400.';
+ const result=await h.provider.generate({lessonId:'bookkeeping',artifacts:{instructor_script:{script:{segments:[{id:'amounts',text}]}}}});
+ assert.deepEqual(h.speech,['Revenue credit nine hundred dollars. Total each side: five thousand four hundred dollars.']);
+ assert.equal(result.segments[0].text,text);assert.equal(result.segments[0].parts[0].speechText,h.speech[0]);
+ assert.equal(h.recognitions.length,0);assert.ok(result.segments[0].wordAlignment.length>10);
 });

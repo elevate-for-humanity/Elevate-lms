@@ -1,3 +1,4 @@
+import { narrationSpeechText } from '../instructional/narration-numbers.mjs';
 import { narrationRateForRepair } from '../instructional/narration-pace.mjs';
 import { alignRecordedNarration } from '@/lib/video/forced-alignment.mjs';
 import { measureNarrationCaptions } from '@/lib/video/media-quality-gate';
@@ -28,7 +29,8 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     const files=[];
     for(const [partIndex,recording] of recordings.entries()){
      if(!recording.text?.trim())throw Error('BLANK_NARRATION_PART_PROHIBITED');
-     const audio=await generateEdgeTTS(recording.text,{voice:EDGE_TTS_VOICES.warm,rate});
+     const speechText=narrationSpeechText(recording.text);
+     const audio=await generateEdgeTTS(speechText,{voice:EDGE_TTS_VOICES.warm,rate});
      reportCourseProgress('narration:recording:'+index,partIndex+1,recordings.length);
      const source=join(directory,index+'-'+partIndex+'.mp3'),pcm=join(directory,index+'-'+partIndex+'.wav');
      await writeFile(source,audio);
@@ -40,15 +42,15 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      const recognition=join(directory,index+'-'+partIndex+'-recognition.wav');
      await execute('ffmpeg',['-v','error','-y','-i',pcm,'-ar','16000','-c:a','pcm_s16le',recognition]);
      const bytes=await readFile(recognition);
-     // Numeral scripts retain the existing measured recognizer until their intended
-     // pronunciation is explicitly supplied. Never guess guard lengths.
+     // Unsupported identifiers retain independent recognition. Ordinary numbers
+     // now have explicit source-preserving speech for measured alignment.
      let measured;
-     const recognize=()=>measureNarrationCaptions(bytes,recording.text,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
-     if (/\d/.test(recording.text)) {
+     const recognize=()=>measureNarrationCaptions(bytes,speechText,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
+     if (/\d/.test(speechText)) {
       measured=await recognize();
      } else {
       let words;
-      try {words=await alignRecordedNarration(pcm,recording.text);}
+      try {words=await alignRecordedNarration(pcm,speechText);}
       catch(error) {
        // A finite grammar can have no path, or omit a requested word,
        // even when the recording is valid. Both failures need a separate
@@ -73,7 +75,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      const encoded=join(directory,index+'-'+partIndex+'-delivery.mp3');
      await execute('ffmpeg',['-v','error','-y','-i',pcm,'-c:a','libmp3lame','-b:a','128k',encoded]);
      const audioUrl=await uploadLessonMediaBuffer(await readFile(encoded),input.lessonId+'-'+index+'-'+partIndex,'mp3');
-     parts.push({text:recording.text,isRecap:recording.isRecap===true,startSeconds:cursor,durationSeconds,audioUrl});
+     parts.push({text:recording.text,speechText,isRecap:recording.isRecap===true,startSeconds:cursor,durationSeconds,audioUrl});
      files.push(pcm);cursor+=durationSeconds;
     }
     const list=join(directory,index+'-concat.txt'),master=join(directory,index+'-master.wav');

@@ -9,13 +9,14 @@ describe('business administration campaign hero', () => {
   );
   const detail = fs.readFileSync(path.resolve('components/programs/ProgramDetailPage.tsx'), 'utf8');
 
-  it('uses the October cohort artwork as the first program hero', () => {
-    expect(route).toContain('isBusinessProgram ? (');
-    expect(route).toContain('/images/cohorts/business-october-15-cohort-flyer.jpg');
-    expect(route).toContain(
-      'aria-label="Apply for the Business Administration October 15, 2026 cohort"',
-    );
-    expect(route).toContain('priority');
+  it('uses the current five-week program disclosure instead of an expired cohort promotion', () => {
+    expect(route).toContain("resolved.slug === 'business-administration'");
+    expect(route).toContain('const banner: HeroBannerConfig = isBusinessProgram');
+    expect(route).toContain('posterImage: resolved.heroImage');
+    expect(route).toContain('Business & Entrepreneurship — 5 Weeks');
+    expect(route).toContain('href: resolved.cta.applyHref');
+    expect(route).toContain('Review Payment Options');
+    expect(route).not.toContain('/images/cohorts/business-october-15-cohort-flyer.jpg');
   });
 
   it('does not repeat the same campaign artwork below the hero', () => {

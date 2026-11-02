@@ -46,3 +46,12 @@ describe('Google website narration', () => {
     await expect(generateGoogleNaturalVoice('Welcome.')).rejects.toThrow('HTTP 403');
   });
 });
+
+describe('selected website speakers',()=>{
+ it('sends a distinct allowed Google voice for each selected narrator',async()=>{
+  vi.stubEnv('K_SERVICE','');vi.stubEnv('GOOGLE_CLOUD_API_KEY','test-key');
+  const request=vi.fn().mockImplementation(async()=>Response.json({audioContent:'SUQz'}));vi.stubGlobal('fetch',request);
+  for(const speaker of ['warm','clear','deep']) await generateGoogleNaturalVoice('Sample.',speaker);
+  expect(request.mock.calls.map(call=>JSON.parse(call[1].body).voice.name)).toEqual(['en-US-Neural2-F','en-US-Neural2-J','en-US-Neural2-D']);
+ });
+});

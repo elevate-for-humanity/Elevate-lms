@@ -16,7 +16,7 @@ export async function handleNaturalVoiceRequest(request: Request) {
   await hydrateProcessEnv();
 
   try {
-    const audio = await generateGoogleNaturalVoice(text);
+    const audio = await generateGoogleNaturalVoice(text, typeof body?.voice === 'string' ? body.voice : 'warm');
     return new Response(audio, {
       headers: {
         'Content-Type': 'audio/mpeg',

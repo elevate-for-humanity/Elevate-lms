@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Loader2, Mic, MicOff, Sparkles, Volume2 } from 'lucide-react';
+import { WebsiteDesignPicker } from '@/components/website-builder/WebsiteDesignPicker';
+import { interviewWebsiteDesign } from '@/lib/website-builder/design-choices';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import {
   getWebsiteInterviewQuestions,
@@ -30,7 +32,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
     setError(null);
     const spoken = step === 0 ? `I'm PARIS. ${current.question}` : current.question;
     const ok = await naturalVoice.play(spoken, {
-      voice: 'coral',
+      voice: interviewWebsiteDesign(values).speaker,
       style: 'assistant',
       rate: 1.05,
       allowBrowserFallback: false,
@@ -107,7 +109,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
           </div>
           <h2 className="mt-4 text-2xl font-black leading-tight">Build the brief by talking to me.</h2>
           <p className="mt-3 text-sm leading-6 text-slate-300">
-            No template questionnaire language. Give me the facts and direction; I’ll turn them into the first working site.
+            Tell me about your business, choose a visual template and speaker, and I’ll build the first working site around your choices.
           </p>
 
           <div className="mt-8 space-y-2">
@@ -190,6 +192,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
                 {listening ? <MicOff className="mx-auto h-5 w-5" /> : <Mic className="mx-auto h-5 w-5" />}
               </button>
             </div>}
+            {current.key === 'brand' ? <WebsiteDesignPicker value={interviewWebsiteDesign(values)} disabled={building} onChange={choice => setValues(prev => ({ ...prev, templateId: choice.template, heroLayout: choice.layout, productDensity: choice.density, speaker: choice.speaker, narration: String(choice.narration), imageStyle: choice.imageStyle }))} /> : null}
             {listening ? <p className="mt-2 text-xs font-bold text-brand-red-700">Listening…</p> : null}
           </div>
 

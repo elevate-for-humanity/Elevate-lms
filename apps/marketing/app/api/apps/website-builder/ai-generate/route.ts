@@ -12,6 +12,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 import { missingRequiredWebsiteAnswers, type WebsiteInterviewAnswers } from '@/lib/website-builder/interview';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { applyWebsiteDesign, interviewWebsiteDesign, readWebsiteDesign, websiteCatalog } from '@/lib/website-builder/design-choices';
 import { buildLicensedAssetProjectPolicy } from '@/lib/media/licensed-asset-policy';
 
 export const runtime = 'nodejs';
@@ -74,7 +75,7 @@ async function _POST(request: NextRequest) {
     Object.entries(rawAnswers).map(([key, value]) => [key, safeString(value, '', 3000)]),
   );
   const briefMode = typeof body.brief === 'string';
-  const allowedDesigns = ['executive', 'modern', 'creative', 'minimal'] as const;
+  const allowedDesigns = ['executive', 'modern', 'creative', 'minimal', 'retail', 'botanical'] as const;
   const designDirection = typeof body.designDirection === 'string' && allowedDesigns.some(item => item === body.designDirection) ? body.designDirection : null;
   if (briefMode) {
     const brief = safeString(body.brief, '', 12000);
@@ -88,6 +89,7 @@ async function _POST(request: NextRequest) {
     answers.siteOwnerType = 'business';
     answers.brief = brief;
   }
+  const designPreferences = body.designPreferences ? readWebsiteDesign(body.designPreferences) : briefMode ? readWebsiteDesign({ template: designDirection }) : interviewWebsiteDesign(answers);
   const missing = briefMode ? [] : missingRequiredWebsiteAnswers(answers);
   if (missing.length) {
     return NextResponse.json({ error: 'Complete the required PARIS interview questions before generation.', missing }, { status: 400 });
@@ -96,7 +98,7 @@ async function _POST(request: NextRequest) {
   const siteOwnerType = answers.siteOwnerType === 'individual' ? 'individual' : 'business or organization';
   const industry = safeString(answers.industry, '', 500);
   const contactEmail = safeString(user.email, '', 240);
-  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers, ...(designDirection ? { designDirection } : {}) }, null, 2).slice(0, 24000);
+  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers, designPreferences, ...(designDirection ? { designDirection } : {}) }, null, 2).slice(0, 24000);
 
   const fallback = buildDefaultSiteConfig({ organizationName: businessName, industry, contactEmail: contactEmail || undefined });
   let config: TenantSiteConfig = fallback;
@@ -119,7 +121,7 @@ async function _POST(request: NextRequest) {
     const result = await runAITask({
       task: 'general_chat',
       context: { userId: user.id, skipRAG: true },
-      prompt: `You are PARIS, a senior website strategist and designer inside Elevate Website Builder. Build a polished, specific website from the verified business brief below. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nStructured interview brief:\n${structuredBrief}\n\nThe result must look intentionally designed for this exact business, never like a generic SaaS template. Avoid generic phrases such as "welcome to", "quality service", "your trusted partner", "solutions for you", "we are committed to excellence", or filler statistics. Give the hero a distinctive point of view based on the supplied facts. Choose a coherent color system rather than default blue/purple gradients. Create all pages the business truly needs, normally 4-8 complete pages, with 3-7 meaningful sections per page (home normally 6-9). Never create empty interior pages. Every page must have an intentional hero, relevant substantive content, and a contextual next-step CTA. Use at least three distinct visual compositions across the site: split photographic hero, editorial story, and service or feature grid. Use premium photographic art direction: choose visual concepts specific to the customer's industry, with consistent lighting, composition, crop, color harmony, and image focal points. Prefer authentic, licensed customer assets and preserve the real logo and founder photos. Where assets are not supplied, do not fabricate image URLs or identities; instead include descriptive imageBrief fields in image-bearing section content so a separate licensed-asset selection or image-generation stage can fulfill them. Image briefs must describe subject, framing, mood, palette, orientation, and alt-text intent. Never represent an AI-generated portrait as a real person. Avoid generic stock imagery, distorted logos, and mismatched aspect ratios. Do not mark the website as visually complete until real image URLs are resolved and checked. Preserve the customer's existing brand assets when supplied. Avoid invented numerical outcomes, statistics, testimonials, and claims. The result must feel like a premium custom-designed multi-page site, not a starter template. Use only these section types: hero, rich_text, features, services, products, gallery, image, video, faq, team, cta, contact_form, booking. Do not generate testimonial, stats, pricing, accreditation, ratings, outcomes, customer counts, staff identities, addresses, licenses, or other material claims; those are inserted only from separately verified claim records. Every contact page should include contact_form. Supported field types are text, email, tel, textarea, and select. Every custom lead form MUST include an email field named exactly "email". Only collect information reasonably needed for the stated purpose. Never request passwords, Social Security numbers, payment-card data, health records, or unnecessary sensitive data. Use internal links matching generated slugs. If information is unknown, omit it. Make the experience conversion-focused, accessible, mobile-first, and visually distinctive.`,
+      prompt: `You are PARIS, a senior website strategist and designer inside Elevate Website Builder. Build a polished, specific website from the verified business brief below. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nStructured interview brief:\n${structuredBrief}\n\nThe result must look intentionally designed for this exact business, never like a generic SaaS template. Avoid generic phrases such as "welcome to", "quality service", "your trusted partner", "solutions for you", "we are committed to excellence", or filler statistics. Give the hero a distinctive point of view based on the supplied facts. Choose a coherent color system rather than default blue/purple gradients. Create all pages the business truly needs, normally 4-8 complete pages, with 3-7 meaningful sections per page (home normally 6-9). Never create empty interior pages. Every page must have an intentional hero, relevant substantive content, and a contextual next-step CTA. Use at least three distinct visual compositions across the site: split photographic hero, editorial story, and service or feature grid. Use premium photographic art direction: choose visual concepts specific to the customer's industry, with consistent lighting, composition, crop, color harmony, and image focal points. Prefer authentic, licensed customer assets and preserve the real logo and founder photos. Where assets are not supplied, do not fabricate image URLs or identities; instead include descriptive imageBrief fields in image-bearing section content so a separate licensed-asset selection or image-generation stage can fulfill them. Image briefs must describe subject, framing, mood, palette, orientation, and alt-text intent. Never represent an AI-generated portrait as a real person. Avoid generic stock imagery, distorted logos, and mismatched aspect ratios. Do not mark the website as visually complete until real image URLs are resolved and checked. Preserve the customer's existing brand assets when supplied. Avoid invented numerical outcomes, statistics, testimonials, and claims. Honor designPreferences exactly for template, layout, product density, image direction and narrator. Retail sites must include a complete product collection with verified prices, product-detail destinations, clear order instructions and an editable customer-care section. Do not invent discounts, inventory, payment connections, delivery promises or customer reviews. The result must feel like a premium custom-designed multi-page site, not a starter template. Use only these section types: hero, rich_text, features, services, products, gallery, image, video, faq, team, cta, contact_form, booking. Do not generate testimonial, stats, pricing, accreditation, ratings, outcomes, customer counts, staff identities, addresses, licenses, or other material claims; those are inserted only from separately verified claim records. Every contact page should include contact_form. Supported field types are text, email, tel, textarea, and select. Every custom lead form MUST include an email field named exactly "email". Only collect information reasonably needed for the stated purpose. Never request passwords, Social Security numbers, payment-card data, health records, or unnecessary sensitive data. Use internal links matching generated slugs. If information is unknown, omit it. Make the experience conversion-focused, accessible, mobile-first, and visually distinctive.`,
       temperature: 0.5,
       maxTokens: 10000,
     });
@@ -145,6 +147,8 @@ async function _POST(request: NextRequest) {
     );
   }
 
+  config = applyWebsiteDesign(config, designPreferences);
+  config.products = websiteCatalog(config);
   const validation = validateSiteConfig(config);
   if (!validation.valid) {
     logger.warn('[website-builder] generated draft failed validation', { errors: validation.errors });

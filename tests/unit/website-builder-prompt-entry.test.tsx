@@ -49,3 +49,14 @@ describe('prompt-first website creation', () => {
     await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('not saved'));
   });
 });
+
+it('persists the chosen template, layout and speaker in the generation request',async()=>{
+ const request=vi.fn().mockResolvedValue({ok:false,json:async()=>({error:'Review saved choices'})});vi.stubGlobal('fetch',request);
+ render(<PromptWebsiteCreator/>);
+ fireEvent.click(screen.getByRole('radio',{name:/Retail Marketplace/}));
+ fireEvent.click(screen.getByRole('radio',{name:/Full-width banner/}));
+ fireEvent.click(screen.getByRole('radio',{name:'Deep'}));
+ enterBrief();
+ await waitFor(()=>expect(request).toHaveBeenCalled());
+ expect(JSON.parse(request.mock.calls[0][1].body).designPreferences).toMatchObject({template:'retail',layout:'cover',speaker:'deep'});
+});

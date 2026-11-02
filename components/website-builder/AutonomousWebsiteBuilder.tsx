@@ -8,6 +8,7 @@ import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComposableSite';
 import { TenantDraftViewport } from '@/components/website-builder/TenantDraftViewport';
+import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type Message = { role: 'user' | 'assistant'; content: string };
@@ -181,7 +182,7 @@ export function AutonomousWebsiteBuilder({
       naturalVoice.stop();
       return;
     }
-    await naturalVoice.play(last.content, { voice: 'coral', style: 'assistant', rate: 0.96 });
+    await naturalVoice.play(last.content, { voice: readWebsiteDesign(config.meta?.designPreferences).speaker, style: 'assistant', rate: 0.96 });
   }
 
   const suggestions = [

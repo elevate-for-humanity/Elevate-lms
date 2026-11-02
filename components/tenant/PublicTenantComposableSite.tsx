@@ -3,7 +3,11 @@
 
 import type { MouseEvent, ReactNode } from 'react';
 import './legacy83-premium.css';
+import './website-designs.css';
+import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
+import { TenantCommerce, TenantBagButton, TenantAddToBag } from './TenantShoppingBag';
 import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
+import { WellnessStorefront } from '@/components/tenant/WellnessStorefront';
 import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantParis } from '@/components/tenant/TenantParis';
 import { TenantHiringApplication } from '@/components/tenant/TenantHiringApplication';
@@ -105,14 +109,14 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
     const highlightIcons = [ChartNoAxesCombined, UsersRound, Sprout];
     const imageSegment = typeof c.imageSegment === 'number' && c.imageSegment >= 0 && c.imageSegment <= 3 ? c.imageSegment : null;
     return (
-      <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)} data-variant={variant}>
+      <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)} data-variant={variant} data-layout={text(section.settings?.layout) || 'split'}>
         <div className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
           <div className={centered || !image ? 'text-center' : ''}>
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
             <Heading className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{titleLines.length ? titleLines.map((line, index) => <span className="tenant-title-line" key={index}>{index > 0 ? ' ' : ''}{highlight && line.includes(highlight) ? <>{line.slice(0, line.indexOf(highlight))}<em>{highlight}</em>{line.slice(line.indexOf(highlight) + highlight.length)}</> : line}</span>) : highlightAt >= 0 ? <><span className="tenant-title-prefix">{title.slice(0, highlightAt)}</span><span className="tenant-title-highlight">{highlight}</span>{title.slice(highlightAt + highlight.length)}</> : title}</Heading>
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
             {text(c.veteranAcknowledgement) ? <p className="tenant-veteran-note"><Flag aria-hidden="true" /><span>{text(c.veteranAcknowledgement)}</span></p> : null}
-            {text(c.narration) ? <TenantIntroduction narration={text(c.narration)} musicUrl={text(c.musicUrl)} /> : null}
+            {text(c.narration) ? <TenantIntroduction narration={text(c.narration)} musicUrl={text(c.musicUrl)} narrator={text(c.narrator) || 'warm'} /> : null}
             {text(c.buttonText) || text(c.secondaryButtonText) ? <div className={`tenant-hero-actions mt-8 flex flex-wrap gap-4 ${centered || !image ? 'justify-center' : ''}`}>{text(c.buttonText) ? <ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink> : null}{text(c.secondaryButtonText) ? <ActionLink href={text(c.secondaryButtonHref) || '/services'} primary={secondary} basePath={basePath}>{text(c.secondaryButtonText)}</ActionLink> : null}</div> : null}
             {highlights.length ? <div className="tenant-hero-highlights">{highlights.slice(0, 3).map((item, index) => { const Icon = highlightIcons[index] || Sprout; return <div key={index}><Icon aria-hidden="true" /><strong>{text(item.title)}</strong><span>{text(item.text)}</span></div>; })}</div> : null}
           </div>
@@ -146,7 +150,7 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
 
   if (section.type === 'products') {
     const items = list(c.items);
-    return <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="text-3xl font-black">{text(c.title)}</h2> : null}<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((item, index) => <article key={`${text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.name)} className="aspect-square w-full object-contain" /> : null}<div className="p-5"><h3 className="text-lg font-black">{text(item.name)}</h3>{text(item.description) ? <p className="mt-2 text-sm leading-6 text-slate-600">{text(item.description)}</p> : null}{text(item.price) ? <p className="mt-3 text-lg font-black" style={{ color: primary }}>{text(item.price)}</p> : null}{text(item.href) ? <div className="mt-4"><ActionLink href={text(item.href)} primary={primary} basePath={basePath} eventName="product_click">{text(item.buttonText) || 'View product'}</ActionLink></div> : null}</div></article>)}</div></section>;
+    return <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="text-3xl font-black">{text(c.title)}</h2> : null}<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((item, index) => <article key={`${text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.name)} className="aspect-square w-full object-contain" /> : null}<div className="p-5"><h3 className="text-lg font-black">{text(item.name)}</h3>{text(item.description) ? <p className="mt-2 text-sm leading-6 text-slate-600">{text(item.description)}</p> : null}{text(item.price) ? <p className="mt-3 text-lg font-black" style={{ color: primary }}>{text(item.price)}</p> : null}<TenantAddToBag product={{ name: text(item.name), href: text(item.href), price: text(item.price), image: text(item.image), description: text(item.description) }} />{text(item.href) ? <div className="mt-4"><ActionLink href={text(item.href)} primary={primary} basePath={basePath} eventName="product_click">{text(item.buttonText) || 'View product'}</ActionLink></div> : null}</div></article>)}</div></section>;
   }
 
   if (section.type === 'testimonial') {
@@ -217,6 +221,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const background = config.branding.backgroundColor || '#ffffff';
   const textColor = config.branding.textColor || '#0f172a';
   const navigation = (config.pages || []).filter((item) => item.showInNavigation !== false);
+  const design = config.meta?.designPreferences ? readWebsiteDesign(config.meta.designPreferences) : null;
   const isLegacy83 = config.template.id === 'legacy83-premium';
   function navigateDraft(event: MouseEvent<HTMLDivElement>) {
     if (!onNavigate || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -228,21 +233,28 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
     onNavigate(target.slug);
   }
 
+  // Keep the imported Curvature collection visual and shoppable without changing other tenants.
+  if (site.subdomain === 'meri-gold-round') {
+    return <div onClickCapture={onNavigate ? navigateDraft : undefined}><WellnessStorefront site={{ ...site, config }} pathname={path} basePath={basePath}>
+      {page.sections.map((section, index) => <Section key={section.id} section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex(item => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}
+    </WellnessStorefront>{site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}</div>;
+  }
+
   return (
-    <div data-page={page.slug} onClickCapture={onNavigate ? navigateDraft : undefined} className={`min-h-screen antialiased ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
+    <TenantCommerce site={{...site,config}} basePath={basePath}><div data-template={design?.template} data-density={design?.density} data-page={page.slug} onClickCapture={onNavigate ? navigateDraft : undefined} className={`min-h-screen antialiased ${design ? 'tenant-designed' : ''} ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
       {/* Real document links remain usable when client routing cannot complete. */}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
           <a href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></a>
           <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.filter((item) => item.slug !== '/contact').map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</a>)}</nav>
-          {navigation.some((item) => item.slug === '/contact') ? <a href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</a> : null}
+          <TenantBagButton />{navigation.some((item) => item.slug === '/contact') ? <a href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</a> : null}
         </div>
       </header>
       {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
       <main>{page.sections.map((section, index) => <Section key={section.id} section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
-    </div>
+    </div></TenantCommerce>
   );
 }

@@ -1,5 +1,6 @@
+import { WEBSITE_SPEAKERS } from '@/lib/website-builder/design-choices';
 /** Cloud Run uses its attached service identity; local runtimes may use an API key. */
-export async function generateGoogleNaturalVoice(text: string): Promise<ArrayBuffer> {
+export async function generateGoogleNaturalVoice(text: string, speaker = 'warm'): Promise<ArrayBuffer> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (process.env.K_SERVICE) {
     const metadata = await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
@@ -24,7 +25,7 @@ export async function generateGoogleNaturalVoice(text: string): Promise<ArrayBuf
     headers,
     body: JSON.stringify({
       input: { text },
-      voice: { languageCode: 'en-US', name: 'en-US-Neural2-F' },
+      voice: { languageCode: 'en-US', name: WEBSITE_SPEAKERS.find(item => item.id === speaker)?.providerVoice || 'en-US-Neural2-F' },
       audioConfig: { audioEncoding: 'MP3', speakingRate: 1 },
     }),
     signal: AbortSignal.timeout(12000),

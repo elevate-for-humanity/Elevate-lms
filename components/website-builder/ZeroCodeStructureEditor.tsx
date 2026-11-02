@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { SectionImagePicker } from './SectionImagePicker';
+import { WebsiteDesignPanel } from './WebsiteDesignPanel';
 import { useWebsiteConfig } from '@/components/website-builder/WebsiteConfigProvider';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from 'lucide-react';
 import type { TenantSiteConfig, TenantSitePage, TenantSiteSection, TenantSiteSectionType } from '@/lib/tenant/site-types';
@@ -127,7 +129,13 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
     if (!page || !selectedSection) return;
     const nextSection = { ...selectedSection, content: { ...selectedSection.content, [key]: value } };
     const nextPage = { ...page, sections: page.sections.map((section) => section.id === selectedSection.id ? nextSection : section) };
-    await persist(replacePage(nextPage), 'Section content updated.');
+    const next = replacePage(nextPage);
+    if (page.slug === '/' && selectedSection.type === 'hero' && key === 'image' && typeof value === 'string') next.meta = { ...next.meta, heroImageOverride: value };
+    if (page.slug === '/shop' && selectedSection.type === 'products' && key === 'items' && Array.isArray(value)) {
+      const old = new Set(Array.isArray(selectedSection.content.items) ? selectedSection.content.items.map(item => item && typeof item === 'object' ? (item as Record<string, unknown>).href : null) : []);
+      next.products = [...(config.products || []).filter(p => !old.has(p.href)), ...value.flatMap(item => typeof item.name === 'string' && typeof item.href === 'string' ? [{ name: item.name, href: item.href, price: typeof item.price === 'string' ? item.price : undefined, image: typeof item.image === 'string' ? item.image : undefined, description: typeof item.description === 'string' ? item.description : undefined }] : [])];
+    }
+    await persist(next, 'Section content updated.');
   }
 
   const fieldValues = useMemo(() => {
@@ -144,6 +152,7 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
 
   return (
     <section className="border-b border-slate-200 bg-white">
+      <WebsiteDesignPanel websiteId={websiteId} initialConfig={config} />
       <div className="mx-auto max-w-7xl px-4 py-5">
         <details className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5">
           <summary className="cursor-pointer text-lg font-black text-slate-950">Detailed page & section controls</summary>
@@ -166,6 +175,7 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
 
                 {selectedSection ? <div key={selectedSection.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wider text-indigo-700">Selected section</p><h3 className="font-black capitalize">{selectedSection.type.replaceAll('_', ' ')}</h3></div><div className="flex gap-1"><button type="button" disabled={busy || selectedSectionIndex <= 0} onClick={() => void moveSection(-1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section up"><ArrowUp className="h-4 w-4" /></button><button type="button" disabled={busy || selectedSectionIndex >= (page?.sections.length || 0) - 1} onClick={() => void moveSection(1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section down"><ArrowDown className="h-4 w-4" /></button><button type="button" disabled={busy} onClick={() => void removeSection()} className="rounded-lg border border-red-200 bg-white p-2 text-red-700" aria-label="Delete section"><Trash2 className="h-4 w-4" /></button></div></div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2"><QuickField label="Title" value={fieldValues.title} onSave={(value) => updateSectionField('title', value)} /><QuickField label="Text" value={fieldValues.text} onSave={(value) => updateSectionField('text', value)} multiline /><QuickField label="Image URL" value={fieldValues.image} onSave={(value) => updateSectionField('image', value)} /><QuickField label="Image alt text" value={fieldValues.imageAlt} onSave={(value) => updateSectionField(selectedSection.type === 'image' ? 'alt' : 'imageAlt', value)} /><QuickField label="Button text" value={fieldValues.buttonText} onSave={(value) => updateSectionField('buttonText', value)} /><QuickField label="Button destination" value={fieldValues.buttonHref} onSave={(value) => updateSectionField('buttonHref', value)} /></div>
+                  {['hero','image','cta'].includes(selectedSection.type) ? <SectionImagePicker websiteId={websiteId} onSelect={url=>updateSectionField('image',url)} images={[...new Set((config.pages || []).flatMap(p=>p.sections.map(s=>typeof s.content.image==='string'?s.content.image:'')).filter(Boolean))].slice(0,12)} /> : null}
                   {selectedSection.type === 'products' ? <ProductItemsEditor key={JSON.stringify(selectedSection.content.items)} items={Array.isArray(selectedSection.content.items) ? selectedSection.content.items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item)) : []} busy={busy} onSave={(items) => updateSectionField('items', items)} /> : null}
                 </div> : <div className="rounded-xl border border-dashed border-slate-300 p-6 text-sm text-slate-500">Select a section to edit it without code.</div>}
               </div>

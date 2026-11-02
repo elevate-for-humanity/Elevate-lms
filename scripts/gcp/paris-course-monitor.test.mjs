@@ -195,3 +195,33 @@ test('an exhausted expired lease retains a real stop reason without resetting or
   assert.match(url,/lease_expires_at=lt\./);assert.match(url,/execution_generation=eq.2/);
  }
 });
+
+
+test('PARIS wakes verified quality work and never bypasses a saved owner pause',async()=>{
+ const base={build_id:'build-1',attempts:0,max_attempts:5,execution_generation:3,monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const quality={...base,id:'quality',job_type:'lesson_autopilot:lesson-a:quality',status:'queued',available_at:'infinity'};
+ const instruction={...base,id:'instruction',job_type:'lesson_autopilot:lesson-a:instruction',status:'completed',last_error:null};
+ const media={...base,id:'media',job_type:'lesson_autopilot:lesson-a:media',status:'completed',last_error:null};
+ for(const {rows,wakes} of [
+  {rows:[quality,instruction,media],wakes:1},
+  {rows:[quality,instruction,{...media,status:'failed'}],wakes:0},
+  {rows:[{...quality,ultimate_course_builds:{status:'running',ownerPaused:true}},instruction,media],wakes:0},
+ ]){
+  const writes=[];let selected='';
+  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+   request:async(url,options={})=>{
+    if(!options.method){selected=new URL(url).searchParams.get('select');return {ok:true,json:async()=>rows};}
+    writes.push({url:String(url),body:JSON.parse(options.body)});
+    return {ok:true,json:async()=>[{id:'quality'}]};
+   }});
+  assert.match(selected,/\\bjob_type\\b/);
+  const actual=writes.filter(w=>w.url.includes('available_at=eq.infinity'));
+  assert.equal(actual.length,wakes);
+  if(wakes){
+   assert.equal(actual[0].body.available_at,now.toISOString());
+   assert.match(actual[0].url,/execution_generation=eq.3/);
+   assert.equal(actual[0].body.status,undefined);
+   assert.equal(actual[0].body.attempts,undefined);
+  }
+ }
+});

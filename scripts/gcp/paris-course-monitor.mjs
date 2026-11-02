@@ -27,8 +27,38 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(!nextCursor || (cursor && nextCursor<=cursor))throw Error('PARIS_MONITOR_CURSOR_NOT_ADVANCING');
     cursor=nextCursor;
   }
+  // Recover a held quality stage only when its exact instruction and media
+  // predecessors have both completed cleanly on the same build. Other held
+  // stages remain fenced; owner-paused builds are never resumed implicitly.
+  const siblingKeys=new Map(rows.map(row=>[row.build_id+'|'+row.job_type,row]));
   const observations=[];
   for(const job of rows){
+    const match=/^lesson_autopilot:(.+):quality$/.exec(job.job_type??'');
+    const build=job.ultimate_course_builds;
+    if(job.status==='queued' && job.available_at==='infinity' && match &&
+      build?.ownerPaused!==true && build?.status==='running' && job.monitor?.enabled){
+      const prefix=job.build_id+'|lesson_autopilot:'+match[1]+':';
+      const instruction=siblingKeys.get(prefix+'instruction');
+      const media=siblingKeys.get(prefix+'media');
+      if([instruction,media].every(upstream=>upstream?.status==='completed' && !upstream.last_error)){
+        const wake=new URL(root);
+        wake.searchParams.set('id','eq.'+job.id);
+        wake.searchParams.set('status','eq.queued');
+        wake.searchParams.set('available_at','eq.infinity');
+        wake.searchParams.set('execution_generation','eq.'+job.execution_generation);
+        const response=await request(wake,{method:'PATCH',
+          headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
+          body:JSON.stringify({available_at:now.toISOString(),updated_at:now.toISOString()}),
+          signal:AbortSignal.timeout(15000)});
+        if(!response.ok)throw Error('PARIS_PREREQUISITE_WAKE_HTTP_'+response.status);
+        const saved=await response.json();
+        if(Array.isArray(saved)&&saved.length===1){
+          observations.push({jobId:job.id,state:'prerequisites_verified',action:'dispatch',saved:true});
+          continue;
+        }
+      }
+    }
+    
     let observation=inspectCourseAutopilot(job,job.ultimate_course_builds,now.getTime());
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='capacity_wait')
       observation={state:'capacity_wait',action:'wait_for_capacity',reason:dispatchState.reason || 'Google regional capacity is unavailable; saved work is preserved'};

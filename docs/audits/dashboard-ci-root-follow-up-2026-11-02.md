@@ -23,3 +23,11 @@ The earlier 36e3ad2 repair has a successful exact LMS release workflow, run 4140
 At inspection, current-main CI and Compliance were queued, Integrity and the exact LMS image build were in progress. Their pending state is not a failure that can be cleared by changing a database flag. This follow-up repairs the observed failures while preserving the gates; its own rollout and final production acceptance must be checked separately.
 
 No learner hours, approvals, payments, placements, enrollment statuses, accounts or credentials were changed.
+
+## Gate follow-up
+
+The local full suite passed 6,321 tests with five skipped tests across 1,030 files on the repaired baseline. Marketing TypeScript also passed. On GitHub, the 620431c4 Integrity Gate passed; all three surface TypeScript checks, lint, canonical enrollment database, compliance files, registered apprenticeship architecture and security passed.
+
+The intervening 607eedcd navigation update converted Host Shop tabs to canonical host-qualified URLs. GitHub CI Preflight then exposed stale relative-string expectations in apprenticeship-portal-navigation-contract.test.ts. host-shop-navigation-context.test.ts had the same stale expectation for non-dashboard tabs. Both now validate the resolved canonical origin and path, retaining real page existence, guard-source checks, complete navigation coverage and duplicate detection. A focused run against the actual 607eedcd navigation source passed 46 tests across five files. This resolves the observed preflight failure without weakening route authorization checks.
+
+At this checkpoint, browser accessibility/enrollment jobs and the full release remained in progress. Those results are not claimed as passing.

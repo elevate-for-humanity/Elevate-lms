@@ -1,19 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 import { ROLE_NAVIGATION } from '@/lib/navigation/navigation-config';
 import { readFileSync } from 'node:fs';
 
 describe('apprenticeship portal navigation contract', () => {
   it('keeps Host Shop operations under the dashboard or an explicitly guarded canonical page', () => {
     const items = ROLE_NAVIGATION.host_shop.flatMap((section) => section.items);
-    expect(items.find((item) => item.id === 'email')?.href).toBe('/host-shop/email');
-    expect(items.find((item) => item.id === 'orientation')?.href).toBe('/host-shop/orientation');
+    expect(new URL(items.find((item) => item.id === 'email')!.href, LMS_HOST).href).toBe(`${LMS_HOST}/host-shop/email`);
+    expect(new URL(items.find((item) => item.id === 'orientation')!.href, LMS_HOST).href).toBe(`${LMS_HOST}/host-shop/orientation`);
     const operational = items.filter((item) => !['dashboard', 'mou'].includes(item.id));
     const guardedPages: Record<string, string> = {
       email: '/host-shop/email',
       orientation: '/host-shop/orientation',
     };
     for (const item of operational) {
-      const path = new URL(item.href, 'https://local.invalid').pathname;
+      const destination = new URL(item.href, LMS_HOST);
+      expect(destination.origin).toBe(new URL(LMS_HOST).origin);
+      const path = destination.pathname;
       if (Object.hasOwn(guardedPages, item.id)) {
         expect(path).toBe(guardedPages[item.id]);
         const source = readFileSync(`apps/lms/app${path}/page.tsx`, 'utf8');

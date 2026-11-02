@@ -6,6 +6,12 @@ spec = importlib.util.spec_from_file_location('pbx_audit', Path(__file__).with_n
 pbx = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pbx)
 class RuntimeEvidence(unittest.TestCase):
+    def test_declined_modules_are_not_running_and_mailboxes_do_not_prove_registration(self):
+        self.assertFalse(pbx.module_running('app_voicemail.so Comedian Mail 0 Not Running core','app_voicemail.so'))
+        self.assertTrue(pbx.module_running('app_voicemail.so Comedian Mail 0 Running core','app_voicemail.so'))
+        self.assertFalse(pbx.voicemail_application_registered('25 voicemail users configured.'))
+        self.assertFalse(pbx.voicemail_application_registered('Your application(s) is (are) not registered'))
+        self.assertTrue(pbx.voicemail_application_registered("-= Info about Application 'VoiceMail' =-\n[Synopsis]"))
     def test_generated_operator_uses_contact_collection_before_dialing(self):
         plan = "[ Context 'elevate-pwa-extensions' ]\n '0' => 1. Set(PWA_CONTACTS=)\n 2. Set(PWA_DEVICE_CONTACTS=${PJSIP_DIAL_CONTACTS(pwa-" + 'a'*40 + ")})\n 3. Dial(${PWA_CONTACTS},25)\n 4. Return()"
         self.assertTrue(pbx.pwa_operator_configured(plan))

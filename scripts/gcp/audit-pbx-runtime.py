@@ -77,6 +77,18 @@ def operator_route_reason(operator_output, target_output):
     return 'generated_route_absent'
 
 
+def module_running(output, module):
+    for line in (output or '').splitlines():
+        if re.match(r'^\s*'+re.escape(module)+r'\s+',line):
+            return bool(re.search(r'\bRunning\b',line) and 'Not Running' not in line)
+    return False
+
+
+def voicemail_application_registered(output):
+    plain=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',output or '')
+    return "Info about Application 'VoiceMail'" in plain and 'not registered' not in plain.lower()
+
+
 def mailbox_count(output):
     # Asterisk 20 emits this sentence instead of a numeric summary when empty.
     if re.search(r'^There are no voicemail users currently defined\.?$', output or '', re.M):
@@ -172,7 +184,8 @@ def audit():
                                ('SRTP', 'res_srtp.so'), ('ARI', 'res_ari_channels.so'),
                                ('EXTERNAL_MEDIA_RTP', 'chan_rtp.so'), ('VOICEMAIL_MODULE', 'app_voicemail.so')]:
         output = cli('module show like ' + module)
-        record(capability, bool(output and re.search(re.escape(module) + r'\s+.*\bRunning\b', output)), 'loaded_module_state')
+        record(capability, module_running(output,module), 'loaded_module_state')
+    record('VOICEMAIL_APPLICATION',voicemail_application_registered(cli('core show application VoiceMail')),'actual_application_registration; mailbox_and_module_presence_are_insufficient')
     plan = cli('dialplan show 0@internal')
     record('OPERATOR_CONFIGURATION', operator_configured(plan), 'explicit_extension_0_required; call acceptance separate')
     generated = cli('dialplan show 0@elevate-pwa-extensions')

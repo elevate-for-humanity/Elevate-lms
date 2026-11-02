@@ -12,8 +12,9 @@ const obsolete = (run, latestSha) =>
   run.head_sha !== latestSha &&
   waiting.has(run.status);
 
-/** Only obsolete CI tests are cancelled. Never touch a release or course worker. */
-export async function pruneSupersededCi({ api, latestSha, execute = false }) {
+/** Keep bounded, started validation so frequent main commits cannot starve
+ * required evidence. Obsolete queued runs and historical hangs still retire. */
+export async function pruneSupersededCi({ api, latestSha, execute = false, now = Date.now() }) {
   if (!/^[a-f0-9]{40}$/.test(latestSha || '')) throw Error('INVALID_MAIN_SHA');
   const runs = new Map();
   for (const status of waiting) {
@@ -34,6 +35,16 @@ export async function pruneSupersededCi({ api, latestSha, execute = false }) {
     const current = await api(endpoint);
     if (current.id !== run.id || current.head_sha !== run.head_sha || !obsolete(current, latestSha))
       continue;
+    const started = Date.parse(current.run_started_at || current.created_at || '');
+    if (Number.isFinite(started) && now - started >= 0 && now - started < 45 * 60 * 1000) {
+      const jobs = await api(endpoint + '/jobs?per_page=100');
+      if (!Array.isArray(jobs.jobs) || jobs.total_count > 100)
+        throw Error('CI_JOB_INVENTORY_UNAVAILABLE');
+      if (jobs.jobs.some(job => ['in_progress', 'completed'].includes(job.status) && job.name !== 'CI Required Gate')) {
+        results.push({ runId: run.id, commit: run.head_sha, status: 'active_validation_preserved' });
+        continue;
+      }
+    }
     if (execute) {
       try {
         await api(endpoint + '/cancel', 'POST');

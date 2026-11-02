@@ -7,10 +7,10 @@ on:
     branches: [main, work, 'fix/unified-paris-acceptance-20261023']
 
 concurrency:
-  # The newest commit retains every required gate; obsolete commits release runners.
-  # Per-SHA groups let every main push consume another full set of runner slots.
+  # Finish active main validation; retain only the newest pending commit.
+  # PR updates may cancel obsolete checks without starving main release evidence.
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   preflight:

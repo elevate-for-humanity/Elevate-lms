@@ -65,7 +65,7 @@ test('CI concurrency is per branch and keeps every gate on the current commit', 
   const policy = workflow.split('concurrency:')[1].split('jobs:')[0];
   assert.match(policy, /group: ci-\$\{\{ github.workflow \}\}-\$\{\{ github.ref \}\}/);
   assert.doesNotMatch(policy, /github.sha/);
-  assert.match(policy, /cancel-in-progress: true/);
+  assert.ok(policy.includes("cancel-in-progress: ${{ github.event_name == 'pull_request' }}"));
   assert.match(workflow, /Run required Vitest suite/);
 });
 
@@ -109,4 +109,38 @@ test('normal cancellation must fail before force cancellation of the same obsole
     'repos/elevate-for-humanity/Elevate-lms/actions/runs/1/cancel',
     'repos/elevate-for-humanity/Elevate-lms/actions/runs/1/force-cancel',
   ]);
+});
+
+const now=Date.parse('2026-11-02T14:30:00Z');
+test('active validation survives newer main commits but an unstarted queue and historical hang still retire',async()=>{
+ for(const scenario of [
+  {age:5,started:true,expected:'active_validation_preserved',writes:0},
+  {age:5,started:false,expected:'cancellation_requested',writes:1},
+  {age:46,started:true,expected:'cancellation_requested',writes:1},
+ ]) {
+  const current=run(1,{run_started_at:new Date(now-scenario.age*60000).toISOString()});
+  const writes=[];
+  const api=async(path,method='GET')=>{
+   if(method==='POST'){writes.push(path);return {};}
+   if(path.includes('/jobs?'))return {total_count:1,jobs:[{name:'Functional Tests & Repo Hygiene',status:scenario.started?'in_progress':'queued'}]};
+   return path.includes('/workflows/')?{workflow_runs:[current]}:current;
+  };
+  assert.equal((await pruneSupersededCi({api,latestSha,execute:true,now}))[0].status,scenario.expected);
+  assert.equal(writes.length,scenario.writes);
+ }
+});
+test('main Integrity Gate also finishes before the newest pending commit starts',()=>{
+ const workflow=readFileSync(new URL('../../.github/workflows/integrity-gate.yml',import.meta.url),'utf8');
+ assert.ok(workflow.includes("cancel-in-progress: ${{ github.event_name == 'pull_request' }}"));
+});
+test('missing or truncated job evidence cannot authorize cancellation of recent validation',async()=>{
+ for(const jobs of [{},{total_count:101,jobs:[]}]) {
+  const current=run(1,{run_started_at:new Date(now-60000).toISOString()});
+  const api=async(path,method='GET')=>{
+   assert.equal(method,'GET');
+   if(path.includes('/jobs?'))return jobs;
+   return path.includes('/workflows/')?{workflow_runs:[current]}:current;
+  };
+  await assert.rejects(pruneSupersededCi({api,latestSha,execute:true,now}),/CI_JOB_INVENTORY_UNAVAILABLE/);
+ }
 });

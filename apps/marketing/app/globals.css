@@ -1830,3 +1830,32 @@ main[data-homepage-curation] a[class*="border-"]:not([class*="bg-"]) {
     aspect-ratio: 16 / 9;
   }
 }
+
+/* One continuous homepage rather than alternating promotional panels. */
+main[data-homepage-curation] > section {
+  border-block-width: 0;
+  padding-inline: 1.25rem;
+  padding-block: 2rem;
+}
+main[data-homepage-curation] > section > div {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+main[data-homepage-curation] > section + section {
+  margin-top: 0;
+}
+main[data-homepage-curation] :where(section,figure,article) {
+  box-shadow: none;
+}
+@media (min-width: 640px) {
+  main[data-homepage-curation] > section {
+    padding-inline: 2rem;
+    padding-block: 2.5rem;
+  }
+}
+@media (max-width: 639px) {
+  main[data-homepage-curation] > section {
+    padding-inline: 1rem;
+    padding-block: 1.25rem;
+  }
+}

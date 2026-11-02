@@ -33,3 +33,14 @@ test('queued saves are discarded after disposal',async()=>{
  w.report('photos',1,4);await new Promise(setImmediate);clock+=11000;w.report('photos',2,4);
  w.dispose();release();await new Promise(setImmediate);assert.equal(calls,1);
 });
+
+test('full learner playback survives the producer deadline but remains bounded',async()=>{
+ const f=fixture();f.w.report('autopilot:quality:learner_runthrough');
+ f.advance(600001);await f.w.check();assert.equal(f.stalls(),0);
+ f.advance(3600000);await f.w.check();assert.equal(f.stalls(),1);f.w.dispose();
+});
+test('leaving learner playback restores the normal producer deadline',async()=>{
+ const f=fixture();f.w.report('autopilot:quality:learner_runthrough');
+ f.advance(600001);f.w.report('autopilot:quality:finished_media_qa');
+ f.advance(101);await f.w.check();assert.equal(f.stalls(),1);f.w.dispose();
+});

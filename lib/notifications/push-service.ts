@@ -5,13 +5,17 @@
 import webpush from 'web-push';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
-// VAPID configuration
-const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@www.elevateforhumanity.org';
-// Initialize web-push
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+import { getSecrets } from '@/lib/secrets';
+// Runtime secrets may be hydrated after this module is imported. Resolve the
+// current signing identity at send time and keep it scoped to each request.
+async function vapidDetails() {
+  const config = await getSecrets(['VAPID_PUBLIC_KEY', 'VAPID_PRIVATE_KEY', 'VAPID_SUBJECT']);
+  if (!config.VAPID_PUBLIC_KEY || !config.VAPID_PRIVATE_KEY) return null;
+  return {
+    subject: config.VAPID_SUBJECT || 'mailto:admin@elevateforhumanity.org',
+    publicKey: config.VAPID_PUBLIC_KEY,
+    privateKey: config.VAPID_PRIVATE_KEY,
+  };
 }
 export interface PushNotification {
   title: string;
@@ -44,21 +48,21 @@ export class PushNotificationService {
   async sendToSubscription(
     subscription: PushSubscription,
     notification: PushNotification,
+    owner?: { database: any; userId: string },
   ): Promise<boolean> {
-    if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-      return false;
-    }
     try {
+      const vapid = await vapidDetails();
+      if (!vapid) return false;
       const payload = JSON.stringify(notification);
-      await webpush.sendNotification(subscription, payload, { timeout: 10000 });
+      await webpush.sendNotification(subscription, payload, { timeout: 10000, vapidDetails: vapid });
       return true;
     } catch (error) {
-      /* Error handled silently */
-      // Handle expired subscriptions
-      if (error.statusCode === 410 || error.statusCode === 404) {
-        await this.removeSubscription(subscription.endpoint);
-      } else {
-        // Error: $1
+      const status = typeof (error as { statusCode?: unknown })?.statusCode === 'number'
+        ? (error as { statusCode: number }).statusCode : null;
+      // Never log provider bodies, subscription endpoints, signing keys or payloads.
+      logger.warn('[PushService] Provider acceptance unconfirmed', { statusCode: status });
+      if (status === 410 || status === 404) {
+        await this.removeSubscription(subscription.endpoint, owner);
       }
       return false;
     }
@@ -85,11 +89,11 @@ export class PushNotificationService {
     userId: string,
     notification: PushNotification,
   ): Promise<number> {
-    if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) return 0;
     const { data, error } = await database
       .from('push_subscriptions')
       .select('endpoint,p256dh,auth')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('active', true);
     if (error || !data?.length) return 0;
     let sent = 0;
     for (const row of data) {
@@ -97,6 +101,7 @@ export class PushNotificationService {
       const ok = await this.sendToSubscription(
         { endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
         notification,
+        { database, userId },
       );
       if (ok) sent += 1;
     }
@@ -177,8 +182,17 @@ export class PushNotificationService {
   /**
    * Remove expired subscription
    */
-  private async removeSubscription(endpoint: string): Promise<void> {
+  private async removeSubscription(
+    endpoint: string,
+    owner?: { database: any; userId: string },
+  ): Promise<void> {
     try {
+      if (owner) {
+        await owner.database.from('push_subscriptions')
+          .update({ active: false, updated_at: new Date().toISOString() })
+          .eq('user_id', owner.userId).eq('endpoint', endpoint);
+        return;
+      }
       const supabase = await createClient();
       await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint);
     } catch (error) {

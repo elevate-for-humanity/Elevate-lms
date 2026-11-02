@@ -85,13 +85,13 @@ async function notifyRecipient(
   const [profileResult, preferencesResult] = input.profileId
     ? await Promise.all([
         db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
-        db.from('notification_preferences').select('email_missed_calls,sms_missed_calls,sms_phone').eq('user_id', input.profileId).maybeSingle(),
+        db.from('notification_preferences').select('email_missed_calls,sms_missed_calls,sms_phone,push_enabled').eq('user_id', input.profileId).maybeSingle(),
       ])
     : [{ data: null, error: null }, { data: null, error: null }];
   if (profileResult.error || preferencesResult.error) throw new Error('Phone notification preferences unavailable');
   const profile = profileResult.data;
   const preferences = preferencesResult.data;
-  deliveries.push(sendPush());
+  if (preferences?.push_enabled !== false) deliveries.push(sendPush());
   const detailLines = [
     input.adminCopy ? 'Admin oversight copy — callback responsibility remains with the assigned holder.' : '',
     input.source === 'voicemail' ? 'A voicemail was left. Open the secure inbox to listen.' : '',

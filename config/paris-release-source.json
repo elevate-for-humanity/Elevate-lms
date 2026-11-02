@@ -12,9 +12,9 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "30bd570692bb874af95beda59fcefbe5fa045de204e40b9ee3d4036e40a83d46",
+      "sha256": "af7e8637a737a7f14c6bb096452cc95702fc209542d1588971b30d7a61ac8eef",
       "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
-      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough",
+      "localRevisionReason": "Reviewed 2026-11-02: add agent training navigation and hiring label; retain existing brand, contact, layout and pinned upstream source identity.",
       "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
@@ -28,9 +28,9 @@
     {
       "source": "app/tax-software/bank-products/page.tsx",
       "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
-      "sha256": "5e4e37febeb234a291d9f55613ebc4809a1d6e9802eaa95f66777463574c6b97",
+      "sha256": "734093b3932249353be41132784a7ad7969a78238e6bca2c56918e97b37af20d",
       "sourceSha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68",
-      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+      "localRevisionReason": "Reviewed 2026-11-02: add researched EPS TY2027 advance and Refund Transfer information, current terms link and availability disclosures; retain pinned upstream source identity."
     },
     {
       "source": "app/tax-software/contact/page.tsx",

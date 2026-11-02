@@ -171,6 +171,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         hasRecruitingAccess: Boolean(recruitmentOffice),
+        ownedOfficeIds: ownedIds,
         candidates,
         candidateCount,
         offices,

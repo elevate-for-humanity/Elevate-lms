@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { TaxSecurityVerification } from '../_components/TaxSecurityVerification';
 import { practiceCases } from '@/lib/tax-software/training/practice';
 type Progress = { module_id: string; completed_at: string | null; score: number; user_id?: string };
 type OfficeData = {
   hasRecruitingAccess: boolean;
+  ownedOfficeIds: string[];
   candidateCount: number;
   candidates: {
     id: string;
@@ -80,6 +81,47 @@ export function Workspace() {
       setRevision((v) => v + 1);
     } catch (e) {
       setFeedback((f) => ({ ...f, [id]: e instanceof Error ? e.message : 'Unable to save' }));
+    } finally {
+      setBusy('');
+    }
+  }
+  async function linkAgent(e: FormEvent<HTMLFormElement>, applicationId: string) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    setBusy(applicationId);
+    try {
+      const response = await fetch('/api/tax/office/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationId,
+          officeId: form.get('officeId'),
+          firstName: form.get('firstName'),
+          lastName: form.get('lastName'),
+          ptin: form.get('ptin'),
+          identityAndPtinVerified: form.get('verified') === 'on',
+        }),
+      });
+      const result = await response.json();
+      const messages: Record<string, string> = {
+        INVALID_AGENT_LINK:
+          'Enter verified names, a PTIN beginning with P followed by eight digits, and confirm identity verification.',
+        AGENT_ALREADY_LINKED:
+          'This account, email or PTIN is already linked. Review the existing preparer record.',
+        VERIFIED_ACCOUNT_REQUIRED:
+          'The applicant must verify the email on their existing account first.',
+        OFFICE_OWNER_REQUIRED:
+          'Only the authorized recruitment-office owner can link this applicant.',
+      };
+      if (!response.ok)
+        throw Error(messages[result.error] ?? 'The agent could not be linked. Retry.');
+      setFeedback((f) => ({ ...f, [applicationId]: result.message }));
+      setRevision((v) => v + 1);
+    } catch (e) {
+      setFeedback((f) => ({
+        ...f,
+        [applicationId]: e instanceof Error ? e.message : 'The agent could not be linked.',
+      }));
     } finally {
       setBusy('');
     }
@@ -314,6 +356,75 @@ export function Workspace() {
                     </td>
                     <td className="border-b p-3">
                       {c.finalPassed ? 'Supervisor/document review required' : c.status}
+                      <details className="mt-3 min-w-64 rounded-lg border p-3">
+                        <summary className="cursor-pointer py-2 font-bold">
+                          Link agent for onboarding
+                        </summary>
+                        <form onSubmit={(e) => linkAgent(e, c.id)} className="mt-3 grid gap-3">
+                          <p className="leading-6">
+                            Link the applicant’s existing account. This creates a pending staff
+                            record; it does not approve employment or grant client, IRS or bank
+                            access.
+                          </p>
+                          <label>
+                            Office
+                            <select
+                              name="officeId"
+                              required
+                              className="mt-1 block w-full rounded border p-2"
+                            >
+                              {data.offices
+                                .filter((o) => data.ownedOfficeIds.includes(o.id))
+                                .map((o) => (
+                                  <option value={o.id} key={o.id}>
+                                    {o.office_name}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                          <label>
+                            Verified first name
+                            <input
+                              name="firstName"
+                              required
+                              maxLength={100}
+                              className="mt-1 block w-full rounded border p-2"
+                            />
+                          </label>
+                          <label>
+                            Verified last name
+                            <input
+                              name="lastName"
+                              required
+                              maxLength={100}
+                              className="mt-1 block w-full rounded border p-2"
+                            />
+                          </label>
+                          <label>
+                            Verified PTIN
+                            <input
+                              name="ptin"
+                              required
+                              pattern="P[0-9]{8}"
+                              maxLength={9}
+                              autoComplete="off"
+                              className="mt-1 block w-full rounded border p-2"
+                            />
+                          </label>
+                          <label className="flex gap-2">
+                            <input type="checkbox" name="verified" required />I verified this
+                            applicant’s identity and PTIN through the approved private process.
+                          </label>
+                          <button className={button} disabled={Boolean(busy)}>
+                            Link pending agent
+                          </button>
+                        </form>
+                        {feedback[c.id] && (
+                          <p role="status" className="mt-3 leading-6">
+                            {feedback[c.id]}
+                          </p>
+                        )}
+                      </details>
                     </td>
                   </tr>
                 ))}

@@ -65,7 +65,13 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-lms-trigger.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
   validate:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    # Serialize short handoff checks so old requests cannot dispatch duplicates.
+    # This does not cancel any image build, rollout or acceptance job.
+    concurrency:
+      group: google-lms-main-handoff
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     outputs:
       ready: ${{ steps.release.outputs.ready }}
     steps:
@@ -119,7 +125,7 @@ jobs:
   release-result:
     name: Confirm LMS release jobs completed
     needs: [validate, build, deploy, acceptance]
-    if: ${{ always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (needs.validate.result != 'success' || needs.validate.outputs.ready == 'true') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { resolveMainRelease } from './resolve-main-release.mjs';
+import { resolveMainRelease, hasPendingSuccessor } from './resolve-main-release.mjs';
 const current = 'a'.repeat(40),
   latest = 'b'.repeat(40);
 const input = { ref: 'refs/heads/main', current, requested: current, latest: current };
@@ -14,7 +14,10 @@ test('manual dispatch can omit requested SHA', () => {
   assert.equal(resolveMainRelease({ ...input, requested: '' }).ready, true);
 });
 test('a delayed request hands off even when the workflow already sees newer main', () => {
-  assert.deepEqual(resolveMainRelease({ ...input, requested: latest }), { ready: false, successor: current });
+  assert.deepEqual(resolveMainRelease({ ...input, requested: latest }), {
+    ready: false,
+    successor: current,
+  });
 });
 test('non-main and malformed requests remain blocked', () => {
   for (const patch of [
@@ -25,4 +28,35 @@ test('non-main and malformed requests remain blocked', () => {
   ]) {
     assert.throws(() => resolveMainRelease({ ...input, ...patch }));
   }
+});
+
+test('a handoff reuses an already queued or running exact-main release', () => {
+  for (const status of ['queued', 'pending', 'waiting', 'requested', 'in_progress'])
+    assert.equal(
+      hasPendingSuccessor(
+        {
+          workflow_runs: [
+            { head_branch: 'main', event: 'workflow_dispatch', head_sha: latest, status },
+          ],
+        },
+        latest,
+      ),
+      true,
+    );
+});
+test('failed, completed, other-branch and other-commit runs cannot suppress a required release', () => {
+  const run = {
+    head_branch: 'main',
+    event: 'workflow_dispatch',
+    head_sha: latest,
+    status: 'queued',
+  };
+  for (const patch of [
+    { status: 'completed' },
+    { head_branch: 'work' },
+    { head_sha: current },
+    { event: 'push' },
+  ])
+    assert.equal(hasPendingSuccessor({ workflow_runs: [{ ...run, ...patch }] }, latest), false);
+  assert.throws(() => hasPendingSuccessor({}, latest), /inventory unavailable/);
 });

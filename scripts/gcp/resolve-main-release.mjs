@@ -16,6 +16,17 @@ export function resolveMainRelease({ ref, current, requested, latest }) {
   return { ready, successor: ready ? null : latest };
 }
 
+export function hasPendingSuccessor(inventory, sha) {
+  if (!Array.isArray(inventory?.workflow_runs)) throw new Error('Release inventory unavailable');
+  return inventory.workflow_runs.some(
+    (run) =>
+      run.head_branch === 'main' &&
+      run.event === 'workflow_dispatch' &&
+      run.head_sha === sha &&
+      ['queued', 'pending', 'waiting', 'requested', 'in_progress'].includes(run.status),
+  );
+}
+
 export function run(env = process.env) {
   const repository = env.GITHUB_REPOSITORY;
   const workflow = env.RELEASE_WORKFLOW;
@@ -35,17 +46,23 @@ export function run(env = process.env) {
     latest,
   });
   if (result.successor) {
+    const inventory = JSON.parse(
+      api([
+        `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`,
+      ]),
+    );
     // A docs-only main update may not trigger a replacement build. Explicitly
-    // hand off to current main rather than failing or deploying the old SHA.
-    api([
-      '--method',
-      'POST',
-      `repos/${repository}/actions/workflows/${workflow}/dispatches`,
-      '-f',
-      'ref=main',
-      '-f',
-      `inputs[requested_sha]=${result.successor}`,
-    ]);
+    // hand off once. Older queued validations must not fan out duplicate builds.
+    if (!hasPendingSuccessor(inventory, result.successor))
+      api([
+        '--method',
+        'POST',
+        `repos/${repository}/actions/workflows/${workflow}/dispatches`,
+        '-f',
+        'ref=main',
+        '-f',
+        `inputs[requested_sha]=${result.successor}`,
+      ]);
     console.log(
       `Superseded release handed off to main ${result.successor}; this run will not deploy.`,
     );

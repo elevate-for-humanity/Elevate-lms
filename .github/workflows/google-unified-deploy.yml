@@ -22,6 +22,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Release runners held by superseded main CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --test scripts/gcp/prune-superseded-ci.test.mjs
+          node scripts/gcp/prune-superseded-ci.mjs --execute
       - name: Retire superseded unstarted web release requests
         env:
           GH_TOKEN: ${{ github.token }}

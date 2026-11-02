@@ -103,3 +103,10 @@ test('skipped historical candidate does not prevent a later eligible repair',asy
  assert.match(writes[0],/id=eq.eligible/);
  assert.deepEqual(result.jobIds,['eligible']);
 });
+
+test('verified deadline repair resumes only the exhausted quality playback checkpoint',async()=>{
+ const job={...base,payload:{autopilot:{version:'three-role-v1',competencyId:'icbp-orientation',role:'quality'}},last_error:'ULTIMATE_PROGRESS_STALLED:'+JSON.stringify({phase:'autopilot:quality:learner_runthrough',idleMs:603179}),build:{...base.build,course_id:'5a72b6d1-6a05-4294-832b-0a836ac4a74d'}};
+ assert.equal((await run(job)).writes.length,1);
+ assert.equal((await run({...job,monitor:{enabled:true,lastRepairDeployment:{imageSha}}})).writes.length,0);
+ for(const last_error of ['ULTIMATE_PROGRESS_STALLED:invalid','ULTIMATE_PROGRESS_STALLED:'+JSON.stringify({phase:'autopilot:media:lesson_film_render'})])assert.equal((await run({...job,last_error})).writes.length,0);
+});

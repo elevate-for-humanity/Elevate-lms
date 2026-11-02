@@ -49,7 +49,11 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   // Per-scene license metadata and saved-assignment findings are internal
   // contract defects after an approved-source deployment, so the verified new
   // image must be allowed to resume those saved checkpoints.
-  if(!error.startsWith('ULTIMATE_INTERNAL_REPAIR_REQUIRED:')||durableExternalBlocker)continue;
+  let repairedPlaybackTimeout=false;
+  if(pool&&job.payload.autopilot.role==='quality'&&error.startsWith('ULTIMATE_PROGRESS_STALLED:')){
+   try { repairedPlaybackTimeout=JSON.parse(error.slice('ULTIMATE_PROGRESS_STALLED:'.length)).phase==='autopilot:quality:learner_runthrough'; } catch {}
+  }
+  if((!error.startsWith('ULTIMATE_INTERNAL_REPAIR_REQUIRED:')&&!repairedPlaybackTimeout)||durableExternalBlocker)continue;
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');
   target.searchParams.set('execution_generation','eq.'+job.execution_generation);

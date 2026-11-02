@@ -67,6 +67,11 @@ it('renders one shell in the parent and retains section approval gates', () => {
   ]) {
     const source = readFileSync(file, 'utf8');
     expect(source).not.toContain('<PlatformShell');
-    expect(source).toContain('await requireProgramHolder()');
+    if (file.endsWith('ProgramHolderSectionLayout.tsx')) {
+      expect(source).toContain('allowPendingApproval = false');
+      expect(source).toContain('await requireProgramHolder({ allowPendingApproval })');
+    } else {
+      expect(source).toContain('await requireProgramHolder()');
+    }
   }
 });

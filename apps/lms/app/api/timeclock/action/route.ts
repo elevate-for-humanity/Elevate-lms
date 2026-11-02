@@ -754,7 +754,7 @@ async function _POST(request: NextRequest) {
     }
 
     const shiftHours = (new Date(serverNow).getTime() - new Date(entry.clock_in_at).getTime()) / 3600000;
-    if (shiftHours >= 6 && !entry.lunch_start_at && !(Number(entry.break_minutes) > 0)) {
+    if (shiftHours >= 6 && !entry.lunch_start_at && !(Number('break_minutes' in entry ? entry.break_minutes : 0) > 0)) {
       await writeComplianceAlert(db, 'missing_lunch', {
         apprentice_id: apprentice.id,
         progress_entry_id: entry.id,

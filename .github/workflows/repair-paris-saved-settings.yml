@@ -59,6 +59,8 @@ jobs:
           if(response.status!==403)throw Error('PARIS_PUBLIC_TURN_ROUTE_NOT_DENIED');
           console.log(JSON.stringify({publicTurnRouteDenied:true,httpStatus:response.status}));
           NODE
+      - name: Synchronize mailboxes for the already enabled owned extension directory
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/configure-owned-voicemail.py
       - name: Apply saved settings only while idle, with rollback
         shell: bash
         run: |

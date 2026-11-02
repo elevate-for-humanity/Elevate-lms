@@ -38,15 +38,22 @@ describe('dashboard orientation', () => {
       />,
     );
     fireEvent.click(screen.getByText('More program-specific instructions and instructor contact'));
-    const programGuide = within(screen.getByRole('region', { name: 'Student orientation slideshow' }));
-    expect(screen.getByRole('heading', { name: 'Your first five minutes' })).toBeInTheDocument();
+    const programGuide = within(
+      screen.getByRole('region', { name: 'Student orientation slideshow' }),
+    );
+    expect(screen.getByRole('button', { name: 'Watch narrated video' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
     const headings: string[] = [];
     const images = new Set<string>();
     for (let i = 0; i < 15; i++) {
       headings.push(programGuide.getByRole('heading').textContent || '');
       images.add(programGuide.getByRole('img').getAttribute('src') || '');
       if (i === 4) {
-        const link = programGuide.getByRole('link', { name: 'Write my introduction to Dr. Wilkes' });
+        const link = programGuide.getByRole('link', {
+          name: 'Write my introduction to Dr. Wilkes',
+        });
         const url = new URL(link.getAttribute('href')!, 'https://app.elevateforhumanity.org');
         expect(url.pathname).toBe('/communications/email');
         expect(url.searchParams.get('to')).toBe('center.of.destiny@elevateforhumanity.org');

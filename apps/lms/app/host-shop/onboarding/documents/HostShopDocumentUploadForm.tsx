@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 export default function HostShopDocumentUploadForm({
+  partnerId,
   documentType,
   requiresExpiration,
 }: {
+  partnerId: string;
   documentType: string;
   requiresExpiration: boolean;
 }) {
@@ -20,6 +22,7 @@ export default function HostShopDocumentUploadForm({
     setWorking(true);
     setError(null);
     const form = new FormData(event.currentTarget);
+    form.set('partnerId', partnerId);
     form.set('documentType', documentType);
     try {
       const response = await fetch('/api/host-shop/documents', { method: 'POST', body: form });

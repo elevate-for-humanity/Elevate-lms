@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
-vi.mock('@/lib/partners/current-host-shop', () => ({ requireCurrentHostShopPartner: async () => ({ user: { id: 'host' }, partner: { name: 'Fixture Shop' }, isPlatformAdmin: false }) }));
-vi.mock('@/lib/partner/board', () => ({ getHostShopBoard: async () => ({ requiredDocumentCount: 1, acceptedDocumentCount: 0, documentStatuses: [
+vi.mock('@/lib/partners/current-host-shop', () => ({ requireCurrentHostShopPartner: async () => ({ user: { id: 'host' }, partner: { id: 'fixture-shop', name: 'Fixture Shop' }, isPlatformAdmin: false }) }));
+vi.mock('@/lib/partner/board', () => ({ getHostShopBoard: async () => ({ partner: {id:'fixture-shop'}, requiredDocumentCount: 1, acceptedDocumentCount: 0, documentStatuses: [
  { document_type: 'salon_license', document_name: 'Salon license', is_required: true, status: 'missing' },
  { document_type: 'local_document', document_name: 'Local document', is_required: false, status: 'missing' },
 ] }) }));

@@ -56,6 +56,7 @@ export default async function HostShopDocumentsPage({
 }) {
   const { user, partner, isPlatformAdmin } = await loadContext();
   const board = await getHostShopBoard(user.id);
+  if (board.partner.id !== partner.id) throw new Error('HOST_SHOP_DOCUMENT_CONTEXT_MISMATCH');
   const params = await searchParams;
   const allRequiredAccepted =
     board.requiredDocumentCount > 0 && board.acceptedDocumentCount === board.requiredDocumentCount;
@@ -148,6 +149,7 @@ export default async function HostShopDocumentsPage({
 
                 {needsUpload ? (
                   <HostShopDocumentUploadForm
+                    partnerId={partner.id}
                     documentType={requirement.document_type}
                     requiresExpiration={Boolean(requirement.requires_expiration)}
                   />

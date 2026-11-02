@@ -18,6 +18,9 @@ export async function POST(request: NextRequest) {
     const { user, db, partner } = await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
     const board = await getHostShopBoard(user.id);
     const form = await request.formData();
+    if (board.partner.id !== partner.id || form.get('partnerId') !== partner.id) {
+      return NextResponse.json({ ok: false, error: 'The selected Host Shop changed. Reload this shop’s documents before uploading.' }, { status: 409 });
+    }
     const documentType = String(form.get('documentType') || '').trim();
     const expirationDate = String(form.get('expirationDate') || '').trim();
     const fileEntry = form.get('file');

@@ -22,14 +22,15 @@ const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 async function phoneContext(
   ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>,
 ) {
-  const { data: extension } = await ctx.db
+  const { data: extension, error: extensionError } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
     .eq('profile_id', ctx.user.id)
     .eq('enabled', true)
     .maybeSingle();
+  if (extensionError) return { extension: null, system: null, phoneNumber: '', unavailable: true };
   const systemId = extension?.communication_workspaces?.phone_system_id;
-  const [{ data: system }, { data: primaryNumber }] = systemId
+  const [{ data: system, error: systemError }, { data: primaryNumber, error: numberError }] = systemId
     ? await Promise.all([
         ctx.db
           .from('phone_systems')
@@ -44,13 +45,21 @@ async function phoneContext(
           .eq('is_primary', true)
           .maybeSingle(),
       ])
-    : [{ data: null }, { data: null }];
+    : [{ data: null, error: null }, { data: null, error: null }];
   return {
     ctx,
     extension,
     system,
     phoneNumber: primaryNumber?.e164 || '',
+    unavailable: Boolean(systemError || numberError),
   };
+}
+
+function phoneConfigurationUnavailable() {
+  return NextResponse.json(
+    { error: 'Phone configuration is temporarily unavailable. Please retry.' },
+    { status: 503, headers: { 'Cache-Control': 'private, no-store' } },
+  );
 }
 
 function safeSchedule(value: unknown): AvailabilitySchedule | null {
@@ -76,7 +85,8 @@ function safeSchedule(value: unknown): AvailabilitySchedule | null {
 export async function GET() {
   const { actor: ctx, response: actorError } = await phoneActorResponse();
   if (actorError) return actorError;
-  const { extension, system, phoneNumber } = await phoneContext(ctx);
+  const { extension, system, phoneNumber, unavailable } = await phoneContext(ctx);
+  if (unavailable) return phoneConfigurationUnavailable();
   if (!extension || !system || !phoneNumber) {
     return NextResponse.json(
       { error: 'An administrator has not assigned a phone extension to this account.' },
@@ -197,7 +207,8 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const { actor: ctx, response: actorError } = await phoneActorResponse();
   if (actorError) return actorError;
-  const { extension, system } = await phoneContext(ctx);
+  const { extension, system, unavailable } = await phoneContext(ctx);
+  if (unavailable) return phoneConfigurationUnavailable();
   if (ctx.previewing) {
     return NextResponse.json(
       {

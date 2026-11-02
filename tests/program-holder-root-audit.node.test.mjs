@@ -297,3 +297,20 @@ test('billing history queries the actual organization relationship and surfaces 
  const page=load('apps/admin/app/billing/subscriptions/page.tsx',{'@/lib/auth/require-role':{requireRole:async()=>{}},'@/lib/supabase/admin':{requireAdminClient:async()=>db}});
  const tree=await page.default();assert.equal(organizationQuery,true);assert.equal(tree.props.children.flat().find(x=>x?.props?.role==='alert')?.props.role,'alert');
 });
+
+
+test('phone configuration database failures are retryable and never report a missing extension', async()=>{
+ for (const failing of ['communication_extensions','phone_systems','phone_numbers']) {
+  const db=dbFor(({table})=>({data:table==='communication_extensions'?{id:'extension',communication_workspaces:{phone_system_id:'system'}}:null,error:table===failing?{message:'private database failure'}:null}));
+  const route=load('apps/lms/app/api/program-holder/phone/route.ts',{'next/server':next,'@/lib/phone/actor-response':{phoneActorResponse:async()=>({actor:{db,user:{id:'owner'},roles:['program_holder']}})}});
+  for(const method of ['GET','PATCH']) {
+   const result=await route[method]({json:async()=>({})});
+   assert.equal(result.status,503,failing+':'+method);
+   assert.match(result.body.error,/temporarily unavailable/);
+   assert.doesNotMatch(result.body.error,/assigned|private database/);
+  }
+ }
+ const db=dbFor(()=>({data:null,error:null}));
+ const route=load('apps/lms/app/api/program-holder/phone/route.ts',{'next/server':next,'@/lib/phone/actor-response':{phoneActorResponse:async()=>({actor:{db,user:{id:'owner'}}})}});
+ assert.equal((await route.GET()).status,404);
+});

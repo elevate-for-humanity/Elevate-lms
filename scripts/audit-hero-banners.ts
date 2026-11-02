@@ -153,17 +153,21 @@ if (heroRenderer === null) {
   }
 }
 
-const homeWrapper = readIfPresent('components/ui/HomeHeroVideo.tsx');
+// Validate the hero actually mounted by the homepage, rather than a dormant
+// alternative whose historical proportions do not control the public page.
+const homePage = readIfPresent('apps/marketing/app/page.tsx');
+const activeHomeHero = homePage?.includes('<PlatformHubHero')
+  ? 'components/home/PlatformHubHero.tsx'
+  : 'components/ui/HomeHeroVideo.tsx';
+const homeWrapper = readIfPresent(activeHomeHero);
 if (homeWrapper === null) {
-  console.error('FAIL HomeHeroVideo wrapper is missing');
+  console.error(`FAIL active homepage hero is missing: ${activeHomeHero}`);
   failures += 1;
 } else {
-  // The production homepage now uses a paired copy/media layout, rather
-  // than the former full-width, near-viewport-height hero.
-  const expectedDesktopHeight = 'h-[clamp(260px,42svh,480px)]';
+  const expectedDesktopHeight = 'h-[clamp(360px,65svh,780px)]';
   if (!homeWrapper.includes(expectedDesktopHeight) ||
-      !homeWrapper.includes('lg:grid-cols-[0.84fr_1.16fr]')) {
-    console.error('FAIL homepage hero desktop proportions drifted from the production contract');
+      !homeWrapper.includes('overflow-hidden') || !homeWrapper.includes('object-cover')) {
+    console.error('FAIL active homepage hero lacks its bounded responsive media frame');
     failures += 1;
   }
 }

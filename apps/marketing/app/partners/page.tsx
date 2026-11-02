@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const partnerships = [
-  { title: 'Employers', text: 'Connect with candidates, post open positions, and discuss your workforce training needs.', href: '/employers', action: 'Explore employer services', image: '/images/programs/refresh-20261101/employers.webp', alt: 'Illustrative employer and workforce collaboration scene' },
+  { title: 'Employers', text: 'Connect with candidates, post open positions, and discuss your workforce training needs.', href: '/employers', action: 'Explore employer services', image: '/images/pages/about-employer-partners.webp', alt: 'Illustrative employer and workforce collaboration scene' },
   { title: 'Workforce agencies', text: 'Explore participant referrals, program requirements, and workforce coordination.', href: '/for-agencies', action: 'Explore agency partnerships', image: '/images/programs/refresh-20261101/business.webp', alt: 'Illustrative workforce planning scene' },
   { title: 'Training providers', text: 'Apply to deliver training through the program-holder network. Share your programs, credentials, and delivery capacity for review.', href: '/apply/program-holder', action: 'Apply as a program holder', image: '/images/about-training-20261102.webp', alt: 'Illustrative adult career education scene' },
   { title: 'Host shops & salons', text: 'Find or become a host shop. Connect related instruction with supervised on-the-job learning in barber and beauty apprenticeships.', href: '/partners/host-shops', action: 'Find or become a host shop', image: '/images/programs/refresh-20261101/beauty.webp', alt: 'Illustrative barber and beauty training scene' },

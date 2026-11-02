@@ -214,7 +214,7 @@ test('PARIS wakes verified quality work and never bypasses a saved owner pause',
     writes.push({url:String(url),body:JSON.parse(options.body)});
     return {ok:true,json:async()=>[{id:'quality'}]};
    }});
-  assert.match(selected,/\\bjob_type\\b/);
+  assert.match(selected,/\bjob_type\b/);
   const actual=writes.filter(w=>w.url.includes('available_at=eq.infinity'));
   assert.equal(actual.length,wakes);
   if(wakes){

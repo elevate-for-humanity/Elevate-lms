@@ -80,6 +80,7 @@ export default function HostShopLoginPage() {
     setError('');
     try {
       const response = await fetch('/api/auth/send-magic-link', {
+        signal: AbortSignal.timeout(20_000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         cache: 'no-store',
@@ -94,7 +95,9 @@ export default function HostShopLoginPage() {
       }
       setMagicLinkSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to send a sign-in link.');
+      setError(err && typeof err === 'object' && 'name' in err && ['TimeoutError', 'AbortError'].includes(String(err.name))
+        ? 'The sign-in link request took too long. Please retry once or contact Host Shop Support.'
+        : err instanceof Error ? err.message : 'Unable to send a sign-in link.');
     } finally {
       setIsLoading(false);
     }

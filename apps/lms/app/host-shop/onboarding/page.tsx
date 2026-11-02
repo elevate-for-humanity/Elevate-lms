@@ -1,3 +1,4 @@
+import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
 import { submitHostShopForReview } from './actions';
 import { hostShopReadyForReview } from '@/lib/partners/host-shop-review';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -98,6 +99,7 @@ export default async function HostShopOnboardingPage({ searchParams }: {
   return (
     <main className="min-h-screen bg-slate-50 py-10">
       <div className="mx-auto max-w-4xl space-y-6 px-4 sm:px-6">
+        <HostShopStudentInvitation />
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <p className="text-sm font-extrabold uppercase tracking-[0.12em] text-brand-red-700">
             Host Site Onboarding

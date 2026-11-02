@@ -710,7 +710,7 @@ async function _POST(request: NextRequest) {
 
     const { data: entry, error: entryError } = await db
       .from('progress_entries')
-      .select('id, site_id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at')
+      .select('id, site_id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at, break_minutes')
       .eq('id', progress_entry_id)
       .eq('apprentice_id', apprentice.id)
       .maybeSingle();

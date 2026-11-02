@@ -1,3 +1,4 @@
+import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
 import HostShopWelcome from '@/components/host-shop/HostShopWelcome';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -177,6 +178,7 @@ export default async function HostShopDashboardView() {
     : { data: null };
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-1 py-4 sm:px-4">
+      <HostShopStudentInvitation />
       <HostShopWelcome shopName={shopName} partnerId={board.partner.id} ownerName={heroProfile?.full_name} profileImageUrl={heroProfile?.avatar_url}>
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>

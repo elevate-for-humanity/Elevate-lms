@@ -9,7 +9,7 @@ on:
       - 'lib/ai/runtime/supervision.ts'
       - 'lib/ai/runtime/code-repair-policy.mjs'
   workflow_run:
-    workflows: ['Deploy Admin']
+    workflows: ['Verify PARIS Admin production authorization']
     types: [completed]
     branches: [main]
   schedule:

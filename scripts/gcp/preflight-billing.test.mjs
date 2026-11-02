@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { verifyBilling } from './preflight-billing.mjs';
 const project = 'elegant-racer-299721';
 test('active billing passes without revealing the billing account', () => {
@@ -48,7 +48,11 @@ test('Google uploads require billing and identity while independent builds stay 
 });
 test('retired provider deletion jobs cannot run when changes reach main', () => {
   for (const file of ['purge-all-gpu-resources.yml', 'delete-stuck-gpu-volume.yml', 'delete-legacy-gpu-build-service.yml']) {
-    const source = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8');
+    const workflow = new URL('../../.github/workflows/' + file, import.meta.url);
+    // A removed retired-provider job cannot execute. If retained for evidence,
+    // it must still carry the explicit false guard.
+    if (!existsSync(workflow)) continue;
+    const source = readFileSync(workflow, 'utf8');
     assert.match(source, /jobs:\n  [\w-]+:\n    #[^\n]+\n    if: \$\{\{ false \}\}/, file);
   }
   const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));

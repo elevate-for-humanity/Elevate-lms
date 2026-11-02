@@ -197,7 +197,7 @@ export default function ElizabethGreenePage() {
                 href={organization.founder.linkedIn}
                 target="_blank"
                 rel="noopener noreferrer me"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3.5 font-extrabold text-white bg-white text-slate-950 hover:bg-slate-100"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-6 py-3.5 font-extrabold text-slate-950 hover:bg-slate-100"
               >
                 LinkedIn <ExternalLink className="h-4 w-4" />
               </a>

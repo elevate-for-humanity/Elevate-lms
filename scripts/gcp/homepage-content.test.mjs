@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {load} from 'js-yaml';
 import {normalizeHomepageText, assertHomepageHostShopContract} from './homepage-content.mjs';
 test('finds the business heading across responsive spans and soft hyphens',()=>{
  const html='<h3>Business &amp; <span class="sm:hidden">Entrepre&shy;neurship</span><span class="hidden sm:inline">Entrepreneurship</span></h3>';
@@ -34,3 +36,14 @@ for (const [label, broken] of [
  ['broken join destination', hostShop.replace('/partners/host-shops', '/missing')],
  ['broken shop destination', hostShop.replace('/host-shops/working-salon', '/missing')],
 ]) test(`rejects ${label}`, () => assert.throws(() => assertHomepageHostShopContract(broken)));
+
+test('exact-release acceptance runs homepage and canonical enrollment regressions on all five devices', () => {
+ const {jobs} = load(readFileSync(new URL('../../.github/workflows/registered-apprenticeship-e2e.yml', import.meta.url), 'utf8'));
+ const publicJob = jobs['hvac-public-playback'];
+ const devices = publicJob.strategy.matrix.include.map(row => row.device);
+ for (const device of ['desktop-chrome','laptop-chrome','tablet-chrome','iphone-webkit','android-chrome']) assert.ok(devices.includes(device), device);
+ const step = publicJob.steps.find(row => row.name === 'Verify released homepage and canonical enrollment on every device');
+ for (const file of ['home-config-leaks.spec.ts','canonical-application-flow.spec.ts']) assert.ok(step.run.includes(file), file);
+ assert.ok(step.run.includes('--project=${{ matrix.device }}'));
+ assert.ok(publicJob.steps.find(row => row.name === 'Capture the live Marketing release being tested').run.includes('version.commitSha, process.env.EXPECTED_MARKETING_SHA'));
+});

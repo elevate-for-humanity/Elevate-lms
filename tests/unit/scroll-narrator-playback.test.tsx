@@ -33,7 +33,7 @@ describe('automatic page narration', () => {
   afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.restoreAllMocks(); vi.useRealTimers(); });
   it('narrates the actual featured Host Shop section after the opening hero', async () => {
     render(<main><HomeFeaturedHostShop /></main>);
-    const section = screen.getByRole('heading', { name: 'Real shops. Real experience.' }).closest('section')!;
+    const section = screen.getByRole('heading', { name: 'Barber & Beauty Apprenticeships' }).closest('section')!;
     section.getBoundingClientRect = () => ({ top: 0, bottom: 400, height: 400 } as DOMRect);
     render(<ScrollNarrator />);
     await advance(1400);

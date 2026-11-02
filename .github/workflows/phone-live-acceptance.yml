@@ -9,7 +9,7 @@ on:
         default: preflight
   push:
     branches: [main]
-    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py']
+    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py', 'scripts/gcp/phone-live-acceptance.mjs', 'scripts/gcp/owned-phone-test-receiver.mjs']
 permissions: {contents: read, actions: write, id-token: write}
 concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('phone-acceptance-dispatch-{0}', github.ref) }}
@@ -20,8 +20,13 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
-      - env: {GH_TOKEN: '${{ github.token }}'}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f 'inputs[mode]=preflight'
+      - env:
+          GH_TOKEN: '${{ github.token }}'
+          HEAD_MESSAGE: '${{ github.event.head_commit.message }}'
+        run: |
+          mode=preflight
+          if [ "$HEAD_MESSAGE" = 'Run one authorized owned operator audio acceptance call' ]; then mode=operator; fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -39,12 +44,20 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
+      - name: Verify phone acceptance guards
+        run: node --test scripts/gcp/exercise-paris-self-call.test.mjs scripts/gcp/phone-live-acceptance.test.mjs
+      - name: Install pinned protocol-test dependencies in the disposable runner
+        if: inputs.mode == 'operator'
+        run: npm install --prefix /tmp/elevate-phone-protocol --ignore-scripts --no-audit --no-fund sip.js@0.21.2 playwright@1.57.0
+      - name: Install the official browser engine for the isolated WebRTC test receiver
+        if: inputs.mode == 'operator'
+        run: node /tmp/elevate-phone-protocol/node_modules/playwright/cli.js install --with-deps chromium
       - name: Verify owned VM identity
         run: test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
       - name: Read current operator routing and voicemail worker health without dialing
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
-      - name: Verify mode is implemented before allowing any call
-        env: {ACCEPTANCE_MODE: '${{ inputs.mode }}'}
-        run: test "$ACCEPTANCE_MODE" = preflight
+      - name: Verify only the approved owner and exercise the selected phone path
+        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}'}
+        run: node scripts/gcp/phone-live-acceptance.mjs

@@ -1,0 +1,28 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {verifyOwner,verifyCredential,operatorAudioPassed} from './phone-live-acceptance.mjs';
+const profileId='964dc85a-bce8-4e67-92eb-198ffafb2384',extensionId='ea5439e0-014b-4020-8e25-e305f20c53d6';
+const system={id:'341f59a3-b1d6-4360-8463-0ce0402f86fe',status:'active',admin_extension:'0',voicemail_enabled:true};
+const extension={id:extensionId,profile_id:profileId,extension:'0',enabled:true,webrtc_provider:'asterisk'};
+const profile={id:profileId,full_name:'Elizabeth Greene',email:'curvaturebodysculpting@gmail.com'};
+test('ownership must match the approved phone system, extension and Elizabeth before any call',()=>{
+ verifyOwner(system,extension,profile);
+ for(const bad of [{...profile,email:'someone@example.org'},{...profile,id:extensionId}])assert.throws(()=>verifyOwner(system,extension,bad),/OWNER_UNVERIFIED/);
+ assert.throws(()=>verifyOwner(system,{...extension,extension:'101'},profile),/OWNER_UNVERIFIED/);
+ assert.throws(()=>verifyOwner({...system,voicemail_enabled:false},extension,profile),/OWNER_UNVERIFIED/);
+});
+test('temporary credentials cannot change the device owner or SIP host',()=>{
+ const identity={profileId,extensionId,deviceId:'asterisk_acceptance_test'};
+ const endpoint='pwa-'+createHash('sha256').update(profileId+':'+identity.deviceId).digest('hex').slice(0,40);
+ const value={provider:'asterisk',endpointId:endpoint,sipUsername:endpoint,sipPassword:'x'.repeat(43),extensionId,extension:'0',sipDomain:'phone.elevateforhumanity.org',wsUrl:'wss://phone.elevateforhumanity.org/ws'};
+ verifyCredential(value,identity);
+ for(const bad of [{...value,wsUrl:'ws://phone.elevateforhumanity.org/ws'},{...value,sipDomain:'other.example'},{...value,endpointId:'pwa-'+'a'.repeat(40)}])assert.throws(()=>verifyCredential(bad,identity),/DEVICE_UNVERIFIED/);
+});
+test('ringing, registration and packet counts alone cannot certify two-way operator audio',()=>{
+ const call={liveGreetingAcceptance:'PASS',operatorTransferAcceptance:'PASS'};
+ const device={received:true,answered:true,dtlsConnected:true,inboundBytes:5000,outboundBytes:5000,remoteAudibleWindows:10,failed:false};
+ assert.equal(operatorAudioPassed(call,device),true);
+ for(const change of [{answered:false},{dtlsConnected:false},{remoteAudibleWindows:0},{outboundBytes:0},{failed:true}])assert.equal(operatorAudioPassed(call,{...device,...change}),false);
+ assert.equal(operatorAudioPassed({...call,operatorTransferAcceptance:'FAIL'},device),false);
+});

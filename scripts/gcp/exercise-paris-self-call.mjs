@@ -19,12 +19,13 @@ export function summarizeSpeech(expected,recognition){
   const ratio=greetingMatch(expected,own.map(s=>s.text).join(' '));
   const late=own.flatMap(s=>Array.isArray(s.lateWords)?s.lateWords:[]).flatMap(words);
   const marker=['audio','test','complete'].filter(w=>late.includes(w)).length;
-  return {ratio,marker};
+  return {ratio,marker,operatorMarker:["operator","audio","test","confirmed"].filter(w=>late.includes(w)).length};
  }).sort((a,b)=>b.ratio-a.ratio);
  const best=channels[0];
- return {ratio:segments.length?best.ratio:greetingMatch(expected,text),wordCount:words(text).length,replyMarkerMatched:best.ratio>=.75&&best.marker>=2};
+ return {ratio:segments.length?best.ratio:greetingMatch(expected,text),wordCount:words(text).length,replyMarkerMatched:best.ratio>=.75&&best.marker>=2,operatorMarkerMatched:best.ratio>=.75&&best.operatorMarker>=3};
 }
-export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,request=fetch,wait=ms=>new Promise(r=>setTimeout(r,ms)),report=()=>{},monitor=async()=>null,expectConversation=false}){
+export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,request=fetch,wait=ms=>new Promise(r=>setTimeout(r,ms)),report=()=>{},monitor=async()=>null,expectConversation=false,operatorTest=false,voicemailTest=false}){
+ if([expectConversation,operatorTest,voicemailTest].filter(Boolean).length>1)throw Error('SELF_CALL_SCENARIO_INVALID');
  if(bindings.TWILIO_ACCOUNT_SID!==ACCOUNT||bindings.TWILIO_PHONE_NUMBER!==NUMBER||!bindings.TWILIO_AUTH_TOKEN||words(expectedGreeting).length<10)throw Error('SELF_CALL_IDENTITY_REQUIRED');
  const base=`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT}`;
  const headers={Authorization:'Basic '+Buffer.from(ACCOUNT+':'+bindings.TWILIO_AUTH_TOKEN).toString('base64')};
@@ -41,20 +42,24 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  const origins=await api('https://trunking.twilio.com/v1/Trunks/'+number.trunk_sid+'/OriginationUrls?PageSize=100');
  if(trunk.account_sid!==ACCOUNT||trunk.domain_name!==DOMAIN||trunk.secure!==true||origins.meta?.next_page_url||origins.origination_urls?.length!==1||origins.origination_urls[0].enabled!==true||origins.origination_urls[0].sip_url!=='sip:phone.elevateforhumanity.org:5061;transport=tls')throw Error('SELF_CALL_ROUTE_UNVERIFIED');
  for(const status of ['queued','ringing','in-progress']){const active=await api(base+'/Calls.json?Status='+status+'&PageSize=100');if(active.next_page_uri||!Array.isArray(active.calls)||active.calls.length)throw Error('SELF_CALL_ACTIVE_CALLS_PRESENT');}
- const twiml=expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
+ const timeLimit=operatorTest?60:voicemailTest?75:45;
+ const operatorTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>Please connect me to the operator.</Say><Pause length="7"/><Say loop="2">Incoming operator audio test. This is a controlled system check.</Say><Pause length="8"/><Hangup/></Response>';
+ const voicemailTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Play digits="0"/><Pause length="2"/><Say loop="4">This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.</Say><Play digits="#"/><Pause length="2"/><Hangup/></Response>';
+ const twiml=operatorTest?operatorTwiml:voicemailTest?voicemailTwiml:expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
  // Exactly one bounded call to the verified business number. Never retry creation.
- const created=await api(base+'/Calls.json',{To:NUMBER,From:NUMBER,Timeout:'15',TimeLimit:'45',Record:'true',RecordingChannels:'dual',RecordingTrack:'both',Twiml:twiml});
+ const created=await api(base+'/Calls.json',{To:NUMBER,From:NUMBER,Timeout:'15',TimeLimit:String(timeLimit),...(voicemailTest?{Record:'false'}:{Record:'true',RecordingChannels:'dual',RecordingTrack:'both'}),Twiml:twiml});
  if(!/^CA[a-f0-9]{32}$/i.test(created.sid||'')||created.account_sid!==ACCOUNT||created.to!==NUMBER||created.from!==NUMBER)throw Error('SELF_CALL_CREATION_UNVERIFIED');
- const sid=created.sid;report({selfCallCreated:true,callSid:sid,onlyVerifiedBusinessNumber:true,maxDurationSeconds:45});
+ const sid=created.sid;report({selfCallCreated:true,callSid:sid,onlyVerifiedBusinessNumber:true,maxDurationSeconds:timeLimit});
  let call;
  try{
   try{const observed=await monitor();if(observed)report(observed);}catch{report({readOnlyRtpMonitor:true,error:'SELF_CALL_RTP_MONITOR_UNAVAILABLE'});}
-  for(let n=0;n<40;n++){call=await api(base+'/Calls/'+sid+'.json');if(['completed','failed','busy','no-answer','canceled'].includes(call.status))break;await wait(2000);}
+  for(let n=0;n<50;n++){call=await api(base+'/Calls/'+sid+'.json');if(['completed','failed','busy','no-answer','canceled'].includes(call.status))break;await wait(2000);}
   if(call?.status!=='completed')throw Error('SELF_CALL_NOT_COMPLETED');
  }finally{
   if(!call||!['completed','failed','busy','no-answer','canceled'].includes(call.status))await api(base+'/Calls/'+sid+'.json',{Status:'completed'});
  }
  report({selfCallCompleted:true,callSid:sid,status:call.status,durationSeconds:Number(call.duration)});
+ if(voicemailTest)return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),voicemailDeliveryAcceptance:"PENDING"};
  let recording;
  for(let n=0;n<12;n++){
   const recordings=await api(base+'/Calls/'+sid+'/Recordings.json?PageSize=20');
@@ -64,7 +69,7 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
   if(absent)throw Error('SELF_CALL_RECORDING_ABSENT_'+(/^[0-9]{3,6}$/.test(String(absent.error_code))?absent.error_code:'UNKNOWN'));
   await wait(2500);
  }
- if(!recording||!/^RE[a-f0-9]{32}$/i.test(recording.sid)||Number(recording.duration)>50)throw Error('SELF_CALL_RECORDING_UNAVAILABLE');
+ if(!recording||!/^RE[a-f0-9]{32}$/i.test(recording.sid)||Number(recording.duration)>(operatorTest?60:50))throw Error('SELF_CALL_RECORDING_UNAVAILABLE');
  let audio=await request(base+'/Recordings/'+recording.sid+'.wav',{headers,redirect:'manual',signal:AbortSignal.timeout(20000)});
  if([301,302,303,307,308].includes(audio.status)){
   const location=new URL(audio.headers.get('location'));
@@ -75,7 +80,7 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  const wav=Buffer.from(await audio.arrayBuffer());
  if(wav.length>2000000||wav.subarray(0,4).toString()!=='RIFF'||wav.subarray(8,12).toString()!=='WAVE')throw Error('SELF_CALL_AUDIO_INVALID');
  const recognition=await transcribe(wav),summary=summarizeSpeech(expectedGreeting,recognition),ratio=summary.ratio;
- return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),recordingDurationSeconds:Number(recording.duration),receivedAudioBytes:wav.length,speechWordCount:summary.wordCount,savedGreetingWordMatch:Math.round(ratio*100)/100,savedGreetingAudioMatched:ratio>=0.75,liveGreetingAcceptance:ratio>=0.75?'PASS':'FAIL',liveConversationAcceptance:expectConversation?(summary.replyMarkerMatched?'PASS':'FAIL'):'NOT_TESTED',operatorTransferAcceptance:'NOT_TESTED',voicemailDeliveryAcceptance:'NOT_TESTED'};
+ return {callSid:sid,callStatus:call.status,callDurationSeconds:Number(call.duration),recordingDurationSeconds:Number(recording.duration),receivedAudioBytes:wav.length,speechWordCount:summary.wordCount,savedGreetingWordMatch:Math.round(ratio*100)/100,savedGreetingAudioMatched:ratio>=0.75,liveGreetingAcceptance:ratio>=0.75?'PASS':'FAIL',liveConversationAcceptance:expectConversation?(summary.replyMarkerMatched?'PASS':'FAIL'):'NOT_TESTED',operatorTransferAcceptance:operatorTest?(summary.operatorMarkerMatched?'PASS':'FAIL'):'NOT_TESTED',voicemailDeliveryAcceptance:'NOT_TESTED'};
 }
 export async function inspectSelfCall(bindings,sid,{request=fetch}={}){
  if(bindings.TWILIO_ACCOUNT_SID!==ACCOUNT||bindings.TWILIO_PHONE_NUMBER!==NUMBER||!/^CA[a-f0-9]{32}$/i.test(sid||''))throw Error('SELF_CALL_INSPECTION_SCOPE_INVALID');
@@ -121,7 +126,7 @@ try:
  print(json.dumps({'text':' '.join(s['text'] for s in segments),'segments':segments}))
 except Exception:print(json.dumps({'error':'self_call_speech_unavailable'}));sys.exit(1)
 `;
-function transcribeOnPbx(wav){
+export function transcribeOnPbx(wav){
  const quote=value=>"'"+value.replaceAll("'","'\\''")+"'";
  const result=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command','sudo python3 -c '+quote(recognitionProgram)],{input:JSON.stringify({audio:wav.toString('base64')}),encoding:'utf8',timeout:90000,maxBuffer:1000000});
  if(result.status!==0)throw Error('SELF_CALL_SPEECH_UNAVAILABLE');

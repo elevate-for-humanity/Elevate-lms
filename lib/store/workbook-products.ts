@@ -1,3 +1,4 @@
+import { HVAC_STORE_BUNDLE, HVAC_STORE_WORKBOOK_COVER, HVAC_STORE_WORKBOOK_SLUG } from './hvac-course-product';
 import type { StoreProduct } from './products';
 
 export const workbookProducts = [
@@ -42,10 +43,13 @@ export const workbookProducts = [
 })) satisfies (StoreProduct & { workbookSlug: string; subject: string; sections: number })[];
 
 export function workbookAccessHref(productId: string | null) {
+  if (productId === HVAC_STORE_BUNDLE.id) return `https://lms.elevateforhumanity.org/workbooks/${HVAC_STORE_WORKBOOK_SLUG}`;
   const book = workbookProducts.find((book) => book.id === productId);
   return book ? `https://app.elevateforhumanity.org/workbooks/${book.workbookSlug}` : null;
 }
 
 export function workbookCover(slug: string, fallback: string) {
+  if (slug === HVAC_STORE_WORKBOOK_SLUG) return HVAC_STORE_WORKBOOK_COVER;
   return workbookProducts.find((book) => book.workbookSlug === slug)?.image || fallback;
 }
+

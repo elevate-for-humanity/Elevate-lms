@@ -281,6 +281,7 @@ export default function DigitalWorkbook({
           ELEVATE FOR HUMANITY · TRAINING WORKBOOK
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
+        {workbook.slug === HVAC_WORKBOOK_SLUG && <img src="/images/courses/epa608-workbook-20261102.webp" alt="Elevate for Humanity EPA 608 Refrigeration Types I, II and III illustrated practice workbook cover" width={1024} height={1536} className="my-5 h-auto w-32 max-w-full rounded-lg border border-stone-300 shadow-sm sm:w-40" />}
         {workbook.slug === HVAC_WORKBOOK_SLUG && <section className="my-5 rounded-xl border border-amber-400 bg-amber-50 p-5" aria-label="Required HVAC workbook and practice tests"><h2 className="text-xl font-bold">Required to finish your HVAC course</h2><p className="mt-3 leading-relaxed">Complete all 17 chapters and 51 activities. Save notes, each practice response, and your next goal with at least 10 meaningful characters in every field, then review and save each chapter checklist. Pass each of the four practice tests at 80% or higher. Your existing lesson progress stays saved. Internal practice does not award EPA certification or hands-on hours.</p><div className="mt-4 flex flex-wrap gap-3">{HVAC_PRACTICE_LESSONS.map(test=><a className="min-h-12 rounded-lg border border-stone-500 bg-white px-4 py-3 font-bold underline" href={`/lms/courses/${HVAC_COURSE_ID}/lessons/${test.id}`} key={test.id}>{test.title} practice test · 25 questions</a>)}</div></section>}
         <p className="my-4 text-lg leading-relaxed">
           Listen with PARIS. Pause to write. Choose Next when you are ready.
@@ -355,3 +356,4 @@ export default function DigitalWorkbook({
     </main>
   );
 }
+

@@ -1,3 +1,4 @@
+import { fulfillHvacCourseBundle } from '@/lib/store/fulfill-hvac-course';
 import 'server-only';
 import { randomBytes } from 'node:crypto';
 import { nextInvoiceDate } from '@/lib/billing/schedule';
@@ -468,6 +469,7 @@ export async function fulfillPaidBillingInvoice(
             .insert({ user_id: order.user_id, product_id: item.product_id, ...values });
       if (entitlement.error) throw new Error(entitlement.error.message);
     }
+    await fulfillHvacCourseBundle(db, job.billing_invoice_id, order);
     const paid = await db
       .from('store_orders')
       .update({
@@ -664,3 +666,4 @@ export async function fulfillPaidBillingInvoice(
 
   throw new Error(`Unsupported billing fulfillment type: ${job.fulfillment_type}`);
 }
+

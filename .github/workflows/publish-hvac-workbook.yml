@@ -7,6 +7,8 @@ on:
       - 'lib/lms/hvac-workbook-content.json'
       - 'lib/lms/hvac-practice-bank.json'
       - 'scripts/curriculum/build-hvac-workbook-pdf.py'
+      - 'scripts/gcp/verify-hvac-instructional-audio.mjs'
+      - 'public/images/courses/epa608-*-20261102.webp'
   workflow_dispatch:
 permissions:
   contents: read
@@ -40,7 +42,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Validate authored workbook and practice bank
-        run: node --test scripts/curriculum/hvac-workbook.test.mjs
+        run: node --test scripts/curriculum/hvac-workbook.test.mjs scripts/curriculum/hvac-store-bundle.test.mjs
       - name: Build protected PDF master
         run: |
           python -m pip install reportlab==4.4.9
@@ -53,3 +55,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
       - name: Upload and verify the exact private workbook master
         run: node scripts/curriculum/publish-hvac-workbook.mjs
+
+      - name: Verify all 17 narrated instructional videos
+        run: |
+          command -v ffprobe >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y ffmpeg; }
+          node scripts/gcp/verify-hvac-instructional-audio.mjs

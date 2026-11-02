@@ -8,6 +8,7 @@ export const PRESTIGE_COURSE_COVERS = {
 } as const;
 
 const COURSE_COVERS: Readonly<Record<string, string>> = {
+  'd48c61c4-8880-4d9d-9ab5-fab4dd51b201': '/images/courses/epa608-course-20261102.webp',
   'a6b0b712-1cf0-475a-ba79-ee2023dea8ec': PRESTIGE_COURSE_COVERS.cosmetology,
   '2c723bfa-8c40-4acc-b961-98d917710ffc': PRESTIGE_COURSE_COVERS.barbering,
   '580f7eeb-aa36-4b2a-8526-bbfa6899bb14': PRESTIGE_COURSE_COVERS.barbering,
@@ -17,3 +18,4 @@ const COURSE_COVERS: Readonly<Record<string, string>> = {
 export function getPrestigeCourseCover(courseId: string): string | null {
   return COURSE_COVERS[courseId] ?? null;
 }
+

@@ -1,5 +1,7 @@
 'use client';
 
+import WorkbookNarration from '@/components/lms/WorkbookNarration';
+import { HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -163,6 +165,7 @@ export default function LessonProgressClient({
                   <legend className="px-1 font-bold text-slate-950">
                     {questionIndex + 1}. {q.text}
                   </legend>
+                  {HVAC_PRACTICE_LESSONS.some(test => test.id === lessonId) && <details className="my-3"><summary className="cursor-pointer py-2 font-semibold">Listen to this question with PARIS</summary><WorkbookNarration text={`Question ${questionIndex + 1}. ${q.text} ${q.options.map((option,index)=>`${String.fromCharCode(65+index)}. ${option}`).join(' ')}`} /></details>}
                   <div className="mt-3 space-y-2">
                     {q.options.map((option, optionIndex) => (
                       <label
@@ -232,3 +235,4 @@ export default function LessonProgressClient({
     </>
   );
 }
+

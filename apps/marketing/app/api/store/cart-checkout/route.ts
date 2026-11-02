@@ -1,3 +1,4 @@
+import { HVAC_STORE_BUNDLE } from '@/lib/store/hvac-course-product';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -165,6 +166,9 @@ export async function POST(request: NextRequest) {
         { error: 'One or more products are no longer available.' },
         { status: 409 },
       );
+    }
+    if (product.id === HVAC_STORE_BUNDLE.id && quantity !== 1) {
+      return NextResponse.json({ error: 'This HVAC bundle is licensed to one learner. Choose quantity 1.' }, { status: 400 });
     }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
       return NextResponse.json({ error: `Invalid quantity for ${product.name}.` }, { status: 400 });
@@ -362,3 +366,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

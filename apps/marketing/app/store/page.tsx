@@ -147,6 +147,12 @@ export default function StorePage() {
         </div>
       </section>
 
+      <section className="mx-auto my-10 max-w-6xl border-y border-stone-200 bg-white px-4 py-8 text-stone-950" aria-label="EPA 608 course and workbook">
+        <div className="grid items-center gap-6 sm:grid-cols-[144px_1fr]">
+          <Image src="/images/courses/epa608-course-20261102.webp" alt="Elevate EPA 608 Refrigeration Types I, II and III course cover" width={1024} height={1536} sizes="144px" className="mx-auto h-auto w-36 rounded-lg border shadow-sm" />
+          <div><p className="font-bold uppercase tracking-wide text-red-700">Online course + illustrated workbook</p><h2 className="mt-2 text-2xl font-black">EPA 608 Refrigeration · Types I, II &amp; III</h2><p className="mt-3 max-w-3xl leading-relaxed">17 narrated lessons, PARIS-guided activities, interactive system exercises and 100 practice questions. $182 for one learner. Official exam and supervised hands-on training are separate.</p><Link href="/store/courses/epa-608-refrigeration" className="mt-4 inline-flex min-h-12 items-center rounded-lg bg-red-700 px-5 py-3 font-bold text-white">Explore the course and workbook</Link></div>
+        </div>
+      </section>
       <GuidedProductInterview />
 
       <section
@@ -259,3 +265,4 @@ export default function StorePage() {
     </main>
   );
 }
+

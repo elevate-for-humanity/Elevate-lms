@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-02.2",
+  "version": "2026-11-02.3",
   "courseId": "d48c61c4-8880-4d9d-9ab5-fab4dd51b201",
   "workbookSlug": "hvac-epa608-guided-practice",
   "passingScore": 80,
@@ -198,7 +198,7 @@
       "teaching": null,
       "prompts": [
         "Use the animated cycle. Record refrigerant state, relative pressure, and heat direction at all four components. Explain why compressor discharge is vapor.",
-        "At the virtual bench, calculate superheat from 50\u00b0F suction-line temperature and 40\u00b0F evaporating saturation temperature, and subcooling from 105\u00b0F condensing saturation and 95\u00b0F liquid-line temperature.",
+        "At the virtual bench, calculate superheat from 50°F suction-line temperature and 40°F evaporating saturation temperature, and subcooling from 105°F condensing saturation and 95°F liquid-line temperature.",
         "Change one virtual reading at a time. Explain the result, the assumed phase, and why readings alone do not justify adding refrigerant."
       ],
       "lesson_id": "9fc1e9bc-707e-4b3f-95a1-d3f727d1fce1",

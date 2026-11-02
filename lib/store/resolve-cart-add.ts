@@ -1,3 +1,4 @@
+import { HVAC_STORE_BUNDLE } from './hvac-course-product';
 import { INDIVIDUAL_APP_CATALOG, type IndividualAppSlug, type IndividualPlanId } from '@/lib/apps/individual-app-plans';
 import { getProductBySlug, type StoreProduct } from '@/lib/store/products';
 import { workbookProducts } from '@/lib/store/workbook-products';
@@ -35,7 +36,7 @@ export function resolveCartAddParam(param: string): StoreProduct | null {
   const normalized = param.trim().toLowerCase();
   if (!normalized) return null;
 
-  const direct = workbookProducts.find(book => book.slug === normalized) ?? getProductBySlug(normalized);
+  const direct = (normalized === HVAC_STORE_BUNDLE.slug ? HVAC_STORE_BUNDLE : null) ?? workbookProducts.find(book => book.slug === normalized) ?? getProductBySlug(normalized);
   if (direct) return direct;
 
   const appPlanMatch = normalized.match(/^(website-builder|sam-gov|grants)-(.+)$/);
@@ -61,3 +62,4 @@ export function parseIndividualAppCartProduct(
   if (!match) return null;
   return { appSlug: match[1] as IndividualAppSlug, planId: match[2] as IndividualPlanId };
 }
+

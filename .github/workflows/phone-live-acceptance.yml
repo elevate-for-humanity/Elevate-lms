@@ -56,6 +56,9 @@ jobs:
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
       - name: Inspect operator mailbox permissions, sound prompts, and fixed warning classes
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-voicemail-diagnostics.py
+      - name: Inspect only the latest failed owned-number test and provider error codes
+        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', SELF_CALL_MODE: inspect, INSPECT_SELF_CALL_SID: CA35042f9dbca8aa48aafc761b427f71e5}
+        run: node scripts/gcp/exercise-paris-self-call.mjs
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
       - name: Verify only the approved owner and exercise the selected phone path

@@ -47,11 +47,14 @@ def main():
   'invalidExitExtension':r'Invalid extension|sent to invalid extension|No such extension',
   'voicemailModuleWarning':r'WARNING[^\n]{0,120}app_voicemail[.]c',
  }.items()}
+ executions=[{'extension':m[1],'context':m[2],'priority':int(m[3]),'application':m[4]} for m in re.finditer(r'Executing \[(0|s)@(internal|elevate-operator|elevate-pwa-extensions):([0-9]+)\]\s+([A-Za-z]+)',logs)][-40:]
+ gateway=run(['journalctl','-u','elevate-paris-gateway.service','--since','15 minutes ago','--no-pager','-o','cat'])[1]
+ gatewayClasses={key:gateway.count(key) for key in ['PARIS_GREETING_SENT','PARIS_TURN_SENT','PARIS_KEYPAD_HANDOFF_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_TURN_FAILED','PARIS_BRIDGE_FAILED']}
  routes={label:cli(command) for label,command in [('operatorEntry','dialplan show 0@internal'),('operatorFallback','dialplan show s@elevate-operator'),('operatorDeviceReturn','dialplan show 0@elevate-pwa-extensions')]}
  logger=cli('logger show channels')
  # These three dialplans contain only application names and internal endpoint IDs.
  # No credentials or unrelated call logs are returned.
- print(json.dumps({'ownedOperatorDialplans':routes,'loggerDestinations':logger,'voicemailDiagnostics':True,'callsPlaced':0,'configurationChanged':False,'modules':modules,'permissions':permissions,'promptAvailability':sounds,'safeGeneralSettings':general,'recentWarningClasses':reasons}))
+ print(json.dumps({'ownedOperatorDialplans':routes,'recentOperatorExecution':executions,'gatewayClasses':gatewayClasses,'loggerDestinations':logger,'voicemailDiagnostics':True,'callsPlaced':0,'configurationChanged':False,'modules':modules,'permissions':permissions,'promptAvailability':sounds,'safeGeneralSettings':general,'recentWarningClasses':reasons}))
 if __name__=='__main__':
  try:main()
  except Exception:print(json.dumps({'voicemailDiagnostics':True,'error':'PHONE_VOICEMAIL_DIAGNOSTICS_UNAVAILABLE','callsPlaced':0}));raise SystemExit(1)

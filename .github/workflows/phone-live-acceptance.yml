@@ -25,7 +25,7 @@ jobs:
           DISPATCH_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-          if [[ "$DISPATCH_MESSAGE" = "Verify the spoken operator voicemail fallback with one observed self-call" ]]; then mode=voicemail; fi
+          if [[ "$DISPATCH_MESSAGE" = "Trace the owned voicemail handoff with temporary scoped logging" ]]; then mode=voicemail; fi
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'

@@ -15,16 +15,18 @@ describe('store narrated product demos', () => {
     expect(container.querySelector('source')).toHaveAttribute('src', '/videos/store-platform/ai-assistants.mp4');
     expect(container.querySelector('track')).toHaveAttribute('src', '/videos/store-platform/ai-assistants.vtt');
     expect(screen.getByRole('link', { name: /Explore this product/ })).toHaveAttribute('href', '/store/ai-assistants');
-    expect(screen.getByRole('link', { name: 'Download transcript' })).toHaveAttribute('href', '/videos/store-platform/ai-assistants-transcript.txt');
+    expect(screen.getByText(/Too many questions, too many documents/)).toBeInTheDocument();
+    expect(screen.queryByText(/What if your next business website started/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Watch Meet Your AI Support Team' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'Watch Speak It. Build It. Grow Your Business.' })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('offers a usable transcript and download on media failure and clears the error when selecting another tour', () => {
+  it('offers a readable transcript on media failure and clears the error when selecting another tour', () => {
     const { container } = render(<StorePlatformDemos />);
     fireEvent.error(container.querySelector('video')!);
     expect(screen.getByRole('alert')).toHaveTextContent('could not load');
-    expect(screen.getByRole('link', { name: 'Download video' })).toHaveAttribute('href', '/videos/store-platform/website-builder.mp4');
+    expect(screen.getByText('Read tour transcript').closest('details')).toHaveAttribute('open');
+    expect(screen.queryByRole('link', { name: /Download/ })).not.toBeInTheDocument();
     expect(screen.getByText(/What if your next business website started/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Watch Choose Your Plan Without Paying for Everything' }));
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

@@ -78,6 +78,10 @@ export default function StorePlatformDemos() {
                   This video could not load. Please select the tour again to retry.
                 </p>
               )}
+              <details key={demo.slug} className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4" open={mediaError}>
+                <summary className="cursor-pointer font-bold">Read tour transcript</summary>
+                <p className="mt-3 whitespace-pre-line text-sm leading-7">{demo.script}</p>
+              </details>
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <Link href={demo.href} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-red-800">
                   {demo.cta}<ArrowRight className="h-4 w-4" aria-hidden="true" />

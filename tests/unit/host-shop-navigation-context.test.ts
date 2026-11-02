@@ -10,7 +10,7 @@ describe('every Host Shop navigation tab resolves to the canonical LMS origin', 
     expect(items.map(i => i.id).sort()).toEqual([
       'dashboard', 'apprentices', 'attendance', 'hours', 'practical-log',
       'match-requests', 'email', 'orientation', 'community', 'competencies',
-      'wages', 'documents', 'resources', 'schedule', 'messages',
+      'wages', 'documents', 'student-certificates', 'resources', 'schedule', 'messages',
       'communications', 'phone', 'reports', 'programs', 'profile',
       'store', 'settings', 'mou',
     ].sort());

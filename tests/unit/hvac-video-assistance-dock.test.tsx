@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
-import { HvacLabHero } from '@/components/programs/HvacTrainingShowcase';
+import { HvacLabHero, HvacProgramFilm } from '@/components/programs/HvacTrainingShowcase';
 import { renderToString } from 'react-dom/server';
 import { hydrateRoot } from 'react-dom/client';
 
@@ -76,6 +76,12 @@ afterEach(() => {
 });
 
 describe('public assistance around the HVAC film', () => {
+  it('keeps the photo hero linked to the program film', () => {
+    const { container } = render(<HvacLabHero />);
+    expect(container.querySelector('video')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Watch the program introduction' })).toHaveAttribute('href', '#hvac-program-film');
+  });
+
   it('moves both controls below the visible film and restores floating controls without losing narration preference', async () => {
     const dock = filmPage();
     render(<><ScrollNarrator /><ParisFloatingButton /></>);
@@ -121,10 +127,10 @@ describe('public assistance around the HVAC film', () => {
     expect(dock?.contains(screen.getByRole('button', { name: 'Open PARIS Career Assistant' }))).toBe(true);
   });
 
-  it('does not mutate server-rendered hero HTML before hydration or replace the native player', async () => {
+  it('does not mutate server-rendered program-film HTML before hydration or replace the native player', async () => {
     vi.useRealTimers();
     const host = document.createElement('main');
-    host.innerHTML = renderToString(<HvacLabHero />);
+    host.innerHTML = renderToString(<HvacProgramFilm />);
     document.body.append(host);
     const originalVideo = host.querySelector('video');
     if (!originalVideo) throw new Error('The server-rendered hero must contain its native player');
@@ -139,7 +145,7 @@ describe('public assistance around the HVAC film', () => {
     let unmount = () => {};
     try {
       await act(async () => {
-        const root = hydrateRoot(host, <HvacLabHero />, { onRecoverableError: recoverableError });
+        const root = hydrateRoot(host, <HvacProgramFilm />, { onRecoverableError: recoverableError });
         unmount = () => root.unmount();
       });
       await showFilm(true);

@@ -17,7 +17,7 @@ export function useHvacVideoDock(enabled = true) {
     let target: HTMLElement | null = null;
     const attach = () => {
       if (!active) return;
-      const nextVideo = document.querySelector('main video[data-hvac-hero-video]');
+      const nextVideo = document.querySelector('main video[data-hvac-hero-video], main video[data-hvac-program-video]');
       const nextTarget = document.querySelector<HTMLElement>('[data-hvac-video-assistance="ready"]');
       if (nextVideo === video && nextTarget === target) return;
       observer?.disconnect();

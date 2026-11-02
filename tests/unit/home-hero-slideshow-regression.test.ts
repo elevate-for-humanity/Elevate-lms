@@ -51,10 +51,12 @@ describe('homepage hero slideshow rendering', () => {
       'utf8',
     );
 
-    expect(hostProfiles).toContain('data-narration={videoScript}');
-    expect(hostProfiles).toContain('tour script');
+    expect(hostProfiles).toContain('data-narration={videoUrl ? undefined : videoScript}');
+    const narratedTour = fs.readFileSync(path.resolve('components/partners/NarratedShopTour.tsx'), 'utf8');
+    expect(narratedTour).toContain('tour script');
+    expect(narratedTour).toContain('{script}');
     expect(featuredHosts).toContain('Welcome to Salon Saloon in South Bend, Indiana.');
-    expect(hostProfiles).toContain('videoScript={videoScript}');
+    expect(hostProfiles).toContain('script={videoScript}');
     expect(barberPage).toContain('KOUNTRY_KUTZ_HERO_TRANSCRIPT');
     expect(barberPage).toContain('As the video moves through the shop');
   });

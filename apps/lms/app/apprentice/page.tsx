@@ -1,3 +1,4 @@
+import { apprenticeDocumentChecklist } from '@/lib/apprenticeship/document-checklist';
 import ApprenticeHomePanel from '@/components/apprenticeship/ApprenticeHomePanel';
 import { loadPublishedLessonProgress } from '@/lib/apprenticeship/published-lesson-progress';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
@@ -89,7 +90,11 @@ function readPriorLearningImport(draftData: unknown): PriorLearningImport | null
   };
 }
 
-export default async function ApprenticePortalPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+export default async function ApprenticePortalPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
   const view = (await searchParams).view;
   const supabase = await createClient();
   const {
@@ -174,8 +179,16 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
     return (
       <main className="mx-auto max-w-3xl p-6">
         <h1 className="text-2xl font-semibold">Complete your enrollment setup</h1>
-        <p className="mt-3 text-slate-600">Your apprenticeship workspace will be available when your enrollment is ready. Review your remaining setup steps or contact Admissions for help.</p>
-        <a href="/enrollment/confirmed" className="mt-5 inline-block rounded-lg bg-brand-red-600 px-4 py-3 text-white">Review enrollment setup</a>
+        <p className="mt-3 text-slate-600">
+          Your apprenticeship workspace will be available when your enrollment is ready. Review your
+          remaining setup steps or contact Admissions for help.
+        </p>
+        <a
+          href="/enrollment/confirmed"
+          className="mt-5 inline-block rounded-lg bg-brand-red-600 px-4 py-3 text-white"
+        >
+          Review enrollment setup
+        </a>
       </main>
     );
   }
@@ -183,7 +196,14 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
   const registeredStandard = getRegisteredProgramStandard(programSlug);
 
   if (view !== 'records') {
-    return <ApprenticeHomePanel userId={subject.userId} programSlug={programSlug} runtime={runtime} billing={billingRequirement} />;
+    return (
+      <ApprenticeHomePanel
+        userId={subject.userId}
+        programSlug={programSlug}
+        runtime={runtime}
+        billing={billingRequirement}
+      />
+    );
   }
 
   const dashboardResults = await Promise.all([
@@ -203,8 +223,7 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
     db
       .from('apprentice_document_types')
       .select('document_type,is_required')
-      .eq('program_slug', programSlug)
-      .eq('is_required', true),
+      .eq('program_slug', programSlug),
     db
       .from('handbook_acknowledgments')
       .select('id')
@@ -243,6 +262,13 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
       .limit(1)
       .maybeSingle(),
     db
+      .from('license_agreement_acceptances')
+      .select('accepted_at')
+      .eq('user_id', subject.userId)
+      .eq('agreement_type', 'apprenticeship_agreement')
+      .eq('document_version', '1.0')
+      .maybeSingle(),
+    db
       .from('agreement_acceptances')
       .select('agreement_key,agreement_version')
       .eq('subject_type', 'apprentice')
@@ -261,6 +287,7 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
     { data: cosmetologyBilling },
     { data: billingAuthorization },
     { data: theorySchedule },
+    { data: apprenticeshipAgreement },
     { data: policyAcceptances },
   ] = dashboardResults;
   const { data: automaticBillingSchedule } = billingAuthorization?.billing_schedule_id
@@ -282,18 +309,12 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
     ),
   ).length;
   const totalDocs = docs?.length ?? 0;
-  const approvedDocumentTypes = new Set(
-    (docs || [])
-      .filter((doc: any) =>
-        ['approved', 'verified', 'accepted'].includes(
-          String(doc.verification_status || doc.status || '').toLowerCase(),
-        ),
-      )
-      .map((doc: any) => doc.document_type),
+  const documentChecklist = apprenticeDocumentChecklist(
+    documentRequirements || [],
+    docs || [],
+    Boolean(apprenticeshipAgreement?.accepted_at),
   );
-  const missingDocumentCount = (documentRequirements || []).filter(
-    (item: any) => !approvedDocumentTypes.has(item.document_type),
-  ).length;
+  const missingDocumentCount = documentChecklist.missingCount;
 
   let courseTitle = 'Assigned RTI course';
   let courseHref = '/lms/courses';
@@ -480,7 +501,7 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
       },
       {
         label: `Complete required documents${missingDocumentCount ? ` (${missingDocumentCount} remaining)` : ''}`,
-        done: (documentRequirements?.length || 0) > 0 && missingDocumentCount === 0,
+        done: documentChecklist.configured && missingDocumentCount === 0,
         href: '/apprentice/documents',
         icon: FileText,
       },
@@ -506,17 +527,42 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
         <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
           <div className="grid lg:grid-cols-[1.2fr_1fr]">
             <div className="flex flex-col justify-center p-7 sm:p-10">
-              <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">{beautyProgram?.portalLabel || 'Apprentice Portal'}</p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">Welcome, {firstName}</h1>
+              <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">
+                {beautyProgram?.portalLabel || 'Apprentice Portal'}
+              </p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+                Welcome, {firstName}
+              </h1>
               <p className="mt-3 text-xl text-slate-600">{displayProgram}</p>
-              <p className="mt-4 max-w-lg text-slate-600">Your lessons, workbook, shop training, and progress. All in one place.</p>
+              <p className="mt-4 max-w-lg text-slate-600">
+                Your lessons, workbook, shop training, and progress. All in one place.
+              </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href={courseHref} className="rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900">My training →</Link>
-                <Link href="/apprentice/documents" className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800">My documents</Link>
+                <Link
+                  href={courseHref}
+                  className="rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900"
+                >
+                  My training →
+                </Link>
+                <Link
+                  href="/apprentice/documents"
+                  className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800"
+                >
+                  My documents
+                </Link>
               </div>
             </div>
             <div className="relative min-h-64 lg:min-h-80">
-              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={heroImage} alt={`${displayProgram} apprentice training`} fill priority className="object-cover object-top" sizes="(max-width: 1024px) 100vw, 45vw" />
+              <Image
+                placeholder="blur"
+                blurDataURL={IMAGE_LOADING_BLUR}
+                src={heroImage}
+                alt={`${displayProgram} apprentice training`}
+                fill
+                priority
+                className="object-cover object-top"
+                sizes="(max-width: 1024px) 100vw, 45vw"
+              />
             </div>
           </div>
         </section>
@@ -527,7 +573,9 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
         <TimeclockAttendanceNotice />
 
         <details className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <summary className="cursor-pointer text-lg font-semibold text-slate-950">My setup checklist · {incompleteCount} remaining</summary>
+          <summary className="cursor-pointer text-lg font-semibold text-slate-950">
+            My setup checklist · {incompleteCount} remaining
+          </summary>
           <div className="flex gap-3">
             <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-slate-600" />
             <div className="w-full">
@@ -579,8 +627,14 @@ export default async function ApprenticePortalPage({ searchParams }: { searchPar
           />
           <Metric
             label="Required documents"
-            value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`}
-            detail={missingDocumentCount ? `${missingDocumentCount} still needed` : 'All required documents verified'}
+            value={`${documentChecklist.completeCount} / ${documentChecklist.requiredCount}`}
+            detail={
+              !documentChecklist.configured
+                ? 'Checklist configuration needs attention'
+                : missingDocumentCount
+                  ? `${missingDocumentCount} still needed`
+                  : 'Required uploads and agreement complete'
+            }
             icon={FileText}
           />
           <Metric
@@ -1056,7 +1110,9 @@ function LearningCenter({
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-red-700">
           One learning center
         </p>
-        <h2 className="mt-1 text-2xl font-semibold text-slate-950">Everything you need for class</h2>
+        <h2 className="mt-1 text-2xl font-semibold text-slate-950">
+          Everything you need for class
+        </h2>
         <p className="mt-1 text-sm font-medium text-slate-700">
           Lessons, assessments, grades, calendar, resources, and portfolio evidence stay connected
           to the same Elevate enrollment.
@@ -1070,7 +1126,13 @@ function LearningCenter({
             className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-red-300 hover:shadow-md"
           >
             <div className="relative h-28 overflow-hidden bg-slate-100">
-              <Image src={image} alt="" fill sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw" className="object-cover object-top transition-transform group-hover:scale-105" />
+              <Image
+                src={image}
+                alt=""
+                fill
+                sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
+                className="object-cover object-top transition-transform group-hover:scale-105"
+              />
               <span className="absolute bottom-2 left-3 rounded-lg bg-white p-2 text-brand-red-700">
                 <Icon className="h-5 w-5" />
               </span>
@@ -1078,7 +1140,9 @@ function LearningCenter({
             <div className="p-5">
               <h3 className="font-semibold text-slate-950">{title}</h3>
               <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{text}</p>
-              <span className="mt-4 inline-flex text-sm font-semibold text-brand-red-700">Open →</span>
+              <span className="mt-4 inline-flex text-sm font-semibold text-brand-red-700">
+                Open →
+              </span>
             </div>
           </Link>
         ))}
@@ -1127,23 +1191,68 @@ function TheorySchedulePanel({
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid md:grid-cols-[1.4fr_1fr]">
           <div className="p-6 sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">Your next step</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Make time for your goals.</h2>
-            <p className="mt-3 max-w-lg text-slate-600">Choose study times outside your shop hours to open your online training.</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">
+              Your next step
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              Make time for your goals.
+            </h2>
+            <p className="mt-3 max-w-lg text-slate-600">
+              Choose study times outside your shop hours to open your online training.
+            </p>
             <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
-              <div><p className="text-2xl font-semibold text-slate-950">{(schedule.weekly_target_minutes / 60).toLocaleString('en-US')}h</p><p className="mt-1 text-slate-500">Weekly target</p></div>
-              <div><p className="text-2xl font-semibold text-slate-950">{(Math.min(schedule.weekly_max_minutes, 600) / 60).toLocaleString('en-US')}h</p><p className="mt-1 text-slate-500">Weekly limit</p></div>
-              <div><p className="text-2xl font-semibold text-slate-950">{completedLessons}/{totalLessons}</p><p className="mt-1 text-slate-500">Lessons complete</p></div>
+              <div>
+                <p className="text-2xl font-semibold text-slate-950">
+                  {(schedule.weekly_target_minutes / 60).toLocaleString('en-US')}h
+                </p>
+                <p className="mt-1 text-slate-500">Weekly target</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold text-slate-950">
+                  {(Math.min(schedule.weekly_max_minutes, 600) / 60).toLocaleString('en-US')}h
+                </p>
+                <p className="mt-1 text-slate-500">Weekly limit</p>
+              </div>
+              <div>
+                <p className="text-2xl font-semibold text-slate-950">
+                  {completedLessons}/{totalLessons}
+                </p>
+                <p className="mt-1 text-slate-500">Lessons complete</p>
+              </div>
             </div>
-            <Link href="/apprentice/theory-schedule" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900">Set my study times →</Link>
+            <Link
+              href="/apprentice/theory-schedule"
+              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900"
+            >
+              Set my study times →
+            </Link>
             <details className="mt-5 border-t border-slate-200 pt-4 text-sm text-slate-600">
-              <summary className="cursor-pointer font-semibold text-slate-800">Plan details &amp; syllabus</summary>
-              <p className="mt-3 leading-6">Your schedule needs your confirmation before theory opens. Save your available days and times to activate study windows and reminders. Recorded OJL: {recordedOjlHours.toLocaleString('en-US')} hours.</p>
-              <a href={syllabusHref} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center font-semibold text-teal-800 underline">Open syllabus</a>
+              <summary className="cursor-pointer font-semibold text-slate-800">
+                Plan details &amp; syllabus
+              </summary>
+              <p className="mt-3 leading-6">
+                Your schedule needs your confirmation before theory opens. Save your available days
+                and times to activate study windows and reminders. Recorded OJL:{' '}
+                {recordedOjlHours.toLocaleString('en-US')} hours.
+              </p>
+              <a
+                href={syllabusHref}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex min-h-11 items-center font-semibold text-teal-800 underline"
+              >
+                Open syllabus
+              </a>
             </details>
           </div>
           <div className="relative min-h-56 bg-slate-100">
-            <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp" alt="Cosmetology professional preparing a salon workstation" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover object-top" />
+            <Image
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp"
+              alt="Cosmetology professional preparing a salon workstation"
+              fill
+              sizes="(max-width: 768px) 100vw, 40vw"
+              className="object-cover object-top"
+            />
           </div>
         </div>
       </section>
@@ -1229,4 +1338,3 @@ function TheorySchedulePanel({
     </section>
   );
 }
-

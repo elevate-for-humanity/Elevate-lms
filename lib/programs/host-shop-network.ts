@@ -26,13 +26,6 @@ function identityKey(value: string) {
     .join('');
 }
 
-function addressKey(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/\b(suite|ste)\b/g, '')
-    .replace(/[^a-z0-9]/g, '');
-}
-
 function phoneKey(value?: string) {
   return (value ?? '').replace(/\D/g, '').slice(-10);
 }
@@ -54,14 +47,9 @@ function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
   const approvedPhone = phoneKey(approved.phone);
   const featuredPhone = phoneKey(featured.phone);
   const samePhone = Boolean(approvedPhone && featuredPhone && approvedPhone === featuredPhone);
-  const sameAddress =
-    Boolean(
-      approved.address &&
-      featured.address &&
-      (addressKey(approved.address).includes(addressKey(featured.address)) ||
-        addressKey(featured.address).includes(addressKey(approved.address))),
-    ) && approved.city.toLowerCase() === featured.city.toLowerCase();
-  return sameName || samePhone || sameAddress;
+  // Independent businesses can share a campus, address, or suite. Location
+  // alone must never replace a shop's identity, portfolio, or occupations.
+  return sameName || samePhone;
 }
 
 function firstImage(shop: FeaturedHostPartner) {

@@ -7,7 +7,7 @@ DECLARE
  a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();preserved uuid:=gen_random_uuid(); module uuid:=gen_random_uuid();
  profile jsonb; planned jsonb; first_job pg_temp.ultimate_build_jobs%ROWTYPE; second_job pg_temp.ultimate_build_jobs%ROWTYPE;
  media_job pg_temp.ultimate_build_jobs%ROWTYPE; reclaimed pg_temp.ultimate_build_jobs%ROWTYPE;
- first_lesson uuid;second_lesson uuid; output jsonb; step_name text; rejected boolean;
+ first_lesson uuid;second_lesson uuid; output jsonb; step_name text; rejected boolean; count_expression text; counted_lessons integer;
 BEGIN
  rejected:=false;
  BEGIN PERFORM pg_temp.seed_ultimate_lesson_autopilots(coordinator,'coordinator',1,'{}',repeat('a',64));
@@ -114,12 +114,17 @@ BEGIN
  IF EXISTS(SELECT 1 FROM pg_temp.ultimate_lesson_builds WHERE build_id=build AND competency_id=preserved::text) OR
   (SELECT video_url FROM pg_temp.course_lessons WHERE id=preserved)<>'private-test-only.mp4'
  THEN RAISE EXCEPTION 'TEST: prior publication changed'; END IF;
+ INSERT INTO pg_temp.course_lessons(id,course_id,module_id,slug,title,order_index,lesson_type,status,is_published,ai_generated)
+ VALUES(gen_random_uuid(),course,module,'separate-final','Separately authored final',4,'quiz','published',true,false);
+ count_expression:=split_part(split_part(pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure),'total_lessons=',2),',updated_at',1);
+ EXECUTE 'SELECT '||replace(count_expression,'v_course_id',quote_literal(course)||'::uuid') INTO counted_lessons;
+ IF counted_lessons<>2 THEN RAISE EXCEPTION 'TEST: supplementary assessment missing from count or draft lessons counted'; END IF;
  UPDATE pg_temp.ultimate_build_jobs SET available_at=now() WHERE id=coordinator;
  IF EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_build_job('legacy-overlap',300))
  THEN RAISE EXCEPTION 'TEST: legacy coordinator overlapped a pool'; END IF;
  IF position('ultimate-lesson-2026-10-29.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))=0 OR
     position('ultimate-lesson-2026-10-05.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))>0
  THEN RAISE EXCEPTION 'TEST: publication contract version drift'; END IF;
- RAISE NOTICE 'PASS: 19 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
+ RAISE NOTICE 'PASS: 20 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
 END $$;
-SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',19) AS autopilot_database_test;
+SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',20) AS autopilot_database_test;

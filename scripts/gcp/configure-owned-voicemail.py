@@ -16,6 +16,30 @@ def run(args):
     result=subprocess.run(args,capture_output=True,text=True,timeout=30)
     if result.returncode: raise ValueError('owned_voicemail_command_failed')
     return result.stdout
+def application_registered(text):
+    plain=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',text)
+    return "Info about Application 'VoiceMail'" in plain and 'not registered' not in plain.lower()
+
+def ensure_voicemail_application(command=run):
+    cli=lambda text: command(['docker','exec','pbx_asterisk_1','asterisk','-rx',text])
+    registered=application_registered(cli('core show application VoiceMail'))
+    if registered:
+        cli('module reload app_voicemail.so')
+    else:
+        active=cli('core show channels count')
+        if not all(re.search(r'^0 active '+kind+r's?$',active,re.M) for kind in ['call','channel']):
+            raise ValueError('owned_voicemail_active_call_or_unverified_state')
+        # A config reload cannot recreate the application's registration.
+        # Use the existing installed module, with an ordinary non-forced unload.
+        cli('module unload app_voicemail.so')
+        inventory=cli('module show like app_voicemail.so')
+        if re.search(r'^app_voicemail[.]so\s',inventory,re.M):
+            raise ValueError('owned_voicemail_module_unload_refused')
+        cli('module load app_voicemail.so')
+    if not application_registered(cli('core show application VoiceMail')):
+        raise ValueError('owned_voicemail_application_not_registered')
+    return {'applicationRegisteredBefore':registered,'applicationRegisteredAfter':True,'moduleReloadedFromDisk':not registered}
+
 def get(url,headers):
     with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=15) as response:
         return json.loads(response.read(1048576))
@@ -72,7 +96,7 @@ def configure():
         mailbox.write_text(text);destination.write_text(OPERATOR)
         for filename in [mailbox,destination]: os.chmod(filename,0o640);os.chown(filename,0,int(gid))
         if '#include elevate-operator.conf' not in prior: main.write_text(prior+chr(10)+'#include elevate-operator.conf'+chr(10))
-        run(['docker','exec','pbx_asterisk_1','asterisk','-rx','module reload app_voicemail.so'])
+        application=ensure_voicemail_application()
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan reload'])
         users=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','voicemail show users'])
         match=re.search(r'([0-9]+) voicemail users? configured',users)
@@ -86,7 +110,7 @@ def configure():
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','module reload app_voicemail.so'])
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan reload'])
         raise
-    return {'result':'PASS','operatorConfigured':True,'mailboxCount':len(rows),'carrierRoutingChanged':False,'liveCallAcceptance':'NOT TESTED'}
+    return {'result':'PASS',**application,'operatorConfigured':True,'mailboxCount':len(rows),'carrierRoutingChanged':False,'liveCallAcceptance':'NOT TESTED'}
 if __name__=='__main__':
     try: result=configure()
     except Exception as error:

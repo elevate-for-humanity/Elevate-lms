@@ -26,6 +26,7 @@ def preflight():
   'operatorVoicemailFallbackVerified':'VoiceMail(0@elevate,u)' in fallback,
   'operatorRegisteredContacts':contacts,'operatorLeasedEndpointCount':len(targets),
   'operatorVoicemailPromptsReady':all(subprocess.run(['docker','exec','--user','asterisk','pbx_asterisk_1','test','-r','/var/lib/asterisk/sounds/en/'+name],capture_output=True,timeout=10).returncode==0 for name in ['beep.ulaw','vm-intro.ulaw','vm-theperson.ulaw','vm-isunavail.ulaw','digits/0.ulaw']),
+  'operatorVoicemailApplicationRegistered':"Info about Application 'VoiceMail'" in cli('core show application VoiceMail'),
   'operatorMailboxConfigured':bool(re.search(r'^\s*elevate\s+0\s+',cli('voicemail show users'),re.M)),
   'voicemailWorkerActive':run(['systemctl','is-active','elevate-voicemail-worker.service']).strip()=='active',
   'recentIngestRetryStatuses':sorted(set(re.findall(r'OWNED_VOICEMAIL_INGEST_REQUIRES_RETRY_(\d{3})',journal))),

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'infra/pbx/paris/turn-adapter.mjs', 'infra/pbx/paris/ari-media.mjs', '.github/workflows/repair-paris-saved-settings.yml']
+    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'scripts/gcp/configure-owned-voicemail.py', 'infra/pbx/paris/turn-adapter.mjs', 'infra/pbx/paris/ari-media.mjs', '.github/workflows/repair-paris-saved-settings.yml']
   pull_request:
     paths: ['scripts/gcp/*repair-paris-turn-proxy.py', 'scripts/gcp/*repair-paris-settings.py', 'infra/pbx/paris/**', '.github/workflows/repair-paris-saved-settings.yml']
 permissions:
@@ -42,7 +42,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: python3 scripts/gcp/test-repair-paris-turn-proxy.py && python3 scripts/gcp/test-repair-paris-settings.py && node --test infra/pbx/paris/*.test.mjs
+      - run: python3 scripts/gcp/test-configure-owned-voicemail.py && python3 scripts/gcp/test-repair-paris-turn-proxy.py && python3 scripts/gcp/test-repair-paris-settings.py && node --test infra/pbx/paris/*.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721

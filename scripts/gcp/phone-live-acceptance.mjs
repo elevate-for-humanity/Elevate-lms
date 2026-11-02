@@ -120,7 +120,7 @@ async function main(){
  const workspaces=await db('communication_workspaces?id=eq.'+extensions[0].workspace_id+'&phone_system_id=eq.'+SYSTEM+'&select=id');if(workspaces.length!==1)throw Error('PHONE_ACCEPTANCE_WORKSPACE_UNVERIFIED');
  const preflight=remoteProgram('phone-acceptance-preflight.py');report(preflight);
  const sourceHash=createHash('sha256').update(readFileSync(new URL('../../infra/pbx/paris/ari-media.mjs',import.meta.url))).digest('hex');
- if(!preflight.idle||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.operatorVoicemailPromptsReady||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
+ if(!preflight.idle||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.operatorVoicemailPromptsReady||!preflight.operatorVoicemailApplicationRegistered||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
  if(mode==='preflight'){report({phoneAcceptance:'PREFLIGHT_PASS',callsPlaced:0,recipientVerified:true});return;}
  if(mode==='mailbox'){await voicemailAcceptance(config,systems[0],db,{directMailbox:true});return;}
  if(preflight.operatorRegisteredContacts!==0||preflight.operatorLeasedEndpointCount!==0)throw Error('PHONE_ACCEPTANCE_OTHER_OPERATOR_DEVICES_PRESENT');

@@ -58,9 +58,9 @@ describe('deployed portal middleware auth coverage', () => {
 
   it('renders the marketing homepage from the conversion-focused static hero', () => {
     expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
-    expect(marketingHome).toContain('<PlatformHubHero compact />');
+    expect(marketingHome).toContain('<PlatformHubHero />');
     expect(marketingHome).not.toContain('<HomeHeroVideo');
-    expect(homeHero).toContain('Build a career. Build a workforce. Build a business.');
+    expect(homeHero).toContain('Train for your next career.');
     expect(homeHero).toContain('href="/programs"');
     expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });

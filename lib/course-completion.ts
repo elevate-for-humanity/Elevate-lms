@@ -10,6 +10,7 @@ import 'server-only';
  */
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getCourseRequirements } from '@/lib/courses/completion-requirements';
+import { checkHvacWorkbookCompletion } from '@/lib/lms/hvac-workbook-completion';
 
 export interface CourseCompletionStatus {
   isComplete: boolean;
@@ -63,15 +64,17 @@ export async function checkCourseCompletion(
   if (!course) throw new Error('Course not found');
 
   const requirements = getCourseRequirements(course.slug || '');
-  const [internal, external, assessments, seatTime, exam] = await Promise.all([
+  const [internal, external, assessments, seatTime, exam, workbook] = await Promise.all([
     checkInternalLessons(userId, courseId),
     checkExternalModules(userId, courseId),
     checkRequiredAssessments(userId, courseId),
     checkSeatTime(userId, courseId, requirements.minimumSeatTimeHours),
     checkRequiredExam(userId, course.slug || '', requirements.examRequirement),
+    checkHvacWorkbookCompletion(db, userId, courseId),
   ]);
 
   const missingRequirements: string[] = [];
+  if (!workbook.complete) missingRequirements.push(`Required HVAC workbook: ${workbook.completed} of 17 chapters complete. Save all five responses (at least 10 meaningful characters each) and the reviewed checklist in every chapter, and pass all four 25-question practice tests at 80% or higher.`);
   if (!internal.complete) {
     missingRequirements.push(
       `${Math.max(0, internal.total - internal.completed)} required lesson(s) remaining`,
@@ -105,6 +108,7 @@ export async function checkCourseCompletion(
       internal.complete &&
       external.complete &&
       assessments.allPassed &&
+      workbook.complete &&
       seatTime.satisfied &&
       exam.satisfied,
     internalLessonsComplete: internal.complete,

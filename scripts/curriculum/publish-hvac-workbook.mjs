@@ -1,0 +1,26 @@
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {loadGoogleConfig} from '../gcp/runtime-config.mjs';
+
+const config=loadGoogleConfig('lms').runtimeEnvironment;
+const url=config.NEXT_PUBLIC_SUPABASE_URL||config.SUPABASE_URL;
+const key=config.SUPABASE_SERVICE_ROLE_KEY;
+if(!url||new URL(url).hostname!=='cuxzzpsyufcewtmicszk.supabase.co'||!key)throw Error('Verified LMS database configuration is required');
+const pdf=await readFile('output/pdf/HVAC-Illustrated-Practice-Workbook.pdf');
+if(pdf.subarray(0,5).toString()!=='%PDF-'||pdf.length<50000)throw Error('Complete PDF master required');
+const bucket='documents',path='workbooks/hvac-epa608/2026-11-02.1.pdf';
+const headers={apikey:key,Authorization:`Bearer ${key}`};
+const bucketResponse=await fetch(`${url}/storage/v1/bucket/${bucket}`,{headers});
+if(!bucketResponse.ok)throw Error(`Protected bucket verification failed (${bucketResponse.status})`);
+if((await bucketResponse.json()).public!==false)throw Error('Workbook destination must remain private');
+const upload=await fetch(`${url}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{...headers,'Content-Type':'application/pdf','x-upsert':'true'},body:pdf});
+if(!upload.ok)throw Error(`Workbook master upload failed (${upload.status})`);
+const patch=await fetch(`${url}/rest/v1/digital_workbooks?id=eq.c8cb6b05-838e-4ef9-b7f5-2f55c864f109&slug=eq.hvac-epa608-guided-practice`,{method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({pdf_storage_path:path})});
+if(!patch.ok)throw Error(`Workbook master registration failed (${patch.status})`);
+const records=await patch.json();if(records.length!==1||records[0].pdf_storage_path!==path)throw Error('Exact workbook registration was not verified');
+const verify=await fetch(`${url}/storage/v1/object/authenticated/${bucket}/${path}`,{headers});
+if(!verify.ok)throw Error(`Workbook master readback failed (${verify.status})`);
+const actual=Buffer.from(await verify.arrayBuffer());
+const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+if(hash(actual)!==hash(pdf))throw Error('Workbook master byte verification failed');
+console.log(JSON.stringify({workbook:'hvac-epa608-guided-practice',version:'2026-11-02.1',bytes:pdf.length,sha256:hash(pdf),private:true,verified:true}));

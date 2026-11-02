@@ -39,6 +39,7 @@ export default function LessonProgressClient({
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<string>('');
   const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<Array<{question:string;correct:boolean;explanation:string}>>([]);
   const [completed, setCompleted] = useState(false);
   const clock = useTheoryTimeclock(courseId, lessonId, theoryClockEnabled);
   const [clockTarget, setClockTarget] = useState<HTMLElement | null>(null);
@@ -99,6 +100,7 @@ export default function LessonProgressClient({
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Assessment could not be recorded.');
 
+      setFeedback(Array.isArray(data.feedback) ? data.feedback : []);
       const score = Number(data.score);
       if (!data.passed) {
         setResult(
@@ -218,6 +220,7 @@ export default function LessonProgressClient({
           </>
         )}
 
+        {feedback.length > 0 && <section className="mt-6 space-y-3" aria-label="Practice test feedback"><h3 className="text-xl font-bold">Review your reasoning</h3>{feedback.map((item,index)=><article key={index} className="rounded-lg border p-4"><p className="font-bold">{index+1}. {item.question}</p><p className="mt-2">{item.correct ? 'Correct. ' : 'Review and retry. '}{item.explanation}</p></article>)}</section>}
         {result ? (
           <p
             className={`mt-4 rounded-lg px-4 py-3 text-sm font-bold ${completed ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-950'}`}

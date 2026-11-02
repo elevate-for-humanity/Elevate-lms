@@ -16,6 +16,7 @@ import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-contro
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
+import { HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,7 @@ type StoredQuizQuestion = {
   correct_answer?: number | string | boolean;
   correct?: number | string | boolean;
   correctAnswer?: number | string | boolean;
+  explanation?: string;
 };
 
 function scoreAnswers(questions: StoredQuizQuestion[], answers: Record<string, number>): number {
@@ -186,7 +188,14 @@ export async function POST(
       );
     }
 
-    return NextResponse.json(result);
+    const feedback = HVAC_PRACTICE_LESSONS.some(test => test.id === lessonId)
+      ? questions.map((question, index) => ({
+          question: question.question || question.prompt || `Question ${index + 1}`,
+          correct: answers[String(question.id || `q-${index + 1}`)] === question.correctAnswer,
+          explanation: question.explanation || 'Review the matching workbook chapter.',
+        }))
+      : undefined;
+    return NextResponse.json({ ...result, feedback });
   } catch (err) {
     logger.error(
       '[checkpoint] recordCheckpointAttempt failed:',

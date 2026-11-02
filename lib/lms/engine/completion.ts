@@ -80,7 +80,11 @@ export async function recordStepCompletion(
   ).size;
   const totalLessons = requiredLessonIds.size;
   const progressPercent = calcProgressPercent(completedCount, totalLessons);
-  const courseCompleted = isCourseComplete(progressPercent, totalLessons);
+  let courseCompleted = isCourseComplete(progressPercent, totalLessons);
+  if (courseCompleted && courseId === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201') {
+    const { checkCourseCompletion } = await import('@/lib/course-completion');
+    courseCompleted = (await checkCourseCompletion(userId, courseId)).isComplete;
+  }
 
   return {
     lessonId,

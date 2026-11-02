@@ -7,6 +7,8 @@ import { workbookSlides } from '@/lib/lms/workbook-slides';
 import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
 import HvacSystemLab from './HvacSystemLab';
+import HvacWorkbookTeaching from './HvacWorkbookTeaching';
+import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
@@ -71,6 +73,7 @@ function SectionEditor({
   }
   return (
     <section hidden={hidden} aria-labelledby={`section-${section.id}`}>
+      {!hidden && workbookSlug === HVAC_WORKBOOK_SLUG ? <HvacWorkbookTeaching number={section.section_number} /> : null}
       {!hidden && section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && [5, 12].includes(section.section_number) ? <HvacSystemLab /> : null}
       {!hidden && !readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && section.lesson_id ? (
         <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
@@ -274,9 +277,10 @@ export default function DigitalWorkbook({
           All my workbooks
         </a>
         <p className="mt-4 font-semibold tracking-wide">
-          ELEVATE FOR HUMANITY · APPRENTICESHIP PROGRAM
+          ELEVATE FOR HUMANITY · TRAINING WORKBOOK
         </p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
+        {workbook.slug === HVAC_WORKBOOK_SLUG && <section className="my-5 rounded-xl border border-amber-400 bg-amber-50 p-5" aria-label="Required HVAC workbook and practice tests"><h2 className="text-xl font-bold">Required to finish your HVAC course</h2><p className="mt-3 leading-relaxed">Complete all 17 chapters and 51 activities. Save notes, each practice response, and your next goal with at least 10 meaningful characters in every field, then review and save each chapter checklist. Pass each of the four practice tests at 80% or higher. Your existing lesson progress stays saved. Internal practice does not award EPA certification or hands-on hours.</p><div className="mt-4 flex flex-wrap gap-3">{HVAC_PRACTICE_LESSONS.map(test=><a className="min-h-12 rounded-lg border border-stone-500 bg-white px-4 py-3 font-bold underline" href={`/lms/courses/${HVAC_COURSE_ID}/lessons/${test.id}`} key={test.id}>{test.title} practice test · 25 questions</a>)}</div></section>}
         <p className="my-4 text-lg leading-relaxed">
           Listen with PARIS. Pause to write. Choose Next when you are ready.
         </p>

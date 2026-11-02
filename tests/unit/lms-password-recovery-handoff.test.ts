@@ -83,3 +83,16 @@ it.each(['null', ''])('rejects opaque or missing origins (%s) without consuming 
   expect(response.status).toBe(403);
   expect(mocks.verify).not.toHaveBeenCalled();
 });
+
+it('preserves the approved LMS alias while rejecting cross-alias POSTs', async () => {
+  const url = 'https://lms.elevateforhumanity.org/api/auth/recovery-callback';
+  const body = new URLSearchParams({ token_hash: 'expired', next: '/reset-password?portal=host-shop' });
+  mocks.verify.mockResolvedValue({ data: { session: null }, error: new Error('expired') });
+  const response = await POST(new NextRequest(url, { method: 'POST', headers: { origin: 'https://lms.elevateforhumanity.org' }, body }));
+  expect(response.status).toBe(303);
+  expect(response.headers.get('location')).toBe('https://lms.elevateforhumanity.org/reset-password?mode=recovery&portal=host-shop&error=recovery_failed');
+  mocks.verify.mockClear();
+  const rejected = await POST(new NextRequest(url, { method: 'POST', headers: { origin: 'https://app.elevateforhumanity.org' }, body }));
+  expect(rejected.status).toBe(403);
+  expect(mocks.verify).not.toHaveBeenCalled();
+});

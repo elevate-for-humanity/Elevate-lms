@@ -27,7 +27,7 @@ export function hasPendingSuccessor(inventory, sha) {
   );
 }
 
-export function run(env = process.env) {
+export function run(env = process.env, execute = execFileSync) {
   const repository = env.GITHUB_REPOSITORY;
   const workflow = env.RELEASE_WORKFLOW;
   if (
@@ -37,7 +37,7 @@ export function run(env = process.env) {
     throw new Error('Unsupported release handoff');
   }
   const api = (args) =>
-    execFileSync('gh', ['api', ...args], { encoding: 'utf8', timeout: 20000 }).trim();
+    execute('gh', ['api', ...args], { encoding: 'utf8', timeout: 20000 }).trim();
   const latest = api([`repos/${repository}/git/ref/heads/main`, '--jq', '.object.sha']);
   const result = resolveMainRelease({
     ref: env.GITHUB_REF,
@@ -48,7 +48,11 @@ export function run(env = process.env) {
   if (result.successor) {
     const inventory = JSON.parse(
       api([
-        `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`,
+        `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&head_sha=${result.successor}&per_page=100`,
+        // Project in gh before buffering stdout: full run metadata exceeds
+        // execFileSync's buffer in repositories with a large workflow history.
+        '--jq',
+        '{workflow_runs: [.workflow_runs[] | {head_branch, event, head_sha, status}]}',
       ]),
     );
     // A docs-only main update may not trigger a replacement build. Explicitly

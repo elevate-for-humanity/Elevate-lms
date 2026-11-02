@@ -1,35 +1,36 @@
 /* Platform accessibility behavior, opt-in through .efh-contrast.
- * Surface defaults belong in a low-priority layer. Component utilities win; a light
+ * Surface defaults use zero-specificity selectors. Component utilities win; a light
  * ancestor must never recolor text inside a nested dark section or dialog.
+ * Do not introduce a named layer after utility layers or use Tailwind base
+ * in this standalone stylesheet; explicit component colors must always win.
  */
-@layer efh-surface-defaults {
-  .efh-contrast {
+  :where(.efh-contrast) {
     color: #0f172a;
     font-weight: 500;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
 
-  .efh-contrast :where(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800,
+  :where(.efh-contrast) :where(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800,
     .bg-gray-950, .bg-gray-900, .bg-zinc-950, .bg-zinc-900,
     .bg-brand-blue-700, .bg-brand-blue-800, .bg-brand-blue-900,
     .bg-brand-red-700, .bg-brand-red-800, .bg-brand-red-900) {
     color: #f8fafc;
   }
 
-  .efh-contrast :where(.bg-white, .bg-slate-50, .bg-gray-50) {
+  :where(.efh-contrast) :where(.bg-white, .bg-slate-50, .bg-gray-50) {
     color: #0f172a;
   }
 
-  .efh-contrast :where(p, li, label, td, th, dd, dt, blockquote, figcaption) {
+  :where(.efh-contrast) :where(p, li, label, td, th, dd, dt, blockquote, figcaption) {
     text-underline-offset: 0.16em;
   }
 
-  .efh-contrast :where(input, textarea, select)::placeholder {
+  :where(.efh-contrast) :where(input, textarea, select)::placeholder {
     color: #475569;
     opacity: 1;
   }
-}
+
 
 /* WCAG 2.2 focus appearance: never rely on browser-default focus being visible. */
 .efh-contrast :is(a, button, input, select, textarea, summary, [role='button'], [role='link'], [tabindex]):focus-visible {

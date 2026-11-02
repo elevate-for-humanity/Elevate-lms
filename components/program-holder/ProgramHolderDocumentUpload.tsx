@@ -177,7 +177,7 @@ export function ProgramHolderDocumentUpload({
             <label className="grid gap-1 text-sm font-bold sm:col-span-2">Training / services provided
               <textarea name="serviceDescription" required maxLength={2000} rows={4} className="rounded-xl border bg-white p-2" />
             </label>
-            <label className="flex gap-2 text-sm sm:col-span-2"><input name="invoiceAttested" type="checkbox" value="yes" required />I certify that these services and the requested amount are accurate.</label>
+            <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm sm:col-span-2"><input name="invoiceAttested" type="checkbox" value="yes" required className="h-11 w-11 shrink-0 cursor-pointer" />I certify that these services and the requested amount are accurate.</label>
           </fieldset>}
         </div>
       )}

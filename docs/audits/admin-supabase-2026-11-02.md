@@ -29,6 +29,7 @@ The initial scan found 44 invalid column references. After repairs, the same sca
 | Tenant risk query filters an absent tenant_id | Profiles carry tenant ownership; risk rows carry user_id | Resolve tenant user IDs first and constrain risk reads to those users |
 | Binder uses disconnected legacy student/document/enrollment tables and inactive actions | Profiles, documents and program_enrollments own current records | Use canonical records, saved program requirements, real review/upload links, and explicit data errors |
 | Upload reports success even if dashboard insert fails, and invents a public private-bucket URL | A usable upload needs storage and a saved document row | Validate owner, persist storage locator, roll back a new orphan on insert failure, return the authorized review route |
+| CSV imports count some rejected or zero-row writes as imported | Supabase mutations return errors and affected records | Require a saved record before increasing imported totals |
 | Repeated geofence attempts create duplicate operational alerts | Original events retain the complete evidence | Partial unique index prevents duplicate open entry/action alerts; genuine events remain preserved |
 | Missing-lunch detection ignores a recorded manual break duration | progress_entries.break_minutes is persisted evidence | Respect a positive recorded break duration without inventing clock punches |
 
@@ -52,4 +53,4 @@ All five registered digital workbooks are active. Their PDFs exist in storage an
 
 Twenty-seven operational alerts remain: 21 missing-lunch, four location, one WRG correction, and one voucher reconciliation. These still require evidence or the underlying financial/attendance correction. No unverified funding receipt, meal break, credential, or training hour was invented.
 
-The Admin TypeScript check, 110 targeted regression tests, and changed-file lint pass. Full production build, mobile browser acceptance across every dashboard, external feed readiness, and exact production revision acceptance remain separate release requirements; a successful source commit or a passing health probe is not deployment completion.
+The Admin TypeScript check, 115 targeted regression tests, and changed-file lint pass. Full production build, mobile browser acceptance across every dashboard, external feed readiness, and exact production revision acceptance remain separate release requirements; a successful source commit or a passing health probe is not deployment completion.

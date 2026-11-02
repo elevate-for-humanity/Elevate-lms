@@ -58,14 +58,17 @@ async function importStudents(supabase: any, tenantId: string, records: Record<s
       const email = record.email?.toLowerCase();
       if (!email) { result.failed++; result.errors.push('Missing email field'); continue; }
       const fullName = record.full_name || [record.first_name, record.last_name].filter(Boolean).join(' ') || email.split('@')[0];
-      const { data: existing } = await supabase.from('profiles').select('id').eq('email', email).eq('tenant_id', tenantId).maybeSingle();
+      const { data: existing, error: lookupError } = await supabase.from('profiles').select('id').eq('email', email).eq('tenant_id', tenantId).maybeSingle();
+      if (lookupError) throw lookupError;
       if (existing) {
-        await supabase.from('profiles').update({
+        const { data: saved, error: saveError } = await supabase.from('profiles').update({
           full_name: fullName,
           phone: record.phone || null,
           external_id: record.external_id || null,
           updated_at: new Date().toISOString(),
-        }).eq('id', existing.id);
+        }).eq('id', existing.id).select('id').maybeSingle();
+        if (saveError) throw saveError;
+        if (!saved) throw new Error('Student update was not persisted');
       } else {
         const { error } = await supabase.from('profiles').insert({
           id: crypto.randomUUID(), email, full_name: fullName, phone: record.phone || null,
@@ -108,7 +111,8 @@ async function importCourses(
       if (!name) { result.failed++; result.errors.push('Missing name field'); continue; }
       const code = record.code || record.course_code || name.toUpperCase().replace(/\s+/g, '_').substring(0, 20);
       const slug = code.toLowerCase().replace(/_/g, '-');
-      const { data: existing } = await supabase.from('courses').select('id').eq('slug', slug).maybeSingle();
+      const { data: existing, error: lookupError } = await supabase.from('courses').select('id').eq('slug', slug).maybeSingle();
+      if (lookupError) throw lookupError;
       const minimumHours = Math.max(1, Number(record.duration_hours || record.hours || 1) || 1);
       const response = await forwardCourseBuilder(request, {
         action: 'save-program-config',
@@ -171,14 +175,19 @@ async function importEnrollments(supabase: any, tenantId: string, records: Recor
       if (!student) { result.failed++; result.errors.push(`Student not found: ${studentEmail}`); continue; }
       const { data: course } = await supabase.from('courses').select('id').eq('slug', courseCode.toLowerCase().replace(/_/g, '-')).maybeSingle();
       if (!course) { result.failed++; result.errors.push(`Course not found: ${courseCode}`); continue; }
-      const { data: existing } = await supabase.from('program_enrollments').select('id').eq('user_id', student.id).eq('course_id', course.id).maybeSingle();
+      const { data: existing, error: lookupError } = await supabase.from('program_enrollments').select('id').eq('user_id', student.id).eq('course_id', course.id).maybeSingle();
       const enrollmentData = {
         user_id: student.id, course_id: course.id, status: record.status || 'active',
         progress: parseInt(record.progress) || 0,
         enrolled_at: record.enrolled_at || new Date().toISOString(), tenant_id: tenantId,
       };
-      if (existing) await supabase.from('program_enrollments').update(enrollmentData).eq('id', existing.id);
-      else await supabase.from('program_enrollments').insert({ ...enrollmentData, id: crypto.randomUUID() });
+      if (lookupError) throw lookupError;
+      const mutation = existing
+        ? supabase.from('program_enrollments').update(enrollmentData).eq('id', existing.id)
+        : supabase.from('program_enrollments').insert({ ...enrollmentData, id: crypto.randomUUID() });
+      const { data: saved, error: saveError } = await mutation.select('id').maybeSingle();
+      if (saveError) throw saveError;
+      if (!saved) throw new Error('Enrollment import was not persisted');
       result.imported++;
     } catch (error) {
       result.failed++;
@@ -195,14 +204,19 @@ async function importEmployers(supabase: any, ownerId: string, records: Record<s
     try {
       const companyName = record.company_name || record.name;
       if (!companyName) { result.failed++; result.errors.push('Missing company_name field'); continue; }
-      const { data: existing } = await supabase.from('employers').select('id').eq('company_name', companyName).eq('owner_user_id', ownerId).maybeSingle();
+      const { data: existing, error: lookupError } = await supabase.from('employers').select('id').eq('company_name', companyName).eq('owner_user_id', ownerId).maybeSingle();
       const employerData = {
         company_name: companyName, contact_name: record.contact_name || null,
         contact_email: record.contact_email?.toLowerCase() || null, phone: record.phone || null,
         city: record.city || null, state: record.state || null, zip: record.zip || null, owner_user_id: ownerId, updated_at: new Date().toISOString(),
       };
-      if (existing) await supabase.from('employers').update(employerData).eq('id', existing.id);
-      else await supabase.from('employers').insert({ ...employerData, id: crypto.randomUUID(), created_at: new Date().toISOString() });
+      if (lookupError) throw lookupError;
+      const mutation = existing
+        ? supabase.from('employers').update(employerData).eq('id', existing.id)
+        : supabase.from('employers').insert({ ...employerData, id: crypto.randomUUID(), created_at: new Date().toISOString() });
+      const { data: saved, error: saveError } = await mutation.select('id').maybeSingle();
+      if (saveError) throw saveError;
+      if (!saved) throw new Error('Employer import was not persisted');
       result.imported++;
     } catch (error) {
       result.failed++;

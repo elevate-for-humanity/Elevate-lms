@@ -61,6 +61,8 @@ jobs:
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-voicemail-diagnostics.py
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
+      - name: Inspect serving push bindings without sending a notification
+        run: node scripts/gcp/phone-push-readiness.mjs
       - name: Verify private trace setup and cleanup before any optional test call
         if: inputs.mode != 'preflight'
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo env OWNED_PHONE_TRACE_PREFLIGHT=1 python3 -' < scripts/gcp/observe-voicemail-self-call.py

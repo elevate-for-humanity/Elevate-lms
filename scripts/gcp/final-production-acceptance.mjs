@@ -1,5 +1,6 @@
 import {writeFileSync,mkdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
+import {reconcileCanonicalReleases} from './canonical-release-reconciliation.mjs';
 const PROJECT='elegant-racer-299721',DB='https://cuxzzpsyufcewtmicszk.supabase.co';
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('PRODUCTION_SUPABASE_AUTH_REQUIRED');
@@ -55,6 +56,14 @@ const courses=await get('courses','id,title,status','status=eq.published&limit=1
 const releases=await get('ultimate_release_versions','course_id,status','status=eq.released&limit=1000');
 const missing=courses.rows.filter(c=>!releases.rows.some(r=>r.course_id===c.id)).map(c=>c.title);
 add('canonical_publication',missing.length===0,{missing});
+const allReleases=await get('ultimate_release_versions','id,course_id,status,package');
+const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url');
+const canonicalReconciliation=reconcileCanonicalReleases(allReleases.rows,allLessons.rows);
+add('canonical_release_media_consistency',canonicalReconciliation.ok,{
+ checkedReleases:canonicalReconciliation.checkedReleases,
+ checkedCourses:canonicalReconciliation.checkedCourses,
+ findings:canonicalReconciliation.findings,
+});
 mkdirSync('audit-output',{recursive:true});
 const report={project:PROJECT,sha,observedAt:new Date().toISOString(),counts,checks,productionReady:checks.every(c=>c.ok),note:'Read-only database and Cloud Run gates. Authenticated learner playback and financial delivery require separate real acceptance receipts.'};
 writeFileSync('audit-output/production-acceptance.json',JSON.stringify(report,null,2));

@@ -1,3 +1,4 @@
+import { readBrowserSnapshot } from './cdp-snapshot.mjs';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -1404,6 +1405,16 @@ export async function auditPage(session) {
 }
 
 export async function snapshotPage(session) {
+  // Read-only callers share one in-flight inspection. Concurrent requests must
+  // not clear or interleave the session's control-reference map.
+  if (session.snapshotInFlight) return session.snapshotInFlight;
+  const inspection = inspectSnapshotPage(session);
+  session.snapshotInFlight = inspection;
+  try { return await inspection; }
+  finally { if (session.snapshotInFlight === inspection) delete session.snapshotInFlight; }
+}
+
+async function inspectSnapshotPage(session) {
   session.lastSeen = Date.now();
   if ((session.dialog && session.dialogPage === session.page) || (session.fileChooser && session.fileChooserPage === session.page)) throw new BrowserServiceError('interaction_required', 409);
   if (sessionRequiresAuthentication(session)) {
@@ -1412,75 +1423,8 @@ export async function snapshotPage(session) {
   await session.page
     .waitForLoadState('domcontentloaded', { timeout: 10_000 })
     .catch(() => undefined);
-  const readFrame = (frame, offset) => frame.evaluate((offset) => {
-    const visible = (element) => {
-      const style = window.getComputedStyle(element);
-      const rect = element.getBoundingClientRect();
-      return (
-        style.display !== 'none' &&
-        style.visibility !== 'hidden' &&
-        rect.width > 0 &&
-        rect.height > 0
-      );
-    };
-    const clean = (value, max = 300) =>
-      String(value || '')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, max);
-    const accessibleName = (element) =>
-      clean(
-        element.getAttribute('aria-label') ||
-          element.getAttribute('title') ||
-          element.textContent ||
-          element.getAttribute('placeholder'),
-      );
-    const queryAll = (selector, root = document) => {
-      const found = [...root.querySelectorAll(selector)];
-      for (const element of root.querySelectorAll('*')) {
-        if (element.shadowRoot) found.push(...queryAll(selector, element.shadowRoot));
-      }
-      return found;
-    };
-    const elements = [
-      ...queryAll(
-        'button, a[href], input, select, textarea, [role="button"], [contenteditable="true"]',
-      ),
-    ]
-      .filter(visible)
-      .slice(0, 80);
-    const controls = elements.map((element, index) => {
-      const ref = `e${offset + index + 1}`;
-      element.setAttribute('data-studio-ref', ref);
-      const tag = element.tagName.toLowerCase();
-      const explicitRole = element.getAttribute('role');
-      const role = explicitRole || (tag === 'a' ? 'link' : tag === 'button' ? 'button' : tag);
-      return {
-        ref,
-        role,
-        name: accessibleName(element),
-        type: clean(element.getAttribute('type'), 40) || undefined,
-        value: tag === 'select' ? clean(element.value, 500) : undefined,
-        placeholder: clean(element.getAttribute('placeholder'), 160) || undefined,
-        href: tag === 'a' ? clean(element.href, 1000) : undefined,
-        disabled: Boolean(element.disabled || element.getAttribute('aria-disabled') === 'true'),
-      };
-    });
-    const headings = queryAll('h1, h2, h3, h4, h5, h6')
-      .filter(visible)
-      .slice(0, 40)
-      .map((element) => ({
-        level: Number(element.tagName.slice(1)),
-        text: clean(element.textContent, 240),
-      }));
-    return {
-      title: clean(document.title, 300),
-      url: window.location.href,
-      visibleText: clean(document.body?.innerText, 6_000),
-      headings,
-      controls,
-    };
-  }, offset);
+  const readFrame = (frame, offset, timeout) => frame.evaluate(readBrowserSnapshot, offset, {timeout});
+  const deadline = Date.now() + 15000;
   const frames = session.page.frames?.() || [session.page];
   session.controlFrames = new Map();
   session.controlPage = session.page;
@@ -1488,7 +1432,9 @@ export async function snapshotPage(session) {
   const frameErrors = [];
   for (const frame of frames.slice(0, 15)) {
     let snapshot;
-    try { snapshot = await readFrame(frame, session.controlFrames.size); }
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) {frameErrors.push('snapshot_frame_budget_exhausted');break;}
+    try { snapshot = await readFrame(frame, session.controlFrames.size, Math.min(5000, remaining)); }
     catch (error) {
       if (!result) throw error;
       frameErrors.push(sanitizeReason(error));
@@ -1505,7 +1451,7 @@ export async function snapshotPage(session) {
   if (requiresHumanVerification(result)) {
     throw new BrowserServiceError('human_verification_required', 409);
   }
-  return { ...result, ...(frameErrors.length ? { frameErrors } : {}) };
+  return { ...result, ...(frameErrors.length ? { frameErrors, partial: true } : {}) };
 }
 
 function scheduleFrame(session, delay = frameIntervalMs) {

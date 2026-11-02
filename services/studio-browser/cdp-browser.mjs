@@ -491,15 +491,19 @@ class CdpFrame {
   getByRole(role, options) {
     return getByRole(this, role, options);
   }
-  async evaluate(fn, arg) {
+  async evaluate(fn, arg, { timeout = 60000 } = {}) {
+    if (!Number.isFinite(timeout) || timeout <= 0) throw new Error('Invalid evaluation timeout');
+    const deadline = Date.now() + timeout;
     const expression = typeof fn === 'function' ? `(${fn.toString()})(${serial(arg)})` : String(fn);
     const page = this.page;
-    const end = Date.now() + 10000;
+    const end = Math.min(deadline, Date.now() + 10000);
     while (!this.executionContextId) {
       if (page.closed) throw new Error('Target closed');
       if (Date.now() > end) throw timeoutError('frame execution context');
       await delay(10);
     }
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) throw timeoutError('frame evaluation');
     const result = await page.browser.connection.send(
       'Runtime.evaluate',
       {
@@ -510,7 +514,7 @@ class CdpFrame {
         userGesture: true,
       },
       this.sessionId || page.sessionId,
-      60000,
+      remaining,
     );
     if (result.exceptionDetails)
       throw new Error(
@@ -777,10 +781,10 @@ export class CdpPage extends EventEmitter {
   async offset() {
     return { x: 0, y: 0 };
   }
-  evaluate(fn, arg) {
+  evaluate(fn, arg, options) {
     const frame = this.frameMap.get(this.mainFrameId);
     if (!frame) throw new Error('Main frame unavailable');
-    return frame.evaluate(fn, arg);
+    return frame.evaluate(fn, arg, options);
   }
   locator(selector) {
     return locator(this, selector);

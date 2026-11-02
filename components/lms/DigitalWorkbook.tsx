@@ -8,6 +8,7 @@ import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
 import HvacSystemLab from './HvacSystemLab';
 import HvacWorkbookTeaching from './HvacWorkbookTeaching';
+import HvacCompletionReview from './HvacCompletionReview';
 import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
@@ -308,6 +309,7 @@ export default function DigitalWorkbook({
             save answers in their own accounts.
           </p>
         )}
+        {workbook.slug === HVAC_WORKBOOK_SLUG && <HvacCompletionReview readOnly={readOnly} />}
         {sections.length ? (
           <>
             <label htmlFor="workbook-section" className="mb-2 block text-lg font-semibold">

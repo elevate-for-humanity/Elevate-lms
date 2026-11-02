@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const { searchParams } = request.nextUrl;
-  const limit = Math.min(parseInt(searchParams.get('limit') ?? '30', 10), 100);
+  const requestedLimit = Number(searchParams.get('limit') ?? 30);
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.max(1, Math.min(Math.trunc(requestedLimit), 100)) : 30;
   const status = searchParams.get('status') ?? 'all';
 
   try {
@@ -56,7 +58,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
     if (error) {
       // Table may not exist yet — return empty list gracefully
-      if (error.code === '42P01') return NextResponse.json({ jobs: [] });
+      if (error.code === '42P01') return safeError('Job storage is unavailable', 503);
       return safeError('Failed to fetch jobs', 500);
     }
 
@@ -83,8 +85,9 @@ export async function POST(request: NextRequest) {
     if (!user) return safeError('Unauthorized', 401);
 
     const body = await request.json().catch(() => ({}));
-    const command: string = body.command ?? '';
-    if (!command.trim()) return safeError('command is required', 400);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return safeError('Invalid request body', 400);
+    const command = body?.command;
+    if (typeof command !== 'string' || !command.trim()) return safeError('command is required', 400);
 
     const db = await requireAdminClient();
     const { data, error } = await db
@@ -94,10 +97,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      // Table not yet created — return a temp ID so the UI still works
-      if (error.code === '42P01') {
-        return NextResponse.json({ jobId: `temp-${Date.now()}` });
-      }
+      if (error.code === '42P01') return safeError('Job storage is unavailable', 503);
       return safeError('Failed to create job', 500);
     }
 
@@ -118,6 +118,7 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json().catch(() => ({}));
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return safeError('Invalid request body', 400);
     const { jobId, lines, status, finished_at } = body as {
       jobId: string;
       lines?: string[];
@@ -125,41 +126,40 @@ export async function PATCH(request: NextRequest) {
       finished_at?: string;
     };
 
-    if (!jobId || jobId.startsWith('temp-')) {
-      // Temp IDs (table not yet created) — silently succeed
-      return NextResponse.json({ ok: true });
+    if (typeof jobId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(jobId)) {
+      return safeError('A persisted jobId is required', 400);
+    }
+    if (lines !== undefined && (!Array.isArray(lines) || lines.some(line => typeof line !== 'string'))) {
+      return safeError('lines must be an array of strings', 400);
+    }
+    if (status !== undefined && !['queued', 'running', 'completed', 'failed', 'cancelled'].includes(status)) {
+      return safeError('Invalid job status', 400);
+    }
+    if (finished_at !== undefined && (typeof finished_at !== 'string' || !Number.isFinite(Date.parse(finished_at)))) {
+      return safeError('Invalid finish time', 400);
     }
 
     const db = await requireAdminClient();
-
-    // Append lines via jsonb_array_elements concat
-    const updates: Record<string, unknown> = {};
-    if (status) updates.status = status;
-    if (finished_at) updates.finished_at = finished_at;
+    // The service client bypasses RLS: authorize ownership before invoking the log RPC.
+    const { data: job, error: lookupError } = await db.from('devstudio_jobs')
+      .select('id').eq('id', jobId).eq('user_id', auth.userId).maybeSingle();
+    if (lookupError) return safeError('Failed to load job', 500);
+    if (!job) return safeError('Job not found', 404);
 
     if (lines && lines.length > 0) {
-      // Use raw SQL to append to the jsonb array atomically
-      const { error } = await db
-        .rpc('devstudio_append_log', {
-          p_job_id: jobId,
-          p_lines: lines,
-        })
-        .single();
-
-      // If RPC doesn't exist yet, fall back to a full replace via select+update
-      if (error && error.code === 'PGRST202') {
-        const { data: existing } = await db
-          .from('devstudio_jobs')
-          .select('log_lines')
-          .eq('id', jobId)
-          .single();
-        const current: string[] = (existing?.log_lines as string[]) ?? [];
-        updates.log_lines = [...current, ...lines];
-      }
+      // This void RPC has no row representation; .single() produces a false error.
+      const { error } = await db.rpc('devstudio_append_log', { p_job_id: jobId, p_lines: lines });
+      if (error) return safeError('Failed to append job logs', 500);
     }
 
+    const updates: Record<string, unknown> = {};
+    if (status !== undefined) updates.status = status;
+    if (finished_at !== undefined) updates.finished_at = finished_at;
     if (Object.keys(updates).length > 0) {
-      await db.from('devstudio_jobs').update(updates).eq('id', jobId);
+      const { data: updated, error } = await db.from('devstudio_jobs').update(updates)
+        .eq('id', jobId).eq('user_id', auth.userId).select('id').maybeSingle();
+      if (error) return safeError('Failed to update job', 500);
+      if (!updated) return safeError('Job not found', 404);
     }
 
     return NextResponse.json({ ok: true });

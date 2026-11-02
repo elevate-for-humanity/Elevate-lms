@@ -52,6 +52,13 @@ jobs:
         run: |
           python - <<'PYCODE'
           import os,json,urllib.request,urllib.error
+          # Never reconcile or dispatch through a runtime predating this workflow.
+          health_req=urllib.request.Request('https://admin.elevateforhumanity.org/api/health',headers={'Cache-Control':'no-store'})
+          health=json.load(urllib.request.urlopen(health_req,timeout=30))
+          runtime_sha=health.get('commitSha') or health.get('commit')
+          if health.get('healthy') is not True or runtime_sha!=os.environ['GITHUB_SHA']:
+            print('Repair monitor deferred until this exact Admin release is serving.')
+            raise SystemExit(0)
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
           headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}
           preflight=urllib.request.Request(endpoint,data=json.dumps({'phase':'auth-diagnostic'}).encode(),headers=headers)

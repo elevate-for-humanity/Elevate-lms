@@ -13,7 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { safeInternalError } from '@/lib/api/safe-error';
+import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,10 +23,14 @@ export async function GET(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const { searchParams } = req.nextUrl;
-  const limit    = Math.min(Number(searchParams.get('limit') ?? 30), 200);
+  const requestedLimit = Number(searchParams.get('limit') ?? 30);
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.max(1, Math.min(Math.trunc(requestedLimit), 200)) : 30;
   const category = searchParams.get('category');
   const severity = searchParams.get('severity');
   const since    = searchParams.get('since');
+
+  if (since && !Number.isFinite(Date.parse(since))) return safeError('Invalid since date', 400);
 
   try {
     const supabase = await requireAdminClient();
@@ -42,8 +46,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await q;
     if (error) {
-      // Table may not exist yet — return empty gracefully, no internal details exposed
-      return NextResponse.json({ events: [], error: 'Failed to load events' });
+      return safeError('Failed to load events', 503);
     }
 
     return NextResponse.json({ events: data ?? [] });

@@ -1,3 +1,4 @@
+import {budgetRepairMessages,REPAIR_INFERENCE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
@@ -370,8 +371,12 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         temperature: 0.1,
         maxTokens: 2400,
         jsonMode: true,
-        signal: AbortSignal.timeout(90_000),
+        signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
       } as Parameters<typeof aiChat>[0];
+      if (provider === 'elevate') {
+        inferenceOptions.messages = budgetRepairMessages(inferenceOptions.messages,
+          Number(process.env.ELEVATE_LLM_CONTEXT_TOKENS ?? 8192), inferenceOptions.maxTokens);
+      }
       const infer=()=>aiChat(inferenceOptions);
       const paid=provider==='elevate'?null:await executePaidInference({db,authorize:()=>reservePaidInference(db,{scopeKey:'studio-chat',actorId,runId:taskId,artifactFingerprint:paidArtifactFingerprint({taskId,turn,task}),idempotencyKey:`paris-repair:${taskId}:${turn}`,provider,model:'canonical',operation:'paris-code-repair',projectedCostMicros:Math.max(0,Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS??'100000'))}),dispatch:infer});
       if(paid&&paid.decision!=='approved')throw Error('PARIS_INFERENCE_'+paid.decision.toUpperCase());

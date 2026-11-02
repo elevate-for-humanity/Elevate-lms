@@ -27,10 +27,10 @@ export default function ProgramCard({ program }: { program: Program }) {
       </div>
 
       {/* Card body */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h3 className="text-base font-bold text-slate-900 leading-snug mb-1">{program.title}</h3>
+      <div className="flex flex-1 flex-col p-6">
+        <h3 className="text-xl font-bold text-slate-900 leading-snug mb-1">{program.title}</h3>
         {program.tagline && (
-          <p className="text-slate-600 text-sm leading-relaxed mb-3">{program.tagline}</p>
+          <p className="text-slate-600 text-base leading-7 mb-3">{program.tagline}</p>
         )}
 
         {/* Metadata chips */}
@@ -56,7 +56,7 @@ export default function ProgramCard({ program }: { program: Program }) {
 
         <Link
           href={`/programs/${program.slug}`}
-          className="mt-auto self-start inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
+          className="mt-auto self-start inline-flex min-h-12 items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors"
         >
           View Program
         </Link>

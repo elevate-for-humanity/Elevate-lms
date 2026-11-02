@@ -150,7 +150,7 @@ export default function LessonContentRenderer({
           />
           {transcript && (
             <details className="mt-4 border border-slate-200 rounded-lg">
-              <summary className="px-4 py-2 text-sm font-semibold text-slate-600 cursor-pointer">Transcript</summary>
+              <summary className="px-4 py-2 text-sm font-semibold text-slate-600 cursor-pointer">Read the lesson</summary>
               <div className="px-4 pb-4 text-sm text-slate-600 whitespace-pre-wrap">{transcript}</div>
             </details>
           )}

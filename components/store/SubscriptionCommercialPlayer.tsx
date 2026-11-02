@@ -69,7 +69,7 @@ export default function SubscriptionCommercialPlayer({
           </p>
         ) : null}
         <details className="mt-3 text-sm">
-          <summary className="cursor-pointer font-bold">Read the commercial transcript</summary>
+          <summary className="cursor-pointer font-bold">Read the introduction</summary>
           <p className="mt-3 whitespace-pre-line leading-7">{commercial.transcript}</p>
         </details>
       </div>

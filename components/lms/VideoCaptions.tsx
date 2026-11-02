@@ -89,7 +89,7 @@ export default function VideoCaptions({ segments, videoSelector = 'video' }: Pro
             d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
           />
         </svg>
-        <span className="text-base font-semibold text-slate-700">Lesson Transcript</span>
+        <span className="text-base font-semibold text-slate-700">Read the lesson</span>
         <span className="text-sm text-slate-400 ml-auto hidden sm:inline">
           Tap any line to jump to that point
         </span>

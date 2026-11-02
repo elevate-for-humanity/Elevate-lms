@@ -49,6 +49,7 @@ export default function StorePlatformDemos() {
               key={demo.slug}
               ref={player}
               controls
+              controlsList="nodownload"
               playsInline
               preload="none"
               poster={`${mediaRoot}/${demo.slug}.jpg`}
@@ -65,7 +66,7 @@ export default function StorePlatformDemos() {
                 label="English (estimated timing)"
                 default
               />
-              Your browser cannot play this video. Use the video download or transcript below.
+              This video cannot play in your browser. Please try another browser.
             </video>
             <div className="p-5 sm:p-6">
               <p className="text-xs font-bold uppercase tracking-wide text-brand-red-700">
@@ -74,20 +75,15 @@ export default function StorePlatformDemos() {
               <h3 className="mt-2 text-2xl font-black" aria-live="polite">{demo.title}</h3>
               {mediaError && (
                 <p role="alert" className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
-                  This video could not load. Try the video download or read the transcript below.
+                  This video could not load. Please select the tour again to retry.
                 </p>
               )}
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <Link href={demo.href} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-red-800">
                   {demo.cta}<ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
-                <a href={`${mediaRoot}/${demo.slug}.mp4`} download className="inline-flex min-h-11 items-center text-sm font-bold text-slate-700 underline underline-offset-4">Download video</a>
-                <a href={`${mediaRoot}/${demo.slug}-transcript.txt`} download className="inline-flex min-h-11 items-center text-sm font-bold text-slate-700 underline underline-offset-4">Download transcript</a>
               </div>
-              <details key={`${demo.slug}-transcript`} className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <summary className="cursor-pointer font-bold">Read this tour’s transcript</summary>
-                <p className="mt-3 text-sm leading-7 text-slate-700">{demo.script}</p>
-              </details>
+
             </div>
           </article>
 

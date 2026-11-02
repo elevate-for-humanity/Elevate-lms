@@ -61,6 +61,7 @@ export default function NarratedProgramIntro({
           {banner?.videoSrcDesktop || banner?.videoSrcMobile ? (
             <video
               controls
+              controlsList="nodownload"
               playsInline
               preload="none"
               poster={getProgramHeroImage(program.slug)}

@@ -12,19 +12,19 @@ export const metadata: Metadata = {
 export default function ScholarshipsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <section className="overflow-hidden bg-slate-950">
-        <div className="relative aspect-video">
+      <section className="overflow-hidden bg-slate-950 lg:grid lg:grid-cols-2 lg:items-center">
+        <div className="relative aspect-[16/10] lg:order-2 lg:aspect-auto lg:h-full lg:min-h-[36rem]">
           <Image
             src="/images/pages/hp-wioa-real.webp"
             alt="Workforce funding and career training support conversation"
             fill
             priority
-            sizes="100vw"
+            sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover object-top"
           />
         </div>
 
-        <div className="mx-auto max-w-6xl px-4 py-8 text-white sm:py-10">
+        <div className="mx-auto w-full max-w-7xl px-6 py-12 text-white sm:px-10 lg:px-12 lg:py-20">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.15em] text-white">Funding</p>
             <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -54,7 +54,7 @@ export default function ScholarshipsPage() {
       </section>
 
       <section className="px-4 py-14">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">
               Funding pathways
@@ -99,7 +99,7 @@ export default function ScholarshipsPage() {
                 <p className="mt-3 font-medium leading-7 text-slate-700">{body}</p>
                 <Link
                   href={href}
-                  className="mt-5 inline-flex font-black text-brand-blue-800 hover:underline"
+                  className="mt-5 inline-flex min-h-12 items-center font-black text-brand-blue-800 hover:underline"
                 >
                   Learn more →
                 </Link>
@@ -109,26 +109,11 @@ export default function ScholarshipsPage() {
         </div>
       </section>
 
-      <section className="border-t border-slate-200 bg-slate-50 px-4 py-12">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row">
-          <Link
-            href={ROUTES.eligibility}
-            className="rounded-xl bg-brand-red-700 px-6 py-3 text-center font-black text-white hover:bg-brand-red-800"
-          >
-            Check Eligibility
-          </Link>
-          <Link
-            href={ROUTES.apply}
-            className="rounded-xl border-2 border-slate-900 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-100"
-          >
-            Apply
-          </Link>
-          <Link
-            href={ROUTES.contact}
-            className="rounded-xl border-2 border-slate-900 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-100"
-          >
-            Contact Admissions
-          </Link>
+      <section className="border-t border-slate-200 bg-slate-50 px-6 py-12">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="text-2xl font-bold">Need help choosing a funding pathway?</h2>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-700">Admissions can help you understand the options for your program and the documents to prepare.</p>
+          <Link href={ROUTES.contact} className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-brand-red-700 px-6 py-3 font-bold text-white">Contact Admissions</Link>
         </div>
       </section>
     </main>

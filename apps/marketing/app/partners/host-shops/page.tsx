@@ -101,10 +101,10 @@ export default async function HostShopsPage() {
       />
 
       <section className="bg-white px-4 py-10 sm:py-14" aria-labelledby="host-trades-heading">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <h2 id="host-trades-heading" className="text-3xl font-black">Barbering. Cosmetology. Nails. Esthetics.</h2>
           <p className="mt-3 max-w-3xl leading-7 text-slate-700">Discover your training community or help the next generation grow. We're looking for new Host Shops in every pathway.</p>
-          <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-6 grid items-stretch gap-6 md:grid-cols-2">
             {Object.entries(PROGRAM_LABELS).map(([slug, label]) => {
               const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug)).length;
               return <article key={slug} className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -121,7 +121,7 @@ export default async function HostShopsPage() {
       </section>
 
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Statewide Indiana recruitment</p>
           <h2 className="mt-2 text-3xl font-black">We’re recruiting Host Shops in cities and communities across Indiana</h2>
           <p className="mt-4 max-w-3xl leading-7 text-slate-700">Elevate is looking for licensed barbershops, beauty salons, nail studios, spas, and esthetics businesses in every Indiana region. Choose your nearest market to see local information and start the free application.</p>
@@ -130,7 +130,7 @@ export default async function HostShopsPage() {
       </section>
 
       <section className="border-b border-slate-200 bg-white px-4 py-14" aria-labelledby="host-site-overview">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="max-w-4xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Host Site overview</p>
             <h2 id="host-site-overview" className="mt-2 text-3xl font-black sm:text-4xl">Train an apprentice, grow your team, and keep the process clear.</h2>
@@ -196,16 +196,10 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
-      <section className="bg-red-50 px-4 py-10">
-        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 md:items-center">
-          <img src="/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg" alt="Professional barbering work at Top Shelf Barber Lounge" className="aspect-[16/10] w-full rounded-3xl object-cover" loading="lazy" />
-          <div><p className="text-sm font-black uppercase text-red-700">Your next chapter starts here</p><h2 className="mt-2 text-3xl font-black">Become a barber. Build a career.</h2><p className="mt-3 leading-7">Explore the program, apply through Elevate, and tell us which host shop interests you. Admissions confirms placement and helps you review a payment plan before enrollment.</p><p className="mt-3 text-sm leading-6">Payment plans are available for self-pay barber apprentices. Students provide their personal tools and supplies. Deposits are non-refundable administrative fees used to enroll.</p><div className="mt-5 flex flex-col gap-3 sm:flex-row"><Link href="/programs/barber-apprenticeship" className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white">Explore Barber Apprenticeship</Link><Link href="/programs/barber-apprenticeship/payment-setup" className="rounded-xl border border-red-700 bg-white px-5 py-3 text-center font-black">Review Payment Plans</Link></div></div>
-        </div>
-      </section>
       <DowntownTrainingGallery />
       <HostShopBenefits />
       <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-14 text-white">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-red-400">Elevate Host Shop Network</p>
             <h2 className="mt-2 text-3xl font-black sm:text-4xl">Find your next barber, salon, or beauty professional.</h2>
@@ -216,7 +210,7 @@ export default async function HostShopsPage() {
       </section>
 
       <section className="px-4 py-14">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Approval requirements</p>
@@ -232,27 +226,8 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-gradient-to-br from-sky-50 via-white to-amber-50 px-4 py-14">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Grow beyond the directory</p>
-            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Your network profile is free. Your next business tools are optional.</h2>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">Showcase your work and connect through the Barber & Beauty Network at no listing fee. When you are ready to grow, Elevate Store offers business tools including the AI Website Builder and additional subscription products. A Store purchase is never required to remain listed in the network.</p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/store/apps/website-builder" className="rounded-xl bg-slate-950 px-6 py-3 text-center font-black text-white hover:bg-brand-red-700">Build Your Business Website</Link>
-              <Link href="/store#marketplace" className="rounded-xl border-2 border-slate-950 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-50">Explore Business Tools</Link>
-            </div>
-          </div>
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-blue-800">Free network membership</p>
-            <img src="/images/partners/generations-hair/premium-curls.jpg" alt="Hair styling portfolio in the Barber & Beauty Network" className="mb-5 aspect-[16/10] w-full rounded-2xl object-cover" loading="lazy" /><h3 className="mt-2 text-2xl font-black">Get discovered. Show your work.</h3>
-            <p className="mt-3 leading-7 text-slate-700">Build a public profile, share portfolio work, link your booking and social channels, and tell visitors whether you are accepting clients or apprentices. Customers can explore your work and find your booking links. Students can discover apprenticeship host shops.</p><Link href="/barber-beauty-network#join" className="mt-5 inline-flex min-h-12 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white">Explore &amp; Join the Free Network</Link>
-          </div>
-        </div>
-      </section>
-
       <section className="border-y border-brand-red-200 bg-brand-red-50 px-4 py-14 text-center text-slate-950">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2"><div className="relative aspect-[4/3] overflow-hidden rounded-2xl"><Image src="/images/pages/barber-hands-on-bright.webp" alt="Barber training and mentorship" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div><div>
+        <div className="mx-auto grid max-w-7xl items-center gap-8 md:grid-cols-2"><div className="relative aspect-[4/3] overflow-hidden rounded-2xl"><Image src="/images/pages/barber-hands-on-bright.webp" alt="Barber training and mentorship" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div><div>
           <h2 className="text-3xl font-black">Want your business in the Host Site network?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>
           <Link href={HOST_SITE_APPLY_HREF} className="mt-7 inline-flex rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white">Start Host Site Application</Link>

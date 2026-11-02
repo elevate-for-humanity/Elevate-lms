@@ -65,12 +65,12 @@ export async function ProgramsGrid() {
                 </div>
               )}
             </div>
-            <div className="flex flex-1 flex-col p-4">
-              <h2 className="text-sm font-semibold text-black">{program.title || program.name}</h2>
-              <p className="mt-1 line-clamp-3 text-xs text-black">{program.description}</p>
-              <p className="mt-2 text-[11px] font-medium text-slate-500">{program.category}</p>
+            <div className="flex flex-1 flex-col p-6">
+              <h2 className="text-xl font-semibold text-black">{program.title || program.name}</h2>
+              <p className="mt-3 text-base leading-7 text-slate-700">{program.description}</p>
+              <p className="mt-2 text-sm font-medium text-slate-500">{program.category}</p>
               {program.training_hours && (
-                <p className="text-[11px] text-slate-500">
+                <p className="text-sm text-slate-500">
                   Duration: {program.training_hours} hours
                 </p>
               )}
@@ -79,7 +79,7 @@ export async function ProgramsGrid() {
                   {program.funding_tags.slice(0, 2).map((tag) => (
                     <span
                       key={tag}
-                      className="text-[10px] px-2 py-0.5 bg-brand-blue-100 text-brand-blue-700 rounded-full"
+                      className="text-xs px-2 py-0.5 bg-brand-blue-100 text-brand-blue-700 rounded-full"
                     >
                       {tag}
                     </span>

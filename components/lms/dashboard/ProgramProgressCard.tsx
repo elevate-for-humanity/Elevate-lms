@@ -28,8 +28,8 @@ export function ProgramProgressCard({
       href={href}
       className="bg-white rounded-xl border hover:border-brand-blue-300 hover:shadow-md transition p-6 group block"
     >
-      <div className="flex items-start justify-between mb-2">
-        <h4 className="font-semibold text-slate-900 group-hover:text-brand-blue-600 transition">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <h4 className="text-lg font-semibold text-slate-900 group-hover:text-brand-blue-600 transition">
           {programTitle}
         </h4>
         <span
@@ -52,7 +52,7 @@ export function ProgramProgressCard({
           style={{ width: `${progressPercent}%` }}
         />
       </div>
-      <p className="text-xs text-slate-700">{progressPercent}% complete</p>
+      <p className="text-sm text-slate-700">{progressPercent}% complete</p>
     </Link>
   );
 }

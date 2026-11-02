@@ -16,11 +16,7 @@ import {
 } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
-import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
-import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
-import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
-import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 import KountryKutzTourSlideshow from '@/components/programs/beauty/KountryKutzTourSlideshow';
 import BeautyApprenticeshipAuthority, {
@@ -91,9 +87,6 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   const program = loaded.program;
-  const shops = (await getHostShopNetwork()).filter((shop) =>
-    matchesHostShopProgram(shop, 'barber-apprenticeship'),
-  );
   const heroBanner = heroBanners['barber-apprenticeship'];
   const structuredData = buildBeautyProgramStructuredData({
     ...program,
@@ -114,7 +107,7 @@ export default async function BarberApprenticeshipPage() {
         data-narration="The registered barber apprenticeship connects required technical instruction, supervised Host Shop training, documented progress, and preparation for Indiana licensing requirements."
         className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12"
       >
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-2 lg:items-center">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-2 lg:items-center">
           <div className="max-w-4xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Registered Barber Apprenticeship
@@ -136,13 +129,13 @@ export default async function BarberApprenticeshipPage() {
                 Apply for Barber Apprenticeship <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="#host-shops"
+                href="/programs/barber-apprenticeship/host-shops"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-7 py-3.5 text-sm font-black text-white hover:bg-brand-blue-900"
               >
                 Explore Host Shops <Building2 className="h-4 w-4" />
               </Link>
               <Link
-                href="/partners/host-shops"
+                href="/partners/host-shop/apply"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 text-sm font-black text-brand-blue-900 hover:bg-sky-50"
               >
                 Become a Host Shop
@@ -191,6 +184,7 @@ export default async function BarberApprenticeshipPage() {
               transcript={heroBanner.transcript}
               narrateTranscript={false}
               showTranscriptControl={false}
+              contentTheme="light"
               analyticsName="barber-apprenticeship"
               mediaFit="cover"
               overlayMode="none"
@@ -200,7 +194,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-8">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Fact
             icon={ShieldCheck}
             label="On-the-job learning"
@@ -226,7 +220,7 @@ export default async function BarberApprenticeshipPage() {
         id="host-shops"
         className="border-b border-slate-200 bg-sky-50 px-4 py-8 sm:py-10"
       >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="mb-8 max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Host-shop network
@@ -239,15 +233,9 @@ export default async function BarberApprenticeshipPage() {
               verified during enrollment and is not implied by a public listing.
             </p>
           </div>
-          <HostShopPlacementGuide programSlug="barber-apprenticeship" />
-          <div className="mt-10">
-            <details className="rounded-xl border border-slate-200 bg-white p-4">
-              <summary className="cursor-pointer py-2 font-bold">
-                View the barber Host Shop map
-              </summary>
-              <BarberWorkforceNetworkMap shops={shops} />
-            </details>
-          </div>
+          <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-6 py-3 font-bold text-white hover:bg-brand-blue-900">
+            Browse Barber Host Shops <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
@@ -257,7 +245,7 @@ export default async function BarberApprenticeshipPage() {
       />
 
       <section className="border-b border-slate-200 bg-white px-4 py-5">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <BeautyEnrollmentPromotion
             compact
             programSlug="barber-apprenticeship"
@@ -271,7 +259,7 @@ export default async function BarberApprenticeshipPage() {
         data-narration="Here is how the pathway works. Complete the theory, train under approved supervision, record your skills and hours, and prepare for the licensing requirements connected to the program."
         className="px-4 py-14 sm:py-18"
       >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[360px]">
               <Image
@@ -315,7 +303,7 @@ export default async function BarberApprenticeshipPage() {
         className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-visual-story-heading"
       >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               See the apprenticeship
@@ -367,7 +355,7 @@ export default async function BarberApprenticeshipPage() {
         className="border-y border-orange-200 bg-orange-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-payment-heading"
       >
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Plan your payment
@@ -410,7 +398,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       <section className="border-y border-sky-200 bg-sky-50 px-4 py-14 text-slate-950">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Skills you build
@@ -444,7 +432,7 @@ export default async function BarberApprenticeshipPage() {
       <BeautyApprenticeshipAuthority program={program} />
 
       <section className="border-t border-sky-200 bg-white px-4 py-14 text-slate-950">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-2">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
             <Image
               src={getProgramHeroImage('barber-apprenticeship')}
@@ -471,7 +459,7 @@ export default async function BarberApprenticeshipPage() {
                 Apply Now
               </Link>
               <Link
-                href="/partners/host-shops"
+                href="/programs/barber-apprenticeship/host-shops"
                 className="rounded-xl border-2 border-brand-blue-700 bg-white px-8 py-4 font-black text-brand-blue-900 hover:bg-sky-50"
               >
                 Host a Barber Apprentice

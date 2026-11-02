@@ -24,13 +24,13 @@
 
 @media (max-width: 767px) {
   #main-content.site-main h1:not(.sr-only) {
-    font-size: clamp(1.75rem, 7.5vw, 2.125rem);
+    font-size: clamp(2rem, 8vw, 3rem);
     line-height: 1.15;
     text-wrap: balance;
   }
 
   #main-content.site-main h2 {
-    font-size: clamp(1.375rem, 6vw, 1.75rem);
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
     line-height: 1.25;
     text-wrap: balance;
   }
@@ -51,12 +51,12 @@
   }
 
   #main-content.site-main section:is(.py-12, .py-14, .py-16, .py-20, .py-24) {
-    padding-block: 2rem;
+    padding-block: 3rem;
   }
 
-  /* Opt-in compact grids must not be flattened by the older safety layer. */
-  #main-content.site-main main [data-mobile-grid='2'] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Content cards need readable line lengths on phones. */
+  #main-content.site-main main [data-mobile-grid='2']:has(> article) {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   #main-content.site-main main [data-featured-shop] h3 {
@@ -98,7 +98,7 @@
 /* Consistent public-page rhythm; dashboard and standalone brands are excluded. */
 @media (min-width: 768px) {
   #main-content.site-main section:is(.py-16, .py-20, .py-24) {
-    padding-block: 3rem;
+    padding-block: 4rem;
   }
 }
 #main-content.site-main .grid > :is(article, a):has(img[data-nimg='fill']) {

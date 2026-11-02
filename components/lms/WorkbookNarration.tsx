@@ -104,7 +104,7 @@ export default function WorkbookNarration({ text }: { text: string }) {
         </p>
       )}
       <details className="mt-3" open={!!caption}>
-        <summary className="cursor-pointer py-2 font-semibold">Narration transcript</summary>
+        <summary className="cursor-pointer py-2 font-semibold">Read along</summary>
         <p className="mt-2 leading-relaxed" aria-live="off">
           {caption || text}
         </p>

@@ -7,8 +7,8 @@ vi.mock('next/navigation', () => ({ usePathname: () => route.path }));
 afterEach(cleanup);
 
 describe('shared public next-step navigation', () => {
-  it('keeps student destinations without repeating decorative photos on program pages', () => {
-    route.path = '/programs/hvac-technician';
+  it('keeps student destinations on the apprenticeship overview', () => {
+    route.path = '/apprenticeships';
     const { container } = render(<PublicPathwayLinks />);
     expect(screen.getByRole('link', { name: /Find your career program/ }).getAttribute('href')).toBe('/programs');
     expect(screen.getByRole('link', { name: /Understand how to pay/ }).getAttribute('href')).toBe('/check-eligibility');
@@ -23,7 +23,7 @@ describe('shared public next-step navigation', () => {
     expect(container.querySelectorAll('img')).toHaveLength(0);
   });
   it('does not add navigation to checkout or operational screens', () => {
-    for (const path of ['/testing/checkout', '/lms/dashboard', '/admin']) {
+    for (const path of ['/testing/checkout', '/lms/dashboard', '/admin', '/programs/hvac-technician', '/partners/host-shops', '/host-shops/salon-saloon', '/funding/wrg']) {
       route.path = path;
       const { container, unmount } = render(<PublicPathwayLinks />);
       expect(container.children).toHaveLength(0);

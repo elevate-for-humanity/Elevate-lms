@@ -54,6 +54,10 @@ export default function PublicPathwayLinks() {
     /\/(?:apply|confirmation|dashboard|onboarding|mou|orientation)(?:\/|$)/.test(path)
   )
     return null;
+  // Detailed pages already own their program, funding and enrollment actions.
+  // Keep this discovery section on overview pages only.
+  const overviewPaths = new Set(['/programs', '/apprenticeships', '/funding', '/student-resources', '/student-support', '/career-services', '/employment-support', '/how-it-works', '/about', '/employers', '/employer', '/for-employers', '/for-agencies']);
+  if (!overviewPaths.has(path.replace(/\/$/, ''))) return null;
   const cards = (employer ? EMPLOYER : STUDENT).filter((card) => card.href !== path);
   return (
     <section

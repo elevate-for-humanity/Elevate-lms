@@ -180,7 +180,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
         data-narration-rate={videoScript ? '0.82' : undefined}
         data-narration-style={videoScript ? 'instructor' : undefined}
       >
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
             <h1 className="mt-4 break-words text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{approved.name}</h1>
@@ -201,19 +201,8 @@ export default async function HostShopProfilePage({ params }: PageProps) {
         </div>
       </section>
 
-      {videoScript && !profile.video_url && !featuredFallbackVideo ? (
-        <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
-          <details className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-            <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
-              Read the {approved.name} guided tour script
-            </summary>
-            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-700">{videoScript}</p>
-          </details>
-        </section>
-      ) : null}
-
       <section className="px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
           <div className="min-w-0">
             <h2 className="text-2xl font-black">Visit {approved.name}</h2>
             <p className="mt-3 text-sm leading-6 text-slate-700">Explore the shop portfolio and contact the business for services, prices, appointments, and current hours. Call the shop to confirm walk-in availability before visiting.</p>
@@ -271,7 +260,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
     <main className="overflow-x-hidden bg-white text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <figure className="mb-7"><div className="relative h-[clamp(260px,42svh,480px)] overflow-hidden rounded-2xl"><Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="100vw" className="object-cover" priority /></div><figcaption className="mt-2 text-xs text-slate-300">Training illustration. Shop portfolio photos are being added.</figcaption></figure>
           <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
@@ -284,7 +273,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
         </div>
       </section>
       <section className="px-4 py-12 sm:px-6">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <h2 className="text-2xl font-black">Approved training location</h2>
             {address ? <p className="mt-5 flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /> {address}</p> : null}
@@ -360,7 +349,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
           className="border-b border-slate-200 bg-white px-4 py-8 sm:px-6 sm:py-12"
 
         >
-          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
               <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{shop.dba ?? shop.name}</h1>
@@ -375,7 +364,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       ) : null}
 
       <section className="border-b border-slate-200 bg-slate-50" data-scroll-narration data-narration={videoUrl ? undefined : videoScript}>
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>
             {videoUrl ? <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">Explore the shop portfolio</h2> : <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">{shop.dba ?? shop.name}</h1>}
@@ -397,7 +386,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       </section>
 
       <section className="px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
           <div className="min-w-0">
             <h2 className="text-2xl font-black">Visit {shop.dba ?? shop.name}</h2>
             <p className="mt-3 text-sm leading-6 text-slate-700">Explore the portfolio and use the shop’s booking, website, or phone links to plan your visit. Contact the shop to confirm current hours and walk-in availability.</p>

@@ -9,12 +9,12 @@ import { MapPin, Search } from 'lucide-react';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 
-type Props = { shops: HostShopNetworkEntry[] };
+type Props = { shops: HostShopNetworkEntry[]; programSlug?: string };
 
-export default function HostShopNetworkDirectory({ shops }: Props) {
+export default function HostShopNetworkDirectory({ shops, programSlug }: Props) {
   const [query, setQuery] = useState('');
-  const [program, setProgram] = useState('all');
-  const programs = Object.keys(PROGRAM_LABELS);
+  const [program, setProgram] = useState(programSlug ?? 'all');
+  const programs = programSlug ? [programSlug] : Object.keys(PROGRAM_LABELS);
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return shops.filter((shop) => {
@@ -45,7 +45,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
             onChange={(event) => setProgram(event.target.value)}
             className="min-h-12 w-full rounded-xl border border-white/15 bg-white px-4 py-3 text-base font-bold text-slate-950 outline-none ring-red-400 focus:ring-2"
           >
-            <option value="all">All apprenticeship programs</option>
+            {!programSlug ? <option value="all">All apprenticeship programs</option> : null}
             {programs.map((slug) => (
               <option key={slug} value={slug}>
                 {PROGRAM_LABELS[slug] ?? slug}

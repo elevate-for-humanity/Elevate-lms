@@ -207,6 +207,7 @@ test.describe('Host Shop production workspace', () => {
 
     const operationalSurfaces = [
       '/host-shop/dashboard/apprentices',
+      '/host-shop/dashboard/certificates',
       '/host-shop/dashboard/hours/pending',
       '/host-shop/dashboard/documents',
       '/host-shop/dashboard/competencies',
@@ -216,6 +217,15 @@ test.describe('Host Shop production workspace', () => {
       '/host-shop/dashboard/profile',
     ];
     for (const path of operationalSurfaces) await expectPortalRoute(page, path);
+
+    await expectPortalRoute(page, '/host-shop/dashboard/certificates', /student certificates/i);
+    const download = page.getByRole('link', { name: /^Download certificate for / }).first();
+    await expect(download).toBeVisible();
+    const certificate = await page.request.get(new URL((await download.getAttribute('href'))!, BASE).toString());
+    expect(certificate.status()).toBe(200);
+    expect(certificate.headers()['content-type']).toContain('application/pdf');
+    expect(certificate.headers()['cache-control']).toBe('private, no-store');
+    expect((await certificate.body()).subarray(0, 5).toString()).toBe('%PDF-');
 
     const listResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
       failOnStatusCode: false,

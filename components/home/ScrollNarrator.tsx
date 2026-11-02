@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import { useHvacVideoDock } from '@/hooks/useHvacVideoDock';
 import {
+  NATURAL_VOICE_STOP_EVENT,
   stopAllNaturalVoicePlayback,
   useNaturalVoice,
 } from '@/components/voice/useNaturalVoice';
@@ -15,6 +16,8 @@ import {
 // preserving every new choice the visitor makes from this release onward.
 const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
 const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
+const SECTION_PAUSE_MS = 1000;
+const SCROLL_SETTLE_MS = 850;
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 2400) ?? '';
@@ -78,12 +81,20 @@ export function ScrollNarrator() {
   const narratedRef = useRef(new Set<string>());
   const pendingRef = useRef<string | null>(null);
   const playbackGenerationRef = useRef(0);
+  const speakingRef = useRef(false);
+  const startingOwnVoiceRef = useRef(false);
+  const transitionTimerRef = useRef(0);
+  const quietUntilRef = useRef(0);
+  const continueRef = useRef<() => void>(() => {});
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
   );
   const { play, prepare, stop } = useNaturalVoice();
 
   const narrateVisibleSection = useCallback(async (replay = false) => {
+    // A section owns the voice until its actual audio ends, including fetch time.
+    // Select the latest visible section afterwards rather than queueing swiped-past copy.
+    if (speakingRef.current || Date.now() < quietUntilRef.current) return false;
     // User-started media owns the sound until it finishes or is paused.
     if (Array.from(document.querySelectorAll<HTMLMediaElement>('audio, video')).some(
       (media) => !media.paused && (!media.muted && media.volume > 0 || media.hasAttribute('data-narrated-tour')),
@@ -110,18 +121,38 @@ export function ScrollNarrator() {
 
     lastNarrationRef.current = { section, text, source };
     pendingRef.current = key;
+    speakingRef.current = true;
     const generation = ++playbackGenerationRef.current;
     pauseOtherAudibleMedia();
-    const started = await play(text, {
+    startingOwnVoiceRef.current = true;
+    const playback = play(text, {
       src: source,
       voice: 'coral',
       style: narrationStyleFor(section),
       rate: narrationRateFor(section),
       allowBrowserFallback: true,
+      onEnded: () => {
+        if (generation !== playbackGenerationRef.current) return;
+        speakingRef.current = false;
+        quietUntilRef.current = Math.max(quietUntilRef.current, Date.now() + SECTION_PAUSE_MS);
+        window.clearTimeout(transitionTimerRef.current);
+        transitionTimerRef.current = window.setTimeout(
+          () => continueRef.current(), quietUntilRef.current - Date.now(),
+        );
+      },
+      onError: () => {
+        if (generation !== playbackGenerationRef.current) return;
+        speakingRef.current = false;
+        pendingRef.current = null;
+        lastNarrationRef.current = null;
+      },
     });
+    startingOwnVoiceRef.current = false;
+    const started = await playback;
     if (generation !== playbackGenerationRef.current) return false;
     pendingRef.current = null;
     if (!started) {
+      speakingRef.current = false;
       lastNarrationRef.current = null;
       setNotice('Narration could not start. Turn narration off and on to retry.');
     } else {
@@ -132,17 +163,34 @@ export function ScrollNarrator() {
   }, [play]);
 
   useEffect(() => {
+    continueRef.current = () => { void narrateVisibleSection(); };
+  }, [narrateVisibleSection]);
+
+  useEffect(() => {
     const governAudibleMedia = (event: Event) => {
       const media = event.target;
       if (!(media instanceof HTMLMediaElement) || media.paused || media.muted || media.volume === 0)
         return;
+      playbackGenerationRef.current += 1;
+      speakingRef.current = false;
+      pendingRef.current = null;
+      window.clearTimeout(transitionTimerRef.current);
       stopAllNaturalVoicePlayback();
       pauseOtherAudibleMedia(media);
     };
 
+    const releaseInterruptedNarration = () => {
+      if (startingOwnVoiceRef.current) return;
+      playbackGenerationRef.current += 1;
+      speakingRef.current = false;
+      pendingRef.current = null;
+      window.clearTimeout(transitionTimerRef.current);
+    };
+    window.addEventListener(NATURAL_VOICE_STOP_EVENT, releaseInterruptedNarration);
     document.addEventListener('play', governAudibleMedia, true);
     document.addEventListener('volumechange', governAudibleMedia, true);
     return () => {
+      window.removeEventListener(NATURAL_VOICE_STOP_EVENT, releaseInterruptedNarration);
       document.removeEventListener('play', governAudibleMedia, true);
       document.removeEventListener('volumechange', governAudibleMedia, true);
     };
@@ -182,6 +230,9 @@ export function ScrollNarrator() {
 
   useEffect(() => {
     playbackGenerationRef.current += 1;
+    speakingRef.current = false;
+    quietUntilRef.current = 0;
+    window.clearTimeout(transitionTimerRef.current);
     pendingRef.current = null;
     narratedRef.current.clear();
     lastNarrationRef.current = null;
@@ -191,7 +242,13 @@ export function ScrollNarrator() {
     // This prevents the hero, route transition, and first scroll section from
     // competing to speak during initial render.
     const timer = window.setTimeout(() => void narrateVisibleSection(), 1400);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(transitionTimerRef.current);
+      playbackGenerationRef.current += 1;
+      speakingRef.current = false;
+      stop();
+    };
   }, [enabled, hasNarration, narrateVisibleSection, pathname, stop]);
 
   useEffect(() => {
@@ -243,6 +300,7 @@ export function ScrollNarrator() {
     const synchronizeNarrationToScroll = () => {
       if (!enabled) return;
       window.clearTimeout(timer);
+      quietUntilRef.current = Math.max(quietUntilRef.current, Date.now() + SCROLL_SETTLE_MS);
       // Wait until scrolling settles so adjacent section scripts never fire
       // over one another during a fast swipe.
       timer = window.setTimeout(() => {
@@ -251,7 +309,7 @@ export function ScrollNarrator() {
         if (visible === current) return;
         if (!visible) return;
         void narrateVisibleSection();
-      }, 850);
+      }, Math.max(SCROLL_SETTLE_MS, quietUntilRef.current - Date.now()));
     };
 
     window.addEventListener('scroll', synchronizeNarrationToScroll, { passive: true });

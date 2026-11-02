@@ -3,27 +3,38 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const source=readFileSync(new URL('../.github/workflows/paris-code-repair.yml',import.meta.url),'utf8');
+const verifier=readFileSync(new URL('../.github/workflows/verify-paris-production-authorization.yml',import.meta.url),'utf8');
 const condition=source.match(/  monitor:\n    if: (.+)/)?.[1];
-function monitor(eventName,run={},ref='refs/heads/main') {
- return vm.runInNewContext(condition,{github:{ref,event_name:eventName,event:{workflow_run:run}}});
+function monitor(eventName,repairId='',ref='refs/heads/main') {
+ return vm.runInNewContext(condition,{github:{ref,event_name:eventName},inputs:{repair_id:repairId}});
 }
-test('verified main runtime authorization wakes the repair monitor without waiting for cron',()=>{
- assert.match(source,/workflow_run:\n    workflows: \['Verify PARIS Admin production authorization'\]\n    types: \[completed\]\n    branches: \[main\]/);
- assert.equal(monitor('workflow_run',{head_branch:'main',event:'workflow_dispatch',conclusion:'success'}),true);
+test('verified live authorization explicitly wakes a monitor without an invented repair ID',()=>{
+ assert.equal(monitor('workflow_dispatch'),true);
  assert.equal(monitor('schedule'),true);
  assert.equal(monitor('push'),true);
+ assert.match(source,/repair_id:[\s\S]*?required: false/);
+ assert.match(verifier,/actions: write/);
+ const checked=verifier.indexOf("raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')");
+ const wake=verifier.indexOf('name: Wake the serialized repair monitor');
+ assert.ok(checked>0 && wake>checked);
+ assert.match(verifier.slice(wake),/paris-code-repair\.yml\/dispatches.*-f ref=main/);
+ assert.doesNotMatch(verifier.slice(wake),/repair_id/);
 });
-test('failed releases and request-only push runs cannot wake repair execution',()=>{
- for(const conclusion of ['failure','cancelled','timed_out','skipped',null]) {
-  assert.equal(monitor('workflow_run',{head_branch:'main',event:'workflow_dispatch',conclusion}),false);
+test('monitor entry cannot impersonate a repair preparation or run outside main',()=>{
+ assert.equal(monitor('workflow_dispatch','existing-repair'),false);
+ assert.equal(monitor('workflow_dispatch','','refs/heads/feature'),false);
+ for(const event of ['pull_request','workflow_run']) assert.equal(monitor(event),false);
+ for(const job of ['prepare','report']) {
+  const header=source.slice(source.indexOf('  '+job+':'),source.indexOf('    runs-on:',source.indexOf('  '+job+':')));
+  assert.ok(header.includes("inputs.repair_id != ''"));
  }
- assert.equal(monitor('workflow_run',{head_branch:'main',event:'push',conclusion:'success'}),false);
- assert.equal(monitor('workflow_run',{head_branch:'feature',event:'workflow_dispatch',conclusion:'success'}),false);
- assert.equal(monitor('workflow_run',{head_branch:'main',event:'workflow_dispatch',conclusion:'success'},'refs/heads/feature'),false);
- assert.equal(monitor('pull_request'),false);
 });
-
-test('new monitors retain an already queued repair dispatch in the serialized workflow',()=>{
+test('the update verification bridge cannot recurse from a manually dispatched monitor',()=>{
+ const bridge=source.slice(source.indexOf('name: Verify serving authorization after compatible control-plane updates'),source.indexOf('  prepare:'));
+ assert.ok(bridge.includes("if: github.event_name == 'push' && steps.tick.outputs.runtime_sha != ''"));
+ assert.match(bridge,/verify-paris-production-authorization\.yml\/dispatches/);
+});
+test('later monitors retain queued repair dispatches in the serialized workflow',()=>{
  const policy=source.split('concurrency:')[1].split('jobs:')[0];
  assert.match(policy,/group: paris-code-repair/);
  assert.match(policy,/cancel-in-progress: false/);

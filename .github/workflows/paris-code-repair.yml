@@ -8,17 +8,13 @@ on:
       - 'lib/devstudio/paris-code-engineer.ts'
       - 'lib/ai/runtime/supervision.ts'
       - 'lib/ai/runtime/code-repair-policy.mjs'
-  workflow_run:
-    workflows: ['Verify PARIS Admin production authorization']
-    types: [completed]
-    branches: [main]
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
       repair_id:
         description: Durable owner-authorized PARIS repair ID
-        required: true
+        required: false
         type: string
 permissions:
   contents: read
@@ -30,7 +26,7 @@ concurrency:
   queue: max
 jobs:
   monitor:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success'))
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == ''))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
@@ -52,6 +48,7 @@ jobs:
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
       - name: Tick PARIS and dispatch the claimed repair with workflow-owned identity
+        id: tick
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -84,6 +81,8 @@ jobs:
             print('Repair monitor deferred until compatible Admin control-plane source is serving.')
             raise SystemExit(0)
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+            output.write('runtime_sha='+runtime_sha+'\n')
           headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}
           preflight=urllib.request.Request(endpoint,data=json.dumps({'phase':'auth-diagnostic'}).encode(),headers=headers)
           capability=json.load(urllib.request.urlopen(preflight,timeout=60))
@@ -104,12 +103,18 @@ jobs:
             print(error.read().decode()[:1000])
             raise
           PYCODE
+      - name: Verify serving authorization after compatible control-plane updates
+        if: github.event_name == 'push' && steps.tick.outputs.runtime_sha != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ steps.tick.outputs.runtime_sha }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-paris-production-authorization.yml/dispatches" -f ref=main -f "inputs[expected_sha]=$EXPECTED_SHA" -f 'inputs[credential_source]=runtime-token'
   prepare:
     permissions:
       contents: write
       actions: read
       id-token: write
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && inputs.repair_id != '' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     outputs:
@@ -271,7 +276,7 @@ jobs:
           print(json.dumps({'status':result.get('status'),'sha':result.get('sha'),'verifiedLive':False}))
           PY
   report:
-    if: always() && github.event_name == 'workflow_dispatch' && (needs.prepare.result != 'success' || needs.validate.result != 'success' || needs.publish.result != 'success')
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.repair_id != '' && (needs.prepare.result != 'success' || needs.validate.result != 'success' || needs.publish.result != 'success')
     needs: [prepare,validate,publish]
     runs-on: ubuntu-24.04
     steps:

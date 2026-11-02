@@ -14,7 +14,7 @@ on:
         required: false
 permissions:
   contents: read
-  actions: read
+  actions: write
   id-token: write
 concurrency:
   group: paris-production-readonly-verification
@@ -122,3 +122,7 @@ jobs:
           if not source_ok or safe['diagnostic_version']!=2 or not safe['repo_ok'] or not safe['contents_ok'] or not safe['workflow_ok']:
             raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
           PY
+      - name: Wake the serialized repair monitor after verified live authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/paris-code-repair.yml/dispatches" -f ref=main

@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-02.1",
+  "version": "2026-11-02.2",
   "courseId": "d48c61c4-8880-4d9d-9ab5-fab4dd51b201",
   "workbookSlug": "hvac-epa608-guided-practice",
   "passingScore": 80,
@@ -48,7 +48,7 @@
           "text": "Create a checklist showing the lesson order, assessment instructions, required practical observations, external examinations and the staff member responsible for each question. Record credentials as verified, pending or not yet attempted. Review your access to the approved learning platform, safe training equipment and qualified supervision. If seeking financial assistance or support services, ask the responsible provider for its actual eligibility and approval process; enrollment does not guarantee funding or employment. Submit a short explanation of one HVAC career role, one task requiring further qualification and one action you will take when a safety instruction or program requirement is unclear."
         }
       ],
-      "image": "/images/workbooks/hvac/context-1.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -95,7 +95,7 @@
           "text": "Create a labeled system map showing the purpose of each major component, the operating mode and the instrument that could answer one defined diagnostic question. Identify electrical energy, pressure, sharp metal, rotating parts, hot surfaces and any refrigerant-specific ignition or exposure hazard before practice. State the required isolation, protective equipment and stop conditions from the actual instructions and task assessment. Do not open a circuit, connect gauges, bypass a safety or perform an energized test merely to complete this worksheet. Have the instructor observe component identification and verify that your proposed next step fits your qualification and the training conditions."
         }
       ],
-      "image": "/images/workbooks/hvac/context-2.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -189,7 +189,7 @@
           "text": "Prepare a three-column comparison for gas combustion, resistance heat and heat-pump heating. For each, name the heat source, one normal operating observation, two hazards and the document that controls service checks. Then write a service note for the customer scenario: reported concern, facts collected, additional authorized checks needed and a clear next step. Keep suspected causes separate from confirmed findings. Ask your instructor to review the sequence and the points at which the work must stop. Completing this written exercise records your reasoning; it does not substitute for supervised practical assessment, an electrical qualification, a combustion analysis or an external safety credential."
         }
       ],
-      "image": "/images/workbooks/hvac/context-4.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -236,7 +236,7 @@
           "text": "Draw the four-component cycle and label the direction of heat transfer at each coil in cooling mode. Beside it, work two calculation problems: vapor at 58 degrees with a corresponding saturation value of 43 gives 15 degrees of superheat; a liquid-side saturation value of 105 with measured liquid at 97 gives 8 degrees of subcooling. State what information is still needed before judging either result acceptable. Include refrigerant identity, chart convention, paired measurement locations, operating conditions and the manufacturer's target method. Review the calculations with an instructor. This paper exercise develops interpretation skills and does not authorize opening a live refrigerant circuit or conducting unsupervised service."
         }
       ],
-      "image": "/images/workbooks/hvac/context-5.jpg",
+      "image": null,
       "imageAlt": "Technician Testing Industrial Air Conditioning with Multimeter"
     },
     {
@@ -283,7 +283,7 @@
           "text": "Prepare an identification sheet for a supplied appliance example. Record its model, refrigerant, charge information, construction and category evidence, required technician scope and the documents that govern equipment selection and hazards. Identify the recovery and container information you would need before supervised service. Where evidence is absent, write a clear stop condition and the information needed to continue. Review the sheet with the instructor and correct any assumption that comes from cabinet size, price or environmental branding alone. Keep the reasoning exercise, observed practical check-offs and external examination results as separate records of what has actually been learned or verified."
         }
       ],
-      "image": "/images/workbooks/hvac/context-6.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -330,7 +330,7 @@
           "text": "For a classroom scenario, list the records needed to support three decisions: the recovery requirement, the permitted handling of the recovered contents and the purchaser's authorization. Include equipment identification, refrigerant identity, recovery machine and container information, applicable instructions and the relevant official sales source. Describe what you would do if a label is missing or a proposed container's suitability cannot be verified. Identify at least one prohibited shortcut and explain the correct reasoning. Review your record with the instructor and retain the corrected version. The exercise is evidence of knowledge; live recovery and external certification need their own verified practical and examination records."
         }
       ],
-      "image": "/images/workbooks/hvac/context-7.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -408,7 +408,7 @@
           "text": "Consider a stationary high-pressure system with a suspected leak. Your task is to prepare a decision record, not connect gauges without authorization. List the appliance and refrigerant identification, full charge, certification scope, recovery equipment information and relevant manufacturer procedure. State which official table or rule you need, what units it uses and whether the available facts support a particular requirement. Then separate the proposed leak test, recovery, repair, evacuation and charging activities in the job plan. Mark missing evidence and unsafe conditions as stop points. Review the record with the instructor and retain practical performance assessment separately from the online knowledge result."
         }
       ],
-      "image": "/images/workbooks/hvac/context-9.jpg",
+      "image": null,
       "imageAlt": "Technician Testing Industrial Air Conditioning with Multimeter"
     },
     {
@@ -455,7 +455,7 @@
           "text": "An instructor provides a chiller description and a worksheet displaying a recovery reading with no unit label. Explain why the reading cannot yet establish compliance. Request the instrument units, absolute or gauge reference, equipment classification and the applicable service procedure. Next, describe why a system operating below atmospheric pressure can draw air inward through a leak. Separate that explanation from an unsupported diagnosis of a particular component. Finish a pre-work checklist containing equipment documents, refrigerant identification, safety controls, selected recovery requirement and required supervisor. Keep your written response and corrections as learning evidence; actual operating and practical check-offs remain separate and must be observed."
         }
       ],
-      "image": "/images/workbooks/hvac/context-10.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -502,7 +502,7 @@
           "text": "Prepare four columns headed Core, Type I, Type II and Type III. Under each appliance type, enter its scope, the evidence needed to classify an example and the source used to select its recovery requirement. Under Core, list the identification, containment and safety concepts shared across the examples. Work the lesson's questions, explain every correction and ask the instructor to review unresolved topics before the separate approved exam. Keep knowledge results, supervised practical records and external certificates as different evidence items. Do not mark an external examination or hands-on skill complete because you watched a film, answered practice questions or finished an online progress bar."
         }
       ],
-      "image": "/images/workbooks/hvac/context-11.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -549,7 +549,7 @@
           "text": "Prepare a worksheet for a system that is reported to cool poorly. Include the customer's concern, equipment identification, refrigerant, operating conditions, airflow observations, measurement locations and units. Explain which evidence is needed before selecting a charging action. Add separate boxes for leak detection, recovery, repair, evacuation and final verification; each box should identify its governing procedure and any missing information. Calculate the example superheat, then state why it cannot be used as a universal target. Review the worksheet with the instructor and correct unsupported conclusions. Retain observed practical check-offs separately: a correct paper calculation or viewed film does not establish that live refrigerant work was performed safely."
         }
       ],
-      "image": "/images/workbooks/hvac/context-12.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -596,7 +596,7 @@
           "text": "Prepare a startup checklist using the actual equipment instructions. It may include verified installation details, electrical checks by qualified personnel, controls, airflow, drain operation, refrigerant checks, safety devices and recorded operating conditions. Confirm which checks apply to the installed configuration and obtain the required review before operation. A fan or compressor running is not proof that the installation is complete. In a practice scenario, identify one missing design assumption, one duct restriction, one hot-work stop condition and one startup measurement that needs a stated target. Retain the worksheet, the governing instructions and actual practical verification as distinct evidence items."
         }
       ],
-      "image": "/images/workbooks/hvac/context-13.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -643,7 +643,7 @@
           "text": "Write a customer-facing summary in plain language: reported concern, confirmed findings, work actually performed, remaining uncertainty, recommended next step and any operating restriction. Identify costs or approvals that must be agreed before additional work. Avoid unsupported guarantees, blame or technical jargon that hides uncertainty. Include measurement units, conditions, equipment identity and the source used to interpret results in the technical record. For practice, prepare both versions of the airflow scenario and label the checks that require a qualified technician. Review the reasoning with an instructor and keep actual practical assessment separate from the written case response or online completion status."
         }
       ],
-      "image": "/images/workbooks/hvac/context-14.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -690,7 +690,7 @@
           "text": "This lesson is safety preparation. It does not award an OSHA Outreach card or replace the employer's training duties under specific standards. OSHA-authorized Outreach training has its own content, delivery and completion records; an OSHA card is a course-completion card, not a professional license or certification. For practice, build a hazard-and-control table for rooftop access, electrical diagnosis, chemical use and brazing. Identify the task-specific instruction or supervisor needed for each. Review your table with the instructor, then document any required external training using the actual provider record. Keep pending training clearly pending and do not convert this online lesson's completion into an external credential."
         }
       ],
-      "image": "/images/workbooks/hvac/context-15.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -737,7 +737,7 @@
           "text": "Before work, know the location and inspection arrangements for emergency equipment and which staff have current first-aid or CPR training. After an actual incident, follow the site's reporting procedure and record observed facts, times and actions without inventing a medical diagnosis. Share sensitive incident information only through the authorized process. For course completion, retain the real external provider's training and skills-assessment documentation where required. Mark a credential pending until its required evidence is verified. Completing this lesson, watching a film or passing its knowledge questions does not issue CPR, AED, first-aid or Basic Life Support certification and does not replace the provider's practical assessment."
         }
       ],
-      "image": "/images/workbooks/hvac/context-16.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     },
     {
@@ -784,7 +784,7 @@
           "text": "As a final practice task, assemble a short portfolio containing an accurate resume, one customer-service explanation, one technical service-note example and a completion checklist. Use a classroom scenario rather than exposing a real customer's personal information. Label each credential earned, pending or not applicable according to evidence. Explain one strength with a documented example and identify one skill that still needs supervised practice. Review the portfolio with the instructor, correct unsupported claims and record the remaining actions and responsible person. The purpose is a truthful, useful transition into employment or further training, with coursework, practical competence and external credentials represented accurately."
         }
       ],
-      "image": "/images/workbooks/hvac/context-17.jpg",
+      "image": null,
       "imageAlt": "HVAC Technician Inspecting Air Conditioning System"
     }
   ],

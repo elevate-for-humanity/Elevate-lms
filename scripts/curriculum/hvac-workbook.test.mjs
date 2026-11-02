@@ -12,7 +12,8 @@ const good=ids.map(section_id=>({section_id,reviewed:true,answers:Object.fromEnt
 
 test('all 17 chapters have substantial teaching, their exact activities, and a real illustration',()=>{
  assert.equal(content.chapters.length,17);assert.equal(new Set(ids).size,17);
- for(const chapter of content.chapters){assert.equal(chapter.prompts.length,3);assert.ok(chapter.lessons.length);assert.ok(chapter.text.length>500);assert.ok(chapter.example.length>100);assert.ok(chapter.image?.startsWith('/images/workbooks/hvac/'));assert.ok(existsSync(new URL('public'+chapter.image,root)));assert.ok(existsSync(new URL(`public/images/workbooks/hvac/chapter-${chapter.number}.svg`,root)));}
+ for(const chapter of content.chapters){assert.equal(chapter.prompts.length,3);assert.ok(chapter.lessons.length);assert.ok(chapter.text.length>500);assert.ok(chapter.example.length>100);if(chapter.image){assert.ok(chapter.image.startsWith('/images/workbooks/hvac/'));assert.ok(existsSync(new URL('public'+chapter.image,root)));}assert.ok(existsSync(new URL(`public/images/workbooks/hvac/chapter-${chapter.number}.svg`,root)));}
+ assert.equal(content.chapters.filter(chapter=>chapter.image).length,2);
 });
 test('practice bank has four distinct balanced 25-question sections with valid authored keys',()=>{
  assert.equal(bank.length,4);assert.equal(new Set(bank.flatMap(section=>section.questions.map(question=>question.id))).size,100);

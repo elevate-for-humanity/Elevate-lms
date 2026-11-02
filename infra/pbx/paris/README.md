@@ -1,6 +1,6 @@
 # PARIS phone receptionist and ARI media gateway
 
-## Current deployment (November 1, 2026)
+## Current deployment (November 2, 2026)
 
 The Google PBX is connected to the verified Twilio business number
 **+1 463-240-1404** through the dedicated
@@ -22,6 +22,106 @@ Timed speech on the same channel must confirm the reply; the caller-side test
 announcement cannot pass either check. It does not certify handset transfers,
 acoustic conversation quality, or voicemail delivery. Do not infer those
 outcomes from successful configuration checks.
+
+## Operator and voicemail acceptance (November 2, 2026)
+
+Protected run `41477857180` verified one public self-call through PARIS to an
+actually registered temporary operator WebRTC device at 16:07 UTC: call
+`CA730294d197bc4c7765556da1dd571bc7`, 52 seconds. The recording matched the
+saved greeting with a 1.00 word score and the operator-side spoken marker. The
+receiver answered, reported connected DTLS, 151,680 inbound and outbound RTP
+bytes, and 75 audible receive windows. Its credential was revoked and its
+registry row was verified revoked/unregistered/disconnected afterward. This
+establishes the operator route and two-way WebRTC media, without claiming a physical staff handset answered.
+
+The first unavailable-operator voicemail tests ended at the keypad handoff and
+created no recording or ingest receipt. Read-only checks found that the
+persistent data volume lacked the standard English core sound prompts and beep.
+Protected repair run `41460728479` added only missing files from the official
+Asterisk English ULAW 1.6.1 archive, SHA-256
+`83ec602fb1f2cb06a5194a95f855b84bae35d49d5bdb6fbd9274d5d1a5d16b0e`.
+The installer preserves custom sounds and all recordings, checks idle state and
+the actual persistent data mount, and rolls back only its newly created files on
+failure. It changes no dialplan, credential, carrier setting, or running service.
+The restoration alone did not resolve the keypad test. The later application
+registration repair and separate recording/delivery evidence are described below.
+
+`phone-live-acceptance.yml` defaults to read-only preflight. Explicit operator
+and voicemail modes make one bounded call to the verified business DID, never
+retry uncertain call creation, and refuse other operator device leases/contacts.
+Checks use the authoritative extension/profile owner and preserve the private
+recording boundary. A saved voicemail or a provider receipt must be verified
+separately from successful route configuration.
+
+The transfer path now waits for the actual caller to leave the ARI application
+before destroying private media. Asterisk 20.15.2 queues `/continue` commands;
+HTTP acceptance does not establish departure. The same release check protects
+spoken operator/extension requests, keypad zero, and failure fallback. Regression
+coverage holds a queued caller inside Stasis and proves that cleanup waits.
+Protected deployment `41466745619` applied gateway SHA-256
+`d742ef787fab22519fc997f7e96e51844350c277ef9df0c3cdbd0d33e609460e`
+and synchronized all 25 already enabled owned extension mailboxes and routes.
+Saved greeting/instruction parity and private synthesized speech checks passed.
+
+The decisive private trace reported `No application 'VoiceMail'` at
+`elevate-operator,s,4`. Mailboxes and a loaded module had therefore supplied a
+false readiness signal. `configure-owned-voicemail.py` now verifies the actual
+application registry. It tries an ordinary, non-forced module reinitialization;
+if references prevent unloading, it verifies idle calls/channels and restarts
+only the existing pinned container. Config, recordings, TLS identity, carrier
+settings and SIP credentials are preserved. Alternate IMAP/ODBC voicemail
+providers are excluded from autoload so the local WAV provider is the sole
+application provider. Alpine's package also builds the IMAP variant; failed
+duplicate initialization can unregister application names owned by another
+voicemail module.
+
+Protected recovery `41474356931` confirmed application registration changed
+from absent to present, all 25 mailboxes remained configured, and saved settings
+and speech checks passed. The read-only runtime audit separately checks the
+actual `VoiceMail` application; a module row marked `Not Running` cannot pass.
+
+Run `41469405686`, attempt 2, then verified a new real voicemail at 15:48 UTC
+through a bounded owned-number self-call. The 24-second message was transcribed,
+assigned to the verified owner in the phone inbox and callback queue, and stored
+as a 391,404-byte WAV in the private voicemail bucket. An authenticated read
+succeeded and anonymous access failed. The email provider accepted its alert
+with a delivery receipt. This used the direct owned-mailbox test path and does
+not certify the normal unavailable-operator fallback. Push acceptance was
+`review_required` with zero accepted devices on the previously deployed Admin.
+
+The push repair resolves existing VAPID signing keys at send time rather than
+capturing empty environment values during module import. Read-only verification
+confirmed the canonical encrypted public/private key pair matches the client
+key and both active owner subscriptions are structurally valid. Keys were not
+rotated. Sends honor the owner's push preference, and expired subscriptions are
+disabled only through the already authorized owner-scoped database client.
+Provider receipts establish acceptance, not that a physical device displayed
+an alert. Commit `9eda54e05ba677f40720fe7b15b84585248c5e96` passed the phone
+contract and 13 focused push/delivery tests. Protected Admin release
+`41477835676` activated revision `elevate-admin-migration-00423-lkn` at 16:36 UTC
+with 100 percent traffic; the public health endpoint returned that exact commit,
+healthy configuration and successful database/auth dependency checks.
+
+Run `41467039647`, attempt 2, then passed the normal unavailable-operator path.
+The preflight found zero registered contacts and zero operator leases. Its one
+62-second public self-call (`CA8d15ad3f9fab6f1ad75fda6ae1f3b931`) used the normal
+keypad-zero transfer without a direct-mailbox redirect. A new 23-second voicemail
+(`a1661d92-a5fa-5fc5-a2cc-73c4a64a4d33`, created 16:35:47 UTC) produced a private
+374,764-byte WAV, matching synthetic transcript, assigned inbox record and
+callback task. At 16:36:39 UTC the email provider accepted its alert and the push
+providers accepted it for both saved active devices (`accepted_device_count=2`).
+Both delivery rows contain `provider_accepted`, and the worker's final readback
+showed two preserved spool messages, two ingest receipts and no retry statuses.
+No old failed delivery claim was replayed. This establishes the normal voicemail
+fallback and server-to-provider email/push acceptance; physical notification
+display remains a device-side observation. The older test artifact's optional
+private trace setup failed before its monitor began; acceptance instead rests
+on the real call and independent durable recording/delivery evidence.
+
+The separate read-only audit `41480389668` also passed actual voicemail application
+registration, 25 configured mailboxes, saved runtime settings and private speech
+checks. Its transport/configuration checks do not replace the separate live
+operator and voicemail evidence above.
 
 ## SIP TLS trust store
 
@@ -88,7 +188,8 @@ registration, and bridge join. Caller speech is not required. Google speech
 recognition and TTS remain behind the authenticated private HTTPS helper; the
 configured conversation provider and saved receptionist instructions govern
 voice replies. Both running services must match the authoritative greeting,
-instructions, and all 22 enabled extension routes.
+instructions, and the current enabled extension directory (25 routes at the
+November 2 recovery checkpoint).
 
 Protected deployment run `41350044816` installed gateway SHA-256
 `04965211e167a7895df38bcacad67d58adb81046c248a94f4a05534e05a0dd87`.
@@ -99,7 +200,7 @@ Live acceptance passed in run `41350265030` on November 1 at 21:07 UTC:
   recording channel after the prompt: greeting PASS, conversation PASS.
 - The carrier sent and received audio, the media channel used TCP, and the
   gateway reported one completed greeting and one completed spoken turn.
-- Staff-device transfers and voicemail delivery remain NOT_TESTED.
+- At that checkpoint, staff-device transfers and voicemail delivery were NOT_TESTED.
 
 This is a successful public-number audio test, not certification of every
 phone workflow or of conversational answer quality.

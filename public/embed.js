@@ -1,7 +1,7 @@
 /**
  * Elevate for Humanity - Dynamic Page Embed Script
  *
- * This script allows embedding dynamic pages from the Vite app into Durable landing pages.
+ * This script embeds supported Elevate pages into external landing pages.
  *
  * Usage in Durable:
  * <div id="efh-embed" data-page="programs"></div>
@@ -43,9 +43,13 @@
     const width = container.getAttribute('data-width') || '100%';
 
     if (!EMBEDDABLE_PAGES.includes(page)) {
+      console.error(
         `EFH Embed: Page "${page}" is not embeddable. Available: ${EMBEDDABLE_PAGES.join(', ')}`
       );
-      container.innerHTML = `<p style="color: red;">Error: Page "${page}" not available for embedding.</p>`;
+      const errorMessage = document.createElement('p');
+      errorMessage.style.color = 'red';
+      errorMessage.textContent = `Error: Page "${page}" not available for embedding.`;
+      container.replaceChildren(errorMessage);
       return;
     }
 
@@ -66,18 +70,23 @@
     iframe.setAttribute('title', `Elevate for Humanity - ${page}`);
 
     // Add loading indicator
-    container.innerHTML =
-      '<div style="text-align: center; padding: 40px;">Loading...</div>';
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.style.textAlign = 'center';
+    loadingIndicator.style.padding = '40px';
+    loadingIndicator.textContent = 'Loading...';
 
     iframe.onload = function () {
-      container.innerHTML = '';
-      container.appendChild(iframe);
+      loadingIndicator.remove();
+      iframe.style.display = 'block';
     };
 
     iframe.onerror = function () {
       container.innerHTML =
         '<p style="color: red;">Failed to load content. Please try again later.</p>';
     };
+
+    // Mount before waiting for load: a detached iframe cannot navigate.
+    container.replaceChildren(loadingIndicator, iframe);
   }
 
   /**

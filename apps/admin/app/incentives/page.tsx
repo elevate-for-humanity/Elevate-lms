@@ -20,14 +20,15 @@ export default async function IncentivesPage() {
   await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
-  const { data: rows } = await db
+  const { data: rows, error } = await db
     .from('incentives')
     .select(
-      'id,employer_name,student_name,program_type,amount,status,hours_completed,hours_required,created_at',
+      'id,name,description,employer_name,type,amount,status,created_at',
     )
     .order('created_at', { ascending: false })
     .limit(100);
 
+  if (error) throw new Error('Incentive records could not load.');
   const incentives = rows ?? [];
   const total = incentives.length;
   const totalAmount = incentives.reduce((s, i) => s + (Number(i.amount) || 0), 0);
@@ -69,7 +70,7 @@ export default async function IncentivesPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl border overflow-hidden">
+        <div className="bg-white rounded-xl border overflow-x-auto">
           {incentives.length === 0 ? (
             <div className="text-center py-16 text-slate-400">
               <DollarSign className="w-12 h-12 mx-auto mb-3 text-slate-200" />
@@ -85,7 +86,7 @@ export default async function IncentivesPage() {
             <table className="min-w-full divide-y divide-slate-100">
               <thead className="bg-slate-50">
                 <tr>
-                  {['Employer', 'Student', 'Type', 'Amount', 'Progress', 'Status', ''].map((h) => (
+                  {['Employer', 'Incentive', 'Type', 'Amount', 'Details', 'Status', ''].map((h) => (
                     <th
                       key={h}
                       className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide"
@@ -97,34 +98,22 @@ export default async function IncentivesPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {incentives.map((inc) => {
-                  const pct =
-                    inc.hours_required > 0
-                      ? Math.min(100, Math.round((inc.hours_completed / inc.hours_required) * 100))
-                      : 0;
                   return (
                     <tr key={inc.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">
                         {inc.employer_name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{inc.student_name}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{inc.name}</td>
                       <td className="px-6 py-4">
                         <span className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800 font-medium">
-                          {inc.program_type}
+                          {inc.type}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-slate-900">
                         ${Number(inc.amount).toLocaleString()}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-xs text-slate-500 mb-1">
-                          {inc.hours_completed ?? 0} / {inc.hours_required ?? 0} hrs
-                        </div>
-                        <div className="w-24 h-1.5 bg-slate-200 rounded-full">
-                          <div
-                            className="h-full bg-blue-500 rounded-full"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
+                        {inc.description || 'No description recorded'}
                       </td>
                       <td className="px-6 py-4">
                         <span

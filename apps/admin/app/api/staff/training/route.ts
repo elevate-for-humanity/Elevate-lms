@@ -27,7 +27,7 @@ async function _GET(request: Request) {
     const { data: modules, error: modulesError } = await supabase
       .from('training_modules')
       .select('*')
-      .order('order_index', { ascending: true });
+      .order('created_at', { ascending: true });
 
     if (modulesError) {
       return NextResponse.json({ error: 'Failed to fetch modules' }, { status: 500 });

@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   description: 'Upload documents and files to the document center.',
 };
 
-export default async function UploadDocumentsPage() {
+export default async function UploadDocumentsPage({ searchParams }: {searchParams: Promise<{user_id?: string}>}) {
   await requireRole(['admin']);
-  return <DocumentUploadClient />;
+  const {user_id} = await searchParams;
+  return <DocumentUploadClient ownerId={user_id} />;
 }

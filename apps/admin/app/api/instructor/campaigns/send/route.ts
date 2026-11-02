@@ -1,3 +1,4 @@
+import { loadAssignedInstructorCourses } from '@/lib/lms/instructor-course-access';
 // Using Node.js runtime for email compatibility
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -46,11 +47,9 @@ async function _POST(request: NextRequest) {
     }
 
     // Verify instructor has access to these students through their courses
-    const { data: courses } = await supabase
-      .from('lms_courses')
-      .select('id')
-      .eq('instructor_id', user.id);
+    const { data: courses, error: courseError } = await loadAssignedInstructorCourses(supabase, user.id, 'id');
 
+    if (courseError) return NextResponse.json({error:'Assigned courses unavailable'}, {status:503});
     if (!courses || courses.length === 0) {
       return NextResponse.json({ error: 'No courses found' }, { status: 403 });
     }

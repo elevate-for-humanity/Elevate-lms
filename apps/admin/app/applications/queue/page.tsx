@@ -102,7 +102,7 @@ export default async function ReviewQueuePage({
         queue_entered_at
       )
     `)
-    .order('priority', { ascending: true })
+    .order('created_at', { ascending: true })
     .order('created_at', { ascending: false });
 
   if (filterStatus !== 'all') {

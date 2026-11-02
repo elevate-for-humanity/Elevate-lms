@@ -62,9 +62,18 @@ export async function POST(request: NextRequest) {
 
   const ext = file.name.split('.').pop() ?? 'bin';
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const path = `${category}/${Date.now()}-${safeName}`;
+  const path = `${category}/${crypto.randomUUID()}-${safeName}`;
 
   const db = await requireAdminClient();
+
+  const application_id = (formData.get('application_id') as string | null) || null;
+  const user_id = (formData.get('user_id') as string | null) || null;
+  if (user_id) {
+    if (!/^[0-9a-f-]{36}$/i.test(user_id)) return NextResponse.json({error:'Invalid document owner'}, {status:400});
+    const owner = await db.from('profiles').select('id').eq('id', user_id).maybeSingle();
+    if (owner.error) return NextResponse.json({error:'Document owner could not be checked'}, {status:503});
+    if (!owner.data) return NextResponse.json({error:'Document owner not found'}, {status:404});
+  }
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const { error: uploadError } = await db.storage
@@ -75,23 +84,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(safeError(uploadError.message), { status: 500 });
   }
 
-  const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path);
-
-  // Optional fields from form data
-  const application_id = (formData.get('application_id') as string | null) ?? null;
-  const user_id        = (formData.get('user_id')        as string | null) ?? null;
-
   // Record in documents table
   const { data: docRow, error: insertError } = await db
     .from('documents')
     .insert({
       file_name: file.name,
       file_path: path,
-      file_url: urlData.publicUrl,
+      file_url: null,
+      storage_path: path,
+      metadata: {storage_bucket: BUCKET, storage_path: path},
       mime_type: file.type,
       file_size_bytes: file.size,
-      document_type: category,
-      status: 'active',
+      document_type: user_id ? 'other' : category,
+      status: 'pending',
       uploaded_by: auth.id,
       ...(application_id ? { application_id } : {}),
       ...(user_id        ? { user_id }        : {}),
@@ -100,8 +105,9 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (insertError) {
-    // Storage upload succeeded — log but don't fail the request
-    console.error('[upload] documents insert failed:', insertError.message);
+    // Roll back this request's new object when its dashboard record cannot commit.
+    await db.storage.from(BUCKET).remove([path]);
+    return NextResponse.json({error:'The file could not be linked to its dashboard. Please retry.'}, {status:503});
   }
 
   // Trigger OCR extraction asynchronously — fire-and-forget
@@ -121,7 +127,7 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({
-    url: urlData.publicUrl,
+    url: docRow?.id ? `/documents/review/${docRow.id}` : null,
     path,
     document_id: docRow?.id ?? null,
     ocr_triggered: !!docRow?.id,

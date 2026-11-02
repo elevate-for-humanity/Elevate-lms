@@ -36,7 +36,7 @@ export default async function ModulesPage() {
   const { data: trainingModules, count: totalTrainingModules } = await supabase
     .from('training_modules')
     .select('*', { count: 'exact' })
-    .order('order_index', { ascending: true });
+    .order('created_at', { ascending: true });
 
   const { count: scormModules } = await supabase
     .from('modules')
@@ -121,7 +121,7 @@ export default async function ModulesPage() {
                 <tbody className="divide-y divide-slate-100">
                   {trainingModules?.map((mod: Record<string, any>) => (
                     <tr key={mod.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 text-sm text-black font-mono">{mod.order_index}</td>
+                      <td className="px-4 py-3 text-sm text-black font-mono">{mod.module_id || 'Not recorded'}</td>
                       <td className="px-4 py-3 text-sm font-medium text-black">{mod.title}</td>
                       <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">{mod.description}</td>
                       <td className="px-4 py-3 text-sm text-black">{mod.duration_minutes ? `${mod.duration_minutes}m` : '—'}</td>

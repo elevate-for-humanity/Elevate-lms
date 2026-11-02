@@ -189,17 +189,17 @@ async function importEnrollments(supabase: any, tenantId: string, records: Recor
   return result;
 }
 
-async function importEmployers(supabase: any, tenantId: string, records: Record<string, string>[]): Promise<ImportResult> {
+async function importEmployers(supabase: any, ownerId: string, records: Record<string, string>[]): Promise<ImportResult> {
   const result: ImportResult = { success: true, imported: 0, failed: 0, errors: [] };
   for (const record of records) {
     try {
       const companyName = record.company_name || record.name;
       if (!companyName) { result.failed++; result.errors.push('Missing company_name field'); continue; }
-      const { data: existing } = await supabase.from('employers').select('id').eq('company_name', companyName).eq('tenant_id', tenantId).maybeSingle();
+      const { data: existing } = await supabase.from('employers').select('id').eq('company_name', companyName).eq('owner_user_id', ownerId).maybeSingle();
       const employerData = {
         company_name: companyName, contact_name: record.contact_name || null,
         contact_email: record.contact_email?.toLowerCase() || null, phone: record.phone || null,
-        address: record.address || null, tenant_id: tenantId, updated_at: new Date().toISOString(),
+        city: record.city || null, state: record.state || null, zip: record.zip || null, owner_user_id: ownerId, updated_at: new Date().toISOString(),
       };
       if (existing) await supabase.from('employers').update(employerData).eq('id', existing.id);
       else await supabase.from('employers').insert({ ...employerData, id: crypto.randomUUID(), created_at: new Date().toISOString() });
@@ -244,7 +244,7 @@ async function _POST(request: NextRequest) {
       case 'students': result = await importStudents(supabase, tenantId, records); break;
       case 'courses': result = await importCourses(request, supabase, records); break;
       case 'enrollments': result = await importEnrollments(supabase, tenantId, records); break;
-      case 'employers': result = await importEmployers(supabase, tenantId, records); break;
+      case 'employers': result = await importEmployers(supabase, auth.id, records); break;
       default: return NextResponse.json({ error: `Unknown import type: ${type}` }, { status: 400 });
     }
 

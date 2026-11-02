@@ -15,13 +15,15 @@ export default async function JRIParticipantsPage() {
   await requireRole(['admin']);
   const supabase = await createClient();
 
-  const { data: participants } = await supabase
+  const { data: participants, error } = await supabase
     .from('jri_participants')
     .select(
-      'id, status, program, enrolled_at, employment_status, profiles(full_name, email, phone)',
+      'id,status,enrolled_at:created_at',
     )
-    .order('enrolled_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(100);
+
+  if (error) throw new Error('JRI participant records could not load.');
 
   const statusBadge: Record<string, string> = {
     active: 'bg-green-100 text-green-700',
@@ -55,7 +57,7 @@ export default async function JRIParticipantsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b">
               <tr>
@@ -87,7 +89,7 @@ export default async function JRIParticipantsPage() {
                         </div>
                         <div>
                           <p className="font-medium text-slate-900">
-                            {p.profiles?.full_name || 'Participant'}
+                            {p.profiles?.full_name || `Participant ${p.id}`}
                           </p>
                           <p className="text-xs text-slate-700">{p.profiles?.email || '—'}</p>
                         </div>

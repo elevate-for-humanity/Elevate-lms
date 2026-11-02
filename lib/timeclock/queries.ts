@@ -40,6 +40,7 @@ export interface LunchViolation {
   hours_worked: number;
   violation_type: 'missing_lunch' | 'excessive_lunch';
   lunch_duration_minutes?: number;
+  break_minutes?: number | null;
 }
 
 export interface WeeklyCapWarning {
@@ -123,7 +124,7 @@ export async function getLunchViolations(
   let query = supabase
     .from('progress_entries')
     .select(
-      'id, apprentice_id, partner_id, work_date, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at, hours_worked',
+      'id, apprentice_id, partner_id, work_date, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at, break_minutes, hours_worked',
     )
     .not('clock_out_at', 'is', null)
     .gte('hours_worked', 6)
@@ -148,7 +149,7 @@ export async function getLunchViolations(
 
   for (const entry of data || []) {
     // Missing lunch violation
-    if (!entry.lunch_start_at) {
+    if (!entry.lunch_start_at && !(Number(entry.break_minutes) > 0)) {
       violations.push({
         ...entry,
         violation_type: 'missing_lunch',

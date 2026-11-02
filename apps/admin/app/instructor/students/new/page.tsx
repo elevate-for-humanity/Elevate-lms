@@ -1,3 +1,4 @@
+import { loadAssignedInstructorCourses } from '@/lib/lms/instructor-course-access';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
@@ -23,12 +24,8 @@ export default async function InstructorAddStudentPage() {
 
   // Guard against null user
   if (!user) redirect('/login');
-  const { data: courses } = await supabase
-    .from('lms_courses')
-    .select('id, course_name:title')
-    .eq('instructor_id', user.id)
-    .eq('is_active', true)
-    .order('course_name');
+  const { data: courses, error: courseError } = await loadAssignedInstructorCourses(supabase, user.id, 'id, course_name:title');
+  if (courseError) throw new Error('Assigned instructor courses could not load.');
 
   return (
     <div className="container mx-auto px-4 py-8">

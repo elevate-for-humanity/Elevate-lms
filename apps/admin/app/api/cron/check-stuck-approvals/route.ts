@@ -49,17 +49,11 @@ async function _POST(request: NextRequest) {
         shop_name,
         owner_name,
         contact_email,
-        partner_id,
-        reviewed_at,
-        partners!partner_applications_partner_id_fkey (
-          id,
-          name,
-          account_status
-        )
+        reviewed_at:approved_at
       `,
       )
       .eq('approval_status', 'approved_pending_user')
-      .lt('reviewed_at', thresholdTime.toISOString());
+      .lt('approved_at', thresholdTime.toISOString());
 
     if (error) {
       logger.error('[Stuck Approvals] Query error:', error);

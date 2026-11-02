@@ -61,7 +61,7 @@ export async function verifyFunding(enrollmentId: string, note?: string) {
       resolution_type: 'resolved_admin_override',
       resolution_note: note?.trim() || 'Funding verified by admin',
     })
-    .eq('enrollment_id', enrollmentId)
+    .eq('entity_type', 'program_enrollment').eq('entity_id', enrollmentId)
     .is('resolved_at', null);
 
   await db.from('audit_logs').insert({
@@ -119,7 +119,7 @@ export async function rejectFunding(enrollmentId: string, reason: string) {
       resolution_type: 'resolved_admin_override',
       resolution_note: reason.trim(),
     })
-    .eq('enrollment_id', enrollmentId)
+    .eq('entity_type', 'program_enrollment').eq('entity_id', enrollmentId)
     .is('resolved_at', null);
 
   await db.from('audit_logs').insert({

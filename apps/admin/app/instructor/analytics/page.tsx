@@ -1,3 +1,4 @@
+import { loadAssignedInstructorCourses } from '@/lib/lms/instructor-course-access';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -24,10 +25,8 @@ export default async function InstructorAnalyticsPage() {
   // Guard against null user
   if (!user) redirect('/login');
   // Get courses assigned to this instructor
-  const { data: myCourses } = await supabase
-    .from('lms_courses')
-    .select('id')
-    .eq('instructor_id', user.id);
+  const { data: myCourses, error: courseError } = await loadAssignedInstructorCourses(supabase, user.id, 'id');
+  if (courseError) throw new Error('Assigned instructor courses could not load.');
   const courseIds = (myCourses || []).map((c: any) => c.id);
   const totalCourses = courseIds.length;
 

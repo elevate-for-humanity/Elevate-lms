@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole, handleRBACError } from '@/lib/rbac';
 import { withAuth } from '@/lib/with-auth';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
@@ -18,12 +18,12 @@ const _GET = withAuth(
     const user = context.user;
     try {
       await requireRole(['admin']);
-      const supabase = await createClient();
+      const supabase = await requireAdminClient();
 
       const { data, error }: any = await supabase
-        .from('sso_connections')
-        .select('*')
-        .order('provider');
+        .from('sso_providers')
+        .select('id,tenant_id,provider_type,provider_name,issuer_url,authorization_url,token_url,userinfo_url,jwks_uri,scopes,attribute_mapping,is_active,created_at,updated_at')
+        .order('provider_name');
 
       if (error) throw error;
 
@@ -43,7 +43,7 @@ const _POST = withAuth(
     if (rateLimited) return rateLimited;
     try {
       await requireRole(['admin']);
-      const supabase = await createClient();
+      const supabase = await requireAdminClient();
       const body = await req.json();
 
       const {
@@ -66,43 +66,37 @@ const _POST = withAuth(
         is_default,
       } = body;
 
-      if (!provider || !display_name) {
+      if (!provider || !display_name || !oauth_client_id) {
         return NextResponse.json(
-          { error: 'provider and display_name are required' },
+          { error: 'provider, display_name, and oauth_client_id are required' },
           { status: 400 },
         );
       }
 
       const { data, error }: any = await supabase
-        .from('sso_connections')
+        .from('sso_providers')
         .insert({
-          provider,
-          domain,
-          display_name,
-          saml_entity_id,
-          saml_sso_url,
-          saml_x509_cert,
-          saml_sign_requests,
-          oauth_client_id,
-          oauth_client_secret,
-          oauth_authorize_url,
-          oauth_token_url,
-          oauth_userinfo_url,
-          oauth_scopes,
-          mapping_rules,
-          default_role,
-          is_enabled,
-          is_default,
+          provider_type: provider,
+          provider_name: display_name,
+          client_id: oauth_client_id,
+          client_secret: oauth_client_secret,
+          issuer_url: saml_entity_id,
+          authorization_url: oauth_authorize_url || saml_sso_url,
+          token_url: oauth_token_url,
+          userinfo_url: oauth_userinfo_url,
+          scopes: Array.isArray(oauth_scopes) ? oauth_scopes : typeof oauth_scopes === 'string' ? oauth_scopes.split(/[ ,]+/).filter(Boolean) : ['openid','email','profile'],
+          attribute_mapping: { ...mapping_rules, domain, saml_x509_cert, saml_sign_requests, default_role, is_default },
+          is_active: is_enabled === true,
         })
-        .select('*')
+        .select('id,tenant_id,provider_type,provider_name,issuer_url,authorization_url,token_url,userinfo_url,jwks_uri,scopes,attribute_mapping,is_active,created_at,updated_at')
         .maybeSingle();
 
       if (error) throw error;
 
       await logAdminAudit({
         action: AdminAction.SSO_CONFIG_CREATED,
-        actorId: user.id,
-        entityType: 'sso_connections',
+        actorId: user.user.id,
+        entityType: 'sso_providers',
         entityId: data.id,
         metadata: { provider, domain },
         req,

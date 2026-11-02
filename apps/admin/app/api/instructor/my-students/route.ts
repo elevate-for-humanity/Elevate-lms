@@ -1,3 +1,4 @@
+import { loadAssignedInstructorCourses } from '@/lib/lms/instructor-course-access';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
@@ -33,11 +34,9 @@ async function _GET(request: NextRequest) {
     }
 
     // Get courses taught by this instructor
-    const { data: courses } = await supabase
-      .from('lms_courses')
-      .select('id, title')
-      .eq('instructor_id', user.id);
+    const { data: courses, error: courseError } = await loadAssignedInstructorCourses(supabase, user.id, 'id, title');
 
+    if (courseError) return NextResponse.json({error:'Assigned courses unavailable'}, {status:503});
     if (!courses || courses.length === 0) {
       return NextResponse.json({ students: [] });
     }

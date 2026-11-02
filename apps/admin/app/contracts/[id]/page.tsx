@@ -53,7 +53,7 @@ export default async function ContractDetailPage({
       )
     `)
     .eq('id', id)
-    .order('sort_order', { referencedTable: 'contract_template_fields', ascending: true })
+    .order('created_at', { referencedTable: 'contract_template_fields', ascending: true })
     .order('created_at', { referencedTable: 'contract_prefill_runs', ascending: false })
     .maybeSingle();
 

@@ -61,12 +61,14 @@ export default async function EditCredentialPage({
 
   if (!credential) notFound();
 
-  // Load linked training courses
-  const { data: linkedCourses } = await supabase
-    .from('lms_courses')
-    .select('id, title, course_name:title, status')
-    .eq('credential_id', credentialId)
-    .order('title');
+  const { data: courseLinks, error: courseLinkError } = await supabase
+    .from('course_credentials').select('course_id').eq('credential_id', credentialId);
+  if (courseLinkError) throw new Error('Credential course links could not load.');
+  const linkedIds = (courseLinks ?? []).map(row => row.course_id);
+  const { data: linkedCourses, error: linkedCoursesError } = linkedIds.length
+    ? await supabase.from('lms_courses').select('id,title,course_name:title,status').in('id', linkedIds).order('title')
+    : { data: [], error: null };
+  if (linkedCoursesError) throw new Error('Credential courses could not load.');
 
   // Load programs using this credential
   const { data: programLinks } = await supabase

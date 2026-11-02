@@ -19,3 +19,16 @@ describe('instructor assignment authorization', () => {
     await expect(isAssignedCourseInstructor(database(null, { message: 'offline' }) as any, 'instructor', 'course')).rejects.toThrow('Instructor assignment unavailable');
   });
 });
+
+import { loadAssignedInstructorCourses } from '@/lib/lms/instructor-course-access';
+it('lists courses through active assignments without a phantom instructor column',async()=>{
+ const reads:any[]=[];
+ const db:any={from:(table:string)=>{const q:any={select:(columns:string)=>{reads.push([table,'select',columns]);return q;},eq:(key:string,value:any)=>{reads.push([table,key,value]);return q;},in:(key:string,value:any)=>{reads.push([table,key,value]);return q;},order:()=>q,range:()=>q,then:(done:any)=>Promise.resolve(table==='instructor_assignments'?{data:[{id:'assigned',course_id:'course'}],error:null}:{data:[{id:'course',title:'Saved Course'}],error:null}).then(done)};return q;}};
+ expect((await loadAssignedInstructorCourses(db,'teacher')).data).toEqual([{id:'course',title:'Saved Course'}]);
+ expect(reads).toContainEqual(['instructor_assignments','active',true]);expect(reads).toContainEqual(['lms_courses','id',['course']]);
+ expect(reads).not.toContainEqual(['lms_courses','instructor_id','teacher']);
+});
+it('returns an assignment outage as unavailable without querying courses',async()=>{
+ const from=vi.fn(()=>{const q:any={select:()=>q,eq:()=>q,order:()=>q,range:async()=>({data:null,error:{message:'offline'}})};return q;});
+ const result=await loadAssignedInstructorCourses({from} as any,'teacher');expect(result.data).toBeNull();expect(result.error.message).toBe('offline');expect(from).toHaveBeenCalledTimes(1);
+});

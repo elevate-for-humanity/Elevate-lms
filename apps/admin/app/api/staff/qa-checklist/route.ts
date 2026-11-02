@@ -24,10 +24,8 @@ async function _GET(request: Request) {
 
     const { data: checklists, error: checklistsError } = await supabase
       .from('qa_checklists')
-      .select('*')
-      .eq('is_active', true)
-      .or(`assignee_role.eq.${profile.role},assignee_role.is.null`)
-      .order('frequency');
+      .select('*,title:name,tasks:items,frequency:category')
+      .order('category');
 
     if (checklistsError) return NextResponse.json({ error: 'Failed to fetch checklists' }, { status: 500 });
 

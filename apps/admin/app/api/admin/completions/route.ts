@@ -40,7 +40,6 @@ const _GET = withAuth(
         id,
         certificate_number,
         certificate_url,
-        verification_url,
         issued_date,
         enrollment_id,
         partner_lms_enrollments!inner (
@@ -48,6 +47,7 @@ const _GET = withAuth(
           program_id,
           provider_id,
           student_id,
+          funding_source,
           partner_lms_providers ( provider_name ),
           partner_courses ( course_name ),
           profiles ( full_name, email )
@@ -59,7 +59,7 @@ const _GET = withAuth(
 
     if (error) {
       logger.error('[GET /api/admin/completions] error', error);
-      return NextResponse.json({ completions: [], error: toErrorMessage(error) }, { status: 200 });
+      return NextResponse.json({ completions: [], error: toErrorMessage(error) }, { status: 503 });
     }
 
     const completions = (data ?? []).map((row: any) => {
@@ -67,7 +67,7 @@ const _GET = withAuth(
       const student = e.profiles ?? {};
       const provider = e.partner_lms_providers ?? {};
       const course = e.partner_courses ?? {};
-      const fundingSource = 'WIOA/WRG';
+      const fundingSource = e.funding_source ?? null;
 
       return {
         id: row.id,

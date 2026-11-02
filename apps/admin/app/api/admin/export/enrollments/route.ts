@@ -14,7 +14,7 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 const _GET = withAuth(
-  async (req: NextRequest, user) => {
+  async (req: NextRequest, { user }) => {
     try {
       const supabaseAdmin = await requireAdminClient();
       const { searchParams } = new URL(req.url);
@@ -29,7 +29,7 @@ const _GET = withAuth(
         user_id,
         program_id,
         enrollment_state,
-        funding_type,
+        funding_source,
         source,
         started_at,
         completed_at,
@@ -40,7 +40,7 @@ const _GET = withAuth(
 
       // Apply filters
       if (fundingType) {
-        query = query.eq('funding_type', fundingType);
+        query = query.eq('funding_source', fundingType);
       }
       if (status) {
         query = query.eq('enrollment_state', status);
@@ -76,8 +76,8 @@ const _GET = withAuth(
           item.programs?.title || '',
           item.programs?.slug || '',
           item.user_id,
-          item.status,
-          item.funding_type || '',
+          item.enrollment_state,
+          item.funding_source || '',
           item.source || '',
           item.started_at || '',
           item.completed_at || '',

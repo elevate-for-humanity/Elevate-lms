@@ -24,6 +24,10 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
 
   const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
+  const { data: tenantProfiles, error: tenantProfilesError } = await db.from('profiles').select('id').eq('tenant_id', id);
+  if (tenantProfilesError) throw new Error('Tenant student identities could not load.');
+  const tenantUserIds = (tenantProfiles ?? []).map(row => row.id);
+
   const [
     workflows,
     workflowRuns,
@@ -47,7 +51,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
       .eq('tenant_id', id),
     db.from('student_risk_status')
       .select('id, status', { count: 'exact' })
-      .eq('tenant_id', id)
+      .in('user_id', tenantUserIds)
       .in('status', ['at_risk', 'critical']),
   ]);
 

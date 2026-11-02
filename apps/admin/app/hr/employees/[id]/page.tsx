@@ -24,7 +24,7 @@ export default async function EmployeeDetailPage({ params }: { params: Promise<{
 
   const [timeOffResult, reviewsResult, payrollResult, historyResult] = await Promise.all([
     supabase.from('time_off_requests').select('*').eq('user_id', employee.user_id).order('created_at', { ascending: false }).limit(5),
-    supabase.from('performance_reviews').select('*').eq('employee_id', id).order('review_date', { ascending: false }).limit(3),
+    supabase.from('performance_reviews').select('*').eq('employee_id', id).order('review_period_end', { ascending: false }).limit(3),
     supabase.from('payroll_profiles').select('rate,payment_type,payout_method,payroll_provider,tax_id_uploaded').eq('user_id', employee.user_id ?? '').maybeSingle(),
     supabase.from('pay_rate_history').select('rate,payment_type,effective_date,notes,created_at').eq('employee_id', id).order('created_at', { ascending: false }).limit(10),
   ]);

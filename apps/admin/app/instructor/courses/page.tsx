@@ -1,3 +1,4 @@
+import { loadAssignedInstructorCourses } from '@/lib/lms/instructor-course-access';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -26,11 +27,7 @@ export default async function InstructorCoursesPage() {
   let error: string | null = null;
 
   try {
-    const { data, error: queryError } = await supabase
-      .from('lms_courses')
-      .select('*')
-      .eq('instructor_id', user.id)
-      .order('created_at', { ascending: false });
+    const { data, error: queryError } = await loadAssignedInstructorCourses(supabase, user.id, '*');
 
     if (queryError) {
       console.error('[instructor/courses] query failed', queryError);

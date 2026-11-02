@@ -1,3 +1,4 @@
+import { CompleteChecklistButton } from './CompleteChecklistButton';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
@@ -21,10 +22,8 @@ export default async function QAChecklistPage() {
 
   const { data: checklists, error } = await supabase
     .from('qa_checklists')
-    .select('*')
-    .eq('is_active', true)
-    .or(`assignee_role.eq.${profile.role},assignee_role.is.null`)
-    .order('frequency');
+    .select('*,title:name,tasks:items,frequency:category')
+    .order('category');
 
   const today = new Date().toISOString().split('T')[0];
   const { data: completions } = await supabase
@@ -139,9 +138,7 @@ export default async function QAChecklistPage() {
                       )}
 
                       {!checklist.completed && (
-                        <button className="w-full px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
-                          Mark as Complete
-                        </button>
+                        <CompleteChecklistButton checklistId={checklist.id} />
                       )}
                     </div>
                   ))}

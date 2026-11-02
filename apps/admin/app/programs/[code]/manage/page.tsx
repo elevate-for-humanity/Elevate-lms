@@ -31,7 +31,7 @@ export default async function ManageProgramPage({ params }: { params: Promise<{ 
   const programCode = program.code || program.slug || code;
   const [internalLinksResult, externalItemsResult, availableCoursesResult] = await Promise.all([
     supabase.from('program_courses').select('id,order_index,is_required,course:training_courses(id,title,course_name,slug,status,duration_hours,category)').eq('program_id', program.id).order('order_index'),
-    supabase.from('program_external_courses').select('*').eq('program_id', program.id).eq('is_active', true).order('order_index'),
+    supabase.from('program_external_courses').select('*').eq('program_id', program.id).eq('is_active', true).order('sort_order'),
     supabase.from('courses').select('id,title,course_name,status,category').in('status', ['published', 'draft']).order('title'),
   ]);
 

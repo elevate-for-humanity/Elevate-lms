@@ -23,8 +23,8 @@ export default async function HostShopFinanceReview() {
   await requireRole(['admin', 'super_admin']);
   const db = await requireAdminClient();
   const result = await db.from('partner_documents')
-    .select('id,partner_id,display_name,file_name,document_type,status,notes,created_at,partners(name)')
-    .in('document_type', TYPES).order('created_at', {ascending:false}).limit(200);
+    .select('id,partner_id,display_name,file_name,document_type,status,notes,uploaded_at,partners(name)')
+    .in('document_type', TYPES).order('uploaded_at', {ascending:false}).limit(200);
   if (result.error) throw new Error('Host Shop finance requests could not load.');
   return <main className="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
     <div className="flex flex-wrap gap-4"><Link href="/partners" className="min-h-11 font-bold underline">Host Shops</Link><Link href="/program-holder-invoices" className="min-h-11 font-bold underline">Program Holder invoices</Link></div>

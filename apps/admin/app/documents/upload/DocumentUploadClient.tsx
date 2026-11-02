@@ -46,7 +46,7 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function DocumentUploadClient() {
+export function DocumentUploadClient({ ownerId }: {ownerId?: string}) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -93,22 +93,13 @@ export function DocumentUploadClient() {
       const formData = new FormData();
       formData.append('file', item.file);
       formData.append('category', 'admin-documents');
-
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.id === item.id && f.progress < 80 ? { ...f, progress: f.progress + 15 } : f,
-          ),
-        );
-      }, 300);
+      if (ownerId) formData.append('user_id', ownerId);
 
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
-      clearInterval(progressInterval);
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -119,7 +110,7 @@ export function DocumentUploadClient() {
       setFiles((prev) =>
         prev.map((f) =>
           f.id === item.id
-            ? { ...f, status: 'done', progress: 100, url: data.url || data.path }
+            ? { ...f, status: 'done', progress: 100, url: data.document_id ? `/documents/review/${data.document_id}` : undefined }
             : f,
         ),
       );

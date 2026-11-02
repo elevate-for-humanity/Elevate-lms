@@ -13,12 +13,11 @@ beforeEach(() => {
 const query = (result: unknown) => ({ eq: vi.fn(() => ({ order: vi.fn().mockResolvedValue(result) })) });
 describe('CRM template schema compatibility', () => {
   it('loads active templates from the baseline schema and preserves content', async () => {
-    select.mockReturnValueOnce(query({ data: null, error: { code: '42703' } }))
-      .mockReturnValueOnce(query({ data: [{ id: 'template', name: 'Welcome', content: '<p>Hello</p>', status: 'active' }], error: null }));
+    select.mockReturnValueOnce(query({ data: [{ id: 'template', name: 'Welcome', content: '<p>Hello</p>', status: 'active' }], error: null }));
     const r = await GET(new Request('https://admin.elevateforhumanity.org/api/crm/templates'));
     expect(r.status).toBe(200);
-    expect((await r.json()).templates[0]).toMatchObject({ html_content: '<p>Hello</p>', category: 'general', subject: 'Welcome' });
-    expect(select).toHaveBeenCalledTimes(2);
+    expect((await r.json()).templates[0]).toMatchObject({ html_content: '<p>Hello</p>', category: null, subject: 'Welcome' });
+    expect(select).toHaveBeenCalledOnce();
   });
   it('does not retry a permission error as a schema fallback', async () => {
     select.mockReturnValue(query({ data: null, error: { code: '42501' } }));

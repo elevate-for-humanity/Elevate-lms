@@ -43,7 +43,7 @@ export default async function RecordAttendancePage() {
   const { data: todayAttendance } = await supabase
     .from('attendance')
     .select('student_id, status, check_in_time')
-    .eq('date', today);
+    .gte('check_in_time', `${today}T00:00:00Z`).lt('check_in_time', `${today}T23:59:59.999Z`);
 
   // Create a map of student attendance
   const attendanceMap = new Map(

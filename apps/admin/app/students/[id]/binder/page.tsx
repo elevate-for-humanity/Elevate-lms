@@ -24,7 +24,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
 
   // Fetch student info
   const { data: student } = await db
-    .from('students')
+    .from('profiles')
     .select('*')
     .eq('id', id)
     .single();
@@ -34,55 +34,64 @@ export default async function StudentBinderPage({ params }: PageProps) {
   }
 
   // Fetch all documents for this student
-  const { data: documents } = await db
-    .from('student_binder_documents')
+  const { data: documents, error: documentsError } = await db
+    .from('documents')
     .select('*')
-    .eq('student_id', id)
+    .eq('user_id', id)
     .order('created_at', { ascending: false });
 
   // Fetch enrollment info
-  const { data: enrollment } = await db
-    .from('enrollments')
+  const { data: enrollment, error: enrollmentError } = await db
+    .from('program_enrollments')
     .select('*')
-    .eq('student_id', id)
-    .single();
+    .eq('user_id', id)
+    .order('created_at', { ascending: false }).limit(1).maybeSingle();
 
   // Fetch certificates
-  const { data: certificates } = await db
+  const { data: certificates, error: certificatesError } = await db
     .from('certificates')
     .select('*')
     .eq('student_id', id)
     .order('issued_at', { ascending: false });
 
   // Fetch attendance
-  const { data: attendance } = await db
+  const { data: attendance, error: attendanceError } = await db
     .from('attendance')
     .select('*')
     .eq('student_id', id)
-    .order('date', { ascending: false })
+    .order('check_in_time', { ascending: false })
     .limit(30);
+
+  if (documentsError || enrollmentError || certificatesError || attendanceError) throw new Error('Student binder data could not load.');
 
   // Group documents by category
   const documentsByCategory = documents?.reduce((acc: any, doc: any) => {
-    const category = doc.category || 'Other';
+    const category = doc.document_type?.replaceAll('_', ' ') || 'Uncategorized';
     if (!acc[category]) acc[category] = [];
     acc[category].push(doc);
     return acc;
   }, {}) || {};
 
-  const requiredDocs = ['Enrollment Agreement', 'ID', 'High School Diploma', 'Background Check', 'Funding Application'];
-  const uploadedDocNames = documents?.map((d: any) => d.name) || [];
-  const missingDocs = requiredDocs.filter(d => !uploadedDocNames.includes(d));
+  const requirementQuery = enrollment?.program_slug
+    ? await db.from('apprentice_document_types').select('document_type,name,is_required')
+        .eq('program_slug', enrollment.program_slug).eq('is_required', true)
+    : { data: null, error: null };
+  if (requirementQuery.error) throw new Error('Document requirements could not load.');
+  const requirements = requirementQuery.data ?? [];
+  const requirementsAvailable = requirements.length > 0;
+  const missingDocs = requirements.filter(requirement => !(documents ?? []).some(doc =>
+    doc.document_type === requirement.document_type && ['approved','verified','accepted'].includes(doc.verification_status || doc.status)
+  )).map(requirement => requirement.name || requirement.document_type);
 
   return (
-    <div className="p-6">
+    <div className="min-w-0 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
             <Link href="/students" className="hover:text-blue-600">Students</Link>
             <span>/</span>
-            <span>{student.name || `${student.first_name} ${student.last_name}`}</span>
+            <span>{student.full_name || student.email}</span>
             <span>/</span>
             <span className="text-gray-900 font-medium">Digital Binder</span>
           </div>
@@ -94,15 +103,9 @@ export default async function StudentBinderPage({ params }: PageProps) {
             {student.email} • {student.phone || 'No phone'} • Enrolled: {enrollment?.created_at ? new Date(enrollment.created_at).toLocaleDateString() : 'N/A'}
           </p>
         </div>
-        <div className="flex gap-3">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            Upload Document
-          </button>
-          <button className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export Binder
-          </button>
+        <div className="flex flex-wrap gap-3">
+          <Link href={`/documents/upload?user_id=${id}`} className="min-h-11 rounded-lg bg-blue-600 px-4 py-2 text-white">Upload Document</Link>
+          <Link href={`/students/${id}`} className="min-h-11 rounded-lg border px-4 py-2">Student record</Link>
         </div>
       </div>
 
@@ -160,7 +163,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
               <CheckCircle className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{missingDocs.length}</p>
+              <p className="text-2xl font-bold">{requirementsAvailable ? missingDocs.length : 'Unavailable'}</p>
               <p className="text-sm text-gray-600">Missing Docs</p>
             </div>
           </div>
@@ -182,7 +185,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
                     <div className="flex items-center gap-3">
                       <FileText className="w-5 h-5 text-gray-400" />
                       <div>
-                        <p className="font-medium">{doc.name}</p>
+                        <p className="font-medium">{doc.file_name}</p>
                         <p className="text-sm text-gray-500">
                           {doc.file_size ? `${(doc.file_size / 1024).toFixed(1)} KB` : ''}
                           {' • '}
@@ -191,12 +194,12 @@ export default async function StudentBinderPage({ params }: PageProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {doc.status === 'verified' && (
+                      {['verified','approved','accepted'].includes(doc.status) && (
                         <span className="text-green-600 flex items-center gap-1">
                           <CheckCircle className="w-4 h-4" /> Verified
                         </span>
                       )}
-                      <button className="text-blue-600 hover:underline text-sm">View</button>
+                      <Link href={`/documents/review/${doc.id}`} className="text-blue-600 hover:underline text-sm">Review file</Link>
                     </div>
                   </div>
                 ))}
@@ -291,7 +294,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
               {attendance?.length ? (
                 attendance.slice(0, 5).map((a: any) => (
                   <div key={a.id} className="p-3 flex items-center justify-between">
-                    <span className="text-sm">{new Date(a.date).toLocaleDateString()}</span>
+                    <span className="text-sm">{new Date(a.check_in_time).toLocaleDateString()}</span>
                     <span className={`text-xs px-2 py-1 rounded ${
                       a.status === 'present' ? 'bg-green-100 text-green-700' :
                       a.status === 'absent' ? 'bg-red-100 text-red-700' :

@@ -76,7 +76,8 @@ async function writeComplianceAlert(
     created_at: new Date().toISOString(),
   });
 
-  if (error) logger.error('[Timeclock] compliance alert insert failed', error);
+  // Concurrent duplicate alerts are coalesced by the partial unique index.
+  if (error && error.code !== '23505') logger.error('[Timeclock] compliance alert insert failed', error);
 }
 
 async function emitGeofenceEvidence(params: {
@@ -753,7 +754,7 @@ async function _POST(request: NextRequest) {
     }
 
     const shiftHours = (new Date(serverNow).getTime() - new Date(entry.clock_in_at).getTime()) / 3600000;
-    if (shiftHours >= 6 && !entry.lunch_start_at) {
+    if (shiftHours >= 6 && !entry.lunch_start_at && !(Number(entry.break_minutes) > 0)) {
       await writeComplianceAlert(db, 'missing_lunch', {
         apprentice_id: apprentice.id,
         progress_entry_id: entry.id,

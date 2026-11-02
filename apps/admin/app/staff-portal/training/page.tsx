@@ -34,7 +34,7 @@ export default async function StaffTrainingPage() {
   const { data: modules, error: modulesError } = await supabase
     .from('training_modules')
     .select('*')
-    .order('order_index', { ascending: true });
+    .order('created_at', { ascending: true });
 
   // Get user's progress
   const { data: progress, error: progressError } = await supabase

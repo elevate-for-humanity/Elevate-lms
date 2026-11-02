@@ -19,7 +19,7 @@ export default async function RapidsPage() {
     { data: recentSubmissions },
     { data: actionQueue },
   ] = await Promise.all([
-    db.from('rapids_progress_updates').select('*', { count: 'exact', head: true }).is('submitted_at', null),
+    db.from('rapids_progress_updates').select('*', { count: 'exact', head: true }).not('submitted_to_rapids', 'is', true),
     db.from('rapids_registrations').select('*', { count: 'exact', head: true }).eq('status', 'completed').is('submitted_at', null),
     db.from('rapids_submissions').select('id, submission_type, submission_date, record_count, status, submitted_by').order('submission_date', { ascending: false }).limit(10),
     db.from('rapids_action_queue').select('id,entity_type,entity_id,action_type,status,payload,created_at').in('status', ['pending','blocked']).order('created_at', { ascending: true }).limit(100),

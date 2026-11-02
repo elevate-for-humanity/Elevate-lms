@@ -19,28 +19,13 @@ async function _GET(request: Request) {
 
     const supabase = await createClient();
 
-    let { data: templates, error } = await supabase
-      .from('campaign_templates')
-      .select('*')
-      .eq('is_active', true)
-      .order('category', { ascending: true });
-
-    // Replayed baseline schema stores lifecycle in status and template HTML in
-    // content. Retry only a missing-column error, never permissions/outages.
-    if (error && ['42703', 'PGRST204'].includes(error.code)) {
-      const baseline = await supabase.from('campaign_templates')
-        .select('id,name,description,content,status,created_at,updated_at')
-        .eq('status', 'active')
-        .order('name', { ascending: true });
-      templates = baseline.data?.map((template) => ({
-        ...template,
-        subject: template.name,
-        html_content: template.content,
-        category: 'general',
-        is_active: true,
-      })) ?? null;
-      error = baseline.error;
-    }
+    const { data: rows, error } = await supabase.from('campaign_templates')
+      .select('id,name,description,content,status,created_at,updated_at')
+      .eq('status', 'active').order('name', { ascending: true });
+    const templates = rows?.map(template => ({
+      ...template, subject: template.name, html_content: template.content,
+      category: null, is_active: template.status === 'active',
+    }));
     if (error) {
       return NextResponse.json({ error: 'Template data unavailable' }, { status: 503 });
     }

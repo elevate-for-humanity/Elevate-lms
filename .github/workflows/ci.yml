@@ -80,7 +80,7 @@ jobs:
       - name: Automatic container build-memory policy
         run: |
           node scripts/check-build-memory-policy.mjs
-          node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
+          node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs scripts/gcp/studio-build-boundary.test.mjs
       - name: Final production reliability contract regressions
         run: |
           node --test scripts/gcp/final-production-acceptance-workflow.test.mjs

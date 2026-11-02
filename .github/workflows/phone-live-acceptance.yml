@@ -25,7 +25,7 @@ jobs:
           HEAD_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-          if [ "$HEAD_MESSAGE" = 'Run one authorized owned operator audio acceptance call' ]; then mode=operator; fi
+          if [ "$HEAD_MESSAGE" = 'Run one authorized owned voicemail delivery acceptance call' ]; then mode=voicemail; fi
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
@@ -61,3 +61,6 @@ jobs:
       - name: Verify only the approved owner and exercise the selected phone path
         env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}'}
         run: node scripts/gcp/phone-live-acceptance.mjs
+      - name: Read voicemail worker receipts and retries after the acceptance run
+        if: always()
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py

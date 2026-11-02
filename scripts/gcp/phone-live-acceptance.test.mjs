@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {verifyOwner,verifyCredential,operatorAudioPassed} from './phone-live-acceptance.mjs';
+import {verifyOwner,verifyCredential,operatorAudioPassed,verifyVoicemailEvidence} from './phone-live-acceptance.mjs';
 const profileId='964dc85a-bce8-4e67-92eb-198ffafb2384',extensionId='ea5439e0-014b-4020-8e25-e305f20c53d6';
 const system={id:'341f59a3-b1d6-4360-8463-0ce0402f86fe',status:'active',admin_extension:'0',voicemail_enabled:true};
 const extension={id:extensionId,profile_id:profileId,extension:'0',enabled:true,webrtc_provider:'asterisk'};
@@ -32,4 +32,13 @@ test('the guarded acceptance dispatcher must parse as shell before it can start 
  const block=workflow.match(/        run: \|\n([\s\S]*?)\n  acceptance:/)?.[1];
  assert.ok(block);const source=block.split('\n').map(line=>line.replace(/^          /,'')).join('\n');
  const checked=spawnSync('/bin/bash',['-n'],{input:source,encoding:'utf8'});assert.equal(checked.status,0,checked.stderr);
+});
+
+test('voicemail acceptance requires a real assigned call, callback, private recording and the synthetic message',()=>{
+ const id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+ const voicemail={id,assigned_profile_id:profileId,extension_id:extensionId,phone_system_id:system.id,phone_number:'+14632401404',recording_url:'supabase://phone-voicemails/'+id+'.wav',transcription:'This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.'};
+ const call={id,phone_system_id:system.id,assigned_profile_id:profileId,assigned_extension_id:extensionId};const task={id,assigned_profile_id:profileId,extension_id:extensionId,source:'voicemail'};
+ assert.equal(verifyVoicemailEvidence(voicemail,call,task),true);
+ for(const change of [{transcription:null},{assigned_profile_id:extensionId},{phone_number:'+15555555555'},{recording_url:'https://public.example/audio.wav'}])assert.equal(verifyVoicemailEvidence({...voicemail,...change},call,task),false);
+ assert.equal(verifyVoicemailEvidence(voicemail,{},task),false);assert.equal(verifyVoicemailEvidence(voicemail,call,{}),false);
 });

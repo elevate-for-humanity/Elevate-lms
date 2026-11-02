@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash,createHmac,randomUUID} from 'node:crypto';
 import {join,resolve,sep} from 'node:path';
 import {tmpdir} from 'node:os';
-import {pathToFileURL,fileURLToPath} from 'node:url';
+import {pathToFileURL} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {loadGoogleConfig} from './runtime-config.mjs';
 import {verifiedTwilioBindings} from './bind-twilio-runtime.mjs';
@@ -29,6 +29,47 @@ function remoteProgram(name){
 }
 export function operatorAudioPassed(call,device){
  return call.liveGreetingAcceptance==='PASS'&&call.operatorTransferAcceptance==='PASS'&&device.received===true&&device.answered===true&&device.dtlsConnected===true&&device.inboundBytes>1000&&device.outboundBytes>1000&&device.remoteAudibleWindows>=5&&!device.failed;
+}
+export function verifyVoicemailEvidence(voicemail,call,task){
+ const words=String(voicemail?.transcription||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/);
+ const marker=['authorized','elevate','phone','system','test','callback','needed','voicemail','routing','complete'].filter(w=>words.includes(w)).length;
+ return Boolean(voicemail?.id&&voicemail.assigned_profile_id===PROFILE&&voicemail.extension_id===EXTENSION&&voicemail.phone_system_id===SYSTEM&&voicemail.phone_number==='+14632401404'&&marker>=8&&voicemail.recording_url==='supabase://phone-voicemails/'+voicemail.id+'.wav'&&call?.id===voicemail.id&&call.assigned_profile_id===PROFILE&&call.assigned_extension_id===EXTENSION&&call.phone_system_id===SYSTEM&&task?.id===voicemail.id&&task.assigned_profile_id===PROFILE&&task.extension_id===EXTENSION&&task.source==='voicemail');
+}
+async function voicemailAcceptance(config,system,db){
+ const started=new Date(Date.now()-5000).toISOString();
+ const call=await exerciseSelfCall(await verifiedTwilioBindings(config),{expectedGreeting:system.greeting,transcribe:async()=>{throw Error('PHONE_ACCEPTANCE_UNEXPECTED_PROVIDER_RECORDING');},voicemailTest:true,report});
+ report({voicemailTestCall:call});
+ const query='voicemails?phone_system_id=eq.'+SYSTEM+'&assigned_profile_id=eq.'+PROFILE+'&extension_id=eq.'+EXTENSION+'&phone_number=eq.%2B14632401404&created_at=gte.'+encodeURIComponent(started)+'&select=id,phone_system_id,extension_id,assigned_profile_id,phone_number,recording_url,transcription,duration_seconds&order=created_at.desc&limit=2';
+ let voicemail,matched=false,deliveries=[];
+ for(let n=0;n<75;n++){
+  const rows=await db(query);
+  if(rows.length>1)throw Error('PHONE_ACCEPTANCE_DUPLICATE_TEST_VOICEMAIL');
+  if(rows.length===1){
+   voicemail=rows[0];
+   const calls=await db('phone_calls?id=eq.'+voicemail.id+'&phone_system_id=eq.'+SYSTEM+'&select=id,phone_system_id,assigned_profile_id,assigned_extension_id');
+   const tasks=await db('phone_callback_tasks?id=eq.'+voicemail.id+'&assigned_profile_id=eq.'+PROFILE+'&select=id,assigned_profile_id,extension_id,source');
+   matched=verifyVoicemailEvidence(voicemail,calls[0],tasks[0]);
+   deliveries=await db('phone_notification_deliveries?task_id=eq.'+voicemail.id+'&recipient_profile_id=eq.'+PROFILE+'&message_kind=eq.voicemail&select=channel,status,provider_message_id,accepted_device_count');
+   const email=deliveries.find(d=>d.channel==='email');const push=deliveries.find(d=>d.channel==='push');
+   if(matched&&email?.status==='accepted'&&email.provider_message_id&&push?.status&&push.status!=='processing')break;
+  }
+  await wait(2000);
+ }
+ if(!voicemail||!matched)throw Error('PHONE_ACCEPTANCE_VOICEMAIL_PERSISTENCE_FAILED');
+ const headers={apikey:config.runtimeEnvironment.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+config.runtimeEnvironment.SUPABASE_SERVICE_ROLE_KEY};
+ const bucket=await fetch(DB+'/storage/v1/bucket/phone-voicemails',{headers,redirect:'error',signal:AbortSignal.timeout(15000)});
+ const metadata=bucket.ok?await bucket.json():null;
+ if(metadata?.public!==false)throw Error('PHONE_ACCEPTANCE_AUDIO_PRIVACY_UNVERIFIED');
+ const path='/storage/v1/object/authenticated/phone-voicemails/'+voicemail.id+'.wav';
+ const audio=await fetch(DB+path,{headers,redirect:'error',signal:AbortSignal.timeout(15000)});
+ if(!audio.ok||Number(audio.headers.get('content-length')||0)>1100000)throw Error('PHONE_ACCEPTANCE_RECORDING_UNAVAILABLE');
+ const wav=Buffer.from(await audio.arrayBuffer());
+ if(wav.length<44||wav.length>1100000||wav.subarray(0,4).toString()!=='RIFF'||wav.subarray(8,12).toString()!=='WAVE')throw Error('PHONE_ACCEPTANCE_RECORDING_INVALID');
+ const anonymous=await fetch(DB+'/storage/v1/object/public/phone-voicemails/'+voicemail.id+'.wav',{redirect:'error',signal:AbortSignal.timeout(15000)});await anonymous.body?.cancel();
+ if(anonymous.ok)throw Error('PHONE_ACCEPTANCE_AUDIO_PUBLICLY_EXPOSED');
+ const email=deliveries.find(d=>d.channel==='email'),push=deliveries.find(d=>d.channel==='push');
+ report({phoneAcceptance:'VOICEMAIL',callSid:call.callSid,voicemailId:voicemail.id,voicemailRecorded:true,recordingBytes:wav.length,recordingPrivate:true,transcriptionMatched:true,phoneInboxRecordVerified:true,callbackTaskVerified:true,emailProviderAccepted:email?.status==='accepted'&&Boolean(email.provider_message_id),pushProviderAccepted:push?.status==='accepted'&&push.accepted_device_count>0,pushAcceptedDeviceCount:push?.accepted_device_count||0,pushStatus:push?.status||'absent',voicemailDeliveryAcceptance:'PASS'});
+ if(email?.status!=='accepted'||!email.provider_message_id)throw Error('PHONE_ACCEPTANCE_EMAIL_NOT_ACCEPTED');
 }
 async function receiver(credential,wavPath){
  const modules=process.env.PHONE_TEST_MODULE_ROOT||'/tmp/elevate-phone-protocol/node_modules';
@@ -81,8 +122,9 @@ async function main(){
  const sourceHash=createHash('sha256').update(readFileSync(new URL('../../infra/pbx/paris/ari-media.mjs',import.meta.url))).digest('hex');
  if(!preflight.idle||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
  if(mode==='preflight'){report({phoneAcceptance:'PREFLIGHT_PASS',callsPlaced:0,recipientVerified:true});return;}
- if(mode!=='operator')throw Error('PHONE_ACCEPTANCE_MODE_NOT_IMPLEMENTED');
  if(preflight.operatorRegisteredContacts!==0||preflight.operatorLeasedEndpointCount!==0)throw Error('PHONE_ACCEPTANCE_OTHER_OPERATOR_DEVICES_PRESENT');
+ if(mode==='voicemail'){await voicemailAcceptance(config,systems[0],db);return;}
+ if(mode!=='operator')throw Error('PHONE_ACCEPTANCE_MODE_NOT_IMPLEMENTED');
  const token=env.PBX_PROVISIONING_TOKEN;
  if(!token||token.length<32)throw Error('PHONE_ACCEPTANCE_CONTROL_BINDING_MISSING');
  const identity={profileId:PROFILE,extensionId:EXTENSION,deviceId:'asterisk_acceptance_'+randomUUID().replaceAll('-','')};

@@ -23,7 +23,7 @@ export function PwaInstallBanner({
   message = 'Install Elevate for faster access — add it to your home screen.',
   storageKey = 'pwa-install-banner-dismissed',
 }: PwaInstallBannerProps) {
-  const { canInstall, isInstalled, promptInstall, dismiss, platform } = usePwaInstall();
+  const { canInstall, isInstalled, promptInstall, platform } = usePwaInstall();
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [pageSettled, setPageSettled] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -62,7 +62,7 @@ export function PwaInstallBanner({
   if (!canInstall && !isIos) return null;
 
   const dismissBanner = () => {
-    dismiss();
+    // Closing this optional banner must preserve the dashboard install action.
     setShowIosHelp(false);
     setBannerDismissed(true);
     try { window.localStorage.setItem(storageKey, '1'); } catch { /* Dismiss for this session when storage is unavailable. */ }
@@ -92,8 +92,7 @@ export function PwaInstallBanner({
                 setShowIosHelp(true);
                 return;
               }
-              const accepted = await promptInstall();
-              if (accepted) dismiss();
+              await promptInstall();
             }}
             className="min-h-11 px-4 py-1.5 bg-white text-brand-orange-700 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors"
           >

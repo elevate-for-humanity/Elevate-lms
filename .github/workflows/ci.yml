@@ -124,7 +124,7 @@ jobs:
       - name: Google Calendar credential and OAuth regressions
         run: pnpm exec vitest run tests/unit/google-calendar-runtime-settings.test.ts tests/unit/google-calendar-env-sync.test.ts tests/unit/google-calendar-oauth.test.ts tests/unit/google-calendar-busy.test.ts --environment node
       - name: Google runtime settings regression tests
-        run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
+        run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/pwa-install-actions.test.tsx tests/unit/pwa-install-video-visibility.test.tsx tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
       - name: Resizable Studio and Course Builder panels
         run: pnpm exec vitest run tests/unit/resizable-workspace.test.tsx tests/unit/course-browser-panels.test.tsx tests/unit/studio-conversation-workspace.test.tsx tests/unit/studio-browser-navigation.test.tsx tests/unit/studio-browser-secure-input.test.tsx tests/unit/studio-viewport.test.tsx
       - name: Daily maintenance cron HTTP contract regression

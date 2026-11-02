@@ -25,6 +25,14 @@ export function clearPwaInstallPrompt() {
   publish();
 }
 
+// Browser install events are single-use, even when the user cancels. Consume
+// synchronously so two mounted controls cannot open the same event twice.
+export function consumePwaInstallPrompt() {
+  const event = deferredPrompt;
+  clearPwaInstallPrompt();
+  return event;
+}
+
 export function subscribeToPwaInstallPrompt(listener: Listener) {
   listeners.add(listener);
   listener(deferredPrompt);

@@ -2,7 +2,7 @@
 
 /**
  * Canonical PWA install prompt hook.
- * Use one instance per app \u2014 consumes the browser's `beforeinstallprompt` event.
+ * All mounted controls share the browser's single-use install event.
  *
  * Usage:
  * const { canInstall, isInstalled, promptInstall } = usePwaInstall();
@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   clearPwaInstallPrompt,
+  consumePwaInstallPrompt,
   subscribeToPwaInstallPrompt,
   type DeferredPwaInstallPrompt,
 } from '@/lib/pwa/install-prompt';
@@ -49,7 +50,7 @@ export function usePwaInstall(): UsePwaInstallReturn {
 
     // Detect platform and browser
     const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) {
+    if (/iphone|ipad|ipod/.test(ua) || (/macintosh/.test(ua) && navigator.maxTouchPoints > 1)) {
       setPlatform('ios');
     } else if (/android/.test(ua)) {
       setPlatform('android');
@@ -92,19 +93,16 @@ export function usePwaInstall(): UsePwaInstallReturn {
   }, []);
 
   const promptInstall = useCallback(async (): Promise<boolean> => {
-    if (!promptEvent) return false;
+    const event = consumePwaInstallPrompt();
+    if (!event) return false;
     try {
-      await promptEvent.prompt();
-      const { outcome } = await promptEvent.userChoice;
-      if (outcome === 'accepted') {
-        clearPwaInstallPrompt();
-        return true;
-      }
-      return false;
+      await event.prompt();
+      const { outcome } = await event.userChoice;
+      return outcome === 'accepted';
     } catch {
       return false;
     }
-  }, [promptEvent]);
+  }, []);
 
   const dismiss = useCallback(() => {
     clearPwaInstallPrompt();

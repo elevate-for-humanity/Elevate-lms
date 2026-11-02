@@ -30,13 +30,12 @@ test('pending onboarding renders an actionable page instead of a redirect loop',
 
 test('onboarding layout permits pending approval while ordinary sections retain their gate', async()=>{
  const calls=[];
- const section=load('components/program-holder/ProgramHolderSectionLayout.tsx',{'@/lib/auth/require-program-holder':{requireProgramHolder:async options=>{calls.push(options);if(!options.allowPendingApproval)throw Error('pending-approval')}},'./ProgramHolderTaskGuide':{ProgramHolderTaskGuide:()=>null}});
+ const section=load('components/program-holder/ProgramHolderSectionLayout.tsx',{'@/lib/auth/require-program-holder':{requireProgramHolder:async (options={})=>{calls.push(options);if(!options.allowPendingApproval)throw Error('pending-approval')}},'./ProgramHolderTaskGuide':{ProgramHolderTaskGuide:()=>null}});
  const onboarding=load('apps/lms/app/program-holder/onboarding/layout.tsx',{'@/components/program-holder/ProgramHolderSectionLayout':section});
- const tree=onboarding.default({children:'pending message'});
- await tree.type(tree.props);
+ await onboarding.default({children:'pending message'});
  assert.equal(calls.at(-1).allowPendingApproval,true);
  await assert.rejects(section.ProgramHolderSectionLayout({children:'protected roster'}),/pending-approval/);
- assert.equal(calls.at(-1).allowPendingApproval,false);
+ assert.notEqual(calls.at(-1).allowPendingApproval,true);
 });
 
 test('verified hours stay in program, honor accepted hours, and count mirrored clocks once',()=>{

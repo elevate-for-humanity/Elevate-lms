@@ -57,6 +57,9 @@ it('uses real published images and unique canonical navigation destinations', ()
   for (const route of ['meetings', 'phone', 'email', 'students', 'hours'])
     expect(hrefs).toContain(`/program-holder/${route}`);
 });
+it('keeps pending approval confined to the onboarding layout export', () => {
+  expect(readFileSync('apps/lms/app/program-holder/onboarding/layout.tsx','utf8')).toContain('ProgramHolderOnboardingSectionLayout as default');
+});
 it('renders one shell in the parent and retains section approval gates', () => {
   const parent = readFileSync('apps/lms/app/program-holder/layout.tsx', 'utf8');
   expect(parent.match(/<PlatformShell\b/g)).toHaveLength(1);
@@ -67,11 +70,6 @@ it('renders one shell in the parent and retains section approval gates', () => {
   ]) {
     const source = readFileSync(file, 'utf8');
     expect(source).not.toContain('<PlatformShell');
-    if (file.endsWith('ProgramHolderSectionLayout.tsx')) {
-      expect(source).toContain('allowPendingApproval = false');
-      expect(source).toContain('await requireProgramHolder({ allowPendingApproval })');
-    } else {
-      expect(source).toContain('await requireProgramHolder()');
-    }
+    expect(source).toContain('await requireProgramHolder()');
   }
 });

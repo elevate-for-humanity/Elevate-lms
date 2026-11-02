@@ -5,6 +5,8 @@
  * Do not hardcode production domains in components or route handlers.
  */
 
+import { resolveLmsHost } from '../routing/lms-host';
+
 function clean(value: string): string {
   return value.replace(/\/$/, '');
 }
@@ -23,10 +25,9 @@ function canonicalDomain(value: string): string {
 }
 
 const SITE_URL = clean(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org');
-const APP_URL = clean(
-  process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.NEXT_PUBLIC_LMS_URL ||
-    'https://app.elevateforhumanity.org',
+const APP_URL = resolveLmsHost(
+  process.env.NEXT_PUBLIC_LMS_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
 );
 const ADMIN_URL = clean(process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org');
 const CANONICAL_DOMAIN = canonicalDomain(

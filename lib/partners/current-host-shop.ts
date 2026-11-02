@@ -58,11 +58,16 @@ export async function requireCurrentHostShopPartner(
 ) {
   const supabase = await createClient();
   const {
-    data: { user },
+    data: { user: sessionUser },
     error: authError,
   } = await supabase.auth.getUser();
-
-  if (authError || !user) throw new Error('HOST_SHOP_UNAUTHENTICATED');
+  const handoff = await resolveHostShopAdminPreview();
+  // The existing signed, short-lived Admin handoff is also the authority for
+  // document APIs when the LMS subdomain has no Supabase session. Never borrow
+  // a handoff belonging to a different authenticated account.
+  const preview = handoff && (!sessionUser || sessionUser.id === handoff.actorId) ? handoff : null;
+  const user = sessionUser || (preview ? { id: preview.actorId, email: preview.actorEmail } : null);
+  if ((!preview && authError) || !user) throw new Error('HOST_SHOP_UNAUTHENTICATED');
 
   const db = await requireAdminClient();
   const [{ data: profile }, { data: roleRows }] = await Promise.all([
@@ -81,7 +86,6 @@ export async function requireCurrentHostShopPartner(
 
   if (isPlatformAdmin) {
     const cookieStore = await cookies();
-    const preview = await resolveHostShopAdminPreview();
     const selectedPartnerId =
       preview?.actorId === user.id
         ? preview.partnerId

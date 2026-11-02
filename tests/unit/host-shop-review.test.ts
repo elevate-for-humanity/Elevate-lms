@@ -28,3 +28,7 @@ it.each(['missing','scope'])('blocks %s prerequisites before writing', async (re
  if(reason==='missing')mocks.missing=true;else mocks.boardPartnerId='different-shop';
  await expect(submitHostShopForReview()).rejects.toThrow('review=incomplete');expect(mocks.update).not.toHaveBeenCalled();
 });
+
+it('requires the current content-protection signature before submitting for review', () => {
+ expect(hostShopReadyForReview(partner,{contentAgreementSigned:false,requiredDocumentCount:1,documentStatuses:[{is_required:true,uploaded:true,status:'pending'}]})).toBe(false);
+});

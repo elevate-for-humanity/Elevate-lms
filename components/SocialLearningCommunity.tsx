@@ -56,7 +56,7 @@ type LeaderboardRow = { user_id: string; points: number };
 type Tab = 'feed' | 'groups' | 'discussions' | 'leaders';
 type ReportTarget = { type: 'post' | 'comment' | 'topic' | 'reply' | 'group' | 'member'; id: string } | null;
 
-type Props = { userId: string; userName?: string | null };
+type Props = { userId: string; userName?: string | null; readOnly?: boolean };
 
 function relativeTime(value?: string | null) {
   if (!value) return '';
@@ -83,7 +83,7 @@ function safeFileName(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-100) || 'upload';
 }
 
-export function SocialLearningCommunity({ userId, userName }: Props) {
+export function SocialLearningCommunity({ userId, userName, readOnly = false }: Props) {
   const supabase = useMemo(() => createClient(), []);
   const [activeTab, setActiveTab] = useState<Tab>('feed');
   const [search, setSearch] = useState('');
@@ -170,6 +170,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   useEffect(() => { void loadCommunity(); }, [loadCommunity]);
 
   async function createPost() {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     const content = postDraft.trim();
     if ((!content && !postFile) || busy) return;
     setBusy(true); setError('');
@@ -208,6 +209,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function deletePost(post: CommunityPost) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     if (post.user_id !== userId || busy) return;
     setBusy(true);
     const { error: deleteError } = await supabase.from('community_posts').delete().eq('id', post.id).eq('user_id', userId);
@@ -218,6 +220,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function toggleLike(postId: string) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     if (likedPostIds.has(postId)) {
       const { error: likeError } = await supabase.from('community_post_likes').delete().eq('post_id', postId).eq('user_id', userId);
       if (likeError) { setError(likeError.message); return; }
@@ -237,6 +240,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function createComment(postId: string) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     const content = (commentDrafts[postId] ?? '').trim();
     if (!content || busy) return;
     setBusy(true);
@@ -252,6 +256,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function deleteComment(comment: CommentRow) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     if (comment.user_id !== userId) return;
     const { error: deleteError } = await supabase.from('community_post_comments').delete().eq('id', comment.id).eq('user_id', userId);
     if (deleteError) setError(deleteError.message);
@@ -260,6 +265,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function createGroup() {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     if (!groupDraft.name.trim() || busy) return;
     setBusy(true); setError('');
     const { data, error: groupError } = await supabase.from('study_groups').insert({
@@ -276,6 +282,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function toggleGroup(groupId: string) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     const joined = joinedGroupIds.has(groupId);
     const result = joined
       ? await supabase.from('study_group_members').delete().eq('study_group_id', groupId).eq('user_id', userId)
@@ -286,6 +293,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function createTopic() {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     if (!topicDraft.title.trim() || !topicDraft.content.trim() || busy) return;
     setBusy(true); setError('');
     const slugBase = topicDraft.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70) || 'discussion';
@@ -310,6 +318,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function createReply(topicId: string) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     const content = (replyDrafts[topicId] ?? '').trim();
     if (!content || busy) return;
     setBusy(true);
@@ -320,6 +329,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function toggleUpvote(reply: ForumReply) {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     const active = upvotedReplyIds.has(reply.id);
     const result = active
       ? await supabase.from('forum_upvotes').delete().eq('reply_id', reply.id).eq('user_id', userId)
@@ -329,6 +339,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
   }
 
   async function submitReport() {
+    if (readOnly) { setError('This administrator preview cannot post or act for the shop. Use your own account to participate.'); return; }
     if (!reportTarget || busy) return;
     setBusy(true);
     const { error: reportError } = await supabase.from('community_reports').insert({ reporter_id: userId, target_type: reportTarget.type, target_id: reportTarget.id, reason: reportReason, details: reportDetails.trim() || null });
@@ -345,6 +356,7 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
 
   return (
     <div className="space-y-6">
+      {readOnly && <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-4">Administrator preview: posts, uploads, group changes and signatures are disabled. Shop owners and students participate from their own accounts.</p>}
       <section className="rounded-3xl bg-slate-950 p-6 text-white md:p-8">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Elevate Community</p>
         <h1 className="mt-2 text-3xl font-black">Learn together. Build your network. Move your career forward.</h1>
@@ -354,14 +366,14 @@ export function SocialLearningCommunity({ userId, userName }: Props) {
 
       {error && <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"><AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" /><span>{error}</span><button onClick={() => setError('')} className="ml-auto"><X className="h-4 w-4" /></button></div>}
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 lg:flex-row lg:items-center lg:justify-between">
+      <div id="community-tools" className="flex scroll-mt-24 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex gap-2 overflow-x-auto">{(['feed','groups','discussions','leaders'] as Tab[]).map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-black capitalize ${activeTab === tab ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-100'}`}>{tab === 'leaders' ? 'Leaderboard' : tab}</button>)}</div>
         <div className="relative min-w-0 lg:w-80"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search community" className="w-full rounded-xl border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-blue-400" /></div>
       </div>
 
       {activeTab === 'feed' && <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div id="community-post-composer" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5">
             <p className="mb-3 text-sm font-black text-slate-800">Post as {userName || members[userId]?.full_name || 'Learner'}</p>
             <textarea value={postDraft} onChange={(e) => setPostDraft(e.target.value)} maxLength={4000} rows={3} className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-brand-blue-500" placeholder="Share an update, question, milestone, resource, or opportunity…" />
             <div className="mt-3 grid gap-2 md:grid-cols-2"><input value={tagDraft} onChange={(e) => setTagDraft(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="Tags, comma separated" /><select value={mentionId} onChange={(e) => setMentionId(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">Mention a member (optional)</option>{memberList.map((m) => <option key={m.id} value={m.id}>@{m.full_name ?? 'Member'}</option>)}</select></div>

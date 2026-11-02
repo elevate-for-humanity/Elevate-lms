@@ -10,6 +10,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
 import { isCurrentHostShopPartner } from '@/lib/partners/host-shop-directory';
 import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
+import { HOST_SHOP_CONTENT_AGREEMENT_VERSION } from '@/lib/partners/host-shop-content-agreement';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -55,8 +56,14 @@ export default async function PartnersPage() {
           .in('partner_id', hostShopIds)
           .neq('active', false),
         supabase.from('partner_document_requirements').select('*'),
+        supabase
+          .from('host_shop_content_agreements')
+          .select('partner_id')
+          .in('partner_id', hostShopIds)
+          .eq('version', HOST_SHOP_CONTENT_AGREEMENT_VERSION),
       ])
     : [
+        { data: [], error: null },
         { data: [], error: null },
         { data: [], error: null },
         { data: [], error: null },
@@ -69,9 +76,13 @@ export default async function PartnersPage() {
     { data: hostUsers },
     { data: canonicalShops },
     { data: requirementRows },
+    { data: contentAgreements },
   ] = readinessResults;
 
   const hostReadiness = hostShopPartners.map((partner: any) => {
+    const contentAgreementSigned = (contentAgreements || []).some(
+      (row: any) => row.partner_id === partner.id,
+    );
     const program = resolveHostShopProgram(partner);
     const documentStatuses = resolveHostShopDocuments(
       program,
@@ -95,6 +106,7 @@ export default async function PartnersPage() {
       missing.length === 0 &&
       partner.mou_signed === true &&
       partner.onboarding_completed === true &&
+      contentAgreementSigned &&
       linkedUsers > 0 &&
       linkedShops > 0;
     return {
@@ -106,6 +118,7 @@ export default async function PartnersPage() {
       linkedShops,
       previewUserId,
       complete,
+      contentAgreementSigned,
     };
   });
 
@@ -184,8 +197,13 @@ export default async function PartnersPage() {
               <p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-300">
                 Production source of truth
               </p>
-              <Link href="/host-shop-finance" className="mb-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 font-bold text-white">Review Host Shop finance requests</Link>
-            <h1 className="mt-1 text-2xl font-black">Host Shop readiness and onboarding</h1>
+              <Link
+                href="/host-shop-finance"
+                className="mb-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 font-bold text-white"
+              >
+                Review Host Shop finance requests
+              </Link>
+              <h1 className="mt-1 text-2xl font-black">Host Shop readiness and onboarding</h1>
               <p className="mt-1 max-w-3xl text-sm text-slate-300">
                 Completion is calculated from account links, canonical shop records, accepted
                 documents, MOU, and onboarding. Database flags alone cannot mark a shop complete.
@@ -222,6 +240,7 @@ export default async function PartnersPage() {
                     linkedShops,
                     previewUserId,
                     complete,
+                    contentAgreementSigned,
                   }: any) => (
                     <tr key={partner.id} className={complete ? 'bg-white' : 'bg-red-50/40'}>
                       <td className="px-5 py-4">
@@ -282,6 +301,10 @@ export default async function PartnersPage() {
                       <td className="px-5 py-4">
                         <StatusLine ok={partner.onboarding_completed === true}>
                           {hostShopOnboardingLabel(partner, requirements.length, missing.length)}
+                          <span className="mt-1 block text-xs">
+                            Content protection:{' '}
+                            {contentAgreementSigned ? 'Signed' : 'Signature required'}
+                          </span>
                         </StatusLine>
                       </td>
                       <td className="px-5 py-4">
@@ -326,6 +349,7 @@ export default async function PartnersPage() {
                 linkedShops,
                 previewUserId,
                 complete,
+                contentAgreementSigned,
               }: any) => (
                 <article
                   key={partner.id}
@@ -367,6 +391,10 @@ export default async function PartnersPage() {
                       <br />
                       {partner.mou_signed ? 'MOU signed' : 'MOU missing'} ·{' '}
                       {hostShopOnboardingLabel(partner, requirements.length, missing.length)}
+                      <span className="mt-1 block text-xs">
+                        Content protection:{' '}
+                        {contentAgreementSigned ? 'Signed' : 'Signature required'}
+                      </span>
                     </div>
                   </div>
                   {missing.length ? (

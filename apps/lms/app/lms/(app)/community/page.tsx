@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import SocialLearningCommunity from '@/components/SocialLearningCommunity';
+import { BarberBeautyNetworkGuide } from '@/components/partners/BarberBeautyNetworkGuide';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -12,12 +13,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function CommunityPage() {
+export default async function CommunityPage({ searchParams }: { searchParams: Promise<{ network?: string }> }) {
+  const beautyNetwork = (await searchParams).network === 'barber-beauty';
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/lms/community');
+  if (!user) redirect('/login?redirect=' + encodeURIComponent(beautyNetwork ? '/lms/community?network=barber-beauty' : '/lms/community'));
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -27,6 +29,7 @@ export default async function CommunityPage() {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
+      {beautyNetwork ? <BarberBeautyNetworkGuide /> : null}
       <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-black text-slate-900">Community groups</p>

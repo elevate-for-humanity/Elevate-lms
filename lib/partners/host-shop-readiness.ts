@@ -8,6 +8,7 @@ export type HostShopReadinessItem = {
 
 type ReadinessBoard = {
   unavailableData?: string[];
+  contentAgreementSigned?: boolean;
   partner?: {
     verification_status?: string | null;
     mou_signed?: boolean | null;
@@ -22,6 +23,16 @@ type ReadinessBoard = {
 
 export function getHostShopReadinessItems(board: ReadinessBoard): HostShopReadinessItem[] {
   const items: HostShopReadinessItem[] = [];
+  if (board.contentAgreementSigned === false) {
+    items.push({
+      key: 'content-agreement',
+      title: 'Content-protection agreement needs your signature',
+      detail:
+        'The shop’s authorized signer must acknowledge copyright, confidentiality, no unauthorized screenshots, and restricted use of Elevate materials.',
+      href: '/host-shop/onboarding/content-agreement',
+      severity: 'required',
+    });
+  }
   const unavailable = board.unavailableData || [];
   if (unavailable.length) {
     items.push({

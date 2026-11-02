@@ -22,6 +22,7 @@ export function OpenPortalPreviewButton({
     setError('');
     try {
       const response = await fetch('/api/admin/impersonate', {
+        signal: AbortSignal.timeout(15_000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -49,7 +50,13 @@ export function OpenPortalPreviewButton({
       document.body.appendChild(form);
       form.submit();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not open the portal');
+      setError(
+        cause && typeof cause === 'object' && 'name' in cause && ['TimeoutError', 'AbortError'].includes(String(cause.name))
+          ? 'The secure preview request took too long. Your account is still signed in. Please retry.'
+          : cause instanceof Error
+            ? cause.message
+            : 'Could not open the portal',
+      );
       setBusy(false);
     }
   }

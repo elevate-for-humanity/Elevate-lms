@@ -288,7 +288,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
     {
       id: 'host-shop',
       items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('hostshop'), icon: LayoutDashboard },
+        { id: 'dashboard', label: 'Dashboard', href: '/host-shop/dashboard', icon: LayoutDashboard },
         {
           id: 'apprentices',
           label: 'Apprentices',

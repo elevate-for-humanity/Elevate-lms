@@ -63,6 +63,44 @@ export default async function HostShopResourcesPage() {
         Host Shop resource center
       </p>
       <h1 className="mt-2 text-3xl font-black text-slate-950">Guides, handbook, and agreements</h1>
+      <section
+        className="mt-5 rounded-2xl border border-slate-200 bg-white p-5"
+        aria-label="Keep your training copies"
+      >
+        <h2 className="text-xl font-black">Download your training copies</h2>
+        <p className="mt-2 leading-6">
+          Keep the operating guide and your assigned syllabus together. Use only the occupation and
+          individual plan approved for your apprentice.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href="/docs/host-shop-packets/Host-Shop-Operating-Guide.pdf"
+            download
+            className="inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-4 py-2 font-bold text-white"
+          >
+            Download operating guide
+          </Link>
+          <Link
+            href={`/docs/host-shop-packets/${board.programType === 'barber' ? 'Barber' : board.programType === 'nail_technician' ? 'Nail-Technician' : board.programType === 'esthetician' ? 'Esthetician' : 'Cosmetology'}-Apprenticeship-Syllabus.pdf`}
+            download
+            className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 font-bold"
+          >
+            Download assigned syllabus
+          </Link>
+          <Link
+            href="/host-shop/onboarding/content-agreement"
+            className="inline-flex min-h-11 items-center rounded-xl border border-violet-300 px-4 py-2 font-bold text-violet-900"
+          >
+            Review and sign content protection
+          </Link>
+          <Link
+            href="/host-shop/dashboard/community"
+            className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 font-bold"
+          >
+            Join Barber &amp; Beauty Network
+          </Link>
+        </div>
+      </section>
       <p className="mt-3 max-w-3xl font-medium leading-7 text-slate-700">
         These resources belong to <strong>{shopName}</strong>. They use the same verified shop,
         placements, programs, and compliance record as the rest of this portal.

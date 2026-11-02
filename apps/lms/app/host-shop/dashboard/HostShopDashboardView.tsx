@@ -181,7 +181,7 @@ export default async function HostShopDashboardView() {
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black text-slate-950">{shopName}</h1>
-            <p className="mt-1 text-sm text-slate-600">Your salon training workspace</p>
+            <p className="mt-1 text-sm text-slate-600">Your Host Shop training workspace</p>
           </div>
           {isPlatformAdmin ? (
             <form action={clearAdminPartner}>

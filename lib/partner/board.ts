@@ -11,6 +11,7 @@ import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
+import { HOST_SHOP_CONTENT_AGREEMENT_VERSION } from '@/lib/partners/host-shop-content-agreement';
 import {
   getHostShopOnboardingPaths,
   resolveHostShopProgram,
@@ -453,6 +454,13 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
   const requiredDocumentCount = documentStatuses.filter((d: any) => d.is_required).length;
   const documentsComplete =
     requiredDocumentCount > 0 && acceptedDocumentCount === requiredDocumentCount;
+  const { data: contentAgreement, error: contentAgreementError } = await db
+    .from('host_shop_content_agreements')
+    .select('id')
+    .eq('partner_id', partner.id)
+    .eq('version', HOST_SHOP_CONTENT_AGREEMENT_VERSION)
+    .maybeSingle();
+  if (contentAgreementError) unavailableData.push('content-protection agreement');
 
   // Program readiness must exist before the first apprentice is placed too.
   const assignedTargets = [tradeInfo, ...apprentices.map((apprentice) => apprentice.tradeInfo)];
@@ -471,6 +479,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
 
   return {
     unavailableData,
+    contentAgreementSigned: contentAgreementError ? undefined : Boolean(contentAgreement?.id),
     partner,
     shops,
     tradeKey: programType,

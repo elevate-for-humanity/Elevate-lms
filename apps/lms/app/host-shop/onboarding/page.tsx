@@ -37,6 +37,13 @@ export default async function HostShopOnboardingPage({ searchParams }: {
 
   const steps = [
     {
+      title: 'Content-protection agreement',
+      complete: board.contentAgreementSigned === true,
+      detail: 'The authorized shop signer must acknowledge copyright, confidentiality and restricted use of Elevate training materials.',
+      href: '/host-shop/onboarding/content-agreement',
+      icon: PenLine,
+    },
+    {
       title: 'Business and supervisor profile',
       complete: Boolean(board.partner?.supervisor_name && board.partner?.supervisor_license_number && board.partner?.phone && board.partner?.compensation_model && board.partner?.workers_comp_status && board.partner?.has_general_liability && board.partner?.can_supervise_and_verify),
       detail: 'Confirm your contact information, licensed supervisor, and employment details.',

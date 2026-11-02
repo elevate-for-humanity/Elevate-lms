@@ -9,8 +9,8 @@ describe('public phone contacts', () => {
   it('labels both numbers in the footer actually used by the marketing layout', () => {
     const footer = renderToStaticMarkup(<SiteFooter />);
     expect(footer).toContain('Main Phone: (463) 240-1404');
-    expect(footer).toContain('Technical Support: (463) 240-1404');
-    expect(footer).toContain('href="tel:+14632401404"');
+    expect(footer).toContain(`Technical Support: ${siteConfig.technicalSupport.display}`);
+    expect(footer).toContain(`href="${siteConfig.technicalSupport.href}"`);
     expect(footer).toContain('href="tel:+14632401404"');
   });
   it('uses the new business number for public contact links', async () => {

@@ -118,8 +118,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
         }}
         role="host_shop"
       >
-        {children}
         {readinessItems ? <HostShopReadinessBanner items={readinessItems} /> : null}
+        {children}
       </PlatformShell>
     );
   }
@@ -167,8 +167,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
       role="host_shop"
     >
       <ProgramHolderPhoneReceiver phoneHref="/host-shop/dashboard/phone" />
-      {children}
       <HostShopReadinessBanner items={readinessItems} />
+      {children}
     </PlatformShell>
   );
 }

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { normalizeRoles } from '@/lib/rbac/role-matrix';
+import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
 
 export type CurrentHostShopPartner = {
   id: string;
@@ -52,7 +53,9 @@ const PARTNER_SELECT =
  * only through the explicit short-lived tenant selector used by the Host Shop
  * board, so admin access never mutates partner membership.
  */
-export async function requireCurrentHostShopPartner(options: { allowPendingOnboarding?: boolean } = {}) {
+export async function requireCurrentHostShopPartner(
+  options: { allowPendingOnboarding?: boolean } = {},
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -78,7 +81,11 @@ export async function requireCurrentHostShopPartner(options: { allowPendingOnboa
 
   if (isPlatformAdmin) {
     const cookieStore = await cookies();
-    const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    const preview = await resolveHostShopAdminPreview();
+    const selectedPartnerId =
+      preview?.actorId === user.id
+        ? preview.partnerId
+        : cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
     if (!selectedPartnerId) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
 
     const { data: partner, error: partnerError } = await db
@@ -139,8 +146,10 @@ export async function requireCurrentHostShopPartner(options: { allowPendingOnboa
   // Only document onboarding may admit a linked pending partner with conditional access.
   // Operational Host Shop routes still require full approval.
   const fullyApproved = partner.approval_status === 'approved';
-  const conditionalOnboarding = options.allowPendingOnboarding === true &&
-    partner.approval_status === 'pending' && partner.account_status === 'conditional_access';
+  const conditionalOnboarding =
+    options.allowPendingOnboarding === true &&
+    partner.approval_status === 'pending' &&
+    partner.account_status === 'conditional_access';
   if (!fullyApproved && !conditionalOnboarding) {
     throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
   }

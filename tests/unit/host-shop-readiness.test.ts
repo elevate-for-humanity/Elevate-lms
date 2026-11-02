@@ -34,8 +34,22 @@ describe('host shop readiness', () => {
   });
 
   it('shows orientation only after documents are complete', () => {
-    const items = getHostShopReadinessItems({ ...base, partner: { ...base.partner, onboarding_completed: false } });
+    const items = getHostShopReadinessItems({
+      ...base,
+      partner: { ...base.partner, onboarding_completed: false },
+    });
     expect(items).toHaveLength(1);
     expect(items[0].key).toBe('orientation');
   });
+});
+
+it('shows an unavailable-data warning rather than false missing-document claims', () => {
+  const items = getHostShopReadinessItems({
+    ...base,
+    unavailableData: ['uploaded documents', 'work hours'],
+    documentsComplete: false,
+    missingDocuments: [{ document_type: 'insurance', document_name: 'Insurance' }],
+  });
+  expect(items.map((item) => item.key)).toEqual(['data-unavailable']);
+  expect(items[0].detail).toContain('a zero is not confirmation');
 });

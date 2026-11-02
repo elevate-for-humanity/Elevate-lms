@@ -158,9 +158,10 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
   if (role && ['admin', 'super_admin', 'org_admin'].includes(role)) {
     const cookieStore = await cookies();
     const preview = await resolveHostShopAdminPreview();
-    const selectedPartnerId = preview?.actorId === userId
-      ? preview.partnerId
-      : cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    const selectedPartnerId =
+      preview?.actorId === userId
+        ? preview.partnerId
+        : cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
     if (!selectedPartnerId) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
 
     const { data: selectedPartner, error: selectedPartnerError } = await db
@@ -221,6 +222,7 @@ export async function getHostShopAdminPartnerOptions() {
 export const getHostShopBoard = cache(async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
   const partner = await resolvePartnerForBoard(db, userId);
+  const unavailableData: string[] = [];
 
   const [{ data: partnerShops, error: partnerShopError }, { data: staffLinks, error: staffError }] =
     await Promise.all([
@@ -264,6 +266,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         .in('shop_id', shopIds)
         .eq('status', 'active')
     : { data: [], error: null };
+  if (placementsError) unavailableData.push('apprentice placements');
   if (placementsError)
     logger.warn('[host-shop-board] Optional apprentice placements unavailable', {
       partnerId: partner.id,
@@ -307,6 +310,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         'user_id, host_shop_id, program_slug, source_type, status, approval_status, accepted_hours, hours, hours_claimed',
       )
       .in('user_id', studentIds);
+    if (hourError) unavailableData.push('work hours');
     if (hourError)
       logger.warn('[host-shop-board] Optional hour records unavailable', {
         partnerId: partner.id,
@@ -343,12 +347,13 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
   const enrollmentByStudent = new Map<string, string>();
   const competencyProgress: Record<string, { completed: number; required: number }> = {};
   if (studentIds.length) {
-    const { data: enrollmentRows } = await db
+    const { data: enrollmentRows, error: enrollmentError } = await db
       .from('program_enrollments')
       .select('id,user_id,student_id,program_slug,status,created_at')
       .or(`user_id.in.(${studentIds.join(',')}),student_id.in.(${studentIds.join(',')})`)
       .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
       .order('created_at', { ascending: false });
+    if (enrollmentError) unavailableData.push('program enrollments');
     for (const row of enrollmentRows || []) {
       const studentId = row.user_id || row.student_id;
       if (!studentId || enrollmentByStudent.has(studentId)) continue;
@@ -362,13 +367,14 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
       enrollmentByStudent.set(studentId, row.id);
     }
     const enrollmentIds = [...enrollmentByStudent.values()];
-    const { data: competencyRows } = enrollmentIds.length
+    const { data: competencyRows, error: competencyError } = enrollmentIds.length
       ? await db
           .from('apprentice_competency_records')
           .select('enrollment_id,competency_id,completed')
           .in('enrollment_id', enrollmentIds)
           .eq('completed', true)
-      : { data: [] };
+      : { data: [], error: null };
+    if (competencyError) unavailableData.push('competency records');
     const sets = new Map<string, Set<string>>();
     for (const row of competencyRows || []) {
       if (!sets.has(row.enrollment_id)) sets.set(row.enrollment_id, new Set());
@@ -389,11 +395,12 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
   const tradeInfo = resolveTradeTarget(programType);
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
-  const { data: programAccess } = await db
+  const { data: programAccess, error: programAccessError } = await db
     .from('partner_program_access')
     .select('program_id')
     .eq('partner_id', partner.id)
     .is('revoked_at', null);
+  if (programAccessError) unavailableData.push('assigned programs');
   const programIds = Array.from(
     new Set([
       programType,
@@ -408,6 +415,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     .select('*')
     .in('program_id', [...programIds, 'ALL'])
     .in('state', stateAliases);
+  if (requirementsError) unavailableData.push('document requirements');
   if (requirementsError)
     logger.warn('[host-shop-board] Using canonical document requirements fallback', {
       partnerId: partner.id,
@@ -420,6 +428,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     )
     .eq('partner_id', partner.id)
     .order('uploaded_at', { ascending: false });
+  if (uploadedDocsError) unavailableData.push('uploaded documents');
   if (uploadedDocsError)
     logger.warn('[host-shop-board] Uploaded-document status temporarily unavailable', {
       partnerId: partner.id,
@@ -446,17 +455,22 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     requiredDocumentCount > 0 && acceptedDocumentCount === requiredDocumentCount;
 
   // Program readiness must exist before the first apprentice is placed too.
-  const assignedTargets = [tradeInfo, ...apprentices.map(apprentice => apprentice.tradeInfo)];
-  const uniqueTargets = (model?: TradeTarget['progressModel']) => Array.from(new Map(
-    assignedTargets.filter(target => model ? target.progressModel === model : target.registered)
-      .map(target => [target.programSlug || 'unknown', target]),
-  ).values());
+  const assignedTargets = [tradeInfo, ...apprentices.map((apprentice) => apprentice.tradeInfo)];
+  const uniqueTargets = (model?: TradeTarget['progressModel']) =>
+    Array.from(
+      new Map(
+        assignedTargets
+          .filter((target) => (model ? target.progressModel === model : target.registered))
+          .map((target) => [target.programSlug || 'unknown', target]),
+      ).values(),
+    );
   const registeredPrograms = uniqueTargets();
   const timeBasedPrograms = uniqueTargets('time_based');
   const hybridPrograms = uniqueTargets('hybrid');
   const unconfiguredPrograms = uniqueTargets('unconfigured');
 
   return {
+    unavailableData,
     partner,
     shops,
     tradeKey: programType,

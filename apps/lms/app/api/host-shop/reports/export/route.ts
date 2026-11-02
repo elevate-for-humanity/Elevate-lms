@@ -14,6 +14,12 @@ export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get('type') || 'overview';
   if (!EXPORT_TYPES.has(type)) return NextResponse.json({ error: 'Unsupported export type' }, { status: 400 });
   const board = await getHostShopBoard(user.id);
+  if (board.unavailableData?.length) {
+    return NextResponse.json(
+      { error: 'Live Host Shop records are temporarily unavailable. Retry before exporting.' },
+      { status: 503 },
+    );
+  }
   const db = await requireAdminClient();
   const shopIds = board.shops.map((shop) => shop.id).filter(Boolean);
   const studentIds = board.apprentices.map((item) => item.student_id).filter(Boolean);

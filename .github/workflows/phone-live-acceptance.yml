@@ -1,4 +1,5 @@
 name: Verify owned operator routing and voicemail delivery
+# Strip terminal formatting before classifying the existing owned-test routing evidence.
 on:
   workflow_dispatch:
     inputs:

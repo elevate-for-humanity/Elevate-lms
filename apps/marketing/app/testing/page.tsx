@@ -1,3 +1,5 @@
+import TestingPolicies from '@/components/testing/TestingPolicies';
+import TestingBooking from '@/components/testing/TestingBooking';
 import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 export const revalidate = 300;
 
@@ -56,7 +58,11 @@ function priceLabel(provider: CertProvider): string | null {
   return min === max ? `$${min.toFixed(0)}` : `$${min.toFixed(0)}–$${max.toFixed(0)}`;
 }
 
-export default function TestingPage() {
+export default async function TestingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ provider?: string; exam?: string; exam_name?: string }>;
+}) {
   return (
     <main className="min-h-screen bg-white">
       <div className="border-b bg-white">
@@ -73,7 +79,7 @@ export default function TestingPage() {
         imageAlt="Adult learners concentrating on a written classroom exam"
       >
         <Link
-          href="/testing/book"
+          href="#booking"
           className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
         >
           <CalendarDays className="h-5 w-5" /> Choose exam & testing date
@@ -85,7 +91,7 @@ export default function TestingPage() {
           Browse exams & prices
         </Link>
         <Link
-          href="/testing/for-employers"
+          href="#booking"
           className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-200 bg-brand-blue-50 px-6 py-3 font-black text-brand-blue-900"
         >
           Employer / group testing
@@ -125,11 +131,11 @@ export default function TestingPage() {
             <div>
               <h2 className="text-3xl font-black text-slate-950">Available providers</h2>
               <p className="mt-2 text-slate-600">
-                Open a provider to review exams, delivery mode, and purchase options.
+                Review exams and full prices below, then book your appointment on this page.
               </p>
             </div>
             <Link
-              href="/testing/for-employers"
+              href="#booking"
               className="inline-flex items-center gap-2 font-bold text-brand-blue-700 hover:underline"
             >
               Employer / cohort testing <ArrowRight className="h-4 w-4" />
@@ -148,12 +154,10 @@ export default function TestingPage() {
               return (
                 <article
                   key={provider.key}
+                  id={provider.key}
                   className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
                 >
-                  <Link
-                    href={`/testing/${provider.key}`}
-                    className="relative block h-56 overflow-hidden"
-                  >
+                  <Link href={`#${provider.key}`} className="relative block h-56 overflow-hidden">
                     <Image
                       src={
                         TESTING_PROVIDER_IMAGES[provider.key]?.src ||
@@ -209,7 +213,7 @@ export default function TestingPage() {
                     </div>
 
                     <div className="mt-5 space-y-2">
-                      {provider.exams.slice(0, 4).map((exam) => {
+                      {provider.exams.map((exam) => {
                         const name = examName(exam);
                         const cents = getPublicExamAmountCents(provider, exam);
                         return (
@@ -223,7 +227,7 @@ export default function TestingPage() {
                             {cents ? (
                               <div className="flex shrink-0 flex-col gap-2 min-[420px]:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                                 <Link
-                                  href={`/testing/checkout?provider=${encodeURIComponent(provider.key)}&exam=${encodeURIComponent(name)}`}
+                                  href={`/testing?provider=${encodeURIComponent(provider.key)}&exam=${encodeURIComponent(name)}#booking`}
                                   className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700"
                                 >
                                   Book — {`$${(cents / 100).toFixed(2)}`}
@@ -245,23 +249,6 @@ export default function TestingPage() {
                         );
                       })}
                     </div>
-
-                    <div className="mt-6 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
-                      <Link
-                        href={`/testing/${provider.key}`}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50"
-                      >
-                        View all {provider.exams.length} exams <ArrowRight className="h-4 w-4" />
-                      </Link>
-                      {canCheckout ? (
-                        <Link
-                          href={`/testing/checkout?provider=${provider.key}`}
-                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-700"
-                        >
-                          Choose exam & pay <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      ) : null}
-                    </div>
                   </div>
                 </article>
               );
@@ -270,9 +257,13 @@ export default function TestingPage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-slate-50 py-12">
+      <TestingBooking searchParams={searchParams} />
+
+      <section id="policies" className="border-y border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="text-2xl font-black text-slate-950">Testing policies</h2>
+          <TestingPolicies />
+          <p className="mt-5 text-sm text-slate-700">Need an accessibility arrangement? <Link href="/testing/accommodations" className="font-bold text-brand-blue-700 underline">Submit an accommodation request</Link> before booking so testing staff can confirm approval.</p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="font-bold text-slate-900">Scheduling</p>

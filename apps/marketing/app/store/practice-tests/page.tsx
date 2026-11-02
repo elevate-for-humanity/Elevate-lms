@@ -250,7 +250,7 @@ export default async function PracticeTestsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/store/testing"
+              href="https://www.elevateforhumanity.org/testing"
               className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all"
             >
               View All Exams

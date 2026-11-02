@@ -1,5 +1,6 @@
 // PUBLIC ROUTE: server-authoritative testing checkout.
 import { NextRequest, NextResponse } from 'next/server';
+import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -25,15 +26,9 @@ function exactExamAmount(
     return name.toLowerCase() === examName.trim().toLowerCase();
   });
 
-  if (exam && typeof exam === 'object' && exam.amountCents && exam.amountCents > 0) {
-    return { amountCents: exam.amountCents, displayName: exam.name };
-  }
-
-  if (exam && provider.fees?.length === 1 && provider.fees[0].amount > 0) {
-    return {
-      amountCents: Math.round(provider.fees[0].amount * 100),
-      displayName: typeof exam === 'string' ? exam : exam.name,
-    };
+  if (exam) {
+    const amountCents = getPublicExamAmountCents(provider, exam);
+    if (amountCents) return { amountCents, displayName: typeof exam === 'string' ? exam : exam.name };
   }
 
   return null;

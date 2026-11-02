@@ -5,11 +5,15 @@ import { createRoot } from 'react-dom/client';
 import { JSDOM } from 'jsdom';
 import TestingCart, { AddExamToCartButton } from '../components/testing/TestingCart';
 import { addToCart, getCart } from '../lib/store/cart';
-import { ACTIVE_PROVIDERS } from '../lib/testing/proctoring-capabilities';
+import { ACTIVE_PROVIDERS, CERT_PROVIDERS } from '../lib/testing/proctoring-capabilities';
 import { getPublicExamAmountCents } from '../lib/testing/exam-pricing';
 
 test('approved prices agree for NHA string exams and reject unknown providers', () => {
-  const nha = ACTIVE_PROVIDERS.find((provider) => provider.key === 'nha')!;
+  const nha = CERT_PROVIDERS.nha;
+  assert.equal(
+    ACTIVE_PROVIDERS.some((provider) => provider.key === 'nha'),
+    false,
+  );
   assert.equal(getPublicExamAmountCents(nha, nha.exams[0]), 24900);
   assert.equal(getPublicExamAmountCents({ ...nha, key: 'unknown' }, nha.exams[0]), null);
   for (const provider of ACTIVE_PROVIDERS)
@@ -58,9 +62,9 @@ test('adding an exam exposes its scheduling destination and clearing leaves merc
     root.render(
       <>
         <AddExamToCartButton
-          examType="nha"
-          examName="Certified Phlebotomy Technician (CPT)"
-          amountCents={24900}
+          examType="esco"
+          examName="Universal (All Sections)"
+          amountCents={9900}
           active
         />
         <TestingCart />
@@ -70,14 +74,15 @@ test('adding an exam exposes its scheduling destination and clearing leaves merc
   const add = host.querySelector('button')!;
   await act(async () => add.click());
   assert.match(host.textContent!, /1 exam/);
-  assert.match(host.textContent!, /\$249\.00/);
+  assert.match(host.textContent!, /\$99\.00/);
   const schedule = [...host.querySelectorAll('a')].find((link) =>
     link.textContent?.includes('Choose date & checkout'),
   )!;
   const destination = new URL(schedule.href);
-  assert.equal(destination.pathname, '/testing/checkout');
-  assert.equal(destination.searchParams.get('provider'), 'nha');
-  assert.equal(destination.searchParams.get('exam'), 'Certified Phlebotomy Technician (CPT)');
+  assert.equal(destination.pathname, '/testing');
+  assert.equal(destination.searchParams.get('provider'), 'esco');
+  assert.equal(destination.searchParams.get('exam'), 'Universal (All Sections)');
+  assert.equal(destination.hash, '#booking');
   assert.equal(dom.window.document.activeElement?.id, 'testing-cart');
   await act(async () => add.click());
   assert.equal(getCart().items.find((item) => item.product.id.startsWith('testing-'))?.quantity, 1);

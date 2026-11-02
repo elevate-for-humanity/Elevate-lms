@@ -109,7 +109,7 @@ export default function BookTestingPage() {
             <CreditCard className="mx-auto h-12 w-12 text-brand-red-600" />
             <h1 className="mt-5 text-center text-3xl font-extrabold text-slate-950">Book your testing day</h1>
             <p className="mt-4 text-center leading-relaxed text-slate-600">Choose your exact exam and an available testing date, then complete secure checkout. We will email your reserved appointment and Google Calendar reminder link after payment is confirmed.</p>
-            <Link href="/testing/checkout" className="mt-6 flex items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3.5 font-bold text-white">Choose Exam & Testing Date</Link>
+            <Link href="/testing#booking" className="mt-6 flex items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3.5 font-bold text-white">Choose Exam & Testing Date</Link>
           </>
         )}
         <p className="mt-7 text-center text-sm text-slate-600">Questions? <a href={`tel:${TESTING_CENTER.phoneTel}`} className="font-semibold text-brand-blue-700">{TESTING_CENTER.phone}</a></p>

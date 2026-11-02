@@ -121,41 +121,9 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
       'Federal refrigerant handling certification required by the EPA Clean Air Act. Elevate has documented ESCO proctor approval. Mainstream Engineering approval is still being verified. Required for HVAC technicians whose work involves regulated refrigerants.',
     exams: [
       {
-        name: 'Core',
-        description:
-          'Covers EPA regulations, refrigerant safety, environmental impact of ozone-depleting substances, and proper handling procedures. Required as part of every certification type. Must pass Core to earn any Section 608 certificate.',
-        durationMinutes: 20,
-        questionCount: 25,
-        amountCents: EPA608_PRICING.singleSection.price * 100,
-      },
-      {
-        name: 'Type I — Small Appliances',
-        description:
-          'Covers equipment containing 5 lbs or less of refrigerant — window AC units, refrigerators, freezers, and dehumidifiers. Focuses on safe recovery techniques for sealed systems.',
-        durationMinutes: 20,
-        questionCount: 25,
-        amountCents: EPA608_PRICING.singleSection.price * 100,
-      },
-      {
-        name: 'Type II — High-Pressure',
-        description:
-          'Covers high-pressure systems using refrigerants like R-22 and R-410A — residential and commercial AC, heat pumps, and refrigeration equipment. The most common certification for residential HVAC technicians.',
-        durationMinutes: 20,
-        questionCount: 25,
-        amountCents: EPA608_PRICING.singleSection.price * 100,
-      },
-      {
-        name: 'Type III — Low-Pressure',
-        description:
-          'Covers low-pressure systems using refrigerants like R-11 and R-123 — large commercial chillers found in office buildings, hospitals, and industrial facilities.',
-        durationMinutes: 20,
-        questionCount: 25,
-        amountCents: EPA608_PRICING.singleSection.price * 100,
-      },
-      {
         name: 'Universal (All Sections)',
         description:
-          'Passes all four sections — Core, Type I, Type II, and Type III — in a single sitting. Required for technicians who work across residential, commercial, and industrial systems. Most employers require Universal certification.',
+          'One complete exam appointment covering Core, Type I, Type II, and Type III. The full price includes all four sections and proctoring.',
         durationMinutes: 80,
         questionCount: 100,
         amountCents: EPA608_PRICING.universal.price * 100,

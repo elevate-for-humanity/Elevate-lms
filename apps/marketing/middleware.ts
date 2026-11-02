@@ -160,6 +160,11 @@ export async function middleware(req: NextRequest) {
   }
   if (isStaticRequest(pathname) && !isProtectedPortal(pathname) && !getPortalKeyFromPath(pathname) && !pathname.startsWith('/admin/') && !pathname.startsWith('/cosmetology-host-shop/')) return NextResponse.next();
 
+  // Consolidate testing entry points before store-only routing can return a 404.
+  if (['/store/testing', '/testing-center', '/testing/testing-center', '/testing/epa-608', '/testing/epa608'].includes(pathname)) {
+    return NextResponse.redirect(new URL('/testing', 'https://www.elevateforhumanity.org'), 308);
+  }
+
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
   if (storeRuntimeResponse) return storeRuntimeResponse;
 

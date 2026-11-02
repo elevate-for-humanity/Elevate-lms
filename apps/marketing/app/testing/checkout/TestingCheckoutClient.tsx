@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import { testingAppointmentLabel } from '@/lib/testing/booking-calendar';
 import { CalendarDays, Check, CreditCard, Loader2, Sparkles, Tag } from 'lucide-react';
 
@@ -57,6 +58,7 @@ export default function TestingCheckoutClient({
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentReady, setPaymentReady] = useState<boolean | null>(null);
   const [slots, setSlots] = useState<TestingSlot[]>([]);
   const [slotId, setSlotId] = useState('');
   const [slotsLoading, setSlotsLoading] = useState(false);
@@ -72,6 +74,31 @@ export default function TestingCheckoutClient({
     () => provider?.exams.find((entry) => entry.name === examName) ?? null,
     [provider, examName],
   );
+
+  useEffect(() => {
+    const next = providers.find((entry) => entry.key === initialProvider);
+    if (!next) return;
+    setProviderKey(next.key);
+    setExamName(
+      next.exams.find((entry) => entry.name.toLowerCase() === initialExam.toLowerCase())?.name ??
+        next.exams[0]?.name ??
+        '',
+    );
+    setAddOn(false);
+  }, [initialProvider, initialExam, providers]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/health/quickbooks', { cache: 'no-store', signal: controller.signal })
+      .then(async (response) => {
+        const status = await response.json();
+        if (!controller.signal.aborted) setPaymentReady(response.ok && status.ready === true);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setPaymentReady(false);
+      });
+    return () => controller.abort();
+  }, []);
 
   function changeProvider(key: string) {
     const next = providers.find((p) => p.key === key) ?? null;
@@ -104,19 +131,22 @@ export default function TestingCheckoutClient({
           fetchError instanceof Error ? fetchError.message : 'Appointments are unavailable.',
         );
       })
-      .finally(() => setSlotsLoading(false));
+      .finally(() => {
+        if (!controller.signal.aborted) setSlotsLoading(false);
+      });
     return () => controller.abort();
   }, [providerKey]);
 
   const examSubtotal = (exam?.amountCents ?? 0) * quantity;
-  const addOnAmount = addOn && provider?.addOn ? provider.addOn.amountCents : 0;
+  const addOnAmount = addOn && quantity === 1 && provider?.addOn ? provider.addOn.amountCents : 0;
   const total = examSubtotal + addOnAmount;
   const checkoutReady = Boolean(
+    paymentReady === true &&
     provider &&
     exam &&
     exam.amountCents &&
     exam.amountCents > 0 &&
-    slotId &&
+    slots.some((slot) => slot.id === slotId && slot.spotsRemaining >= quantity) &&
     customerName.trim() &&
     customerEmail.trim(),
   );
@@ -159,7 +189,7 @@ export default function TestingCheckoutClient({
           examName: exam.name,
           bookingType: quantity > 1 ? 'organization' : 'individual',
           participantCount: quantity,
-          addOn,
+          addOn: addOn && quantity === 1,
           slotId,
           name: customerName.trim(),
           email: customerEmail.trim(),
@@ -308,7 +338,7 @@ export default function TestingCheckoutClient({
                   : 'No appointments currently available'}
             </option>
             {slots.map((slot) => (
-              <option key={slot.id} value={slot.id}>
+              <option key={slot.id} value={slot.id} disabled={slot.spotsRemaining < quantity}>
                 {testingAppointmentLabel(slot.startTime)}
                 {slot.location ? ` — ${slot.location}` : ''} ({slot.spotsRemaining} open)
               </option>
@@ -322,7 +352,7 @@ export default function TestingCheckoutClient({
           ) : null}
         </div>
 
-        {provider?.addOn ? (
+        {provider?.addOn && quantity === 1 ? (
           <div className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <div className="flex items-start gap-3">
               <Sparkles className="mt-1 h-5 w-5 shrink-0 text-amber-700" />
@@ -382,7 +412,7 @@ export default function TestingCheckoutClient({
               <span className="font-bold">{money(examSubtotal)}</span>
             </div>
           ) : null}
-          {addOn && provider?.addOn ? (
+          {addOn && quantity === 1 && provider?.addOn ? (
             <div className="flex justify-between gap-3">
               <span className="text-slate-600">{provider.addOn.label}</span>
               <span className="font-bold">{money(addOnAmount)}</span>
@@ -420,6 +450,17 @@ export default function TestingCheckoutClient({
           )}
           {loading ? 'Opening Checkout…' : 'Continue to Secure Checkout'}
         </button>
+        {paymentReady === false ? (
+          <p role="status" className="mt-3 text-sm font-semibold text-amber-800">
+            Online payment is temporarily unavailable. You can review available dates above. Call{' '}
+            <a className="underline" href={`tel:${TESTING_CENTER.phoneTel}`}>
+              {TESTING_CENTER.phone}
+            </a>{' '}
+            for booking assistance before making a payment.
+          </p>
+        ) : paymentReady === null ? (
+          <p className="mt-3 text-sm text-slate-600">Checking payment availability…</p>
+        ) : null}
         {!checkoutReady ? (
           <p className="mt-3 text-sm text-amber-700">
             Enter your name and email, then select a priced exam and an available appointment before

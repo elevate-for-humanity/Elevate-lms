@@ -742,7 +742,7 @@ export function PremiumTestingCenter() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/testing/book"
+                href="/testing#booking"
                 className="px-8 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold rounded-lg text-lg transition-colors text-center"
               >
                 Book My Exam
@@ -979,7 +979,7 @@ export function PremiumTestingCenter() {
 
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/testing/book"
+                href="/testing#booking"
                 className="px-8 py-4 bg-white text-brand-red-700 font-bold rounded-lg text-lg hover:bg-slate-100 transition-colors"
               >
                 Book My Exam

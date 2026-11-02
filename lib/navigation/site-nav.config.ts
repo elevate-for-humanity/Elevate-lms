@@ -29,10 +29,10 @@ export const headerNavigation: NavGroup[] = [
     href: '/testing',
     items: [
       { label: 'Testing Center', href: '/testing', description: 'Credential exams, providers, pricing and testing information' },
-      { label: 'Book an Exam', href: '/testing/book', description: 'Schedule a testing appointment' },
+      { label: 'Book an Exam', href: '/testing#booking', description: 'Schedule a testing appointment' },
       { label: 'Exams & Pricing', href: '/testing#providers', description: 'Compare available exams and published prices' },
-      { label: 'Employer / Group Testing', href: '/testing/for-employers', description: 'Cohort and workforce testing' },
-      { label: 'Testing Policies', href: '/testing/policies', description: 'Identification, arrival, rescheduling and testing rules' },
+      { label: 'Employer / Group Testing', href: '/testing#booking', description: 'Cohort and workforce testing' },
+      { label: 'Testing Policies', href: '/testing#policies', description: 'Identification, arrival, rescheduling and testing rules' },
     ],
   },
   {

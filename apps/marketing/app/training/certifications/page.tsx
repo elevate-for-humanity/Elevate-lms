@@ -29,7 +29,7 @@ export default function TrainingCertificationsPage() {
         description="Prepare for credentials employers recognize. Certification availability depends on the program, testing partner, eligibility, and current exam requirements."
         actions={(
           <>
-            <Link href="/testing/book" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Schedule Testing</Link>
+            <Link href="/testing#booking" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Schedule Testing</Link>
             <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">View Training Programs</Link>
           </>
         )}
@@ -79,7 +79,7 @@ export default function TrainingCertificationsPage() {
           <h2 className="mb-4 text-2xl font-bold text-slate-950">Ready to Prepare or Test?</h2>
           <p className="mb-8 text-slate-700">Check the testing page for current availability or enroll in the related training program first.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/testing/book" className="inline-flex items-center rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Testing Options</Link>
+            <Link href="/testing#booking" className="inline-flex items-center rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Testing Options</Link>
             <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-8 py-4 font-bold text-slate-800 transition-colors hover:border-slate-500">View Programs</Link>
           </div>
         </div>

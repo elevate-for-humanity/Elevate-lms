@@ -3,6 +3,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { ShoppingCart, X, Check, CalendarDays } from 'lucide-react';
+import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
+import { getPublicExamAmountCents } from '@/lib/testing/exam-pricing';
 import { useCart } from '@/lib/store/use-cart';
 import { addToCart, getCart } from '@/lib/store/cart';
 
@@ -44,7 +46,7 @@ export function AddExamToCartButton({
         category: 'certification-prep',
         price: amountCents / 100,
         description: `${examName} exam at Elevate Testing Center`,
-        image: '/images/pages/testing-page-1.webp',
+        image: '/images/licensed-envato/testing-exam-291b8cff.webp',
         inStock: true,
         featured: false,
         digital: false,
@@ -118,6 +120,17 @@ export default function TestingCart() {
           <ul className="mt-4 space-y-3">
             {items.map((item) => {
               const provider = PROVIDERS.find((key) => item.id.startsWith(`testing-${key}-`));
+              const definition = provider ? CERT_PROVIDERS[provider] : null;
+              const exam = definition?.exams.find(
+                (entry) => (typeof entry === 'string' ? entry : entry.name) === item.name,
+              );
+              const current = Boolean(
+                definition &&
+                definition.status === 'active' &&
+                definition.publicVisible !== false &&
+                exam &&
+                getPublicExamAmountCents(definition, exam) === Math.round(item.price * 100),
+              );
               return (
                 <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -134,9 +147,9 @@ export default function TestingCart() {
                       <X className="h-5 w-5" aria-hidden="true" />
                     </button>
                   </div>
-                  {provider ? (
+                  {provider && current ? (
                     <Link
-                      href={`/testing/checkout?provider=${encodeURIComponent(provider)}&exam=${encodeURIComponent(item.name)}`}
+                      href={`/testing?provider=${encodeURIComponent(provider)}&exam=${encodeURIComponent(item.name)}#booking`}
                       className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-600 px-4 py-3 text-sm font-bold text-white hover:bg-brand-red-700"
                     >
                       <CalendarDays className="h-4 w-4" aria-hidden="true" />
@@ -165,7 +178,7 @@ export default function TestingCart() {
         </>
       )}
       <Link
-        href="/testing/checkout"
+        href="/testing#booking"
         className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand-blue-700 underline"
       >
         See available testing dates

@@ -59,11 +59,7 @@ export const EPA608_FEES = [
     amount: EPA608_PRICING.universal.price,
     note: 'Core + Type I + Type II + Type III — includes exam fee + proctoring',
   },
-  {
-    label: 'Single section',
-    amount: EPA608_PRICING.singleSection.price,
-    note: 'Core, Type I, Type II, or Type III — includes exam fee + proctoring',
-  },
+
 ] as const;
 
 // ─── Mainstream EPATest online pricing ───────────────────────────────────────

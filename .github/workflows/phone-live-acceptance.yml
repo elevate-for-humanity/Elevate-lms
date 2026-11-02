@@ -22,9 +22,11 @@ jobs:
     steps:
       - env:
           GH_TOKEN: '${{ github.token }}'
+          DISPATCH_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-                    gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
+          if [[ "$DISPATCH_MESSAGE" = "Verify restored voicemail with one owned-number call" ]]; then mode=voicemail; fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

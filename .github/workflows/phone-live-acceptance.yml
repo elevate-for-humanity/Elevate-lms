@@ -1,0 +1,50 @@
+name: Verify owned operator routing and voicemail delivery
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspect current routing or run one explicitly authorized owned-number test
+        type: choice
+        options: [preflight, operator, voicemail]
+        default: preflight
+  push:
+    branches: [main]
+    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py']
+permissions: {contents: read, actions: write, id-token: write}
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('phone-acceptance-dispatch-{0}', github.ref) }}
+  cancel-in-progress: false
+  queue: max
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f 'inputs[mode]=preflight'
+  acceptance:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify owned VM identity
+        run: test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Read current operator routing and voicemail worker health without dialing
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
+      - name: Inspect durable voicemail spool and worker receipts without reading audio
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
+      - name: Verify mode is implemented before allowing any call
+        env: {ACCEPTANCE_MODE: '${{ inputs.mode }}'}
+        run: test "$ACCEPTANCE_MODE" = preflight

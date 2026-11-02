@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { assertStorePageChrome } from './store-page-contract.mjs';
+import { assertHomepageHostShopContract } from './homepage-content.mjs';
 
 const sha = process.env.GITHUB_SHA;
 assert.match(sha ?? '', /^[a-f0-9]{40}$/);
@@ -64,6 +65,11 @@ try {
   const packagedVersion = await version.json();
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
+  if (component === 'marketing') {
+    const home = await fetch(root + '/', { signal: AbortSignal.timeout(20000) });
+    assert.equal(home.status, 200, 'Packaged homepage must render');
+    assertHomepageHostShopContract(await home.text());
+  }
   if (component === 'store') {
     // Exercise the packaged pages: source-level rendering tests cannot detect a
     // Store image that accidentally prerendered the shared Marketing chrome.

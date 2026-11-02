@@ -26,3 +26,10 @@ test('ringing, registration and packet counts alone cannot certify two-way opera
  for(const change of [{answered:false},{dtlsConnected:false},{remoteAudibleWindows:0},{outboundBytes:0},{failed:true}])assert.equal(operatorAudioPassed(call,{...device,...change}),false);
  assert.equal(operatorAudioPassed({...call,operatorTransferAcceptance:'FAIL'},device),false);
 });
+test('the guarded acceptance dispatcher must parse as shell before it can start a live test',async()=>{
+ const {readFileSync}=await import('node:fs');const {spawnSync}=await import('node:child_process');
+ const workflow=readFileSync(new URL('../../.github/workflows/phone-live-acceptance.yml',import.meta.url),'utf8');
+ const block=workflow.match(/        run: \|\n([\s\S]*?)\n  acceptance:/)?.[1];
+ assert.ok(block);const source=block.split('\n').map(line=>line.replace(/^          /,'')).join('\n');
+ const checked=spawnSync('/bin/bash',['-n'],{input:source,encoding:'utf8'});assert.equal(checked.status,0,checked.stderr);
+});

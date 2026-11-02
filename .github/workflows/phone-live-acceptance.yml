@@ -26,7 +26,7 @@ jobs:
         run: |
           mode=preflight
           if [ "$HEAD_MESSAGE" = 'Run one authorized owned operator audio acceptance call' ]; then mode=operator; fi
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

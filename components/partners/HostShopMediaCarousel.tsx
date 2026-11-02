@@ -28,12 +28,14 @@ export default function HostShopMediaCarousel({
   videoUrl,
   videoScript,
   compact = false,
+  spacious = false,
 }: {
   shopName: string;
   items: MediaItem[];
   videoUrl?: string;
   videoScript?: string;
   compact?: boolean;
+  spacious?: boolean;
 }) {
   const media = useMemo(() => {
     const candidates = items.filter((item) => item.type !== 'video');
@@ -91,7 +93,7 @@ export default function HostShopMediaCarousel({
       }
     >
       <div
-        className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${compact ? 'aspect-[16/10] max-h-[160px]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}
+        className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${spacious ? 'aspect-[16/10]' : compact ? 'aspect-[16/10] max-h-[160px]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}
       >
         {active.type === 'video' ? (
           <video
@@ -120,9 +122,11 @@ export default function HostShopMediaCarousel({
                   fill
                   unoptimized={!item.url.startsWith('/')}
                   sizes={
-                    compact
-                      ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
-                      : '(max-width: 640px) 90vw, 480px'
+                    spacious
+                      ? '(max-width: 767px) 100vw, 560px'
+                      : compact
+                        ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
+                        : '(max-width: 640px) 90vw, 480px'
                   }
                   alt={item.alt || `${shopName} promotional image`}
                   aria-hidden={item.url !== active.url}

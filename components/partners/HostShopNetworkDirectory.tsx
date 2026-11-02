@@ -60,18 +60,16 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
       </p>
 
       {visible.length ? (
-        <div
-          data-mobile-grid="2"
-          className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4"
-        >
+        <div data-host-shop-directory className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           {visible.map((shop) => (
             <article
               key={shop.id}
-              className="group flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-white/15 bg-white text-slate-950 shadow-xl"
+              className="group flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
               <HostShopMediaCarousel
                 shopName={shop.name}
                 compact
+                spacious
                 items={
                   shop.gallery?.length
                     ? shop.gallery
@@ -95,12 +93,12 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                       ]
                 }
               />
-              <div className="flex flex-1 flex-col p-3">
+              <div className="flex flex-1 flex-col p-5 sm:p-6">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
                   {shop.state}
                 </p>
-                <h3 className="mt-3 text-sm sm:text-base font-black leading-tight text-slate-950">
+                <h3 className="mt-3 text-xl font-black leading-tight sm:text-2xl text-slate-950">
                   <Link
                     href={`/host-shops/${shop.slug}`}
                     className="hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-700"
@@ -108,9 +106,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                     {shop.name}
                   </Link>
                 </h3>
-                <p className="mt-3 line-clamp-2 text-xs leading-5 text-slate-700">
-                  {shop.description}
-                </p>
+                <p className="mt-4 text-base leading-7 text-slate-700">{shop.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {shop.programs.map((slug) => (
                     <span

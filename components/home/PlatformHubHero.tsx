@@ -12,7 +12,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
       className="relative w-full overflow-hidden bg-slate-950 text-white"
       aria-labelledby="home-hero-heading"
       data-scroll-narration
-      data-narration="Elevate for Humanity connects career training, workforce development, registered apprenticeship, employer partnerships, and business technology. Choose the path that fits what you came here to do."
+      data-narration="Explore career training and apprenticeships with Elevate for Humanity. Choose a program, check your funding options, and apply."
       data-narration-style="instructor"
     >
       <ImageMetadata
@@ -34,18 +34,17 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
       <div className="relative mx-auto flex max-w-6xl items-center px-5 py-6 sm:px-8 sm:py-8">
         <div className="max-w-3xl">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">
-            Career training • Workforce development • Registered apprenticeship • Business growth
+            Career training & apprenticeships
           </p>
           <Heading
             id="home-hero-heading"
             className="mt-3 text-3xl font-black leading-[1.1] tracking-tight sm:text-3xl"
           >
-            Build a career. Build a workforce. Build a business.
+            Train for your next career.
           </Heading>
           <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-100">
-            Elevate for Humanity connects individuals, employers, workforce partners, and businesses
-            through career training, state and workforce funding pathways for eligible participants,
-            Registered Apprenticeship, employer services, and practical business technology.
+            Choose a career training program or apprenticeship. See what you’ll learn,
+            review tuition and funding options, and apply when you’re ready.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -54,36 +53,14 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
             >
               Explore Career Training
             </Link>
-            {!compact && (<>
             <Link
               href="/check-eligibility"
-              className="inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
+              className="inline-flex min-h-12 items-center rounded-xl border border-slate-500 px-5 py-3 font-semibold text-slate-950 hover:bg-slate-50"
             >
               Check Funding Options
             </Link>
-            <Link
-              href="/employers"
-              className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-200 px-6 py-3 font-black text-white hover:bg-slate-100 hover:text-slate-950"
-            >
-              Employers & Partners
-            </Link>
-            </>)}
-            <Link
-              href="/store/apps/website-builder"
-              className="inline-flex min-h-12 items-center rounded-xl border-2 border-cyan-300 px-6 py-3 font-black text-cyan-100 hover:bg-cyan-50 hover:text-cyan-950"
-            >
-              Business & Website Builder
-            </Link>
           </div>
-          {!compact && (
-          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-200">
-            <span>Registered Apprenticeship</span>
-            <span>Workforce training</span>
-            <span>Employer partnerships</span>
-            <span>Industry credentials</span>
-            <span>Compliance & reporting</span>
-          </div>
-          )}
+
         </div>
       </div>
     </section>

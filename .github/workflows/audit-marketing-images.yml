@@ -91,6 +91,24 @@ jobs:
                   for lineno, line in enumerate(text.splitlines(), 1):
                       for m in pattern.finditer(line):
                           ref = m.group(1)
+                          # Validate templated HVAC chapter diagrams against every actual
+                          # chapter rather than mistaking the template for a file.
+                          if ref == '/images/workbooks/hvac/chapter-${number}.svg':
+                              workbook = Path('lib/lms/hvac-workbook-content.json')
+                              if not workbook.exists():
+                                  findings.append({'file': str(p), 'line': lineno, 'ref': ref, 'reason': 'workbook manifest missing'})
+                                  continue
+                              chapters = json.loads(workbook.read_text()).get('chapters', [])
+                              if not chapters or any(not isinstance(ch.get('number'), int) for ch in chapters):
+                                  findings.append({'file': str(p), 'line': lineno, 'ref': ref, 'reason': 'invalid chapter manifest'})
+                                  continue
+                              for chapter in chapters:
+                                  concrete = '/images/workbooks/hvac/chapter-' + str(chapter['number']) + '.svg'
+                                  present = exists(concrete)
+                                  refs.append((str(p), lineno, concrete, present, False))
+                                  if not present:
+                                      findings.append({'file': str(p), 'line': lineno, 'ref': concrete})
+                              continue
                           direct = exists(ref)
                           aliased = ref in aliases and exists(aliases[ref])
                           refs.append((str(p), lineno, ref, direct, aliased))

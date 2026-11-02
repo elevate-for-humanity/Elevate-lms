@@ -1,70 +1,39 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 import type { HeroBannerConfig } from '@/content/heroBanners';
 import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 import recordings from '@/content/program-introduction-recordings.json';
 import { buildProgramIntroduction } from '@/lib/programs/program-introduction';
-import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 
-/** User-initiated narration uses the shared MP3 service and exclusive playback. */
+/** Register the visible introduction with the site's single narration controller. */
 export function ProgramNarration({ text, source }: { text: string; source?: string }) {
-  const voice = useNaturalVoice();
-  return (
-    <div className="mt-5">
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          disabled={voice.isLoading}
-          onClick={() => {
-            if (voice.isPlaying) voice.pause();
-            else if (voice.isPaused) void voice.resume();
-            else void voice.play(text, { src: source, style: 'commercial' });
-          }}
-          className="min-h-12 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-orange-400 disabled:opacity-60"
-        >
-          {voice.isLoading
-            ? 'Loading introduction…'
-            : voice.isPlaying
-              ? 'Pause introduction'
-              : voice.isPaused
-                ? 'Resume introduction'
-                : 'Listen to the introduction'}
-        </button>
-        {(voice.isPlaying || voice.isPaused) && (
-          <button
-            type="button"
-            onClick={voice.stop}
-            className="min-h-12 rounded-xl border border-current px-5 py-3 text-sm font-bold"
-          >
-            Stop audio
-          </button>
-        )}
-        {source && (
-          <a
-            href={source}
-            download
-            className="inline-flex min-h-12 items-center px-3 text-sm font-semibold underline"
-          >
-            Download MP3
-          </a>
-        )}
-      </div>
-      {voice.error && (
-        <p role="status" className="mt-3 text-sm">
-          Audio is temporarily unavailable. The introduction is available below.
-        </p>
-      )}
-      <details className="mt-3 max-w-3xl text-sm leading-6">
-        <summary className="min-h-11 cursor-pointer py-2 font-semibold">
-          Read the introduction
-        </summary>
-        <p className="pb-3">{text}</p>
-      </details>
-    </div>
-  );
+  const marker = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const surface = marker.current?.closest<HTMLElement>('figure, section, article')
+      ?? marker.current?.parentElement;
+    if (!surface) return;
+    const attributes = {
+      'data-scroll-narration': '',
+      'data-narration': text,
+      'data-narration-src': source ?? '',
+      'data-narration-style': 'commercial',
+    };
+    const previous = Object.fromEntries(
+      Object.keys(attributes).map(key => [key, surface.getAttribute(key)]),
+    );
+    Object.entries(attributes).forEach(([key, value]) => surface.setAttribute(key, value));
+    return () => {
+      Object.entries(previous).forEach(([key, value]) => {
+        if (value === null) surface.removeAttribute(key);
+        else surface.setAttribute(key, value);
+      });
+    };
+  }, [text, source]);
+  return <span ref={marker} className="sr-only">{text}</span>;
 }
 
 export function ProgramIntroductionAudio({ program }: { program: ProgramSchema }) {
@@ -84,7 +53,7 @@ export default function NarratedProgramIntro({
 }) {
   return (
     <figure
-      className="border-b-4 border-orange-500 bg-slate-950 text-white"
+      className="border-b border-slate-200 bg-white text-slate-950"
       data-program-visual-intro={program.slug}
     >
       <div className="mx-auto grid max-w-7xl lg:grid-cols-[1.2fr_1fr]">
@@ -117,11 +86,11 @@ export default function NarratedProgramIntro({
           )}
         </div>
         <figcaption className="flex flex-col justify-center px-5 py-8 sm:px-8 sm:py-10">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-300">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-600">
             Elevate for Humanity • Career training
           </p>
           <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{program.title}</h2>
-          <p className="mt-4 text-base leading-7 text-slate-200">{program.subtitle}</p>
+          <p className="mt-4 text-base leading-7 text-slate-700">{program.subtitle}</p>
           <ProgramIntroductionAudio program={program} />
         </figcaption>
       </div>

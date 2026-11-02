@@ -11,10 +11,11 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
 
   test('homepage featured shop image alt is human-readable', async ({ page }) => {
     await page.goto('/');
-    // Career pathways now use decorative icons; verify the featured shop photographs.
-    const pathwaySection = page.getByRole('region', { name: 'Real shops. Real experience.' });
+    // Keep the accessible landmark aligned with the approved combined beauty section.
+    const pathwaySection = page.getByRole('region', { name: 'Barber & Beauty Apprenticeships' });
     await expect(pathwaySection).toBeVisible();
-    const img = pathwaySection.getByRole('img').first();
+    await expect(pathwaySection.getByRole('heading', { name: 'Meet our Host Shops' })).toBeVisible();
+    const img = pathwaySection.locator('[data-featured-shops]').getByRole('img').first();
     const alt = await img.getAttribute('alt');
     expect(alt).toBeTruthy();
     expect(alt).not.toMatch(/PLATFORM_DEFAULTS/);

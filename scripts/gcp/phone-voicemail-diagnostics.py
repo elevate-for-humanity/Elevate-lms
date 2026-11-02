@@ -57,11 +57,24 @@ def main():
     cdr.append({'lastApplication':row[7] if re.fullmatch('[A-Za-z]+',row[7]) else 'other','context':row[3] if re.fullmatch('[A-Za-z0-9_-]+',row[3]) else 'other','disposition':row[14] if re.fullmatch('[A-Z ]+',row[14]) else 'other','started':row[9]})
  gateway=run(['journalctl','-u','elevate-paris-gateway.service','--since','15 minutes ago','--no-pager','-o','cat'])[1]
  gatewayClasses={key:gateway.count(key) for key in ['PARIS_GREETING_SENT','PARIS_TURN_SENT','PARIS_KEYPAD_HANDOFF_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_TURN_FAILED','PARIS_BRIDGE_FAILED']}
+ priorTrace=[]
+ _,names=run(['docker','exec','pbx_asterisk_1','find','/var/log/asterisk','-maxdepth','1','-type','f','-name','efhvm_*'])
+ for path in names.splitlines():
+  if not re.fullmatch(r'/var/log/asterisk/efhvm_[0-9a-f]{10}',path):continue
+  _,raw=run(['docker','exec','pbx_asterisk_1','tail','-n','1000',path])
+  raw=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',raw)
+  # Existing private test traces only: export fixed locations and dialplan
+  # priority numbers, never recording content, caller identifiers or credentials.
+  spawned=[{'context':m[1],'priority':int(m[3])} for m in re.finditer(r'Spawn extension \(([A-Za-z0-9_-]+), ([^,]*), ([0-9]+)\) exited non-zero',raw)]
+  warnings=[{'file':m[1],'line':int(m[2]),'function':m[3]} for line in raw.splitlines() if re.search(r'\b(?:WARNING|ERROR|NOTICE)\b',line) for m in [re.search(r'([A-Za-z0-9_]+[.]c):([0-9]+)\s+([A-Za-z0-9_]+):',line)] if m]
+  if spawned or warnings:priorTrace.append({'spawnedExitPoints':spawned[-10:],'warningSourceLocations':warnings[-10:],'lineCount':len(raw.splitlines())})
+ settings=cli('core show settings')
+ verbosity={key:int(m[1]) for key,pattern in [('root',r'Root console verbosity:\s*([0-9]+)'),('current',r'Current console verbosity:\s*([0-9]+)')] for m in [re.search(pattern,settings)] if m}
  routes={label:cli(command) for label,command in [('operatorEntry','dialplan show 0@internal'),('operatorFallback','dialplan show s@elevate-operator'),('operatorDeviceReturn','dialplan show 0@elevate-pwa-extensions')]}
  logger=cli('logger show channels')
  # These three dialplans contain only application names and internal endpoint IDs.
  # No credentials or unrelated call logs are returned.
- print(json.dumps({'ownedOperatorDialplans':routes,'recentOperatorExecution':executions,'ownedTestCdr':cdr[-5:],'gatewayClasses':gatewayClasses,'loggerDestinations':logger,'voicemailDiagnostics':True,'callsPlaced':0,'configurationChanged':False,'modules':modules,'permissions':permissions,'promptAvailability':sounds,'safeGeneralSettings':general,'recentWarningClasses':reasons}))
+ print(json.dumps({'ownedOperatorDialplans':routes,'recentOperatorExecution':executions,'ownedTestCdr':cdr[-5:],'priorOwnedTrace':priorTrace,'verbosity':verbosity,'gatewayClasses':gatewayClasses,'loggerDestinations':logger,'voicemailDiagnostics':True,'callsPlaced':0,'configurationChanged':False,'modules':modules,'permissions':permissions,'promptAvailability':sounds,'safeGeneralSettings':general,'recentWarningClasses':reasons}))
 if __name__=='__main__':
  try:main()
  except Exception:print(json.dumps({'voicemailDiagnostics':True,'error':'PHONE_VOICEMAIL_DIAGNOSTICS_UNAVAILABLE','callsPlaced':0}));raise SystemExit(1)

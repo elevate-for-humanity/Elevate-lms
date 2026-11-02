@@ -6,6 +6,14 @@ DID='14632401404'
 PHASE='identity'
 PREFLIGHT=os.environ.get('OWNED_PHONE_TRACE_PREFLIGHT')=='1'
 DIRECT_MAILBOX=os.environ.get('OWNED_PHONE_MAILBOX_TEST')=='1'
+def capture_name():
+ return 'efhvm_'+uuid.uuid4().hex[:10]
+
+def root_verbosity():
+ match=re.search(r'Root console verbosity:\s*([0-9]+)',cli('core show settings'))
+ if not match:raise ValueError()
+ return int(match[1])
+
 def cli(command):
  p=subprocess.run(['docker','exec','pbx_asterisk_1','asterisk','-rx',command],capture_output=True,text=True,timeout=10)
  if p.returncode:raise ValueError()
@@ -39,7 +47,7 @@ def main():
  password=base64.b64decode(secret['payload']['data']).decode().strip()
  headers={'Authorization':'Basic '+base64.b64encode(('elevate-paris:'+password).encode()).decode()}
  started=time.monotonic();events=[];last=None;observed=False;missing=0;names=set();handoff=False
- capture='efhvm_'+uuid.uuid4().hex[:10]
+ capture=capture_name()
  path='/var/log/asterisk/'+capture
  PHASE='private_log_file'
  pid=subprocess.run(['docker','exec','pbx_asterisk_1','pidof','asterisk'],capture_output=True,text=True,timeout=10).stdout.strip()
@@ -50,11 +58,12 @@ def main():
  owner=uid[1]+':'+gid[1]
  for command in [['touch',path],['chown',owner,path],['chmod','600',path]]:
   subprocess.run(['docker','exec','pbx_asterisk_1',*command],capture_output=True,timeout=10,check=True)
- cleanup=False;trace={}
+ cleanup=False;trace={};priorVerbosity=root_verbosity()
  try:
   PHASE='temporary_log_channel'
   cli('logger add channel '+capture+' notice,warning,error,verbose(5),dtmf')
   if capture not in cli('logger show channels'):raise ValueError()
+  cli('core set verbose 5')
   if DIRECT_MAILBOX and 'VoiceMail(0@elevate,u)' not in cli('dialplan show s@elevate-operator'):raise ValueError()
   PHASE='owned_call_observation'
   while not PREFLIGHT and time.monotonic()-started<42:
@@ -79,11 +88,12 @@ def main():
     if missing>=10:events.append({'elapsedSeconds':round(time.monotonic()-started,1),'application':'ended'});break
    time.sleep(.15)
  finally:
+  cli('core set verbose '+str(priorVerbosity))
   cli('logger remove channel '+capture)
-  cleanup=capture not in cli('logger show channels')
+  cleanup=capture not in cli('logger show channels') and root_verbosity()==priorVerbosity
   raw=subprocess.run(['docker','exec','pbx_asterisk_1','tail','-n','1000',path],capture_output=True,text=True,timeout=10)
   trace=scoped_trace(raw.stdout,names)
- print(json.dumps({'tracePreflight':PREFLIGHT,'ownedVoicemailObservation':True,'temporaryLoggingRemoved':cleanup,'routingChanged':False,'directOwnedMailboxTest':DIRECT_MAILBOX,'ownedMailboxHandoffRequested':handoff,'trace':trace,'callsPlaced':0,'callerObserved':observed,'transitions':events[:50]}))
+ print(json.dumps({'tracePreflight':PREFLIGHT,'ownedVoicemailObservation':True,'temporaryLoggingRemoved':cleanup,'persistentRoutingChanged':False,'directOwnedMailboxTest':DIRECT_MAILBOX,'ownedMailboxHandoffRequested':handoff,'trace':trace,'callsPlaced':0,'callerObserved':observed,'transitions':events[:50]}))
 if __name__=='__main__':
  try:main()
  except Exception as e:print(json.dumps({'ownedVoicemailObservation':True,'error':'OWNED_CALL_OBSERVATION_UNAVAILABLE','phase':PHASE,'exceptionClass':type(e).__name__,'callsPlaced':0}));raise SystemExit(1 if PREFLIGHT else 0)

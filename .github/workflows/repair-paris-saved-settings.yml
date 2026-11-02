@@ -1,9 +1,14 @@
 name: Repair PARIS saved answering settings
 on:
   workflow_dispatch:
+    inputs:
+      verify_menu:
+        description: Place one bounded call to the owned business number after repair to verify the entire spoken menu
+        type: boolean
+        default: false
   push:
     branches: [main]
-    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'scripts/gcp/configure-owned-voicemail.py', 'infra/pbx/paris/turn-adapter.mjs', 'infra/pbx/paris/ari-media.mjs', '.github/workflows/repair-paris-saved-settings.yml']
+    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'scripts/gcp/configure-owned-voicemail.py', 'infra/pbx/paris/turn-adapter.mjs', 'infra/pbx/paris/ari-media.mjs', 'infra/pbx/paris/menu.mjs', '.github/workflows/repair-paris-saved-settings.yml']
   pull_request:
     paths: ['scripts/gcp/*repair-paris-turn-proxy.py', 'scripts/gcp/*repair-paris-settings.py', 'infra/pbx/paris/**', '.github/workflows/repair-paris-saved-settings.yml']
 permissions:
@@ -31,7 +36,7 @@ jobs:
     steps:
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-paris-saved-settings.yml/dispatches" -f ref=main
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-paris-saved-settings.yml/dispatches" -f ref=main -f 'inputs[verify_menu]=true'
   repair:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -68,7 +73,7 @@ jobs:
           test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
           target="/tmp/elevate-paris-settings-$GITHUB_SHA-$GITHUB_RUN_ID"
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="mkdir -m 0700 '$target'"
-          gcloud compute scp infra/pbx/paris/launch.mjs infra/pbx/paris/turn-adapter.mjs infra/pbx/paris/ari-media.mjs "elevate-pbx:$target/" --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          gcloud compute scp infra/pbx/paris/launch.mjs infra/pbx/paris/turn-adapter.mjs infra/pbx/paris/ari-media.mjs infra/pbx/paris/menu.mjs "elevate-pbx:$target/" --project=elegant-racer-299721 --zone=us-central1-a --quiet
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="sudo python3 - '$target'" < scripts/gcp/repair-paris-settings.py
       - name: Verify running settings and synthetic speech without dialing
         if: always()
@@ -76,3 +81,11 @@ jobs:
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-live-phone-configuration.py
       - name: Verify public phone transport
         run: node scripts/gcp/verify-pbx-transport.mjs
+      - name: Verify the full spoken menu through one bounded business-number self-call
+        if: inputs.verify_menu == true
+        env:
+          AUTHORIZED_SELF_TEST_DID: '+14632401404'
+          SELF_CALL_MODE: menu-call
+        run: |
+          node --test scripts/gcp/exercise-paris-self-call.test.mjs
+          node scripts/gcp/exercise-paris-self-call.mjs

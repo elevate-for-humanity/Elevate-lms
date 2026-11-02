@@ -11,6 +11,7 @@
  */
 import { createServer } from 'node:net';
 import {pcm16ToUlaw} from './turn-adapter.mjs';
+import {menuOptions, menuRoute} from './menu.mjs';
 import { randomBytes,randomUUID } from 'node:crypto';
 import { setTimeout as sleep } from 'node:timers/promises';
 import {privateTurn,privateTurnOptions} from './private-turn.mjs';
@@ -140,6 +141,7 @@ export async function listenAudioSocket(session,onAudio,{finish=end}={}){
   return {host:'127.0.0.1:'+server.address().port,connected};
 }
 function required(){
+  menuOptions();
   if (!config.user || !config.password || !config.token || !config.adapter) throw Error('PARIS_RUNTIME_CONFIG_INCOMPLETE');
   for(const [raw,protocol] of [[config.ari,'http:'],[config.ws,'ws:']]){
     const endpoint=new URL(raw);
@@ -185,16 +187,18 @@ export async function routeApprovedExtension(callId,route,request=ari,allowed=pr
   });
   await waitForCallerExit(callId,request,wait);
 }
-export async function handleDtmf(event,active=sessions,{route=routeOperator,finish=end}={}){
-  if(event?.type!=='ChannelDtmfReceived' || event.digit!=='0')return;
+export async function handleDtmf(event,active=sessions,{route=routeOperator,routeExtension=routeApprovedExtension,finish=end,menu=process.env.PARIS_MENU_OPTIONS || '[]',allowedExtensions=process.env.PARIS_ALLOWED_EXTENSIONS || ''}={}){
+  if(event?.type!=='ChannelDtmfReceived' || !/^[0-9]$/.test(event.digit))return;
   const session=active.get(event.channel?.id);
   if(!session || session.closed || session.transferring)return;
-  // Only the caller already owned by this gateway can request operator zero.
-  // Ignore other digits until directory routing has an authoritative mapping.
+  const requested=menuRoute(event.digit,menuOptions(menu,allowedExtensions));
+  if(!requested)return;
+  // Only route this owned caller to a destination resolved from the saved menu.
   session.transferring=true;
   session.frames=[];session.quiet=0;session.heard=false;
   try{
-    await route(session.callId,{type:'operator',extension:'0'});
+    if(requested.type==='operator')await route(session.callId,requested);
+    else await routeExtension(session.callId,requested);
   }catch{
     await finish(session,'continue');
     return;

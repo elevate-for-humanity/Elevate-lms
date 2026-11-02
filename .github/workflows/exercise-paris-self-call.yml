@@ -5,7 +5,7 @@ on:
       mode:
         description: Inspect a prior self-call, or place exactly one new greeting test
         type: choice
-        options: [inspect, greeting-call]
+        options: [inspect, greeting-call, menu-call]
         default: inspect
       inspect_call_sid:
         description: Prior self-call SID to inspect; required in inspect mode

@@ -26,7 +26,7 @@ def get(url, headers):
     with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=20) as response:
         return json.loads(response.read(1048576))
 
-def settings(system, extensions):
+def settings(system, extensions, menu_options=None):
     if system.get('status') != 'active' or system.get('ai_enabled') is not True:
         raise ValueError('PARIS_DISABLED_IN_AUTHORITATIVE_SETTINGS')
     result = {}
@@ -39,6 +39,21 @@ def settings(system, extensions):
     if not numbers or any(not isinstance(n, str) or not re.fullmatch(r'0|[1-9][0-9]{2}', n) for n in numbers) or len(numbers) != len(set(numbers)):
         raise ValueError('PARIS_SAVED_EXTENSIONS_INVALID')
     result['PARIS_ALLOWED_EXTENSIONS'] = ','.join(sorted(n for n in numbers if n != '0'))
+    menu = []
+    digits = set()
+    for option in menu_options or []:
+        digit, label = option.get('digit'), option.get('label')
+        targets = [row['extension'] for row in extensions if row.get('destination_id') and row.get('destination_id') == option.get('destination_id')]
+        if (type(digit) is not int or not 0 <= digit <= 9 or digit in digits or
+                not isinstance(label, str) or not label.strip() or len(label) > 160 or any(ord(c) < 32 for c in label) or
+                len(targets) != 1 or (digit == 0 and targets[0] != '0')):
+            raise ValueError('PARIS_SAVED_MENU_INVALID')
+        digits.add(digit)
+        menu.append({'digit': str(digit), 'label': label.strip(), 'extension': targets[0]})
+    opening = ' '.join([result['PARIS_GREETING'].strip()] + [f"For {row['label']}, press {row['digit']}." for row in menu])
+    if len(opening) > 1200:
+        raise ValueError('PARIS_SAVED_MENU_GREETING_TOO_LONG')
+    result['PARIS_MENU_OPTIONS'] = json.dumps(menu, separators=(',', ':'))
     return result
 
 def environment_text(values):
@@ -87,8 +102,9 @@ def read_authority():
     workspaces = get(base + 'communication_workspaces?select=id&phone_system_id=eq.' + system_id, headers)
     if len(systems) != 1 or len(workspaces) != 1:
         raise ValueError('PARIS_SETTINGS_SCOPE_UNVERIFIED')
-    extensions = get(base + 'communication_extensions?select=extension&enabled=eq.true&workspace_id=eq.' + workspaces[0]['id'], headers)
-    return settings(systems[0], extensions)
+    extensions = get(base + 'communication_extensions?select=extension,destination_id&enabled=eq.true&workspace_id=eq.' + workspaces[0]['id'], headers)
+    menu = get(base + 'phone_menu_options?select=digit,label,destination_id&enabled=eq.true&order=position.asc,digit.asc&phone_system_id=eq.' + system_id, headers)
+    return settings(systems[0], extensions, menu)
 
 def repair(source):
     require_idle()
@@ -98,7 +114,7 @@ def repair(source):
             raise ValueError('PARIS_EXISTING_RUNTIME_NOT_ACTIVE')
     # Source must already have passed the repository's complete PARIS tests.
     source = Path(source)
-    names = ['launch.mjs', 'turn-adapter.mjs', 'ari-media.mjs']
+    names = ['launch.mjs', 'turn-adapter.mjs', 'ari-media.mjs', 'menu.mjs']
     for name in names:
         if not (source / name).is_file() or (ROOT / name).is_symlink():
             raise ValueError('PARIS_SOURCE_UNVERIFIED')

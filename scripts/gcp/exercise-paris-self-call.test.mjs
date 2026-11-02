@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {exerciseSelfCall,greetingMatch,summarizeSpeech} from './exercise-paris-self-call.mjs';
+import {exerciseSelfCall,greetingMatch,summarizeSpeech,heardMenuDigits} from './exercise-paris-self-call.mjs';
 const account='AC75bcca01e19767614252902185ed948f',number='+14632401404',sid='CA'+'a'.repeat(32),trunk='TK'+'b'.repeat(32),recording='RE'+'c'.repeat(32);
 const greeting='Thank you for calling Elevate for Humanity. I am Paris your virtual assistant. How can I help you with your career training today?';
 const bindings={TWILIO_ACCOUNT_SID:account,TWILIO_PHONE_NUMBER:number,TWILIO_AUTH_TOKEN:'private-test-token'};
@@ -21,6 +21,31 @@ function fixture({active=false,secure=true,createError=false,callStatus='complet
  return {requests,request};
 }
 const options=f=>({request:f.request,wait:async()=>{},expectedGreeting:greeting,transcribe:async()=>greeting});
+test('menu acceptance requires every announced choice on the PARIS greeting channel',()=>{
+ const recognition={segments:[{channel:1,text:greeting+' For Administration press zero.'},{channel:2,text:'For Beauty press five.'}]};
+ assert.equal(heardMenuDigits(['0','5'],recognition,greeting),false);
+ recognition.segments.push({channel:1,text:'For Beauty press five.'});
+ assert.equal(heardMenuDigits(['0','5'],recognition,greeting),true);
+ assert.equal(heardMenuDigits(['0','5','7'],recognition,greeting),false);
+});
+test('menu-only self-call waits for the full opening without dialing staff or claiming a transfer',async()=>{
+ const f=fixture();const result=await exerciseSelfCall(bindings,{...options(f),menuTest:true,expectedMenuDigits:['0','5'],transcribe:async()=>({segments:[{channel:1,text:greeting+' For Administration press zero. For Beauty press five.'}]})});
+ const create=f.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');
+ assert.equal(create.length,1);
+ const params=new URLSearchParams(create[0].options.body);
+ assert.equal(params.get('To'),number);assert.equal(params.get('TimeLimit'),'60');
+ assert.ok(params.get('Twiml').includes('Pause length="54"'));
+ assert.ok(!params.get('Twiml').includes('digits='));
+ assert.equal(result.liveMenuAcceptance,'PASS');
+ assert.equal(result.operatorTransferAcceptance,'NOT_TESTED');
+ assert.equal(result.voicemailDeliveryAcceptance,'NOT_TESTED');
+});
+test('menu self-call refuses missing, duplicate or injected options before placing a call',async()=>{
+ for(const expectedMenuDigits of [[],['5','5'],['SIP/attacker']]){
+  const f=fixture();await assert.rejects(exerciseSelfCall(bindings,{...options(f),menuTest:true,expectedMenuDigits}),/MENU_INVALID/);
+  assert.equal(f.requests.length,0);
+ }
+});
 test('places exactly one bounded self-call and verifies only received greeting audio',async()=>{
  const f=fixture();const result=await exerciseSelfCall(bindings,options(f));assert.equal(result.liveGreetingAcceptance,'PASS');
  const creates=f.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');assert.equal(creates.length,1);

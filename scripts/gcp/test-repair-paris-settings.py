@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import unittest
 import tempfile
+import json
 from unittest.mock import patch
 spec = importlib.util.spec_from_file_location('repair', Path(__file__).with_name('repair-paris-settings.py'))
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
@@ -19,6 +20,15 @@ class SettingsTests(unittest.TestCase):
             with self.assertRaises(ValueError):m.settings(self.system(),extensions)
     def test_systemd_quoting_preserves_text_without_shell_evaluation(self):
         self.assertEqual(m.environment_text({'PARIS_GREETING':'Hi "there"\\next\nnew line $HOME `date`'}),'PARIS_GREETING="Hi \\"there\\"\\\\next\nnew line $HOME `date`"\n')
+    def test_saved_menu_resolves_only_enabled_owned_extension_destinations(self):
+        extensions=[{'extension':'0','destination_id':'admin'},{'extension':'105','destination_id':'beauty'}]
+        menu=[{'digit':0,'label':'Administration','destination_id':'admin'},{'digit':5,'label':'Beauty Programs','destination_id':'beauty'}]
+        result=m.settings(self.system(),extensions,menu)
+        self.assertEqual(json.loads(result['PARIS_MENU_OPTIONS']),[
+            {'digit':'0','label':'Administration','extension':'0'}, {'digit':'5','label':'Beauty Programs','extension':'105'}])
+        for invalid in [[{**menu[1],'destination_id':'outside-workspace'}],[menu[1],menu[1]],[{**menu[1],'digit':0}],[{**menu[1],'label':'bad\nlabel'}]]:
+            with self.assertRaises(ValueError):m.settings(self.system(),extensions,invalid)
+        with self.assertRaises(ValueError):m.settings({**self.system(),'greeting':'x'*1200},extensions,menu)
     def test_refuses_active_or_unknown_calls(self):
         for output in ['1 active call','unknown','']:
             with patch.object(m,'run',return_value=output),self.assertRaises(ValueError):m.require_idle()
@@ -37,7 +47,7 @@ class SettingsTests(unittest.TestCase):
             root=Path(temporary)
             live=root/'live';live.mkdir()
             source=root/'source';source.mkdir()
-            for name in ['launch.mjs','turn-adapter.mjs','ari-media.mjs']:
+            for name in ['launch.mjs','turn-adapter.mjs','ari-media.mjs','menu.mjs']:
                 (live/name).write_text('old-'+name);(source/name).write_text('new-'+name)
             config=root/'etc/elevate-pbx/paris-dashboard-settings.conf'
             config.parent.mkdir(parents=True);config.write_text('old-settings')
@@ -59,7 +69,7 @@ class SettingsTests(unittest.TestCase):
             self.assertTrue(failed)
             self.assertEqual(config.read_text(),'old-settings')
             self.assertEqual(main.read_text(),'old-dialplan')
-            for name in ['launch.mjs','turn-adapter.mjs','ari-media.mjs']:
+            for name in ['launch.mjs','turn-adapter.mjs','ari-media.mjs','menu.mjs']:
                 self.assertEqual((live/name).read_text(),'old-'+name)
             self.assertFalse((root/'etc/systemd/system/elevate-paris-turn.service.d/30-dashboard-settings.conf').exists())
 if __name__=='__main__': unittest.main()

@@ -52,10 +52,22 @@ def process_environment(unit):
     return dict(item.decode().split('=', 1) for item in Path('/proc/' + pid + '/environ').read_bytes().split(b'\0') if b'=' in item)
 
 
-def compare_configuration(system, extensions, turn, gateway):
+def compare_configuration(system, extensions, turn, gateway, menu=None):
     expected = sorted(row['extension'] for row in extensions if row['extension'] != '0')
     turn_routes = sorted(set(filter(None, turn.get('PARIS_ALLOWED_EXTENSIONS', '').split(','))))
     gateway_routes = sorted(set(filter(None, gateway.get('PARIS_ALLOWED_EXTENSIONS', '').split(','))))
+    expected_menu = []
+    menu_valid = True
+    for option in menu or []:
+        targets = [row['extension'] for row in extensions if row.get('destination_id') and row.get('destination_id') == option.get('destination_id')]
+        if len(targets) != 1:
+            menu_valid = False
+            continue
+        expected_menu.append({'digit': str(option['digit']), 'label': option['label'].strip(), 'extension': targets[0]})
+    try:
+        menu_matches = menu_valid and all(json.loads(env.get('PARIS_MENU_OPTIONS', '[]')) == expected_menu for env in [turn, gateway])
+    except (ValueError, TypeError):
+        menu_matches = False
     return {
         'phoneSystemActive': system.get('status') == 'active',
         'parisEnabledInDashboard': system.get('ai_enabled') is True,
@@ -64,6 +76,7 @@ def compare_configuration(system, extensions, turn, gateway):
         'allEnabledExtensionsUseOwnedPbx': all(row.get('webrtc_provider') == 'asterisk' for row in extensions),
         'turnExtensionListMatchesDashboard': turn_routes == expected,
         'gatewayExtensionListMatchesDashboard': gateway_routes == expected,
+        'savedMenuMatchesTurnAndGateway': menu_matches,
         'voicemailEnabledInDashboard': system.get('voicemail_enabled') is True,
         'transcriptionEnabledInDashboard': system.get('voicemail_transcription_enabled') is True,
     }
@@ -88,7 +101,7 @@ def mulaw_payload(wav):
     return audio + b'\xff' * ((-len(audio)) % 160)
 
 
-def voice_probe(token, google_token, send=request):
+def voice_probe(token, google_token, send=request, menu=None):
     headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
     base = {'sessionId': secrets.token_hex(12), 'callId': 'synthetic-phone-readiness-' + secrets.token_hex(8),
             'encoding': 'PCMU', 'sampleRate': 8000, 'sequence': 0}
@@ -101,6 +114,16 @@ def voice_probe(token, google_token, send=request):
             return False
     status, reply = send(url, headers, {**base, 'event': 'greeting'})
     report = {'greetingHttpStatus': status, 'greetingAudioReturned': status == 200 and audible(reply), 'greetingAudioDurationSeconds':round(len(base64.b64decode(reply.get('replyAudioUlawBase64','')))/8000,2) if status==200 and audible(reply) else 0}
+    report['spokenMenuDigitsVerified'] = not menu
+    if menu and report['greetingAudioReturned']:
+        speech_status, speech = send('https://speech.googleapis.com/v1/speech:recognize',
+            {'Authorization': 'Bearer ' + google_token, 'Content-Type': 'application/json'},
+            {'config': {'encoding': 'MULAW', 'sampleRateHertz': 8000, 'languageCode': 'en-US'},
+             'audio': {'content': reply['replyAudioUlawBase64']}})
+        transcript = ' '.join(result.get('alternatives', [{}])[0].get('transcript', '') for result in speech.get('results', [])).lower()
+        names = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+        report['greetingSpeechHttpStatus'] = speech_status
+        report['spokenMenuDigitsVerified'] = speech_status == 200 and all(re.search(r'\bpress\s+(?:' + str(option['digit']) + '|' + names[int(option['digit'])] + r')\b', transcript) for option in menu)
     tts_status, tts = send('https://texttospeech.googleapis.com/v1/text:synthesize',
         {'Authorization': 'Bearer ' + google_token, 'Content-Type': 'application/json'},
         {'input': {'text': 'Please connect me to the operator.'},
@@ -153,12 +176,15 @@ def main():
     status, systems = request(DATABASE + '/rest/v1/phone_systems?select=status,greeting,ai_instructions,ai_enabled,ai_voice,voicemail_enabled,voicemail_transcription_enabled&id=eq.' + SYSTEM, headers)
     if status != 200 or len(systems) != 1:
         raise ValueError('phone_system_unverified')
-    status, extensions = request(DATABASE + '/rest/v1/communication_extensions?select=extension,webrtc_provider,voicemail_greeting,communication_workspaces!inner(phone_system_id)&enabled=eq.true&communication_workspaces.phone_system_id=eq.' + SYSTEM, headers)
+    status, extensions = request(DATABASE + '/rest/v1/communication_extensions?select=extension,destination_id,webrtc_provider,voicemail_greeting,communication_workspaces!inner(phone_system_id)&enabled=eq.true&communication_workspaces.phone_system_id=eq.' + SYSTEM, headers)
     if status != 200 or not extensions or any(not re.fullmatch(r'0|[1-9][0-9]{2}', row['extension']) for row in extensions):
         raise ValueError('phone_extensions_unverified')
     turn = process_environment('elevate-paris-turn.service')
     gateway = process_environment('elevate-paris-gateway.service')
-    comparison = compare_configuration(systems[0], extensions, turn, gateway)
+    status, menu = request(DATABASE + '/rest/v1/phone_menu_options?select=digit,label,destination_id&enabled=eq.true&order=position.asc,digit.asc&phone_system_id=eq.' + SYSTEM, headers)
+    if status != 200 or not isinstance(menu, list):
+        raise ValueError('phone_menu_unverified')
+    comparison = compare_configuration(systems[0], extensions, turn, gateway, menu)
     cli = lambda value: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', value])
     routes = []
     for row in extensions:
@@ -177,9 +203,9 @@ def main():
     # Emit configuration evidence even if a speech provider is unavailable.
     print(json.dumps({'livePhoneConfiguration': report}), flush=True)
     token=secret(paris.get('PARIS_TURN_TOKEN_SECRET', ''))
-    report['speech'] = voice_probe(token, identity['access_token'])
+    report['speech'] = voice_probe(token, identity['access_token'], menu=menu)
     report['privateGatewayGreeting']=private_gateway_probe(token)
-    report['result'] = 'PASS' if report['privateGatewayGreeting'].get('audioReturned') is True and all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
+    report['result'] = 'PASS' if report['privateGatewayGreeting'].get('audioReturned') is True and all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'spokenMenuDigitsVerified', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
     return report
 
 

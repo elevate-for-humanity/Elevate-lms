@@ -1,4 +1,5 @@
 import base64
+import json
 import importlib.util
 from pathlib import Path
 import struct
@@ -16,6 +17,23 @@ def wav(code=7, rate=8000, data=bytes(range(256)) * 5):
 
 
 class ConfigurationTests(unittest.TestCase):
+    def test_runtime_parity_requires_the_announced_menu_not_just_extension_numbers(self):
+        extensions=[{'extension':'105','destination_id':'beauty'}]
+        menu=[{'digit':5,'label':'Beauty','destination_id':'beauty'}]
+        self.assertFalse(m.compare_configuration({},extensions,{}, {},menu)['savedMenuMatchesTurnAndGateway'])
+        env={'PARIS_MENU_OPTIONS':json.dumps([{'digit':'5','label':'Beauty','extension':'105'}])}
+        self.assertTrue(m.compare_configuration({},extensions,env,env,menu)['savedMenuMatchesTurnAndGateway'])
+        self.assertFalse(m.compare_configuration({},extensions,env,{},menu)['savedMenuMatchesTurnAndGateway'])
+
+    def test_speech_probe_requires_every_menu_choice_in_the_actual_greeting_audio(self):
+        for transcript,expected in [('For Administration press zero. For Beauty press five.',True),('Thank you for calling.',False)]:
+            def send(url, headers, body):
+                if 'speech.googleapis.com' in url and 'texttospeech' not in url:
+                    return 200,{'results':[{'alternatives':[{'transcript':transcript}]}]}
+                if 'texttospeech' in url:return 200,{'audioContent':base64.b64encode(wav()).decode()}
+                return 200,{'replyAudioUlawBase64':base64.b64encode(bytes(range(160))).decode(),'requestedRoute':{'type':'operator','extension':'0'}}
+            self.assertEqual(m.voice_probe('token','google-token',send,menu=[{'digit':0},{'digit':5}])['spokenMenuDigitsVerified'],expected)
+
     def test_database_active_does_not_conceal_unapplied_runtime_settings(self):
         system = {'status': 'active', 'ai_enabled': True, 'greeting': 'Approved greeting', 'ai_instructions': 'Approved instructions', 'voicemail_enabled': True, 'voicemail_transcription_enabled': True}
         extensions = [{'extension': '0', 'webrtc_provider': 'asterisk'}, {'extension': '101', 'webrtc_provider': 'asterisk'}]

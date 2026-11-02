@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
   ...publicArtworkMetadata({
     path: '/check-eligibility',
-    image: '/images/refresh-20261014/admissions.webp',
+    image: '/images/career-advising-20261102.webp',
     alt: 'Illustrative admissions funding review',
     title: 'Prepare for Workforce Funding Review | Elevate for Humanity',
     description:
@@ -26,7 +26,7 @@ export default function CheckEligibilityPage() {
   return (
     <main className="min-h-screen bg-white">
       <PublicPageLead
-        image="/images/refresh-20261014/admissions.webp"
+        image="/images/career-advising-20261102.webp"
         alt="Illustrative admissions funding review"
         actions={[
           { href: '/apply/student', label: 'Start a student application' },

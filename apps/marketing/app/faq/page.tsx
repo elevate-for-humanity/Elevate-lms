@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
   ...publicArtworkMetadata({
     path: '/faq',
-    image: '/images/refresh-20261014/admissions.webp',
+    image: '/images/licensed-envato/resources-study-378c48c4.webp',
     alt: 'Illustrative student asking an advisor about enrollment',
     title: 'FAQ | Elevate for Humanity',
     description:
@@ -142,7 +142,7 @@ export default function FAQPage() {
   return (
     <main className="min-h-screen bg-white">
       <PublicPageLead
-        image="/images/refresh-20261014/admissions.webp"
+        image="/images/licensed-envato/resources-study-378c48c4.webp"
         alt="Illustrative student asking an advisor about enrollment"
         actions={[
           { href: '/advising', label: 'Ask an advisor' },

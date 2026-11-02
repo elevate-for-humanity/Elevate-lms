@@ -162,7 +162,7 @@ export async function middleware(req: NextRequest) {
 
   // Consolidate testing entry points before store-only routing can return a 404.
   if (['/store/testing', '/testing-center', '/testing/testing-center', '/testing/epa-608', '/testing/epa608'].includes(pathname)) {
-    return NextResponse.redirect(new URL('/testing', 'https://www.elevateforhumanity.org'), 308);
+    return NextResponse.redirect(new URL('/testing' + search, 'https://www.elevateforhumanity.org'), 308);
   }
 
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);

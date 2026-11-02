@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
   ...publicArtworkMetadata({
     path: '/funding/wrg',
-    image: '/images/refresh-20261014/admissions.webp',
+    image: '/images/career-advising-20261102.webp',
     alt: 'Illustrative advisor helping a learner review training funding',
     title: 'Workforce Ready Grant | Indiana Funding Guidance',
     description:
@@ -30,7 +30,7 @@ export default function WorkforceReadyGrantPage() {
   return (
     <div className="min-h-screen bg-white">
       <PublicPageLead
-        image="/images/refresh-20261014/admissions.webp"
+        image="/images/career-advising-20261102.webp"
         alt="Illustrative advisor helping a learner review training funding"
         actions={[
           { href: '/check-eligibility', label: 'Check my funding options' },

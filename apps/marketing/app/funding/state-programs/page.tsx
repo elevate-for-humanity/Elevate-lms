@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
   ...publicArtworkMetadata({
     path: '/funding/state-programs',
-    image: '/images/refresh-20261014/admissions.webp',
+    image: '/images/career-advising-20261102.webp',
     alt: 'Illustrative learner and advisor reviewing training options',
     title: 'Indiana Workforce Funding Guidance | Elevate for Humanity',
     description:
@@ -57,7 +57,7 @@ export default function StateProgramsPage() {
   return (
     <main className="min-h-screen bg-white">
       <PublicPageLead
-        image="/images/refresh-20261014/admissions.webp"
+        image="/images/career-advising-20261102.webp"
         alt="Illustrative learner and advisor reviewing training options"
         actions={[
           { href: '/check-eligibility', label: 'Check my options' },

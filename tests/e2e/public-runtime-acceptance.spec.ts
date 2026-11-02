@@ -1,3 +1,4 @@
+import { registerPublicNavigationAudit } from './public-navigation-audit';
 import { expect, test } from '@playwright/test';
 import { observeDocumentStability } from './helpers/document-stability';
 
@@ -140,3 +141,5 @@ test('password recovery confirmation preserves its origin and reports an invalid
     contentType: 'application/json',
   });
 });
+
+registerPublicNavigationAudit();

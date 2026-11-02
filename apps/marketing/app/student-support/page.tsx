@@ -1,269 +1,37 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Phone, MessageSquare, Calendar } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import HeroVideo from '@/components/marketing/HeroVideo';
-
-const SITE_URL = 'https://www.elevateforhumanity.org';
+import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 
 export const metadata: Metadata = {
-  title: 'Student Support Services | Elevate for Humanity',
-  description:
-    'Access academic support, financial aid, career services, counseling, and more. We are here to help you succeed throughout your educational journey.',
-  keywords: [
-    'student support',
-    'academic help',
-    'financial aid',
-    'career services',
-    'tutoring',
-    'counseling',
-  ],
-  alternates: {
-    canonical: `${SITE_URL}/student-support`,
-  },
-  openGraph: {
-    title: 'Student Support Services | Elevate for Humanity',
-    description:
-      'Access academic support, financial aid, career services, and counseling to help you succeed.',
-    url: `${SITE_URL}/student-support`,
-    siteName: 'Elevate for Humanity',
-    type: 'website',
-    images: [
-      {
-        url: `${SITE_URL}/images/og/student-support-og.jpg`,
-        width: 1200,
-        height: 630,
-        alt: 'Student Support Services',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Student Support Services | Elevate for Humanity',
-    description: 'Access academic support, financial aid, career services, and counseling.',
-  },
+  title: 'Student Support Services',
+  description: 'Find academic help, funding guidance, career services, accessibility support and advising in one place.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/student-support' },
 };
-
 const services = [
-  {
-    title: 'Academic Support',
-    description:
-      'One-on-one tutoring, study groups, and academic advising. Get help with coursework, exam prep, and staying on track in your program.',
-    link: '/student-support/academic',
-    image: '/images/pages/student-portal-page-1.webp',
-  },
-  {
-    title: 'Financial Aid',
-    description:
-      'Program-specific funding guidance, scholarships when available, and payment options. Eligibility and authorization are determined by the applicable funding source.',
-    link: '/student-support/financial-aid',
-    image: '/images/pages/financial-aid-page-1.webp',
-  },
-  {
-    title: 'Career Services',
-    description:
-      'Resume support, interview preparation, job-search assistance, and employer connections. Available follow-up depends on the student and placement plan.',
-    link: '/student-support/career',
-    image: '/images/pages/career-services-page-1.webp',
-  },
-  {
-    title: 'Counseling & Wellness',
-    description:
-      'Referrals and resource navigation for counseling, mental health, and crisis-support services. Availability, cost, and confidentiality terms depend on the service provider.',
-    link: '/student-support/counseling',
-    image: '/images/pages/career-counseling-page-1.webp',
-  },
-  {
-    title: 'Accessibility Services',
-    description:
-      'Reasonable-accommodation coordination, assistive-technology support where available, and individualized accessibility planning. Contact Student Support to request an accommodation.',
-    link: '/student-support/accessibility',
-    image: '/images/pages/support-page-2.webp',
-  },
-  {
-    title: 'Scheduling & Advising',
-    description:
-      'Class scheduling, program advising, and calendar management. Flexible scheduling for working adults and parents.',
-    link: '/student-support/scheduling',
-    image: '/images/pages/student-portal-page-3.webp',
-  },
+  { id: 'academic', title: 'Academic support', description: 'Ask about coursework, exam preparation, study resources, and help staying on track in your program.', href: '/contact?topic=academic-support', action: 'Ask for academic help', image: '/images/licensed-envato/resources-study-378c48c4.webp', alt: 'Learner reviewing study materials beside a laptop' },
+  { id: 'financial-aid', title: 'Funding & payment guidance', description: 'Review program-specific funding pathways, scholarships when available, and payment options. Eligibility and authorization come from the responsible funding source.', href: '/funding', action: 'Review funding options', image: '/images/career-advising-20261102.webp', alt: 'Illustrative advisor helping a learner review training options' },
+  { id: 'career', title: 'Career services', description: 'Get connected with resume support, interview preparation, job-search resources, and employer opportunities.', href: '/career-services', action: 'Explore career services', image: '/images/programs/refresh-20261101/employers.webp', alt: 'Illustrative employer and workforce collaboration scene' },
+  { id: 'counseling', title: 'Wellness & referrals', description: 'Ask for help finding counseling, wellness, and community resources. Availability, cost, and confidentiality terms depend on the service provider.', href: '/contact?topic=wellness-referrals', action: 'Request resource guidance', image: '/images/career-advising-20261102.webp', alt: 'Illustrative supportive advising conversation' },
+  { id: 'accessibility', title: 'Accessibility & accommodations', description: 'Contact our team to discuss a reasonable accommodation, accessible learning resources, or an individualized support plan.', href: '/accessibility', action: 'Review accessibility support', image: '/images/about-training-20261102.webp', alt: 'Illustrative instructor supporting adult learners in career training' },
+  { id: 'scheduling', title: 'Scheduling & advising', description: 'Discuss your program, class schedule, and next steps with the team. Available appointment formats are shown during scheduling.', href: '/student-support/schedule', action: 'Schedule an appointment', image: '/images/licensed-envato/resources-study-378c48c4.webp', alt: 'Study materials used to plan a learning schedule' },
 ];
-
 export default function StudentSupportPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Student Support' }]} />
-        </div>
-      </div>
-
-      {/* Video Hero */}
-      <HeroVideo
-        contentTheme="light"
-        videoSrcDesktop="/videos/student-portal-hero.mp4"
-        posterImage="/images/pages/student-support-hero.webp"
-        voiceoverSrc="/audio/heroes/programs.mp3"
-        microLabel="Student Support"
-        analyticsName="student-support"
-      >
-        <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-3">
-          Elevate for Humanity
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-4">
-          Student Support Services
-        </h1>
-        <p className="text-slate-600 text-lg leading-relaxed mb-6 max-w-2xl">
-          Academic help, financial aid, career services, and counseling — everything you need to
-          succeed from enrollment through employment.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/start-trial"
-            className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-7 py-3 rounded-lg font-bold hover:bg-brand-green-700 transition text-sm"
-          >
-            Apply Now <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/student-support/schedule"
-            className="border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition text-sm"
-          >
-            Schedule Appointment
-          </Link>
-        </div>
-      </HeroVideo>
-
-      {/* Services — Image Cards */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900">How We Support You</h2>
-            <p className="text-slate-600 mt-2 max-w-2xl mx-auto">
-              From your first day in class to your first day on the job — and beyond.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
-              <div
-                key={service.title}
-                className="group bg-white rounded-xl overflow-hidden border hover:shadow-lg transition"
-              >
-                <div className="relative h-44 overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <div className="absolute bottom-3 left-4">
-                    <h3 className="text-lg font-bold text-slate-900">{service.title}</h3>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <p className="text-slate-600 text-sm mb-4">{service.description}</p>
-                  <Link
-                    href={service.link}
-                    className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
-                  >
-                    Learn More <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Support */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-slate-900 text-center mb-10">Contact Support</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-6 text-center">
-              <Phone className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-slate-900 mb-1">Phone Support</h3>
-              <a
-                href="tel:+14632401404"
-                className="text-brand-green-600 font-semibold hover:underline"
-              >
-                (463) 240-1404
-              </a>
-              <p className="text-sm text-slate-500 mt-1">Mon–Fri 8am–6pm EST</p>
-              <Link
-                href="tel:+14632401404"
-                className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
-              >
-                Call Now
-              </Link>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center">
-              <MessageSquare className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-slate-900 mb-1">Live Chat</h3>
-              <p className="text-slate-600">Chat availability varies by staffing</p>
-              <p className="text-sm text-slate-500 mt-1">
-                For urgent matters, use the published phone or emergency resources.
-              </p>
-              <Link
-                href="/support/chat"
-                className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
-              >
-                Start Chat
-              </Link>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center">
-              <Calendar className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-slate-900 mb-1">Schedule Meeting</h3>
-              <p className="text-slate-600">Request a one-on-one appointment</p>
-              <p className="text-sm text-slate-500 mt-1">
-                Available formats are shown during scheduling.
-              </p>
-              <Link
-                href="/student-support/schedule"
-                className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
-              >
-                Book Now
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative py-20 overflow-hidden">
-        <Image
-          src="/images/pages/student-support-page-1.webp"
-          alt="Students succeeding in workforce training"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            Ready to Start Your Career?
-          </h2>
-          <p className="text-white text-lg mb-8">
-            Review possible funding pathways for your selected program. Funding is program- and
-            participant-specific and requires approval from the responsible source.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/start-trial"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
-            >
-              Apply Now <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/programs"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
-            >
-              Browse Programs
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+  return <main className="min-h-screen bg-white text-slate-950">
+    <div className="mx-auto max-w-6xl px-4 py-3"><Breadcrumbs items={[{ label: 'Student Support' }]} /></div>
+    <PublicEditorialHero eyebrow="Student support" title="Support for your next step." description="Find the right help without searching through separate pages. Choose a topic below or speak with our team about what you need." image="/images/career-advising-20261102.webp" imageAlt="Illustrative advisor and adult learner planning a training pathway">
+      <Link href="/contact?topic=student-support" className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-700 px-5 py-3 font-bold text-white hover:bg-brand-red-800">Contact student support</Link>
+      <Link href="/student-support/schedule" className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-100">Schedule an appointment</Link>
+    </PublicEditorialHero>
+    <section className="mx-auto max-w-6xl px-4 py-12">
+      <h2 className="mb-7 text-3xl font-bold">How can we help?</h2>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{services.map(service => <article id={service.id} key={service.id} className="scroll-mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="relative aspect-[3/2]"><Image src={service.image} alt={service.alt} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" /></div>
+        <div className="p-6"><h3 className="text-xl font-bold">{service.title}</h3><p className="mt-3 leading-7 text-slate-700">{service.description}</p><Link href={service.href} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-brand-red-700 hover:underline">{service.action}<ArrowRight className="h-4 w-4 shrink-0" /></Link></div>
+      </article>)}</div>
+    </section>
+    <section className="bg-slate-50 px-4 py-12"><div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6"><div><h2 className="text-2xl font-bold">Ready to explore a program?</h2><p className="mt-3 leading-7 text-slate-700">Compare training options and review your next enrollment step.</p></div><Link href="/programs" className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-700 px-5 py-3 font-bold text-white hover:bg-brand-red-800">Browse programs</Link></div></section>
+  </main>;
 }

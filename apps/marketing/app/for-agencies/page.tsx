@@ -119,8 +119,8 @@ export default async function ForAgenciesPage() {
       </div>
 
       <HeroPicture
-        src="/images/refresh-20261014/admissions.webp"
-        alt="Illustrative learner and advisor reviewing a career-training pathway"
+        src="/images/programs/refresh-20261101/employers.webp"
+        alt="Illustrative workforce partners planning a career-training pathway"
         belowHeroHeadline="Refer clients to career training"
         belowHeroSubheadline="Review the participant's career goal, select the exact program, and confirm the responsible agency's eligibility and funding authorization before enrollment."
         ctas={[

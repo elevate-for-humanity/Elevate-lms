@@ -71,8 +71,8 @@ export default function WioaPage() {
 
       <section className="relative isolate min-h-[520px] overflow-hidden bg-slate-950">
         <Image
-          src="/images/pages/funding-page-4.jpg"
-          alt="Adult learner meeting with a workforce training advisor"
+          src="/images/career-advising-20261102.webp"
+          alt="Illustrative adult learner meeting with a workforce training advisor"
           fill
           priority
           quality={90}

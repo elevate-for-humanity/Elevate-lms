@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { TEAM } from '@/data/team';
-import { teamProfileHref } from '@/lib/navigation/team-profile';
+import { teamProfileHref, teamPortrait, teamPortraitAlt } from '@/lib/navigation/team-profile';
 import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 
 // Load the active staff roster at request time; cookies() cannot run during prerendering.
@@ -36,7 +36,7 @@ export default async function TeamPage() {
         name: p.name ?? 'Team Member',
         title: p.title ?? '',
         bio: p.bio ?? '',
-        headshotSrc: p.image_url || TEAM.find(member => member.name === p.name)?.headshotSrc,
+        headshotSrc: teamPortrait(p) || TEAM.find(member => member.name === p.name)?.headshotSrc,
         email: p.email ?? '',
       }));
     }
@@ -74,7 +74,7 @@ export default async function TeamPage() {
               {member.headshotSrc && (
                 <Image
                   src={member.headshotSrc}
-                  alt={member.name}
+                  alt={teamPortraitAlt(member.name, member.headshotSrc)}
                   width={400}
                   height={400}
                   className="aspect-[4/5] w-full object-cover object-top"

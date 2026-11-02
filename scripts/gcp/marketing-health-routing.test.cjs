@@ -25,16 +25,17 @@ const { middleware } = compile('apps/marketing/middleware.ts', {
   }),
   '@/lib/supabase/middleware': { createMiddlewareSupabaseClient: () => { throw new Error('Probe must not use authentication'); } },
 });
-for (const [path, target] of [
-  ['/employer', 'https://www.elevateforhumanity.org/employers'],
-  ['/testing-center', 'https://www.elevateforhumanity.org/testing'],
-  ['/learner/dashboard', 'https://lms.elevateforhumanity.org/lms/dashboard'],
+for (const [path, target, status] of [
+  ['/employer', 'https://www.elevateforhumanity.org/employers', 307],
+  // Testing consolidation is permanent; preserve the exact 308 contract.
+  ['/testing-center', 'https://www.elevateforhumanity.org/testing', 308],
+  ['/learner/dashboard', 'https://lms.elevateforhumanity.org/lms/dashboard', 307],
 ]) {
   test(`${path} resolves its public entry before portal-prefix dispatch`, async () => {
     const response = await middleware(new NextRequest(`https://www.elevateforhumanity.org${path}?source=bookmark`, {
       headers: { host: 'www.elevateforhumanity.org' },
     }));
-    assert.equal(response.status, 307);
+    assert.equal(response.status, status);
     assert.equal(response.headers.get('location'), `${target}?source=bookmark`);
   });
 }

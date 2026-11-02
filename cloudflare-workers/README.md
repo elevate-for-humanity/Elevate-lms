@@ -17,7 +17,7 @@ This Cloudflare Worker serves SCORM training courses from Cloudflare R2 storage 
 
 - **Purpose:** SCORM course delivery
 - **Used for:** JRI training modules
-- **Domain:** `scorm.www.elevateforhumanity.org`
+- **Domain:** `scorm.elevateforhumanity.org`
 - **Status:** Configured but not deployed
 
 ## Deployment
@@ -56,15 +56,27 @@ wrangler r2 object put elevate-scorm-courses/jri-badge-1/index.html --file=./1-j
 # Repeat for all SCORM files
 ```
 
-### Step 3: Create KV Namespace (for tracking)
+### Step 3: Use canonical authenticated LMS tracking
+
+Tracking no longer writes to a separate KV namespace. It verifies the caller's
+Supabase access token, requires an existing SCORM enrollment for that user and
+package, and confirms the RLS-protected database update before returning success.
+The legacy `courseId` request field identifies the SCORM package UUID.
+
+Configure the existing project's publishable key as a Worker secret:
 
 ```bash
-# Create KV namespace
-wrangler kv:namespace create "SCORM_TRACKING"
-
-# Copy the ID and update wrangler.toml
-# Replace "your-kv-namespace-id" with the actual ID
+wrangler secret put SUPABASE_PUBLISHABLE_KEY
 ```
+
+Never configure a service-role key. Requests must include `Authorization: Bearer`
+with the signed-in learner's access token, `Content-Type: application/json`, and
+`{courseId, progress, completed}`. If `userId` is supplied it must match the
+verified caller. Missing configuration, rejected sessions, missing enrollment,
+and unconfirmed writes return errors. This records SCORM progress only; it does
+not award program completion or credentials.
+
+Run `node --test cloudflare-workers/scorm-player-worker.test.mjs` from the repo root.
 
 ### Step 4: Deploy Worker
 
@@ -88,7 +100,7 @@ In Cloudflare Dashboard:
 In Netlify (or your deployment platform):
 
 ```bash
-NEXT_PUBLIC_SCORM_CDN_URL=https://scorm.www.elevateforhumanity.org
+NEXT_PUBLIC_SCORM_CDN_URL=https://scorm.elevateforhumanity.org
 ```
 
 ## How It Works
@@ -96,7 +108,7 @@ NEXT_PUBLIC_SCORM_CDN_URL=https://scorm.www.elevateforhumanity.org
 ### With Cloudflare Worker (Deployed):
 
 ```
-Student → scorm.www.elevateforhumanity.org → Cloudflare Worker → R2 Storage
+Student → scorm.elevateforhumanity.org → Cloudflare Worker → R2 Storage
 ```
 
 ### Without Worker (Fallback):
@@ -129,7 +141,7 @@ wrangler dev
 ### Test SCORM Delivery:
 
 ```bash
-curl https://scorm.www.elevateforhumanity.org/jri-badge-1/index.html
+curl https://scorm.elevateforhumanity.org/jri-badge-1/index.html
 ```
 
 ## Monitoring

@@ -7,10 +7,9 @@ compatibility_date = "2024-12-02"
 binding = "SCORM_BUCKET"
 bucket_name = "elevate-scorm-courses"
 
-# KV Namespace for tracking (optional)
-[[kv_namespaces]]
-binding = "SCORM_TRACKING"
-id = "your-kv-namespace-id"
+# Tracking persists to the canonical LMS Supabase enrollment, under the user's
+# verified session and existing RLS. Set SUPABASE_PUBLISHABLE_KEY (or the legacy
+# SUPABASE_ANON_KEY) with wrangler secret put; no service-role credential is used.
 
 # Routes
 routes = [

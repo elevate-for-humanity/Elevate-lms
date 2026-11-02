@@ -63,6 +63,8 @@ jobs:
         include:
           - device: desktop-chrome
             os: ubuntu-24.04
+          - device: laptop-chrome
+            os: ubuntu-24.04
           - device: tablet-chrome
             os: ubuntu-24.04
           - device: iphone-webkit
@@ -111,6 +113,10 @@ jobs:
           NODE
       - name: Verify public HVAC film on desktop, tablet, iPhone and Android
         run: pnpm exec playwright test tests/e2e/hvac-hero-playback.spec.ts --config playwright.config.ts --reporter=line,html --output=test-results/hvac-hero --project=${{ matrix.device }}
+      - name: Verify released homepage and canonical enrollment on every device
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/homepage-enrollment
+        run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts --reporter=line,html --output=test-results/homepage-enrollment --project=${{ matrix.device }}
       - name: Preserve playback samples, screenshots and browser report
         if: always()
         uses: actions/upload-artifact@v4
@@ -118,6 +124,7 @@ jobs:
           name: hvac-hero-playback-${{ github.run_id }}-${{ matrix.device }}
           path: |
             test-results/hvac-hero/
+            test-results/homepage-enrollment/
             test-results/hvac-release-*.json
             playwright-report/
           retention-days: 14

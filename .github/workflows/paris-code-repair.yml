@@ -8,6 +8,10 @@ on:
       - 'lib/devstudio/paris-code-engineer.ts'
       - 'lib/ai/runtime/supervision.ts'
       - 'lib/ai/runtime/code-repair-policy.mjs'
+  workflow_run:
+    workflows: ['Deploy Admin']
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
@@ -25,7 +29,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   monitor:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push')
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success'))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:

@@ -117,8 +117,12 @@ export async function processLessonAutopilot({db,job,workerId,generation,build,q
       });
       if (delegated.error) throw delegated.error;
       if (delegated.data?.delegated === true) {
+        const producerJobId = delegated.data.producerJobId;
+        if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(producerJobId ?? '') ||
+            producerJobId === job.id || !['instruction','media'].includes(delegated.data.role))
+          throw Error('ULTIMATE_REPAIR_HANDOFF_RECEIPT_INVALID');
         await notifyCourseDispatcher({});
-        return {claimed:true,completed:false,continuing:true,jobId:job.id,result};
+        return {claimed:true,completed:false,continuing:true,repairHandoffPersisted:true,producerJobId,jobId:job.id,result};
       }
     }
     const message = 'ULTIMATE_INTERNAL_REPAIR_REQUIRED:'+task.competencyId+':FINDINGS='+JSON.stringify(result.findings).slice(0,2800);

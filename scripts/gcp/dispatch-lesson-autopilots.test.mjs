@@ -33,6 +33,11 @@ function fixture(rows){
    throw Error('unexpected command');
   },
   request:async (url,init)=>{
+   if(url.pathname.endsWith('/rpc/ultimate_autopilot_ready_jobs')){
+    controls.batchCalls=(controls.batchCalls??0)+1;
+    const ids=JSON.parse(init.body).p_jobs;
+    return {ok:true,json:async()=>ids.filter(id=>!controls.notReady?.includes(id))};
+   }
    if(url.pathname.endsWith('/rpc/ultimate_autopilot_job_ready')){
     const id=JSON.parse(init.body).p_job;
     return {ok:true,json:async()=>!controls.notReady?.includes(id)};
@@ -216,4 +221,18 @@ test('Cloud Run numeric string readback is accepted without relaxing image or ro
  const result=await dispatchLessonAutopilots(s.options);
  assert.equal(result.status,'assigned');
  assert.equal(result.assignments.length,1);
+});
+
+test('a large ready queue uses one authoritative readiness batch',async()=>{
+ const s=fixture(Array.from({length:80},(_,i)=>waiting('instruction','ready-'+i)));
+ await dispatchLessonAutopilots(s.options);assert.equal(s.controls.batchCalls,1);assert.equal(launches(s).length,80);
+});
+test('an immutable role image rolling forward defers dispatch before any paid launch',async()=>{
+ const s=fixture([waiting('quality')]);s.templates.get(LESSON_ROLE_JOBS.instruction.name).spec.template.spec.template.spec.containers[0].image=source.spec.template.spec.template.spec.containers[0].image.replace('a'.repeat(64),'b'.repeat(64));
+ const result=await dispatchLessonAutopilots(s.options);assert.equal(result.status,'retry_wait');assert.equal(result.reason,'approved_worker_rollout_pending');assert.equal(launches(s).length,0);
+});
+test('bounded admission yields to a new coordination pass without discarding saved work',async()=>{
+ const s=fixture(Array.from({length:8},(_,i)=>waiting('instruction','ready-'+i)));let clock=now.getTime();s.options.clock=()=>clock;const capacity=s.options.capacityCheck;
+ s.options.capacityCheck=async args=>{const result=await capacity(args);clock+=70000;return result;};
+ const result=await dispatchLessonAutopilots(s.options);assert.equal(result.reason,'admission_budget_yield');assert.equal(launches(s).length,2);assert.ok(result.uncoveredJobs>0);
 });

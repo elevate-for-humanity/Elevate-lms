@@ -34,6 +34,12 @@ BEGIN
  IF EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_lesson_autopilot('premature-media',300,'media')) OR
    EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_lesson_autopilot('premature-quality',300,'quality'))
  THEN RAISE EXCEPTION 'TEST: prerequisite bypass'; END IF;
+ IF (SELECT count(*) FROM pg_temp.ultimate_autopilot_ready_jobs(ARRAY(SELECT id FROM pg_temp.ultimate_build_jobs WHERE build_id=build AND payload?'autopilot')))<>2
+ THEN RAISE EXCEPTION 'TEST: batch readiness did not preserve instruction prerequisites'; END IF;
+ rejected:=false;
+ BEGIN PERFORM pg_temp.ultimate_autopilot_ready_jobs(array_fill(gen_random_uuid(),ARRAY[1001]));
+ EXCEPTION WHEN OTHERS THEN IF SQLERRM LIKE '%READINESS_BATCH_TOO_LARGE%' THEN rejected:=true;ELSE RAISE;END IF;END;
+ IF NOT rejected THEN RAISE EXCEPTION 'TEST: unbounded readiness batch accepted'; END IF;
  SELECT * INTO first_job FROM pg_temp.claim_ultimate_lesson_autopilot('worker-a',300,'instruction');
  SELECT * INTO second_job FROM pg_temp.claim_ultimate_lesson_autopilot('worker-b',300,'instruction');
  IF first_job.id IS NULL OR second_job.id IS NULL OR first_job.id=second_job.id OR
@@ -125,6 +131,6 @@ BEGIN
  IF position('ultimate-lesson-2026-10-29.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))=0 OR
     position('ultimate-lesson-2026-10-05.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))>0
  THEN RAISE EXCEPTION 'TEST: publication contract version drift'; END IF;
- RAISE NOTICE 'PASS: 20 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
+ RAISE NOTICE 'PASS: 22 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
 END $$;
-SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',20) AS autopilot_database_test;
+SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',22) AS autopilot_database_test;

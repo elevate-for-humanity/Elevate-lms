@@ -2,6 +2,8 @@ export interface WorkerResult {
   claimed: boolean;
   completed?: boolean;
   continuing?: boolean;
+  repairHandoffPersisted?: boolean;
+  producerJobId?: string;
   result?: { findings?: Array<{ severity: string }> };
 }
 export function runWorkerLoop<T extends WorkerResult>(options: {

@@ -65,21 +65,35 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  if(!/@sha256:[a-f0-9]{64}$/.test(expectedImage??''))throw Error('IMMUTABLE_APPROVED_WORKER_IMAGE_REQUIRED');
  // Ask the same database predicate used by claims before reserving paid capacity.
  // Waiting media/QA stages must not occupy slots intended for runnable lessons.
- const ready=[];
- for(const job of eligible){
-  if(Date.parse(job.available_at)>now.getTime() ||
-    (job.status==='running' && Date.parse(job.lease_expires_at)>now.getTime()))continue;
-  const response=await request(new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_job_ready'),{
-   method:'POST',headers:{...headers,'Content-Type':'application/json'},
-   body:JSON.stringify({p_job:job.id}),signal:AbortSignal.timeout(15000),
-  });
+ const readyCandidates=eligible.filter(job=>Date.parse(job.available_at)<=now.getTime() &&
+  !(job.status==='running' && Date.parse(job.lease_expires_at)>now.getTime()));
+ let ready=[];
+ if(readyCandidates.length){
+  const response=await request(new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready_jobs'),{
+   method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({p_jobs:readyCandidates.map(j=>j.id)}),signal:AbortSignal.timeout(15000)});
   if(!response.ok)throw Error('ULTIMATE_AUTOPILOT_READINESS_HTTP_'+response.status);
-  const result=await response.json();
-  if(typeof result!=='boolean')throw Error('ULTIMATE_AUTOPILOT_READINESS_INVALID');
-  if(result)ready.push(job);
+  const ids=await response.json(),requested=new Set(readyCandidates.map(j=>j.id));
+  if(!Array.isArray(ids)||new Set(ids).size!==ids.length||ids.some(id=>typeof id!=='string'||!requested.has(id)))throw Error('ULTIMATE_AUTOPILOT_READINESS_INVALID');
+  const accepted=new Set(ids);ready=readyCandidates.filter(j=>accepted.has(j.id));
  }
- let activeCount=0,capacityWait=false,reserved=null;const launches=[],assigned=[];
+ const validateTemplate=(job,role)=>{
+  const envelope=job.spec?.template?.spec,task=envelope?.template?.spec;
+  const image=task?.containers?.[0]?.image;
+  if(Number(envelope?.parallelism)!==1||Number(envelope?.taskCount)!==1||
+    task?.containers?.[0]?.env?.find(e=>e.name==='ULTIMATE_AUTOPILOT_ROLE')?.value!==role||
+    !/@sha256:[a-f0-9]{64}$/.test(image??'')||image.split('@')[0]!==expectedImage.split('@')[0])throw Error('ULTIMATE_AUTOPILOT_APPROVED_TEMPLATE_REQUIRED:'+role);
+  return image===expectedImage;
+ };
+ // Read every role before the first paid launch. A verified immutable image
+ // rolling forward is a coordination wait, not a failed lesson.
  for(const role of ['quality','media','instruction']){
+  if(!validateTemplate(read(['run','jobs','describe',LESSON_ROLE_JOBS[role].name]),role))return {status:'retry_wait',reason:'approved_worker_rollout_pending'};
+ }
+ const admissionDeadline=clock()+120000;
+ let admissionLimited=false,rolloutPending=false;
+ let activeCount=0,capacityWait=false,reserved=null;const launches=[],assigned=[];
+ roleLoop: for(const role of ['quality','media','instruction']){
+  if(clock()>=admissionDeadline){admissionLimited=true;break;}
   const candidates=ready.filter(j=>j.payload?.autopilot?.role===role && Date.parse(j.available_at)<=now.getTime() &&
    (j.status==='queued' || Date.parse(j.lease_expires_at)<=now.getTime()));
   const config=LESSON_ROLE_JOBS[role];
@@ -98,10 +112,9 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   const slots=Math.min(Math.max(0,concurrency(role,env,candidates.length+leased)-active.length),Math.max(0,candidates.length-unclaimed));
   if(!slots)continue;
   const job=read(['run','jobs','describe',config.name]),envelope=job.spec?.template?.spec,task=envelope?.template?.spec;
-  if(Number(envelope?.parallelism)!==1 || Number(envelope?.taskCount)!==1 || task?.containers?.[0]?.image!==expectedImage ||
-    task?.containers?.[0]?.env?.find(e=>e.name==='ULTIMATE_AUTOPILOT_ROLE')?.value!==role)
-   throw Error('ULTIMATE_AUTOPILOT_APPROVED_TEMPLATE_REQUIRED:'+role);
+  if(!validateTemplate(job,role)){rolloutPending=true;break;}
   for(let slot=0;slot<slots;slot++){
+   if(clock()>=admissionDeadline){admissionLimited=true;break roleLoop;}
    const capacity=await capacityCheck({region:LESSON_ROLE_REGION,task,taskCount:1,run,request});
    const next=reserveCapacity(capacity,task,reserved);
    if(!next){
@@ -163,6 +176,7 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  const coveredJobs=freshLeases+assigned.length;
  const uncoveredJobs=Math.max(0,runnableJobs-coveredJobs);
  const coverage={contract:'runnable-stage-required-v1',runnableJobs,coveredJobs,uncoveredJobs};
+ if(rolloutPending||admissionLimited)return {status:'busy',reason:rolloutPending?'approved_worker_rollout_pending':'admission_budget_yield',activeExecutions:activeCount,assignments:assigned,...coverage};
  if(pending.size)return {status:'busy',reason:'awaiting_worker_assignment',
   activeExecutions:activeCount,unconfirmedExecutions:pending.size,assignments:assigned,...coverage};
  // Partial admission is not success. Keep the trusted coordinator alive while

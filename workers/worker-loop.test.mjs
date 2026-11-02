@@ -51,3 +51,11 @@ test('a saved owner preview ends the finite task without claiming course complet
   const result={claimed:true,completed:false,previewReady:true};
   assert.equal(await runWorkerLoop(options(async()=>result)),result);
 });
+
+test('a server-persisted producer repair releases the finite task without claiming lesson completion',async()=>{
+ const result={claimed:true,completed:false,continuing:true,repairHandoffPersisted:true,
+  producerJobId:'11111111-1111-1111-1111-111111111111',result:{findings:[{severity:'error',code:'AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED'}]}};
+ assert.equal(await runWorkerLoop(options(async()=>result)),result);
+ for(const altered of [{...result,repairHandoffPersisted:false},{...result,producerJobId:undefined},{...result,producerJobId:'invalid'},{...result,completed:true}])
+  await assert.rejects(runWorkerLoop(options(async()=>altered)),/ULTIMATE_TASK_REPAIR_REQUIRED/);
+});

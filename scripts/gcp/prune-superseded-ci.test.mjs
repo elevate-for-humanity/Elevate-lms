@@ -68,3 +68,21 @@ test('CI concurrency is per branch and keeps every gate on the current commit', 
   assert.match(policy, /cancel-in-progress: true/);
   assert.match(workflow, /Run required Vitest suite/);
 });
+
+test('a cancellation conflict is accepted only after a terminal receipt for the same run', async () => {
+  for (const terminal of [false, true]) {
+    let reads = 0;
+    const api = async (path, method = 'GET') => {
+      if (method === 'POST') throw Error('RELEASE_API_HTTP_409');
+      if (path.includes('/workflows/')) return { workflow_runs: [run(1)] };
+      reads++;
+      return run(1, { status: terminal && reads > 1 ? 'completed' : 'in_progress' });
+    };
+    if (terminal)
+      assert.equal(
+        (await pruneSupersededCi({ api, latestSha, execute: true }))[0].status,
+        'already_completed',
+      );
+    else await assert.rejects(pruneSupersededCi({ api, latestSha, execute: true }), /HTTP_409/);
+  }
+});

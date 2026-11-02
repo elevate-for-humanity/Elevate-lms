@@ -34,7 +34,19 @@ export async function pruneSupersededCi({ api, latestSha, execute = false }) {
     const current = await api(endpoint);
     if (current.id !== run.id || current.head_sha !== run.head_sha || !obsolete(current, latestSha))
       continue;
-    if (execute) await api(endpoint + '/cancel', 'POST');
+    if (execute) {
+      try {
+        await api(endpoint + '/cancel', 'POST');
+      } catch (error) {
+        // GitHub may finish a run between the read and cancellation POST.
+        // Accept that race only after verifying the same run is terminal.
+        if (!(error instanceof Error) || error.message !== 'RELEASE_API_HTTP_409') throw error;
+        const receipt = await api(endpoint);
+        if (receipt.id !== run.id || receipt.status !== 'completed') throw error;
+        results.push({ runId: run.id, commit: run.head_sha, status: 'already_completed' });
+        continue;
+      }
+    }
     results.push({
       runId: run.id,
       commit: run.head_sha,

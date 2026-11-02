@@ -1,3 +1,4 @@
+import { isLearnerUploadRequirement } from '@/lib/apprenticeship/document-checklist';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -72,7 +73,7 @@ async function _GET(request: NextRequest) {
 
     return NextResponse.json({
       enrollmentId: enrollment.id,
-      documentTypes: documentTypes || [],
+      documentTypes: (documentTypes || []).filter(isLearnerUploadRequirement),
       uploadedDocuments: uploadedDocuments || [],
     });
   } catch (error) {
@@ -124,16 +125,25 @@ async function _POST(request: NextRequest) {
         { status: 400 },
       );
 
+    if (!isLearnerUploadRequirement(docType)) {
+      return NextResponse.json(
+        {
+          error:
+            'This item is completed electronically or by the employer; it is not a learner upload.',
+        },
+        { status: 400 },
+      );
+    }
+
     // Requirements are database-configured, so validate their machine key by
     // shape instead of maintaining a second, inevitably drifting allowlist.
     const documentType = String(docType.document_type || '').trim();
     if (!/^[a-z][a-z0-9_-]{0,127}$/.test(documentType)) {
       const configurationError = new Error('Invalid configured apprentice document type');
-      logger.error(
-        '[Documents API] Invalid configured document type',
-        configurationError,
-        { documentTypeId, programSlug },
-      );
+      logger.error('[Documents API] Invalid configured document type', configurationError, {
+        documentTypeId,
+        programSlug,
+      });
       return NextResponse.json(
         { error: 'This document requirement is misconfigured. Please contact program staff.' },
         { status: 500 },
@@ -186,12 +196,10 @@ async function _POST(request: NextRequest) {
     const timestamp = Date.now();
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const storagePath = `${user.id}/apprentice-documents/${programSlug}/${enrollment.id}/${documentType}/${timestamp}_${safeFileName}`;
-    const { error: uploadError } = await db.storage
-      .from('documents')
-      .upload(storagePath, file, {
-        contentType: file.type || 'application/octet-stream',
-        upsert: false,
-      });
+    const { error: uploadError } = await db.storage.from('documents').upload(storagePath, file, {
+      contentType: file.type || 'application/octet-stream',
+      upsert: false,
+    });
     if (uploadError) return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
 
     const { data: docRecord, error: recordError } = await db
@@ -222,18 +230,14 @@ async function _POST(request: NextRequest) {
         recordError || new Error('Document insert returned no record'),
         'Failed to persist uploaded document',
       );
-      logger.error(
-        '[Documents API] Failed to persist uploaded document',
-        persistenceError,
-        {
-          ...getErrorContext(recordError || persistenceError),
-          documentType,
-          documentTypeId,
-          programSlug,
-          enrollmentId: enrollment.id,
-          userId: user.id,
-        },
-      );
+      logger.error('[Documents API] Failed to persist uploaded document', persistenceError, {
+        ...getErrorContext(recordError || persistenceError),
+        documentType,
+        documentTypeId,
+        programSlug,
+        enrollmentId: enrollment.id,
+        userId: user.id,
+      });
       await db.storage.from('documents').remove([storagePath]);
       return NextResponse.json({ error: 'Failed to save document record' }, { status: 500 });
     }

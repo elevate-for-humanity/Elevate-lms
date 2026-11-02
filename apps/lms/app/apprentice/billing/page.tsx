@@ -227,34 +227,38 @@ export default async function ApprenticeBillingPage() {
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const portalPath =
     (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
-  const { data: billingAuthorization } = await db
+  const { data: billingAuthorization, error: authorizationError } = await db
     .from('billing_migration_authorizations')
     .select('billing_schedule_id')
     .eq('user_id', subject.userId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  const { data: automaticSchedule } = billingAuthorization?.billing_schedule_id
-    ? await db
-        .from('billing_schedules')
-        .select(
-          'amount_cents,cadence,next_invoice_date,status,provider_status,provider_subscription_id,provider_approval_url',
-        )
-        .eq('id', billingAuthorization.billing_schedule_id)
-        .maybeSingle()
-    : { data: null };
+  if (authorizationError) throw authorizationError;
+  const { data: automaticSchedule, error: scheduleError } =
+    billingAuthorization?.billing_schedule_id
+      ? await db
+          .from('billing_schedules')
+          .select(
+            'amount_cents,cadence,next_invoice_date,status,provider_status,provider_subscription_id,provider_approval_url',
+          )
+          .eq('id', billingAuthorization.billing_schedule_id)
+          .maybeSingle()
+      : { data: null, error: null };
+  if (scheduleError) throw scheduleError;
   const schedule = automaticSchedule as ScheduleRow | null;
 
   if (programSlug === 'barber-apprenticeship') {
-    const { data } = await db
+    const { data, error } = await db
       .from('barber_subscriptions')
       .select(
-        'payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid',
+        'payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,fully_paid,setup_fee_paid',
       )
       .eq('user_id', subject.userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+    if (error) throw error;
     const sub = data as SubscriptionRow | null;
     if (!sub && !schedule)
       return (
@@ -279,7 +283,7 @@ export default async function ApprenticeBillingPage() {
   }
 
   if (programSlug === 'cosmetology-apprenticeship') {
-    const { data } = await db
+    const { data, error } = await db
       .from('cosmetology_subscriptions')
       .select(
         'payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid',
@@ -288,6 +292,7 @@ export default async function ApprenticeBillingPage() {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+    if (error) throw error;
     const sub = data as SubscriptionRow | null;
     if (sub || schedule) {
       const billing = summary('cosmetology', sub || {}, schedule);

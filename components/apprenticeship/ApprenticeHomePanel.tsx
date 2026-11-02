@@ -1,3 +1,4 @@
+import { apprenticeDocumentChecklist } from '@/lib/apprenticeship/document-checklist';
 import { actionableNoticeFilter, actionableNotices } from '@/lib/notifications/actionable-notices';
 import {
   APPRENTICE_POLICY_KEYS,
@@ -55,9 +56,15 @@ export default async function ApprenticeHomePanel({
       .maybeSingle(),
     db
       .from('apprentice_document_types')
-      .select('document_type')
-      .eq('program_slug', programSlug)
-      .eq('is_required', true),
+      .select('document_type,is_required')
+      .eq('program_slug', programSlug),
+    db
+      .from('license_agreement_acceptances')
+      .select('accepted_at')
+      .eq('user_id', userId)
+      .eq('agreement_type', 'apprenticeship_agreement')
+      .eq('document_version', '1.0')
+      .maybeSingle(),
     db
       .from('agreement_acceptances')
       .select('agreement_key,agreement_version')
@@ -66,8 +73,16 @@ export default async function ApprenticeHomePanel({
       .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
   const failed = results.some((result) => result.error);
-  const [profile, notifications, apprentice, documents, verification, requirements, policies] =
-    results.map((result) => result.data);
+  const [
+    profile,
+    notifications,
+    apprentice,
+    documents,
+    verification,
+    requirements,
+    agreement,
+    policies,
+  ] = results.map((result) => result.data);
   // Keep announcements in one expandable area; setup tasks below use current records.
   const seenNotices = new Set<string>();
   const currentNotices = actionableNotices((notifications || []) as any[])
@@ -131,21 +146,15 @@ export default async function ApprenticeHomePanel({
     },
   ];
   const actions: Array<{ title: string; text: string; href: string }> = [];
-  const approved = new Set(
-    ((documents || []) as any[])
-      .filter((doc) =>
-        ['approved', 'verified', 'accepted'].includes(
-          String(doc.verification_status || doc.status || '').toLowerCase(),
-        ),
-      )
-      .map((doc) => doc.document_type),
+  const checklist = apprenticeDocumentChecklist(
+    (requirements || []) as any[],
+    (documents || []) as any[],
+    Boolean((agreement as any)?.accepted_at),
   );
-  const missing = ((requirements || []) as any[]).filter(
-    (item) => !approved.has(item.document_type),
-  ).length;
+  const missing = checklist.missingCount;
   if (!failed && missing)
     actions.push({
-      title: `${missing} required document${missing === 1 ? ' needs' : 's need'} attention`,
+      title: `${missing} required item${missing === 1 ? ' needs' : 's need'} attention`,
       text: 'Open Documents to see exactly what is missing or needs correction.',
       href: '/apprentice/documents',
     });

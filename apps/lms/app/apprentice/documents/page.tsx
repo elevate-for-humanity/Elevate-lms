@@ -1,3 +1,7 @@
+import {
+  apprenticeDocumentChecklist,
+  isLearnerUploadRequirement,
+} from '@/lib/apprenticeship/document-checklist';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -17,11 +21,11 @@ export const metadata: Metadata = {
 };
 export const dynamic = 'force-dynamic';
 
-const approvedStates = new Set(['approved', 'accepted', 'verified']);
-
 export default async function ApprenticeDocumentsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const admin = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(admin, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice/documents');
@@ -31,7 +35,9 @@ export default async function ApprenticeDocumentsPage() {
   const documentResults = await Promise.all([
     admin
       .from('apprentice_document_types')
-      .select('id,name,description,document_type,is_required,accepted_formats,max_file_size_mb,display_order')
+      .select(
+        'id,name,description,document_type,is_required,accepted_formats,max_file_size_mb,display_order',
+      )
       .eq('program_slug', programSlug)
       .order('display_order', { ascending: true }),
     admin
@@ -58,62 +64,122 @@ export default async function ApprenticeDocumentsPage() {
   // Program-specific requirements should be provisioned in apprentice_document_types;
   // this visible fallback keeps onboarding actionable while Admin repairs configuration.
   const configuredRequirements = requirements ?? [];
-  const uploadRequirements = configuredRequirements.filter((item: any) =>
-    !['apprenticeship_agreement', 'employer_verification', 'offer_letter'].includes(String(item.document_type || '').toLowerCase()),
-  );
-  const required = uploadRequirements.filter((item: any) => item.is_required);
-  const rows = uploadRequirements.map((requirement: any) => {
-    const document = docs.find((doc: any) => doc.document_type === requirement.document_type);
-    const raw = String(document?.verification_status || document?.status || 'missing').toLowerCase();
-    const status = approvedStates.has(raw) ? 'complete' : raw === 'pending' ? 'pending' : raw === 'rejected' ? 'rejected' : 'missing';
-    return { requirement, document, status };
-  });
   const agreementSigned = Boolean(agreement?.accepted_at);
-  const missingRequired = rows.filter(({ requirement, status }: any) => requirement.is_required && status !== 'complete').length + (agreementSigned ? 0 : 1);
+  const checklist = apprenticeDocumentChecklist(configuredRequirements, docs, agreementSigned);
+  const rows = checklist.rows;
+  const required = configuredRequirements
+    .filter(isLearnerUploadRequirement)
+    .filter((item) => item.is_required);
+  const missingRequired = checklist.missingCount;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
-      <Breadcrumbs items={[{ label: 'Apprentice Portal', href: '/apprentice' }, { label: 'Documents' }]} />
+      <Breadcrumbs
+        items={[{ label: 'Apprentice Portal', href: '/apprentice' }, { label: 'Documents' }]}
+      />
       <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
           <h1 className="text-3xl font-black">Apprenticeship documents</h1>
-          <p className="mt-2 text-slate-700">Required records stay visible until accepted. Missing or rejected items are shown in red.</p>
-          <div className={`mt-5 rounded-xl border p-4 ${missingRequired ? 'border-red-300 bg-red-50 text-red-950' : 'border-green-300 bg-green-50 text-green-950'}`}>
-            {missingRequired ? (
-              <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-black">Action required: {missingRequired} required item{missingRequired === 1 ? '' : 's'} incomplete.</p><p className="mt-1 text-sm font-semibold">Upload supporting documents below. Read and electronically sign the apprenticeship agreement in the portal—do not upload it.</p></div></div>
+          <p className="mt-2 text-slate-700">
+            Required records stay visible until accepted. Missing or rejected items are shown in
+            red.
+          </p>
+          <div
+            className={`mt-5 rounded-xl border p-4 ${!checklist.configured || missingRequired ? 'border-red-300 bg-red-50 text-red-950' : 'border-green-300 bg-green-50 text-green-950'}`}
+          >
+            {!checklist.configured ? (
+              <p role="status" className="font-black">
+                Document checklist configuration needs attention. Completion cannot yet be
+                confirmed.
+              </p>
+            ) : missingRequired ? (
+              <div className="flex gap-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                <div>
+                  <p className="font-black">
+                    Action required: {missingRequired} required item
+                    {missingRequired === 1 ? '' : 's'} incomplete.
+                  </p>
+                  <p className="mt-1 text-sm font-semibold">
+                    Upload supporting documents below. Read and electronically sign the
+                    apprenticeship agreement in the portal—do not upload it.
+                  </p>
+                </div>
+              </div>
             ) : (
-              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><p className="font-black">All {required.length} required uploads and the apprenticeship agreement are complete.</p></div>
+              <div className="flex gap-3">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
+                <p className="font-black">
+                  All {required.length} required uploads and the apprenticeship agreement are
+                  complete.
+                </p>
+              </div>
             )}
           </div>
         </div>
 
-        <section className={`mt-6 rounded-2xl border p-6 ${agreementSigned ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
+        <section
+          className={`mt-6 rounded-2xl border p-6 ${agreementSigned ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}
+        >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-xl font-black">Apprenticeship Agreement</h2>
-              <p className="mt-1 max-w-3xl text-sm leading-6">Read and electronically sign your student apprenticeship agreement here. Employer agreements and employer MOUs are completed by the employer in its own dashboard; students do not upload them.</p>
-              <Link href="/lms/legal/apprenticeship-agreement" target="_blank" className="mt-3 inline-flex font-black text-blue-800 underline">Read the apprenticeship agreement</Link>
+              <p className="mt-1 max-w-3xl text-sm leading-6">
+                Read and electronically sign your student apprenticeship agreement here. Employer
+                agreements and employer MOUs are completed by the employer in its own dashboard;
+                students do not upload them.
+              </p>
+              <Link
+                href="/lms/legal/apprenticeship-agreement"
+                target="_blank"
+                className="mt-3 inline-flex font-black text-blue-800 underline"
+              >
+                Read the apprenticeship agreement
+              </Link>
             </div>
             {agreementSigned ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-1 text-xs font-black text-white"><CheckCircle2 className="h-4 w-4" /> Signed</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-1 text-xs font-black text-white">
+                <CheckCircle2 className="h-4 w-4" /> Signed
+              </span>
             ) : subject.previewing ? (
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-black">Learner signature required</span>
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black">
+                Learner signature required
+              </span>
             ) : (
               <AgreementAcceptanceButton type="apprenticeship_agreement" version="1.0" />
             )}
           </div>
         </section>
 
-        {!subject.previewing ? <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="text-xl font-black">Upload or replace a document</h2>
-          <p className="mt-1 text-sm text-slate-600">Approved evidence is locked. Missing, pending, or rejected evidence can be uploaded through the secure document endpoint.</p>
-          <div className="mt-5"><UploadDocuments programSlug={programSlug} /></div>
-        </section> : <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">Admin preview is read-only. This learner can upload these documents from their own account.</div>}
+        {!subject.previewing ? (
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-xl font-black">Upload or replace a document</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Approved evidence is locked. Missing, pending, or rejected evidence can be uploaded
+              through the secure document endpoint.
+            </p>
+            <div className="mt-5">
+              <UploadDocuments programSlug={programSlug} />
+            </div>
+          </section>
+        ) : (
+          <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
+            Admin preview is read-only. This learner can upload these documents from their own
+            account.
+          </div>
+        )}
 
         {configuredRequirements.length === 0 ? (
-          <section role="alert" className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-950">
+          <section
+            role="alert"
+            className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-950"
+          >
             <h2 className="font-black">Document checklist configuration needs attention</h2>
-            <p className="mt-2 text-sm font-semibold">Your enrollment is active, but this program's document checklist has not been configured yet. You can still complete orientation and the apprenticeship agreement. Elevate has been alerted to add the program-specific upload requirements.</p>
+            <p className="mt-2 text-sm font-semibold">
+              Your enrollment is active, but this program's document checklist has not been
+              configured yet. You can still complete orientation and the apprenticeship agreement.
+              Elevate has been alerted to add the program-specific upload requirements.
+            </p>
           </section>
         ) : null}
         <section className="mt-6 grid gap-4">
@@ -132,25 +198,48 @@ export default async function ApprenticeDocumentsPage() {
                     <FileText className="mt-1 h-6 w-6 shrink-0" />
                     <div>
                       <h2 className="font-black">{requirement.name}</h2>
-                      {getDocumentUploadGuidance(requirement) ? <p className="mt-1 max-w-3xl text-sm leading-6">{getDocumentUploadGuidance(requirement)}</p> : null}
-                      <p className="mt-1 text-sm font-semibold">{requirement.is_required ? 'Required' : 'Optional'} · Accepted: {(requirement.accepted_formats ?? []).join(', ').toUpperCase()} · Max {requirement.max_file_size_mb || 10} MB</p>
-                      {document?.file_name ? <p className="mt-2 text-xs font-semibold">Latest upload: {document.file_name}</p> : null}
+                      {getDocumentUploadGuidance(requirement) ? (
+                        <p className="mt-1 max-w-3xl text-sm leading-6">
+                          {getDocumentUploadGuidance(requirement)}
+                        </p>
+                      ) : null}
+                      <p className="mt-1 text-sm font-semibold">
+                        {requirement.is_required ? 'Required' : 'Optional'} · Accepted:{' '}
+                        {(requirement.accepted_formats ?? []).join(', ').toUpperCase()} · Max{' '}
+                        {requirement.max_file_size_mb || 10} MB
+                      </p>
+                      {document?.file_name ? (
+                        <p className="mt-2 text-xs font-semibold">
+                          Latest upload: {document.file_name}
+                        </p>
+                      ) : null}
                       {!complete && !subject.previewing ? (
                         <Link
                           href={`/apprentice/documents?documentType=${encodeURIComponent(requirement.id)}#document-upload`}
                           className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white hover:bg-slate-800"
                         >
-                          {pending ? 'Upload a replacement' : status === 'rejected' ? 'Replace document' : `Upload ${requirement.name}`}
+                          {pending
+                            ? 'Upload a replacement'
+                            : status === 'rejected'
+                              ? 'Replace document'
+                              : `Upload ${requirement.name}`}
                         </Link>
                       ) : null}
                     </div>
                   </div>
                   {complete ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-1 text-xs font-black text-white"><CheckCircle2 className="h-4 w-4" /> Complete</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-1 text-xs font-black text-white">
+                      <CheckCircle2 className="h-4 w-4" /> Complete
+                    </span>
                   ) : pending ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-700 px-3 py-1 text-xs font-black text-white"><Hourglass className="h-4 w-4" /> In review</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-700 px-3 py-1 text-xs font-black text-white">
+                      <Hourglass className="h-4 w-4" /> In review
+                    </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-red-700 px-3 py-1 text-xs font-black text-white"><AlertCircle className="h-4 w-4" /> {status === 'rejected' ? 'Rejected — replace' : 'Missing — upload'}</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-700 px-3 py-1 text-xs font-black text-white">
+                      <AlertCircle className="h-4 w-4" />{' '}
+                      {status === 'rejected' ? 'Rejected — replace' : 'Missing — upload'}
+                    </span>
                   )}
                 </div>
               </article>
@@ -159,8 +248,18 @@ export default async function ApprenticeDocumentsPage() {
         </section>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/apprentice" className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold hover:bg-slate-100">Return to dashboard</Link>
-          <Link href="/apprentice/hours" className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800">Hours & timeclock</Link>
+          <Link
+            href="/apprentice"
+            className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold hover:bg-slate-100"
+          >
+            Return to dashboard
+          </Link>
+          <Link
+            href="/apprentice/hours"
+            className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800"
+          >
+            Hours & timeclock
+          </Link>
         </div>
       </div>
     </main>

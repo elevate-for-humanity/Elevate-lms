@@ -18,12 +18,12 @@ export default function VisualDashboardOrientation({
 }) {
   const guide = orientations[audience];
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState<'slides' | 'video'>('slides');
+  const [mode, setMode] = useState<'slides' | 'video'>(audience === 'host-shop' ? 'video' : 'slides');
   const [unavailable, setUnavailable] = useState(false);
   useEffect(() => {
     setIndex(0);
     setUnavailable(false);
-    setMode('slides');
+    setMode(audience === 'host-shop' ? 'video' : 'slides');
   }, [audience]);
   const slide = guide.slides[Math.min(index, guide.slides.length - 1)];
   const primary = guide.slides.slice(0, 3);

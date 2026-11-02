@@ -4,7 +4,9 @@ import { requestsJson } from './structured-output';
 import { resolveOwnedModelConnection } from './owned-model-config.mjs';
 import { ownedModelHeaders } from './google-runtime-auth.mjs';
 
-const DEFAULT_TIMEOUT_MS = 120_000;
+// Bound one inference request below the Admin repair phase's 300s deadline.
+// Long-running structured repair planning regularly exceeds the old 120s default.
+const DEFAULT_TIMEOUT_MS = 210_000;
 const DEFAULT_CONTEXT_TOKENS = 8192;
 const COMPLETION_SAFETY_TOKENS = 512;
 

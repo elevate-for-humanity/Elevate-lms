@@ -7,7 +7,8 @@ import { TEAM } from '@/data/team';
 import { teamProfileHref } from '@/lib/navigation/team-profile';
 import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
 
-export const revalidate = 3600;
+// Load the active staff roster at request time; cookies() cannot run during prerendering.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Our Team | Elevate for Humanity',

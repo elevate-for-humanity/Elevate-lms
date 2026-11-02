@@ -1,3 +1,4 @@
+import { restoreRecordedStoryboardSource } from '../instructional/storyboard-repair-policy.mjs';
 import { lessonInstructionalSources } from '../instructional/rti-teaching-policy.mjs';
 import {sceneRole} from '../core/repair-policy.mjs';
 import type { UltimateInstructionalGenerator } from '../instructional/generation-contract';
@@ -308,11 +309,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     // Speech and picture-cue repairs must retain the approved source.
     // Independent re-authoring here would change the narration instead of
     // correcting its storyboard binding.
-    const restoreRecordedSource = directive?.target === 'storyboard' &&
-      Array.isArray(directive.requirements) && directive.requirements.length > 0 &&
-      directive.requirements.every((finding: any) =>
-        finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
-        /^(?:ULTIMATE_VIDEO_RENDER_FAILED:)?(?:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED|PICTURE_CUE_NOT_ALIGNED_TO_SPEECH|PREMIUM_TEACHING_CUE_NOT_ALIGNED)$/.test(finding.message));
+    const restoreRecordedSource = restoreRecordedStoryboardSource(directive);
     const b = await this.blueprint(restoreRecordedSource
       ? {...evidence, repairDirective: undefined} : input);
     return {

@@ -23,7 +23,7 @@ export function verifyCredential(value,identity){
 }
 function remoteProgram(name,{directMailbox=false}={}){
  const script=readFileSync(new URL('./'+name,import.meta.url),'utf8');
- const r=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command',directMailbox?'sudo env OWNED_PHONE_MAILBOX_TEST=1 python3 -':'sudo python3 -'],{input:script,encoding:'utf8',timeout:60000,maxBuffer:2000000});
+ const r=spawnSync('gcloud',['compute','ssh','elevate-pbx','--project=elegant-racer-299721','--zone=us-central1-a','--quiet','--command',directMailbox?'sudo env OWNED_PHONE_MAILBOX_TEST=1 python3 -':'sudo python3 -'],{input:script,encoding:'utf8',timeout:name==='observe-voicemail-self-call.py'?90000:60000,maxBuffer:2000000});
  if(r.status!==0)throw Error('PHONE_ACCEPTANCE_VM_PROBE_FAILED');
  try{return JSON.parse(r.stdout.trim());}catch{throw Error('PHONE_ACCEPTANCE_VM_RESULT_INVALID');}
 }

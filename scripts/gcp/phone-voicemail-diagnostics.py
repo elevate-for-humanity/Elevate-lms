@@ -58,14 +58,14 @@ def main():
  gateway=run(['journalctl','-u','elevate-paris-gateway.service','--since','15 minutes ago','--no-pager','-o','cat'])[1]
  gatewayClasses={key:gateway.count(key) for key in ['PARIS_GREETING_SENT','PARIS_TURN_SENT','PARIS_KEYPAD_HANDOFF_FAILED','PARIS_CALL_RELEASE_FAILED','PARIS_TURN_FAILED','PARIS_BRIDGE_FAILED']}
  priorTrace=[]
- _,names=run(['docker','exec','pbx_asterisk_1','find','/var/log/asterisk','-maxdepth','1','-type','f','-name','efhvm_*'])
+ _,names=run(['docker','exec','pbx_asterisk_1','find','-L','/var/log/asterisk','-maxdepth','1','-type','f','-name','efhvm_*'])
  for path in names.splitlines():
   if not re.fullmatch(r'/var/log/asterisk/efhvm_[0-9a-f]{10}',path):continue
   _,raw=run(['docker','exec','pbx_asterisk_1','tail','-n','1000',path])
   raw=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',raw)
   # Existing private test traces only: export fixed locations and dialplan
   # priority numbers, never recording content, caller identifiers or credentials.
-  spawned=[{'context':m[1],'priority':int(m[3])} for m in re.finditer(r'Spawn extension \(([A-Za-z0-9_-]+), ([^,]*), ([0-9]+)\) exited non-zero',raw)]
+  spawned=[{'context':m[1],'priority':int(m[3])} for m in re.finditer(r'Spawn extension \(([A-Za-z0-9_-]+),\s*([^,]*),\s*(-?[0-9]+)\) exited non-zero',raw)]
   warnings=[{'file':m[1],'line':int(m[2]),'function':m[3]} for line in raw.splitlines() if re.search(r'\b(?:WARNING|ERROR|NOTICE)\b',line) for m in [re.search(r'([A-Za-z0-9_]+[.]c):([0-9]+)\s+([A-Za-z0-9_]+):',line)] if m]
   if spawned or warnings:priorTrace.append({'spawnedExitPoints':spawned[-10:],'warningSourceLocations':warnings[-10:],'lineCount':len(raw.splitlines())})
  settings=cli('core show settings')

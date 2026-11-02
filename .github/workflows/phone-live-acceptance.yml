@@ -9,7 +9,7 @@ on:
         default: preflight
   push:
     branches: [main]
-    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py', 'scripts/gcp/phone-live-acceptance.mjs', 'scripts/gcp/owned-phone-test-receiver.mjs']
+    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py', 'scripts/gcp/phone-live-acceptance.mjs', 'scripts/gcp/owned-phone-test-receiver.mjs', 'scripts/gcp/phone-voicemail-diagnostics.py', 'scripts/gcp/observe-voicemail-self-call.py']
 permissions: {contents: read, actions: write, id-token: write}
 concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('phone-acceptance-dispatch-{0}', github.ref) }}
@@ -62,6 +62,7 @@ jobs:
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
       - name: Verify private trace setup and cleanup before any optional test call
+        if: inputs.mode != 'preflight'
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo env OWNED_PHONE_TRACE_PREFLIGHT=1 python3 -' < scripts/gcp/observe-voicemail-self-call.py
       - name: Verify only the approved owner and exercise the selected phone path
         env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}'}

@@ -99,6 +99,9 @@ export default function NarratedProgramIntro({
               onPlay={stopAllNaturalVoicePlayback}
               className="absolute inset-0 h-full w-full bg-black object-contain"
             >
+              {banner.videoSrcMobile && banner.videoSrcMobile !== banner.videoSrcDesktop ? (
+                <source src={banner.videoSrcMobile} media="(max-width: 767px)" type="video/mp4" />
+              ) : null}
               <source src={banner.videoSrcDesktop || banner.videoSrcMobile} type="video/mp4" />
               Your browser does not support embedded video.
             </video>

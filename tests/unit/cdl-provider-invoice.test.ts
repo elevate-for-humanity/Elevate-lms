@@ -32,6 +32,7 @@ describe('Program Holder invoice submission', () => {
     context.current = {
       mode: 'holder',
       holderId: 'academy',
+      programIds: ['cdl'],
       user: { id: 'holder-user' },
       db: {
         from: (table: string) =>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { siteUrls } from '@/lib/utils/site-urls';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 
 const PROGRAM_OPTIONS = [
@@ -204,7 +205,7 @@ export default function UniversalHostSiteApplyPage() {
       </section>
 
       <div className="mx-auto min-w-0 max-w-4xl space-y-5 px-3 py-6 sm:space-y-6 sm:px-4 sm:py-8">
-        <p className="rounded-xl border border-slate-300 bg-white p-4 text-slate-800">Already started? <a className="font-bold underline" href="https://app.elevateforhumanity.org/host-shop/login">Sign in to finish your Host Shop onboarding</a>. No password yet? Use the password setup link on the sign-in page.</p>
+        <p className="rounded-xl border border-slate-300 bg-white p-4 text-slate-800">Already started? <a className="font-bold underline" href={`${siteUrls.app}/host-shop/login`}>Sign in to finish your Host Shop onboarding</a>. No password yet? Use the password setup link on the sign-in page.</p>
         <div className="min-w-0 break-words rounded-xl border-2 border-emerald-300 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950 sm:p-5">
           <strong>No-cost Host Site application:</strong> Elevate charges no application or
           placement fee. The Host Site is still responsible for apprentice wages, payroll

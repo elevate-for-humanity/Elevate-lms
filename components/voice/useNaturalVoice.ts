@@ -13,6 +13,8 @@ type PlayOptions = {
   userControlledRate?: boolean;
   onEnded?: () => void;
   onError?: () => void;
+  /** The browser requires a user gesture; the audio service itself succeeded. */
+  onPlaybackBlocked?: () => void;
   /** Deprecated: production narration never switches to a device voice. */
   allowBrowserFallback?: boolean;
 };
@@ -223,11 +225,16 @@ export function useNaturalVoice() {
       };
       await audio.play();
       return true;
-    } catch {
+    } catch (cause) {
       if (playbackToken !== playbackTokenRef.current) return false;
       setIsLoading(false);
       setIsPlaying(false);
       setIsPaused(false);
+      if (cause instanceof DOMException && cause.name === 'NotAllowedError') {
+        setError(null);
+        options.onPlaybackBlocked?.();
+        return false;
+      }
       setError('Natural voice is temporarily unavailable.');
       options.onError?.();
       return false;

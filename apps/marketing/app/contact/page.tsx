@@ -3,6 +3,7 @@ import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
+import { ContactRequestForm } from '@/components/forms/ContactRequestForm';
 
 export const metadata: Metadata = {
   title: 'Contact | Workforce Development & Apprenticeship Programs',
@@ -22,6 +23,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const product = typeof params.product === 'string' ? params.product : '';
   const course = typeof params.course === 'string' ? params.course : '';
   const submitted = params.submitted === '1';
+  const submitError = typeof params.error === 'string' ? params.error : '';
   const requestedItem = product || course;
   const defaultSubject = course ? 'enrollment' : requestedItem ? 'other' : '';
   const defaultMessage = requestedItem
@@ -56,8 +58,15 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     Message received. Our team will follow up using the email you provided.
                   </div>
                 )}
+                {submitError && (
+                  <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-900" role="alert">
+                    {submitError === 'invalid'
+                      ? 'Please complete all required fields with a valid email and a message of at least 10 characters.'
+                      : 'Your message could not be sent. Please try again or call our team for help.'}
+                  </div>
+                )}
                 
-                <form id="contact-form" className="space-y-6 scroll-mt-24" action="/api/contact" method="post">
+                <ContactRequestForm>
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -163,7 +172,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     <MessageSquare className="w-5 h-5" />
                     Send Message
                   </button>
-                </form>
+                </ContactRequestForm>
 
                 <p className="text-sm text-slate-500 mt-4 text-center">
                   We typically respond within 1-2 business days. For urgent matters, call us directly.

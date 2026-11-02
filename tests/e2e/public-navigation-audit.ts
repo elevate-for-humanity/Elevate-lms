@@ -31,20 +31,34 @@ export function registerPublicNavigationAudit() {
       await expect(page.locator('h1').first()).toBeVisible();
       await expect(page.locator('body')).not.toContainText(/Application error: a client-side exception|Lorem ipsum|Under construction/i);
       const imageSelector = await page.locator('main').count() ? 'main img' : 'body img';
-      const brokenImages = await page.locator(imageSelector).evaluateAll(async images => {
-        const broken: string[] = [];
-        for (const element of images) {
-          const image = element as HTMLImageElement;
-          try { await image.decode(); if (!image.naturalWidth) broken.push(image.currentSrc || image.src); }
-          catch { broken.push(image.currentSrc || image.src); }
-        }
-        return broken;
-      });
-      expect(brokenImages, `${href} contains an undecodable image`).toEqual([]);
+      // Lazy images only load after entering the viewport. Exercise the actual
+      // visitor scroll rather than waiting forever on below-the-fold decode().
+      for (const image of await page.locator(imageSelector).all()) {
+        if (!await image.isVisible()) continue;
+        await image.scrollIntoViewIfNeeded();
+        await expect(image, `${href} image did not finish loading`).toHaveJSProperty('complete', true, { timeout: 10_000 });
+        expect(await image.evaluate(async element => {
+          const img = element as HTMLImageElement;
+          try { await img.decode(); return img.naturalWidth > 0; }
+          catch { return false; }
+        }), `${href} contains an undecodable image`).toBe(true);
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${href} overflows horizontally`).toBe(true);
       expect(errors).toEqual([]);
     });
   }
+
+  test('empty contact submission gives visible feedback without sending a message', async ({ page }) => {
+    const deliveries: string[] = [];
+    page.on('request', request => {
+      if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/contact') deliveries.push(request.url());
+    });
+    await page.goto(origin + '/contact', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: 'Send Message', exact: true }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Please complete each required field' })).toBeVisible();
+    expect(deliveries).toEqual([]);
+    await expect(page).toHaveURL(origin + '/contact');
+  });
 
   test('every public menu section opens and its team link navigates', async ({ page }) => {
     await page.goto(origin + '/about', { waitUntil: 'domcontentloaded' });

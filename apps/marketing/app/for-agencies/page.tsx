@@ -156,18 +156,18 @@ export default async function ForAgenciesPage() {
 
       <section className="bg-slate-900 py-6 px-4">
         <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-8 text-center">
-          <div>
-            <p className="text-3xl font-extrabold text-white">{totalEnrollments ?? '—'}</p>
+          {totalEnrollments !== null && <div>
+            <p className="text-3xl font-extrabold text-white">{totalEnrollments}</p>
             <p className="text-slate-400 text-sm mt-1">Active Enrollments</p>
-          </div>
-          <div>
-            <p className="text-3xl font-extrabold text-white">{completedEnrollments ?? '—'}</p>
+          </div>}
+          {completedEnrollments !== null && <div>
+            <p className="text-3xl font-extrabold text-white">{completedEnrollments}</p>
             <p className="text-slate-400 text-sm mt-1">Program Completions</p>
-          </div>
-          <div>
-            <p className="text-3xl font-extrabold text-white">{programs?.length ?? '—'}</p>
+          </div>}
+          {programs !== null && <div>
+            <p className="text-3xl font-extrabold text-white">{programs.length}</p>
             <p className="text-slate-400 text-sm mt-1">Current Program Listings</p>
-          </div>
+          </div>}
           <div>
             <p className="text-3xl font-extrabold text-white">Agency</p>
             <p className="text-slate-400 text-sm mt-1">Funding Coordination</p>

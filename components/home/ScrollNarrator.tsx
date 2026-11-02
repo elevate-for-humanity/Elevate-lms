@@ -18,6 +18,7 @@ const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
 const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 const SECTION_PAUSE_MS = 1000;
 const SCROLL_SETTLE_MS = 850;
+const NARRATION_GESTURE_NOTICE = 'Tap the speaker to start page narration.';
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 2400) ?? '';
@@ -125,12 +126,14 @@ export function ScrollNarrator() {
     const generation = ++playbackGenerationRef.current;
     pauseOtherAudibleMedia();
     startingOwnVoiceRef.current = true;
+    let playbackBlocked = false;
     const playback = play(text, {
       src: source,
       voice: 'coral',
       style: narrationStyleFor(section),
       rate: narrationRateFor(section),
       allowBrowserFallback: true,
+      onPlaybackBlocked: () => { playbackBlocked = true; },
       onEnded: () => {
         if (generation !== playbackGenerationRef.current) return;
         speakingRef.current = false;
@@ -154,7 +157,9 @@ export function ScrollNarrator() {
     if (!started) {
       speakingRef.current = false;
       lastNarrationRef.current = null;
-      setNotice('Narration could not start. Turn narration off and on to retry.');
+      setNotice(playbackBlocked
+        ? NARRATION_GESTURE_NOTICE
+        : 'Narration could not start. Turn narration off and on to retry.');
     } else {
       narratedRef.current.add(key);
       setNotice(null);
@@ -362,7 +367,13 @@ export function ScrollNarrator() {
     };
   }, [enabled, narrateVisibleSection]);
 
+  const needsPlaybackGesture = notice === NARRATION_GESTURE_NOTICE;
   const toggle = () => {
+    if (enabled && needsPlaybackGesture) {
+      setNotice(null);
+      void narrateVisibleSection(true);
+      return;
+    }
     if (enabled) {
       setEnabled(false);
       setNotice(null);
@@ -389,23 +400,23 @@ export function ScrollNarrator() {
         data-page-narrator-control
         type="button"
         onClick={toggle}
-        aria-pressed={enabled}
+        aria-pressed={enabled && !needsPlaybackGesture}
         aria-label={
-          enabled ? 'Stop page narration' : 'Play narration for this section'
+          enabled && !needsPlaybackGesture ? 'Stop page narration' : 'Play narration for this section'
         }
-        title={enabled ? 'Stop narration' : 'Play section narration'}
+        title={enabled && !needsPlaybackGesture ? 'Stop narration' : 'Play section narration'}
         className={`inline-flex h-12 w-12 min-h-0 min-w-0 touch-manipulation items-center justify-center rounded-full border-2 border-white p-0 text-white shadow-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
-          enabled ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
+          enabled && !needsPlaybackGesture ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
         }`}
         style={{ minHeight: '3rem', minWidth: '3rem', padding: 0 }}
       >
-        {enabled ? (
+        {enabled && !needsPlaybackGesture ? (
           <VolumeX className="h-5 w-5" aria-hidden="true" />
         ) : (
           <Volume2 className="h-5 w-5" aria-hidden="true" />
         )}
         <span className="sr-only">
-          {enabled ? 'Stop narration' : 'Play narration'}
+          {enabled && !needsPlaybackGesture ? 'Stop narration' : 'Play narration'}
         </span>
       </button>
       {notice && enabled ? (

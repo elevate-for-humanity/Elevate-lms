@@ -170,6 +170,21 @@ describe('automatic page narration', () => {
     await act(async () => { fireEvent.pointerDown(document.body); });
     expect(voice.play).toHaveBeenCalledTimes(2);
   });
+  it('offers a one-tap start when the browser blocks autoplay without reporting a service failure', async () => {
+    voice.play.mockImplementationOnce(async (_text, options) => {
+      options.onPlaybackBlocked();
+      return false;
+    }).mockResolvedValue(true);
+    setup(); await advance(1400);
+    expect(screen.getByRole('status')).toHaveTextContent('Tap the speaker');
+    expect(screen.queryByText(/Narration could not start/)).not.toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Play narration for this section' }));
+    });
+    expect(voice.play).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole('button', { name: 'Stop page narration' })).toBeVisible();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
   it('does not race a pending request against the first touch', async () => {
     let complete!: (started: boolean) => void;
     voice.play.mockReturnValue(new Promise<boolean>((resolve) => { complete = resolve; }));

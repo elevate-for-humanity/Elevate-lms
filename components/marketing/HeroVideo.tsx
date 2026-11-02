@@ -95,7 +95,7 @@ export default function HeroVideo({
   heightClassName = HERO_IMAGE_FRAME,
   soundButtonVariant = 'pill',
   showSoundControl = true,
-  showTranscriptControl = true,
+  showTranscriptControl = false,
   deferVideoMs = 0,
   demoSlides,
   demoActiveSlideIndex = 0,
@@ -462,6 +462,7 @@ export default function HeroVideo({
         ) : null}
       </div>
 
+      {transcript && !showTranscriptControl ? <p className="sr-only">{transcript}</p> : null}
       {transcript && showTranscriptControl ? (
         <div className="border-b border-slate-100 bg-slate-50">
           <div className="mx-auto max-w-4xl px-6 py-3">

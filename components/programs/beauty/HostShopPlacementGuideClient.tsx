@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { Building2, MapPin, Search, UserPlus, Users } from 'lucide-react';
+import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 
 function normalized(value: string) {
@@ -23,13 +24,14 @@ export default function HostShopPlacementGuideClient({
   const [query, setQuery] = useState('');
   const filtered = useMemo(() => {
     const q = normalized(query);
-    if (!q) return shops;
-    return shops.filter((shop) =>
+    const programShops = shops.filter((shop) => matchesHostShopProgram(shop, programSlug));
+    if (!q) return programShops;
+    return programShops.filter((shop) =>
       normalized(
         [shop.name, shop.city, shop.state, shop.address].filter(Boolean).join(' '),
       ).includes(q),
     );
-  }, [query, shops]);
+  }, [query, shops, programSlug]);
 
   const suggestionHref = `/contact?topic=host-shop-suggestion&program=${encodeURIComponent(programSlug)}`;
   const waitlistHref = `/apply/student?program=${encodeURIComponent(programSlug)}&placement=waitlist`;
@@ -74,10 +76,7 @@ export default function HostShopPlacementGuideClient({
         </div>
 
         {filtered.length ? (
-          <div
-            data-mobile-grid="2"
-            className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4"
-          >
+          <div data-host-shop-directory className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
             {filtered.map((shop) => {
               const address = shop.address || [shop.city, shop.state].filter(Boolean).join(', ');
               const directions = address
@@ -86,11 +85,12 @@ export default function HostShopPlacementGuideClient({
               return (
                 <article
                   key={shop.id}
-                  className="overflow-hidden flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                  className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                 >
                   <HostShopMediaCarousel
                     shopName={shop.name}
                     compact
+                    spacious
                     items={
                       shop.gallery?.length
                         ? shop.gallery
@@ -99,10 +99,10 @@ export default function HostShopPlacementGuideClient({
                           : []
                     }
                   />
-                  <div className="flex flex-1 flex-col p-3">
+                  <div className="flex flex-1 flex-col p-5 sm:p-6">
                     <div className="flex flex-col gap-2">
                       <div>
-                        <h3 className="text-sm sm:text-base font-black text-slate-950">
+                        <h3 className="text-xl font-black leading-tight text-slate-950 sm:text-2xl">
                           <Link
                             href={`/host-shops/${shop.slug}`}
                             className="hover:text-brand-red-700"
@@ -115,17 +115,15 @@ export default function HostShopPlacementGuideClient({
                           <span>{address || 'Location available during placement review'}</span>
                         </p>
                       </div>
-                      <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-emerald-800">
+                      <span className="self-start rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-emerald-800">
                         Approved network
                       </span>
                     </div>
-                    <p className="mt-3 line-clamp-2 text-xs leading-5 text-slate-700">
-                      {shop.description}
-                    </p>
-                    <div className="mt-auto flex flex-wrap gap-2 pt-4">
+                    <p className="mt-4 text-base leading-7 text-slate-700">{shop.description}</p>
+                    <div className="mt-auto grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2">
                       <Link
                         href={`/host-shops/${shop.slug}`}
-                        className="inline-flex min-h-11 items-center rounded-lg bg-brand-blue-800 px-3 py-2 text-xs font-black text-white hover:bg-brand-blue-900"
+                        className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-blue-800 px-4 py-3 text-sm font-black text-white hover:bg-brand-blue-900"
                       >
                         View Host Shop
                       </Link>
@@ -134,7 +132,7 @@ export default function HostShopPlacementGuideClient({
                           href={directions}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 hover:bg-slate-50"
+                          className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-black text-slate-900 hover:bg-slate-50"
                         >
                           Directions
                         </a>
@@ -148,7 +146,7 @@ export default function HostShopPlacementGuideClient({
         ) : (
           <div className="mt-8 rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-7 text-center">
             <MapPin className="mx-auto h-9 w-9 text-slate-400" />
-            <h3 className="mt-3 text-sm sm:text-base font-black text-slate-950">
+            <h3 className="mt-3 text-xl font-black leading-tight text-slate-950 sm:text-2xl">
               No matching Host Shop is listed in that area yet.
             </h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-700">

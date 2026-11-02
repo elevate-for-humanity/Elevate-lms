@@ -18,6 +18,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
+import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
@@ -90,7 +91,9 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   const program = loaded.program;
-  const shops = await getHostShopNetwork();
+  const shops = (await getHostShopNetwork()).filter((shop) =>
+    matchesHostShopProgram(shop, 'barber-apprenticeship'),
+  );
   const heroBanner = heroBanners['barber-apprenticeship'];
   const structuredData = buildBeautyProgramStructuredData({
     ...program,
@@ -185,9 +188,9 @@ export default async function BarberApprenticeshipPage() {
               videoSrcDesktop={heroBanner.videoSrcDesktop}
               videoSrcMobile={heroBanner.videoSrcMobile ?? heroBanner.videoSrcDesktop}
               posterImage={BARBER_HERO_IMAGE}
-              microLabel={heroBanner.microLabel}
               transcript={heroBanner.transcript}
               narrateTranscript={false}
+              showTranscriptControl={false}
               analyticsName="barber-apprenticeship"
               mediaFit="contain"
               overlayMode="none"

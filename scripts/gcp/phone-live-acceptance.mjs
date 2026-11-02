@@ -37,7 +37,7 @@ export function verifyVoicemailEvidence(voicemail,call,task){
 }
 async function voicemailAcceptance(config,system,db){
  const started=new Date(Date.now()-5000).toISOString();
- const call=await exerciseSelfCall(await verifiedTwilioBindings(config),{expectedGreeting:system.greeting,transcribe:async()=>{throw Error('PHONE_ACCEPTANCE_UNEXPECTED_PROVIDER_RECORDING');},voicemailTest:true,report});
+ const call=await exerciseSelfCall(await verifiedTwilioBindings(config),{expectedGreeting:system.greeting,transcribe:async()=>{throw Error('PHONE_ACCEPTANCE_UNEXPECTED_PROVIDER_RECORDING');},voicemailTest:true,report,monitor:async()=>({voicemailRouteObservation:remoteProgram('observe-voicemail-self-call.py')})});
  report({voicemailTestCall:call});
  const query='voicemails?phone_system_id=eq.'+SYSTEM+'&assigned_profile_id=eq.'+PROFILE+'&extension_id=eq.'+EXTENSION+'&phone_number=eq.%2B14632401404&created_at=gte.'+encodeURIComponent(started)+'&select=id,phone_system_id,extension_id,assigned_profile_id,phone_number,recording_url,transcription,duration_seconds&order=created_at.desc&limit=2';
  let voicemail,matched=false,deliveries=[];

@@ -22,3 +22,10 @@ test('failed releases and request-only push runs cannot wake repair execution',(
  assert.equal(monitor('workflow_run',{head_branch:'main',event:'workflow_dispatch',conclusion:'success'},'refs/heads/feature'),false);
  assert.equal(monitor('pull_request'),false);
 });
+
+test('new monitors retain an already queued repair dispatch in the serialized workflow',()=>{
+ const policy=source.split('concurrency:')[1].split('jobs:')[0];
+ assert.match(policy,/group: paris-code-repair/);
+ assert.match(policy,/cancel-in-progress: false/);
+ assert.match(policy,/queue: max/);
+});

@@ -27,6 +27,7 @@ permissions:
 concurrency:
   group: paris-code-repair
   cancel-in-progress: false
+  queue: max
 jobs:
   monitor:
     if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success'))

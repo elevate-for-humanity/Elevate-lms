@@ -1,3 +1,4 @@
+import {reapUnclaimedLessonExecutions} from './reap-unclaimed-lesson-executions.mjs';
 import {google,PROJECT} from './runtime-config.mjs';
 import {inspectRegionalCapacity,isTerminalExecution,allocation} from './regional-capacity.mjs';
 import {LESSON_ROLE_JOBS,LESSON_ROLE_REGION} from './deploy-lesson-autopilots.mjs';
@@ -82,7 +83,13 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   const candidates=ready.filter(j=>j.payload?.autopilot?.role===role && Date.parse(j.available_at)<=now.getTime() &&
    (j.status==='queued' || Date.parse(j.lease_expires_at)<=now.getTime()));
   const config=LESSON_ROLE_JOBS[role];
-  const active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));
+  let active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));
+  const cancelled=await reapUnclaimedLessonExecutions({executions:active,role,now,request,root,headers,
+   cancel:name=>run(['run','jobs','executions','cancel',name,...scope,'--quiet'])});
+  if(cancelled.length) {
+   console.info(JSON.stringify({event:'unclaimed_lesson_executions_cancelled',role,executions:cancelled}));
+   active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));
+  }
   activeCount+=active.length;
   // Executions still booting also reserve a queue row. Otherwise backfilling
   // beside them could launch more tasks than there is unfinished work.

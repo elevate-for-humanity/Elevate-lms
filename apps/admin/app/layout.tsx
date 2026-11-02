@@ -1,3 +1,4 @@
+import { AutomaticPhone } from '@/components/communications/AutomaticPhone';
 import { DashboardReadingSupport } from '@/components/accessibility/DashboardReadingSupport';
 /**
  * Admin application root layout.
@@ -19,6 +20,9 @@ import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
+
+// Phone activation is tied to the current owner and must never be prerendered.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: {
@@ -81,7 +85,7 @@ export default async function AdminGroupLayout({ children }: { children: React.R
         <I18nProvider>
           <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
             <DashboardReadingSupport>
-              <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+              <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}<Suspense fallback={null}><AutomaticPhone admin /></Suspense></AdminApplicationChrome>
             </DashboardReadingSupport>
           </Suspense>
         </I18nProvider>

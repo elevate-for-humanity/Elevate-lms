@@ -48,7 +48,9 @@ describe('Host Shop communications contract', () => {
 
   it('renders the shared phone with Host Shop authorization and training language', () => {
     expect(phonePage).toContain('await requireRole(HOST_SHOP_ROLES)');
-    expect(phonePage).toContain('<ProgramHolderPhone roleLabel="Host Shop" />');
+    expect(phonePage).toContain('<ProgramHolderPhone roleLabel="Host Shop"');
+    expect(phonePage).toContain('calendarHref="/host-shop/dashboard/schedule"');
+    expect(phonePage).toContain('emailHref="/host-shop/dashboard/email"');
     expect(phoneApi).toContain("'host_shop'");
     expect(phoneApi).toContain("'host_shop_admin'");
     expect(phoneApi).toContain("'partner'");

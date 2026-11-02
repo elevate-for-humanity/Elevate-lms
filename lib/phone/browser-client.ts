@@ -99,9 +99,13 @@ export async function createPhoneClient(
   if (credential.provider !== 'asterisk') {
     throw new Error('This phone connection is no longer supported. Reconnect the phone to get current credentials.');
   }
-  await verifyPhoneMicrophone(undefined, { signal: options.signal });
+  // SIP registration does not capture audio. Permission belongs to the
+  // owner's Answer/Call gesture, so opening a dashboard activates the phone.
+  if (options.signal?.aborted) throw new DOMException('Phone connection was cancelled.', 'AbortError');
 
+  const connectionSignal = options.signal;
   const { SessionManager } = await import('sip.js/lib/platform/web');
+  if (connectionSignal?.aborted) throw new DOMException('Phone connection was cancelled.', 'AbortError');
   const listeners = new Map<string, Array<(data?: any) => void>>();
   const emit = (event: string, data?: any) =>
     listeners.get(event)?.forEach((listener) => listener(data));
@@ -120,6 +124,7 @@ export async function createPhoneClient(
         direction,
         options: { callerNumber: session.remoteIdentity.uri.user },
         answer: async () => {
+          await verifyPhoneMicrophone(undefined, { signal: connectionSignal });
           tone.stop();
           await manager.answer(session);
         },
@@ -236,6 +241,7 @@ export async function createPhoneClient(
       if (!registered) throw new Error('Connect the phone before calling.');
       const destination = phoneDestination(options.destinationNumber, 'asterisk');
       if (!destination) throw new Error('Enter operator 0, a three-digit extension, or a valid telephone number.');
+      await verifyPhoneMicrophone(undefined, { signal: connectionSignal });
       const session = await manager.call(`sip:${destination}@${credential.sipDomain}`);
       return wrap(session, 'calling');
     },

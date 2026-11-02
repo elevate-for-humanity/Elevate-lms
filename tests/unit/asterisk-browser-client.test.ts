@@ -10,6 +10,7 @@ vi.mock('sip.js/lib/platform/web', () => ({
     register = vi.fn().mockResolvedValue(undefined);
     unregister = vi.fn().mockResolvedValue(undefined);
     disconnect = vi.fn().mockResolvedValue(undefined);
+    answer = vi.fn().mockResolvedValue(undefined);
     call = vi.fn().mockImplementation(async () => ({
       id: 'test-session',
       remoteIdentity: { uri: { user: '102' } },
@@ -54,8 +55,8 @@ describe('Asterisk browser registration', () => {
   });
   it('does not report ready when transport opens or a REGISTER is merely sent', async () => {
     const client = await createPhoneClient(credential, document.createElement('audio'));
-    expect(getUserMedia).toHaveBeenCalledWith({ audio: true, video: false });
-    expect(stopCapture).toHaveBeenCalledOnce();
+    expect(getUserMedia).not.toHaveBeenCalled();
+    expect(stopCapture).not.toHaveBeenCalled();
     const ready = vi.fn();
     client.on('ready', ready);
     let connected = false;
@@ -73,14 +74,24 @@ describe('Asterisk browser registration', () => {
     expect(state.options.userAgentOptions.logBuiltinEnabled).toBe(false);
   });
 
-  it('rejects blocked microphone capture before creating a SIP client', async () => {
+  it('registers without capture permission and checks microphone only on a user call', async () => {
     const cause = Object.assign(new Error('blocked by browser'), { name: 'NotAllowedError' });
     getUserMedia.mockRejectedValue(cause);
-    await expect(createPhoneClient(credential, document.createElement('audio'))).rejects.toMatchObject({
-      message: expect.stringContaining('Microphone access is blocked'),
-      cause,
-    });
-    expect(state.manager).toBeNull();
+    const client = await createPhoneClient(credential, document.createElement('audio'));
+    expect(getUserMedia).not.toHaveBeenCalled();
+    const registration = client.connect(); state.options.delegate.onRegistered(); await registration;
+    await expect(client.newCall({destinationNumber:'102',audio:true,remoteElement:document.createElement('audio')})).rejects.toMatchObject({ message: expect.stringContaining('Microphone access is blocked'), cause });
+    expect(state.manager.call).not.toHaveBeenCalled();
+  });
+  it('checks capture on Answer without blocking incoming-call registration', async () => {
+    const client = await createPhoneClient(credential, document.createElement('audio'));
+    const received = vi.fn(); client.on('call', received);
+    const session = {id:'incoming',remoteIdentity:{uri:{user:'102'}}};
+    state.options.delegate.onCallReceived(session);
+    expect(getUserMedia).not.toHaveBeenCalled();
+    await received.mock.calls[0][0].call.answer();
+    expect(getUserMedia).toHaveBeenCalledOnce(); expect(stopCapture).toHaveBeenCalledOnce();
+    expect(state.manager.answer).toHaveBeenCalledWith(session);
   });
 
   it('clears online state on lost registration and disallows calls before reconnect', async () => {

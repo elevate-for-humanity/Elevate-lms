@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getSessionUser } from '@/lib/partner/access';
-import { ProgramHolderPhoneReceiver } from '@/components/program-holder/ProgramHolderPhoneReceiver';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
@@ -166,7 +165,6 @@ export default async function HostShopDashboardLayout({ children }: { children: 
       }}
       role="host_shop"
     >
-      <ProgramHolderPhoneReceiver phoneHref="/host-shop/dashboard/phone" />
       <HostShopReadinessBanner items={readinessItems} />
       {children}
     </PlatformShell>

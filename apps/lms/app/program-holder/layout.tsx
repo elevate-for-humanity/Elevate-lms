@@ -1,7 +1,6 @@
 import { hasRecruitingAssignment } from '@/lib/program-holder/recruiting-access';
 import type { Metadata } from 'next';
 import { PlatformShell } from '@/components/platform/PlatformShell';
-import { ProgramHolderPhoneReceiver } from '@/components/program-holder/ProgramHolderPhoneReceiver';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const metadata: Metadata = {
@@ -44,7 +43,6 @@ export default async function ProgramHolderPortalLayout({
       role={context.profile.role === 'site_coordinator' ? 'site_coordinator' : 'program_holder'}
       paris={{ personName: context.profile.full_name || undefined, autoOpenOnDashboard: false }}
     >
-      <ProgramHolderPhoneReceiver />
       <div className="program-holder-portal min-w-0 overflow-x-clip">{children}</div>
     </PlatformShell>
   );

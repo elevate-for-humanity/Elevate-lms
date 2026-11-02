@@ -5,7 +5,7 @@ import { requireCommunicationActor } from '@/lib/communications/actor';
 /** Preserve authentication failures as 401/403 instead of an unhandled 500. */
 export async function phoneActorResponse() {
   try {
-    return { actor: await requireCommunicationActor(), response: undefined };
+    return { actor: await requireCommunicationActor({ assignedPhone: true }), response: undefined };
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     const status =

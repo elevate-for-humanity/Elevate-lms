@@ -5,7 +5,7 @@ import {ProgramHolderPhone} from '@/components/program-holder/ProgramHolderPhone
 export const dynamic='force-dynamic';
 export const metadata:Metadata={title:'Elevate Phone',robots:{index:false},manifest:'/communications/phone/manifest.webmanifest'};
 export default async function PersonalPhonePage(){
- try {await requireCommunicationActor();} catch(error) {
+ try {await requireCommunicationActor({assignedPhone:true});} catch(error) {
   if(error instanceof Error && error.message==='COMMUNICATIONS_UNAUTHENTICATED') redirect('/login?redirect=%2Fcommunications%2Fphone');
   if(error instanceof Error && error.message==='COMMUNICATIONS_FORBIDDEN') redirect('/unauthorized');
   throw error;

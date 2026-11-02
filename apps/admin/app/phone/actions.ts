@@ -471,6 +471,7 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
         display_name: profile.full_name || profile.email || 'Team member',
         department,
         enabled: true,
+        webrtc_provider: 'asterisk',
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'workspace_id,profile_id' },

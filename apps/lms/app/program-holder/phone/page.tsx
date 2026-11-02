@@ -1,3 +1,4 @@
+import { requireCommunicationActor } from '@/lib/communications/actor';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import type { Metadata } from 'next';
 import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPhone';
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgramHolderPhonePage() {
-  await requireProgramHolder();
+  await requireProgramHolder({ allowPendingApproval: true });
+  await requireCommunicationActor({ assignedPhone: true });
   return <ProgramHolderPhone calendarHref="/program-holder/meetings" emailHref="/program-holder/email" />;
 }

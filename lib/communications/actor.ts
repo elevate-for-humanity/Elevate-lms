@@ -10,7 +10,7 @@ const COMMUNICATION_ROLES = new Set([
   'site_coordinator','provider_admin','host_shop','host_shop_admin','hostshop','partner','employer','instructor','case_manager','counselor','advisor'
 ]);
 
-export async function requireCommunicationActor() {
+export async function requireCommunicationActor(options: { assignedPhone?: boolean } = {}) {
   const db = await requireAdminClient();
 
   // Cross-domain Admin previews use a short-lived signed handoff and may not
@@ -49,6 +49,13 @@ export async function requireCommunicationActor() {
     throw new Error('COMMUNICATIONS_FORBIDDEN');
   }
 
+  const { data: extension } = await db
+    .from('communication_extensions')
+    .select('*,communication_workspaces!inner(id,phone_system_id)')
+    .eq('profile_id', effectiveUserId)
+    .eq('enabled', true)
+    .maybeSingle();
+
   // A holder role alone does not authorize phone/email after its agreement or
   // approval has been withdrawn. Independent staff roles retain staff access.
   const holderRoles = new Set(['program_holder', 'site_coordinator', 'provider_admin']);
@@ -57,17 +64,15 @@ export async function requireCommunicationActor() {
       .select('status,approved_at,mou_terminated,suspended_at,terminated_at')
       .eq('user_id', effectiveUserId).maybeSingle();
     if (holderError) throw new Error('COMMUNICATIONS_LOOKUP_UNAVAILABLE');
-    if (!holder?.approved_at || !['approved','active','approved_pending_mou'].includes(holder.status) || holder.mou_terminated || holder.suspended_at || holder.terminated_at) {
+    // An administrator's enabled extension is a phone-only grant, not a
+    // training approval or access to email. Withdrawal checks still apply.
+    const assignedPhone = options.assignedPhone === true && extension?.enabled === true;
+    const holderStatusAllowed = holder && (['approved','active','approved_pending_mou'].includes(holder.status) || (assignedPhone && holder.status === 'inactive'));
+    if ((!holder?.approved_at && !assignedPhone) || !holderStatusAllowed || holder.mou_terminated || holder.suspended_at || holder.terminated_at) {
       throw new Error('COMMUNICATIONS_FORBIDDEN');
     }
   }
 
-  const { data: extension } = await db
-    .from('communication_extensions')
-    .select('*,communication_workspaces!inner(id,phone_system_id)')
-    .eq('profile_id', effectiveUserId)
-    .eq('enabled', true)
-    .maybeSingle();
   const systemId = extension?.communication_workspaces?.phone_system_id;
   const { data: system } = systemId
     ? await db.from('phone_systems').select('*').eq('id', systemId).maybeSingle()

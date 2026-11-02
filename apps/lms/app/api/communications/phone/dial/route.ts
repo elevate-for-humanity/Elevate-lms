@@ -23,6 +23,6 @@ export async function POST(request:Request){
   .gte('last_seen_at',new Date(Date.now()-120000).toISOString()).order('last_seen_at',{ascending:false}).limit(1);
  if(deviceError)return NextResponse.json({error:'Phone reachability could not be verified.'},{status:503});
  const username=devices?.[0]?.sip_username;
- if(typeof username!=='string'||!/^[A-Za-z0-9._-]{1,128}$/.test(username))return NextResponse.json({error:'That person must open and connect their phone before receiving a call.'},{status:409});
+ if(typeof username!=='string'||!/^[A-Za-z0-9._-]{1,128}$/.test(username))return NextResponse.json({error:'That person is currently unreachable. Try again later or leave a message.'},{status:409});
  return NextResponse.json({destination:'sip:'+username+'@phone.elevateforhumanity.org',extension:number},{headers:{'Cache-Control':'no-store'}});
 }

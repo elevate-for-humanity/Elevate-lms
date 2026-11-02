@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 
 export default async function HostShopPhonePage() {
   await requireRole(HOST_SHOP_ROLES);
-  return <ProgramHolderPhone roleLabel="Host Shop" />;
+  return <ProgramHolderPhone roleLabel="Host Shop" calendarHref="/host-shop/dashboard/schedule" emailHref="/host-shop/dashboard/email" />;
 }

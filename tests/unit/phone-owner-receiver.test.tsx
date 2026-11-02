@@ -39,8 +39,9 @@ it('does not promote a disconnected client with a late heartbeat', async () => {
  await act(async()=>{mock.handlers.offline(); reply(Response.json({}));});
  expect(screen.queryByText('Work phone online')).toBeNull();
 });
-it('mounts a host shop receiver only in the authenticated owner branch', () => {
- const source=readFileSync('apps/lms/app/host-shop/dashboard/layout.tsx','utf8');
- expect(source.match(/<ProgramHolderPhoneReceiver/g)).toHaveLength(1);
- expect(source.indexOf('<ProgramHolderPhoneReceiver')).toBeGreaterThan(source.indexOf('if (!partnerApproved) redirect'));
+it('mounts activation once at each app root instead of recreating it per portal', () => {
+ for (const path of ['apps/lms/app/layout.tsx','apps/admin/app/layout.tsx']) expect(readFileSync(path,'utf8')).toContain('<AutomaticPhone');
+ for (const path of ['apps/lms/app/program-holder/layout.tsx','apps/lms/app/host-shop/dashboard/layout.tsx']) expect(readFileSync(path,'utf8')).not.toContain('ProgramHolderPhoneReceiver');
 });
+
+it('stops automatic phone enrollment on sign-in and recovery pages',()=>{mock.path='/login';render(<ProgramHolderPhoneReceiver/>);expect(fetch).not.toHaveBeenCalled();});

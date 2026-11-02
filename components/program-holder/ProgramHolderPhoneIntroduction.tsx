@@ -25,7 +25,7 @@ const guide = [
   },
   {
     title: 'Answering live calls',
-    body: 'Open the Phone tab and select Connect phone. When a call appears, use Answer or Decline. During a connected call you can mute and unmute the microphone or hang up. Keep the installed PWA open or recently active for the most reliable live ringing; mobile operating systems can suspend background browser audio.',
+    body: 'Your phone connects automatically when you sign in to Elevate. When a call appears, use Answer or Decline. Microphone permission is requested when you answer or place a call. During a connected call you can mute and unmute the microphone or hang up. Keep the installed PWA open or recently active for the most reliable live ringing; mobile operating systems can suspend background browser audio.',
   },
   {
     title: 'What PARIS does when you are unavailable',
@@ -41,7 +41,7 @@ const guide = [
   },
   {
     title: 'Returning a call',
-    body: 'Select Return call from an inbox item or enter a valid ten-digit number in the dial box. You must connect the phone first. The call is placed through Elevate Phone with the business caller ID rather than your personal service.',
+    body: 'Select Return call from an inbox item or enter a valid ten-digit number in the dial box. Your phone connects automatically. The call is placed through Elevate Phone with the business caller ID rather than your personal service.',
   },
   {
     title: 'Immediate administrator assistance',
@@ -88,7 +88,7 @@ export function ProgramHolderPhoneIntroduction({
               Your Elevate dashboard now includes your work phone
             </h2>
             <p className="mt-3 text-base leading-7 text-slate-700">
-              Install the {roleLabel} PWA, connect your extension, choose how and when it rings,
+              Your {roleLabel} extension connects automatically. Choose how and when it rings,
               and manage every missed call from one secure dashboard. Calls do not forward to your
               personal cell.
             </p>
@@ -97,7 +97,7 @@ export function ProgramHolderPhoneIntroduction({
                 'Install the PWA on this device.',
                 'Open Phone and choose your ring mode.',
                 'Set weekly hours or stay in manual mode.',
-                'Select Connect phone and allow microphone access.',
+                'Your extension connects automatically when signed in.',
                 'Enable missed-call notifications.',
                 'Use the PARIS inbox to return and resolve calls.',
               ].map((item, index) => (
@@ -199,7 +199,7 @@ export function ProgramHolderPhoneIntroduction({
             <PhoneCall className="h-6 w-6 text-blue-700" />
             <p className="mt-2 font-black">Before taking calls</p>
             <p className="mt-1 text-sm text-slate-600">
-              Install the PWA, allow microphone access, save a live mode, and confirm the green
+              Your extension connects automatically. Choose a live mode and check the green
               Online for calls status.
             </p>
           </div>

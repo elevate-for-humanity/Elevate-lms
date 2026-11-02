@@ -29,8 +29,9 @@ function friendlyNumber(value: string) {
     : value || 'Unknown caller';
 }
 
-export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone' }: { phoneHref?: string } = {}) {
-  const phonePage = usePathname() === phoneHref;
+export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone', includeVideoCalls = true }: { phoneHref?: string; includeVideoCalls?: boolean } = {}) {
+  const pathname = usePathname();
+  const phonePage = /\/(login|signup|reset-password|auth)(\/|$)/.test(pathname) || ['/program-holder/phone', '/host-shop/dashboard/phone', '/communications/phone', '/phone/dial-pad'].includes(pathname);
   const [online, setOnline] = useState(false);
   const [number, setNumber] = useState('');
   const [state, setState] = useState<'idle' | 'ringing' | 'active'>('idle');
@@ -234,7 +235,7 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
   if (phonePage) return null;
   return (
     <>
-      <DashboardVideoCalls />
+      {includeVideoCalls ? <DashboardVideoCalls /> : null}
       <audio ref={audioRef} autoPlay playsInline />
       {online && state === 'idle' ? (
         <Link

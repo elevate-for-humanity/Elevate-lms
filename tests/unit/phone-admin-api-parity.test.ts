@@ -1,0 +1,11 @@
+import {expect,it,vi} from 'vitest';
+vi.mock('server-only',()=>({}));
+vi.mock('@/lib/phone/actor-response',()=>({phoneActorResponse:async()=>({response:new Response(null,{status:401})})}));
+import {GET as ownerGet,PATCH as ownerPatch} from '@/apps/lms/app/api/program-holder/phone/route';
+import {POST as ownerToken} from '@/apps/lms/app/api/program-holder/phone/token/route';
+import {POST as ownerDial} from '@/apps/lms/app/api/communications/phone/dial/route';
+import {GET as adminGet,PATCH as adminPatch} from '@/apps/admin/app/api/program-holder/phone/route';
+import {POST as adminToken} from '@/apps/admin/app/api/program-holder/phone/token/route';
+import {POST as adminDial} from '@/apps/admin/app/api/communications/phone/dial/route';
+it('uses identical authenticated phone handlers on Admin and LMS',()=>{expect(adminGet).toBe(ownerGet);expect(adminPatch).toBe(ownerPatch);expect(adminToken).toBe(ownerToken);expect(adminDial).toBe(ownerDial);});
+it('rejects signed-out administrator phone requests before provider work',async()=>{expect((await adminGet()).status).toBe(401);for(const handler of [adminPatch,adminToken,adminDial]) expect((await handler(new Request('https://admin.example/api/phone',{method:'POST'}))).status).toBe(401);});

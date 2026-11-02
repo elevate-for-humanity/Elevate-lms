@@ -321,7 +321,7 @@ export default async function PhonePage() {
         </div>
       </div>
       <Link
-        href="https://app.elevateforhumanity.org/communications/phone"
+        href="/phone/dial-pad"
         className="inline-flex min-h-12 items-center rounded-xl bg-blue-700 px-5 font-black text-white"
       >
         Open my phone and dial pad

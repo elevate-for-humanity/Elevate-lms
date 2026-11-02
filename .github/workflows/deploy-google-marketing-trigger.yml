@@ -432,7 +432,11 @@ jobs:
             assert.equal(res.status,200,path+' must be available');
           }
           const home=await (await fetch(root+'/',{cache:'no-store'})).text();
-          assert.ok(home.includes('href="/tax"'),'Homepage must link to the tax page');
+          assert.ok(home.includes('href="/resources"'),'Homepage must expose the consolidated Resources hub');
+          const resourceResponse=await fetch(root+'/resources',{cache:'no-store',signal:AbortSignal.timeout(20000)});
+          assert.equal(resourceResponse.status,200,'Resources hub must be available');
+          const resources=await resourceResponse.text();
+          assert.ok(resources.includes('href="/tax"'),'Resources must link to Supersonic tax services');
           const tax=await (await fetch(root+'/tax',{cache:'no-store'})).text();
           assert.ok(tax.includes('Supersonic main navigation'),'Tax landing page must render Supersonic navigation');
           for (const choice of ['Prepare your own taxes','Hire a professional','Start your own tax business']) assert.ok(tax.includes(choice),'Missing Supersonic service choice: '+choice);

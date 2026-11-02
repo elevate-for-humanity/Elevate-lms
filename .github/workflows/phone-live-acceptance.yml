@@ -25,7 +25,7 @@ jobs:
           DISPATCH_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-          if [[ "$DISPATCH_MESSAGE" = "Verify acknowledged caller handoff with one owned voicemail test" ]]; then mode=voicemail; fi
+          if [[ "$DISPATCH_MESSAGE" = "Capture the exact voicemail handoff after verifying private trace readiness" ]]; then mode=voicemail; fi
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
@@ -63,6 +63,8 @@ jobs:
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-voicemail-diagnostics.py
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
+      - name: Verify private trace setup and cleanup before any optional test call
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo env OWNED_PHONE_TRACE_PREFLIGHT=1 python3 -' < scripts/gcp/observe-voicemail-self-call.py
       - name: Verify only the approved owner and exercise the selected phone path
         env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}'}
         run: node scripts/gcp/phone-live-acceptance.mjs

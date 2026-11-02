@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Observe only the owned synthetic call; remove the private temporary log channel in finally."""
-import base64,json,re,time,urllib.request,subprocess,uuid
+import base64,json,re,time,urllib.request,subprocess,uuid,os
 from pathlib import Path
 DID='14632401404'
 PHASE='identity'
+PREFLIGHT=os.environ.get('OWNED_PHONE_TRACE_PREFLIGHT')=='1'
 def cli(command):
  p=subprocess.run(['docker','exec','pbx_asterisk_1','asterisk','-rx',command],capture_output=True,text=True,timeout=10)
  if p.returncode:raise ValueError()
@@ -37,13 +38,15 @@ def main():
  password=base64.b64decode(secret['payload']['data']).decode().strip()
  headers={'Authorization':'Basic '+base64.b64encode(('elevate-paris:'+password).encode()).decode()}
  started=time.monotonic();events=[];last=None;observed=False;missing=0;names=set()
- capture='elevate_owned_acceptance_'+uuid.uuid4().hex
+ capture='efhvm_'+uuid.uuid4().hex[:10]
  path='/var/log/asterisk/'+capture
  PHASE='private_log_file'
  pid=subprocess.run(['docker','exec','pbx_asterisk_1','pidof','asterisk'],capture_output=True,text=True,timeout=10).stdout.strip()
  if not re.fullmatch('[0-9]+',pid):raise ValueError()
- owner=subprocess.run(['docker','exec','pbx_asterisk_1','stat','-c','%u:%g','/proc/'+pid],capture_output=True,text=True,timeout=10).stdout.strip()
- if not re.fullmatch('[0-9]+:[0-9]+',owner):raise ValueError()
+ status=subprocess.run(['docker','exec','pbx_asterisk_1','cat','/proc/'+pid+'/status'],capture_output=True,text=True,timeout=10).stdout
+ uid=re.search(r'^Uid:\s+[0-9]+\s+([0-9]+)',status,re.M);gid=re.search(r'^Gid:\s+[0-9]+\s+([0-9]+)',status,re.M)
+ if not uid or not gid:raise ValueError()
+ owner=uid[1]+':'+gid[1]
  for command in [['touch',path],['chown',owner,path],['chmod','600',path]]:
   subprocess.run(['docker','exec','pbx_asterisk_1',*command],capture_output=True,timeout=10,check=True)
  cleanup=False;trace={}
@@ -52,7 +55,7 @@ def main():
   cli('logger add channel '+capture+' notice,warning,error,verbose(5),dtmf')
   if capture not in cli('logger show channels'):raise ValueError()
   PHASE='owned_call_observation'
-  while time.monotonic()-started<42:
+  while not PREFLIGHT and time.monotonic()-started<42:
    rows=get('http://127.0.0.1:8088/ari/channels',headers)
    owned=[c for c in rows if re.sub('[^0-9]','',str(c.get('caller',{}).get('number',''))) in [DID,DID[1:]] and str(c.get('name','')).startswith('PJSIP/twilio-')]
    if len(owned)>1:raise ValueError()
@@ -71,7 +74,7 @@ def main():
   cleanup=capture not in cli('logger show channels')
   raw=subprocess.run(['docker','exec','pbx_asterisk_1','tail','-n','1000',path],capture_output=True,text=True,timeout=10)
   trace=scoped_trace(raw.stdout,names)
- print(json.dumps({'ownedVoicemailObservation':True,'temporaryLoggingRemoved':cleanup,'routingChanged':False,'trace':trace,'callsPlaced':0,'callerObserved':observed,'transitions':events[:50]}))
+ print(json.dumps({'tracePreflight':PREFLIGHT,'ownedVoicemailObservation':True,'temporaryLoggingRemoved':cleanup,'routingChanged':False,'trace':trace,'callsPlaced':0,'callerObserved':observed,'transitions':events[:50]}))
 if __name__=='__main__':
  try:main()
- except Exception as e:print(json.dumps({'ownedVoicemailObservation':True,'error':'OWNED_CALL_OBSERVATION_UNAVAILABLE','phase':PHASE,'exceptionClass':type(e).__name__,'callsPlaced':0}))
+ except Exception as e:print(json.dumps({'ownedVoicemailObservation':True,'error':'OWNED_CALL_OBSERVATION_UNAVAILABLE','phase':PHASE,'exceptionClass':type(e).__name__,'callsPlaced':0}));raise SystemExit(1 if PREFLIGHT else 0)

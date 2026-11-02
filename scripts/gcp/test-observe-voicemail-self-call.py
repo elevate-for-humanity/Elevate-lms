@@ -2,6 +2,8 @@ import importlib.util,json,unittest
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('observer',Path(__file__).with_name('observe-voicemail-self-call.py'));o=importlib.util.module_from_spec(spec);spec.loader.exec_module(o)
 class Privacy(unittest.TestCase):
+ def test_capture_filename_fits_the_actual_asterisk_cli_column(self):
+  self.assertLessEqual(len('/var/log/asterisk/efhvm_'+'a'*10),35)
  def test_only_owned_call_and_fixed_source_locations_leave_private_trace(self):
   data='''VERBOSE[111][C-00000001] Executing [s@elevate-operator:4] VoiceMail("PJSIP/twilio-00000001", "0@elevate,u")
 WARNING[111][C-00000001] app_voicemail.c:1234 leave_voicemail: secret dynamic contents 5555555555

@@ -1,3 +1,4 @@
+import DowntownTrainingGallery from '@/components/partners/DowntownTrainingGallery';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
@@ -257,6 +258,7 @@ export default function BarberBeautyProgramsPage() {
           </div>
         </div>
       </section>
+      <DowntownTrainingGallery />
     </main>
   );
 }

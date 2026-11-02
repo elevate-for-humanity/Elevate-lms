@@ -54,12 +54,15 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     businessType: 'BarberShop',
     city: 'Indianapolis',
     state: 'IN',
-    zip: '46220',
-    address: '6331 N Keystone Ave, Suite D',
+    zip: '',
+    address: '120 East Market Street, Suite 560',
     programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
     primaryProgram: 'barber-apprenticeship',
     marketingBlurb: 'An Indianapolis barber and beauty business offering haircuts, beard grooming, styling and client care. Explore the shop portfolio and contact Elevate about supervised apprenticeship placement.',
-    media: [{ src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Haircut portfolio published by Prestige Elevation Barber and Beauty Institute', kind: 'photo' }],
+    media: [
+      { src: '/images/partners/prestige-elevation/downtown-cosmetology-program.webp', alt: 'Prestige Elevation downtown cosmetology lab with salon chairs at 120 East Market Street, Suite 560', kind: 'photo' },
+      { src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Haircut portfolio published by Prestige Elevation Barber and Beauty Institute', kind: 'photo' },
+    ],
     websiteUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
     websiteLabel: 'Explore services and book with Prestige Elevation',
     bookingUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
@@ -361,7 +364,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A South Bend salon offering appointment-based hair services while participating in Elevate’s growing apprenticeship host-shop network.',
     media: [
       {
-        src: '/images/partners/salon-saloon/team-sign.webp',
+        src: '/images/partners/salon-saloon/team-commercial-2026.webp',
         alt: 'Salon Saloon team in front of the salon sign',
         kind: 'photo',
       },

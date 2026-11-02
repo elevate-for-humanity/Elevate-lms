@@ -1,3 +1,4 @@
+import DowntownTrainingGallery from '@/components/partners/DowntownTrainingGallery';
 import HostShopBenefits from '@/components/partners/HostShopBenefits';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork, type HostShopNetworkEntry } from '@/lib/programs/host-shop-network';
@@ -118,6 +119,7 @@ export default async function BarberBeautyNetworkPage() {
           </div>
         </div>
       </section>
+      <DowntownTrainingGallery />
       <HostShopBenefits />
       <section id="shop-directory" className="bg-slate-950 px-5 py-10 text-white sm:py-14">
         <div className="mx-auto max-w-6xl">

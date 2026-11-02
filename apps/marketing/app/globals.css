@@ -1771,3 +1771,62 @@ pre {
 #main-content img {
   image-rendering: auto;
 }
+
+/* Homepage: bright surfaces and compact phone proportions. */
+main[data-homepage-curation] {
+  background: #fff;
+  color: #0f172a;
+}
+main[data-homepage-curation] :where(section, figure, article) {
+  background-color: #fff;
+  background-image: none;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+main[data-homepage-curation] :where(div, figcaption):is(
+  [class*="bg-slate-9"], [class*="bg-blue-9"], [class*="bg-black"],
+  [class*="bg-gradient-"]
+) {
+  background: #fff;
+  color: #0f172a;
+}
+main[data-homepage-curation] :where(h1,h2,h3,h4,p,li,span,figcaption) {
+  color: #0f172a;
+}
+main[data-homepage-curation] :where(p,li) {
+  color: #475569;
+}
+main[data-homepage-curation] a:not([class*="bg-"]) {
+  color: #0f172a;
+}
+main[data-homepage-curation] a[class*="border-"]:not([class*="bg-"]) {
+  border-color: #64748b;
+}
+@media (max-width: 639px) {
+  main[data-homepage-curation] h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  main[data-homepage-curation] h2 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+  main[data-homepage-curation] h3 {
+    font-size: 1.0625rem;
+    line-height: 1.4;
+  }
+  main[data-homepage-curation] :where(p,li) {
+    font-size: .875rem;
+    line-height: 1.6;
+  }
+  main[data-homepage-curation] section {
+    padding-block: 1.5rem;
+  }
+  main[data-homepage-curation] a {
+    font-size: .875rem;
+    max-width: 100%;
+  }
+  main[data-homepage-curation] [data-home-card-image] {
+    aspect-ratio: 16 / 9;
+  }
+}

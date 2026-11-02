@@ -9,6 +9,7 @@ vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 vi.mock('@/components/voice/useNaturalVoice', () => ({
   useNaturalVoice: () => ({ ...voice, isLoading: false, isPlaying: false }),
   stopAllNaturalVoicePlayback: vi.fn(),
+  NATURAL_VOICE_STOP_EVENT: 'elevate:natural-voice-stop',
 }));
 
 let visible = 'a';
@@ -133,9 +134,35 @@ describe('automatic page narration', () => {
   });
   it('does not replay a completed script when scrolling back to it', async () => {
     setup(); await advance(1400);
-    visible = 'b'; fireEvent.scroll(window); await advance(850);
+    await act(async () => { voice.play.mock.calls[0][1].onEnded(); });
+    visible = 'b'; fireEvent.scroll(window); await advance(1000);
+    await act(async () => { voice.play.mock.calls[1][1].onEnded(); });
     visible = 'a'; fireEvent.scroll(window); await advance(850);
     expect(voice.play.mock.calls.map(([text]) => text)).toEqual(['Tour a', 'Tour b']);
+  });
+  it('finishes the active script and pauses before reading the latest visible section', async () => {
+    setup(); await advance(1400);
+    visible = 'b'; fireEvent.scroll(window); await advance(3000);
+    expect(voice.play).toHaveBeenCalledTimes(1);
+    await act(async () => { voice.play.mock.calls[0][1].onEnded(); });
+    await advance(999);
+    expect(voice.play).toHaveBeenCalledTimes(1);
+    await advance(1);
+    expect(voice.play.mock.calls.map(([text]) => text)).toEqual(['Tour a', 'Tour b']);
+  });
+  it('releases the narration slot when another voice takes over', async () => {
+    setup(); await advance(1400);
+    await act(async () => { window.dispatchEvent(new Event('elevate:natural-voice-stop')); });
+    visible = 'b'; fireEvent.scroll(window); await advance(850);
+    expect(voice.play.mock.calls.map(([text]) => text)).toEqual(['Tour a', 'Tour b']);
+  });
+  it('cancels a waiting transition when narration is turned off', async () => {
+    setup(); await advance(1400);
+    visible = 'b';
+    await act(async () => { voice.play.mock.calls[0][1].onEnded(); });
+    fireEvent.click(screen.getByRole('button', { name: 'Stop page narration' }));
+    await advance(3000);
+    expect(voice.play).toHaveBeenCalledTimes(1);
   });
   it('allows the next touch to retry blocked autoplay', async () => {
     voice.play.mockResolvedValueOnce(false).mockResolvedValue(true);

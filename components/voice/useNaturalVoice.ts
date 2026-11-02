@@ -18,7 +18,7 @@ type PlayOptions = {
 };
 
 const naturalVoiceCache = new Map<string, Promise<Blob>>();
-const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
+export const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
 let playbackGeneration = 0;
 let standaloneAudio: HTMLAudioElement | null = null;
 

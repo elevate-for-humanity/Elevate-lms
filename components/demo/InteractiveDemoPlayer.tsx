@@ -60,6 +60,7 @@ export default function InteractiveDemoPlayer({
   const [muted, setMuted] = useState(false);
   const [ended, setEnded] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [playBlocked, setPlayBlocked] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [showChoices, setShowChoices] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -72,13 +73,14 @@ export default function InteractiveDemoPlayer({
     setEnded(false);
     setLoaded(false);
     setVideoError(false);
+    setPlayBlocked(false);
     setShowChoices(false);
     const v = videoRef.current;
     if (v) {
       v.load();
       v.play()
         .then(() => setPlaying(true))
-        .catch(() => {});
+        .catch(() => { setPlaying(false); setPlayBlocked(true); });
     }
   }, [currentId]);
 
@@ -108,7 +110,7 @@ export default function InteractiveDemoPlayer({
     if (v.paused) {
       v.play()
         .then(() => setPlaying(true))
-        .catch(() => {});
+        .catch(() => { setPlaying(false); setPlayBlocked(true); });
     } else {
       v.pause();
       setPlaying(false);
@@ -161,8 +163,9 @@ export default function InteractiveDemoPlayer({
           muted={muted}
           preload="metadata"
           poster={scene.poster}
+          onLoadedMetadata={() => setLoaded(true)}
           onLoadedData={() => setLoaded(true)}
-          onPlay={() => setPlaying(true)}
+          onPlay={() => { setPlaying(true); setPlayBlocked(false); }}
           onPause={() => setPlaying(false)}
           onEnded={() => {
             setPlaying(false);
@@ -191,23 +194,33 @@ export default function InteractiveDemoPlayer({
           </div>
         )}
 
+        {videoError && (
+          <p role="alert" className="absolute inset-x-0 bottom-0 z-20 bg-slate-950 p-4 text-center text-white">
+            This demo could not load. <button type="button" className="underline" onClick={() => {
+              setVideoError(false); videoRef.current?.load(); togglePlay();
+            }}>Retry video</button>
+          </p>
+        )}
+        {playBlocked && !videoError && <p role="status" className="absolute inset-x-0 bottom-0 z-20 bg-slate-950 p-3 text-center text-white">Tap Play to start the demo.</p>}
         {/* Loading spinner */}
-        {!loaded && !videoError && (
+        {!loaded && playing && !videoError && (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-brand-red-500" />
           </div>
         )}
 
         {/* Click-to-play overlay (before video starts) */}
-        {loaded && !playing && !ended && !videoError && (
-          <div
-            className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
+        {!playing && !ended && !videoError && (
+          <button
+            type="button"
+            aria-label={`Play ${scene.title} demo`}
+            className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 cursor-pointer"
             onClick={togglePlay}
           >
             <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
               <Play className="w-9 h-9 text-brand-red-600 ml-1" />
             </div>
-          </div>
+          </button>
         )}
 
         {/* Choice overlay — shown when video ends */}

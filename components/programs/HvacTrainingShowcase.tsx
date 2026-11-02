@@ -126,6 +126,22 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
             </Link>
           )}
         </div>
+        {compact && (
+          <figure className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
+            <video
+              aria-label="HVAC training program demo"
+              src="/videos/hvac-recruitment-20261029.mp4"
+              controls
+              playsInline
+              preload="metadata"
+              poster={`${imageRoot}/lab-overview.webp`}
+              className="mx-auto max-h-[65svh] w-full object-contain"
+            />
+            <figcaption className="bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+              Watch the HVAC training program introduction.
+            </figcaption>
+          </figure>
+        )}
         <p className="mt-5 text-sm leading-6 text-slate-600">
           AI-generated lab concept, training demonstrations, and career illustrations.
         </p>

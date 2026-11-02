@@ -27,13 +27,13 @@ describe('homepage platform introduction', () => {
     expect(page).not.toContain('<HomeFunding />');
     expect(page).not.toContain('Get your taxes prepared. Start your own tax office.');
     expect(pathways).not.toContain("slug: 'hvac-technician'");
-    expect(page).toContain('Learn how to start your own tax preparation business');
+    expect(page.match(/<PlatformHubHero \/>/g)).toHaveLength(1);
   });
 
-  it('describes Elevate as the connected hub for the complete workforce journey', () => {
-    expect(hero).toContain('Build a career. Build a workforce. Build a business.');
-    expect(hero).toContain('career training, state and workforce funding pathways');
-    expect(hero).toContain('Employers & Partners');
+  it('keeps the approved career and funding introduction focused on the next enrollment step', () => {
+    expect(hero).toContain('Train for your next career.');
+    expect(hero).toContain('Choose a career training program or apprenticeship.');
+    expect(hero).toContain('Explore Career Training');
     expect(hero).toContain('Check Funding Options');
     expect(pathways).toContain(
       'programs; eligibility and authorization are determined individually.',

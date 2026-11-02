@@ -172,7 +172,7 @@ export function HomeFeaturedHostShop() {
               Join as a Host Shop
             </Link>
             <Link
-              href="/barber-and-beauty-apprenticeship"
+              href="/barber-and-beauty-apprenticeships"
               className="inline-flex min-h-11 items-center px-3 py-3 text-sm font-bold text-brand-red-700"
             >
               Explore Barber &amp; Beauty <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />

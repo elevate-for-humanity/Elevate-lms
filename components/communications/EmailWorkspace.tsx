@@ -535,7 +535,7 @@ export function EmailWorkspace({
           </a>
         </nav>
         <div className="grid min-h-[620px] lg:grid-cols-[240px_330px_minmax(0,1fr)]">
-          <aside className="border-b border-slate-200 bg-slate-50 p-3 lg:border-b-0 lg:border-r">
+          <aside className={`border-b border-slate-200 bg-slate-50 p-3 lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}>
             <p className="px-2 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
               Mailboxes
             </p>
@@ -874,7 +874,7 @@ export function EmailWorkspace({
             )}
           </section>
 
-          <section className={`${data.selectedThread ? 'block' : 'hidden lg:block'} min-w-0`}>
+          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white lg:static lg:z-auto lg:block lg:overflow-visible' : 'hidden lg:block'} min-w-0`} aria-label="Email reading pane">
             {data.selectedThread ? (
               <>
                 <div className="flex items-center gap-3 border-b border-slate-200 p-4">
@@ -908,7 +908,7 @@ export function EmailWorkspace({
                     </>
                   ) : null}
                 </div>
-                <div className="max-h-[555px] space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6">
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:max-h-[555px] lg:flex-none">
                   {data.selectedThread.messages.map((message) => (
                     <article
                       key={message.id}

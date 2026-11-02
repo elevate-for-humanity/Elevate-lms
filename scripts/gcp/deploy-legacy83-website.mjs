@@ -1,5 +1,6 @@
 import {execFileSync} from 'node:child_process';
 import {mkdirSync,writeFileSync} from 'node:fs';
+import {verifyLegacy83Candidate} from './legacy83-acceptance-gate.mjs';
 const project='elegant-racer-299721',zone='us-central1-a',region='us-central1';
 const vm='legacy83-website',tag='legacy83-website',address='legacy83-website-ip';
 const sha=process.env.SOURCE_SHA;
@@ -97,6 +98,7 @@ try {
   ssh('sudo docker run -d --name legacy83-proxy --restart=always --network=host --log-opt=max-size=10m --log-opt=max-file=3 --volume=/etc/legacy83:/etc/caddy:ro --volume=/var/lib/legacy83/caddy:/data --volume=/var/lib/legacy83/caddy-config:/config caddy:2 >/dev/null');
  }
  const base='https://'+hostname;
+ await verifyLegacy83Candidate(async()=>{
  let tlsReady=false;
  for(let attempt=0;attempt<40;attempt++){
   try{const response=await fetch(base+'/api/health',{signal:AbortSignal.timeout(10000)});const health=await response.json();if(response.ok&&health.revision===sha){tlsReady=true;break;}}
@@ -104,13 +106,23 @@ try {
   await sleep(5000);
  }
  if(!tlsReady)throw Error('Trusted HTTPS readiness did not pass');
- for(const path of ['/','/about','/services','/academy','/resources','/contact','/growth-iq','/journal','/events','/schedule-a-call']){
+ for(const path of ['/','/about','/services','/academy','/academy/my-learning','/portal/admin/academy','/resources','/contact','/growth-iq','/journal','/events','/schedule-a-call']){
   const response=await fetch(base+path,{redirect:'manual',signal:AbortSignal.timeout(30000)});
   console.log(JSON.stringify({path,status:response.status}));
   if(response.status!==200)throw Error('Website page failed: '+path);
  }
  const retired=await fetch(base+'/quiz',{redirect:'manual'});
  if(![307,308].includes(retired.status)||retired.headers.get('location')!=='/growth-iq')throw Error('Retired assessment route did not reach reviewed flow');
+ // Keep the previous container until the complete read-only beta suite passes.
+ execFileSync(process.execPath,[process.env.RUNNER_TEMP+'/legacy83-source/scripts/beta-preview.mjs'],{env:{...process.env,LEGACY83_CANDIDATE_URL:base,SOURCE_SHA:sha},stdio:'inherit',timeout:600000});
+ },async()=>{
+  if(priorPort==='8080'||priorPort==='8081'){
+   ssh('sudo cp /etc/legacy83/Caddyfile.previous /etc/legacy83/Caddyfile && sudo docker exec legacy83-proxy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null');
+   const restored=JSON.parse(ssh('curl --fail --silent http://127.0.0.1:'+priorPort+'/api/health'));
+   if(restored.service!=='legacy83')throw Error('Previous Legacy 83 revision failed rollback health');
+   console.log('Restored previous verified Legacy 83 preview after candidate acceptance failure');
+  }
+ });
  ssh('sudo install -m 644 /dev/stdin /etc/legacy83/active-port',port+'\n');
  // Remove the old container only after HTTPS and all reviewed routes pass.
  ssh('sudo bash -c '+q('for id in $(docker ps -aq --filter name=legacy83-); do name=$(docker inspect --format "{{.Name}}" "$id"); case "$name" in /'+container+'|/legacy83-proxy) ;; *) docker rm -f "$id" >/dev/null ;; esac; done'));

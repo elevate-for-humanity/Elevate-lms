@@ -25,7 +25,7 @@ jobs:
           DISPATCH_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-          if [[ "$DISPATCH_MESSAGE" = "Trace the owned voicemail handoff with temporary scoped logging" ]]; then mode=voicemail; fi
+          if [[ "$DISPATCH_MESSAGE" = "Verify acknowledged caller handoff with one owned voicemail test" ]]; then mode=voicemail; fi
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
@@ -45,7 +45,10 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
       - name: Verify phone acceptance guards
-        run: node --test scripts/gcp/exercise-paris-self-call.test.mjs scripts/gcp/phone-live-acceptance.test.mjs
+        run: |
+          node --test scripts/gcp/exercise-paris-self-call.test.mjs scripts/gcp/phone-live-acceptance.test.mjs
+          python3 scripts/gcp/test-observe-voicemail-self-call.py
+          python3 scripts/gcp/test-repair-pbx-voicemail-prompts.py
       - name: Install pinned protocol-test dependencies in the disposable runner
         if: inputs.mode == 'operator'
         run: npm install --prefix /tmp/elevate-phone-protocol --ignore-scripts --no-audit --no-fund sip.js@0.21.2 playwright@1.57.0
@@ -58,9 +61,6 @@ jobs:
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
       - name: Inspect operator mailbox permissions, sound prompts, and fixed warning classes
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-voicemail-diagnostics.py
-      - name: Inspect only the latest failed owned-number test and provider error codes
-        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', SELF_CALL_MODE: inspect, INSPECT_SELF_CALL_SID: CA35042f9dbca8aa48aafc761b427f71e5}
-        run: node scripts/gcp/exercise-paris-self-call.mjs
       - name: Inspect durable voicemail spool and worker receipts without reading audio
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
       - name: Verify only the approved owner and exercise the selected phone path

@@ -14,10 +14,10 @@ it.each([
  ['inactive system',{actor:{...owner,system:{status:'inactive'}}}],
 ])('does not activate a device for %s',async(_label,result)=>{mock.actor.mockResolvedValue(result);expect(await AutomaticPhone({})).toBeNull();});
 it.each([
- [['program_holder'],'/program-holder/phone'],
- [['site_coordinator'],'/program-holder/phone'],
- [['host_shop'],'/host-shop/dashboard/phone'],
- [['partner'],'/host-shop/dashboard/phone'],
+ [['program_holder'],'/communications/phone'],
+ [['site_coordinator'],'/communications/phone'],
+ [['host_shop'],'/communications/phone'],
+ [['partner'],'/communications/phone'],
  [['instructor'],'/communications/phone'],
 ])('automatically activates the assigned %s owner',async(roles,href)=>{mock.actor.mockResolvedValue({actor:{...owner,roles}});const result=await AutomaticPhone({});expect(result?.key).toBe('owner');expect(result?.props.phoneHref).toBe(href);});
 it('keeps the admin phone on its own origin',async()=>{const result=await AutomaticPhone({admin:true});expect(result?.props.phoneHref).toBe('/phone/dial-pad');});

@@ -7,6 +7,7 @@ export async function AutomaticPhone({ admin = false }: { admin?: boolean }) {
   if (response || !actor || actor.previewing || !actor.extension?.enabled || actor.system?.status !== 'active') return null;
   const holder = actor.roles.some(role => ['program_holder', 'site_coordinator', 'provider_admin'].includes(role));
   const host = actor.roles.some(role => ['host_shop', 'host_shop_admin', 'partner'].includes(role));
-  const phoneHref = admin ? '/phone/dial-pad' : holder ? '/program-holder/phone' : host ? '/host-shop/dashboard/phone' : '/communications/phone';
+  // Phone access is independent of the training/onboarding portal gates.
+  const phoneHref = admin ? '/phone/dial-pad' : '/communications/phone';
   return <ProgramHolderPhoneReceiver key={actor.user.id} phoneHref={phoneHref} includeVideoCalls={!admin && (holder || host)} />;
 }

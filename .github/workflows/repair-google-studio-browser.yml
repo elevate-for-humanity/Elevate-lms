@@ -31,13 +31,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches" -f ref=main -f 'inputs[candidate_only]=false'
-  repair:
+  build-browser:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (vars.GOOGLE_RELEASE_HOLD != 'true' || inputs.candidate_only == true)
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 45
+    outputs:
+      digest: ${{ steps.upload.outputs.digest }}
     concurrency:
-      group: google-runtime-us-central1
+      group: google-studio-browser-build-main
       queue: max
       cancel-in-progress: false
     steps:
@@ -122,12 +124,51 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Publish tested browser image
+        id: upload
         run: |
           set -euo pipefail
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/studio-browser:$GITHUB_SHA"
           docker tag "studio-browser:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+  repair:
+    needs: build-browser
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (vars.GOOGLE_RELEASE_HOLD != 'true' || inputs.candidate_only == true)
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    concurrency:
+      group: google-runtime-us-central1
+      queue: max
+      cancel-in-progress: false
+    env:
+      TESTED_IMAGE_DIGEST: ${{ needs.build-browser.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Recheck prepared runtime boundary before mutation
+        run: |
+          node scripts/gcp/preflight-studio-browser-permissions.mjs
+          node scripts/gcp/verify-studio-service-identity.mjs
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          assert.match(process.env.TESTED_IMAGE_DIGEST || '', /^sha256:[a-f0-9]{64}$/);
+          NODE
       - name: Restore browser and persistent encrypted provider storage before Admin cutover
         env:
           IMAGE_SHA: ${{ github.sha }}

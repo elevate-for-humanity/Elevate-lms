@@ -18,7 +18,7 @@ The initial scan found 44 invalid column references. After repairs, the same sca
 | Staff training/modules order by absent order_index | training_modules records have created_at and module_id | Use saved order and identity fields |
 | Application queue sorts on an absent priority | Queue view exposes created_at | Use actual submission chronology |
 | Contract templates and reviews sort by absent fields | created_at / review_period_end | Use saved chronology |
-| Funding resolution filters a nonexistent enrollment_id | Flags use entity_type=program_enrollment and entity_id | Resolve the exact enrollment's flags |
+| Funding resolution filters a nonexistent enrollment_id | Flags use entity_type=program_enrollment and entity_id | Resolve the exact enrollment's flags only after a confirmed enrollment update |
 | Host Shop finance reads nonexistent document created_at | Partner uploads record uploaded_at | Read/order by actual upload timestamp |
 | Impersonation history reads the wrong audit stream and action | Session writer uses audit_logs with impersonation_started | Read the writer's actual stream and metadata |
 | Incentives invent a student/hour-progress contract | Saved incentive records have name, type, description, amount and employer | Show saved incentive fields; remove manufactured progress |
@@ -52,4 +52,4 @@ All five registered digital workbooks are active. Their PDFs exist in storage an
 
 Twenty-seven operational alerts remain: 21 missing-lunch, four location, one WRG correction, and one voucher reconciliation. These still require evidence or the underlying financial/attendance correction. No unverified funding receipt, meal break, credential, or training hour was invented.
 
-Targeted regression tests and changed-file lint pass. Full dependency-complete TypeScript/build checks, mobile browser acceptance across every dashboard, external feed readiness, and exact production revision acceptance remain separate release requirements; a successful source commit or a passing health probe is not deployment completion.
+The Admin TypeScript check, 110 targeted regression tests, and changed-file lint pass. Full production build, mobile browser acceptance across every dashboard, external feed readiness, and exact production revision acceptance remain separate release requirements; a successful source commit or a passing health probe is not deployment completion.

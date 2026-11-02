@@ -37,7 +37,7 @@ export async function verifyFunding(enrollmentId: string, note?: string) {
     .eq('id', enrollmentId)
     .maybeSingle();
 
-  const { error } = await db
+  const { data: changed, error } = await db
     .from('program_enrollments')
     .update({
       enrollment_state: 'onboarding',
@@ -47,9 +47,11 @@ export async function verifyFunding(enrollmentId: string, note?: string) {
       funding_verified_by: adminId,
     })
     .eq('id', enrollmentId)
-    .eq('enrollment_state', 'pending_funding_verification');
+    .eq('enrollment_state', 'pending_funding_verification')
+    .select('id').maybeSingle();
 
   if (error) throw new Error(`Failed to verify: ${error.message}`);
+  if (!changed) throw new Error('Enrollment state changed. Refresh before verifying funding.');
 
   // "resolved_admin_override" distinguishes human judgment from system auto-resolution.
   // This distinction matters when auditing fraud vs legitimate admin overrides.
@@ -97,7 +99,7 @@ export async function rejectFunding(enrollmentId: string, reason: string) {
     .eq('id', enrollmentId)
     .maybeSingle();
 
-  const { error } = await db
+  const { data: changed, error } = await db
     .from('program_enrollments')
     .update({
       enrollment_state: 'revoked',
@@ -107,9 +109,11 @@ export async function rejectFunding(enrollmentId: string, reason: string) {
       revocation_reason: reason.trim(),
     })
     .eq('id', enrollmentId)
-    .eq('enrollment_state', 'pending_funding_verification');
+    .eq('enrollment_state', 'pending_funding_verification')
+    .select('id').maybeSingle();
 
   if (error) throw new Error(`Failed to reject: ${error.message}`);
+  if (!changed) throw new Error('Enrollment state changed. Refresh before rejecting funding.');
 
   await db
     .from('payment_integrity_flags')

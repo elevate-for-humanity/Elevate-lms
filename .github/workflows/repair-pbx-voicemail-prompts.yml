@@ -1,5 +1,5 @@
 name: Restore missing owned PBX voicemail prompts
-# Keep failures scoped to fixed phases; never print credential-bearing exceptions.
+# Also restore a missing sounds directory within the verified persistent data volume.
 on:
   workflow_dispatch:
   push:

@@ -72,7 +72,7 @@ def main():
  files=members(data);idle();created=[];directories=[]
  try:
   PHASE="install_missing_files"
-  created,directories=install_files(root/'sounds/en',files)
+  created,directories=install_files(root,{'sounds/en/'+name:data for name,data in files.items()})
   PHASE="runtime_read_verification"
   for name in REQUIRED:
    run(['docker','exec','--user','asterisk','pbx_asterisk_1','test','-r','/var/lib/asterisk/sounds/en/'+name])

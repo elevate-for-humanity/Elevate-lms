@@ -8,6 +8,11 @@ class Safety(unittest.TestCase):
    files,dirs=repair.install_files(root,{'beep.ulaw':b'stock','digits/0.ulaw':b'zero'})
    self.assertEqual(custom.read_bytes(),b'custom');self.assertEqual((root/'digits/0.ulaw').read_bytes(),b'zero')
    repair.rollback(files,dirs);self.assertEqual(custom.read_bytes(),b'custom');self.assertFalse((root/'digits').exists())
+ def test_creates_missing_sounds_tree_inside_existing_persistent_volume(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);files,dirs=repair.install_files(root,{'sounds/en/digits/0.ulaw':b'zero'})
+   self.assertEqual((root/'sounds/en/digits/0.ulaw').read_bytes(),b'zero')
+   repair.rollback(files,dirs);self.assertEqual(list(root.iterdir()),[])
  def test_rejects_symlink_without_touching_destination(self):
   with tempfile.TemporaryDirectory() as temp:
    root=Path(temp);outside=root/'outside';outside.mkdir();(root/'digits').symlink_to(outside,target_is_directory=True)

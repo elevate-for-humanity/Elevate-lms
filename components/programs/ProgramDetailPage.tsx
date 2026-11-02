@@ -93,6 +93,7 @@ export default function ProgramDetailPage({
     }
   }
 
+  const consolidatedEnrollment = p.slug === 'hvac-technician';
   const totalHours = getTotalHoursFromBreakdown(p);
   const hoursRange = getTotalHoursRange(p);
   const primaryCTA = getPrimaryCTA(p);
@@ -462,7 +463,7 @@ export default function ProgramDetailPage({
             </p>
           </div>
 
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <div className={`mt-8 grid gap-5 ${consolidatedEnrollment ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-black text-slate-950">Program format</h3>
               <dl className="mt-4 space-y-3 text-sm">
@@ -517,6 +518,7 @@ export default function ProgramDetailPage({
               </ol>
             </div>
 
+            {!consolidatedEnrollment && (
             <div
               id="payment-options"
               className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm"
@@ -554,6 +556,7 @@ export default function ProgramDetailPage({
                 ) : null}
               </ul>
             </div>
+            )}
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -583,7 +586,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {showPriorityFundingPath ? (
+      {showPriorityFundingPath && !consolidatedEnrollment ? (
         <section
           aria-labelledby={`funding-next-steps-${p.slug}`}
           className="border-y border-emerald-200 bg-emerald-50 px-4 py-10 sm:py-12"
@@ -662,12 +665,12 @@ export default function ProgramDetailPage({
         <ProgramCohortFlyer programSlug={p.slug} programTitle={p.title} />
       ) : null}
 
-      <ProgramExperienceGuide program={p} />
+      {!consolidatedEnrollment && <ProgramExperienceGuide program={p} />}
 
       {afterHero ? <div>{afterHero}</div> : null}
 
       {/* DECISION PANEL — answers the questions visitors need before applying */}
-      <section className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
+      <section id={consolidatedEnrollment ? "enrollment-options" : undefined} className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
@@ -701,59 +704,66 @@ export default function ProgramDetailPage({
             </div>
           </div>
 
-          <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-8">
-            <WalletCards className="h-8 w-8 text-orange-300" aria-hidden="true" />
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-orange-300">
+          <aside id={consolidatedEnrollment ? "payment-options" : undefined} className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-950 sm:p-6">
+            <WalletCards className="h-8 w-8 text-slate-700" aria-hidden="true" />
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-slate-700">
               Price & Enrollment
             </p>
-            <div className="mt-2 text-4xl font-black">{p.selfPayCost}</div>
-            <p className="mt-3 text-sm font-bold leading-6 text-white">
+            <div className="mt-2 text-3xl font-black">{p.selfPayCost}</div>
+            <p className="mt-3 text-sm font-bold leading-6 text-slate-950">
               Choose the payment path that fits your budget after your application is reviewed.
             </p>
             {bnplDepositStart && (
-              <p className="mt-2 text-sm font-semibold text-slate-200">
+              <p className="mt-2 text-sm font-semibold text-slate-600">
                 {`Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.`}
               </p>
             )}
             {estimatedWeeklyAfterDeposit && (
-              <p className="mt-1 text-sm text-slate-300">
+              <p className="mt-1 text-sm text-slate-600">
                 Estimated from ${estimatedWeeklyAfterDeposit.toLocaleString()} per week across the
                 published program length. Final terms depend on checkout selections and provider
                 approval.
               </p>
             )}
+            {consolidatedEnrollment && isWorkforceFunded && (
+              <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-base font-bold text-slate-950">Workforce funding</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{fundedDescription}</p>
+                <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-slate-950 underline">Schedule WorkOne intake</a>
+              </div>
+            )}
             <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
               <Link
                 href={paymentSelectionHref('full')}
-                className="rounded-xl border border-white/25 bg-slate-900 p-4 transition hover:border-white/60"
+                className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-400"
               >
-                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
+                <span className="block text-xs font-black uppercase tracking-wider text-slate-700">
                   Pay in full
                 </span>
-                <span className="mt-1 block text-xl font-black text-white">{p.selfPayCost}</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-300">
+                <span className="mt-1 block text-xl font-black text-slate-950">{p.selfPayCost}</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-600">
                   One payment after application approval
                 </span>
               </Link>
               <Link
                 href={paymentSelectionHref('plan')}
-                className="rounded-xl border border-white/25 bg-slate-900 p-4 transition hover:border-white/60"
+                className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-400"
               >
-                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
+                <span className="block text-xs font-black uppercase tracking-wider text-slate-700">
                   Payment plan
                 </span>
-                <span className="mt-1 block text-xl font-black text-white">
+                <span className="mt-1 block text-xl font-black text-slate-950">
                   {bnplDepositStart
                     ? `From $${bnplDepositStart.toLocaleString()} down`
                     : 'See available terms'}
                 </span>
-                <span className="mt-1 block text-xs leading-5 text-slate-300">
+                <span className="mt-1 block text-xs leading-5 text-slate-600">
                   Deposit and installment options
                 </span>
               </Link>
               <Link
                 href={paymentSelectionHref('bnpl')}
-                className="rounded-xl border border-white/25 bg-white p-4 text-slate-950 transition hover:bg-slate-100"
+                className="rounded-xl border border-slate-200 bg-white p-4 text-slate-950 transition hover:bg-slate-100"
               >
                 <span className="block text-xs font-black uppercase tracking-wider text-brand-red-700">
                   Buy now, pay later
@@ -773,7 +783,7 @@ export default function ProgramDetailPage({
               </Link>
               <Link
                 href="#curriculum"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-slate-800"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
               >
                 See What You Will Learn
               </Link>
@@ -1101,6 +1111,7 @@ export default function ProgramDetailPage({
         </section>
       )}
 
+      {!consolidatedEnrollment && (<>
       {/* ENROLLMENT TRACKS */}
       <section id="enrollment-options" className="py-14 border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
@@ -1283,6 +1294,8 @@ export default function ProgramDetailPage({
         </div>
         {/* max-w-5xl */}
       </section>
+
+      </>)}
 
       {/* EMPLOYER PROOF */}
       <section className="py-12 border-t border-slate-100 bg-slate-50">

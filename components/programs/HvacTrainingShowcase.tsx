@@ -184,7 +184,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
           </div>
         )}
         {!compact && (
-          <div className="mt-10 grid gap-7 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-950 sm:p-8 lg:grid-cols-2">
+          <div className="mt-10 grid gap-7 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-950 sm:p-8">
             <div>
               <h3 className="text-2xl font-bold">Know the credential you are preparing for.</h3>
               <ul className="mt-4 space-y-3 leading-7 text-slate-700">
@@ -217,36 +217,6 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
               >
                 Review EPA certification requirements
               </a>
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold">
-                WRG and WIOA funding for eligible participants.
-              </h3>
-              <p className="mt-4 leading-7 text-slate-700">
-                Tuition funding may be available through the Workforce Ready Grant or WIOA. WorkOne
-                or the responsible agency determines eligibility, covered costs, availability, and
-                written authorization before funded enrollment.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link
-                  href="/funding/wrg"
-                  className="inline-flex min-h-12 items-center rounded-xl border border-slate-500 px-4 py-3 font-semibold"
-                >
-                  Workforce Ready Grant
-                </Link>
-                <Link
-                  href="/funding/wioa"
-                  className="inline-flex min-h-12 items-center rounded-xl border border-slate-500 px-4 py-3 font-semibold"
-                >
-                  WIOA / WorkOne
-                </Link>
-              </div>
-              <Link
-                href={applyHref}
-                className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-white px-6 py-3 font-bold text-slate-950"
-              >
-                Start your HVAC application
-              </Link>
             </div>
           </div>
         )}

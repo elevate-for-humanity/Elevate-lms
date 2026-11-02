@@ -9,7 +9,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
   const Heading = compact ? 'h2' : 'h1';
   return (
     <section
-      className="relative w-full overflow-hidden bg-slate-950 text-white"
+      className="relative w-full overflow-hidden bg-white text-slate-950"
       aria-labelledby="home-hero-heading"
       data-scroll-narration
       data-narration="Explore career training and apprenticeships with Elevate for Humanity. Choose a program, check your funding options, and apply."
@@ -33,7 +33,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
       </div>
       <div className="relative mx-auto flex max-w-6xl items-center px-5 py-6 sm:px-8 sm:py-8">
         <div className="max-w-3xl">
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-600">
             Career training & apprenticeships
           </p>
           <Heading
@@ -42,7 +42,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
           >
             Train for your next career.
           </Heading>
-          <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-100">
+          <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700">
             Choose a career training program or apprenticeship. See what you’ll learn,
             review tuition and funding options, and apply when you’re ready.
           </p>

@@ -48,7 +48,7 @@ function pauseOtherAudibleMedia(except?: HTMLMediaElement) {
 
 function mostVisiblePageSection() {
   const sections = Array.from(
-    document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
+    document.querySelectorAll<HTMLElement>(':is(main, #main-content) [data-scroll-narration]'),
   ).filter((section) => section.dataset.narrationDisabled !== 'true');
   let best: { section: HTMLElement; visibleRatio: number } | null = null;
 
@@ -165,13 +165,18 @@ export function ScrollNarrator() {
     const updateNarrationAvailability = () => {
       setHasNarration(
         document.querySelector(
-          'main [data-scroll-narration]:not([data-narration-disabled="true"])',
+          ':is(main, #main-content) [data-scroll-narration]:not([data-narration-disabled="true"])',
         ) !== null,
       );
     };
     updateNarrationAvailability();
     const observer = new MutationObserver(updateNarrationAvailability);
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-scroll-narration', 'data-narration-disabled'],
+    });
     return () => observer.disconnect();
   }, [pathname]);
 
@@ -194,7 +199,7 @@ export function ScrollNarrator() {
     if (!enabled || !hasNarration) return;
 
     const sections = Array.from(
-      document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
+      document.querySelectorAll<HTMLElement>(':is(main, #main-content) [data-scroll-narration]'),
     ).filter((section) => section.dataset.narrationDisabled !== 'true');
 
     const preload = (section: HTMLElement) => {

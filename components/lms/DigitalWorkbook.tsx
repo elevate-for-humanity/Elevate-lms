@@ -6,6 +6,7 @@ import { workbookVisualAssignments, type WorkbookVisual } from '@/lib/lms/workbo
 import { workbookSlides } from '@/lib/lms/workbook-slides';
 import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
+import HvacSystemLab from './HvacSystemLab';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
@@ -70,10 +71,11 @@ function SectionEditor({
   }
   return (
     <section hidden={hidden} aria-labelledby={`section-${section.id}`}>
-      {!hidden && !readOnly && section.course_id && section.lesson_id ? (
+      {!hidden && section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && [5, 12].includes(section.section_number) ? <HvacSystemLab /> : null}
+      {!hidden && !readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && section.lesson_id ? (
         <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
       ) : null}
-      {!hidden && readOnly && section.course_id ? (
+      {!hidden && readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' ? (
         <p className="my-4 rounded-xl border border-amber-300 bg-amber-50 p-4 font-bold text-amber-950">
           Theory Timeclock is available for this section in the learner's own account. Clocking and
           saving are disabled in admin preview.

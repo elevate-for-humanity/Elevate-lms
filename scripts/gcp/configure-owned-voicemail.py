@@ -8,6 +8,7 @@ import re
 import secrets
 import shutil
 import subprocess
+import time
 import urllib.request
 OPERATOR="; Managed Elevate operator fallback\n[internal]\nexten => 0,1,Gosub(elevate-operator,s,1)\n same => n,Hangup()\n[elevate-operator]\nexten => s,1,GotoIf($[${DIALPLAN_EXISTS(elevate-pwa-extensions,0,1)}=0]?voicemail)\n same => n,Gosub(elevate-pwa-extensions,0,1)\n same => n,GotoIf($[\"${DIALSTATUS}\"=\"ANSWER\"]?done)\n same => n(voicemail),VoiceMail(0@elevate,u)\n same => n(done),Return()\n"
 ROOT=Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
@@ -20,9 +21,10 @@ def application_registered(text):
     plain=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',text)
     return "Info about Application 'VoiceMail'" in plain and 'not registered' not in plain.lower()
 
-def ensure_voicemail_application(command=run):
+def ensure_voicemail_application(command=run,restart=None):
     cli=lambda text: command(['docker','exec','pbx_asterisk_1','asterisk','-rx',text])
     registered=application_registered(cli('core show application VoiceMail'))
+    restarted=False
     if registered:
         cli('module reload app_voicemail.so')
     else:
@@ -34,11 +36,37 @@ def ensure_voicemail_application(command=run):
         cli('module unload app_voicemail.so')
         inventory=cli('module show like app_voicemail.so')
         if re.search(r'^app_voicemail[.]so\s',inventory,re.M):
-            raise ValueError('owned_voicemail_module_unload_refused')
-        cli('module load app_voicemail.so')
+            if restart is None:raise ValueError('owned_voicemail_module_unload_refused')
+            restart();restarted=True
+        else:
+            cli('module load app_voicemail.so')
     if not application_registered(cli('core show application VoiceMail')):
         raise ValueError('owned_voicemail_application_not_registered')
-    return {'applicationRegisteredBefore':registered,'applicationRegisteredAfter':True,'moduleReloadedFromDisk':not registered}
+    return {'applicationRegisteredBefore':registered,'applicationRegisteredAfter':True,'moduleReloadedFromDisk':not registered and not restarted,'existingContainerRestarted':restarted}
+
+def voicemail_module_policy(text):
+    alternatives=['app_voicemail_imap.so','app_voicemail_odbc.so']
+    if any(re.search(r'^\s*(load|require|preload)\s*(?:=>|=)\s*'+re.escape(name)+r'\s*$',text,re.M) for name in alternatives):
+        raise ValueError('owned_voicemail_module_policy_conflict')
+    result=text.rstrip()+'\n'
+    for name in alternatives:
+        if not re.search(r'^\s*noload\s*(?:=>|=)\s*'+re.escape(name)+r'\s*$',result,re.M):
+            result+='noload='+name+'\n'
+    return result
+
+def restart_owned_asterisk():
+    cli=lambda text:run(['docker','exec','pbx_asterisk_1','asterisk','-rx',text])
+    active=cli('core show channels count')
+    if not all(re.search(r'^0 active '+kind+r's?$',active,re.M) for kind in ['call','channel']):raise ValueError('owned_voicemail_active_call_or_unverified_state')
+    if run(['docker','inspect','pbx_asterisk_1','--format','{{.Config.Image}}']).strip()!='mlan/asterisk:xtra-1.1.13':raise ValueError('owned_voicemail_container_unverified')
+    # Keep the existing image, mounts, TLS identity, carrier and SIP credentials.
+    run(['docker','restart','--time','10','pbx_asterisk_1'])
+    for attempt in range(30):
+        try:
+            if application_registered(cli('core show application VoiceMail')):return
+        except Exception:pass
+        time.sleep(.5)
+    raise ValueError('owned_voicemail_restart_application_unavailable')
 
 def get(url,headers):
     with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=15) as response:
@@ -83,6 +111,9 @@ def configure():
         pin=pins.get(row['extension']) or str(secrets.randbelow(900000)+100000)
         names.append(row['extension']+' => '+pin+','+name+',,')
     text=MARKER+chr(10)+'[general]'+chr(10)+'format=wav'+chr(10)+'maxsecs=55'+chr(10)+'minsecs=1'+chr(10)+'maxmsg=100'+chr(10)+'[elevate]'+chr(10)+chr(10).join(names)+chr(10)
+    modules=ROOT/'modules.conf'
+    if not modules.is_file() or modules.is_symlink():raise ValueError('owned_voicemail_module_policy_unverified')
+    prior_modules=modules.read_text();module_policy=voicemail_module_policy(prior_modules)
     main=ROOT/'extensions.conf';prior=main.read_text()
     destination=ROOT/'elevate-operator.conf'
     if destination.exists() and destination.read_text()!=OPERATOR: raise ValueError('existing_operator_route_requires_review')
@@ -91,12 +122,13 @@ def configure():
     backup=Path('/var/lib/elevate-pbx/voicemail-backup')
     backup.mkdir(mode=0o700,parents=True,exist_ok=True)
     if not (backup/'extensions.conf').exists(): shutil.copy2(main,backup/'extensions.conf')
+    if not (backup/'modules.conf').exists():shutil.copy2(modules,backup/'modules.conf')
     if mailbox.exists() and not (backup/'voicemail.conf').exists(): shutil.copy2(mailbox,backup/'voicemail.conf');os.chmod(backup/'voicemail.conf',0o600)
     try:
-        mailbox.write_text(text);destination.write_text(OPERATOR)
-        for filename in [mailbox,destination]: os.chmod(filename,0o640);os.chown(filename,0,int(gid))
+        mailbox.write_text(text);destination.write_text(OPERATOR);modules.write_text(module_policy)
+        for filename in [mailbox,destination,modules]: os.chmod(filename,0o640);os.chown(filename,0,int(gid))
         if '#include elevate-operator.conf' not in prior: main.write_text(prior+chr(10)+'#include elevate-operator.conf'+chr(10))
-        application=ensure_voicemail_application()
+        application=ensure_voicemail_application(restart=restart_owned_asterisk)
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan reload'])
         users=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','voicemail show users'])
         match=re.search(r'([0-9]+) voicemail users? configured',users)
@@ -104,13 +136,13 @@ def configure():
         if not match or int(match[1])!=len(rows) or 'Gosub(elevate-operator,s,1)' not in plan:
             raise ValueError('operator_or_mailbox_verification_failed')
     except Exception:
-        main.write_text(prior)
+        main.write_text(prior);modules.write_text(prior_modules)
         if previous: mailbox.write_text(previous)
         else: mailbox.unlink(missing_ok=True)
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','module reload app_voicemail.so'])
         run(['docker','exec','pbx_asterisk_1','asterisk','-rx','dialplan reload'])
         raise
-    return {'result':'PASS',**application,'operatorConfigured':True,'mailboxCount':len(rows),'carrierRoutingChanged':False,'liveCallAcceptance':'NOT TESTED'}
+    return {'result':'PASS',**application,'alternateVoicemailProvidersDisabled':True,'operatorConfigured':True,'mailboxCount':len(rows),'carrierRoutingChanged':False,'liveCallAcceptance':'NOT TESTED'}
 if __name__=='__main__':
     try: result=configure()
     except Exception as error:

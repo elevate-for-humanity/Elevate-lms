@@ -8,7 +8,7 @@ def run(args):
 
 def main():
  cli=lambda command:run(['docker','exec','pbx_asterisk_1','asterisk','-rx',command])[1]
- modules={name:bool(re.search(re.escape(name)+r'\s+.*\bRunning\b',cli('module show like '+name))) for name in ['app_voicemail.so','format_wav.so','codec_ulaw.so']}
+ modules={name:bool(re.search(re.escape(name)+r'\s+.*\bRunning\b',cli('module show like '+name)) and 'Not Running' not in cli('module show like '+name)) for name in ['app_voicemail.so','format_wav.so','codec_ulaw.so']}
  uid=run(['docker','exec','pbx_asterisk_1','id','-u','asterisk'])[1].strip();gid=run(['docker','exec','pbx_asterisk_1','id','-g','asterisk'])[1].strip()
  if not uid.isdigit() or not gid.isdigit():raise ValueError()
  permissions={}

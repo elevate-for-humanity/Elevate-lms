@@ -51,13 +51,26 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PYCODE'
-          import os,json,urllib.request,urllib.error
-          # Never reconcile or dispatch through a runtime predating this workflow.
+          import os,json,re,urllib.request,urllib.error
+          # Require the deployed control plane, not unrelated UI/browser commit identity.
           health_req=urllib.request.Request('https://admin.elevateforhumanity.org/api/health',headers={'Cache-Control':'no-store'})
           health=json.load(urllib.request.urlopen(health_req,timeout=30))
           runtime_sha=health.get('commitSha') or health.get('commit')
-          if health.get('healthy') is not True or runtime_sha!=os.environ['GITHUB_SHA']:
-            print('Repair monitor deferred until this exact Admin release is serving.')
+          compatible=health.get('healthy') is True and isinstance(runtime_sha,str) and re.fullmatch(r'[a-f0-9]{40}',runtime_sha)
+          if compatible and runtime_sha!=os.environ['GITHUB_SHA']:
+            compare_url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/compare/'+runtime_sha+'...'+os.environ['GITHUB_SHA']
+            compare_req=urllib.request.Request(compare_url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            comparison=json.load(urllib.request.urlopen(compare_req,timeout=20))
+            files=comparison.get('files')
+            # GitHub returns at most 300 changed files. A full page cannot prove
+            # the absence of an omitted control-plane change; defer safely.
+            compatible=comparison.get('status') in ('ahead','identical') and isinstance(files,list) and len(files)<300 and all(
+              isinstance(item,dict) and isinstance(item.get('filename'),str) and
+              not item['filename'].startswith(('lib/','apps/admin/app/api/','packages/')) and
+              not str(item.get('previous_filename','')).startswith(('lib/','apps/admin/app/api/','packages/'))
+              for item in files)
+          if not compatible:
+            print('Repair monitor deferred until compatible Admin control-plane source is serving.')
             raise SystemExit(0)
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
           headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}

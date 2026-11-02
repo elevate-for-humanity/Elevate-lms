@@ -39,7 +39,7 @@ Total logical output removed: 17.74 GiB. Observed free capacity after cleanup: 1
 - The repair inference deadline is 210 seconds, below the existing 240-second workflow HTTP deadline.
 - Recurring incidents are deduplicated across unrelated source commits by their observed recovery boundary.
 - Historical queued and blocked incidents are scanned in bounded pages and retired only with a later successful observation. Retirement never certifies a code repair.
-- The monitor defers execution until the Admin runtime serves its exact workflow commit.
+- The monitor checks healthy deployed Admin control-plane source. Different UI/browser-only commits may proceed; changed server libraries, Admin APIs, shared packages, divergent history, and incomplete comparisons defer safely.
 - The missing break_minutes selection in clock-out validation was corrected; current main independently contains the same correction.
 
 ## Repair reconciliation

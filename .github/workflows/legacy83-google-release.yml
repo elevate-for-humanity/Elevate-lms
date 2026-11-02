@@ -2,7 +2,7 @@ name: Legacy 83 Google release candidate
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/legacy83-google-release.yml', '.deploy/legacy83-source/**', 'scripts/gcp/deploy-legacy83-website.mjs', 'scripts/gcp/legacy83-acceptance-gate*.mjs', 'scripts/gcp/legacy83-startup.sh']
+    paths: ['.github/workflows/legacy83-google-release.yml', '.deploy/legacy83-source/**', 'scripts/gcp/deploy-legacy83-website.mjs', 'scripts/gcp/legacy83-acceptance-gate*.mjs', 'scripts/gcp/legacy83-runtime-config*.mjs', 'scripts/gcp/legacy83-startup.sh']
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      SOURCE_SHA: f05c500209bfd3271d9f2be25bad7bb1df4de644
+      SOURCE_SHA: fc113a98ec9ef15fcdda01c9fc8ff2f00c4d2fa7
       NEXT_PUBLIC_SUPABASE_URL: https://vhulnzcfmlnsmoxixjco.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_lb8-f5trWyOLdTY-ElpX9A_ImDp8eGe
       PROJECT: elegant-racer-299721
@@ -36,7 +36,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
       - name: Verify Legacy 83 acceptance rollback
-        run: node --test scripts/gcp/legacy83-acceptance-gate.test.mjs
+        run: node --test scripts/gcp/legacy83-acceptance-gate.test.mjs scripts/gcp/legacy83-runtime-config.test.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - uses: google-github-actions/auth@v3
@@ -55,11 +55,12 @@ jobs:
           trap 'rm -f "$DECRYPTION_KEY_FILE" "$SOURCE_ARCHIVE"' EXIT
           gcloud secrets versions access latest --secret=legacy83-source-decryption-key --project="$PROJECT" > "$DECRYPTION_KEY_FILE"
           node --input-type=module <<'NODE'
-          import {readFileSync,writeFileSync} from 'node:fs';
+          import {readFileSync,writeFileSync,appendFileSync} from 'node:fs';
+          import {decryptLegacy83Runtime,verifyLegacy83Runtime} from './scripts/gcp/legacy83-runtime-config.mjs';
           import {createHash,privateDecrypt,createDecipheriv,constants} from 'node:crypto';
           const manifest=JSON.parse(readFileSync('.deploy/legacy83-source/manifest.json','utf8'));
-          const expected="f05c500209bfd3271d9f2be25bad7bb1df4de644";
-          if(manifest.sourceSha!==expected || manifest.sha256!=="4caae4dcdbb62a03a953b5223c40ab4ba09f090aab90da2f3d1495da2bd0d560")throw Error('Unexpected source revision');
+          const expected="fc113a98ec9ef15fcdda01c9fc8ff2f00c4d2fa7";
+          if(manifest.sourceSha!==expected || manifest.sha256!=="328e824083f41f9714b443b0da5e3a2404e7c437b78e54d31d1094f1dd45dfcb")throw Error('Unexpected source revision');
           const envelopeText=manifest.chunks.map(name=>{
            if(!/^part-[0-9]{3}[.]txt$/.test(name))throw Error('Invalid encrypted chunk path');
            return readFileSync('.deploy/legacy83-source/'+name,'utf8');
@@ -71,7 +72,13 @@ jobs:
           const decipher=createDecipheriv('aes-256-gcm',key,Buffer.from(envelope.iv,'base64'));
           decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));
           writeFileSync(process.env.SOURCE_ARCHIVE,Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext,'base64')),decipher.final()]),{mode:0o600});
-          console.log('Authenticated source revision: '+expected);
+          const runtimeConfig=decryptLegacy83Runtime(envelope,key);
+          await verifyLegacy83Runtime(runtimeConfig);
+          for(const [name,value] of Object.entries(runtimeConfig)){
+           console.log('::add-mask::'+value);
+           appendFileSync(process.env.GITHUB_ENV,name+'='+value+'\n');
+          }
+          console.log('Authenticated source revision and dedicated runtime connection: '+expected);
 
           NODE
           node scripts/gcp/load-legacy83-client-config.mjs

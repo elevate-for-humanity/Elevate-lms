@@ -65,13 +65,14 @@ try {
  const env={
   NEXT_PUBLIC_SUPABASE_URL:'https://vhulnzcfmlnsmoxixjco.supabase.co',
   NEXT_PUBLIC_SUPABASE_ANON_KEY:process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  SUPABASE_SERVICE_ROLE_KEY:process.env.SUPABASE_SERVICE_ROLE_KEY,
   LEGACY83_REVISION:sha,PORT:'8080',HOSTNAME:'0.0.0.0'
  };
  for(const suffix of ['API_KEY','AUTH_DOMAIN','PROJECT_ID','STORAGE_BUCKET','MESSAGING_SENDER_ID','APP_ID','MEASUREMENT_ID']){
   const name='NEXT_PUBLIC_FIREBASE_'+suffix;
   if(typeof process.env[name]==='string')env[name]=process.env[name];
  }
- if(!env.NEXT_PUBLIC_SUPABASE_ANON_KEY||Object.values(env).some(x=>/[\r\n\0]/.test(x)))throw Error('Invalid customer runtime configuration');
+ if(!env.SUPABASE_SERVICE_ROLE_KEY||!env.NEXT_PUBLIC_SUPABASE_ANON_KEY||Object.values(env).some(x=>/[\r\n\0]/.test(x)))throw Error('Invalid customer runtime configuration');
  ssh('sudo install -m 600 /dev/stdin /etc/legacy83/runtime.env',Object.entries(env).map(([k,v])=>k+'='+v).join('\n')+'\n');
  const priorPort=ssh('sudo cat /etc/legacy83/active-port 2>/dev/null || true').trim();
  const port=priorPort==='8080'?'8081':'8080',container='legacy83-'+sha.slice(0,12)+'-'+runId+'-'+(process.env.GITHUB_RUN_ATTEMPT||'1');
@@ -84,6 +85,8 @@ try {
   await sleep(3000);
  }
  if(!appReady)throw Error('Candidate image did not become healthy');
+ // Probe from inside the exact running container before switching preview traffic.
+ ssh('sudo docker exec '+q(container)+' node --input-type=module -e '+q("const key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!key)throw Error('Runtime server credential missing');const headers={apikey:key};if(!key.startsWith('sb_secret_'))headers.Authorization='Bearer '+key;const response=await fetch('https://vhulnzcfmlnsmoxixjco.supabase.co/rest/v1/academy_courses?select=id&limit=1',{headers,signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('Runtime database connection rejected');console.log('Dedicated runtime database connection verified');"));
  const caddy=hostname+' {\n  header X-Robots-Tag "noindex, nofollow"\n  encode zstd gzip\n  reverse_proxy 127.0.0.1:'+port+'\n}\n';
  ssh('sudo install -m 644 /dev/stdin /etc/legacy83/Caddyfile.next',caddy);
  ssh('sudo docker pull caddy:2 >/dev/null');
@@ -126,7 +129,7 @@ try {
  ssh('sudo install -m 644 /dev/stdin /etc/legacy83/active-port',port+'\n');
  // Remove the old container only after HTTPS and all reviewed routes pass.
  ssh('sudo bash -c '+q('for id in $(docker ps -aq --filter name=legacy83-); do name=$(docker inspect --format "{{.Name}}" "$id"); case "$name" in /'+container+'|/legacy83-proxy) ;; *) docker rm -f "$id" >/dev/null ;; esac; done'));
- console.log(JSON.stringify({candidateUrl:base,revision:sha,image,noRuntimeCloudIdentity:true,tlsVerified:true,customerDatabase:'vhulnzcfmlnsmoxixjco',publicDomainChanged:false}));
+ console.log(JSON.stringify({candidateUrl:base,revision:sha,image,noRuntimeCloudIdentity:true,tlsVerified:true,serverRuntimeConnectionVerified:true,customerDatabase:'vhulnzcfmlnsmoxixjco',publicDomainChanged:false}));
  writeFileSync(process.env.GITHUB_ENV,'LEGACY83_CANDIDATE_URL='+base+'\n',{flag:'a'});
  writeFileSync(process.env.GITHUB_STEP_SUMMARY,'Legacy 83 verified candidate: '+base+'\nSource: '+sha+'\n',{flag:'a'});
  passed=true;

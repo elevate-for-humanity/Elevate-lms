@@ -1,3 +1,4 @@
+import {restoreRecordedStoryboardSource} from '../../lib/ultimate-course-builder/instructional/storyboard-repair-policy.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -98,7 +99,7 @@ test('an audio mismatch repairs the storyboard only when saved narration matches
 });
 test('storyboard audio repair restores the approved blueprint without independent re-authoring',async()=>{
  const generatorSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/adapters/platform-instructional-generator.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
- const Generator=new Function('sceneRole','ULTIMATE_LESSON_CONTRACT_VERSION','produceTeachingVisual',generatorSource+';return UltimatePlatformInstructionalGenerator;')((stage,fallback)=>fallback,'test',()=>({kind:'sequence',steps:[]}));
+ const Generator=new Function('restoreRecordedStoryboardSource','sceneRole','ULTIMATE_LESSON_CONTRACT_VERSION','produceTeachingVisual',generatorSource+';return UltimatePlatformInstructionalGenerator;')(restoreRecordedStoryboardSource,(stage,fallback)=>fallback,'test',()=>({kind:'sequence',steps:[]}));
  const generator=new Generator();let requested;
  generator.blueprint=async input=>{requested=input;return {segments:[{id:'approved',stage:'concept_explanation',text:'Approved instruction',recapText:'Fresh recap',objectiveIds:['o'],sourceRequirementIds:['s'],visualRequirement:'Assigned visual',sceneType:'mental_model'}]};};
  const directive={target:'storyboard',requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]};

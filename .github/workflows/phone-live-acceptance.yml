@@ -9,7 +9,7 @@ on:
         default: preflight
   push:
     branches: [main]
-    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py', 'scripts/gcp/phone-live-acceptance.mjs', 'scripts/gcp/owned-phone-test-receiver.mjs', 'scripts/gcp/phone-voicemail-diagnostics.py', 'scripts/gcp/observe-voicemail-self-call.py']
+    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py', 'scripts/gcp/phone-live-acceptance.mjs', 'scripts/gcp/owned-phone-test-receiver.mjs', 'scripts/gcp/phone-voicemail-diagnostics.py', 'scripts/gcp/observe-voicemail-self-call.py', 'scripts/gcp/phone-push-readiness.mjs']
 permissions: {contents: read, actions: write, id-token: write}
 concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('phone-acceptance-dispatch-{0}', github.ref) }}
@@ -22,10 +22,8 @@ jobs:
     steps:
       - env:
           GH_TOKEN: '${{ github.token }}'
-          DISPATCH_MESSAGE: '${{ github.event.head_commit.message }}'
         run: |
           mode=preflight
-          if [[ "$DISPATCH_MESSAGE" = "Fix runtime push keys and verify repaired operator audio" ]]; then mode=operator; fi
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
   acceptance:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'

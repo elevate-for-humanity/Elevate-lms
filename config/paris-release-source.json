@@ -28,9 +28,9 @@
     {
       "source": "app/tax-software/bank-products/page.tsx",
       "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
-      "sha256": "734093b3932249353be41132784a7ad7969a78238e6bca2c56918e97b37af20d",
+      "sha256": "4578ca140982a38879ee317d31cc76155a1da4be94a39986922670a0b2db8276",
       "sourceSha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68",
-      "localRevisionReason": "Reviewed 2026-11-02: add researched EPS TY2027 advance and Refund Transfer information, current terms link and availability disclosures; retain pinned upstream source identity."
+      "localRevisionReason": "Reviewed 2026-11-02: prepare researched EPS product content behind the existing verified-approval status, preserving provider publication requirements, current availability disclosure and immutable upstream identity."
     },
     {
       "source": "app/tax-software/contact/page.tsx",

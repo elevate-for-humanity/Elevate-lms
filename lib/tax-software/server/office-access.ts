@@ -41,5 +41,18 @@ export async function officeAccess() {
     .select('id,office_code,office_name,status')
     .in('id', officeIds);
   if (offices.error) throw Error('OFFICE_LOOKUP_FAILED');
-  return { db, user, ownedIds, officeIds, offices: offices.data ?? [] };
+  // A suspended/closed office must not remain accessible through an old active
+  // preparer membership. Pending offices retain onboarding and training access.
+  const accessible = (offices.data ?? []).filter((office: { status: string }) =>
+    ['active', 'pending'].includes(office.status),
+  );
+  const accessibleIds = accessible.map((office: { id: string }) => office.id);
+  if (!accessibleIds.length) throw new OfficeAccessError(403, 'OFFICE_ACCESS_REQUIRED');
+  return {
+    db,
+    user,
+    ownedIds: ownedIds.filter((id: string) => accessibleIds.includes(id)),
+    officeIds: accessibleIds,
+    offices: accessible,
+  };
 }

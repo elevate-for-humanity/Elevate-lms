@@ -12,7 +12,36 @@ beforeEach(() => {
   mocks.auth.mockResolvedValue({ data: { user: { id: 'current' } }, error: null });
   mocks.assurance.mockResolvedValue({ data: { currentLevel: 'aal2' }, error: null });
 });
+function assignedOffice(status: string) {
+  const rows = {
+    tax_offices: [{ id: 'office', office_code: 'SFC-IND-001', status }],
+    tax_preparers: [{ office_id: 'office' }],
+  };
+  mocks.admin.mockResolvedValue({
+    from: (table: keyof typeof rows) => {
+      const chain: Record<string, unknown> = {};
+      for (const method of ['select', 'eq', 'in']) chain[method] = () => chain;
+      chain.then = (resolve: (v: unknown) => unknown) =>
+        Promise.resolve({ data: rows[table], error: null }).then(resolve);
+      return chain;
+    },
+  });
+}
 describe('tax office permission gate', () => {
+  it.each(['suspended', 'closed', 'unexpected'])(
+    'denies %s offices even with active membership',
+    async (status) => {
+      assignedOffice(status);
+      await expect(officeAccess()).rejects.toMatchObject({ code: 'OFFICE_ACCESS_REQUIRED' });
+    },
+  );
+  it.each(['active', 'pending'])(
+    'retains %s office access for authorized onboarding and training',
+    async (status) => {
+      assignedOffice(status);
+      expect((await officeAccess()).officeIds).toEqual(['office']);
+    },
+  );
   it('requires authentication before privileged queries', async () => {
     mocks.auth.mockResolvedValue({ data: { user: null }, error: null });
     await expect(officeAccess()).rejects.toMatchObject({ status: 401 });

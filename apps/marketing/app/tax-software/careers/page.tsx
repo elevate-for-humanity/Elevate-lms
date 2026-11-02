@@ -219,8 +219,9 @@ export default async function Careers({
                 <li>□ Confidentiality, security and remote-work acknowledgments</li>
               </ul>
               <p className="mt-5 text-xs leading-6 text-slate-600">
-                Only provide these documents when the hiring team sends approved private instructions.
-                Do not upload identity, banking or background documents into this application.
+                Only provide these documents when the hiring team sends approved private
+                instructions. Do not upload identity, banking or background documents into this
+                application.
               </p>
             </aside>
           </div>
@@ -263,6 +264,12 @@ export default async function Careers({
               Use your account to save your application, assessments and training progress. Choose
               remote work, tax-office work or either. You can return to this page to continue.
             </p>
+            <Link
+              href="/tax-software/training"
+              className={taxButton + ' mb-6 bg-white text-[#073ca2]'}
+            >
+              Explore agent training and practice labs →
+            </Link>
             <Application key={preference} initialPreference={preference} />
           </div>
         </section>

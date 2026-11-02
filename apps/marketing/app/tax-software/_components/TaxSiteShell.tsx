@@ -8,6 +8,7 @@ export const taxNav = [
   ['Free preparation options', '/tax-software/contact#free-preparation'],
   ['Pricing', '/tax-software/pricing'],
   ["We're hiring", '/tax-software/careers'],
+  ['Agent training & practice', '/tax-software/training'],
   ['Office reports & staff training', '/tax-software/office'],
   ['Refund and bank options', '/tax-software/bank-products'],
   ['Sign in', '/tax-software/login'],
@@ -68,7 +69,10 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
               Training & business
             </Link>
             <Link href="/tax-software/careers" className="py-4 hover:text-[#073ca2]">
-              Careers
+              We’re hiring
+            </Link>
+            <Link href="/tax-software/training" className="py-4 hover:text-[#073ca2]">
+              Agent training
             </Link>
             <Link href="/tax-software/login" className="py-4 hover:text-[#073ca2]">
               Sign in
@@ -108,6 +112,9 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
               </Link>
               <Link href="/tax-software/careers" className="block py-3 font-semibold">
                 We're hiring
+              </Link>
+              <Link href="/tax-software/training" className="block py-3 font-semibold">
+                Agent training & practice
               </Link>
               <Link
                 href="/tax-software/login"
@@ -155,6 +162,9 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
               </Link>
               <Link href="/tax-software/careers" className="block py-2 text-sm">
                 Office & remote careers
+              </Link>
+              <Link href="/tax-software/training" className="block py-2 text-sm">
+                Agent training & practice
               </Link>
               <Link href="/tax-software/office" className="block py-2 text-sm">
                 Staff reports & training

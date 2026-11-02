@@ -27,6 +27,18 @@ test('pending onboarding renders an actionable page instead of a redirect loop',
  const page=load('apps/lms/app/program-holder/onboarding/page.tsx',{'next/link':'Link','next/navigation':{redirect:url=>{throw Error(url)}},'@/lib/auth/require-program-holder':{requireProgramHolder:async options=>{assert.equal(options.allowPendingApproval,true);return{mode:'holder',holderId:'holder',db:dbFor(()=>({data:{status:'approved_pending_mou',approved_at:null}}))}}}});assert.equal((await page.default()).type,'main');
 });
 
+
+test('onboarding layout permits pending approval while ordinary sections retain their gate', async()=>{
+ const calls=[];
+ const section=load('components/program-holder/ProgramHolderSectionLayout.tsx',{'@/lib/auth/require-program-holder':{requireProgramHolder:async options=>{calls.push(options);if(!options.allowPendingApproval)throw Error('pending-approval')}},'./ProgramHolderTaskGuide':{ProgramHolderTaskGuide:()=>null}});
+ const onboarding=load('apps/lms/app/program-holder/onboarding/layout.tsx',{'@/components/program-holder/ProgramHolderSectionLayout':section});
+ const tree=onboarding.default({children:'pending message'});
+ await tree.type(tree.props);
+ assert.equal(calls.at(-1).allowPendingApproval,true);
+ await assert.rejects(section.ProgramHolderSectionLayout({children:'protected roster'}),/pending-approval/);
+ assert.equal(calls.at(-1).allowPendingApproval,false);
+});
+
 test('verified hours stay in program, honor accepted hours, and count mirrored clocks once',()=>{
  const {verifiedTrainingForEnrollment:sum}=load('lib/program-holder/verified-hours.ts');const student={user_id:'s',program_id:'p',program_slug:'bookkeeping'};
  const hours=[{id:'h',user_id:'s',program_slug:'bookkeeping',approval_status:'approved',hours_claimed:8,accepted_hours:6,progress_entry_id:'c',work_date:'2026-10-20'},{id:'x',user_id:'s',program_slug:'hvac',status:'approved',hours_claimed:24}];
@@ -44,7 +56,7 @@ test('failed acknowledgement writes never report success',async()=>{
 });
 
 test('document, acknowledgement, alert, closeout and progress forms recover from network failure',async()=>{
- for(const name of ['ProgramHolderDocumentUpload','ProgramHolderAcknowledgements','ProgramHolderNotificationPreferences','ProgramHolderStudentCloseoutForm','ProgramHolderTrainingLogForm']){let states=[];const react={useState:v=>[v,n=>states.push(n)]};const exports=load(`components/program-holder/${name}.tsx`,{'react':react,'@/lib/program-holder/training-milestones':load('lib/program-holder/training-milestones.ts'),'next/navigation':{useRouter:()=>({refresh(){}})},'@/lib/partners/enchanted-hearts':{ENCHANTED_HEARTS:{programs:[]},formatUsd:()=>''}},{fetch:async()=>{throw Error('Network unavailable')},FormData:class{get(){return ''}},window:{setTimeout(){}}});const tree=exports[name]({enrollments:[{id:'e'}],programs:[],verifiedHours:[],phone:''});function find(n){if(n?.type==='form')return n;for(const c of [n?.props?.children].flat()){const result=c&&find(c);if(result)return result}}const form=find(tree);await(form.props.onSubmit?form.props.onSubmit({preventDefault(){},currentTarget:{}}):form.props.action(new Map()));assert.equal(states.at(-1),false,name);assert.ok(states.includes('Network unavailable'),name);}
+ for(const name of ['ProgramHolderDocumentUpload','ProgramHolderAcknowledgements','ProgramHolderNotificationPreferences','ProgramHolderStudentCloseoutForm','ProgramHolderTrainingLogForm']){let states=[];const react={useState:v=>[v,n=>states.push(n)],useEffect(){}};const exports=load(`components/program-holder/${name}.tsx`,{'react':react,'@/lib/program-holder/training-milestones':load('lib/program-holder/training-milestones.ts'),'next/navigation':{useRouter:()=>({refresh(){}})},'@/lib/partners/enchanted-hearts':{ENCHANTED_HEARTS:{programs:[]},formatUsd:()=>''}},{fetch:async()=>{throw Error('Network unavailable')},FormData:class{get(){return ''}},window:{setTimeout(){}}});const tree=exports[name]({enrollments:[{id:'e'}],programs:[],verifiedHours:[],phone:''});function find(n){if(n?.type==='form')return n;for(const c of [n?.props?.children].flat()){const result=c&&find(c);if(result)return result}}const form=find(tree);await(form.props.onSubmit?form.props.onSubmit({preventDefault(){},currentTarget:{}}):form.props.action(new Map()));assert.equal(states.at(-1),false,name);assert.ok(states.includes('Network unavailable'),name);}
 });
 
 test('verified banking configuration is idempotent and rejects unsafe setup links',async()=>{

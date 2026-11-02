@@ -83,6 +83,30 @@ test('a cancellation conflict is accepted only after a terminal receipt for the 
         (await pruneSupersededCi({ api, latestSha, execute: true }))[0].status,
         'already_completed',
       );
-    else await assert.rejects(pruneSupersededCi({ api, latestSha, execute: true }), /HTTP_409/);
+    else
+      assert.equal(
+        (await pruneSupersededCi({ api, latestSha, execute: true }))[0].status,
+        'github_cancellation_conflict',
+      );
   }
+});
+
+test('normal cancellation must fail before force cancellation of the same obsolete CI run', async () => {
+  const writes = [];
+  const api = async (path, method = 'GET') => {
+    if (method === 'POST') {
+      writes.push(path);
+      if (path.endsWith('/cancel')) throw Error('RELEASE_API_HTTP_409');
+      return {};
+    }
+    return path.includes('/workflows/') ? { workflow_runs: [run(1)] } : run(1);
+  };
+  assert.equal(
+    (await pruneSupersededCi({ api, latestSha, execute: true }))[0].status,
+    'force_cancellation_requested',
+  );
+  assert.deepEqual(writes, [
+    'repos/elevate-for-humanity/Elevate-lms/actions/runs/1/cancel',
+    'repos/elevate-for-humanity/Elevate-lms/actions/runs/1/force-cancel',
+  ]);
 });

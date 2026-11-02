@@ -1,0 +1,667 @@
+{
+  "checked_at": "2026-11-02T06:27:55.532Z",
+  "repository": "elevate-for-humanity/Elevate-lms",
+  "commit": "f09a992f1b8ba8c8881287b24effde0c2ba89c2b",
+  "total_count": 94,
+  "checks": [
+    {
+      "id": 125121696141,
+      "name": "CI Required Gate",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125121696141"
+    },
+    {
+      "id": 125119207243,
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396390869/job/125119207243"
+    },
+    {
+      "id": 125119207177,
+      "name": "deploy",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396390869/job/125119207177"
+    },
+    {
+      "id": 125119206411,
+      "name": "build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396390869/job/125119206411"
+    },
+    {
+      "id": 125119206086,
+      "name": "Confirm LMS release jobs completed",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396390869/job/125119206086"
+    },
+    {
+      "id": 125119048664,
+      "name": "Deploy and verify Store on Google",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395968175/job/125119048664"
+    },
+    {
+      "id": 125119048582,
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395968175/job/125119048582"
+    },
+    {
+      "id": 125119048455,
+      "name": "Build and upload Store image",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395968175/job/125119048455"
+    },
+    {
+      "id": 125118529035,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396390869/job/125118529035"
+    },
+    {
+      "id": 125118527649,
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396390869/job/125118527649"
+    },
+    {
+      "id": 125118299176,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301803/job/125118299176"
+    },
+    {
+      "id": 125118294930,
+      "name": "resume",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301847/job/125118294930"
+    },
+    {
+      "id": 125118261876,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301847/job/125118261876"
+    },
+    {
+      "id": 125118261601,
+      "name": "diagnose",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301855/job/125118261601"
+    },
+    {
+      "id": 125118261184,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301855/job/125118261184"
+    },
+    {
+      "id": 125118260832,
+      "name": "sync",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301818/job/125118260832"
+    },
+    {
+      "id": 125118260611,
+      "name": "resume",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301803/job/125118260611"
+    },
+    {
+      "id": 125118260608,
+      "name": "start",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301820/job/125118260608"
+    },
+    {
+      "id": 125118260157,
+      "name": "request-dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301855/job/125118260157"
+    },
+    {
+      "id": 125118259520,
+      "name": "request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301818/job/125118259520"
+    },
+    {
+      "id": 125118259489,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396301820/job/125118259489"
+    },
+    {
+      "id": 125118153525,
+      "name": "request-dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396265400/job/125118153525"
+    },
+    {
+      "id": 125118152100,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396265400/job/125118152100"
+    },
+    {
+      "id": 125118151731,
+      "name": "diagnose",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41396265400/job/125118151731"
+    },
+    {
+      "id": 125117308942,
+      "name": "publish",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395990422/job/125117308942"
+    },
+    {
+      "id": 125117284828,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395968175/job/125117284828"
+    },
+    {
+      "id": 125117283597,
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395968175/job/125117283597"
+    },
+    {
+      "id": 125116973177,
+      "name": "hvac-public-playback",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395863352/job/125116973177"
+    },
+    {
+      "id": 125116959955,
+      "name": "inspect",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395863332/job/125116959955"
+    },
+    {
+      "id": 125116954004,
+      "name": "migrated-domains",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395863332/job/125116954004"
+    },
+    {
+      "id": 125116937759,
+      "name": "inspect",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395852060/job/125116937759"
+    },
+    {
+      "id": 125116934776,
+      "name": "inspect",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395850690/job/125116934776"
+    },
+    {
+      "id": 125116931514,
+      "name": "hvac-public-playback",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395852012/job/125116931514"
+    },
+    {
+      "id": 125116923096,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395863332/job/125116923096"
+    },
+    {
+      "id": 125116922917,
+      "name": "Full portal authenticated persistence and responsive design",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395863352/job/125116922917"
+    },
+    {
+      "id": 125116919794,
+      "name": "hvac-public-playback",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395847348/job/125116919794"
+    },
+    {
+      "id": 125116918313,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395847421/job/125116918313"
+    },
+    {
+      "id": 125116913630,
+      "name": "inspect",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395847421/job/125116913630"
+    },
+    {
+      "id": 125116891046,
+      "name": "verify",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395852288/job/125116891046"
+    },
+    {
+      "id": 125116890583,
+      "name": "migrated-domains",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395852060/job/125116890583"
+    },
+    {
+      "id": 125116890070,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395852060/job/125116890070"
+    },
+    {
+      "id": 125116889814,
+      "name": "Full portal authenticated persistence and responsive design",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395852012/job/125116889814"
+    },
+    {
+      "id": 125116887320,
+      "name": "hvac-public-playback",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395850633/job/125116887320"
+    },
+    {
+      "id": 125116886973,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395850690/job/125116886973"
+    },
+    {
+      "id": 125116886695,
+      "name": "Full portal authenticated persistence and responsive design",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395850633/job/125116886695"
+    },
+    {
+      "id": 125116886479,
+      "name": "migrated-domains",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395850690/job/125116886479"
+    },
+    {
+      "id": 125116878191,
+      "name": "migrated-domains",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395847421/job/125116878191"
+    },
+    {
+      "id": 125116877932,
+      "name": "Full portal authenticated persistence and responsive design",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395847348/job/125116877932"
+    },
+    {
+      "id": 125116871006,
+      "name": "Confirm LMS release jobs completed",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844347/job/125116871006"
+    },
+    {
+      "id": 125116870990,
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844347/job/125116870990"
+    },
+    {
+      "id": 125116870968,
+      "name": "Confirm Admin release jobs completed",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844398/job/125116870968"
+    },
+    {
+      "id": 125116870840,
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844398/job/125116870840"
+    },
+    {
+      "id": 125116870717,
+      "name": "Deploy and verify Admin on Google",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844398/job/125116870717"
+    },
+    {
+      "id": 125116870688,
+      "name": "Build and upload Admin image",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844398/job/125116870688"
+    },
+    {
+      "id": 125116870535,
+      "name": "Verify automatic production deployment coverage",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844321/job/125116870535"
+    },
+    {
+      "id": 125116870507,
+      "name": "Platform Doctor",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844508/job/125116870507"
+    },
+    {
+      "id": 125116870275,
+      "name": "deploy",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844347/job/125116870275"
+    },
+    {
+      "id": 125116870133,
+      "name": "integrity",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844346/job/125116870133"
+    },
+    {
+      "id": 125116870020,
+      "name": "authority",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844295/job/125116870020"
+    },
+    {
+      "id": 125116869977,
+      "name": "static-safety",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844299/job/125116869977"
+    },
+    {
+      "id": 125116869969,
+      "name": "Security Audit",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844250/job/125116869969"
+    },
+    {
+      "id": 125116869964,
+      "name": "E2E Enrollment Flow",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844250/job/125116869964"
+    },
+    {
+      "id": 125116869952,
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844347/job/125116869952"
+    },
+    {
+      "id": 125116869950,
+      "name": "enforce-design-policy",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844280/job/125116869950"
+    },
+    {
+      "id": 125116869928,
+      "name": "build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844347/job/125116869928"
+    },
+    {
+      "id": 125116869869,
+      "name": "verify-lockfile",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844330/job/125116869869"
+    },
+    {
+      "id": 125116869836,
+      "name": "Compliance Files Check",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844250/job/125116869836"
+    },
+    {
+      "id": 125116869806,
+      "name": "Accessibility Tests",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844250/job/125116869806"
+    },
+    {
+      "id": 125116869754,
+      "name": "Confirm Marketing release jobs completed",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844261/job/125116869754"
+    },
+    {
+      "id": 125116869608,
+      "name": "Deploy and verify Store on Google",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844271/job/125116869608"
+    },
+    {
+      "id": 125116869540,
+      "name": "Registered Apprenticeship Architecture",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844250/job/125116869540"
+    },
+    {
+      "id": 125116869453,
+      "name": "Reliability & Critical Route Guard",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844305/job/125116869453"
+    },
+    {
+      "id": 125116869419,
+      "name": "Build and upload Marketing image",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844261/job/125116869419"
+    },
+    {
+      "id": 125116869389,
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844261/job/125116869389"
+    },
+    {
+      "id": 125116869271,
+      "name": "acceptance",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844271/job/125116869271"
+    },
+    {
+      "id": 125116869247,
+      "name": "Deploy and verify Marketing on Google",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844261/job/125116869247"
+    },
+    {
+      "id": 125116868923,
+      "name": "validate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844271/job/125116868923"
+    },
+    {
+      "id": 125116868890,
+      "name": "Build and upload Store image",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844271/job/125116868890"
+    },
+    {
+      "id": 125116868805,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844398/job/125116868805"
+    },
+    {
+      "id": 125116868719,
+      "name": "TypeScript — admin",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868719"
+    },
+    {
+      "id": 125116868718,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844347/job/125116868718"
+    },
+    {
+      "id": 125116868682,
+      "name": "TypeScript — lms",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868682"
+    },
+    {
+      "id": 125116868638,
+      "name": "audit",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844387/job/125116868638"
+    },
+    {
+      "id": 125116868625,
+      "name": "CI Preflight",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868625"
+    },
+    {
+      "id": 125116868611,
+      "name": "Functional Tests & Repo Hygiene",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868611"
+    },
+    {
+      "id": 125116868591,
+      "name": "TypeScript — marketing",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868591"
+    },
+    {
+      "id": 125116868564,
+      "name": "Lint",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868564"
+    },
+    {
+      "id": 125116868386,
+      "name": "Canonical Enrollment Database",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844327/job/125116868386"
+    },
+    {
+      "id": 125116868181,
+      "name": "canonical-public-urls",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844336/job/125116868181"
+    },
+    {
+      "id": 125116868117,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844261/job/125116868117"
+    },
+    {
+      "id": 125116867999,
+      "name": "audit",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844324/job/125116867999"
+    },
+    {
+      "id": 125116867990,
+      "name": "geo-claim-integrity",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844351/job/125116867990"
+    },
+    {
+      "id": 125116867984,
+      "name": "Block plaintext credentials",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844343/job/125116867984"
+    },
+    {
+      "id": 125116867805,
+      "name": "dispatch",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/41395844271/job/125116867805"
+    }
+  ],
+  "interpretation": "Combined statuses and check runs are separate APIs. Empty statuses are not proof CI is absent or passing. This merge's CI prerequisites were cancelled. Its exact LMS release handed off to newer main and did not deploy."
+}

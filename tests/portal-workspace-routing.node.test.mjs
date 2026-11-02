@@ -41,8 +41,11 @@ const assignments = {
 for (const role of Object.keys(nav.ROLE_DISPLAY_NAMES)) {
   test(role + ': header destination matches the canonical portal and navigation', () => {
     const key = assignments[nav.getNavigationRole(role)];
-    assert.equal(nav.getDashboardHref(role), PortalRouter.get(key));
-    assert.notEqual(new URL(nav.getDashboardHref(role)).pathname, '/');
+    // Same-origin Host Shop links preserve the signed preview's current host.
+    // Compare their resolved destination against the canonical portal contract.
+    const dashboard = new URL(nav.getDashboardHref(role), PORTAL_MAP[key].host);
+    assert.equal(dashboard.href, PortalRouter.get(key));
+    assert.notEqual(dashboard.pathname, '/');
     const original = nav.ROLE_NAVIGATION[nav.getNavigationRole(role)].flatMap(section => section.items);
     const grouped = nav.getFlatNavItems(role);
     assert.deepEqual(Array.from(grouped, item => item.id).sort(), Array.from(original, item => item.id).sort());

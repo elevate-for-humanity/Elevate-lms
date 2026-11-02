@@ -1,21 +1,10 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { PORTAL_PREVIEW_COOKIE } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
-const HOST_SHOP_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin', 'program_holder']);
-const APPRENTICE_ROLES = new Set(['apprentice', 'barber_apprentice', 'cosmetology_apprentice']);
-
-function previewDestination(role: unknown) {
-  const value = String(role || '');
-  if (HOST_SHOP_ROLES.has(value)) return '/host-shop/dashboard';
-  if (APPRENTICE_ROLES.has(value)) return '/apprentice';
-  return '/lms/dashboard';
-}
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
 
 async function requirePreviewTarget(userId: string) {
@@ -44,14 +33,9 @@ async function startPreview(formData: FormData) {
   if (!userId) redirect('/admin-preview?error=missing-user');
   const target = await requirePreviewTarget(userId);
 
-  (await cookies()).set(PORTAL_PREVIEW_COOKIE, target.id, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60,
-    path: '/',
-  });
-  redirect(previewDestination(target.role));
+  // Use the canonical entry point to replace the complete signed preview
+  // identity and clear any earlier shop scope before routing this target.
+  redirect(`/api/admin/preview?user_id=${encodeURIComponent(target.id)}`);
 }
 
 export default async function AdminPreviewPage({

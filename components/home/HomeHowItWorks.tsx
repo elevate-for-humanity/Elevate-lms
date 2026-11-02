@@ -1,98 +1,84 @@
 import HomeSectionNarration from './HomeSectionNarration';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 
 const STEPS = [
   {
-    n: '01',
-    label: 'Apply',
-    detail: 'Start with a short application so we know your program interest and next step.',
-    href: '/apply',
-  },
-  {
-    n: '02',
-    label: 'Review Funding',
-    detail: 'Explore potential workforce funding and eligibility requirements before enrollment.',
-    href: '/check-eligibility',
-  },
-  {
-    n: '03',
-    label: 'Train',
-    detail: 'Complete credential-aligned instruction and required hands-on learning.',
+    n: '1',
+    label: 'Choose your program',
+    detail: 'Compare training, tuition, and the credential you can earn.',
     href: '/programs',
+    action: 'Explore programs',
+    image: '/images/programs/refresh-20261101/beauty.webp',
+    alt: 'Illustration of beauty career training',
   },
   {
-    n: '04',
-    label: 'Work & Learn',
-    detail:
-      'Eligible apprenticeship pathways combine structured training with employer-based learning.',
-    href: '/apprenticeships',
+    n: '2',
+    label: 'Check funding options',
+    detail: 'See eligibility requirements and ways to pay for training.',
+    href: '/check-eligibility',
+    action: 'Check eligibility',
+    image: '/images/programs/refresh-20261101/business.webp',
+    alt: 'Illustration of professionals reviewing a plan together',
   },
   {
-    n: '05',
-    label: 'Earn Credentials',
-    detail:
-      'Prepare for the credential, certification, or license requirement connected to your pathway.',
-    href: '/credentials',
-  },
-  {
-    n: '06',
-    label: 'Move Forward',
-    detail:
-      'Use career services, employer connections, and work-based learning support as you advance.',
-    href: '/employment-support',
+    n: '3',
+    label: 'Apply and get started',
+    detail: 'Tell us your program interest so we can guide your enrollment.',
+    href: '/apply',
+    action: 'Start your application',
+    image: '/images/programs/refresh-20261101/home.webp',
+    alt: 'Illustration of the Elevate training institute',
   },
 ] as const;
 
 export function HomeHowItWorks() {
   return (
-    <section className="bg-slate-950 px-4 py-8 sm:py-8" aria-labelledby="how-it-works-heading">
+    <section
+      data-home-enrollment-steps
+      className="bg-white px-4 py-6"
+      aria-labelledby="how-it-works-heading"
+    >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 max-w-3xl">
-          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-orange-300">
-            The Elevate Pathway
-          </p>
-          <h2
-            id="how-it-works-heading"
-            className="text-3xl font-black tracking-tight text-white sm:text-4xl"
-          >
-            Know what happens next.
+        <div className="mb-4 max-w-2xl">
+          <h2 id="how-it-works-heading" className="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
+            Start here. Three simple steps.
           </h2>
-          <p className="mt-4 text-lg leading-8 text-slate-200">
-            A clear journey from application through training, credentials, and career
-            advancement—without making people guess where to go next.
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Find your training, review funding, then apply.
           </p>
         </div>
-
         <HomeSectionNarration section="journey" />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ol className="grid list-none gap-3 p-0 lg:grid-cols-3">
           {STEPS.map((step) => (
-            <Link
-              key={step.n}
-              href={step.href}
-              className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 transition hover:-translate-y-1 hover:border-slate-500 hover:shadow-2xl"
-            >
-              <div className="flex flex-1 flex-col p-4">
-                <span className="mb-3 w-fit rounded-full bg-slate-800 px-3 py-1 text-sm font-black text-orange-300">{step.n}</span>
-                <h3 className="text-lg font-black text-white">{step.label}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{step.detail}</p>
-                <span className="mt-auto pt-3 inline-flex items-center gap-2 text-base font-extrabold text-orange-300">
-                  Learn more{' '}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </span>
-              </div>
-            </Link>
+            <li key={step.n} className="m-0">
+              <Link
+                href={step.href}
+                className="group flex h-full items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-slate-950 transition hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-800"
+              >
+                <Image
+                  src={step.image}
+                  alt={step.alt}
+                  width={80}
+                  height={88}
+                  sizes="80px"
+                  className="h-[88px] w-20 shrink-0 rounded-lg object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base font-bold leading-5 text-slate-950">
+                    {step.n}. {step.label}
+                  </h3>
+                  <p className="mt-1 text-sm leading-5 text-slate-600">{step.detail}</p>
+                  <span className="mt-2 inline-flex min-h-6 items-center gap-1 text-sm font-semibold text-slate-950">
+                    {step.action}
+                    <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            </li>
           ))}
-        </div>
-
-        <div className="mt-6">
-          <Link
-            href="/how-it-works"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-extrabold text-slate-950 hover:bg-slate-100"
-          >
-            See the Full Process <ArrowRight className="h-5 w-5" />
-          </Link>
-        </div>
+        </ol>
       </div>
     </section>
   );

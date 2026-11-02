@@ -1,3 +1,4 @@
+import { APPLICATION_REVIEW_URL } from '@/lib/admin/application-filters';
 // Current operational counts are independent snapshots, not a cohort conversion funnel.
 import Link from 'next/link';
 import type { AdminDashboardData } from './types';
@@ -9,7 +10,7 @@ export function EnrollmentFunnel({ data }: {data: AdminDashboardData}) {
     return item && item.unavailable !== true ? item.value.toLocaleString() : 'Unavailable';
   };
   const steps = [
-    {label:'Pending applications', value:count('Pending Applications'), href:'/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding'},
+    {label:'Pending applications', value:count('Pending Applications'), href:APPLICATION_REVIEW_URL},
     {label:'Enrollment records', value:data.enrollmentSummary?.available ? data.enrollmentSummary.totalRecords.toLocaleString() : 'Unavailable', href:'/enrollments'},
     {label:'Active enrollments', value:count('Active Enrollments'), href:'/students?status=active'},
     {label:'Certificates issued', value:count('Certificates Issued'), href:'/certificates'},

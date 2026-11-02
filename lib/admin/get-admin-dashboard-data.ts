@@ -1,3 +1,4 @@
+import { isTestRecord, isUnpublishedOperationalProgram } from './dashboard/record-evidence';
 import 'server-only';
 import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
 import { hasUnavailableInvoiceTotals } from './dashboard/data-availability.mjs';
@@ -185,6 +186,24 @@ async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof require
   }
 }
 
+async function loadDashboardCompliance(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('admin_alerts')
+      .select('id,alert_type,severity,message,created_at,resolved')
+      .eq('resolved', false)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 async function loadDashboardPaidInvoices(db: Awaited<ReturnType<typeof requireAdminClient>>) {
   const {data, error} = await db.rpc('get_admin_paid_invoice_totals');
   if (error) return {data:null,error};
@@ -281,12 +300,6 @@ function n(value: unknown): number {
 function dollarsToCents(value: unknown): number {
   return Math.round(n(value) * 100);
 }
-function isTestRecord(...values: unknown[]): boolean {
-  const value = values.filter(Boolean).join(' ');
-  return /\b(sample|test|demo|example|placeholder|qa[-_\s]?e2e)\b|@qa\.invalid\b|^[A-Za-z0-9_-]{30,}$/i.test(
-    value,
-  );
-}
 function monthKey(value: string | null | undefined): string | null {
   if (!value) return null;
   const date = new Date(value);
@@ -356,7 +369,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
         .eq('role', 'student')
         .like('email', '%@%')
         .not('email', 'ilike', '%@qa.invalid')
-        .not('full_name', 'ilike', '[QA%'),
+        // A missing name is incomplete profile data, not evidence of a test account.
+        .or('full_name.is.null,full_name.not.ilike."[QA%"'),
       'student count',
     ),
     timeboxDashboardQuery(
@@ -387,15 +401,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
         .limit(25),
       'recent enrollments',
     ),
-    timeboxDashboardQuery(
-      db
-        .from('admin_alerts')
-        .select('id,alert_type,severity,message,created_at,resolved')
-        .eq('resolved', false)
-        .order('created_at', { ascending: false })
-        .limit(50),
-      'compliance alerts',
-    ),
+    timeboxDashboardQuery(loadDashboardCompliance(db), 'compliance alerts'),
     timeboxDashboardQuery(loadDashboardLeads(db), 'CRM leads'),
     timeboxDashboardQuery(
       db
@@ -431,8 +437,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const pendingApplications: RecentApplication[] = applications
     .filter((row: any) => pendingStatuses.has(String(row.status ?? 'submitted')))
     .map((row: any) => {
-      const createdAt = row.submitted_at || row.created_at || new Date().toISOString();
-      const ageDays = Math.max(0, Math.floor((now - new Date(createdAt).getTime()) / 86_400_000));
+      const createdAt = row.submitted_at || row.created_at || '';
+      const ageDays = Number.isFinite(Date.parse(createdAt)) ? Math.max(0, Math.floor((now - Date.parse(createdAt)) / 86_400_000)) : 0;
       return {
         id: row.id,
         first_name: row.first_name ?? null,
@@ -451,8 +457,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     .sort((a, b) => b.age_days - a.age_days);
 
   const recentApplications: RecentApplication[] = applications.slice(0, 15).map((row: any) => {
-    const createdAt = row.submitted_at || row.created_at || new Date().toISOString();
-    const ageDays = Math.max(0, Math.floor((now - new Date(createdAt).getTime()) / 86_400_000));
+    const createdAt = row.submitted_at || row.created_at || '';
+    const ageDays = Number.isFinite(Date.parse(createdAt)) ? Math.max(0, Math.floor((now - Date.parse(createdAt)) / 86_400_000)) : 0;
     return {
       id: row.id,
       first_name: row.first_name ?? null,
@@ -520,7 +526,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const topPrograms = Object.entries(programCounts)
     .map(([id, value]) => ({
       id,
-      title: programTitleById.get(id) ?? value.slug ?? 'Program',
+      title: programTitleById.get(id) || value.slug || `Unassigned program (${id})`,
       slug: value.slug || undefined,
       learners: value.learners,
       completed: value.completed,
@@ -656,8 +662,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     }));
 
   const blockedPrograms = programRows
-    .filter((row: any) => row.status !== 'archived' && !row.archived_at && !isTestRecord(row.title, row.slug))
-    .filter((row: any) => row.published !== true)
+    .filter(isUnpublishedOperationalProgram)
     .map((row: any) => ({
       id: row.id,
       title: row.title ?? 'Untitled',
@@ -745,7 +750,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     ...recentStudents.map((row) => ({
       id: `enr-${row.id}`,
       title: `Enrollment: ${row.full_name || row.email || row.id}`,
-      timestamp: row.created_at || new Date(0).toISOString(),
+      timestamp: row.created_at || '',
     })),
   ]
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -834,6 +839,14 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const isSuperAdmin = profileRes.data?.role === 'super_admin';
 
   return {
+    sourceAvailability: {
+      applications: !applicationsRes.error,
+      wioaDocuments: !wioaDocsRes.error && typeof wioaDocsRes.count === 'number',
+      submissions: !submissionsRes.error,
+      programHolders: !holdersRes.error && typeof holdersRes.count === 'number',
+      holderDocuments: !holderDocsRes.error && typeof holderDocsRes.count === 'number',
+      operationalAlerts: !applicationsRes.error && !enrollmentsRes.error && !outcomesRes.error && !complianceRes.error,
+    },
     enrollmentSummary: {totalRecords: enrollments.filter((row: any) => !row.revoked_at).length, available: !enrollmentsRes.error},
     counts,
     revenueAllTimeCents,
@@ -877,7 +890,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       ...row,
       program_title: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
     })),
-    missingFundingEnrollments: enrollments.filter(
+    missingFundingEnrollments: activeEnrollments.filter(
       (row: any) => !row.funding_source && n(row.amount_paid_cents) === 0,
     ) as Record<string, unknown>[],
     profile,

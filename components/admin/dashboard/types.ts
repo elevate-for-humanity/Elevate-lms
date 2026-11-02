@@ -174,6 +174,14 @@ export interface RecentPayment {
 }
 
 export interface AdminDashboardData {
+  sourceAvailability?: {
+    applications: boolean;
+    wioaDocuments: boolean;
+    submissions: boolean;
+    programHolders: boolean;
+    holderDocuments: boolean;
+    operationalAlerts: boolean;
+  };
   enrollmentSummary?: { totalRecords: number; available: boolean };
   paidInvoiceSummary?: {allTimeAvailable: boolean; monthAvailable: boolean; paidCount: number};
   totalStudentsAvailable?: boolean;

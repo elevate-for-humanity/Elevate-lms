@@ -169,7 +169,7 @@ describe('normalizeAdminDashboardData', () => {
     });
 
     expect(normalized.profile?.full_name).toBeNull();
-    expect(normalized.isSuperAdmin).toBe(true);
+    expect(normalized.isSuperAdmin).toBe(false);
   });
 
   it('drops recent students without ids', () => {
@@ -229,5 +229,21 @@ describe('unavailable metrics', () => {
       ],
     });
     expect(data.kpis[0].unavailable).toBe(true);
+  });
+});
+
+describe('dashboard evidence boundaries', () => {
+  it('does not promote an admin profile to super admin and preserves an explicit false flag', () => {
+    expect(normalizeAdminDashboardData({profile:{full_name:'Admin',role:'admin'},isSuperAdmin:false}).isSuperAdmin).toBe(false);
+    expect(normalizeAdminDashboardData({isSuperAdmin:true}).isSuperAdmin).toBe(true);
+  });
+  it('keeps missing activity dates unknown and partial health degraded', () => {
+    const data = normalizeAdminDashboardData({recentActivity:[{id:'saved',title:'Recorded activity'} as any],systemHealth:{alerts:[]} as any});
+    expect(data.recentActivity[0].timestamp).toBe('');
+    expect(data.systemHealth.degraded).toBe(true);
+  });
+  it('preserves individual failed source states', () => {
+    const data = normalizeAdminDashboardData({sourceAvailability:{applications:true,wioaDocuments:false,submissions:true,programHolders:false,holderDocuments:true,operationalAlerts:false}});
+    expect(data.sourceAvailability).toEqual({applications:true,wioaDocuments:false,submissions:true,programHolders:false,holderDocuments:true,operationalAlerts:false});
   });
 });

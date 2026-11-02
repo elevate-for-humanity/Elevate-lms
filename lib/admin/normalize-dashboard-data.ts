@@ -77,7 +77,7 @@ const FALLBACK_SITE_PREVIEW: SitePreviewTarget[] = [];
 
 function normalizeKpis(kpis: KPICard[] | null | undefined): KPICard[] {
   return asObjectArray(kpis).map((kpi) => ({
-    unavailable: kpi.unavailable === true,
+    unavailable: kpi.unavailable === true || typeof kpi.value !== 'number' || !Number.isFinite(kpi.value),
     label: typeof kpi.label === 'string' ? kpi.label : 'Metric',
     value: asCount(kpi.value),
     delta: asCount(kpi.delta),
@@ -149,7 +149,7 @@ function normalizeSystemHealth(
     quickBooksBillingOk: raw.quickBooksBillingOk === true,
     buildEnvOk: raw.buildEnvOk === true,
     staleJobs: asCount(raw.staleJobs, FALLBACK_SYSTEM_HEALTH.staleJobs),
-    degraded: raw.degraded === true || alerts.some((a) => a.severity === 'critical'),
+    degraded: raw.degraded !== false || !Array.isArray(raw.alerts) || alerts.some((a) => a.severity === 'critical'),
     missingDocuments: asCount(raw.missingDocuments, FALLBACK_SYSTEM_HEALTH.missingDocuments),
     missingCertifications: asCount(
       raw.missingCertifications,
@@ -337,8 +337,16 @@ export function normalizeAdminDashboardData(
   const recentApplications = normalizeRecentApplications(input.recentApplications);
 
   return {
+    sourceAvailability: input.sourceAvailability ? {
+      applications: input.sourceAvailability.applications === true,
+      wioaDocuments: input.sourceAvailability.wioaDocuments === true,
+      submissions: input.sourceAvailability.submissions === true,
+      programHolders: input.sourceAvailability.programHolders === true,
+      holderDocuments: input.sourceAvailability.holderDocuments === true,
+      operationalAlerts: input.sourceAvailability.operationalAlerts === true,
+    } : undefined,
     enrollmentSummary: input.enrollmentSummary ? {totalRecords: asCount(input.enrollmentSummary.totalRecords), available: input.enrollmentSummary.available === true} : undefined,
-    counts: normalizeCounts(input.counts, pendingApplications.length || recentApplications.length),
+    counts: normalizeCounts(input.counts, pendingApplications.length),
     revenueAllTimeCents: asCount(input.revenueAllTimeCents, 0),
     totalStudents: asCount(input.totalStudents, 0),
     recentPayments: asObjectArray(input.recentPayments),
@@ -354,7 +362,7 @@ export function normalizeAdminDashboardData(
     recentActivity: asObjectArray(input.recentActivity).map((item) => ({
       id: String(item.id ?? 'activity'),
       title: typeof item.title === 'string' ? item.title : 'Activity',
-      timestamp: typeof item.timestamp === 'string' ? item.timestamp : new Date().toISOString(),
+      timestamp: typeof item.timestamp === 'string' && Number.isFinite(Date.parse(item.timestamp)) ? item.timestamp : '',
     })),
     recentStudents: normalizeRecentStudents(input.recentStudents),
     recentApplications,
@@ -380,6 +388,6 @@ export function normalizeAdminDashboardData(
         typeof section === 'string',
     ),
     systemHealth: normalizeSystemHealth(input.systemHealth),
-    isSuperAdmin: input.isSuperAdmin === true || normalizeProfile(input.profile)?.role === 'admin',
+    isSuperAdmin: input.isSuperAdmin === true,
   };
 }

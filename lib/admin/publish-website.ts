@@ -212,7 +212,7 @@ export async function getPublishWebsiteStatus(): Promise<PublishWebsiteStatus> {
         const payload = (await response.json().catch(() => null)) as { healthy?: boolean } | null;
         status =
           response.ok && payload?.healthy === true
-            ? 'healthy (revision not verified)'
+            ? 'Health probe passed; deployment revision unverified'
             : 'unhealthy (HTTP ' + response.status + ')';
       } catch {
         /* Do not treat a failed probe as healthy. */

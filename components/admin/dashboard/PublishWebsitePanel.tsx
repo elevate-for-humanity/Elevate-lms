@@ -33,8 +33,8 @@ type PublishStatus = {
   revalidatePathCount: number;
   services: ServiceStatus[];
   content?: {
-    unpublishedPrograms: number;
-    unpublishedTestimonials: number;
+    unpublishedPrograms: number | null;
+    unpublishedTestimonials: number | null;
   };
 };
 
@@ -139,11 +139,15 @@ export function PublishWebsitePanel() {
             access is configured.
           </p>
 
+          {status?.content && (status.content.unpublishedPrograms === null || status.content.unpublishedTestimonials === null) && (
+            <p role="status" className="mt-3 text-sm text-amber-800">Publication counts are unavailable for one or more content sources. Review Programs and System Health.</p>
+          )}
+
           {status?.content &&
-            (status.content.unpublishedPrograms > 0 ||
-              status.content.unpublishedTestimonials > 0) && (
+            ((status.content.unpublishedPrograms ?? 0) > 0 ||
+              (status.content.unpublishedTestimonials ?? 0) > 0) && (
               <p className="mt-3 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                {status.content.unpublishedPrograms > 0 && (
+                {(status.content.unpublishedPrograms ?? 0) > 0 && (
                   <span>
                     {status.content.unpublishedPrograms} program(s) still unpublished — use{' '}
                     <Link href="/programs" className="font-semibold underline">
@@ -152,7 +156,7 @@ export function PublishWebsitePanel() {
                     to publish catalog changes first.{' '}
                   </span>
                 )}
-                {status.content.unpublishedTestimonials > 0 && (
+                {(status.content.unpublishedTestimonials ?? 0) > 0 && (
                   <span>
                     {status.content.unpublishedTestimonials} testimonial draft(s) — publish in CRM /
                     content tools for homepage success stories.

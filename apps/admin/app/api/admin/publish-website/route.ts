@@ -1,3 +1,4 @@
+import { isUnpublishedOperationalProgram } from '@/lib/admin/dashboard/record-evidence';
 /**
  * GET  /api/admin/publish-website — deployment/content status
  * POST /api/admin/publish-website — revalidate and deploy website services
@@ -32,23 +33,32 @@ export async function GET(request: NextRequest) {
     const status = await getPublishWebsiteStatus();
     const db = await requireAdminClient();
 
-    let draftPrograms = 0;
-    let draftTestimonials = 0;
+    let draftPrograms: number | null = null;
+    let draftTestimonials: number | null = null;
 
     if (db) {
       const [programsRes, testimonialsRes] = await Promise.all([
-        db
-          .from('programs')
-          .select('id', { count: 'exact', head: true })
-          .eq('published', false)
-          .neq('status', 'archived'),
+        (async () => {
+          let count = 0;
+          const signal = AbortSignal.timeout(8000);
+          for (let offset = 0; ; offset += 500) {
+            const { data, error } = await db.from('programs')
+              .select('id,title,slug,published,status,archived_at')
+              .order('id', { ascending: true })
+              .range(offset, offset + 499)
+              .abortSignal(signal);
+            if (error) return { count: null, error };
+            count += (data ?? []).filter(isUnpublishedOperationalProgram).length;
+            if (!data || data.length < 500) return { count, error: null };
+          }
+        })(),
         db
           .from('testimonials')
           .select('id', { count: 'exact', head: true })
           .eq('published', false),
       ]);
-      draftPrograms = programsRes.count ?? 0;
-      draftTestimonials = testimonialsRes.count ?? 0;
+      draftPrograms = programsRes.error ? null : programsRes.count;
+      draftTestimonials = testimonialsRes.error ? null : (testimonialsRes.count ?? null);
     }
 
     return NextResponse.json({

@@ -1,3 +1,4 @@
+import { APPLICATION_REVIEW_URL } from '@/lib/admin/application-filters';
 // Server component — no client state.
 // Renders a horizontal stats bar with key all-time and period metrics.
 import Link from 'next/link';
@@ -112,7 +113,7 @@ export function StatsOverviewBar({ data }: Props) {
           label="Pending Applications"
           value={unavailable('Pending Applications') ? 'Unavailable' : counts.pendingApplications.toLocaleString()}
           sub="awaiting review"
-          href="/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding"
+          href={APPLICATION_REVIEW_URL}
           urgent={counts.pendingApplications > 0}
         />
         <StatCard

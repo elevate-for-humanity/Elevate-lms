@@ -1,3 +1,4 @@
+import { APPLICATION_REVIEW_URL } from '@/lib/admin/application-filters';
 // Server component. Operational Admin dashboard using canonical routes and live data only.
 
 import Link from 'next/link';
@@ -193,26 +194,31 @@ function ReviewQueues({ data }: { data: AdminDashboardData }) {
   const queues = [
     {
       label: 'Applications awaiting review',
+      available: data.sourceAvailability?.applications === true,
       count: counts?.pendingApplications ?? 0,
-      href: '/applications?status=submitted,pending,in_review,pending_admin_review',
+      href: APPLICATION_REVIEW_URL,
     },
     {
       label: 'WIOA documents awaiting review',
+      available: data.sourceAvailability?.wioaDocuments === true,
       count: data.pendingWioaDocs ?? 0,
       href: '/wioa/documents',
     },
     {
       label: 'Lab submissions awaiting sign-off',
+      available: data.sourceAvailability?.submissions === true,
       count: data.pendingSubmissions?.length ?? 0,
       href: '/submissions',
     },
     {
       label: 'Program holders awaiting approval',
+      available: data.sourceAvailability?.programHolders === true,
       count: counts?.pendingProgramHolders ?? 0,
       href: '/program-holders',
     },
     {
       label: 'Program holder documents pending',
+      available: data.sourceAvailability?.holderDocuments === true,
       count: counts?.pendingDocuments ?? 0,
       href: '/program-holder-documents',
     },
@@ -232,7 +238,7 @@ function ReviewQueues({ data }: { data: AdminDashboardData }) {
           >
             <span className="text-sm font-semibold text-slate-800">{queue.label}</span>
             <span className="shrink-0 text-lg font-black tabular-nums text-slate-950">
-              {queue.count}
+              {queue.available ? queue.count : 'Unavailable'}
             </span>
           </Link>
         ))}
@@ -253,9 +259,11 @@ function RecentActivity({ items }: { items: { id: string; title: string; timesta
         {items.slice(0, 8).map((item) => (
           <div key={item.id} className="px-5 py-3">
             <p className="text-sm text-slate-700">{item.title}</p>
-            <time className="mt-1 block text-xs text-slate-500" dateTime={item.timestamp}>
-              {new Date(item.timestamp).toLocaleString('en-US')}
-            </time>
+            {item.timestamp && Number.isFinite(Date.parse(item.timestamp)) ? (
+              <time className="mt-1 block text-xs text-slate-500" dateTime={item.timestamp}>
+                {new Date(item.timestamp).toLocaleString('en-US')}
+              </time>
+            ) : <span className="mt-1 block text-xs text-slate-500">Date unavailable</span>}
           </div>
         ))}
       </div>

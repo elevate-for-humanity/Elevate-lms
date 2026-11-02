@@ -6,6 +6,8 @@ export const APPLICATION_REVIEW_STATUSES = [
   'pending_admin_review',
 ] as const;
 
+export const APPLICATION_REVIEW_URL = `/applications?status=${APPLICATION_REVIEW_STATUSES.join(',')}`;
+
 export function applicationSearchFilter(search: string) {
   const value = JSON.stringify(`%${search.trim()}%`);
   return ['first_name', 'last_name', 'email', 'full_name']

@@ -53,7 +53,7 @@ export function RecentApplicationsList({ items }: { items: RecentApplication[] }
     <div className="divide-y divide-slate-50">
       {items.slice(0, 8).map((app) => {
         const name =
-          [app.first_name, app.last_name].filter(Boolean).join(' ') || app.full_name || 'Unknown';
+          [app.first_name, app.last_name].filter(Boolean).join(' ') || app.full_name || app.email || `Application ${app.id}`;
         return (
           <Link
             key={app.id}
@@ -75,7 +75,7 @@ export function RecentApplicationsList({ items }: { items: RecentApplication[] }
                 <span
                   className={`ml-2 font-medium ${app.urgent ? 'text-rose-600' : 'text-slate-400'}`}
                 >
-                  · {ageLabel(app.age_days)}
+                  · {Number.isFinite(Date.parse(app.created_at)) ? ageLabel(app.age_days) : 'Date unavailable'}
                 </span>
               </div>
             </div>

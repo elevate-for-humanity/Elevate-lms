@@ -9,7 +9,7 @@ function database(){
  return {rpc:async(name:string)=>{state.rpcCalls.push(name);return {data:[state.invoiceSnapshot],error:state.fail.has('billing_invoices')?{message:'unavailable'}:null};},from(table:string){
   let start=0,end=Infinity,head=false,single=false;
   const query:any={select(_columns:string,options:any){head=options?.head===true;return query;},range(a:number,b:number){state.ranges.push(`${table}:${a}`);start=a;end=b;return query;},limit(n:number){end=n-1;return query;},maybeSingle(){single=true;return query;},then(resolve:any){return Promise.resolve({data:single?{full_name:'Admin',role:'admin'}:head?null:(state.rows[table]??[]).slice(start,end+1),count:(state.rows[table]??[]).length,error:state.fail.has(table)?{message:'database unavailable'}:null}).then(resolve);}};
-  for(const method of ['eq','gt','gte','lt','in','like','ilike','not','order','abortSignal'])query[method]=()=>query;
+  for(const method of ['eq','gt','gte','lt','in','like','ilike','not','order','abortSignal','or'])query[method]=()=>query;
   return query;
  }};
 }
@@ -127,3 +127,26 @@ describe('executed admin dashboard data loader',()=>{
  });
 });
 
+
+it('retains failed queue availability independently of successfully loaded queues', async()=>{
+ state.fail.add('documents'); state.fail.add('admin_alerts');
+ const data=await getAdminDashboardData();
+ expect(data.sourceAvailability).toMatchObject({applications:true,wioaDocuments:false,submissions:true,operationalAlerts:false});
+});
+it('does not manufacture application or activity dates',async()=>{
+ state.rows.applications=[{id:'undated',status:'submitted',full_name:'Recorded Applicant'}];
+ const data=await getAdminDashboardData();
+ expect(data.pendingApplications[0]).toMatchObject({created_at:'',age_days:0,urgent:false});
+ expect(data.recentActivity[0].timestamp).toBe('');
+});
+it('loads all open compliance alerts beyond the old fifty-row preview',async()=>{
+ state.rows.admin_alerts=Array.from({length:501},(_,i)=>({id:String(i),resolved:false}));
+ const data=await getAdminDashboardData();
+ expect(data.complianceAlerts).toHaveLength(501);
+ expect(state.ranges).toContain('admin_alerts:500');
+});
+it('restricts missing funding alerts to active non-revoked enrollments',async()=>{
+ state.rows.program_enrollments=[{id:'active',status:'active'},{id:'completed',status:'completed'},{id:'revoked',status:'active',revoked_at:new Date().toISOString()}];
+ const data=await getAdminDashboardData();
+ expect(data.missingFundingEnrollments.map(row=>row.id)).toEqual(['active']);
+});

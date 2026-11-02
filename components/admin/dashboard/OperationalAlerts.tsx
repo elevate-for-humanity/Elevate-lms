@@ -1,3 +1,4 @@
+import { APPLICATION_REVIEW_URL } from '@/lib/admin/application-filters';
 // Server component — no client state needed.
 // Surfaces operational alert categories that require admin action.
 
@@ -58,6 +59,10 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
   const openComplianceAlerts: any[] = Array.isArray(data.complianceAlerts) ? data.complianceAlerts : [];
   const totalAlerts = stalledApplications.length + noOutcomeEnrollments.length + missingFundingEnrollments.length + openComplianceAlerts.length;
 
+  const complete = data.sourceAvailability?.operationalAlerts === true;
+  if (totalAlerts === 0 && !complete) {
+    return <div role="status" className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">Operational alert checks are incomplete. Open <Link href="/system-health" className="font-bold underline">System Health</Link> before relying on the empty queues.</div>;
+  }
   if (totalAlerts === 0) {
     return (
       <div className="flex items-center gap-3 rounded-xl border border-brand-green-200 bg-brand-green-50 px-5 py-4 mb-6">
@@ -69,13 +74,14 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
 
   return (
     <div className="mb-6">
+      {!complete && <p role="status" className="mb-3 text-sm text-amber-900">Some alert sources are unavailable. These are the alerts from loaded records.</p>}
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-4 w-4 text-amber-500" />
         <p className="text-sm font-bold text-slate-700 uppercase tracking-widest text-xs">Needs Attention</p>
         <span className="text-xs font-bold bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">{totalAlerts}</span>
       </div>
 
-      <AlertSection icon={<Clock className="h-4 w-4 text-amber-600" />} title="Applications stalled 7+ days" count={stalledApplications.length} viewAllHref="/applications?status=awaiting_review">
+      <AlertSection icon={<Clock className="h-4 w-4 text-amber-600" />} title="Applications stalled 7+ days" count={stalledApplications.length} viewAllHref={APPLICATION_REVIEW_URL}>
         {stalledApplications.slice(0, ALERT_PREVIEW_LIMIT).map((app: any) => {
           const name = app.full_name || [app.first_name, app.last_name].filter(Boolean).join(' ') || app.email || 'Unknown';
           const ageDays = Math.floor((Date.now() - new Date(app.submitted_at || app.created_at).getTime()) / 86400000);
@@ -87,7 +93,7 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
         })}
       </AlertSection>
 
-      <AlertSection icon={<span className="w-4 h-4 rounded-full bg-amber-600 inline-block flex-shrink-0" aria-hidden="true" />} title="Enrolled — no placement or credential outcome" count={noOutcomeEnrollments.length} viewAllHref="/reports/wioa">
+      <AlertSection icon={<span className="w-4 h-4 rounded-full bg-amber-600 inline-block flex-shrink-0" aria-hidden="true" />} title="Completed — no recorded employment outcome" count={noOutcomeEnrollments.length} viewAllHref="/reports/wioa">
         {noOutcomeEnrollments.slice(0, ALERT_PREVIEW_LIMIT).map((enr: any) => {
           const id = (enr.enrollment_id ?? enr.id ?? enr.participant_id) as string;
           const name = enr.full_name || [enr.first_name, enr.last_name].filter(Boolean).join(' ') || enr.email || (id?.slice(0, 8) + '…');

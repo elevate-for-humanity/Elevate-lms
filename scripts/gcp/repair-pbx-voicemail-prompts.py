@@ -4,6 +4,7 @@ import hashlib,io,json,os,re,subprocess,tarfile,tempfile,urllib.request
 from pathlib import Path,PurePosixPath
 URL='https://downloads.asterisk.org/pub/telephony/sounds/releases/asterisk-core-sounds-en-ulaw-1.6.1.tar.gz'
 SHA256='83ec602fb1f2cb06a5194a95f855b84bae35d49d5bdb6fbd9274d5d1a5d16b0e'
+PHASE="initial"
 REQUIRED=['beep.ulaw','vm-intro.ulaw','vm-theperson.ulaw','vm-isunavail.ulaw','vm-goodbye.ulaw','digits/0.ulaw']
 def run(args):
  p=subprocess.run(args,capture_output=True,text=True,timeout=30)
@@ -51,7 +52,10 @@ def rollback(files,directories):
   except OSError:pass
 
 def main():
+ global PHASE
+ PHASE="idle_check"
  idle()
+ PHASE="container_identity"
  info=json.loads(run(['docker','inspect','pbx_asterisk_1']))[0]
  if info['Config']['Image']!='mlan/asterisk:xtra-1.1.13' or info['HostConfig']['NetworkMode']!='host':raise ValueError('PBX_PROMPT_CONTAINER_UNVERIFIED')
  mounts=[m for m in info['Mounts'] if m['Destination']=='/var/lib/asterisk' and m.get('RW')]
@@ -59,12 +63,17 @@ def main():
  root=Path(mounts[0]['Source'])
  if not root.is_absolute() or root.is_symlink() or not root.is_dir():raise ValueError('PBX_PROMPT_VOLUME_UNVERIFIED')
  # Verify the actual runtime data directory, not only the repository default.
+ PHASE="runtime_directory"
  settings=run(['docker','exec','pbx_asterisk_1','asterisk','-rx','core show settings'])
  if not re.search(r'Data directory:\s*/var/lib/asterisk\s*$',settings,re.M):raise ValueError('PBX_PROMPT_RUNTIME_DIRECTORY_UNVERIFIED')
+ PHASE="official_archive_download"
  with urllib.request.urlopen(URL,timeout=40) as response:data=response.read(12_000_001)
+ PHASE="archive_validation"
  files=members(data);idle();created=[];directories=[]
  try:
+  PHASE="install_missing_files"
   created,directories=install_files(root/'sounds/en',files)
+  PHASE="runtime_read_verification"
   for name in REQUIRED:
    run(['docker','exec','--user','asterisk','pbx_asterisk_1','test','-r','/var/lib/asterisk/sounds/en/'+name])
  except Exception:
@@ -73,4 +82,4 @@ def main():
 if __name__=='__main__':
  try:main()
  except Exception as e:
-  print(json.dumps({'result':'FAIL','code':str(e) if isinstance(e,ValueError) and re.fullmatch('PBX_PROMPT_[A-Z_]+',str(e)) else 'PBX_PROMPT_REPAIR_UNAVAILABLE'}));raise SystemExit(1)
+  print(json.dumps({'result':'FAIL','code':str(e) if isinstance(e,ValueError) and re.fullmatch('PBX_PROMPT_[A-Z_]+',str(e)) else 'PBX_PROMPT_REPAIR_UNAVAILABLE','phase':PHASE,'exceptionClass':type(e).__name__,'httpStatus':getattr(e,'code',None) if isinstance(getattr(e,'code',None),int) else None}));raise SystemExit(1)

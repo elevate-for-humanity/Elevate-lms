@@ -1,4 +1,5 @@
 name: Restore missing owned PBX voicemail prompts
+# Keep failures scoped to fixed phases; never print credential-bearing exceptions.
 on:
   workflow_dispatch:
   push:

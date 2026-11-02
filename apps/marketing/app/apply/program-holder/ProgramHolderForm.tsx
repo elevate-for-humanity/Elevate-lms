@@ -107,6 +107,7 @@ export default function ProgramHolderForm({
     try {
       const res = await fetch('/api/program-holder/apply', {
         method: 'POST',
+        signal: AbortSignal.timeout(60_000),
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           organizationName: form.orgName,
@@ -161,19 +162,19 @@ export default function ProgramHolderForm({
       <section>
         <h2 className="mb-4 text-xl font-black text-slate-950">Organization identity</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2"><label className={labelClass}>Legal Organization Name *</label><input name="orgName" required value={form.orgName} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Primary Contact *</label><input name="contactName" required value={form.contactName} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Email *</label><input type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Phone</label><input type="tel" name="phone" value={form.phone} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Website</label><input type="url" name="website" value={form.website} onChange={handleChange} className={fieldClass} placeholder="https://" /></div>
-          <div><label className={labelClass}>Organization Type</label><select name="orgType" value={form.orgType} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="school">Career / technical school</option><option value="employer">Employer</option><option value="nonprofit">Nonprofit / community organization</option><option value="workforce_agency">Workforce agency</option><option value="testing_center">Testing / certification center</option><option value="healthcare">Healthcare organization</option><option value="other">Other</option></select></div>
-          <div><label className={labelClass}>Legal Structure</label><select name="legalStructure" value={form.legalStructure} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="llc">LLC</option><option value="corporation">Corporation</option><option value="nonprofit_501c3">501(c)(3) nonprofit</option><option value="government">Government / public entity</option><option value="sole_proprietor">Sole proprietor</option><option value="other">Other</option></select></div>
-          <div><label className={labelClass}>Years in Operation</label><input type="number" min="0" name="yearsInBusiness" value={form.yearsInBusiness} onChange={handleChange} className={fieldClass} /></div>
-          <div className="sm:col-span-2"><label className={labelClass}>Street Address</label><input name="address" value={form.address} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>City</label><input name="city" value={form.city} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>State</label><input name="state" value={form.state} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>ZIP</label><input name="zip" value={form.zip} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>License / Provider / Approval Number</label><input name="licenseNumber" value={form.licenseNumber} onChange={handleChange} className={fieldClass} /></div>
+          <div className="sm:col-span-2"><label htmlFor="orgName" className={labelClass}>Legal Organization Name *</label><input id="orgName" name="orgName" required value={form.orgName} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="contactName" className={labelClass}>Primary Contact *</label><input id="contactName" name="contactName" required value={form.contactName} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="email" className={labelClass}>Email *</label><input id="email" type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="phone" className={labelClass}>Phone</label><input id="phone" type="tel" name="phone" value={form.phone} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="website" className={labelClass}>Website</label><input id="website" type="url" name="website" value={form.website} onChange={handleChange} className={fieldClass} placeholder="https://" /></div>
+          <div><label htmlFor="orgType" className={labelClass}>Organization Type</label><select id="orgType" name="orgType" value={form.orgType} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="school">Career / technical school</option><option value="employer">Employer</option><option value="nonprofit">Nonprofit / community organization</option><option value="workforce_agency">Workforce agency</option><option value="testing_center">Testing / certification center</option><option value="healthcare">Healthcare organization</option><option value="other">Other</option></select></div>
+          <div><label htmlFor="legalStructure" className={labelClass}>Legal Structure</label><select id="legalStructure" name="legalStructure" value={form.legalStructure} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="llc">LLC</option><option value="corporation">Corporation</option><option value="nonprofit_501c3">501(c)(3) nonprofit</option><option value="government">Government / public entity</option><option value="sole_proprietor">Sole proprietor</option><option value="other">Other</option></select></div>
+          <div><label htmlFor="yearsInBusiness" className={labelClass}>Years in Operation</label><input id="yearsInBusiness" type="number" min="0" name="yearsInBusiness" value={form.yearsInBusiness} onChange={handleChange} className={fieldClass} /></div>
+          <div className="sm:col-span-2"><label htmlFor="address" className={labelClass}>Street Address</label><input id="address" name="address" value={form.address} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="city" className={labelClass}>City</label><input id="city" name="city" value={form.city} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="state" className={labelClass}>State</label><input id="state" name="state" value={form.state} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="zip" className={labelClass}>ZIP</label><input id="zip" name="zip" value={form.zip} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="licenseNumber" className={labelClass}>License / Provider / Approval Number</label><input id="licenseNumber" name="licenseNumber" value={form.licenseNumber} onChange={handleChange} className={fieldClass} /></div>
         </div>
       </section>
 
@@ -197,16 +198,16 @@ export default function ProgramHolderForm({
           ))}
         </div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <div><label className={labelClass}>Existing Approvals / Accreditations / Certifications</label><textarea name="approvals" rows={3} value={form.approvals} onChange={handleChange} className={fieldClass} placeholder="ETPL/INTraining, DOL apprenticeship, state license, testing authorization, accreditation, etc." /></div>
-          <div><label className={labelClass}>Instructor / Staff Capacity</label><textarea name="instructorCapacity" rows={3} value={form.instructorCapacity} onChange={handleChange} className={fieldClass} placeholder="Number of instructors, licenses/credentials, proctors, support staff, etc." /></div>
-          <div><label className={labelClass}>Facility / Lab / Equipment Capacity</label><textarea name="facilityCapacity" rows={3} value={form.facilityCapacity} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Workforce / Funding Relationships</label><textarea name="fundingRelationships" rows={3} value={form.fundingRelationships} onChange={handleChange} className={fieldClass} placeholder="WorkOne, workforce boards, WRG, WIOA, employer-funded, self-pay, grants, etc." /></div>
-          <div><label className={labelClass}>Delivery Model</label><select name="deliveryModel" value={form.deliveryModel} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online</option><option value="multiple">Multiple delivery models</option></select></div>
+          <div><label htmlFor="approvals" className={labelClass}>Existing Approvals / Accreditations / Certifications</label><textarea id="approvals" name="approvals" rows={3} value={form.approvals} onChange={handleChange} className={fieldClass} placeholder="ETPL/INTraining, DOL apprenticeship, state license, testing authorization, accreditation, etc." /></div>
+          <div><label htmlFor="instructorCapacity" className={labelClass}>Instructor / Staff Capacity</label><textarea id="instructorCapacity" name="instructorCapacity" rows={3} value={form.instructorCapacity} onChange={handleChange} className={fieldClass} placeholder="Number of instructors, licenses/credentials, proctors, support staff, etc." /></div>
+          <div><label htmlFor="facilityCapacity" className={labelClass}>Facility / Lab / Equipment Capacity</label><textarea id="facilityCapacity" name="facilityCapacity" rows={3} value={form.facilityCapacity} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="fundingRelationships" className={labelClass}>Workforce / Funding Relationships</label><textarea id="fundingRelationships" name="fundingRelationships" rows={3} value={form.fundingRelationships} onChange={handleChange} className={fieldClass} placeholder="WorkOne, workforce boards, WRG, WIOA, employer-funded, self-pay, grants, etc." /></div>
+          <div><label htmlFor="deliveryModel" className={labelClass}>Delivery Model</label><select id="deliveryModel" name="deliveryModel" value={form.deliveryModel} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online</option><option value="multiple">Multiple delivery models</option></select></div>
         </div>
-        <div className="mt-4"><label className={labelClass}>Organization / Program Description</label><textarea name="description" rows={4} value={form.description} onChange={handleChange} className={fieldClass} /></div>
+        <div className="mt-4"><label htmlFor="description" className={labelClass}>Organization / Program Description</label><textarea id="description" name="description" rows={4} value={form.description} onChange={handleChange} className={fieldClass} /></div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div><label className={labelClass}>Preferred Public Position / Title</label><input name="preferredTitle" value={form.preferredTitle} onChange={handleChange} className={fieldClass} placeholder="Project Management Program Holder" /></div>
-          <div className="sm:col-span-2"><label className={labelClass}>Professional Bio</label><textarea name="professionalBio" rows={5} value={form.professionalBio} onChange={handleChange} className={fieldClass} placeholder="Share 100–150 words about your professional background, credentials, and experience. This is reviewed before any public team profile is published." /></div>
+          <div><label htmlFor="preferredTitle" className={labelClass}>Preferred Public Position / Title</label><input id="preferredTitle" name="preferredTitle" value={form.preferredTitle} onChange={handleChange} className={fieldClass} placeholder="Project Management Program Holder" /></div>
+          <div className="sm:col-span-2"><label htmlFor="professionalBio" className={labelClass}>Professional Bio</label><textarea id="professionalBio" name="professionalBio" rows={5} value={form.professionalBio} onChange={handleChange} className={fieldClass} placeholder="Share 100–150 words about your professional background, credentials, and experience. This is reviewed before any public team profile is published." /></div>
         </div>
       </section>
 

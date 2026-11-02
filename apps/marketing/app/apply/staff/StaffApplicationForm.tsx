@@ -30,6 +30,7 @@ export default function StaffApplicationForm() {
     try {
       const res = await fetch('/api/staff/apply', {
         method: 'POST',
+        signal: AbortSignal.timeout(60_000),
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });

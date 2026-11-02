@@ -120,7 +120,11 @@ if (!success) {
 // ── 4. /apply/status must redirect to /apply/track ────────────
 const status = read(join(SRC, 'apply/status/page.tsx'));
 if (!status) {
-  fail('/apply/status page not found');
+  if (nextConfig?.includes("source: '/apply/status', destination: '/apply/track'")) {
+    pass('/apply/status redirects to /apply/track in the route configuration');
+  } else {
+    fail('/apply/status must redirect to /apply/track');
+  }
 } else {
   if (status.includes('redirect') && status.includes('/apply/track')) {
     pass('/apply/status redirects to /apply/track');

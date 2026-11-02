@@ -51,6 +51,30 @@ async function _GET(request: NextRequest) {
       .limit(1)
       .maybeSingle();
 
+    // Employer, Program Holder and staff references identify intake records,
+    // not learner applications. Verify both credentials before returning only
+    // receipt information; intake processing is not an admissions decision.
+    if (!error && !data && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      const { data: intake, error: intakeError } = await supabase
+        .from('application_intake')
+        .select('id, application_type, created_at')
+        .eq('id', id)
+        .eq('payload->>email', email)
+        .in('application_type', ['employer', 'program_holder', 'staff'])
+        .maybeSingle();
+      if (!intakeError && intake) {
+        return NextResponse.json({ application: {
+          id: intake.id,
+          first_name: 'Applicant',
+          program_interest: ({ employer: 'Employer Partnership', program_holder: 'Program Holder Partnership', staff: 'Staff Application' } as Record<string, string>)[intake.application_type],
+          program_id: null,
+          reference_number: intake.id,
+          status: 'under_review',
+          submitted_at: intake.created_at,
+        } }, { headers: { 'Cache-Control': 'no-store' } });
+      }
+    }
+
     if (error || !data) {
       return NextResponse.json(
         { error: 'We could not verify those application details.' },

@@ -69,6 +69,7 @@ export default function EmployerApplicationForm() {
     try {
       const res = await fetch('/api/employer/apply', {
         method: 'POST',
+        signal: AbortSignal.timeout(60_000),
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           companyName: form.companyName,
@@ -121,39 +122,39 @@ export default function EmployerApplicationForm() {
       <section>
         <h3 className="mb-4 text-xl font-black text-slate-950">Company and contact</h3>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2"><label className={labelClass}>Company / Organization Name *</label><input name="companyName" required value={form.companyName} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Primary Contact *</label><input name="contactName" required value={form.contactName} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Email *</label><input type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Phone</label><input type="tel" name="phone" value={form.phone} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>Industry</label><input name="industry" value={form.industry} onChange={handleChange} className={fieldClass} placeholder="Healthcare, construction, transportation, etc." /></div>
-          <div><label className={labelClass}>Employee Count</label><select name="employeeCount" value={form.employeeCount} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="1-10">1–10</option><option value="11-50">11–50</option><option value="51-200">51–200</option><option value="201-500">201–500</option><option value="500+">500+</option></select></div>
-          <div><label className={labelClass}>City</label><input name="city" value={form.city} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>State</label><input name="state" value={form.state} onChange={handleChange} className={fieldClass} /></div>
-          <div className="sm:col-span-2"><label className={labelClass}>Company Website</label><input type="url" name="website" value={form.website} onChange={handleChange} className={fieldClass} placeholder="https://" /></div>
+          <div className="sm:col-span-2"><label htmlFor="companyName" className={labelClass}>Company / Organization Name *</label><input id="companyName" name="companyName" required value={form.companyName} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="contactName" className={labelClass}>Primary Contact *</label><input id="contactName" name="contactName" required value={form.contactName} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="email" className={labelClass}>Email *</label><input id="email" type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="phone" className={labelClass}>Phone</label><input id="phone" type="tel" name="phone" value={form.phone} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="industry" className={labelClass}>Industry</label><input id="industry" name="industry" value={form.industry} onChange={handleChange} className={fieldClass} placeholder="Healthcare, construction, transportation, etc." /></div>
+          <div><label htmlFor="employeeCount" className={labelClass}>Employee Count</label><select id="employeeCount" name="employeeCount" value={form.employeeCount} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="1-10">1–10</option><option value="11-50">11–50</option><option value="51-200">51–200</option><option value="201-500">201–500</option><option value="500+">500+</option></select></div>
+          <div><label htmlFor="city" className={labelClass}>City</label><input id="city" name="city" value={form.city} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="state" className={labelClass}>State</label><input id="state" name="state" value={form.state} onChange={handleChange} className={fieldClass} /></div>
+          <div className="sm:col-span-2"><label htmlFor="website" className={labelClass}>Company Website</label><input id="website" type="url" name="website" value={form.website} onChange={handleChange} className={fieldClass} placeholder="https://" /></div>
         </div>
       </section>
 
       <section className="border-t border-slate-200 pt-7">
         <h3 className="mb-4 text-xl font-black text-slate-950">Hiring and workforce needs</h3>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div><label className={labelClass}>Primary Partnership Interest *</label><select name="interestedIn" required value={form.interestedIn} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="hire_graduates">Hire trained graduates</option><option value="sponsor_apprentice">Employ / host registered apprentices</option><option value="ojt">On-the-Job Training reimbursement</option><option value="wex">Work Experience / WEX</option><option value="custom_training">Custom training cohort</option><option value="multiple">Multiple workforce services</option></select></div>
-          <div><label className={labelClass}>Number of Current/Expected Openings</label><input type="number" min="0" name="openings" value={form.openings} onChange={handleChange} className={fieldClass} /></div>
-          <div className="sm:col-span-2"><label className={labelClass}>Roles / Occupations You Need</label><textarea name="hiringRoles" rows={3} value={form.hiringRoles} onChange={handleChange} className={fieldClass} placeholder="CNA, medical assistant, HVAC technician, CDL driver, barber, etc." /></div>
-          <div><label className={labelClass}>Expected Wage / Wage Range</label><input name="wageRange" value={form.wageRange} onChange={handleChange} className={fieldClass} placeholder="$18–$24/hour" /></div>
-          <div><label className={labelClass}>Work Schedule</label><input name="workSchedule" value={form.workSchedule} onChange={handleChange} className={fieldClass} placeholder="Full-time days, evenings, weekends, etc." /></div>
-          <div><label className={labelClass}>Hiring Timeline</label><select name="startTimeline" value={form.startTimeline} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="immediate">Immediately</option><option value="30_days">Within 30 days</option><option value="60_90_days">Within 60–90 days</option><option value="ongoing">Ongoing hiring</option><option value="planning">Planning / future need</option></select></div>
+          <div><label htmlFor="interestedIn" className={labelClass}>Primary Partnership Interest *</label><select id="interestedIn" name="interestedIn" required value={form.interestedIn} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="hire_graduates">Hire trained graduates</option><option value="sponsor_apprentice">Employ / host registered apprentices</option><option value="ojt">On-the-Job Training reimbursement</option><option value="wex">Work Experience / WEX</option><option value="custom_training">Custom training cohort</option><option value="multiple">Multiple workforce services</option></select></div>
+          <div><label htmlFor="openings" className={labelClass}>Number of Current/Expected Openings</label><input id="openings" type="number" min="0" name="openings" value={form.openings} onChange={handleChange} className={fieldClass} /></div>
+          <div className="sm:col-span-2"><label htmlFor="hiringRoles" className={labelClass}>Roles / Occupations You Need</label><textarea id="hiringRoles" name="hiringRoles" rows={3} value={form.hiringRoles} onChange={handleChange} className={fieldClass} placeholder="CNA, medical assistant, HVAC technician, CDL driver, barber, etc." /></div>
+          <div><label htmlFor="wageRange" className={labelClass}>Expected Wage / Wage Range</label><input id="wageRange" name="wageRange" value={form.wageRange} onChange={handleChange} className={fieldClass} placeholder="$18–$24/hour" /></div>
+          <div><label htmlFor="workSchedule" className={labelClass}>Work Schedule</label><input id="workSchedule" name="workSchedule" value={form.workSchedule} onChange={handleChange} className={fieldClass} placeholder="Full-time days, evenings, weekends, etc." /></div>
+          <div><label htmlFor="startTimeline" className={labelClass}>Hiring Timeline</label><select id="startTimeline" name="startTimeline" value={form.startTimeline} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="immediate">Immediately</option><option value="30_days">Within 30 days</option><option value="60_90_days">Within 60–90 days</option><option value="ongoing">Ongoing hiring</option><option value="planning">Planning / future need</option></select></div>
         </div>
       </section>
 
       <section className="border-t border-slate-200 pt-7">
         <h3 className="mb-4 text-xl font-black text-slate-950">Workforce program participation</h3>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div><label className={labelClass}>Interested in OJT reimbursement?</label><select name="ojtInterest" value={form.ojtInterest} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="learn_more">Need information</option></select></div>
-          <div><label className={labelClass}>Registered Apprenticeship?</label><select name="apprenticeshipInterest" value={form.apprenticeshipInterest} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="learn_more">Need information</option></select></div>
-          <div><label className={labelClass}>Work Experience / WEX?</label><select name="wexInterest" value={form.wexInterest} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="learn_more">Need information</option></select></div>
+          <div><label htmlFor="ojtInterest" className={labelClass}>Interested in OJT reimbursement?</label><select id="ojtInterest" name="ojtInterest" value={form.ojtInterest} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="learn_more">Need information</option></select></div>
+          <div><label htmlFor="apprenticeshipInterest" className={labelClass}>Registered Apprenticeship?</label><select id="apprenticeshipInterest" name="apprenticeshipInterest" value={form.apprenticeshipInterest} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="learn_more">Need information</option></select></div>
+          <div><label htmlFor="wexInterest" className={labelClass}>Work Experience / WEX?</label><select id="wexInterest" name="wexInterest" value={form.wexInterest} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="learn_more">Need information</option></select></div>
         </div>
-        <div className="mt-4"><label className={labelClass}>Accessibility / Accommodation Capacity or Questions</label><textarea name="accommodations" rows={2} value={form.accommodations} onChange={handleChange} className={fieldClass} /></div>
-        <div className="mt-4"><label className={labelClass}>Additional Information</label><textarea name="notes" rows={3} value={form.notes} onChange={handleChange} className={fieldClass} /></div>
+        <div className="mt-4"><label htmlFor="accommodations" className={labelClass}>Accessibility / Accommodation Capacity or Questions</label><textarea id="accommodations" name="accommodations" rows={2} value={form.accommodations} onChange={handleChange} className={fieldClass} /></div>
+        <div className="mt-4"><label htmlFor="notes" className={labelClass}>Additional Information</label><textarea id="notes" name="notes" rows={3} value={form.notes} onChange={handleChange} className={fieldClass} /></div>
       </section>
 
       <label className="flex items-start gap-3 rounded-xl border border-slate-300 p-4 text-sm font-semibold leading-6 text-slate-900">

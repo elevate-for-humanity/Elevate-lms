@@ -11,6 +11,11 @@ const CDL_APPLY_SLUGS = new Set(['cdl-training', 'cdl']);
 
 // Programs that have a waitlist — all others are rejected
 const WAITLIST_PROGRAMS = new Set([
+  'fssa',
+  'cna',
+  'hvac-technician',
+  'medical-assistant',
+  'phlebotomy',
   'barber-apprenticeship',
   'cosmetology-apprenticeship',
   'welding',
@@ -103,7 +108,7 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       position: data.position,
-      message: `You are #${data.position} on the waitlist. Check your email for confirmation.`,
+      message: `You are #${data.position} on the waitlist. Save this confirmation for your records.`,
     });
   } catch (error: any) {
     return NextResponse.json({ error: 'Failed to join waitlist' }, { status: 500 });

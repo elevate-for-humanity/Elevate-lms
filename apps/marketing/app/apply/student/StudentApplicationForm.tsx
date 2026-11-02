@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApplicationDraft } from '@/hooks/useApplicationDraft';
 import {
@@ -180,9 +180,13 @@ export default function StudentApplicationForm({
 
   const { hasDraft, savedData, savedStep, savedAt, saveDraft, clearDraft } =
     useApplicationDraft<DraftData>('student-apply');
+  const draftPromptHandled = useRef(false);
 
   useEffect(() => {
-    if (hasDraft) setShowResume(true);
+    if (hasDraft && !draftPromptHandled.current) {
+      draftPromptHandled.current = true;
+      setShowResume(true);
+    }
   }, [hasDraft]);
 
   const requiresWorkOne = form.fundingSource === 'wioa' || form.fundingSource === 'wrg';
@@ -216,6 +220,7 @@ export default function StudentApplicationForm({
   }
 
   function persist(nextStep = step) {
+    draftPromptHandled.current = true;
     saveDraft({ form, workOneAcknowledged, apprenticeshipFundingConfirmed }, nextStep);
   }
 
@@ -496,17 +501,17 @@ export default function StudentApplicationForm({
             <p className="mt-1 text-sm text-slate-700">Use your legal name and current contact information.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className={labelClass}>First Name *</label><input aria-label="First Name" name="firstName" required value={form.firstName} onChange={handleChange} className={fieldClass} autoComplete="given-name" /></div>
-            <div><label className={labelClass}>Last Name *</label><input aria-label="Last Name" name="lastName" required value={form.lastName} onChange={handleChange} className={fieldClass} autoComplete="family-name" /></div>
-            <div><label className={labelClass}>Date of Birth *</label><input aria-label="Date of Birth" type="date" name="dateOfBirth" required value={form.dateOfBirth} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>Preferred Contact</label><select name="preferredContact" value={form.preferredContact} onChange={handleChange} className={fieldClass}><option value="phone">Phone</option><option value="text">Text</option><option value="email">Email</option></select></div>
-            <div><label className={labelClass}>Email *</label><input aria-label="Email" type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} autoComplete="email" /></div>
-            <div><label className={labelClass}>Phone *</label><input aria-label="Phone" type="tel" name="phone" required value={form.phone} onChange={handleChange} className={fieldClass} autoComplete="tel" /></div>
-            <div className="sm:col-span-2"><label className={labelClass}>Street Address *</label><input aria-label="Street Address" name="address" required value={form.address} onChange={handleChange} className={fieldClass} autoComplete="street-address" /></div>
-            <div><label className={labelClass}>City *</label><input aria-label="City" name="city" required value={form.city} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>State *</label><input aria-label="State" name="state" required value={form.state} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>ZIP Code *</label><input aria-label="ZIP Code" name="zipCode" required value={form.zipCode} onChange={handleChange} className={fieldClass} inputMode="numeric" maxLength={10} /></div>
-            <div><label className={labelClass}>County of Residence</label><input aria-label="County of Residence" name="countyOfResidence" value={form.countyOfResidence} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="firstName" className={labelClass}>First Name *</label><input id="firstName" aria-label="First Name" name="firstName" required value={form.firstName} onChange={handleChange} className={fieldClass} autoComplete="given-name" /></div>
+            <div><label htmlFor="lastName" className={labelClass}>Last Name *</label><input id="lastName" aria-label="Last Name" name="lastName" required value={form.lastName} onChange={handleChange} className={fieldClass} autoComplete="family-name" /></div>
+            <div><label htmlFor="dateOfBirth" className={labelClass}>Date of Birth *</label><input id="dateOfBirth" aria-label="Date of Birth" type="date" name="dateOfBirth" required value={form.dateOfBirth} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="preferredContact" className={labelClass}>Preferred Contact</label><select id="preferredContact" name="preferredContact" value={form.preferredContact} onChange={handleChange} className={fieldClass}><option value="phone">Phone</option><option value="text">Text</option><option value="email">Email</option></select></div>
+            <div><label htmlFor="email" className={labelClass}>Email *</label><input id="email" aria-label="Email" type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} autoComplete="email" /></div>
+            <div><label htmlFor="phone" className={labelClass}>Phone *</label><input id="phone" aria-label="Phone" type="tel" name="phone" required value={form.phone} onChange={handleChange} className={fieldClass} autoComplete="tel" /></div>
+            <div className="sm:col-span-2"><label htmlFor="address" className={labelClass}>Street Address *</label><input id="address" aria-label="Street Address" name="address" required value={form.address} onChange={handleChange} className={fieldClass} autoComplete="street-address" /></div>
+            <div><label htmlFor="city" className={labelClass}>City *</label><input id="city" aria-label="City" name="city" required value={form.city} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="state" className={labelClass}>State *</label><input id="state" aria-label="State" name="state" required value={form.state} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="zipCode" className={labelClass}>ZIP Code *</label><input id="zipCode" aria-label="ZIP Code" name="zipCode" required value={form.zipCode} onChange={handleChange} className={fieldClass} inputMode="numeric" maxLength={10} /></div>
+            <div><label htmlFor="countyOfResidence" className={labelClass}>County of Residence</label><input id="countyOfResidence" aria-label="County of Residence" name="countyOfResidence" value={form.countyOfResidence} onChange={handleChange} className={fieldClass} /></div>
           </div>
         </section>
       )}
@@ -517,15 +522,15 @@ export default function StudentApplicationForm({
             <h3 className="text-xl font-black text-slate-950">Program and training preferences</h3>
             <p className="mt-1 text-sm text-slate-700">Tell us what you want to study and how you prefer to train.</p>
           </div>
-          <div><label className={labelClass}>Program of Interest *</label><select name="program" required value={form.program} onChange={handleChange} className={fieldClass}><option value="">Select a program</option>{PROGRAMS.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}</select></div>
-          <div><label className={labelClass}>Training Preference</label><select name="modalityPreference" value={form.modalityPreference} onChange={handleChange} className={fieldClass}><option value="">No preference</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online where available</option></select></div>
+          <div><label htmlFor="program" className={labelClass}>Program of Interest *</label><select id="program" name="program" required value={form.program} onChange={handleChange} className={fieldClass}><option value="">Select a program</option>{PROGRAMS.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}</select></div>
+          <div><label htmlFor="modalityPreference" className={labelClass}>Training Preference</label><select id="modalityPreference" name="modalityPreference" value={form.modalityPreference} onChange={handleChange} className={fieldClass}><option value="">No preference</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online where available</option></select></div>
           {isApprenticeship && (
             <div className="rounded-xl border border-blue-200 bg-blue-50 p-5">
               <h4 className="font-black text-slate-950">Apprenticeship placement information</h4>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div><label className={labelClass}>Do you already have a Host Shop?</label><select name="hasHostShop" value={form.hasHostShop} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="need_help">I need placement help</option></select></div>
-                <div><label className={labelClass}>Host Shop Name</label><input name="hostShopName" value={form.hostShopName} onChange={handleChange} className={fieldClass} /></div>
-                <div><label className={labelClass}>Prior/Transfer Hours Claimed</label><input type="number" min="0" name="transferHours" value={form.transferHours} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Claimed hours require documentation and verification before credit is awarded.</p></div>
+                <div><label htmlFor="hasHostShop" className={labelClass}>Do you already have a Host Shop?</label><select id="hasHostShop" name="hasHostShop" value={form.hasHostShop} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="need_help">I need placement help</option></select></div>
+                <div><label htmlFor="hostShopName" className={labelClass}>Host Shop Name</label><input id="hostShopName" name="hostShopName" value={form.hostShopName} onChange={handleChange} className={fieldClass} /></div>
+                <div><label htmlFor="transferHours" className={labelClass}>Prior/Transfer Hours Claimed</label><input id="transferHours" type="number" min="0" name="transferHours" value={form.transferHours} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Claimed hours require documentation and verification before credit is awarded.</p></div>
                 {transferHoursClaimed > 0 && (
                   <div className="sm:col-span-2 rounded-lg border border-amber-300 bg-amber-50 p-4">
                     <label className={labelClass}>Transfer Hours Documentation *</label>
@@ -553,7 +558,7 @@ export default function StudentApplicationForm({
         <section className="space-y-5">
           <div><h3 className="text-xl font-black text-slate-950">{isApprenticeship ? "Self-pay enrollment" : "Funding and eligibility"}</h3><p className="mt-1 text-sm text-slate-700">{isApprenticeship ? "Apprenticeship tuition is self-pay only. Review your program’s published tuition and payment terms." : "Funding eligibility is determined by the applicable workforce agency, not by submitting this form."}</p></div>
           {isApprenticeship ? <ApprenticeshipFundingNotice /> : null}
-          <div><label className={labelClass}>How do you plan to pay? *</label><select name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option>{!isApprenticeship ? <><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option></> : null}{!isApprenticeship ? <option value="not_sure">Not sure yet</option> : null}</select></div>
+          <div><label htmlFor="fundingSource" className={labelClass}>How do you plan to pay? *</label><select id="fundingSource" name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option>{!isApprenticeship ? <><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option></> : null}{!isApprenticeship ? <option value="not_sure">Not sure yet</option> : null}</select></div>
 
           {requiresWorkOne && (
             <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-5 text-amber-950">
@@ -561,16 +566,16 @@ export default function StudentApplicationForm({
               <p className="mt-2 text-sm leading-6">Schedule or begin your WorkOne intake before submitting a WIOA/WRG-funded application.</p>
               <a href={WORKONE_INTAKE_URL} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-extrabold text-white">Schedule WorkOne Intake</a>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div><label className={labelClass}>WorkOne Status</label><select name="fundingEligibilityStatus" value={form.fundingEligibilityStatus} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="needs_appointment">Need appointment</option><option value="appointment_scheduled">Appointment scheduled</option><option value="in_process">Eligibility in process</option><option value="approved">Approved / referred</option></select></div>
-                <div><label className={labelClass}>WorkOne Center / Region</label><input name="workoneCenter" value={form.workoneCenter} onChange={handleChange} className={fieldClass} /></div>
+                <div><label htmlFor="fundingEligibilityStatus" className={labelClass}>WorkOne Status</label><select id="fundingEligibilityStatus" name="fundingEligibilityStatus" value={form.fundingEligibilityStatus} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="needs_appointment">Need appointment</option><option value="appointment_scheduled">Appointment scheduled</option><option value="in_process">Eligibility in process</option><option value="approved">Approved / referred</option></select></div>
+                <div><label htmlFor="workoneCenter" className={labelClass}>WorkOne Center / Region</label><input id="workoneCenter" name="workoneCenter" value={form.workoneCenter} onChange={handleChange} className={fieldClass} /></div>
               </div>
               <label className="mt-4 flex items-start gap-3 text-sm font-bold"><input type="checkbox" checked={workOneAcknowledged} onChange={(event) => setWorkOneAcknowledged(event.target.checked)} className="mt-1 h-5 w-5" /><span>I have scheduled the WorkOne intake appointment or I am already working with WorkOne on this funding request.</span></label>
             </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className={labelClass}>Referred by WorkOne?</label><select name="hasWorkOneReferral" value={form.hasWorkOneReferral} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-            <div><label className={labelClass}>Household Size</label><input type="number" min="1" name="familySize" value={form.familySize} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>Approximate Annual Household Income</label><input type="number" min="0" name="householdIncome" value={form.householdIncome} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Used only for preliminary funding/support screening. Workforce agencies make final eligibility decisions.</p></div>
+            <div><label htmlFor="hasWorkOneReferral" className={labelClass}>Referred by WorkOne?</label><select id="hasWorkOneReferral" name="hasWorkOneReferral" value={form.hasWorkOneReferral} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="familySize" className={labelClass}>Household Size</label><input id="familySize" type="number" min="1" name="familySize" value={form.familySize} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="householdIncome" className={labelClass}>Approximate Annual Household Income</label><input id="householdIncome" type="number" min="0" name="householdIncome" value={form.householdIncome} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Used only for preliminary funding/support screening. Workforce agencies make final eligibility decisions.</p></div>
           </div>
         </section>
       )}
@@ -579,20 +584,20 @@ export default function StudentApplicationForm({
         <section className="space-y-5">
           <div><h3 className="text-xl font-black text-slate-950">Background and support needs</h3><p className="mt-1 text-sm text-slate-700">These answers help admissions and workforce staff identify the correct pathway and support services.</p></div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className={labelClass}>Employment Status</label><select name="employmentStatus" value={form.employmentStatus} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="unemployed">Unemployed</option><option value="part_time">Employed part-time</option><option value="full_time">Employed full-time</option><option value="self_employed">Self-employed</option></select></div>
-            <div><label className={labelClass}>Current Employer</label><input name="currentEmployer" value={form.currentEmployer} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>Highest Education</label><select name="highestEducation" value={form.highestEducation} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="less_than_hs">Less than high school</option><option value="hs_ged">High school / GED / HSE</option><option value="some_college">Some college</option><option value="associate">Associate degree</option><option value="bachelor_plus">Bachelor degree or higher</option></select></div>
-            <div><label className={labelClass}>Military Connected?</label><select name="militaryConnected" value={form.militaryConnected} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-            <div><label className={labelClass}>Criminal Record?</label><select name="felonRecord" value={form.felonRecord} onChange={handleChange} className={fieldClass}><option value="">Prefer not to answer / Select</option><option value="none">No</option><option value="misdemeanor">Misdemeanor</option><option value="felony">Felony</option></select></div>
-            {form.felonRecord && form.felonRecord !== 'none' && <div><label className={labelClass}>Record Details / Reentry Support Needed</label><input name="felonDetails" value={form.felonDetails} onChange={handleChange} className={fieldClass} /></div>}
-            <div><label className={labelClass}>Do you have a Case Manager?</label><select name="hasCaseManager" value={form.hasCaseManager} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-            {form.hasCaseManager === 'yes' && <div><label className={labelClass}>Case Manager / Agency</label><input name="caseManagerAgency" value={form.caseManagerAgency} onChange={handleChange} className={fieldClass} /></div>}
-            <div><label className={labelClass}>Transportation Support Needed?</label><select name="transportationNeeds" value={form.transportationNeeds} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-            <div><label className={labelClass}>Childcare Support Needed?</label><select name="childcareNeeds" value={form.childcareNeeds} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="employmentStatus" className={labelClass}>Employment Status</label><select id="employmentStatus" name="employmentStatus" value={form.employmentStatus} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="unemployed">Unemployed</option><option value="part_time">Employed part-time</option><option value="full_time">Employed full-time</option><option value="self_employed">Self-employed</option></select></div>
+            <div><label htmlFor="currentEmployer" className={labelClass}>Current Employer</label><input id="currentEmployer" name="currentEmployer" value={form.currentEmployer} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="highestEducation" className={labelClass}>Highest Education</label><select id="highestEducation" name="highestEducation" value={form.highestEducation} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="less_than_hs">Less than high school</option><option value="hs_ged">High school / GED / HSE</option><option value="some_college">Some college</option><option value="associate">Associate degree</option><option value="bachelor_plus">Bachelor degree or higher</option></select></div>
+            <div><label htmlFor="militaryConnected" className={labelClass}>Military Connected?</label><select id="militaryConnected" name="militaryConnected" value={form.militaryConnected} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="felonRecord" className={labelClass}>Criminal Record?</label><select id="felonRecord" name="felonRecord" value={form.felonRecord} onChange={handleChange} className={fieldClass}><option value="">Prefer not to answer / Select</option><option value="none">No</option><option value="misdemeanor">Misdemeanor</option><option value="felony">Felony</option></select></div>
+            {form.felonRecord && form.felonRecord !== 'none' && <div><label htmlFor="felonDetails" className={labelClass}>Record Details / Reentry Support Needed</label><input id="felonDetails" name="felonDetails" value={form.felonDetails} onChange={handleChange} className={fieldClass} /></div>}
+            <div><label htmlFor="hasCaseManager" className={labelClass}>Do you have a Case Manager?</label><select id="hasCaseManager" name="hasCaseManager" value={form.hasCaseManager} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            {form.hasCaseManager === 'yes' && <div><label htmlFor="caseManagerAgency" className={labelClass}>Case Manager / Agency</label><input id="caseManagerAgency" name="caseManagerAgency" value={form.caseManagerAgency} onChange={handleChange} className={fieldClass} /></div>}
+            <div><label htmlFor="transportationNeeds" className={labelClass}>Transportation Support Needed?</label><select id="transportationNeeds" name="transportationNeeds" value={form.transportationNeeds} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="childcareNeeds" className={labelClass}>Childcare Support Needed?</label><select id="childcareNeeds" name="childcareNeeds" value={form.childcareNeeds} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
           </div>
-          <div><label className={labelClass}>Other Support Needs</label><textarea name="supportNeeds" rows={3} value={form.supportNeeds} onChange={handleChange} className={fieldClass} placeholder="Housing, technology, uniforms, testing accommodations, scheduling, etc." /></div>
-          <div><label className={labelClass}>Career Goals</label><textarea name="goals" rows={3} value={form.goals} onChange={handleChange} className={fieldClass} /></div>
-          <div><label className={labelClass}>How did you hear about Elevate?</label><select name="howDidYouHear" value={form.howDidYouHear} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="workone">WorkOne / workforce agency</option><option value="referral">Referral</option><option value="google">Google / web search</option><option value="social">Social media</option><option value="community">Community event / organization</option><option value="employer">Employer</option><option value="other">Other</option></select></div>
+          <div><label htmlFor="supportNeeds" className={labelClass}>Other Support Needs</label><textarea id="supportNeeds" name="supportNeeds" rows={3} value={form.supportNeeds} onChange={handleChange} className={fieldClass} placeholder="Housing, technology, uniforms, testing accommodations, scheduling, etc." /></div>
+          <div><label htmlFor="goals" className={labelClass}>Career Goals</label><textarea id="goals" name="goals" rows={3} value={form.goals} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="howDidYouHear" className={labelClass}>How did you hear about Elevate?</label><select id="howDidYouHear" name="howDidYouHear" value={form.howDidYouHear} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="workone">WorkOne / workforce agency</option><option value="referral">Referral</option><option value="google">Google / web search</option><option value="social">Social media</option><option value="community">Community event / organization</option><option value="employer">Employer</option><option value="other">Other</option></select></div>
         </section>
       )}
 
@@ -620,7 +625,7 @@ export default function StudentApplicationForm({
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
         {step > 1 ? <button type="button" onClick={previousStep} className="min-h-12 w-full rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900 sm:w-auto">Back</button> : <span />}
-        {step < 5 ? <button type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
+        {step < 5 ? <button key="continue" type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button key="submit" type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
       </div>
     </form>
   );

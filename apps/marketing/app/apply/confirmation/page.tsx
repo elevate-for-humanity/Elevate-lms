@@ -31,7 +31,7 @@ export default async function ConfirmationPage({
   const isFunded = params.funded === '1';
   const warning = params.warning && typeof params.warning === 'string' ? decodeURIComponent(params.warning) : null;
   // Params from legacy /apply/success (role-based flows)
-  const role = (params.role && typeof params.role === 'string' ? params.role : 'student') as string;
+  const role = typeof params.type === 'string' ? params.type : typeof params.role === 'string' ? params.role : 'student';
   const isEnrolled = params.enrolled === 'true';
   const funding = params.funding && typeof params.funding === 'string' ? params.funding : null;
   const hasPassword = params.pw === '1';
@@ -188,7 +188,7 @@ export default async function ConfirmationPage({
                   <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-600 text-white text-sm font-bold rounded-full mr-3 flex-shrink-0 mt-0.5">
                     3
                   </span>
-                  <span>If eligible, we'll schedule your enrollment and orientation</span>
+                  <span>{role === 'student' ? "If eligible, we'll schedule your enrollment and orientation" : 'After review, we will explain any required documents, agreements, and role-specific onboarding.'}</span>
                 </li>
               </ol>
             </div>

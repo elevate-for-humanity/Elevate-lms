@@ -18,12 +18,12 @@ export default function VisualDashboardOrientation({
 }) {
   const guide = orientations[audience];
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState<'slides' | 'video'>(audience === 'host-shop' ? 'video' : 'slides');
+  const [mode, setMode] = useState<'slides' | 'video'>('video');
   const [unavailable, setUnavailable] = useState(false);
   useEffect(() => {
     setIndex(0);
     setUnavailable(false);
-    setMode(audience === 'host-shop' ? 'video' : 'slides');
+    setMode('video');
   }, [audience]);
   const slide = guide.slides[Math.min(index, guide.slides.length - 1)];
   const primary = guide.slides.slice(0, 3);
@@ -79,6 +79,7 @@ export default function VisualDashboardOrientation({
         ))}
       </div>
       <div
+        key={audience}
         id={`tour-${audience}`}
         className="scroll-mt-24 overflow-hidden rounded-3xl border border-stone-200 bg-neutral-950 text-white"
       >
@@ -110,7 +111,7 @@ export default function VisualDashboardOrientation({
                 key={audience}
                 controls
                 playsInline
-                preload="none"
+                preload="metadata"
                 poster={guide.hero}
                 className="aspect-video w-full rounded-xl bg-black"
                 onError={() => setUnavailable(true)}
@@ -128,8 +129,7 @@ export default function VisualDashboardOrientation({
             ) : (
               <div role="status" className="rounded-xl bg-white/10 p-5">
                 <p>
-                  The narrated video is not available yet. Every topic and its full transcript are
-                  available in Explore slides.
+                  This video could not load. Open the picture guide below or try the video again.
                 </p>
                 <button
                   onClick={() => setMode('slides')}
@@ -146,8 +146,7 @@ export default function VisualDashboardOrientation({
               </div>
             )}
             <p className="mt-3 text-sm text-stone-300">
-              Pause, replay, use captions, or return to any slide. Watching this guide does not sign
-              agreements or complete your training.
+              Press play for a guided tour. You can pause, replay, or turn on captions.
             </p>
           </div>
         ) : (
@@ -219,7 +218,12 @@ export default function VisualDashboardOrientation({
               <summary className="min-h-11 cursor-pointer font-bold text-amber-100">
                 Read the detailed instructions for this topic
               </summary>
-              <p tabIndex={0} role="region" aria-label="Orientation transcript" className="mt-3 max-h-64 max-w-4xl overflow-y-auto whitespace-pre-line text-base leading-8 text-stone-200">
+              <p
+                tabIndex={0}
+                role="region"
+                aria-label="Orientation transcript"
+                className="mt-3 max-h-64 max-w-4xl overflow-y-auto whitespace-pre-line text-base leading-8 text-stone-200"
+              >
                 {slide.narration}
               </p>
             </details>

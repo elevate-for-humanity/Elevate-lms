@@ -169,17 +169,48 @@ export default async function HostShopDashboardView() {
   // Display the selected shop account, never the administrator's photo or
   // another shop's training image. Missing photos retain a named initials banner.
   const { data: heroMember } = isPlatformAdmin
-    ? await db.from('partner_users').select('user_id')
-        .eq('partner_id', board.partner.id).eq('status', 'active')
-        .order('created_at', { ascending: true }).limit(1).maybeSingle()
+    ? await db
+        .from('partner_users')
+        .select('user_id')
+        .eq('partner_id', board.partner.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle()
     : { data: { user_id: user.id } };
   const { data: heroProfile } = heroMember?.user_id
-    ? await db.from('profiles').select('full_name,avatar_url').eq('id', heroMember.user_id).maybeSingle()
+    ? await db
+        .from('profiles')
+        .select('full_name,avatar_url')
+        .eq('id', heroMember.user_id)
+        .maybeSingle()
     : { data: null };
+  const nextTask =
+    board.pendingHoursCount > 0
+      ? {
+          label: 'Review submitted hours',
+          href: '/host-shop/dashboard/hours/pending',
+          detail: `${board.pendingHoursCount} waiting for your review`,
+        }
+      : board.missingDocuments.length + board.pendingDocuments.length > 0
+        ? {
+            label: 'Review shop documents',
+            href: '/host-shop/dashboard/documents',
+            detail: 'Check missing items and review status',
+          }
+        : {
+            label: 'Open your students',
+            href: '/host-shop/dashboard/apprentices',
+            detail: 'View training and the next step for each student',
+          };
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-1 py-4 sm:px-4">
-      <HostShopStudentInvitation />
-      <HostShopWelcome shopName={shopName} partnerId={board.partner.id} ownerName={heroProfile?.full_name} profileImageUrl={heroProfile?.avatar_url}>
+      <HostShopWelcome
+        shopName={shopName}
+        partnerId={board.partner.id}
+        ownerName={heroProfile?.full_name}
+        profileImageUrl={heroProfile?.avatar_url}
+      >
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black text-slate-950">{shopName}</h1>
@@ -193,6 +224,22 @@ export default async function HostShopDashboardView() {
             </form>
           ) : null}
         </header>
+        <section
+          aria-label="Your next action"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-blue-200 bg-blue-50 p-5"
+        >
+          <div>
+            <p className="text-sm font-bold text-blue-800">Start here</p>
+            <h2 className="mt-1 text-xl font-black text-slate-950">{nextTask.label}</h2>
+            <p className="mt-1 text-sm text-slate-700">{nextTask.detail}</p>
+          </div>
+          <Link
+            href={nextTask.href}
+            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-5 py-3 font-bold text-white"
+          >
+            Continue →
+          </Link>
+        </section>
         <section aria-label="Today at your shop" className="grid gap-3 sm:grid-cols-3">
           {[
             {
@@ -254,6 +301,7 @@ export default async function HostShopDashboardView() {
           </p>
         </section>
       </HostShopWelcome>
+      <HostShopStudentInvitation />
     </div>
   );
 }

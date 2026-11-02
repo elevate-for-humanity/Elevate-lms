@@ -17,7 +17,7 @@ const filing = z.enum([
   'qualifying_surviving_spouse',
 ]);
 const dollars = z.number().finite().min(0).max(1_000_000_000);
-export const officeWorksheetSchema = z
+const officeWorksheetSchema = z
   .object({
     w2: z
       .array(

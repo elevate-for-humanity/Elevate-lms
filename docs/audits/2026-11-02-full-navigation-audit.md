@@ -134,3 +134,11 @@ At the initial live check, production still served e3453b6e4c3ebec65e31b29dd85a5
 | `/testing/for-employers` | 200 |
 | `/testing/nha` | 200 |
 | `/testing/policies` | 200 |
+
+## Post-deployment findings
+
+Revision 590b1f72e7545c7e1806882311319bcbd08e4706 served the new About, Team, and Student Support headings with HTTP 200. The full production build, generated-route typecheck, container tests, and Cloud Run activation passed. A later acceptance assertion still required a direct homepage Tax link; it now verifies the approved Homepage → Resources → Tax discovery path while retaining the protected API checks.
+
+Wire-level probes found that page-level compatibility redirects streamed HTTP 200 with a refresh element. Retired About, Founder, Team, and Support URLs are now resolved in middleware before rendering, returning an exact HTTP 308 with query strings and section fragments preserved. Customer domains, mutation requests, unknown topics, and the real scheduling page retain their own routing.
+
+Public EPA scheduling returned five slots. QuickBooks readiness returned HTTP 503: client and company settings exist, but access/refresh tokens are absent; the runtime also reports a missing webhook verifier. This requires authorized account connection/configuration before payment readiness can pass. No payment was attempted and no connection credentials were fabricated.

@@ -8,7 +8,7 @@ import {
 import { ADMIN_HOST, LMS_HOST, MARKETING_HOST, getPortalKeyFromPath, PORTAL_MAP } from '@/lib/routing/portal-map';
 import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { isWithdrawnProgramRequest } from '@/lib/programs/withdrawn-programs.mjs';
-import { resolvePublicEntryAlias } from '@/lib/routing/public-entry-aliases.mjs';
+import { resolvePublicEntryAlias, resolvePublicPageRedirect } from '@/lib/routing/public-entry-aliases.mjs';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -159,6 +159,11 @@ export async function middleware(req: NextRequest) {
     return response;
   }
   if (isStaticRequest(pathname) && !isProtectedPortal(pathname) && !getPortalKeyFromPath(pathname) && !pathname.startsWith('/admin/') && !pathname.startsWith('/cosmetology-host-shop/')) return NextResponse.next();
+
+  const retiredPublicPage = resolvePublicPageRedirect({
+    host: requestHost(req), pathname, search, method: req.method, marketingHost: MARKETING_HOST,
+  });
+  if (retiredPublicPage) return NextResponse.redirect(retiredPublicPage, 308);
 
   // Consolidate testing entry points before store-only routing can return a 404.
   if (['/store/testing', '/testing-center', '/testing/testing-center', '/testing/epa-608', '/testing/epa608'].includes(pathname)) {

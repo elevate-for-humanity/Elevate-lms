@@ -39,6 +39,19 @@ for (const [path, target, status] of [
     assert.equal(response.headers.get('location'), `${target}?source=bookmark`);
   });
 }
+for (const [path, target] of [
+  ['/founder', '/about/elizabeth-greene'], ['/team', '/about/team'],
+  ['/about/partners', '/partners'], ['/about/mission', '/about#mission'],
+  ...['academic','financial-aid','career','counseling','accessibility','scheduling'].map(topic => ['/student-support/'+topic, '/student-support#'+topic]),
+]) {
+  test(`${path} redirects permanently before streaming and preserves its query`, async () => {
+    const response = await middleware(new NextRequest('https://www.elevateforhumanity.org'+path+'?source=bookmark', { headers: { host: 'www.elevateforhumanity.org' } }));
+    const targetUrl = new URL(target, 'https://www.elevateforhumanity.org');
+    targetUrl.search = '?source=bookmark';
+    assert.equal(response.status, 308);
+    assert.equal(response.headers.get('location'), targetUrl.toString());
+  });
+}
 for (const path of ['/programs/bookkeeping','/programs/financial-literacy','/apply/student?program=bookkeeping']) {
   test(`${path} withdraws the offering before auth or tenant lookup`, async () => {
     const response = await middleware(new NextRequest('https://www.elevateforhumanity.org'+path));

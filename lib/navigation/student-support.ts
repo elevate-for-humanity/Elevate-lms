@@ -1,5 +1,2 @@
-/** Retired topic URLs remain bookmarks into one complete support page. */
-export const STUDENT_SUPPORT_TOPICS = ['academic', 'financial-aid', 'career', 'counseling', 'accessibility', 'scheduling'] as const;
-export function studentSupportTopicHref(topic: string): string | null {
-  return (STUDENT_SUPPORT_TOPICS as readonly string[]).includes(topic) ? `/student-support#${topic}` : null;
-}
+/** One topic registry for the early HTTP redirects and page-level compatibility fallback. */
+export { STUDENT_SUPPORT_TOPICS, studentSupportTopicHref } from '@/lib/routing/public-entry-aliases.mjs';

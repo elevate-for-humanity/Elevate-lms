@@ -7,6 +7,20 @@ const destinations = [...new Set(NAV_ITEMS.flatMap(item => [item.href, ...(item.
 if (!destinations.includes('/student-support')) destinations.push('/student-support');
 
 export function registerPublicNavigationAudit() {
+  test('retired public pages redirect before HTML streaming', async ({ request }) => {
+    for (const [path, target] of [
+      ['/founder', '/about/elizabeth-greene'], ['/team', '/about/team'],
+      ['/about/partners', '/partners'], ['/about/mission', '/about#mission'],
+      ...['academic','financial-aid','career','counseling','accessibility','scheduling'].map(topic => ['/student-support/'+topic, '/student-support#'+topic]),
+    ]) {
+      const response = await request.get(origin + path + '?source=acceptance', { maxRedirects: 0 });
+      expect(response.status(), path).toBe(308);
+      const expected = new URL(target, origin);
+      expected.search = '?source=acceptance';
+      expect(response.headers().location, path).toBe(expected.toString());
+    }
+  });
+
   for (const href of destinations) {
     test(`navigation destination ${href}: content, images, layout and client errors`, async ({ page }) => {
       const errors: string[] = [];

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createSocket} from 'node:dgram';
-import {ownedMediaPeer,speak,parseRtp,rtp,isSpeech,routeOperator,routeApprovedExtension,isCallerStart,createExternalChannel,releaseCaller,handleDtmf,greet} from './ari-media.mjs';
+import {ownedMediaPeer,speak,parseRtp,rtp,isSpeech,routeOperator,routeApprovedExtension,isCallerStart,createExternalChannel,releaseCaller,handleDtmf,greet,waitForCallerExit} from './ari-media.mjs';
 
 test('configured greeting starts once on a media peer without caller speech',async()=>{
  const session={callId:'call-greeting',id:'c'.repeat(24),turn:0,bridgeReady:true,remote:{address:'127.0.0.1',port:12345}};
@@ -80,6 +80,7 @@ test('operator transfer exits Stasis into the reviewed dialplan without changing
   await routeOperator('call-1',{type:'operator',extension:'0'},async(path,method,params)=>{
     // ARI redirect requires the same channel technology; SIP -> Local is 422.
     if(path.includes('/redirect'))throw Error('ARI_POST_422');
+    if(path.startsWith('/applications/'))return {channel_ids:[]};
     calls.push({path,method,params});
   });
   assert.deepEqual(calls,[{path:'/channels/call-1/continue',method:'POST',params:{context:'internal',extension:'0',priority:1}}]);
@@ -123,7 +124,7 @@ test('external channel response must match the preallocated cleanup identity',as
 });
 test('voice processing failure returns the caller to its owning dialplan without a fabricated route',async()=>{
   const calls=[];
-  await releaseCaller('call-1','continue',async(...args)=>calls.push(args));
+  await releaseCaller('call-1','continue',async(...args)=>{if(args[0].startsWith('/applications/'))return {channel_ids:[]};calls.push(args);});
   assert.deepEqual(calls,[['/channels/call-1/continue','POST']]);
 });
 test('failed fallback or requested call termination hangs up only the owned caller leg',async()=>{
@@ -150,7 +151,7 @@ test('RTP padding cannot exceed payload and zero-length packets are rejected',()
 
 test('approved PWA extension transfer requires exact allowlist and dialplan',async()=>{
  const calls=[];
- await routeApprovedExtension('call-1',{type:'extension',extension:'123'},async(...args)=>calls.push(args),'123,456');
+ await routeApprovedExtension('call-1',{type:'extension',extension:'123'},async(...args)=>{if(args[0].startsWith('/applications/'))return {channel_ids:[]};calls.push(args);},'123,456');
  assert.deepEqual(calls,[['/channels/call-1/continue','POST',{context:'elevate-paris-directory',extension:'123',priority:1}]]);
  await assert.rejects(routeApprovedExtension('call-1',{type:'extension',extension:'999'},async()=>assert.fail('must not route'),'123'),/ROUTE_NOT_ALLOWED/);
  await assert.rejects(routeApprovedExtension('call-1',{type:'extension',extension:'123'},async()=>assert.fail('must not route'),''),/ROUTE_NOT_ALLOWED/);
@@ -185,4 +186,27 @@ test('ARI media metadata cannot redirect greeting audio to public or privileged 
   await assert.rejects(ownedMediaPeer(session,{id:session.externalId,channelvars:{UNICASTRTP_LOCAL_ADDRESS:address,UNICASTRTP_LOCAL_PORT:port}}),/PEER_NOT_LOOPBACK/);
  }
  await assert.rejects(ownedMediaPeer(session,{id:'different'}),/CHANNEL_ID_MISMATCH/);
+});
+
+
+test('a queued ARI transfer cannot destroy media before the caller actually leaves Stasis',async()=>{
+ const session={callId:'call-queued',closed:false};let reads=0,cleanup=false,unblock;
+ const paused=new Promise(resolve=>{unblock=resolve;});
+ const request=async(path,method)=>{
+  if(method==='POST')return {};
+  assert.equal(path,'/applications/elevate-paris');
+  return {channel_ids:++reads===1?[session.callId,'paris-media-owned']:['paris-media-owned']};
+ };
+ const operation=handleDtmf({type:'ChannelDtmfReceived',digit:'0',channel:{id:session.callId}},new Map([[session.callId,session]]),{
+  route:(id,route)=>routeOperator(id,route,request,()=>paused),
+  finish:async()=>{cleanup=true;},
+ });
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(reads,1);assert.equal(cleanup,false);
+ unblock();await operation;assert.equal(reads,2);assert.equal(cleanup,true);
+});
+test('unverified or stalled Stasis departures cannot be mistaken for completed handoffs',async()=>{
+ await assert.rejects(waitForCallerExit('call-1',async()=>({}),async()=>{}),/STATE_INVALID/);
+ await assert.rejects(waitForCallerExit('call-1',async()=>({channel_ids:['call-1']}),async()=>{}),/NOT_RELEASED/);
+ await assert.rejects(waitForCallerExit('../other',async()=>assert.fail('invalid caller must not query')),/NOT_ALLOWED/);
 });

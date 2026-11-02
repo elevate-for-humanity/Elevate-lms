@@ -158,18 +158,32 @@ async function ari(path,method='GET',data){
   return txt?JSON.parse(txt):{};
 }
 const encode=encodeURIComponent;
-export async function routeOperator(callId,route,request=ari){
+// ARI /continue acknowledges a queued command. Wait for the actual Stasis
+// departure before closing private media or deleting the caller's old bridge.
+export async function waitForCallerExit(callId,request=ari,wait=sleep){
+  if(!UUIDISH.test(callId||''))throw Error('CALL_RELEASE_NOT_ALLOWED');
+  for(let attempt=0;attempt<50;attempt++){
+    const app=await request('/applications/'+config.app);
+    if(!Array.isArray(app?.channel_ids) || app.channel_ids.some(id=>typeof id!=='string'))throw Error('CALL_HANDOFF_STATE_INVALID');
+    if(!app.channel_ids.includes(callId))return;
+    await wait(50);
+  }
+  throw Error('CALL_HANDOFF_NOT_RELEASED');
+}
+export async function routeOperator(callId,route,request=ari,wait=sleep){
   if(!UUIDISH.test(callId||'') || route?.type!=='operator' || route.extension!=='0')throw Error('ROUTE_NOT_ALLOWED');
   await request('/channels/'+encode(callId)+'/continue','POST',{
     context:'internal',extension:'0',priority:1,
   });
+  await waitForCallerExit(callId,request,wait);
 }
-export async function routeApprovedExtension(callId,route,request=ari,allowed=process.env.PARIS_ALLOWED_EXTENSIONS || ''){
+export async function routeApprovedExtension(callId,route,request=ari,allowed=process.env.PARIS_ALLOWED_EXTENSIONS || '',wait=sleep){
   const permitted=new Set(String(allowed).split(',').map(v=>v.trim()).filter(v=>/^[1-9]\d{2}$/.test(v)));
   if(!UUIDISH.test(callId||'') || route?.type!=='extension' || !permitted.has(route.extension))throw Error('ROUTE_NOT_ALLOWED');
   await request('/channels/'+encode(callId)+'/continue','POST',{
     context:'elevate-paris-directory',extension:route.extension,priority:1,
   });
+  await waitForCallerExit(callId,request,wait);
 }
 export async function handleDtmf(event,active=sessions,{route=routeOperator,finish=end}={}){
   if(event?.type!=='ChannelDtmfReceived' || event.digit!=='0')return;
@@ -188,13 +202,14 @@ export async function handleDtmf(event,active=sessions,{route=routeOperator,fini
   // Successful handoff releases media without hanging up the caller leg.
   await finish(session);
 }
-export async function releaseCaller(callId,disposition,request=ari){
+export async function releaseCaller(callId,disposition,request=ari,wait=sleep){
   if(!UUIDISH.test(callId||'') || !['continue','hangup'].includes(disposition))throw Error('CALL_RELEASE_NOT_ALLOWED');
   if(disposition==='continue'){
     try{
       // Resume after the original Stasis application, where the reviewed
       // dialplan owns fallback. Never invent a destination or leave a silent leg.
       await request('/channels/'+encode(callId)+'/continue','POST');
+      await waitForCallerExit(callId,request,wait);
       return;
     }catch{ /* If fallback cannot resume, terminate only this owned caller leg. */ }
   }
@@ -286,8 +301,14 @@ export async function turn(session,{request=privateTurn,play=speak,finish=end}={
     if(body.requestedRoute?.type==='operator' || body.requestedRoute?.type==='extension') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
       // Resume the allowlisted dialplan route without changing channel technology.
-      if(body.requestedRoute.type==='operator')await routeOperator(session.callId,body.requestedRoute);
-      else await routeApprovedExtension(session.callId,body.requestedRoute);
+      session.transferring=true;
+      try{
+        if(body.requestedRoute.type==='operator')await routeOperator(session.callId,body.requestedRoute);
+        else await routeApprovedExtension(session.callId,body.requestedRoute);
+      }catch{
+        await finish(session,'continue');
+        return;
+      }
       await finish(session);
     } else if(body.endCall===true) await finish(session,'hangup');
   }catch(e){
@@ -307,13 +328,13 @@ async function end(s,disposition='released'){
   if(s.closed)return;s.closed=true;sessions.delete(s.callId);
   clearTimeout(s.deadline);
   clearTimeout(s.greetingDeadline);clearTimeout(s.mediaDeadline);
-  try{s.server?.close();}catch{ /* Close is best-effort; continue call cleanup. */ }
-  try{if(s.socket?.destroy)s.socket.destroy();else s.socket?.close();}catch{ /* Binding may have failed before cleanup. */ }
-  await cleanupMedia(s);
   if(disposition!=='released'){
     try{await releaseCaller(s.callId,disposition);}
     catch{process.stderr.write('PARIS_CALL_RELEASE_FAILED\n');}
   }
+  try{s.server?.close();}catch{ /* Close is best-effort; continue call cleanup. */ }
+  try{if(s.socket?.destroy)s.socket.destroy();else s.socket?.close();}catch{ /* Binding may have failed before cleanup. */ }
+  await cleanupMedia(s);
 }
 async function begin(call){
   const callId=call?.id;

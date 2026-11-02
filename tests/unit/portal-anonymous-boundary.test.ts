@@ -35,7 +35,7 @@ describe('anonymous portal request boundary', () => {
         const response = await marketing(new NextRequest(`https://www.elevateforhumanity.org${portal.defaultPath}?source=legacy`, {
           headers: { host: 'www.elevateforhumanity.org' },
         }));
-        expect(response.status).toBe(307);
+        expect(response.status).toBe(key === 'testing' ? 308 : 307);
         // Public testing information and the authenticated Admin testing
         // workspace have different entry URLs; owning-service auth stays above.
         const destination = key === 'testing'

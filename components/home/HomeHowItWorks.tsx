@@ -10,8 +10,8 @@ const STEPS = [
     detail: 'Compare training, tuition, and the credential you can earn.',
     href: '/programs',
     action: 'Explore programs',
-    image: '/images/programs/refresh-20261101/beauty.webp',
-    alt: 'Illustration of beauty career training',
+    image: '/images/pages/training-classroom.webp',
+    alt: 'Students learning in a training classroom',
   },
   {
     n: '2',
@@ -19,8 +19,8 @@ const STEPS = [
     detail: 'See eligibility requirements and ways to pay for training.',
     href: '/check-eligibility',
     action: 'Check eligibility',
-    image: '/images/programs/refresh-20261101/business.webp',
-    alt: 'Illustration of professionals reviewing a plan together',
+    image: '/images/heroes/hero-federal-funding.webp',
+    alt: 'Training and career funding support',
   },
   {
     n: '3',
@@ -28,8 +28,8 @@ const STEPS = [
     detail: 'Tell us your program interest so we can guide your enrollment.',
     href: '/apply',
     action: 'Start your application',
-    image: '/images/programs/refresh-20261101/home.webp',
-    alt: 'Illustration of the Elevate training institute',
+    image: '/images/refresh-20261014/admissions.webp',
+    alt: 'Admissions support for new learners',
   },
 ] as const;
 

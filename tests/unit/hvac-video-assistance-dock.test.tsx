@@ -10,6 +10,7 @@ import { hydrateRoot } from 'react-dom/client';
 const voice = vi.hoisted(() => ({ play: vi.fn(), prepare: vi.fn(), stop: vi.fn() }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/programs/hvac-technician' }));
 vi.mock('@/components/voice/useNaturalVoice', () => ({
+  NATURAL_VOICE_STOP_EVENT: 'elevate:natural-voice-stop',
   useNaturalVoice: () => voice,
   stopAllNaturalVoicePlayback: vi.fn(),
 }));

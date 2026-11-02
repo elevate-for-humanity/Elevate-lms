@@ -45,7 +45,7 @@ it('plays the approved spoken introduction only on request and leaves music off 
   const {container}=render(<TenantIntroduction narration="Legacy is lasting value." musicUrl="https://unapproved.example/song.mp3" />);
   expect(play).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button',{name:'Listen to the introduction'}));
-  expect(play).toHaveBeenCalledWith('Legacy is lasting value.',{style:'assistant',voice:'coral'});
+  expect(play).toHaveBeenCalledWith('Legacy is lasting value.',{style:'assistant',voice:'warm'});
   expect(container.querySelector('audio')).toBeNull();
   expect(screen.getByText('Read the introduction')).toBeVisible();
 });

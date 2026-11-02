@@ -257,22 +257,30 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  for(const event of eligibleRepairEvents(events??[]).slice(0,1))await enqueueParisRepair({actorId:policy.actor_id,fingerprint:repairIncidentFingerprint(event),goal:`Diagnose and repair the recurring ${event.failure_category} failure in ${event.operation}. Correlation: ${event.correlation_id??'unavailable'}. Inspect source and correlated logs; do not guess. Add a regression test proving the root cause. Preserve checkpoints, quality gates, access controls and unrelated work. Commit to a task branch for independent tests, then publish to main and deploy. If evidence or credentials are missing, report blocked.`});
  // Owner-authorized automatic repairs have no daily quota. The active-repair
  // guard above still serializes releases through independent validation.
- const pending=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id').eq('status','queued').order('created_at',{ascending:true}).limit(1).maybeSingle();
- if(pending.error)throw pending.error;if(!pending.data)return {enabled:true,dispatched:0};
- if(pending.data.source_job_id){
-  const source=await db.from('ultimate_build_jobs').select('id,build_id,status,last_error').eq('id',pending.data.source_job_id).single();
+ // Do not let an ineligible oldest repair starve a later eligible incident.
+ // Inspect a bounded page; disposition decisions preserve source evidence.
+ const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id')
+  .eq('status','queued').order('created_at',{ascending:true}).limit(100);
+ if(queued.error)throw queued.error;
+ let pending: {id:string;attempt_count:number;source_job_id:string|null}|null=null;
+ for(const candidate of queued.data??[]){
+  if(!candidate.source_job_id){pending=candidate;break;}
+  const source=await db.from('ultimate_build_jobs').select('id,build_id,status,last_error').eq('id',candidate.source_job_id).single();
   if(source.error)throw source.error;
   const latest=await db.from('ultimate_build_jobs').select('id,build_id,status').eq('build_id',source.data.build_id).order('created_at',{ascending:false}).limit(1).maybeSingle();
   if(latest.error)throw latest.error;
   const build=await db.from('ultimate_course_builds').select('id,status,profile,findings').eq('id',source.data.build_id).single();
   if(build.error)throw build.error;
   const disposition=courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
-  if(disposition!=='repair'){
-   await update(pending.data.id,{status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_NOT_AUTHORIZED'});
-   return {enabled:true,dispatched:0,disposition};
-  }
+  if(disposition==='repair'){pending=candidate;break;}
+  const blocked=await db.from('paris_code_repairs').update({
+   status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_NOT_AUTHORIZED',
+   updated_at:new Date().toISOString(),
+  }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+  if(blocked.error)throw blocked.error;
  }
- const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.data.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.data.id).eq('status','queued').eq('attempt_count',pending.data.attempt_count).select('id').maybeSingle();
+ if(!pending)return {enabled:true,dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE'};
+ const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.id).eq('status','queued').eq('attempt_count',pending.attempt_count).select('id').maybeSingle();
  if(claim.error)throw claim.error;if(!claim.data)return {enabled:true,dispatched:0};
  if(workflowOwnedDispatch)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:claim.data.id};
  try{await gh(`/actions/workflows/${REPAIR_WORKFLOW}/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',inputs:{repair_id:claim.data.id}})});}

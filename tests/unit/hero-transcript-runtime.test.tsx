@@ -67,6 +67,7 @@ describe('marketing hero transcript runtime behavior', () => {
         videoSrcDesktop="/videos/hero.mp4"
         posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
         transcript="A video transcript."
+        showTranscriptControl
       />,
     );
 
@@ -80,3 +81,9 @@ describe('marketing hero transcript runtime behavior', () => {
     expect(screen.getByText('A video transcript.')).toBeInTheDocument();
   });
 });
+
+ it('keeps the default hero transcript accessible without a technical disclosure', () => {
+   render(<HeroVideo videoSrcDesktop="/videos/hero.mp4" transcript="Accessible spoken content." />);
+   expect(screen.queryByRole('button', { name: /video transcript/i })).not.toBeInTheDocument();
+   expect(screen.getByText('Accessible spoken content.')).toHaveClass('sr-only');
+ });

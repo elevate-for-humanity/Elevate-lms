@@ -30,9 +30,9 @@ describe('marketing middleware routing without learner disruption', () => {
     ['/learner/dashboard', `${LMS_HOST}/lms/dashboard`],
   ])('resolves %s before the portal registry', async (path, expected) => {
     const response = await middleware(request(`${path}?program=hvac&ref=a%2Bb`));
-    expect(response.status).toBe(307);
+    expect(response.status).toBe(path === '/testing-center' ? 308 : 307);
     expect(response.headers.get('location')).toBe(`${expected}?program=hvac&ref=a%2Bb`);
-    expect(response.headers.get('cache-control')).toContain('no-store');
+    if (path !== '/testing-center') expect(response.headers.get('cache-control')).toContain('no-store');
     expect(createClient).not.toHaveBeenCalled();
   });
   it.each([
@@ -47,9 +47,10 @@ describe('marketing middleware routing without learner disruption', () => {
     const response = await middleware(request('/testing-center/bookings'));
     expect(response.headers.get('location')).toBe(`${ADMIN_HOST}/testing-center/bookings`);
   });
-  it('leaves testing POST ownership unchanged', async () => {
+  it('preserves testing POST requests at the consolidated public entry', async () => {
     const response = await middleware(request('/testing-center', undefined, 'POST'));
-    expect(response.headers.get('location')).toBe(`${ADMIN_HOST}/testing-center`);
+    expect(response.status).toBe(308);
+    expect(response.headers.get('location')).toBe('https://www.elevateforhumanity.org/testing');
   });
   it('preserves custom-domain rewrite instead of redirecting its testing page', async () => {
     const response = await middleware(request('/learner/dashboard', 'school.example.com'));

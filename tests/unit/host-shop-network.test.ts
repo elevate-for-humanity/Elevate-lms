@@ -37,7 +37,8 @@ describe('host shop network architecture', () => {
   it('keeps the More menu compact by avoiding globally padded section wrappers', () => {
     const desktopNav = readFileSync('components/site/HeaderDesktopNav.tsx', 'utf8');
     expect(desktopNav).not.toContain('<section key={item.id ?? item.name}');
-    expect(desktopNav).toContain('<div key={item.id ?? item.name} className="min-w-0">');
+    expect(desktopNav).toContain('<div key={key} className="relative shrink-0"');
+    expect(desktopNav).toContain('aria-controls={panelId}');
   });
 
   it('supports network media and a privacy-safe personalized email campaign', () => {

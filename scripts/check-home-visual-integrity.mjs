@@ -25,7 +25,10 @@ function auditImageQuality(relative, source) {
 
     const sizesMatch = tag.match(/\bsizes=(?:"([^"]+)"|'([^']+)'|\{([^}]+)\})/);
     const sizesLiteral = sizesMatch?.[1] ?? sizesMatch?.[2] ?? '';
-    if (sizesLiteral && /(?:^|[,\s])(?:[1-9]|[1-8]\d|9\d|1[0-5]\d)px(?:[,\s]|$)/.test(sizesLiteral)) {
+    const intrinsicWidth = Number(tag.match(/\bwidth=\{(\d+)\}/)?.[1]);
+    const renderedAtIntrinsicWidth = tag.includes(`w-${intrinsicWidth / 4} `) || tag.includes(`w-[${intrinsicWidth}px]`);
+    const fixedThumbnail = !/\bfill\b/.test(tag) && intrinsicWidth > 0 && intrinsicWidth <= 160 && sizesLiteral === `${intrinsicWidth}px` && renderedAtIntrinsicWidth;
+    if (!fixedThumbnail && sizesLiteral && /(?:^|[,\s])(?:[1-9]|[1-8]\d|9\d|1[0-5]\d)px(?:[,\s]|$)/.test(sizesLiteral)) {
       fail(`${relative} declares an implausibly small responsive Image size: ${sizesLiteral}`);
     }
 

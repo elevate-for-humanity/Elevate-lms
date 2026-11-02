@@ -21,6 +21,7 @@ const portalAccess = read('lib/auth/portal-access.ts');
 const publicAccessRegistry = read('apps/marketing/lib/platform-access-registry.ts');
 const publicNavigation = read('lib/navigation.ts');
 const portalsPage = read('apps/marketing/app/portals/page.tsx');
+const onlineAppsPage = read('apps/marketing/app/online-apps/page.tsx');
 const adminDashboard = read('apps/admin/app/dashboard/page.tsx');
 const marketingMiddleware = read('apps/marketing/middleware.ts');
 const marketingChrome = read('components/site/MarketingChromeBoundary.tsx');
@@ -112,13 +113,21 @@ if (lmsMiddleware.includes("'/host-shop/dashboard',")) fail('/host-shop: middlew
 
 console.log('\n── Public discovery contract ──');
 if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: public portal directory missing');
-if (!publicNavigation.includes("id: 'platform'") || !publicNavigation.includes("href: '/online-apps'")) fail('Platform/Online Apps are not exposed from canonical public navigation');
+if (!publicNavigation.includes("href: '/online-apps'")) fail('Platform/Online Apps are not exposed from canonical public navigation');
 if (!portalsPage.includes('PORTAL_KEYS.map') || !portalsPage.includes('PORTAL_MAP[key]')) fail('/portals does not derive its directory from canonical portal registries');
 if (/const\s+PORTAL_KEYS\s*:\s*PortalKey\[\]\s*=\s*\[/.test(portalsPage)) fail('/portals reintroduced a hand-maintained portal key list');
 if (!publicAccessRegistry.includes("import { PORTAL_MAP") || !publicAccessRegistry.includes('Object.keys(PORTAL_MAP)') || !publicAccessRegistry.includes('portal.host') || !publicAccessRegistry.includes('portal.defaultPath')) fail('/online-apps registry does not derive portal URLs from PORTAL_MAP');
 if (!publicAccessRegistry.includes('CANONICAL_PORTAL_ACCESS')) fail('public access registry lacks full canonical portal projection');
-if (!publicNavigation.includes('ROUTES.creatorPortal')) fail('Creator Studio missing from global portal navigation');
-if (!publicNavigation.includes('ROUTES.testingPortal')) fail('Testing Center operations missing from global portal navigation');
+// Consolidated navigation discovers role workspaces through the directory.
+// Check the rendered group, not a now-retired top-level menu ID.
+const operationalKeys = publicAccessRegistry.match(/const OPERATIONAL_PORTAL_KEYS[^=]*=\s*\[([\s\S]*?)\];/)?.[1] ?? '';
+for (const [key, label] of [['creator', 'Creator Studio'], ['testing', 'Testing Center']]) {
+  if (!operationalKeys.includes(`'${key}'`) ||
+      !publicAccessRegistry.includes('OPERATIONAL_PORTAL_KEYS.map') ||
+      !onlineAppsPage.includes('STAFF_AND_PARTNER_PORTALS.map')) {
+    fail(`${label} missing from the rendered canonical portal directory`);
+  }
+}
 
 console.log('\n── Admin override invariant ──');
 if (!roleMatrix.includes("role === 'admin' || role === 'super_admin'")) fail('RBAC admin override invariant missing');

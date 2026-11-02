@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ProgramNarration } from '@/components/programs/NarratedProgramIntro';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 
@@ -38,6 +39,30 @@ describe('automatic page narration', () => {
     render(<ScrollNarrator />);
     await advance(1400);
     expect(voice.play).toHaveBeenCalledWith(expect.stringContaining('licensed supervision'), expect.objectContaining({ style: 'instructor' }));
+  });
+  it('automatically narrates a program introduction without listen or download prompts', async () => {
+    render(<main><section aria-label="Program introduction"><ProgramNarration text="Train for your next career." source="/audio/program.mp3" /></section></main>);
+    const section = screen.getByRole('region', { name: 'Program introduction' });
+    section.getBoundingClientRect = () => ({ top: 0, bottom: 400, height: 400 } as DOMRect);
+    render(<ScrollNarrator />);
+    await advance(1400);
+    expect(voice.play).toHaveBeenCalledWith('Train for your next career.', expect.objectContaining({ src: '/audio/program.mp3', style: 'commercial' }));
+    expect(screen.queryByRole('button', { name: /listen.*introduction/i })).not.toBeInTheDocument();
+    expect(document.querySelector('a[download]')).toBeNull();
+  });
+  it('detects narration attributes added after an existing section renders', async () => {
+    const main = document.createElement('main');
+    const section = document.createElement('section');
+    section.getBoundingClientRect = () => ({ top: 0, bottom: 400, height: 400 } as DOMRect);
+    main.append(section);
+    document.body.append(main);
+    render(<ScrollNarrator />);
+    await act(async () => {
+      section.dataset.narration = 'Late introduction';
+      section.dataset.scrollNarration = '';
+    });
+    await advance(1400);
+    expect(voice.play).toHaveBeenCalledWith('Late introduction', expect.any(Object));
   });
   it('keeps the page and stop/replay controls usable when browser storage is blocked', async () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError'); });

@@ -12,9 +12,9 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "af7e8637a737a7f14c6bb096452cc95702fc209542d1588971b30d7a61ac8eef",
+      "sha256": "619911265cbb9fa1d8965563dac0b3e3f9fb66e0f7d6f5ce5c8fd26e6d339188",
       "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
-      "localRevisionReason": "Reviewed 2026-11-02: add agent training navigation and hiring label; retain existing brand, contact, layout and pinned upstream source identity.",
+      "localRevisionReason": "Reviewed professional portal entry and responsive-menu breakpoint; preserve original Supersonic identity and immutable upstream source.",
       "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
@@ -35,9 +35,9 @@
     {
       "source": "app/tax-software/contact/page.tsx",
       "target": "apps/marketing/app/tax-software/contact/page.tsx",
-      "sha256": "0c0eaf9517b68e4df449da42939e4b234cba1ae529adb21ef8905a428702ba6e",
+      "sha256": "f4bd900bc28af95162705bf51a393ce225166cc8db9e850980f829c4dbba809c",
       "sourceSha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5",
-      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths",
+      "localRevisionReason": "Reviewed same-page professional-help inquiry, durable tax request storage and owner inbox; remove workforce-contact redirects.",
       "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
@@ -62,9 +62,9 @@
     {
       "source": "app/tax-software/login/page.tsx",
       "target": "apps/marketing/app/tax-software/login/page.tsx",
-      "sha256": "41f11019cec6948f1b9e29948ad0ee9b39ea973b6cbe85f761fe0bdfc4dbc114",
+      "sha256": "ac214cd9f82d7f7d5bfae258ac7c01150f80176192feec1531b92fc37843f72e",
       "sourceSha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728",
-      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+      "localRevisionReason": "Reviewed branded Supersonic login, individual shared-account instructions, professional destination and explicit readable form surfaces; preserve password and MFA verification."
     },
     {
       "source": "app/tax-software/page.tsx",
@@ -95,22 +95,24 @@
     {
       "source": "app/tax-software/self-file/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/page.tsx",
-      "sha256": "dfd70447bc4078d61ed787a153bf9129c4eade3b209dfbe4cdd1e3b3fd29733d"
+      "sha256": "5b0f745ca65099bd6b59d7fdee02c578c89d295472a7de12bb9501f73b0e5cc4",
+      "sourceSha256": "dfd70447bc4078d61ed787a153bf9129c4eade3b209dfbe4cdd1e3b3fd29733d",
+      "localRevisionReason": "Reviewed signed-in account display, manual W-2 entry links and return-bound OCR imports."
     },
     {
       "source": "app/tax-software/self-file/return/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
-      "sha256": "f4953f0278c24665041b13a448509261d22ec6751fbaa2fb3647428692535a25",
+      "sha256": "fb7645d1ad376d1653dc98957ba4e731514d6abbc022a6b73f55762705f91393",
       "sourceSha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
-      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
+      "localRevisionReason": "Reviewed branded return workspace, preparation navigation, manual-income entry and calculated refund/amount-owed display.",
       "changeReason": "Connect owned business worksheets and separate Supersonic payment preferences to the return workspace."
     },
     {
       "source": "app/tax-software/self-file/w2/confirm/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
-      "sha256": "0d8d82364d6c7d79645f4397a46ec5fc9d06d5b630d374cde69973b87d22f28d",
+      "sha256": "5cf90e34b6630e97613680193ed8ea589dd14ac0d97dc66154a5b374c8bb4dc4",
       "sourceSha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d",
-      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
+      "localRevisionReason": "Reviewed manual W-2 entry, spouse income-owner selection for joint returns, import-to-return binding and readable inputs."
     },
     {
       "source": "app/api/tax/interview/route.ts",
@@ -130,9 +132,9 @@
     {
       "source": "app/api/tax/returns/route.ts",
       "target": "apps/marketing/app/api/tax/returns/route.ts",
-      "sha256": "b345383ba381589b431f1f05587470ae12bf4c69ed914972115c0fcb14ee961b",
+      "sha256": "d443b4a00b3cab6afad2c7561300978a25df4b4ec9b9964cefcf18efef8227b4",
       "sourceSha256": "d8c5413e56a596c6ab7a9c8e0742a02519d98bb00519ee3af16c51c370c7d755",
-      "localRevisionReason": "Reviewed Oct 27 consolidation of tax repair 4005e98e: private, no-store tax-return responses without changing ownership or MFA checks."
+      "localRevisionReason": "Reviewed inclusion of the authenticated user email in that user\u2019s private return-list response, enabling account verification and switching without changing authorization."
     },
     {
       "source": "app/api/tax/w2/confirm/route.ts",
@@ -198,7 +200,9 @@
     {
       "source": "app/tax-software/_components/TaxSecurityVerification.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSecurityVerification.tsx",
-      "sha256": "ead69024a1edd57bba57848c337a1546d25ed3bad46d69b6f1b7ae3f3a2fe426"
+      "sha256": "db0ea9dab0fa15590942e6e41eb3f0c87822c7398c6a21a70c5ed1497cb7f068",
+      "sourceSha256": "ead69024a1edd57bba57848c337a1546d25ed3bad46d69b6f1b7ae3f3a2fe426",
+      "localRevisionReason": "Reviewed professional-account MFA wording; authentication challenge and verification behavior remain intact."
     },
     {
       "source": "public/images/tax/supersonic-tax-hero-2026.webp",

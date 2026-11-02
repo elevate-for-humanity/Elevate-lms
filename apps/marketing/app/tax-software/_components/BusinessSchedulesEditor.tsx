@@ -246,7 +246,7 @@ export function BusinessSchedulesEditor({
                     onChange={(x) =>
                       update(i, { [key]: x.target.value || (key === 'ein' ? undefined : '') })
                     }
-                    className="mt-2 w-full rounded border p-3"
+                    className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                   />
                 </label>
               ))}
@@ -257,7 +257,7 @@ export function BusinessSchedulesEditor({
                   onChange={(x) =>
                     update(i, { owner: x.target.value as ScheduleCBusiness['owner'] })
                   }
-                  className="mt-2 w-full rounded border p-3"
+                  className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                 >
                   <option value="primary">Taxpayer</option>
                   {joint && <option value="spouse">Spouse</option>}
@@ -272,7 +272,7 @@ export function BusinessSchedulesEditor({
                       accountingMethod: x.target.value as ScheduleCBusiness['accountingMethod'],
                     })
                   }
-                  className="mt-2 w-full rounded border p-3"
+                  className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                 >
                   <option value="cash">Cash</option>
                   <option value="accrual">Accrual</option>
@@ -293,7 +293,7 @@ export function BusinessSchedulesEditor({
                     step="0.01"
                     value={b[key]}
                     onChange={(x) => update(i, { [key]: Number(x.target.value) })}
-                    className="mt-2 w-full rounded border p-3"
+                    className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                   />
                 </label>
               ))}
@@ -344,7 +344,7 @@ export function BusinessSchedulesEditor({
                       onChange={(x) =>
                         update(i, { expenses: { ...b.expenses, [key]: Number(x.target.value) } })
                       }
-                      className="mt-2 w-full rounded border p-3"
+                      className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                     />
                   </label>
                 ))}
@@ -362,7 +362,7 @@ export function BusinessSchedulesEditor({
                           ),
                         })
                       }
-                      className="mt-2 w-full rounded border p-3"
+                      className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                     />
                   </label>
                   <label className="text-sm font-semibold">
@@ -379,7 +379,7 @@ export function BusinessSchedulesEditor({
                           ),
                         })
                       }
-                      className="mt-2 w-full rounded border p-3"
+                      className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                     />
                   </label>
                   <button
@@ -440,7 +440,7 @@ export function BusinessSchedulesEditor({
                         },
                       })
                     }
-                    className="mt-2 w-full rounded border p-3"
+                    className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                   >
                     <option value="cost">Cost</option>
                     <option value="lower_of_cost_or_market">Lower of cost or market</option>
@@ -466,7 +466,7 @@ export function BusinessSchedulesEditor({
                       onChange={(x) =>
                         update(i, { inventory: { ...b.inventory!, [key]: Number(x.target.value) } })
                       }
-                      className="mt-2 w-full rounded border p-3"
+                      className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                     />
                   </label>
                 ))}

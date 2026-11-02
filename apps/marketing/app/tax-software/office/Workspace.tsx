@@ -4,6 +4,13 @@ import { TaxSecurityVerification } from '../_components/TaxSecurityVerification'
 import { practiceCases } from '@/lib/tax-software/training/practice';
 type Progress = { module_id: string; completed_at: string | null; score: number; user_id?: string };
 type OfficeData = {
+  inquiries: {
+    id: string;
+    tax_year: number;
+    status: string;
+    created_at: string;
+    payload: { name: string; email: string; phone?: string; service: string; message: string };
+  }[];
   hasRecruitingAccess: boolean;
   ownedOfficeIds: string[];
   candidateCount: number;
@@ -157,7 +164,12 @@ export function Workspace() {
           ['reports', 'Reports'],
           ['training', 'Staff training'],
           ['practice', 'Mock documents'],
-          ...(data.hasRecruitingAccess ? [['recruiting', 'Hiring progress']] : []),
+          ...(data.hasRecruitingAccess
+            ? [
+                ['inquiries', 'Customer inquiries'],
+                ['recruiting', 'Hiring progress'],
+              ]
+            : []),
         ].map(([id, label]) => (
           <button
             key={id}
@@ -314,6 +326,31 @@ export function Workspace() {
             </article>
           ))}
         </>
+      )}
+      {tab === 'inquiries' && data.hasRecruitingAccess && (
+        <section>
+          <h2 className="text-3xl font-bold">Supersonic customer inquiries</h2>
+          <p className="mt-3">
+            Most recent 100 requests. Contact details are visible only to the authorized office
+            owner.
+          </p>
+          <div className="mt-5 grid gap-5">
+            {data.inquiries.map((q) => (
+              <article key={q.id} className="rounded-xl border bg-white p-5 text-slate-950">
+                <h3 className="text-xl font-bold">{q.payload.name}</h3>
+                <p className="mt-2">
+                  {q.tax_year} · {q.payload.service} · {q.status}
+                </p>
+                <p className="mt-2 break-words">
+                  {q.payload.email} {q.payload.phone && ' · ' + q.payload.phone}
+                </p>
+                <p className="mt-4 whitespace-pre-wrap break-words">{q.payload.message}</p>
+                <p className="mt-3 text-sm">Received {new Date(q.created_at).toLocaleString()}</p>
+              </article>
+            ))}
+            {data.inquiries.length === 0 && <p>No customer inquiries received yet.</p>}
+          </div>
+        </section>
       )}
       {tab === 'recruiting' && data.hasRecruitingAccess && (
         <section>

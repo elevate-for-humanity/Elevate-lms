@@ -18,7 +18,7 @@ export async function GET() {
     .eq('service_type', 'self_file')
     .order('updated_at', { ascending: false });
   if (error) return returnError(error, 'Unable to load returns');
-  return taxJson({ returns: data ?? [] });
+  return taxJson({ returns: data ?? [], accountEmail: user.email ?? null });
 }
 export async function POST(req: NextRequest) {
   const limited = await applyRateLimit(req, 'api');

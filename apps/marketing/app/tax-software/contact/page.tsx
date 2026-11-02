@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { InquiryForm } from './InquiryForm';
 import { TaxSiteShell, taxButton } from '../_components/TaxSiteShell';
 export const metadata: Metadata = {
   title: 'Hire a Tax Professional | Supersonic Fast Cash',
@@ -26,7 +27,7 @@ export default function Contact() {
               Call (463) 240-1404
             </a>
             <Link
-              href="/contact?product=supersonic-fast-cash-tax-preparation#contact-form"
+              href="#request-help"
               className={taxButton + ' border border-[#073ca2] bg-white text-[#073ca2]'}
             >
               Request tax preparation help →
@@ -98,13 +99,14 @@ export default function Contact() {
               Start my own return →
             </Link>
             <Link
-              href="/contact?product=supersonic-fast-cash-free-tax-preparation#contact-form"
+              href="#request-help"
               className={taxButton + ' border border-[#073ca2] text-[#073ca2]'}
             >
               Ask about free professional preparation →
             </Link>
           </div>
         </section>
+        <InquiryForm />
       </main>
     </TaxSiteShell>
   );

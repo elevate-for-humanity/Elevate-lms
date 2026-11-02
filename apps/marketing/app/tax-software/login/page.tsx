@@ -2,6 +2,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { taxLoginDestination } from '@/lib/tax-software/login-destination';
 import Link from 'next/link';
+import { TaxSiteShell } from '../_components/TaxSiteShell';
 import { createClient } from '@/lib/supabase/client';
 function taxWorkspaceDestination() {
   return taxLoginDestination(
@@ -68,113 +69,115 @@ export default function TaxLogin() {
     }
   }
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-12 text-slate-950">
-      <div className="mx-auto max-w-md">
-        <Link href="/tax" className="font-semibold text-sky-800">
-          ← Supersonic Fast Cash
-        </Link>
-        <h1 className="mt-8 text-3xl font-bold">
-          {returnPath.startsWith('/tax-software/careers')
-            ? 'Continue your job application'
-            : returnPath.startsWith('/tax-software/office')
-              ? 'Sign in to your office'
-              : 'Sign in to your tax workspace'}
-        </h1>
-        <p className="mt-4 text-slate-600">
-          Use your existing Elevate account to continue. Your application, training or tax workspace
-          stays connected to your account.
-        </p>
-        {factors.length > 0 ? (
-          <form onSubmit={verify} className="mt-7 space-y-5 rounded-2xl bg-white p-7">
-            <h2 className="text-xl font-bold">Verify your account</h2>
-            <label className="block font-semibold">
-              Authenticator
-              <select
-                value={factorId}
-                onChange={(e) => setFactorId(e.target.value)}
-                className="mt-2 w-full rounded-lg border p-3"
+    <TaxSiteShell>
+      <main className="min-h-screen bg-slate-50 px-6 py-12 text-slate-950">
+        <div className="mx-auto max-w-md">
+          <Link href="/tax" className="font-semibold text-sky-800">
+            ← Supersonic Fast Cash
+          </Link>
+          <h1 className="mt-8 text-3xl font-bold">
+            {returnPath.startsWith('/tax-software/careers')
+              ? 'Continue your job application'
+              : returnPath.startsWith('/tax-software/office')
+                ? 'Tax professional sign in'
+                : 'Sign in to your tax workspace'}
+          </h1>
+          <p className="mt-4 text-slate-600">
+            Sign in to Supersonic Fast Cash. If you already have an Elevate account, use the same
+            email and password. Your tax information stays private to your account.
+          </p>
+          {factors.length > 0 ? (
+            <form onSubmit={verify} className="mt-7 space-y-5 rounded-2xl bg-white p-7">
+              <h2 className="text-xl font-bold">Verify your account</h2>
+              <label className="block font-semibold">
+                Authenticator
+                <select
+                  value={factorId}
+                  onChange={(e) => setFactorId(e.target.value)}
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base text-slate-950"
+                >
+                  {factors.map((f, i) => (
+                    <option key={f.id} value={f.id}>
+                      {f.friendly_name || `Authenticator ${i + 1}`}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block font-semibold">
+                Six-digit code
+                <input
+                  required
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base text-slate-950"
+                />
+              </label>
+              <button
+                disabled={busy}
+                className="w-full rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white disabled:opacity-50"
               >
-                {factors.map((f, i) => (
-                  <option key={f.id} value={f.id}>
-                    {f.friendly_name || `Authenticator ${i + 1}`}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block font-semibold">
-              Six-digit code
-              <input
-                required
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                pattern="[0-9]{6}"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="mt-2 w-full rounded-lg border p-3"
-              />
-            </label>
-            <button
-              disabled={busy}
-              className="w-full rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white disabled:opacity-50"
-            >
-              {busy ? 'Verifying…' : 'Verify and continue'}
-            </button>
-            {error && (
-              <p role="alert" className="text-red-800">
-                {error}
-              </p>
-            )}
-          </form>
-        ) : (
-          <form onSubmit={signIn} className="mt-7 space-y-5 rounded-2xl bg-white p-7">
-            <label className="block font-semibold">
-              Email
-              <input
-                type="email"
-                autoComplete="username"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-2 w-full rounded-lg border p-3"
-              />
-            </label>
-            <label className="block font-semibold">
-              Password
-              <input
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-2 w-full rounded-lg border p-3"
-              />
-            </label>
-            <button
-              disabled={busy}
-              className="w-full rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white disabled:opacity-50"
-            >
-              {busy ? 'Signing in…' : 'Sign in'}
-            </button>
-            {error && (
-              <p role="alert" className="text-red-800">
-                {error}
-              </p>
-            )}
-            <Link href="/forgot-password" className="block font-semibold text-sky-800">
-              Forgot your password?
-            </Link>
-            <Link
-              href={
-                'https://app.elevateforhumanity.org/signup?next=' +
-                encodeURIComponent('https://www.elevateforhumanity.org' + returnPath)
-              }
-              className="block font-semibold text-sky-800"
-            >
-              Create an Elevate account
-            </Link>
-          </form>
-        )}
-      </div>
-    </main>
+                {busy ? 'Verifying…' : 'Verify and continue'}
+              </button>
+              {error && (
+                <p role="alert" className="text-red-800">
+                  {error}
+                </p>
+              )}
+            </form>
+          ) : (
+            <form onSubmit={signIn} className="mt-7 space-y-5 rounded-2xl bg-white p-7">
+              <label className="block font-semibold">
+                Email
+                <input
+                  type="email"
+                  autoComplete="username"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base text-slate-950"
+                />
+              </label>
+              <label className="block font-semibold">
+                Password
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base text-slate-950"
+                />
+              </label>
+              <button
+                disabled={busy}
+                className="w-full rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white disabled:opacity-50"
+              >
+                {busy ? 'Signing in…' : 'Sign in'}
+              </button>
+              {error && (
+                <p role="alert" className="text-red-800">
+                  {error}
+                </p>
+              )}
+              <Link href="/forgot-password" className="block font-semibold text-sky-800">
+                Forgot your password?
+              </Link>
+              <Link
+                href={
+                  'https://app.elevateforhumanity.org/signup?next=' +
+                  encodeURIComponent('https://www.elevateforhumanity.org' + returnPath)
+                }
+                className="block font-semibold text-sky-800"
+              >
+                Create an account for Supersonic
+              </Link>
+            </form>
+          )}
+        </div>
+      </main>
+    </TaxSiteShell>
   );
 }

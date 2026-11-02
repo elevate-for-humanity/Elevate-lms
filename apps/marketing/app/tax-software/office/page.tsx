@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { TaxSiteShell } from '../_components/TaxSiteShell';
 import { Workspace } from './Workspace';
 export const metadata: Metadata = {
@@ -13,6 +14,12 @@ export default function TaxOffice() {
           Supersonic Fast Cash · Office operations
         </p>
         <h1 className="mb-7 mt-3 text-4xl font-black">Your team. Your tax season.</h1>
+        <Link
+          href="/tax-software/office/preparation"
+          className="mb-7 inline-flex min-h-12 items-center rounded-xl bg-[#073ca2] px-6 py-3 font-bold text-white"
+        >
+          Open professional tax preparation →
+        </Link>
         <Workspace />
       </main>
     </TaxSiteShell>

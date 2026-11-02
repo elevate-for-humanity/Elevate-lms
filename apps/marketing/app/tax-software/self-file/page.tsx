@@ -11,6 +11,7 @@ export default function SelfFilePage() {
   const [verificationRequired, setVerificationRequired] = useState(false);
   const [returns, setReturns] = useState<TaxReturn[]>([]);
   const [selected, setSelected] = useState('');
+  const [accountEmail, setAccountEmail] = useState<string | null>(null);
   const [filingStatus, setFilingStatus] = useState('single');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -33,6 +34,7 @@ export default function SelfFilePage() {
         }
         if (!res.ok) throw Error(b.error || 'Unable to load returns');
         setReturns(b.returns);
+        setAccountEmail(b.accountEmail ?? null);
         const saved = sessionStorage.getItem('sfc:active-return-id');
         if (b.returns.some((r: TaxReturn) => r.id === saved)) setSelected(saved!);
       } catch (e) {
@@ -100,6 +102,7 @@ export default function SelfFilePage() {
       const b = await res.json();
       if (!res.ok || !b.success) throw Error(b.error || 'Unable to read W-2');
       sessionStorage.setItem('sfc:w2-import', JSON.stringify(b.data));
+      sessionStorage.setItem('sfc:w2-import-return-id', selected);
       sessionStorage.setItem('sfc:w2-file-name', file.name);
       choose(selected);
       router.push('/tax-software/self-file/w2/confirm?returnId=' + encodeURIComponent(selected));
@@ -121,6 +124,14 @@ export default function SelfFilePage() {
             Answer a few questions, add your documents, and review your information. This workspace
             prepares your return; it does not submit it to the IRS.
           </p>
+          {accountEmail && (
+            <p className="mt-5 break-words text-sm text-slate-700">
+              Signed in as {accountEmail}.{' '}
+              <Link href="/tax-software/login" className="font-semibold text-sky-800 underline">
+                Switch account
+              </Link>
+            </p>
+          )}
           {verificationRequired ? (
             <TaxSecurityVerification onVerified={() => window.location.reload()} />
           ) : loading ? (
@@ -221,6 +232,17 @@ export default function SelfFilePage() {
                   >
                     {busy ? 'Working…' : 'Upload W-2'}
                   </button>
+                  {selected && (
+                    <Link
+                      href={
+                        '/tax-software/self-file/w2/confirm?manual=1&returnId=' +
+                        encodeURIComponent(selected)
+                      }
+                      className="ml-4 inline-flex min-h-12 items-center font-semibold text-sky-800 underline"
+                    >
+                      Enter a W-2 manually →
+                    </Link>
+                  )}
                 </section>
               )}
             </>

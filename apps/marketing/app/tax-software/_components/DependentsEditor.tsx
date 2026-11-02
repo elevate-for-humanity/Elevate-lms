@@ -55,7 +55,7 @@ export function DependentsEditor({
                       [key]: e.target.value || (key === 'identityProtectionPin' ? undefined : ''),
                     })
                   }
-                  className="mt-2 w-full rounded border p-3"
+                  className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                 />
               </label>
             ))}
@@ -66,7 +66,7 @@ export function DependentsEditor({
                 onChange={(e) =>
                   update(index, { relationship: e.target.value as TaxDependent['relationship'] })
                 }
-                className="mt-2 w-full rounded border p-3"
+                className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
               >
                 {DEPENDENT_RELATIONSHIPS.map((r) => (
                   <option key={r}>{r}</option>
@@ -82,7 +82,7 @@ export function DependentsEditor({
                 step={1}
                 value={d.monthsLivedWithTaxpayer}
                 onChange={(e) => update(index, { monthsLivedWithTaxpayer: Number(e.target.value) })}
-                className="mt-2 w-full rounded border p-3"
+                className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
               />
             </label>
           </div>

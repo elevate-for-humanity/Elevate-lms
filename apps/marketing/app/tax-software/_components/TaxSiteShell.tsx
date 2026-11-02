@@ -12,6 +12,7 @@ export const taxNav = [
   ['Office reports & staff training', '/tax-software/office'],
   ['Refund and bank options', '/tax-software/bank-products'],
   ['Sign in', '/tax-software/login'],
+  ['Tax Professional Portal', '/tax-software/office/preparation'],
 ];
 export const taxButton =
   'inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 py-3 text-center text-sm font-bold transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4';
@@ -49,7 +50,7 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
           </Link>
           <nav
             aria-label="Supersonic main navigation"
-            className="hidden items-center gap-6 text-sm font-bold lg:flex"
+            className="hidden items-center gap-6 text-sm font-bold xl:flex"
           >
             <details className="group relative">
               <summary className="cursor-pointer py-4">Tax services</summary>
@@ -74,17 +75,20 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
             <Link href="/tax-software/training" className="py-4 hover:text-[#073ca2]">
               Agent training
             </Link>
+            <Link href="/tax-software/office/preparation" className="py-4 hover:text-[#073ca2]">
+              Tax Professional Portal
+            </Link>
             <Link href="/tax-software/login" className="py-4 hover:text-[#073ca2]">
               Sign in
             </Link>
           </nav>
           <Link
             href="/tax-software/contact"
-            className={taxButton + ' hidden bg-[#c8102e] !text-white lg:inline-flex'}
+            className={taxButton + ' hidden bg-[#c8102e] !text-white xl:inline-flex'}
           >
             Get tax help →
           </Link>
-          <details className="group lg:hidden">
+          <details className="group xl:hidden">
             <summary className="cursor-pointer rounded-lg border border-slate-300 px-5 py-3 text-sm font-bold">
               Menu
             </summary>
@@ -121,6 +125,9 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
                 className={taxButton + ' mt-4 w-full bg-[#082b66] !text-white'}
               >
                 Sign in
+              </Link>
+              <Link href="/tax-software/office/preparation" className="block py-3 font-semibold">
+                Tax Professional Portal
               </Link>
             </nav>
           </details>
@@ -168,6 +175,9 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
               </Link>
               <Link href="/tax-software/office" className="block py-2 text-sm">
                 Staff reports & training
+              </Link>
+              <Link href="/tax-software/office/preparation" className="block py-2 text-sm">
+                Tax Professional Portal
               </Link>
               <Link href="/tax-software/contact" className="block py-2 text-sm">
                 Contact us

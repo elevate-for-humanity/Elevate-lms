@@ -65,7 +65,7 @@ export function TaxSecurityVerification({ onVerified }: { onVerified: () => void
         Verify your account to continue
       </h2>
       <p className="mt-3 text-slate-700">
-        Your administrator account requires two-step verification before accessing private tax
+        Your professional account requires two-step verification before accessing private tax
         records.
       </p>
       {loading ? (

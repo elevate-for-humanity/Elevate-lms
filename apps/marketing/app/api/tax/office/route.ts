@@ -168,8 +168,20 @@ export async function GET(req: NextRequest) {
         },
       );
     }
+    let inquiries: unknown[] = [];
+    if (recruitmentOffice) {
+      const incoming = await db
+        .from('tax_return_requests')
+        .select('id,tax_year,status,payload,created_at')
+        .contains('payload', { kind: 'professional_inquiry', officeCode: 'SFC-IND-001' })
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (incoming.error) throw Error('INQUIRY_READ_FAILED');
+      inquiries = incoming.data ?? [];
+    }
     return NextResponse.json(
       {
+        inquiries,
         hasRecruitingAccess: Boolean(recruitmentOffice),
         ownedOfficeIds: ownedIds,
         candidates,

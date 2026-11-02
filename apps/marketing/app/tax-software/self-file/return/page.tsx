@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { TaxSiteShell } from '../../_components/TaxSiteShell';
 import { deriveInterviewTriggers } from '@/lib/tax-software/paris-interview';
 import { formsForTriggers } from '@/lib/tax-software/form-registry-2026';
 import type { calculateFederal1040_2026 } from '@/lib/tax-software/calculation/federal-1040-2026';
@@ -120,7 +121,9 @@ function Workspace() {
         <Link href="/tax-software/self-file" className="font-semibold text-sky-800">
           ← Your returns and documents
         </Link>
-        <h1 className="mt-8 text-4xl font-bold">Supersonic Fast Cash return workspace</h1>
+        <h1 className="mt-8 text-3xl font-bold sm:text-4xl">
+          Supersonic Fast Cash return workspace
+        </h1>
         {loading ? (
           <p className="mt-6">Loading return…</p>
         ) : !record ? (
@@ -131,7 +134,27 @@ function Workspace() {
               {record.tax_year} · {record.filing_status.replaceAll('_', ' ')} ·{' '}
               {record.status.replaceAll('_', ' ')}
             </p>
-            <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_300px]">
+            <nav
+              aria-label="Return preparation steps"
+              className="mt-5 flex flex-wrap gap-3 rounded-xl border bg-white p-4 text-sm font-semibold text-sky-800"
+            >
+              <a href="#income" className="inline-flex min-h-12 items-center px-2">
+                1. Income
+              </a>
+              <a href="#federal-forms" className="inline-flex min-h-12 items-center px-2">
+                2. Deductions & credits
+              </a>
+              <a href="#calculation" className="inline-flex min-h-12 items-center px-2">
+                3. Calculate & review
+              </a>
+              <a href="#taxpayer-details" className="inline-flex min-h-12 items-center px-2">
+                4. Taxpayer & signature
+              </a>
+              <a href="#filing-export" className="inline-flex min-h-12 items-center px-2">
+                5. Export
+              </a>
+            </nav>
+            <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
               <section className="rounded-2xl bg-white p-7">
                 <h2 className="text-2xl font-bold">Income, deductions and credits interview</h2>
                 <p className="mt-3 text-slate-600">
@@ -167,7 +190,26 @@ function Workspace() {
                     Answers saved to your return.
                   </p>
                 )}
-                <h2 className="mt-10 text-2xl font-bold">Confirmed W-2 records</h2>
+                <h2 id="income" className="mt-10 scroll-mt-6 text-2xl font-bold">
+                  Confirmed W-2 records
+                </h2>
+                <div className="mt-3 flex flex-wrap gap-4">
+                  <Link
+                    href={
+                      '/tax-software/self-file/w2/confirm?manual=1&returnId=' +
+                      encodeURIComponent(id!)
+                    }
+                    className="inline-flex min-h-12 items-center font-semibold text-sky-800 underline"
+                  >
+                    Add a W-2 manually
+                  </Link>
+                  <Link
+                    href="/tax-software/self-file"
+                    className="inline-flex min-h-12 items-center font-semibold text-sky-800 underline"
+                  >
+                    Upload a W-2 image
+                  </Link>
+                </div>
                 {w2.length === 0 ? (
                   <p className="mt-3 text-slate-600">No confirmed W-2 records saved yet.</p>
                 ) : (
@@ -195,32 +237,42 @@ function Workspace() {
                     setAnswers((v) => ({ ...v, hasSelfEmployment: true }));
                   }}
                 />
-                <FederalFormsEditor
+                <div id="federal-forms" className="scroll-mt-6">
+                  <FederalFormsEditor
+                    returnId={id!}
+                    initialInputs={record.return_json?.federalInputs ?? {}}
+                    onDirty={() => setEstimate(null)}
+                    onSaved={(inputs) => {
+                      setRecord((current: any) => ({
+                        ...current,
+                        return_json: { ...current.return_json, federalInputs: inputs },
+                      }));
+                      setEstimate(null);
+                    }}
+                  />
+                </div>
+                <div id="taxpayer-details" className="scroll-mt-6">
+                  <TaxpayerDetailsEditor
+                    returnId={id!}
+                    joint={record.filing_status === 'married_joint'}
+                    onSaved={() =>
+                      setRecord((current: any) => ({
+                        ...current,
+                        return_json: { ...current.return_json, privateProfileComplete: true },
+                      }))
+                    }
+                  />
+                </div>
+                <TaxPaymentOptions
                   returnId={id!}
-                  initialInputs={record.return_json?.federalInputs ?? {}}
-                  onSaved={(inputs) => {
-                    setRecord((current: any) => ({
-                      ...current,
-                      return_json: { ...current.return_json, federalInputs: inputs },
-                    }));
-                    setEstimate(null);
-                  }}
+                  calculationDigest={estimate ? JSON.stringify(estimate) : null}
                 />
-                <TaxpayerDetailsEditor
-                  returnId={id!}
-                  joint={record.filing_status === 'married_joint'}
-                  onSaved={() =>
-                    setRecord((current: any) => ({
-                      ...current,
-                      return_json: { ...current.return_json, privateProfileComplete: true },
-                    }))
-                  }
-                />
-                <TaxPaymentOptions returnId={id!} calculationDigest={estimate ? JSON.stringify(estimate) : null} />
               </section>
               <aside className="space-y-5">
                 <section className="rounded-2xl bg-white p-6">
-                  <h2 className="text-xl font-bold">Federal return calculation</h2>
+                  <h2 id="calculation" className="scroll-mt-6 text-xl font-bold">
+                    Federal return calculation
+                  </h2>
                   <p className="mt-3 text-sm text-slate-600">
                     Calculates your saved federal income, deductions, credits, payments and
                     additional taxes. Complete and review every supporting form before filing.
@@ -235,6 +287,20 @@ function Workspace() {
                   {estimate && (
                     <div role="status" className="mt-4 space-y-2 text-sm">
                       <dl className="space-y-2">
+                        <div className="rounded-lg border border-sky-200 bg-sky-50 p-4">
+                          <dt>
+                            {estimate.amountOwed > 0
+                              ? 'Estimated federal amount owed'
+                              : 'Estimated federal refund'}
+                          </dt>
+                          <dd className="mt-2 text-2xl font-bold text-slate-950">
+                            $
+                            {(estimate.amountOwed > 0
+                              ? estimate.amountOwed
+                              : estimate.refundAmount
+                            ).toFixed(2)}
+                          </dd>
+                        </div>
                         <div>
                           <dt>Federal income tax</dt>
                           <dd className="font-semibold">${estimate.incomeTax.toFixed(2)}</dd>
@@ -251,7 +317,9 @@ function Workspace() {
                   )}
                 </section>
                 <section className="rounded-2xl bg-white p-6">
-                  <h2 className="text-xl font-bold">Filing export</h2>
+                  <h2 id="filing-export" className="scroll-mt-6 text-xl font-bold">
+                    Filing export
+                  </h2>
                   <p className="mt-3 text-sm text-slate-600">
                     Download the IRS XML after reviewing your calculation and saving taxpayer
                     details and signature. The download does not submit your return.
@@ -305,7 +373,9 @@ function Workspace() {
 export default function ReturnWorkspacePage() {
   return (
     <Suspense fallback={<p>Loading return…</p>}>
-      <Workspace />
+      <TaxSiteShell>
+        <Workspace />
+      </TaxSiteShell>
     </Suspense>
   );
 }

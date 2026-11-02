@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState, Suspense } from 'react';
+import Link from 'next/link';
+import { TaxSiteShell } from '../../../_components/TaxSiteShell';
 import { useRouter, useSearchParams } from 'next/navigation';
 type W2 = {
   employerStreet: string;
@@ -39,6 +41,9 @@ const keys: [keyof W2, string][] = [
 function W2ConfirmContent() {
   const router = useRouter();
   const params = useSearchParams();
+  const manual = params.get('manual') === '1';
+  const returnId = params.get('returnId');
+  const [joint, setJoint] = useState(false);
   const [values, setValues] = useState<W2>(
     Object.fromEntries(keys.map(([k]) => [k, ''])) as unknown as W2,
   );
@@ -47,10 +52,34 @@ function W2ConfirmContent() {
   const [busy, setBusy] = useState(false);
   const [fileName, setFileName] = useState('');
   useEffect(() => {
+    if (!returnId) {
+      setError('Open a return before entering a W-2.');
+      return;
+    }
+    let active = true;
+    void fetch('/api/tax/interview?returnId=' + encodeURIComponent(returnId), { cache: 'no-store' })
+      .then(async (response) => {
+        const body = await response.json();
+        if (!response.ok) throw Error(body.error || 'Unable to load your return.');
+        if (active) setJoint(body.taxReturn.filing_status === 'married_joint');
+      })
+      .catch((e) => {
+        if (active) setError(e instanceof Error ? e.message : 'Unable to load return.');
+      });
+    return () => {
+      active = false;
+    };
+  }, [returnId]);
+  useEffect(() => {
+    if (manual) return;
     try {
       const raw = sessionStorage.getItem('sfc:w2-import');
-      if (!raw) {
-        setError('No imported W-2 was found. Upload a W-2 first.');
+      if (!raw) return;
+      const importedFor = sessionStorage.getItem('sfc:w2-import-return-id');
+      if (!returnId || importedFor !== returnId) {
+        setError(
+          'This import is not linked to the current return. Upload it again, or enter the values manually.',
+        );
         return;
       }
       const data = JSON.parse(raw) as Record<string, unknown>;
@@ -59,9 +88,8 @@ function W2ConfirmContent() {
     } catch {
       setError('Unable to read imported W-2. Please upload it again.');
     }
-  }, []);
+  }, [manual, returnId]);
   async function save() {
-    const returnId = params.get('returnId') || sessionStorage.getItem('sfc:active-return-id');
     if (!returnId) {
       setError('Select an active tax return before saving this W-2.');
       return;
@@ -82,6 +110,7 @@ function W2ConfirmContent() {
       if (!response.ok || !body.success) throw new Error(body.error || 'W-2 could not be saved');
       sessionStorage.removeItem('sfc:w2-import');
       sessionStorage.removeItem('sfc:w2-file-name');
+      sessionStorage.removeItem('sfc:w2-import-return-id');
       router.push('/tax-software/self-file/return?returnId=' + encodeURIComponent(returnId));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'W-2 could not be saved');
@@ -90,10 +119,22 @@ function W2ConfirmContent() {
     }
   }
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 text-slate-950">
       <div className="mx-auto max-w-4xl px-6 py-10">
-        <p className="text-sm font-semibold text-sky-700">PARIS / Income</p>
-        <h1 className="mt-2 text-3xl font-bold">Review imported W-2</h1>
+        <Link
+          href={
+            returnId
+              ? '/tax-software/self-file/return?returnId=' + encodeURIComponent(returnId)
+              : '/tax-software/self-file'
+          }
+          className="inline-flex min-h-12 items-center font-semibold text-sky-800"
+        >
+          ← Back to your return
+        </Link>
+        <p className="mt-4 text-sm font-semibold text-sky-700">Supersonic / W-2 income</p>
+        <h1 className="mt-2 text-3xl font-bold">
+          {fileName ? 'Review imported W-2' : 'Enter your W-2'}
+        </h1>
         <p className="mt-3 text-slate-600">
           Verify each value against your original document before saving it to the return.
         </p>
@@ -103,12 +144,27 @@ function W2ConfirmContent() {
           </p>
         )}
         <div className="mt-8 rounded-2xl border bg-white p-6">
+          <label className="mb-5 block font-semibold">
+            Whose W-2 is this?
+            <select
+              aria-label="Whose W-2 is this?"
+              value={values.incomeOwner || 'primary'}
+              onChange={(e) => {
+                setAgreed(false);
+                setValues((v) => ({ ...v, incomeOwner: e.target.value }));
+              }}
+              className="mt-2 block min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-slate-950"
+            >
+              <option value="primary">Taxpayer</option>
+              {joint && <option value="spouse">Spouse</option>}
+            </select>
+          </label>
           <div className="grid gap-4 sm:grid-cols-2">
             {keys.map(([key, label]) => (
               <label key={key} className="block">
                 <span className="text-sm font-semibold">{label}</span>
                 <input
-                  className="mt-1 w-full rounded-lg border px-3 py-2"
+                  className="mt-1 min-h-12 w-full rounded-lg border border-slate-400 bg-white px-3 py-2 text-base text-slate-950"
                   value={values[key]}
                   onChange={(e) => {
                     setAgreed(false);
@@ -120,9 +176,7 @@ function W2ConfirmContent() {
           </div>
           <label className="mt-6 flex gap-3">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-            <span>
-              I compared the extracted information with my original W-2 and confirm it is accurate.
-            </span>
+            <span>I compared these values with my original W-2 and confirm they are accurate.</span>
           </label>
           {error && (
             <p role="alert" className="mt-4 text-sm text-red-700">
@@ -132,7 +186,7 @@ function W2ConfirmContent() {
           <button
             type="button"
             onClick={save}
-            disabled={busy || !agreed}
+            disabled={busy || !agreed || !returnId}
             className="mt-6 rounded-xl bg-sky-700 px-6 py-3 font-semibold text-white disabled:opacity-50"
           >
             {busy ? 'Saving…' : 'Save confirmed W-2 to return'}
@@ -146,7 +200,9 @@ function W2ConfirmContent() {
 export default function W2ConfirmPage() {
   return (
     <Suspense fallback={<p role="status">Loading W-2 confirmation…</p>}>
-      <W2ConfirmContent />
+      <TaxSiteShell>
+        <W2ConfirmContent />
+      </TaxSiteShell>
     </Suspense>
   );
 }

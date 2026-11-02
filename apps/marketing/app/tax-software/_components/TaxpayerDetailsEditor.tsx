@@ -156,7 +156,7 @@ export function TaxpayerDetailsEditor({
                     setV((x) => ({ ...x, [key]: e.target.value }));
                     setConsent(false);
                   }}
-                  className="mt-2 w-full rounded border p-3"
+                  className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
                 />
               </label>
             ))}

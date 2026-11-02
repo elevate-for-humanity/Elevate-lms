@@ -51,10 +51,14 @@ export function FederalFormsEditor({
   returnId,
   initialInputs,
   onSaved,
+  persistInputs,
+  onDirty,
 }: {
   returnId: string;
   initialInputs: SavedFederalInputs;
   onSaved: (inputs: SavedFederalInputs) => void;
+  persistInputs?: (inputs: SavedFederalInputs) => Promise<SavedFederalInputs>;
+  onDirty?: () => void;
 }) {
   const [values, setValues] = useState<SavedFederalInputs>(initialInputs),
     [busy, setBusy] = useState(false),
@@ -65,6 +69,12 @@ export function FederalFormsEditor({
     setError('');
     setMessage('');
     try {
+      if (persistInputs) {
+        const saved = await persistInputs(values);
+        onSaved(saved);
+        setMessage('Federal form values saved and calculation updated.');
+        return;
+      }
       const response = await fetch('/api/tax/returns/forms', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -81,7 +91,7 @@ export function FederalFormsEditor({
     }
   }
   return (
-    <section className="mt-8 rounded-2xl bg-white p-7">
+    <section onChange={onDirty} className="mt-8 rounded-2xl bg-white p-7">
       <h2 className="text-2xl font-bold">Complete federal form values</h2>
       <p className="mt-3 text-slate-600">
         Imported W-2 and 1099 amounts remain in your return. Enter additional amounts once. Capital
@@ -106,7 +116,7 @@ export function FederalFormsEditor({
                     }));
                     setMessage('');
                   }}
-                  className="mt-2 w-full rounded-lg border p-3"
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base text-slate-950"
                 />
               </label>
             ))}
@@ -133,7 +143,7 @@ export function FederalFormsEditor({
                   },
                 }))
               }
-              className="mt-2 w-full rounded border p-3"
+              className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
             />
           </label>
           <label>
@@ -153,7 +163,7 @@ export function FederalFormsEditor({
                   },
                 }))
               }
-              className="mt-2 w-full rounded border p-3"
+              className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
             />
           </label>
           <label className="flex gap-3 sm:col-span-2">
@@ -191,7 +201,7 @@ export function FederalFormsEditor({
                   },
                 }))
               }
-              className="mt-2 w-full rounded border p-3"
+              className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
             />
           </label>
           <label>
@@ -210,7 +220,7 @@ export function FederalFormsEditor({
                   },
                 }))
               }
-              className="mt-2 w-full rounded border p-3"
+              className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
             />
           </label>
           <label className="flex gap-3 sm:col-span-2">
@@ -257,7 +267,7 @@ export function FederalFormsEditor({
                   },
                 }))
               }
-              className="mt-2 w-full rounded border p-3"
+              className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
             />
           </label>
           <label className="block">
@@ -280,7 +290,7 @@ export function FederalFormsEditor({
                   },
                 }))
               }
-              className="mt-2 w-full rounded border p-3"
+              className="mt-2 min-h-12 w-full rounded border border-slate-400 bg-white p-3 text-base text-slate-950"
             />
           </label>
           {(

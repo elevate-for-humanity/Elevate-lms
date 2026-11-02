@@ -54,37 +54,58 @@ const scenes = [
 
 export function HvacLabHero() {
   return (
-    <figure className="border-b-4 border-orange-500 bg-white text-slate-950">
-      <div className="mx-auto max-w-7xl px-4 pb-5 pt-6 sm:px-6">
-        <p className="mb-4 text-sm font-bold tracking-wide text-orange-800">
-          Sponsored by Elevate for Humanity
-        </p>
-        <div className="relative overflow-hidden rounded-2xl bg-white">
-          <video
-            aria-label="Elevate for Humanity HVAC training program introduction"
-            data-hvac-hero-video="20261029"
-            src="/videos/hvac-recruitment-20261029.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            controls
-            preload="auto"
-            poster={`${imageRoot}/lab-overview.webp`}
-            width={1080}
-            height={1350}
-            className="mx-auto block max-h-[75svh] w-full object-contain"
-          >
-            Your browser does not support embedded video.{' '}
-            <a href="/videos/hvac-recruitment-20261029.mp4">Watch the HVAC program video</a>.
-          </video>
-          <p className="px-4 py-3 text-center text-sm text-slate-700">
-            Watch our HVAC program introduction. Use the video controls to turn on sound or pause.
-          </p>
-          <HvacVideoAssistanceDock />
-        </div>
+    <figure className="w-full border-b-4 border-orange-500 bg-white text-slate-950" data-hvac-photo-hero>
+      <div className="relative h-[clamp(360px,65svh,780px)] w-full overflow-hidden">
+        <Image
+          src="/images/hvac-training-vibrant-2026.webp"
+          alt="HVAC technicians examining an air-conditioning system"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[center_40%]"
+        />
       </div>
+      <figcaption className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
+        <p className="text-sm font-bold tracking-wide text-orange-800">Sponsored by Elevate for Humanity</p>
+        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Build your future in HVAC.</h2>
+        <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">
+          Explore six-week hybrid training, hands-on skills, and EPA Section 608 exam preparation.
+        </p>
+        <a href="#hvac-program-film" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-orange-500 px-6 py-3 font-bold text-slate-950 hover:bg-orange-400">
+          Watch the program introduction
+        </a>
+      </figcaption>
     </figure>
+  );
+}
+
+export function HvacProgramFilm({ assistance = true }: { assistance?: boolean }) {
+  return (
+    <section id="hvac-program-film" aria-labelledby="hvac-film-title" className="mt-8 grid items-center gap-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-8 lg:grid-cols-[1fr_1fr]">
+      <div>
+        <p className="text-sm font-bold uppercase tracking-widest text-orange-800">Inside the program</p>
+        <h3 id="hvac-film-title" className="mt-3 text-3xl font-black text-slate-950">See your next chapter.</h3>
+        <p className="mt-4 text-lg leading-8 text-slate-700">Get a closer look at HVAC training, the tools you will learn about, and the path toward your next career.</p>
+        <p className="mt-4 leading-7 text-slate-600">Press play to watch with sound. You can pause or expand the video at any time.</p>
+      </div>
+      <div className="min-w-0">
+        <video
+          aria-label="Elevate for Humanity HVAC training program introduction"
+          data-hvac-program-video="20261029"
+          src="/videos/hvac-recruitment-20261029.mp4"
+          controls
+          playsInline
+          preload="metadata"
+          poster={`${imageRoot}/program-film-poster.webp`}
+          width={720}
+          height={900}
+          className="mx-auto block h-auto w-full max-w-[36rem] rounded-xl bg-slate-950"
+        >
+          Your browser does not support embedded video.
+        </video>
+        {assistance && <HvacVideoAssistanceDock />}
+      </div>
+    </section>
   );
 }
 
@@ -126,22 +147,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
             </Link>
           )}
         </div>
-        {compact && (
-          <figure className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
-            <video
-              aria-label="HVAC training program demo"
-              src="/videos/hvac-recruitment-20261029.mp4"
-              controls
-              playsInline
-              preload="metadata"
-              poster={`${imageRoot}/lab-overview.webp`}
-              className="mx-auto max-h-[65svh] w-full object-contain"
-            />
-            <figcaption className="bg-white px-4 py-3 text-sm font-semibold text-slate-700">
-              Watch the HVAC training program introduction.
-            </figcaption>
-          </figure>
-        )}
+        <HvacProgramFilm assistance={!compact} />
         <p className="mt-5 text-sm leading-6 text-slate-600">
           AI-generated lab concept, training demonstrations, and career illustrations.
         </p>

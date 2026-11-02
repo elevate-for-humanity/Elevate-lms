@@ -192,7 +192,7 @@ export default async function BarberApprenticeshipPage() {
               narrateTranscript={false}
               showTranscriptControl={false}
               analyticsName="barber-apprenticeship"
-              mediaFit="contain"
+              mediaFit="cover"
               overlayMode="none"
             />
           </section>

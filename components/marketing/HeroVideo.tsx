@@ -115,8 +115,8 @@ export default function HeroVideo({
   const sectionRef = useRef<HTMLElement>(null);
   const scrollNarrationAttemptedRef = useRef(false);
 
-  // Preserve complete videos by default; photo-only callers can fill their frame.
-  const resolvedFit = mediaFit ?? (videoSrcDesktop || videoSrcMobile ? 'contain' : 'cover');
+  // Banner media fills the frame; instructional films belong in an in-page player.
+  const resolvedFit = mediaFit ?? 'cover';
   const mediaClass = resolvedFit === 'cover' ? 'object-cover' : 'object-contain';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
   const mobileSource = videoSrcMobile || videoSrcDesktop || '';

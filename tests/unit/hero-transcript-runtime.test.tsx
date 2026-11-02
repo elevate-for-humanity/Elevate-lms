@@ -35,6 +35,7 @@ describe('marketing hero transcript runtime behavior', () => {
 
     const video = container.querySelector('video');
     expect(video).not.toBeNull();
+    expect(video).toHaveClass('object-cover');
     expect(video).not.toHaveAttribute('poster');
     expect(video).toHaveAttribute('data-video-ready', 'false');
     expect(video).toHaveClass('opacity-0');

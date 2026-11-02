@@ -31,7 +31,7 @@ export function CTASection({
           <SafeHeroVideo
             src={videoSrc}
             poster={videoPoster || '/images/og-default.jpg'}
-            className="absolute inset-0 h-full w-full object-contain"
+            className="absolute inset-0 h-full w-full object-cover"
             ariaLabel="Program call to action video"
           />
         ) : (

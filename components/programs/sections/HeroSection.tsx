@@ -29,16 +29,16 @@ export function HeroSection({
 }: HeroSectionProps) {
   return (
     <section className="overflow-hidden bg-white">
-      <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden bg-slate-100">
+      <div className="relative h-[clamp(360px,65svh,780px)] w-full overflow-hidden bg-slate-100">
         {heroVideo ? (
           <SafeHeroVideo
             src={heroVideo}
             poster={heroImage}
-            className="absolute inset-0 h-full w-full object-contain"
+            className="absolute inset-0 h-full w-full object-cover"
             ariaLabel={`${title} program overview video`}
           />
         ) : (
-          <Image src={heroImage} alt={`${title} training`} fill className="object-contain" priority sizes="100vw" />
+          <Image src={heroImage} alt={`${title} training`} fill className="object-cover" priority sizes="100vw" />
         )}
       </div>
 

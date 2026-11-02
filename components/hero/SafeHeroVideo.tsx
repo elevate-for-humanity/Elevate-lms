@@ -103,7 +103,7 @@ export function SafeHeroVideo({
           src={poster}
           alt=""
           aria-hidden="true"
-          className={`absolute inset-0 h-full w-full object-contain ${className} z-0`}
+          className={`absolute inset-0 h-full w-full object-cover ${className} z-0`}
           decoding="async"
           fetchPriority={priority || showPosterBeforePlayback ? 'high' : 'auto'}
         />
@@ -128,7 +128,7 @@ export function SafeHeroVideo({
             setIsPlaying(false);
             setHasFailed(true);
           }}
-          className={`absolute inset-0 h-full w-full object-contain ${className} z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 h-full w-full object-cover ${className} z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
         >
           <source src={src} type="video/mp4" />
         </video>

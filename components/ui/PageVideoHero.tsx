@@ -1,5 +1,6 @@
 'use client';
 
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 /**
@@ -21,10 +22,10 @@ export interface PageVideoHeroProps {
 }
 
 const HEIGHT_BY_SIZE: Record<HeroSize, string> = {
-  compact: 'h-[clamp(260px,42svh,480px)]',
-  marketing: 'h-[clamp(260px,42svh,480px)]',
-  primary: 'h-[clamp(260px,42svh,480px)]',
-  full: 'h-[clamp(260px,42svh,480px)]',
+  compact: 'h-[clamp(320px,50svh,560px)]',
+  marketing: HERO_IMAGE_FRAME,
+  primary: HERO_IMAGE_FRAME,
+  full: HERO_IMAGE_FRAME,
 };
 
 export default function PageVideoHero({

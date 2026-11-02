@@ -34,7 +34,7 @@ export default async function NailTechnicianApprenticeshipPage() {
       microLabel={banner.microLabel}
       analyticsName={banner.analyticsName}
       overlayMode="none"
-      mediaFit="contain"
+      mediaFit="cover"
       transcript={banner.transcript}
       narrateTranscript
     />

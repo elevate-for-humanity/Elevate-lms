@@ -11,12 +11,9 @@ describe('homepage hero slideshow rendering', () => {
     expect(image).toMatch(/^\/images\/.+\.webp$/);
     expect(fs.existsSync(path.resolve('public', image!.slice(1)))).toBe(true);
     expect(hero).toContain('priority');
-    expect(hero).toContain('h-48');
-    expect(hero).toContain('sm:h-64');
-    expect(hero).toContain('lg:h-80');
+    expect(hero).toContain('h-[clamp(360px,65svh,780px)]');
     const frame = fs.readFileSync(path.resolve('lib/images/hero-layout.ts'), 'utf8');
-    expect(frame).toContain('aspect-video');
-    expect(frame).not.toContain('svh');
+    expect(frame).toContain('h-[clamp(360px,65svh,780px)]');
     expect(hero).toContain('object-cover');
     for (const href of [
       '/programs',
@@ -109,7 +106,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(salonSlide).toBeLessThan(kountrySlide);
     expect(source).toContain('className="relative z-20 order-1');
     expect(source).toContain('className="relative order-2 w-full');
-    expect(source).toContain('h-[clamp(260px,42svh,480px)]');
+    expect(source).toContain('h-[clamp(360px,65svh,780px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
     expect(source).toContain('narrateTranscript');
     expect(source).toContain('soundButtonVariant="prominent"');

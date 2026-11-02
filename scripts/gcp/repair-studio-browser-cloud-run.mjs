@@ -41,6 +41,7 @@ const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('
 const image='us-central1-docker.pkg.dev/'+project+'/elevate/studio-browser';
 const digest=command(['artifacts','docker','images','describe',image+':'+sha,'--project='+project,'--format=value(image_summary.digest)']);
 if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('Image digest unavailable');
+if(process.env.TESTED_IMAGE_DIGEST && process.env.TESTED_IMAGE_DIGEST!==digest)throw Error('Tested Studio image digest mismatch; refusing rollout');
 const existingBrowser=existingService.spec?.template?.spec;
 const previousTraffic=(existingService.status?.traffic||[]).filter(t=>t.percent>0&&t.revisionName).map(t=>t.revisionName+'='+t.percent).join(',');
 const authMount=existingBrowser?.containers?.[0]?.volumeMounts?.find(m=>m.mountPath==='/var/lib/studio-browser-auth');

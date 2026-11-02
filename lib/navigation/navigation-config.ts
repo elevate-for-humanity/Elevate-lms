@@ -330,6 +330,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'wages', label: 'Wage Compliance', href: p('hostshop', 'dashboard/wages'), icon: BarChart3 },
         { id: 'documents', label: 'Documents', href: p('hostshop', 'dashboard/documents'), icon: FileText },
+        { id: 'student-certificates', label: 'Student Certificates', href: p('hostshop', 'dashboard/certificates'), icon: Award },
         {
           id: 'resources',
           label: 'Guides & Agreements',
@@ -745,7 +746,7 @@ const WORKSPACE_GROUPS: Partial<Record<NavigationRole, Array<[string, string, st
     ['today', 'Daily training', ['dashboard', 'apprentices', 'hours', 'attendance', 'practical-log', 'schedule']],
     ['training', 'Training & compliance', ['competencies', 'wages', 'programs', 'reports', 'match-requests']],
     ['connect', 'Communication', ['email', 'messages', 'communications', 'phone', 'community']],
-    ['setup', 'Documents & setup', ['documents', 'resources', 'orientation', 'mou', 'profile', 'settings', 'store']],
+    ['setup', 'Documents & setup', ['documents', 'student-certificates', 'resources', 'orientation', 'mou', 'profile', 'settings', 'store']],
   ],
 };
 

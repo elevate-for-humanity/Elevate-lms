@@ -228,6 +228,7 @@ export default async function HostShopDashboardView() {
         <section className="rounded-2xl bg-white p-5 shadow-sm">
           <h2 className="text-lg font-black">What would you like to do?</h2>
           <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/host-shop/dashboard/certificates" className="min-h-11 rounded-xl border px-4 py-3 font-bold">Student certificates</Link>
             <Link
               href="/host-shop/dashboard/practical-log"
               className="min-h-11 rounded-xl bg-neutral-950 px-4 py-3 font-bold text-white"

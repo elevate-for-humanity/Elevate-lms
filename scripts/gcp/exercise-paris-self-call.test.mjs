@@ -73,3 +73,14 @@ test('operator and voicemail scenarios stay bounded to the business DID and do n
  assert.equal(voicemailParams.get('TimeLimit'),'75');assert.equal(voicemailParams.get('Record'),'false');assert.equal(result.voicemailDeliveryAcceptance,'PENDING');
  await assert.rejects(exerciseSelfCall(bindings,{...options(f),operatorTest:true,voicemailTest:true}),/SCENARIO_INVALID/);
 });
+
+
+test('direct owned mailbox test cannot request or dial an operator device',async()=>{
+ const f=fixture();await exerciseSelfCall(bindings,{...options(f),voicemailTest:true,directMailboxTest:true});
+ const params=new URLSearchParams(f.requests.find(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST').options.body);
+ assert.equal(params.get('To'),number);assert.equal(params.get('TimeLimit'),'75');
+ assert.equal(params.get('Twiml').includes('connect me to the operator'),false);
+ assert.equal(params.get('Twiml').includes('digits="w0"'),false);
+ assert.equal(params.get('Twiml').includes('Voicemail routing test complete'),true);
+ await assert.rejects(exerciseSelfCall(bindings,{...options(f),directMailboxTest:true}),/SCENARIO_INVALID/);
+});

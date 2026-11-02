@@ -24,7 +24,8 @@ export function summarizeSpeech(expected,recognition){
  const best=channels[0];
  return {ratio:segments.length?best.ratio:greetingMatch(expected,text),wordCount:words(text).length,replyMarkerMatched:best.ratio>=.75&&best.marker>=2,operatorMarkerMatched:best.ratio>=.75&&best.operatorMarker>=3};
 }
-export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,request=fetch,wait=ms=>new Promise(r=>setTimeout(r,ms)),report=()=>{},monitor=async()=>null,expectConversation=false,operatorTest=false,voicemailTest=false}){
+export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,request=fetch,wait=ms=>new Promise(r=>setTimeout(r,ms)),report=()=>{},monitor=async()=>null,expectConversation=false,operatorTest=false,voicemailTest=false,directMailboxTest=false}){
+ if(directMailboxTest&&!voicemailTest)throw Error('SELF_CALL_SCENARIO_INVALID');
  if([expectConversation,operatorTest,voicemailTest].filter(Boolean).length>1)throw Error('SELF_CALL_SCENARIO_INVALID');
  if(bindings.TWILIO_ACCOUNT_SID!==ACCOUNT||bindings.TWILIO_PHONE_NUMBER!==NUMBER||!bindings.TWILIO_AUTH_TOKEN||words(expectedGreeting).length<10)throw Error('SELF_CALL_IDENTITY_REQUIRED');
  const base=`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT}`;
@@ -45,7 +46,8 @@ export async function exerciseSelfCall(bindings,{expectedGreeting,transcribe,req
  const timeLimit=operatorTest?60:voicemailTest?75:45;
  const operatorTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>Please connect me to the operator.</Say><Pause length="7"/><Say loop="2">Incoming operator audio test. This is a controlled system check.</Say><Pause length="8"/><Hangup/></Response>';
  const voicemailTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Play digits="w0"/><Pause length="12"/><Say loop="3">This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.</Say><Play digits="#"/><Pause length="2"/><Hangup/></Response>';
- const twiml=operatorTest?operatorTwiml:voicemailTest?voicemailTwiml:expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
+ const mailboxTwiml='<Response><Say>This is an authorized automated phone system test.</Say><Pause length="36"/><Say loop="3">This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.</Say><Play digits="#"/><Pause length="2"/><Hangup/></Response>';
+ const twiml=operatorTest?operatorTwiml:voicemailTest?(directMailboxTest?mailboxTwiml:voicemailTwiml):expectConversation?'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="23"/><Say>For this phone check, please say audio test complete.</Say><Pause length="11"/><Hangup/></Response>':'<Response><Say>This is an authorized automated phone system test.</Say><Pause length="25"/><Hangup/></Response>';
  // Exactly one bounded call to the verified business number. Never retry creation.
  const created=await api(base+'/Calls.json',{To:NUMBER,From:NUMBER,Timeout:'15',TimeLimit:String(timeLimit),...(voicemailTest?{Record:'false'}:{Record:'true',RecordingChannels:'dual',RecordingTrack:'both'}),Twiml:twiml});
  if(!/^CA[a-f0-9]{32}$/i.test(created.sid||'')||created.account_sid!==ACCOUNT||created.to!==NUMBER||created.from!==NUMBER)throw Error('SELF_CALL_CREATION_UNVERIFIED');

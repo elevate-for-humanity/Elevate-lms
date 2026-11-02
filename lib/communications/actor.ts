@@ -49,12 +49,15 @@ export async function requireCommunicationActor(options: { assignedPhone?: boole
     throw new Error('COMMUNICATIONS_FORBIDDEN');
   }
 
-  const { data: extension } = await db
+  const loadExtension = async () => db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
     .eq('profile_id', effectiveUserId)
     .eq('enabled', true)
     .maybeSingle();
+  // Phone-only grants need extension metadata during authorization. Ordinary
+  // communication requests must pass holder checks before reading that data.
+  let extension = options.assignedPhone === true ? (await loadExtension()).data : null;
 
   // A holder role alone does not authorize phone/email after its agreement or
   // approval has been withdrawn. Independent staff roles retain staff access.
@@ -73,6 +76,7 @@ export async function requireCommunicationActor(options: { assignedPhone?: boole
     }
   }
 
+  if (options.assignedPhone !== true) extension = (await loadExtension()).data;
   const systemId = extension?.communication_workspaces?.phone_system_id;
   const { data: system } = systemId
     ? await db.from('phone_systems').select('*').eq('id', systemId).maybeSingle()

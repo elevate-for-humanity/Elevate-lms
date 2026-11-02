@@ -90,6 +90,18 @@ BEGIN
    (SELECT lease_owner FROM pg_temp.ultimate_build_jobs WHERE id=second_job.id)<>'worker-b' OR
    (SELECT priority FROM pg_temp.ultimate_build_jobs WHERE id=second_job.id)<>30
  THEN RAISE EXCEPTION 'TEST: prioritizing a repair modified another lesson'; END IF;
+ -- A repeat on the same image must not spend another producer attempt.
+ UPDATE pg_temp.ultimate_build_jobs SET status='running',lease_owner='media-a',lease_expires_at=now()+interval '5 minutes' WHERE id=media_job.id;
+ output:=pg_temp.delegate_ultimate_autopilot_repair(media_job.id,'media-a',media_job.execution_generation,
+  jsonb_build_object('target','learning_objectives','failedStep','lesson_film_render','requirements',jsonb_build_array(jsonb_build_object('code','INSTRUCTIONAL_QUALITY_FAILED','message','Missing safety scene'))));
+ IF output->>'delegated' IS DISTINCT FROM 'false' THEN RAISE EXCEPTION 'TEST: same image repeated identical repair'; END IF;
+ -- New verified image can correct that historical defect, preserving all IDs.
+ UPDATE pg_temp.ultimate_autopilot_runtime SET image_sha=repeat('b',40);
+ UPDATE pg_temp.ultimate_build_jobs SET status='completed',lease_owner=null,lease_expires_at=null WHERE id=reclaimed.id;
+ output:=pg_temp.delegate_ultimate_autopilot_repair(media_job.id,'media-a',media_job.execution_generation,
+  jsonb_build_object('target','learning_objectives','failedStep','lesson_film_render','requirements',jsonb_build_array(jsonb_build_object('code','INSTRUCTIONAL_QUALITY_FAILED','message','Missing safety scene'))));
+ IF output->>'delegated' IS DISTINCT FROM 'true' OR (SELECT monitor#>>'{lastDelegatedRepair,runtimeImageSha}' FROM pg_temp.ultimate_build_jobs WHERE id=media_job.id)<>repeat('b',40)
+ THEN RAISE EXCEPTION 'TEST: new verified image could not repair the saved finding'; END IF;
  UPDATE pg_temp.ultimate_build_jobs SET available_at=now() WHERE build_id=build AND payload#>>'{autopilot,role}'='quality';
  IF EXISTS(SELECT 1 FROM pg_temp.claim_ultimate_lesson_autopilot('quality-before-film',300,'quality'))
  THEN RAISE EXCEPTION 'TEST: quality bypassed an unfinished media job'; END IF;
@@ -108,6 +120,6 @@ BEGIN
  IF position('ultimate-lesson-2026-10-29.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))=0 OR
     position('ultimate-lesson-2026-10-05.1' IN pg_get_functiondef('pg_temp.commit_ultimate_publication_core(jsonb,jsonb,uuid,uuid,jsonb)'::regprocedure))>0
  THEN RAISE EXCEPTION 'TEST: publication contract version drift'; END IF;
- RAISE NOTICE 'PASS: 17 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
+ RAISE NOTICE 'PASS: 19 runtime, role, dependency, recovery, fencing, contract version, priority and preservation assertions';
 END $$;
-SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',17) AS autopilot_database_test;
+SELECT jsonb_build_object('passed',true,'isolation','session-private tables; rollback','assertions',19) AS autopilot_database_test;

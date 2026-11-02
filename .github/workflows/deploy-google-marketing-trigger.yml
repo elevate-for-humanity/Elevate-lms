@@ -168,7 +168,7 @@ jobs:
           const hvac=readFileSync('components/programs/HvacTrainingShowcase.tsx','utf8');
           const shops=readFileSync('components/home/HomeFeaturedHostShop.tsx','utf8');
           const trust=readFileSync('components/home/HomeTrustBar.tsx','utf8');
-          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','Find or become a Host Shop'];
+          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','Join as a Host Shop','Meet our Host Shops'];
           for(const name of required) if(!shops.includes(name)) throw new Error('Missing homepage content: '+name);
           for(const name of ['CDL Training','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
           if(!page.includes('<HvacTrainingShowcase compact />') || !hvac.includes('HVAC Technician')) throw new Error('Missing featured HVAC program');
@@ -369,9 +369,9 @@ jobs:
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
-          import { normalizeHomepageText } from './scripts/gcp/homepage-content.mjs';
+          import { normalizeHomepageText, assertHomepageHostShopContract } from './scripts/gcp/homepage-content.mjs';
           const root='https://www.elevateforhumanity.org';
-          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Business & Entrepreneurship','Find or become a Host Shop'];
+          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Business & Entrepreneurship','Join as a Host Shop','Meet our Host Shops'];
           const forbidden=['Workforce systems and public-sector alignment'];
           const deadline=Date.now()+180000;
           let last='';
@@ -388,6 +388,7 @@ jobs:
               last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
               console.log(last);
               if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) {
+                assertHomepageHostShopContract(html);
                 if(html.includes('href="/programs/bookkeeping"')) throw new Error('Withdrawn Bookkeeping navigation remains');
                 for(const path of ['/programs/bookkeeping','/programs/financial-literacy','/apply/student?program=bookkeeping']) {
                   const response=await fetch(root+path,{cache:'no-store',signal:AbortSignal.timeout(20000)});

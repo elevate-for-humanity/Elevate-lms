@@ -1,23 +1,12 @@
 name: Restore missing owned PBX voicemail prompts
-# Also restore a missing sounds directory within the verified persistent data volume.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/repair-pbx-voicemail-prompts.yml']
-permissions: {contents: read, actions: write, id-token: write}
+permissions: {contents: read, id-token: write}
 concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('voicemail-prompts-dispatch-{0}', github.ref) }}
+  group: google-pbx-infrastructure
   cancel-in-progress: false
   queue: max
 jobs:
-  dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    steps:
-      - env:
-          GH_TOKEN: '${{ github.token }}'
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-pbx-voicemail-prompts.yml/dispatches" -f ref=main
   repair:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

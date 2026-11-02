@@ -68,7 +68,7 @@ async function voicemailAcceptance(config,system,db){
  const anonymous=await fetch(DB+'/storage/v1/object/public/phone-voicemails/'+voicemail.id+'.wav',{redirect:'error',signal:AbortSignal.timeout(15000)});await anonymous.body?.cancel();
  if(anonymous.ok)throw Error('PHONE_ACCEPTANCE_AUDIO_PUBLICLY_EXPOSED');
  const email=deliveries.find(d=>d.channel==='email'),push=deliveries.find(d=>d.channel==='push');
- report({phoneAcceptance:'VOICEMAIL',callSid:call.callSid,voicemailId:voicemail.id,voicemailRecorded:true,recordingBytes:wav.length,recordingPrivate:true,transcriptionMatched:true,phoneInboxRecordVerified:true,callbackTaskVerified:true,emailProviderAccepted:email?.status==='accepted'&&Boolean(email.provider_message_id),pushProviderAccepted:push?.status==='accepted'&&push.accepted_device_count>0,pushAcceptedDeviceCount:push?.accepted_device_count||0,pushStatus:push?.status||'absent',voicemailDeliveryAcceptance:'PASS'});
+ report({phoneAcceptance:'VOICEMAIL',callSid:call.callSid,voicemailId:voicemail.id,voicemailRecorded:true,recordingBytes:wav.length,recordingPrivate:true,transcriptionMatched:true,phoneInboxRecordVerified:true,callbackTaskVerified:true,emailProviderAccepted:email?.status==='accepted'&&Boolean(email.provider_message_id),pushProviderAccepted:push?.status==='accepted'&&push.accepted_device_count>0,pushAcceptedDeviceCount:push?.accepted_device_count||0,pushStatus:push?.status||'absent',voicemailDeliveryAcceptance:email?.status==='accepted'&&Boolean(email.provider_message_id)?'PASS':'FAIL'});
  if(email?.status!=='accepted'||!email.provider_message_id)throw Error('PHONE_ACCEPTANCE_EMAIL_NOT_ACCEPTED');
 }
 async function receiver(credential,wavPath){
@@ -120,7 +120,7 @@ async function main(){
  const workspaces=await db('communication_workspaces?id=eq.'+extensions[0].workspace_id+'&phone_system_id=eq.'+SYSTEM+'&select=id');if(workspaces.length!==1)throw Error('PHONE_ACCEPTANCE_WORKSPACE_UNVERIFIED');
  const preflight=remoteProgram('phone-acceptance-preflight.py');report(preflight);
  const sourceHash=createHash('sha256').update(readFileSync(new URL('../../infra/pbx/paris/ari-media.mjs',import.meta.url))).digest('hex');
- if(!preflight.idle||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
+ if(!preflight.idle||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.operatorVoicemailPromptsReady||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
  if(mode==='preflight'){report({phoneAcceptance:'PREFLIGHT_PASS',callsPlaced:0,recipientVerified:true});return;}
  if(preflight.operatorRegisteredContacts!==0||preflight.operatorLeasedEndpointCount!==0)throw Error('PHONE_ACCEPTANCE_OTHER_OPERATOR_DEVICES_PRESENT');
  if(mode==='voicemail'){await voicemailAcceptance(config,systems[0],db);return;}

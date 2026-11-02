@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
 import { getDashboardHref, getFlatNavItems } from '@/lib/navigation/navigation-config';
 import { canonicalPreviewUrl } from '@/lib/admin/preview-origin';
+import { PortalRouter } from '@/lib/routing/portal-router';
 
 describe('every Host Shop navigation tab keeps the current session origin', () => {
   const items = getFlatNavItems('host_shop');
@@ -17,15 +18,22 @@ describe('every Host Shop navigation tab keeps the current session origin', () =
     expect(new Set(items.map(i => i.href)).size).toBe(items.length);
   });
   it.each(items)('$label has an existing LMS page on the same hostname', item => {
-    expect(item.href.startsWith('/host-shop/')).toBe(true);
-    expect(existsSync(`apps/lms/app${item.href}/page.tsx`)).toBe(true);
-    for (const origin of ['https://app.elevateforhumanity.org', 'https://lms.elevateforhumanity.org']) {
-      expect(new URL(item.href, origin).origin).toBe(origin);
+    const target = new URL(item.href, 'https://lms.elevateforhumanity.org');
+    expect(target.pathname.startsWith('/host-shop/')).toBe(true);
+    expect(existsSync(`apps/lms/app${target.pathname}/page.tsx`)).toBe(true);
+    if (item.id === 'dashboard') {
+      expect(item.href).toBe(PortalRouter.get('hostshop'));
+      expect(target.origin).toBe(new URL(PortalRouter.get('hostshop')).origin);
+    } else {
+      expect(item.href.startsWith('/host-shop/')).toBe(true);
+      for (const origin of ['https://app.elevateforhumanity.org', 'https://lms.elevateforhumanity.org']) {
+        expect(new URL(item.href, origin).origin).toBe(origin);
+      }
     }
   });
   it('keeps the header Dashboard link on the same origin too', () => {
-    expect(getDashboardHref('host_shop')).toBe('/host-shop/dashboard');
-    expect(getDashboardHref('partner')).toBe('/host-shop/dashboard');
+    expect(getDashboardHref('host_shop')).toBe(PortalRouter.get('hostshop'));
+    expect(getDashboardHref('partner')).toBe(PortalRouter.get('hostshop'));
   });
   it('moves legacy preview POST URLs before setting host-only cookies', () => {
     const req = new Request('https://app.elevateforhumanity.org/api/admin/select-host-shop?partner_id=styles', {method:'POST',body:'handoff=opaque'});

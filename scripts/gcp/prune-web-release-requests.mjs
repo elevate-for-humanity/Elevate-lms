@@ -42,12 +42,7 @@ export async function releaseApi(
   return response.json();
 }
 
-export async function assertLatestWebReleaseRequest({ api, repository, workflow, runId }) {
-  if (
-    repository !== 'elevate-for-humanity/Elevate-lms' ||
-    !WEB_RELEASE_WORKFLOWS.includes(workflow)
-  )
-    throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
+async function readReleaseRequest({ api, repository, workflow, runId }) {
   const endpoint = `repos/${repository}/actions/workflows/${workflow}/runs`;
   const readRuns = async query => {
     const inventory = await api(endpoint + query);
@@ -61,13 +56,23 @@ export async function assertLatestWebReleaseRequest({ api, repository, workflow,
   let runs = filtered;
   let current = filtered.find(r => String(r.id) === String(runId));
   if (!current) {
-    // A newly started dispatch can appear in the branch list before GitHub's
-    // event-filtered index. Both lists must agree that no newer request exists.
+    // A dispatch can appear in the branch index first. Preserve newer runs
+    // from either list for the build and rollout ordering checks.
     const recent = await readRuns('?branch=main&per_page=10');
     current = recent.find(r => String(r.id) === String(runId));
     if (!current) throw Error('RELEASE_REQUEST_NOT_VISIBLE_IN_INVENTORY:' + runId);
-    runs = [...filtered, ...recent];
+    runs = [...new Map([...filtered, ...recent].map(run => [run.id, run])).values()];
   }
+  return { current, runs };
+}
+
+export async function assertLatestWebReleaseRequest({ api, repository, workflow, runId }) {
+  if (
+    repository !== 'elevate-for-humanity/Elevate-lms' ||
+    !WEB_RELEASE_WORKFLOWS.includes(workflow)
+  )
+    throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
+  const { current, runs } = await readReleaseRequest({ api, repository, workflow, runId });
   const newer = runs.find(r => r.run_number > current.run_number);
   if (newer) throw Error('SUPERSEDED_RELEASE_REQUEST:' + newer.id);
   return { workflow, runId: current.id, status: 'latest_requested_release' };
@@ -101,15 +106,8 @@ export async function assertTestedWebRollout({ api, repository, workflow, runId,
   const label = testedRollouts[workflow],
     component = label.toLowerCase();
   if (!/^[a-f0-9]{40}$/.test(commitSha || '')) throw Error('RELEASE_COMMIT_INVALID');
-  const inventory = await api(
-    `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`,
-  );
-  if (!Array.isArray(inventory.workflow_runs)) throw Error('RELEASE_INVENTORY_UNAVAILABLE');
-  const runs = inventory.workflow_runs.filter(eligible);
-  if (runs.some((r) => !Number.isSafeInteger(r.id) || !Number.isSafeInteger(r.run_number)))
-    throw Error('RELEASE_INVENTORY_INVALID');
-  const current = runs.find((r) => String(r.id) === String(runId));
-  if (!current || current.head_sha !== commitSha) throw Error('RELEASE_COMMIT_MISMATCH');
+  const { current, runs } = await readReleaseRequest({ api, repository, workflow, runId });
+  if (current.head_sha !== commitSha) throw Error('RELEASE_COMMIT_MISMATCH');
   const jobsFor = async (id) => {
     const result = await api(`repos/${repository}/actions/runs/${id}/jobs?filter=all&per_page=100`);
     if (

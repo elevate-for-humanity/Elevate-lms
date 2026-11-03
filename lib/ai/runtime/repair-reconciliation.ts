@@ -6,12 +6,27 @@ export function recoveredIncident(repair: any, events: any[]) {
   if (repair.source_job_id || !['queued', 'blocked'].includes(repair.status)) return null;
   const match = String(repair.fingerprint ?? '').match(/^(.+):(quality|unknown):(?:[a-f0-9]{40}|incident:.+)$/);
   if (!match || !String(repair.goal ?? '').startsWith(`Diagnose and repair the recurring ${match[2]} failure in ${match[1]}.`)) return null;
-  const recovery = events.filter(event => event.operation === match[1] && event.status === 'completed')
-    .sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at))[0];
+  // A successful call with no correlation is only a service observation.
+  // It cannot certify unrelated GitHub, model-timeout or code-repair incidents.
+  // Legacy "unavailable" correlations retain their history until a distinct
+  // failure-specific recovery can be demonstrated.
+  const correlation = String(repair.goal ?? '').match(/Correlation:\\s*([^\\n.]+)\\.?/i)?.[1]?.trim();
+  if (!correlation || correlation === 'unavailable') return null;
   const lastAttempt = Date.parse(repair.updated_at ?? repair.created_at);
-  if (!recovery || !Number.isFinite(lastAttempt) || Date.parse(recovery.created_at) <= lastAttempt) return null;
+  if (!Number.isFinite(lastAttempt)) return null;
+  const related = events.filter(event => event.operation === match[1] &&
+    event.correlation_id === correlation && Number.isFinite(Date.parse(event.created_at)));
+  const recovery = related.filter(event => event.status === 'completed' &&
+    Date.parse(event.created_at) > lastAttempt)
+    .sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at))[0];
+  if (!recovery) return null;
+  // A subsequent failure cancels recovery evidence; do not retire on the
+  // strength of a transient success during an ongoing failed incident.
+  if (related.some(event => event.status === 'failed' &&
+    Date.parse(event.created_at) > Date.parse(recovery.created_at))) return null;
   return { disposition: 'historical_incident_recovered', replay: false, operation: match[1],
-    recoveryEventId: recovery.id, recoveredAt: recovery.created_at, verifiedRepair: false };
+    correlationId: correlation, recoveryEventId: recovery.id,
+    recoveredAt: recovery.created_at, verifiedRepair: false };
 }
 
 export async function reconcileRecoveredRepairs(db: any, events: any[]) {

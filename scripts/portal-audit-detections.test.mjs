@@ -60,3 +60,11 @@ test('unguarded identity writes and an unused guard import still fail', () => {
     assert.match(result.stderr, /host_shop_attendance_records/);
   }
 });
+
+
+test('exam ownership access is recognized only when invoked, not imported', () => {
+  const guarded = checkGuard('const access = await requireExamSessionAccess(sessionId); if (access instanceof NextResponse) return access;');
+  assert.equal(guarded.status, 0, guarded.stdout + guarded.stderr);
+  const unguarded = checkGuard("import { requireExamSessionAccess } from '@/lib/testing/session-access';");
+  assert.equal(unguarded.status, 1, unguarded.stdout + unguarded.stderr);
+});

@@ -47,7 +47,7 @@ test('approved-source contract deployment resumes old per-scene metadata and sav
 
 test('missing course-scoped licensed media prevents futile scene repair retries',async()=>{
  const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:esthetician-a:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]';
- const job={...base,last_error:error,build:{...base.build,course_id:'8f3472fe-8fe9-4e16-bc31-d502e3de3c7a'}};
+ const job={...base,last_error:error};
  assert.equal((await run(job,false,false)).writes.length,0);
  // Admission is only a precondition, not a substitute for scene QA.
  assert.equal((await run(job,false,true)).writes.length,1);

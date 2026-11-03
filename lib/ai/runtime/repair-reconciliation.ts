@@ -10,7 +10,7 @@ export function recoveredIncident(repair: any, events: any[]) {
   // It cannot certify unrelated GitHub, model-timeout or code-repair incidents.
   // Legacy "unavailable" correlations retain their history until a distinct
   // failure-specific recovery can be demonstrated.
-  const correlation = String(repair.goal ?? '').match(/Correlation:\\s*([^\\n.]+)\\.?/i)?.[1]?.trim();
+  const correlation = String(repair.goal ?? '').match(/Correlation:\s*([^\n.]+)\.?/i)?.[1]?.trim();
   if (!correlation || correlation === 'unavailable') return null;
   const lastAttempt = Date.parse(repair.updated_at ?? repair.created_at);
   if (!Number.isFinite(lastAttempt)) return null;

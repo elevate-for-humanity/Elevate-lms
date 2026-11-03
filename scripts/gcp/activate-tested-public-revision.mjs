@@ -79,7 +79,7 @@ export async function cleanupUnusedCandidateTags({
  * canonical encrypted dashboard settings before assigning production traffic.
  * The short-lived GitHub OIDC identity is never logged or persisted.
  */
-export async function verifyAdminDashboardAppCandidate(candidateUrl,{request=fetch,environment=process.env}={}){
+export async function verifyAdminDashboardAppCandidate(candidateUrl,{request=fetch,environment=process.env,mode='app'}={}){
  const authUrl=environment.ACTIONS_ID_TOKEN_REQUEST_URL;
  const authBearer=environment.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
  if(!authUrl || !authBearer)throw Error('PARIS_APP_CANDIDATE_OIDC_UNAVAILABLE');
@@ -96,18 +96,32 @@ export async function verifyAdminDashboardAppCandidate(candidateUrl,{request=fet
  let diagnostic;
  try{
   const response=await request(candidateUrl+'/api/cron/paris-code-repair',{
-   method:'POST',headers:{Authorization:'Bearer '+jwt,'Content-Type':'application/json','Cache-Control':'no-store'},
-   body:JSON.stringify({phase:'app-auth-diagnostic'}),cache:'no-store',redirect:'error',
+   method:'POST',headers:{Authorization:'Bearer '+jwt,'Content-Type':'application/json','Cache-Control':'no-store',...(mode==='workflow'?{'X-Paris-GitHub-Token':environment.GH_TOKEN}: {})},
+   body:JSON.stringify({phase:mode==='workflow'?'auth-diagnostic':'app-auth-diagnostic'}),cache:'no-store',redirect:'error',
    signal:AbortSignal.timeout(20000),
   });
   if(!response.ok)throw Error('diagnostic rejected');
   diagnostic=await response.json();
  }catch{throw Error('PARIS_APP_CANDIDATE_DIAGNOSTIC_UNAVAILABLE');}
+ if(mode==='workflow'){
+  if(!environment.GH_TOKEN || diagnostic?.workflowAuthorization!=='temporary-job-v1' ||
+     diagnostic?.plannerContinuation!=='durable-turn-v1' || diagnostic?.diagnosticVersion!==2 ||
+     diagnostic?.repository?.ok!==true || diagnostic?.contents?.ok!==true || diagnostic?.workflow?.ok!==true){
+    throw Error('PARIS_WORKFLOW_CANDIDATE_AUTHORIZATION_UNVERIFIED');
+  }
+  return {verified:true,source:'signed-workflow-job'};
+ }
  if(diagnostic?.credentialSource!=='github-app-installation' || diagnostic?.diagnosticVersion!==2 ||
     diagnostic?.repository?.ok!==true || diagnostic?.contents?.ok!==true || diagnostic?.workflow?.ok!==true){
   throw Error('PARIS_APP_CANDIDATE_AUTHORIZATION_UNVERIFIED');
  }
  return {verified:true,source:'github-app-installation'};
+}
+
+/** Verify the existing scoped GitHub Actions job identity on the zero-traffic
+ * candidate when no independent PARIS App signing key is available. */
+export async function verifyAdminWorkflowCandidate(candidateUrl, options={}) {
+ return verifyAdminDashboardAppCandidate(candidateUrl,{...options,mode:'workflow'});
 }
 
 export async function activateTestedRevision({
@@ -205,6 +219,9 @@ export async function activateTestedRevision({
     }
     if(service==='elevate-admin-migration' && process.env.PARIS_GITHUB_APP_SOURCE==='dashboard'){
       await verifyAdminDashboardAppCandidate(candidate.url,{request:fetcher});
+    }
+    if(service==='elevate-admin-migration' && process.env.PARIS_GITHUB_APP_SOURCE==='workflow'){
+      await verifyAdminWorkflowCandidate(candidate.url,{request:fetcher});
     }
     const current = describe();
     assertTrafficUnchanged(before, current);

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyAdminDashboardAppCandidate } from './gcp/activate-tested-public-revision.mjs';
+import { verifyAdminDashboardAppCandidate, verifyAdminWorkflowCandidate } from './gcp/activate-tested-public-revision.mjs';
 
 const candidate='https://candidate.example.run.app';
 const environment={
@@ -44,4 +44,29 @@ test('missing GitHub workflow OIDC environment never authorizes candidate',async
  await assert.rejects(verifyAdminDashboardAppCandidate(candidate,{request:f.request,environment:{}}),
   /PARIS_APP_CANDIDATE_OIDC_UNAVAILABLE/);
  assert.equal(f.calls.length,0);
+});
+
+test('signed GitHub Actions identity verifies the zero-traffic Admin worker without an App RSA key',async()=>{
+ const workflow={diagnosticVersion:2,workflowAuthorization:'temporary-job-v1',plannerContinuation:'durable-turn-v1',
+  repository:{ok:true},contents:{ok:true},workflow:{ok:true}};
+ const f=fixture(workflow);
+ const env={...environment,GH_TOKEN:'scoped-job-identity-fixture'};
+ assert.deepEqual(await verifyAdminWorkflowCandidate(candidate,{request:f.request,environment:env}),
+  {verified:true,source:'signed-workflow-job'});
+ assert.equal(JSON.parse(f.calls[1].init.body).phase,'auth-diagnostic');
+ assert.equal(f.calls[1].init.headers['X-Paris-GitHub-Token'],env.GH_TOKEN);
+});
+test('workflow candidate cannot pass on missing scoped job identity or unavailable repository authority',async()=>{
+ const good={diagnosticVersion:2,workflowAuthorization:'temporary-job-v1',plannerContinuation:'durable-turn-v1',
+  repository:{ok:true},contents:{ok:true},workflow:{ok:true}};
+ await assert.rejects(verifyAdminWorkflowCandidate(candidate,{request:fixture(good).request,environment}),
+  /PARIS_WORKFLOW_CANDIDATE_AUTHORIZATION_UNVERIFIED/);
+ for(const bad of [
+  {...good,workflowAuthorization:'unexpected'},
+  {...good,repository:{ok:false}},
+  {...good,contents:{ok:false}},
+  {...good,workflow:{ok:false}},
+ ])await assert.rejects(verifyAdminWorkflowCandidate(candidate,{request:fixture(bad).request,
+  environment:{...environment,GH_TOKEN:'scoped-fixture'}}),
+  /PARIS_WORKFLOW_CANDIDATE_AUTHORIZATION_UNVERIFIED/);
 });

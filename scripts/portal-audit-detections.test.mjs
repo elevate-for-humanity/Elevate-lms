@@ -62,9 +62,19 @@ test('unguarded identity writes and an unused guard import still fail', () => {
 });
 
 
-test('exam ownership access is recognized only when invoked, not imported', () => {
-  const guarded = checkGuard('const access = await requireExamSessionAccess(sessionId); if (access instanceof NextResponse) return access;');
+test('exam access must use the canonical guard and handle a denial before writing', () => {
+  const imported = "import { requireExamSessionAccess } from '@/lib/testing/session-access';";
+  const invoked = 'const access = await requireExamSessionAccess(sessionId);';
+  const deny = 'if (access instanceof NextResponse) return access;';
+  const guarded = checkGuard([imported, invoked, deny].join('\n'));
   assert.equal(guarded.status, 0, guarded.stdout + guarded.stderr);
-  const unguarded = checkGuard("import { requireExamSessionAccess } from '@/lib/testing/session-access';");
-  assert.equal(unguarded.status, 1, unguarded.stdout + unguarded.stderr);
+  for (const unsafe of [
+    imported,
+    [imported, invoked].join('\n'),
+    [imported.replace('@/lib/testing/session-access', './other'), invoked, deny].join('\n'),
+    [imported, "await db.from('exam_events').insert({ user_id: user.id });", invoked, deny].join('\n'),
+  ]) {
+    const result = checkGuard(unsafe);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+  }
 });

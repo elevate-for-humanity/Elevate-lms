@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest';
-const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false }));
+const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false, stageLookups: [] as any[] }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/ai/runtime/repair-reconciliation', () => ({ reconcileRecoveredRepairs: vi.fn() }));
 vi.mock('@/lib/ai/runtime/repair-events', () => ({ readRecentRepairEvents: async () => [] }));
@@ -27,8 +27,9 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
       }
       if (table === 'ultimate_build_jobs' && filters.id) {
         if (h.sourceError) return Promise.resolve(resolve({ data: null, error: new Error('source lookup failed') }));
-        data = { id: filters.id, build_id: filters.id, status: 'failed', last_error: 'quality failure' };
+        data = { id: filters.id, build_id: filters.id, job_type: 'lesson_autopilot:test:media', status: 'failed', last_error: 'quality failure' };
       } else if (table === 'ultimate_build_jobs' && filters.build_id) {
+        h.stageLookups.push({...filters});
         data = { id: filters.build_id, build_id: filters.build_id, status: 'failed' };
       }
       if (table === 'ultimate_course_builds') data = { id: filters.id, status: 'building', profile: { ownerPaused: filters.id === 'paused' }, findings: [] };
@@ -39,7 +40,7 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
 } }) }));
 import { tickParisCodeRepairs } from '@/lib/ai/runtime/code-repair';
 beforeEach(() => {
-  h.queue = []; h.active = []; h.writes = []; h.token = true; h.claimLost = false; h.sourceError = false;
+  h.queue = []; h.active = []; h.writes = []; h.stageLookups = []; h.token = true; h.claimLost = false; h.sourceError = false;
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ object: { sha: 'a'.repeat(40) } }))));
 });
 it('advances past a paused source to the next eligible repair without dispatching the paused build', async () => {
@@ -69,4 +70,10 @@ it('propagates source failures instead of treating missing evidence as eligibili
   h.queue = [{ id: 'unknown', attempt_count: 0, source_job_id: 'failed' }]; h.sourceError = true;
   await expect(tickParisCodeRepairs({ workflowOwnedDispatch: true })).rejects.toThrow('source lookup failed');
   expect(h.writes).toEqual([]);
+});
+
+it('matches a source repair to its exact lesson stage, not an unrelated sibling in the build', async () => {
+ h.queue = [{ id: 'eligible', attempt_count: 0, source_job_id: 'failed' }];
+ expect(await tickParisCodeRepairs({ workflowOwnedDispatch: true })).toMatchObject({ dispatchRequired: true, repairId: 'eligible' });
+ expect(h.stageLookups).toContainEqual(expect.objectContaining({build_id:'failed',job_type:'lesson_autopilot:test:media'}));
 });

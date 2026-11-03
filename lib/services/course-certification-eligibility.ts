@@ -43,17 +43,19 @@ export async function checkCertificationEligibility(
   const unmet: UnmetRequirement[] = [];
 
   // ── 1. Fetch all required lessons ──────────────────────────────────────────
-  const { data: lessons } = await db
+  const { data: lessons, error: lessonsError } = await db
     .from('course_lessons')
     .select(
-      'id, title, lesson_type, is_required, passing_score, requires_evidence, requires_signoff',
+      'id, title, lesson_type, is_required, passing_score, requires_evidence:requires_verification, requires_signoff:requires_instructor_signoff',
     )
     .eq('course_id', courseId)
     .eq('is_required', true);
 
-  if (!lessons?.length) {
-    // No required lessons — eligible by default (edge case)
-    return { eligible: true, unmetRequirements: [] };
+  if (lessonsError || !lessons?.length) {
+    return { eligible: false, unmetRequirements: [{
+      code: lessonsError ? 'REQUIREMENTS_UNAVAILABLE' : 'REQUIREMENTS_NOT_CONFIGURED',
+      message: 'Course requirements must be available and configured before certificate issuance.',
+    }] };
   }
 
   const requiredIds = lessons.map((l) => l.id);
@@ -186,11 +188,13 @@ export async function checkCertificationEligibility(
       approved_attempts: number;
     };
 
-    const { data: practicalReqs } = (await db
+    const { data: practicalReqs, error: practicalError } = (await db
       .from('practical_requirements')
       .select('lesson_id, required_hours, required_attempts')
       .in('lesson_id', practicalLessonIds)
-      .or('required_hours.gt.0,required_attempts.gt.0')) as { data: PracticalReq[] | null };
+      .or('required_hours.gt.0,required_attempts.gt.0')) as { data: PracticalReq[] | null; error?: unknown };
+
+    if (practicalError) return { eligible: false, unmetRequirements: [{ code: 'REQUIREMENTS_UNAVAILABLE', message: 'Practical requirements could not be verified.' }] };
 
     if (practicalReqs?.length) {
       const { data: practicalProgress } = (await db

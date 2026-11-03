@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { ONBOARDING_VIDEO_CATALOG } from '@/content/onboarding/video-catalog';
 
 const progressSchema = z.object({
   enrollmentId: z.string().uuid(),
@@ -32,7 +33,15 @@ export async function POST(
   }
 
   const { videoKey } = await context.params;
-  const input = progressSchema.parse(await request.json());
+  const parsed = progressSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: 'Invalid video progress' }, { status: 400 });
+  const input = parsed.data;
+  const definition = ONBOARDING_VIDEO_CATALOG.find(video => video.id === videoKey);
+  if (!definition) return NextResponse.json({ error: 'Video not found' }, { status: 404 });
+  const enrollment = await supabase.from('program_enrollments').select('id')
+    .eq('id', input.enrollmentId).eq('user_id', user.id).maybeSingle();
+  if (enrollment.error) return NextResponse.json({ error: 'Enrollment lookup unavailable' }, { status: 503 });
+  if (!enrollment.data) return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
 
   const percentage = Math.min(
     100,
@@ -48,10 +57,9 @@ export async function POST(
     await supabase
       .from('onboarding_video_assignments')
       .select(
-        'id, user_id, required, acknowledgment_required, completed_at',
+        'id, user_id, completed_at',
       )
       .eq('user_id', user.id)
-      .eq('enrollment_id', input.enrollmentId)
       .eq('video_key', videoKey)
       .single();
 
@@ -89,6 +97,6 @@ export async function POST(
     completed,
     percentage,
     acknowledgmentRequired:
-      assignment.acknowledgment_required,
+      definition.acknowledgmentRequired ?? false,
   });
 }

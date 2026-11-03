@@ -39,6 +39,8 @@ jobs:
           node tests/integration/practical-authorization-postgres.mjs
           node tests/integration/classroom-conflict-index-postgres.mjs
           node tests/integration/payment-integrity-evidence-postgres.mjs
+          node tests/integration/native-epa-postgres.mjs
+          node --experimental-strip-types --test lib/testing/native-exam-policy.test.mjs
       - name: Verify authenticated canonical SCORM tracking
         run: node --test cloudflare-workers/scorm-player-worker.test.mjs
       - name: Verify voicemail release hook and PARIS terminal-state regressions

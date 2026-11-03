@@ -15,7 +15,7 @@ export type ExamEventType =
 
 /**
  * Append an immutable event to exam_session_events.
- * Non-throwing — failures are logged but never break the primary flow.
+ * Fails closed. Session transitions are also audited atomically by the database trigger.
  */
 export async function appendSessionEvent(
   db: SupabaseClient,
@@ -39,5 +39,6 @@ export async function appendSessionEvent(
       undefined,
       { error: error.message },
     );
+    throw new Error('EXAM_AUDIT_WRITE_FAILED');
   }
 }

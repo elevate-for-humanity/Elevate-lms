@@ -1,72 +1,62 @@
-import { logger } from '@/lib/logger';
-import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
+import { createHash, randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireExamSessionAccess } from '@/lib/testing/session-access';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
 export async function POST(req: Request) {
-  const rateLimited = await applyRateLimit(req, 'api');
-  if (rateLimited) return rateLimited;
+  const limited = await applyRateLimit(req, 'api');
+  if (limited) return limited;
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const form = await req.formData();
+    const file = form.get('file');
+    const sessionId = form.get('sessionId');
+    if (
+      !(file instanceof File) ||
+      typeof sessionId !== 'string' ||
+      !/^[0-9a-f-]{36}$/i.test(sessionId)
+    ) {
+      return NextResponse.json({ error: 'Valid file and sessionId are required' }, { status: 400 });
     }
-
-    const formData = await req.formData();
-    const file = formData.get('file');
-    const sessionId = formData.get('sessionId');
-
-    if (!(file instanceof File) || typeof sessionId !== 'string' || !sessionId) {
-      return NextResponse.json({ error: 'file and sessionId are required' }, { status: 400 });
+    const access = await requireExamSessionAccess(sessionId);
+    if (access instanceof NextResponse) return access;
+    if (access.session.evidence_storage_key)
+      return NextResponse.json({ error: 'Evidence is already recorded' }, { status: 409 });
+    const mime = file.type.split(';')[0];
+    if (
+      !['video/webm', 'video/mp4'].includes(mime) ||
+      file.size < 1 ||
+      file.size > 100 * 1024 * 1024
+    ) {
+      return NextResponse.json(
+        { error: 'A WebM or MP4 recording up to 100 MB is required' },
+        { status: 400 },
+      );
     }
-
-    const ext = file.name?.split('.').pop()?.toLowerCase() || 'webm';
-    const path = `exam-recordings/${sessionId}/${Date.now()}.${ext}`;
-
-    const arrayBuffer = await file.arrayBuffer();
-
-    const { error: uploadError } = await supabase.storage.from('media').upload(path, arrayBuffer, {
-      contentType: file.type || 'video/webm',
-      upsert: false,
+    const path = `${sessionId}/${randomUUID()}.${mime === 'video/mp4' ? 'mp4' : 'webm'}`;
+    const bytes = await file.arrayBuffer();
+    const hash = createHash('sha256').update(Buffer.from(bytes)).digest('hex');
+    const { error: uploadError } = await access.db.storage
+      .from('exam-evidence')
+      .upload(path, bytes, { contentType: mime, upsert: false });
+    if (uploadError)
+      return NextResponse.json({ error: 'Recording upload failed' }, { status: 503 });
+    // The attachment and its actor-attributed audit entry commit in one transaction.
+    const { data, error } = await access.db.rpc('attach_private_exam_evidence', {
+      p_actor: access.user.id,
+      p_session: sessionId,
+      p_key: `exam-evidence/${path}`,
+      p_hash: hash,
     });
-
-    if (uploadError) {
-      logger.error('Upload failed', undefined, { detail: uploadError.message });
-      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    if (error || !data) {
+      await access.db.storage.from('exam-evidence').remove([path]);
+      return NextResponse.json({ error: 'Evidence could not be attached' }, { status: 409 });
     }
-
-    const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(path);
-
-    const publicUrl = publicUrlData?.publicUrl ?? null;
-
-    const { error: updateError } = await supabase
-      .from('exam_sessions')
-      .update({
-        recording_url: publicUrl,
-        evidence_url: publicUrl,
-      })
-      .eq('id', sessionId);
-
-    if (updateError) {
-      logger.error('Update failed', undefined, { detail: updateError.message });
-      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
-    }
-
-    return NextResponse.json({ ok: true, path, publicUrl });
-  } catch (error) {
-    logger.error('POST /api/exams/upload-recording failed', normalizeError(error, 'Upload recording failed'), getErrorContext(error));
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: true, path, evidenceHash: hash });
+  } catch {
+    return NextResponse.json({ error: 'Recording could not be saved' }, { status: 500 });
   }
 }

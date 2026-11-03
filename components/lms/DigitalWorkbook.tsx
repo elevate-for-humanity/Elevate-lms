@@ -25,6 +25,7 @@ function SectionEditor({
   accountId,
   visual,
   workbookSlug,
+  onReviewSaved,
 }: {
   section: WorkbookSection;
   initial?: WorkbookResponse;
@@ -33,6 +34,7 @@ function SectionEditor({
   accountId: string;
   visual?: WorkbookVisual;
   workbookSlug: string;
+  onReviewSaved?: (sectionId: string, reviewed: boolean) => void;
 }) {
   const { draft, edit, save, status, error } = useWorkbookSave(
     section.id,
@@ -224,13 +226,20 @@ function SectionEditor({
           <input
             type="checkbox"
             checked={draft.reviewed}
-            disabled={readOnly}
+            disabled={readOnly || Object.values(draft.answers).some(answer => answer.trim().length < 10)}
             className="mt-1 h-6 w-6 shrink-0"
-            onChange={(event) => edit({ ...draft, reviewed: event.target.checked })}
+            onChange={(event) => {
+              const reviewed=event.target.checked;
+              edit({ ...draft, reviewed });
+              void save().then(saved => { if(saved) onReviewSaved?.(section.id, reviewed); });
+            }}
           />
           I reviewed this lesson and my practice responses. This is my study checklist, not
           instructor approval.
         </label>
+      )}
+      {slide.review && Object.values(draft.answers).some(answer => answer.trim().length < 10) && (
+        <p className="text-sm font-semibold text-amber-900">Finish each writing activity with at least 10 characters before checking this section as reviewed. Personal reflections are saved without right-or-wrong grades.</p>
       )}
       <button
         type="button"
@@ -270,15 +279,29 @@ export default function DigitalWorkbook({
   // Existing writing is preserved, but a saved browser slide position must never
   // teleport a learner to Week 7 or conceal earlier sections.
   const [active, setActive] = useState(sections[0]?.id ?? '');
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(
+    () => new Set(responses.filter(row => row.reviewed).map(row => row.section_id))
+  );
+  const firstIncomplete = sections.findIndex(section => !reviewedIds.has(section.id));
+  const unlockedIndex = firstIncomplete < 0 ? sections.length - 1 : firstIncomplete;
   useEffect(() => {
     function selectLinkedSection() {
       const requested = window.location.hash.replace(/^#section-/, '');
-      if (sections.some((section) => section.id === requested)) setActive(requested);
+      const index = sections.findIndex(section => section.id === requested);
+      if (index >= 0 && index <= unlockedIndex) setActive(requested);
     }
     selectLinkedSection();
     window.addEventListener('hashchange', selectLinkedSection);
     return () => window.removeEventListener('hashchange', selectLinkedSection);
-  }, [sections]);
+  }, [sections, unlockedIndex]);
+  const reviewSaved=(id:string,reviewed:boolean) => {
+    setReviewedIds(previous => {
+      const next = new Set(previous);
+      if(reviewed) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
   const visuals = workbookVisualAssignments(workbook.slug, sections);
   return (
     <main className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
@@ -328,12 +351,15 @@ export default function DigitalWorkbook({
             <select
               id="workbook-section"
               value={active}
-              onChange={(event) => setActive(event.target.value)}
+              onChange={(event) => {
+                const index=sections.findIndex(section => section.id===event.target.value);
+                if(index>=0 && index<=unlockedIndex) setActive(event.target.value);
+              }}
               className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
             >
-              {sections.map((section) => (
-                <option key={section.id} value={section.id}>
-                  {section.section_number}. {section.title}
+              {sections.map((section,index) => (
+                <option key={section.id} value={section.id} disabled={index>unlockedIndex}>
+                  {section.section_number}. {section.title}{index>unlockedIndex?' · Complete earlier workbook sections first':''}
                 </option>
               ))}
             </select>
@@ -352,6 +378,7 @@ export default function DigitalWorkbook({
                 hidden={section.id !== active}
                 readOnly={readOnly}
                 accountId={accountId}
+                onReviewSaved={reviewSaved}
               />
             ))}
           </>

@@ -24,7 +24,7 @@ describe('staff authorization boundary', () => {
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org/api/admin/impersonate'));
     expect(response.status).toBe(403);
   });
-  it.each(['/staff-portal/dashboard', '/staff-portal/courses', '/api/staff/my-students', '/dashboard'])('retains the authorized staff surface %s', async path => {
+  it.each(['/staff-portal/dashboard', '/staff-portal/courses', '/api/staff/my-students', '/dashboard', '/api/auth/session', '/api/auth/signout'])('retains the authorized staff surface %s', async path => {
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org' + path));
     expect(response.headers.get('x-middleware-next')).toBe('1');
   });

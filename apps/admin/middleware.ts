@@ -96,7 +96,7 @@ function requiredRoles(pathname: string): readonly UserRole[] {
 
   // The shared entry immediately routes staff to their own workspace before
   // loading platform data. Other Admin pages and APIs are not staff tools.
-  if (pathname === '/dashboard') return ADMIN_ROLES;
+  if (['/dashboard', '/api/auth/session', '/api/auth/signout'].includes(pathname)) return ADMIN_ROLES;
 
   return ADMIN_ROLES.filter(role => role !== 'staff');
 }

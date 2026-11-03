@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 
-async function resolver({deployed, canonical, statuses = [], storeError, workflow, canonicalReads, app, appError}) {
+async function resolver({deployed, canonical, statuses = [], storeError, workflow, canonicalReads, app, appError, mode}) {
   const source = await readFile(new URL('../lib/devstudio/github-token.ts', import.meta.url), 'utf8');
   const calls = [];
   let storeReads = 0;
@@ -11,12 +11,13 @@ async function resolver({deployed, canonical, statuses = [], storeError, workflo
     .replace("import { getDecryptedPlatformSecret } from '@/lib/secrets';", '')
     .replace("import { currentWorkflowGitHubToken } from './workflow-github-context';", '')
     .replace("import { getGitHubAppToken } from './github-app-token';", '')
-    .replaceAll('process.env.GITHUB_TOKEN', 'environment.GITHUB_TOKEN');
+    .replaceAll('process.env.GITHUB_TOKEN', 'environment.GITHUB_TOKEN')
+    .replaceAll('process.env.PARIS_GITHUB_AUTH_MODE', 'environment.PARIS_GITHUB_AUTH_MODE');
   const factory = new Function('getDecryptedPlatformSecret', 'fetch', 'environment', 'currentWorkflowGitHubToken', 'getGitHubAppToken',
     stripTypeScriptTypes(injected).replaceAll('export ', '') + '\nreturn {getGitHubToken, getGitHubHeaders, getGitHubTokenCandidates};');
   const api = factory(async () => { storeReads++; if (storeError) throw storeError; return canonicalReads ? canonicalReads.shift() : canonical; },
     async (url, init) => { calls.push({url, init}); return new Response(null, {status: statuses.shift() ?? 200}); },
-    {GITHUB_TOKEN: deployed}, () => workflow, async () => { if (appError) throw appError; return app ?? null; });
+    {GITHUB_TOKEN: deployed, PARIS_GITHUB_AUTH_MODE: mode}, () => workflow, async () => { if (appError) throw appError; return app ?? null; });
   return {...api, calls, storeReads: () => storeReads};
 }
 
@@ -95,3 +96,10 @@ test('workflow token remains authoritative even when App configuration fails', a
 });
 
 test('a rejected canonical credential never silently switches to a different stored identity',async()=>{const r=await resolver({canonical:'rejected-canonical-token',deployed:'other-identity-token',statuses:[401]});await assert.rejects(r.getGitHubToken(),/GITHUB_TOKEN_REJECTED/);assert.equal(r.calls.length,1);assert.equal(r.calls[0].init.headers.Authorization,'Bearer rejected-canonical-token');});
+
+test('App-only mode refuses legacy PAT when dashboard/App credentials are not configured', async () => {
+ const r = await resolver({deployed:'legacy-credential', canonical:'legacy-credential', mode:'app'});
+ await assert.rejects(r.getGitHubToken(), { message: 'GITHUB_APP_NOT_CONFIGURED' });
+ assert.equal(r.storeReads(), 0);
+ assert.equal(r.calls.length, 0);
+});

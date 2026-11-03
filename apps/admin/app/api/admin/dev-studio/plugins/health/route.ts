@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 import { probeCloudflareControlPlane } from '@/lib/control-plane/cloudflare';
@@ -13,7 +14,9 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
     await hydrateProcessEnv();
-    const githubConfigured = Boolean(process.env.GITHUB_TOKEN || process.env.GH_TOKEN);
+    const githubConfigured = process.env.PARIS_GITHUB_AUTH_MODE === 'app'
+      ? Boolean(await getGitHubAppToken().catch(() => null))
+      : Boolean(process.env.GITHUB_TOKEN || process.env.GH_TOKEN);
     const supabaseConfigured = Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
     );

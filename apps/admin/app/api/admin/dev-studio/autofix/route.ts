@@ -21,6 +21,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -129,12 +130,14 @@ async function playbookEnvGap(_dryRun: boolean): Promise<ActionResult[]> {
 async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResult[]> {
   const actions: ActionResult[] = [];
 
-  const hasToken = Boolean(process.env.GITHUB_TOKEN);
+  const hasToken = process.env.PARIS_GITHUB_AUTH_MODE === 'app'
+    ? Boolean(await getGitHubAppToken().catch(() => null))
+    : Boolean(process.env.GITHUB_TOKEN);
   if (!hasToken) {
-    actions.push(error('check-github-token', 'GITHUB_TOKEN is not set in the admin runtime'));
+    actions.push(error('check-github-token', 'GitHub authentication is not configured in the Admin runtime'));
     return actions;
   }
-  actions.push(ok('check-github-token', 'GITHUB_TOKEN is present'));
+  actions.push(ok('check-github-token', 'GitHub repository authorization is configured'));
 
   const currentMode = process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto';
   if (currentMode === 'github-only') {

@@ -54,13 +54,21 @@ export async function resolveProgramId(slug: string): Promise<string | null> {
 }
 
 /**
- * Convenience: resolve HVAC course ID by slug.
- * Falls back to the known stable UUID if DB is unavailable at build time.
+ * Resolve the active, published EPA 608 course. The historical
+ * hvac-technician slug still belongs to an inactive 96-lesson revision,
+ * so using that slug or its UUID can send students into a retired course.
+ * Fail closed rather than returning an inactive course on DB errors.
  */
 export async function resolveHvacCourseId(): Promise<string> {
-  return (
-    (await resolveCourseId('hvac-technician')) ?? '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0' // fallback — stable in prod DB
-  );
+  const db = (await requireAdminClient()) ?? (await createClient());
+  const { data, error } = await db.from('courses')
+    .select('id')
+    .eq('slug', 'epa608-replacement-20261019')
+    .eq('is_active', true)
+    .eq('status', 'published')
+    .maybeSingle();
+  if (error || !data?.id) throw new Error('ACTIVE_HVAC_COURSE_NOT_AVAILABLE');
+  return data.id;
 }
 
 /**

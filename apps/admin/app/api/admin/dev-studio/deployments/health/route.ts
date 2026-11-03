@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
 
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
@@ -40,10 +41,13 @@ export async function GET(request: NextRequest) {
         };
       }
     }));
+    const githubConnected = process.env.PARIS_GITHUB_AUTH_MODE === 'app'
+      ? Boolean(await getGitHubAppToken().catch(() => null))
+      : Boolean(process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PERSONAL_ACCESS_TOKEN);
     return buildCapabilityHealth('deployments', [
       {
         name: 'github-integration',
-        passed: Boolean(process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PERSONAL_ACCESS_TOKEN),
+        passed: githubConnected,
         required: true,
         message: 'GitHub dispatch token checked (does not prove Cloud Run deployment)',
       },

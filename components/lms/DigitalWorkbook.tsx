@@ -42,6 +42,7 @@ function SectionEditor({
     accountId,
   );
   const slides = workbookSlides(section, visual?.caption);
+  const hasMissingWriting = slides.some(item => item.field && (draft.answers[item.field] ?? '').trim().length < 10);
   const [step, setStep] = useState(0);
   const [moving, setMoving] = useState(false);
   const slide = slides[step];
@@ -220,7 +221,7 @@ function SectionEditor({
           <input
             type="checkbox"
             checked={draft.reviewed}
-            disabled={readOnly || Object.values(draft.answers).some(answer => answer.trim().length < 10)}
+            disabled={readOnly || hasMissingWriting}
             className="mt-1 h-6 w-6 shrink-0"
             onChange={(event) => {
               const reviewed=event.target.checked;
@@ -232,7 +233,7 @@ function SectionEditor({
           instructor approval.
         </label>
       )}
-      {slide.review && Object.values(draft.answers).some(answer => answer.trim().length < 10) && (
+      {slide.review && hasMissingWriting && (
         <p className="text-sm font-semibold text-amber-900">Finish each writing activity with at least 10 characters before checking this section as reviewed. Personal reflections are saved without right-or-wrong grades.</p>
       )}
       <button
@@ -295,6 +296,10 @@ export default function DigitalWorkbook({
       else next.delete(id);
       return next;
     });
+    // A successful saved review advances to the next lesson in this same
+    // workbook; never redirect through an unrelated dashboard.
+    const index=sections.findIndex(section=>section.id===id);
+    if(reviewed && index>=0 && index<sections.length-1) setActive(sections[index+1].id);
   };
   const visuals = workbookVisualAssignments(workbook.slug, sections);
   return (
@@ -351,9 +356,9 @@ export default function DigitalWorkbook({
               }}
               className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
             >
-              {sections.map((section,index) => (
-                <option key={section.id} value={section.id} disabled={index>unlockedIndex}>
-                  {section.section_number}. {section.title}{index>unlockedIndex?' · Complete earlier workbook sections first':''}
+              {sections.filter((_,index)=>index<=unlockedIndex).map(section => (
+                <option key={section.id} value={section.id}>
+                  {section.section_number}. {section.title}
                 </option>
               ))}
             </select>

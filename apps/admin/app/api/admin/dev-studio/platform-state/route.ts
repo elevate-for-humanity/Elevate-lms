@@ -15,6 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { refreshSecrets } from '@/lib/secrets';
+import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { isGroqConfigured } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
@@ -123,6 +124,9 @@ export async function GET(req: NextRequest) {
       low: PLATFORM_DEBT.filter((d) => d.severity === 'low').length,
     };
 
+    const githubConnected = process.env.PARIS_GITHUB_AUTH_MODE === 'app'
+      ? Boolean(await getGitHubAppToken().catch(() => null))
+      : Boolean(process.env.GITHUB_TOKEN);
     const state = {
       timestamp: new Date().toISOString(),
       deployment: {
@@ -130,7 +134,7 @@ export async function GET(req: NextRequest) {
         service: 'admin',
         ai_provider: activeAiProvider,
         ai_providers: aiProviders,
-        github_connected: !!process.env.GITHUB_TOKEN,
+        github_connected: githubConnected,
         stripe_connected: !!process.env.STRIPE_SECRET_KEY,
         resend_connected: !!process.env.RESEND_API_KEY,
       },

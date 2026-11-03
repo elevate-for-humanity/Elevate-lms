@@ -52,20 +52,15 @@ export function HomeHowItWorks() {
         <HomeSectionNarration section="journey" />
         <ol className="grid list-none gap-3 p-0 lg:grid-cols-3">
           {STEPS.map((step) => (
-            <li key={step.n} className="m-0">
+            <li key={step.n} className="m-0 min-w-0">
               <Link
                 href={step.href}
-                className="group flex h-full items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-slate-950 transition hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-800"
+                className="group grid h-full grid-cols-[5rem_minmax(0,1fr)] items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-slate-950 transition hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-800"
               >
-                <Image
-                  src={step.image}
-                  alt={step.alt}
-                  width={80}
-                  height={88}
-                  sizes="80px"
-                  className="h-[88px] w-20 shrink-0 rounded-lg object-cover"
-                />
-                <div className="min-w-0 flex-1">
+                <div className="relative h-[88px] overflow-hidden rounded-lg">
+                  <Image src={step.image} alt={step.alt} fill sizes="80px" className="object-cover" />
+                </div>
+                <div className="min-w-0">
                   <h3 className="text-base font-bold leading-5 text-slate-950">
                     {step.n}. {step.label}
                   </h3>

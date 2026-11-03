@@ -7,6 +7,7 @@ describe('server-rendered HVAC hero source', () => {
   it('connects the homepage feature to the program, official WorkOne signup and existing orientation', () => {
     const root = document.createElement('div');
     root.innerHTML = renderToStaticMarkup(<HvacTrainingShowcase compact />);
+    expect(root.querySelector('video, #hvac-program-film')).toBeNull();
     expect(root.querySelector('h2')).toHaveTextContent('HVAC');
     expect(root.querySelector('a[href="/programs/hvac-technician"]')).toHaveTextContent(
       'View HVAC program',
@@ -18,6 +19,13 @@ describe('server-rendered HVAC hero source', () => {
     expect(workone).toHaveAttribute('rel', 'noopener noreferrer');
     expect(root.querySelector('a[href="/onboarding/learner/orientation"]')).toHaveTextContent(
       'Complete your orientation',
+    );
+  });
+  it('keeps the film on the dedicated HVAC program page', () => {
+    const root = document.createElement('div');
+    root.innerHTML = renderToStaticMarkup(<HvacTrainingShowcase />);
+    expect(root.querySelector('#hvac-program-film video')).toHaveAttribute(
+      'src', '/videos/hvac-recruitment-20261029.mp4',
     );
   });
   it('uses a full-width photo banner with a link to the in-page film', () => {

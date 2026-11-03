@@ -147,7 +147,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
             </Link>
           )}
         </div>
-        <HvacProgramFilm assistance={!compact} />
+        {!compact && <HvacProgramFilm />}
         <p className="mt-5 text-sm leading-6 text-slate-600">
           AI-generated lab concept, training demonstrations, and career illustrations.
         </p>

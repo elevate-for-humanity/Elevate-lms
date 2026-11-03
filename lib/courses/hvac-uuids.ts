@@ -9,5 +9,7 @@
  * HvacLessonVideo now accepts lessonId (the DB UUID) directly.
  */
 
-export const HVAC_COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
+// Active student course; preserve the superseded UUID only for historical lookups.
+export const HVAC_COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
+export const LEGACY_HVAC_COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
 export const HVAC_PROGRAM_ID = '4226f7f6-fbc1-44b5-83e8-b12ea149e4c7';

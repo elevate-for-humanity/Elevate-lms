@@ -80,20 +80,13 @@ jobs:
         run: |
           node --test scripts/gcp/resolve-main-release.test.mjs
           node scripts/gcp/resolve-main-release.mjs
-  build-store:
-    name: Build and upload Store image
-    outputs:
-      digest: ${{ steps.upload.outputs.digest }}
+  preflight-store:
+    name: Validate Store source
     needs: validate
-    concurrency:
-      group: google-store-build-main
-      # Finish the active tested release; queue the latest main update.
-      cancel-in-progress: false
-      queue: max
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
     runs-on: ubuntu-24.04
     environment: production
-    timeout-minutes: 120
+    timeout-minutes: 30
     env:
       COMPONENT: store
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -121,9 +114,41 @@ jobs:
       - name: Verify rejected rollout leaves no phantom candidate
         run: python3 scripts/gcp/test_store_preflight_admission.py
       - name: Verify independent build boundary
-        run: node --test scripts/gcp/admin-build-boundary.test.mjs
+        run: node --test scripts/gcp/admin-build-boundary.test.mjs scripts/gcp/store-build-capacity.test.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
+  build-store:
+    name: Build and upload Store image
+    outputs:
+      digest: ${{ steps.upload.outputs.digest }}
+    needs: [validate, preflight-store]
+    concurrency:
+      group: google-store-build-main
+      # Finish the active tested release; queue the latest main update.
+      cancel-in-progress: false
+      queue: max
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 120
+    env:
+      COMPONENT: store
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - name: Reject superseded Store requests before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-google-store-runtime.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Record fresh Store build runner capacity
+        run: |
+          df -h . /var/lib/docker
+          docker system df
       - name: Build shared commerce application for Store
         run: |
           set -euo pipefail

@@ -3,6 +3,7 @@
  * Runtime credentials are bound and verified through Google Secret Manager.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { createPrivateKey } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireRoles } from '@/lib/admin/guards';
 import { PERMISSIONS } from '@/lib/rbac/role-matrix';
@@ -26,6 +27,7 @@ const SECRET_PATTERNS = [
 
 function isSecret(key: string): boolean {
   return key.startsWith('IRS_') || key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
+    key === 'GITHUB_APP_ID' || key === 'GITHUB_APP_INSTALLATION_ID' ||
     SECRET_PATTERNS.some((pattern) => pattern.test(key));
 }
 
@@ -106,6 +108,20 @@ export async function POST(req: NextRequest) {
     if (!isAllowedKey(key)) return safeError('Invalid key format', 400);
     if (seen.has(key)) return safeError('Duplicate settings are not allowed', 400);
     seen.add(key);
+    // Distinguish a GitHub App RSA signing key from a PAT or OAuth secret.
+    // Validate in memory, never return or log the entered key material.
+    if (key === 'GITHUB_APP_PRIVATE_KEY') {
+      try {
+        const parsed = createPrivateKey(entry.value.replace(/\\n/g, '\n'));
+        if (parsed.asymmetricKeyType !== 'rsa') throw new Error('RSA required');
+      } catch {
+        return safeError('GitHub App private key must be a valid RSA PEM private key', 400);
+      }
+    }
+    if ((key === 'GITHUB_APP_ID' || key === 'GITHUB_APP_INSTALLATION_ID') &&
+        !/^[1-9][0-9]*$/.test(entry.value.trim())) {
+      return safeError('GitHub App and installation IDs must be positive integers', 400);
+    }
     if ((key.startsWith('ELEVATE_MEDIA_') || key.startsWith('NEXT_PUBLIC_ELEVATE_MEDIA_')) &&
         !isElevateMediaRuntimeKey(key)) {
       return safeError('Unsupported Elevate Media setting; credentials must be server-only', 400);

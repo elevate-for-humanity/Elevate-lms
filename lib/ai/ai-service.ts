@@ -184,20 +184,22 @@ function resolveImageProvider(): AIImageProvider {
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   const started = Date.now();
+  const { correlationId, ...input } = options;
+  let provider: AIProvider | undefined;
   try {
-    const result = await executeConfiguredChat(options);
-    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'completed', durationMs:Date.now()-started, provider:result.provider});
+    provider = resolveConfiguredChatProvider(input);
+    const result = await executeConfiguredChat(input, provider);
+    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'completed', durationMs:Date.now()-started, provider:result.provider, correlationId});
     return result;
   } catch (error) {
-    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'failed', durationMs:Date.now()-started, error});
+    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'failed', durationMs:Date.now()-started, provider:provider?.name, correlationId, error});
     throw error;
   }
 }
 
-async function executeConfiguredChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+async function executeConfiguredChat(options: ChatCompletionOptions, provider: AIProvider): Promise<ChatCompletionResult> {
   // Elevate-owned inference is part of the platform runtime and must not require
   // paid-inference authorization. Metered/external providers retain the paid gate.
-  let provider = resolveConfiguredChatProvider(options);
   if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat');
   const allowCircuitRecoveryWait = process.env.AI_CIRCUIT_RECOVERY_WAIT === '1';
   const passes = allowCircuitRecoveryWait ? 2 : 1;

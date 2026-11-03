@@ -355,6 +355,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     for (let turn = nextTurn; !complete && turn < stopTurn; turn += 1) {
       try {
       const inferenceOptions = {
+        correlationId: taskId,
         messages: [
           {
             role: 'system',

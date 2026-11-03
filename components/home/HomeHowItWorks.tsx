@@ -57,8 +57,15 @@ export function HomeHowItWorks() {
                 href={step.href}
                 className="group grid h-full grid-cols-[5rem_minmax(0,1fr)] items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-slate-950 transition hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-800"
               >
-                <div className="relative h-[88px] overflow-hidden rounded-lg">
-                  <Image src={step.image} alt={step.alt} fill sizes="80px" className="object-cover" />
+                <div className="h-[88px] overflow-hidden rounded-lg">
+                  <Image
+                    src={step.image}
+                    alt={step.alt}
+                    width={80}
+                    height={88}
+                    sizes="80px"
+                    className="h-full w-20 object-cover"
+                  />
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-base font-bold leading-5 text-slate-950">

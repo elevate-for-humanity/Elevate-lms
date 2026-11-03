@@ -11,6 +11,7 @@ export type HostStudentCertificate = {
   title: string;
   status: 'enrolled' | 'assigned' | 'application';
   recordDate: string | null;
+  completion?: { startDate: string; completionDate: string };
 };
 type Shop = { id: string; name?: string | null };
 type Placement = { id: string; student_id: string; shop_id: string; name: string; program_slug: string | null; start_date?: string | null };

@@ -207,6 +207,9 @@ jobs:
         run: node scripts/gcp/prune-web-release-requests.mjs --assert-tested-admin-rollout
       - name: Upload and deploy the exact Admin image
         shell: bash
+        env:
+          PARIS_GITHUB_AUTH_MODE: ${{ vars.PARIS_GITHUB_AUTH_MODE || 'legacy' }}
+          PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET }}
         run: |
           set -euo pipefail
           IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin'
@@ -215,11 +218,22 @@ jobs:
           test "$DIGEST" = "$IMAGE_DIGEST"
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
-          # Admin repository reads use the one verified saved token. Writes and
-          # dispatches stay with the existing signed, scoped Actions job identity.
-          node --test scripts/gcp/github-runtime-binding.test.mjs
-          node scripts/gcp/github-runtime-binding.mjs > "$RUNNER_TEMP/github-runtime-flags"
-          mapfile -t GITHUB_RUNTIME_FLAGS < "$RUNNER_TEMP/github-runtime-flags"
+          # Explicit App mode binds the existing Secret Manager key and verifies
+          # the exact installation's Contents, Actions, and PR write permissions.
+          # Never fall back to a rejected App or silently switch identities.
+          if [[ "${PARIS_GITHUB_AUTH_MODE}" == 'app' ]]; then
+            node --test scripts/gcp/paris-github-app-binding.test.mjs
+            node scripts/gcp/paris-github-app-binding.mjs > "$RUNNER_TEMP/github-runtime-flags"
+            mapfile -t GITHUB_RUNTIME_FLAGS < "$RUNNER_TEMP/github-runtime-flags"
+            GITHUB_RUNTIME_FLAGS+=(--remove-secrets=GITHUB_TOKEN)
+          elif [[ "${PARIS_GITHUB_AUTH_MODE}" == 'legacy' ]]; then
+            node --test scripts/gcp/github-runtime-binding.test.mjs
+            node scripts/gcp/github-runtime-binding.mjs > "$RUNNER_TEMP/github-runtime-flags"
+            mapfile -t GITHUB_RUNTIME_FLAGS < "$RUNNER_TEMP/github-runtime-flags"
+          else
+            echo '::error::PARIS_GITHUB_AUTH_MODE must be app or legacy'
+            exit 1
+          fi
           # Reserve rollout headroom before creating a replacement revision.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.

@@ -8,7 +8,7 @@ const pair = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const pem = pair.privateKey.export({ type: 'pkcs8', format: 'pem' });
 const source = stripTypeScriptTypes(await readFile(new URL('../lib/devstudio/github-app-token.ts', import.meta.url), 'utf8'))
   .replace(/^import .*;\n/gm, '').replaceAll('export ', '');
-function fixture({ env = {}, status = 200, mismatch = false, invalidToken = false, network = false, mounted = false } = {}) {
+function fixture({ env = {}, status = 200, mismatch = false, invalidToken = false, network = false, mounted = false, permissions = { contents: 'write', actions: 'write', pull_requests: 'write' } } = {}) {
   let now = Date.now();
   const calls = [];
   const environment = { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42',
@@ -20,7 +20,7 @@ function fixture({ env = {}, status = 200, mismatch = false, invalidToken = fals
     if (network) throw new Error('network error containing sensitive upstream details');
     return new Response(JSON.stringify(url.endsWith('/installation')
       ? { id: mismatch ? 99 : 42, app_id: 5477907, suspended_at: null }
-      : { token: 'ghs_fixture_installation_token', expires_at: invalidToken ? 'invalid' : new Date(now + 3600_000).toISOString() }), { status });
+      : { token: 'ghs_fixture_installation_token', expires_at: invalidToken ? 'invalid' : new Date(now + 3600_000).toISOString(), permissions }), { status });
   }, { now: () => now, parse: Date.parse });
   return { get, calls, env: environment, advance: ms => { now += ms; } };
 }
@@ -85,4 +85,17 @@ test('failed issuance is not cached', async () => {
   await assert.rejects(f.get());
   await assert.rejects(f.get());
   assert.equal(f.calls.length, 2);
+});
+
+test('read-only or incomplete App permissions cannot authorize PARIS repairs', async () => {
+  for (const permissions of [
+    { contents: 'read', actions: 'write', pull_requests: 'write' },
+    { contents: 'write', actions: 'read', pull_requests: 'write' },
+    { contents: 'write', actions: 'write', pull_requests: 'read' },
+    {},
+  ]) {
+    const f = fixture({ permissions });
+    await assert.rejects(f.get(), { message: 'GITHUB_APP_WRITE_PERMISSIONS_REQUIRED' });
+    assert.equal(f.calls.length, 2);
+  }
 });

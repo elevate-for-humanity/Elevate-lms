@@ -16,6 +16,20 @@ export async function githubRuntimeBinding({run=google,request=fetch}={}){
  try{response=await request('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main',{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'},redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});}
  catch{throw Error('GITHUB_RUNTIME_CHECK_UNAVAILABLE');}
  if(!response.ok)throw Error([401,403,404].includes(response.status)?'GITHUB_RUNTIME_TOKEN_REJECTED':'GITHUB_RUNTIME_CHECK_UNAVAILABLE');
+ // The main-ref probe only certifies read access. PARIS needs Contents write.
+ // Check repository permissions before binding a legacy runtime credential.
+ let repository;
+ try{
+  repository=await request('https://api.github.com/repos/elevate-for-humanity/Elevate-lms',{
+   headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'},
+   redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000),
+  });
+ }catch{throw Error('GITHUB_RUNTIME_PERMISSION_CHECK_UNAVAILABLE');}
+ if(!repository.ok)throw Error([401,403,404].includes(repository.status)?'GITHUB_RUNTIME_TOKEN_REJECTED':'GITHUB_RUNTIME_PERMISSION_CHECK_UNAVAILABLE');
+ let permissions;
+ try{permissions=(await repository.json()).permissions;}
+ catch{throw Error('GITHUB_RUNTIME_PERMISSION_CHECK_UNAVAILABLE');}
+ if(permissions?.push!==true && permissions?.admin!==true)throw Error('GITHUB_RUNTIME_CONTENTS_WRITE_REQUIRED');
  return ['--remove-env-vars='+GITHUB_RUNTIME_KEY,'--update-secrets='+GITHUB_RUNTIME_KEY+'='+GITHUB_RUNTIME_SECRET+':'+version];
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)githubRuntimeBinding().then(flags=>console.log(flags.join('\n'))).catch(error=>{console.error(/^GITHUB_RUNTIME_[A-Z_]+$/.test(error.message)?error.message:'GITHUB_RUNTIME_BINDING_FAILED');process.exitCode=1;});

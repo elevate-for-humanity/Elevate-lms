@@ -71,6 +71,14 @@ export async function getGitHubAppToken(): Promise<string | null> {
       || !Number.isFinite(expires) || expires <= Date.now() + 60_000 || expires > Date.now() + 3_660_000) {
       throw new Error('GITHUB_APP_TOKEN_RESPONSE_INVALID');
     }
+    // A readable repository token is not necessarily capable of repairing it.
+    // Reject read-only App installations at issuance instead of failing later
+    // with confusing 403s during patch creation or workflow dispatch.
+    if (result.permissions?.contents !== 'write' ||
+        result.permissions?.actions !== 'write' ||
+        result.permissions?.pull_requests !== 'write') {
+      throw new Error('GITHUB_APP_WRITE_PERMISSIONS_REQUIRED');
+    }
     cached = { identity, token: result.token, expires };
     return result.token as string;
   })();

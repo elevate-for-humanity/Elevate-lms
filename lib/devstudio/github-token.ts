@@ -53,6 +53,11 @@ export async function getGitHubToken(): Promise<string | null> {
   if(workflowToken)return workflowToken;
   const appToken = await getGitHubAppToken();
   if (appToken) return appToken;
+  // Explicit App-only deployments must not fall back to a legacy access
+  // token if the encrypted dashboard App settings are missing or incomplete.
+  if (process.env.PARIS_GITHUB_AUTH_MODE === 'app') {
+    throw new Error('GITHUB_APP_NOT_CONFIGURED');
+  }
   // One saved runtime source. Never retry a rejected credential through an
   // expired duplicate or silently change identities after a failed check.
   const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));

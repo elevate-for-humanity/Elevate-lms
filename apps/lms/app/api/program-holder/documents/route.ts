@@ -30,7 +30,7 @@ const DOCUMENT_TYPES = new Set([
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, 'strict');
   if (limited) return limited;
-  const ctx = await requireProgramHolder();
+  const ctx = await requireProgramHolder({ allowPendingApproval: true });
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
 
@@ -41,9 +41,10 @@ export async function POST(request: NextRequest) {
   let invoiceDetails: Record<string, string> | null = null;
   if (documentType === 'provider_invoice' && form.get('invoiceMode') === 'form') {
     const read = (key: string) => String(form.get(key) || '').trim();
-    const fields = ['providerName', 'invoiceNumber', 'studentName', 'trainingStart', 'trainingEnd', 'serviceDescription', 'amount'] as const;
+    const fields = ['providerName', 'invoiceNumber', 'studentName', 'trainingStart', 'trainingEnd', 'serviceDescription', 'amount', 'invoiceStage', 'enrollmentId'] as const;
     invoiceDetails = Object.fromEntries(fields.map(key => [key, read(key)]));
     const amount = read('amount');
+    if (!isHolderRecordId(read('enrollmentId')) || !['start', 'completion'].includes(read('invoiceStage'))) return NextResponse.json({ error: 'Select your assigned student and payment stage.' }, { status: 400 });
     const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) &&
       Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
     if (fields.some(key => !read(key) || read(key).length > (key === 'serviceDescription' ? 2000 : 200)) ||
@@ -63,6 +64,8 @@ export async function POST(request: NextRequest) {
       'Provider: ' + read('providerName'),
       'Invoice number: ' + read('invoiceNumber'),
       'Student: ' + read('studentName'),
+      'Enrollment: ' + read('enrollmentId'),
+      'Payment stage: ' + read('invoiceStage'),
       'Training dates: ' + read('trainingStart') + ' to ' + read('trainingEnd'),
       'Amount requested (USD): ' + Number(amount).toFixed(2),
       'Services: ' + read('serviceDescription'),
@@ -78,6 +81,14 @@ export async function POST(request: NextRequest) {
       y += 3;
     }
     file = new File([pdf.output('arraybuffer')], 'training-invoice.pdf', { type: 'application/pdf' });
+  }
+  if (['training_plan', 'hvac_training_plan'].includes(documentType) && (!(file instanceof File) || file.size === 0)) {
+    const text = String(form.get('syllabusText') || '').trim();
+    if (text.length < 100 || text.length > 250000) return NextResponse.json({ error: 'Complete your training plan (at least 100 characters), or attach the original file.' }, { status: 400 });
+    const { jsPDF } = await import('jspdf'); const pdf = new jsPDF(); let y = 20;
+    pdf.setFontSize(11);
+    for (const line of pdf.splitTextToSize(text, 178)) { if (y > 275) { pdf.addPage(); y = 20; } pdf.text(line, 15, y); y += 6; }
+    file = new File([pdf.output('arraybuffer')], 'training-plan.pdf', { type: 'application/pdf' });
   }
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
@@ -109,7 +120,7 @@ export async function POST(request: NextRequest) {
   if (enrollmentId) {
     const { data: student, error } = await ctx.db
       .from('program_enrollments')
-      .select('id,program_id')
+      .select('id,program_id,full_name')
       .eq('id', enrollmentId)
       .eq('program_holder_id', ctx.holderId)
       .is('revoked_at', null)
@@ -119,6 +130,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Student verification unavailable.' }, { status: 503 });
     if (!student || !ctx.programIds.includes(student.program_id))
       return NextResponse.json({ error: 'Student is not assigned to you.' }, { status: 403 });
+  }
+  if (invoiceDetails && enrollmentId) {
+    const { data: namedStudent, error: nameError } = await ctx.db.from('program_enrollments').select('full_name').eq('id', enrollmentId).eq('program_holder_id', ctx.holderId).single();
+    if (nameError || namedStudent.full_name !== invoiceDetails.studentName) return NextResponse.json({ error: 'Student details changed. Select the student again.' }, { status: 409 });
   }
   const isSyllabus = ['training_plan', 'hvac_training_plan'].includes(documentType);
   const programId = String(form.get('programId') || (ctx.programIds.length === 1 ? ctx.programIds[0] : ''));

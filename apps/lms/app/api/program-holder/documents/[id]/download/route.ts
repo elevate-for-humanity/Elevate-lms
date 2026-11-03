@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 export const dynamic = 'force-dynamic';
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const ctx = await requireProgramHolder();
+  const ctx = await requireProgramHolder({ allowPendingApproval: true });
   if (ctx.mode === 'admin')
     return NextResponse.json({ error: 'Select a Program Holder.' }, { status: 403 });
   const { id } = await params;

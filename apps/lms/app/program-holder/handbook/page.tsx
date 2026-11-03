@@ -1,3 +1,5 @@
+import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
+import { PartnerStandards } from '@/components/program-holder/PartnerStandards';
 import Link from 'next/link';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
@@ -8,7 +10,7 @@ export const metadata = {
 };
 
 export default async function ProgramHolderHandbookPage() {
-  await requireProgramHolder();
+  await requireProgramHolder({ allowPendingApproval: true });
   const sections = [
     [
       'Assigned applicants',
@@ -69,12 +71,13 @@ export default async function ProgramHolderHandbookPage() {
           <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-300">
             Required reading
           </p>
-          <h1 className="mt-2 text-3xl font-black">Program Holder Handbook</h1>
+          <h1 className="mt-2 text-3xl font-black">Program Holder Handbook</h1><PrintDocumentControl />
           <p className="mt-3 max-w-2xl text-slate-300">
             Operational guidelines for authorized Program Holders delivering Elevate for Humanity
             workforce training.
           </p>
         </div>
+        <div className="mt-6"><PartnerStandards /></div>
         <div className="mt-6 grid gap-4">
           {sections.map(([title, body], index) => (
             <section

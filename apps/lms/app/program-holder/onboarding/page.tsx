@@ -25,8 +25,8 @@ export default async function ProgramHolderOnboardingPage() {
   }
 
   if (!holder.mou_signed) {
-    redirect('/program-holder/sign-mou');
+    redirect('/program-holder/orientation');
   }
 
-  redirect('/program-holder/how-to-use');
+  redirect('/program-holder/orientation');
 }

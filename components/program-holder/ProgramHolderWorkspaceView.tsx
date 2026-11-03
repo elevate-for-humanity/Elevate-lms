@@ -1,3 +1,6 @@
+import { PartnerFormsLibrary } from './PartnerFormsLibrary';
+import { GuidedW9Form } from './GuidedW9Form';
+import onboardingMedia from '@/lib/program-holder/onboarding-media.json';
 import SyllabusBuildRetry from '@/components/program-holder/SyllabusBuildRetry';
 import { trainingHoursDisplay } from '@/lib/program-holder/training-hours-display';
 import ProgramSyllabusReader from '@/components/learner/ProgramSyllabusReader';
@@ -190,6 +193,12 @@ export async function ProgramHolderWorkspaceView({
     {
       label: 'Program Holder handbook acknowledgement',
       complete: data.acknowledgements.some((item) => item.document_type === 'handbook'),
+      required: true,
+      owner: 'Program Holder',
+    },
+    {
+      label: 'PARIS onboarding video and understanding acknowledgement',
+      complete: data.acknowledgements.some((item) => item.document_type === onboardingMedia.version),
       required: true,
       owner: 'Program Holder',
     },
@@ -1573,6 +1582,7 @@ function Hours({
 function programHolderRequirementLink(label: string): string | null {
   if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
   if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+  if (label === 'PARIS onboarding video and understanding acknowledgement') return '/program-holder/orientation';
   if (label === 'Non-disclosure and confidentiality agreement')
     return '/program-holder/non-compete';
   if (label === 'Non-compete agreement') return '/program-holder/non-compete';
@@ -1767,6 +1777,8 @@ function Documents({
         title="Documents"
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
+      <PartnerFormsLibrary />
+      <GuidedW9Form />
       <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
       <SyllabusUploadStatus documents={rows} courseAssignments={courseAssignments} />
       <ProgramHolderDocumentUpload materialsOnly students={students} />

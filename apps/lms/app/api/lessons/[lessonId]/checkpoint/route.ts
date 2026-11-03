@@ -15,60 +15,11 @@ import { logger } from '@/lib/logger';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import {evaluateAnswer,scoreAnswers,type StoredQuizQuestion} from '@/lib/lms/assessment-feedback';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
-import { HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-type StoredQuizQuestion = {
-  id?: string;
-  prompt?: string;
-  question?: string;
-  options?: string[];
-  choices?: string[];
-  answerIndex?: number;
-  correct_answer?: number | string | boolean;
-  correct?: number | string | boolean;
-  correctAnswer?: number | string | boolean;
-  explanation?: string;
-};
-
-function scoreAnswers(questions: StoredQuizQuestion[], answers: Record<string, number>): number {
-  if (!questions.length) throw new Error('Assessment has no questions');
-
-  let correct = 0;
-  questions.forEach((question, index) => {
-    const questionId = String(question.id || `q-${index + 1}`);
-    const selectedIndex = answers[questionId] ?? answers[String(index)];
-    if (!Number.isInteger(selectedIndex)) return;
-
-    const options = Array.isArray(question.options)
-      ? question.options
-      : Array.isArray(question.choices)
-        ? question.choices
-        : [];
-    const expected =
-      question.correctAnswer ?? question.correct_answer ?? question.answerIndex ?? question.correct;
-    if (typeof expected === 'number') {
-      if (selectedIndex === expected) correct += 1;
-      return;
-    }
-    if (typeof expected === 'boolean') {
-      const selected =
-        options[selectedIndex] ??
-        (selectedIndex === 0 ? 'True' : selectedIndex === 1 ? 'False' : '');
-      if (selected.toLowerCase() === String(expected).toLowerCase()) correct += 1;
-      return;
-    }
-    if (typeof expected === 'string') {
-      const selected = options[selectedIndex];
-      if (selected !== undefined && selected.trim() === expected.trim()) correct += 1;
-    }
-  });
-
-  return Math.round((correct / questions.length) * 100);
-}
 
 export async function POST(
   request: NextRequest,
@@ -146,6 +97,11 @@ export async function POST(
       );
     }
 
+    // Do not record or pass a quiz with missing answer keys. Personal
+    // reflection fields are saved by the separate workbook route, not graded.
+    if (questions.some((question) => !evaluateAnswer(question, undefined).configured)) {
+      return NextResponse.json({ error: 'Assessment answer key requires instructor review' }, { status: 409 });
+    }
     const score = scoreAnswers(questions, answers);
     const passingScore =
       lesson.passing_score != null && Number.isFinite(Number(lesson.passing_score))
@@ -188,13 +144,17 @@ export async function POST(
       );
     }
 
-    const feedback = HVAC_PRACTICE_LESSONS.some(test => test.id === lessonId)
-      ? questions.map((question, index) => ({
-          question: question.question || question.prompt || `Question ${index + 1}`,
-          correct: answers[String(question.id || `q-${index + 1}`)] === question.correctAnswer,
-          explanation: question.explanation || 'Review the matching workbook chapter.',
-        }))
-      : undefined;
+    const feedback = questions.map((question, index) => {
+      const questionId = String(question.id || `q-${index + 1}`);
+      const evaluation = evaluateAnswer(question, answers[questionId] ?? answers[String(index)]);
+      return {
+        question: question.question || question.question_text || question.prompt || `Question ${index + 1}`,
+        correct: evaluation.correct,
+        correctAnswer: evaluation.correctOption,
+        explanation: question.explanation ||
+          (evaluation.correct ? 'That is the correct selection.' : 'Review the lesson explanation, then try the question again.'),
+      };
+    });
     return NextResponse.json({ ...result, feedback });
   } catch (err) {
     logger.error(

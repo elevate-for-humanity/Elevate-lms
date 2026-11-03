@@ -44,6 +44,15 @@ afterEach(() => {
 });
 
 describe('PWA updates across dashboard applications', () => {
+  it('makes one initial Marketing worker request and checks again when the browser reconnects', async () => {
+    render(<CanonicalPwaRegistration application="marketing" />);
+    await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledTimes(1));
+    expect(fetch).not.toHaveBeenCalled();
+    expect(registration.update).not.toHaveBeenCalled();
+    act(() => window.dispatchEvent(new Event('online')));
+    await waitFor(() => expect(registration.update).toHaveBeenCalledOnce());
+  });
+
   it('keeps a healthy registration when an update check is offline', async () => {
     registration.update.mockRejectedValue(new TypeError('Network unavailable'));
     render(<CanonicalPwaRegistration application="lms" />);

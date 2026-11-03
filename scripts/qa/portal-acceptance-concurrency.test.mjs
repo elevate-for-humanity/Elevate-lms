@@ -8,6 +8,7 @@ const condition = job.match(/^    if: (.+)$/m)?.[1];
 const concurrency = workflow.match(/^concurrency:\n([\s\S]*?)(?=^\S)/m)?.[1]
   || job.match(/^    concurrency:\n([\s\S]*?)(?=^    \S)/m)?.[1];
 const group = concurrency?.match(/^\s+group: (.+)$/m)?.[1];
+const cancel = concurrency?.match(/^\s+cancel-in-progress: \$\{\{ (.*?) \}\}$/m)?.[1];
 // Exercise the actual boolean/string expressions in the checked-in workflow.
 // These expressions use operators shared by JavaScript and GitHub Actions.
 function evaluate(expression, {github, inputs}) {
@@ -43,7 +44,13 @@ test('real deployment acceptance retains serialization and source checks remain 
   const source = reservation(event('push'));
   assert.equal(explicit, completed);
   assert.notEqual(explicit, source);
-  assert.match(concurrency, /cancel-in-progress: true/);
+  for (const component of ['marketing', 'admin', 'lms', 'store']) {
+    assert.equal(evaluate(cancel, event('workflow_dispatch', {}, {component, deployment_run_id:'123'})), false);
+  }
+  assert.equal(evaluate(cancel, event('workflow_run', {conclusion:'success', event:'workflow_dispatch', head_branch:'main'})), false);
+  assert.equal(evaluate(cancel, event('push')), true);
+  assert.equal(evaluate(cancel, event('workflow_dispatch')), true);
+  assert.match(job, /Require the attested release to remain live through acceptance/);
 });
 
 test('only the admitted test job owns concurrency and runs this regression before provisioning', () => {

@@ -41,7 +41,7 @@ export default function LessonProgressClient({
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<string>('');
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<Array<{question:string;correct:boolean;explanation:string}>>([]);
+  const [feedback, setFeedback] = useState<Array<{question:string;correct:boolean;correctAnswer:string|null;explanation:string}>>([]);
   const [completed, setCompleted] = useState(false);
   const clock = useTheoryTimeclock(courseId, lessonId, theoryClockEnabled);
   const [clockTarget, setClockTarget] = useState<HTMLElement | null>(null);
@@ -177,9 +177,11 @@ export default function LessonProgressClient({
                           name={q.id}
                           value={optionIndex}
                           checked={answers[q.id] === optionIndex}
-                          onChange={() =>
-                            setAnswers((current) => ({ ...current, [q.id]: optionIndex }))
-                          }
+                          onChange={() => {
+                            setAnswers((current) => ({ ...current, [q.id]: optionIndex }));
+                            setFeedback([]);
+                            setResult('');
+                          }}
                           className="mt-1"
                         />
                         <span>{option}</span>
@@ -223,7 +225,7 @@ export default function LessonProgressClient({
           </>
         )}
 
-        {feedback.length > 0 && <section className="mt-6 space-y-3" aria-label="Practice test feedback"><h3 className="text-xl font-bold">Review your reasoning</h3>{feedback.map((item,index)=><article key={index} className="rounded-lg border p-4"><p className="font-bold">{index+1}. {item.question}</p><p className="mt-2">{item.correct ? 'Correct. ' : 'Review and retry. '}{item.explanation}</p></article>)}</section>}
+        {feedback.length > 0 && <section className="mt-6 space-y-3" aria-label="Assessment answer feedback"><h3 className="text-xl font-bold">Check your answers</h3>{feedback.map((item,index)=><article key={index} className={`rounded-lg border p-4 ${item.correct ? 'border-emerald-400 bg-emerald-50' : 'border-amber-400 bg-amber-50'}`}><p className="font-bold">{index+1}. {item.question}</p><p className="mt-2 font-semibold">{item.correct ? 'Correct answer.' : 'Not quite. Try again.'}</p>{!item.correct && item.correctAnswer && <p className="mt-2">Correct answer: <strong>{item.correctAnswer}</strong></p>}<p className="mt-2">{item.explanation}</p></article>)}</section>}
         {result ? (
           <p
             className={`mt-4 rounded-lg px-4 py-3 text-sm font-bold ${completed ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-950'}`}

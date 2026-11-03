@@ -136,7 +136,9 @@ jobs:
     # Keep source regression and exact deployed-SHA certification independent.
     concurrency:
       group: registered-apprenticeship-e2e-${{ (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
-      cancel-in-progress: true
+      # Finish an active deployment's tests and cleanup. The latest pending
+      # handoff runs next and must still attest its live revision at both ends.
+      cancel-in-progress: ${{ github.event_name != 'workflow_run' && inputs.deployment_run_id == '' }}
     name: Full portal authenticated persistence and responsive design
     runs-on: ubuntu-24.04
     environment: production

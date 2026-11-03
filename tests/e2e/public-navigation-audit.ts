@@ -9,6 +9,7 @@ if (!destinations.includes('/student-support')) destinations.push('/student-supp
 export function registerPublicNavigationAudit() {
   test('retired public pages redirect before HTML streaming', async ({ request }) => {
     for (const [path, target] of [
+      ['/programs/skilled-trades', '/programs'], ['/programs/technology', '/programs'],
       ['/founder', '/about/elizabeth-greene'], ['/team', '/about/team'],
       ['/about/partners', '/partners'], ['/about/mission', '/about#mission'],
       ...['academic','financial-aid','career','counseling','accessibility','scheduling'].map(topic => ['/student-support/'+topic, '/student-support#'+topic]),
@@ -37,11 +38,20 @@ export function registerPublicNavigationAudit() {
         if (!await image.isVisible()) continue;
         await image.scrollIntoViewIfNeeded();
         await expect(image, `${href} image did not finish loading`).toHaveJSProperty('complete', true, { timeout: 10_000 });
-        expect(await image.evaluate(async element => {
+        const description = await image.evaluate(element => {
           const img = element as HTMLImageElement;
-          try { await img.decode(); return img.naturalWidth > 0; }
-          catch { return false; }
-        }), `${href} contains an undecodable image`).toBe(true);
+          return `${img.alt} (${img.currentSrc || img.src})`;
+        });
+        // An error handler may replace an image while decode() is pending.
+        // Only a decoded, visible source with real dimensions passes.
+        await expect.poll(() => image.evaluate(async element => {
+          const img = element as HTMLImageElement;
+          const source = img.currentSrc;
+          try {
+            await img.decode();
+            return Boolean(source && source === img.currentSrc && img.naturalWidth && img.naturalHeight);
+          } catch { return false; }
+        }), { message: `${href} image did not decode: ${description}`, timeout: 10000 }).toBe(true);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${href} overflows horizontally`).toBe(true);
       expect(errors).toEqual([]);

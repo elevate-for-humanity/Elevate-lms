@@ -34,9 +34,9 @@ export default function FundingPage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400">
             Workforce funding
           </p>
-          <h1 className="mt-3 text-4xl font-extrabold sm:text-5xl">
+          <h2 className="mt-3 text-4xl font-extrabold sm:text-5xl">
             Program-specific funding records
-          </h1>
+          </h2>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
             Elevate publishes workforce-funding labels only for programs represented in the current
             verified registry. A provider relationship, website label, application, or preliminary

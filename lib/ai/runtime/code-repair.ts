@@ -1,13 +1,15 @@
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS} from '@/lib/devstudio/repair-inference-budget.mjs';
 import 'server-only';
+import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
 import {isRepairableCourseFailure,courseRepairOutcome} from './course-repair-policy.mjs';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {getGitHubHeaders} from '@/lib/devstudio/github-token';
+import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
+import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
-import {publishTaskToMain} from '@/lib/devstudio/main-release.mjs';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -48,6 +50,16 @@ async function gh(path:string,init:RequestInit={}) {
 async function update(id:string,values:Record<string,unknown>){
  const db=await requireAdminClient();const {error}=await db.from('paris_code_repairs').update({...values,updated_at:new Date().toISOString()}).eq('id',id);
  if(error)throw error;
+}
+async function infrastructureGitHub(path:string,init:RequestInit={}) {
+ const token=await getGitHubAppToken();
+ if(!token)throw Error('PARIS_INFRASTRUCTURE_APP_AUTHORITY_REQUIRED');
+ const endpoint=path==='/graphql'?'https://api.github.com/graphql':`https://api.github.com/repos/${REPAIR_REPOSITORY}${path}`;
+ const response=await fetch(endpoint,{...init,headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},cache:'no-store',signal:AbortSignal.timeout(20000)});
+ if(!response.ok)throw Error('PARIS_INFRASTRUCTURE_GITHUB_HTTP_'+response.status);
+ const result=await response.json();
+ if(result.errors?.length)throw Error('PARIS_INFRASTRUCTURE_PULL_REQUEST_AUTOMERGE_REJECTED');
+ return result;
 }
 export async function enqueueParisRepair({actorId,goal,candidate,fingerprint,sourceJobId}:{actorId:string;goal:string;candidate?:any;fingerprint?:string;sourceJobId?:string}){
  const db=await requireAdminClient();
@@ -115,13 +127,12 @@ export async function publishParisRepair(id:string,runId:number){
  if(!(artifacts.artifacts??[]).some((a:any)=>!a.expired&&a.name===`paris-validated-${id}-${candidate.branch.sha}`))throw Error('EXACT_CANDIDATE_VALIDATION_RECEIPT_REQUIRED');
  const ref=await gh('/git/ref/heads/'+encodeURIComponent(candidate.branch.name));
  if(ref.object?.sha!==candidate.branch.sha)throw Error('REPAIR_CANDIDATE_CHANGED_AFTER_VALIDATION');
- const release=await publishTaskToMain({baseSha:candidate.base_sha,branchSha:candidate.branch.sha,githubJson:gh});
- await update(id,{status:'deploying',release_sha:release.sha,verification:{requestedDeployments:['deploy-admin.yml'],requestedDeploymentAt:{'deploy-admin.yml':new Date().toISOString()}}});
- // Explicit dispatch is required even when the stored token cannot trigger push workflows.
- try{
-  await gh('/actions/workflows/deploy-admin.yml/dispatches',{method:'POST',body:JSON.stringify({ref:'main',inputs:{requested_sha:release.sha}})});
- }catch(error){await update(id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_DISPATCH_FAILED'});throw error;}
- return release;
+ const comparison=await gh(`/compare/${candidate.base_sha}...${candidate.branch.sha}`);
+ if(!Array.isArray(comparison.files)||comparison.files.length>=300)throw Error('COMPLETE_REPAIR_FILE_INVENTORY_REQUIRED');
+ const infrastructureRepair=comparison.files.some((file:any)=>infrastructureRepairPath(file.filename));
+ const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub,graphql:(body:any)=>infrastructureGitHub('/graphql',{method:'POST',body:JSON.stringify(body)})});
+ await update(id,{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
+ return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
 }
 export async function reportParisRepairFailure(id:string,runId:number){
  const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
@@ -146,12 +157,14 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
  let recoveredProviderThisTick=false;
  let providerRecoveryHealth: boolean | undefined;
+ const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
   // Provider outages are infrastructure failures, not proof that a source
   // patch passed. A signed repair workflow may retry one historical, unlinked
   // timeout only when the owned model and scoped GitHub read identity recover.
   // Preserve the earlier attempt and do not reset any course job state.
-  if(!recoveredProviderThisTick && canRetryHealthyProviderRepair(repair)){
+  const legacyCpuEdit=canResumeLegacyCpuEdit(repair,events,ownedTier);
+  if(!recoveredProviderThisTick && (legacyCpuEdit || canRetryHealthyProviderRepair(repair))){
    if(providerRecoveryHealth===undefined){
     const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
     const health=await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false}));
@@ -181,14 +194,14 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
      const updated=await db.from('paris_code_repairs').update({
       status:'queued',error_code:null,
       attempt_history:[...(repair.attempt_history??[]),{
-       error:repair.error_code,at:repair.updated_at,retryReason:'verified-owned-provider-recovery'
+       error:repair.error_code,at:repair.updated_at,retryReason:legacyCpuEdit?'bounded-cpu-edit-recovery':'verified-owned-provider-recovery'
       }],
       verification:{...repair.verification,providerRecoveryPreflight:{
        ownedModelVerified:true,githubRepositoryRead:true,workflowEnabled:true,
        checkedAt:new Date().toISOString(),writeAuthorityVerified:false
       }},
       updated_at:new Date().toISOString(),
-     }).eq('id',repair.id).eq('status','blocked').eq('attempt_count',1)
+     }).eq('id',repair.id).eq('status','blocked').eq('attempt_count',repair.attempt_count)
        .eq('updated_at',repair.updated_at).select('id').maybeSingle();
      if(updated.error)throw updated.error;
      if(updated.data)recoveredProviderThisTick=true;
@@ -229,26 +242,36 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  const active=await db.from('paris_code_repairs').select('id,status,release_sha,workflow_run_id,source_job_id,verification,updated_at').in('status',['dispatched','patching','validating','deploying','verifying']).limit(10);
  if(active.error)throw active.error;
  for(const repair of active.data??[]){
+  if(repair.status==='validating'&&repair.verification?.pullRequest){
+   try{
+    const pr=await gh('/pulls/'+repair.verification.pullRequest.number);
+    const sha=infrastructureMergeEvidence(pr,repair.verification.pullRequest.headSha);
+    if(!sha)continue;
+    await update(repair.id,{status:'deploying',release_sha:sha,verification:{...repair.verification,requestedDeployments:[]}});
+   }catch(error){await update(repair.id,{status:'blocked',error_code:String(error instanceof Error?error.message:error).slice(0,500)});}
+   continue;
+  }
   if(repair.status==='dispatched'&&!repair.workflow_run_id&&Date.now()-Date.parse(repair.updated_at)>15*60000){await update(repair.id,{status:'blocked',error_code:'REPAIR_DISPATCH_NOT_CLAIMED'});continue;}
   if(['dispatched','patching','validating'].includes(repair.status)&&repair.workflow_run_id){
    const run=await gh(`/actions/runs/${repair.workflow_run_id}`);
    if(run.status==='completed'&&run.conclusion!=='success')await update(repair.id,{status:'blocked',error_code:'REPAIR_WORKFLOW_'+run.conclusion});
   }
   if(repair.release_sha&&['deploying','verifying'].includes(repair.status)){
+   const deployments=repair.verification?.protectedMerge?[...REPAIR_DEPLOYMENTS,STORE_REPAIR_DEPLOYMENT]:REPAIR_DEPLOYMENTS;
    const runs=await gh(`/actions/runs?head_sha=${repair.release_sha}&per_page=100`);
-   const state=repairDeploymentState(runs.workflow_runs??[],repair.release_sha);
+   const state=repairDeploymentState(runs.workflow_runs??[],repair.release_sha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
    if(state!=='passed'){
     const requested=repair.verification?.requestedDeployments??[];
-    const missing=unobservedRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested,repair.verification?.requestedDeploymentAt??{},repair.updated_at);
+    const missing=unobservedRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested,repair.verification?.requestedDeploymentAt??{},repair.updated_at,Date.now(),deployments);
     if(missing){await update(repair.id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_NOT_OBSERVED',verification:{...repair.verification,missingDeployment:missing}});continue;}
-    const next=nextRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested);
+    const next=nextRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested,deployments);
     if(next){
      const currentMain=await gh('/git/ref/heads/main');
      if(currentMain.object?.sha!==repair.release_sha){await update(repair.id,{status:'blocked',error_code:'REPAIR_RELEASE_SUPERSEDED_BEFORE_DEPLOYMENT'});continue;}
      // Save dispatch intent before sending; a later tick must not duplicate it.
      await update(repair.id,{verification:{...repair.verification,requestedDeployments:[...requested,next],requestedDeploymentAt:{...repair.verification?.requestedDeploymentAt,[next]:new Date().toISOString()}}});
-     const inputs=['deploy-admin.yml','deploy-google-lms-trigger.yml'].includes(next)?{requested_sha:repair.release_sha}:undefined;
+     const inputs=['deploy-admin.yml','deploy-google-lms-trigger.yml','deploy-google-store-runtime.yml'].includes(next)?{requested_sha:repair.release_sha}:undefined;
      try{await gh(`/actions/workflows/${next}/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',...(inputs?{inputs}:{})})});}
      catch(error){await update(repair.id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_DISPATCH_FAILED'});throw error;}
     }
@@ -257,9 +280,10 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    // Exact immutable runtime identity is required on all three production apps.
    // Keep the immutable release verification receipt while its course runs.
    // A later unrelated deployment must not erase an already verified rollout.
-   const checks=repair.verification?.exactRuntimeSha===true?[true,true,true]:await Promise.all(['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org'].map(async origin=>{
+   const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.protectedMerge?['https://store.elevateforhumanity.org']:[])];
+   const checks=repair.verification?.exactRuntimeSha===true?origins.map(()=>true):await Promise.all(origins.map(async origin=>{
     const response=await fetch(origin+'/api/health',{cache:'no-store',signal:AbortSignal.timeout(10000)});
-    const body=await response.json();return response.ok&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
+    const body=await response.json();return response.ok&&(!repair.verification?.protectedMerge||(body.healthy===true&&body.ready===true))&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
    }));
    const verification:any={...repair.verification,tests:'passed',deployments:'passed',exactRuntimeSha:checks.every(Boolean),runtimeVerifiedAt:repair.verification?.runtimeVerifiedAt??(checks.every(Boolean)?new Date().toISOString():null)};
    if(!checks.every(Boolean)){await update(repair.id,{status:'verifying',verification});continue;}
@@ -310,6 +334,8 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // guard above still serializes releases through independent validation.
  // Do not let an ineligible oldest repair starve a later eligible incident.
  // Inspect a bounded page; disposition decisions preserve source evidence.
+ // An ineligible source is a state/eligibility decision, never missing owner authorization.
+ // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
  const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id')
   .eq('status','queued').order('created_at',{ascending:true}).limit(100);
  if(queued.error)throw queued.error;
@@ -325,7 +351,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   const disposition=courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
   if(disposition==='repair'){pending=candidate;break;}
   const blocked=await db.from('paris_code_repairs').update({
-   status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_NOT_AUTHORIZED',
+   status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
    updated_at:new Date().toISOString(),
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
   if(blocked.error)throw blocked.error;

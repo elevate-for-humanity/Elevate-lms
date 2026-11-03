@@ -15,6 +15,7 @@ export default function HvacHandsOnClock() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selected, setSelected] = useState('');
   const [attested, setAttested] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const [busy, setBusy] = useState(true);
   const [message, setMessage] = useState('');
   async function load() {
@@ -23,6 +24,7 @@ export default function HvacHandsOnClock() {
     if (!res.ok) throw new Error(data.error || 'Could not load attendance.');
     setEnrollments(data.enrollments);
     setSessions(data.sessions);
+    setPreviewing(data.previewing === true);
     setSelected((current) => current || data.enrollments[0]?.id || '');
   }
   useEffect(() => {
@@ -32,6 +34,7 @@ export default function HvacHandsOnClock() {
   }, []);
   const open = sessions.find((session) => !session.clock_out_at);
   async function act(action: 'clock_in' | 'clock_out') {
+    if (previewing) return;
     setBusy(true);
     setMessage('');
     try {
@@ -64,6 +67,7 @@ export default function HvacHandsOnClock() {
         Do not clock in for online theory, lessons, videos, quizzes, or study at home.
         Submitted hands-on time requires instructor verification.
       </p>
+      {previewing && <p className="font-semibold">Read-only attendance preview</p>}
       {enrollments.length > 0 && (
         <label className="block">
           Program enrollment
@@ -81,14 +85,14 @@ export default function HvacHandsOnClock() {
           </select>
         </label>
       )}
-      {!open && enrollments.length > 0 && <label className="mt-4 flex items-start gap-2 text-sm font-semibold">
+      {!previewing && !open && enrollments.length > 0 && <label className="mt-4 flex items-start gap-2 text-sm font-semibold">
         <input type="checkbox" checked={attested} onChange={event => setAttested(event.target.checked)} disabled={busy} />
         I am attending supervised, hands-on HVAC training with my instructor.
       </label>}
       {open && <p className="my-3">Clocked in: {new Date(open.clock_in_at).toLocaleString()}</p>}
       <button
         className="my-4 min-h-11 rounded bg-blue-800 px-5 py-3 font-bold text-white disabled:opacity-50"
-        disabled={busy || (!open && (!selected || !attested))}
+        disabled={busy || previewing || (!open && (!selected || !attested))}
         onClick={() => act(open ? 'clock_out' : 'clock_in')}
       >
         {busy ? 'Please wait…' : open ? 'Clock out' : 'Clock in for hands-on training'}

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ImageMetadata from '@/components/marketing/ImageMetadata';
 
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
+
 const HOME_IMAGE = '/images/refresh-20261014/home-signed-20261017.webp';
 
 export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
@@ -19,7 +21,7 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
         src={HOME_IMAGE}
         description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
       />
-      <div className={`${compact ? 'relative h-28 w-full overflow-hidden sm:h-36' : 'relative h-[clamp(360px,65svh,780px)] w-full overflow-hidden'} bg-sky-100`}>
+      <div className={`${compact ? 'relative h-28 w-full overflow-hidden sm:h-36' : HERO_IMAGE_FRAME} bg-sky-100`}>
         <Image
           placeholder="blur"
           blurDataURL={IMAGE_LOADING_BLUR}

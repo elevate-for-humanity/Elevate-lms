@@ -27,13 +27,13 @@ const PROGRAMS = [
     title: 'Phlebotomy Technician',
     description:
       'Learn specimen collection, infection control, patient identification, and workplace safety.',
-    href: '/programs/phlebotomy-technician',
+    href: '/programs/phlebotomy',
   },
   {
     title: 'Patient Care Technician',
     description:
       'Develop practical patient-support skills for hospitals, clinics, and long-term care settings.',
-    href: '/programs/patient-care-technician',
+    href: '/programs/healthcare/nha-patient-care-technician',
   },
   {
     title: 'Pharmacy Technician',
@@ -45,7 +45,7 @@ const PROGRAMS = [
     title: 'Medical Billing & Coding',
     description:
       'Train in healthcare documentation, claims, coding fundamentals, and revenue-cycle support.',
-    href: '/programs/medical-billing-coding',
+    href: '/programs/healthcare/nha-billing-coding',
   },
 ] as const;
 

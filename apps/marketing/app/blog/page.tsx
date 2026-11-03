@@ -1,5 +1,5 @@
 import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero';
-import { getBlogImage } from '@/lib/blog/images';
+import { getBlogCardImage, getBlogImage } from '@/lib/blog/images';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import BlogImage from '@/components/blog/BlogImage';
@@ -107,7 +107,7 @@ export default async function BlogPage() {
             >
               <div className="md:w-1/2 relative h-64 md:h-auto bg-white overflow-hidden">
                 <BlogImage
-                  src={getBlogImage(featured)}
+                  src={getBlogCardImage(getBlogImage(featured))}
                   alt={featured.title}
                   fill
                   priority
@@ -157,7 +157,7 @@ export default async function BlogPage() {
                 >
                   <div className="relative h-48 bg-white overflow-hidden">
                     <BlogImage
-                      src={getBlogImage(post)}
+                      src={getBlogCardImage(getBlogImage(post))}
                       alt={post.title}
                       fill
                       className="object-cover group-hover:scale-[1.02] transition-transform duration-300"

@@ -19,8 +19,22 @@ it('gives owned inference its supported deadline with workflow headroom',()=>{
  expect(REPAIR_INFERENCE_TIMEOUT_MS + REPAIR_MODEL_PROBE_TIMEOUT_MS).toBeLessThan(285000);
 });
 
-it('keeps private CPU discovery turns short and preserves the edit budget after reading a file',()=>{
+it('bounds private CPU discovery and editing while preserving GPU capacity',()=>{
  expect(repairCompletionTokens('cpu',['SEARCH ai.chat','READ_REJECTED lib/ai/chat'])).toBe(384);
- expect(repairCompletionTokens('cpu',['READ lib/ai/ai-service.ts (sha verified):'])).toBe(2400);
+ expect(repairCompletionTokens('cpu',['READ lib/ai/ai-service.ts (sha verified):'])).toBe(512);
  expect(repairCompletionTokens('gpu',[])).toBe(2400);
+});
+
+it('keeps the latest source excerpt and task inside the private CPU time budget',()=>{
+ const rules={role:'system',content:'Repository and actor restrictions. '.repeat(60)};
+ const input={task:'Inspect the exact failure',turn:6,observations:['READ lib/source.ts: '+('line of real source\n'.repeat(1800))]};
+ const messages=[rules,{role:'user',content:JSON.stringify(input)}];
+ const cpu=budgetRepairMessages(messages,8192,512,'cpu');
+ const gpu=budgetRepairMessages(messages,8192,2400,'gpu');
+ expect(cpu[0]).toBe(rules);
+ expect(JSON.parse(cpu[1].content).task).toBe(input.task);
+ expect(cpu[1].content).toContain('READ lib/source.ts');
+ expect(cpu[1].content).toContain('Partial diagnostic excerpt');
+ expect(cpu[0].content.length+cpu[1].content.length).toBeLessThanOrEqual((3072-512-512-24)*3);
+ expect(gpu[1].content.length).toBeGreaterThan(cpu[1].content.length);
 });

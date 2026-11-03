@@ -37,7 +37,9 @@ COPY packages/bounded-braces ./packages/bounded-braces
 COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
 RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-FROM base AS builder
+# Reuse the installed dependency layer. Copying its full pnpm graph into a new
+# stage duplicates it on the build runner before Next.js can start compiling.
+FROM dependencies AS builder
 
 ARG APPLICATION_SERVICE=marketing
 ENV APPLICATION_SERVICE=$APPLICATION_SERVICE
@@ -73,11 +75,7 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_SUPPORT_EMAIL=$NEXT_PUBLIC_SUPPORT_EMAIL
 
-COPY --from=dependencies /workspace/node_modules ./node_modules
-# pnpm keeps direct workspace dependencies (including browser polyfills) in the
-# workspace package's node_modules. Copy that directory as well so the
-# container build resolves the same dependency graph as local/CI builds.
-COPY --from=dependencies /workspace/apps/marketing/node_modules ./apps/marketing/node_modules
+# Inheriting the dependency stage keeps both root and workspace pnpm links.
 COPY . .
 
 RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \

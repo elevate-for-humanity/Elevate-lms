@@ -8,12 +8,14 @@ import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
 import HvacSystemLab from './HvacSystemLab';
 import HvacWorkbookTeaching from './HvacWorkbookTeaching';
+import BarberWorkbookSimulator from './BarberWorkbookSimulator';
+import BeautyWorkbookSimulator from './BeautyWorkbookSimulator';
 import HvacCompletionReview from './HvacCompletionReview';
 import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
-import { workbookLessonHref } from '@/lib/lms/workbook-lesson-links';
+import {workbookWritingComplete,firstWorkbookUnreviewedIndex} from '@/lib/lms/workbook-progression';
 
 function SectionEditor({
   section,
@@ -23,6 +25,7 @@ function SectionEditor({
   accountId,
   visual,
   workbookSlug,
+  onReviewSaved,
 }: {
   section: WorkbookSection;
   initial?: WorkbookResponse;
@@ -31,6 +34,7 @@ function SectionEditor({
   accountId: string;
   visual?: WorkbookVisual;
   workbookSlug: string;
+  onReviewSaved?: (sectionId: string, reviewed: boolean) => void;
 }) {
   const { draft, edit, save, status, error } = useWorkbookSave(
     section.id,
@@ -39,6 +43,7 @@ function SectionEditor({
     accountId,
   );
   const slides = workbookSlides(section, visual?.caption);
+  const hasMissingWriting = !workbookWritingComplete(draft.answers,Math.min(3,section.prompts.length));
   const [step, setStep] = useState(0);
   const [moving, setMoving] = useState(false);
   const slide = slides[step];
@@ -46,6 +51,8 @@ function SectionEditor({
   useEffect(() => {
     if (readOnly) return;
     try {
+      // A different section is a different lesson. Never infer its completion
+      // from training hours or from a previous browser session.
       const stored = sessionStorage.getItem(positionKey);
       if (stored !== null) {
         const value = Number(stored);
@@ -76,6 +83,8 @@ function SectionEditor({
     <section hidden={hidden} aria-labelledby={`section-${section.id}`}>
       {!hidden && workbookSlug === HVAC_WORKBOOK_SLUG ? <HvacWorkbookTeaching number={section.section_number} /> : null}
       {!hidden && section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && [5, 12].includes(section.section_number) ? <HvacSystemLab /> : null}
+      {!hidden && workbookSlug === 'prestige-elevation-barbering' && [15, 18, 22, 23, 24, 25, 26, 27].includes(section.section_number) ? <BarberWorkbookSimulator sectionNumber={section.section_number} /> : null}
+      {!hidden && section.section_number === 1 && ['prestige-elevation-cosmetology','prestige-elevation-esthetics','prestige-elevation-nail-technology'].includes(workbookSlug) ? <BeautyWorkbookSimulator slug={workbookSlug} /> : null}
       {!hidden && !readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && section.lesson_id ? (
         <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
       ) : null}
@@ -92,11 +101,6 @@ function SectionEditor({
       >
         {section.section_number}. {section.title}
       </h2>
-      {workbookLessonHref(section, workbookSlug) ? (
-        <a className="my-4 inline-flex min-h-12 items-center rounded-lg border border-slate-700 bg-white px-4 py-3 font-bold underline" href={workbookLessonHref(section, workbookSlug)!}>
-          Study the matching lesson section
-        </a>
-      ) : null}
       <div className="my-4 flex flex-wrap items-center gap-3">
         <button
           type="button"
@@ -218,13 +222,20 @@ function SectionEditor({
           <input
             type="checkbox"
             checked={draft.reviewed}
-            disabled={readOnly}
+            disabled={readOnly || hasMissingWriting}
             className="mt-1 h-6 w-6 shrink-0"
-            onChange={(event) => edit({ ...draft, reviewed: event.target.checked })}
+            onChange={(event) => {
+              const reviewed=event.target.checked;
+              edit({ ...draft, reviewed });
+              void save().then(saved => { if(saved) onReviewSaved?.(section.id, reviewed); });
+            }}
           />
           I reviewed this lesson and my practice responses. This is my study checklist, not
           instructor approval.
         </label>
+      )}
+      {slide.review && hasMissingWriting && (
+        <p className="text-sm font-semibold text-amber-900">Finish each writing activity with at least 10 characters before checking this section as reviewed. Personal reflections are saved without right-or-wrong grades.</p>
       )}
       <button
         type="button"
@@ -260,16 +271,36 @@ export default function DigitalWorkbook({
   readOnly: boolean;
   accountId: string;
 }) {
+  // Always start with the first workbook lesson when entering from a dashboard.
+  // Existing writing is preserved, but a saved browser slide position must never
+  // teleport a learner to Week 7 or conceal earlier sections.
   const [active, setActive] = useState(sections[0]?.id ?? '');
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(
+    () => new Set(responses.filter(row => row.reviewed).map(row => row.section_id))
+  );
+  const unlockedIndex = firstWorkbookUnreviewedIndex(sections.map(section=>section.id),reviewedIds);
   useEffect(() => {
     function selectLinkedSection() {
       const requested = window.location.hash.replace(/^#section-/, '');
-      if (sections.some((section) => section.id === requested)) setActive(requested);
+      const index = sections.findIndex(section => section.id === requested);
+      if (index >= 0 && index <= unlockedIndex) setActive(requested);
     }
     selectLinkedSection();
     window.addEventListener('hashchange', selectLinkedSection);
     return () => window.removeEventListener('hashchange', selectLinkedSection);
-  }, [sections]);
+  }, [sections, unlockedIndex]);
+  const reviewSaved=(id:string,reviewed:boolean) => {
+    setReviewedIds(previous => {
+      const next = new Set(previous);
+      if(reviewed) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+    // A successful saved review advances to the next lesson in this same
+    // workbook; never redirect through an unrelated dashboard.
+    const index=sections.findIndex(section=>section.id===id);
+    if(reviewed && index>=0 && index<sections.length-1) setActive(sections[index+1].id);
+  };
   const visuals = workbookVisualAssignments(workbook.slug, sections);
   return (
     <main className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
@@ -319,10 +350,13 @@ export default function DigitalWorkbook({
             <select
               id="workbook-section"
               value={active}
-              onChange={(event) => setActive(event.target.value)}
+              onChange={(event) => {
+                const index=sections.findIndex(section => section.id===event.target.value);
+                if(index>=0 && index<=unlockedIndex) setActive(event.target.value);
+              }}
               className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
             >
-              {sections.map((section) => (
+              {sections.filter((_,index)=>index<=unlockedIndex).map(section => (
                 <option key={section.id} value={section.id}>
                   {section.section_number}. {section.title}
                 </option>
@@ -343,6 +377,7 @@ export default function DigitalWorkbook({
                 hidden={section.id !== active}
                 readOnly={readOnly}
                 accountId={accountId}
+                onReviewSaved={reviewSaved}
               />
             ))}
           </>

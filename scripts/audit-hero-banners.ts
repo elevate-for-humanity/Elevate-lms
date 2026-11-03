@@ -164,8 +164,9 @@ if (homeWrapper === null) {
   console.error(`FAIL active homepage hero is missing: ${activeHomeHero}`);
   failures += 1;
 } else {
-  const expectedDesktopHeight = 'h-[clamp(360px,65svh,780px)]';
-  if (!homeWrapper.includes(expectedDesktopHeight) ||
+  const frame = readIfPresent('lib/images/hero-layout.ts');
+  if (!homeWrapper.includes('HERO_IMAGE_FRAME') ||
+      !frame?.includes('h-[clamp(210px,72vw,320px)] md:h-[clamp(360px,65svh,780px)]') ||
       !homeWrapper.includes('overflow-hidden') || !homeWrapper.includes('object-cover')) {
     console.error('FAIL active homepage hero lacks its bounded responsive media frame');
     failures += 1;

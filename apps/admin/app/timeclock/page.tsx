@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { DEFAULT_TIMECLOCK_TIME_ZONE, getTimeclockWorkDate } from '@/lib/timeclock/work-date';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import {
@@ -12,11 +13,11 @@ export const metadata: Metadata = { title: 'Timeclock Operations | Admin' };
 
 function fmtTime(iso: string | null) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: DEFAULT_TIMECLOCK_TIME_ZONE });
 }
 function fmtDate(iso: string | null) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: DEFAULT_TIMECLOCK_TIME_ZONE });
 }
 function elapsed(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -47,7 +48,7 @@ export default async function TimeclockPage({
   const sp = await searchParams;
   const tab = sp.tab || 'live';
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getTimeclockWorkDate();
   const dateFilter = sp.date || today;
 
   // ── Currently clocked in (no clock_out_at, today) ────────────────────────
@@ -55,6 +56,7 @@ export default async function TimeclockPage({
     .from('progress_entries')
     .select('id, apprentice_id, partner_id, program_id, site_id, work_date, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at, auto_clocked_out, status, hours_worked')
     .eq('work_date', today)
+    .not('clock_in_at', 'is', null)
     .is('clock_out_at', null)
     .order('clock_in_at', { ascending: false });
 

@@ -1,5 +1,7 @@
 import HvacHandsOnClock from '@/components/learner/HvacHandsOnClock';
 import { Metadata } from 'next';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -17,31 +19,35 @@ export default async function AttendancePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  // Get user's enrollments to find their attendance
-  const { data: enrollments } = await supabase
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/lms/attendance');
+  // Both reads are scoped to the authenticated learner.
+  const { data: enrollments, error: enrollmentError } = await db
     .from('program_enrollments')
     .select('id, course_id, courses(title)')
-    .eq('user_id', user.id);
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`);
+  if (enrollmentError) throw new Error('Attendance enrollment lookup failed');
 
   const enrollmentIds = enrollments?.map((e) => e.id) || [];
 
-  const { data: attendance } =
+  const { data: attendance, error: attendanceError } =
     enrollmentIds.length > 0
-      ? await supabase
+      ? await db
           .from('attendance_hours')
-          .select('*')
+          .select('id,enrollment_id,date,hours_logged,type,verified')
+          .eq('user_id', subject.userId)
           .in('enrollment_id', enrollmentIds)
           .order('date', { ascending: false })
           .limit(50)
-      : { data: [] };
+      : { data: [], error: null };
+  if (attendanceError) throw new Error('Attendance history lookup failed');
 
   // Build enrollment lookup for course titles
   const enrollmentMap = new Map(enrollments?.map((e) => [e.id, e]) || []);
 
   const totalHoursLogged =
-    attendance?.reduce((sum: number, a: any) => sum + (a.hours_logged || 0), 0) || 0;
+    [...(attendance || [])].reduce((sum, row) => sum + Number(row.hours_logged || 0), 0);
   const verifiedCount = attendance?.filter((a: any) => a.verified).length || 0;
   const totalCount = attendance?.length || 0;
 

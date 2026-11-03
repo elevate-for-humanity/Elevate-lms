@@ -96,6 +96,17 @@ test('only the newest request for the selected app can start an expensive build'
   );
   assert.deepEqual(f.writes, []);
 });
+test('a delayed dispatch index requires branch evidence for the same run and still rejects a newer release', async () => {
+  const workflow = WEB_RELEASE_WORKFLOWS[0];
+  const check = (filtered, recent) => assertLatestWebReleaseRequest({
+    repository, workflow, runId: 3,
+    api: async path => ({ workflow_runs: path.includes('event=workflow_dispatch') ? filtered : recent }),
+  });
+  assert.equal((await check([row(2)], [row(4, 'success', {event:'push'}), row(3)])).runId, 3);
+  await assert.rejects(check([row(2)], [row(4), row(3)]), /SUPERSEDED_RELEASE_REQUEST:4/);
+  await assert.rejects(check([row(4)], [row(3)]), /SUPERSEDED_RELEASE_REQUEST:4/);
+  await assert.rejects(check([row(2)], [row(2)]), /NOT_VISIBLE_IN_INVENTORY/);
+});
 test('large GitHub inventories are read without a subprocess output buffer', async () => {
   const payload = {
     workflow_runs: [{ ...row(1), head_commit: { message: 'x'.repeat(2_000_000) } }],
@@ -367,4 +378,22 @@ test('GitHub synthetic cancellation clock ordering does not invent a newer rollo
    {completed_at:'2026-10-30T00:08:45Z'}])
    await assert.rejects(check({...unstarted,...change}),/ROLLOUT_STARTED/);
  }
+});
+
+test('a tested rollout verifies the current run in the branch index and still refuses a newer rollout', async () => {
+  const {assertTestedWebRollout}=await import('./prune-web-release-requests.mjs');
+  const sha='a'.repeat(40);
+  const current=row(3,'in_progress',{head_sha:sha});
+  const run=(filtered,branch,commitSha=sha)=>assertTestedWebRollout({
+    repository,workflow:'deploy-admin.yml',runId:3,commitSha,
+    api:async path=>{
+      if(path.includes('/workflows/'))return {workflow_runs:path.includes('event=workflow_dispatch')?filtered:branch};
+      if(path.includes('/runs/3/'))return {total_count:1,jobs:[{name:'Build and upload Admin image',status:'completed',conclusion:'success'}]};
+      return {total_count:1,jobs:[{name:'Deploy and verify Admin on Google',status:'in_progress'}]};
+    },
+  });
+  assert.equal((await run([row(2)],[current])).runId,3);
+  await assert.rejects(run([row(2)],[current],'b'.repeat(40)),/COMMIT_MISMATCH/);
+  await assert.rejects(run([row(4)],[current]),/ROLLOUT_STARTED/);
+  await assert.rejects(run([row(2)],[row(2)]),/NOT_VISIBLE_IN_INVENTORY/);
 });

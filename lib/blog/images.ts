@@ -16,11 +16,9 @@ export function getBlogImage(post: {
   return LEGACY_BLOG_IMAGES[source] || source;
 }
 
-const archivedThumbnails = new Set(archivedCardImages);
+const archivedThumbnails = new Map(Object.entries(archivedCardImages));
 
 /** The archive links to print-size photos. Lists use smaller copies of the same images. */
 export function getBlogCardImage(source: string): string {
-  const match = /^https:\/\/cdn\.durable\.co\/getty\/([A-Za-z0-9_-]+)\.jpeg$/.exec(source);
-  if (match && archivedThumbnails.has(match[1])) return `/images/blog-cards/${match[1]}.webp`;
-  return source;
+  return archivedThumbnails.get(source) ?? source;
 }

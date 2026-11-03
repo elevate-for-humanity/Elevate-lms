@@ -59,6 +59,9 @@ export default async function FeaturedHostPartners({
       })),
     }));
 
+  // Program-specific, image-first cards: every approved shop gets equal space.
+  const compactShowcase = ['barber-apprenticeship', 'cosmetology-apprenticeship', 'nail-technician-apprenticeship'].includes(programSlug ?? '');
+
   // Show every verified barber host in one directory, including Kountry Kutz.
   // The prior exclusion made the featured shop disappear from the network list.
   const directoryShops = shops;
@@ -115,7 +118,7 @@ export default async function FeaturedHostPartners({
 
   return (
     <>
-      {programSlug !== 'barber-apprenticeship' ? (
+      {!compactShowcase ? (
         <HostShopShowcase
           shops={shops}
           enableNarration
@@ -139,7 +142,7 @@ export default async function FeaturedHostPartners({
               Training network & local businesses
             </p>
             <h2 className="mt-2 text-center text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-              Visit, book, and train with our host-shop network
+              Meet our Host Shops
             </h2>
             <p className="mx-auto mt-3 max-w-3xl text-center text-base font-medium leading-7 text-slate-700">
               Each participating shop is a real local business. Use the contact, website, and map
@@ -188,11 +191,11 @@ export default async function FeaturedHostPartners({
                         </span>
                       </div>
 
-                      <p className="mt-3 line-clamp-2 text-xs font-medium leading-5 text-slate-700">
+                      <p className="mt-2 hidden text-xs font-medium leading-5 text-slate-700 sm:line-clamp-2">
                         {shop.marketingBlurb ?? shop.note}
                       </p>
 
-                      <div className="mt-3 space-y-2 border-y border-slate-100 py-3">
+                      <div className="mt-2 hidden space-y-2 border-y border-slate-100 py-3 sm:block">
                         <p className="flex items-start gap-2 text-sm font-bold text-slate-800">
                           <MapPin
                             className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700"
@@ -215,7 +218,7 @@ export default async function FeaturedHostPartners({
                         )}
                       </div>
 
-                      <div className="mt-5 flex flex-wrap gap-2">
+                      <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
                         {shop.programs.map((program) => (
                           <span
                             key={program}
@@ -226,7 +229,7 @@ export default async function FeaturedHostPartners({
                         ))}
                       </div>
 
-                      <div className="mt-auto flex flex-wrap gap-3 pt-6">
+                      <div className="mt-auto flex flex-wrap gap-2 pt-3 sm:pt-5">
                         <Link
                           href={`/host-shops/${shop.slug}`}
                           className="inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-brand-red-700"
@@ -237,7 +240,7 @@ export default async function FeaturedHostPartners({
                           href={directionsUrl(fullAddress)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-extrabold text-slate-900 transition hover:bg-slate-50"
+                          className="hidden min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-extrabold text-slate-900 transition hover:bg-slate-50 sm:inline-flex"
                         >
                           <Navigation className="h-4 w-4" aria-hidden="true" /> Map & directions
                         </a>

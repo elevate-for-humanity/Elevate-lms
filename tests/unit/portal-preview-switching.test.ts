@@ -28,6 +28,9 @@ vi.mock('@/lib/supabase/admin', () => ({
           return query;
         },
         order: () => query,
+        then: (resolve: (result: unknown) => unknown) => resolve({ data: state.member ? [
+          { user_id: 'older-member', role: 'partner_admin' }, { user_id: state.member, role: 'owner' },
+        ] : [] }),
         limit: () => query,
         maybeSingle: async () => ({
           data:

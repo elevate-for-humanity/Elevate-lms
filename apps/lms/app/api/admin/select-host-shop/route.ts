@@ -1,3 +1,4 @@
+import { hostShopPreviewMemberId } from '@/lib/partners/host-shop-preview-member';
 import { randomUUID } from 'node:crypto';
 import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
 import { NextRequest, NextResponse } from 'next/server';
@@ -109,15 +110,15 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
     );
   }
 
-  const { data: previewMember } = await db
+  const { data: members, error: memberError } = await db
     .from('partner_users')
-    .select('user_id')
+    .select('user_id,role')
     .eq('partner_id', partnerId)
     .eq('status', 'active')
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  const previewUserId = previewMember?.user_id || '';
+    .order('created_at')
+    .order('user_id');
+  if (memberError) return NextResponse.json({ error: 'Unable to load the shop’s linked accounts.' }, { status: 503 });
+  const previewUserId = hostShopPreviewMemberId(members) || '';
   const previewActorId = handoff?.actorId || actor?.id || '';
 
   const destination =

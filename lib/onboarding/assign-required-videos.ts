@@ -26,28 +26,19 @@ export async function assignRequiredOnboardingVideos(
     );
   }
 
-  const rows = videos.map((video) => ({
-    user_id: input.userId,
-    enrollment_id: input.enrollmentId,
-    program_id: input.programId ?? null,
-    video_key: video.id,
-    title: video.title,
-    sequence: video.sequence,
-    required: video.required,
-    acknowledgment_required:
-      video.acknowledgmentRequired ?? false,
-    status: 'assigned',
-    watch_seconds: 0,
-    completion_percentage: 0,
-    assigned_at: new Date().toISOString(),
-  }));
+  const enrollment = await supabase.from('program_enrollments').select('id')
+    .eq('id', input.enrollmentId).eq('user_id', input.userId).maybeSingle();
+  if (enrollment.error || !enrollment.data) throw new Error('Enrollment could not be verified');
+  // General orientation is assigned once per person/video by the canonical
+  // schema. Reassignment must preserve existing watch/completion evidence.
+  const rows = videos.map(video => ({ user_id: input.userId, video_key: video.id }));
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('onboarding_video_assignments')
     .upsert(rows, {
-      onConflict: 'user_id,enrollment_id,video_key',
-    })
-    .select();
+      onConflict: 'user_id,video_key',
+      ignoreDuplicates: true,
+    });
 
   if (error) {
     throw new Error(
@@ -55,5 +46,12 @@ export async function assignRequiredOnboardingVideos(
     );
   }
 
-  return data;
+  const assignments = await supabase.from('onboarding_video_assignments').select('*')
+    .eq('user_id', input.userId).in('video_key', videos.map(video => video.id));
+  if (assignments.error) throw new Error('Assigned onboarding videos could not be read');
+  return (assignments.data ?? []).map(row => {
+    const video = videos.find(item => item.id === row.video_key)!;
+    return { ...row, title: video.title, sequence: video.sequence, required: video.required,
+      acknowledgment_required: video.acknowledgmentRequired ?? false };
+  }).sort((a, b) => a.sequence - b.sequence);
 }

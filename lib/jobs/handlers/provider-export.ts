@@ -44,7 +44,7 @@ async function fetchRows(
         .select('id, full_name, email, phone, city, state, created_at, role')
         .eq('tenant_id', tenantId)
         .eq('role', 'student')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }).throwOnError();
       return data ?? [];
     }
 
@@ -53,21 +53,21 @@ async function fetchRows(
         .from('program_enrollments')
         .select('id, user_id, program_id, status, funding_source, enrolled_at, completed_at')
         .eq('tenant_id', tenantId)
-        .order('enrolled_at', { ascending: false });
+        .order('enrolled_at', { ascending: false }).throwOnError();
       return data ?? [];
     }
 
     case 'completions': {
       const { data } = await db
         .from('program_completion')
-        .select('id, user_id, program_id, completed_at, credential_earned, certificate_issued_at')
+        .select('id, user_id, program_id, completed_at')
         .in(
           'program_id',
-          (await db.from('programs').select('id').eq('tenant_id', tenantId)).data?.map(
+          (await db.from('programs').select('id').eq('tenant_id', tenantId).throwOnError()).data?.map(
             (p: any) => p.id,
           ) ?? [],
         )
-        .order('completed_at', { ascending: false });
+        .order('completed_at', { ascending: false }).throwOnError();
       return data ?? [];
     }
 
@@ -75,15 +75,15 @@ async function fetchRows(
       const { data } = await db
         .from('learner_credentials')
         .select(
-          'id, learner_id, credential_id, status, issued_at, expires_at, verified_at, verification_source',
+          'id, learner_id, credential_id, status, issued_at, expires_at, verification_code',
         )
         .in(
           'learner_id',
           (
-            await db.from('profiles').select('id').eq('tenant_id', tenantId).eq('role', 'student')
+            await db.from('profiles').select('id').eq('tenant_id', tenantId).eq('role', 'student').throwOnError()
           ).data?.map((p: any) => p.id) ?? [],
         )
-        .order('issued_at', { ascending: false });
+        .order('issued_at', { ascending: false }).throwOnError();
       return data ?? [];
     }
 
@@ -94,7 +94,7 @@ async function fetchRows(
           'id, learner_id, employer_id, program_id, hire_date, job_title, employment_type, hourly_wage, verification_source, status, created_at',
         )
         .eq('tenant_id', tenantId)
-        .order('hire_date', { ascending: false });
+        .order('hire_date', { ascending: false }).throwOnError();
       return data ?? [];
     }
 

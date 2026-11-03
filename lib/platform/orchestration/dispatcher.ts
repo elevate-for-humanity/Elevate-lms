@@ -43,6 +43,7 @@ export interface OrchestrationProcessResult {
   blocked?: 'historical_backlog_review_required';
   backlogCount?: number;
   cutoff?: string;
+  historicalBacklogCount?: number;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -407,10 +408,9 @@ export async function processPendingPlatformEvents(limit = 20): Promise<Orchestr
   if (waiting.count === null || stale.count === null) throw new Error('WORKFLOW_EVENT_BACKLOG_CHECK_UNCONFIRMED');
   const backlogCount = Number(waiting.count) + Number(stale.count);
   if (!Number.isFinite(backlogCount)) throw new Error('WORKFLOW_EVENT_BACKLOG_CHECK_UNCONFIRMED');
-  if (backlogCount > 0) {
-    return { claimed: 0, processed: 0, failed: 0, workflowRuns: 0, eventIds: [],
-      blocked: 'historical_backlog_review_required', backlogCount, cutoff };
-  }
+  // The claim RPC independently excludes historical events. Preserve that
+  // evidence for review without allowing it to stop unrelated fresh work.
+  // Old rows are never replayed, mutated or marked successfully processed here.
   const { data: claimed, error } = await db.rpc('claim_platform_events_v1', { p_limit: boundedLimit });
   if (error) throw error;
 
@@ -421,6 +421,7 @@ export async function processPendingPlatformEvents(limit = 20): Promise<Orchestr
     failed: 0,
     workflowRuns: 0,
     eventIds: events.map((event) => event.id),
+    ...(backlogCount > 0 ? { historicalBacklogCount: backlogCount, cutoff } : {}),
   };
 
   for (const event of events) {

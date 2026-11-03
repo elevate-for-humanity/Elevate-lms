@@ -30,7 +30,7 @@ function database(events = [event()]) {
   const db: any = {
     tables, writes,
     failWhen(predicate?: (operation: Operation) => boolean) { fail = predicate; },
-    rpc: vi.fn(async (_name: string, args: { p_limit: number }) => ({ data: structuredClone(tables.platform_events.slice(0, args.p_limit)), error: null })),
+    rpc: vi.fn(async (_name: string, args: { p_limit: number }) => ({ data: structuredClone(tables.platform_events.filter(row => Date.parse(row.created_at) >= now.getTime() - 24 * 60 * 60_000 && ['pending', 'failed'].includes(row.processing_status)).slice(0, args.p_limit)), error: null })),
     from(table: string) {
       const filters: Array<(row: any) => boolean> = [];
       let one = false;
@@ -128,21 +128,30 @@ describe('canonical event workflow dispatch', () => {
 });
 
 describe('historical event replay release gate', () => {
-  it.each(['pending', 'failed'])('blocks old eligible %s work before claims or any mutation', async status => {
+
+  it('processes a fresh event while retaining historical pending evidence untouched', async () => {
+    const historical = event({ id: 'old-event', created_at: old });
+    const db = database([historical, event()]);
+    expect(await processPendingPlatformEvents()).toMatchObject({ processed: 1, historicalBacklogCount: 1 });
+    expect(db.tables.platform_events.find((row: any) => row.id === 'old-event')).toEqual(historical);
+    expect(mocks.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['pending', 'failed'])('holds old eligible %s work without stopping fresh claims or mutating history', async status => {
     const db = database([event({ created_at: old, processing_status: status })]);
     const before = structuredClone(db.tables);
     expect(await processPendingPlatformEvents()).toEqual({ claimed: 0, processed: 0, failed: 0, workflowRuns: 0, eventIds: [],
-      blocked: 'historical_backlog_review_required', backlogCount: 1, cutoff: '2026-10-21T12:00:00.000Z' });
-    expect(db.rpc).not.toHaveBeenCalled();
+      historicalBacklogCount: 1, cutoff: '2026-10-21T12:00:00.000Z' });
+    expect(db.rpc).toHaveBeenCalledTimes(1);
     expect(mocks.execute).not.toHaveBeenCalled();
     expect(db.writes).toHaveLength(0);
     expect(db.tables).toEqual(before);
   });
 
-  it('also blocks a historical run whose processing lease has expired', async () => {
+  it('holds a historical run whose processing lease has expired', async () => {
     const db = database([event({ created_at: old, processing_status: 'processing', locked_at: fresh })]);
-    expect(await processPendingPlatformEvents()).toMatchObject({ blocked: 'historical_backlog_review_required', backlogCount: 1 });
-    expect(db.rpc).not.toHaveBeenCalled();
+    expect(await processPendingPlatformEvents()).toMatchObject({ historicalBacklogCount: 1, claimed: 0 });
+    expect(db.rpc).toHaveBeenCalledTimes(1);
     expect(db.writes).toHaveLength(0);
   });
 

@@ -8,7 +8,6 @@ import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
-import {publishTaskToMain} from '@/lib/devstudio/main-release.mjs';
 import {readRecentRepairEvents} from './repair-events';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
 
@@ -130,18 +129,10 @@ export async function publishParisRepair(id:string,runId:number){
  if(ref.object?.sha!==candidate.branch.sha)throw Error('REPAIR_CANDIDATE_CHANGED_AFTER_VALIDATION');
  const comparison=await gh(`/compare/${candidate.base_sha}...${candidate.branch.sha}`);
  if(!Array.isArray(comparison.files)||comparison.files.length>=300)throw Error('COMPLETE_REPAIR_FILE_INVENTORY_REQUIRED');
- if(comparison.files.some((file:any)=>infrastructureRepairPath(file.filename))){
-  const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub,graphql:(body:any)=>infrastructureGitHub('/graphql',{method:'POST',body:JSON.stringify(body)})});
-  await update(id,{verification:{...row.verification,infrastructureRepair:true,pullRequest}});
-  return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
- }
- const release=await publishTaskToMain({baseSha:candidate.base_sha,branchSha:candidate.branch.sha,githubJson:gh});
- await update(id,{status:'deploying',release_sha:release.sha,verification:{requestedDeployments:['deploy-admin.yml'],requestedDeploymentAt:{'deploy-admin.yml':new Date().toISOString()}}});
- // Explicit dispatch is required even when the stored token cannot trigger push workflows.
- try{
-  await gh('/actions/workflows/deploy-admin.yml/dispatches',{method:'POST',body:JSON.stringify({ref:'main',inputs:{requested_sha:release.sha}})});
- }catch(error){await update(id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_DISPATCH_FAILED'});throw error;}
- return release;
+ const infrastructureRepair=comparison.files.some((file:any)=>infrastructureRepairPath(file.filename));
+ const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub,graphql:(body:any)=>infrastructureGitHub('/graphql',{method:'POST',body:JSON.stringify(body)})});
+ await update(id,{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
+ return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
 }
 export async function reportParisRepairFailure(id:string,runId:number){
  const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
@@ -251,7 +242,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  const active=await db.from('paris_code_repairs').select('id,status,release_sha,workflow_run_id,source_job_id,verification,updated_at').in('status',['dispatched','patching','validating','deploying','verifying']).limit(10);
  if(active.error)throw active.error;
  for(const repair of active.data??[]){
-  if(repair.status==='validating'&&repair.verification?.infrastructureRepair&&repair.verification?.pullRequest){
+  if(repair.status==='validating'&&repair.verification?.pullRequest){
    try{
     const pr=await gh('/pulls/'+repair.verification.pullRequest.number);
     const sha=infrastructureMergeEvidence(pr,repair.verification.pullRequest.headSha);
@@ -266,7 +257,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    if(run.status==='completed'&&run.conclusion!=='success')await update(repair.id,{status:'blocked',error_code:'REPAIR_WORKFLOW_'+run.conclusion});
   }
   if(repair.release_sha&&['deploying','verifying'].includes(repair.status)){
-   const deployments=repair.verification?.infrastructureRepair?[...REPAIR_DEPLOYMENTS,STORE_REPAIR_DEPLOYMENT]:REPAIR_DEPLOYMENTS;
+   const deployments=repair.verification?.protectedMerge?[...REPAIR_DEPLOYMENTS,STORE_REPAIR_DEPLOYMENT]:REPAIR_DEPLOYMENTS;
    const runs=await gh(`/actions/runs?head_sha=${repair.release_sha}&per_page=100`);
    const state=repairDeploymentState(runs.workflow_runs??[],repair.release_sha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
@@ -289,10 +280,10 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    // Exact immutable runtime identity is required on all three production apps.
    // Keep the immutable release verification receipt while its course runs.
    // A later unrelated deployment must not erase an already verified rollout.
-   const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.infrastructureRepair?['https://store.elevateforhumanity.org']:[])];
+   const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.protectedMerge?['https://store.elevateforhumanity.org']:[])];
    const checks=repair.verification?.exactRuntimeSha===true?origins.map(()=>true):await Promise.all(origins.map(async origin=>{
     const response=await fetch(origin+'/api/health',{cache:'no-store',signal:AbortSignal.timeout(10000)});
-    const body=await response.json();return response.ok&&(!repair.verification?.infrastructureRepair||(body.healthy===true&&body.ready===true))&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
+    const body=await response.json();return response.ok&&(!repair.verification?.protectedMerge||(body.healthy===true&&body.ready===true))&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
    }));
    const verification:any={...repair.verification,tests:'passed',deployments:'passed',exactRuntimeSha:checks.every(Boolean),runtimeVerifiedAt:repair.verification?.runtimeVerifiedAt??(checks.every(Boolean)?new Date().toISOString():null)};
    if(!checks.every(Boolean)){await update(repair.id,{status:'verifying',verification});continue;}

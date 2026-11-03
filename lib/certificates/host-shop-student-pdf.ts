@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName, PDFRawStream, rgb } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFRawStream, StandardFonts, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -37,20 +37,43 @@ export async function hostStudentCertificatePdf(record: HostStudentCertificate) 
   center('CAREER & TECHNICAL INSTITUTE', 517, 11);
   page.drawLine({ start: { x: 280, y: 496 }, end: { x: 512, y: 496 }, color: red, thickness: 3 });
   center(record.title, 452, 34, bold, red);
-  center(record.status === 'application' ? 'This acknowledges the application of' : 'This certifies the current student record for', 410, 14, sans, gray);
+  center(record.completion ? 'This certifies successful course completion by' : record.status === 'application' ? 'This acknowledges the application of' : 'This certifies the current student record for', 410, 14, sans, gray);
   center(record.studentName, 357, 34, bold);
   center(record.program, 318, 19, bold);
-  center('HOST TRAINING SITE', 272, 10, sans, gray);
+  center(record.completion ? 'CREDENTIAL EARNED' : 'HOST TRAINING SITE', 272, 10, sans, gray);
   center(record.shopName, 245, 23, bold);
   const status = record.status === 'enrolled' ? 'Enrollment recorded with Elevate for Humanity' : record.status === 'application' ? 'Application received - enrollment and training authorization pending' : 'Host-site placement recorded - enrollment not confirmed';
-  center(status, 202, 12, sans, gray);
+  const completionDate = (value: string) => new Date(value + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'long', day: 'numeric' });
+  center(record.completion ? `Started: ${completionDate(record.completion.startDate)} | Completed: ${completionDate(record.completion.completionDate)}` : status, 202, 12, sans, gray);
   const dateValue = record.recordDate && /^\d{4}-\d{2}-\d{2}$/.test(record.recordDate) ? `${record.recordDate}T12:00:00Z` : record.recordDate;
   const date = dateValue ? new Date(dateValue).toLocaleDateString('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not recorded';
-  center(`Record date: ${date}`, 178, 11, sans, gray);
-  center('Issued from Elevate student records', 128, 12, bold);
-  center('This document confirms application, enrollment or host-site assignment only.', 101, 10, sans, gray);
-  center('It does not certify program completion, licensure, hours or authorization to begin work.', 85, 10, sans, gray);
-  center(record.reference, 51, 8, sans, gray);
+  center(`${record.completion ? 'Issued date' : 'Record date'}: ${date}`, 178, 11, sans, gray);
+  if (record.status === 'enrolled') {
+    center('2Exclusive LLC-S', 158, 12, bold);
+    center('DOL Apprenticeship Sponsor', 142, 10);
+    // Institutional Elevate seal; this is not a government seal.
+    page.drawCircle({ x: 138, y: 97, size: 34, borderColor: red, borderWidth: 1.6 });
+    page.drawCircle({ x: 138, y: 97, size: 30, borderColor: red, borderWidth: .7 });
+    const at = (text: string, x: number, y: number, size: number, font = sans, color = navy) =>
+      page.drawText(text, { x: x - font.widthOfTextAtSize(text, size) / 2, y, size, font, color });
+    at('ELEVATE', 138, 110, 8, bold, red);
+    at('OFFICIAL', 138, 98, 8, bold, red);
+    at('SEAL', 138, 86, 9, bold, red);
+    at('FOR HUMANITY', 138, 75, 6, sans, red);
+    center('Issued by Elevate for Humanity', 97, 10, bold);
+    // Elizabeth Greene authorized this typed signature for enrollment certificates.
+    const signature = await pdf.embedFont(StandardFonts.TimesRomanItalic);
+    at('Elizabeth Greene', 607, 100, 20, signature);
+    page.drawLine({ start: { x: 510, y: 92 }, end: { x: 704, y: 92 }, color: navy, thickness: .6 });
+    at('Elizabeth Greene | Authorized Signature', 607, 78, 8);
+    center(record.completion ? 'This certifies course completion. External certifications and professional licenses are issued separately.' : 'Enrollment confirmation only. This is not a completion certificate or professional license.', 50, 8, sans, gray);
+    center(record.reference, 35, 7, sans, gray);
+  } else {
+    center('Issued from Elevate student records', 128, 12, bold);
+    center('This document confirms application, enrollment or host-site assignment only.', 101, 10, sans, gray);
+    center('It does not certify program completion, licensure, hours or authorization to begin work.', 85, 10, sans, gray);
+    center(record.reference, 51, 8, sans, gray);
+  }
   await bold.embed();
   await sans.embed();
   // Full OpenType assets include the SFNT wrapper, not a raw CFF program.

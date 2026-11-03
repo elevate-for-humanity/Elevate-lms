@@ -376,13 +376,31 @@ export async function issueProgramCertificate(
   // Email (non-fatal)
   if (studentEmail) {
     try {
-      const { emailService } = await import('@/lib/notifications/email');
-      await emailService.sendCertificateNotification(
-        studentEmail,
-        studentName,
-        courseTitle,
-        verifyUrl,
-      );
+      const enrollment = await db.from('program_enrollments')
+        .select('training_start_date,student_start_date,start_date')
+        .eq('id', enrollmentId).maybeSingle();
+      if (enrollment.error) throw new Error('Training start date unavailable for completion document');
+      const start = enrollment.data?.training_start_date || enrollment.data?.student_start_date || enrollment.data?.start_date;
+      if (start) {
+        const { programCompletionPdf } = await import('@/lib/certificates/program-completion-pdf');
+        const { sendEmail } = await import('@/lib/email/sendgrid');
+        const bytes = await programCompletionPdf({
+          certificateNumber: certNumber, studentName, studentId: userId, courseTitle,
+          startDate: String(start).slice(0, 10), completionDate: now.slice(0, 10),
+        });
+        const escape = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
+        const result = await sendEmail({
+          singleAttempt: true, to: studentEmail,
+          subject: `Your certificate of completion: ${courseTitle}`,
+          html: `<p>Hello ${escape(studentName)},</p><p>Congratulations on completing ${escape(courseTitle)}. Your signed Elevate certificate, including your training start and completion dates, is attached.</p><p>This is Elevate's course completion credential. External exam certifications are issued separately by their certification body.</p><p>Elizabeth Greene<br>Elevate for Humanity</p>`,
+          attachments: [{ content: Buffer.from(bytes).toString('base64'), filename: `${certNumber}.pdf`, type: 'application/pdf', disposition: 'attachment' }],
+        });
+        if (!result.success) throw new Error(result.error || 'Completion certificate email was not accepted');
+      } else {
+        const { emailService } = await import('@/lib/notifications/email');
+        await emailService.sendCertificateNotification(studentEmail, studentName, courseTitle, verifyUrl);
+        logger.warn('[cert-compiler] Dated PDF awaits verified training start date', { enrollmentId });
+      }
     } catch (e) {
       logger.warn('[cert-compiler] Email failed (non-fatal)', { error: (e as Error).message });
     }

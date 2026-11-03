@@ -2,6 +2,7 @@ import { storeInboundCommunicationEmail } from './communication-inbound';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from './sendgrid';
 import { safeMailboxDisplayName, textToEmailHtml } from './communication-email';
+import { enrollmentCertificateAttachments } from '@/lib/certificates/enrollment-issuance';
 import { applicantConversationSubject } from './program-conversation-routing';
 export async function processInterofficeOutbox(limit = 20) {
   const db = await requireAdminClient();
@@ -32,6 +33,16 @@ export async function processInterofficeOutbox(limit = 20) {
       await db
         .from('communication_email_outbox')
         .update({ status: 'failed', error_message: 'Sending mailbox unavailable' })
+        .eq('id', row.id);
+      failed++;
+      continue;
+    }
+    let certificateAttachments;
+    try {
+      certificateAttachments = await enrollmentCertificateAttachments(db, row.campaign_key, row.recipient_email);
+    } catch {
+      await db.from('communication_email_outbox')
+        .update({ status: 'failed', error_message: 'Certificate payment, identity or recipient verification failed; email not sent' })
         .eq('id', row.id);
       failed++;
       continue;
@@ -83,6 +94,7 @@ export async function processInterofficeOutbox(limit = 20) {
     }
     const result = await sendEmail({
       singleAttempt: true,
+      ...(certificateAttachments ? { attachments: certificateAttachments } : {}),
       to: row.recipient_email,
       from: `${displayName} <${mailbox.address}>`,
       replyTo: mailbox.address,

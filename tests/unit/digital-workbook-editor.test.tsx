@@ -53,11 +53,13 @@ it('shows one section at a time and restores saved answers on reopening', async 
   await waitFor(() =>
     expect(within(region).getByRole('status')).toHaveTextContent('Saved to your account'),
   );
+  // Workbook progression is sequential. A newly opened account must not
+  // silently jump into section 2 just because that section exists.
+  expect(screen.getByRole('option', { name: /2\. Study topic 2/ })).toBeDisabled();
   fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
     target: { value: 'section-2' },
   });
-  expect(screen.queryByRole('region', { name: '1. Study topic 1' })).toBeNull();
-  expect(screen.getByRole('region', { name: '2. Study topic 2' })).toBeVisible();
+  expect(screen.getByRole('region', { name: '1. Study topic 1' })).toBeVisible();
   view.unmount();
   render(
     <DigitalWorkbook
@@ -78,6 +80,35 @@ it('shows one section at a time and restores saved answers on reopening', async 
   expect(
     within(screen.getByRole('region', { name: '1. Study topic 1' })).getAllByRole('textbox')[0],
   ).toHaveValue('My saved learning notes');
+});
+
+it('unlocks the next section only after a saved review, without losing written responses', () => {
+  render(
+    <DigitalWorkbook
+      accountId="current-user"
+      workbook={workbook}
+      sections={sections}
+      responses={[{
+        section_id: 'section-1',
+        answers: {
+          notes: 'I studied the safety procedures.',
+          practice1: 'I explained a detailed learning goal.',
+          practice2: 'I described an appropriate workplace response.',
+          practice3: 'I wrote my practice plan for the week.',
+          nextGoal: 'I will review the next section tomorrow.',
+        },
+        reviewed: true,
+        version: 1,
+        updated_at: 'now',
+      }]}
+      readOnly={false}
+    />,
+  );
+  expect(screen.getByRole('option', { name: /2\. Study topic 2/ })).not.toBeDisabled();
+  fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
+    target: { value: 'section-2' },
+  });
+  expect(screen.getByRole('region', { name: '2. Study topic 2' })).toBeVisible();
 });
 
 it('keeps administrator previews read-only', () => {

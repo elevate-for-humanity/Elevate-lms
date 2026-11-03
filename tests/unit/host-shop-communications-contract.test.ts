@@ -50,7 +50,9 @@ describe('Host Shop communications contract', () => {
     expect(phonePage).toContain('await requireRole(HOST_SHOP_ROLES)');
     expect(phonePage).toContain('<ProgramHolderPhone roleLabel="Host Shop"');
     expect(phonePage).toContain('calendarHref="/host-shop/dashboard/schedule"');
-    expect(phonePage).toContain('emailHref="/host-shop/dashboard/email"');
+    expect(phonePage).toContain('emailHref="/host-shop/email"');
+    const legacy = readFileSync('apps/lms/app/host-shop/dashboard/email/page.tsx', 'utf8');
+    expect(legacy).toContain("redirect('/host-shop/email')");
     expect(phoneApi).toContain("'host_shop'");
     expect(phoneApi).toContain("'host_shop_admin'");
     expect(phoneApi).toContain("'partner'");

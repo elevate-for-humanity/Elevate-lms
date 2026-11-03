@@ -2,19 +2,22 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Loader2, Upload } from 'lucide-react';
 
 type Props = {
+  photoUrl?: string | null;
   logoUrl?: string | null;
   flyerUrl?: string | null;
   videoUrl?: string | null;
   publicProfileUrl?: string | null;
 };
 
-export default function HostShopPublicMediaForm({ logoUrl, flyerUrl, videoUrl, publicProfileUrl }: Props) {
+export default function HostShopPublicMediaForm({ photoUrl, logoUrl, flyerUrl, videoUrl, publicProfileUrl }: Props) {
   const [logo, setLogo] = useState(logoUrl || '');
   const [flyer, setFlyer] = useState(flyerUrl || '');
-  const [photo, setPhoto] = useState('');
+  const [photo, setPhoto] = useState(photoUrl || '');
+  const router = useRouter();
   const [video, setVideo] = useState(videoUrl || '');
   const [busy, setBusy] = useState<'logo' | 'flyer' | 'photo' | 'video' | null>(null);
   const [message, setMessage] = useState('');
@@ -34,6 +37,7 @@ export default function HostShopPublicMediaForm({ logoUrl, flyerUrl, videoUrl, p
       else if (kind === 'flyer') setFlyer(data.url);
       else if (kind === 'photo') setPhoto(data.url);
       else setVideo(data.url);
+      router.refresh();
       setMessage(`${kind === 'logo' ? 'Logo' : kind === 'flyer' ? 'Flyer' : kind === 'photo' ? 'Photo' : 'Video'} published successfully.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Upload failed.');
@@ -73,7 +77,7 @@ function MediaCard({ title, url, kind, busy, onUpload }: {
   return (
     <div className="min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-4">
       <p className="font-black text-slate-950">{title}</p>
-      {url ? <div className="relative mt-3 aspect-[16/9] overflow-hidden rounded-lg border bg-white">{kind === 'video' ? <video src={url} controls preload="metadata" className="h-full w-full object-contain" /> : <Image src={url} alt={title} fill sizes="50vw" className="object-contain p-2" />}</div> : <div className="mt-3 flex aspect-[16/9] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500">No {kind === 'video' ? 'video' : 'image'} uploaded</div>}
+      {url ? <div className="relative mt-3 aspect-[16/9] overflow-hidden rounded-lg border bg-white">{kind === 'video' ? <video src={url} controls preload="metadata" className="h-full w-full object-contain" /> : <Image src={url} alt={title} unoptimized={url.startsWith('https://')} fill sizes="50vw" className="object-contain p-2" />}</div> : <div className="mt-3 flex aspect-[16/9] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white text-sm text-slate-500">No {kind === 'video' ? 'video' : 'image'} uploaded</div>}
       <label className="mt-3 inline-flex min-h-11 max-w-full cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-black text-white">
         {busy === kind ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
         {busy === kind ? 'Uploading…' : `Upload ${title.toLowerCase()}`}

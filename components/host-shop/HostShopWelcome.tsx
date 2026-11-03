@@ -11,15 +11,19 @@ export default function HostShopWelcome({
   partnerId,
   profileImageUrl,
   ownerName,
+  savedImageUrl,
+  savedImageAlt,
   children,
 }: {
   shopName: string;
   partnerId: string;
   profileImageUrl?: string | null;
   ownerName?: string | null;
+  savedImageUrl?: string | null;
+  savedImageAlt?: string | null;
   children: ReactNode;
 }) {
-  const [photoFailed, setPhotoFailed] = useState(false);
+  const [failedImages, setFailedImages] = useState<string[]>([]);
   // Match complete verified business identities; never borrow another shop's photo.
   const identity = (value: string) =>
     value
@@ -41,8 +45,12 @@ export default function HostShopWelcome({
       [shop.name, shop.dba, shop.slug].some((name) => name && identity(name) === shopIdentity),
   );
   const shopPhoto = featured?.media?.find((item) => item.kind === 'photo');
-  const heroImageUrl = shopPhoto?.src || profileImageUrl;
-  useEffect(() => setPhotoFailed(false), [heroImageUrl, partnerId]);
+  const hero = [
+    { src: savedImageUrl, alt: savedImageAlt || shopName },
+    { src: shopPhoto?.src, alt: shopPhoto?.alt || shopName },
+    { src: profileImageUrl, alt: `${ownerName || shopName} profile photo` },
+  ].find((item) => item.src && !failedImages.includes(item.src));
+  useEffect(() => setFailedImages([]), [savedImageUrl, profileImageUrl, partnerId]);
   const displayName = ownerName || shopName;
   const initials = displayName
     .split(/\s+/)
@@ -56,22 +64,23 @@ export default function HostShopWelcome({
       className="relative flex h-44 sm:h-56 lg:h-64 items-center justify-center overflow-hidden rounded-3xl bg-neutral-950 text-white"
       aria-label={`${displayName} dashboard banner`}
     >
-      {heroImageUrl && !photoFailed ? (
+      {hero?.src ? (
         <Image
-          src={heroImageUrl}
-          alt={shopPhoto?.alt || `${displayName} profile photo`}
+          src={hero.src}
+          unoptimized={hero.src.startsWith('https://')}
+          alt={hero.alt}
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 75vw"
           className="object-contain object-top"
-          onError={() => setPhotoFailed(true)}
+          onError={() => setFailedImages((failed) => [...failed, hero.src!])}
         />
       ) : (
         <div className="p-6 text-center">
           <p className="text-6xl font-black sm:text-8xl">{initials}</p>
           <p className="mt-3 text-lg font-bold">{displayName}</p>
           <p className="mt-2 text-sm text-neutral-300">
-            {heroImageUrl ? 'Shop photo is unavailable' : 'Profile photo has not been added'}
+            {failedImages.length ? 'Shop photo is unavailable' : 'Profile photo has not been added'}
           </p>
         </div>
       )}

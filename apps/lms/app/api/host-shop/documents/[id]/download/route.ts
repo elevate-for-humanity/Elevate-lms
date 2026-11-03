@@ -4,7 +4,7 @@ import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop'
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -31,6 +31,16 @@ export async function GET(
     return NextResponse.json({ error: 'Document not found.' }, { status: 404 });
   }
 
+  const open = new URL(request.url).searchParams.get('open') === '1';
+  function deliver(url: string) {
+    const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' };
+    return open ? NextResponse.redirect(url, { status: 307, headers }) : NextResponse.json({ url }, { headers });
+  }
+
+  // Imported agreements can reference the original access-controlled Drive file.
+  const driveFile = /^https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view(?:\?[^#]*)?$/.exec(document.file_url);
+  if (driveFile) return deliver(`https://drive.google.com/file/d/${driveFile[1]}/view`);
+
   const bucket = document.storage_bucket || 'partner-documents';
   const { data: signed, error: signedError } = await db.storage
     .from(bucket)
@@ -40,5 +50,5 @@ export async function GET(
     return NextResponse.json({ error: 'Unable to create a secure document link.' }, { status: 500 });
   }
 
-  return NextResponse.json({ url: signed.signedUrl });
+  return deliver(signed.signedUrl);
 }

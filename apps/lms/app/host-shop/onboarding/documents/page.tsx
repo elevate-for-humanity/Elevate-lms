@@ -123,6 +123,7 @@ export default async function HostShopDocumentsPage({
             return (
               <section
                 key={requirement.document_type}
+                id={`upload-${requirement.document_type}`}
                 className={`rounded-2xl border p-6 ${
                   needsAttention ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'
                 }`}

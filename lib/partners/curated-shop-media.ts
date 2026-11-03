@@ -46,3 +46,13 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
     return true;
   });
 }
+
+/** Portfolio media comes from the selected partner's public gallery, never from compliance uploads. */
+export function hostShopPortfolioPhotos(slug: string, gallery: unknown): ShopMedia[] {
+  if (!Array.isArray(gallery)) return [];
+  const photos = gallery.filter((item): item is ShopMedia => {
+    if (!item || typeof item.url !== 'string' || (item.kind && !['photo', 'image'].includes(item.kind))) return false;
+    return (/^\/(?!\/)/.test(item.url) || /^https:\/\//.test(item.url)) && !/\.(?:mp4|webm|mov)(?:$|\?)/i.test(item.url);
+  });
+  return curateShopGallery(slug, photos);
+}

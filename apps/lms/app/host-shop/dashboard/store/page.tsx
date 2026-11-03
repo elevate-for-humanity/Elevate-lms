@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ExternalLink, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { ExternalLink, ShoppingBag } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
@@ -24,7 +24,7 @@ export default async function HostShopStorePage() {
             {board.partner?.name || 'Host Shop'}
           </p>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop Store</h1>
-          <p className="mt-2 text-slate-600">Only verified products with an active checkout should be offered here.</p>
+          <p className="mt-2 text-slate-600">Find supplies and services for your shop.</p>
         </div>
         <Link href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
           Back to dashboard
@@ -35,22 +35,8 @@ export default async function HostShopStorePage() {
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-50 text-brand-blue-700">
           <ShoppingBag className="h-6 w-6" />
         </div>
-        <h2 className="mt-5 text-2xl font-black text-slate-950">No portal-only add-ons are currently published</h2>
-        <p className="mt-3 max-w-2xl leading-7 text-slate-700">
-          The previous page displayed sample seat packages, AI credits, compliance packages, background checks, prices, discounts, and a cart that were not connected to an approved product catalog or checkout. Those sample offers have been removed from production.
-        </p>
-
-        <div className="mt-6 rounded-2xl border border-brand-green-200 bg-brand-green-50 p-5">
-          <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-0.5 h-5 w-5 text-brand-green-700" />
-            <div>
-              <p className="font-black text-brand-green-950">Purchase integrity rule</p>
-              <p className="mt-1 text-sm text-brand-green-900">
-                A product will appear in this portal only after its price, entitlement, fulfillment logic, and payment route are verified end to end.
-              </p>
-            </div>
-          </div>
-        </div>
+        <h2 className="mt-5 text-2xl font-black text-slate-950">Shop supplies and services</h2>
+        <p className="mt-3 text-slate-700">Browse the Elevate store or contact us about a service for your shop.</p>
 
         <div className="mt-7 flex flex-wrap gap-3">
           <a

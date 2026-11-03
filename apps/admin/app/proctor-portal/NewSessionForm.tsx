@@ -12,17 +12,13 @@ import type {
   IdType,
   DeliveryMethod,
 } from './types';
-import {
-  PROVIDER_LABELS,
-  STATUS_LABELS,
-  RESULT_LABELS,
-  EPA_EXAMS,
-  DEFAULT_PROCTOR_NAME,
-  ESCO_PROCTOR_ID,
-  MAINSTREAM_PROCTOR_ID,
-} from './types';
+import { PROVIDER_LABELS, STATUS_LABELS, RESULT_LABELS, EPA_EXAMS } from './types';
 
-interface Program { id: string; title: string; slug: string }
+interface Program {
+  id: string;
+  title: string;
+  slug: string;
+}
 
 interface Props {
   session: ExamSession | null;
@@ -62,13 +58,16 @@ export default function NewSessionForm({ session, programs = [], onSaved, onCanc
         setCurrentUserId(user.id);
         const { data: profile } = await supabase
           .from('profiles')
-          .select('tenant_id')
+          .select('tenant_id, full_name')
           .eq('id', user.id)
           .maybeSingle();
-        if (profile) setTenantId(profile.tenant_id);
+        if (profile) {
+          setTenantId(profile.tenant_id);
+          if (!session) setProctorName(profile.full_name || user.email || '');
+        }
       }
     })();
-  }, [supabase]);
+  }, [supabase, session]);
 
   // Student lookup
   const [studentSearch, setStudentSearch] = useState('');
@@ -96,7 +95,7 @@ export default function NewSessionForm({ session, programs = [], onSaved, onCanc
   const [durationMin, setDurationMin] = useState(session?.duration_min?.toString() || '180');
   const [startedAt, setStartedAt] = useState(session?.started_at?.slice(0, 16) || '');
   const [completedAt, setCompletedAt] = useState(session?.completed_at?.slice(0, 16) || '');
-  const [proctorName, setProctorName] = useState(session?.proctor_name || DEFAULT_PROCTOR_NAME);
+  const [proctorName, setProctorName] = useState(session?.proctor_name || '');
   const [proctorNotes, setProctorNotes] = useState(session?.proctor_notes || '');
   const [isRetest, setIsRetest] = useState(session?.is_retest ?? false);
   const [programSlug, setProgramSlug] = useState(session?.program_slug || 'hvac-technician');
@@ -343,7 +342,9 @@ export default function NewSessionForm({ session, programs = [], onSaved, onCanc
                 className={selectCls}
               >
                 {programs.map((p) => (
-                  <option key={p.id} value={p.slug}>{p.title}</option>
+                  <option key={p.id} value={p.slug}>
+                    {p.title}
+                  </option>
                 ))}
                 <option value="">Other / Standalone</option>
               </select>
@@ -616,9 +617,6 @@ export default function NewSessionForm({ session, programs = [], onSaved, onCanc
                 onChange={(e) => setProctorName(e.target.value)}
                 className={inputCls}
               />
-              <p className="text-xs text-slate-400 mt-1">
-                Proctor ID: {provider === 'esco_epa608' ? ESCO_PROCTOR_ID : MAINSTREAM_PROCTOR_ID}
-              </p>
             </div>
             <div>
               <Label>Proctor Notes</Label>

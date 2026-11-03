@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -20,7 +21,11 @@ import SessionRow from './SessionRow';
 import type { ExamSession, ExamProvider, ExamResult } from './types';
 import { PROVIDER_LABELS, RESULT_LABELS } from './types';
 
-interface Program { id: string; title: string; slug: string }
+interface Program {
+  id: string;
+  title: string;
+  slug: string;
+}
 
 export default function ProctorPortalPage({ programs = [] }: { programs?: Program[] }) {
   const router = useRouter();
@@ -99,44 +104,11 @@ export default function ProctorPortalPage({ programs = [] }: { programs?: Progra
   };
 
   const exportCSV = () => {
-    const headers = [
-      'Date',
-      'Student',
-      'Email',
-      'Provider',
-      'Exam',
-      'Delivery',
-      'ID Verified',
-      'Status',
-      'Result',
-      'Score',
-      'Proctor',
-      'Retest',
-      'Notes',
-    ];
-    const rows = sessions.map((s) => [
-      s.created_at?.slice(0, 10) || '',
-      s.student_name,
-      s.student_email || '',
-      PROVIDER_LABELS[s.provider],
-      s.exam_name,
-      s.delivery_method,
-      s.id_verified ? 'Yes' : 'No',
-      s.status,
-      s.result,
-      s.score?.toString() || '',
-      s.proctor_name,
-      s.is_retest ? 'Yes' : 'No',
-      (s.proctor_notes || '').replace(/,/g, ';'),
-    ]);
-    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `exam-sessions-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const params = new URLSearchParams();
+    if (providerFilter) params.set('provider', providerFilter);
+    if (resultFilter) params.set('result', resultFilter);
+    if (reviewFilter !== 'all') params.set('review_status', reviewFilter);
+    window.location.assign(`/api/testing/sessions/export?${params}`);
   };
 
   const stats = {
@@ -165,7 +137,13 @@ export default function ProctorPortalPage({ programs = [] }: { programs?: Progra
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/proctor-portal/certification"
+              className="rounded-lg border px-4 py-2 text-sm font-semibold text-blue-700"
+            >
+              Certification operations
+            </Link>
             <button
               onClick={exportCSV}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"

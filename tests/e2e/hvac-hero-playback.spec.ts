@@ -53,8 +53,8 @@ test('the HVAC program film plays all 96 seconds after the visitor presses play'
   expect(initial).toMatchObject({ controls: true, autoplay: false, paused: true, loop: false, inline: true, overflow: false });
   expect(initial.renderedWidth).toBeLessThanOrEqual(initial.viewportWidth);
   expect(initial.renderedWidth / initial.renderedHeight).toBeCloseTo(720 / 900, 2);
+  await video.scrollIntoViewIfNeeded();
   await video.click();
-  await video.evaluate((element: HTMLVideoElement) => element.play());
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime), { timeout: 15_000 }).toBeGreaterThan(0.5);
   try {
     await expect.poll(() => video.evaluate((element: HTMLVideoElement) => {
@@ -102,7 +102,9 @@ test('HVAC native media supports sound, pause, and resume', async ({ page }, tes
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   const video = page.locator(selector);
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState), { timeout: 15000 }).toBeGreaterThanOrEqual(1);
+  await video.scrollIntoViewIfNeeded();
   await video.click();
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime), { timeout: 15000 }).toBeGreaterThan(0.5);
   await video.evaluate((element: HTMLVideoElement) => element.pause());
   expect(await video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
   // Native controls vary across mobile engines; exercise their real media API

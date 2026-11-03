@@ -3,8 +3,9 @@ import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
 const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18},status:'failed',execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
  monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false}}};
-async function run(job,conflict=false){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+async function run(job,conflict=false,mediaAvailable=true){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
+ if(String(url).includes('/course_videos'))return {ok:true,json:async()=>mediaAvailable?[{id:'entitled-source'}]:[]};
  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[job]};
  }});return {writes,result};}
 test('new verified repair queues an exhausted internal failure, retaining checkpoints and previous error',async()=>{
@@ -43,6 +44,14 @@ test('approved-source contract deployment resumes old per-scene metadata and sav
  ]) assert.equal((await run({...base,last_error})).writes.length,1);
 });
 
+
+test('missing course-scoped licensed media prevents futile scene repair retries',async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:esthetician-a:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]';
+ const job={...base,last_error:error,build:{...base.build,course_id:'8f3472fe-8fe9-4e16-bc31-d502e3de3c7a'}};
+ assert.equal((await run(job,false,false)).writes.length,0);
+ // Admission is only a precondition, not a substitute for scene QA.
+ assert.equal((await run(job,false,true)).writes.length,1);
+});
 
 test('an active continuation prevents a historical failed attempt being reopened',async()=>{
  let writes=0;

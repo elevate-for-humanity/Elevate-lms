@@ -15,49 +15,11 @@ import { logger } from '@/lib/logger';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import {evaluateAnswer,scoreAnswers,type StoredQuizQuestion} from '@/lib/lms/assessment-feedback';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-type StoredQuizQuestion = {
-  id?: string;
-  prompt?: string;
-  question?: string;
-  options?: string[];
-  choices?: string[];
-  answerIndex?: number;
-  correct_answer?: number | string | boolean;
-  correct?: number | string | boolean;
-  correctAnswer?: number | string | boolean;
-  explanation?: string;
-};
-
-function evaluateAnswer(question: StoredQuizQuestion, selectedIndex: number | undefined) {
-  const options = Array.isArray(question.options) ? question.options :
-    Array.isArray(question.choices) ? question.choices : [];
-  const expected = question.correctAnswer ?? question.correct_answer ??
-    question.answerIndex ?? question.correct;
-  const correctIndex = typeof expected === 'number' ? expected :
-    typeof expected === 'boolean' ?
-      options.findIndex(option => option.trim().toLowerCase() === String(expected).toLowerCase()) :
-    typeof expected === 'string' ?
-      options.findIndex(option => option.trim().toLowerCase() === expected.trim().toLowerCase()) : -1;
-  // A malformed or absent answer key is not an invitation to accept an answer.
-  const configured = Number.isInteger(correctIndex) && correctIndex >= 0 && correctIndex < options.length;
-  return {
-    correct: configured && Number.isInteger(selectedIndex) && selectedIndex === correctIndex,
-    correctOption: configured ? options[correctIndex] : null,
-    configured,
-  };
-}
-
-function scoreAnswers(questions: StoredQuizQuestion[], answers: Record<string, number>): number {
-  if (!questions.length) throw new Error('Assessment has no questions');
-  return Math.round(questions.filter((question, index) =>
-    evaluateAnswer(question, answers[String(question.id || `q-${index + 1}`)] ?? answers[String(index)]).correct
-  ).length / questions.length * 100);
-}
 
 export async function POST(
   request: NextRequest,
@@ -186,7 +148,7 @@ export async function POST(
       const questionId = String(question.id || `q-${index + 1}`);
       const evaluation = evaluateAnswer(question, answers[questionId] ?? answers[String(index)]);
       return {
-        question: question.question || question.prompt || `Question ${index + 1}`,
+        question: question.question || question.question_text || question.prompt || `Question ${index + 1}`,
         correct: evaluation.correct,
         correctAnswer: evaluation.correctOption,
         explanation: question.explanation ||

@@ -207,8 +207,10 @@ jobs:
           tests=[]
           for line in changes:
             status,path=line.split('\t',1)
-            if status not in ['A','M'] or not re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path): raise SystemExit('Repair outside application scope')
-            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
+            infrastructure = re.fullmatch(r'(?:\.github/workflows/[\w-]+\.ya?ml|Dockerfile\.(?:admin|lms|marketing)|scripts/gcp/[\w-]+\.(?:mjs|py))',path)
+            if status not in ['A','M'] or not (re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path) or infrastructure): raise SystemExit('Repair outside authorized source scope')
+            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|infrastructure-repair|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
+            if re.search(r'\.(test|spec)\.[cm]?[jt]sx?$',path) and status != 'A': raise SystemExit('Existing tests must remain unchanged')
             if path.startswith('tests/'):
               if status!='A': raise SystemExit('Existing tests must remain unchanged')
               if re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)
@@ -216,6 +218,14 @@ jobs:
           open('/tmp/paris-tests.json','w').write(json.dumps(tests))
           PY
       - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Validate deployment repairs with the trusted base validator
+        env:
+          BASE_SHA: ${{ needs.prepare.outputs.base }}
+          PATCH_SHA: ${{ needs.prepare.outputs.sha }}
+        run: |
+          set -euo pipefail
+          git show "$BASE_SHA:scripts/gcp/validate-infrastructure-repair.mjs" > "$RUNNER_TEMP/paris-deployment-validator.mjs"
+          node "$RUNNER_TEMP/paris-deployment-validator.mjs" "$BASE_SHA" "$PATCH_SHA"
       - name: Run regression and shared PARIS checks
         run: |
           python - <<'PY'

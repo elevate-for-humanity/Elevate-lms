@@ -2,9 +2,24 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { emptyWorkbookAnswers } from '@/lib/lms/workbook-validation';
 
-const mocks = vi.hoisted(() => ({ getUser: vi.fn(), rpc: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  getUser: vi.fn(),
+  rpc: vi.fn(),
+  from: vi.fn(),
+  sections: {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn(),
+    lt: vi.fn(),
+  },
+  reviews: {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    in: vi.fn(),
+  },
+}));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({ auth: { getUser: mocks.getUser }, rpc: mocks.rpc }),
+  createClient: async () => ({ auth: { getUser: mocks.getUser }, from: mocks.from, rpc: mocks.rpc }),
 }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn() } }));
 import { POST } from '@/apps/lms/app/api/workbooks/sections/[sectionId]/route';
@@ -22,6 +37,17 @@ const request = (body: unknown, origin?: string) =>
 const save = { answers: emptyWorkbookAnswers(), reviewed: false, expectedVersion: 0 };
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.from.mockImplementation((table: string) => {
+    if (table === 'digital_workbook_sections') return mocks.sections;
+    if (table === 'digital_workbook_responses') return mocks.reviews;
+    throw new Error(`Unexpected workbook table: ${table}`);
+  });
+  mocks.sections.maybeSingle.mockResolvedValue({
+    data: { workbook_id: 'workbook', section_number: 1, prompts: [] },
+    error: null,
+  });
+  mocks.sections.lt.mockResolvedValue({ data: [], error: null });
+  mocks.reviews.in.mockResolvedValue({ data: [], error: null });
   mocks.getUser.mockResolvedValue({ data: { user: { id: 'current-user' } }, error: null });
 });
 describe('Workbook API', () => {
@@ -113,6 +139,34 @@ describe('Workbook API', () => {
     expect(
       (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
     ).toBe(status);
+  });
+  it('requires the current learner to review all earlier sections before saving', async () => {
+    mocks.sections.maybeSingle.mockResolvedValue({
+      data: { workbook_id: 'workbook', section_number: 2, prompts: [] },
+      error: null,
+    });
+    mocks.sections.lt.mockResolvedValue({ data: [{ id: 'earlier' }], error: null });
+    const response = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+    expect(response.status).toBe(409);
+    expect(mocks.sections.eq).toHaveBeenCalledWith('workbook_id', 'workbook');
+    expect(mocks.sections.lt).toHaveBeenCalledWith('section_number', 2);
+    expect(mocks.reviews.eq).toHaveBeenCalledWith('user_id', 'current-user');
+    expect(mocks.reviews.eq).toHaveBeenCalledWith('reviewed', true);
+    expect(mocks.reviews.in).toHaveBeenCalledWith('section_id', ['earlier']);
+    expect(mocks.rpc).not.toHaveBeenCalled();
+
+    mocks.reviews.in.mockResolvedValue({ data: [{ section_id: 'earlier' }], error: null });
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    const allowed = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+    expect(allowed.status).toBe(200);
+    expect(mocks.rpc).toHaveBeenCalledOnce();
+  });
+  it('does not mark unfinished writing as reviewed', async () => {
+    const response = await POST(request({ ...save, reviewed: true }), {
+      params: Promise.resolve({ sectionId: section }),
+    });
+    expect(response.status).toBe(400);
+    expect(mocks.rpc).not.toHaveBeenCalled();
   });
   it('rejects malformed fields before any database write', async () => {
     expect(

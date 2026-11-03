@@ -14,7 +14,13 @@ const get=async(table,select,filter='')=>{
   url.searchParams.set('order','id.asc');
   url.searchParams.set('limit',String(limit));
   url.searchParams.set('offset',String(offset));
-  if(filter){for(const [name,value] of new URLSearchParams(filter))url.searchParams.set(name,value);}
+  if(filter){
+   for(const [name,value] of new URLSearchParams(filter)){
+    // A filter must never override pagination or the canonical projection.
+    if(['limit','offset','order','select'].includes(name))throw Error('PRODUCTION_FILTER_CONTROL_NOT_ALLOWED:'+name);
+    url.searchParams.set(name,value);
+   }
+  }
   const r=await fetch(url,{headers:{apikey:key,Authorization:'Bearer '+key,Prefer:'count=exact'},signal:AbortSignal.timeout(25000)});
   if(!r.ok)throw Error('PRODUCTION_READ_FAILED:'+table+':'+r.status);
   const page=await r.json();
@@ -43,7 +49,7 @@ try{
 const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at');
 const counts=Object.fromEntries(['completed','failed','queued','running'].map(s=>[s,jobs.rows.filter(j=>j.status===s).length]));
 const unmonitored=jobs.rows.filter(j=>['failed','queued','running'].includes(j.status)&&j.monitor?.enabled!==true).length;
-const stale=jobs.rows.filter(j=>j.status==='running'&&(!j.heartbeat_at||Date.now()-Date.parse(j.heartbeat_at)>300000)).length;
+const stale=jobs.rows.filter(j=>j.status==='running'&&(!j.heartbeat_at||!Number.isFinite(Date.parse(j.heartbeat_at))||Date.now()-Date.parse(j.heartbeat_at)>300000||!j.lease_expires_at||Date.parse(j.lease_expires_at)<=Date.now())).length;
 const exhausted=jobs.rows.filter(j=>j.status==='failed'&&j.attempts>=j.max_attempts).length;
 add('paris_monitoring',unmonitored===0,{unmonitored});
 add('worker_heartbeat',stale===0,{stale});
@@ -52,8 +58,8 @@ add('queue_drained',counts.queued===0&&counts.running===0,{queued:counts.queued,
 const repairs=await get('paris_code_repairs','id,status');
 const blocked=repairs.rows.filter(r=>r.status==='blocked').length;
 add('paris_code_repairs',blocked===0,{blocked});
-const courses=await get('courses','id,title,status','status=eq.published&limit=1000');
-const releases=await get('ultimate_release_versions','course_id,status','status=eq.released&limit=1000');
+const courses=await get('courses','id,title,status','status=eq.published');
+const releases=await get('ultimate_release_versions','course_id,status','status=eq.released');
 const missing=courses.rows.filter(c=>!releases.rows.some(r=>r.course_id===c.id)).map(c=>c.title);
 add('canonical_publication',missing.length===0,{missing});
 const allReleases=await get('ultimate_release_versions','id,course_id,status,package');

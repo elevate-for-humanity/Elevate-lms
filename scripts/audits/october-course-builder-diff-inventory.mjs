@@ -5,11 +5,21 @@ const commits=git(['log','--since=2026-10-01T00:00:00-04:00','--until=2026-10-31
 const match=/^(lib\/ultimate-course-builder\/|lib\/course-builder\/|lib\/course-factory\/|lib\/video\/|lib\/media\/|workers\/|scripts\/gcp\/|tests\/worker\/|\.github\/workflows\/.*course|Dockerfile\.ultimate-worker|supabase\/migrations\/)/;
 const rows=[],patches=[];
 for(const sha of commits){
- const names=[...new Set(git(['diff-tree','--no-commit-id','--name-only','-r','-m',sha]).trim().split('\n').filter(name=>match.test(name)))];
+ // Merge commits need an explicit first-parent comparison; git show without
+ // -m silently emits empty patches for many of these paths.
+ const parents=git(['rev-list','--parents','-n','1',sha]).trim().split(' ').slice(1);
+ const base=parents[0];
+ const names=[...new Set((base
+  ? git(['diff','--name-only',base,sha,'--'])
+  : git(['diff-tree','--root','--no-commit-id','--name-only','-r',sha]))
+  .trim().split('\n').filter(name=>match.test(name)))];
  if(!names.length)continue;
  const changes=[];
  for(const path of names){
-  const patch=git(['show','--format=','--no-ext-diff','--unified=3',sha,'--',path]);
+  const patch=base
+   ? git(['diff','--no-ext-diff','--unified=3',base,sha,'--',path])
+   : git(['show','--root','--format=','--no-ext-diff','--unified=3',sha,'--',path]);
+  if(!patch.includes('diff --git '))throw Error('OCTOBER_AUDIT_MISSING_PATCH:'+sha+':'+path);
   const added=patch.split('\n').filter(line=>line.startsWith('+')&&!line.startsWith('+++')).length;
   const removed=patch.split('\n').filter(line=>line.startsWith('-')&&!line.startsWith('---')).length;
   changes.push({path,added,removed});

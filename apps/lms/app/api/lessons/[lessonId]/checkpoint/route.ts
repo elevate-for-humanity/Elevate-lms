@@ -34,40 +34,30 @@ type StoredQuizQuestion = {
   explanation?: string;
 };
 
+function evaluateAnswer(question: StoredQuizQuestion, selectedIndex: number | undefined) {
+  const options = Array.isArray(question.options) ? question.options :
+    Array.isArray(question.choices) ? question.choices : [];
+  const expected = question.correctAnswer ?? question.correct_answer ??
+    question.answerIndex ?? question.correct;
+  const correctIndex = typeof expected === 'number' ? expected :
+    typeof expected === 'boolean' ?
+      options.findIndex(option => option.trim().toLowerCase() === String(expected).toLowerCase()) :
+    typeof expected === 'string' ?
+      options.findIndex(option => option.trim().toLowerCase() === expected.trim().toLowerCase()) : -1;
+  // A malformed or absent answer key is not an invitation to accept an answer.
+  const configured = Number.isInteger(correctIndex) && correctIndex >= 0 && correctIndex < options.length;
+  return {
+    correct: configured && Number.isInteger(selectedIndex) && selectedIndex === correctIndex,
+    correctOption: configured ? options[correctIndex] : null,
+    configured,
+  };
+}
+
 function scoreAnswers(questions: StoredQuizQuestion[], answers: Record<string, number>): number {
   if (!questions.length) throw new Error('Assessment has no questions');
-
-  let correct = 0;
-  questions.forEach((question, index) => {
-    const questionId = String(question.id || `q-${index + 1}`);
-    const selectedIndex = answers[questionId] ?? answers[String(index)];
-    if (!Number.isInteger(selectedIndex)) return;
-
-    const options = Array.isArray(question.options)
-      ? question.options
-      : Array.isArray(question.choices)
-        ? question.choices
-        : [];
-    const expected =
-      question.correctAnswer ?? question.correct_answer ?? question.answerIndex ?? question.correct;
-    if (typeof expected === 'number') {
-      if (selectedIndex === expected) correct += 1;
-      return;
-    }
-    if (typeof expected === 'boolean') {
-      const selected =
-        options[selectedIndex] ??
-        (selectedIndex === 0 ? 'True' : selectedIndex === 1 ? 'False' : '');
-      if (selected.toLowerCase() === String(expected).toLowerCase()) correct += 1;
-      return;
-    }
-    if (typeof expected === 'string') {
-      const selected = options[selectedIndex];
-      if (selected !== undefined && selected.trim() === expected.trim()) correct += 1;
-    }
-  });
-
-  return Math.round((correct / questions.length) * 100);
+  return Math.round(questions.filter((question, index) =>
+    evaluateAnswer(question, answers[String(question.id || `q-${index + 1}`)] ?? answers[String(index)]).correct
+  ).length / questions.length * 100);
 }
 
 export async function POST(
@@ -146,6 +136,11 @@ export async function POST(
       );
     }
 
+    // Do not record or pass a quiz with missing answer keys. Personal
+    // reflection fields are saved by the separate workbook route, not graded.
+    if (questions.some((question) => !evaluateAnswer(question, undefined).configured)) {
+      return NextResponse.json({ error: 'Assessment answer key requires instructor review' }, { status: 409 });
+    }
     const score = scoreAnswers(questions, answers);
     const passingScore =
       lesson.passing_score != null && Number.isFinite(Number(lesson.passing_score))
@@ -188,13 +183,17 @@ export async function POST(
       );
     }
 
-    const feedback = HVAC_PRACTICE_LESSONS.some(test => test.id === lessonId)
-      ? questions.map((question, index) => ({
-          question: question.question || question.prompt || `Question ${index + 1}`,
-          correct: answers[String(question.id || `q-${index + 1}`)] === question.correctAnswer,
-          explanation: question.explanation || 'Review the matching workbook chapter.',
-        }))
-      : undefined;
+    const feedback = questions.map((question, index) => {
+      const questionId = String(question.id || `q-${index + 1}`);
+      const evaluation = evaluateAnswer(question, answers[questionId] ?? answers[String(index)]);
+      return {
+        question: question.question || question.prompt || `Question ${index + 1}`,
+        correct: evaluation.correct,
+        correctAnswer: evaluation.correctOption,
+        explanation: question.explanation ||
+          (evaluation.correct ? 'That is the correct selection.' : 'Review the lesson explanation, then try the question again.'),
+      };
+    });
     return NextResponse.json({ ...result, feedback });
   } catch (err) {
     logger.error(

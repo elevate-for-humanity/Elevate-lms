@@ -77,7 +77,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   if((!error.startsWith('ULTIMATE_INTERNAL_REPAIR_REQUIRED:')&&!repairedPlaybackTimeout)||durableExternalBlocker)continue;
   // Do not spend another execution generation on scenes with no licensed source.
   // An eligible image still requires normal scene-specific relevance validation.
-  if(/ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|licensed third-party scenes are missing entitlement\\/license evidence/i.test(error) &&
+  if(/ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|licensed third-party scenes are missing entitlement\/license evidence/i.test(error) &&
      !(await hasReadyEntitledSource(job.build?.course_id))) continue;
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');

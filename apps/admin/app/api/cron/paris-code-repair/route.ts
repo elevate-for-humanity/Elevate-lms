@@ -1,14 +1,18 @@
 import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
-import {authorizeParisWorkflow} from '@/lib/paris-workflow-identity';
+import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
 import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
 export async function POST(request:NextRequest){
- if(!await authorizeParisWorkflow(request.headers.get('authorization')))return NextResponse.json({error:'Unauthorized'},{status:401});
+ const authorization=request.headers.get('authorization');
+ const repairAuthority=await authorizeParisWorkflow(authorization);
+ const deploymentDiagnosticOnly=!repairAuthority && await authorizeParisDeploymentAppDiagnostic(authorization);
+ if(!repairAuthority && !deploymentDiagnosticOnly)return NextResponse.json({error:'Unauthorized'},{status:401});
  const body=await request.json().catch(()=>({}));
+ if(deploymentDiagnosticOnly && body.phase!=='app-auth-diagnostic')return NextResponse.json({error:'Unauthorized'},{status:401});
  try{
   if(body.phase==='app-auth-diagnostic'){
    // Deliberately ignore X-Paris-GitHub-Token: this phase proves the runtime App.

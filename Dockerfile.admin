@@ -57,7 +57,9 @@ RUN set -eux; \
     pnpm install --help | grep -E -- 'frozen-lockfile|lockfile'; \
     node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-FROM base AS builder
+# Share the installed dependency layer with the builder to keep compilation
+# headroom on the runner used for the Admin image and PARIS runtime.
+FROM dependencies AS builder
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_ADMIN_URL
 ARG NEXT_PUBLIC_APP_URL
@@ -82,7 +84,6 @@ ENV GITHUB_SHA="${NF_GIT_SHA}"
 ENV NEXT_PUBLIC_GIT_SHA="${NF_GIT_SHA}"
 ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
-COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
 RUN set -eux; \
     test -n "$NEXT_PUBLIC_SUPABASE_URL"; \

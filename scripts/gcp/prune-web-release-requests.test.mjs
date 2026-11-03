@@ -96,6 +96,17 @@ test('only the newest request for the selected app can start an expensive build'
   );
   assert.deepEqual(f.writes, []);
 });
+test('a delayed dispatch index requires branch evidence for the same run and still rejects a newer release', async () => {
+  const workflow = WEB_RELEASE_WORKFLOWS[0];
+  const check = (filtered, recent) => assertLatestWebReleaseRequest({
+    repository, workflow, runId: 3,
+    api: async path => ({ workflow_runs: path.includes('event=workflow_dispatch') ? filtered : recent }),
+  });
+  assert.equal((await check([row(2)], [row(4, 'success', {event:'push'}), row(3)])).runId, 3);
+  await assert.rejects(check([row(2)], [row(4), row(3)]), /SUPERSEDED_RELEASE_REQUEST:4/);
+  await assert.rejects(check([row(4)], [row(3)]), /SUPERSEDED_RELEASE_REQUEST:4/);
+  await assert.rejects(check([row(2)], [row(2)]), /NOT_VISIBLE_IN_INVENTORY/);
+});
 test('large GitHub inventories are read without a subprocess output buffer', async () => {
   const payload = {
     workflow_runs: [{ ...row(1), head_commit: { message: 'x'.repeat(2_000_000) } }],

@@ -20,13 +20,13 @@ test('automatic acceptance uses an authorized dispatch without expanding Google 
 test('production acceptance cannot silently overlap paginated release and course scans',()=>{
  const source=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
  assert.match(source,/PRODUCTION_FILTER_CONTROL_NOT_ALLOWED/);
- assert.doesNotMatch(source,/status=eq\\.(?:published|released)&limit=/);
- assert.match(source,/get\\('courses'.*status=eq\\.published/);
- assert.match(source,/get\\('ultimate_release_versions'.*status=eq\\.released/);
+ assert.doesNotMatch(source,/status=eq\.(?:published|released)&limit=/);
+ assert.match(source,/get\('courses'.*status=eq\.published/);
+ assert.match(source,/get\('ultimate_release_versions'.*status=eq\.released/);
 });
 
 test('production acceptance requires a live unexpired lease as well as a fresh heartbeat',()=>{
  const source=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
- assert.match(source,/Date\\.parse\\(j\\.lease_expires_at\\)<=Date\\.now\\(\\)/);
- assert.match(source,/Date\\.now\\(\\)-Date\\.parse\\(j\\.heartbeat_at\\)>300000/);
+ assert.match(source,/Date\.parse\(j\.lease_expires_at\)<=Date\.now\(\)/);
+ assert.match(source,/Date\.now\(\)-Date\.parse\(j\.heartbeat_at\)>300000/);
 });

@@ -2,7 +2,7 @@ import { hostStudentCertificatePdf } from './host-shop-student-pdf';
 
 type CompletionDocument = {
   certificateNumber: string; studentName: string; studentId: string;
-  courseTitle: string; startDate: string; completionDate: string;
+  courseTitle: string; startDate: string; completionDate: string; issuedAt?: string;
 };
 
 /** Institutional course completion only. Never infers an EPA/ESB exam award. */
@@ -23,7 +23,7 @@ export async function programCompletionPdf(input: CompletionDocument) {
     id: input.certificateNumber, reference: input.certificateNumber,
     studentName: input.studentName, studentId: input.studentId,
     shopId: '', shopName: 'Elevate Certificate of Completion', program: input.courseTitle,
-    title: 'Certificate of Completion', status: 'enrolled', recordDate: new Date().toISOString(),
+    title: 'Certificate of Completion', status: 'enrolled', recordDate: input.issuedAt || new Date().toISOString(),
     completion: { startDate: input.startDate, completionDate: input.completionDate },
   });
 }

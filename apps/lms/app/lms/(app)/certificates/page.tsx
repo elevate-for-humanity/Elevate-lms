@@ -68,15 +68,15 @@ export default async function CertificatesPage() {
               >
                 <CertificateTemplate
                   studentName={
-                    profile?.first_name
+                    cert.student_name || profile?.full_name || (profile?.first_name
                       ? `${profile.first_name} ${profile.last_name || ''}`
-                      : user.email || 'Student'
+                      : user.email || 'Student')
                   }
                   courseName={
                     cert.course_title || cert.program_name || cert.metadata?.course_name || 'Course'
                   }
-                  completionDate={cert.issued_at}
-                  certificateNumber={cert.id}
+                  completionDate={cert.completion_date || cert.issued_at}
+                  certificateNumber={cert.certificate_number || cert.id}
                 />
                 <div className="p-4 border-t border-slate-100 flex justify-end gap-3">
                   <GenerateCertificateButton courseId={cert.course_id} />

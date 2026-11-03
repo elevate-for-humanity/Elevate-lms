@@ -59,3 +59,34 @@ it('filters the shopping collection and restores it after an empty search',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Show all products'}));
  expect(screen.getByRole('button',{name:/add to bag/i})).toBeTruthy();
 });
+
+it('plays the film inline, falls back to muted playback, and enables sound on request', async () => {
+  let onVisibility: (entries: Array<{ intersectionRatio: number }>) => void = () => {};
+  vi.stubGlobal('IntersectionObserver', class {
+    constructor(callback: typeof onVisibility) { onVisibility = callback; }
+    observe() {} disconnect() {}
+  });
+  vi.stubGlobal('matchMedia', () => ({ matches: false }));
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play')
+    .mockRejectedValueOnce(new DOMException('User interaction required', 'NotAllowedError'))
+    .mockResolvedValue(undefined);
+  const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
+  try {
+    render(<WellnessStorefront site={site} pathname="/" basePath="/sites/meri-gold-round">{null}</WellnessStorefront>);
+    const video = screen.getByLabelText('The Meri-Gold-Round brand film') as HTMLVideoElement;
+    expect(video.controls).toBe(false);
+    expect(document.querySelector('audio')).toBeNull();
+    onVisibility([{ intersectionRatio: 1 }]);
+    await waitFor(() => expect(play).toHaveBeenCalledTimes(2));
+    expect(video.muted).toBe(true);
+    fireEvent.volumeChange(video);
+    fireEvent.click(screen.getByRole('button', { name: 'Hear narration and music' }));
+    expect(video.muted).toBe(false);
+    onVisibility([{ intersectionRatio: 0 }]);
+    expect(pause).toHaveBeenCalled();
+  } finally {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  }
+});

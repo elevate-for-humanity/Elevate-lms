@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useState, type ReactNode, type CSSProperties } from 'react';
-import { ShoppingBag, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react';
+import { ShoppingBag, ArrowRight, ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import type { PublishedTenantSite, TenantSiteProduct } from '@/lib/tenant/site-types';
 import { useTenantShoppingBag, TenantBagDrawer, productPrice } from './TenantShoppingBag';
 import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
@@ -17,6 +17,58 @@ const rituals = [
 ];
 const money = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 const price = productPrice;
+
+function BrandFilm() {
+  const ref = useRef<HTMLVideoElement>(null);
+  const pausedByViewer = useRef(false);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+  useEffect(() => {
+    const film = ref.current;
+    if (!film || !window.IntersectionObserver) return;
+    let attempt = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      const current = ++attempt;
+      if (entry.intersectionRatio < 0.5) { film.pause(); return; }
+      if (pausedByViewer.current || film.ended || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      film.play().catch(error => {
+        if (current !== attempt || error.name !== 'NotAllowedError') return;
+        film.muted = true;
+        void film.play().catch(() => {});
+      });
+    }, { threshold: [0, 0.5] });
+    observer.observe(film);
+    return () => { ++attempt; observer.disconnect(); film.pause(); };
+  }, []);
+  function togglePlay() {
+    const film = ref.current;
+    if (!film) return;
+    pausedByViewer.current = !film.paused;
+    if (film.paused) void film.play().catch(() => {});
+    else film.pause();
+  }
+  function toggleSound() {
+    const film = ref.current;
+    if (!film) return;
+    film.muted = !film.muted;
+    if (!film.muted && film.paused) {
+      pausedByViewer.current = false;
+      void film.play().catch(() => {});
+    }
+  }
+  return <div className={styles.brandFilm}>
+    <video ref={ref} playsInline preload="metadata" poster={`${ROOT}/rituals/body.webp`}
+      aria-label="The Meri-Gold-Round brand film" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+      onVolumeChange={e => setMuted(e.currentTarget.muted)}>
+      <source src="/videos/meri-gold-round/brand-story.mp4?v=music2" type="video/mp4" />
+      <track default kind="captions" srcLang="en" label="English" src="/videos/meri-gold-round/brand-story.vtt?v=warm-20261103" />
+    </video>
+    <div className={styles.filmActions}>
+      <button type="button" onClick={togglePlay} aria-label={playing ? 'Pause film' : 'Play film'}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
+      <button type="button" onClick={toggleSound} aria-label={muted ? 'Hear narration and music' : 'Mute film'}>{muted ? <VolumeX size={16} /> : <Volume2 size={16} />}</button>
+    </div>
+  </div>;
+}
 
 /** Isolated presentation for the owner's existing imported Shopify collection.
  * Catalog, prices, product URLs, contacts and secondary pages remain builder-owned.
@@ -69,7 +121,7 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
           <div className={styles.slideImage}><img src={`${ROOT}/rituals/${active.image}.webp`} alt={`${active.title} Illustrative self-care scene`} /><span>Illustrative lifestyle photography</span></div>
           <div className={styles.slideCopy} aria-live="polite"><p className={styles.kicker}>THE EVERYDAY ROUND · {String(slide + 1).padStart(2, '0')} / 04</p><h2>{active.title}</h2><p>{active.text}</p><a className={styles.primary} href={href(products.find(p => p.href?.includes(active.match))?.href || '/shop')}>{active.label} <ArrowRight size={18} /></a><div className={styles.slideControls}><button type="button" aria-label="Previous ritual" onClick={() => setSlide((slide + 3) % 4)}><ChevronLeft /></button>{rituals.map((r, i) => <button key={r.image} type="button" aria-label={`Show ${r.title}`} aria-pressed={slide === i} onClick={() => setSlide(i)}>{i + 1}</button>)}<button type="button" aria-label="Next ritual" onClick={() => setSlide((slide + 1) % 4)}><ChevronRight /></button></div></div>
         </section>
-        <section className={styles.section} id="brand-film"><div className={styles.sectionHeading}><div><p className={styles.kicker}>WATCH. LISTEN. MAKE IT YOURS.</p><h2>The story of your everyday round.</h2></div></div><div className={styles.filmGrid}><video controls preload="none" poster={`${ROOT}/rituals/body.webp`}><source src="/videos/meri-gold-round/brand-story.mp4?v=warm-20261103" type="video/mp4" /><track default kind="captions" srcLang="en" label="English" src="/videos/meri-gold-round/brand-story.vtt?v=warm-20261103" /></video><div><p className={styles.kicker}>A MOMENT OF INTENTION</p><h3>Care that fits into your life.</h3><p>A gentle cleanse. A warm soak. A thoughtful scalp routine. A moment of body care. Explore the collection one ritual at a time.</p><small>AI-created lifestyle scenes illustrate care routines; they do not show customer results.</small></div></div></section>
+        <section className={styles.section} id="brand-film"><div className={styles.sectionHeading}><div><p className={styles.kicker}>WATCH. LISTEN. MAKE IT YOURS.</p><h2>The story of your everyday round.</h2></div></div><div className={styles.filmGrid}><BrandFilm /><div><p className={styles.kicker}>A MOMENT OF INTENTION</p><h3>Care that fits into your life.</h3><p>A gentle cleanse. A warm soak. A thoughtful scalp routine. A moment of body care. Explore the collection one ritual at a time.</p><small>AI-created lifestyle scenes illustrate care routines; they do not show customer results.</small></div></div></section>
         <section className={styles.ritualSteps}><div><p className={styles.kicker}>MAKE ROOM FOR YOURSELF</p><h2>Build your everyday round.</h2><p>Choose a moment. Choose your care. Make it a habit.</p></div><div className={styles.stepsGrid}>{[
           ['01', 'Fresh beginnings', 'Discover cosmetic soaps for your cleansing routine.', 'turmeric-glycerin', 'Find your cleanse'],
           ['02', 'Rooted in care', 'Explore botanical oils for your hair and scalp routine.', 'hair-scalp', 'Find your hair care'],

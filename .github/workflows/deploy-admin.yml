@@ -209,8 +209,8 @@ jobs:
       - name: Upload and deploy the exact Admin image
         shell: bash
         env:
-          PARIS_GITHUB_AUTH_MODE: app
-          PARIS_GITHUB_AUTH_SOURCE: dashboard
+          PARIS_GITHUB_AUTH_MODE: workflow
+          PARIS_GITHUB_AUTH_SOURCE: signed-job
         run: |
           set -euo pipefail
           IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin'
@@ -222,7 +222,12 @@ jobs:
           # Explicit App mode binds the existing Secret Manager key and verifies
           # the exact installation's Contents, Actions, and PR write permissions.
           # Never fall back to a rejected App or silently switch identities.
-          if [[ "${PARIS_GITHUB_AUTH_MODE}" == 'app' && "${PARIS_GITHUB_AUTH_SOURCE}" == 'dashboard' ]]; then
+          if [[ "${PARIS_GITHUB_AUTH_MODE}" == 'workflow' && "${PARIS_GITHUB_AUTH_SOURCE}" == 'signed-job' ]]; then
+            # PARIS repair writes and dispatch use the short-lived signed
+            # GitHub Actions job identity; preserve the existing Admin read
+            # credential. A PARIS App RSA key does not exist in configured stores.
+            GITHUB_RUNTIME_FLAGS=()
+          elif [[ "${PARIS_GITHUB_AUTH_MODE}" == 'app' && "${PARIS_GITHUB_AUTH_SOURCE}" == 'dashboard' ]]; then
             # Canonical Admin encrypted secret records are resolved at runtime.
             # Enforce App-only mode and remove the old GITHUB_TOKEN mounting;
             # the candidate must pass a GitHub-signed App diagnostic before traffic.
@@ -246,11 +251,11 @@ jobs:
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            --update-env-vars=AI_NARRATION_PROVIDER=kokoro,PARIS_GITHUB_AUTH_MODE=app,PARIS_GITHUB_APP_SOURCE=dashboard "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
+            --update-env-vars=AI_NARRATION_PROVIDER=kokoro,PARIS_GITHUB_AUTH_MODE=workflow,PARIS_GITHUB_APP_SOURCE=workflow "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         env:
-          PARIS_GITHUB_APP_SOURCE: dashboard
+          PARIS_GITHUB_APP_SOURCE: workflow
         run: |
           set -euo pipefail
           export CANDIDATE_SERVICE=elevate-admin-migration
@@ -265,7 +270,7 @@ jobs:
       - name: Dispatch read-only runtime verification using the scoped Actions identity
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-paris-production-authorization.yml/dispatches" -f ref=main -f "inputs[expected_sha]=$GITHUB_SHA" -f 'inputs[credential_source]=github-app-installation'
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-paris-production-authorization.yml/dispatches" -f ref=main -f "inputs[expected_sha]=$GITHUB_SHA" -f 'inputs[credential_source]=runtime-token'
 
   acceptance:
     needs: deploy-admin

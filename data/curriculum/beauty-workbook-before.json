@@ -1,0 +1,1018 @@
+{
+  "lessons": [
+    {
+      "id": "12d256b2-136e-4235-8601-58036650c3ed",
+      "title": "Natural-nail shaping with hand tools",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-h"
+    },
+    {
+      "id": "6b3d8851-1c4a-4f1f-a860-7d4f444fd48b",
+      "title": "Hand and nail observation before service",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-p"
+    },
+    {
+      "id": "c064b66a-1d12-40d8-aa7c-60bdb103abde",
+      "title": "Natural-nail preparation and controlled soaking",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-c"
+    },
+    {
+      "id": "c6a2ad42-5826-43d2-94ce-50a2992f108b",
+      "title": "Inventory, expiry and replenishment",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-m"
+    },
+    {
+      "id": "4e1a737b-d407-43aa-99c4-b32e98e13987",
+      "title": "Conservative surface preparation",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-j"
+    },
+    {
+      "id": "d2791ee0-4a3b-41e6-99c2-f93962d94a36",
+      "title": "Cuticle care and living-tissue protection",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-b"
+    },
+    {
+      "id": "ebd82032-4b2e-42ec-809f-7791a8104096",
+      "title": "Lash and brow tint readiness",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-t"
+    },
+    {
+      "id": "c9ab6ef4-dff6-4b55-848b-6997cd8b5bdb",
+      "title": "Base coat, color and top coat",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-i"
+    },
+    {
+      "id": "be48b986-86a1-4267-9108-ed70168b225f",
+      "title": "Chemical-peel boundaries and product protocols",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-h"
+    },
+    {
+      "id": "9971c7c3-68fa-4595-960f-a69bcf1f731c",
+      "title": "Reusable tools and sterilization decisions",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-b"
+    },
+    {
+      "id": "a13b6258-0feb-4217-b2f6-f3449fed21ed",
+      "title": "Gentle cleansing and the skin barrier",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-c"
+    },
+    {
+      "id": "c2c0086c-ba1a-4f6d-94e2-3c5e2439d7e5",
+      "title": "Selecting and applying cosmetic products",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-d"
+    },
+    {
+      "id": "4896ffc8-1bca-4e7f-a20a-088dd7d14ebc",
+      "title": "Facial sequence, masks and equipment",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-f"
+    },
+    {
+      "id": "8b9d78dd-8861-4b5a-9b3d-2bd6ac9fb728",
+      "title": "Building a manageable home-care plan",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-k"
+    },
+    {
+      "id": "c8501984-7233-481e-9cd7-64f9ab51296b",
+      "title": "Referral without diagnosis",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-l"
+    },
+    {
+      "id": "74288ff8-7732-45e0-a569-cc1a30ddad87",
+      "title": "Cosmetic massage and client comfort",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-q"
+    },
+    {
+      "id": "fd7db98f-8d56-4849-8155-66605bfa4bfa",
+      "title": "Accurate confidential client records",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-r"
+    },
+    {
+      "id": "0e368e7c-248e-4aca-80ec-eff604beb8c5",
+      "title": "Room turnover and contamination control",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-a"
+    },
+    {
+      "id": "e4f292b1-79be-4849-b712-ae978ef4ba82",
+      "title": "Comedone assessment and conservative extraction",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-e"
+    },
+    {
+      "id": "4fbc9ee3-139e-4a23-9880-599715c82fee",
+      "title": "Wax consultation and hair-removal safety",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-g"
+    },
+    {
+      "id": "e2ebe9df-9d6f-49f3-8f5f-b5909dd4da4f",
+      "title": "Skin observation and referral decisions",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-i"
+    },
+    {
+      "id": "4bee125b-b911-4773-8eaa-2e5d9079241f",
+      "title": "Color and product decisions across skin tones",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-j"
+    },
+    {
+      "id": "21c76d14-3adb-4722-b12e-85c8fff8aa3f",
+      "title": "Teaching hygienic makeup application",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-m"
+    },
+    {
+      "id": "3dda227a-4123-44bd-ae7a-0f30204ef8e4",
+      "title": "Demonstrating a cleansing routine",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-n"
+    },
+    {
+      "id": "d154acde-041b-4ccd-a20b-02348e1a65fe",
+      "title": "Teaching personal hygiene and tool care",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-o"
+    },
+    {
+      "id": "448cac70-074f-47d3-954c-20ead5432351",
+      "title": "Evaluating new services and maintaining competence",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-p"
+    },
+    {
+      "id": "c6dcfe7e-1c17-4e6c-8b02-59be900ccaea",
+      "title": "Ethical makeup retail and transactions",
+      "course_id": "8f3472fe-8fe9-4e16-bc31-d502e3de3c7a",
+      "competency_id": "esthetician-s"
+    },
+    {
+      "id": "066415e6-327a-4352-a466-ac27677fa4f8",
+      "title": "Nail-station sanitation and chemical safety",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-a"
+    },
+    {
+      "id": "27f2878f-a8a2-424e-ba3e-ee78911274e5",
+      "title": "Rotary-tool control for nail enhancements",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-d"
+    },
+    {
+      "id": "193fb07c-23d7-4f9f-bcde-595b1c0c2fc1",
+      "title": "Nail wraps and repair decisions",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-e"
+    },
+    {
+      "id": "eb995d9d-1bed-4e35-8a5f-15e1d50133e1",
+      "title": "Polish removal and solvent exposure",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-g"
+    },
+    {
+      "id": "546a5f75-eb43-4b94-9865-fb4407804203",
+      "title": "Forms, liquid-and-powder systems and balance",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-f"
+    },
+    {
+      "id": "bc47e701-d3de-4623-8570-2612f5905116",
+      "title": "Buffing and shine without over-thinning",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-k"
+    },
+    {
+      "id": "55691fd4-b845-40ff-82e3-be7f73abf8df",
+      "title": "Nail-service records and traceability",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-l"
+    },
+    {
+      "id": "8dd2a92e-1cf2-4765-8fb9-7f9b2cdcce17",
+      "title": "Appointments, consented charges and receipts",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-n"
+    },
+    {
+      "id": "13d6f5ab-ac09-48d2-a8b6-db2318cea1e9",
+      "title": "Cosmetic hand massage and exfoliation boundaries",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-o"
+    },
+    {
+      "id": "f3ab86b6-40f7-4cb4-befe-eead25c64a7d",
+      "title": "Nail home care and color advice",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-q"
+    },
+    {
+      "id": "cc85b8f1-c526-49c3-a8a9-487daf3d5adb",
+      "title": "Ethical nail-product promotion",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-r"
+    },
+    {
+      "id": "04ae1b7a-9cf3-4b43-b7c3-c89b86cc8a45",
+      "title": "Retail checkout and responsible follow-up",
+      "course_id": "377cd34a-b402-40ab-8ff9-2fcfd394b96d",
+      "competency_id": "manicurist-s"
+    }
+  ],
+  "sections": [
+    {
+      "id": "ea621b03-58f2-4d83-ab57-cde67483af45",
+      "unit": "Program Orientation & Professional Standards",
+      "title": "Welcome to Esthetician Apprenticeship",
+      "prompts": [
+        "Describe your learning goal and the roles of the learner, instructor, program sponsor, and host-shop trainer.",
+        "Create a short scenario about professional conduct or client privacy. Explain a respectful response.",
+        "Plan your next week: theory study, supervised practice, feedback, and accurate documentation. Keep RTI and OJL separate."
+      ],
+      "pdf_page": 5,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 1
+    },
+    {
+      "id": "f71712f0-e3ba-4948-9217-270aa711b3db",
+      "unit": "Program Orientation & Professional Standards",
+      "title": "Indiana Esthetician License Requirements",
+      "prompts": [
+        "Use the current IPLA instructions to identify the requirements relevant to your pathway. Record the source and date checked.",
+        "Make two lists: apprenticeship completion documents and state licensure application documents. Explain why the lists are different.",
+        "Write a question for staff about a requirement you could not verify. Do not guess a fee, hour total, or renewal obligation."
+      ],
+      "pdf_page": 7,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 2
+    },
+    {
+      "id": "6bf63977-7126-4ad4-89dc-fe61e32295d4",
+      "unit": "Program Orientation & Professional Standards",
+      "title": "Orientation & Professional Standards - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 9,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 3
+    },
+    {
+      "id": "f074aaff-9904-4cad-b71f-2b22ec0e60ce",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Infection Control Fundamentals",
+      "prompts": [
+        "Choose a tool or work area used in this lesson. Identify the manufacturer or site instructions you must check before use.",
+        "Describe the safe preparation, service, cleanup, and storage sequence. Distinguish cleaning from disinfection.",
+        "A used item touches a clean area. Describe what you would stop, separate, report, and reprocess under the site procedure."
+      ],
+      "pdf_page": 11,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 4
+    },
+    {
+      "id": "56064513-b9b7-4aa7-8cca-d9b99e1e76f2",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Sanitation and Disinfection in Spa Settings",
+      "prompts": [
+        "Choose a tool or work area used in this lesson. Identify the manufacturer or site instructions you must check before use.",
+        "Describe the safe preparation, service, cleanup, and storage sequence. Distinguish cleaning from disinfection.",
+        "A used item touches a clean area. Describe what you would stop, separate, report, and reprocess under the site procedure."
+      ],
+      "pdf_page": 13,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 5
+    },
+    {
+      "id": "c2e0ca0f-320b-4a2c-aebd-7e477a845df1",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Spa Safety and Emergency Procedures",
+      "prompts": [
+        "Choose a tool or work area used in this lesson. Identify the manufacturer or site instructions you must check before use.",
+        "Describe the safe preparation, service, cleanup, and storage sequence. Distinguish cleaning from disinfection.",
+        "A used item touches a clean area. Describe what you would stop, separate, report, and reprocess under the site procedure."
+      ],
+      "pdf_page": 15,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 6
+    },
+    {
+      "id": "292bc617-10de-4766-8200-5167490de5f3",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Safety & Infection Control - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 17,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 7
+    },
+    {
+      "id": "34799cc0-5b2e-4cff-a7b5-ebb3eab7d507",
+      "unit": "Skin Science & Analysis",
+      "title": "Skin Anatomy and Physiology",
+      "prompts": [
+        "List observations and consultation questions relevant to this lesson. Separate observations from a medical diagnosis.",
+        "Explain which observations would make you pause and ask your trainer before beginning a service.",
+        "Use the lesson picture to identify what it does and does not show. Explain what additional evidence a trainer must demonstrate."
+      ],
+      "pdf_page": 19,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 8
+    },
+    {
+      "id": "bc6fd3c1-0215-4ca6-925f-8ac653123e95",
+      "unit": "Skin Science & Analysis",
+      "title": "Skin Types and Conditions",
+      "prompts": [
+        "List observations and consultation questions relevant to this lesson. Separate observations from a medical diagnosis.",
+        "Explain which observations would make you pause and ask your trainer before beginning a service.",
+        "Use the lesson picture to identify what it does and does not show. Explain what additional evidence a trainer must demonstrate."
+      ],
+      "pdf_page": 21,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 9
+    },
+    {
+      "id": "de2e6e61-e8e7-4990-85e3-f0f8f54f6f4d",
+      "unit": "Skin Science & Analysis",
+      "title": "Professional Skin Analysis",
+      "prompts": [
+        "Describe your learning goal and the roles of the learner, instructor, program sponsor, and host-shop trainer.",
+        "Create a short scenario about professional conduct or client privacy. Explain a respectful response.",
+        "Plan your next week: theory study, supervised practice, feedback, and accurate documentation. Keep RTI and OJL separate."
+      ],
+      "pdf_page": 23,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 10
+    },
+    {
+      "id": "f767cc21-9386-4ed6-ad92-66ee4da41376",
+      "unit": "Skin Science & Analysis",
+      "title": "Skin Analysis - Hands-On Practice",
+      "prompts": [
+        "List observations and consultation questions relevant to this lesson. Separate observations from a medical diagnosis.",
+        "Explain which observations would make you pause and ask your trainer before beginning a service.",
+        "Use the lesson picture to identify what it does and does not show. Explain what additional evidence a trainer must demonstrate."
+      ],
+      "pdf_page": 25,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 11
+    },
+    {
+      "id": "f2e711fd-370e-44b9-8cf7-3dca4e8458cf",
+      "unit": "Skin Science & Analysis",
+      "title": "Common Skin Disorders and When to Refer",
+      "prompts": [
+        "List observations and consultation questions relevant to this lesson. Separate observations from a medical diagnosis.",
+        "Explain which observations would make you pause and ask your trainer before beginning a service.",
+        "Use the lesson picture to identify what it does and does not show. Explain what additional evidence a trainer must demonstrate."
+      ],
+      "pdf_page": 27,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 12
+    },
+    {
+      "id": "5880c66e-0a65-465a-b435-a603d34d839a",
+      "unit": "Skin Science & Analysis",
+      "title": "Skin Science & Analysis - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 29,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 13
+    },
+    {
+      "id": "4b35447a-c603-43cd-96aa-00a1e567a9ea",
+      "unit": "Facial Treatments",
+      "title": "Client Consultation for Facials",
+      "prompts": [
+        "Write three open questions that help you understand a client need without making an unsupported promise.",
+        "Draft a short explanation of your recommendation, its limitations, aftercare, and how you would check understanding.",
+        "Describe how you will document the consultation and protect private information. Identify when to involve your supervisor."
+      ],
+      "pdf_page": 31,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 14
+    },
+    {
+      "id": "469b2f65-ec8a-4ee4-8ce9-401b9cab6141",
+      "unit": "Facial Treatments",
+      "title": "Basic Facial Treatment Protocol",
+      "prompts": [
+        "Explain the purpose and main decisions in Basic Facial Treatment Protocol. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 33,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 15
+    },
+    {
+      "id": "b7f1e46d-dddf-41e2-b9ad-283414e05102",
+      "unit": "Facial Treatments",
+      "title": "Facial Products and Ingredients",
+      "prompts": [
+        "Compare two options discussed in this lesson. Explain the client information and product directions needed to choose safely.",
+        "Make a preparation checklist, including the checks or tests required by the product directions and your trainer.",
+        "The planned result and the observed result differ. Explain how you would stop, consult, document, and plan an appropriate next step."
+      ],
+      "pdf_page": 35,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 16
+    },
+    {
+      "id": "d830c60a-2e1c-4fac-acf5-3dae0215b8a9",
+      "unit": "Facial Treatments",
+      "title": "Advanced Facial Treatments",
+      "prompts": [
+        "Explain the purpose and main decisions in Advanced Facial Treatments. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 37,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 17
+    },
+    {
+      "id": "0b82c990-4e6a-48c3-889c-92a6677695f2",
+      "unit": "Facial Treatments",
+      "title": "Facial Treatments - Hands-On Practice",
+      "prompts": [
+        "Explain the purpose and main decisions in Facial Treatments - Hands-On Practice. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 39,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 18
+    },
+    {
+      "id": "c70e807a-54c7-47d7-b6dc-579fcdae25c5",
+      "unit": "Facial Treatments",
+      "title": "Facial Treatments - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 41,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 19
+    },
+    {
+      "id": "c12f4a75-cba3-4c09-b4c1-11b8f571481a",
+      "unit": "Hair Removal Services",
+      "title": "Hair Removal Methods Overview",
+      "prompts": [
+        "Explain the purpose and main decisions in Hair Removal Methods Overview. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 43,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 20
+    },
+    {
+      "id": "54d00d66-0605-4c33-a3e1-3e2c789d5cef",
+      "unit": "Hair Removal Services",
+      "title": "Waxing Techniques",
+      "prompts": [
+        "Explain the purpose and main decisions in Waxing Techniques. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 45,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 21
+    },
+    {
+      "id": "133182c8-e297-45f6-be69-b3782d43c845",
+      "unit": "Hair Removal Services",
+      "title": "Hair Removal - Hands-On Practice",
+      "prompts": [
+        "Explain the purpose and main decisions in Hair Removal - Hands-On Practice. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 47,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 22
+    },
+    {
+      "id": "4b4411df-c2d2-4a67-9697-99819d7da730",
+      "unit": "Hair Removal Services",
+      "title": "Hair Removal - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 49,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 23
+    },
+    {
+      "id": "c503908b-508b-4db9-bcbd-93b74ad5f4e6",
+      "unit": "Makeup Application",
+      "title": "Makeup Fundamentals and Color Theory",
+      "prompts": [
+        "Compare two options discussed in this lesson. Explain the client information and product directions needed to choose safely.",
+        "Make a preparation checklist, including the checks or tests required by the product directions and your trainer.",
+        "The planned result and the observed result differ. Explain how you would stop, consult, document, and plan an appropriate next step."
+      ],
+      "pdf_page": 51,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 24
+    },
+    {
+      "id": "1bd88830-a362-47f9-afc3-026c112a6377",
+      "unit": "Makeup Application",
+      "title": "Professional Makeup Application",
+      "prompts": [
+        "Describe your learning goal and the roles of the learner, instructor, program sponsor, and host-shop trainer.",
+        "Create a short scenario about professional conduct or client privacy. Explain a respectful response.",
+        "Plan your next week: theory study, supervised practice, feedback, and accurate documentation. Keep RTI and OJL separate."
+      ],
+      "pdf_page": 53,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 25
+    },
+    {
+      "id": "cce20823-31bd-47d0-a21e-62f5f7b52061",
+      "unit": "Makeup Application",
+      "title": "Makeup Application - Hands-On Practice",
+      "prompts": [
+        "Explain the purpose and main decisions in Makeup Application - Hands-On Practice. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 55,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 26
+    },
+    {
+      "id": "9d06cc1f-34f0-4188-aaa5-a7efd0486a73",
+      "unit": "Makeup Application",
+      "title": "Makeup Application - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 57,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 27
+    },
+    {
+      "id": "33cabf6d-a718-4976-9b05-abc3373c05f1",
+      "unit": "Final Examination",
+      "title": "Esthetician Final Examination",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 59,
+      "lesson_id": null,
+      "workbook_id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "section_number": 28
+    },
+    {
+      "id": "a9d206bf-68b9-4dea-8dc6-a7bc45c96cfc",
+      "unit": "Program Orientation & Professional Standards",
+      "title": "Welcome to Nail Technician Apprenticeship",
+      "prompts": [
+        "Describe your learning goal and the roles of the learner, instructor, program sponsor, and host-shop trainer.",
+        "Create a short scenario about professional conduct or client privacy. Explain a respectful response.",
+        "Plan your next week: theory study, supervised practice, feedback, and accurate documentation. Keep RTI and OJL separate."
+      ],
+      "pdf_page": 5,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 1
+    },
+    {
+      "id": "22c68fa6-be72-4151-9463-32560eaee6cf",
+      "unit": "Program Orientation & Professional Standards",
+      "title": "Indiana Nail Technician License Requirements",
+      "prompts": [
+        "Use the current IPLA instructions to identify the requirements relevant to your pathway. Record the source and date checked.",
+        "Make two lists: apprenticeship completion documents and state licensure application documents. Explain why the lists are different.",
+        "Write a question for staff about a requirement you could not verify. Do not guess a fee, hour total, or renewal obligation."
+      ],
+      "pdf_page": 7,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 2
+    },
+    {
+      "id": "986d25a7-fcb0-4f6b-9e0d-c9a90e52a6c3",
+      "unit": "Program Orientation & Professional Standards",
+      "title": "Orientation & Professional Standards - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 9,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 3
+    },
+    {
+      "id": "8e2c07e1-3045-467b-90a6-ce7ce91510c4",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Infection Control in Nail Services",
+      "prompts": [
+        "Choose a tool or work area used in this lesson. Identify the manufacturer or site instructions you must check before use.",
+        "Describe the safe preparation, service, cleanup, and storage sequence. Distinguish cleaning from disinfection.",
+        "A used item touches a clean area. Describe what you would stop, separate, report, and reprocess under the site procedure."
+      ],
+      "pdf_page": 11,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 4
+    },
+    {
+      "id": "d2dfc0ca-d75b-46b2-b64b-a9030b8c7b5a",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Sanitation and Disinfection for Nail Salons",
+      "prompts": [
+        "Choose a tool or work area used in this lesson. Identify the manufacturer or site instructions you must check before use.",
+        "Describe the safe preparation, service, cleanup, and storage sequence. Distinguish cleaning from disinfection.",
+        "A used item touches a clean area. Describe what you would stop, separate, report, and reprocess under the site procedure."
+      ],
+      "pdf_page": 13,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 5
+    },
+    {
+      "id": "6b74383a-403e-46ae-b732-611b5d2486c2",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Tool and Equipment Sanitization",
+      "prompts": [
+        "Choose a tool or work area used in this lesson. Identify the manufacturer or site instructions you must check before use.",
+        "Describe the safe preparation, service, cleanup, and storage sequence. Distinguish cleaning from disinfection.",
+        "A used item touches a clean area. Describe what you would stop, separate, report, and reprocess under the site procedure."
+      ],
+      "pdf_page": 15,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 6
+    },
+    {
+      "id": "eb3d9dc2-eb27-4b57-aee9-0c5f0687e82b",
+      "unit": "Sanitation, Infection Control & Safety",
+      "title": "Safety & Infection Control - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 17,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 7
+    },
+    {
+      "id": "a7479107-d9ec-46f4-951f-5432db4b87eb",
+      "unit": "Nail Anatomy & Disorders",
+      "title": "Nail Anatomy and Structure",
+      "prompts": [
+        "List observations and consultation questions relevant to this lesson. Separate observations from a medical diagnosis.",
+        "Explain which observations would make you pause and ask your trainer before beginning a service.",
+        "Use the lesson picture to identify what it does and does not show. Explain what additional evidence a trainer must demonstrate."
+      ],
+      "pdf_page": 19,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 8
+    },
+    {
+      "id": "44a54ad3-e954-413f-9e73-00c66fee4007",
+      "unit": "Nail Anatomy & Disorders",
+      "title": "Common Nail Disorders and Diseases",
+      "prompts": [
+        "List observations and consultation questions relevant to this lesson. Separate observations from a medical diagnosis.",
+        "Explain which observations would make you pause and ask your trainer before beginning a service.",
+        "Use the lesson picture to identify what it does and does not show. Explain what additional evidence a trainer must demonstrate."
+      ],
+      "pdf_page": 21,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 9
+    },
+    {
+      "id": "c074a855-ed99-4031-9d15-1a744368a455",
+      "unit": "Nail Anatomy & Disorders",
+      "title": "When to Refer Clients to a Physician",
+      "prompts": [
+        "Explain the purpose and main decisions in When to Refer Clients to a Physician. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 23,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 10
+    },
+    {
+      "id": "05893b64-8fd1-4c2a-b783-fbe3eb7f220c",
+      "unit": "Nail Anatomy & Disorders",
+      "title": "Nail Anatomy & Disorders - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 25,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 11
+    },
+    {
+      "id": "a6966453-2d6c-4768-a690-4b7ba8225f19",
+      "unit": "Manicure Services",
+      "title": "Client Consultation for Manicures",
+      "prompts": [
+        "Write three open questions that help you understand a client need without making an unsupported promise.",
+        "Draft a short explanation of your recommendation, its limitations, aftercare, and how you would check understanding.",
+        "Describe how you will document the consultation and protect private information. Identify when to involve your supervisor."
+      ],
+      "pdf_page": 27,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 12
+    },
+    {
+      "id": "6bac245c-bfb1-479c-914e-65fde7f2a6a6",
+      "unit": "Manicure Services",
+      "title": "Basic Manicure Procedure",
+      "prompts": [
+        "Explain the purpose and main decisions in Basic Manicure Procedure. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 29,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 13
+    },
+    {
+      "id": "56151877-d2f7-4eb3-82ea-14407b3f51db",
+      "unit": "Manicure Services",
+      "title": "Spa Manicure Services",
+      "prompts": [
+        "Explain the purpose and main decisions in Spa Manicure Services. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 31,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 14
+    },
+    {
+      "id": "21280c7c-93b9-45c5-9c3d-9781d1100816",
+      "unit": "Manicure Services",
+      "title": "Manicure - Hands-On Practice",
+      "prompts": [
+        "Explain the purpose and main decisions in Manicure - Hands-On Practice. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 33,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 15
+    },
+    {
+      "id": "ef63e36d-103a-458d-b255-7c2665081f3b",
+      "unit": "Manicure Services",
+      "title": "Manicure Services - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 35,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 16
+    },
+    {
+      "id": "b1dc6d6a-05ad-4950-874b-b810c4a95ab6",
+      "unit": "Pedicure Services",
+      "title": "Pedicure Procedure",
+      "prompts": [
+        "Explain the purpose and main decisions in Pedicure Procedure. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 37,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 17
+    },
+    {
+      "id": "0f248dd9-2a70-45da-aafd-ba37f38e9391",
+      "unit": "Pedicure Services",
+      "title": "Spa Pedicure Services",
+      "prompts": [
+        "Explain the purpose and main decisions in Spa Pedicure Services. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 39,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 18
+    },
+    {
+      "id": "d1191ed1-6578-4894-9ab6-979d13160319",
+      "unit": "Pedicure Services",
+      "title": "Pedicure - Hands-On Practice",
+      "prompts": [
+        "Explain the purpose and main decisions in Pedicure - Hands-On Practice. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 41,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 19
+    },
+    {
+      "id": "ab0c81a5-f88a-472c-aea3-a1d7b5c241c0",
+      "unit": "Pedicure Services",
+      "title": "Pedicure Services - Checkpoint",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 43,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 20
+    },
+    {
+      "id": "36f309ff-56bb-4c9f-be16-4f88de2305c2",
+      "unit": "Nail Enhancements",
+      "title": "Nail Product Knowledge",
+      "prompts": [
+        "Compare two options discussed in this lesson. Explain the client information and product directions needed to choose safely.",
+        "Make a preparation checklist, including the checks or tests required by the product directions and your trainer.",
+        "The planned result and the observed result differ. Explain how you would stop, consult, document, and plan an appropriate next step."
+      ],
+      "pdf_page": 45,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 21
+    },
+    {
+      "id": "001a772f-9f1a-4183-920e-850ec4ea575f",
+      "unit": "Nail Enhancements",
+      "title": "Sculptured Nails",
+      "prompts": [
+        "Explain the purpose and main decisions in Sculptured Nails. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 47,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 22
+    },
+    {
+      "id": "9c1eb62e-d8f7-4973-b073-4d5d6247c311",
+      "unit": "Nail Enhancements",
+      "title": "Gel and Acrylic Application",
+      "prompts": [
+        "Compare two options discussed in this lesson. Explain the client information and product directions needed to choose safely.",
+        "Make a preparation checklist, including the checks or tests required by the product directions and your trainer.",
+        "The planned result and the observed result differ. Explain how you would stop, consult, document, and plan an appropriate next step."
+      ],
+      "pdf_page": 49,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 23
+    },
+    {
+      "id": "b0921a97-9b24-4d0b-805f-2df7f76f5a6e",
+      "unit": "Nail Enhancements",
+      "title": "Fill-ins and Repairs",
+      "prompts": [
+        "Explain the purpose and main decisions in Fill-ins and Repairs. Use a concrete example from your assigned instruction.",
+        "Plan supervised practice: list the tools, preparation, sequence, and quality checks your trainer should demonstrate.",
+        "Compare the intended result with the observed result. Record one correction, the feedback you need, and your next practice goal."
+      ],
+      "pdf_page": 51,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 24
+    },
+    {
+      "id": "152d3a09-7b5f-4072-b891-42e5ce5be8b3",
+      "unit": "Nail Enhancements",
+      "title": "Nail Enhancements - Hands-On Practice",
+      "prompts": [
+        "Compare two options discussed in this lesson. Explain the client information and product directions needed to choose safely.",
+        "Make a preparation checklist, including the checks or tests required by the product directions and your trainer.",
+        "The planned result and the observed result differ. Explain how you would stop, consult, document, and plan an appropriate next step."
+      ],
+      "pdf_page": 53,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 25
+    },
+    {
+      "id": "691f2837-0efb-4f1c-9691-01f0be1cf88d",
+      "unit": "Final Examination",
+      "title": "Nail Technician Final Examination",
+      "prompts": [
+        "Choose three topics from this unit. Explain each in your own words and name the lesson evidence you used.",
+        "Write your own client or workplace scenario. Explain your decision and why the other choices would not fit.",
+        "List the two topics you need to revisit. Set a study plan and explain how you will check your improvement."
+      ],
+      "pdf_page": 55,
+      "lesson_id": null,
+      "workbook_id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "section_number": 26
+    }
+  ],
+  "workbooks": [
+    {
+      "id": "a7fbfd18-0bdf-4995-8c61-3a90cc8008cf",
+      "slug": "prestige-elevation-nail-technology",
+      "title": "Prestige Elevation Nail Technology Apprenticeship Workbook",
+      "is_active": true,
+      "program_id": "ab52add5-3e28-46f2-8990-d2e404073a0c",
+      "cover_image": "/images/pexels/nail-tech.webp",
+      "pdf_storage_path": "admin-documents/1793157078121-Prestige_Elevation_Nail_Technology_Digital_Workbook.pdf",
+      "source_library_id": "libfile_2ab9fd15a7148191ad517f4b994b1ebf"
+    },
+    {
+      "id": "36b0e860-c6c4-48c2-9439-c5f79975639d",
+      "slug": "prestige-elevation-esthetics",
+      "title": "Prestige Elevation Esthetics Apprenticeship Workbook",
+      "is_active": true,
+      "program_id": "7a7a8ad7-bac8-4883-b0cd-97d8353be94b",
+      "cover_image": "/images/pexels/esthetician.webp",
+      "pdf_storage_path": "admin-documents/1793157078143-Prestige_Elevation_Esthetics_Digital_Workbook.pdf",
+      "source_library_id": "libfile_652fec0406f0819193e9258f43d0142a"
+    }
+  ]
+}

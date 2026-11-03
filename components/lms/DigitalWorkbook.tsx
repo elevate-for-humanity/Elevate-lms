@@ -15,6 +15,7 @@ import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
+import {workbookWritingComplete,firstWorkbookUnreviewedIndex} from '@/lib/lms/workbook-progression';
 
 function SectionEditor({
   section,
@@ -42,7 +43,7 @@ function SectionEditor({
     accountId,
   );
   const slides = workbookSlides(section, visual?.caption);
-  const hasMissingWriting = slides.some(item => item.field && (draft.answers[item.field] ?? '').trim().length < 10);
+  const hasMissingWriting = !workbookWritingComplete(draft.answers,Math.min(3,section.prompts.length));
   const [step, setStep] = useState(0);
   const [moving, setMoving] = useState(false);
   const slide = slides[step];
@@ -277,8 +278,7 @@ export default function DigitalWorkbook({
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(
     () => new Set(responses.filter(row => row.reviewed).map(row => row.section_id))
   );
-  const firstIncomplete = sections.findIndex(section => !reviewedIds.has(section.id));
-  const unlockedIndex = firstIncomplete < 0 ? sections.length - 1 : firstIncomplete;
+  const unlockedIndex = firstWorkbookUnreviewedIndex(sections.map(section=>section.id),reviewedIds);
   useEffect(() => {
     function selectLinkedSection() {
       const requested = window.location.hash.replace(/^#section-/, '');

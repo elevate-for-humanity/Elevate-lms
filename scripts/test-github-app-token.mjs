@@ -13,7 +13,7 @@ function fixture({ env = {}, stored = {}, status = 200, mismatch = false, invali
   const calls = [];
   const environment = { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42',
     ...(mounted ? { GITHUB_APP_PRIVATE_KEY_FILE: '/mounted/key.pem' } : { GITHUB_APP_PRIVATE_KEY: pem }), ...env };
-  const factory = new Function('createHash', 'createPrivateKey', 'sign', 'readFileSync', 'process', 'fetch', 'Date', 'getDecryptedPlatformSecret',
+  const factory = new Function('createHash', 'createPrivateKey', 'sign', 'readFileSync', 'process', 'fetch', 'Date', 'getDecryptedPlatformSecret', 'getAdminGitHubAppSecret',
     source + '\nreturn getGitHubAppToken;');
   const get = factory(createHash, createPrivateKey, sign, () => pem, { env: environment }, async (url, init) => {
     calls.push({ url, init });
@@ -21,7 +21,7 @@ function fixture({ env = {}, stored = {}, status = 200, mismatch = false, invali
     return new Response(JSON.stringify(url.endsWith('/installation')
       ? { id: mismatch ? 99 : 42, app_id: 5477907, suspended_at: null }
       : { token: 'ghs_fixture_installation_token', expires_at: invalidToken ? 'invalid' : new Date(now + 3600_000).toISOString(), permissions }), { status });
-  }, { now: () => now, parse: Date.parse }, async key => stored[key]);
+  }, { now: () => now, parse: Date.parse }, async key => stored[key], async key => stored[key]);
   return { get, calls, env: environment, advance: ms => { now += ms; } };
 }
 test('signs verifiable RSA JWT and scopes token to only Elevate-lms', async () => {
@@ -119,4 +119,18 @@ test('does not promote dashboard PAT into the GitHub App signing key', async () 
 test('mounted App key does not load dashboard key or silently mix identities', async () => {
   const f = fixture({ mounted: true, stored: { GITHUB_APP_PRIVATE_KEY: 'not-a-key' } });
   assert.equal(await f.get(), 'ghs_fixture_installation_token');
+});
+
+test('dashboard-only mode ignores stale deployment App environment and rejects missing canonical key', async () => {
+  const f = fixture({
+    env: { PARIS_GITHUB_APP_SOURCE: 'dashboard', GITHUB_APP_PRIVATE_KEY: 'obsolete-runtime-key', GITHUB_APP_ID: '999', GITHUB_APP_INSTALLATION_ID: '888' },
+    stored: { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42', GITHUB_APP_PRIVATE_KEY: pem },
+  });
+  assert.equal(await f.get(), 'ghs_fixture_installation_token');
+  assert.equal(f.calls.length, 2);
+  const missing = fixture({
+    env: { PARIS_GITHUB_APP_SOURCE: 'dashboard' },
+    stored: { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42' },
+  });
+  await assert.rejects(missing.get(), { message: 'GITHUB_APP_CONFIGURATION_INVALID' });
 });

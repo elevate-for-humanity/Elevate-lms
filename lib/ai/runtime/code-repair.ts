@@ -1,3 +1,4 @@
+import {REPAIR_MODEL_PROBE_TIMEOUT_MS} from '@/lib/devstudio/repair-inference-budget.mjs';
 import 'server-only';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
 import {isRepairableCourseFailure,courseRepairOutcome} from './course-repair-policy.mjs';
@@ -153,7 +154,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   if(!recoveredProviderThisTick && canRetryHealthyProviderRepair(repair)){
    if(providerRecoveryHealth===undefined){
     const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
-    const health=await probeOwnedModel().catch(()=>({verified:false}));
+    const health=await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false}));
     const identity=health.verified?await diagnoseParisGitHubCredential().catch(()=>null):null;
     providerRecoveryHealth=Boolean(health.verified&&identity?.repository?.ok&&identity?.contents?.ok&&identity?.workflow?.ok);
    }

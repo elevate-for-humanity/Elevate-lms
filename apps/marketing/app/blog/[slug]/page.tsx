@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import Image from 'next/image';
+import BlogImage from '@/components/blog/BlogImage';
 import { notFound } from 'next/navigation';
 import { getDb } from '@/lib/lms/api';
 import { SocialShare } from '@/components/blog/SocialShare';
@@ -150,7 +150,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 flex items-end overflow-hidden">
-        <Image
+        <BlogImage
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src={getBlogImage(post)}
@@ -217,7 +217,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                   className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition group"
                 >
                   <div className="relative h-48 overflow-hidden">
-                    <Image
+                    <BlogImage
                       src={related.image || '/images/pages/admin-email-campaigns-new-detail.webp'}
                       alt={related.title}
                       fill

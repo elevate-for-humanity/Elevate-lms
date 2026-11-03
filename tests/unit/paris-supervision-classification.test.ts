@@ -13,3 +13,10 @@ describe('PARIS failure root-cause classification', () => {
   expect(classifyParisFailure('The operation was aborted due to timeout').recovery).toBe('existing_retry_policy');
  });
 });
+
+it('records a provider configuration or authorization problem without scheduling an unknown code repair', () => {
+  expect(classifyParisFailure('PAID_INFERENCE_AUTHORIZATION_REQUIRED:ai-chat').category).toBe('approval');
+  expect(classifyParisFailure('Provider override "openai" is not allowed; the configured provider is "elevate"').category).toBe('approval');
+  expect(classifyParisFailure('Configured AI provider "elevate" is unavailable; repair its canonical configuration').category).toBe('credentials');
+  expect(classifyParisFailure('Selected AI provider "elevate" is not configured').category).toBe('credentials');
+});

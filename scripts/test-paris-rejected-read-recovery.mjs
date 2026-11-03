@@ -46,3 +46,12 @@ test('authorization and network failures are propagated without discovery retrie
 test('planner records recovered directory evidence in durable observations',()=>{
  assert.ok(source.includes('observations.push(await rejectedReadFeedback(action.path, branch))'));
 });
+
+test('empty content searches can suggest real task-branch paths without exposing protected files',()=>{
+ const pathGuard=source.slice(source.indexOf('function normalizePath('),source.indexOf('async function githubHeaders('));
+ const selector=source.slice(source.indexOf('function suggestedSourcePaths('),source.indexOf('function parseAction('));
+ const suggest=new Function(pathGuard+selector+';return suggestedSourcePaths;')();
+ const tree=['lib/ai/chat.ts','lib/ai/providers/elevate.ts','lib/ai/auth/chat.ts','.env','lib/ai/github-token.ts'].map(path=>({type:'blob',path}));
+ assert.deepEqual(suggest('ai.chat unknown failure',tree),['lib/ai/chat.ts','lib/ai/providers/elevate.ts']);
+ assert.deepEqual(suggest('doesnotexist',tree),[]);
+});

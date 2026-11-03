@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import type { NavItem, NavSubItem } from '@/types/navigation';
@@ -36,6 +36,8 @@ const topLevelClass = 'rounded-md px-1.5 py-2 text-[13px] font-semibold text-sla
 export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState<string | null>(null);
   const [pinned, setPinned] = useState(false);
+  const [interactive, setInteractive] = useState(false);
+  useEffect(() => { setInteractive(true); }, []);
   const close = () => { setOpen(null); setPinned(false); };
   const triggers = useRef<Record<string, HTMLButtonElement | null>>({});
   return (
@@ -56,7 +58,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
             }}>
             <div className="flex items-center">
               {item.href ? <Link href={item.href} prefetch={false} onClick={close} className={topLevelClass}>{item.name}</Link> : null}
-              <button type="button" onClick={() => { if (expanded && pinned) close(); else { setOpen(key); setPinned(true); } }}
+              <button type="button" disabled={!interactive} onClick={() => { if (expanded && pinned) close(); else { setOpen(key); setPinned(true); } }}
                 ref={(node) => { triggers.current[key] = node; }}
                 className={`${topLevelClass} inline-flex min-h-11 items-center gap-1 px-1`}
                 aria-label={item.href ? `${item.name} menu` : item.name}

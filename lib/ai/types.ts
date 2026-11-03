@@ -277,6 +277,8 @@ export interface ChatMessage {
 }
 
 export interface ChatCompletionOptions {
+  /** Internal run or task identifier for correlating runtime observations. */
+  correlationId?: string;
   signal?: AbortSignal;
   model?: string;
   messages: ChatMessage[];

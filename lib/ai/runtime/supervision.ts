@@ -9,6 +9,10 @@ export type FailureDisposition = {
 /** Classify every failure; classification never authorizes replaying a mutation. */
 export function classifyParisFailure(error: unknown): FailureDisposition {
   const message = error instanceof Error ? error.message : String(error ?? '');
+  if (/^PAID_INFERENCE_AUTHORIZATION_REQUIRED:|^Provider override .* is not allowed;/.test(message))
+    return { category: 'approval', recovery: 'attention_required', nextAction: 'Check the authorized provider and inference budget for this operation.' };
+  if (/^Configured AI provider "[^"]+" is (?:unavailable|unknown or disabled)|^Elevate-owned AI is unavailable|^Selected AI provider "[^"]+" is (?:not configured|quarantined)|^Unknown AI chat provider:/.test(message))
+    return { category: 'credentials', recovery: 'attention_required', nextAction: 'Verify the selected provider configuration and its access before resuming this operation.' };
   if (/billing|\bcredits?\b|payment required|insufficient_quota|HTTP.?402/i.test(message))
     return { category: 'billing', recovery: 'attention_required', nextAction: 'Verify billing and remaining funds before resuming paid work.' };
   if (/401|403|credential|unauthori[sz]|forbidden|api.?key|permission|bad credentials|token rejected|resource not accessible by personal access token/i.test(message))

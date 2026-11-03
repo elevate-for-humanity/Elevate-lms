@@ -76,6 +76,14 @@ export class UltimateBuildRunner {
     }> = [];
     const savedRepair = (ctx.artifacts as any).__repairState;
     ctx.repairDirective = savedRepair?.status === 'producer-validated' ? undefined : savedRepair?.directive;
+    const resumed = ctx.repairDirective;
+    if (resumed?.target === 'visual_assignment' && resumed.failedStep === 'lesson_film_render' &&
+        Array.isArray(resumed.requirements) && resumed.requirements.length > 0 &&
+        resumed.requirements.every((f: UltimateInstructionalFinding) => f.code === 'ULTIMATE_VIDEO_RENDER_FAILED' && f.message.includes('MEDIA_RESOLVED_VISUALS_REPEATED:')) &&
+        routeSelectiveRepairs(resumed.requirements, ctx.artifacts.visual_assignment ?? resumed.previous)[0]?.step === 'lesson_film_render') {
+      ctx.repairDirective = { ...resumed, target: 'lesson_film_render', previous: ctx.artifacts.lesson_film_render };
+      savedRepair.directive = ctx.repairDirective;
+    }
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
       if (ctx.stopAfterStep && index > ULTIMATE_BUILD_STEPS.indexOf(ctx.stopAfterStep)) break;
@@ -236,7 +244,7 @@ export class UltimateBuildRunner {
       ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'failed', artifacts, findings: failures });
       for (const finding of failures) await ctx.persistFinding?.(finding);
-      const route = routeSelectiveRepairs(failures)[0];
+      const route = routeSelectiveRepairs(failures, ctx.artifacts.visual_assignment)[0];
       // Retry transient execution failures only; missing sources/licensing/browser
       // evidence are durable blockers and must never be manufactured by a retry.
       const transient = failures.every((f) =>

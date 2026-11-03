@@ -1,5 +1,5 @@
 import {expect,it} from 'vitest';
-import {budgetRepairMessages,REPAIR_INFERENCE_TIMEOUT_MS} from '@/lib/devstudio/repair-inference-budget.mjs';
+import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {elevateCompletionBudget} from '@/lib/ai/providers/elevate';
 it('retains task authority while fitting eight large source observations in the owned context',()=>{
  const task='Fix the known bug. Preserve all existing learner records.';
@@ -16,5 +16,11 @@ it('refuses to silently truncate an oversized task or its system rules',()=>{
 });
 it('gives owned inference its supported deadline with workflow headroom',()=>{
  expect(REPAIR_INFERENCE_TIMEOUT_MS).toBe(210000);
- expect(REPAIR_INFERENCE_TIMEOUT_MS).toBeLessThan(240000);
+ expect(REPAIR_INFERENCE_TIMEOUT_MS + REPAIR_MODEL_PROBE_TIMEOUT_MS).toBeLessThan(285000);
+});
+
+it('keeps private CPU discovery turns short and preserves the edit budget after reading a file',()=>{
+ expect(repairCompletionTokens('cpu',['SEARCH ai.chat','READ_REJECTED lib/ai/chat'])).toBe(384);
+ expect(repairCompletionTokens('cpu',['READ lib/ai/ai-service.ts (sha verified):'])).toBe(2400);
+ expect(repairCompletionTokens('gpu',[])).toBe(2400);
 });

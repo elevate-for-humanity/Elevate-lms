@@ -144,17 +144,20 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  if(blocked.error)throw blocked.error;
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
  let recoveredProviderThisTick=false;
+ let providerRecoveryHealth: boolean | undefined;
  for(const repair of blocked.data??[]){
   // Provider outages are infrastructure failures, not proof that a source
   // patch passed. A signed repair workflow may retry one historical, unlinked
   // timeout only when the owned model and scoped GitHub read identity recover.
   // Preserve the earlier attempt and do not reset any course job state.
   if(!recoveredProviderThisTick && canRetryHealthyProviderRepair(repair)){
-   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
-   const health=await probeOwnedModel().catch(()=>({verified:false}));
-   if(health.verified){
-    const identity=await diagnoseParisGitHubCredential().catch(()=>null);
-    if(identity?.repository?.ok && identity?.contents?.ok && identity?.workflow?.ok){
+   if(providerRecoveryHealth===undefined){
+    const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
+    const health=await probeOwnedModel().catch(()=>({verified:false}));
+    const identity=health.verified?await diagnoseParisGitHubCredential().catch(()=>null):null;
+    providerRecoveryHealth=Boolean(health.verified&&identity?.repository?.ok&&identity?.contents?.ok&&identity?.workflow?.ok);
+   }
+   if(providerRecoveryHealth){
      const updated=await db.from('paris_code_repairs').update({
       status:'queued',error_code:null,
       attempt_history:[...(repair.attempt_history??[]),{
@@ -169,7 +172,6 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
        .eq('updated_at',repair.updated_at).select('id').maybeSingle();
      if(updated.error)throw updated.error;
      if(updated.data)recoveredProviderThisTick=true;
-    }
    }
    continue;
   }

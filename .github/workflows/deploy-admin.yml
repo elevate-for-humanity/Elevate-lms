@@ -226,7 +226,7 @@ jobs:
             # Canonical Admin encrypted secret records are resolved at runtime.
             # Enforce App-only mode and remove the old GITHUB_TOKEN mounting;
             # the candidate must pass a GitHub-signed App diagnostic before traffic.
-            GITHUB_RUNTIME_FLAGS=(--update-env-vars=PARIS_GITHUB_AUTH_MODE=app,PARIS_GITHUB_APP_SOURCE=dashboard --remove-secrets=GITHUB_TOKEN)
+            GITHUB_RUNTIME_FLAGS=(--remove-secrets=GITHUB_TOKEN)
           elif [[ "${PARIS_GITHUB_AUTH_MODE}" == 'app' ]]; then
             node --test scripts/gcp/paris-github-app-binding.test.mjs
             node scripts/gcp/paris-github-app-binding.mjs > "$RUNNER_TEMP/github-runtime-flags"
@@ -246,7 +246,7 @@ jobs:
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            --update-env-vars=AI_NARRATION_PROVIDER=kokoro "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
+            --update-env-vars=AI_NARRATION_PROVIDER=kokoro,PARIS_GITHUB_AUTH_MODE=app,PARIS_GITHUB_APP_SOURCE=dashboard "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         env:

@@ -5,6 +5,26 @@ const SHOPS = ['Cal’s Kutz Studio', 'Kountry Kutz Barbershop', 'Salon Saloon',
 const SHOP_LINKS = ['/host-shops/cals-kutz-studio', '/host-shops/kountry-kutz-barbershop', '/host-shops/salon-saloon', '/host-shops/top-shelf-barber-lounge'];
 
 for (const width of [320, 390, 768, 1440]) {
+  test(`enrollment cards reserve readable copy at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const steps = page.locator('[data-home-enrollment-steps] li a');
+    await expect(steps).toHaveCount(3);
+    for (const step of await steps.all()) {
+      await step.scrollIntoViewIfNeeded();
+      const image = step.locator('img');
+      await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+      const heading = await step.locator('h3').boundingBox();
+      const photo = await image.boundingBox();
+      const card = await step.boundingBox();
+      expect(heading!.width).toBeGreaterThan(145);
+      expect(photo!.width).toBeLessThanOrEqual(81);
+      expect(heading!.x).toBeGreaterThanOrEqual(photo!.x + photo!.width);
+      expect(heading!.x + heading!.width).toBeLessThanOrEqual(card!.x + card!.width);
+    }
+    await expect(page.locator('[data-hvac-program-video], #hvac-program-film')).toHaveCount(0);
+  });
+
   test(`curated homepage at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });

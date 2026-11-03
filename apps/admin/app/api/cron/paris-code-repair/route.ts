@@ -12,7 +12,7 @@ export async function POST(request:NextRequest){
  const deploymentDiagnosticOnly=!repairAuthority && await authorizeParisDeploymentAppDiagnostic(authorization);
  if(!repairAuthority && !deploymentDiagnosticOnly)return NextResponse.json({error:'Unauthorized'},{status:401});
  const body=await request.json().catch(()=>({}));
- if(deploymentDiagnosticOnly && body.phase!=='app-auth-diagnostic')return NextResponse.json({error:'Unauthorized'},{status:401});
+ if(deploymentDiagnosticOnly && !['app-auth-diagnostic','auth-diagnostic'].includes(body.phase))return NextResponse.json({error:'Unauthorized'},{status:401});
  try{
   if(body.phase==='app-auth-diagnostic'){
    // Deliberately ignore X-Paris-GitHub-Token: this phase proves the runtime App.

@@ -9,7 +9,7 @@ const WORKFLOWS=new Set([
  '.github/workflows/paris-code-repair.yml',
  '.github/workflows/verify-paris-production-authorization.yml',
 ]);
-export async function authorizeParisWorkflow(header:string|null):Promise<boolean>{
+async function verifyParisWorkflowIdentity(header:string|null, allowedWorkflows:Set<string>):Promise<boolean>{
  const token=/^Bearer (\S+)$/.exec(header||'')?.[1];
  if(!token)return false;
  try{
@@ -17,6 +17,16 @@ export async function authorizeParisWorkflow(header:string|null):Promise<boolean
   if(payload.repository!=='elevate-for-humanity/Elevate-lms'||payload.ref!=='refs/heads/main')return false;
   const workflowRef=String(payload.job_workflow_ref||payload.workflow_ref||'');
   const path=workflowRef.match(/^elevate-for-humanity\/Elevate-lms\/(\.github\/workflows\/[^@]+)@refs\/heads\/main$/)?.[1];
-  return Boolean(path&&WORKFLOWS.has(path));
+  return Boolean(path&&allowedWorkflows.has(path));
  }catch{return false;}
+}
+
+/** Repair dispatch authority remains limited to the original PARIS workflows. */
+export async function authorizeParisWorkflow(header:string|null):Promise<boolean> {
+ return verifyParisWorkflowIdentity(header,WORKFLOWS);
+}
+
+/** Deployment may ONLY inspect App credentials on a zero-traffic candidate. */
+export async function authorizeParisDeploymentAppDiagnostic(header:string|null):Promise<boolean> {
+ return verifyParisWorkflowIdentity(header,new Set(['.github/workflows/deploy-admin.yml']));
 }

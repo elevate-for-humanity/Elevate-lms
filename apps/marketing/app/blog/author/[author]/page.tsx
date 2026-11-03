@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { getBlogCardImage } from '@/lib/blog/images';
 import BlogImage from '@/components/blog/BlogImage';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
@@ -106,7 +107,7 @@ export default async function AuthorPage({ params }: { params: Promise<{ author:
                 <div className="relative h-48 overflow-hidden">
                   <BlogImage
                     loading="lazy"
-                    src={post.featured_image}
+                    src={getBlogCardImage(post.featured_image)}
                     alt={post.title}
                     fill
                     sizes="100vw"

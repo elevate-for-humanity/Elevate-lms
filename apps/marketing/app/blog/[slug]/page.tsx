@@ -1,4 +1,4 @@
-import { getBlogImage } from '@/lib/blog/images';
+import { getBlogCardImage, getBlogImage } from '@/lib/blog/images';
 import { Metadata } from 'next';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -218,7 +218,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                 >
                   <div className="relative h-48 overflow-hidden">
                     <BlogImage
-                      src={related.image || '/images/pages/admin-email-campaigns-new-detail.webp'}
+                      src={getBlogCardImage(related.image || '/images/pages/admin-email-campaigns-new-detail.webp')}
                       alt={related.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

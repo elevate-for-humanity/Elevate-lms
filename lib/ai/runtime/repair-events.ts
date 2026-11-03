@@ -14,7 +14,7 @@ export async function readRecentRepairEvents(db: any, now = Date.now()) {
   const through = new Date(now).toISOString();
   for (let page = 0; page < MAX_PAGES; page++) {
     const result = await db.from('paris_runtime_events')
-      .select('id,operation,status,failure_category,correlation_id,created_at')
+      .select('id,operation,status,failure_category,correlation_id,provider,duration_ms,created_at')
       .gte('created_at', from)
       .lte('created_at', through)
       .order('created_at', { ascending: false })

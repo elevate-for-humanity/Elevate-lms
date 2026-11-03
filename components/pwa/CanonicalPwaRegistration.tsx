@@ -128,7 +128,9 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
           window.removeEventListener('online', checkForUpdate);
         });
 
-        checkForUpdate();
+        // register() just checked the public worker. A second native update in
+        // the same navigation can fail origin checks in WebKit even after a 200.
+        if (application !== 'marketing') checkForUpdate();
       } catch (error) {
         if (cancelled) return;
         // A registration exception must not leave an obsolete worker controlling

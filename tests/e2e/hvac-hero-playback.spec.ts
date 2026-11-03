@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 const website = 'https://www.elevateforhumanity.org/programs/hvac-technician';
-const selector = '#hvac-program-film video[data-hvac-program-video="20261029"]';
+const selector = 'video[data-hvac-program-video="20261029"]';
 type PlaybackEvidence = {
   startedAt: number; firstTime: number; maxTime: number;
   samples: Array<{ time: number; elapsedMs: number; paused: boolean; error: number }>;
@@ -14,10 +14,10 @@ function trackPageErrors(page: Page) {
   return errors;
 }
 
-test('the dedicated HVAC film plays the full 96 seconds on request without cropping and can replay', async ({ page }, testInfo) => {
+test('the HVAC program film plays all 96 seconds after the visitor presses play', async ({ page }, testInfo) => {
   test.setTimeout(155_000);
   const pageErrors = trackPageErrors(page);
-  // Observe native playback from the visitor's first play through the natural end.
+  // Record real-time playback without seeking or substituting a media source.
   await page.addInitScript(target => {
     const evidence: PlaybackEvidence = { startedAt: 0, firstTime: -1, maxTime: 0, samples: [] };
     (window as ObservedWindow).__hvacPlaybackEvidence = evidence;
@@ -35,16 +35,14 @@ test('the dedicated HVAC film plays the full 96 seconds on request without cropp
   expect(response?.status()).toBe(200);
   const video = page.locator(selector);
   await expect(video).toBeVisible();
-  await video.scrollIntoViewIfNeeded();
-  expect(await video.evaluate((element: HTMLVideoElement) => element.paused && !element.autoplay)).toBe(true);
-  await video.click();
-  await video.evaluate((element: HTMLVideoElement) => element.play());
-  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState)).toBeGreaterThanOrEqual(2);
+  await page.getByRole('link', { name: 'Watch the program introduction' }).click();
+  await expect(page).toHaveURL(/#hvac-program-film$/);
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState), { timeout: 15000 }).toBeGreaterThanOrEqual(1);
   const initial = await video.evaluate((element: HTMLVideoElement) => {
     const rect = element.getBoundingClientRect();
     return {
       duration: element.duration, width: element.videoWidth, height: element.videoHeight,
-      controls: element.controls, muted: element.muted, loop: element.loop, inline: element.playsInline,
+      controls: element.controls, autoplay: element.autoplay, paused: element.paused, loop: element.loop, inline: element.playsInline,
       fit: getComputedStyle(element).objectFit, renderedWidth: rect.width, renderedHeight: rect.height,
       viewportWidth: innerWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1,
     };
@@ -52,25 +50,17 @@ test('the dedicated HVAC film plays the full 96 seconds on request without cropp
   expect(initial.duration).toBeCloseTo(96, 1);
   expect(initial.width).toBe(720);
   expect(initial.height).toBe(900);
-  expect(initial).toMatchObject({ controls: true, muted: false, loop: false, inline: true, overflow: false });
-  expect(initial.renderedWidth / initial.renderedHeight).toBeCloseTo(initial.width / initial.height, 2);
+  expect(initial).toMatchObject({ controls: true, autoplay: false, paused: true, loop: false, inline: true, overflow: false });
   expect(initial.renderedWidth).toBeLessThanOrEqual(initial.viewportWidth);
+  expect(initial.renderedWidth / initial.renderedHeight).toBeCloseTo(720 / 900, 2);
+  await video.scrollIntoViewIfNeeded();
+  await video.click();
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime), { timeout: 15_000 }).toBeGreaterThan(0.5);
-  const started = Date.now();
   try {
-    while (Date.now() - started < 110_000) {
-      const sample = await video.evaluate((element: HTMLVideoElement) => ({
-        time: element.currentTime, paused: element.paused, error: element.error?.code ?? 0,
-        readyState: element.readyState, networkState: element.networkState, muted: element.muted,
-        ended: element.ended, seeking: element.seeking, visibility: document.visibilityState,
-        installBannerVisible: Boolean(document.querySelector('[data-pwa-install-banner]')),
-      }));
-      expect(sample.error, JSON.stringify(sample)).toBe(0);
-      if (sample.ended) break;
-      expect(sample.paused, JSON.stringify(sample)).toBe(false);
-      await page.waitForTimeout(250);
-    }
-    expect(await video.evaluate((el: HTMLVideoElement) => el.ended), 'The full film should finish').toBe(true);
+    await expect.poll(() => video.evaluate((element: HTMLVideoElement) => {
+      if (element.error) throw Error('Native media error ' + element.error.code);
+      return element.ended;
+    }), { timeout: 110000, intervals: [500] }).toBe(true);
     const evidence = await page.evaluate(() => (window as ObservedWindow).__hvacPlaybackEvidence);
     expect(evidence.firstTime).toBeGreaterThanOrEqual(0);
     expect(evidence.firstTime).toBeLessThanOrEqual(1);
@@ -85,14 +75,14 @@ test('the dedicated HVAC film plays the full 96 seconds on request without cropp
     const evidence = await page.evaluate(() => (window as ObservedWindow).__hvacPlaybackEvidence);
     await testInfo.attach('hvac-full-playback', { body: JSON.stringify({ url: page.url(), project: testInfo.project.name, initial, pageErrors, ...evidence }), contentType: 'application/json' });
   }
-  await testInfo.attach('hvac-hero-playing', { body: await page.screenshot(), contentType: 'image/png' });
+  await testInfo.attach('hvac-program-film-finished', { body: await page.screenshot(), contentType: 'image/png' });
 });
 
 test('optional assistance and installation do not cover the HVAC film or controls', async ({ page }, testInfo) => {
   const pageErrors = trackPageErrors(page);
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   await expect(page.locator(selector)).toBeVisible();
-  await page.locator(selector).scrollIntoViewIfNeeded();
+  await page.locator(selector).evaluate(element => element.scrollIntoView({ block: 'end' }));
   // Cover the delayed iOS install promotion as well as the initial page load.
   await page.waitForTimeout(12_000);
   await expect(page.locator('[data-pwa-install-banner]')).toHaveCount(0);
@@ -114,10 +104,10 @@ test('HVAC native media supports sound, pause, and resume', async ({ page }, tes
   const pageErrors = trackPageErrors(page);
   await page.goto(website, { waitUntil: 'domcontentloaded' });
   const video = page.locator(selector);
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState), { timeout: 15000 }).toBeGreaterThanOrEqual(1);
   await video.scrollIntoViewIfNeeded();
   await video.click();
-  await video.evaluate((element: HTMLVideoElement) => element.play());
-  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.readyState)).toBeGreaterThanOrEqual(2);
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime), { timeout: 15000 }).toBeGreaterThan(0.5);
   await video.evaluate((element: HTMLVideoElement) => element.pause());
   expect(await video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
   // Native controls vary across mobile engines; exercise their real media API

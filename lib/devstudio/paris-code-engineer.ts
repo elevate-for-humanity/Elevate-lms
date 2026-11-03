@@ -292,7 +292,7 @@ function parseAction(value: Record<string, unknown>): AgentAction {
 }
 
 export type ParisRepairCheckpoint = {
-  version: 1; branch: string; baseSha: string; headSha: string; nextTurn: number;
+  version: 1; boundedCpuEdits?: boolean; branch: string; baseSha: string; headSha: string; nextTurn: number;
   observations: string[]; changedFiles: string[]; newRegressionTests: string[];
   commits: string[]; writes: number; summary: string; complete: boolean;
 };
@@ -343,7 +343,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     const ref = await githubJson(`/git/ref/heads/${encodeURIComponent(branch)}`);
     headSha = String(ref.object?.sha ?? '');
     if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
-    await continuation.save({version:1,branch,baseSha,headSha,nextTurn,
+    await continuation.save({version:1,boundedCpuEdits:true,branch,baseSha,headSha,nextTurn,
       observations:observations.slice(-8),changedFiles:[...changedFiles],
       newRegressionTests:[...newRegressionTests],commits,writes,summary,complete});
   };
@@ -354,6 +354,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     const stopTurn = continuation ? Math.min(MAX_TURNS, nextTurn + 1) : MAX_TURNS;
     for (let turn = nextTurn; !complete && turn < stopTurn; turn += 1) {
       try {
+      const ownedTier = provider === 'elevate' ? resolveOwnedModelConnection().tier : undefined;
       const inferenceOptions = {
         correlationId: taskId,
         messages: [
@@ -370,7 +371,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
               '{"type":"replace","path":"...","old":"exact existing text","replacement":"new text","message":"commit message"}, ' +
               '{"type":"create","path":"...","content":"...","message":"commit message"}, ' +
               '{"type":"complete","summary":"..."}. ' +
-              'Use replace for existing files. The old text must be exact and sufficiently specific. ' +
+              'Use small, self-contained edits. The old text must be exact and sufficiently specific. ' +
               'Do not touch secrets, .env files, generated dependencies, or unrelated features. ' +
               'Do not claim success until the required source changes are committed to the task branch.',
           },
@@ -387,13 +388,13 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           },
         ],
         temperature: 0.1,
-        maxTokens: provider === 'elevate' ? repairCompletionTokens(resolveOwnedModelConnection().tier, observations) : 2400,
+        maxTokens: repairCompletionTokens(ownedTier, observations),
         jsonMode: true,
         signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
       } as Parameters<typeof aiChat>[0];
       if (provider === 'elevate') {
         inferenceOptions.messages = budgetRepairMessages(inferenceOptions.messages,
-          Number(process.env.ELEVATE_LLM_CONTEXT_TOKENS ?? 8192), inferenceOptions.maxTokens);
+          Number(process.env.ELEVATE_LLM_CONTEXT_TOKENS ?? 8192), inferenceOptions.maxTokens, ownedTier);
       }
       const infer=()=>aiChat(inferenceOptions);
       const paid=provider==='elevate'?null:await executePaidInference({db,authorize:()=>reservePaidInference(db,{scopeKey:'studio-chat',actorId,runId:taskId,artifactFingerprint:paidArtifactFingerprint({taskId,turn,task}),idempotencyKey:`paris-repair:${taskId}:${turn}`,provider,model:'canonical',operation:'paris-code-repair',projectedCostMicros:Math.max(0,Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS??'100000'))}),dispatch:infer});

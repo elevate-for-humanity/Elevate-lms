@@ -40,6 +40,7 @@ for (const [path, target, status] of [
   });
 }
 for (const [path, target] of [
+  ['/programs/skilled-trades', '/programs'], ['/programs/technology', '/programs'],
   ['/founder', '/about/elizabeth-greene'], ['/team', '/about/team'],
   ['/about/partners', '/partners'], ['/about/mission', '/about#mission'],
   ...['academic','financial-aid','career','counseling','accessibility','scheduling'].map(topic => ['/student-support/'+topic, '/student-support#'+topic]),

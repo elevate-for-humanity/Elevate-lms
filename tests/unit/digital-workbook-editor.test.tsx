@@ -55,7 +55,7 @@ it('shows one section at a time and restores saved answers on reopening', async 
   );
   // Workbook progression is sequential. A newly opened account must not
   // silently jump into section 2 just because that section exists.
-  expect(screen.getByRole('option', { name: /2\. Study topic 2/ })).toBeDisabled();
+  expect(screen.queryByRole('option', { name: /2\. Study topic 2/ })).toBeNull();
   fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
     target: { value: 'section-2' },
   });

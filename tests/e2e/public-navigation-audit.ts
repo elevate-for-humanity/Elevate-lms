@@ -9,6 +9,7 @@ if (!destinations.includes('/student-support')) destinations.push('/student-supp
 export function registerPublicNavigationAudit() {
   test('retired public pages redirect before HTML streaming', async ({ request }) => {
     for (const [path, target] of [
+      ['/programs/skilled-trades', '/programs'], ['/programs/technology', '/programs'],
       ['/founder', '/about/elizabeth-greene'], ['/team', '/about/team'],
       ['/about/partners', '/partners'], ['/about/mission', '/about#mission'],
       ...['academic','financial-aid','career','counseling','accessibility','scheduling'].map(topic => ['/student-support/'+topic, '/student-support#'+topic]),

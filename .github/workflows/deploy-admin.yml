@@ -256,6 +256,7 @@ jobs:
         shell: bash
         env:
           PARIS_GITHUB_APP_SOURCE: workflow
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           export CANDIDATE_SERVICE=elevate-admin-migration

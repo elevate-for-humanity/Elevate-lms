@@ -8,12 +8,12 @@ const pair = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const pem = pair.privateKey.export({ type: 'pkcs8', format: 'pem' });
 const source = stripTypeScriptTypes(await readFile(new URL('../lib/devstudio/github-app-token.ts', import.meta.url), 'utf8'))
   .replace(/^import .*;\n/gm, '').replaceAll('export ', '');
-function fixture({ env = {}, status = 200, mismatch = false, invalidToken = false, network = false, mounted = false, permissions = { contents: 'write', actions: 'write', pull_requests: 'write' } } = {}) {
+function fixture({ env = {}, stored = {}, status = 200, mismatch = false, invalidToken = false, network = false, mounted = false, permissions = { contents: 'write', actions: 'write', pull_requests: 'write' } } = {}) {
   let now = Date.now();
   const calls = [];
   const environment = { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42',
     ...(mounted ? { GITHUB_APP_PRIVATE_KEY_FILE: '/mounted/key.pem' } : { GITHUB_APP_PRIVATE_KEY: pem }), ...env };
-  const factory = new Function('createHash', 'createPrivateKey', 'sign', 'readFileSync', 'process', 'fetch', 'Date',
+  const factory = new Function('createHash', 'createPrivateKey', 'sign', 'readFileSync', 'process', 'fetch', 'Date', 'getDecryptedPlatformSecret',
     source + '\nreturn getGitHubAppToken;');
   const get = factory(createHash, createPrivateKey, sign, () => pem, { env: environment }, async (url, init) => {
     calls.push({ url, init });
@@ -21,7 +21,7 @@ function fixture({ env = {}, status = 200, mismatch = false, invalidToken = fals
     return new Response(JSON.stringify(url.endsWith('/installation')
       ? { id: mismatch ? 99 : 42, app_id: 5477907, suspended_at: null }
       : { token: 'ghs_fixture_installation_token', expires_at: invalidToken ? 'invalid' : new Date(now + 3600_000).toISOString(), permissions }), { status });
-  }, { now: () => now, parse: Date.parse });
+  }, { now: () => now, parse: Date.parse }, async key => stored[key]);
   return { get, calls, env: environment, advance: ms => { now += ms; } };
 }
 test('signs verifiable RSA JWT and scopes token to only Elevate-lms', async () => {
@@ -98,4 +98,25 @@ test('read-only or incomplete App permissions cannot authorize PARIS repairs', a
     await assert.rejects(f.get(), { message: 'GITHUB_APP_WRITE_PERMISSIONS_REQUIRED' });
     assert.equal(f.calls.length, 2);
   }
+});
+
+test('uses exact encrypted Admin GitHub App fields when deployment has no App environment', async () => {
+  const f = fixture({
+    env: { GITHUB_APP_ID: '', GITHUB_APP_INSTALLATION_ID: '', GITHUB_APP_PRIVATE_KEY: '' },
+    stored: { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42', GITHUB_APP_PRIVATE_KEY: pem, GITHUB_TOKEN: 'not-a-private-key' },
+  });
+  assert.equal(await f.get(), 'ghs_fixture_installation_token');
+  assert.equal(f.calls.length, 2);
+});
+test('does not promote dashboard PAT into the GitHub App signing key', async () => {
+  const f = fixture({
+    env: { GITHUB_APP_ID: '', GITHUB_APP_INSTALLATION_ID: '', GITHUB_APP_PRIVATE_KEY: '' },
+    stored: { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42', GITHUB_TOKEN: 'github_pat_old_token' },
+  });
+  await assert.rejects(f.get(), { message: 'GITHUB_APP_CONFIGURATION_INVALID' });
+  assert.equal(f.calls.length, 0);
+});
+test('mounted App key does not load dashboard key or silently mix identities', async () => {
+  const f = fixture({ mounted: true, stored: { GITHUB_APP_PRIVATE_KEY: 'not-a-key' } });
+  assert.equal(await f.get(), 'ghs_fixture_installation_token');
 });

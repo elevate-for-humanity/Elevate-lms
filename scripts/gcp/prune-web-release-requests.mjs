@@ -33,6 +33,7 @@ export async function releaseApi(
       Authorization: 'Bearer ' + token,
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
+      'Cache-Control': 'no-cache',
     },
     signal: AbortSignal.timeout(20000),
   });
@@ -47,16 +48,28 @@ export async function assertLatestWebReleaseRequest({ api, repository, workflow,
     !WEB_RELEASE_WORKFLOWS.includes(workflow)
   )
     throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
-  const inventory = await api(
-    `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`,
-  );
-  if (!Array.isArray(inventory.workflow_runs)) throw Error('RELEASE_INVENTORY_UNAVAILABLE');
-  const runs = inventory.workflow_runs.filter(eligible);
-  if (runs.some((r) => !Number.isSafeInteger(r.id) || !Number.isSafeInteger(r.run_number)))
-    throw Error('RELEASE_INVENTORY_INVALID');
-  const current = runs.find((r) => String(r.id) === String(runId));
-  if (!current || runs.some((r) => r.run_number > current.run_number))
-    throw Error('SUPERSEDED_RELEASE_REQUEST');
+  const endpoint = `repos/${repository}/actions/workflows/${workflow}/runs`;
+  const readRuns = async query => {
+    const inventory = await api(endpoint + query);
+    if (!Array.isArray(inventory.workflow_runs)) throw Error('RELEASE_INVENTORY_UNAVAILABLE');
+    const runs = inventory.workflow_runs.filter(eligible);
+    if (runs.some(r => !Number.isSafeInteger(r.id) || !Number.isSafeInteger(r.run_number)))
+      throw Error('RELEASE_INVENTORY_INVALID');
+    return runs;
+  };
+  const filtered = await readRuns('?event=workflow_dispatch&branch=main&per_page=100');
+  let runs = filtered;
+  let current = filtered.find(r => String(r.id) === String(runId));
+  if (!current) {
+    // A newly started dispatch can appear in the branch list before GitHub's
+    // event-filtered index. Both lists must agree that no newer request exists.
+    const recent = await readRuns('?branch=main&per_page=10');
+    current = recent.find(r => String(r.id) === String(runId));
+    if (!current) throw Error('RELEASE_REQUEST_NOT_VISIBLE_IN_INVENTORY:' + runId);
+    runs = [...filtered, ...recent];
+  }
+  const newer = runs.find(r => r.run_number > current.run_number);
+  if (newer) throw Error('SUPERSEDED_RELEASE_REQUEST:' + newer.id);
   return { workflow, runId: current.id, status: 'latest_requested_release' };
 }
 

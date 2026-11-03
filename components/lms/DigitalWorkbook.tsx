@@ -15,7 +15,6 @@ import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
-import { workbookLessonHref } from '@/lib/lms/workbook-lesson-links';
 
 function SectionEditor({
   section,
@@ -100,11 +99,6 @@ function SectionEditor({
       >
         {section.section_number}. {section.title}
       </h2>
-      {workbookLessonHref(section, workbookSlug) ? (
-        <a className="my-4 inline-flex min-h-12 items-center rounded-lg border border-slate-700 bg-white px-4 py-3 font-bold underline" href={workbookLessonHref(section, workbookSlug)!}>
-          Study the matching lesson section
-        </a>
-      ) : null}
       <div className="my-4 flex flex-wrap items-center gap-3">
         <button
           type="button"

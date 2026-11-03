@@ -88,17 +88,19 @@ export default function TestingCheckoutClient({
   }, [initialProvider, initialExam, providers]);
 
   useEffect(() => {
+    setPaymentReady(null);
+    if (!slotId) return;
     const controller = new AbortController();
-    fetch('/api/health/quickbooks', { cache: 'no-store', signal: controller.signal })
+    fetch('/api/testing/payment-availability', { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         const status = await response.json();
-        if (!controller.signal.aborted) setPaymentReady(response.ok && status.ready === true);
+        if (!controller.signal.aborted) setPaymentReady(response.ok && status.available === true);
       })
       .catch(() => {
         if (!controller.signal.aborted) setPaymentReady(false);
       });
     return () => controller.abort();
-  }, []);
+  }, [slotId]);
 
   function changeProvider(key: string) {
     const next = providers.find((p) => p.key === key) ?? null;
@@ -458,7 +460,7 @@ export default function TestingCheckoutClient({
             </a>{' '}
             for booking assistance before making a payment.
           </p>
-        ) : paymentReady === null ? (
+        ) : slotId && paymentReady === null ? (
           <p className="mt-3 text-sm text-slate-600">Checking payment availability…</p>
         ) : null}
         {!checkoutReady ? (

@@ -2,7 +2,7 @@ import { PublicEditorialHero } from '@/components/marketing/PublicEditorialHero'
 import { getBlogImage } from '@/lib/blog/images';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
-import Image from 'next/image';
+import BlogImage from '@/components/blog/BlogImage';
 import Link from 'next/link';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -106,7 +106,7 @@ export default async function BlogPage() {
               className="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden md:flex hover:shadow-md transition-shadow"
             >
               <div className="md:w-1/2 relative h-64 md:h-auto bg-white overflow-hidden">
-                <Image
+                <BlogImage
                   src={getBlogImage(featured)}
                   alt={featured.title}
                   fill
@@ -156,7 +156,7 @@ export default async function BlogPage() {
                   className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
                   <div className="relative h-48 bg-white overflow-hidden">
-                    <Image
+                    <BlogImage
                       src={getBlogImage(post)}
                       alt={post.title}
                       fill

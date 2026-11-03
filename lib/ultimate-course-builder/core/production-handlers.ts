@@ -482,7 +482,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
     },
     selective_repair: async (ctx) => {
-      const routes = routeSelectiveRepairs(ctx.findings);
+      const routes = routeSelectiveRepairs(ctx.findings, ctx.artifacts.visual_assignment);
       const plan: CourseRepairPlan = {
         buildId: ctx.buildId,
         createdAt: new Date().toISOString(),

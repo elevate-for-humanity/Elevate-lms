@@ -48,7 +48,10 @@ export function isDurableExternalBlocker(finding: UltimateInstructionalFinding) 
   return DURABLE_EXTERNAL_BLOCKERS.test(finding.code);
 }
 
-export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) {
+export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[], visual?: Record<string, unknown>) {
+  const assignments = (visual?.media as { assignments?: { assignmentMethod?: string }[] } | undefined)?.assignments;
+  const deferredPhotos = Array.isArray(assignments) && assignments.length > 0 && assignments.every(a =>
+    a.assignmentMethod === 'instructional-visual-request' || a.assignmentMethod === 'teaching-photograph-request');
   const targets = new Map<UltimateBuildStep, string[]>();
   for (const f of findings) {
     if (isDurableExternalBlocker(f)) continue;
@@ -67,7 +70,9 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
       continue;
     }
     // Cue quotations originate in the storyboard, not the deterministic timeline.
-    const target = renderAssignmentFailure ? 'visual_assignment' : renderNarrationFailure ? 'natural_narration' : renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    // Conceptual assignments reserve scenes. Their actual photographs are selected by the renderer.
+    const repeatedDeferredPhoto = renderAssignmentFailure && deferredPhotos && f.message.includes('MEDIA_RESOLVED_VISUALS_REPEATED:');
+    const target = repeatedDeferredPhoto ? 'lesson_film_render' : renderAssignmentFailure ? 'visual_assignment' : renderNarrationFailure ? 'natural_narration' : renderInputFailure ? 'storyboard' : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

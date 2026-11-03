@@ -33,9 +33,14 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const approvedReference=premium ? await approvedReferencePhotoPicker(input,db) : null;
   let placedPhotos: any[] | undefined;
   const usedPhotoHashes=new Set<string>();
+  const primaryPhotoHashes=new Set<string>();
   const usedSelections=new Set<string>();
   const assignPhoto=(sceneId:string,photo:any,cueIndex:number)=>{
     if(!photo.sha256||(!photo.courseRelated && usedPhotoHashes.has(photo.sha256)))return false;
+    if(cueIndex===0) {
+      if(primaryPhotoHashes.has(photo.sha256)) return false;
+      primaryPhotoHashes.add(photo.sha256);
+    }
     usedPhotoHashes.add(photo.sha256);
     photos[sceneId][cueIndex]=photo;
     return true;
@@ -56,9 +61,10 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       if(approvedReference){
         try {
           const photo=await approvedReference(scene,index,step,index===recapIndex);
-          if(!assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index))throw new Error('COURSE_PHOTO_ALREADY_USED');
-          reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
-          continue;
+          if(assignPhoto(scene.id,{...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index)) {
+            reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+            continue;
+          }
         } catch(error) {
           // A previous approved lesson may not contain the current scene or
           // picture cue. Reuse an eligible saved/selected/licensed asset instead.
@@ -86,8 +92,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         continue;
       }
       const selected=await courseSelectedStill(input,db,scene,index,step,{allowRelatedCoursePhoto:true,usedSelections});
-      if(selected){
-        if(!assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index))throw new Error('COURSE_PHOTO_ALREADY_USED');
+      if(selected && assignPhoto(scene.id,{...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index)){
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -103,9 +108,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
-      const contextual=relatedPhoto ? await relatedPhoto({...scene,previousPhotoHash:photos[scene.id][index-1]?.sha256},index,step) : null;
-      if(contextual){
-        assignPhoto(scene.id,{...contextual,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index);
+      const contextual=relatedPhoto ? await relatedPhoto({...scene,previousPhotoHash:photos[scene.id][index-1]?.sha256},index,step,index===0 ? primaryPhotoHashes : undefined) : null;
+      if(contextual && assignPhoto(scene.id,{...contextual,stepIndex:Math.min(index,steps.length-1),isRecap:index===recapIndex},index)){
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -120,9 +124,9 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const legacyRequestHash=createHash('sha256').update(JSON.stringify({
         version:'approved-picture-cues-photos-v2',lesson:input.lessonId,scene:scene.id,index,prompt,
       })).digest('hex');
-      const indexPath='approved-teaching-photo-index/'+requestHash+'.json';
+      let indexPath='approved-teaching-photo-index/'+requestHash+'.json';
       const bucket=db.storage.from('course_videos');
-      const cached=await bucket.download(indexPath);
+      let cached=await bucket.download(indexPath);
       if(cached.error && !optionalStorageCacheMiss(cached.error)) throw cached.error;
       let saved:any;
       if(cached.data){
@@ -142,6 +146,17 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const hit=variants.find(variant=>variant.data);
         if(hit?.data) saved={storagePath:hit.path,sha256:createHash('sha256')
           .update(Buffer.from(await hit.data.arrayBuffer())).digest('hex')};
+      }
+      if(saved && usedPhotoHashes.has(saved.sha256)){
+        // Keep the original cue index intact. Repeated attempts read the same
+        // replacement before requesting another generated image.
+        indexPath='approved-teaching-photo-index/'+requestHash+'-distinct-'+saved.sha256+'.json';
+        cached=await bucket.download(indexPath);
+        if(cached.error && !optionalStorageCacheMiss(cached.error)) throw cached.error;
+        saved=cached.data ? JSON.parse(await cached.data.text()) : undefined;
+        if(saved && (!/^[a-f0-9]{64}$/.test(saved.sha256??'') ||
+            !new RegExp('^approved-teaching-photos/'+saved.sha256+'\\.(png|jpg|webp)$').test(saved.storagePath??'')))
+          throw new Error('TEACHING_PHOTO_INDEX_INVALID');
       }
       if(!saved){
         // The cue needs a relevant photograph, not a bespoke teacher portrait

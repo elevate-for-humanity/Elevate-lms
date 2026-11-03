@@ -1,6 +1,6 @@
 import { LEGACY_IMAGE_ALIASES } from '@/lib/media/legacy-image-aliases.mjs';
 
-const BLOG_IMAGE_FALLBACK = '/images/pages/social-media-1.webp';
+export const BLOG_IMAGE_FALLBACK = '/images/pages/social-media-1.webp';
 
 // Published legacy posts still reference a retired directory. Resolve those
 // exact sources to existing topic artwork without rewriting stored content.

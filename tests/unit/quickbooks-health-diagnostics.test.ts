@@ -46,3 +46,14 @@ it('allows a saved refresh token to recover a missing access token during a live
   expect(response.status).toBe(200);
   expect(request).toHaveBeenCalledOnce();
 });
+
+it('shows unavailable payment as a booking option while keeping the provider health failure visible', async () => {
+  request.mockRejectedValue(new Error('private provider detail'));
+  const { GET: availability } = await import('../../apps/marketing/app/api/testing/payment-availability/route');
+  const response = await availability();
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({available:false});
+  expect((await GET()).status).toBe(503);
+  request.mockResolvedValue({CompanyInfo:{Id:'company'}});
+  expect(await (await availability()).json()).toEqual({available:true});
+});

@@ -73,15 +73,19 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
         await removeStaleWorkers(config.workerPath, config.cachePrefix);
         if (cancelled) return;
 
-        const probe = await fetch(`${config.workerPath}?v=${encodeURIComponent(process.env.NEXT_PUBLIC_GIT_SHA || 'current')}`, {
-          cache: 'no-store',
-          credentials: 'same-origin',
-          headers: { 'cache-control': 'no-cache' },
-        });
+        // Marketing uses native registration to fetch and validate its same-origin
+        // worker once. A second page fetch can race navigation in WebKit.
+        if (application !== 'marketing') {
+          const probe = await fetch(`${config.workerPath}?v=${encodeURIComponent(process.env.NEXT_PUBLIC_GIT_SHA || 'current')}`, {
+            cache: 'no-store',
+            credentials: 'same-origin',
+            headers: { 'cache-control': 'no-cache' },
+          });
 
-        if (!probe.ok) {
-          await purgeBrokenPwaState();
-          return;
+          if (!probe.ok) {
+            await purgeBrokenPwaState();
+            return;
+          }
         }
         if (cancelled) return;
 
@@ -126,6 +130,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
 
         checkForUpdate();
       } catch (error) {
+        if (cancelled) return;
         // A registration exception must not leave an obsolete worker controlling
         // the installed app. Reset PWA state so the next navigation uses network.
         try {

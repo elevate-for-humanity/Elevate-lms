@@ -166,7 +166,7 @@ jobs:
             # Renew authority before every mutation; never replay an ambiguous POST.
             token=fresh_identity()
             req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+token,'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
-            result=json.load(urllib.request.urlopen(req,timeout=240))
+            result=json.load(urllib.request.urlopen(req,timeout=285))
             if result.get('pending') is True:
               print('Saved PARIS planner turn',result.get('turn'),flush=True)
               continue

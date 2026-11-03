@@ -1,4 +1,5 @@
-import {budgetRepairMessages,REPAIR_INFERENCE_TIMEOUT_MS} from './repair-inference-budget.mjs';
+import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
+import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
@@ -232,6 +233,19 @@ async function searchCode(query: string) {
   }));
 }
 
+function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = []) {
+  const terms = [...new Set(query.toLowerCase().match(/[a-z0-9]{2,}/g) ?? [])];
+  return tree.filter(entry => entry.type === 'blob' && !blockedPath(entry.path))
+    .map(({path}) => {
+      const parts = path.toLowerCase().split(/[^a-z0-9]+/);
+      const score = terms.filter(term => parts.includes(term)).length;
+      return {path, score};
+    })
+    .filter(match => match.score > 0)
+    .sort((a,b) => b.score - a.score || a.path.length - b.path.length || a.path.localeCompare(b.path))
+    .slice(0,12).map(match => match.path);
+}
+
 function parseAction(value: Record<string, unknown>): AgentAction {
   const type = String(value.type ?? '');
   if (type === 'search') {
@@ -294,8 +308,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const db=await requireAdminClient();
   const provider=(process.env.AI_PROVIDER??'openai').trim().toLowerCase();
   if(provider==='elevate'){
-    const owned = await probeOwnedModel();
-    if (!owned.verified) return NextResponse.json({error:'Owned model connection is unavailable. Verify the selected private CPU endpoint before retrying.'},{status:503});
+    const owned = await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS});
+    if (!owned.verified) {
+      const transient = owned.status === 'request_failed' || [408, 429, 500, 502, 503, 504].includes(owned.httpStatus ?? 0);
+      return NextResponse.json({error: (transient ? 'OWNED_MODEL_TEMPORARILY_UNAVAILABLE:' : 'OWNED_MODEL_NOT_READY:') + owned.status}, {status:503});
+    }
   }
   const taskId = repairId ?? crypto.randomUUID();
   const saved = continuation?.checkpoint;
@@ -369,7 +386,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           },
         ],
         temperature: 0.1,
-        maxTokens: 2400,
+        maxTokens: provider === 'elevate' ? repairCompletionTokens(resolveOwnedModelConnection().tier, observations) : 2400,
         jsonMode: true,
         signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
       } as Parameters<typeof aiChat>[0];
@@ -388,9 +405,13 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       catch { observations.push('ACTION_REJECTED: return one valid JSON action from the allowed schema; no write occurred.'); continue; }
       if (action.type === 'search') {
         const matches = await searchCode(action.query);
-        observations.push(
-          `SEARCH ${action.query}: ${JSON.stringify(matches).slice(0, 12_000)}`,
-        );
+        if (!matches.length) {
+          const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
+          const paths = suggestedSourcePaths(action.query, tree.tree);
+          observations.push(`SEARCH ${action.query}: no content matches. Candidate filenames from the task branch: ${JSON.stringify(paths)}. Read an exact file before proposing a change.`);
+        } else {
+          observations.push(`SEARCH ${action.query}: ${JSON.stringify(matches).slice(0, 12_000)}`);
+        }
         continue;
       }
 

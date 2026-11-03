@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import Image from 'next/image';
+import BlogImage from '@/components/blog/BlogImage';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -125,7 +125,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                 >
                   {post.featured_image && (
                     <div className="relative h-48 overflow-hidden">
-                      <Image
+                      <BlogImage
                         loading="lazy"
                         src={post.featured_image}
                         alt={post.title}

@@ -105,3 +105,12 @@ test('all course builds inherit repeated resolved visual repair instead of uncha
  assert.deepEqual(routeSelectiveRepairs([{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}]).map(x=>x.step),['lesson_film_render']);
  assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_LICENSE_REQUIRED',message:'license unavailable'}]),[]);
 });
+
+test('repeated resolved photos retry the render when visual assignments only reserve scenes', () => {
+  const finding = {step:'lesson_film_render',code:'ULTIMATE_VIDEO_RENDER_FAILED',
+    message:'ULTIMATE_VIDEO_RENDER_FAILED:MEDIA_RESOLVED_VISUALS_REPEATED:9:13'};
+  const deferred = {media:{assignments:[{assignmentMethod:'instructional-visual-request'}]}};
+  assert.equal(routeSelectiveRepairs([finding],deferred)[0].step,'lesson_film_render');
+  assert.equal(routeSelectiveRepairs([finding],{media:{assignments:[{assignmentMethod:'licensed'}]}})[0].step,'visual_assignment');
+  assert.equal(routeSelectiveRepairs([{...finding,message:'MEDIA_RESOLVED_VISUALS_MISSING:2'}],deferred)[0].step,'visual_assignment');
+});

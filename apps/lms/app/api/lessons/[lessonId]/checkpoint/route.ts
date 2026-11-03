@@ -16,7 +16,6 @@ import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-contro
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
-import { HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

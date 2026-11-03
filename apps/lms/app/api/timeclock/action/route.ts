@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
@@ -28,6 +29,8 @@ type ActionPayload = {
   lat: number;
   lng: number;
   accuracy_m?: number;
+  offline_submission?: boolean;
+  client_recorded_at?: string;
 };
 
 function escapeHtml(value: string) {
@@ -249,7 +252,7 @@ async function _POST(request: NextRequest) {
     }
 
     const coordinateError = validateCoordinates(lat, lng, accuracy_m);
-    if (coordinateError) {
+    if (coordinateError && body.offline_submission !== true) {
       return NextResponse.json({ error: coordinateError }, { status: 400 });
     }
 
@@ -265,7 +268,7 @@ async function _POST(request: NextRequest) {
 
     const { data: apprentice } = await db
       .from('apprentices')
-      .select('id, employer_id, shop_id, created_at')
+      .select('id, employer_id, shop_id, program_id, created_at')
       .eq('user_id', user.id)
       .eq('status', 'active')
       .maybeSingle();
@@ -275,6 +278,27 @@ async function _POST(request: NextRequest) {
     }
     if (apprentice_id && apprentice_id !== apprentice.id) {
       return NextResponse.json({ error: 'Forbidden: apprentice_id does not match authenticated user' }, { status: 403 });
+    }
+
+    if (body.offline_submission === true) {
+      const attemptedAt = typeof body.client_recorded_at === 'string' ? Date.parse(body.client_recorded_at) : NaN;
+      if (!apprentice_id || !Number.isFinite(attemptedAt)) {
+        return NextResponse.json({ error: 'Recorded time and apprentice are required for review.' }, { status: 400 });
+      }
+      const { data: assignedSite, error: siteLookupError } = await db.from('apprentice_sites')
+        .select('id,name').eq('id', site_id).eq('shop_id', apprentice.shop_id || apprentice.employer_id).maybeSingle();
+      if (siteLookupError) return NextResponse.json({ error: 'Site lookup unavailable' }, { status: 503 });
+      if (!assignedSite) return NextResponse.json({ error: 'Assigned site required' }, { status: 403 });
+      const recordedAt = new Date(attemptedAt).toISOString();
+      const reviewId = createHash('sha256').update(JSON.stringify([user.id, site_id, action, recordedAt])).digest('hex').slice(0, 32);
+      const { error } = await db.from('admin_alerts').upsert({
+        id: reviewId, alert_type: 'timeclock', severity: 'warning', apprentice_id: apprentice.id,
+        site_id, message: `Review delayed ${action} at ${assignedSite.name} for ${recordedAt}. Check existing shifts before correcting attendance.`,
+        metadata: { user_id: user.id, action, client_recorded_at: recordedAt, location_captured: !coordinateError,
+          ...(coordinateError ? {} : { lat, lng, accuracy_m }) },
+      }, { onConflict: 'id', ignoreDuplicates: true });
+      if (error) return NextResponse.json({ error: 'Attendance review unavailable' }, { status: 503 });
+      return NextResponse.json({ pending_review: true }, { status: 202 });
     }
 
     const { data: studentProfile } = await db.from('profiles')
@@ -318,34 +342,39 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    let resolvedProgramId = program_id ?? null;
-    if (!resolvedProgramId) {
-      const { data: enrollment } = await db
-        .from('program_enrollments')
-        .select('program_id')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'enrolled', 'in_progress'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      resolvedProgramId = enrollment?.program_id ?? null;
-    }
-    if (!resolvedProgramId) {
-      return NextResponse.json({ error: 'No active enrollment found to determine program_id' }, { status: 400 });
+    let resolvedProgramId = apprentice.program_id;
+    if (action === 'clock_in') {
+      let query = db.from('program_enrollments').select('program_id')
+        .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+        .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
+        .is('revoked_at', null).is('suspended_at', null).is('cancelled_at', null);
+      if (apprentice.program_id) query = query.eq('program_id', apprentice.program_id);
+      const { data: enrollment, error } = await query
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (error) return NextResponse.json({ error: 'Enrollment unavailable' }, { status: 503 });
+      resolvedProgramId = enrollment?.program_id;
+      if (!resolvedProgramId || (program_id && program_id !== resolvedProgramId)) {
+        return NextResponse.json({ error: 'Active apprenticeship enrollment required' }, { status: 403 });
+      }
     }
 
     const { data: site, error: siteError } = await db
       .from('apprentice_sites')
       .select('id, latitude, longitude, radius_meters, name, shop_id, partner_id')
       .eq('id', site_id)
+      .eq('is_active', true)
       .maybeSingle();
     if (siteError || !site) return NextResponse.json({ error: 'Site not found' }, { status: 404 });
 
     const assignedShopId = apprentice.shop_id || apprentice.employer_id;
-    if (assignedShopId && site.shop_id !== assignedShopId) {
+    if (!assignedShopId || site.shop_id !== assignedShopId) {
       return NextResponse.json({ error: 'Forbidden: selected site is not assigned to apprentice' }, { status: 403 });
     }
 
+    if (site.latitude == null || site.longitude == null || Math.abs(Number(site.latitude)) > 90 ||
+        Math.abs(Number(site.longitude)) > 180 || !(Number(site.radius_meters) > 0)) {
+      return NextResponse.json({ error: 'Training site location is not configured.' }, { status: 409 });
+    }
     const distanceM = Math.round(haversineDistance(lat, lng, Number(site.latitude), Number(site.longitude)));
     const radiusM = Number(site.radius_meters);
     const accepted = distanceM <= radiusM;
@@ -646,12 +675,21 @@ async function _POST(request: NextRequest) {
         .maybeSingle();
 
       const entryWrite = currentDraft
-        ? db.from('progress_entries').update(clockInValues).eq('id', currentDraft.id)
+        ? db.from('progress_entries').update(clockInValues).eq('id', currentDraft.id).is('clock_in_at', null)
         : db.from('progress_entries').insert(clockInValues);
       const { data: newEntry, error: insertError } = await entryWrite
         .select('id')
         .single();
 
+      if (insertError?.code === '23505' || (currentDraft && insertError?.code === 'PGRST116')) {
+        const { data: existing } = await db.from('progress_entries')
+          .select('id,clock_in_at,clock_out_at').eq('apprentice_id', apprentice.id)
+          .eq('work_date', serverDate).not('clock_in_at', 'is', null)
+          .order('clock_in_at', { ascending: false }).limit(1).maybeSingle();
+        if (existing?.clock_out_at) return NextResponse.json({ error: 'Today’s shift is already complete.' }, { status: 409 });
+        if (existing) return NextResponse.json({ success: true, action, progress_entry_id: existing.id,
+          clock_in_at: existing.clock_in_at, already_clocked_in: true });
+      }
       if (insertError || !newEntry) {
         await writeComplianceAlert(db, 'timeclock_persistence_error', {
           apprentice_id: apprentice.id,

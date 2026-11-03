@@ -40,7 +40,7 @@ describe('timeclock clock-in persistence contract', () => {
   it('only treats a real current-day clock-in as an active shift', () => {
     expect(route).toContain(".eq('work_date', serverDate)");
     expect(route).toContain(".not('clock_in_at', 'is', null)");
-    expect(contextRoute).toContain(".eq('work_date', workDate)");
+    expect(contextRoute).toContain('row.work_date === workDate');
     expect(contextRoute).toContain(".not('clock_in_at', 'is', null)");
   });
 

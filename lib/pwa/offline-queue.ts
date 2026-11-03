@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 // Uses IndexedDB to store pending requests when offline
 
 const DB_NAME = 'elevate-offline-queue';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'pending-requests';
 
 interface QueuedRequest {
@@ -27,11 +27,15 @@ class OfflineQueue {
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
+        this.db.onversionchange = () => { this.db?.close(); this.db = null; };
         resolve();
       };
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains('pending-hours')) {
+          db.createObjectStore('pending-hours', { keyPath: 'id', autoIncrement: true });
+        }
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const store = db.createObjectStore(STORE_NAME, {
             keyPath: 'id',
@@ -53,7 +57,8 @@ class OfflineQueue {
       const store = transaction.objectStore(STORE_NAME);
       const addRequest = store.add(request);
 
-      addRequest.onsuccess = () => resolve(addRequest.result as number);
+      transaction.oncomplete = () => resolve(addRequest.result as number);
+      transaction.onabort = () => reject(transaction.error);
       addRequest.onerror = () => reject(addRequest.error);
     });
   }
@@ -114,20 +119,26 @@ class OfflineQueue {
     });
   }
 
-  async sync(): Promise<{ synced: number; failed: number }> {
+  async sync(apprenticeId?: string): Promise<{ synced: number; failed: number }> {
     const requests = await this.getAll();
     let synced = 0;
     let failed = 0;
 
     for (const req of requests) {
       try {
+        const clockAttempt = req.url === '/api/timeclock/action';
+        if (apprenticeId && !clockAttempt) continue;
+        if (clockAttempt) {
+          const body = JSON.parse(req.body);
+          if (!apprenticeId || body.apprentice_id !== apprenticeId || body.offline_submission !== true) continue;
+        }
         const response = await fetch(req.url, {
           method: req.method,
           headers: { 'Content-Type': 'application/json' },
           body: req.body,
         });
 
-        if (response.ok) {
+        if (response.ok && (!clockAttempt || (await response.json()).pending_review === true)) {
           await this.remove(req.id!);
           synced++;
         } else {

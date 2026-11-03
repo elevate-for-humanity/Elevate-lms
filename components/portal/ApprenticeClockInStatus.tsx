@@ -8,6 +8,7 @@ import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-pat
 type TimeclockContext = {
   programName?: string;
   activeShift?: {
+    siteId: string;
     clockInAt: string;
     lunchStartAt: string | null;
     lunchEndAt: string | null;
@@ -65,7 +66,9 @@ export function ApprenticeClockInStatus() {
   }
 
   const active = ctx.activeShift;
-  const siteName = ctx.allowedSites?.[0]?.name;
+  const siteName = active
+    ? ctx.allowedSites?.find(site => site.id === active.siteId)?.name
+    : ctx.allowedSites?.[0]?.name;
 
   if (active?.clockInAt) {
     const onLunch = active.lunchStartAt && !active.lunchEndAt;

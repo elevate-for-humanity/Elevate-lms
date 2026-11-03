@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { LMS_HOST } from '@/lib/routing/portal-map';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -9,13 +10,14 @@ export async function GET() {
   const {
     data: { user },
   } = await client.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Sign in to record attendance.' }, { status: 401 });
   const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) return NextResponse.json({ error: 'Sign in to record attendance.' }, { status: 401 });
   const [enrollments, sessions] = await Promise.all([
     db
       .from('program_enrollments')
       .select('id,program_slug')
-      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+      .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
       .in('program_slug', ['hvac-technician', 'hvac', 'hvac-epa-608'])
       .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
       .is('revoked_at', null)
@@ -24,7 +26,7 @@ export async function GET() {
     db
       .from('hvac_hands_on_sessions')
       .select('id,enrollment_id,clock_in_at,clock_out_at,attendance_hours(verified)')
-      .eq('user_id', user.id)
+      .eq('user_id', subject.userId)
       .order('clock_in_at', { ascending: false })
       .limit(50),
   ]);
@@ -34,7 +36,7 @@ export async function GET() {
       { status: 503 },
     );
   return NextResponse.json(
-    { enrollments: enrollments.data, sessions: sessions.data },
+    { enrollments: enrollments.data, sessions: sessions.data, previewing: subject.previewing },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }
@@ -70,6 +72,8 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  if (subject.previewing) return NextResponse.json({ error: 'Attendance preview is read-only.' }, { status: 403 });
   const { data, error } = await db.rpc('record_hvac_hands_on', {
     p_user_id: user.id,
     p_enrollment_id: body.enrollment_id,

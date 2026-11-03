@@ -208,7 +208,7 @@ jobs:
       - name: Upload and deploy the exact Admin image
         shell: bash
         env:
-          PARIS_GITHUB_AUTH_MODE: ${{ vars.PARIS_GITHUB_AUTH_MODE || 'legacy' }}
+          PARIS_GITHUB_AUTH_MODE: app
           PARIS_GITHUB_APP_SECRET: ${{ vars.PARIS_GITHUB_APP_SECRET }}
         run: |
           set -euo pipefail

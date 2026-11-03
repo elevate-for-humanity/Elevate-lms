@@ -4,7 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { ingestCourse } from '@/lib/ultimate-course-builder/authoring/source-ingestion';
-import { isOpenAIConfigured, getOpenAIClient } from '@/lib/ai/openai-client';
+import { createCourseAuthoringChat, CourseAuthoringUnavailable } from '@/lib/ultimate-course-builder/authoring/course-chat';
 import { loadIndustryStandards } from '@/lib/industry/standards-loader';
 import { buildBlueprintSystemPrompt } from '@/lib/ai/prompts/course-blueprint';
 import { logger } from '@/lib/logger';
@@ -92,13 +92,6 @@ async function _POST(request: Request) {
     return NextResponse.json({ error: 'COURSE_BUILDER_GENERATION_PAUSED' }, { status: 423 });
   }
 
-  if (!isOpenAIConfigured()) {
-    return NextResponse.json(
-      { error: 'AI features are not configured. Add OPENAI_API_KEY to enable course ingestion.' },
-      { status: 503 },
-    );
-  }
-
   const body = await request.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
@@ -160,6 +153,7 @@ async function _POST(request: Request) {
   const isLarge = source_text.trim().length > SAFE_CHARS;
 
   try {
+    const chat = await createCourseAuthoringChat(db, auth.id, 'course-ingestion');
     let textForExtraction = source_text.trim();
     const ingestionWarnings: string[] = [];
     let systemPromptOverride: string | undefined;
@@ -199,10 +193,9 @@ async function _POST(request: Request) {
     }
 
     if (isLarge) {
-      const openai = getOpenAIClient();
       const { summarizedText, chunkCount, wasChunked } = await summarizeForExtraction(
         source_text.trim(),
-        openai,
+        chat,
       );
       textForExtraction = summarizedText;
       if (wasChunked) {
@@ -225,7 +218,7 @@ async function _POST(request: Request) {
       certificate_enabled: certificate_enabled ?? true,
       compile_lessons: !preview_only && compile_lessons !== false,
       systemPromptOverride,
-    });
+    }, chat);
 
     // Merge any large-doc warnings into blueprint warnings
     if (ingestionWarnings.length) {
@@ -234,6 +227,9 @@ async function _POST(request: Request) {
 
     return NextResponse.json({ blueprint }, { status: 200 });
   } catch (err: any) {
+    if (err instanceof CourseAuthoringUnavailable) {
+      return NextResponse.json({ error: err.message, decision: err.decision }, { status: err.status });
+    }
     const msg = err?.message || '';
 
     // On timeout or abort, persist summarized text so the admin can resume
@@ -315,11 +311,8 @@ async function _GET(request: Request) {
     return NextResponse.json({ error: 'This draft failed and cannot be resumed' }, { status: 410 });
   }
 
-  if (!isOpenAIConfigured()) {
-    return NextResponse.json({ error: 'AI not configured' }, { status: 503 });
-  }
-
   try {
+    const chat = await createCourseAuthoringChat(db, auth.id, 'course-ingestion');
     await updateIngestionDraftStage(jobId, 'extracting');
 
     const industryContext = await resolveIndustryContext({
@@ -360,7 +353,7 @@ async function _GET(request: Request) {
       program_id: draft.program_id,
       certificate_enabled: draft.certificate_enabled,
       systemPromptOverride,
-    });
+    }, chat);
 
     if (draft.warnings?.length || resumeWarnings.length) {
       blueprint.warnings = [
@@ -374,6 +367,9 @@ async function _GET(request: Request) {
 
     return NextResponse.json({ blueprint, resumed: true }, { status: 200 });
   } catch (err: any) {
+    if (err instanceof CourseAuthoringUnavailable) {
+      return NextResponse.json({ error: err.message, decision: err.decision }, { status: err.status });
+    }
     await updateIngestionDraftStage(jobId, 'failed', {
       warnings: [err?.message || 'Resume failed'],
     });

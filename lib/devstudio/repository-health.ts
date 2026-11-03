@@ -1,10 +1,11 @@
 import 'server-only';
 import { getGitHubToken } from './github-token';
 import { buildCapabilityHealth } from './capability-health';
+import { GOOGLE_DEPLOY_WORKFLOWS } from '@/lib/gcp/dispatch-production-workflow';
 
 /** Use the same identity as repository operations, including GitHub Apps. */
 export async function getRepositoryHealth() {
-  let passed = false;
+  let mainSha: string | null = null;
   let message = 'GitHub authentication is not configured.';
   try {
     const token = await getGitHubToken();
@@ -18,15 +19,21 @@ export async function getRepositoryHealth() {
         },
       );
       const body = response.ok ? await response.json() : null;
-      passed = response.ok && /^[a-f0-9]{40}$/.test(body?.object?.sha ?? '');
-      message = passed
+      if (response.ok && /^[a-f0-9]{40}$/.test(body?.object?.sha ?? '')) mainSha = body.object.sha;
+      message = mainSha
         ? 'Elevate-lms main reference verified. Write and workflow execution require separate operation evidence.'
         : `Repository access could not be verified (HTTP ${response.status}).`;
     }
   } catch {
     message = 'Repository authentication or connectivity could not be verified.';
   }
-  return buildCapabilityHealth('repository', [
-    { name: 'github-repository-access', passed, required: true, message },
-  ]);
+  const ok = mainSha !== null;
+  return {
+    ...buildCapabilityHealth('repository', [
+      { name: 'github-repository-access', passed: ok, required: true, message },
+    ]),
+    summary: mainSha ? `Elevate-lms main is ${mainSha}. Admin deploys through .github/workflows/${GOOGLE_DEPLOY_WORKFLOWS.admin}.` : message,
+    ok, mainSha, repository: 'elevate-for-humanity/Elevate-lms', branch: 'main',
+    configuredDeploymentWorkflows: GOOGLE_DEPLOY_WORKFLOWS,
+  };
 }

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { getAITool } from './registry';
-import { isReadOnlyRequest } from '../command-intent';
+import { isReadOnlyRequest, isRepositoryRevisionInspection } from '../command-intent';
 
 export type PlannedAITool = {
   name: string;
@@ -122,6 +122,12 @@ export function planAIToolFromCommand(
   command: string,
   context: Record<string, unknown> = {},
 ): PlannedAITool | null {
+  const tool = matchAITool(command, context);
+  if (tool && isReadOnlyRequest(command) && getAITool(tool.name)?.classification === 'write') return null;
+  return tool;
+}
+
+function matchAITool(command: string, context: Record<string, unknown>): PlannedAITool | null {
   const explicitTool = typeof context.toolName === 'string' ? context.toolName : null;
   if (explicitTool && getAITool(explicitTool)) {
     return { name: explicitTool, input: asAIRecord(context.toolInput) };
@@ -155,6 +161,9 @@ export function planAIToolFromCommand(
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(instruction);
 
+  if (isRepositoryRevisionInspection(instruction)) {
+    return { name: 'studio.repository.status', input: {} };
+  }
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }

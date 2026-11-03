@@ -25,6 +25,7 @@ type Lesson = {
   hasCheckpoint?: boolean;
   ultimate_lesson_steps?: Step[];
 };
+type PublishedItem = { id: string; title: string; type: string | null; previewUrl: string };
 type Check = { name: string; passed: boolean; message: string };
 
 function findingText(value: unknown): string {
@@ -145,6 +146,7 @@ export default function UltimateStageInspector({
   const workspace = useContext(CourseWorkspaceContext);
   const [selected, setSelected] = useState<UltimateBuildStep | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [publishedItems, setPublishedItems] = useState<PublishedItem[]>([]);
   const [selectedLesson, setSelectedLesson] = useState('');
   const [followActive, setFollowActive] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -165,6 +167,7 @@ export default function UltimateStageInspector({
   useEffect(() => {
     setSelected(null);
     setLessons([]);
+    setPublishedItems([]);
     setSelectedLesson('');
     setFollowActive(true);
     setError('');
@@ -188,6 +191,7 @@ export default function UltimateStageInspector({
         if (!response.ok)
           throw new Error(payload.error || 'Unable to load saved lesson checkpoints');
         if (token !== requestToken.current) return;
+        setPublishedItems(payload.build?.publishedItems ?? []);
         const competencies = payload.build?.profile?.competencies ?? [];
         setLessons((previous) =>
           competencies.map((c: any, index: number) => {
@@ -370,9 +374,26 @@ export default function UltimateStageInspector({
   return (
     <>
       <details className="my-3 rounded-xl border border-slate-700">
-        <summary className="cursor-pointer p-3 font-bold">All lessons</summary>
+        <summary className="cursor-pointer p-3 font-bold">Build plan ({lessons.length} lessons)</summary>
         {outline}
       </details>
+      {publishedItems.length > 0 && (
+        <details className="my-3 rounded-xl border border-slate-700">
+          <summary className="min-h-11 cursor-pointer p-3 font-bold">
+            Published LMS course ({publishedItems.length} {publishedItems.length === 1 ? 'item' : 'items'})
+          </summary>
+          <ol className="space-y-1 px-3 pb-3">
+            {publishedItems.map(item => (
+              <li key={item.id}>
+                <a href={item.previewUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center gap-2 text-cyan-200 underline">
+                  {item.title} {item.type && <span className="text-xs">({item.type})</span>}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
       <details className="my-3 rounded-xl border border-slate-700 p-3">
         <summary className="cursor-pointer font-bold">Build status and publishing</summary>
         {operations}

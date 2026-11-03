@@ -20,7 +20,7 @@
  *   MAX_PAGES_OCR: 8 pages — OCR only first N pages of scanned PDFs
  */
 
-import { getOpenAIClient } from '@/lib/ai/openai-client';
+import type { CourseAuthoringChat } from '@/lib/ultimate-course-builder/authoring/course-chat';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const SAFE_CHARS = 50_000;
@@ -67,12 +67,12 @@ export function chunkText(text: string, maxChars = CHUNK_SIZE): string[] {
   return chunks;
 }
 
-/** Summarize a single chunk via gpt-4o-mini */
+/** Summarize a single chunk with the selected course authoring provider */
 async function summarizeChunk(
-  openai: ReturnType<typeof getOpenAIClient>,
+  chat: CourseAuthoringChat,
   chunk: string,
 ): Promise<string> {
-  const res = await openai.chat.completions.create({
+  const res = await chat({
     model: 'gpt-4.1-mini',
     messages: [
       {
@@ -81,9 +81,9 @@ async function summarizeChunk(
       },
     ],
     temperature: 0.2,
-    max_tokens: 1200,
+    maxTokens: 1200,
   });
-  return res.choices[0].message.content || chunk.slice(0, 1500);
+  return res.content || chunk.slice(0, 1500);
 }
 
 /**
@@ -93,7 +93,7 @@ async function summarizeChunk(
  */
 export async function summarizeForExtraction(
   text: string,
-  openai: ReturnType<typeof getOpenAIClient>,
+  chat: CourseAuthoringChat,
 ): Promise<{ summarizedText: string; chunkCount: number; wasChunked: boolean }> {
   if (text.length <= SAFE_CHARS) {
     return { summarizedText: text, chunkCount: 1, wasChunked: false };
@@ -103,7 +103,7 @@ export async function summarizeForExtraction(
   const summaries: string[] = [];
 
   for (const chunk of chunks) {
-    summaries.push(await summarizeChunk(openai, chunk));
+    summaries.push(await summarizeChunk(chat, chunk));
   }
 
   return {

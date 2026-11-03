@@ -9,11 +9,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
-import { aiChat } from '@/lib/ai/ai-service';
+import { createCourseAuthoringChat, CourseAuthoringUnavailable } from '@/lib/ultimate-course-builder/authoring/course-chat';
 import type { GeneratedLesson } from '../route';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-import { hydrateProcessEnv } from '@/lib/secrets';
 
 const ADMIN_ROLES = new Set(['admin', 'staff']);
 
@@ -24,7 +23,6 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
-  await hydrateProcessEnv();
   try {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -37,10 +35,6 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
     if (!profile || !ADMIN_ROLES.has(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 503 });
     }
 
     const body = await req.json();
@@ -77,7 +71,8 @@ Return ONLY a JSON object for a single lesson:
 }
 Minimum 2 quiz questions. Real instructional content only.`;
 
-    const completion = await aiChat({
+    const chat = await createCourseAuthoringChat(db, user.id, 'course-regenerate');
+    const completion = await chat({
       model: 'gpt-4.1',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.4,
@@ -93,6 +88,9 @@ Minimum 2 quiz questions. Real instructional content only.`;
     logger.info('Lesson regenerated', { userId: user.id, lesson_number, course_title });
     return NextResponse.json({ lesson });
   } catch (err: any) {
+    if (err instanceof CourseAuthoringUnavailable) {
+      return NextResponse.json({ error: err.message, decision: err.decision }, { status: err.status });
+    }
     logger.error('Regenerate error:', err);
     return NextResponse.json({ error: 'Regenerate failed' }, { status: 500 });
   }

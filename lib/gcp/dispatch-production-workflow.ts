@@ -7,7 +7,7 @@ import 'server-only';
 import { getGitHubTokenCandidates } from '@/lib/devstudio/github-token';
 
 export type GoogleDeployTarget = 'admin' | 'marketing' | 'lms' | 'store' | 'course-builder';
-const WORKFLOWS: Record<GoogleDeployTarget, string> = {
+export const GOOGLE_DEPLOY_WORKFLOWS: Readonly<Record<GoogleDeployTarget, string>> = {
   admin: 'deploy-admin.yml',
   lms: 'deploy-google-lms-trigger.yml',
   marketing: 'deploy-google-marketing-trigger.yml',
@@ -20,7 +20,7 @@ export async function dispatchGoogleDeployment(target: GoogleDeployTarget, depen
   request?: typeof fetch;
   tokens?: () => Promise<string[]>;
 } = {}) {
-  const workflow = WORKFLOWS[target];
+  const workflow = GOOGLE_DEPLOY_WORKFLOWS[target];
   if (!workflow) throw new Error('Unsupported Google deployment target');
   const tokens = await (dependencies.tokens ?? getGitHubTokenCandidates)();
   if (!tokens.length) throw new Error('Google deployment dispatch token is not configured');

@@ -188,13 +188,13 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const health = source('lib/devstudio/health-handler.ts');
     const panel = source('components/studio/DevStudioHealthPanel.tsx');
     expect(health).toContain('const githubToken = await getGitHubToken()');
-    expect(health).toContain('repositoryWritesReady: githubTokenValid');
+    expect(health).toContain('repositoryWritesReady: githubTokenValid ? null : false');
     expect(health).toContain('ready: executionPrerequisitesReady');
     expect(panel).toContain(
       "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
     );
     expect(panel).toContain("'Repository writes'");
-    expect(panel).toContain('connected GitHub plugin is separate');
+    expect(panel).toContain('not tested by this check');
   });
 
   it('opens the Studio browser container directly and preserves mobile task width', () => {
@@ -360,11 +360,12 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(programs).toContain('>Course Library<');
   });
 
-  it('validates GitHub credentials before declaring repository writes ready', () => {
+  it('separates repository reads from untested write and dispatch permissions', () => {
     const health = source('lib/devstudio/health-handler.ts');
     expect(health).toContain("fetch('https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main'");
     expect(health).toContain("redirect: 'error'");
-    expect(health).toContain('repositoryWritesReady: githubTokenValid');
+    expect(health).toContain('deploymentDispatchReady: githubTokenValid ? null : false');
+    expect(health).toContain('repositoryWritesReady: githubTokenValid ? null : false');
   });
 });
 

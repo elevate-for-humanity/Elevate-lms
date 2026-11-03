@@ -11,6 +11,10 @@ it('uses the canonical App/workflow/runtime identity and validates the actual re
   vi.stubGlobal('fetch', request);
   const result = await getRepositoryHealth();
   expect(result.status).toBe('healthy');
+  expect(result.mainSha).toBe('a'.repeat(40));
+  expect(result.summary).toContain('a'.repeat(40));
+  expect(result.summary).toContain('.github/workflows/deploy-admin.yml');
+  expect(result.configuredDeploymentWorkflows.admin).toBe('deploy-admin.yml');
   expect(request).toHaveBeenCalledWith(expect.stringContaining('/Elevate-lms/git/ref/heads/main'),
     expect.objectContaining({ redirect: 'error', cache: 'no-store', signal: expect.any(AbortSignal) }));
   expect(JSON.stringify(result)).not.toContain('private-installation-token');
@@ -21,6 +25,8 @@ it.each([401, 403, 404, 429, 503])('fails closed for rejected or unavailable rep
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ error: 'private-error' }, { status })));
   const result = await getRepositoryHealth();
   expect(result.status).toBe('unavailable');
+  expect(result.mainSha).toBeNull();
+  expect(result.ok).toBe(false);
   expect(JSON.stringify(result)).not.toContain('private-');
 });
 

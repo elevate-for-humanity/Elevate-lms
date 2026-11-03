@@ -18,6 +18,7 @@ beforeEach(()=>{
  vi.spyOn(HTMLMediaElement.prototype,'play').mockResolvedValue(undefined);
  vi.spyOn(HTMLMediaElement.prototype,'pause').mockImplementation(()=>{});
  vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({build:{
+  publishedItems:[{id:'extra',title:'Supplemental instruction',type:'lesson',previewUrl:'/api/admin/course-builder/preview?courseId=course&lessonId=extra'}],
   profile:{competencies:[{id:'one',title:'First lesson'},{id:'two',title:'Second lesson'}]},
   ultimate_lesson_builds:[1,2].map(n=>({id:'saved-'+n,competency_id:n===1?'one':'two',lesson_key:n===1?'one':'two',
    canonicalLessonId:'canonical-'+n,status:'built',hasCheckpoint:true,ultimate_lesson_steps:[],
@@ -40,4 +41,14 @@ it('opens the real learner handoff in the same right preview pane',async()=>{
  fireEvent.click(within(right).getByRole('button',{name:'Learner view',exact:true}));
  expect(right.querySelector('iframe')).toHaveAttribute('src','/api/admin/course-builder/preview?courseId=course&lessonId=canonical-1');
  expect(screen.getByRole('region',{name:'Work controls'}).querySelector('iframe')).toBeNull();
+});
+
+it('opens published course items that are outside this build plan',async()=>{
+ render(<Harness/>);
+ const summary=await screen.findByText('Published LMS course (1 item)');
+ fireEvent.click(summary);
+ const link=screen.getByRole('link',{name:/Supplemental instruction/});
+ expect(link).toHaveAttribute('href','/api/admin/course-builder/preview?courseId=course&lessonId=extra');
+ expect(link).toHaveAttribute('rel','noopener noreferrer');
+ expect(within(screen.getByRole('combobox',{name:'Selected lesson'})).queryByText(/Supplemental instruction/)).toBeNull();
 });

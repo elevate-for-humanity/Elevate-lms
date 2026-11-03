@@ -24,14 +24,20 @@ type HealthPayload = Record<string, unknown> & {
   execution?: {
     mode?: string;
     ready?: boolean;
-    repositoryWritesReady?: boolean;
+    repositoryWritesReady?: boolean | null;
     legacyShellRemoved?: boolean;
   };
-  google?: { ready?: boolean; project?: string; deploymentDispatchReady?: boolean };
+  google?: { ready?: boolean; project?: string; deploymentDispatchReady?: boolean | null };
 };
 
 function flag(ok: boolean | undefined) {
   return ok === undefined ? 'not reported' : ok ? 'configured' : 'missing';
+}
+
+function operationStatus(ready?: boolean | null) {
+  if (ready === true) return 'verified';
+  if (ready === false) return 'repository access unavailable';
+  return 'not tested by this check';
 }
 
 export default function DevStudioHealthPanel() {
@@ -86,14 +92,8 @@ export default function DevStudioHealthPanel() {
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
         ['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable'],
         ['Paris owned inference', health.hasElevate ? 'verified reachable' : 'unavailable'],
-        [
-          'Repository writes',
-          health.execution?.repositoryWritesReady
-            ? 'ready'
-            : health.hasGitHub
-              ? 'container token invalid — connected GitHub plugin is separate'
-              : 'needs container GitHub token',
-        ],
+        ['Repository writes', operationStatus(health.execution?.repositoryWritesReady)],
+        ['Deployment dispatch', operationStatus(health.google?.deploymentDispatchReady)],
         ['Google runtime', flag(health.google?.ready)],
         ['Google project', health.google?.project ?? 'unavailable'],
       ]

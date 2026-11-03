@@ -11,6 +11,15 @@ describe('Admin AI operational planner safety', () => {
     ({ decomposePlan } = await import('@/lib/platform/planner'));
   });
 
+  it('reads the repository revision without submitting a repair', () => {
+    const goal = 'Read-only repository check. Report the current main commit and the file used to deploy Admin. Do not edit files, create repairs, or start workflows.';
+    const steps = decomposePlan(goal).steps;
+    expect(steps).toHaveLength(1);
+    expect(planAIToolFromCommand(steps[0].command)).toEqual({ name: 'studio.repository.status', input: {} });
+    expect(planAIToolFromCommand('Read-only. Review the repository code; do not fix any files.')).toBeNull();
+    expect(planAIToolFromCommand('Read-only', { toolName: 'studio.engineering.execute' })).toBeNull();
+  });
+
   it.each([
     'Audit the Course Builder',
     'Audit the Course Builder. Use read-only checks to inspect its current health, saved build status, worker dispatch and heartbeat, lesson preview, and browser workspace. Do not start jobs, modify data, repair anything, or deploy.',

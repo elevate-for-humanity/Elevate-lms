@@ -129,17 +129,15 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </Link>
             </div>
 
-            <a
+            <Link
               href={APPLICATION_CHECKER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Application Checker (opens private tool in a new tab)"
+              aria-label="Application Checker"
               className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-bold text-blue-700 hover:bg-blue-50 sm:px-3 sm:text-sm"
             >
               <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="md:hidden">App Checker</span>
               <span className="hidden md:inline">Application Checker</span>
-            </a>
+            </Link>
 
             {/* Search */}
             <form

@@ -65,7 +65,9 @@ for (const route of routes) {
     const response = await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90000 });
     expect(response?.status()).toBeLessThan(400);
     const consolidatedDestinations: Record<string, string> = { '/founder': '/about/elizabeth-greene', '/team': '/about/team', '/about/partners': '/partners' };
-    expect(new URL(page.url()).pathname).toBe(consolidatedDestinations[route] ?? route);
+    // Server components may stream a redirect after the first document is ready.
+    const expectedPath = consolidatedDestinations[route] ?? route;
+    await page.waitForURL(url => url.pathname === expectedPath, { waitUntil: 'domcontentloaded', timeout: 90000 });
     await expect(page.locator('h1').first()).toBeVisible();
     if (route === '/founder') {
       const portrait = page.getByRole('img', { name: 'Elizabeth Greene, Founder and CEO of Elevate for Humanity', exact: true });

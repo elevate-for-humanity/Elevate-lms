@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import { hostShopPortfolioPhotos } from '@/lib/partners/curated-shop-media';
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { Building2, CheckCircle2, FileText, MapPin, ShieldCheck } from 'lucide-react';
@@ -48,6 +50,7 @@ export default async function HostShopProfilePage() {
     ? `https://www.elevateforhumanity.org/host-shops/${publicProfile.public_slug}`
     : null;
 
+  const photos = hostShopPortfolioPhotos(board.partner.public_slug || '', board.partner.media_gallery);
   return (
     <main className="mx-auto w-full min-w-0 max-w-6xl overflow-x-clip px-4 py-8 sm:px-6" style={{ contain: 'inline-size', maxWidth: '100vw' }}>
       <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -60,7 +63,19 @@ export default async function HostShopProfilePage() {
         <section className="min-w-0 max-w-full rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-green-700"/><h2 className="break-words font-black">Compliance</h2></div><div className="mt-5 space-y-3 text-sm"><div className="flex min-w-0 flex-wrap justify-between gap-2"><span>MOU</span><b>{board.partner?.mou_signed ? 'Signed' : 'Pending'}</b></div><div className="flex min-w-0 flex-wrap justify-between gap-2"><span>Orientation</span><b>{board.partner?.onboarding_completed ? 'Complete' : 'Incomplete'}</b></div><div className="flex min-w-0 flex-wrap justify-between gap-2"><span>Documents</span><b>{board.partner?.documents_verified ? 'Verified' : board.requiredDocumentCount ? `${board.acceptedDocumentCount}/${board.requiredDocumentCount} accepted` : 'Pending'}</b></div></div><Link href="/host-shop/dashboard/documents" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-brand-blue-700"><FileText className="h-4 w-4"/> Review documents</Link></section>
       </div>
 
-      {!isPlatformAdmin ? <HostShopPublicMediaForm logoUrl={publicProfile?.logo_url} flyerUrl={publicProfile?.flyer_url} videoUrl={publicProfile?.video_url} publicProfileUrl={publicProfileUrl} /> : null}
+      {photos.length > 0 && (
+        <details className="mt-6 rounded-2xl border bg-white p-5">
+          <summary className="min-h-11 cursor-pointer font-bold">Shop portfolio ({photos.length} photos)</summary>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {photos.map((photo) => <li key={photo.url}>
+              <a href={photo.url} target="_blank" rel="noopener noreferrer" className="relative block aspect-[4/3] overflow-hidden rounded-xl bg-stone-50">
+                <Image src={photo.url} alt={photo.alt || `${board.partner.name || 'Host Shop'} portfolio photo`} fill unoptimized={photo.url.startsWith('https://')} sizes="(max-width: 640px) 85vw, 25vw" className="object-contain" />
+              </a>
+            </li>)}
+          </ul>
+        </details>
+      )}
+      {!isPlatformAdmin ? <HostShopPublicMediaForm photoUrl={photos[0]?.url} logoUrl={publicProfile?.logo_url} flyerUrl={publicProfile?.flyer_url} videoUrl={publicProfile?.video_url} publicProfileUrl={publicProfileUrl} /> : null}
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><MapPin className="h-5 w-5 text-brand-blue-700"/><h2 className="break-words font-black">Active shop locations</h2></div><p className="mt-2 text-sm text-slate-600">Confirm the exact place where apprentices work. A confirmed address still needs a verified map location before geofenced clock-in is enabled.</p>{board.shops.length === 0 ? <p className="mt-4 text-sm text-slate-500">No active shop location is linked to this partner record.</p> : <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2">{board.shops.map((shop) => { const location = locations?.find((row) => row.id === shop.id); return <div key={shop.id} className="min-w-0 max-w-full rounded-xl border border-slate-200 p-4"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-brand-green-700"/><div className="min-w-0"><p className="break-words font-black">{shop.name}</p><p className="mt-1 text-sm text-slate-700">{[location?.address1, location?.address2, location?.city, location?.state, location?.zip].filter(Boolean).join(', ') || 'Address not provided'}</p><p className="mt-2 text-sm font-semibold text-slate-700">{location?.address_review_status === 'confirmed' ? 'Address confirmed by Host Shop' : location?.address_review_status === 'correction_requested' ? 'Correction requested; administrator review needed' : 'Address confirmation needed'}</p>{location?.address_review_note ? <p className="mt-1 text-sm text-slate-600">Correction: {location.address_review_note}</p> : null}</div></div>{!isPlatformAdmin ? <form action={reviewShopAddress} className="mt-4 space-y-3"><input type="hidden" name="shopId" value={shop.id}/><label className="block text-sm font-semibold">If incorrect, enter the complete work-site address<input name="note" maxLength={500} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Street, suite, city, state, ZIP" /></label><div className="flex flex-wrap gap-2"><button name="decision" value="confirmed" className="rounded-lg bg-green-700 px-3 py-2 text-sm font-bold text-white">Confirm this address</button><button name="decision" value="correction_requested" className="rounded-lg border border-slate-400 px-3 py-2 text-sm font-bold">Submit correction</button></div></form> : null}</div>; })}</div>}</section>
     </main>

@@ -1,4 +1,4 @@
-import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
+import HostShopPacketLinks from '@/components/host-shop/HostShopPacketLinks';
 import { submitHostShopForReview } from './actions';
 import { hostShopReadyForReview } from '@/lib/partners/host-shop-review';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -99,7 +99,6 @@ export default async function HostShopOnboardingPage({ searchParams }: {
   return (
     <main className="min-h-screen bg-slate-50 py-10">
       <div className="mx-auto max-w-4xl space-y-6 px-4 sm:px-6">
-        <HostShopStudentInvitation />
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <p className="text-sm font-extrabold uppercase tracking-[0.12em] text-brand-red-700">
             Host Site Onboarding
@@ -114,21 +113,6 @@ export default async function HostShopOnboardingPage({ searchParams }: {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-          <h2 className="text-xl font-black text-slate-950">Read your Host Shop handbook</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            Your program responsibilities are available while onboarding is in progress. The host
-            shop provides supervised hands-on training; Elevate handles theory and RTI.
-          </p>
-          <a
-            href="#handbook"
-            className="mt-3 inline-flex min-h-11 items-center font-bold text-blue-800 underline"
-          >
-            Read handbook and program responsibilities
-          </a>
-        </section>
-        <StudentOnboardingLinks shopName={board.partner?.name || 'Host Shop'} />
-        <HostShopHandbook />
         {params?.review === 'incomplete' ? <p role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 font-bold text-red-900">Complete your business/supervisor profile, sign the MOU, and upload every required document before submitting for review.</p> : null}
         {application?.data?.status === 'drafted' ? (
           <section className="rounded-2xl border border-slate-300 bg-white p-6">
@@ -217,6 +201,16 @@ export default async function HostShopOnboardingPage({ searchParams }: {
             </div>
           </div>
         </section>
+        <section className="rounded-2xl border bg-white p-5">
+          <h2 className="text-xl font-bold">Your shop training packet</h2>
+          <a href="#handbook" className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline">Read handbook</a>
+          <div className="mt-4 flex flex-wrap gap-3"><HostShopPacketLinks primary={board.programType} programs={board.partner.programs} /></div>
+        </section>
+        <details className="rounded-2xl border bg-white p-5">
+          <summary className="min-h-11 cursor-pointer font-bold">Read your Host Shop handbook</summary>
+          <HostShopHandbook />
+        </details>
+        <StudentOnboardingLinks shopName={board.partner?.name || 'Host Shop'} />
       </div>
     </main>
   );

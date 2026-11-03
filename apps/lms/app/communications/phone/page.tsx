@@ -15,5 +15,5 @@ export default async function PersonalPhonePage(){
  const host=actor.roles.some(role=>['host_shop','host_shop_admin','partner'].includes(role));
  return <ProgramHolderPhone roleLabel={holder?'Program Holder':host?'Host Shop':'Team member'}
   calendarHref={holder?'/program-holder/meetings':host?'/host-shop/dashboard/schedule':'/lms/calendar'}
-  emailHref={holder?'/program-holder/email':host?'/host-shop/dashboard/email':'/communications/email'} />;
+  emailHref={holder?'/program-holder/email':host?'/host-shop/email':'/communications/email'} />;
 }

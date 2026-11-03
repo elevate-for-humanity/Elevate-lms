@@ -101,6 +101,9 @@ type PartnerRecord = {
   verification_status?: string | null;
   name?: string | null;
   phone?: string | null;
+  logo_url?: string | null;
+  media_gallery?: unknown;
+  public_slug?: string | null;
   supervisor_name?: string | null;
   supervisor_license_number?: string | null;
   compensation_model?: string | null;
@@ -168,7 +171,7 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
     const { data: selectedPartner, error: selectedPartnerError } = await db
       .from('partners')
       .select(
-        'id, partner_application_id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state',
+        'id, partner_application_id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, logo_url, media_gallery, public_slug, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state',
       )
       .eq('id', selectedPartnerId)
       .maybeSingle();
@@ -180,7 +183,7 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
   const { data: partnerLinks, error: partnerLinkError } = await db
     .from('partner_users')
     .select(
-      'partner_id, status, partners(id, partner_application_id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state)',
+      'partner_id, status, partners(id, partner_application_id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, logo_url, media_gallery, public_slug, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state)',
     )
     .eq('user_id', userId)
     .eq('status', 'active');
@@ -491,6 +494,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     timeBasedPrograms,
     unconfiguredPrograms,
     documentStatuses,
+    uploadedDocuments: (uploadedDocs || []).map(({ id, file_name, display_name }) => ({ id, file_name, display_name })),
     missingDocuments,
     pendingDocuments,
     acceptedDocumentCount,

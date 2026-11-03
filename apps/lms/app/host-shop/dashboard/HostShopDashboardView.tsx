@@ -1,4 +1,7 @@
+import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
+import { hostShopPortfolioPhotos } from '@/lib/partners/curated-shop-media';
 import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
+import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
 import HostShopWelcome from '@/components/host-shop/HostShopWelcome';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -25,6 +28,7 @@ async function clearAdminPartner() {
   const cookieStore = await cookies();
   for (const name of [
     HOST_SHOP_ADMIN_COOKIE,
+    HOST_SHOP_PREVIEW_MARKER,
     HOST_SHOP_PREVIEW_SESSION_COOKIE,
     PORTAL_PREVIEW_COOKIE,
     PORTAL_PREVIEW_ACTOR_COOKIE,
@@ -185,6 +189,8 @@ export default async function HostShopDashboardView() {
         .eq('id', heroMember.user_id)
         .maybeSingle()
     : { data: null };
+  const [shopImage] = hostShopPortfolioPhotos(board.partner.public_slug || '', board.partner.media_gallery);
+  const requiredAction = getHostShopReadinessItems(board).find((item) => item.severity === 'required');
   const nextTask =
     board.pendingHoursCount > 0
       ? {
@@ -192,11 +198,11 @@ export default async function HostShopDashboardView() {
           href: '/host-shop/dashboard/hours/pending',
           detail: `${board.pendingHoursCount} waiting for your review`,
         }
-      : board.missingDocuments.length + board.pendingDocuments.length > 0
+      : requiredAction
         ? {
-            label: 'Review shop documents',
-            href: '/host-shop/dashboard/documents',
-            detail: 'Check missing items and review status',
+            label: requiredAction.title,
+            href: requiredAction.href,
+            detail: requiredAction.key.startsWith('document:') ? 'Open the requested upload.' : 'Open this requirement to continue.',
           }
         : {
             label: 'Open your students',
@@ -210,6 +216,8 @@ export default async function HostShopDashboardView() {
         partnerId={board.partner.id}
         ownerName={heroProfile?.full_name}
         profileImageUrl={heroProfile?.avatar_url}
+        savedImageUrl={shopImage?.url || board.partner.logo_url}
+        savedImageAlt={shopImage?.alt || shopName}
       >
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>

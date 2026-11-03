@@ -1,3 +1,4 @@
+import HostShopPacketLinks from '@/components/host-shop/HostShopPacketLinks';
 import Link from 'next/link';
 import { HostShopHandbook } from '@/components/partners/HostShopHandbook';
 import { BookOpen, CheckCircle2, ClipboardList, FileSignature, FileText } from 'lucide-react';
@@ -73,20 +74,7 @@ export default async function HostShopResourcesPage() {
           individual plan approved for your apprentice.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            href="/docs/host-shop-packets/Host-Shop-Operating-Guide.pdf"
-            download
-            className="inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-4 py-2 font-bold text-white"
-          >
-            Download operating guide
-          </Link>
-          <Link
-            href={`/docs/host-shop-packets/${board.programType === 'barber' ? 'Barber' : board.programType === 'nail_technician' ? 'Nail-Technician' : board.programType === 'esthetician' ? 'Esthetician' : 'Cosmetology'}-Apprenticeship-Syllabus.pdf`}
-            download
-            className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 font-bold"
-          >
-            Download assigned syllabus
-          </Link>
+          <HostShopPacketLinks primary={board.programType} programs={board.partner.programs} />
           <Link
             href="/host-shop/onboarding/content-agreement"
             className="inline-flex min-h-11 items-center rounded-xl border border-violet-300 px-4 py-2 font-bold text-violet-900"
@@ -192,7 +180,10 @@ export default async function HostShopResourcesPage() {
         </Link>
       </section>
 
-      <HostShopHandbook />
+      <details className="rounded-2xl border bg-white p-5">
+        <summary className="min-h-11 cursor-pointer font-bold">Read the full operating handbook</summary>
+        <HostShopHandbook />
+      </details>
     </main>
   );
 }

@@ -21,17 +21,20 @@ export default function HostShopDocumentUploadForm({
     event.preventDefault();
     setWorking(true);
     setError(null);
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     form.set('partnerId', partnerId);
     form.set('documentType', documentType);
     try {
       const response = await fetch('/api/host-shop/documents', { method: 'POST', body: form });
       const body = await response.json().catch(() => null);
       if (!response.ok || !body?.ok) throw new Error(body?.error || 'The document could not be uploaded.');
+      formElement.reset();
       router.push(`/host-shop/onboarding/documents?uploaded=${encodeURIComponent(documentType)}`);
       router.refresh();
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : 'The document could not be uploaded.');
+    } finally {
       setWorking(false);
     }
   }

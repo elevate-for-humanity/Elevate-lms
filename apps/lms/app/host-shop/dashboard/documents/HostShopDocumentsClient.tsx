@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { CheckCircle2, FileText, Loader2, Upload, XCircle } from 'lucide-react';
+import { CheckCircle2, FileText, Upload, XCircle } from 'lucide-react';
 
 type Requirement = {
   document_type: string;
@@ -36,6 +35,7 @@ type Props = {
   programType: string;
   partnerState: string;
   requirements: Requirement[];
+  uploads: PartnerDocument[];
 };
 
 function statusClass(status: string) {
@@ -45,51 +45,21 @@ function statusClass(status: string) {
   return 'bg-slate-100 text-slate-700';
 }
 
-export default function HostShopDocumentsClient({ requirements }: Props) {
-  const [workingType, setWorkingType] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+function fileLink(id: string) {
+  return `/api/host-shop/documents/${encodeURIComponent(id)}/download?open=1`;
+}
 
-  async function viewDocument(document: PartnerDocument) {
-    setMessage(null);
-    setError(null);
-    setWorkingType(document.document_type || document.id);
-    try {
-      const response = await fetch(`/api/host-shop/documents/${document.id}/download`, {
-        method: 'GET',
-        cache: 'no-store',
-      });
-      const body = await response.json();
-      if (!response.ok || !body?.url) throw new Error(body?.error || 'Unable to open document.');
-      window.open(body.url, '_blank', 'noopener,noreferrer');
-    } catch (viewFailure) {
-      setError(viewFailure instanceof Error ? viewFailure.message : 'Unable to open document.');
-    } finally {
-      setWorkingType(null);
-    }
-  }
-
+export default function HostShopDocumentsClient({ requirements, uploads }: Props) {
+  const shown = new Set(requirements.map((item) => item.document?.id));
+  const otherFiles = uploads.filter((file) => !shown.has(file.id));
   return (
     <div className="space-y-6">
-      {(message || error) && (
-        <div
-          className={`rounded-xl border p-4 text-sm font-medium ${
-            error
-              ? 'border-red-200 bg-red-50 text-red-800'
-              : 'border-green-200 bg-green-50 text-green-800'
-          }`}
-          role="status"
-        >
-          {error || message}
-        </div>
-      )}
-
       <div className="grid gap-4">
         {requirements.map((requirement) => {
           const document = requirement.document || null;
-          const status = String(document?.status || requirement.status || 'missing').toLowerCase();
-          const working = workingType === requirement.document_type;
-          const needsAction = status !== 'accepted' && status !== 'pending';
+          const status = String(requirement.status || document?.status || 'missing').toLowerCase();
+
+          const needsAction = requirement.is_required !== false && status !== 'accepted' && status !== 'pending';
 
           return (
             <article
@@ -127,7 +97,7 @@ export default function HostShopDocumentsClient({ requirements }: Props) {
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusClass(status)}`}
                       >
-                        {status}
+                        {requirement.is_required === false && status === 'missing' ? 'If applicable' : status}
                       </span>
                     </div>
                     {requirement.description && (
@@ -146,17 +116,13 @@ export default function HostShopDocumentsClient({ requirements }: Props) {
 
                 <div className="flex flex-wrap gap-2">
                   {document?.id && (
-                    <button
-                      type="button"
-                      disabled={working}
-                      onClick={() => void viewDocument(document)}
-                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-50"
-                    >
-                      View
-                    </button>
+                    <a href={fileLink(document.id)} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800">
+                      View file
+                    </a>
                   )}
                   <Link
-                    href={`/host-shop/onboarding/documents?document=${encodeURIComponent(requirement.document_type)}`}
+                    href={`/host-shop/onboarding/documents?document=${encodeURIComponent(requirement.document_type)}#upload-${encodeURIComponent(requirement.document_type)}`}
                     className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800"
                   >
                     <Upload className="h-4 w-4" />
@@ -169,6 +135,18 @@ export default function HostShopDocumentsClient({ requirements }: Props) {
         })}
       </div>
 
+      {otherFiles.length > 0 && (
+        <details className="rounded-2xl border bg-white p-5">
+          <summary className="min-h-11 cursor-pointer font-bold">Other paperwork and earlier uploads ({otherFiles.length})</summary>
+          <ul className="divide-y">
+            {otherFiles.map((file) => <li key={file.id} className="py-2">
+              <a href={fileLink(file.id)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center break-all font-semibold text-blue-800 underline">
+                {file.file_name || file.display_name || 'Open file'}
+              </a>
+            </li>)}
+          </ul>
+        </details>
+      )}
       {requirements.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-600">
           No document requirements are configured for this host site yet.

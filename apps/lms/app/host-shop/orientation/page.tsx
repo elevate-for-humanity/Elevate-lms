@@ -210,10 +210,10 @@ export default async function HostShopOrientationPage({
         <p className="text-xs font-bold uppercase tracking-widest text-amber-800">
           Welcome to your Host Shop
         </p>
-        <h1 className="mt-2 text-3xl font-black">Cosmetology &amp; Beauty Orientation</h1>
+        <h1 className="mt-2 text-3xl font-black">Host Shop Orientation</h1>
         <p className="mt-3 text-slate-700">
-          Learn how to train students in your salon, record their progress, and connect with the
-          Barber &amp; Beauty Network.
+          Learn how to use your dashboard for {board.partner.name}, record supervised training,
+          and review the requirements for your assigned programs.
         </p>
         <Link
           href="/host-shop/dashboard"

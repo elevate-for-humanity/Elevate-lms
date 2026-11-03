@@ -27,6 +27,10 @@ export default function VisualDashboardOrientation({
   }, [audience]);
   const slide = guide.slides[Math.min(index, guide.slides.length - 1)];
   const primary = guide.slides.slice(0, 3);
+  // Interactive actions are independent of the already published film and captions.
+  const planTraining = audience === 'host-shop' && slide.href === '/host-shop/dashboard/reports';
+  const actionHref = planTraining ? '/host-shop/dashboard/schedule' : slide.href;
+  const actionTitle = planTraining ? 'Open training schedule' : slide.action;
   return (
     <section
       id={`orientation-${audience}`}
@@ -112,6 +116,7 @@ export default function VisualDashboardOrientation({
                 controls
                 playsInline
                 preload="metadata"
+                aria-label={audience === 'host-shop' ? 'Host Shop dashboard tour with a salon example' : guide.title}
                 poster={guide.hero}
                 className="aspect-video w-full rounded-xl bg-black"
                 onError={() => setUnavailable(true)}
@@ -146,7 +151,7 @@ export default function VisualDashboardOrientation({
               </div>
             )}
             <p className="mt-3 text-sm text-stone-300">
-              Press play for a guided tour. You can pause, replay, or turn on captions.
+              {audience === 'host-shop' ? 'This dashboard tour uses a salon as its example. ' : ''}Press play for a guided tour. You can pause, replay, or turn on captions.
             </p>
           </div>
         ) : (
@@ -156,7 +161,7 @@ export default function VisualDashboardOrientation({
                 <Image
                   key={slide.image}
                   src={slide.image}
-                  alt="Training and workplace illustration"
+                  alt={slide.title}
                   fill
                   sizes="(max-width: 767px) 100vw, 50vw"
                   className="object-contain p-3"
@@ -178,10 +183,10 @@ export default function VisualDashboardOrientation({
                   ))}
                 </ol>
                 <Link
-                  href={slide.href}
+                  href={actionHref}
                   className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-amber-100 px-4 py-3 text-sm font-bold text-neutral-950"
                 >
-                  {slide.action} →
+                  {actionTitle} →
                 </Link>
               </div>
             </div>

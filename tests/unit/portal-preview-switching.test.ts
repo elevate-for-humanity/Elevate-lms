@@ -142,6 +142,7 @@ describe('switching signed portal previews', () => {
         'elevate_portal_preview_actor',
         'elevate_host_shop_preview_session',
         '__efh_host_shop_partner',
+        'efh_host_shop_preview_view',
       ]) {
         expect(response.cookies.get(name)?.value).toBe('');
         expect(response.cookies.get(name)?.expires?.getTime()).toBe(0);
@@ -160,6 +161,7 @@ describe('switching signed portal previews', () => {
         }),
       );
       expect(response.status).toBe(303);
+      expect(response.cookies.get('efh_host_shop_preview_view')?.value).toMatch(/^[a-f0-9-]{36}$/);
       expect(response.cookies.get('elevate_host_shop_preview_session')?.value).toBe('admin:shop');
       expect(response.cookies.get(userCookie)?.value).toBe(member || '');
       expect(response.cookies.get(sessionCookie)?.value).toBe(member ? `admin:${member}` : '');

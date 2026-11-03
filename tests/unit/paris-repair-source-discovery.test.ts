@@ -82,7 +82,7 @@ it('recovers a rejected read and discovers allowed source when GitHub code searc
 });
 
 it('does not weaken protected writes or retry a GitHub permission failure as a missing file', async () => {
-  h.actions = [{ type: 'create', path: '.github/workflows/release.yml', content: 'unsafe' }];
+  h.actions = [{ type: 'create', path: '.github/workflows/paris-code-repair.yml', content: 'unsafe' }];
   expect((await stageParisCodeRepair('Fix the known retry defect', 'repair', 'owner')).status).toBe(500);
   expect(h.writes).toEqual([]);
   h.actions = [{ type: 'read', path: 'lib/example.ts' }, ...patch]; h.denyReads = true;

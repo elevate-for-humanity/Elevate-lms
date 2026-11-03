@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, Clock, Award, Users, DollarSign } from 'lucide-react';
+import { BookOpen, Clock, Award, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
@@ -65,11 +65,11 @@ export default async function ProgramCoursesPage({ params }: ProgramCoursesPageP
   const { data: courses } = await supabase
     .from('lms_courses')
     .select(
-      'id, title, description, price, duration, lessons_count, enrolled_count, certification, image_url',
+      'id, title, description, duration:duration_hours, lessons_count:total_lessons, certification:certificate_enabled, image_url:thumbnail_url',
     )
     .eq('program_id', program.id)
     .eq('status', 'published')
-    .order('display_order', { ascending: true });
+    .order('title', { ascending: true });
 
   const allCourses = courses || [];
   const category = getCategory(slug);
@@ -149,11 +149,7 @@ export default async function ProgramCoursesPage({ params }: ProgramCoursesPageP
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover hover:scale-105 transition-transform duration-300"
                   />
-                  {course.price === 0 && (
-                    <span className="absolute top-3 right-3 bg-brand-green-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                      FREE
-                    </span>
-                  )}
+
                 </div>
                 <div className="p-5 flex flex-col flex-1">
                   <h3 className="font-bold text-slate-900 text-base mb-2 leading-snug">
@@ -168,7 +164,7 @@ export default async function ProgramCoursesPage({ params }: ProgramCoursesPageP
                     {course.duration && (
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {course.duration}
+                        {course.duration} hours
                       </span>
                     )}
                     {course.lessons_count && (
@@ -177,12 +173,7 @@ export default async function ProgramCoursesPage({ params }: ProgramCoursesPageP
                         {course.lessons_count} lessons
                       </span>
                     )}
-                    {course.enrolled_count > 0 && (
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3 h-3" />
-                        {course.enrolled_count} enrolled
-                      </span>
-                    )}
+
                     {course.certification && (
                       <span className="flex items-center gap-1">
                         <Award aria-label="award" className="w-3 h-3" />
@@ -192,11 +183,7 @@ export default async function ProgramCoursesPage({ params }: ProgramCoursesPageP
                   </div>
                   <div className="border-t pt-4 flex items-center justify-between gap-3">
                     <div className="font-extrabold text-lg text-slate-900">
-                      {course.price === 0 ? (
-                        <span className="text-brand-green-600">FREE</span>
-                      ) : (
-                        `$${course.price}`
-                      )}
+                      See program pricing
                     </div>
                     <Link
                       href={`/lms/courses/${course.id}`}

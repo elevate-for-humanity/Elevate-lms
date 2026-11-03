@@ -67,11 +67,11 @@ async function _GET(request: NextRequest, { params }: { params: Promise<{ course
     supabase
       .from('course_lessons')
       .select(
-        'id, course_id, module_id, title, description, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id',
+        'id, course_id, module_id, title, lesson_number:order_index, order_index, duration_minutes, is_required, is_published, content_type:lesson_type',
       )
       .eq('course_id', courseId)
       .eq('is_published', true)
-      .order('lesson_number', { ascending: true }),
+      .order('order_index', { ascending: true }),
     supabase
       .from('course_modules')
       .select('id, title, description, order_index')
@@ -118,7 +118,6 @@ function stripSensitiveFields(data: {
       course_id: lesson.course_id,
       module_id: lesson.module_id,
       title: lesson.title,
-      description: lesson.description,
       lesson_number: lesson.lesson_number,
       order_index: lesson.order_index,
       duration_minutes: lesson.duration_minutes,

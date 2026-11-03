@@ -18,6 +18,27 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  const activeResponse=await request(activeUrl,{headers,signal:AbortSignal.timeout(15000)});
  if(!activeResponse.ok)throw Error('REPAIR_ACTIVE_READ_HTTP_'+activeResponse.status);
  const active=await activeResponse.json();if(!Array.isArray(active))throw Error('REPAIR_ACTIVE_INVENTORY_INVALID');
+ // A repaired image does not create missing licensed course media. Fail closed
+ // when a scene-license failure has no course-scoped, ready entitled source.
+ const availableMedia = new Map();
+ async function hasReadyEntitledSource(courseId) {
+  if (!courseId) return false;
+  if (availableMedia.has(courseId)) return availableMedia.get(courseId);
+  const mediaUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/course_videos');
+  mediaUrl.searchParams.set('select','id');
+  mediaUrl.searchParams.set('course_id','eq.'+courseId);
+  mediaUrl.searchParams.set('status','eq.ready');
+  mediaUrl.searchParams.set('asset_role','eq.source_broll');
+  mediaUrl.searchParams.set('entitlement_id','not.is.null');
+  mediaUrl.searchParams.set('limit','1');
+  const mediaResponse = await request(mediaUrl,{headers,signal:AbortSignal.timeout(15000)});
+  if (!mediaResponse.ok) throw Error('REPAIR_MEDIA_EVIDENCE_READ_HTTP_'+mediaResponse.status);
+  const mediaRows = await mediaResponse.json();
+  if (!Array.isArray(mediaRows)) throw Error('REPAIR_MEDIA_EVIDENCE_INVALID');
+  const available = mediaRows.length>0;
+  availableMedia.set(courseId,available);
+  return available;
+ }
  const seenBuilds=new Set(active.map(row=>row.build_id));
  const seenLessons=new Set(active.filter(row=>row.payload?.autopilot && row.available_at!=='infinity')
   .map(row=>row.build_id+':'+row.payload.autopilot.competencyId));
@@ -54,6 +75,10 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    try { repairedPlaybackTimeout=JSON.parse(error.slice('ULTIMATE_PROGRESS_STALLED:'.length)).phase==='autopilot:quality:learner_runthrough'; } catch {}
   }
   if((!error.startsWith('ULTIMATE_INTERNAL_REPAIR_REQUIRED:')&&!repairedPlaybackTimeout)||durableExternalBlocker)continue;
+  // Do not spend another execution generation on scenes with no licensed source.
+  // An eligible image still requires normal scene-specific relevance validation.
+  if(/ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|licensed third-party scenes are missing entitlement\/license evidence/i.test(error) &&
+     !(await hasReadyEntitledSource(job.build?.course_id))) continue;
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');
   target.searchParams.set('execution_generation','eq.'+job.execution_generation);

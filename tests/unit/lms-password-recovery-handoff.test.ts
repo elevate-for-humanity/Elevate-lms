@@ -96,3 +96,23 @@ it('preserves the approved LMS alias while rejecting cross-alias POSTs', async (
   expect(rejected.status).toBe(403);
   expect(mocks.verify).not.toHaveBeenCalled();
 });
+
+
+it('accepts the approved public Host behind an internal Cloud Run request URL', async () => {
+  mocks.verify.mockResolvedValue({ data: { session: null }, error: new Error('expired') });
+  const response = await POST(new NextRequest('http://localhost:8080/api/auth/recovery-callback', {
+    method: 'POST', headers: { host: 'app.elevateforhumanity.org', origin: 'https://app.elevateforhumanity.org' },
+    body: new URLSearchParams({ token_hash: 'expired' }),
+  }));
+  expect(response.status).toBe(303);
+  expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/reset-password?mode=recovery&error=recovery_failed');
+});
+
+it.each(['evil.example', 'app.elevateforhumanity.org.evil.example', 'app.elevateforhumanity.org:444'])('rejects an unapproved ingress host %s', async host => {
+  const response = await POST(new NextRequest('http://localhost:8080/api/auth/recovery-callback', {
+    method: 'POST', headers: { host, origin: 'https://app.elevateforhumanity.org', 'x-forwarded-host': 'app.elevateforhumanity.org' },
+    body: new URLSearchParams({ token_hash: 'must-not-consume' }),
+  }));
+  expect(response.status).toBe(403);
+  expect(mocks.verify).not.toHaveBeenCalled();
+});

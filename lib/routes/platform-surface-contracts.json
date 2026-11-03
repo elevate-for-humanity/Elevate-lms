@@ -45,11 +45,11 @@
       "compatibility": [
         { "app": "marketing", "path": "/partners/barber-host-shop", "target": "/partners/host-shops" },
         { "app": "marketing", "path": "/apprenticeships/host-shop", "target": "/partners/host-shops" },
-        { "app": "marketing", "path": "/programs/barber-apprenticeship/host-shops", "target": "/partners/host-shops" },
         { "app": "marketing", "path": "/partners/barber-host-shop/apply", "target": "/partners/host-shop/apply" },
         { "app": "lms", "path": "/cosmetology-host-shop/dashboard", "target": "/host-shop/dashboard" }
       ],
       "informational": [
+        { "app": "marketing", "path": "/programs/barber-apprenticeship/host-shops", "purpose": "Program-filtered directory using the canonical Host Shop network service" },
         { "app": "marketing", "path": "/apprenticeship-sponsor", "purpose": "Sponsor-of-record governance and compliance; not a second employer application" }
       ]
     },

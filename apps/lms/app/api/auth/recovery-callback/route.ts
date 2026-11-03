@@ -10,7 +10,12 @@ export const dynamic = 'force-dynamic';
 function recoveryOrigin(request: NextRequest) {
   const origin = request.nextUrl.origin;
   const allowed = new Set([new URL(siteUrls.app).origin, 'https://app.elevateforhumanity.org', 'https://lms.elevateforhumanity.org']);
-  return allowed.has(origin) ? origin : new URL(siteUrls.app).origin;
+  if (allowed.has(origin)) return origin;
+  // Cloud Run may construct request.url from its internal listener. Bind the
+  // browser origin to an exact approved ingress Host, never to the POST Origin.
+  const host = request.headers.get('host');
+  const ingressOrigin = host ? `https://${host}` : '';
+  return allowed.has(ingressOrigin) ? ingressOrigin : new URL(siteUrls.app).origin;
 }
 function resetTarget(value: string | null, origin: string) {
   const destination = new URL('/reset-password?mode=recovery', origin);
@@ -57,7 +62,10 @@ export async function GET(request: NextRequest) {
 /** Persist recovery cookies on the actual redirect response, never a discarded response. */
 export async function POST(request: NextRequest) {
   const origin = recoveryOrigin(request);
-  if (request.nextUrl.origin !== origin || request.headers.get('origin') !== origin) return new NextResponse('Invalid origin', { status: 403 });
+  const requestOrigin = request.nextUrl.origin;
+  const ingressHost = request.headers.get('host');
+  const sameIngress = requestOrigin === origin || (ingressHost !== null && `https://${ingressHost}` === origin);
+  if (!sameIngress || request.headers.get('origin') !== origin) return new NextResponse('Invalid origin', { status: 403 });
   const form = await request.formData().catch(() => null);
   const token = String(form?.get('token_hash') || '');
   const code = String(form?.get('code') || '');

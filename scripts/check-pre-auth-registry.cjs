@@ -54,6 +54,7 @@ const AUTH_PATTERNS = [
   /createServerSupabaseClient\s*\(/,
   /requireProgramHolder\s*\(/,
   /requireIndividualWorkspace\s*\(/,
+  /await\s+requireExamSessionAccess\s*\(/,
   /requireCurrentHostShopPartner\s*\(/,
   /requireApiRole\s*\(/,
   /requireRoleAPI\s*\(/,

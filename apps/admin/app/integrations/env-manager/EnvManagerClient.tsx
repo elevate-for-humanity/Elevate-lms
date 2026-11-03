@@ -204,6 +204,9 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     label: 'GitHub',
     keys: [
       'GITHUB_TOKEN',
+      'GITHUB_APP_ID',
+      'GITHUB_APP_INSTALLATION_ID',
+      'GITHUB_APP_PRIVATE_KEY',
       'GITHUB_OAUTH_CLIENT_ID',
       'GITHUB_OAUTH_CLIENT_SECRET',
       'NEXT_PUBLIC_GITHUB_ENABLED',
@@ -782,13 +785,25 @@ export default function EnvManagerClient() {
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <input
-                                type={isSecret && !show ? 'password' : 'text'}
-                                value={editVal || (show ? displayVal : '')}
-                                onChange={(e) => handleChange(key, e.target.value)}
-                                placeholder={displayVal || `Enter ${key}`}
-                                className="flex-1 text-sm font-mono border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 bg-white"
-                              />
+                              {key === 'GITHUB_APP_PRIVATE_KEY' ? (
+                                <textarea
+                                  value={editVal}
+                                  onChange={(e) => handleChange(key, e.target.value)}
+                                  placeholder={settings[key] ? 'Private key saved securely — paste a replacement only to rotate' : 'Paste the full GitHub App RSA private key, including BEGIN/END lines'}
+                                  rows={5}
+                                  spellCheck={false}
+                                  autoComplete="off"
+                                  className="flex-1 min-w-0 resize-y text-sm font-mono border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 bg-white"
+                                />
+                              ) : (
+                                <input
+                                  type={isSecret && !show ? 'password' : 'text'}
+                                  value={editVal || (show ? displayVal : '')}
+                                  onChange={(e) => handleChange(key, e.target.value)}
+                                  placeholder={displayVal || `Enter ${key}`}
+                                  className="flex-1 text-sm font-mono border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 bg-white"
+                                />
+                              )}
                               {isSecret && (
                                 <button
                                   onClick={() => toggleReveal(key)}

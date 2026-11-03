@@ -31,6 +31,13 @@ export function registerPublicNavigationAudit() {
       expect(response?.status(), href).toBeLessThan(400);
       await expect(page.locator('h1').first()).toBeVisible();
       await expect(page.locator('body')).not.toContainText(/Application error: a client-side exception|Lorem ipsum|Under construction/i);
+      if (href === '/partners/host-shops') {
+        // Hold the visitor-visible slide while checking its images. Rotation
+        // replaces live nodes, which otherwise detaches an image mid-scroll.
+        await page.getByRole('button', { name: 'Pause host shop slideshow', exact: true }).click();
+        await expect(page.getByRole('button', { name: 'Resume host shop slideshow', exact: true }))
+          .toHaveAttribute('aria-pressed', 'true');
+      }
       const imageSelector = await page.locator('main').count() ? 'main img' : 'body img';
       // Lazy images only load after entering the viewport. Exercise the actual
       // visitor scroll rather than waiting forever on below-the-fold decode().

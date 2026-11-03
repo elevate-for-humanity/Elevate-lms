@@ -8,6 +8,7 @@ on:
       - 'components/pwa/PwaInstallBanner.tsx'
       - 'public/videos/hvac-recruitment-20261029.mp4'
       - 'tests/e2e/hvac-hero-playback.spec.ts'
+      - 'tests/e2e/public-navigation-audit.ts'
   workflow_dispatch:
     inputs:
       deployed_sha:
@@ -117,6 +118,11 @@ jobs:
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/homepage-enrollment
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts --reporter=line,html --output=test-results/homepage-enrollment --project=${{ matrix.device }}
+      - name: Verify Host Shop slideshow controls and images on every device
+        if: github.event_name == 'pull_request'
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/host-shop-navigation
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --grep 'navigation destination /partners/host-shops:' --config playwright.config.ts --reporter=line,html --output=test-results/host-shop-navigation --project=${{ matrix.device }}
       - name: Preserve playback samples, screenshots and browser report
         if: always()
         uses: actions/upload-artifact@v4
@@ -125,6 +131,7 @@ jobs:
           path: |
             test-results/hvac-hero/
             test-results/homepage-enrollment/
+            test-results/host-shop-navigation/
             test-results/hvac-release-*.json
             playwright-report/
           retention-days: 14

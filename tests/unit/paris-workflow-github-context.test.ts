@@ -1,6 +1,6 @@
 import {afterEach,expect,it,vi} from 'vitest';
 vi.mock('server-only',()=>({}));
-vi.mock('@/lib/secrets',()=>({getDecryptedPlatformSecret:async()=> 'stored-platform-token',getAdminGitHubAppSecret:async()=>undefined}));
+vi.mock('@/lib/secrets',()=>({getDecryptedPlatformSecret:async(key:string)=>key==='GITHUB_TOKEN'?'stored-platform-token':undefined,getAdminGitHubAppSecret:async()=>undefined}));
 import {withWorkflowGitHubToken,currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {getGitHubToken} from '@/lib/devstudio/github-token';
 afterEach(()=>vi.unstubAllGlobals());

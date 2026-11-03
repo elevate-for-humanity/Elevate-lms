@@ -244,7 +244,7 @@ begin
  if not found or s.evidence_storage_key is not null then raise exception 'Exam unavailable or evidence already attached'; end if;
  select * into p from public.profiles where id=p_actor;
  if not found or p.is_active is false or p.suspended is true then raise exception 'Active account required'; end if;
- if p.role not in ('admin','super_admin') and p_actor is distinct from s.student_id and not(p_actor=s.proctor_id and p.role in ('proctor','test_admin','staff','instructor')) and not(p.tenant_id=s.tenant_id and p.role in ('staff','test_admin')) then raise exception 'Exam access denied'; end if;
+ if p.role not in ('admin','super_admin') and p_actor is distinct from s.student_id and not(coalesce(p_actor=s.proctor_id and p.role in ('proctor','test_admin','staff','instructor'),false)) and not(coalesce(p.tenant_id=s.tenant_id and p.role in ('staff','test_admin'),false)) then raise exception 'Exam access denied'; end if;
  if p_key not like 'exam-evidence/'||p_session::text||'/%' or p_hash !~ '^[0-9a-f]{64}$' then raise exception 'Invalid private evidence'; end if;
  perform set_config('app.exam_actor',p_actor::text,true);
  update public.exam_sessions set evidence_storage_key=p_key,evidence_hash=p_hash,evidence_uploaded_at=now(),
@@ -253,3 +253,22 @@ begin
 end $$;
 revoke all on function public.attach_private_exam_evidence(uuid,uuid,text,text) from public,anon,authenticated;
 grant execute on function public.attach_private_exam_evidence(uuid,uuid,text,text) to service_role;
+
+create table testing_private.epa_program_events (
+ id uuid primary key default gen_random_uuid(),created_at timestamptz not null default now(),
+ actor_id uuid,entity_type text not null,entity_id text not null,before_state jsonb,after_state jsonb
+);
+alter table testing_private.epa_program_events enable row level security;
+grant all on testing_private.epa_program_events to service_role;
+create function testing_private.audit_epa_program_configuration() returns trigger language plpgsql security definer set search_path='' as $$
+begin
+ insert into testing_private.epa_program_events(actor_id,entity_type,entity_id,before_state,after_state)
+ values(auth.uid(),tg_table_name,new.id::text,case when tg_op='UPDATE' then to_jsonb(old) else null end,to_jsonb(new));
+ return new;
+end $$;
+revoke all on function testing_private.audit_epa_program_configuration() from public,anon,authenticated;
+create trigger audit_epa_authority after insert or update on public.epa_certification_authority for each row execute function testing_private.audit_epa_program_configuration();
+create trigger audit_epa_proctors after insert or update on public.epa_proctor_registrations for each row execute function testing_private.audit_epa_program_configuration();
+create trigger retain_epa_program_events before update or delete on testing_private.epa_program_events for each row execute function testing_private.retain_exam_evidence();
+create trigger retain_epa_native_attempts before delete on public.epa_native_attempts for each row execute function testing_private.retain_exam_evidence();
+create trigger retain_epa_proctors before delete on public.epa_proctor_registrations for each row execute function testing_private.retain_exam_evidence();

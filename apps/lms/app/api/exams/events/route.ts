@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     ]);
     if (
       typeof examSessionId !== 'string' ||
-      !/^[0-9a-f-]{36}$/i.test(examSessionId) ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(examSessionId) ||
       !allowed.has(eventType) ||
       JSON.stringify(metadata).length > 4096
     ) {

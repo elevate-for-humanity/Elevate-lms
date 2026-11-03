@@ -75,7 +75,7 @@ export default function CertificationConsole() {
               const f = new FormData(e.currentTarget);
               action({
                 action: 'register-proctor',
-                userId: f.get('userId'),
+                userEmail: f.get('userEmail'),
                 siteName: f.get('siteName'),
                 siteAddress: f.get('siteAddress'),
                 status: f.get('status'),
@@ -84,8 +84,13 @@ export default function CertificationConsole() {
             }}
           >
             <label>
-              Proctor account ID
-              <input name="userId" required className="mt-1 block w-full rounded border p-2" />
+              Proctor email
+              <input
+                name="userEmail"
+                type="email"
+                required
+                className="mt-1 block w-full rounded border p-2"
+              />
             </label>
             <label>
               Site name
@@ -186,8 +191,15 @@ export default function CertificationConsole() {
           }}
         >
           <label>
-            Exam session ID
-            <input name="session" required className="mt-1 block w-full rounded border p-2" />
+            Checked-in candidate
+            <select name="session" required className="mt-1 block w-full rounded border p-2">
+              <option value="">Select a candidate</option>
+              {data?.sessions?.map((s: any) => (
+                <option key={s.id} value={s.id}>
+                  {s.student_name} — {s.proctor_name}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Bank version

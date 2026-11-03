@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireExamSessionAccess } from '@/lib/testing/session-access';
 export async function getExamEvidence(request: Request) {
   const id = new URL(request.url).searchParams.get('sessionId');
-  if (!id || !/^[0-9a-f-]{36}$/i.test(id))
+  if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
     return NextResponse.json({ error: 'Valid sessionId required' }, { status: 400 });
   const access = await requireExamSessionAccess(id);
   if (access instanceof NextResponse) return access;

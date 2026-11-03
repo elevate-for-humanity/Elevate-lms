@@ -11,7 +11,7 @@ export async function nativeCardGet(request: Request) {
   } = await client.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const id = new URL(request.url).searchParams.get('attemptId');
-  if (!id || !/^[0-9a-f-]{36}$/i.test(id))
+  if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
     return NextResponse.json({ error: 'Valid attempt required' }, { status: 400 });
   const db = await requireAdminClient();
   const [{ data: attempt, error }, { data: profile }] = await Promise.all([

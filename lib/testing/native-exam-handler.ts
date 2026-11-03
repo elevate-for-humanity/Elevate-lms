@@ -87,8 +87,20 @@ export async function nativeExamPost(request: Request) {
       }
       case 'register-proctor': {
         if (!auth.platformAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        const { data: proctor, error: proctorError } = await auth.db
+          .from('profiles')
+          .select('id')
+          .eq(
+            'email',
+            String(body.userEmail || '')
+              .trim()
+              .toLowerCase(),
+          )
+          .maybeSingle();
+        if (proctorError || !proctor)
+          throw new Error('No unique existing proctor account matches that email');
         if (
-          !UUID.test(body.userId || '') ||
+          !UUID.test(proctor.id || '') ||
           !body.siteName?.trim() ||
           !body.siteAddress?.trim() ||
           !['pending', 'active', 'suspended'].includes(body.status)
@@ -100,7 +112,7 @@ export async function nativeExamPost(request: Request) {
           .from('epa_proctor_registrations')
           .upsert(
             {
-              user_id: body.userId,
+              user_id: proctor.id,
               site_name: body.siteName.trim(),
               site_address: body.siteAddress.trim(),
               status: body.status,
@@ -196,8 +208,18 @@ export async function nativeExamGet(request: Request) {
   const { data: attempts, error: attemptsError } = await attemptsQuery;
   if (attemptsError)
     return NextResponse.json({ error: 'Exam attempts unavailable' }, { status: 503 });
+  let sessionsQuery = auth.db
+    .from('exam_sessions')
+    .select('id,student_name,proctor_name')
+    .eq('status', 'checked_in')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (!auth.platformAdmin) sessionsQuery = sessionsQuery.eq('proctor_id', auth.user.id);
+  const { data: sessions, error: sessionsError } = await sessionsQuery;
+  if (sessionsError)
+    return NextResponse.json({ error: 'Checked-in candidates unavailable' }, { status: 503 });
   return NextResponse.json(
-    { data: { ...data, attempts, canManage: auth.platformAdmin } },
+    { data: { ...data, attempts, sessions, canManage: auth.platformAdmin } },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 }

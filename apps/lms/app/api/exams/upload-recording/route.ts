@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     if (
       !(file instanceof File) ||
       typeof sessionId !== 'string' ||
-      !/^[0-9a-f-]{36}$/i.test(sessionId)
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)
     ) {
       return NextResponse.json({ error: 'Valid file and sessionId are required' }, { status: 400 });
     }

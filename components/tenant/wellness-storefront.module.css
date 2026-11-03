@@ -18,6 +18,9 @@
 .store .kicker, .productCopy .kicker { font-size: 12px; }
 .store .productCopy > p:not(.kicker) { font-size: 14px; line-height: 1.6; }
 .store [data-section-id="ritual-set-includes"] article > img {
+  display: block;
+  width: 100%;
+  height: auto;
   aspect-ratio: 1;
   object-fit: contain;
   object-position: center;

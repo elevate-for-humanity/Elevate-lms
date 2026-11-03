@@ -27,9 +27,9 @@ export default async function CdlTrainingPage() {
               <p className="font-bold uppercase tracking-widest text-blue-800">
                 Elevate for Humanity · Transportation
               </p>
-              <h1 className="mt-3 text-4xl font-black text-slate-950 sm:text-6xl">
+              <h2 className="mt-3 text-4xl font-black text-slate-950 sm:text-6xl">
                 Your next chapter starts behind the wheel.
-              </h1>
+              </h2>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
                 Class A training, hands-on driving practice, flexible scheduling, and support for
                 your next career step.

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, CreditCard, Store } from 'lucide-react';
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
@@ -206,7 +207,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             }))}
             demoActiveSlideIndex={activeSlide}
             analyticsName={`${banner.analyticsName}-${activeSlide + 1}`}
-            heightClassName="h-[clamp(360px,65svh,780px)]"
+            heightClassName={HERO_IMAGE_FRAME}
             mediaClassName={SALON_EDITORIAL_GRADE}
             overlayMode="none"
             showSoundControl={false}

@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
+
 interface HeroSectionProps {
   title: string;
   tagline: string;
@@ -29,7 +31,7 @@ export function HeroSection({
 }: HeroSectionProps) {
   return (
     <section className="overflow-hidden bg-white">
-      <div className="relative h-[clamp(360px,65svh,780px)] w-full overflow-hidden bg-slate-100">
+      <div className={`${HERO_IMAGE_FRAME} bg-slate-100`}>
         {heroVideo ? (
           <SafeHeroVideo
             src={heroVideo}

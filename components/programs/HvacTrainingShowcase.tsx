@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 import { HvacVideoAssistanceDock } from './HvacVideoAssistanceDock';
 
+import { HERO_IMAGE_FRAME } from '@/lib/images/hero-layout';
+
 const imageRoot = '/images/programs/hvac/elevate-20261029';
 const applyHref = '/apply/student?program=hvac-technician';
 const scenes = [
@@ -55,7 +57,7 @@ const scenes = [
 export function HvacLabHero() {
   return (
     <figure className="w-full border-b-4 border-orange-500 bg-white text-slate-950" data-hvac-photo-hero>
-      <div className="relative h-[clamp(360px,65svh,780px)] w-full overflow-hidden">
+      <div className={HERO_IMAGE_FRAME}>
         <Image
           src="/images/hvac-training-vibrant-2026.webp"
           alt="HVAC technicians examining an air-conditioning system"

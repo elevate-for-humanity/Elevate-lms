@@ -2,10 +2,11 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react';
-import { ShoppingBag, ArrowRight, ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { ShoppingBag, ArrowRight, ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause, Captions } from 'lucide-react';
 import type { PublishedTenantSite, TenantSiteProduct } from '@/lib/tenant/site-types';
 import { useTenantShoppingBag, TenantBagDrawer, productPrice } from './TenantShoppingBag';
 import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
+import { StoreMusicSwitch, useStoreMusic } from './MeriStoreMusic';
 import styles from './wellness-storefront.module.css';
 
 const ROOT = '/images/meri-gold-round';
@@ -20,6 +21,8 @@ const price = productPrice;
 
 function BrandFilm() {
   const ref = useRef<HTMLVideoElement>(null);
+  const setFilmAudible = useStoreMusic()?.setFilmAudible;
+  const [captions, setCaptions] = useState(false);
   const pausedByViewer = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -40,6 +43,14 @@ function BrandFilm() {
     observer.observe(film);
     return () => { ++attempt; observer.disconnect(); film.pause(); };
   }, []);
+  useEffect(() => {
+    setFilmAudible?.(playing && !muted);
+    return () => setFilmAudible?.(false);
+  }, [playing, muted, setFilmAudible]);
+  useEffect(() => {
+    const track = ref.current?.textTracks?.[0];
+    if (track) track.mode = captions ? 'showing' : 'disabled';
+  }, [captions]);
   function togglePlay() {
     const film = ref.current;
     if (!film) return;
@@ -61,9 +72,10 @@ function BrandFilm() {
       aria-label="The Meri-Gold-Round brand film" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
       onVolumeChange={e => setMuted(e.currentTarget.muted)}>
       <source src="/videos/meri-gold-round/brand-story.mp4?v=music2" type="video/mp4" />
-      <track default kind="captions" srcLang="en" label="English" src="/videos/meri-gold-round/brand-story.vtt?v=warm-20261103" />
+      <track kind="captions" srcLang="en" label="English" src="/videos/meri-gold-round/brand-story.vtt?v=warm-20261103" />
     </video>
     <div className={styles.filmActions}>
+      <button type="button" aria-label="Closed captions" aria-pressed={captions} onClick={() => setCaptions(!captions)}><Captions size={16} /></button>
       <button type="button" onClick={togglePlay} aria-label={playing ? 'Pause film' : 'Play film'}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
       <button type="button" onClick={toggleSound} aria-label={muted ? 'Hear narration and music' : 'Mute film'}>{muted ? <VolumeX size={16} /> : <Volume2 size={16} />}</button>
     </div>
@@ -103,7 +115,7 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
     <div className={styles.announcement}>CURVATURE BODY SCULPTING · THE MERI-GOLD-ROUND COLLECTION</div>
     <header className={styles.header}>
       <a className={styles.brand} href={href('/')}><span>MERI-GOLD-ROUND</span><small>BOTANICAL BODY, SKIN & HAIR CARE</small></a>
-      <nav aria-label="Store navigation"><a href={href('/shop')}>Shop collection</a><a href={href('/about')}>Our story</a><a href={href('/contact')}>Contact</a></nav>
+      <nav aria-label="Store navigation"><a href={href('/shop')}>Shop collection</a><a href={href('/about')}>Our story</a><a href={href('/contact')}>Contact</a><StoreMusicSwitch /></nav>
       <button type="button" className={styles.bagButton} onClick={openBag} aria-label={`Shopping bag, ${totalCount} items`}><ShoppingBag size={19} /> Bag <span>{totalCount}</span></button>
     </header>
     <main id="main-content">
@@ -115,13 +127,13 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
         <div className={styles.promise}><span>Body & massage</span><span>Hair & scalp</span><span>Bath & foot care</span><span>Skin & daily cleansing</span></div>
         <div className={styles.purchaseInfo}><div><strong>Shop your ritual</strong><span>Body, skin, hair and bath essentials in one collection.</span></div><div><strong>Your bag stays with you</strong><span>Review quantities and a clear merchandise subtotal.</span></div><div><strong>Personal order support</strong><span>Request an invoice to confirm availability, shipping and tax.</span></div></div>
         <section className={styles.brandNote} aria-label="The Meri-Gold-Round approach"><span className={styles.brandSeal} aria-hidden="true">M<span>the everyday round</span></span><div><p className={styles.kicker}>MORE THAN A SPOT ON YOUR SHELF</p><h2>A little ritual.<br /><em>A whole lot of you.</em></h2></div><p>For the mornings you want to start fresh. The evenings you need to slow down. And the quiet moments when taking care of yourself comes first.</p></section>
+        <section className={styles.section} id="brand-film"><div className={styles.sectionHeading}><div><p className={styles.kicker}>WATCH. LISTEN. MAKE IT YOURS.</p><h2>The story of your everyday round.</h2></div></div><div className={styles.filmGrid}><BrandFilm /><div><p className={styles.kicker}>A MOMENT OF INTENTION</p><h3>Care that fits into your life.</h3><p>A gentle cleanse. A warm soak. A thoughtful scalp routine. A moment of body care. Explore the collection one ritual at a time.</p><small>AI-created lifestyle scenes illustrate care routines; they do not show customer results.</small></div></div></section>
         <section className={styles.section}><div className={styles.sectionHeading}><div><p className={styles.kicker}>YOUR EVERYDAY ESSENTIALS</p><h2>Small rituals. Beautiful possibilities.</h2></div><a href={href('/shop')}>Shop all products <ArrowRight size={17} /></a></div><div className={styles.productGrid}>{featured.map(p => <Card key={p.href} product={p} />)}</div></section>
         <section className={styles.storyPanel}><div className={styles.storyPhoto}><img src={`${ROOT}/original-spa-hero.jpg`} alt="A bright spa setting with botanical care, towels and massage tools" loading="lazy" /><span>THE ART OF TAKING A MOMENT</span></div><div className={styles.storyWords}><p className={styles.kicker}>CURVATURE BODY SCULPTING PRESENTS</p><h2>Your body.<br />Your pace.<br /><em>Your round.</em></h2><p>Meri-Gold-Round brings body, skin, hair and bath care into one thoughtful collection. Start with the part of your day that needs a little more care, and build a routine that feels like yours.</p><a className={styles.primary} href={href('/shop')}>Create your own ritual <ArrowRight size={18} /></a></div></section>
         <section className={styles.slideshow} aria-roledescription="carousel" aria-label="Everyday self-care rituals">
           <div className={styles.slideImage}><img src={`${ROOT}/rituals/${active.image}.webp`} alt={`${active.title} Illustrative self-care scene`} /><span>Illustrative lifestyle photography</span></div>
           <div className={styles.slideCopy} aria-live="polite"><p className={styles.kicker}>THE EVERYDAY ROUND · {String(slide + 1).padStart(2, '0')} / 04</p><h2>{active.title}</h2><p>{active.text}</p><a className={styles.primary} href={href(products.find(p => p.href?.includes(active.match))?.href || '/shop')}>{active.label} <ArrowRight size={18} /></a><div className={styles.slideControls}><button type="button" aria-label="Previous ritual" onClick={() => setSlide((slide + 3) % 4)}><ChevronLeft /></button>{rituals.map((r, i) => <button key={r.image} type="button" aria-label={`Show ${r.title}`} aria-pressed={slide === i} onClick={() => setSlide(i)}>{i + 1}</button>)}<button type="button" aria-label="Next ritual" onClick={() => setSlide((slide + 1) % 4)}><ChevronRight /></button></div></div>
         </section>
-        <section className={styles.section} id="brand-film"><div className={styles.sectionHeading}><div><p className={styles.kicker}>WATCH. LISTEN. MAKE IT YOURS.</p><h2>The story of your everyday round.</h2></div></div><div className={styles.filmGrid}><BrandFilm /><div><p className={styles.kicker}>A MOMENT OF INTENTION</p><h3>Care that fits into your life.</h3><p>A gentle cleanse. A warm soak. A thoughtful scalp routine. A moment of body care. Explore the collection one ritual at a time.</p><small>AI-created lifestyle scenes illustrate care routines; they do not show customer results.</small></div></div></section>
         <section className={styles.ritualSteps}><div><p className={styles.kicker}>MAKE ROOM FOR YOURSELF</p><h2>Build your everyday round.</h2><p>Choose a moment. Choose your care. Make it a habit.</p></div><div className={styles.stepsGrid}>{[
           ['01', 'Fresh beginnings', 'Discover cosmetic soaps for your cleansing routine.', 'turmeric-glycerin', 'Find your cleanse'],
           ['02', 'Rooted in care', 'Explore botanical oils for your hair and scalp routine.', 'hair-scalp', 'Find your hair care'],

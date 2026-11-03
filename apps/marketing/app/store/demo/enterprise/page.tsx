@@ -108,15 +108,15 @@ export default function EnterpriseDemoPage() {
             </div>
             
             {/* Analytics Dashboard Mockup */}
-            <div className="p-6 bg-slate-50">
-              <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="bg-slate-50 p-4 sm:p-6">
+              <div className="mb-6 grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 lg:grid-cols-4">
                 {[
                   { label: 'WIOA Enrolled', value: '1,247', change: 'This quarter' },
                   { label: 'ITA Issued', value: '$2.4M', change: 'Allocated' },
                   { label: 'Credentials Earned', value: '892', change: '+18% YoY' },
                   { label: 'Placement Rate', value: '87%', change: 'Above target' },
                 ].map((stat) => (
-                  <div key={stat.label} className="bg-white rounded-lg p-4 border border-slate-200">
+                  <div key={stat.label} className="min-w-0 rounded-lg border border-slate-200 bg-white p-4">
                     <p className="text-xs text-slate-500 font-medium">{stat.label}</p>
                     <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
                     <p className="text-xs text-emerald-600 mt-1">{stat.change}</p>
@@ -124,7 +124,7 @@ export default function EnterpriseDemoPage() {
                 ))}
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="bg-white rounded-lg border border-slate-200 p-4">
                   <h4 className="font-semibold text-slate-900 mb-4">Provider Performance</h4>
                   <div className="space-y-3">

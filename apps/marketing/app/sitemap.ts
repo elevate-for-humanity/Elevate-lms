@@ -20,10 +20,12 @@ import {
  * are intentionally excluded.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const redirectOnlyPaths = new Set(['/programs/technology', '/programs/business']);
+  // Legacy static copy for entrepreneurship still exists, but its public detail
+  // route renders Program Not Found. Only advertise the published programs.
+  const excludedPaths = new Set(['/programs/technology', '/programs/business', '/programs/entrepreneurship']);
 
   const staticRoutes: MetadataRoute.Sitemap = PUBLIC_ROUTE_REGISTRY
-    .filter((route) => !redirectOnlyPaths.has(route.path))
+    .filter((route) => !excludedPaths.has(route.path))
     .map((route) => ({
     url: `${PUBLIC_SITE_ORIGIN}${route.path === '/' ? '' : route.path}`,
     lastModified: new Date(route.lastModified),
@@ -51,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const programRoutes: MetadataRoute.Sitemap = [...STATIC_PROGRAM_MAP.keys()]
     .map((slug) => `/programs/${slug}`)
-    .filter((path) => !redirectOnlyPaths.has(path))
+    .filter((path) => !excludedPaths.has(path))
     .map((path) => ({
       url: `${PUBLIC_SITE_ORIGIN}${path}`,
       changeFrequency: 'weekly',

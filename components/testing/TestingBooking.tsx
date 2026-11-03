@@ -51,9 +51,9 @@ export default async function TestingBooking({
               <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
                 Secure exam checkout
               </p>
-              <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
+              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
                 Choose the exact exam you are taking.
-              </h1>
+              </h2>
               <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
                 Choose your exam and testing day, review the total, and pay securely through
                 QuickBooks. After payment is confirmed, we will email your reserved time and a link

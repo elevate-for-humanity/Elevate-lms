@@ -75,6 +75,9 @@ it('plays the film inline, falls back to muted playback, and enables sound on re
     render(<WellnessStorefront site={site} pathname="/" basePath="/sites/meri-gold-round">{null}</WellnessStorefront>);
     const video = screen.getByLabelText('The Meri-Gold-Round brand film') as HTMLVideoElement;
     expect(video.controls).toBe(false);
+    expect(video.querySelector('track')?.hasAttribute('default')).toBe(false);
+    expect(screen.getByRole('button', { name: 'Closed captions' }).getAttribute('aria-pressed')).toBe('false');
+    expect(video.closest('#brand-film')?.previousElementSibling?.textContent).toContain('A whole lot of you.');
     expect(document.querySelector('audio')).toBeNull();
     onVisibility([{ intersectionRatio: 1 }]);
     await waitFor(() => expect(play).toHaveBeenCalledTimes(2));

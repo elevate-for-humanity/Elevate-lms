@@ -8,6 +8,7 @@ import { workbookCover } from '@/lib/store/workbook-products';
 import TheoryTimeclock from './TheoryTimeclock';
 import HvacSystemLab from './HvacSystemLab';
 import HvacWorkbookTeaching from './HvacWorkbookTeaching';
+import BarberWorkbookSimulator from './BarberWorkbookSimulator';
 import HvacCompletionReview from './HvacCompletionReview';
 import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
@@ -46,6 +47,8 @@ function SectionEditor({
   useEffect(() => {
     if (readOnly) return;
     try {
+      // A different section is a different lesson. Never infer its completion
+      // from training hours or from a previous browser session.
       const stored = sessionStorage.getItem(positionKey);
       if (stored !== null) {
         const value = Number(stored);
@@ -76,6 +79,7 @@ function SectionEditor({
     <section hidden={hidden} aria-labelledby={`section-${section.id}`}>
       {!hidden && workbookSlug === HVAC_WORKBOOK_SLUG ? <HvacWorkbookTeaching number={section.section_number} /> : null}
       {!hidden && section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && [5, 12].includes(section.section_number) ? <HvacSystemLab /> : null}
+      {!hidden && workbookSlug === 'prestige-elevation-barbering' && [15, 18, 22, 23, 24, 25, 26, 27].includes(section.section_number) ? <BarberWorkbookSimulator sectionNumber={section.section_number} /> : null}
       {!hidden && !readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && section.lesson_id ? (
         <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
       ) : null}
@@ -260,6 +264,9 @@ export default function DigitalWorkbook({
   readOnly: boolean;
   accountId: string;
 }) {
+  // Always start with the first workbook lesson when entering from a dashboard.
+  // Existing writing is preserved, but a saved browser slide position must never
+  // teleport a learner to Week 7 or conceal earlier sections.
   const [active, setActive] = useState(sections[0]?.id ?? '');
   useEffect(() => {
     function selectLinkedSection() {

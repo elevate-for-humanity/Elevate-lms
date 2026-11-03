@@ -146,6 +146,10 @@ async function dispatchToolRequest(
   // self-call creates a false dependency on ingress, DNS, and loopback routing.
   // Invoke the canonical route in-process while preserving its auth, rate-limit,
   // validation, approval, audit, and response contract.
+  if (tool.name === 'studio.repository.status') {
+    const { GET } = await import('@/apps/admin/app/api/admin/dev-studio/repository/health/route');
+    return GET(new NextRequest(url, init));
+  }
   if (tool.name === 'studio.runtime.files' || tool.name === 'studio.runtime.exec') {
     const route = await import(
       '@/apps/admin/app/api/admin/dev-studio/runtime/route'

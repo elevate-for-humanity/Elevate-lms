@@ -26,12 +26,14 @@ describe('paid provider boundary', () => {
       'apps/admin/app/api/admin/courses/generate/route.ts',
       'utf8',
     );
+    expect(canonicalGeneration).toContain('createCourseAuthoringChat');
+    const courseChat = readFileSync('lib/ultimate-course-builder/authoring/course-chat.ts', 'utf8');
     const blueprintGeneration = readFileSync(
       'apps/admin/app/api/admin/generate-course/route.ts',
       'utf8',
     );
     const media = readFileSync('lib/video/process-video-job.ts', 'utf8');
-    for (const source of [generation, canonicalGeneration, blueprintGeneration]) {
+    for (const source of [generation, courseChat, blueprintGeneration]) {
       expect(source).toContain('reservePaidInference');
       expect(source).toContain('executePaidInference');
     }

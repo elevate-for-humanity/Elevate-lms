@@ -15,7 +15,7 @@ import type { CompiledLesson } from '@/lib/curriculum/compiled-lesson';
  *   Quiz data is stored in training_courses.metadata JSONB to avoid the integer/UUID mismatch.
  */
 
-import { getOpenAIClient } from '@/lib/ai/openai-client';
+import { CourseAuthoringUnavailable, type CourseAuthoringChat } from './course-chat';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export type SourceType = 'prompt' | 'syllabus' | 'script' | 'transcript' | 'document';
@@ -274,8 +274,7 @@ function validateAndWarn(blueprint: CourseBlueprint): void {
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
-export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint> {
-  const openai = getOpenAIClient();
+export async function ingestCourse(input: IngestInput, chat: CourseAuthoringChat): Promise<CourseBlueprint> {
 
   if (input.source_text.length > 80000) {
     throw new Error(
@@ -287,18 +286,19 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
   let detectedType = input.source_type;
   if (input.source_type === 'document') {
     try {
-      const classRes = await openai.chat.completions.create({
+      const classRes = await chat({
         model: 'gpt-4.1-mini',
         messages: [{ role: 'user', content: CLASSIFICATION_PROMPT(input.source_text) }],
         temperature: 0,
-        max_tokens: 120,
+        maxTokens: 120,
       });
-      const raw = classRes.choices[0].message.content || '{}';
+      const raw = classRes.content || '{}';
       const parsed = parseJSON(raw);
       if (parsed.confidence > 0.75 && parsed.source_type) {
         detectedType = parsed.source_type as SourceType;
       }
-    } catch {
+    } catch (error) {
+      if (error instanceof CourseAuthoringUnavailable) throw error;
       // non-fatal — proceed with stated type
     }
   }
@@ -311,7 +311,7 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
       const summaries: string[] = [];
       for (const chunk of chunks.slice(0, 5)) {
         try {
-          const sumRes = await openai.chat.completions.create({
+          const sumRes = await chat({
             model: 'gpt-4.1-mini',
             messages: [
               {
@@ -320,10 +320,11 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
               },
             ],
             temperature: 0.2,
-            max_tokens: 1500,
+            maxTokens: 1500,
           });
-          summaries.push(sumRes.choices[0].message.content || '');
-        } catch {
+          summaries.push(sumRes.content || '');
+        } catch (error) {
+          if (error instanceof CourseAuthoringUnavailable) throw error;
           summaries.push(chunk.slice(0, 2000));
         }
       }
@@ -338,7 +339,7 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
     input.systemPromptOverride ??
     'You are an expert instructional designer and course architect. Output only valid JSON.';
 
-  const extractRes = await openai.chat.completions.create({
+  const extractRes = await chat({
     model: 'gpt-4.1',
     messages: [
       {
@@ -351,10 +352,10 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
       },
     ],
     temperature: 0.4,
-    max_tokens: 8000,
+    maxTokens: 8000,
   });
 
-  const raw = extractRes.choices[0].message.content;
+  const raw = extractRes.content;
   if (!raw) throw new Error('No response from AI');
 
   let blueprint: CourseBlueprint;

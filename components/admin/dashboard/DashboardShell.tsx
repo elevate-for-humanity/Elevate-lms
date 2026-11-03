@@ -78,7 +78,7 @@ function OperationalShortcuts() {
     },
     {
       title: 'Application Checker',
-      description: 'Check public application steps and record broken Continue buttons or routing. Opens your private tool in a new tab; ChatGPT sign-in is required.',
+      description: 'Check the student and host shop application journeys and inspect the latest repository test results.',
       href: APPLICATION_CHECKER_URL,
     },
     {
@@ -171,9 +171,6 @@ function OperationalShortcuts() {
           <Link
             key={item.href}
             href={item.href}
-            target={item.href === APPLICATION_CHECKER_URL ? '_blank' : undefined}
-            rel={item.href === APPLICATION_CHECKER_URL ? 'noopener noreferrer' : undefined}
-            aria-label={item.href === APPLICATION_CHECKER_URL ? 'Application Checker (opens private tool in a new tab)' : undefined}
             className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
           >
             <div className="flex items-center justify-between gap-3">

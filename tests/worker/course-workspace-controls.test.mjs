@@ -9,12 +9,12 @@ const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 function compile(path,names=[],values=[]){
  let source=readFileSync(new URL('../../'+path,import.meta.url),'utf8');
  source=stripTypeScriptTypes(source).replace(/^import .*;\n/gm,'').replace(/export /g,'');
- return new Function(...names,source+';return typeof planAIToolFromCommand!=="undefined"?planAIToolFromCommand:typeof decomposePlan!=="undefined"?decomposePlan:{isReadOnlyRequest,affirmativeActionText,prohibitsToolUse};')(...values);
+ return new Function(...names,source+';return typeof planAIToolFromCommand!=="undefined"?planAIToolFromCommand:typeof decomposePlan!=="undefined"?decomposePlan:{isReadOnlyRequest,affirmativeActionText,prohibitsToolUse,isRepositoryRevisionInspection};')(...values);
 }
 const intent=compile('lib/ai/command-intent.ts');
-const plan=compile('lib/ai/tools/planner.ts',['getAITool','isReadOnlyRequest'],[()=>null,intent.isReadOnlyRequest]);
-const decompose=compile('lib/platform/planner.ts',['buildUnifiedEngineeringStages','affirmativeActionText','isReadOnlyRequest','prohibitsToolUse'],[
- ()=>[{id:'engineering',title:'Engineering',command:'code work',runner:'OPENHANDS',dependsOn:[],maxAttempts:1}],intent.affirmativeActionText,intent.isReadOnlyRequest,intent.prohibitsToolUse]);
+const plan=compile('lib/ai/tools/planner.ts',['getAITool','isReadOnlyRequest','isRepositoryRevisionInspection'],[()=>null,intent.isReadOnlyRequest,intent.isRepositoryRevisionInspection]);
+const decompose=compile('lib/platform/planner.ts',['buildUnifiedEngineeringStages','affirmativeActionText','isReadOnlyRequest','prohibitsToolUse','isRepositoryRevisionInspection'],[
+ ()=>[{id:'engineering',title:'Engineering',command:'code work',runner:'OPENHANDS',dependsOn:[],maxAttempts:1}],intent.affirmativeActionText,intent.isReadOnlyRequest,intent.prohibitsToolUse,intent.isRepositoryRevisionInspection]);
 const context=JSON.stringify({workspace:'course',courseId:id(1),lessonId:id(2),buildId:id(3),title:'Complete Lesson Build'});
 test('lesson edits route to the scoped editor with exact selected identities',()=>{
  const result=plan('Rewrite the introduction to explain sanitation.\n\n'+context);
@@ -90,8 +90,11 @@ test('a lesson outside the selected course is rejected before any write',async()
 test('checkpoint polling returns all canonical lessons without producer artifacts or version scans',async()=>{
  const selections=[],tables=[];
  const build={id:id(8),course_id:id(1),profile:{competencies:[{id:'first'},{id:'second'}],canonicalLessonIds:{first:id(2),second:id(4)}}};
- const db={from(table){tables.push(table);let fields;const q={select(v){fields=v;selections.push(v);return q;},eq(){return q;},order(){return q;},single:async()=>({data:build,error:null}),then(resolve){return Promise.resolve({data:table==='course_lessons'?[{id:id(2),title:'First',is_published:true,video_url:'https://example.com/film.mp4'},{id:id(4),title:'Second',is_published:true,video_url:'https://example.com/second.mp4'}]:[{id:id(9),competency_id:'first',status:'built'}],error:null}).then(resolve);}};return q;}};
+ const db={from(table){tables.push(table);let fields;const q={select(v){fields=v;selections.push(v);return q;},eq(){return q;},order(){return q;},single:async()=>({data:build,error:null}),then(resolve){return Promise.resolve({data:table==='course_lessons'?[{id:id(2),title:'First',is_published:true,video_url:'https://example.com/film.mp4'},{id:id(4),title:'Second',is_published:true,video_url:'https://example.com/second.mp4'},{id:id(5),title:'Additional published lesson',lesson_type:'lesson',is_published:true},{id:id(6),title:'Published quiz',lesson_type:'quiz',is_published:true},{id:id(7),title:'Unpublished',is_published:false}]:[{id:id(9),competency_id:'first',status:'built'}],error:null}).then(resolve);}};return q;}};
  const result=await loadCheckpointPage(db,id(8));assert.equal(result.ultimate_lesson_builds.length,2);
+ assert.deepEqual(result.publishedItems.map(x=>x.id),[id(2),id(4),id(5),id(6)]);
+ assert.equal(result.publishedItems[3].type,'quiz');
+ assert.equal(result.publishedItems[2].previewUrl,'/api/admin/course-builder/preview?courseId='+id(1)+'&lessonId='+id(5));
  assert.equal(result.ultimate_lesson_builds[1].hasCheckpoint,false);
  assert.ok(result.ultimate_lesson_builds.every(row=>row.preview.videoUrl));
  assert.ok(selections.every(s=>!s.includes('artifacts')));assert.ok(!tables.includes('ultimate_artifact_versions'));

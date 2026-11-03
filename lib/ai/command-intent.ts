@@ -17,3 +17,10 @@ export function isReadOnlyRequest(command: string): boolean {
   );
   return /\bread[- ]?only\b/i.test(scope);
 }
+
+/** Route a read-only revision request without using a mutation-capable runner. */
+export function isRepositoryRevisionInspection(command: string): boolean {
+  const request = affirmativeActionText(command).toLowerCase();
+  return isReadOnlyRequest(command) && /\b(repo|repository|github|main)\b/.test(request) &&
+    /\b(sha|revision|commit|branch|repository status)\b/.test(request);
+}

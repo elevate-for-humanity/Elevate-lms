@@ -10,7 +10,7 @@
  */
 
 import { buildUnifiedEngineeringStages } from '@/lib/devstudio/engineering-runner/plan';
-import { affirmativeActionText, isReadOnlyRequest, prohibitsToolUse } from '@/lib/ai/command-intent';
+import { affirmativeActionText, isReadOnlyRequest, isRepositoryRevisionInspection, prohibitsToolUse } from '@/lib/ai/command-intent';
 
 export type StepStatus =
   | 'pending'
@@ -449,8 +449,14 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
     steps=[{id:'s1',order:1,title:'Inspect selected course',command:goal,status:'pending',expected_output:'Selected course execution evidence',max_attempts:1}];
   } else if (courseAudit) {
     steps = GOAL_TEMPLATES.read_only_course_audit!({});
+  } else if (isRepositoryRevisionInspection(instruction)) {
+    steps = [{ id: 's1', order: 1, title: 'Read repository revision', command: goal,
+      status: 'pending', expected_output: 'Current main revision from GitHub', max_attempts: 1 }];
   } else if (explicitReadOnlyStudioDiagnostic) {
     steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
+  } else if (explicitReadOnly) {
+    steps = [{ id: 's1', order: 1, title: 'Inspect requested state', command: goal,
+      status: 'pending', expected_output: 'Read-only evidence for the requested scope', max_attempts: 1 }];
   } else if (g.includes('quickbooks') && !compoundEngineeringExecution) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})

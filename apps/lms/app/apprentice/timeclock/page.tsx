@@ -1,6 +1,7 @@
 'use client';
 
 import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
+import { getTimeclockWorkDate } from '@/lib/timeclock/work-date';
 import { offlineQueue } from '@/lib/pwa/offline-queue';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -19,7 +20,6 @@ import {
   XCircle,
   ChevronRight,
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
@@ -128,15 +128,17 @@ export default function TimeclockPage() {
       auto_clocked_out: boolean | null;
     }[]
   >([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   // Fetch timeclock context on mount
   useEffect(() => {
+    let cancelled = false;
     async function fetchContext() {
       try {
-        const response = await fetch('/api/timeclock/context');
+        const response = await fetch('/api/timeclock/context', { cache: 'no-store' });
         const data = await response.json();
 
+        if (cancelled) return;
         if (!response.ok) {
           if (data.code === 'NO_APPRENTICESHIP') {
             setContextError(
@@ -151,10 +153,11 @@ export default function TimeclockPage() {
           return;
         }
 
+        setContextError(null);
         setContext(data);
-        setSelectedSiteId(data.defaultSiteId);
+        setRecentShifts(data.recentShifts || []);
+        setSelectedSiteId(data.activeShift?.siteId || data.defaultSiteId);
 
-        // If there's an active shift, restore it
         if (data.activeShift) {
           setShift({
             entryId: data.activeShift.entryId,
@@ -163,40 +166,30 @@ export default function TimeclockPage() {
             lunchEndAt: data.activeShift.lunchEndAt,
             clockOutAt: null,
           });
+        } else {
+          const today = data.recentShifts?.find((row: { work_date: string }) => row.work_date === getTimeclockWorkDate());
+          setShift({ entryId: today?.id || null, clockInAt: today?.clock_in_at || null,
+            lunchStartAt: today?.lunch_start_at || null, lunchEndAt: today?.lunch_end_at || null,
+            clockOutAt: today?.clock_out_at || null });
         }
       } catch (err) {
-        setContextError('Failed to connect to server');
+        if (!cancelled) setContextError('Failed to connect to server');
       } finally {
-        setContextLoading(false);
+        if (!cancelled) setContextLoading(false);
       }
     }
 
-    fetchContext();
-  }, [router]);
-
-  // Fetch recent shift history once context is loaded
-  useEffect(() => {
-    if (!context || context.previewing) return;
-    setHistoryLoading(true);
-    const supabase = createClient();
-    supabase
-      .from('progress_entries')
-      .select('id,work_date,clock_in_at,clock_out_at,hours_worked,status,auto_clocked_out')
-      .eq('apprentice_id', context.apprenticeId)
-      .not('clock_in_at', 'is', null)
-      .order('work_date', { ascending: false })
-      .limit(7)
-      .then(({ data }) => {
-        setRecentShifts(data ?? []);
-        setHistoryLoading(false);
-      });
-  }, [context]);
+    void fetchContext();
+    return () => { cancelled = true; };
+  }, [router, refreshCount]);
 
   // Get current location
   const getLocation = useCallback((): Promise<GeolocationPosition> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error('Geolocation not supported'));
+        const message = 'This browser does not provide location. Open the clock in a browser with location access.';
+        setLocation({ lat: null, lng: null, accuracy: null, error: message, loading: false });
+        reject(new Error(message));
         return;
       }
 
@@ -216,11 +209,11 @@ export default function TimeclockPage() {
         (err) => {
           const errorMsg =
             err.code === 1
-              ? 'Location permission denied. Please enable location access.'
+              ? 'Allow Location for this LMS site in your browser settings and turn on device location. Then retry your clock action.'
               : err.code === 2
                 ? 'Location unavailable. Please try again.'
                 : 'Location request timed out.';
-          setLocation((prev) => ({ ...prev, error: errorMsg, loading: false }));
+          setLocation({ lat: null, lng: null, accuracy: null, error: errorMsg, loading: false });
           reject(new Error(errorMsg));
         },
         {
@@ -255,6 +248,7 @@ export default function TimeclockPage() {
       if (response.ok) {
         if (data.clock_out_at) {
           setShift((previous) => ({ ...previous, clockOutAt: data.clock_out_at }));
+          setRefreshCount(n => n + 1);
         }
         setGeofence({
           withinGeofence: data.within_geofence,
@@ -321,6 +315,24 @@ export default function TimeclockPage() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [shift.entryId, shift.clockOutAt, sendHeartbeat]);
 
+  // Reconnect only this learner's attempts. The server records these for staff
+  // review and never converts a delayed request into a live punch.
+  useEffect(() => {
+    if (!context?.apprenticeId || context.previewing) return;
+    let mounted = true;
+    const sync = async () => {
+      try {
+        const { synced } = await offlineQueue.sync(context.apprenticeId);
+        if (mounted && synced) setError('Your saved clock attempt was sent for attendance review. Check your shift before trying again.');
+      } catch (err) {
+        logger.warn('[Timeclock] Saved attempts could not be checked', normalizeError(err, 'Offline storage unavailable'));
+      }
+    };
+    void sync();
+    window.addEventListener('online', sync);
+    return () => { mounted = false; window.removeEventListener('online', sync); };
+  }, [context]);
+
   // Timeclock action handler
   const handleAction = async (action: 'clock_in' | 'lunch_start' | 'lunch_end' | 'clock_out') => {
     if (!context || context.previewing) return;
@@ -329,9 +341,12 @@ export default function TimeclockPage() {
     setError(null);
 
     try {
-      const position = await getLocation();
+      // getLocation displays the specific device error. Do not queue a punch
+      // unless this attempt actually captured an accurate location.
+      const position = await getLocation().catch(() => null);
+      if (!position) return;
 
-      if (position.coords.accuracy > MAX_ACCURACY_M) {
+      if (!Number.isFinite(position.coords.accuracy) || position.coords.accuracy < 0 || position.coords.accuracy > MAX_ACCURACY_M) {
         setError(
           `GPS accuracy too low (${Math.round(position.coords.accuracy)}m). Please wait for better signal.`,
         );
@@ -346,21 +361,35 @@ export default function TimeclockPage() {
         return;
       }
 
-      const response = await fetch('/api/timeclock/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action,
-          apprentice_id: context.apprenticeId,
-          partner_id: context.partnerId,
-          program_id: context.programId,
-          site_id: selectedSiteId,
-          progress_entry_id: shift.entryId,
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          accuracy_m: position.coords.accuracy,
-        }),
-      });
+      const payload = {
+        action,
+        apprentice_id: context.apprenticeId,
+        program_id: context.programId,
+        site_id: selectedSiteId,
+        progress_entry_id: shift.entryId,
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy_m: position.coords.accuracy,
+      };
+      const attemptedAt = Date.now();
+      let response: Response;
+      try {
+        response = await fetch('/api/timeclock/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        await offlineQueue.add({
+          url: '/api/timeclock/action',
+          method: 'POST',
+          body: JSON.stringify({ ...payload, offline_submission: true, client_recorded_at: new Date(attemptedAt).toISOString() }),
+          timestamp: attemptedAt,
+          type: 'hours',
+        });
+        setError('The server could not confirm this punch. Your attempt is saved on this device for staff review. Reopen the clock here when connected.');
+        return;
+      }
 
       const data = await response.json();
 
@@ -370,6 +399,8 @@ export default function TimeclockPage() {
         return;
       }
 
+      if (data.success !== true || data.action !== action) throw new Error('Unconfirmed action');
+      setRefreshCount(n => n + 1);
       // Update shift state based on action
       switch (action) {
         case 'clock_in':
@@ -380,7 +411,6 @@ export default function TimeclockPage() {
             lunchEndAt: null,
             clockOutAt: null,
           });
-          startHeartbeat();
           break;
 
         case 'lunch_start':
@@ -396,38 +426,8 @@ export default function TimeclockPage() {
           stopHeartbeat();
           break;
       }
-    } catch (err) {
-      // Preserve a timestamped, geolocated attendance intent when the LMS
-      // origin is temporarily unreachable. It will sync when service returns.
-      // Server-side validation remains authoritative; queued events are not
-      // treated as approved hours until accepted by the canonical API.
-      try {
-        const position = location.lat != null && location.lng != null
-          ? { lat: location.lat, lng: location.lng, accuracy: location.accuracy }
-          : null;
-        await offlineQueue.add({
-          url: '/api/timeclock/action',
-          method: 'POST',
-          body: JSON.stringify({
-            action,
-            apprentice_id: context.apprenticeId,
-            partner_id: context.partnerId,
-            program_id: context.programId,
-            site_id: selectedSiteId,
-            progress_entry_id: shift.entryId,
-            lat: position?.lat,
-            lng: position?.lng,
-            accuracy_m: position?.accuracy,
-            client_recorded_at: new Date().toISOString(),
-            offline_submission: true,
-          }),
-          timestamp: Date.now(),
-          type: 'hours',
-        });
-        setError('Connection unavailable. Your clock action was saved on this device and will be submitted for validation when service returns.');
-      } catch {
-        setError('Connection unavailable and the clock action could not be saved. Do not leave this page; retry when service returns.');
-      }
+    } catch {
+      setError('The clock could not confirm this action. Refresh to check your shift. If the time is missing, report it to your supervisor.');
     } finally {
       setActionLoading(null);
     }
@@ -703,7 +703,7 @@ export default function TimeclockPage() {
                 </span>
               )}
             </div>
-            {location.error && <p className="text-sm text-brand-red-600 mt-2">{location.error}</p>}
+            {location.error && <p role="alert" className="text-sm text-brand-red-600 mt-2">{location.error}</p>}
           </div>
 
           {/* Geofence Status */}
@@ -736,7 +736,7 @@ export default function TimeclockPage() {
             <div className="mb-6 p-4 bg-brand-red-50 rounded-lg">
               <div className="flex items-center">
                 <AlertTriangle className="w-5 h-5 mr-2 text-brand-red-600" />
-                <span className="text-sm text-brand-red-700">{error}</span>
+                <span role="alert" className="text-sm text-brand-red-700">{error}</span>
               </div>
             </div>
           )}
@@ -767,7 +767,7 @@ export default function TimeclockPage() {
               <button
                 onClick={() => handleAction('clock_in')}
                 disabled={
-                  actionLoading !== null || location.loading || !selectedSiteId || !context.canClock
+                  actionLoading !== null || location.loading || !selectedSiteId || !context.canClock || Boolean(shift.clockOutAt)
                 }
                 className="w-full flex items-center justify-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-slate-400 text-white font-bold rounded-lg transition-colors"
               >
@@ -842,7 +842,7 @@ export default function TimeclockPage() {
               </Link>
             </div>
 
-            {historyLoading ? (
+            {contextLoading ? (
               <div className="flex items-center justify-center py-6 text-slate-700">
                 <Loader2 className="w-4 h-4 animate-spin mr-2" /> Loading…
               </div>
@@ -852,7 +852,7 @@ export default function TimeclockPage() {
               <div className="space-y-2">
                 {recentShifts.map((s) => {
                   const hrs = s.hours_worked ?? 0;
-                  const isToday = s.work_date === new Date().toISOString().slice(0, 10);
+                  const isToday = s.work_date === getTimeclockWorkDate();
                   return (
                     <div
                       key={s.id}
@@ -893,14 +893,14 @@ export default function TimeclockPage() {
                                   minute: '2-digit',
                                 })
                               : s.clock_in_at
-                                ? 'Active'
+                                ? (isToday ? 'Active' : 'Clock-out missing')
                                 : '—'}
                             {s.auto_clocked_out && ' (auto)'}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-slate-900">{hrs.toFixed(1)}h</p>
+                        <p className="font-semibold text-slate-900">{Number(hrs).toFixed(1)}h</p>
                         <p
                           className={`text-xs capitalize ${
                             s.status === 'approved'

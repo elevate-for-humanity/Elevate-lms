@@ -75,30 +75,19 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
     }
 
-    // Load progress_entries row with apprentice ownership check
+    // progress_entries has no FK to apprentices. Resolve ownership explicitly.
     const { data: entry, error: entryError } = await supabase
       .from('progress_entries')
-      .select(
-        `
-        id, clock_in_at, clock_out_at, site_id, auto_clocked_out, auto_clock_out_reason,
-        apprentice_id,
-        apprentices!inner(user_id)
-      `,
-      )
+      .select('id, clock_in_at, clock_out_at, site_id, auto_clocked_out, auto_clock_out_reason, apprentice_id')
       .eq('id', progress_entry_id)
       .maybeSingle();
+    if (entryError) return NextResponse.json({ error: 'Shift lookup unavailable' }, { status: 503 });
+    if (!entry) return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
 
-    // Verify user owns this entry via apprentice relationship
-    if (entry && entry.apprentices && (entry.apprentices as any).user_id !== user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden: entry does not belong to you' },
-        { status: 403 },
-      );
-    }
-
-    if (entryError || !entry) {
-      return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
-    }
+    const { data: owner, error: ownerError } = await supabase.from('apprentices')
+      .select('id').eq('id', entry.apprentice_id).eq('user_id', user.id).maybeSingle();
+    if (ownerError) return NextResponse.json({ error: 'Shift ownership unavailable' }, { status: 503 });
+    if (!owner) return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
 
     // If already clocked out, return closed status
     if (entry.clock_out_at) {

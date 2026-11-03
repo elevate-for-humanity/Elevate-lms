@@ -93,9 +93,12 @@ async function _GET(request: NextRequest) {
       shopId: site.shop_id,
     }));
 
-  const { data: enrollment, error: enrollmentError } = await db.from('program_enrollments')
-    .select('program_slug,program_id').or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
+  let enrollmentQuery = db.from('program_enrollments').select('program_slug,program_id')
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
+    .is('revoked_at', null).is('suspended_at', null).is('cancelled_at', null);
+  if (apprentice?.program_id) enrollmentQuery = enrollmentQuery.eq('program_id', apprentice.program_id);
+  const { data: enrollment, error: enrollmentError } = await enrollmentQuery
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
   if (enrollmentError) return NextResponse.json({ error: 'Enrollment unavailable' }, { status: 503 });
   const { data: program } = enrollment?.program_id
@@ -114,7 +117,9 @@ async function _GET(request: NextRequest) {
     }
   }
 
+  let recentShifts: Array<Record<string, unknown>> = [];
   let activeShift = null;
+  let completedToday = false;
   let weeklyOjlHours = 0;
   let weeklyTheoryRecordedHours = 0;
   let weeklyTheoryVerifiedHours = 0;
@@ -158,18 +163,16 @@ async function _GET(request: NextRequest) {
       (sum: number, row: any) => sum + Number(row.active_seconds || 0) / 3600,
       0,
     );
-    const { data: shift, error: shiftError } = await db
-      .from('progress_entries')
-      .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
-      .eq('apprentice_id', apprentice.id)
-      .eq('work_date', workDate)
-      .not('clock_in_at', 'is', null)
-      .is('clock_out_at', null)
-      .order('clock_in_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (shiftError) return NextResponse.json({ error: 'Active shift unavailable' }, { status: 503 });
-    activeShift = shift ?? null;
+    const { data: shifts, error: shiftError } = await db.from('progress_entries')
+      .select('id,work_date,clock_in_at,clock_out_at,lunch_start_at,lunch_end_at,site_id,hours_worked,status,auto_clocked_out')
+      .eq('apprentice_id', apprentice.id).not('clock_in_at', 'is', null)
+      .lte('work_date', workDate)
+      .order('work_date', { ascending: false }).order('clock_in_at', { ascending: false }).limit(7);
+    if (shiftError) return NextResponse.json({ error: 'Shift history unavailable' }, { status: 503 });
+    recentShifts = shifts || [];
+    const shift = shifts?.find(row => row.work_date === workDate);
+    completedToday = Boolean(shift?.clock_out_at);
+    activeShift = completedToday ? null : shift;
   }
 
   return NextResponse.json({
@@ -183,6 +186,7 @@ async function _GET(request: NextRequest) {
     allowedSites,
     hoursCompleted,
     hoursRequired: getApprenticeshipRequiredHours(enrollment?.program_slug ?? null) ?? 0,
+    recentShifts,
     activeShift: activeShift
       ? {
           entryId: activeShift.id,
@@ -200,7 +204,7 @@ async function _GET(request: NextRequest) {
     weeklyTheoryMaxHours: APPRENTICE_TIME_POLICY.weeklyTheoryMaxHours,
     weeklyCombinedMaxHours: APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours,
     outsideGeofenceGraceMinutes: APPRENTICE_TIME_POLICY.outsideGeofenceGraceMinutes,
-    canClock: Boolean(enrollment && apprentice && allowedSites.length && identity.eligible && !subject.previewing && weeklyOjlHours < APPRENTICE_TIME_POLICY.weeklyOjlMaxHours),
+    canClock: Boolean(enrollment && apprentice && allowedSites.length && identity.eligible && !subject.previewing && !completedToday && weeklyOjlHours < APPRENTICE_TIME_POLICY.weeklyOjlMaxHours),
     identityVerification: identity,
     previewing: subject.previewing,
     configurationMessage: !apprentice
@@ -209,6 +213,10 @@ async function _GET(request: NextRequest) {
         ? 'Host Shop geofence coordinates must be verified before clock-in is enabled.'
         : !identity.eligible
           ? 'Complete secure ID and selfie verification before clock-in is enabled.'
+        : completedToday
+          ? 'Today’s shift is already complete.'
+        : !enrollment
+          ? 'An active apprenticeship enrollment is required to start a shift.'
         : subject.previewing
           ? 'Admin preview is read-only. The learner can clock in from their own account at the verified Host Shop.'
           : weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours

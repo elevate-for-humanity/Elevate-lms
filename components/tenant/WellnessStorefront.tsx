@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react';
 import { ShoppingBag, ArrowRight, ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause, Captions } from 'lucide-react';
 import type { PublishedTenantSite, TenantSiteProduct } from '@/lib/tenant/site-types';
 import { useTenantShoppingBag, TenantBagDrawer, productPrice } from './TenantShoppingBag';
@@ -26,6 +26,17 @@ function BrandFilm() {
   const pausedByViewer = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
+  const playFilm = useCallback(() => {
+    const film = ref.current;
+    if (!film) return Promise.resolve();
+    // Claim audible playback before play() queues its event and the tap bubbles
+    // to the document's soundtrack unlock handler.
+    setFilmAudible?.(!film.muted);
+    return film.play().catch(error => {
+      setFilmAudible?.(false);
+      throw error;
+    });
+  }, [setFilmAudible]);
   useEffect(() => {
     const film = ref.current;
     if (!film || !window.IntersectionObserver) return;
@@ -34,19 +45,16 @@ function BrandFilm() {
       const current = ++attempt;
       if (entry.intersectionRatio < 0.5) { film.pause(); return; }
       if (pausedByViewer.current || film.ended || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      film.play().catch(error => {
+      playFilm().catch(error => {
         if (current !== attempt || error.name !== 'NotAllowedError') return;
         film.muted = true;
-        void film.play().catch(() => {});
+        void playFilm().catch(() => {});
       });
     }, { threshold: [0, 0.5] });
     observer.observe(film);
     return () => { ++attempt; observer.disconnect(); film.pause(); };
-  }, []);
-  useEffect(() => {
-    setFilmAudible?.(playing && !muted);
-    return () => setFilmAudible?.(false);
-  }, [playing, muted, setFilmAudible]);
+  }, [playFilm]);
+  useEffect(() => () => setFilmAudible?.(false), [setFilmAudible]);
   useEffect(() => {
     const track = ref.current?.textTracks?.[0];
     if (track) track.mode = captions ? 'showing' : 'disabled';
@@ -55,22 +63,25 @@ function BrandFilm() {
     const film = ref.current;
     if (!film) return;
     pausedByViewer.current = !film.paused;
-    if (film.paused) void film.play().catch(() => {});
+    if (film.paused) void playFilm().catch(() => {});
     else film.pause();
   }
   function toggleSound() {
     const film = ref.current;
     if (!film) return;
+    setFilmAudible?.(film.muted);
     film.muted = !film.muted;
     if (!film.muted && film.paused) {
       pausedByViewer.current = false;
-      void film.play().catch(() => {});
+      void playFilm().catch(() => {});
     }
   }
   return <div className={styles.brandFilm}>
     <video ref={ref} playsInline preload="metadata" poster={`${ROOT}/rituals/body.webp`}
-      aria-label="The Meri-Gold-Round brand film" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-      onVolumeChange={e => setMuted(e.currentTarget.muted)}>
+      aria-label="The Meri-Gold-Round brand film" onPlay={e => { setFilmAudible?.(!e.currentTarget.muted); setPlaying(true); }}
+      onPause={() => { setPlaying(false); setFilmAudible?.(false); }}
+      onEnded={() => { setPlaying(false); setFilmAudible?.(false); }}
+      onVolumeChange={e => { setMuted(e.currentTarget.muted); setFilmAudible?.(!e.currentTarget.paused && !e.currentTarget.muted); }}>
       <source src="/videos/meri-gold-round/brand-story.mp4?v=music2" type="video/mp4" />
       <track kind="captions" srcLang="en" label="English" src="/videos/meri-gold-round/brand-story.vtt?v=warm-20261103" />
     </video>

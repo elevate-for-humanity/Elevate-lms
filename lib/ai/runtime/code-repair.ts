@@ -6,7 +6,7 @@ import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {publishTaskToMain} from '@/lib/devstudio/main-release.mjs';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -143,7 +143,36 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  const blocked=await db.from('paris_code_repairs').select('*').eq('status','blocked').order('updated_at',{ascending:false}).limit(2000);
  if(blocked.error)throw blocked.error;
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
+ let recoveredProviderThisTick=false;
  for(const repair of blocked.data??[]){
+  // Provider outages are infrastructure failures, not proof that a source
+  // patch passed. A signed repair workflow may retry one historical, unlinked
+  // timeout only when the owned model and scoped GitHub read identity recover.
+  // Preserve the earlier attempt and do not reset any course job state.
+  if(!recoveredProviderThisTick && canRetryHealthyProviderRepair(repair)){
+   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
+   const health=await probeOwnedModel().catch(()=>({verified:false}));
+   if(health.verified){
+    const identity=await diagnoseParisGitHubCredential().catch(()=>null);
+    if(identity?.repository?.ok && identity?.contents?.ok && identity?.workflow?.ok){
+     const updated=await db.from('paris_code_repairs').update({
+      status:'queued',error_code:null,
+      attempt_history:[...(repair.attempt_history??[]),{
+       error:repair.error_code,at:repair.updated_at,retryReason:'verified-owned-provider-recovery'
+      }],
+      verification:{...repair.verification,providerRecoveryPreflight:{
+       ownedModelVerified:true,githubRepositoryRead:true,workflowEnabled:true,
+       checkedAt:new Date().toISOString(),writeAuthorityVerified:false
+      }},
+      updated_at:new Date().toISOString(),
+     }).eq('id',repair.id).eq('status','blocked').eq('attempt_count',1)
+       .eq('updated_at',repair.updated_at).select('id').maybeSingle();
+     if(updated.error)throw updated.error;
+     if(updated.data)recoveredProviderThisTick=true;
+    }
+   }
+   continue;
+  }
   if(!canRetryRepair(repair))continue;
   if (!repair.candidate?.branch?.sha) {
    // A dispatch failure has no patch or workflow run. Retry only the bounded

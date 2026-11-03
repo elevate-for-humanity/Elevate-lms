@@ -10,6 +10,27 @@ const PRECACHE_ASSETS = [
   '/icon-512.png',
 ];
 
+// Only these account-independent install files may serve a document offline.
+const WORKSPACE_FILES = new Map([
+  ['/install/dev-studio.html', 'text/html'],
+  ['/install/course-builder.html', 'text/html'],
+  ['/install/workspace.js', 'javascript'],
+  ['/install/workspace.css', 'text/css'],
+]);
+
+async function workspaceFile(path) {
+  const cache = await caches.open(STATIC_CACHE);
+  const cached = await cache.match(path);
+  if (cached) return cached;
+  const response = await fetch(path, { credentials: 'omit', redirect: 'error', cache: 'no-store' });
+  if (!isCacheableResponse(response) ||
+      !response.headers.get('content-type')?.includes(WORKSPACE_FILES.get(path))) {
+    throw new Error('Unexpected workspace asset: ' + path);
+  }
+  await cache.put(path, response.clone());
+  return response;
+}
+
 function isCacheableResponse(response) {
   return Boolean(
     response &&
@@ -33,6 +54,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE);
+      await Promise.allSettled([...WORKSPACE_FILES.keys()].map(workspaceFile));
       const results = await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
           const req = new Request(asset, { cache: 'reload', redirect: 'follow' });
@@ -79,6 +101,14 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  if (WORKSPACE_FILES.has(url.pathname)) {
+    event.respondWith(workspaceFile(url.pathname).catch(() => new Response(
+      'Open the app while connected to prepare it for offline use.',
+      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+    )));
+    return;
+  }
 
   // Admin pages are authenticated and may contain sensitive records. Do not
   // intercept document navigation: if both the network request and optional
@@ -144,6 +174,11 @@ self.addEventListener('notificationclick', (event) => {
 
 self.addEventListener('message', (event) => {
   const { type } = event.data || {};
+  if (type === 'PREPARE_WORKSPACE' && event.ports[0]) {
+    event.waitUntil(Promise.all([...WORKSPACE_FILES.keys()].map(workspaceFile))
+      .then(() => event.ports[0].postMessage({ ready: true }))
+      .catch(() => event.ports[0].postMessage({ ready: false })));
+  }
   if (type === 'SKIP_WAITING') self.skipWaiting();
   if (type === 'GET_CACHE_SIZE') {
     caches

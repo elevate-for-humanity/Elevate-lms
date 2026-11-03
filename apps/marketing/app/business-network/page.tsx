@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 export const metadata = {
+  manifest: '/manifest-business-network.json',
   title: 'Business Network | Elevate for Humanity',
   description:
     'A focused network for employers, entrepreneurs, small businesses, hiring partners, and apprenticeship hosts.',

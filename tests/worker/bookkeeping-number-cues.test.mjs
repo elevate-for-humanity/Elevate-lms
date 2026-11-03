@@ -17,6 +17,7 @@ test('a numeric match retains the measured onset after an earlier multiword quan
 });
 test('different amounts and ambiguous repeated financial quotations remain blocked',()=>{
  assert.throws(()=>quoteStartSeconds('The owner contributes $12,000.',timed('The owner contributes $13,000.')),/NOT_ALIGNED/);
+ assert.throws(()=>quoteStartSeconds('It remits a six-hundred-eighty-dollar loan installment.',timed('It remits a six-hundred-ninety-dollar loan installment.')),/NOT_ALIGNED/);
  assert.throws(()=>quoteStartSeconds('Pay $900 rent.',timed('Pay $900 rent. Pay $900 rent.')),/NOT_ALIGNED/);
 });
 test('existing numeric token callers keep their string-array contract',()=>{

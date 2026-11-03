@@ -85,6 +85,7 @@ async function exercise({ outside = false, spoofedId = false } = {}) {
     },
   };
   const stubs = {
+    'node:crypto': require('node:crypto'),
     'next/server': {
       NextResponse: {
         json(body, options) {

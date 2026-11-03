@@ -7,8 +7,8 @@ const source = stripTypeScriptTypes(await readFile(new URL('../apps/admin/app/ap
   .replace(/^import .*;\n/gm, '').replaceAll('export ', '');
 function route({ authorized = true, token = 'ghs_fixture_app_installation', error } = {}) {
   let appCalls = 0, contextCalls = 0, headers;
-  const factory = new Function('authorizeParisWorkflow', 'getGitHubAppToken', 'diagnoseParisGitHubCredential', 'withWorkflowGitHubToken', 'NextResponse', source + '\nreturn POST;');
-  const post = factory(async () => authorized, async () => { appCalls++; if (error) throw error; return token; },
+  const factory = new Function('authorizeParisWorkflow', 'authorizeParisDeploymentAppDiagnostic', 'getGitHubAppToken', 'diagnoseParisGitHubCredential', 'withWorkflowGitHubToken', 'NextResponse', source + '\nreturn POST;');
+  const post = factory(async () => authorized, async () => false, async () => { appCalls++; if (error) throw error; return token; },
     async h => { headers = h; return { diagnosticVersion: 2, repository: { ok: true } }; },
     () => { contextCalls++; throw Error('must not use workflow token'); },
     { json: (body, options = {}) => ({ body, status: options.status ?? 200, headers: options.headers }) });

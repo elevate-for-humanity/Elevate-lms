@@ -19,7 +19,6 @@ import { logger } from '@/lib/logger';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 import { hydrateProcessEnv, getDecryptedPlatformSecret } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
-import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

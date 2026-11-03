@@ -313,6 +313,8 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // guard above still serializes releases through independent validation.
  // Do not let an ineligible oldest repair starve a later eligible incident.
  // Inspect a bounded page; disposition decisions preserve source evidence.
+ // An ineligible source is a state/eligibility decision, never missing owner authorization.
+ // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
  const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id')
   .eq('status','queued').order('created_at',{ascending:true}).limit(100);
  if(queued.error)throw queued.error;
@@ -328,7 +330,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   const disposition=courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
   if(disposition==='repair'){pending=candidate;break;}
   const blocked=await db.from('paris_code_repairs').update({
-   status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_NOT_AUTHORIZED',
+   status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
    updated_at:new Date().toISOString(),
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
   if(blocked.error)throw blocked.error;

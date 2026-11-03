@@ -224,6 +224,11 @@ jobs:
           PATCH_SHA: ${{ needs.prepare.outputs.sha }}
         run: |
           set -euo pipefail
+          # Earlier application repairs predate the infrastructure validator.
+          # Their immutable base remains valid without a workflow-source change.
+          if git diff --quiet "$BASE_SHA" "$PATCH_SHA" -- .github/workflows 'Dockerfile.*' scripts/gcp; then
+            exit 0
+          fi
           git show "$BASE_SHA:scripts/gcp/validate-infrastructure-repair.mjs" > "$RUNNER_TEMP/paris-deployment-validator.mjs"
           node "$RUNNER_TEMP/paris-deployment-validator.mjs" "$BASE_SHA" "$PATCH_SHA"
       - name: Run regression and shared PARIS checks

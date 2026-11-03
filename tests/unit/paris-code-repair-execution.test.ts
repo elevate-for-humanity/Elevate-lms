@@ -1,17 +1,22 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const h=vi.hoisted(()=>({row:null as any,updates:[] as any[],validation:'success',branchSha:'b'.repeat(40)}));
+const h=vi.hoisted(()=>({row:null as any,updates:[] as any[],validation:'success',branchSha:'b'.repeat(40),infrastructure:false}));
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'})}));
+vi.mock('@/lib/devstudio/github-app-token',()=>({getGitHubAppToken:async()=> 'app-only-fixture'}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{
  let values:any;
  const q:any={select:()=>q,eq:()=>q,in:()=>q,update:(v:any)=>{values=v;return q;},single:async()=>({data:h.row,error:null}),maybeSingle:async()=>({data:h.row,error:null}),then:(resolve:any)=>{if(values)h.updates.push(values);return Promise.resolve(resolve({data:h.row,error:null}));}};return q;
 }})}));
 import {publishParisRepair,prepareParisRepair} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
- h.row={id:'repair',status:'validating',workflow_run_id:7,candidate:{base_sha:'a'.repeat(40),branch:{name:'studio/task',sha:'b'.repeat(40)}}};h.updates=[];h.validation='success';h.branchSha='b'.repeat(40);
+ h.row={id:'repair',status:'validating',workflow_run_id:7,candidate:{base_sha:'a'.repeat(40),branch:{name:'studio/task',sha:'b'.repeat(40)}}};h.updates=[];h.validation='success';h.branchSha='b'.repeat(40);h.infrastructure=false;
  vi.stubGlobal('fetch',vi.fn(async(url:string,init:any={})=>{
   if(url.includes('/artifacts?'))return new Response(JSON.stringify({artifacts:[{name:'paris-validated-repair-'+'b'.repeat(40),expired:false}]}));
   if(url.includes('/jobs?'))return new Response(JSON.stringify({jobs:[{name:'validate',status:'completed',conclusion:h.validation}]}));
+  if(url.includes('/compare/'))return Response.json({files:[{filename:h.infrastructure?'.github/workflows/deploy-google-store-runtime.yml':'components/Example.tsx'}]});
+  if(url.includes('/pulls?'))return Response.json([]);
+  if(url.endsWith('/pulls'))return Response.json({number:12,node_id:'PR_12',state:'open',html_url:'https://github.com/example/pull/12'});
+  if(url.endsWith('/graphql'))return Response.json({data:{enablePullRequestAutoMerge:{pullRequest:{number:12}}}});
   if(url.includes('/git/ref/heads/studio'))return new Response(JSON.stringify({object:{sha:h.branchSha}}));
   if(url.includes('/git/ref/heads/main'))return new Response(JSON.stringify({object:{sha:'a'.repeat(40)}}));
   if(url.includes('/git/refs/heads/main'))return new Response(JSON.stringify({object:{sha:JSON.parse(init.body).sha}}));
@@ -35,6 +40,16 @@ it('publishes only the validated SHA without force and dispatches actual Google 
  expect(writes).toHaveLength(1);expect(JSON.parse(String(writes[0][1]?.body))).toEqual({sha:'b'.repeat(40),force:false});
  expect(h.updates).toContainEqual(expect.objectContaining({status:'deploying',release_sha:'b'.repeat(40)}));
  expect(vi.mocked(fetch).mock.calls.filter(([u])=>String(u).endsWith('/dispatches')).map(([u])=>String(u))).toEqual([expect.stringContaining('deploy-admin.yml')]);
+});
+it('publishes workflow corrections through App-authenticated protected auto-merge before deployment',async()=>{
+ h.infrastructure=true;
+ expect(await publishParisRepair('repair',7)).toMatchObject({status:'awaiting-protected-merge',verifiedLive:false,pullRequest:{number:12}});
+ expect(h.updates).toContainEqual(expect.objectContaining({verification:expect.objectContaining({infrastructureRepair:true,pullRequest:expect.objectContaining({headSha:'b'.repeat(40)})})}));
+ const calls=vi.mocked(fetch).mock.calls;
+ expect(calls.some(([,init])=>init?.method==='PATCH')).toBe(false);
+ expect(calls.some(([url])=>String(url).endsWith('/dispatches'))).toBe(false);
+ expect(calls.find(([url])=>String(url).endsWith('/pulls'))?.[1]?.headers).toMatchObject({Authorization:'Bearer app-only-fixture'});
+ expect(JSON.parse(String(calls.find(([url])=>String(url).endsWith('/graphql'))?.[1]?.body)).query).toContain('enablePullRequestAutoMerge');
 });
 it('a stale repair state or another workflow run cannot publish',async()=>{
  await expect(publishParisRepair('repair',8)).rejects.toThrow('STATE_MISMATCH');

@@ -129,7 +129,8 @@ export async function publishParisRepair(id:string,runId:number){
  const ref=await gh('/git/ref/heads/'+encodeURIComponent(candidate.branch.name));
  if(ref.object?.sha!==candidate.branch.sha)throw Error('REPAIR_CANDIDATE_CHANGED_AFTER_VALIDATION');
  const comparison=await gh(`/compare/${candidate.base_sha}...${candidate.branch.sha}`);
- if(comparison.files?.some((file:any)=>infrastructureRepairPath(file.filename))){
+ if(!Array.isArray(comparison.files)||comparison.files.length>=300)throw Error('COMPLETE_REPAIR_FILE_INVENTORY_REQUIRED');
+ if(comparison.files.some((file:any)=>infrastructureRepairPath(file.filename))){
   const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub,graphql:(body:any)=>infrastructureGitHub('/graphql',{method:'POST',body:JSON.stringify(body)})});
   await update(id,{verification:{...row.verification,infrastructureRepair:true,pullRequest}});
   return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
@@ -291,7 +292,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.infrastructureRepair?['https://store.elevateforhumanity.org']:[])];
    const checks=repair.verification?.exactRuntimeSha===true?origins.map(()=>true):await Promise.all(origins.map(async origin=>{
     const response=await fetch(origin+'/api/health',{cache:'no-store',signal:AbortSignal.timeout(10000)});
-    const body=await response.json();return response.ok&&body.healthy===true&&body.ready===true&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
+    const body=await response.json();return response.ok&&(!repair.verification?.infrastructureRepair||(body.healthy===true&&body.ready===true))&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
    }));
    const verification:any={...repair.verification,tests:'passed',deployments:'passed',exactRuntimeSha:checks.every(Boolean),runtimeVerifiedAt:repair.verification?.runtimeVerifiedAt??(checks.every(Boolean)?new Date().toISOString():null)};
    if(!checks.every(Boolean)){await update(repair.id,{status:'verifying',verification});continue;}

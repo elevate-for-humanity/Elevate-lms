@@ -17,31 +17,12 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { logger } from '@/lib/logger';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { hydrateProcessEnv, getDecryptedPlatformSecret } from '@/lib/secrets';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-/**
- * Resolve a secret: env var first, then platform_secrets table fallback.
- */
-async function resolveSecret(key: string): Promise<string | null> {
-  const envVal = process.env[key];
-  if (envVal && envVal.trim()) return envVal.trim();
-  try {
-    const db = await requireAdminClient();
-    const { data } = await db
-      .from('platform_secrets')
-      .select('value_enc')
-      .eq('key', key)
-      .maybeSingle();
-    const val = data?.value_enc;
-    return val && val.trim() ? val.trim() : null;
-  } catch {
-    return null;
-  }
-}
 
 type GitActionBody = {
   action: string;
@@ -114,6 +95,9 @@ function encodePath(filePath: string): string {
 }
 
 async function getGithubToken(request?: NextRequest, body?: { githubToken?: string }): Promise<string> {
+  // App-only deployments always use the scoped server installation token;
+  // never accept a browser-supplied PAT or encrypted value_enc as a token.
+  if (process.env.PARIS_GITHUB_AUTH_MODE === 'app') return await getGitHubToken() ?? '';
   const fromRequest = body?.githubToken ||
     request?.headers.get('x-gh-token') ||
     request?.headers.get('x-github-token');
@@ -124,7 +108,7 @@ async function getGithubToken(request?: NextRequest, body?: { githubToken?: stri
   if (fromEnv) return fromEnv.trim();
   
   // Fall back to platform_secrets
-  const fromDb = await resolveSecret('GITHUB_TOKEN');
+  const fromDb = await getDecryptedPlatformSecret('GITHUB_TOKEN');
   return fromDb?.trim() ?? '';
 }
 

@@ -210,3 +210,18 @@ export async function getDecryptedPlatformSecret(key: string): Promise<string | 
   if (error || typeof data !== 'string' || !data.trim()) return process.env[key];
   return data.trim();
 }
+
+/**
+ * Exact encrypted Admin GitHub App source. Unlike the generic runtime resolver,
+ * this never falls back to process.env, a Google-mounted key or a legacy PAT.
+ * Missing or inaccessible canonical secrets must fail closed.
+ */
+export async function getAdminGitHubAppSecret(
+  key: 'GITHUB_APP_ID' | 'GITHUB_APP_INSTALLATION_ID' | 'GITHUB_APP_PRIVATE_KEY',
+): Promise<string | undefined> {
+  const client = getBootstrapClient();
+  if (!client) throw new Error('GITHUB_APP_DASHBOARD_STORE_UNAVAILABLE');
+  const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
+  if (error) throw new Error('GITHUB_APP_DASHBOARD_STORE_UNAVAILABLE');
+  return typeof data === 'string' && data.trim() ? data.trim() : undefined;
+}

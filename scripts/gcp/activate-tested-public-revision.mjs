@@ -74,6 +74,42 @@ export async function cleanupUnusedCandidateTags({
   return { service, removedCandidateTags: staleTags };
 }
 
+/**
+ * Verify a zero-traffic Admin candidate can mint a scoped App token from its
+ * canonical encrypted dashboard settings before assigning production traffic.
+ * The short-lived GitHub OIDC identity is never logged or persisted.
+ */
+export async function verifyAdminDashboardAppCandidate(candidateUrl,{request=fetch,environment=process.env}={}){
+ const authUrl=environment.ACTIONS_ID_TOKEN_REQUEST_URL;
+ const authBearer=environment.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
+ if(!authUrl || !authBearer)throw Error('PARIS_APP_CANDIDATE_OIDC_UNAVAILABLE');
+ let jwt;
+ try{
+  const url=new URL(authUrl);
+  url.searchParams.set('audience','elevate-paris-code-repair');
+  const identity=await request(url.toString(),{headers:{Authorization:'Bearer '+authBearer},
+   cache:'no-store',redirect:'error',signal:AbortSignal.timeout(15000)});
+  if(!identity.ok)throw Error('not authorized');
+  jwt=(await identity.json()).value;
+ }catch{throw Error('PARIS_APP_CANDIDATE_OIDC_UNAVAILABLE');}
+ if(typeof jwt!=='string' || jwt.split('.').length!==3)throw Error('PARIS_APP_CANDIDATE_OIDC_INVALID');
+ let diagnostic;
+ try{
+  const response=await request(candidateUrl+'/api/cron/paris-code-repair',{
+   method:'POST',headers:{Authorization:'Bearer '+jwt,'Content-Type':'application/json','Cache-Control':'no-store'},
+   body:JSON.stringify({phase:'app-auth-diagnostic'}),cache:'no-store',redirect:'error',
+   signal:AbortSignal.timeout(20000),
+  });
+  if(!response.ok)throw Error('diagnostic rejected');
+  diagnostic=await response.json();
+ }catch{throw Error('PARIS_APP_CANDIDATE_DIAGNOSTIC_UNAVAILABLE');}
+ if(diagnostic?.credentialSource!=='github-app-installation' || diagnostic?.diagnosticVersion!==2 ||
+    diagnostic?.repository?.ok!==true || diagnostic?.contents?.ok!==true || diagnostic?.workflow?.ok!==true){
+  throw Error('PARIS_APP_CANDIDATE_AUTHORIZATION_UNVERIFIED');
+ }
+ return {verified:true,source:'github-app-installation'};
+}
+
 export async function activateTestedRevision({
   service, revision, commit, read = gcloud, fetcher = fetch, attempts = 12,
   pause = () => new Promise(resolve => setTimeout(resolve, 2000)),
@@ -166,6 +202,9 @@ export async function activateTestedRevision({
       // candidate URLs, provider errors or credentials.
       report({ event: 'candidate_health_failed', service, revision, commit, lastProbe });
       throw Error('Exact candidate failed runtime health; public traffic unchanged');
+    }
+    if(service==='elevate-admin-migration' && process.env.PARIS_GITHUB_APP_SOURCE==='dashboard'){
+      await verifyAdminDashboardAppCandidate(candidate.url,{request:fetcher});
     }
     const current = describe();
     assertTrafficUnchanged(before, current);

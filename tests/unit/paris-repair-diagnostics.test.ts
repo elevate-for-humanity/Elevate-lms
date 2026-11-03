@@ -2,10 +2,11 @@ import {afterEach,expect,it,vi} from 'vitest';
 import {NextRequest} from 'next/server';
 const tick=vi.hoisted(()=>vi.fn());
 const authorized=vi.hoisted(()=>vi.fn(async()=>true));
-vi.mock('@/lib/paris-workflow-identity',()=>({authorizeParisWorkflow:authorized}));
+const deployDiagnostic=vi.hoisted(()=>vi.fn(async()=>false));
+vi.mock('@/lib/paris-workflow-identity',()=>({authorizeParisWorkflow:authorized,authorizeParisDeploymentAppDiagnostic:deployDiagnostic}));
 vi.mock('@/lib/ai/runtime/code-repair',()=>({tickParisCodeRepairs:tick,prepareParisRepair:vi.fn(),publishParisRepair:vi.fn(),reportParisRepairFailure:vi.fn()}));
 import {POST} from '@/apps/admin/app/api/cron/paris-code-repair/route';
-afterEach(()=>{vi.unstubAllEnvs();vi.restoreAllMocks();tick.mockReset();authorized.mockReset();authorized.mockResolvedValue(true);});
+afterEach(()=>{vi.unstubAllEnvs();vi.restoreAllMocks();tick.mockReset();authorized.mockReset();authorized.mockResolvedValue(true);deployDiagnostic.mockReset();deployDiagnostic.mockResolvedValue(false);});
 it('returns an actionable safe credential code to the trusted monitor',async()=>{
  vi.spyOn(console,'error').mockImplementation(()=>{});tick.mockRejectedValue(Error('PARIS_GITHUB_HTTP_401'));
  const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{method:'POST',headers:{authorization:'Bearer test-only'},body:JSON.stringify({phase:'tick'})}));expect(response.status).toBe(502);expect(await response.json()).toMatchObject({errorCode:'PARIS_GITHUB_HTTP_401'});
@@ -35,4 +36,14 @@ it('uses the temporary job identity only inside an authenticated prepare request
  });
  const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{method:'POST',headers:{authorization:'Bearer test-only','x-paris-github-token':'temporary-workflow-token-123456'},body:JSON.stringify({phase:'prepare',repairId:'00000000-0000-4000-8000-000000000001',runId:7})}));
  expect(response.status).toBe(200);expect(await response.text()).not.toContain('temporary-workflow-token');expect(currentWorkflowGitHubToken()).toBeUndefined();
+});
+
+it('deploy-admin OIDC cannot call PARIS tick, prepare or publish operations',async()=>{
+ authorized.mockResolvedValue(false);
+ deployDiagnostic.mockResolvedValue(true);
+ const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{
+  method:'POST',headers:{authorization:'Bearer deploy-only'},body:JSON.stringify({phase:'tick'}),
+ }));
+ expect(response.status).toBe(401);
+ expect(tick).not.toHaveBeenCalled();
 });

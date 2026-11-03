@@ -1,7 +1,7 @@
 import 'server-only';
 import { createHash, createPrivateKey, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { getDecryptedPlatformSecret } from '@/lib/secrets';
+import { getDecryptedPlatformSecret, getAdminGitHubAppSecret } from '@/lib/secrets';
 
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 const API = 'https://api.github.com';
@@ -14,12 +14,12 @@ export async function getGitHubAppToken(): Promise<string | null> {
   // exact key. Never confuse a saved GITHUB_TOKEN/PAT with an RSA App key.
   // A mounted Google secret takes precedence over the Admin dashboard source.
   const dashboardOnly = process.env.PARIS_GITHUB_APP_SOURCE === 'dashboard';
-  const appId = (dashboardOnly ? await getDecryptedPlatformSecret('GITHUB_APP_ID')
+  const appId = (dashboardOnly ? await getAdminGitHubAppSecret('GITHUB_APP_ID')
     : process.env.GITHUB_APP_ID || await getDecryptedPlatformSecret('GITHUB_APP_ID'))?.trim();
-  const installationId = (dashboardOnly ? await getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID')
+  const installationId = (dashboardOnly ? await getAdminGitHubAppSecret('GITHUB_APP_INSTALLATION_ID')
     : process.env.GITHUB_APP_INSTALLATION_ID || await getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID'))?.trim();
   const path = dashboardOnly ? undefined : process.env.GITHUB_APP_PRIVATE_KEY_FILE?.trim();
-  const pem = dashboardOnly ? await getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY')
+  const pem = dashboardOnly ? await getAdminGitHubAppSecret('GITHUB_APP_PRIVATE_KEY')
     : process.env.GITHUB_APP_PRIVATE_KEY || (path ? undefined : await getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY'));
   if (!appId && !installationId && !pem && !path) return null;
   if (!appId || !installationId || !/^\d+$/.test(appId) || !/^\d+$/.test(installationId) || Boolean(pem) === Boolean(path)) {

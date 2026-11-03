@@ -158,6 +158,25 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
     providerRecoveryHealth=Boolean(health.verified&&identity?.repository?.ok&&identity?.contents?.ok&&identity?.workflow?.ok);
    }
    if(providerRecoveryHealth){
+     if(repair.source_job_id){
+      // A provider outage is not authorization to revive a paused, published,
+      // superseded or already recovered lesson. Confirm the exact stage.
+      const source=await db.from('ultimate_build_jobs')
+       .select('id,build_id,job_type,status,last_error,monitor')
+       .eq('id',repair.source_job_id).maybeSingle();
+      if(source.error)throw source.error;
+      if(!source.data || source.data.status!=='failed' || source.data.monitor?.enabled!==true)continue;
+      const build=await db.from('ultimate_course_builds')
+       .select('id,status,profile,findings').eq('id',source.data.build_id).maybeSingle();
+      if(build.error)throw build.error;
+      if(!build.data || !['running','queued','building'].includes(build.data.status)
+       || build.data.profile?.ownerPaused===true)continue;
+      const latest=await db.from('ultimate_build_jobs').select('id,build_id,status')
+       .eq('build_id',source.data.build_id).eq('job_type',source.data.job_type)
+       .order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if(latest.error)throw latest.error;
+      if(courseDefectDisposition({source:source.data,latest:latest.data,build:build.data})!=='repair')continue;
+     }
      const updated=await db.from('paris_code_repairs').update({
       status:'queued',error_code:null,
       attempt_history:[...(repair.attempt_history??[]),{

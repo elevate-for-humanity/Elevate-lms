@@ -32,6 +32,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'employers', name: 'Partners', href: '/partners', subItems: [
     { name: 'Partnership Options', href: '/partners' },
     { name: 'Hire Talent & Post Jobs', href: ROUTES.employers },
+    { name: 'Browse Jobs', href: '/jobs' },
     { name: 'Employer Directory', href: '/employers/directory' },
     { name: 'Workforce Agencies', href: ROUTES.forAgencies },
     { name: 'Platform & Licensing', href: '/platform' },
@@ -40,6 +41,11 @@ export const NAV_ITEMS: NavItem[] = [
     { name: 'Student & Community Resources', href: '/resources' },
     { name: 'Student Dashboard', href: ROUTES.studentPortal, isAuth: true },
     { name: 'Choose Your Portal', href: '/online-apps' },
+    { name: 'Student Support', href: '/student-support' },
+    { name: 'Career Services', href: '/career-services' },
+    { name: 'Community Hub', href: '/community' },
+    { name: 'Community Services', href: '/services' },
+    { name: 'Rise Forward Foundation', href: '/rise-forward-foundation' },
     { name: 'FAQ', href: ROUTES.faq },
     { name: 'Blog & Insights', href: ROUTES.blog },
   ] },
@@ -47,10 +53,16 @@ export const NAV_ITEMS: NavItem[] = [
     { name: 'About Elevate', href: ROUTES.about },
     { name: 'Our Founder — Elizabeth Greene', href: '/about/elizabeth-greene' },
     { name: 'Our Team & Staff', href: '/about/team' },
-    { name: 'Approvals & Accountability', href: '/compliance/center' },
+    { name: 'Approvals', href: ROUTES.aboutApprovals },
+    { name: 'Compliance & Accountability', href: '/compliance/center' },
     { name: 'Contact & Visit', href: ROUTES.contact },
   ] },
-  { id: 'store', name: 'Store', href: ROUTES.store },
+  { id: 'store', name: 'Store & Businesses', href: ROUTES.store, subItems: [
+    { name: 'Elevate Store', href: ROUTES.store },
+    { name: 'Curvature Body Sculpting', href: ROUTES.curvatureBodySculpting },
+    { name: 'Supersonic Fast Cash', href: ROUTES.supersonicFastCash },
+    { name: '2Exclusive Platinum Cleaning', href: ROUTES.platinumCleaning },
+  ] },
 ];
 
 export function findDuplicateNavHrefs(

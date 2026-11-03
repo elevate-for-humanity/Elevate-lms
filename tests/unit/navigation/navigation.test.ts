@@ -24,6 +24,16 @@ describe('public navigation discoverability', () => {
       ]),
     );
   });
+  it('keeps all three businesses directly discoverable in the shared menu', () => {
+    const businesses = NAV_ITEMS.find(item => item.id === 'store');
+    expect(businesses?.name).toBe('Store & Businesses');
+    expect(businesses?.subItems).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'Elevate Store', href: '/store' }),
+      expect.objectContaining({ name: 'Curvature Body Sculpting', href: '/sites/meri-gold-round' }),
+      expect.objectContaining({ name: 'Supersonic Fast Cash', href: '/tax' }),
+      expect.objectContaining({ name: '2Exclusive Platinum Cleaning', href: '/sites/2exclusive-platinum-cleaning' }),
+    ]));
+  });
   it('keeps exam services in Testing rather than Microcourses', () => {
     const programs = NAV_ITEMS.find((item) => item.id === 'programs');
     const testing = NAV_ITEMS.find((item) => item.id === 'testing');

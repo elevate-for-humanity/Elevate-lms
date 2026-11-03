@@ -82,6 +82,13 @@ const AUTH_PATTERNS = [
   /auditPiiAccess/,
 ];
 
+function hasExamSessionGuard(source) {
+  if (!/import\s*\{\s*requireExamSessionAccess\s*\}\s*from\s*['"]@\/lib\/testing\/session-access['"]/.test(source)) return false;
+  const firstWrite = source.search(/\.(?:insert|upsert)\s*\(/);
+  if (firstWrite < 0) return false;
+  return /const\s+(\w+)\s*=\s*await\s+requireExamSessionAccess\([^;]+\);\s*if\s*\(\1\s+instanceof\s+NextResponse\)\s*return\s+\1;/.test(source.slice(0, firstWrite));
+}
+
 const EXEMPT_RE = /\/\/\s*pre-auth-registry:\s*exempt/i;
 const INSERT_RE = /\.from\s*\(\s*['"]([^'"]+)['"]\s*\)[\s\S]{0,300}?\.(insert|upsert)\s*\(/g;
 const IDENTITY_COLS = /user_id|student_id|customer_email|recipient_id/;
@@ -108,7 +115,7 @@ for (const file of routeFiles) {
     coverage.push({ file: rel, status: 'exempt', tables: [] });
     continue;
   }
-  if (AUTH_PATTERNS.some((p) => p.test(source))) {
+  if (AUTH_PATTERNS.some((p) => p.test(source)) || hasExamSessionGuard(source)) {
     coverage.push({ file: rel, status: 'authenticated', tables: [] });
     continue;
   }

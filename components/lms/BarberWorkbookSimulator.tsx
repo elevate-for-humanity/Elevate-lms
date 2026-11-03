@@ -64,9 +64,10 @@ export default function BarberWorkbookSimulator({sectionNumber}:{sectionNumber:n
     <div className="mt-4 flex flex-wrap gap-3">
       <button type="button" onClick={()=>setChecked(true)} disabled={choice===null||complete} className="min-h-12 rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50">Check my answer</button>
       <button type="button" onClick={()=>setPasses(value=>Math.min(4,value+1))} disabled={!correct||passes>=4||complete} className="min-h-12 rounded-lg border border-slate-500 px-5 py-3 font-semibold disabled:opacity-50">Make a virtual clipper pass ({passes}/4)</button>
-      {correct&&!complete&&<button type="button" onClick={()=>{if(stage===exercises.length-1){setComplete(true);}else{setStage(s=>s+1);setChoice(null);setChecked(false);setPasses(0);}}} className="min-h-12 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white">{stage===exercises.length-1?'Finish virtual practice':'Next practice step'}</button>}
+      {correct&&!complete&&<button type="button" disabled={passes<4} onClick={()=>{if(stage===exercises.length-1){setComplete(true);}else{setStage(s=>s+1);setChoice(null);setChecked(false);setPasses(0);}}} className="min-h-12 rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white">{stage===exercises.length-1?'Finish virtual practice':'Next practice step'}</button>}
       {complete&&<button type="button" onClick={()=>{setComplete(false);setStage(0);setChoice(null);setChecked(false);setPasses(0);}} className="min-h-12 rounded-lg border px-5 py-3 font-semibold">Practice again</button>}
     </div>
+    {correct && !complete && passes<4 && <p className="mt-3 text-sm font-semibold text-slate-700">Make four simulated clipper passes to practice the motion before the next decision.</p>}
     {complete&&<p role="status" className="mt-4 rounded-lg bg-emerald-50 p-4 font-bold">Virtual practice completed. Record what you learned in the workbook. Your practical hours and instructor sign-off have not changed.</p>}
   </section>;
 }

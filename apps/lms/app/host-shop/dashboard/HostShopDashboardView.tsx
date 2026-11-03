@@ -1,3 +1,4 @@
+import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
 import { hostShopPortfolioPhotos } from '@/lib/partners/curated-shop-media';
 import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
 import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
@@ -27,6 +28,7 @@ async function clearAdminPartner() {
   const cookieStore = await cookies();
   for (const name of [
     HOST_SHOP_ADMIN_COOKIE,
+    HOST_SHOP_PREVIEW_MARKER,
     HOST_SHOP_PREVIEW_SESSION_COOKIE,
     PORTAL_PREVIEW_COOKIE,
     PORTAL_PREVIEW_ACTOR_COOKIE,

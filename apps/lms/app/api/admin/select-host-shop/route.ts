@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireRoles } from '@/lib/admin/guards';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
@@ -121,6 +123,9 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
   const destination =
     partner?.approval_status === 'approved' ? '/host-shop/dashboard' : '/host-shop/onboarding';
   const response = NextResponse.redirect(new URL(destination, APP_ORIGIN), 303);
+  response.cookies.set(HOST_SHOP_PREVIEW_MARKER, randomUUID(), {
+    httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 3600,
+  });
   response.cookies.set(HOST_SHOP_ADMIN_COOKIE, partnerId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

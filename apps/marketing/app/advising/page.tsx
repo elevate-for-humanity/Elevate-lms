@@ -209,7 +209,7 @@ export default function AdvisingPage() {
                 <label htmlFor="questions" className="block text-xs font-semibold text-black">
                   What would you like to talk about?
                 </label>
-                <p className="mt-1 text-[0.7rem] text-slate-500">
+                <p className="mt-1 text-sm leading-relaxed text-slate-600">
                   (Optional) Share any questions, concerns, or barriers you want help with—like
                   funding, childcare, transportation, re-enstart, housing, or mental health.
                 </p>
@@ -221,7 +221,7 @@ export default function AdvisingPage() {
                 />
               </div>
 
-              <p className="text-[0.7rem] text-slate-500">
+              <p className="text-sm leading-relaxed text-slate-600">
                 By submitting this form, you are giving Elevate for Humanity permission to contact
                 you about advising, programs, and support services. We do not share your information
                 without your consent except as required by law.

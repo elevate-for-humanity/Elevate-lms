@@ -15,6 +15,8 @@
 .brandFilm video { display: block; }
 .brandNote { background: linear-gradient(120deg, #fffefa, #fff2cd); }
 .brandNote em, .storyWords em { color: #805318; }
+.store .kicker, .productCopy .kicker { font-size: 12px; }
+.store .productCopy > p:not(.kicker) { font-size: 14px; line-height: 1.6; }
 .ritualSteps { background: linear-gradient(120deg, #fff5d9, #f1f8e9); }
 .header nav { align-items: center; flex-wrap: wrap; }
 .header [data-music-switch] { min-height: 44px; padding: 0 12px; border: 1px solid #a58c56; border-radius: 24px; background: #fff8de; color: #27402f; }

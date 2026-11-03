@@ -13,11 +13,14 @@ export async function getGitHubAppToken(): Promise<string | null> {
   // Dashboard-managed App credentials are encrypted at rest and resolved by
   // exact key. Never confuse a saved GITHUB_TOKEN/PAT with an RSA App key.
   // A mounted Google secret takes precedence over the Admin dashboard source.
-  const appId = (process.env.GITHUB_APP_ID || await getDecryptedPlatformSecret('GITHUB_APP_ID'))?.trim();
-  const installationId = (process.env.GITHUB_APP_INSTALLATION_ID || await getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID'))?.trim();
-  const path = process.env.GITHUB_APP_PRIVATE_KEY_FILE?.trim();
-  const pem = process.env.GITHUB_APP_PRIVATE_KEY ||
-    (path ? undefined : await getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY'));
+  const dashboardOnly = process.env.PARIS_GITHUB_APP_SOURCE === 'dashboard';
+  const appId = (dashboardOnly ? await getDecryptedPlatformSecret('GITHUB_APP_ID')
+    : process.env.GITHUB_APP_ID || await getDecryptedPlatformSecret('GITHUB_APP_ID'))?.trim();
+  const installationId = (dashboardOnly ? await getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID')
+    : process.env.GITHUB_APP_INSTALLATION_ID || await getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID'))?.trim();
+  const path = dashboardOnly ? undefined : process.env.GITHUB_APP_PRIVATE_KEY_FILE?.trim();
+  const pem = dashboardOnly ? await getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY')
+    : process.env.GITHUB_APP_PRIVATE_KEY || (path ? undefined : await getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY'));
   if (!appId && !installationId && !pem && !path) return null;
   if (!appId || !installationId || !/^\d+$/.test(appId) || !/^\d+$/.test(installationId) || Boolean(pem) === Boolean(path)) {
     throw new Error('GITHUB_APP_CONFIGURATION_INVALID');

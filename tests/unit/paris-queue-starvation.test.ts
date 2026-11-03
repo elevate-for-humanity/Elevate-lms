@@ -46,7 +46,7 @@ beforeEach(() => {
 it('advances past a paused source to the next eligible repair without dispatching the paused build', async () => {
   h.queue = [{ id: 'paused-repair', attempt_count: 0, source_job_id: 'paused' }, { id: 'eligible', attempt_count: 1, source_job_id: null }];
   expect(await tickParisCodeRepairs({ workflowOwnedDispatch: true })).toMatchObject({ dispatchRequired: true, repairId: 'eligible' });
-  expect(h.writes[0]).toMatchObject({ values: { status: 'blocked', error_code: 'SOURCE_REPAIR_NOT_AUTHORIZED' }, filters: { id: 'paused-repair', status: 'queued', attempt_count: 0 } });
+  expect(h.writes[0]).toMatchObject({ values: { status: 'blocked', error_code: 'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE' }, filters: { id: 'paused-repair', status: 'queued', attempt_count: 0 } });
   expect(h.writes[1]).toMatchObject({ values: { status: 'dispatched', attempt_count: 2 }, filters: { id: 'eligible', status: 'queued', attempt_count: 1 } });
 });
 it('returns without dispatch when every scanned source is paused', async () => {

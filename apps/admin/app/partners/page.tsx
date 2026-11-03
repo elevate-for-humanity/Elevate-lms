@@ -1,3 +1,4 @@
+import { hostShopPreviewMemberId } from '@/lib/partners/host-shop-preview-member';
 import { resolveHostShopDocuments } from '@/lib/partners/host-shop-document-status';
 import { hostShopOnboardingLabel } from '@/lib/partners/host-shop-onboarding-label';
 import { Metadata } from 'next';
@@ -47,9 +48,11 @@ export default async function PartnersPage() {
           .in('partner_id', hostShopIds),
         supabase
           .from('partner_users')
-          .select('partner_id,user_id,status')
+          .select('partner_id,user_id,status,role')
           .in('partner_id', hostShopIds)
-          .eq('status', 'active'),
+          .eq('status', 'active')
+          .order('created_at')
+          .order('user_id'),
         supabase
           .from('shops')
           .select('id,partner_id,name,active')
@@ -98,8 +101,7 @@ export default async function PartnersPage() {
     const linkedShops = (canonicalShops || []).filter(
       (row: any) => row.partner_id === partner.id,
     ).length;
-    const previewUserId =
-      (hostUsers || []).find((row: any) => row.partner_id === partner.id)?.user_id ?? null;
+    const previewUserId = hostShopPreviewMemberId((hostUsers || []).filter((row: { partner_id: string }) => row.partner_id === partner.id));
     const complete =
       partner.approval_status === 'approved' &&
       requirements.length > 0 &&

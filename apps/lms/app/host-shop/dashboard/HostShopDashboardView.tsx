@@ -1,3 +1,4 @@
+import { hostShopPreviewMemberId } from '@/lib/partners/host-shop-preview-member';
 import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
 import { hostShopPortfolioPhotos } from '@/lib/partners/curated-shop-media';
 import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
@@ -172,21 +173,21 @@ export default async function HostShopDashboardView() {
   const shopName = board.partner?.name || board.shops[0]?.name || 'Your Host Shop';
   // Display the selected shop account, never the administrator's photo or
   // another shop's training image. Missing photos retain a named initials banner.
-  const { data: heroMember } = isPlatformAdmin
+  const { data: heroMembers } = isPlatformAdmin
     ? await db
         .from('partner_users')
-        .select('user_id')
+        .select('user_id,role')
         .eq('partner_id', board.partner.id)
         .eq('status', 'active')
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .maybeSingle()
-    : { data: { user_id: user.id } };
-  const { data: heroProfile } = heroMember?.user_id
+        .order('created_at')
+        .order('user_id')
+    : { data: null };
+  const heroUserId = isPlatformAdmin ? hostShopPreviewMemberId(heroMembers) : user.id;
+  const { data: heroProfile } = heroUserId
     ? await db
         .from('profiles')
         .select('full_name,avatar_url')
-        .eq('id', heroMember.user_id)
+        .eq('id', heroUserId)
         .maybeSingle()
     : { data: null };
   const [shopImage] = hostShopPortfolioPhotos(board.partner.public_slug || '', board.partner.media_gallery);

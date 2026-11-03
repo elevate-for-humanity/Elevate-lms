@@ -21,12 +21,14 @@ test('Store image compilation uses a fresh runner after required source validati
   assert.match(buildCommands, /smoke-marketing-container.mjs/);
 });
 
-test('public Docker builder inherits the dependency graph without copying it again', () => {
-  const dockerfile = readFileSync(new URL('../../Dockerfile.marketing', import.meta.url), 'utf8');
-  const builder = dockerfile.split('FROM dependencies AS builder')[1]?.split(/\nFROM /)[0];
-  assert.ok(builder, 'public build must inherit the installed dependency layer');
-  assert.doesNotMatch(builder, /COPY --from=dependencies/);
-  assert.match(builder, /pnpm --filter @elevate\/marketing build/);
+test('public and Admin Docker builders inherit dependency graphs without copying them again', () => {
+  for (const component of ['marketing', 'admin']) {
+    const dockerfile = readFileSync(new URL('../../Dockerfile.' + component, import.meta.url), 'utf8');
+    const builder = dockerfile.split('FROM dependencies AS builder')[1]?.split(/\nFROM /)[0];
+    assert.ok(builder, component + ' must inherit the installed dependency layer');
+    assert.doesNotMatch(builder, /COPY --from=dependencies/);
+    assert.ok(builder.includes('pnpm --filter @elevate/' + component + ' build'));
+  }
   const boundedRunner = readFileSync(new URL('../run-bounded-build.mjs', import.meta.url), 'utf8');
   assert.match(boundedRunner, /4 \* 1024/);
 });

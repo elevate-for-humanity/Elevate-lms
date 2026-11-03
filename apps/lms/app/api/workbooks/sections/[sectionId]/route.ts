@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { validWorkbookSave } from '@/lib/lms/workbook-validation';
+import {workbookWritingComplete} from '@/lib/lms/workbook-progression';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -61,6 +62,28 @@ export async function POST(
         { error: 'Check your answers and try again (6,000 characters per field).' },
         400,
       );
+    // Pacing is enforced on the server as well as in the dashboard. Do not
+    // infer a workbook completion from approved workplace hours, old browser
+    // position, or a purchased workbook entitlement.
+    const {data:targetSection,error:targetError}=await db.from('digital_workbook_sections')
+      .select('workbook_id,section_number,prompts')
+      .eq('id',sectionId).maybeSingle();
+    if(targetError||!targetSection)return reply({error:'This workbook section is not available.'},403);
+    if(body.reviewed && !workbookWritingComplete(body.answers,Math.min(3,
+      Array.isArray(targetSection.prompts)?targetSection.prompts.length:0)))
+      return reply({error:'Finish the writing activities before reviewing this section.'},400);
+    const {data:prerequisites,error:prerequisiteError}=await db.from('digital_workbook_sections')
+      .select('id').eq('workbook_id',targetSection.workbook_id)
+      .lt('section_number',targetSection.section_number);
+    if(prerequisiteError)return reply({error:'Workbook progression could not be checked.'},503);
+    const requiredIds=(prerequisites||[]).map(row=>row.id);
+    if(requiredIds.length){
+      const {data:savedReviews,error:reviewError}=await db.from('digital_workbook_responses')
+        .select('section_id').eq('user_id',user.id).eq('reviewed',true).in('section_id',requiredIds);
+      if(reviewError)return reply({error:'Workbook progression could not be checked.'},503);
+      if((savedReviews||[]).length!==requiredIds.length)
+        return reply({error:'Complete the earlier workbook section before continuing.'},409);
+    }
     const { data, error } = await db.rpc('save_digital_workbook_section', {
       p_section_id: sectionId,
       p_answers: body.answers,

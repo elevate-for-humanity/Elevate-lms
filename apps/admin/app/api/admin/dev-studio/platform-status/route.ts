@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { loadBillingProviderConfig } from '@/lib/billing/config';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
       }>,
     };
 
-    const githubToken = process.env.GITHUB_TOKEN;
+    const githubToken = await getGitHubToken().catch(() => null);
     if (githubToken) {
       try {
         const repoResponse = await fetch(

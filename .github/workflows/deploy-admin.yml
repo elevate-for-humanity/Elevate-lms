@@ -99,6 +99,7 @@ jobs:
       - name: Validate Studio runtime cutover before building Admin
         run: |
           node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-phone-sending-number.mjs
+          node --test scripts/test-paris-dashboard-app-candidate.mjs scripts/test-github-app-token.mjs scripts/test-devstudio-github-token.mjs scripts/test-github-authorization-contract.mjs
           node --test scripts/test-public-revision-activation.mjs
           node --test scripts/gcp/shared-runtime-concurrency.test.mjs
           node --test scripts/gcp/production-browser-binding.test.mjs

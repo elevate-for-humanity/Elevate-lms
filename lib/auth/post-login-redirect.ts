@@ -18,10 +18,16 @@ const STORE_ORIGIN = 'https://store.elevateforhumanity.org';
 export function isSharedPostLoginDestination(destination: string): boolean {
   try {
     const url = new URL(destination);
-    return (url.origin === STORE_ORIGIN && (url.pathname === '/store' || url.pathname.startsWith('/store/'))) ||
+    return (
+      (url.origin === STORE_ORIGIN &&
+        (url.pathname === '/store' || url.pathname.startsWith('/store/'))) ||
       (url.origin === new URL(siteUrls.site).origin &&
-        (url.pathname === '/apps/website-builder' || url.pathname.startsWith('/apps/website-builder/')));
-  } catch { return false; }
+        (url.pathname === '/apps/website-builder' ||
+          url.pathname.startsWith('/apps/website-builder/')))
+    );
+  } catch {
+    return false;
+  }
 }
 
 const ROLE_OWNED_PREFIXES = new Set(
@@ -61,16 +67,26 @@ export function resolveRoleCompatiblePostLoginUrl(
       return requestedUrl.toString();
     }
 
+    // A verified secondary learner role may return to its own LMS workspace.
+    // Staff precedence chooses a default, not permission to hijack course links.
+    const learnerConfig = ROLE_ROUTE_CONFIG.student;
+    const learnerUrl = new URL(getRoleDestinationUrl('student'));
+    const roles = effectiveRoles?.length ? effectiveRoles : [role];
+    if (
+      roles.some((value) => value === 'student' || value === 'learner') &&
+      requestedUrl.origin === learnerUrl.origin &&
+      firstPathSegment(requestedUrl.pathname) === firstPathSegment(learnerConfig.path)
+    ) {
+      return requestedUrl.toString();
+    }
+
     if (requestedUrl.origin !== canonical.origin) return canonicalUrl;
 
     const requestedPrefix = firstPathSegment(requestedUrl.pathname);
     const canonicalConfig = resolveRoleRoute(role, effectiveRoles);
     const canonicalPrefix = firstPathSegment(canonicalConfig.path);
 
-    if (
-      ROLE_OWNED_PREFIXES.has(requestedPrefix) &&
-      requestedPrefix !== canonicalPrefix
-    ) {
+    if (ROLE_OWNED_PREFIXES.has(requestedPrefix) && requestedPrefix !== canonicalPrefix) {
       return canonicalUrl;
     }
 

@@ -94,7 +94,11 @@ function requiredRoles(pathname: string): readonly UserRole[] {
   if (pathname.startsWith('/instructor')) return INSTRUCTOR_ROLES;
   if (pathname.startsWith('/staff-portal') || pathname.startsWith('/api/staff')) return STAFF_ROLES;
 
-  return ADMIN_ROLES;
+  // The shared entry immediately routes staff to their own workspace before
+  // loading platform data. Other Admin pages and APIs are not staff tools.
+  if (pathname === '/dashboard') return ADMIN_ROLES;
+
+  return ADMIN_ROLES.filter(role => role !== 'staff');
 }
 
 function platformCookieOptions(options: Record<string, unknown> | undefined, hostname: string) {

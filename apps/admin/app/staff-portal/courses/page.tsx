@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function StaffCoursesPage() {
-  await requireStaffPortalAccess();
+  const { effectiveRoles } = await requireStaffPortalAccess();
+  const canManageCourses = effectiveRoles.some(role => role === 'admin' || role === 'super_admin');
   const supabase = await createClient();
 
   // Fetch courses from programs table
@@ -55,7 +56,7 @@ export default async function StaffCoursesPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Course Management</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Program Courses</h1>
           <div className="flex gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
@@ -65,12 +66,12 @@ export default async function StaffCoursesPage() {
                 className="pl-10 pr-4 py-2 border rounded-lg"
               />
             </div>
-            <Link
+            {canManageCourses ? <Link
               href="/staff-portal/courses/create"
               className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-5 h-5" /> New Course
-            </Link>
+            </Link> : null}
           </div>
         </div>
 
@@ -84,7 +85,7 @@ export default async function StaffCoursesPage() {
                   <th className="text-left p-4 font-semibold text-slate-900">Students</th>
                   <th className="text-left p-4 font-semibold text-slate-900">Duration</th>
                   <th className="text-left p-4 font-semibold text-slate-900">Status</th>
-                  <th className="text-left p-4 font-semibold text-slate-900">Actions</th>
+                  {canManageCourses ? <th className="text-left p-4 font-semibold text-slate-900">Actions</th> : null}
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -119,14 +120,14 @@ export default async function StaffCoursesPage() {
                           {course.status}
                         </span>
                       </td>
-                      <td className="p-4">
+                      {canManageCourses ? <td className="p-4">
                         <Link
-                          href={`/staff-portal/courses/${course.slug || course.id}`}
+                          href={`/programs/${course.slug || course.id}/manage`}
                           className="text-brand-blue-600 hover:underline text-sm"
                         >
                           Manage
                         </Link>
-                      </td>
+                      </td> : null}
                     </tr>
                   ))
                 )}

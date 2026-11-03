@@ -17,14 +17,31 @@ export function AdminApplicationChrome({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  // Staff owns a separate, server-authorized shell. Never mount the platform
+  // administrator menu, inbox notices, or mobile dock around that workspace.
+  if (pathname === '/staff-portal' || pathname.startsWith('/staff-portal/')) {
+    return (
+      <div data-elevate-staff-shell className="min-h-dvh min-w-0 bg-white">
+        {children}
+      </div>
+    );
+  }
   // Embedded tools retain their server authentication; only duplicate chrome is omitted.
   if (searchParams.get('embedded') === 'studio') {
-    return <div data-elevate-embedded-tool className="min-h-dvh min-w-0 bg-white">{children}</div>;
+    return (
+      <div data-elevate-embedded-tool className="min-h-dvh min-w-0 bg-white">
+        {children}
+      </div>
+    );
   }
   // Sign-in and account recovery are public forms, not dashboard documents.
   // Fixed dashboard navigation can cover their fields when a mobile keyboard opens.
   if (pathname === '/login' || pathname.startsWith('/auth/')) {
-    return <div data-elevate-auth-shell className="min-h-dvh min-w-0 bg-slate-950">{children}</div>;
+    return (
+      <div data-elevate-auth-shell className="min-h-dvh min-w-0 bg-slate-950">
+        {children}
+      </div>
+    );
   }
   // Only the conversation workspace owns the viewport. Tool pages such as
   // Course Builder are ordinary documents and must retain the Admin header and

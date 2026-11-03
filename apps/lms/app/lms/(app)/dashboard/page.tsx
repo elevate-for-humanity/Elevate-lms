@@ -115,9 +115,14 @@ export default async function StudentDashboard() {
   if (isAdminActor && !subject.previewing) return <NeutralStudentPortalPreview />;
 
   const subjectId = subject.userId;
-  const { data: subjectProfile } = subject.previewing
+  const { data: storedSubjectProfile } = subject.previewing
     ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
     : { data: profile };
+  // requireRole above has already verified a learner membership. Keep staff
+  // employment separate from the learner's coursework and requirements.
+  const subjectProfile = storedSubjectProfile?.role === 'staff'
+    ? { ...storedSubjectProfile, role: 'student' }
+    : storedSubjectProfile;
   // Old bookmarks and installed Student app shortcuts must not create a second
   // home for apprentices. Shared course routes remain available with apprentice chrome.
   const assignedHome = await resolveAssignedLearnerHome(db, subjectId);

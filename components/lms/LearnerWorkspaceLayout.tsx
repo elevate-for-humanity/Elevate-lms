@@ -48,9 +48,13 @@ export default async function LearnerWorkspaceLayout({
   if (!subjectProfile) throw new Error('Learner workspace profile could not be loaded.');
   const photoProfile = { avatar_url: subjectProfile.avatar_url };
   const isAdmin =
-    subject.previewing || ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
-  const subjectRole = subjectProfile.role;
-  const assignedHome = !['admin', 'super_admin', 'staff'].includes(String(subjectRole))
+    subject.previewing || ['admin', 'super_admin'].includes(String(profile?.role));
+  // The active workspace determines presentation; a staff job must not suppress
+  // that same person's learner requirements or course tools.
+  const subjectRole = subjectProfile.role === 'staff' && authorized?.effectiveRoles.some(role => role === 'student' || role === 'learner')
+    ? 'student'
+    : subjectProfile.role;
+  const assignedHome = !['admin', 'super_admin'].includes(String(subjectRole))
     ? await resolveAssignedLearnerHome(db, subject.userId)
     : null;
   const apprenticeWorkspace = assignedHome

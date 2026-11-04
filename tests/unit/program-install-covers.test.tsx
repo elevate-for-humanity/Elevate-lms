@@ -6,7 +6,12 @@ vi.mock('@/components/pwa/PwaInstallButton', () => ({ PwaInstallButton: () => nu
 describe('program install cover metadata', () => {
   it('uses the selected program photo while preserving the learner manifest', async () => {
     const metadata = await generateMetadata({ params: Promise.resolve({ portal: 'learner' }), searchParams: Promise.resolve({ program: 'hvac-technician' }) });
-    expect(metadata.manifest).toBe('/manifest-lms.json');
+    const learner = await generateMetadata({
+      params: Promise.resolve({ portal: 'learner' }),
+      searchParams: Promise.resolve({}),
+    });
+    expect(learner.manifest).toBe('/manifest-student.json');
+    expect(metadata.manifest).toBe(learner.manifest);
     expect(metadata.openGraph?.images).toEqual([{ url: getProgramHeroImage('hvac-technician'), alt: expect.any(String) }]);
   });
   it('does not let an unrecognized program replace the apprentice identity', async () => {

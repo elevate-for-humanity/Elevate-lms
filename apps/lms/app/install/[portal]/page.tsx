@@ -7,7 +7,7 @@ import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 import { InstallQrCode } from '@/components/pwa/InstallQrCode';
 
 const PORTALS = {
-  learner: { name: 'Student / Learner', manifest: '/manifest-lms.json', href: '/lms/dashboard' },
+  learner: { name: 'Student / Learner', manifest: '/manifest-student.json', href: '/lms/dashboard' },
   apprentice: { name: 'Apprentice', manifest: '/manifest-apprentice.json', href: '/apprentice' },
   employer: { name: 'Employer', manifest: '/manifest-employer.json', href: '/employer/dashboard' },
   'program-holder': { name: 'Program Holder', manifest: '/manifest-program-holder.json', href: '/program-holder/dashboard' },

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153052"><meta name="robots" content="noindex,nofollow">
+  <meta name="apple-mobile-web-app-title" content="Course Builder">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest-course-builder.json">
+  <link rel="stylesheet" href="/install/workspace.css">
+  <script defer src="/install/workspace.js"></script>
+  <title>Course Builder | Elevate for Humanity</title>
+</head>
+<body data-workspace="course-builder">
+<main>
+  <header><small>Elevate for Humanity</small><h1>Course Builder</h1>
+    <p id="readiness" role="status">Open once online to prepare this app for offline use.</p>
+    <a class="primary" id="workspace" href="/studio/courses">Open Course Builder</a>
+    <button type="button" id="install" hidden>Install Course Builder</button>
+  </header>
+  <section><h2>Outline a lesson</h2><p>Draft a course outline or lesson on your phone. Download it as a text file. When you reconnect, select your course in Course Builder and use “Upload syllabus for course production” to review and attach it.</p>
+    <label for="draft">Course or lesson outline</label>
+    <textarea id="draft" rows="9" maxlength="100000" placeholder="Course title, learning objective, lesson steps, practice activity, and assessment."></textarea>
+    <p class="hint">Saving keeps this draft on this device. Anyone using this browser can read it. Keep private records in the secure workspace.</p>
+    <div class="actions"><button id="save">Save on device</button><button id="copy">Copy text</button><button id="download">Download outline (.txt)</button><button id="clear">Clear draft</button></div>
+    <p id="feedback" role="status"></p>
+  </section>
+  <footer>On Android, open this page in Chrome and use the menu to install Course Builder.</footer>
+</main></body></html>

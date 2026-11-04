@@ -292,7 +292,8 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
     if(sourceError)throw sourceError;
     const {data:build,error:buildError}=await db.from('ultimate_course_builds').select('id,course_id,status,profile').eq('id',source.build_id).single();
     if(buildError)throw buildError;
-    if(!verification.resumedJobId && source.status==='failed' && source.monitor?.enabled && !['published','archived'].includes(build.status) && build?.profile?.ownerPaused!==true && !/owner|pause/i.test(source.monitor?.reason??'')){
+    const alreadyResumed=source.payload?.codeRepairId===repair.id && source.payload?.codeRepairSha===repair.release_sha;
+    if(!verification.resumedJobId && (source.status==='failed'||alreadyResumed) && source.monitor?.enabled && !['published','archived'].includes(build.status) && build?.profile?.ownerPaused!==true && !/owner|pause/i.test(source.monitor?.reason??'')){
      // enqueue() preserves the failed lesson cursor and reuses any active job.
      // Persist correlation before dispatch so retries cannot launch a second job.
      const {resumeRepairedJob}=await import('@/lib/ultimate-course-builder/worker/resume-repaired-job.mjs');

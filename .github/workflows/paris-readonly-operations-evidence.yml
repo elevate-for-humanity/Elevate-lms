@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: paris-readonly-evidence-${{ github.ref }}
@@ -41,8 +42,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Retrieve last successful read-only observation if available
+        id: previous
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p previous
+          for run in $(gh run list --repo "$GITHUB_REPOSITORY" --workflow paris-readonly-operations-evidence.yml --status success --limit 5 --json databaseId --jq '.[].databaseId'); do
+            if [ "$run" != "$GITHUB_RUN_ID" ] && gh run download "$run" --repo "$GITHUB_REPOSITORY" --pattern "paris-operations-evidence-*" --dir previous >/dev/null 2>&1; then
+              latest=$(find previous -name paris-runtime-watch.json -type f | head -1)
+              if [ -n "$latest" ]; then
+                cp "$latest" previous.json
+                break
+              fi
+            fi
+          done
+          if [ -f previous.json ]; then echo 'found=true' >> "$GITHUB_OUTPUT"; fi
       - name: Observe runtime without modifying database
-        run: node scripts/operations/paris-runtime-watch.mjs
+        run: |
+          if [ -f previous.json ]; then
+            node scripts/operations/paris-runtime-watch.mjs previous.json
+          else
+            node scripts/operations/paris-runtime-watch.mjs
+          fi
       - name: Evaluate release gate (expected BLOCKED until independent evidence provided)
         if: always()
         continue-on-error: true

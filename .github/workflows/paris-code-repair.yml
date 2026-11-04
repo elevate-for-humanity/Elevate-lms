@@ -10,6 +10,9 @@ on:
       - 'lib/ai/runtime/code-repair-policy.mjs'
   schedule:
     - cron: '*/10 * * * *'
+  workflow_run:
+    workflows: ['Deploy Admin', 'Deploy LMS automatically on Google', 'Deploy Google Marketing on trigger', 'Deploy Google Course Builder on source changes', 'Deploy Google Store runtime identity', 'CI', 'Registered Apprenticeship E2E', 'Verify PARIS Admin production authorization']
+    types: [completed]
   workflow_dispatch:
     inputs:
       repair_id:
@@ -26,7 +29,7 @@ concurrency:
   queue: max
 jobs:
   monitor:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == ''))
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'failure'))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:

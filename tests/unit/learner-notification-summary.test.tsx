@@ -6,7 +6,8 @@ vi.mock('@/lib/supabase/client', () => ({
   createClient: () => {
     const query: Record<string, unknown> = {};
     for (const method of ['select', 'eq', 'in', 'or', 'order']) query[method] = () => query;
-    query.limit = async () => ({
+    query.limit = () => query;
+    query.abortSignal = async () => ({
       data: [{ id: 'notice', title: 'Course reminder', message: 'Review your assignment' }],
     });
     const channel = { on: () => channel, subscribe: () => channel };

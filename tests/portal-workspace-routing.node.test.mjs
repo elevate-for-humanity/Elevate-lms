@@ -57,7 +57,7 @@ test('all apprentice aliases keep apprentice identity; ordinary students do not 
   for (const role of ['student', 'learner', 'host_shop', 'program_holder', 'admin', null]) assert.equal(nav.isApprenticeWorkspaceRole(role), false);
   const dashboard = read('apps/lms/app/lms/(app)/dashboard/page.tsx');
   const assignedHomeAt = dashboard.indexOf("if (assignedHome?.startsWith('/apprentice')) redirect(assignedHome)");
-  const fallbackAt = dashboard.indexOf("if (!assignedHome && isApprenticeWorkspaceRole(subjectProfile?.role)) redirect(PortalRouter.get('apprentice'))");
+  const fallbackAt = dashboard.search(/if\s*\(!assignedHome\s*&&\s*isApprenticeWorkspaceRole\(subjectProfile\?\.role\)\)\s*redirect\(PortalRouter\.get\('apprentice'\)\)/);
   const workspaceAt = dashboard.indexOf('const workspace = await loadLearnerWorkspace');
   assert.ok(assignedHomeAt > 0, 'assigned apprentice home must redirect before loading student workspace');
   assert.ok(fallbackAt > assignedHomeAt, 'apprentice role fallback must run after explicit assigned-home redirect');

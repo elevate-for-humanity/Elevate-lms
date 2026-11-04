@@ -468,6 +468,8 @@ export default function UltimateStageInspector({
               ))}
             </ul>
           ) : null}
+          <details className="min-w-0 rounded-xl border border-slate-700 p-3">
+          <summary className="min-h-11 cursor-pointer font-bold">Advanced checkpoints &amp; diagnostics</summary>
           <ol className="min-w-0 grid gap-2 sm:grid-cols-2 ">
             {ULTIMATE_BUILD_STEPS.map((step, index) => (
               <li key={step}>
@@ -621,11 +623,12 @@ export default function UltimateStageInspector({
               ) : null}
             </div>
           ) : null}
+          </details>
         </div>
       </section>
       {workspace.previewTarget && createPortal(
-        <section aria-label="Selected lesson preview" className="h-full overflow-auto bg-slate-950 p-4 text-white">
-          <nav aria-label="Preview display" className="mb-3 flex flex-wrap gap-2">
+        <section aria-label="Selected lesson preview" className="flex h-full min-h-0 flex-col overflow-auto bg-slate-950 p-4 text-white">
+          <nav aria-label="Preview display" className="mb-3 flex shrink-0 flex-wrap gap-2">
             <button type="button" aria-pressed={!learnerView} onClick={()=>setLearnerView(false)} className="min-h-11 rounded-lg border border-slate-600 px-3">Lesson video & content</button>
             <button type="button" aria-pressed={learnerView} onClick={()=>setLearnerView(true)} disabled={!previewLesson?.preview?.learnerPreviewUrl} className="min-h-11 rounded-lg border border-slate-600 px-3 disabled:opacity-50">Learner view</button>
           </nav>
@@ -634,7 +637,7 @@ export default function UltimateStageInspector({
           {!selectedLesson && !loading && !error && <p>Choose a lesson on the left to preview it here.</p>}
           {learnerView && previewLesson?.preview?.learnerPreviewUrl
             ? <iframe title={previewLesson.title+' — learner preview'} src={previewLesson.preview.learnerPreviewUrl}
-                className="h-[75dvh] min-h-[36rem] w-full rounded-xl border border-slate-700 bg-white" allow="autoplay; fullscreen" />
+                className="min-h-0 w-full flex-1 rounded-xl border border-slate-700 bg-white" allow="autoplay; fullscreen" />
             : <>            {lessons
               .filter((lesson) => lesson.lesson_key === selectedLesson)
               .map((lesson) => (

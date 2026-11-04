@@ -154,6 +154,7 @@ export default function UnifiedCourseBuilder({
   const [previewTarget,setPreviewTarget]=useState<HTMLDivElement|null>(null);
   const [lessonSelection,setLessonSelection]=useState<CourseSelection|null>(null);
   const [deployOpen,setDeployOpen]=useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const [suggestedPrompt,setSuggestedPrompt]=useState('');
   const [currentBuildId,setCurrentBuildId]=useState('');
   const [requestedLessonId,setRequestedLessonId]=useState('');
@@ -259,7 +260,7 @@ export default function UnifiedCourseBuilder({
 
   const workspace = (
     <div
-      className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100`}
+      className="min-h-full min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100"
     >
       <div className="border-b border-slate-800 bg-slate-900 px-3 py-2 sm:px-5 sm:py-4">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -267,11 +268,11 @@ export default function UnifiedCourseBuilder({
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
               <Bot className="h-4 w-4" /> Ultimate Course Builder
             </div>
-            <p className="mt-1 hidden max-w-3xl text-sm text-slate-200 sm:block">
+            <p className="sr-only">
               One durable 20-stage authority for standards, instruction, media, narration,
               assessments, QA, repair, and LMS release.
             </p>
-            <p className="mt-2 hidden items-center gap-2 text-sm font-bold text-emerald-300 sm:inline-flex">
+            <p className="sr-only">
               <ShieldCheck className="h-4 w-4" /> All production builds use the same verified execution contract.
             </p>
           </div>
@@ -283,7 +284,7 @@ export default function UnifiedCourseBuilder({
               id="ultimate-course-selector"
               value={courseId}
               onChange={(event) => selectCourse(event.target.value)}
-              className="min-h-10 max-w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm font-semibold text-white sm:min-w-80"
+              className="min-h-10 max-w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm font-semibold text-white sm:w-80"
             >
               <option value="">Select a course…</option>
               {courses.map((course) => (
@@ -314,12 +315,16 @@ export default function UnifiedCourseBuilder({
 
       <section aria-label="Course AI controls" className="space-y-3 border-b border-slate-700 p-3">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="flex-1 font-bold">Tell PARIS what to build or change</h2>
+          <h2 className="sr-only">Tell PARIS what to build or change</h2>
+          <button type="button" aria-expanded={assistantOpen} aria-controls="course-paris-instructions"
+            className="min-h-11 rounded-lg border border-cyan-600 px-3"
+            onClick={() => setAssistantOpen(value => !value)}>PARIS instructions</button>
           <button type="button" className="min-h-11 rounded-lg border border-cyan-600 px-3"
-            onClick={()=>{setTab('ultimate');setSuggestedPrompt('Help me plan a new course. Ask for its topic, learner, credential and program. Do not use tools or start a build yet.');}}>Build a course</button>
+            onClick={()=>{setAssistantOpen(true);setTab('ultimate');setSuggestedPrompt('Help me plan a new course. Ask for its topic, learner, credential and program. Do not use tools or start a build yet.');}}>Build a course</button>
           <button type="button" aria-expanded={deployOpen} className="min-h-11 rounded-lg border border-cyan-600 px-3"
             onClick={()=>setDeployOpen(value=>!value)}>Deploy</button>
         </div>
+        <div id="course-paris-instructions" hidden={!assistantOpen}>
         <p className="text-sm text-slate-300">Speak or type your instructions here. Select courses and lessons below; previews stay on the right.</p>
         <p className="text-xs text-slate-300">Deploy updates the platform. Publish course releases accepted lessons to learners.</p>
         <div className="h-[32rem] min-w-0 overflow-hidden rounded-xl border border-slate-700">
@@ -336,6 +341,7 @@ export default function UnifiedCourseBuilder({
             }}
             onCourseResult={(id,lessonId)=>{setPreviewRevision(value=>value+1);setCurrentBuildId('');setRequestedLessonId(lessonId??'');void loadCourses(id);openUltimate(id);setBrowserOpen(true);}}
           />
+        </div>
         </div>
         {taskStatus && <p role="status" className="text-sm text-cyan-200">{taskStatus}</p>}
         {deployOpen && <div className="h-[34rem] overflow-hidden rounded-xl border border-slate-700"><DeployPanel /></div>}
@@ -411,7 +417,7 @@ export default function UnifiedCourseBuilder({
   return (
     <CourseWorkspaceContext.Provider value={previewContext}>
       <ResizableWorkspace
-        className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
+        className={embedded ? "h-full overflow-hidden" : "h-[calc(100dvh-5rem)] min-h-0 overflow-hidden"}
         title="Course previews" initialPanelSize={60}
         stackedTabs primaryLabel="Courses, lessons & AI" panelLabel="Preview"
         open={browserOpen} onOpenChange={setBrowserOpen}
@@ -423,7 +429,7 @@ export default function UnifiedCourseBuilder({
           <div ref={setPreviewTarget} className="min-h-0 flex-1 overflow-auto">
             {!currentBuildId && selectedCourse && <iframe title={selectedCourse.title+' — learner preview'}
               src={'/api/admin/course-builder/preview?'+new URLSearchParams({courseId:selectedCourse.id,revision:String(previewRevision),...(requestedLessonId?{lessonId:requestedLessonId}:{})})}
-              className="h-full min-h-[36rem] w-full border-0 bg-white" allow="autoplay; fullscreen" />}
+              className="h-full min-h-0 w-full border-0 bg-white" allow="autoplay; fullscreen" />}
           </div>
         </section>}
       >{workspace}</ResizableWorkspace>

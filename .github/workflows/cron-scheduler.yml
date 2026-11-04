@@ -281,6 +281,8 @@ jobs:
          || github.event.inputs.job == 'barber-reinstate'
       ))
     steps:
+      - uses: actions/checkout@v4
+
       - name: Interoffice mail queue
         run: |
           curl -sf -X GET "$ADMIN_URL/api/cron/interoffice-mail" \
@@ -367,10 +369,10 @@ jobs:
             || echo "::warning::check-licenses failed"
 
       - name: Daily attendance alerts
+        id: attendance_alerts
+        continue-on-error: true
         run: |
-          curl -sf -X GET "$ADMIN_URL/api/cron/daily-attendance-alerts" \
-            -H "Authorization: Bearer $CRON_SECRET" --max-time 60 \
-            || echo "::warning::daily-attendance-alerts failed"
+          node scripts/run-critical-cron.mjs daily-attendance-alerts POST
 
       - name: Morning reminders
         run: |
@@ -422,35 +424,11 @@ jobs:
             || echo "::warning::trial-lifecycle failed"
 
       - name: Platform autopilot tick
+        id: autopilot_tick
+        continue-on-error: true
         shell: bash
         run: |
-          set -euo pipefail
-          response_file="$(mktemp)"
-          trap 'rm -f "$response_file"' EXIT
-          status="$(curl --silent --show-error --max-time 60 \
-            --output "$response_file" --write-out '%{http_code}' \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            "$ADMIN_URL/api/cron/autopilot-tick")"
-          if [ "$status" != 200 ]; then
-            echo "::error::autopilot-tick returned HTTP $status"
-            exit 1
-          fi
-          node - "$response_file" <<'NODE'
-          const fs = require('node:fs');
-          let result;
-          try {
-            result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
-          } catch {
-            console.error('::error::autopilot-tick response was not JSON');
-            process.exit(1);
-          }
-          if (result?.success !== true || result?.ok !== true ||
-              (Array.isArray(result.errors) && result.errors.length > 0)) {
-            console.error('::error::autopilot-tick reported unsuccessful engineering reconciliation');
-            process.exit(1);
-          }
-          console.log('autopilot-tick verified successful');
-          NODE
+          node scripts/run-critical-cron.mjs autopilot-tick GET
 
       - name: Ops Agent scan
         run: |
@@ -481,6 +459,17 @@ jobs:
           curl -sf -X GET "$ADMIN_URL/api/cron/testing-lead-followup" \
             -H "Authorization: Bearer $CRON_SECRET" --max-time 60 \
             || echo "::warning::testing-lead-followup failed"
+
+      - name: Require attendance alerts and autopilot to succeed
+        if: always()
+        env:
+          ATTENDANCE_RESULT: ${{ steps.attendance_alerts.outcome }}
+          AUTOPILOT_RESULT: ${{ steps.autopilot_tick.outcome }}
+        run: |
+          test "$ATTENDANCE_RESULT" = success && test "$AUTOPILOT_RESULT" = success || {
+            echo "::error::Attendance alerts or autopilot failed; see individual step results"
+            exit 1
+          }
 
   # ── Daily 8 PM: end-of-day summary ────────────────────────────────────────
   daily-evening:

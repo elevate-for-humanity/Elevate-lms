@@ -43,6 +43,10 @@ jobs:
           node --experimental-strip-types --test lib/testing/native-exam-policy.test.mjs
       - name: Verify authenticated canonical SCORM tracking
         run: node --test cloudflare-workers/scorm-player-worker.test.mjs
+      - name: Verify attendance scheduler and engineering reconciliation
+        run: |
+          node --test scripts/run-critical-cron.test.mjs
+          pnpm exec vitest run tests/unit/openhands-reconciliation-queue.test.ts tests/unit/openhands-exact-reconcile-contract.test.ts tests/unit/cron-scheduler-session.test.ts
       - name: Verify voicemail release hook and PARIS terminal-state regressions
         run: node --test scripts/gcp/voicemail-acceptance-workflow.test.mjs scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/supervise-course-queue.test.mjs
       - name: Student funding and permission regression tests

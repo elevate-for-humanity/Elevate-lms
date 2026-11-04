@@ -10,7 +10,12 @@ class ReviewedSourceTests(unittest.TestCase):
     def row(self):
         return {'content_json':{'experience':{'readingGuide':{'sections':[{'heading':'Review','body':'Saved instruction.'}]}},'manualMediaDraft':{'mode':'manually-reviewed-source-and-photo-selections','sourceTranscriptSha256':hashlib.sha256(b'Review. Saved instruction.').hexdigest(),'photoGroups':[['photo-a','photo-b']],'noAutomaticPublication':True,'reviewRequiredAfterEncoding':True}}}
     def test_exact_reviewed_source(self):
-        sections,groups,text=manual.canonical_source(self.row());self.assertEqual(text,'Review. Saved instruction.');self.assertEqual(groups,[['photo-a','photo-b']])
+        row=self.row();row['content_json']['manualMediaDraft']['visualCues']=[{'photoId':'photo-a'}]
+        sections,groups,text=manual.canonical_source(row);self.assertEqual(text,'Review. Saved instruction.');self.assertEqual(groups,[['photo-a','photo-b']])
+    def test_legacy_evenly_split_pictures_require_a_reviewed_timeline(self):
+        with self.assertRaisesRegex(RuntimeError,'REVIEWED_VISUAL_CUES_REQUIRED'):manual.canonical_source(self.row(),require_timeline=True)
+    def test_legacy_media_can_still_be_inspected_without_rendering(self):
+        self.assertEqual(manual.canonical_source(self.row())[2],'Review. Saved instruction.')
     def test_changed_instruction_stops_before_encoding(self):
         row=self.row();row['content_json']['experience']['readingGuide']['sections'][0]['body']='Changed.'
         with self.assertRaisesRegex(RuntimeError,'MANUAL_SOURCE_CHANGED'):manual.canonical_source(row)

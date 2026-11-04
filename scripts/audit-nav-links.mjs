@@ -155,16 +155,18 @@ function resolveHref(href, ctx) {
     return { ok: true, resolved: '/testing/:provider', via: `provider "${testing[1]}"` };
   }
 
-  // Match against route patterns (single-segment params)
+  // Match dynamic segments, including hosted sites whose home page has no
+  // trailing slug: /sites/[subdomain]/[[...slug]].
   for (const pattern of ctx.routePatterns) {
     if (!pattern.includes(':')) continue;
-    const regex = new RegExp(
-      '^' +
-        pattern
-          .replace(/:[^/]+/g, '[^/]+')
-          .replace(/\//g, '\\/') +
-        '$',
-    );
+    const segments = pattern.split('/').filter(Boolean);
+    const expression = segments.map((segment) => {
+      if (/^:\[\.\.\..+\]$/.test(segment)) return '(?:/[^/]+)*';
+      if (segment.startsWith(':...')) return '(?:/[^/]+)+';
+      if (segment.startsWith(':')) return '/[^/]+';
+      return '/' + segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('');
+    const regex = new RegExp('^' + expression + '$');
     if (regex.test(p)) return { ok: true, resolved: pattern, via: 'pattern' };
   }
 

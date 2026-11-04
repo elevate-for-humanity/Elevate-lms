@@ -35,7 +35,7 @@ export default function Header() {
             className="h-10 w-8 shrink-0 object-contain"
             style={{ width: 32, height: 40 }}
           />
-          <span className="hidden whitespace-nowrap text-sm font-extrabold tracking-tight text-slate-950 min-[1180px]:inline">
+          <span className="hidden whitespace-nowrap text-sm font-extrabold tracking-tight text-slate-950 min-[1440px]:inline">
             Elevate for Humanity
           </span>
         </Link>

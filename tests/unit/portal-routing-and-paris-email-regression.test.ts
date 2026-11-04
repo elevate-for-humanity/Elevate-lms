@@ -36,7 +36,9 @@ describe('portal routing and PARIS inbound email', () => {
     const holderGuard = fs.readFileSync(path.resolve('lib/auth/require-program-holder.ts'), 'utf8');
     expect(holderGuard).toContain(applicationUrl);
     expect(holderGuard).toContain("from '@/lib/utils/site-urls'");
-    expect(holderMou).toContain('await requireProgramHolder()');
+    expect(holderMou).toContain('allowPendingApproval: true');
+    expect(holderMou).toContain('!approvalReady');
+    expect(holderMou).toContain('Boolean(holder.approved_at)');
     expect(holderOnboarding).toContain('allowPendingApproval: true');
     expect(holderOnboarding).toContain('Program Holder approval pending');
     expect(holderOnboarding).not.toContain('/program-holder/dashboard?onboarding=pending-approval');

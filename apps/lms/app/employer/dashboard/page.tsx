@@ -68,7 +68,7 @@ export default async function EmployerDashboardOrchestrated() {
           <Building2 className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Application Under Review</h1>
           <p className="text-slate-600 mb-6">
-            Your employer record is pending approval. Hiring and apprenticeship controls unlock
+            Your employer record is pending approval. You can finish your company profile and documents now. Hiring and apprenticeship controls unlock
             after verification.
           </p>
           <a
@@ -77,6 +77,7 @@ export default async function EmployerDashboardOrchestrated() {
           >
             Call {PLATFORM_DEFAULTS.supportPhone}
           </a>
+          <Link href="/employer/setup" className="mt-4 block rounded-lg bg-blue-700 px-6 py-3 font-semibold text-white">Continue employer setup</Link>
         </div>
       </div>
     );

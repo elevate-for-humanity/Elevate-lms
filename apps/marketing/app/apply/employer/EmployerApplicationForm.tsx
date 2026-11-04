@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function EmployerApplicationForm() {
@@ -27,6 +27,45 @@ export default function EmployerApplicationForm() {
     accommodations: '',
     notes: '',
   });
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftNotice, setDraftNotice] = useState('');
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('elevate-employer-application-draft-v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          setForm(
+            (current) =>
+              Object.fromEntries(
+                Object.entries(current).map(([key, value]) => [
+                  key,
+                  typeof parsed[key] === 'string' ? parsed[key].slice(0, 4000) : value,
+                ]),
+              ) as typeof current,
+          );
+          setDraftNotice(
+            'Your unfinished application was restored. Please review it and certify it again before submitting.',
+          );
+        }
+      }
+    } catch {
+      setDraftNotice(
+        'Draft recovery is unavailable in this browser. Keep this page open until submission is confirmed.',
+      );
+    }
+    setDraftReady(true);
+  }, []);
+  useEffect(() => {
+    if (!draftReady) return;
+    try {
+      sessionStorage.setItem('elevate-employer-application-draft-v1', JSON.stringify(form));
+    } catch {
+      setDraftNotice(
+        'Draft saving is unavailable in this browser. Keep this page open until submission is confirmed.',
+      );
+    }
+  }, [form, draftReady]);
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message?: string; error?: string; reference?: string } | null>(null);
@@ -84,6 +123,7 @@ export default function EmployerApplicationForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
+        try { sessionStorage.removeItem('elevate-employer-application-draft-v1'); } catch { /* Submission is already confirmed. */ }
         const reference = data.referenceNumber || data.applicationId || '';
         setResult({
           success: true,
@@ -119,6 +159,13 @@ export default function EmployerApplicationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-7">
+      <p
+        role="status"
+        className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-slate-900"
+      >
+        {draftNotice ||
+          'Your entries are kept in this browser tab while you finish. A saved draft is not a submitted application. Wait for a confirmation reference after submitting.'}
+      </p>
       <section>
         <h3 className="mb-4 text-xl font-black text-slate-950">Company and contact</h3>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -163,7 +210,7 @@ export default function EmployerApplicationForm() {
       </label>
 
       {result?.error && <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-950">{result.error}</div>}
-      <button type="submit" disabled={submitting} className="w-full rounded-xl bg-brand-blue-700 py-4 font-extrabold text-white hover:bg-brand-blue-800 disabled:bg-slate-600">{submitting ? 'Submitting…' : 'Submit Employer Application'}</button>
+      <button type="submit" disabled={submitting || !draftReady} className="w-full rounded-xl bg-brand-blue-700 py-4 font-extrabold text-white hover:bg-brand-blue-800 disabled:bg-slate-600">{submitting ? 'Submitting…' : 'Submit Employer Application'}</button>
     </form>
   );
 }

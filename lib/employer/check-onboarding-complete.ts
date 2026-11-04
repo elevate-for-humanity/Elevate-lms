@@ -69,7 +69,7 @@ export async function checkOnboardingComplete(
   // Get documents with their approval status
   const { data: documents, error: documentError } = await db
     .from('documents')
-    .select('document_type, status, expiration_date, file_url, file_path, storage_path')
+    .select('document_type, status, expiration_date, file_url, file_path, storage_path, metadata')
     .eq('user_id', employerId);
 
   const { data: agreements, error: agreementError } = await db
@@ -82,11 +82,12 @@ export async function checkOnboardingComplete(
   for (const doc of documents || []) {
     if (!doc.file_url && !doc.file_path && !doc.storage_path) continue;
     // Keep the highest status per type (approved > pending > rejected)
-    const existing = docMap.get(doc.document_type);
+    const type = typeof doc.metadata?.original_type === 'string' ? doc.metadata.original_type : doc.document_type;
+    const existing = docMap.get(type);
     const expired = doc.expiration_date && doc.expiration_date.slice(0, 10) < new Date().toISOString().slice(0, 10);
     const documentStatus = expired ? 'expired' : doc.status;
     if (!existing || documentStatus === 'approved') {
-      docMap.set(doc.document_type, documentStatus);
+      docMap.set(type, documentStatus);
     }
   }
 

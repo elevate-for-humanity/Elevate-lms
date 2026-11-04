@@ -288,16 +288,15 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    const verification:any={...repair.verification,tests:'passed',deployments:'passed',exactRuntimeSha:checks.every(Boolean),runtimeVerifiedAt:repair.verification?.runtimeVerifiedAt??(checks.every(Boolean)?new Date().toISOString():null)};
    if(!checks.every(Boolean)){await update(repair.id,{status:'verifying',verification});continue;}
    if(repair.source_job_id){
-    const {data:source,error:sourceError}=await db.from('ultimate_build_jobs').select('id,build_id,status,payload,monitor').eq('id',repair.source_job_id).single();
+    const {data:source,error:sourceError}=await db.from('ultimate_build_jobs').select('*').eq('id',repair.source_job_id).single();
     if(sourceError)throw sourceError;
     const {data:build,error:buildError}=await db.from('ultimate_course_builds').select('id,status,profile').eq('id',source.build_id).single();
     if(buildError)throw buildError;
     if(!verification.resumedJobId && source.status==='failed' && source.monitor?.enabled && !['published','archived'].includes(build.status) && build?.profile?.ownerPaused!==true && !/owner|pause/i.test(source.monitor?.reason??'')){
      // enqueue() preserves the failed lesson cursor and reuses any active job.
      // Persist correlation before dispatch so retries cannot launch a second job.
-     const {UltimateJobQueue}=await import('@/lib/ultimate-course-builder/worker/job-queue');
-     const payload={...source.payload,codeRepairId:repair.id,codeRepairSha:repair.release_sha};delete payload.progress;
-     const resumed=await new UltimateJobQueue(db).enqueue(source.build_id,payload);
+     const {resumeRepairedJob}=await import('@/lib/ultimate-course-builder/worker/resume-repaired-job.mjs');
+     const resumed=await resumeRepairedJob({db,source,repair:{...repair,verification}});
      if(resumed?.payload?.codeRepairId===repair.id && resumed?.payload?.codeRepairSha===repair.release_sha){
       verification.resumedJobId=resumed.id;
       await update(repair.id,{status:'verifying',verification});
@@ -306,7 +305,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
     }
     let resumed=null;
     if(verification.resumedJobId){
-     const result=await db.from('ultimate_build_jobs').select('id,build_id,status,payload').eq('id',verification.resumedJobId).single();
+     const result=await db.from('ultimate_build_jobs').select('id,build_id,status,payload,execution_generation').eq('id',verification.resumedJobId).single();
      if(result.error)throw result.error;resumed=result.data;
     }
     const outcome=courseRepairOutcome({repairId:repair.id,releaseSha:repair.release_sha,sourceJobId:repair.source_job_id,job:resumed,build});

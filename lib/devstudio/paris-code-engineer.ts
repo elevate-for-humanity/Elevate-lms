@@ -1,3 +1,4 @@
+import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
@@ -510,9 +511,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // A model declaring completion is not evidence of a repair. Feed the
       // missing deliverables back to the planner while turns remain, instead
       // of ending with a misleading no-change 422 after a premature summary.
-      if (!changedFiles.size || !newRegressionTests.size ||
-          ![...changedFiles].some(path => !path.startsWith('tests/') &&
-            !/\.(?:test|spec)\.[cm]?[jt]sx?$/.test(path))) {
+      if (missingRepairDeliverables(changedFiles, newRegressionTests)) {
         observations.push('COMPLETE REJECTED: commit an application correction AND create a new regression test on the task branch before completing. Read a specific source file and use replace/create actions.');
         continue;
       }

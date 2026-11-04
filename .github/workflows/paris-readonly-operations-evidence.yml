@@ -1,0 +1,92 @@
+name: PARIS read-only operations evidence
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '13 * * * *'
+  pull_request:
+    paths:
+      - 'scripts/operations/paris-runtime-watch*.mjs'
+      - 'scripts/operations/assess-production-readiness*.mjs'
+      - '.github/workflows/paris-readonly-operations-evidence.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: paris-readonly-evidence-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify read-only observer and operations launch gate
+        run: node --test scripts/operations/paris-runtime-watch.test.mjs scripts/operations/assess-production-readiness.test.mjs
+
+  observe:
+    if: github.event_name != 'pull_request'
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Retrieve last successful read-only observation if available
+        id: previous
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p previous
+          for run in $(gh run list --repo "$GITHUB_REPOSITORY" --workflow paris-readonly-operations-evidence.yml --status success --limit 5 --json databaseId --jq '.[].databaseId'); do
+            if [ "$run" != "$GITHUB_RUN_ID" ] && gh run download "$run" --repo "$GITHUB_REPOSITORY" --pattern "paris-operations-evidence-*" --dir previous >/dev/null 2>&1; then
+              latest=$(find previous -name paris-runtime-watch.json -type f | head -1)
+              if [ -n "$latest" ]; then
+                cp "$latest" previous.json
+                break
+              fi
+            fi
+          done
+          if [ -f previous.json ]; then echo 'found=true' >> "$GITHUB_OUTPUT"; fi
+      - name: Observe runtime without modifying database
+        run: |
+          if [ -f previous.json ]; then
+            node scripts/operations/paris-runtime-watch.mjs previous.json
+          else
+            node scripts/operations/paris-runtime-watch.mjs
+          fi
+      - name: Evaluate release gate (expected BLOCKED until independent evidence provided)
+        if: always()
+        continue-on-error: true
+        run: |
+          if [ -f audit-output/paris-runtime-watch.json ]; then
+            node scripts/operations/assess-production-readiness.mjs audit-output/paris-runtime-watch.json
+          fi
+      - name: Summarize observed evidence
+        if: always()
+        run: |
+          echo '### PARIS read-only observations' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No database writes, deployments, or repair dispatches were performed.' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f audit-output/paris-runtime-watch.json ]; then
+            node -e "let x=require('./audit-output/paris-runtime-watch.json');console.log(JSON.stringify({capturedAt:x.capturedAt,counts:x.jobs,alerts:x.diagnostics.alerts,exhaustedFailures:x.diagnostics.exhaustedFailures},null,2))" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Evidence collection failed or secret is not configured.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paris-operations-evidence-${{ github.run_id }}
+          path: audit-output/paris-runtime-watch.json
+          if-no-files-found: ignore
+          retention-days: 14

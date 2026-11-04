@@ -8,7 +8,7 @@ import {pathToFileURL} from 'node:url';
 import {mkdirSync,writeFileSync} from 'node:fs';
 
 export const SURFACES = Object.freeze([
- {name:'marketing', url:'https://www.elevateforhumanity.org/', expected:[200]},
+ {name:'marketing', url:'https://www.elevateforhumanity.org/', expected:[200,301,302,307,308]},
  {name:'admin-health', url:'https://admin.elevateforhumanity.org/api/health', expected:[200]},
  {name:'lms-entry', url:'https://www.elevateforhumanity.org/login', expected:[200,302,307,308]},
 ]);

@@ -39,3 +39,14 @@ test('transport and malformed responses never disclose provider error text', asy
       !error.message.includes('private') && !error.message.includes('secret') && error.message.includes('no success inferred'));
   }
 });
+
+import { readFileSync } from 'node:fs';
+test('production recovery workflow uses protected secrets and never applies migrations', () => {
+  const workflow = readFileSync('.github/workflows/db-backup.yml', 'utf8');
+  assert.match(workflow, /environment: production/);
+  assert.match(workflow, /Confirm backup-read credential is bound to production/);
+  assert.match(workflow, /SUPABASE_ACCESS_TOKEN: \$\{\{ secrets\.SUPABASE_ACCESS_TOKEN \}\}/);
+  assert.match(workflow, /SUPABASE_PROJECT_ID: cuxzzpsyufcewtmicszk/);
+  assert.match(workflow, /check-database-recovery\.mjs/);
+  assert.doesNotMatch(workflow, /\bsupabase db push\b|\bpsql\b|\bapply_migration\b/i);
+});

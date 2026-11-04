@@ -1,4 +1,4 @@
-import { test, expect, type Locator } from '@playwright/test';
+import { test, expect, type Locator, type Request as BrowserRequest } from '@playwright/test';
 import { isConfirmedWebKitCancellation, type CapturedBrowserError, type CancelledBrowserRequest } from './helpers/browser-runtime-errors';
 const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
@@ -10,12 +10,36 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   test.skip(!email || !password, 'Provision the isolated QA employer identity first');
   const runtimeErrors: CapturedBrowserError[] = [];
   const cancelledRequests: CancelledBrowserRequest[] = [];
+  const pendingClientReads = new Set<BrowserRequest>();
+  let lastClientReadActivity = Date.now();
+  const clientReadPaths = new Set(['/auth/v1/user', '/rest/v1/notifications']);
+  const authOrigin = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://unused.invalid').origin;
+  const finishClientRead = (request: BrowserRequest) => {
+    if (pendingClientReads.delete(request)) lastClientReadActivity = Date.now();
+  };
+  page.on('request', request => {
+    const url = new URL(request.url());
+    if (request.method() === 'GET' && url.origin === authOrigin && clientReadPaths.has(url.pathname)) {
+      pendingClientReads.add(request);
+      lastClientReadActivity = Date.now();
+    }
+  });
+  page.on('requestfinished', finishClientRead);
   page.on('pageerror', (error) => runtimeErrors.push({ message: error.message, stack: error.stack, time: Date.now() }));
-  page.on('requestfailed', (request) => cancelledRequests.push({ url: request.url(), errorText: request.failure()?.errorText || '', time: Date.now() }));
+  page.on('requestfailed', (request) => {
+    cancelledRequests.push({ url: request.url(), errorText: request.failure()?.errorText || '', time: Date.now() });
+    finishClientRead(request);
+  });
   // Let mounted notification/auth requests settle before deliberately leaving
   // a document. This exercises the UI without generating unload-only errors.
+  const waitForClientReads = async () => {
+    await expect.poll(() => pendingClientReads.size === 0 && Date.now() - lastClientReadActivity >= 300, {
+      timeout: 10000,
+      message: 'Account and notification requests should settle before leaving the document',
+    }).toBe(true);
+  };
   const clickReady = async (locator: Locator) => {
-    await page.waitForLoadState('networkidle');
+    await waitForClientReads();
     await locator.click();
   };
   await page.goto(`${base}/login`);
@@ -37,7 +61,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   await page.getByLabel('State', { exact: true }).fill('TN');
   await clickReady(page.getByRole('button', { name: 'Save company profile' }));
   await expect(page.getByText('Company profile saved.', { exact: true })).toBeVisible();
-  await page.waitForLoadState('networkidle');
+  await waitForClientReads();
   await page.reload();
   await expect(page.getByLabel('Company name', { exact: true })).toHaveValue(
     '[QA E2E] Employer workflow',
@@ -50,7 +74,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   await expect(
     page.getByText('Your hiring and training needs are saved.', { exact: true }),
   ).toBeVisible();
-  await page.waitForLoadState('networkidle');
+  await waitForClientReads();
   await page.reload();
   await expect(page.getByLabel('Positions or staff training needed')).toHaveValue(
     'QA staff training only',
@@ -83,7 +107,14 @@ test('Employer setup saves company and hiring needs, opens private files and ack
       { message: 'Employer setup images must load', timeout: 15000 },
     )
     .toBe(true);
-  expect(runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName)).map(error => error.message), 'Employer workflow must not produce unhandled browser errors').toEqual([]);
+  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName));
+  if (unhandledErrors.length) {
+    await test.info().attach('browser-runtime-errors.json', {
+      body: Buffer.from(JSON.stringify({ runtimeErrors, cancelledRequests })),
+      contentType: 'application/json',
+    });
+  }
+  expect(unhandledErrors.map(error => error.message), 'Employer workflow must not produce unhandled browser errors').toEqual([]);
   await page.screenshot({
     path: test.info().outputPath('employer-setup-complete.png'),
     fullPage: true,

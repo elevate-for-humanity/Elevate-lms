@@ -1,0 +1,38 @@
+.workspace {
+  container-type: inline-size;
+}
+
+.views {
+  display: flex;
+}
+
+.panel {
+  display: none;
+}
+
+.panel[data-active='true'] {
+  display: block;
+}
+
+/* Use the available workspace width, including when the portal sidebar is open. */
+@container (min-width: 900px) {
+  .views {
+    display: none;
+  }
+
+  .panels {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  }
+
+  .panel {
+    display: block;
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .preview {
+    position: sticky;
+    top: 1rem;
+  }
+}

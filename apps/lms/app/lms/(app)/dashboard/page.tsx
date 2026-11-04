@@ -120,16 +120,22 @@ export default async function StudentDashboard() {
     : { data: profile };
   // requireRole above has already verified a learner membership. Keep staff
   // employment separate from the learner's coursework and requirements.
-  const subjectProfile = storedSubjectProfile?.role === 'staff'
-    ? { ...storedSubjectProfile, role: 'student' }
-    : storedSubjectProfile;
+  const subjectProfile =
+    storedSubjectProfile?.role === 'staff'
+      ? { ...storedSubjectProfile, role: 'student' }
+      : storedSubjectProfile;
   // Old bookmarks and installed Student app shortcuts must not create a second
   // home for apprentices. Shared course routes remain available with apprentice chrome.
   const assignedHome = await resolveAssignedLearnerHome(db, subjectId);
   if (assignedHome?.startsWith('/apprentice')) redirect(assignedHome);
-  if (!assignedHome && isApprenticeWorkspaceRole(subjectProfile?.role)) redirect(PortalRouter.get('apprentice'));
+  if (!assignedHome && isApprenticeWorkspaceRole(subjectProfile?.role))
+    redirect(PortalRouter.get('apprentice'));
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
-  const hasHvacEnrollment = workspace.enrollments.some(row => ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(row.program_slug || '') && ['active', 'enrolled', 'in_progress', 'confirmed'].includes(row.status));
+  const hasHvacEnrollment = workspace.enrollments.some(
+    (row) =>
+      ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(row.program_slug || '') &&
+      ['active', 'enrolled', 'in_progress', 'confirmed'].includes(row.status),
+  );
   const qwikStudyCode = hasHvacEnrollment ? await loadQwikStudyCode(db, subjectId) : null;
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling
@@ -570,6 +576,12 @@ export default async function StudentDashboard() {
                 </div>
               )}
 
+              {activeCourseIsAvailable && (
+                <p className="mt-3 text-sm leading-6 text-slate-100">
+                  Choose lessons and follow instructions on the left. Watch the lesson or practice
+                  preview on the right. On a phone, switch between Instructions and Preview.
+                </p>
+              )}
               <div className="mt-7 flex flex-wrap gap-3">
                 {activeCourseIsAvailable && resumeHref ? (
                   <Link
@@ -577,11 +589,7 @@ export default async function StudentDashboard() {
                     className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-500"
                   >
                     <Play className="h-4 w-4" />{' '}
-                    {isComplete
-                      ? 'Review Course'
-                      : isFirstVisit
-                        ? 'Start Training'
-                        : 'Continue Training'}
+                    {isComplete ? 'Review Course' : 'Continue Learning'}
                   </Link>
                 ) : (
                   <Link
@@ -635,9 +643,7 @@ export default async function StudentDashboard() {
           </section>
         )}
 
-        {hasHvacEnrollment ? (
-          <HvacStartHere studyCode={qwikStudyCode} />
-        ) : null}
+        {hasHvacEnrollment ? <HvacStartHere studyCode={qwikStudyCode} /> : null}
         <section
           className="rounded-2xl border border-slate-200 bg-white p-5"
           aria-label="Documents and agreements"
@@ -751,7 +757,9 @@ export default async function StudentDashboard() {
           </summary>
           <StudentCompletionTasks userId={subjectId} />
           {programEnrollments.some((row: any) =>
-            ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(String(row.programs?.slug || row.program_slug || '')),
+            ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(
+              String(row.programs?.slug || row.program_slug || ''),
+            ),
           ) ? (
             <HvacHandsOnClock />
           ) : null}

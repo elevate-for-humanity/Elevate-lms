@@ -1,4 +1,5 @@
 'use client';
+import { LearningPreview } from './LearningWorkspace';
 import {useState} from 'react';
 import WorkbookNarration from './WorkbookNarration';
 
@@ -44,7 +45,7 @@ export default function BeautyWorkbookSimulator({slug}:{slug:string}) {
     <p className="text-xs font-extrabold uppercase tracking-wide text-violet-900">Virtual practice · No workplace hours</p>
     <h3 className="mt-2 text-2xl font-bold">{lab.name}</h3>
     <p className="mt-2">{lab.caption} Use the choices below to rehearse the decision before supervised practice.</p>
-    <svg viewBox="0 0 440 240" role="img" aria-label={lab.caption} className="my-4 w-full max-w-lg rounded-xl bg-stone-50">
+    <LearningPreview><svg viewBox="0 0 440 240" role="img" aria-label={lab.caption} className="my-4 w-full max-w-lg rounded-xl bg-stone-50">
       <rect x="10" y="10" width="420" height="220" rx="12" fill="#fafaf9" stroke="#57534e"/>
       <rect x="42" y="130" width="356" height="42" rx="8" fill="#d6d3d1" stroke="#57534e"/>
       <circle cx="220" cy="88" r="48" fill="#d7aa8b" stroke="#7c624d" strokeWidth="2"/>
@@ -53,7 +54,7 @@ export default function BeautyWorkbookSimulator({slug}:{slug:string}) {
       <rect x="334" y="98" width="38" height="32" rx="5" fill="#c4b5fd" stroke="#57534e"/>
       <text x="45" y="202" fontSize="15" fill="#334155">Preparation</text>
       <text x="270" y="202" fontSize="15" fill={correct?'#065f46':'#334155'}>{correct?'Correct safe decision':'Choose your next action'}</text>
-    </svg>
+    </svg></LearningPreview>
     <h4 className="font-bold">{lab.action}</h4>
     <p className="mt-2">{lab.question}</p>
     <WorkbookNarration text={`${lab.name}. ${lab.question} ${lab.choices.join('. ')}`} />

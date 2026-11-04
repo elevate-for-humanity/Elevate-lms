@@ -8,6 +8,8 @@ import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachin
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
+import LearningWorkspace from '@/components/lms/LearningWorkspace';
+import LessonPicker from '@/components/lms/LessonPicker';
 import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
@@ -187,7 +189,9 @@ export default async function LessonPage({
   const { data: program } = course.program_id
     ? await db.from('programs').select('slug').eq('id', course.program_id).maybeSingle()
     : { data: null };
-  const handsOnClockOnly = program?.slug === 'hvac-technician' || /^(hvac(?:-|$)|epa-?608(?:-|$))/i.test(course.slug || '');
+  const handsOnClockOnly =
+    program?.slug === 'hvac-technician' ||
+    /^(hvac(?:-|$)|epa-?608(?:-|$))/i.test(course.slug || '');
 
   if (!preview.active && user) {
     const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', {
@@ -317,7 +321,7 @@ export default async function LessonPage({
 
   const lessonHeader = (
     <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
         <Link
           href={`/lms/courses/${course.id}`}
           className="inline-flex items-center gap-2 text-sm font-bold text-cyan-800 hover:underline"
@@ -353,77 +357,21 @@ export default async function LessonPage({
   return (
     <LessonFocusShell header={lessonHeader}>
       <TheoryWindowBoundary courseId={course.id} readOnly={preview.active}>
-        <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+        <div className="mx-auto max-w-[1600px] space-y-6 px-4 py-8 sm:px-6">
           {preview.active ? (
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700">
               Administrator lesson view · Full content, playback and assessment inspection
             </div>
           ) : null}
-          {lessonVisual?.media_type === 'image' ? (
-            <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
-              <img
-                src={lessonVisual.asset_url}
-                alt={lessonVisual.alt_text || lesson.title}
-                className="h-40 w-full object-contain bg-slate-50 sm:h-48"
-              />
-              {lessonVisual.caption ? (
-                <figcaption className="border-t border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700">
-                  {lessonVisual.caption}
-                </figcaption>
-              ) : null}
-            </figure>
-          ) : null}
-
-          {!lesson.video_url ? (
-            <AITeachingPlayer
-              courseTitle={course.title}
-              lessonTitle={lesson.title}
-              instructorName={instructorName}
-              instructorImage={instructorImage}
-              visualImage={lessonVisual?.asset_url ?? lessonVisual?.poster_url ?? undefined}
-              slides={slides}
-            />
-          ) : null}
-
-          {lesson.video_url ? (
-            <section
-              aria-label="Instructional lesson video"
-              className="overflow-hidden rounded-3xl border border-neutral-700 bg-neutral-900 shadow-lg"
-            >
-              <div className="p-3">
-                <InteractiveVideoPlayer
-                  videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
-                  title={lesson.title}
-                  lessonId={lesson.id}
-                  courseId={course.id}
-                  checkpoints={videoCheckpoints}
-                  transcript={videoTranscript}
-                  captionsUrl={
-                    captionsUrl &&
-                    managedLessonPlaybackUrl(captionsUrl, course.id, lesson.id) !== captionsUrl
-                      ? `/api/courses/${course.id}/lessons/${lesson.id}/playback?asset=captions`
-                      : captionsUrl
-                  }
-                  adminReview={preview.active}
-                  readOnly={preview.active}
-                  learnerId={preview.active ? undefined : user?.id}
-                />
-                <div className="mt-4 rounded-xl bg-white p-4 text-slate-950">
-                  <p className="font-bold">Finished watching?</p>
-                  <p className="mt-1 text-sm">
-                    Complete the required lesson activities and questions, then save your completion
-                    below. Watching the video alone does not complete the lesson.
-                  </p>
-                  <a
-                    href="#lesson-completion"
-                    className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-4 py-2 font-bold text-white"
-                  >
-                    Go to lesson completion
-                  </a>
-                </div>
+          <LearningWorkspace
+            instructions={
+              <>
+                <LessonPicker courseId={course.id} lessonId={lesson.id} lessons={lessonList} />
                 {handsOnClockOnly ? (
                   <p className="mt-3 rounded-xl bg-amber-50 p-4 font-bold text-amber-950">
-                    Use the timeclock only for supervised hands-on training. Online theory and workbook study do not require clocking in. Your lesson progress saves separately.
+                    Use the timeclock only for supervised hands-on training. Online theory and
+                    workbook study do not require clocking in. Your lesson progress saves
+                    separately.
                   </p>
                 ) : !preview.active ? (
                   <div id="theory-timeclock-slot" className="mt-4" />
@@ -433,147 +381,239 @@ export default async function LessonPage({
                     session. Administrator review does not start a learner timeclock.
                   </p>
                 )}
-              </div>
-            </section>
-          ) : null}
-
-          {objectives.length ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="flex items-center gap-2 text-xl font-extrabold">
-                <BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives
-              </h2>
-              <ul className="mt-4 space-y-2 text-base font-medium leading-7 text-slate-800">
-                {objectives.map((objective, index) => (
-                  <li key={index} className="flex gap-3">
-                    <span className="font-extrabold text-cyan-700">•</span>
-                    <span>{String(objective)}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {lessonHtml ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-950">Lesson reading</h2>
-              <p className="mt-1 text-sm text-slate-600">Scroll inside this panel to continue reading.</p>
-              <div
-                role="region"
-                aria-label="Lesson reading text"
-                tabIndex={0}
-                className="prose prose-slate mt-4 max-h-[28rem] max-w-none overflow-y-auto overscroll-contain pr-3 prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700"
-                dangerouslySetInnerHTML={{ __html: lessonHtml }}
-              />
-            </section>
-          ) : (
-            <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 font-semibold text-amber-950">
-              Lesson content is not available. Contact your instructor before marking this lesson
-              complete.
-            </section>
-          )}
-
-          <WorkbookLessonInstruction resources={lesson.resources} />
-
-          {keyTerms.length ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-extrabold">Key terms</h2>
-              <dl className="mt-4 space-y-4">
-                {keyTerms.map((term, index) => (
-                  <div
-                    key={index}
-                    className="rounded-xl bg-slate-100 p-4 text-slate-800"
-                  >
-                    <dt className="font-bold">{term.term}</dt>
-                    {term.definition ? <dd className="mt-2 leading-relaxed break-words">{term.definition}</dd> : null}
-                  </div>
-                ))}
-              </dl>
-            </section>
-          ) : null}
-
-          {preview.active ? (
-            <section
-              id="lesson-completion"
-              className="rounded-2xl border border-amber-300 bg-amber-50 p-6"
-            >
-              <h2 className="text-xl font-bold">Assessment and completion review</h2>
-              <p className="mt-2">Inspect every saved question and answer below. Administrator review does not award learner hours, assessment results or completion.</p>
-              <div className="mt-4 space-y-4">
-                {questions.map((question: any, index: number) => (
-                  <article key={question.id || index} className="rounded-xl border border-slate-200 bg-white p-4">
-                    <h3 className="font-bold">{index + 1}. {question.question || question.question_text || question.prompt}</h3>
-                    <ol className="mt-3 list-[upper-alpha] space-y-2 pl-6">
-                      {(question.options || question.choices || []).map((option: any, optionIndex: number) => (
-                        <li key={optionIndex}>{typeof option === 'string' ? option : option.text || option.label || JSON.stringify(option)}</li>
+                {objectives.length ? (
+                  <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="flex items-center gap-2 text-xl font-extrabold">
+                      <BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives
+                    </h2>
+                    <ul className="mt-4 space-y-2 text-base font-medium leading-7 text-slate-800">
+                      {objectives.map((objective, index) => (
+                        <li key={index} className="flex gap-3">
+                          <span className="font-extrabold text-cyan-700">•</span>
+                          <span>{String(objective)}</span>
+                        </li>
                       ))}
-                    </ol>
-                    <details className="mt-3">
-                      <summary className="cursor-pointer font-bold">Inspect saved answer and rationale</summary>
-                      <pre className="mt-2 whitespace-pre-wrap break-words text-sm">{JSON.stringify({
-                        answer: question.correctAnswer ?? question.correct_answer ?? question.correct ?? question.answer ?? 'No answer key saved',
-                        explanation: question.explanation ?? question.rationale ?? 'No rationale saved',
-                      }, null, 2)}</pre>
-                    </details>
-                  </article>
-                ))}
-                {!questions.length && <p>No assessment questions have been saved for this lesson yet.</p>}
-              </div>
-              <a href={`https://admin.elevateforhumanity.org/studio/courses?courseId=${course.id}&tab=ultimate`}
-                target="_blank" rel="noopener noreferrer"
-                className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-4 py-3 font-bold text-white">
-                Edit and manage this course in Studio
-              </a>
-            </section>
-          ) : (
-            <>
-              <InteractiveLessonExperience
-                courseId={course.id}
-                lessonSlug={lesson.slug}
-                lessonId={lesson.id}
-              />
-              <LessonProgressClient
-                theoryClockEnabled={!handsOnClockOnly}
-                courseId={course.id}
-                lessonId={lesson.id}
-                lessonType={lessonType}
-                moduleOrder={moduleOrder}
-                passingScore={passingScore}
-                questions={questions.map((question: any, index: number) => ({
-                  id: question.id || `q-${index + 1}`,
-                  question: question.question || question.question_text || question.prompt,
-                  options: question.options || question.choices || [],
-                }))}
-              />
-            </>
-          )}
+                    </ul>
+                  </section>
+                ) : null}
+                {lessonHtml ? (
+                  <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h2 className="text-xl font-bold text-slate-950">Lesson reading</h2>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Read the instructions here, then complete the activities below.
+                    </p>
+                    <div
+                      role="region"
+                      aria-label="Lesson reading text"
+                      tabIndex={0}
+                      className="prose prose-slate mt-4 max-w-none prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700"
+                      dangerouslySetInnerHTML={{ __html: lessonHtml }}
+                    />
+                  </section>
+                ) : (
+                  <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 font-semibold text-amber-950">
+                    Lesson content is not available. Contact your instructor before marking this
+                    lesson complete.
+                  </section>
+                )}
+                <WorkbookLessonInstruction resources={lesson.resources} />
+                {keyTerms.length ? (
+                  <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="text-xl font-extrabold">Key terms</h2>
+                    <dl className="mt-4 space-y-4">
+                      {keyTerms.map((term, index) => (
+                        <div key={index} className="rounded-xl bg-slate-100 p-4 text-slate-800">
+                          <dt className="font-bold">{term.term}</dt>
+                          {term.definition ? (
+                            <dd className="mt-2 leading-relaxed break-words">{term.definition}</dd>
+                          ) : null}
+                        </div>
+                      ))}
+                    </dl>
+                  </section>
+                ) : null}
+                {preview.active ? (
+                  <section
+                    id="lesson-completion"
+                    className="rounded-2xl border border-amber-300 bg-amber-50 p-6"
+                  >
+                    <h2 className="text-xl font-bold">Assessment and completion review</h2>
+                    <p className="mt-2">
+                      Inspect every saved question and answer below. Administrator review does not
+                      award learner hours, assessment results or completion.
+                    </p>
+                    <div className="mt-4 space-y-4">
+                      {questions.map((question: any, index: number) => (
+                        <article
+                          key={question.id || index}
+                          className="rounded-xl border border-slate-200 bg-white p-4"
+                        >
+                          <h3 className="font-bold">
+                            {index + 1}.{' '}
+                            {question.question || question.question_text || question.prompt}
+                          </h3>
+                          <ol className="mt-3 list-[upper-alpha] space-y-2 pl-6">
+                            {(question.options || question.choices || []).map(
+                              (option: any, optionIndex: number) => (
+                                <li key={optionIndex}>
+                                  {typeof option === 'string'
+                                    ? option
+                                    : option.text || option.label || JSON.stringify(option)}
+                                </li>
+                              ),
+                            )}
+                          </ol>
+                          <details className="mt-3">
+                            <summary className="cursor-pointer font-bold">
+                              Inspect saved answer and rationale
+                            </summary>
+                            <pre className="mt-2 whitespace-pre-wrap break-words text-sm">
+                              {JSON.stringify(
+                                {
+                                  answer:
+                                    question.correctAnswer ??
+                                    question.correct_answer ??
+                                    question.correct ??
+                                    question.answer ??
+                                    'No answer key saved',
+                                  explanation:
+                                    question.explanation ??
+                                    question.rationale ??
+                                    'No rationale saved',
+                                },
+                                null,
+                                2,
+                              )}
+                            </pre>
+                          </details>
+                        </article>
+                      ))}
+                      {!questions.length && (
+                        <p>No assessment questions have been saved for this lesson yet.</p>
+                      )}
+                    </div>
+                    <a
+                      href={`https://admin.elevateforhumanity.org/studio/courses?courseId=${course.id}&tab=ultimate`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-cyan-800 px-4 py-3 font-bold text-white"
+                    >
+                      Edit and manage this course in Studio
+                    </a>
+                  </section>
+                ) : (
+                  <>
+                    <InteractiveLessonExperience
+                      courseId={course.id}
+                      lessonSlug={lesson.slug}
+                      lessonId={lesson.id}
+                    />
+                    <LessonProgressClient
+                      theoryClockEnabled={!handsOnClockOnly}
+                      courseId={course.id}
+                      lessonId={lesson.id}
+                      lessonType={lessonType}
+                      moduleOrder={moduleOrder}
+                      passingScore={passingScore}
+                      questions={questions.map((question: any, index: number) => ({
+                        id: question.id || `q-${index + 1}`,
+                        question: question.question || question.question_text || question.prompt,
+                        options: question.options || question.choices || [],
+                      }))}
+                    />
+                  </>
+                )}
+                <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
+                  {previous ? (
+                    <Link
+                      href={`/lms/courses/${course.id}/lessons/${previous.id}`}
+                      className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100"
+                    >
+                      ← {previous.title}
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+                  {next ? (
+                    <Link
+                      href={`/lms/courses/${course.id}/lessons/${next.id}`}
+                      className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800"
+                    >
+                      {next.title} →
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/lms/courses/${course.id}`}
+                      className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800"
+                    >
+                      Return to course
+                    </Link>
+                  )}
+                </nav>{' '}
+              </>
+            }
+            preview={
+              <>
+                {!lesson.video_url ? (
+                  <AITeachingPlayer
+                    courseTitle={course.title}
+                    lessonTitle={lesson.title}
+                    instructorName={instructorName}
+                    instructorImage={instructorImage}
+                    visualImage={lessonVisual?.asset_url ?? lessonVisual?.poster_url ?? undefined}
+                    slides={slides}
+                  />
+                ) : null}
 
-          <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
-            {previous ? (
-              <Link
-                href={`/lms/courses/${course.id}/lessons/${previous.id}`}
-                className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100"
-              >
-                ← {previous.title}
-              </Link>
-            ) : (
-              <span />
-            )}
-            {next ? (
-              <Link
-                href={`/lms/courses/${course.id}/lessons/${next.id}`}
-                className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800"
-              >
-                {next.title} →
-              </Link>
-            ) : (
-              <Link
-                href={`/lms/courses/${course.id}`}
-                className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800"
-              >
-                Return to course
-              </Link>
-            )}
-          </nav>
+                {lesson.video_url ? (
+                  <section
+                    aria-label="Instructional lesson video"
+                    className="overflow-hidden rounded-3xl border border-neutral-700 bg-neutral-900 shadow-lg"
+                  >
+                    <div className="p-3">
+                      <InteractiveVideoPlayer
+                        videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
+                        title={lesson.title}
+                        lessonId={lesson.id}
+                        courseId={course.id}
+                        checkpoints={videoCheckpoints}
+                        transcript={videoTranscript}
+                        captionsUrl={
+                          captionsUrl &&
+                          managedLessonPlaybackUrl(captionsUrl, course.id, lesson.id) !==
+                            captionsUrl
+                            ? `/api/courses/${course.id}/lessons/${lesson.id}/playback?asset=captions`
+                            : captionsUrl
+                        }
+                        adminReview={preview.active}
+                        readOnly={preview.active}
+                        learnerId={preview.active ? undefined : user?.id}
+                      />
+                    </div>
+                  </section>
+                ) : null}
+                {lessonVisual?.media_type === 'image' ? (
+                  <details className="rounded-xl border border-slate-200 bg-white p-3">
+                    <summary className="cursor-pointer font-bold">Lesson reference image</summary>
+                    {lessonVisual?.media_type === 'image' ? (
+                      <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
+                        <img
+                          src={lessonVisual.asset_url}
+                          alt={lessonVisual.alt_text || lesson.title}
+                          className="h-40 w-full object-contain bg-slate-50 sm:h-48"
+                        />
+                        {lessonVisual.caption ? (
+                          <figcaption className="border-t border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700">
+                            {lessonVisual.caption}
+                          </figcaption>
+                        ) : null}
+                      </figure>
+                    ) : null}
+                  </details>
+                ) : null}
+              </>
+            }
+          />
         </div>
       </TheoryWindowBoundary>
     </LessonFocusShell>

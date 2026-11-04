@@ -1,4 +1,5 @@
 'use client';
+import { LearningPreview } from './LearningWorkspace';
 import { useState } from 'react';
 import WorkbookNarration from './WorkbookNarration';
 import {businessRetailProjects,businessRetailCase,checkBusinessRetailNumber} from '@/lib/lms/business-retail-workbook.mjs';
@@ -19,6 +20,7 @@ export default function BusinessRetailWorkbookLab({sectionNumber,readOnly,onReco
   <WorkbookNarration text={`${p.title}. ${p.teaching} Case. ${p.scenario} ${scenario.facts} ${p.decision}`} />
   <label className="block font-semibold">Practice case<select className="mt-2 block min-h-12 w-full rounded border border-slate-500 bg-white p-3" value={variant} onChange={e=>{setVariant(Number(e.target.value));setChecked(false);setNumbers([]);setChoice(null);setReason('');}}>{['A','B','C'].map((v,i)=><option value={i} key={v}>Case {v}</option>)}</select></label>
   <p className="max-w-prose leading-7">{p.scenario}</p><p className="rounded-lg border border-teal-700 bg-white p-4 leading-7">{scenario.facts}</p>
+  <LearningPreview><article className="space-y-3 rounded-xl border border-teal-300 bg-white p-5" aria-label="Business case preview"><h3 className="text-xl font-bold">{p.title} · Case {'ABC'[variant]}</h3><p>{p.scenario}</p><p>{scenario.facts}</p><p className="whitespace-pre-line leading-7">{summary}</p></article></LearningPreview>
   <fieldset className="space-y-3"><legend className="mb-3 text-lg font-bold">{p.decision}</legend>{p.choices.map((c,i)=><label className="flex min-h-12 items-start gap-3 rounded-lg border border-slate-400 bg-white p-3" key={c}><input type="radio" className="mt-1" name={`business-lab-${p.id}`} checked={choice===i} onChange={()=>{setChoice(i);setChecked(false);}}/>{c}</label>)}</fieldset>
   {scenario.checks.map((c,i)=><label className="block font-semibold" key={c[0]}>{c[0]}<input type="number" step="0.01" className="mt-2 block min-h-12 w-full rounded border border-slate-500 bg-white p-3" value={numbers[i]??''} onChange={e=>{setNumbers(old=>{const n=[...old];n[i]=e.target.value;return n;});setChecked(false);}}/></label>)}
   <label className="block font-semibold">Explain your decision and show your working<textarea className="mt-2 block w-full rounded border border-slate-500 bg-white p-3 leading-7" rows={4} maxLength={1800} value={reason} onChange={e=>setReason(e.target.value)}/></label>

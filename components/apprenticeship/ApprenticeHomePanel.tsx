@@ -105,11 +105,6 @@ export default async function ApprenticeHomePanel({
   const paidInFull = runtime.enrollment.payment_status === 'paid_in_full';
   const learningTools = [
     {
-      title: 'Workbook & reading',
-      text: 'Review instruction and continue your saved workbook.',
-      href: '/apprentice/workbook',
-    },
-    {
       title: 'Assignments',
       text: 'Open assigned work and review submission requirements.',
       href: '/lms/assignments',
@@ -218,8 +213,8 @@ export default async function ApprenticeHomePanel({
             <p className="text-sm font-semibold text-teal-800">Your apprentice dashboard</p>
             <h1 className="mt-2 text-3xl font-bold text-slate-950">Welcome, {name}</h1>
             <p className="mt-4 text-base leading-7 text-slate-700">
-              Continue your course, open your workbook, or review feedback below. Record supervised
-              shop work separately with the timeclock.
+              Continue learning below. Your lessons and workbook use instructions on the left and a
+              preview on the right. Record supervised shop work separately with the timeclock.
             </p>
             <p className="mt-3 text-sm text-slate-600">
               Lesson completion, approved work hours and verified practical skills are tracked
@@ -275,10 +270,14 @@ export default async function ApprenticeHomePanel({
               >
                 {learning.totalLessons > 0 && learning.completedLessons === learning.totalLessons
                   ? 'Review course'
-                  : learning.completedLessons > 0
-                    ? 'Continue course'
-                    : 'Open course'}{' '}
+                  : 'Continue Learning'}{' '}
                 →
+              </Link>
+              <Link
+                href="/apprentice/workbook"
+                className="inline-flex min-h-12 items-center rounded-xl border border-teal-800 bg-white px-5 py-3 font-bold text-teal-900"
+              >
+                My Workbook
               </Link>
             </div>
             <progress
@@ -298,18 +297,23 @@ export default async function ApprenticeHomePanel({
             training access.
           </p>
         )}
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {learningTools.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="rounded-2xl border border-slate-200 p-4 transition hover:border-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800"
-            >
-              <h3 className="font-bold text-slate-950">{tool.title} →</h3>
-              <p className="mt-2 leading-6 text-slate-700">{tool.text}</p>
-            </Link>
-          ))}
-        </div>
+        <details className="mt-5 rounded-xl border border-slate-200 p-4">
+          <summary className="cursor-pointer font-bold text-slate-900">
+            Assignments, feedback & training records
+          </summary>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {learningTools.map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="rounded-2xl border border-slate-200 p-4 transition hover:border-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800"
+              >
+                <h3 className="font-bold text-slate-950">{tool.title} →</h3>
+                <p className="mt-2 leading-6 text-slate-700">{tool.text}</p>
+              </Link>
+            ))}
+          </div>
+        </details>
         {paidInFull ? (
           <p className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-950">
             Tuition paid in full. No payment setup is required.

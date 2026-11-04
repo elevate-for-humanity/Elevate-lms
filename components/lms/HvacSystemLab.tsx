@@ -1,4 +1,5 @@
 'use client';
+import { LearningPreview } from './LearningWorkspace';
 import { useState } from 'react';
 import WorkbookNarration from '@/components/lms/WorkbookNarration';
 import { refrigerationStages, superheat, subcooling } from '@/lib/lms/hvac-system-model';
@@ -18,7 +19,7 @@ export default function HvacSystemLab() {
     <p className="text-sm font-bold uppercase tracking-wide text-amber-800">HVAC visual practice · refrigeration cycle</p>
     <h3 className="mt-2 text-2xl font-bold">Follow the refrigerant around the system</h3>
     <p className="my-3 leading-relaxed">Select each numbered component. Trace the arrows and explain where pressure changes and heat moves. This is an idealized steady-state cooling model; actual equipment and refrigerants vary.</p>
-    <svg viewBox="0 0 700 440" role="img" aria-labelledby="hvac-cycle-title hvac-cycle-description" className="w-full rounded-xl bg-stone-50">
+    <LearningPreview><svg viewBox="0 0 700 440" role="img" aria-labelledby="hvac-cycle-title hvac-cycle-description" className="w-full rounded-xl bg-stone-50">
       <title id="hvac-cycle-title">Four-stage vapor-compression refrigeration cycle</title>
       <desc id="hvac-cycle-description">Compressor to condenser to metering device to evaporator and back to compressor. High-pressure flow is at the top and right; low-pressure flow is at the bottom and left. Heat leaves the condenser and enters the evaporator.</desc>
       <defs><marker id="hvac-flow-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="currentColor" /></marker></defs>
@@ -28,7 +29,7 @@ export default function HvacSystemLab() {
       <text x="435" y="40" fontSize="16">Heat OUT ↑</text><text x="75" y="415" fontSize="16">Heat IN ↑</text>
       {running && <circle r="7" fill="#15803d"><animateMotion dur="8s" repeatCount="indefinite" path="M165 110H510V310H165Z" /></circle>}
       {refrigerationStages.map((entry,index)=><g key={entry.name}><rect x={positions[index][0]} y={positions[index][1]} width="180" height="80" rx="12" fill={index===stage?'#fef3c7':'white'} stroke="#292524" strokeWidth={index===stage?3:1}/><text x={positions[index][0]+12} y={positions[index][1]+45} fontSize="17" fontWeight="bold">{index+1}. {entry.name}</text></g>)}
-    </svg>
+    </svg></LearningPreview>
     <div className="my-4 flex flex-wrap gap-2">{refrigerationStages.map((entry,index)=><button type="button" key={entry.name} aria-pressed={index===stage} onClick={()=>{setStage(index);setAnswer(null);}} className="min-h-12 rounded-lg border border-stone-500 px-4 py-3">{index+1}. {entry.name}</button>)}<button type="button" onClick={()=>setRunning(!running)} className="min-h-12 rounded-lg bg-stone-900 px-4 py-3 text-white">{running?'Pause flow':'Animate flow'}</button></div>
     <h4 className="text-xl font-bold">{item.name}: {item.state}</h4><p className="mt-2 leading-relaxed">{item.action}</p>
     <WorkbookNarration text={`I'm PARIS. Follow the refrigerant to the ${item.name}. ${item.action} The illustrated outlet condition is ${item.state}. Pause and explain the change in your own words. ${item.question}`} />

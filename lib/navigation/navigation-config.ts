@@ -187,7 +187,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
       id: 'apprenticeship',
       items: [
         { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
-        { id: 'theory', label: 'Theory / My Lessons', href: p('apprentice', 'theory'), icon: BookOpen },
+        { id: 'theory', label: 'My Lessons', href: p('apprentice', 'theory'), icon: BookOpen },
         { id: 'class-assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: FileText },
         { id: 'class-quizzes', label: 'My Quizzes & Exams', href: p('lms', 'quizzes'), icon: ClipboardCheck },
         { id: 'class-grades', label: 'My Grades & Feedback', href: p('lms', 'grades'), icon: Award },

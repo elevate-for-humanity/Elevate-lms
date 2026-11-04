@@ -1,4 +1,5 @@
 'use client';
+import { LearningPreview } from './LearningWorkspace';
 import { useState } from 'react';
 import content from '@/lib/lms/hvac-workbook-content.json';
 import WorkbookNarration from './WorkbookNarration';
@@ -9,7 +10,7 @@ function ElectricalBench() {
   const amps=closed?24/resistance:0;
   return <section className="my-5 rounded-xl border bg-white p-4" aria-label="Virtual low-voltage circuit">
     <h4 className="text-xl font-bold">Operate a virtual 24 V circuit</h4>
-    <svg viewBox="0 0 620 240" role="img" aria-label={`Ideal circuit: switch ${closed?'closed':'open'}, current ${amps.toFixed(2)} amperes`} className="my-4 w-full bg-stone-50">
+    <LearningPreview><svg viewBox="0 0 620 240" role="img" aria-label={`Ideal circuit: switch ${closed?'closed':'open'}, current ${amps.toFixed(2)} amperes`} className="my-4 w-full bg-stone-50">
       <path d="M90 170V60H250 M310 60H510V170H90" stroke="#44403c" strokeWidth="5" fill="none"/>
       <circle cx="90" cy="115" r="32" fill="white" stroke="#44403c" strokeWidth="3"/>
       <text x="64" y="121" fontSize="18">24 V</text>
@@ -17,7 +18,7 @@ function ElectricalBench() {
       <rect x="460" y="95" width="100" height="50" fill="#fef3c7" stroke="#44403c"/>
       <text x="478" y="125" fontSize="18">{resistance} Ω</text>
       <text x="225" y="215" fontSize="18">I = {amps.toFixed(2)} A · ideal resistive model</text>
-    </svg>
+    </svg></LearningPreview>
     <button type="button" onClick={()=>setClosed(!closed)} aria-pressed={closed} className="min-h-12 rounded-lg bg-stone-900 px-4 py-3 text-white">{closed?'Open switch':'Close switch'}</button>
     <label className="my-4 block">Load resistance: {resistance} ohms<input type="range" min="6" max="48" step="6" value={resistance} onChange={e=>setResistance(Number(e.target.value))} className="block w-full"/></label>
     <p role="status">{closed?`Complete path: 24 V ÷ ${resistance} ohms = ${amps.toFixed(2)} A. Increasing resistance reduces current at this fixed voltage.`:'The open series switch interrupts the path. Current is zero in this model.'}</p>
@@ -32,7 +33,7 @@ function RecoveryBench() {
     <h4 className="text-xl font-bold">Choose the Type I percentage branch</h4>
     <label className="my-4 flex gap-3"><input type="checkbox" checked={modern} onChange={e=>setModern(e.target.checked)} className="h-6 w-6"/>Recovery equipment manufactured on or after November 15, 1993</label>
     <label className="my-4 flex gap-3"><input type="checkbox" checked={works} onChange={e=>setWorks(e.target.checked)} className="h-6 w-6"/>Appliance compressor functions</label>
-    <output className="block rounded-lg bg-amber-50 p-4">Percentage-method target: <strong>{target}%</strong>. For a ten-ounce example, that is {10*target/100} ounces.</output>
+    <LearningPreview><output className="block rounded-lg bg-amber-50 p-4">Percentage-method target: <strong>{target}%</strong>. For a ten-ounce example, that is {10*target/100} ounces.</output></LearningPreview>
     <p className="mt-3">First verify that the appliance meets the complete small-appliance definition. The four-inches-Hg-vacuum alternative is a different measurement method. This selector is a knowledge exercise; it does not operate recovery equipment.</p>
   </section>;
 }
@@ -41,11 +42,11 @@ function AirflowBench() {
   const [restricted,setRestricted]=useState(false);
   return <section className="my-5 rounded-xl border p-4" aria-label="Airflow reasoning simulator">
     <h4 className="text-xl font-bold">Investigate an airside restriction</h4>
-    <svg viewBox="0 0 680 180" role="img" aria-label={`Return filter ${restricted?'restricted':'clear'}; inspect the complete return, blower, coil, and supply path`} className="my-4 w-full bg-stone-50">
+    <LearningPreview><svg viewBox="0 0 680 180" role="img" aria-label={`Return filter ${restricted?'restricted':'clear'}; inspect the complete return, blower, coil, and supply path`} className="my-4 w-full bg-stone-50">
       <path d="M30 90H650" stroke="#0369a1" strokeWidth={restricted?4:14}/>
       {['Return / filter','Blower','Coil','Supply'].map((label,i)=><g key={label}><rect x={15+i*170} y="50" width="145" height="80" rx="10" fill={i===0&&restricted?'#fecaca':'#e0f2fe'} stroke="#44403c"/><text x={28+i*170} y="95" fontSize="17">{label}</text></g>)}
       <text x="250" y="160" fontSize="18">Airflow direction →</text>
-    </svg>
+    </svg></LearningPreview>
     <button type="button" aria-pressed={restricted} onClick={()=>setRestricted(!restricted)} className="min-h-12 rounded-lg bg-stone-900 px-4 py-3 text-white">{restricted?'Clear the virtual restriction':'Add a virtual filter restriction'}</button>
     <p role="status" className="mt-4">{restricted?'Observed change: a return-filter restriction is present. Investigate airflow using the approved equipment procedure. This alone does not prove a refrigerant shortage.':'Model condition: the illustrated filter path is clear. This does not establish that the complete real installation or charge is correct.'}</p>
     <p className="mt-3 text-sm">This is a qualitative reasoning model, not an airflow calculator. Write a discriminating test and an unsupported conclusion to avoid.</p>
@@ -60,8 +61,8 @@ export default function HvacWorkbookTeaching({number}:{number:number}) {
   const page = pages[Math.min(active, pages.length - 1)];
   return <section className="my-6 space-y-5 rounded-2xl border border-stone-300 bg-stone-50 p-4 sm:p-6" aria-label={`Chapter ${number} illustrated instruction`}>
     <h3 className="text-2xl font-bold">Learn and work through the example</h3>
-    <figure><img src={`/images/workbooks/hvac/chapter-${number}.svg`} alt={chapter.diagram.join(' → ')} className="w-full rounded-xl bg-white"/><figcaption className="mt-2 text-sm">Learning map: {chapter.heading}. Diagram labels describe concepts; they are not equipment connection instructions.</figcaption></figure>
-    {chapter.image&&<figure><img src={chapter.image} alt={chapter.imageAlt||chapter.title} loading="lazy" className="max-h-72 w-full rounded-xl bg-white object-contain"/><figcaption className="mt-2 text-sm">Workplace context for the matching lesson. This picture does not demonstrate every service step or verify student performance.</figcaption></figure>}
+    <LearningPreview><figure><img src={`/images/workbooks/hvac/chapter-${number}.svg`} alt={chapter.diagram.join(' → ')} className="w-full rounded-xl bg-white"/><figcaption className="mt-2 text-sm">Learning map: {chapter.heading}. Diagram labels describe concepts; they are not equipment connection instructions.</figcaption></figure></LearningPreview>
+    {chapter.image&&<LearningPreview><figure><img src={chapter.image} alt={chapter.imageAlt||chapter.title} loading="lazy" className="max-h-72 w-full rounded-xl bg-white object-contain"/><figcaption className="mt-2 text-sm">Workplace context for the matching lesson. This picture does not demonstrate every service step or verify student performance.</figcaption></figure></LearningPreview>}
     <article className="rounded-xl border bg-white p-4">
       <p className="mb-3 font-semibold">Instruction {active + 1} of {pages.length}</p>
       <h4 className="text-xl font-bold">{page.heading}</h4>

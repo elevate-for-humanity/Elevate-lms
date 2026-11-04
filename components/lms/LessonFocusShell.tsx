@@ -23,11 +23,19 @@ export default function LessonFocusShell({
 
   return (
     <main
-      className={focused ? 'min-h-screen bg-white text-slate-950' : 'min-h-screen bg-slate-50 text-slate-950'}
+      className={
+        focused ? 'min-h-screen bg-white text-slate-950' : 'min-h-screen bg-slate-50 text-slate-950'
+      }
       data-focus-mode={focused ? 'active' : 'inactive'}
     >
       {!focused ? header : null}
-      <div className={focused ? 'mx-auto max-w-3xl px-4 py-6 sm:px-6' : 'mx-auto max-w-5xl px-4 pt-4 sm:px-6'}>
+      <div
+        className={
+          focused
+            ? 'mx-auto max-w-[1600px] px-4 py-6 sm:px-6'
+            : 'mx-auto max-w-[1600px] px-4 pt-4 sm:px-6'
+        }
+      >
         <div className="flex justify-end">
           <button
             type="button"
@@ -36,11 +44,17 @@ export default function LessonFocusShell({
             onClick={() => setFocused((value) => !value)}
             className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-900 shadow-sm hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-cyan-200"
           >
-            {focused ? <Minimize2 className="h-4 w-4" aria-hidden="true" /> : <Maximize2 className="h-4 w-4" aria-hidden="true" />}
+            {focused ? (
+              <Minimize2 className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Maximize2 className="h-4 w-4" aria-hidden="true" />
+            )}
             {focused ? 'Exit Focus Mode' : 'Focus Mode'}
           </button>
         </div>
-        {focused ? <p className="mt-2 text-right text-xs text-slate-600">Press Escape to exit.</p> : null}
+        {focused ? (
+          <p className="mt-2 text-right text-xs text-slate-600">Press Escape to exit.</p>
+        ) : null}
       </div>
       {children}
     </main>

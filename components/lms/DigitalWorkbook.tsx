@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import WorkbookNarration from './WorkbookNarration';
+import LearningWorkspace from './LearningWorkspace';
 import WorkbookLessonPicture from './WorkbookLessonPicture';
 import { workbookVisualAssignments, type WorkbookVisual } from '@/lib/lms/workbook-visuals';
 import { workbookSlides } from '@/lib/lms/workbook-slides';
@@ -13,11 +14,18 @@ import BeautyWorkbookSimulator from './BeautyWorkbookSimulator';
 import BusinessRetailWorkbookLab from './BusinessRetailWorkbookLab';
 import { BUSINESS_RETAIL_WORKBOOK_SLUG } from '@/lib/lms/business-retail-workbook.mjs';
 import HvacCompletionReview from './HvacCompletionReview';
-import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
+import {
+  HVAC_COURSE_ID,
+  HVAC_WORKBOOK_SLUG,
+  HVAC_PRACTICE_LESSONS,
+} from '@/lib/lms/hvac-workbook-contract';
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
-import {workbookWritingComplete,firstWorkbookUnreviewedIndex} from '@/lib/lms/workbook-progression';
+import {
+  workbookWritingComplete,
+  firstWorkbookUnreviewedIndex,
+} from '@/lib/lms/workbook-progression';
 
 export function SectionEditor({
   section,
@@ -28,6 +36,7 @@ export function SectionEditor({
   visual,
   workbookSlug,
   onReviewSaved,
+  sectionPicker,
 }: {
   section: WorkbookSection;
   initial?: WorkbookResponse;
@@ -37,6 +46,7 @@ export function SectionEditor({
   visual?: WorkbookVisual;
   workbookSlug: string;
   onReviewSaved?: (sectionId: string, reviewed: boolean) => void;
+  sectionPicker: ReactNode;
 }) {
   const { draft, edit, save, status, error } = useWorkbookSave(
     section.id,
@@ -45,7 +55,10 @@ export function SectionEditor({
     accountId,
   );
   const slides = workbookSlides(section, visual?.caption);
-  const hasMissingWriting = !workbookWritingComplete(draft.answers,Math.min(3,section.prompts.length));
+  const hasMissingWriting = !workbookWritingComplete(
+    draft.answers,
+    Math.min(3, section.prompts.length),
+  );
   const [step, setStep] = useState(0);
   const [moving, setMoving] = useState(false);
   const slide = slides[step];
@@ -83,185 +96,235 @@ export function SectionEditor({
   }
   return (
     <section hidden={hidden} aria-labelledby={`section-${section.id}`}>
-      {!hidden && workbookSlug === HVAC_WORKBOOK_SLUG ? <HvacWorkbookTeaching number={section.section_number} /> : null}
-      {!hidden && section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && [5, 12].includes(section.section_number) ? <HvacSystemLab /> : null}
-      {!hidden && workbookSlug === 'prestige-elevation-barbering' && [15, 18, 22, 23, 24, 25, 26, 27].includes(section.section_number) ? <BarberWorkbookSimulator sectionNumber={section.section_number} /> : null}
-      {!hidden && section.section_number === 1 && ['prestige-elevation-cosmetology','prestige-elevation-esthetics','prestige-elevation-nail-technology'].includes(workbookSlug) ? <BeautyWorkbookSimulator slug={workbookSlug} /> : null}
-      {!hidden && [BUSINESS_RETAIL_WORKBOOK_SLUG, `${BUSINESS_RETAIL_WORKBOOK_SLUG}-startup`].includes(workbookSlug) ? <BusinessRetailWorkbookLab sectionNumber={section.section_number} readOnly={readOnly} onRecord={async (record) => {
-        const next = [draft.answers.practice3, record].filter(Boolean).join('\n\n');
-        if (next.length > 6000) return false;
-        edit({ answers: { ...draft.answers, practice3: next }, reviewed: false });
-        return save();
-      }} /> : null}
-      {!hidden && !readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && section.lesson_id ? (
-        <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
-      ) : null}
-      {!hidden && readOnly && section.course_id && section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' ? (
-        <p className="my-4 rounded-xl border border-amber-300 bg-amber-50 p-4 font-bold text-amber-950">
-          Theory Timeclock is available for this section in the learner's own account. Clocking and
-          saving are disabled in admin preview.
-        </p>
-      ) : null}
-      <p className="text-sm text-slate-600">Guided workbook · {section.unit}</p>
-      <h2
-        id={`section-${section.id}`}
-        className="mt-2 text-2xl font-bold leading-relaxed break-words"
-      >
-        {section.section_number}. {section.title}
-      </h2>
-      <div className="my-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          disabled={readOnly}
-          onClick={() => {
-            void save();
-          }}
-          className="min-h-12 rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50"
-        >
-          Save answers
-        </button>
-        <p
-          role="status"
-          aria-live="polite"
-          className={`max-w-prose leading-relaxed ${error ? 'text-red-700' : 'text-slate-700'}`}
-        >
-          {status}
-        </p>
-      </div>
-      <div className="my-6 overflow-hidden rounded-2xl border border-stone-300 bg-white shadow-sm">
-        <div className="bg-stone-950 p-5 text-white sm:p-8">
-          <p className="text-sm font-semibold text-amber-200">
-            Screen {step + 1} of {slides.length}
-          </p>
-          <progress
-            aria-label="Section screens"
-            value={step + 1}
-            max={slides.length}
-            className="my-3 h-2 w-full accent-amber-300"
-          />
-          <h3 className="text-2xl font-bold leading-relaxed sm:text-3xl">{slide.title}</h3>
-          {step === 0 && visual && (
-            <div className="mt-5">
-              <WorkbookLessonPicture key={visual.src} visual={visual} />
-            </div>
-          )}
-          <p className="mt-4 max-w-prose text-xl leading-relaxed">{slide.text}</p>
-        </div>
-        <div className="p-5 sm:p-8">
-          {!hidden && <WorkbookNarration text={slide.narration} />}
-          {slide.field && (
-            <div className="my-5">
-              <label
-                htmlFor={`${section.id}-${slide.field}`}
-                className="mb-3 block text-lg font-semibold"
-              >
-                {slide.field === 'notes'
-                  ? 'My key ideas, words to define, and questions for my instructor'
-                  : slide.field === 'nextGoal'
-                    ? 'Trainer feedback and my next practice goal'
-                    : slide.text}
-              </label>
-              <textarea
-                id={`${section.id}-${slide.field}`}
-                value={draft.answers[slide.field]}
-                disabled={readOnly}
-                onChange={(event) =>
-                  edit({
-                    ...draft,
-                    answers: { ...draft.answers, [slide.field!]: event.target.value },
-                  })
-                }
-                onBlur={() => {
-                  void save();
-                }}
-                maxLength={6000}
-                rows={6}
-                className="w-full rounded-xl border border-stone-400 bg-white p-4 text-lg leading-loose focus:outline-none focus:ring-2 focus:ring-amber-600 disabled:bg-stone-100"
-              />
-            </div>
-          )}
-          {slide.review && (
-            <dl className="space-y-4">
-              {slides
-                .filter((item) => item.field)
-                .map((item) => (
-                  <div key={item.field}>
-                    <dt className="font-bold">{item.title}</dt>
-                    <dd className="mt-1 whitespace-pre-wrap break-words leading-relaxed">
-                      {draft.answers[item.field!] ||
-                        'No response yet. Return to this activity to add your answer.'}
-                    </dd>
+      <LearningWorkspace
+        instructionLabel="Workbook instructions & answers"
+        previewLabel="Practice preview"
+        instructions={
+          <>
+            {sectionPicker}
+            {!hidden &&
+            !readOnly &&
+            section.course_id &&
+            section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' &&
+            section.lesson_id ? (
+              <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
+            ) : null}
+            {!hidden &&
+            readOnly &&
+            section.course_id &&
+            section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' ? (
+              <p className="my-4 rounded-xl border border-amber-300 bg-amber-50 p-4 font-bold text-amber-950">
+                Theory Timeclock is available for this section in the learner's own account.
+                Clocking and saving are disabled in admin preview.
+              </p>
+            ) : null}
+            <p className="text-sm text-slate-600">Guided workbook · {section.unit}</p>
+            <h2
+              id={`section-${section.id}`}
+              className="mt-2 text-2xl font-bold leading-relaxed break-words"
+            >
+              {section.section_number}. {section.title}
+            </h2>
+            <div className="my-6 overflow-hidden rounded-2xl border border-stone-300 bg-white shadow-sm">
+              <div className="bg-teal-50 p-5 text-slate-950 sm:p-8">
+                <p className="text-sm font-semibold text-teal-800">
+                  Screen {step + 1} of {slides.length}
+                </p>
+                <progress
+                  aria-label="Section screens"
+                  value={step + 1}
+                  max={slides.length}
+                  className="my-3 h-2 w-full accent-amber-300"
+                />
+                <h3 className="text-2xl font-bold leading-relaxed sm:text-3xl">{slide.title}</h3>
+                <p className="mt-4 max-w-prose text-xl leading-relaxed">{slide.text}</p>
+              </div>
+              <div className="p-5 sm:p-8">
+                {!hidden && <WorkbookNarration text={slide.narration} />}
+                {slide.field && (
+                  <div className="my-5">
+                    <label
+                      htmlFor={`${section.id}-${slide.field}`}
+                      className="mb-3 block text-lg font-semibold"
+                    >
+                      {slide.field === 'notes'
+                        ? 'My key ideas, words to define, and questions for my instructor'
+                        : slide.field === 'nextGoal'
+                          ? 'Trainer feedback and my next practice goal'
+                          : slide.text}
+                    </label>
+                    <textarea
+                      id={`${section.id}-${slide.field}`}
+                      value={draft.answers[slide.field]}
+                      disabled={readOnly}
+                      onChange={(event) =>
+                        edit({
+                          ...draft,
+                          answers: { ...draft.answers, [slide.field!]: event.target.value },
+                        })
+                      }
+                      onBlur={() => {
+                        void save();
+                      }}
+                      maxLength={6000}
+                      rows={6}
+                      className="w-full rounded-xl border border-stone-400 bg-white p-4 text-lg leading-loose focus:outline-none focus:ring-2 focus:ring-amber-600 disabled:bg-stone-100"
+                    />
                   </div>
-                ))}
-            </dl>
-          )}
-          <nav
-            aria-label="Workbook screens"
-            className="mt-6 flex items-center justify-between gap-4"
-          >
+                )}
+                {!hidden &&
+                workbookSlug === 'prestige-elevation-barbering' &&
+                [15, 18, 22, 23, 24, 25, 26, 27].includes(section.section_number) ? (
+                  <BarberWorkbookSimulator sectionNumber={section.section_number} />
+                ) : null}
+                {!hidden &&
+                section.section_number === 1 &&
+                [
+                  'prestige-elevation-cosmetology',
+                  'prestige-elevation-esthetics',
+                  'prestige-elevation-nail-technology',
+                ].includes(workbookSlug) ? (
+                  <BeautyWorkbookSimulator slug={workbookSlug} />
+                ) : null}
+
+                {!hidden && workbookSlug === HVAC_WORKBOOK_SLUG ? (
+                  <HvacWorkbookTeaching number={section.section_number} />
+                ) : null}
+                {!hidden &&
+                section.course_id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' &&
+                [5, 12].includes(section.section_number) ? (
+                  <HvacSystemLab />
+                ) : null}
+                {!hidden &&
+                [
+                  BUSINESS_RETAIL_WORKBOOK_SLUG,
+                  `${BUSINESS_RETAIL_WORKBOOK_SLUG}-startup`,
+                ].includes(workbookSlug) ? (
+                  <BusinessRetailWorkbookLab
+                    sectionNumber={section.section_number}
+                    readOnly={readOnly}
+                    onRecord={async (record) => {
+                      const next = [draft.answers.practice3, record].filter(Boolean).join('\n\n');
+                      if (next.length > 6000) return false;
+                      edit({ answers: { ...draft.answers, practice3: next }, reviewed: false });
+                      return save();
+                    }}
+                  />
+                ) : null}
+
+                {slide.review && (
+                  <dl className="space-y-4">
+                    {slides
+                      .filter((item) => item.field)
+                      .map((item) => (
+                        <div key={item.field}>
+                          <dt className="font-bold">{item.title}</dt>
+                          <dd className="mt-1 whitespace-pre-wrap break-words leading-relaxed">
+                            {draft.answers[item.field!] ||
+                              'No response yet. Return to this activity to add your answer.'}
+                          </dd>
+                        </div>
+                      ))}
+                  </dl>
+                )}
+                <nav
+                  aria-label="Workbook screens"
+                  className="mt-6 flex items-center justify-between gap-4"
+                >
+                  <button
+                    type="button"
+                    disabled={step === 0 || moving}
+                    onClick={() => {
+                      void move(step - 1);
+                    }}
+                    className="min-h-12 rounded-lg border border-stone-400 px-5 py-3 font-semibold disabled:opacity-40"
+                  >
+                    Back
+                  </button>
+                  <span className="text-sm">
+                    {step + 1} / {slides.length}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={step === slides.length - 1 || moving}
+                    onClick={() => {
+                      void move(step + 1);
+                    }}
+                    className="min-h-12 rounded-lg bg-stone-900 px-5 py-3 font-semibold text-white disabled:opacity-40"
+                  >
+                    {moving ? 'Saving…' : 'Next'}
+                  </button>
+                </nav>
+              </div>
+            </div>
+            {slide.review && (
+              <label className="flex items-start gap-3 py-4 text-base leading-relaxed">
+                <input
+                  type="checkbox"
+                  checked={draft.reviewed}
+                  disabled={readOnly || hasMissingWriting}
+                  className="mt-1 h-6 w-6 shrink-0"
+                  onChange={(event) => {
+                    const reviewed = event.target.checked;
+                    edit({ ...draft, reviewed });
+                    void save().then((saved) => {
+                      if (saved) onReviewSaved?.(section.id, reviewed);
+                    });
+                  }}
+                />
+                I reviewed this lesson and my practice responses. This is my study checklist, not
+                instructor approval.
+              </label>
+            )}
+            {slide.review && hasMissingWriting && (
+              <p className="text-sm font-semibold text-amber-900">
+                Finish each writing activity with at least 10 characters before checking this
+                section as reviewed. Personal reflections are saved without right-or-wrong grades.
+              </p>
+            )}
             <button
               type="button"
-              disabled={step === 0 || moving}
+              disabled={readOnly}
               onClick={() => {
-                void move(step - 1);
+                void save();
               }}
-              className="min-h-12 rounded-lg border border-stone-400 px-5 py-3 font-semibold disabled:opacity-40"
+              className="min-h-12 rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50"
             >
-              Back
+              Save answers
             </button>
-            <span className="text-sm">
-              {step + 1} / {slides.length}
-            </span>
-            <button
-              type="button"
-              disabled={step === slides.length - 1 || moving}
-              onClick={() => {
-                void move(step + 1);
-              }}
-              className="min-h-12 rounded-lg bg-stone-900 px-5 py-3 font-semibold text-white disabled:opacity-40"
-            >
-              {moving ? 'Saving…' : 'Next'}
-            </button>
-          </nav>
-        </div>
-      </div>
-      {slide.review && (
-        <label className="flex items-start gap-3 py-4 text-base leading-relaxed">
-          <input
-            type="checkbox"
-            checked={draft.reviewed}
-            disabled={readOnly || hasMissingWriting}
-            className="mt-1 h-6 w-6 shrink-0"
-            onChange={(event) => {
-              const reviewed=event.target.checked;
-              edit({ ...draft, reviewed });
-              void save().then(saved => { if(saved) onReviewSaved?.(section.id, reviewed); });
-            }}
-          />
-          I reviewed this lesson and my practice responses. This is my study checklist, not
-          instructor approval.
-        </label>
-      )}
-      {slide.review && hasMissingWriting && (
-        <p className="text-sm font-semibold text-amber-900">Finish each writing activity with at least 10 characters before checking this section as reviewed. Personal reflections are saved without right-or-wrong grades.</p>
-      )}
-      <button
-        type="button"
-        disabled={readOnly}
-        onClick={() => {
-          void save();
-        }}
-        className="min-h-12 rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white disabled:opacity-50"
-      >
-        Save answers
-      </button>
-      <p className="mt-3 text-sm leading-relaxed">
-        <span className={`mb-2 block font-semibold ${error ? 'text-red-700' : 'text-slate-700'}`}>
-          {status}
-        </span>
-        Wait for “Saved to your account” before closing. Saving does not add training hours or mark
-        a course lesson complete.
-      </p>
+            <p className="mt-3 text-sm leading-relaxed">
+              <span
+                role="status"
+                aria-live="polite"
+                className={`mb-2 block font-semibold ${error ? 'text-red-700' : 'text-slate-700'}`}
+              >
+                {status}
+              </span>
+              Wait for “Saved to your account” before closing. Saving does not add training hours or
+              mark a course lesson complete.
+            </p>
+          </>
+        }
+        preview={
+          <>
+            <p className="text-sm font-semibold text-teal-900">
+              {section.section_number}. {section.title} · {slide.title}
+            </p>
+            {visual ? (
+              <WorkbookLessonPicture key={visual.src} visual={visual} />
+            ) : (
+              <p className="rounded-xl border border-slate-200 bg-white p-5 leading-relaxed">
+                {slide.text}
+              </p>
+            )}
+
+            <p className="text-sm leading-relaxed text-slate-600">
+              Use the instructions and answer fields on the left. Choose Next to continue the
+              workbook activity.
+            </p>
+          </>
+        }
+      />
     </section>
   );
 }
@@ -284,46 +347,88 @@ export default function DigitalWorkbook({
   // teleport a learner to Week 7 or conceal earlier sections.
   const [active, setActive] = useState(sections[0]?.id ?? '');
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(
-    () => new Set(responses.filter(row => row.reviewed).map(row => row.section_id))
+    () => new Set(responses.filter((row) => row.reviewed).map((row) => row.section_id)),
   );
-  const unlockedIndex = firstWorkbookUnreviewedIndex(sections.map(section=>section.id),reviewedIds);
+  const unlockedIndex = firstWorkbookUnreviewedIndex(
+    sections.map((section) => section.id),
+    reviewedIds,
+  );
   useEffect(() => {
     function selectLinkedSection() {
       const requested = window.location.hash.replace(/^#section-/, '');
-      const index = sections.findIndex(section => section.id === requested);
+      const index = sections.findIndex((section) => section.id === requested);
       if (index >= 0 && index <= unlockedIndex) setActive(requested);
     }
     selectLinkedSection();
     window.addEventListener('hashchange', selectLinkedSection);
     return () => window.removeEventListener('hashchange', selectLinkedSection);
   }, [sections, unlockedIndex]);
-  const reviewSaved=(id:string,reviewed:boolean) => {
-    setReviewedIds(previous => {
+  const reviewSaved = (id: string, reviewed: boolean) => {
+    setReviewedIds((previous) => {
       const next = new Set(previous);
-      if(reviewed) next.add(id);
+      if (reviewed) next.add(id);
       else next.delete(id);
       return next;
     });
     // A successful saved review advances to the next lesson in this same
     // workbook; never redirect through an unrelated dashboard.
-    const index=sections.findIndex(section=>section.id===id);
-    if(reviewed && index>=0 && index<sections.length-1) setActive(sections[index+1].id);
+    const index = sections.findIndex((section) => section.id === id);
+    if (reviewed && index >= 0 && index < sections.length - 1) setActive(sections[index + 1].id);
   };
   const visuals = workbookVisualAssignments(workbook.slug, sections);
   return (
-    <main className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
-      <div className="mx-auto max-w-5xl">
+    <div className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
+      <div className="mx-auto max-w-[1600px]">
         <a href="/workbooks" className="inline-block py-3 underline">
           All my workbooks
         </a>
-        <p className="mt-4 font-semibold tracking-wide">
-          ELEVATE FOR HUMANITY · TRAINING WORKBOOK
-        </p>
+        <p className="mt-4 font-semibold tracking-wide">ELEVATE FOR HUMANITY · TRAINING WORKBOOK</p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
-        {workbook.slug === HVAC_WORKBOOK_SLUG && <img src="/images/courses/epa608-workbook-20261102.webp" alt="Elevate for Humanity EPA 608 Refrigeration Types I, II and III illustrated practice workbook cover" width={1024} height={1536} className="my-5 h-auto w-32 max-w-full rounded-lg border border-stone-300 shadow-sm sm:w-40" />}
-        {workbook.slug === HVAC_WORKBOOK_SLUG && <section className="my-5 rounded-xl border border-amber-400 bg-amber-50 p-5" aria-label="Required HVAC workbook and practice tests"><h2 className="text-xl font-bold">Required to finish your HVAC course</h2><p className="mt-3 leading-relaxed">Complete all 17 chapters and 51 activities. Save notes, each practice response, and your next goal with at least 10 meaningful characters in every field, then review and save each chapter checklist. Pass each of the four practice tests at 80% or higher. Your existing lesson progress stays saved. Internal practice does not award EPA certification or hands-on hours.</p><div className="mt-4 flex flex-wrap gap-3">{HVAC_PRACTICE_LESSONS.map(test=><a className="min-h-12 rounded-lg border border-stone-500 bg-white px-4 py-3 font-bold underline" href={`/lms/courses/${HVAC_COURSE_ID}/lessons/${test.id}`} key={test.id}>{test.title} practice test · 25 questions</a>)}</div></section>}
+        {workbook.slug === HVAC_WORKBOOK_SLUG && (
+          <details className="my-4 rounded-xl border border-slate-300 bg-white p-4">
+            <summary className="cursor-pointer font-bold">
+              HVAC workbook requirements & practice tests
+            </summary>
+            {workbook.slug === HVAC_WORKBOOK_SLUG && (
+              <img
+                src="/images/courses/epa608-workbook-20261102.webp"
+                alt="Elevate for Humanity EPA 608 Refrigeration Types I, II and III illustrated practice workbook cover"
+                width={1024}
+                height={1536}
+                className="my-5 h-auto w-32 max-w-full rounded-lg border border-stone-300 shadow-sm sm:w-40"
+              />
+            )}
+            {workbook.slug === HVAC_WORKBOOK_SLUG && (
+              <section
+                className="my-5 rounded-xl border border-amber-400 bg-amber-50 p-5"
+                aria-label="Required HVAC workbook and practice tests"
+              >
+                <h2 className="text-xl font-bold">Required to finish your HVAC course</h2>
+                <p className="mt-3 leading-relaxed">
+                  Complete all 17 chapters and 51 activities. Save notes, each practice response,
+                  and your next goal with at least 10 meaningful characters in every field, then
+                  review and save each chapter checklist. Pass each of the four practice tests at
+                  80% or higher. Your existing lesson progress stays saved. Internal practice does
+                  not award EPA certification or hands-on hours.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {HVAC_PRACTICE_LESSONS.map((test) => (
+                    <a
+                      className="min-h-12 rounded-lg border border-stone-500 bg-white px-4 py-3 font-bold underline"
+                      href={`/lms/courses/${HVAC_COURSE_ID}/lessons/${test.id}`}
+                      key={test.id}
+                    >
+                      {test.title} practice test · 25 questions
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+          </details>
+        )}
         <p className="my-4 text-lg leading-relaxed">
-          Listen with PARIS. Pause to write. Choose Next when you are ready.
+          Read and answer on the left. View the example or practice on the right. Choose Next when
+          you are ready.
         </p>
         <details className="my-4 rounded-xl border border-stone-300 bg-white p-4">
           <summary className="cursor-pointer font-semibold">
@@ -349,32 +454,14 @@ export default function DigitalWorkbook({
             save answers in their own accounts.
           </p>
         )}
-        {workbook.slug === HVAC_WORKBOOK_SLUG && <HvacCompletionReview readOnly={readOnly} />}
+        {workbook.slug === HVAC_WORKBOOK_SLUG && (
+          <details className="mb-5 rounded-xl border border-slate-300 bg-white p-4">
+            <summary className="cursor-pointer font-bold">My HVAC completion checklist</summary>
+            <HvacCompletionReview readOnly={readOnly} />
+          </details>
+        )}
         {sections.length ? (
           <>
-            <label htmlFor="workbook-section" className="mb-2 block text-lg font-semibold">
-              Choose a workbook section
-            </label>
-            <select
-              id="workbook-section"
-              value={active}
-              onChange={(event) => {
-                const index=sections.findIndex(section => section.id===event.target.value);
-                if(index>=0 && index<=unlockedIndex) setActive(event.target.value);
-              }}
-              className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
-            >
-              {sections.filter((_,index)=>index<=unlockedIndex).map(section => (
-                <option key={section.id} value={section.id}>
-                  {section.section_number}. {section.title}
-                </option>
-              ))}
-            </select>
-            <p className="mb-6 leading-relaxed text-slate-600">
-              Use these published exercises alongside your course. Workbook study is available
-              outside video study windows. Saving answers does not complete lessons or award
-              training hours.
-            </p>
             {sections.map((section) => (
               <SectionEditor
                 key={section.id}
@@ -386,6 +473,42 @@ export default function DigitalWorkbook({
                 readOnly={readOnly}
                 accountId={accountId}
                 onReviewSaved={reviewSaved}
+                sectionPicker={
+                  section.id === active ? (
+                    <>
+                      <label
+                        htmlFor="workbook-section"
+                        className="mb-2 block text-lg font-semibold"
+                      >
+                        Choose a workbook section
+                      </label>
+                      <select
+                        id="workbook-section"
+                        value={active}
+                        onChange={(event) => {
+                          const index = sections.findIndex(
+                            (section) => section.id === event.target.value,
+                          );
+                          if (index >= 0 && index <= unlockedIndex) setActive(event.target.value);
+                        }}
+                        className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
+                      >
+                        {sections
+                          .filter((_, index) => index <= unlockedIndex)
+                          .map((section) => (
+                            <option key={section.id} value={section.id}>
+                              {section.section_number}. {section.title}
+                            </option>
+                          ))}
+                      </select>
+                      <p className="mb-6 leading-relaxed text-slate-600">
+                        Use these published exercises alongside your course. Workbook study is
+                        available outside video study windows. Saving answers does not complete
+                        lessons or award training hours.
+                      </p>
+                    </>
+                  ) : null
+                }
               />
             ))}
           </>
@@ -396,7 +519,6 @@ export default function DigitalWorkbook({
           </p>
         )}
       </div>
-    </main>
+    </div>
   );
 }
-

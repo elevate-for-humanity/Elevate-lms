@@ -10,6 +10,7 @@ import {
   type OpenHandsStartTask,
 } from './client';
 import { verifyOpenHandsGitHubOutcome, type OpenHandsGitHubEvidence } from './github-verifier';
+import { loadOpenHandsReconciliationQueue } from './reconciliation-queue';
 
 export type OpenHandsDispatchInput = {
   actorId: string;
@@ -376,9 +377,9 @@ export async function reconcileOpenHandsTasks(
     .eq('tool_name', 'openhands.execute')
     .in('status', ['running', 'failed']);
   if (taskId) query = query.eq('id', taskId);
-  const { data, error } = await query
-    .order('updated_at', { ascending: true })
-    .limit(taskId ? 1 : Math.max(1, Math.min(limit, 50)));
+  const { data, error } = taskId
+    ? await query.order('updated_at', { ascending: true }).limit(taskId ? 1 : limit)
+    : { data: await loadOpenHandsReconciliationQueue(db, limit), error: null };
   if (error) throw new Error(`Unable to load OpenHands reconciliation queue: ${error.message}`);
 
   const result = {

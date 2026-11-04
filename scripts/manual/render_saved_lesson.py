@@ -24,7 +24,7 @@ def request(url, data=None, headers=None, method=None):
         safe=reason if isinstance(reason,str) and re.fullmatch('[A-Z_]{1,80}',reason) else 'UNKNOWN'
         raise RuntimeError('MANUAL_REMOTE_HTTP_'+str(error.code)+'_'+safe) from None
 
-def canonical_source(row):
+def canonical_source(row, require_timeline=False):
     sections=row['content_json']['experience']['readingGuide']['sections']
     draft=row['content_json']['manualMediaDraft']
     text='\n\n'.join(s['heading']+'. '+s['body'] for s in sections)
@@ -33,7 +33,7 @@ def canonical_source(row):
     if draft['sourceTranscriptSha256']!=digest(text.encode()): raise RuntimeError('MANUAL_SOURCE_CHANGED')
     groups=draft['photoGroups']
     if len(groups)!=len(sections) or not all(len(g)==2 for g in groups): raise RuntimeError('MANUAL_PHOTO_PLAN_INVALID')
-    if not draft.get('visualCues'): raise RuntimeError('REVIEWED_VISUAL_CUES_REQUIRED')
+    if require_timeline and not draft.get('visualCues'): raise RuntimeError('REVIEWED_VISUAL_CUES_REQUIRED')
     return sections,groups,text
 
 def main():
@@ -68,7 +68,7 @@ def main():
     access=secret('ELEVATE_MEDIA_ACCESS_KEY_ID'); private=secret('ELEVATE_MEDIA_SECRET_ACCESS_KEY')
     s3=boto3.client('s3',endpoint_url='https://s3.us-east-005.backblazeb2.com',region_name='us-east-005',aws_access_key_id=access,aws_secret_access_key=private)
     source_hash=digest(text.encode())
-    visual_cues=row['content_json']['manualMediaDraft']['visualCues']
+    visual_cues=row['content_json']['manualMediaDraft'].get('visualCues',[])
     plan_hash=digest(json.dumps({'source':source_hash,'photos':images,'groups':groups,'visualCues':visual_cues,'voice':'en-US-Neural2-F','renderer':'manual-ffmpeg-v2'},sort_keys=True).encode())
     prefix=f'course-videos/manual-lessons/{COURSE}/{lesson}/reviewed-{plan_hash}'
     manifest_key=prefix+'/render-manifest.json'; film_key=prefix+'/completed-lesson-manual.mp4'
@@ -120,6 +120,7 @@ def main():
         print(json.dumps({'lessonId':lesson,'state':'existing-review-candidate','manifestKey':manifest_key})); return
     if os.environ.get('MANUAL_REVIEW_ONLY')=='true':
         print(json.dumps({'lessonId':lesson,'state':'not-yet-encoded'}));return
+    canonical_source(row, require_timeline=True)
     import google.auth
     from google.auth.transport.requests import Request as GoogleRequest
     speech_credentials,_=google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])

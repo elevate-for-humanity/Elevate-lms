@@ -42,6 +42,13 @@ test('Employer setup saves company and hiring needs, opens private files and ack
     await waitForClientReads();
     await locator.click();
   };
+  const replaceReadyValue = async (locator: Locator, value: string) => {
+    await waitForClientReads();
+    await locator.fill('');
+    await expect(locator).toHaveValue('');
+    await locator.fill(value);
+    await expect(locator).toHaveValue(value);
+  };
   await page.goto(`${base}/login`);
   const emailInput = page.locator('input[type=email]').first();
   await expect(emailInput).toBeEnabled({ timeout: 20000 });
@@ -56,9 +63,9 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   await clickReady(page.getByRole('link', { name: 'Continue employer setup' }));
   await expect(page.getByRole('heading', { name: 'Complete employer setup' })).toBeVisible();
   await clickReady(page.getByRole('link', { name: /Company profile Confirm/ }));
-  await page.getByLabel('Company name', { exact: true }).fill('[QA E2E] Employer workflow');
-  await page.getByLabel('City', { exact: true }).fill('QA worksite');
-  await page.getByLabel('State', { exact: true }).fill('TN');
+  await replaceReadyValue(page.getByLabel('Company name', { exact: true }), '[QA E2E] Employer workflow');
+  await replaceReadyValue(page.getByLabel('City', { exact: true }), 'QA worksite');
+  await replaceReadyValue(page.getByLabel('State', { exact: true }), 'TN');
   await clickReady(page.getByRole('button', { name: 'Save company profile' }));
   await expect(page.getByText('Company profile saved.', { exact: true })).toBeVisible();
   await waitForClientReads();
@@ -68,8 +75,8 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   );
   await clickReady(page.getByRole('link', { name: 'Back to employer setup' }));
   await clickReady(page.getByRole('link', { name: /Hiring and training needs Tell/ }));
-  await page.getByLabel('Positions or staff training needed').fill('QA staff training only');
-  await page.getByLabel('Worksite locations').fill('QA Tennessee worksite');
+  await replaceReadyValue(page.getByLabel('Positions or staff training needed'), 'QA staff training only');
+  await replaceReadyValue(page.getByLabel('Worksite locations'), 'QA Tennessee worksite');
   await clickReady(page.getByRole('button', { name: 'Save hiring and training needs' }));
   await expect(
     page.getByText('Your hiring and training needs are saved.', { exact: true }),

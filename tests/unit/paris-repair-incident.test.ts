@@ -6,10 +6,10 @@ it('deduplicates one unresolved incident across commits and repeated failures',(
  const after=eligibleRepairEvents([failure(1),failure(2),failure(3),failure(4)])[0];
  expect(repairIncidentFingerprint(before)).toBe(repairIncidentFingerprint(after));
 });
-it('opens a distinct incident after observed recovery and three new failures',()=>{
+it('opens a distinct incident after observed recovery and the first new failure',()=>{
  const first=eligibleRepairEvents([failure(1),failure(2),failure(3)])[0];
  const recovery={...failure(4),id:'recovery-event',status:'completed'};
- expect(eligibleRepairEvents([failure(1),failure(2),failure(3),recovery,failure(5)])).toEqual([]);
+ expect(eligibleRepairEvents([failure(1),failure(2),failure(3),recovery,failure(5)])).toHaveLength(1);
  const next=eligibleRepairEvents([recovery,failure(5),failure(6),failure(7)])[0];
  expect(next.recoveryAnchor).toBe('recovery-event');
  expect(repairIncidentFingerprint(next)).not.toBe(repairIncidentFingerprint(first));

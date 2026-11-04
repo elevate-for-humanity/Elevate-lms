@@ -5,9 +5,14 @@ import vm from 'node:vm';
 const source=readFileSync(new URL('../.github/workflows/paris-code-repair.yml',import.meta.url),'utf8');
 const verifier=readFileSync(new URL('../.github/workflows/verify-paris-production-authorization.yml',import.meta.url),'utf8');
 const condition=source.match(/  monitor:\n    if: (.+)/)?.[1];
-function monitor(eventName,repairId='',ref='refs/heads/main') {
- return vm.runInNewContext(condition,{github:{ref,event_name:eventName},inputs:{repair_id:repairId}});
+function monitor(eventName,repairId='',ref='refs/heads/main',workflowRun={}) {
+ return vm.runInNewContext(condition,{github:{ref,event_name:eventName,event:{workflow_run:workflowRun}},inputs:{repair_id:repairId}});
 }
+test('a failed main workflow wakes repair; successful, skipped and feature runs cannot',()=>{
+ assert.equal(monitor('workflow_run','','refs/heads/main',{head_branch:'main',conclusion:'failure'}),true);
+ for(const workflowRun of [{head_branch:'feature',conclusion:'failure'},{head_branch:'main',conclusion:'success'},{head_branch:'main',conclusion:'skipped'}])
+  assert.equal(monitor('workflow_run','','refs/heads/main',workflowRun),false);
+});
 test('verified live authorization explicitly wakes a monitor without an invented repair ID',()=>{
  assert.equal(monitor('workflow_dispatch'),true);
  assert.equal(monitor('schedule'),true);

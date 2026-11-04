@@ -66,7 +66,7 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
 
   const QUICK_LINKS = [
     { label: 'Proposal', href: `/employers/${id}/proposal` },
-    { label: 'Onboarding', href: `/employers/${id}/onboarding` },
+    { label: 'Dashboard Setup', href: `/employers/${id}/setup` },
     { label: 'Job Postings', href: `/jobs?employer=${id}` },
   ];
 

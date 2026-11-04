@@ -18,7 +18,7 @@ export default async function EmployerDocumentsPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
-  const { data: documents } = await supabase
+  const { data: documents, error: documentError } = await supabase
     .from('documents')
     .select('*')
     .eq('user_id', user.id)
@@ -29,6 +29,8 @@ export default async function EmployerDocumentsPage() {
     .select('*')
     .eq('role', 'employer')
     .order('is_required', { ascending: false });
+
+  if (documentError) throw new Error('Your documents could not be loaded. Please retry.');
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -62,6 +64,7 @@ export default async function EmployerDocumentsPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        <Link href="/employer/setup" className="mb-6 inline-block text-blue-700 underline">Back to employer setup</Link>
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-black">Upload New Document</h2>
@@ -83,7 +86,7 @@ export default async function EmployerDocumentsPage() {
             <h2 className="text-2xl font-bold text-black mb-4">Required Documents</h2>
             <div className="space-y-3">
               {requirements.map((req) => {
-                const uploaded = documents?.find((d) => d.document_type === req.document_type);
+                const uploaded = documents?.find((d) => (d.metadata?.original_type || d.document_type) === req.document_type);
                 return (
                   <div
                     key={req.id}
@@ -131,7 +134,7 @@ export default async function EmployerDocumentsPage() {
                     <div>
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
-                        {doc.document_type
+                        {String(doc.metadata?.original_type || doc.document_type || 'other')
                           .replace(/_/g, ' ')
                           .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
                         • Uploaded {new Date(doc.created_at).toLocaleDateString()}
@@ -147,10 +150,10 @@ export default async function EmployerDocumentsPage() {
                     <span
                       className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.status)}`}
                     >
-                      {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                      {String(doc.status || 'pending').replace(/_/g, ' ')}
                     </span>
                     <a
-                      href={doc.file_url}
+                      href={`/employer/documents/${doc.id}/view`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-brand-blue-600 hover:underline text-sm font-semibold"

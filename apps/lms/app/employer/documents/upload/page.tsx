@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 
 // Employer document types — document_requirements table is program-scoped (no role column).
 const EMPLOYER_REQUIREMENTS = [
+  { id: 'nda_noncompete', document_type: 'nda_noncompete', description: 'NDA and Non-Compete Agreement', instructions: 'Upload your signed agreement after reviewing the document provided by Elevate.', accepted_formats: ['pdf'], max_file_size: 10485760 },
+  { id: 'employer_handbook', document_type: 'employer_handbook', description: 'Partner Handbook and Expectations Acknowledgment', instructions: 'Upload your signed acknowledgment of the partner handbook and expectations.', accepted_formats: ['pdf'], max_file_size: 10485760 },
   {
     id: 'coi_general_liability',
     document_type: 'coi_general_liability',

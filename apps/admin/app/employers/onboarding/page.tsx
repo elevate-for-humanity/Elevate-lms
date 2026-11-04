@@ -20,7 +20,9 @@ export default async function EmployerOnboardingReview() {
     const [onboardingRes, orientationRes] = await Promise.all([
       supabase
         .from('employers')
-        .select('id,business_name,company_name,name,contact_name,contact_email,email,contact_phone,phone,status,approved,created_at,employer_onboarding(id,status,activated_at,updated_at)')
+        .select(
+          'id,business_name,company_name,name,contact_name,contact_email,email,contact_phone,phone,status,approved,created_at,employer_onboarding(id,status,activated_at,updated_at)',
+        )
         .order('created_at', { ascending: false }),
       // employer_onboarding_progress — written by /onboarding/employer/orientation
       supabase
@@ -35,7 +37,8 @@ export default async function EmployerOnboardingReview() {
         : employer.employer_onboarding;
       return {
         id: employer.id,
-        business_name: employer.company_name || employer.business_name || employer.name || 'Employer',
+        business_name:
+          employer.company_name || employer.business_name || employer.name || 'Employer',
         contact_name: employer.contact_name,
         contact_email: employer.contact_email || employer.email,
         contact_phone: employer.contact_phone || employer.phone,
@@ -68,8 +71,14 @@ export default async function EmployerOnboardingReview() {
       </div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
+          <Link
+            href="/employers/applications"
+            className="mb-6 inline-block rounded-lg bg-blue-800 px-5 py-3 font-bold text-white"
+          >
+            Review employer applications and directory drafts
+          </Link>
           <h1 className="text-3xl font-bold text-black mb-2">Employer Onboarding Review</h1>
-          <p className="text-black">Review and approve employer applications</p>
+          <p className="text-black">Review employer records and onboarding progress</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -84,7 +93,9 @@ export default async function EmployerOnboardingReview() {
                   <th className="px-6 py-4 text-left text-sm font-bold text-black">Email</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-black">Phone</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-black">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-black">Submitted</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-black">
+                    Record created
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-black">Actions</th>
                 </tr>
               </thead>

@@ -220,6 +220,11 @@ jobs:
           node scripts/qa/require-portal-e2e-identities.mjs
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Verify employer onboarding persistence and private documents after deployment
+        if: github.event_name == 'workflow_run' || inputs.deployment_run_id != ''
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/employer-onboarding
+        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
       # The complete HVAC film runs in hvac-public-playback, where the iPhone

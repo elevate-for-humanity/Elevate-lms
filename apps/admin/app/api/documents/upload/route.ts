@@ -20,6 +20,8 @@ const EMPLOYER_DOCUMENT_TYPES = new Set([
   'employer_mou',
   'supervisor_designation',
   'worksite_verification',
+  'nda_noncompete',
+  'employer_handbook',
 ]);
 const EMPLOYER_ROLES = new Set(['employer', 'admin', 'super_admin', 'org_admin']);
 

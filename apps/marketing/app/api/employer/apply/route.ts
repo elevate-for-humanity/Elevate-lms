@@ -9,7 +9,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function clean(value: unknown, max = 2000): string {
-  return String(value ?? '').trim().slice(0, max);
+  return String(value ?? '')
+    .trim()
+    .slice(0, max);
 }
 
 function validEmail(value: string): boolean {
@@ -17,7 +19,12 @@ function validEmail(value: string): boolean {
 }
 
 function escapeHtml(value: string): string {
-  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 export async function POST(request: Request) {
@@ -42,7 +49,10 @@ export async function POST(request: Request) {
       );
     }
     if (!validEmail(email)) {
-      return NextResponse.json({ ok: false, error: 'Enter a valid email address.' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Enter a valid email address.' },
+        { status: 400 },
+      );
     }
 
     const admin = await getAdminClient();
@@ -78,10 +88,41 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (error || !data?.id) {
-      logger.error('[employer/apply] intake insert failed', error ?? undefined, { email, companyName });
+      logger.error('[employer/apply] intake insert failed', error ?? undefined, {
+        email,
+        companyName,
+      });
       return NextResponse.json(
         { ok: false, error: 'We could not save the employer application. Please try again.' },
         { status: 500 },
+      );
+    }
+
+    // AFTER INSERT promotion updates the persisted intake row. Verify it before
+    // acknowledging receipt or sending submission notifications.
+    const { data: receipt, error: receiptError } = await admin
+      .from('application_intake')
+      .select('status, destination_table, destination_id')
+      .eq('id', data.id)
+      .single();
+    if (
+      receiptError ||
+      receipt?.status !== 'processed' ||
+      receipt?.destination_table !== 'employer_applications' ||
+      !receipt?.destination_id
+    ) {
+      logger.error(
+        '[employer/apply] review queue promotion unconfirmed',
+        receiptError ?? undefined,
+        { intakeId: data.id },
+      );
+      return NextResponse.json(
+        {
+          ok: false,
+          referenceNumber: data.id,
+          error: `Your request was saved, but review processing could not be confirmed. Please call ${PLATFORM_DEFAULTS.mainPhone} with reference ${data.id} before submitting again.`,
+        },
+        { status: 503 },
       );
     }
 
@@ -98,7 +139,7 @@ export async function POST(request: Request) {
       applicantSubject: 'Employer Partnership Application Received | Elevate for Humanity',
       applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Employer Partnership Application Received</h2><p>Hello ${safeName},</p><p>We received the employer partnership application for <strong>${safeCompany}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><h3>What happens next</h3><ol><li>Our workforce team reviews your hiring, OJT, WEX, apprenticeship, and training needs.</li><li>If additional employer verification or agreements are needed, we will send the exact next step.</li><li>Once the partnership is approved, your employer/partner portal access and onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.mainPhone}.</p></div>`,
       staffSubject: `[EMPLOYER APPLICATION] ${companyName}`,
-      staffHtml: `<h2>New Employer Partnership Application</h2><p><strong>${safeCompany}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Industry:</strong> ${escapeHtml(industry || 'Not provided')}</p><p><strong>Hiring/workforce needs:</strong> ${escapeHtml(hiringNeeds || 'Not provided')}</p><p>Review the application and initiate employer onboarding when approved.</p>`,
+      staffHtml: `<h2>New Employer Partnership Application</h2><p><strong>${safeCompany}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Industry:</strong> ${escapeHtml(industry || 'Not provided')}</p><p><strong>Hiring/workforce needs:</strong> ${escapeHtml(hiringNeeds || 'Not provided')}</p><p><a href="https://admin.elevateforhumanity.org/employers/applications/${receipt.destination_id}">Review this employer application</a> and begin employer verification and onboarding.</p>`,
       metadata: { company_name: companyName, industry },
     });
 

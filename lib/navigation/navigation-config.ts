@@ -261,6 +261,9 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
       id: 'operations',
       items: [
         { id: 'dashboard', label: 'Dashboard', href: p('employer'), icon: LayoutDashboard },
+        { id: 'setup', label: 'Complete Setup', href: p('employer', 'setup'), icon: ClipboardCheck },
+        { id: 'documents', label: 'Documents & Agreements', href: p('employer', 'documents'), icon: FileText },
+        { id: 'settings', label: 'Company Settings', href: p('employer', 'settings'), icon: Settings },
         { id: 'jobs', label: 'Job Postings', href: p('employer', 'jobs'), icon: Briefcase },
         {
           id: 'applications',

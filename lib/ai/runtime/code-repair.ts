@@ -290,7 +290,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    if(repair.source_job_id){
     const {data:source,error:sourceError}=await db.from('ultimate_build_jobs').select('*').eq('id',repair.source_job_id).single();
     if(sourceError)throw sourceError;
-    const {data:build,error:buildError}=await db.from('ultimate_course_builds').select('id,status,profile').eq('id',source.build_id).single();
+    const {data:build,error:buildError}=await db.from('ultimate_course_builds').select('id,course_id,status,profile').eq('id',source.build_id).single();
     if(buildError)throw buildError;
     if(!verification.resumedJobId && source.status==='failed' && source.monitor?.enabled && !['published','archived'].includes(build.status) && build?.profile?.ownerPaused!==true && !/owner|pause/i.test(source.monitor?.reason??'')){
      // enqueue() preserves the failed lesson cursor and reuses any active job.
@@ -308,7 +308,20 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
      const result=await db.from('ultimate_build_jobs').select('id,build_id,status,payload,execution_generation').eq('id',verification.resumedJobId).single();
      if(result.error)throw result.error;resumed=result.data;
     }
-    const outcome=courseRepairOutcome({repairId:repair.id,releaseSha:repair.release_sha,sourceJobId:repair.source_job_id,job:resumed,build});
+    let lessonAcceptance;
+    const competencyId=resumed?.payload?.autopilot?.competencyId;
+    const canonicalId=build.profile?.canonicalLessonIds?.[competencyId];
+    if(resumed?.status==='completed' && competencyId && canonicalId){
+     const lesson=await db.from('course_lessons').select('status,is_published,video_status,video_url')
+      .eq('id',canonicalId).eq('course_id',build.course_id).maybeSingle();
+     if(lesson.error)throw lesson.error;
+     const saved=await db.from('ultimate_lesson_builds').select('id').eq('build_id',build.id).eq('competency_id',competencyId).maybeSingle();
+     if(saved.error)throw saved.error;
+     const learner=saved.data?await db.from('ultimate_lesson_steps').select('state').eq('lesson_build_id',saved.data.id).eq('step','learner_runthrough').maybeSingle():{data:null,error:null};
+     if(learner.error)throw learner.error;
+     lessonAcceptance={published:lesson.data?.status==='published'&&lesson.data.is_published===true&&lesson.data.video_status==='complete'&&Boolean(lesson.data.video_url),learnerPassed:learner.data?.state==='passed'};
+    }
+    const outcome=courseRepairOutcome({repairId:repair.id,releaseSha:repair.release_sha,sourceJobId:repair.source_job_id,job:resumed,build,lessonAcceptance});
     verification.courseExecution=outcome;
     verification.symptom=outcome.reason;
     await update(repair.id,{status:outcome.state==='passed'?'verified':outcome.state==='failed'?'blocked':'verifying',verification,

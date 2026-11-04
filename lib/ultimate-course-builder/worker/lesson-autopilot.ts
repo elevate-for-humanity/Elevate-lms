@@ -13,6 +13,7 @@ import {resolveReleaseActor} from './release-actor';
 import {isDurableExternalBlocker} from '../core/repair-router';
 import {reportCourseProgress} from './progress-watch.mjs';
 import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
+import {isTransientCourseFailure,requestFirstFailureRepair} from './first-failure-repair.mjs';
 
 /** A role may delegate only the directive produced for its current blocking
  * finding. Saved producer feedback from an earlier stage is recovery history,
@@ -132,9 +133,12 @@ export async function processLessonAutopilot({db,job,workerId,generation,build,q
     }
     // An unchanged producer or unresolved role handoff needs a new repair or
     // deployed code, not another identical claim that consumes the retry budget.
-    const retry = !result.findings.some((finding:any) =>
-      ['AUTOPILOT_UPSTREAM_CHECKPOINT_REQUIRED','REPAIR_PRODUCER_UNCHANGED'].includes(finding.code));
+    const retry = isTransientCourseFailure(result.findings);
     await queue.fail(job.id,workerId,message,generation,retry);
+    if (!retry) {
+      const repair = await requestFirstFailureRepair({db,job,findings:result.findings,notify:notifyCourseDispatcher});
+      return {claimed:true,completed:false,repairing:true,repairId:repair.id,jobId:job.id,result};
+    }
     return {claimed:true,completed:false,repairQueued:retry,jobId:job.id,result};
   }
   if (task.role === 'quality') {

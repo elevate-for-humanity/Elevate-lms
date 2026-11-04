@@ -23,6 +23,8 @@ import { isDurableExternalBlocker } from '../core/repair-router';
 import { liveCheckpointRepairReader } from './live-checkpoint-repair';
 import { verifyNewCourseAssessmentContract } from '../instructional/new-course-contract.mjs';
 import {coordinateLessonAutopilots, processLessonAutopilot} from './lesson-autopilot';
+import {isTransientCourseFailure,requestFirstFailureRepair} from './first-failure-repair.mjs';
+import {notifyCourseDispatcher} from './dispatch-on-enqueue.mjs';
 export function isTargetedCourseJob(payload: Record<string, unknown> = {}) {
   return Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance || payload.ownerPreview);
 }
@@ -35,6 +37,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   if (!Number.isSafeInteger(generation) || generation < 1)
     throw new Error('ULTIMATE_EXECUTION_GENERATION_REQUIRED');
   const fence = {jobId: job.id, workerId, generation};
+  const failOrRepair = async (message:string, findings:any[] = [{code:'COURSE_EXECUTION_FAILED',severity:'error',message}]) => {
+    const retry=isTransientCourseFailure(findings);
+    await queue.fail(job.id,workerId,message,generation,retry);
+    if(!retry) await requestFirstFailureRepair({db,job,findings,notify:notifyCourseDispatcher});
+  };
   console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId, generation });
   let leaseLost = false;
   let heartbeatInFlight = false;
@@ -265,7 +272,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           await queue.waitForDependency(job.id,workerId,`ULTIMATE_EXTERNAL_ASSET_REQUIRED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
           return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
         }
-        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}:FINDINGS=${JSON.stringify((result.findings || []).map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,2800)}`,generation,true);
+        await failOrRepair(`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}:FINDINGS=${JSON.stringify((result.findings || []).map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,2800)}`,result.findings);
         return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
       }
     }
@@ -277,11 +284,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       // Quality findings are repair work, not a terminal queue state. Requeue
       // the durable build so the worker resumes from its persisted checkpoint
       // and selective-repair plan instead of stranding the entire course.
-      await queue.fail(
-        job.id,
-        workerId,
+      await failOrRepair(
         `ULTIMATE_REPAIR_REQUIRED:${JSON.stringify(result.findings.map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,4000)}`,
-        generation,
+        result.findings,
       );
       return { claimed: true, completed: false, repairQueued: true, jobId: job.id, result };
     }
@@ -361,7 +366,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     }
     if (isDurableExternalBlocker({code:message.split(':')[0],step:'learning_objectives',severity:'error',message}))
       await queue.waitForDependency(job.id,workerId,message,generation);
-    else await queue.fail(job.id, workerId, message, generation, true);
+    else await failOrRepair(message);
     const failedBuild = await db.from('ultimate_course_builds').select('course_id').eq('id',job.build_id).single();
     if (failedBuild.data) await recordProductionAlert(db,{actorId:job.payload?.requestedBy,buildId:job.build_id,
       courseId:failedBuild.data.course_id,eventKey:`attention:${job.id}:${generation}`,title:'Course production needs attention',

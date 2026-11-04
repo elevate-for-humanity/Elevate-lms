@@ -10,6 +10,11 @@ const source = stripTypeScriptTypes(
 const { isDurableExternalBlocker, routeSelectiveRepairs, requiresIndependentMediaDelivery, COURSE_RECOVERY_CONTRACT_VERSION } =
   new Function(source + '\nreturn { isDurableExternalBlocker, routeSelectiveRepairs, requiresIndependentMediaDelivery, COURSE_RECOVERY_CONTRACT_VERSION };')();
 
+test('caption coverage repairs the timeline producer instead of repeating QA', () => {
+ assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'Media quality gate failed: captions do not cover rendered narration'}]),
+ [{step:'synchronization',codes:['Media quality gate failed'],rebuildOnlyThisStage:true}]);
+});
+
 test('unchanged producer output is an internal repair failure, not an external blocker', () => {
   assert.equal(isDurableExternalBlocker({ code: 'REPAIR_PRODUCER_UNCHANGED' }), false);
   assert.equal(routeSelectiveRepairs([{ code: 'REPAIR_PRODUCER_UNCHANGED', message: 'unchanged' }]).length, 0);

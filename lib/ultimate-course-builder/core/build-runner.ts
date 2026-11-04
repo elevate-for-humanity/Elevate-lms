@@ -251,7 +251,11 @@ export class UltimateBuildRunner {
         /HTTP (429|5\d\d)|timeout|timed out|ECONNRESET|fetch failed/i.test(f.message),
       );
       const durableBlocker = failures.some((f) => isDurableExternalBlocker(f));
-      const proposedTarget = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
+      // Repeating a deterministic checker cannot correct its input. Escalate
+      // to PARIS unless a distinct producer owns the correction.
+      const proposedTarget = !durableBlocker
+        ? (route?.step !== step ? route?.step : undefined) ?? (transient ? step : undefined)
+        : undefined;
       // A previously validated producer checkpoint must not be invalidated
       // indefinitely for the same downstream finding. A genuine new source
       // revision or explicit checkpoint repair can authorize a fresh attempt;

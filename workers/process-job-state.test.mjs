@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import {createCourseProgressWatch,reportCourseProgress} from '../lib/ultimate-course-builder/worker/progress-watch.mjs';
 import {createLeaseDeadline} from '../lib/ultimate-course-builder/worker/runtime-guards.mjs';
+import {isTransientCourseFailure} from '../lib/ultimate-course-builder/worker/first-failure-repair.mjs';
 const repairSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/core/repair-router.ts', import.meta.url),'utf8'));
 const {isDurableExternalBlocker} = await import('data:text/javascript;base64,'+Buffer.from(repairSource).toString('base64'));
 const checkpointSource=stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/worker/live-checkpoint-repair.ts',import.meta.url),'utf8')).replace(/^import .*;\n/gm,'');
@@ -36,7 +37,7 @@ function scenario(payload, completed = true, options = {}) {
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
   const names = ['verifySavedCourseLessons','ULTIMATE_BUILD_STEPS','continuousCourseLease','checkpointContinuousLesson','attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
   const values = [verifySavedCourseLessons,ULTIMATE_BUILD_STEPS,continuousCourseLease,checkpointContinuousLesson,options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } async publishReadyLessons() { events.push('publish-ready');await options.publishReady?.(); } }, options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
-  const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
+  const worker = new Function(...names, 'liveCheckpointRepairReader', 'isTransientCourseFailure', 'requestFirstFailureRepair', 'notifyCourseDispatcher', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader,isTransientCourseFailure,async input=>{await options.repair?.(input);return {id:'repair'};},async()=>{});
   return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
 
@@ -57,11 +58,14 @@ test('a targeted lesson on a parallel course cannot seed or finish the whole-cou
 });
 
 test('an incomplete targeted lesson stays in the existing repair queue instead of being completed', async () => {
-  const s = scenario({ lessonBuildId: 'lesson' }, false);
+  const repairs=[];
+  const s = scenario({ lessonBuildId: 'lesson' }, false,{repair:async input=>repairs.push(input)});
   const result = await s.run();
   assert.equal(result.completed, false);
   assert.equal(result.repairQueued, true);
   assert.deepEqual(s.events, ['fail']);
+  assert.equal(repairs.length,1);
+  assert.equal(repairs[0].job.id,'job');
 });
 test('missing Google permission waits for a dependency without consuming repair retries',async()=>{
  const s=scenario({acceptance:true},false,{runCourse:async()=>({completed:false,findings:[{code:'ULTIMATE_GOOGLE_AUTHORING_HTTP_403',message:'Permission missing'}],lessons:[]})});

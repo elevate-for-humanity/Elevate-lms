@@ -1,7 +1,7 @@
 import { inheritCourseProductionPolicy } from '../core/production-policy.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
-import { instructionView } from '../core/repair-policy.mjs';
+import { instructionView, recoverTeachingVisibilityRepair } from '../core/repair-policy.mjs';
 import { currentEvidence } from '../core/lesson-contract';
 import { ULTIMATE_BUILD_STEPS } from '../core/types';
 import { MIN_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
@@ -44,7 +44,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
           .single(),
         this.db
           .from('ultimate_lesson_steps')
-          .select('step,state,artifacts,completed_at')
+          .select('step,state,artifacts,findings,completed_at')
           .eq('lesson_build_id', input.lessonBuildId),
       ]);
     if (lessonError) throw lessonError;
@@ -99,6 +99,10 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       row.step === 'lesson_film_render' && row.state === 'failed');
     const savedErrors = Array.isArray(lesson?.findings)
       ? lesson.findings.filter((finding: any) => finding.severity === 'error') : [];
+    if (savedErrors.some((finding: any) => finding.code === 'REPAIR_PRODUCER_UNCHANGED')) {
+      const teachingRepair = recoverTeachingVisibilityRepair(artifacts, steps ?? [], savedErrors, currentEvidence);
+      if (teachingRepair) artifacts.__repairState = teachingRepair;
+    }
     const sourceSteps = ['instructor_script', 'natural_narration', 'storyboard'].map(step =>
       passed.find((row: any) => row.step === step));
     const savedFailureIsCurrent = savedRenderFailure?.completed_at &&
@@ -154,7 +158,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     if (narrationInspectorRetry) {
       artifacts.synchronization = narrationDirective.previous;
       if (!passed.some((step: any) => step.step === 'synchronization'))
-        passed.push({step:'synchronization',state:'passed',artifacts:narrationDirective.previous,completed_at:null});
+        passed.push({step:'synchronization',state:'passed',artifacts:narrationDirective.previous,findings:[],completed_at:null});
       artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
         directive:{...narrationDirective,target:'finished_media_qa'}};
     }
@@ -188,6 +192,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
           step: 'synchronization',
           state: 'passed',
           artifacts: pictureCueDirective.previous,
+          findings: [],
           completed_at: null,
         });
       }
@@ -220,7 +225,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     if (legacyTitleRetry) {
       artifacts.scene_construction = directive.previous;
       if (!passed.some((step: any) => step.step === 'scene_construction')) {
-        passed.push({ step: 'scene_construction', state: 'passed', artifacts: directive.previous, completed_at: null });
+        passed.push({ step: 'scene_construction', state: 'passed', artifacts: directive.previous, findings: [], completed_at: null });
       }
       delete artifacts.__repairState;
     }

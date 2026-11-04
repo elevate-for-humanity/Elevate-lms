@@ -46,6 +46,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   await page.getByRole('link', { name: 'Back to employer setup' }).click();
   await page.getByRole('link', { name: /Documents and agreements Review/ }).click();
   await expect(page.getByText('QA-employer-onboarding.pdf', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'Employer documents must fit the device viewport').toBe(true);
   const view = page.getByRole('link', { name: 'View', exact: true }).first();
   const url = await view.getAttribute('href');
   expect(url).toMatch(/^\/employer\/documents\/[^/]+\/view$/);

@@ -46,6 +46,7 @@ export default function LessonWorkbook({
         readOnly={readOnly}
         accountId={accountId}
         workbookSlug={workbook.slug}
+        sectionPicker={null}
         visual={visual}
         onReviewSaved={(_, value) => setReviewed(value)}
       />

@@ -18,6 +18,7 @@ export function CommunicationTodos({
   const [signedIn, setSignedIn] = useState(false);
   const [activeUserId, setActiveUserId] = useState('');
   const [items, setItems] = useState<any[]>([]);
+  const [loadError, setLoadError] = useState(false);
   useEffect(() => {
     if (authPage || (holderPage && !embedded)) return;
     let active = true;
@@ -25,10 +26,13 @@ export function CommunicationTodos({
     let channel: any;
     let channelUser = '';
     let authTimer: ReturnType<typeof setTimeout> | undefined;
-    async function load() {
+    const reads = new AbortController();
+    let loading: Promise<any> | undefined;
+    async function readNotifications() {
       const {
         data: { user },
       } = await db.auth.getUser();
+      if (!active) return;
       if (!user) {
         if (active) {
           setItems([]);
@@ -37,7 +41,7 @@ export function CommunicationTodos({
         }
         return;
       }
-      const { data } = await db
+      const { data, error } = await db
         .from('notifications')
         .select('id,title,message,action_url,action_label,created_at,idempotency_key,metadata')
         .eq('user_id', user.id)
@@ -45,13 +49,24 @@ export function CommunicationTodos({
         .or(actionableNoticeFilter())
         .in('type', ['message', 'announcement', 'reminder'])
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(50)
+        .abortSignal(reads.signal);
       if (active) {
-        setItems(actionableNotices(data || []).slice(0, 5));
         setSignedIn(true);
         setActiveUserId(user.id);
+        setLoadError(Boolean(error));
+        if (error) return user;
+        setItems(actionableNotices(data || []).slice(0, 5));
       }
       return user;
+    }
+    function load() {
+      // Auth events and realtime events can arrive during the initial read.
+      // Share that read rather than launching competing notification queries.
+      if (!loading) loading = readNotifications().catch(() => {
+        if (active) setLoadError(true);
+      }).finally(() => { loading = undefined; });
+      return loading;
     }
     async function setup() {
       const user = await load();
@@ -74,6 +89,7 @@ export function CommunicationTodos({
     });
     return () => {
       active = false;
+      reads.abort();
       listener.subscription.unsubscribe();
       if (authTimer) clearTimeout(authTimer);
       if (channel) void db.removeChannel(channel);
@@ -82,6 +98,7 @@ export function CommunicationTodos({
   if (authPage) return null;
   const content = (
     <>
+      {loadError && <p role="status">Messages are temporarily unavailable. Please try again shortly.</p>}
       {!embedded && (
         <nav aria-label="Interoffice communications">
           <a

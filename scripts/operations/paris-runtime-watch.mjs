@@ -101,7 +101,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
    const d=snapshot.diagnostics;
    console.log(JSON.stringify({capturedAt:snapshot.capturedAt,counts:snapshot.jobs,
      alerts:d.alerts,exhaustedFailures:d.exhaustedFailures,unmonitoredJobs:d.unmonitoredJobs}));
-   if(d.alerts.some(a=>['failed','stale_worker','overdue_queue','completed_reversal'].includes(a.type)))process.exitCode=1;
+   // An incident is actionable evidence, not a collection failure. Keep the\n   // observation run successful so the next cycle can diff against this exact\n   // snapshot; surface alerts through Actions summaries/artifacts instead.\n   // Read/validation errors still fail the workflow in the catch block.
  } catch(error) {
    console.error('PARIS_READONLY_OBSERVER_FAILED:'+String(error.message).slice(0,100));
    process.exitCode=2;

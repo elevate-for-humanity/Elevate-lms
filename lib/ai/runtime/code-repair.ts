@@ -10,7 +10,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -360,11 +360,20 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // Inspect a bounded page; disposition decisions preserve source evidence.
  // An ineligible source is a state/eligibility decision, never missing owner authorization.
  // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
- const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id')
+ const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history')
   .eq('status','queued').order('created_at',{ascending:true}).limit(100);
  if(queued.error)throw queued.error;
- let pending: {id:string;attempt_count:number;source_job_id:string|null}|null=null;
+ let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown}|null=null;
  for(const candidate of queued.data??[]){
+  if(!canDispatchParisRepairAttempt(candidate)){
+   // Preserve the original repair and report a bounded budget block. No claim,
+   // attempt reset, worker restart, or data mutation beyond its repair receipt.
+   const limited=await db.from('paris_code_repairs').update({
+    status:'blocked',error_code:'PARIS_REPAIR_ATTEMPT_BUDGET_EXHAUSTED',updated_at:new Date().toISOString()
+   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+   if(limited.error)throw limited.error;
+   continue;
+  }
   if(!candidate.source_job_id){pending=candidate;break;}
   const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,status,last_error').eq('id',candidate.source_job_id).single();
   if(source.error)throw source.error;

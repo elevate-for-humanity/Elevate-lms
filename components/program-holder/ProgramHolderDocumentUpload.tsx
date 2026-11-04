@@ -1,4 +1,5 @@
 'use client';
+import { GuidedInvoiceFields } from './GuidedInvoiceFields';
 import { FormEvent, useEffect, useState } from 'react';
 
 const commonOptions = [
@@ -109,7 +110,7 @@ export function ProgramHolderDocumentUpload({
             Upload the documents that apply to your Program Holder account. Start with your
             government-issued photo ID, business registration, W-9
             {insuranceRequired ? ', general liability insurance,' : ''} and your program
-            syllabus/training plan. Upload a profile photo and company logo so your portal and
+            syllabus/training plan. Complete your W-9 with the guided form above. Upload a profile photo and company logo so your portal and
             program presentation can be completed. Student training photos/videos are evidence
             uploads, not substitutes for your onboarding records.
           </p>
@@ -133,7 +134,7 @@ export function ProgramHolderDocumentUpload({
             {programOptions.map(program => <option key={program.id} value={program.id}>{program.title || program.name || 'Assigned program'}</option>)}
           </select>
         </label>
-        <label className="grid gap-1 text-sm font-bold">Syllabus text (optional for readable PDFs; required if the file cannot be read)
+        <label className="grid gap-1 text-sm font-bold">Syllabus / training-plan text (fill in here, or attach a readable PDF)
           <textarea name="syllabusText" maxLength={250000} rows={5} className="rounded-xl border bg-white p-2" />
         </label>
         <p className="text-sm">Course Builder uses this syllabus to create secondary training for your assigned students. Your primary Elevate curriculum remains in place.</p>
@@ -163,22 +164,7 @@ export function ProgramHolderDocumentUpload({
               <option value="upload">Upload an existing invoice</option>
             </select>
           </label>
-          {invoiceMode === 'form' && <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
-            {[
-              ['providerName', 'Provider / business name', 'text'],
-              ['invoiceNumber', 'Invoice number', 'text'],
-              ['studentName', 'Student name', 'text'],
-              ['trainingStart', 'Training start date', 'date'],
-              ['trainingEnd', 'Training end date', 'date'],
-              ['amount', 'Amount requested (USD)', 'number'],
-            ].map(([name, label, type]) => <label key={name} className="grid gap-1 text-sm font-bold">{label}
-              <input name={name} type={type} required maxLength={200} min={type === 'number' ? '0.01' : undefined} max={type === 'number' ? '9999999.99' : undefined} step={type === 'number' ? '0.01' : undefined} className="min-h-11 min-w-0 rounded-xl border bg-white p-2" />
-            </label>)}
-            <label className="grid gap-1 text-sm font-bold sm:col-span-2">Training / services provided
-              <textarea name="serviceDescription" required maxLength={2000} rows={4} className="rounded-xl border bg-white p-2" />
-            </label>
-            <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm sm:col-span-2"><input name="invoiceAttested" type="checkbox" value="yes" required className="h-11 w-11 shrink-0 cursor-pointer" />I certify that these services and the requested amount are accurate.</label>
-          </fieldset>}
+          {invoiceMode === 'form' && <fieldset disabled={busy}><GuidedInvoiceFields /></fieldset>}
         </div>
       )}
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
@@ -221,7 +207,7 @@ export function ProgramHolderDocumentUpload({
         {(!invoiceOnly || invoiceMode === 'upload') && <input
           name="file"
           type="file"
-          required
+          required={!isSyllabus}
           accept={
             materialsOnly
               ? selectedType === 'testing_evidence'

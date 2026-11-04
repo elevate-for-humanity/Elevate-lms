@@ -1,3 +1,5 @@
+import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
+import FullProgramHostAgreement from '@/components/program-holder/FullProgramHostAgreement';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
@@ -9,12 +11,12 @@ export const metadata = {
 };
 
 export default async function NonCompetePage() {
-  const context = await requireProgramHolder();
+  const context = await requireProgramHolder({ allowPendingApproval: true });
   if (context.holderId === 'acc9f5ab-8804-432e-9b12-aac1a6c86426') {
     const { data: holder, error } = await context.db.from('program_holders')
       .select('features').eq('id', context.holderId).maybeSingle();
     if (error || !holder) throw new Error('Agreement readiness could not be checked.');
-    if (holder.features?.full_forms_status === 'review_pending') redirect('/program-holder/agreements');
+    redirect('/program-holder/agreements');
   }
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -23,7 +25,7 @@ export default async function NonCompetePage() {
       </p>
       <h1 className="mt-2 text-3xl font-black">
         Confidentiality, non-solicitation, and limited non-compete terms
-      </h1>
+      </h1><PrintDocumentControl />
       <div className="mt-6 space-y-4">
         {[
           [
@@ -40,7 +42,7 @@ export default async function NonCompetePage() {
           ],
           [
             'Duration and enforceability',
-            'Relationship-protection duties apply during the Program Holder relationship and for 12 months afterward, only to the extent permitted by controlling law. Confidentiality and learner-privacy duties continue as required by law and contract.',
+            'Review the duration and scope in your executed individual agreement and the full master terms below. Individual amendments may differ. Confidentiality and learner-privacy duties continue as required by your agreement and applicable law.',
           ],
           [
             'Remedies and reporting',
@@ -54,8 +56,8 @@ export default async function NonCompetePage() {
         ))}
       </div>
       <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
-        This portal summary is incorporated into the Program Holder agreement. Review the full
-        agreement before signing.
+        These cards are a reading guide. Review your assigned agreement and the full master
+        terms below before signing. This page does not change an executed agreement.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
@@ -64,15 +66,14 @@ export default async function NonCompetePage() {
         >
           Sign acknowledgements
         </Link>
-        <a
-          href="https://www.elevateforhumanity.org/legal/program-host-agreement"
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          href="/program-holder/agreements"
           className="rounded-xl border px-5 py-3 text-sm font-black"
         >
-          Open full agreement
-        </a>
+          Open my assigned agreements
+        </Link>
       </div>
+      <div className="mt-8"><FullProgramHostAgreement /></div>
     </main>
   );
 }

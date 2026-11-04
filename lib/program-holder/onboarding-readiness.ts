@@ -1,3 +1,4 @@
+import media from './onboarding-media.json';
 import { isApprovedDocument } from './document-review';
 
 export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
@@ -150,6 +151,9 @@ export async function getProgramHolderPaymentReadiness(
     ...(!mouSigned ? ['Signed current Program Holder MOU'] : []),
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),
     ...(!rightsAcknowledged ? ['Rights and responsibilities acknowledgement'] : []),
+    ...(!acknowledgedTypes.has('nda') ? ['Confidentiality acknowledgement'] : []),
+    ...(!acknowledgedTypes.has('non_compete') ? ['Non-compete and non-solicitation acknowledgement'] : []),
+    ...(!acknowledgedTypes.has(media.version) ? ['PARIS onboarding video and signed understanding acknowledgement'] : []),
     ...required.filter((item) => !approvedTypes.has(item.type)).map((item) => item.label),
     ...(!approvedTypes.has('company_logo') ? ['Program Holder company logo'] : []),
     ...(requiresMediaRelease && !imageRelease ? ['Signed image release'] : []),

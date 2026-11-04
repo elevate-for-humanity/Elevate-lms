@@ -1,3 +1,4 @@
+import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
 import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';
 import Link from 'next/link';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
@@ -9,7 +10,7 @@ export const metadata = {
 };
 
 export default async function RightsResponsibilitiesPage() {
-  await requireProgramHolder();
+  await requireProgramHolder({ allowPendingApproval: true });
   const workspace = await getProgramHolderWorkspace();
   const features = workspace.holder?.features || {};
   const assignedRequirements = [
@@ -43,7 +44,7 @@ export default async function RightsResponsibilitiesPage() {
       <p className="text-xs font-black uppercase tracking-widest text-blue-700">
         Program Holder agreement
       </p>
-      <h1 className="mt-2 text-3xl font-black">Rights and responsibilities</h1>
+      <h1 className="mt-2 text-3xl font-black">Rights and responsibilities</h1><PrintDocumentControl />
       <p className="mt-3 text-slate-700">
         These duties follow the live portal workflow and apply only to programs assigned to this
         Program Holder.

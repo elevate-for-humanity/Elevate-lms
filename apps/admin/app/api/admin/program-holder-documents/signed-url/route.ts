@@ -46,12 +46,13 @@ export async function POST(req: NextRequest) {
   // Look up document record for audit
   const { data: doc } = await db
     .from('program_holder_documents')
-    .select('id, user_id')
+    .select('id, user_id, storage_bucket')
     .eq('file_url', filePath)
     .maybeSingle();
 
+  if (!doc || !['documents', 'provider-documents', 'program-holder-documents', 'program_holder_documents'].includes(doc.storage_bucket || 'documents')) return NextResponse.json({ error: 'Document not found.' }, { status: 404 });
   const { data, error } = await db.storage
-    .from('program_holder_documents')
+    .from(doc.storage_bucket || 'documents')
     .createSignedUrl(filePath, 3600);
 
   if (error || !data?.signedUrl) {
@@ -69,5 +70,5 @@ export async function POST(req: NextRequest) {
     }).catch(() => {});
   }
 
-  return NextResponse.json({ url: data.signedUrl });
+  return NextResponse.json({ url: data.signedUrl }, { headers: { 'Cache-Control': 'private, no-store' } });
 }

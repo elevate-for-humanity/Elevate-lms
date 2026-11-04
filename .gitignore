@@ -267,3 +267,6 @@ exports/northflank-env.production.json
 # Runtime artifact stores are application source, not generated build artifacts.
 !lib/ultimate-course-builder/artifacts/
 !lib/ultimate-course-builder/artifacts/*.ts
+
+# Generated intermediate PARIS onboarding renders
+.partner-onboarding-render/

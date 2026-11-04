@@ -5,7 +5,7 @@ import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
 
 export async function POST(request: Request) {
-  const ctx = await requireProgramHolder();
+  const ctx = await requireProgramHolder({ allowPendingApproval: true });
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   const body = await request.json().catch(() => ({}));

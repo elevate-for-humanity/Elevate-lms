@@ -1,3 +1,4 @@
+import { PrintDocumentControl } from '@/components/program-holder/PrintDocumentControl';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
@@ -11,7 +12,7 @@ export const metadata = {
 };
 
 export default async function SignMouPage() {
-  const context = await requireProgramHolder();
+  const context = await requireProgramHolder({ allowPendingApproval: true });
   if (context.mode === 'admin') redirect('/program-holder/dashboard');
   const db = context.db;
   const { data: holder, error } = await db.from('program_holders')
@@ -23,6 +24,7 @@ export default async function SignMouPage() {
     redirect('/program-holder/agreements');
   }
   const executedUrl = typeof holder.mou_final_pdf_url === 'string' && /^https:\/\//i.test(holder.mou_final_pdf_url) ? holder.mou_final_pdf_url : null;
+  const approvalReady = ['approved', 'active', 'approved_pending_mou'].includes(holder.status) && Boolean(holder.approved_at);
   const requirements: string[] = Array.isArray(holder.features?.custom_mou?.requirements) ? holder.features.custom_mou.requirements.filter((value: unknown): value is string => typeof value === 'string') : [];
 
   const { data: assignments } = await db
@@ -42,9 +44,9 @@ export default async function SignMouPage() {
         <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">
           Program Holder onboarding
         </p>
-        <h1 className="mt-3 text-3xl font-black sm:text-4xl">Sign the Program Holder MOU</h1>
+        <h1 className="mt-3 text-3xl font-black sm:text-4xl">Sign the Program Holder MOU</h1><PrintDocumentControl />
         <p className="mt-4 text-base leading-7 text-slate-700">
-          Your application for <strong>{holder.organization_name}</strong> is approved. Review the complete terms below. Your existing signature remains on record if you have already signed.
+          Review the assigned terms for <strong>{holder.organization_name}</strong>. Your existing signature remains on record if you have already signed. New signatures become available after Elevate approves your application.
         </p>
 
         <section className="mt-7 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
@@ -58,7 +60,7 @@ export default async function SignMouPage() {
             payment readiness.
           </p>
           <Link
-            href="https://www.elevateforhumanity.org/legal/program-host-agreement"
+            href="/program-holder/agreements"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-flex font-bold text-blue-800 underline"
@@ -85,6 +87,8 @@ export default async function SignMouPage() {
           </div>
         ) : context.mode === 'preview' ? (
           <p className="mt-6 rounded-xl bg-blue-50 p-5">Administrator preview is read only. The Program Holder must sign from their own account.</p>
+        ) : !approvalReady ? (
+          <p className="mt-6 rounded-xl bg-amber-50 p-5">Review these documents while Elevate completes your application approval. Your signature is not recorded by viewing this page.</p>
         ) : (
           <DocumentSignatureBlock
             agreementType="program_holder_mou"

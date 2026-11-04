@@ -11,7 +11,7 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:s
   if(table==='profiles')return {data:{role:'admin'},error:null};
   if(table==='paris_code_repairs')return {data:filters.some(([key,v])=>key==='status'&&Array.isArray(v)&&v.includes('verifying'))?[{id:'repair',status:'verifying',release_sha:'sha',source_job_id:'source',verification:{resumedJobId:'resumed',exactRuntimeSha:h.verifiedRuntime}}]:[],error:null};
   if(table==='ultimate_course_builds')return {data:{id:'build',status:h.courseStatus,profile:{}},error:null};
-  if(table==='ultimate_build_jobs')return {data:filters.some(([key,v])=>key==='id'&&v==='source')?{id:'source',build_id:'build',status:'failed',monitor:{enabled:true},payload:{}}:{id:'resumed',build_id:'build',status:h.workerStatus,payload:{codeRepairId:'repair',codeRepairSha:'sha'}},error:null};
+  if(table==='ultimate_build_jobs')return {data:filters.some(([key])=>key==='id')?(filters.some(([key,v])=>key==='id'&&v==='source')?{id:'source',build_id:'build',status:'failed',monitor:{enabled:true},payload:{}}:{id:'resumed',build_id:'build',status:h.workerStatus,payload:{codeRepairId:'repair',codeRepairSha:'sha'}}):[],error:null};
   return {data:[],error:null};
  };
  const q:any={select:(value:string)=>{selection=value;return q;},eq:(...v:any[])=>{filters.push(v);return q;},in:(...v:any[])=>{filters.push(v);return q;},gte:()=>q,lte:()=>q,range:()=>q,order:()=>q,limit:()=>q,update:(v:any)=>{values=v;return q;},single:async()=>result(),maybeSingle:async()=>result(),then:(resolve:any)=>Promise.resolve(resolve(result()))};return q;

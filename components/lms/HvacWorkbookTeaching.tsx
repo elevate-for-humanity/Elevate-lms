@@ -53,15 +53,25 @@ function AirflowBench() {
 }
 
 export default function HvacWorkbookTeaching({number}:{number:number}) {
+  const [active, setActive] = useState(0);
   const chapter=content.chapters.find(chapter=>chapter.number===number);
   if(!chapter)return null;
+  const pages = [...chapter.lessons, { heading: chapter.heading, text: chapter.text }, { heading: 'Worked example', text: chapter.example }];
+  const page = pages[Math.min(active, pages.length - 1)];
   return <section className="my-6 space-y-5 rounded-2xl border border-stone-300 bg-stone-50 p-4 sm:p-6" aria-label={`Chapter ${number} illustrated instruction`}>
     <h3 className="text-2xl font-bold">Learn and work through the example</h3>
     <figure><img src={`/images/workbooks/hvac/chapter-${number}.svg`} alt={chapter.diagram.join(' → ')} className="w-full rounded-xl bg-white"/><figcaption className="mt-2 text-sm">Learning map: {chapter.heading}. Diagram labels describe concepts; they are not equipment connection instructions.</figcaption></figure>
     {chapter.image&&<figure><img src={chapter.image} alt={chapter.imageAlt||chapter.title} loading="lazy" className="max-h-72 w-full rounded-xl bg-white object-contain"/><figcaption className="mt-2 text-sm">Workplace context for the matching lesson. This picture does not demonstrate every service step or verify student performance.</figcaption></figure>}
-    {chapter.lessons.map((part,index)=><details key={part.heading} open={index===0} className="rounded-xl border bg-white p-4"><summary className="cursor-pointer py-2 text-lg font-bold">{part.heading}</summary><p className="mt-3 max-w-prose leading-loose">{part.text}</p><WorkbookNarration text={`${part.heading}. ${part.text} Pause. Explain the idea in your own words before you continue.`}/></details>)}
-    <article className="rounded-xl border bg-white p-4"><h4 className="text-xl font-bold">{chapter.heading}</h4><p className="mt-3 max-w-prose leading-loose">{chapter.text}</p><WorkbookNarration text={`${chapter.heading}. ${chapter.text}`}/></article>
-    <article className="rounded-xl border border-amber-300 bg-amber-50 p-4"><h4 className="text-xl font-bold">Worked example</h4><p className="mt-3 leading-loose">{chapter.example}</p><WorkbookNarration text={`Let's work through an example. ${chapter.example} Now try the assigned activities and explain your reasoning.`}/></article>
+    <article className="rounded-xl border bg-white p-4">
+      <p className="mb-3 font-semibold">Instruction {active + 1} of {pages.length}</p>
+      <h4 className="text-xl font-bold">{page.heading}</h4>
+      <p className="mt-3 max-w-prose leading-loose">{page.text}</p>
+      <WorkbookNarration text={`${page.heading}. ${page.text} Pause and explain the idea in your own words.`} />
+      <nav aria-label="Workbook instruction pages" className="mt-4 flex flex-wrap gap-3">
+        <button type="button" disabled={active === 0} onClick={() => setActive(value => value - 1)} className="min-h-12 rounded-lg border px-4 py-3 disabled:opacity-40">Previous explanation</button>
+        <button type="button" disabled={active === pages.length - 1} onClick={() => setActive(value => value + 1)} className="min-h-12 rounded-lg bg-stone-900 px-4 py-3 text-white disabled:opacity-40">Next explanation</button>
+      </nav>
+    </article>
     {number===3&&<ElectricalBench/>}{number===8&&<RecoveryBench/>}{[2,13,14].includes(number)&&<AirflowBench/>}
     <p className="rounded-lg bg-white p-4 font-semibold">Self-check: {chapter.review}</p>
     <details className="rounded-lg border bg-white p-4"><summary className="cursor-pointer font-bold">Official reference sources</summary><ul className="mt-3 space-y-2">{content.sources.map(source=><li key={source.url}><a href={source.url} target="_blank" rel="noopener noreferrer" className="underline">{source.title}</a></li>)}</ul><p className="mt-3 text-sm">Content version {content.version}. Practice tests are original Elevate learning questions, not official or leaked exam items. Follow the current applicable rule and exact equipment instructions.</p></details>

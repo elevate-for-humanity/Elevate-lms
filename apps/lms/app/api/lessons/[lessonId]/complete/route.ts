@@ -15,6 +15,7 @@ import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-contro
 import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { hasRequiredLessonWorkbook } from '@/lib/lms/lesson-workbook';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -91,6 +92,10 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
     }
     if (!ACTIVE_ENROLLMENT_STATUSES.has(enrollmentStatus)) {
       return NextResponse.json({ error: 'Enrollment is not active' }, { status: 403 });
+    }
+
+    if (!(await hasRequiredLessonWorkbook(db, lesson.course_id, lessonId, user.id))) {
+      return NextResponse.json({ error: 'Complete and save the matching workbook activities and chapter review beneath this lesson, then try again.', code: 'LESSON_WORKBOOK_REQUIRED' }, { status: 403 });
     }
 
     try {

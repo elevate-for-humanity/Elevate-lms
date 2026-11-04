@@ -33,6 +33,7 @@ def canonical_source(row):
     if draft['sourceTranscriptSha256']!=digest(text.encode()): raise RuntimeError('MANUAL_SOURCE_CHANGED')
     groups=draft['photoGroups']
     if len(groups)!=len(sections) or not all(len(g)==2 for g in groups): raise RuntimeError('MANUAL_PHOTO_PLAN_INVALID')
+    if not draft.get('visualCues'): raise RuntimeError('REVIEWED_VISUAL_CUES_REQUIRED')
     return sections,groups,text
 
 def main():
@@ -67,7 +68,8 @@ def main():
     access=secret('ELEVATE_MEDIA_ACCESS_KEY_ID'); private=secret('ELEVATE_MEDIA_SECRET_ACCESS_KEY')
     s3=boto3.client('s3',endpoint_url='https://s3.us-east-005.backblazeb2.com',region_name='us-east-005',aws_access_key_id=access,aws_secret_access_key=private)
     source_hash=digest(text.encode())
-    plan_hash=digest(json.dumps({'source':source_hash,'photos':images,'groups':groups,'voice':'en-US-Neural2-F','renderer':'manual-ffmpeg-v1'},sort_keys=True).encode())
+    visual_cues=row['content_json']['manualMediaDraft']['visualCues']
+    plan_hash=digest(json.dumps({'source':source_hash,'photos':images,'groups':groups,'visualCues':visual_cues,'voice':'en-US-Neural2-F','renderer':'manual-ffmpeg-v2'},sort_keys=True).encode())
     prefix=f'course-videos/manual-lessons/{COURSE}/{lesson}/reviewed-{plan_hash}'
     manifest_key=prefix+'/render-manifest.json'; film_key=prefix+'/completed-lesson-manual.mp4'
     def get(key):
@@ -142,7 +144,7 @@ def main():
                 if len(cached)<1000: raise RuntimeError('MANUAL_NARRATION_EMPTY')
                 put('course-videos/manual-narration/en-US-Neural2-F/'+h+'.mp3',cached,'audio/mpeg')
             (speech/(h+'.mp3')).write_bytes(cached)
-        plan={'lessonId':lesson,'courseId':COURSE,'title':row['title'],'sections':sections,'images':images,'photoGroups':groups,'outputDirectory':'film'}
+        plan={'lessonId':lesson,'courseId':COURSE,'title':row['title'],'sections':sections,'images':images,'photoGroups':groups,'visualCues':visual_cues,'outputDirectory':'film'}
         path=root/'plan.json'; path.write_text(json.dumps(plan))
         env={**os.environ,'MANUAL_RENDER_ROOT':str(root)}
         subprocess.run([sys.executable,str(Path(__file__).with_name('encode_reviewed_lesson.py')),str(path)],check=True,env=env)

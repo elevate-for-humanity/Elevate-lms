@@ -316,6 +316,13 @@ export default async function CourseLandingPage({
               )}
             </section>
           ) : null}
+          {course.id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && (
+            <section aria-label="Course workbook" className="mt-4 rounded-xl border border-teal-300 bg-white p-4">
+              <h2 className="text-xl font-bold">Your workbook is inside each lesson</h2>
+              <p className="mt-2 leading-relaxed">Start or continue the course above. The matching workbook chapter appears directly below each lesson video. Complete and save its activities and chapter review before finishing the lesson.</p>
+              <Link href="/workbooks/hvac-epa608-guided-practice" className="mt-3 inline-flex min-h-12 items-center font-bold underline">Review the full HVAC workbook</Link>
+            </section>
+          )}
           {(pacing as any)?.theoryWindow ? (
             <TheoryWindowNotice access={(pacing as any).theoryWindow} />
           ) : null}

@@ -19,7 +19,7 @@ import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
 import {workbookWritingComplete,firstWorkbookUnreviewedIndex} from '@/lib/lms/workbook-progression';
 
-function SectionEditor({
+export function SectionEditor({
   section,
   initial,
   hidden,

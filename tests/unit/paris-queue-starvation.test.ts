@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest';
-const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false, stageLookups: [] as any[] }));
+const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false, stageLookups: [] as any[], releases: [] as any[], enqueues: [] as any[] }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/ai/runtime/repair-reconciliation', () => ({ reconcileRecoveredRepairs: vi.fn() }));
 vi.mock('@/lib/ai/runtime/repair-events', () => ({ readRecentRepairEvents: async () => [] }));
@@ -8,18 +8,21 @@ vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubHeaders: async () => (
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from(table: string) {
   const filters: Record<string, any> = {};
   let values: any;
+  let inserted = false;
   const q: any = {
     select: () => q, order: () => q, limit: () => q, gte: () => q,
     eq: (key: string, value: any) => { filters[key] = value; return q; },
     in: (key: string, value: any) => { filters[key] = value; return q; },
     update: (update: any) => { values = update; return q; },
+    upsert: (value: any, options: any) => { inserted = true; h.enqueues.push({value,options}); return q; },
     single: () => q, maybeSingle: () => q,
     then(resolve: any) {
       let data: any = [];
       if (table === 'paris_autopilot_policy') data = { enabled: true, actor_id: 'owner' };
       if (table === 'profiles') data = { role: 'admin' };
       if (table === 'paris_code_repairs') {
-        if (values) {
+        if (inserted) data = {id:'release-repair'};
+        else if (values) {
           h.writes.push({ values, filters: { ...filters } });
           data = values.status === 'dispatched' && !h.claimLost ? { id: filters.id } : null;
         } else if (filters.status === 'queued') data = h.queue;
@@ -40,8 +43,18 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
 } }) }));
 import { tickParisCodeRepairs } from '@/lib/ai/runtime/code-repair';
 beforeEach(() => {
-  h.queue = []; h.active = []; h.writes = []; h.stageLookups = []; h.token = true; h.claimLost = false; h.sourceError = false;
-  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ object: { sha: 'a'.repeat(40) } }))));
+  h.queue = []; h.active = []; h.writes = []; h.stageLookups = []; h.releases = []; h.enqueues = []; h.token = true; h.claimLost = false; h.sourceError = false;
+  vi.stubGlobal('fetch', vi.fn(async (url: string) => new Response(JSON.stringify(url.includes('/actions/runs?') ? {workflow_runs:h.releases} : { object: { sha: 'a'.repeat(40) } }))));
+});
+it('durably hands a failed deployment to PARIS while preserving the active repair and duplicate incident identity', async () => {
+ h.active=[{id:'active',status:'dispatched',updated_at:new Date().toISOString()}];
+ h.releases=[{id:42,head_branch:'main',head_sha:'a'.repeat(40),path:'.github/workflows/deploy-google-lms-trigger.yml',event:'workflow_dispatch',status:'completed',conclusion:'failure'}];
+ for(let tick=0;tick<2;tick++)expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({active:true,dispatched:0});
+ expect(h.writes).toEqual([]);
+ expect(h.enqueues).toHaveLength(2);
+ expect(h.enqueues[0].value).toMatchObject({actor_id:'owner',status:'queued',goal:expect.stringContaining('failed production release 42')});
+ expect(h.enqueues[0].value.fingerprint).toBe(h.enqueues[1].value.fingerprint);
+ expect(h.enqueues[0].options).toMatchObject({onConflict:'fingerprint',ignoreDuplicates:true});
 });
 it('advances past a paused source to the next eligible repair without dispatching the paused build', async () => {
   h.queue = [{ id: 'paused-repair', attempt_count: 0, source_job_id: 'paused' }, { id: 'eligible', attempt_count: 1, source_job_id: null }];

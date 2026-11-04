@@ -158,7 +158,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     if (narrationInspectorRetry) {
       artifacts.synchronization = narrationDirective.previous;
       if (!passed.some((step: any) => step.step === 'synchronization'))
-        passed.push({step:'synchronization',state:'passed',artifacts:narrationDirective.previous,completed_at:null});
+        passed.push({step:'synchronization',state:'passed',artifacts:narrationDirective.previous,findings:[],completed_at:null});
       artifacts.__repairState = {...artifacts.__repairState as any,status:'producer-validated',
         directive:{...narrationDirective,target:'finished_media_qa'}};
     }
@@ -192,6 +192,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
           step: 'synchronization',
           state: 'passed',
           artifacts: pictureCueDirective.previous,
+          findings: [],
           completed_at: null,
         });
       }
@@ -224,7 +225,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     if (legacyTitleRetry) {
       artifacts.scene_construction = directive.previous;
       if (!passed.some((step: any) => step.step === 'scene_construction')) {
-        passed.push({ step: 'scene_construction', state: 'passed', artifacts: directive.previous, completed_at: null });
+        passed.push({ step: 'scene_construction', state: 'passed', artifacts: directive.previous, findings: [], completed_at: null });
       }
       delete artifacts.__repairState;
     }

@@ -292,6 +292,22 @@ jobs:
         run: |
           node --test scripts/gcp/production-acceptance.test.mjs
           node scripts/gcp/production-acceptance.mjs dispatch
+      - name: Run isolated employer acceptance alongside the full portal audit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'registered-apprenticeship-e2e.yml',
+              ref: 'main',
+              inputs: {
+                employer_only: 'true',
+                deployed_sha: context.sha,
+                deployment_run_id: String(context.runId),
+                component: 'admin',
+              },
+            });
 
 # Release readable voicemail emails with the verified current main revision.
 

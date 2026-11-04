@@ -27,34 +27,34 @@ export async function prepareEmployerAccount(form: FormData) {
   let userId: string | null = employer.owner_user_id;
   let created = false;
   if (!userId) {
-    // Auth owns identity creation. Search all pages so a retry cannot duplicate an orphaned account.
-    let existing: User | null = null;
-    for (let page = 1; ; page++) {
-      const result = await db.auth.admin.listUsers({ page, perPage: 200 });
-      if (result.error) throw new Error('Existing accounts could not be checked');
-      existing =
-        (result.data.users as User[]).find((account) => account.email?.toLowerCase() === email) ||
-        null;
-      if (existing || result.data.users.length < 200) break;
-    }
-    if (existing) {
+    // Auth enforces email uniqueness atomically. Do not enumerate unrelated
+    // identities: an older banned account can make Auth pagination unreadable.
+    const result = await db.auth.admin.createUser({
+      email,
+      email_confirm: false,
+      app_metadata: { role: 'employer', employer_id: id },
+      user_metadata: {
+        full_name: employer.contact_name || '',
+        company_name: employer.company_name || '',
+      },
+    });
+    if (result.error || !result.data.user) {
+      // This service-role-only RPC resolves one normalized profile email.
+      // Auth still owns the identity and validates its trusted metadata below.
+      const lookup = await db.rpc('get_user_id_by_email', { user_email: email });
+      const profileId = lookup.data?.[0]?.id;
+      if (lookup.error || !profileId)
+        throw new Error('Employer login could not be prepared. Review the exact email before retrying.');
+      const account = await db.auth.admin.getUserById(profileId);
+      const existing: User | null = account.data?.user || null;
+      if (account.error || !existing || existing.email?.toLowerCase() !== email)
+        throw new Error('Existing account requires an explicit ownership review before linking');
       // Reuse only an identity this employer preparation already created. Never repurpose another account.
       if (existing.app_metadata?.employer_id !== id || existing.app_metadata?.role !== 'employer')
         throw new Error('An existing account requires an explicit ownership review before linking');
       userId = existing.id;
       created = true;
     } else {
-      const result = await db.auth.admin.createUser({
-        email,
-        email_confirm: false,
-        app_metadata: { role: 'employer', employer_id: id },
-        user_metadata: {
-          full_name: employer.contact_name || '',
-          company_name: employer.company_name || '',
-        },
-      });
-      if (result.error || !result.data.user)
-        throw new Error('Employer login could not be prepared');
       userId = result.data.user.id;
       created = true;
     }

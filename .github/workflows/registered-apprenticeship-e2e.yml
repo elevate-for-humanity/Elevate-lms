@@ -11,6 +11,10 @@ on:
       - 'tests/e2e/public-navigation-audit.ts'
   workflow_dispatch:
     inputs:
+      employer_only:
+        description: Run only the isolated employer workflow against an attested live release
+        type: boolean
+        default: false
       deployed_sha:
         description: Exact live commit from a completed deployment
         type: string
@@ -57,7 +61,7 @@ permissions:
 
 jobs:
   hvac-public-playback:
-    if: github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Google Marketing on trigger' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing')))
+    if: (inputs.employer_only != true) && (github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Google Marketing on trigger' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing'))))
     strategy:
       fail-fast: false
       matrix:
@@ -137,12 +141,12 @@ jobs:
           retention-days: 14
   production-authenticated-e2e:
     # Dispatch-only success proves the deployment ran, not just that it was queued.
-    if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
+    if: github.ref == 'refs/heads/main' && (!inputs.employer_only || (github.event_name == 'workflow_dispatch' && inputs.deployment_run_id != '' && inputs.deployed_sha != '' && inputs.component != '')) && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main'))
     # Acquire concurrency only after this job is admitted. Workflow-level locks
     # let skipped push-dispatch notifications cancel real production acceptance.
     # Keep source regression and exact deployed-SHA certification independent.
     concurrency:
-      group: registered-apprenticeship-e2e-${{ (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
+      group: registered-apprenticeship-e2e-${{ inputs.employer_only && 'employer' || (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
       # Finish an active deployment's tests and cleanup. The latest pending
       # handoff runs next and must still attest its live revision at both ends.
       cancel-in-progress: ${{ github.event_name != 'workflow_run' && inputs.deployment_run_id == '' }}
@@ -223,29 +227,40 @@ jobs:
       - name: Verify employer onboarding persistence and private documents after deployment
         if: github.event_name == 'workflow_run' || inputs.deployment_run_id != ''
         env:
+          PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/employer-onboarding
-        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
+        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
+      - name: Upload employer onboarding evidence immediately
+        if: ${{ always() && (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: employer-onboarding-e2e-results
+          path: |
+            test-results/employer-onboarding/
+            playwright-report/employer-onboarding/
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
       # The complete HVAC film runs in hvac-public-playback, where the iPhone
       # profile uses macOS media codecs. Keep portal and hydration checks here.
       - name: Verify public hydration, startup stability and audible-media exclusivity
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
         run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Certify Studio sign-in and fonts on all devices
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/studio
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
         run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/responsive
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome

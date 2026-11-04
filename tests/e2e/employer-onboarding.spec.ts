@@ -1,13 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { isConfirmedWebKitCancellation, type CapturedBrowserError, type CancelledBrowserRequest } from './helpers/browser-runtime-errors';
 const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
 const password = process.env.E2E_EMPLOYER_PASSWORD || '';
 test('Employer setup saves company and hiring needs, opens private files and acknowledges orientation', async ({
   page,
+  browserName,
 }) => {
   test.skip(!email || !password, 'Provision the isolated QA employer identity first');
-  const runtimeErrors: string[] = [];
-  page.on('pageerror', (error) => runtimeErrors.push(error.message));
+  const runtimeErrors: CapturedBrowserError[] = [];
+  const cancelledRequests: CancelledBrowserRequest[] = [];
+  page.on('pageerror', (error) => runtimeErrors.push({ message: error.message, stack: error.stack, time: Date.now() }));
+  page.on('requestfailed', (request) => cancelledRequests.push({ url: request.url(), errorText: request.failure()?.errorText || '', time: Date.now() }));
   await page.goto(`${base}/login`);
   const emailInput = page.locator('input[type=email]').first();
   await expect(emailInput).toBeEnabled({ timeout: 20000 });
@@ -17,7 +21,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
     page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30000 }),
     page.locator('button[type=submit]').first().click(),
   ]);
-  await page.goto(`${base}/employer/dashboard`);
+  await expect(page).toHaveURL(/\/employer\/dashboard/);
   await expect(page.getByRole('link', { name: 'Continue employer setup' })).toBeVisible();
   await page.getByRole('link', { name: 'Continue employer setup' }).click();
   await expect(page.getByRole('heading', { name: 'Complete employer setup' })).toBeVisible();
@@ -71,7 +75,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
       { message: 'Employer setup images must load', timeout: 15000 },
     )
     .toBe(true);
-  expect(runtimeErrors, 'Employer workflow must not produce unhandled browser errors').toEqual([]);
+  expect(runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName)).map(error => error.message), 'Employer workflow must not produce unhandled browser errors').toEqual([]);
   await page.screenshot({
     path: test.info().outputPath('employer-setup-complete.png'),
     fullPage: true,

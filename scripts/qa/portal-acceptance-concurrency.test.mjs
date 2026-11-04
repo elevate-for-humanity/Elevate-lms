@@ -106,3 +106,33 @@ test('Admin release requests both full and isolated employer acceptance only aft
   assert.match(acceptance, /deployed_sha: context.sha/);
   assert.match(acceptance, /deployment_run_id: String\(context.runId\)/);
 });
+
+test('focused regression reports current tests separately from the attested deployed source', () => {
+  const expression = job.match(/^          ref: \$\{\{ (.*?) \}\}$/m)?.[1];
+  assert.ok(expression);
+  const focused = event('workflow_dispatch', {}, {employer_only:true,deployed_sha:'deployed',deployment_run_id:'123',component:'admin'});
+  focused.github.sha = 'current-trusted-main';
+  assert.equal(evaluate(expression, focused), 'current-trusted-main');
+  assert.equal(evaluate(expression, {...focused,inputs:{...focused.inputs,employer_only:false}}), 'deployed');
+  assert.match(job, /Attested deployed commit:/);
+  assert.match(job, /Require the attested release to remain live through acceptance/);
+});
+
+test('the push dispatcher requires a healthy live version and a matching successful Admin deployment', async () => {
+  const section = workflow.slice(workflow.indexOf('\n  request-employer-regression:'), workflow.indexOf('\n  hvac-public-playback:'));
+  assert.match(section, /if: github.event_name == 'push' && github.ref == 'refs\/heads\/main'/);
+  const script = section.split('          script: |\n')[1].split('\n').map(line=>line.startsWith('            ')?line.slice(12):line).join('\n');
+  const execute = new (Object.getPrototypeOf(async function(){}).constructor)('github','context','fetch',script);
+  const sha='a'.repeat(40);const calls=[];
+  const run={id:123,head_branch:'main',head_sha:sha,conclusion:'success'};
+  const github={rest:{actions:{listWorkflowRuns:async()=>({data:{workflow_runs:[run]}}),createWorkflowDispatch:async value=>calls.push(value)}}};
+  const context={repo:{owner:'owner',repo:'repo'}};
+  const health={service:'admin',commit:sha,ready:true,healthy:true,dependencies:{supabase:{ok:true}}};
+  await execute(github,context,async()=>Response.json(health));
+  assert.deepEqual(calls[0].inputs,{employer_only:'true',deployed_sha:sha,deployment_run_id:'123',component:'admin'});
+  assert.equal(calls[0].ref,'main');calls.length=0;
+  await assert.rejects(execute(github,context,async()=>Response.json({...health,ready:false})),/must be healthy/);
+  run.head_sha='b'.repeat(40);
+  await assert.rejects(execute(github,context,async()=>Response.json(health)),/must attest/);
+  assert.equal(calls.length,0);
+});

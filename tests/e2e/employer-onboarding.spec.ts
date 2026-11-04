@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import { isConfirmedWebKitCancellation, type CapturedBrowserError, type CancelledBrowserRequest } from './helpers/browser-runtime-errors';
 const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
@@ -12,6 +12,12 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   const cancelledRequests: CancelledBrowserRequest[] = [];
   page.on('pageerror', (error) => runtimeErrors.push({ message: error.message, stack: error.stack, time: Date.now() }));
   page.on('requestfailed', (request) => cancelledRequests.push({ url: request.url(), errorText: request.failure()?.errorText || '', time: Date.now() }));
+  // Let mounted notification/auth requests settle before deliberately leaving
+  // a document. This exercises the UI without generating unload-only errors.
+  const clickReady = async (locator: Locator) => {
+    await page.waitForLoadState('networkidle');
+    await locator.click();
+  };
   await page.goto(`${base}/login`);
   const emailInput = page.locator('input[type=email]').first();
   await expect(emailInput).toBeEnabled({ timeout: 20000 });
@@ -19,36 +25,38 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   await page.locator('input[type=password]').first().fill(password);
   await Promise.all([
     page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30000 }),
-    page.locator('button[type=submit]').first().click(),
+    clickReady(page.locator('button[type=submit]').first()),
   ]);
   await expect(page).toHaveURL(/\/employer\/dashboard/);
   await expect(page.getByRole('link', { name: 'Continue employer setup' })).toBeVisible();
-  await page.getByRole('link', { name: 'Continue employer setup' }).click();
+  await clickReady(page.getByRole('link', { name: 'Continue employer setup' }));
   await expect(page.getByRole('heading', { name: 'Complete employer setup' })).toBeVisible();
-  await page.getByRole('link', { name: /Company profile Confirm/ }).click();
+  await clickReady(page.getByRole('link', { name: /Company profile Confirm/ }));
   await page.getByLabel('Company name', { exact: true }).fill('[QA E2E] Employer workflow');
   await page.getByLabel('City', { exact: true }).fill('QA worksite');
   await page.getByLabel('State', { exact: true }).fill('TN');
-  await page.getByRole('button', { name: 'Save company profile' }).click();
+  await clickReady(page.getByRole('button', { name: 'Save company profile' }));
   await expect(page.getByText('Company profile saved.', { exact: true })).toBeVisible();
+  await page.waitForLoadState('networkidle');
   await page.reload();
   await expect(page.getByLabel('Company name', { exact: true })).toHaveValue(
     '[QA E2E] Employer workflow',
   );
-  await page.getByRole('link', { name: 'Back to employer setup' }).click();
-  await page.getByRole('link', { name: /Hiring and training needs Tell/ }).click();
+  await clickReady(page.getByRole('link', { name: 'Back to employer setup' }));
+  await clickReady(page.getByRole('link', { name: /Hiring and training needs Tell/ }));
   await page.getByLabel('Positions or staff training needed').fill('QA staff training only');
   await page.getByLabel('Worksite locations').fill('QA Tennessee worksite');
-  await page.getByRole('button', { name: 'Save hiring and training needs' }).click();
+  await clickReady(page.getByRole('button', { name: 'Save hiring and training needs' }));
   await expect(
     page.getByText('Your hiring and training needs are saved.', { exact: true }),
   ).toBeVisible();
+  await page.waitForLoadState('networkidle');
   await page.reload();
   await expect(page.getByLabel('Positions or staff training needed')).toHaveValue(
     'QA staff training only',
   );
-  await page.getByRole('link', { name: 'Back to employer setup' }).click();
-  await page.getByRole('link', { name: /Documents and agreements Review/ }).click();
+  await clickReady(page.getByRole('link', { name: 'Back to employer setup' }));
+  await clickReady(page.getByRole('link', { name: /Documents and agreements Review/ }));
   await expect(page.getByText('QA-employer-onboarding.pdf', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'Employer documents must fit the device viewport').toBe(true);
   const view = page.getByRole('link', { name: 'View', exact: true }).first();
@@ -57,10 +65,10 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   const file = await page.request.get(`${base}${url}`);
   expect(file.ok()).toBeTruthy();
   expect(file.headers()['content-type']).toContain('application/pdf');
-  await page.getByRole('link', { name: 'Back to employer setup' }).click();
-  await page.getByRole('link', { name: /Employer orientation Review/ }).click();
+  await clickReady(page.getByRole('link', { name: 'Back to employer setup' }));
+  await clickReady(page.getByRole('link', { name: /Employer orientation Review/ }));
   await page.getByRole('checkbox', { name: /I have reviewed the employer orientation/ }).check();
-  await page.getByRole('button', { name: 'Save orientation acknowledgment' }).click();
+  await clickReady(page.getByRole('button', { name: 'Save orientation acknowledgment' }));
   await expect(page).toHaveURL(/\/employer\/setup\?orientation=saved/);
   await expect
     .poll(

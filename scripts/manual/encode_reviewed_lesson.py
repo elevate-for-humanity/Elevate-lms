@@ -1,6 +1,7 @@
 """Encode the reviewed saved lesson and licensed photographs; no course/quiz authoring."""
 import hashlib, json, math, re, subprocess, textwrap, urllib.request, sys, time, os, base64
 from pathlib import Path
+from visual_timeline import reviewed_visual_timeline
 
 ROOT=Path(os.environ['MANUAL_RENDER_ROOT'])
 PLAN=json.loads(Path(sys.argv[1]).read_text())
@@ -47,9 +48,7 @@ for n,section in enumerate(PLAN['sections']):
         audio.append(path);captions.append({'start':cursor,'end':cursor+seconds,'text':chunk});cursor+=seconds
         (OUT/'captions-checkpoint.json').write_text(json.dumps(captions))
         # Do not print private instruction or signed source URLs.
-    section_seconds=cursor-start
-    for term in groups[n]:
-        item=photo(term);visuals.append({'image':item,'duration':section_seconds/len(groups[n]),'title':section['heading']})
+visuals = reviewed_visual_timeline(PLAN.get('visualCues'), captions, PLAN['images'])
 
 assert cursor>120
 (OUT/'audio.ffconcat').write_text(''.join("file '"+str(p)+"'\n" for p in audio))
@@ -57,7 +56,7 @@ subprocess.run(['ffmpeg','-v','error','-threads','2','-y','-f','concat','-safe',
 font='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';clips=[]
 for n,visual in enumerate(visuals):
     p=ROOT/(visual['image']['id']+'.jpg');title=OUT/(str(n)+'.title.txt');title.write_text('\n'.join(textwrap.wrap(visual['title'],62)))
-    clip=OUT/('shot-'+str(n)+'.mp4');frames=math.ceil(visual['duration']*24)
+    clip=OUT/('shot-'+str(n)+'.mp4');frames=visual['frames']
     if not clip.exists():
         filt=("scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=0x18181b,"
               "zoompan=z='min(1.035,1+on*0.00004)':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':d="+str(frames)+":s=1280x720:fps=24,"

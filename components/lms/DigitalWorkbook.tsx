@@ -27,7 +27,7 @@ import {
   firstWorkbookUnreviewedIndex,
 } from '@/lib/lms/workbook-progression';
 
-function SectionEditor({
+export function SectionEditor({
   section,
   initial,
   hidden,

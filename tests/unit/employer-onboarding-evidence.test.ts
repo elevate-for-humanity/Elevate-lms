@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest';
-const state = vi.hoisted(() => ({ expired: false, missingFile: false, parentApproved: true, pending: false, update: vi.fn(), email: vi.fn(), filters: [] as unknown[][] }));
+const state = vi.hoisted(() => ({ originalType: false, expired: false, missingFile: false, parentApproved: true, pending: false, update: vi.fn(), email: vi.fn(), filters: [] as unknown[][] }));
 vi.mock('@/lib/jobs/enqueue-email', () => ({ enqueueEmail: state.email }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn() } }));
 import { checkOnboardingComplete, tryAutoActivate } from '@/lib/employer/check-onboarding-complete';
@@ -7,7 +7,7 @@ const documents = ['coi_general_liability', 'coi_workers_comp', 'business_licens
 const db: any = { from: (table: string) => {
   const q: any = { select: () => q, eq: (...args: unknown[]) => { state.filters.push([table, ...args]); return q; }, in: () => q, order: () => q, limit: () => q, update: (values: unknown) => { state.update(values); return q; }, insert: async () => ({ error: null }),
     maybeSingle: async () => ({ data: table === 'employers' ? { id: 'business-id', owner_user_id: 'login-id', approved: state.parentApproved, business_name: 'Business', contact_name: 'Owner', contact_email: 'owner@example.invalid' } : { id: 'onboarding', status: 'approved', hiring_needs: { job_title: 'Technician' } }, error: null }),
-    then: (resolve: (value: unknown) => unknown) => Promise.resolve({ data: table === 'documents' ? documents.map((type, index) => ({ document_type: type, status: state.pending && index === 0 ? 'pending' : 'approved', file_path: state.missingFile && index === 0 ? null : `protected/${type}.pdf`, expiration_date: state.expired && index === 0 ? '2020-01-01' : null })) : [], error: null }).then(resolve),
+    then: (resolve: (value: unknown) => unknown) => Promise.resolve({ data: table === 'documents' ? documents.map((type, index) => ({ document_type: state.originalType ? 'other' : type, metadata: state.originalType ? { original_type: type } : {}, status: state.pending && index === 0 ? 'pending' : 'approved', file_path: state.missingFile && index === 0 ? null : `protected/${type}.pdf`, expiration_date: state.expired && index === 0 ? '2020-01-01' : null })) : [], error: null }).then(resolve),
   }; return q;
 } };
 beforeEach(() => { state.expired = false; state.missingFile = false; state.parentApproved = true; state.pending = false; state.filters = []; state.update.mockClear(); state.email.mockClear(); state.email.mockResolvedValue('mail-job'); });
@@ -28,4 +28,10 @@ it('cannot activate an employer whose business approval is missing', async () =>
   state.parentApproved = false;
   expect(await tryAutoActivate(db, 'login-id')).toBe(false);
   expect(state.update).not.toHaveBeenCalled();
+});
+
+it('recognizes the original employer type preserved by the upload route', async () => {
+  state.originalType = true;
+  expect((await checkOnboardingComplete(db, 'login-id')).complete).toBe(true);
+  state.originalType = false;
 });

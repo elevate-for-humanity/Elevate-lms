@@ -19,6 +19,8 @@ import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNoti
 import { TheoryWindowBoundary } from '@/components/apprenticeship/TheoryWindowBoundary';
 import WorkbookLessonInstruction from '@/components/lms/WorkbookLessonInstruction';
 import { lessonKeyTerms } from '@/lib/lms/lesson-key-terms';
+import LessonWorkbook from '@/components/lms/LessonWorkbook';
+import { loadLessonWorkbook } from '@/lib/lms/lesson-workbook';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -354,6 +356,7 @@ export default async function LessonPage({
     </header>
   );
 
+  const lessonWorkbook = await loadLessonWorkbook(db, course.id, lesson.id, user?.id, preview.active);
   return (
     <LessonFocusShell header={lessonHeader}>
       <TheoryWindowBoundary courseId={course.id} readOnly={preview.active}>
@@ -381,6 +384,7 @@ export default async function LessonPage({
                     session. Administrator review does not start a learner timeclock.
                   </p>
                 )}
+                {lessonWorkbook && <LessonWorkbook {...lessonWorkbook} />}
                 {objectives.length ? (
                   <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h2 className="flex items-center gap-2 text-xl font-extrabold">

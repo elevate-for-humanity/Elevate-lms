@@ -16,9 +16,12 @@ export default async function AdminEmployersPage() {
   const [employersRes] = await Promise.all([
     db
       .from('employers')
-      .select('id, name, business_name, company_name, industry, city, state, phone, contact_phone, email, contact_email, status, approved, created_at', {
-        count: 'exact',
-      })
+      .select(
+        'id, name, business_name, company_name, industry, city, state, phone, contact_phone, email, contact_email, status, approved, created_at',
+        {
+          count: 'exact',
+        },
+      )
       .order('created_at', { ascending: false })
       .limit(100),
   ]);
@@ -53,6 +56,12 @@ export default async function AdminEmployersPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <Link
+          href="/employers/applications"
+          className="mb-6 inline-block rounded-lg bg-blue-800 px-5 py-3 font-bold text-white"
+        >
+          Review employer applications and directory drafts
+        </Link>
         {employers.length === 0 ? (
           <div className="py-24 text-center">
             <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-3" />

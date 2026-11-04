@@ -61,17 +61,37 @@ it("keeps course selection, AI instructions and deployment controls on the left 
   const preview=screen.getByRole("region",{name:"Course preview pane"});
   const controls=screen.getByRole("region",{name:"Course AI controls"});
   expect(preview).toBeVisible();expect(controls).toBeVisible();
+  expect(screen.queryByRole("textbox",{name:"AI course instruction"})).toBeNull();
+  fireEvent.click(screen.getByRole("button",{name:"PARIS instructions"}));
   expect(preview).not.toContainElement(screen.getByRole("textbox",{name:"AI course instruction"}));
   expect(screen.queryByRole("button",{name:"Web browser",exact:true})).toBeNull();
   expect(screen.queryByText(/Podcast & program guide/)).toBeNull();
   const input=screen.getByRole("textbox",{name:"AI course instruction"});
   fireEvent.change(input,{target:{value:"Change the introduction"}});
+  fireEvent.click(screen.getByRole("button",{name:"PARIS instructions"}));
+  expect(input).not.toBeVisible();
+  expect(preview).toBeVisible();
+  fireEvent.click(screen.getByRole("button",{name:"PARIS instructions"}));
+  expect(input).toHaveValue("Change the introduction");
   fireEvent.click(screen.getByRole("button",{name:"Deploy",exact:true}));
   expect(controls).toContainElement(screen.getByRole("button",{name:"Deploy Admin"}));
   fireEvent.click(screen.getByRole("button",{name:"Close Course previews"}));
   fireEvent.click(screen.getByRole("button",{name:"Open Course previews"}));
   expect(input).toHaveValue("Change the introduction");
   expect(screen.getByRole("separator",{name:"Resize Course previews"})).toBeInTheDocument();
+});
+
+it("fits the standalone panes below the page header and resizes without forcing document scrolling", async () => {
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 1280, height: 800, top: 220 } as DOMRect);
+  const viewport = vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(720);
+  const { container } = render(<CourseProductionWorkspace initialCourseId="" initialTab="ultimate" />);
+  await waitFor(() => expect(fetch).toHaveBeenCalled());
+  const workspace = container.querySelector('[data-course-browser-workspace]');
+  expect(workspace).toHaveStyle({ height: '488px' });
+  viewport.mockReturnValue(520);
+  fireEvent(window, new Event('resize'));
+  expect(workspace).toHaveStyle({ height: '288px' });
+  expect(screen.getByRole('region', { name: 'Course preview pane' })).toBeVisible();
 });
 
 it("keeps the lesson editor, learner preview and browser mounted when changing side panels", async () => {

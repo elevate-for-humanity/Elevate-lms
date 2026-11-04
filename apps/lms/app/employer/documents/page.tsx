@@ -18,7 +18,7 @@ export default async function EmployerDocumentsPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
-  const { data: documents } = await supabase
+  const { data: documents, error: documentError } = await supabase
     .from('documents')
     .select('*')
     .eq('user_id', user.id)
@@ -29,6 +29,8 @@ export default async function EmployerDocumentsPage() {
     .select('*')
     .eq('role', 'employer')
     .order('is_required', { ascending: false });
+
+  if (documentError) throw new Error('Your documents could not be loaded. Please retry.');
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -62,8 +64,9 @@ export default async function EmployerDocumentsPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        <Link href="/employer/setup" className="mb-6 inline-block text-blue-700 underline">Back to employer setup</Link>
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-2xl font-bold text-black">Upload New Document</h2>
             <Link
               href="/employer/documents/upload"
@@ -83,13 +86,13 @@ export default async function EmployerDocumentsPage() {
             <h2 className="text-2xl font-bold text-black mb-4">Required Documents</h2>
             <div className="space-y-3">
               {requirements.map((req) => {
-                const uploaded = documents?.find((d) => d.document_type === req.document_type);
+                const uploaded = documents?.find((d) => (d.metadata?.original_type || d.document_type) === req.document_type);
                 return (
                   <div
                     key={req.id}
                     className="flex items-center justify-between p-4 bg-white rounded-lg"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex min-w-0 flex-wrap items-center gap-3">
                       {uploaded ? (
                         getStatusIcon(uploaded.status)
                       ) : (
@@ -124,14 +127,14 @@ export default async function EmployerDocumentsPage() {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-white transition"
+                  className="flex flex-col items-start gap-4 rounded-lg border p-4 transition hover:bg-white sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 flex-wrap items-center gap-3">
                     {getStatusIcon(doc.status)}
                     <div>
-                      <h3 className="font-semibold text-black">{doc.file_name}</h3>
+                      <h3 className="break-all font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
-                        {doc.document_type
+                        {String(doc.metadata?.original_type || doc.document_type || 'other')
                           .replace(/_/g, ' ')
                           .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
                         • Uploaded {new Date(doc.created_at).toLocaleDateString()}
@@ -143,14 +146,14 @@ export default async function EmployerDocumentsPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 flex-wrap items-center gap-3">
                     <span
                       className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.status)}`}
                     >
-                      {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                      {String(doc.status || 'pending').replace(/_/g, ' ')}
                     </span>
                     <a
-                      href={doc.file_url}
+                      href={`/employer/documents/${doc.id}/view`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-brand-blue-600 hover:underline text-sm font-semibold"

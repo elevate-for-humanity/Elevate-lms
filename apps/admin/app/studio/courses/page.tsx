@@ -29,21 +29,21 @@ export default async function StudioCoursesPage({
   const initialTab = isCourseBuilderTab(params.tab) ? params.tab : 'ultimate';
 
   return (
-    <main className="min-h-screen bg-white text-slate-950">
-      <header className="border-b border-slate-200 bg-white px-5 py-4">
+    <main className="flex h-full min-h-0 flex-col overflow-hidden bg-white text-slate-950">
+      <header className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3">
-          <div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link href="/studio" className="text-sm font-semibold text-slate-600 hover:text-slate-950">
               ← Admin AI
             </Link>
-            <h1 className="mt-1 text-2xl font-black tracking-tight">Course Production Studio</h1>
-            <p className="mt-1 text-sm text-slate-600">
+            <h1 className="text-lg font-black tracking-tight">Course Production Studio</h1>
+            <p className="sr-only">
               Create lessons, preview media, diagnose checkpoints, and publish verified courses.
             </p>
           </div>
         </div>
       </header>
-      <section>
+      <section className="min-h-0 flex-1">
         <CourseProductionWorkspace initialCourseId={params.courseId?.trim() || ''} initialTab={initialTab} />
       </section>
     </main>

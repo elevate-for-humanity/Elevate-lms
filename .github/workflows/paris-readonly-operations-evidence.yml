@@ -8,6 +8,8 @@ on:
     paths:
       - 'scripts/operations/paris-runtime-watch*.mjs'
       - 'scripts/operations/assess-production-readiness*.mjs'
+      - 'scripts/operations/paris-public-probes*.mjs'
+      - 'scripts/operations/paris-incident-triage*.mjs'
       - '.github/workflows/paris-readonly-operations-evidence.yml'
 
 permissions:
@@ -28,7 +30,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify read-only observer and operations launch gate
-        run: node --test scripts/operations/paris-runtime-watch.test.mjs scripts/operations/assess-production-readiness.test.mjs
+        run: node --test scripts/operations/paris-runtime-watch.test.mjs scripts/operations/assess-production-readiness.test.mjs scripts/operations/paris-public-probes.test.mjs scripts/operations/paris-incident-triage.test.mjs
 
   observe:
     if: github.event_name != 'pull_request'
@@ -66,6 +68,20 @@ jobs:
           else
             node scripts/operations/paris-runtime-watch.mjs
           fi
+      - name: Probe allowlisted public routes (unauthenticated reachability only)
+        if: always()
+        run: node scripts/operations/paris-public-probes.mjs
+      - name: Build non-mutating incident triage evidence
+        if: always()
+        shell: bash
+        run: |
+          if [ -f audit-output/paris-runtime-watch.json ]; then
+            if [ -f audit-output/paris-public-probes.json ]; then
+              node scripts/operations/paris-incident-triage.mjs audit-output/paris-runtime-watch.json audit-output/paris-public-probes.json
+            else
+              node scripts/operations/paris-incident-triage.mjs audit-output/paris-runtime-watch.json
+            fi
+          fi
       - name: Evaluate release gate (expected BLOCKED until independent evidence provided)
         if: always()
         continue-on-error: true
@@ -83,10 +99,16 @@ jobs:
           else
             echo 'Evidence collection failed or secret is not configured.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ -f audit-output/paris-incident-triage.json ]; then
+            node -e "let x=require('./audit-output/paris-incident-triage.json');console.log(JSON.stringify({incidents:x.incidents,dispatchAuthorized:x.dispatchAuthorized},null,2))" >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: paris-operations-evidence-${{ github.run_id }}
-          path: audit-output/paris-runtime-watch.json
+          path: |
+            audit-output/paris-runtime-watch.json
+            audit-output/paris-public-probes.json
+            audit-output/paris-incident-triage.json
           if-no-files-found: ignore
           retention-days: 14

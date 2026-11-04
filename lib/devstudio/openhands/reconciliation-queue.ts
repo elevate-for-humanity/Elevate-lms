@@ -19,6 +19,11 @@ export async function loadOpenHandsReconciliationQueue(db: SupabaseClient, limit
       .range(page * 100, page * 100 + 99);
     if (failed.error) throw new Error(`Unable to load retryable OpenHands tasks: ${failed.error.message}`);
     for (const task of failed.data ?? []) {
+      // A dispatch error can supersede an older retryable evaluation. Access or
+      // configuration failures require an explicit recovery after configuration
+      // changes; an unchanged scheduled tick must not spend another attempt.
+      if (/allowlist|NoCredentialsError|(?:API|HTTP)\s+(?:401|403)\b|(?:missing|not configured|not set).*(?:credential|api.?key)|(?:credential|api.?key).*(?:missing|not configured|not set)/i
+        .test(String(task.error_message ?? ''))) continue;
       const attempts = Number(task.attempts ?? 1);
       const maximum = Number(task.max_attempts ?? 3);
       if (Number.isFinite(attempts) && Number.isFinite(maximum) && attempts < maximum) {

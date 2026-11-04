@@ -131,7 +131,13 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
     await emitEvent('autopilot.tick_complete', 'system', {
       severity: errors.length ? 'warning' : 'info',
       actor_type: 'cron',
-      payload: { checks, actions, errorCount: errors.length },
+      payload: {
+        checks, actions, errorCount: errors.length,
+        errorCodes: errors.map((error) => {
+          const code = error.split(':')[0];
+          return /^[a-z][a-z0-9_]{0,79}$/.test(code) ? code : 'autopilot_tick_failed';
+        }),
+      },
     });
 
     return { ok: errors.length === 0, checks, actions, errors };

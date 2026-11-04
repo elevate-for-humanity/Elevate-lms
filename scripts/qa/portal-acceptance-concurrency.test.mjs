@@ -75,6 +75,34 @@ test('unchanged full-film acceptance runs for PRs and real Marketing releases', 
     { name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'push', head_branch: 'main' },
     { name: 'Deploy Google Marketing on trigger', conclusion: 'success', event: 'workflow_dispatch', head_branch: 'feature' },
   ]) assert.equal(evaluate(mediaCondition, event('workflow_run', upstream)), false);
+  assert.equal(evaluate(mediaCondition, event('workflow_dispatch', {}, {component:'marketing',employer_only:true})), false);
   assert.equal(evaluate(mediaCondition, event('push')), false);
   assert.equal(evaluate(mediaCondition, event('workflow_dispatch')), false);
+});
+
+
+test('focused employer acceptance needs an attested release and cannot displace full acceptance', () => {
+  const inputs = {employer_only:true, deployment_run_id:'123', deployed_sha:'a'.repeat(40), component:'lms'};
+  const focused = reservation(event('workflow_dispatch', {}, inputs));
+  assert.ok(focused);
+  assert.notEqual(focused, reservation(event('workflow_dispatch', {}, {...inputs, employer_only:false})));
+  assert.equal(evaluate(cancel, event('workflow_dispatch', {}, inputs)), false);
+  for (const key of ['deployment_run_id','deployed_sha','component']) {
+    assert.equal(reservation(event('workflow_dispatch', {}, {...inputs,[key]:''})), null);
+  }
+  for (const name of ['Verify public hydration', 'Certify Studio sign-in', 'Run authenticated production functional', 'Run authenticated cross-device']) {
+    const step = job.slice(job.indexOf('- name: '+name)).split('\n      - name:')[0];
+    assert.match(step, /!cancelled\(\) && !inputs.employer_only/);
+  }
+});
+
+test('Admin release requests both full and isolated employer acceptance only after deployment', () => {
+  const admin = readFileSync(new URL('../../.github/workflows/deploy-admin.yml', import.meta.url), 'utf8');
+  const acceptance = admin.slice(admin.indexOf('\n  acceptance:'), admin.indexOf('\n  release-result:'));
+  assert.match(acceptance, /needs: deploy-admin/);
+  assert.match(acceptance, /needs.deploy-admin.result == 'success'/);
+  assert.match(acceptance, /node scripts\/gcp\/production-acceptance.mjs dispatch/);
+  assert.match(acceptance, /employer_only: 'true'/);
+  assert.match(acceptance, /deployed_sha: context.sha/);
+  assert.match(acceptance, /deployment_run_id: String\(context.runId\)/);
 });

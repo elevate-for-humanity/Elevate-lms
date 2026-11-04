@@ -507,6 +507,15 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         continue;
       }
 
+      // A model declaring completion is not evidence of a repair. Feed the
+      // missing deliverables back to the planner while turns remain, instead
+      // of ending with a misleading no-change 422 after a premature summary.
+      if (!changedFiles.size || !newRegressionTests.size ||
+          ![...changedFiles].some(path => !path.startsWith('tests/') &&
+            !/\.(?:test|spec)\.[cm]?[jt]sx?$/.test(path))) {
+        observations.push('COMPLETE REJECTED: commit an application correction AND create a new regression test on the task branch before completing. Read a specific source file and use replace/create actions.');
+        continue;
+      }
       summary = action.summary;
       complete = true;
       break;

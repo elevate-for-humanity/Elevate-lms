@@ -38,6 +38,12 @@ describe('OpenHands scheduled reconciliation queue', () => {
     expect(await loadOpenHandsReconciliationQueue(db as any, 1)).toHaveLength(1);
     expect(db.queries).toHaveLength(1);
   });
+  it.each(['OpenHands repository is not on the configured allowlist', 'OpenHands API 401: NoCredentialsError'])(
+    'does not reuse a stale retryable evaluation after %s', async error_message => {
+      const db = database([task('blocked', 'failed', { ...retryable, error_message }), task('recoverable', 'failed', retryable)]);
+      expect((await loadOpenHandsReconciliationQueue(db as any, 10)).map(t => t.id)).toEqual(['recoverable']);
+    },
+  );
   it('leaves exhausted and terminal failures untouched', async () => {
     const db = database([task('terminal', 'failed'), task('exhausted', 'failed', { ...retryable, attempts: 3 })]);
     expect(await loadOpenHandsReconciliationQueue(db as any, 10)).toEqual([]);

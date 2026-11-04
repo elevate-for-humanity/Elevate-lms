@@ -1,7 +1,7 @@
 import { inheritCourseProductionPolicy } from '../core/production-policy.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
-import { instructionView } from '../core/repair-policy.mjs';
+import { instructionView, recoverTeachingVisibilityRepair } from '../core/repair-policy.mjs';
 import { currentEvidence } from '../core/lesson-contract';
 import { ULTIMATE_BUILD_STEPS } from '../core/types';
 import { MIN_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
@@ -44,7 +44,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
           .single(),
         this.db
           .from('ultimate_lesson_steps')
-          .select('step,state,artifacts,completed_at')
+          .select('step,state,artifacts,findings,completed_at')
           .eq('lesson_build_id', input.lessonBuildId),
       ]);
     if (lessonError) throw lessonError;
@@ -99,6 +99,10 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       row.step === 'lesson_film_render' && row.state === 'failed');
     const savedErrors = Array.isArray(lesson?.findings)
       ? lesson.findings.filter((finding: any) => finding.severity === 'error') : [];
+    if (savedErrors.some((finding: any) => finding.code === 'REPAIR_PRODUCER_UNCHANGED')) {
+      const teachingRepair = recoverTeachingVisibilityRepair(artifacts, steps ?? [], savedErrors, currentEvidence);
+      if (teachingRepair) artifacts.__repairState = teachingRepair;
+    }
     const sourceSteps = ['instructor_script', 'natural_narration', 'storyboard'].map(step =>
       passed.find((row: any) => row.step === step));
     const savedFailureIsCurrent = savedRenderFailure?.completed_at &&

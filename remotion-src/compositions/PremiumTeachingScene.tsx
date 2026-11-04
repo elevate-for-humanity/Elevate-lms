@@ -2,6 +2,8 @@ import { AbsoluteFill, Audio, Img, Video, Sequence, interpolate, useCurrentFrame
 import type { SceneData, SlideLessonProps } from './SlideLesson';
 import { measuredTeachingStep } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import { activePictureCue, quoteStartSeconds } from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
+import { useMemo } from 'react';
+import { fitTeachingPanel } from '../../lib/ultimate-course-builder/instructional/teaching-panel-layout.mjs';
 
 /** Whole photographs change on the speech timeline. Inspected motion footage
  * stays muted; illustrations never stand in for a practical demonstration. */
@@ -30,6 +32,18 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const photoMotion=`translate(${(-0.8+pictureProgress*1.6).toFixed(3)}%, ${(-0.35+pictureProgress*0.7).toFixed(3)}%) scale(${(0.975+pictureProgress*0.02).toFixed(4)})`;
  const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity,transform:photoMotion}}/>;
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
+ const label=recap?'Fresh recap':String(stepIndex+1).padStart(2,'0')+'  '+step?.label;
+ const value=recap?scene.recapText??'':step?.value??'';
+ const readable=scene.teachingVisual?.readableLayout==='bounded-v1';
+ const layout=useMemo(()=>{
+  if(!readable)return null;
+  const context=document.createElement('canvas').getContext('2d');
+  if(!context)throw new Error('ULTIMATE_TEACHING_PANEL_MEASUREMENT_REQUIRED');
+  return fitTeachingPanel(label,value,(text:string,size:number)=>{
+   context.font=size+'px Arial, sans-serif';
+   return context.measureText(text).width;
+  });
+ },[readable,label,value]);
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
   <div style={{position:'absolute',top:30,left:54,color:'#cdb795',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>
   <div style={{position:'absolute',top:78,left:54,right:54,display:'flex',gap:24,alignItems:'center'}}>
@@ -49,10 +63,10 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
     </>:!demonstration&&scene.imageUrl?photo(scene.imageUrl):null}
    </div>
   </div>
-  <div style={{position:'absolute',left:1220,right:54,top:225,height:640,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(textStart,scene.teachingVisual?.transitionSeconds??.75)}}>
-   <div style={{fontSize:!recap&&(step?.label?.length??0)>30?56:64,color:'#cdb795',lineHeight:1.25}}>{recap?'Fresh recap':String(stepIndex+1).padStart(2,'0')+'  '+step?.label}</div>
-   <div style={{fontSize:recap?56:(step?.value?.length??0)>100?52:64,lineHeight:1.25}}>{recap?scene.recapText:step?.value}</div>
-   <div style={{fontSize:22,color:'#cdb795'}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>
+  <div style={{position:'absolute',left:1220,right:54,top:225,height:640,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,wordSpacing:layout?.wordSpacing,opacity:fade(textStart,scene.teachingVisual?.transitionSeconds??.75)}}>
+   <div style={{flexShrink:layout?0:undefined,fontSize:layout?.labelSize??(!recap&&(step?.label?.length??0)>30?56:64),color:'#cdb795',lineHeight:1.25}}>{label}</div>
+   <div style={{flexShrink:layout?0:undefined,fontSize:layout?.valueSize??(recap?56:(step?.value?.length??0)>100?52:64),lineHeight:1.25}}>{value}</div>
+   <div style={{flexShrink:layout?0:undefined,fontSize:22,lineHeight:layout?1.25:undefined,color:'#cdb795',wordSpacing:0}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>
   </div>
   <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',color:'#ffffff',fontSize:60,fontWeight:700,lineHeight:1.25,textAlign:'center',textShadow:'0 2px 4px #000'}}>{caption}</div>
   {scene.audioSrc&&<Audio src={scene.audioSrc} volume={1}/>}

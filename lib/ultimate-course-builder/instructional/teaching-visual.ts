@@ -9,6 +9,7 @@ export interface TeachingVisual {
   /** Presentation-only repair metadata; authored teaching text is unchanged. */
   transitionSeconds?: number;
   visibilityRepair?: { stepIndex: number; width: 390 | 1280 };
+  readableLayout?: 'bounded-v1';
 }
 /** Fill an omitted visual plan from the exact authored narration. This is a
  * renderer-owned teaching layer, never a claim that stock demonstrates an

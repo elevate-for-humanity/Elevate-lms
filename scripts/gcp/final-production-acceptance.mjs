@@ -1,6 +1,7 @@
 import {writeFileSync,mkdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {reconcileCanonicalReleases} from './canonical-release-reconciliation.mjs';
+import {productionWorkScope} from './production-work-scope.mjs';
 const PROJECT='elegant-racer-299721',DB='https://cuxzzpsyufcewtmicszk.supabase.co';
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('PRODUCTION_SUPABASE_AUTH_REQUIRED');
@@ -48,17 +49,7 @@ try{
  const result=JSON.parse(output);add('five_worker_digest_and_identity',result.verified===true,{workers:result.workers?.length||0});
 }catch(e){add('five_worker_digest_and_identity',false,{reason:String(e.message).slice(0,160).replace(/Bearer\s+\S+/gi,'[redacted]')});}
 const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at,build:ultimate_course_builds!inner(status,owner_paused:profile->>ownerPaused)');
-const counts=Object.fromEntries(['completed','failed','queued','running'].map(s=>[s,jobs.rows.filter(j=>j.status===s).length]));
-// Historical failures and explicitly owner-paused builds are retained for
-// audit, not reclassified as completed or counted as runnable production work.
-if(jobs.rows.some(j=>!j.build || Array.isArray(j.build) || typeof j.build.status!=='string'))
- throw Error('PRODUCTION_BUILD_SCOPE_EVIDENCE_REQUIRED');
-const eligible=jobs.rows.filter(j=>j.build.owner_paused!=='true' &&
- !['published','archived','cancelled'].includes(j.build.status));
-const paused=jobs.rows.filter(j=>j.build.owner_paused==='true');
-const actionableFailed=eligible.filter(j=>j.status==='failed');
-const actionableQueued=eligible.filter(j=>j.status==='queued');
-const actionableRunning=eligible.filter(j=>j.status==='running');
+const {counts,eligible,paused,actionableFailed,actionableQueued,actionableRunning}=productionWorkScope(jobs.rows);
 const unmonitored=eligible.filter(j=>['failed','queued','running'].includes(j.status)&&j.monitor?.enabled!==true).length;
 const stale=jobs.rows.filter(j=>j.status==='running'&&(!j.heartbeat_at||!Number.isFinite(Date.parse(j.heartbeat_at))||Date.now()-Date.parse(j.heartbeat_at)>300000||!j.lease_expires_at||Date.parse(j.lease_expires_at)<=Date.now())).length;
 const exhausted=actionableFailed.filter(j=>j.attempts>=j.max_attempts).length;

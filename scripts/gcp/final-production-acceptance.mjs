@@ -4,14 +4,14 @@ import {reconcileCanonicalReleases} from './canonical-release-reconciliation.mjs
 const PROJECT='elegant-racer-299721',DB='https://cuxzzpsyufcewtmicszk.supabase.co';
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('PRODUCTION_SUPABASE_AUTH_REQUIRED');
-const get=async(table,select,filter='')=>{
+const get=async(table,select,filter='',keyColumn='id')=>{
  const rows=[];
  const limit=500;
  let expected=null;
  for(let offset=0;offset<100000;offset+=limit){
   const url=new URL(DB+'/rest/v1/'+table);
   url.searchParams.set('select',select);
-  url.searchParams.set('order','id.asc');
+  url.searchParams.set('order',keyColumn+'.asc');
   url.searchParams.set('limit',String(limit));
   url.searchParams.set('offset',String(offset));
   if(filter){
@@ -31,7 +31,7 @@ const get=async(table,select,filter='')=>{
   if(total!==expected)throw Error('PRODUCTION_DATASET_CHANGED_DURING_SCAN:'+table);
   rows.push(...page);
   if(rows.length>=expected){
-   if(rows.length!==expected||new Set(rows.map(row=>row.id)).size!==rows.length)throw Error('PRODUCTION_READ_INCONSISTENT:'+table);
+   if(rows.length!==expected||new Set(rows.map(row=>row[keyColumn])).size!==rows.length)throw Error('PRODUCTION_READ_INCONSISTENT:'+table);
    return {rows,count:expected};
   }
   if(page.length!==limit)throw Error('PRODUCTION_READ_INCOMPLETE:'+table);

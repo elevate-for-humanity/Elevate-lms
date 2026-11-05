@@ -639,7 +639,7 @@ export function EmailWorkspace({
           </aside>
 
           <section
-            className={`border-b border-slate-200 lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}
+            className={`border-b border-slate-200 lg:max-h-[75dvh] lg:overflow-y-auto lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}
           >
             <div className="flex items-center gap-2 border-b border-slate-200 p-4">
               <Inbox className="h-4 w-4 text-slate-500" />
@@ -874,7 +874,7 @@ export function EmailWorkspace({
             )}
           </section>
 
-          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white lg:static lg:z-auto lg:block lg:overflow-visible' : 'hidden lg:block'} min-w-0`} aria-label="Email reading pane">
+          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white lg:static lg:z-auto lg:block lg:max-h-[75dvh] lg:overflow-y-auto' : 'hidden lg:block'} min-w-0`} aria-label="Email reading pane">
             {data.selectedThread ? (
               <>
                 <div className="flex items-center gap-3 border-b border-slate-200 p-4">

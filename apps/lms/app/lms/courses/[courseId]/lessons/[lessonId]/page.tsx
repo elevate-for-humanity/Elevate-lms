@@ -367,6 +367,8 @@ export default async function LessonPage({
             </div>
           ) : null}
           <LearningWorkspace
+            instructionLabel="Workbook & lesson activities"
+            previewLabel="Theory lesson & video"
             instructions={
               <>
                 <LessonPicker courseId={course.id} lessonId={lesson.id} lessons={lessonList} />

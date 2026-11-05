@@ -45,7 +45,7 @@ export async function hydrateUltimateProfileSources(
   if ((profile as any).sourcePolicy === 'frozen-reference-v1') return profile;
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id,slug,title,learning_objectives,content,content_json')
+    .select('id,slug,title,learning_objectives,content,content_json,approved,is_published,status')
     .eq('course_id', courseId)
     .order('order_index');
   if (error) throw error;
@@ -55,9 +55,22 @@ export async function hydrateUltimateProfileSources(
     .flatMap((lesson: any) => {
       // Preserve the exact competency identifier used by the instructional
       // generator. A canonical UUID, slug, and content_json key may differ.
-      const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId]
+      // The saved canonical map is authoritative when legacy slugs differ from
+      // competency identifiers. Reuse only that exact lesson association.
+      const mappedCompetencies = Object.entries(
+        (profile as UltimateCredentialProfile & {canonicalLessonIds?: Record<string,string>}).canonicalLessonIds ?? {},
+      ).filter(([competencyId, canonicalId]) =>
+        competencyIds.has(competencyId) && canonicalId === lesson.id,
+      ).map(([competencyId]) => competencyId);
+      const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId, ...mappedCompetencies]
         .filter((key): key is string => typeof key === 'string' && competencyIds.has(key));
       if (!keys.length) return [];
+      // Only approved authored drafts or the canonical published lesson may
+      // supply instructional material. An arbitrary unapproved draft must not
+      // silently become "Authorized course content" on a worker resume.
+      const sourceApproved = lesson.approved === true ||
+        (lesson.is_published === true && lesson.status === 'published');
+      if (!sourceApproved) return [];
       const objectives = Array.isArray(lesson.learning_objectives)
         ? lesson.learning_objectives.filter(Boolean).join('; ') : '';
       // The source reader consumes a JSON envelope. Plain authored text must

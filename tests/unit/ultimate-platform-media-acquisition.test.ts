@@ -113,6 +113,28 @@ test('auto-approval requires course ownership, license evidence, usable media, a
     },
   };
   expect(canAutoApproveLicensedMediaMatch(base, 'course-a')).toBe(true);
+  // A stored private file, even with an entitlement row, cannot fabricate
+  // evidence that the item is licensed to this course.
+  expect(canAutoApproveLicensedMediaMatch({
+    ...base,
+    licensed_media_entitlements: {
+      ...base.licensed_media_entitlements,
+      license_document_url: '',
+      metadata: { ...base.licensed_media_entitlements.metadata },
+    },
+  }, 'course-a')).toBe(false);
+  expect(canAutoApproveLicensedMediaMatch({
+    ...base,
+    licensed_media_entitlements: {
+      ...base.licensed_media_entitlements,
+      license_document_url: '',
+      metadata: {
+        ...base.licensed_media_entitlements.metadata,
+        licenseObserved: true, licenseObservedAt: '2026-11-05T12:00:00Z',
+        licenseTermsUrl: 'https://elements.envato.com/license-terms',
+      },
+    },
+  }, 'course-a')).toBe(true);
   expect(canAutoApproveLicensedMediaMatch({
     ...base,
     licensed_media_entitlements: {

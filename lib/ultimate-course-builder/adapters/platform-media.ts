@@ -41,6 +41,10 @@ export function canAutoApproveLicensedMediaMatch(match: RecordLike, courseId: st
   if (String(entitlement.provider ?? '') !== 'envato') return false;
   const metadata = firstRecord(entitlement.metadata);
   if (!licensedMediaBelongsToCourse(metadata, courseId)) return false;
+  // A stored object is NOT itself proof of its licensed entitlement.
+  // Auto-approval needs observed item-level license evidence, independent of
+  // whether an object was already copied into the private library.
+  if (!observedLicenseEvidence(entitlement)) return false;
   // A stored school-controlled file plus its Envato entitlement and course
   // scope is sufficient production provenance. A separate per-scene license
   // URL is advisory and must not stop an otherwise approved course asset.

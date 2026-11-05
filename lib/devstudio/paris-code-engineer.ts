@@ -179,7 +179,7 @@ async function writeFile(input: {
   // Use that explicit identity for this operation, before sending any write.
   let workflowHeaders: HeadersInit | undefined;
   if (normalized.startsWith('.github/workflows/')) {
-    const token = await getGitHubAppToken();
+    const token = await getGitHubAppToken({requireWorkflowWrite:true});
     if (!token) throw Error('PARIS_WORKFLOW_APP_AUTHORITY_REQUIRED');
     workflowHeaders = { Authorization: `Bearer ${token}` };
   }
@@ -325,7 +325,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
 
   if(!actorId)return NextResponse.json({error:'PARIS repair actor is required.'},{status:403});
   const db=await requireAdminClient();
-  const provider=(process.env.AI_PROVIDER??'openai').trim().toLowerCase();
+  const provider=(process.env.AI_PROVIDER??'elevate').trim().toLowerCase();
   if(provider==='elevate'){
     const owned = await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS});
     if (!owned.verified) {

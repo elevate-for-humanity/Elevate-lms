@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { state, route } = vi.hoisted(() => ({
-  state: { messages: [] as any[], threads: [] as any[] },
+  state: { messages: [] as any[], threads: [] as any[], mailboxes: [] as any[] },
   route: vi.fn(),
 }));
 vi.mock('@/lib/email/program-conversation-routing', async (original) => ({
@@ -11,12 +11,14 @@ vi.mock('@/lib/supabase/admin', () => ({
   requireAdminClient: async () => ({
     from: (table: string) => {
       let inserted: any;
+      let requested: string[] | null = null;
+      let address: string | null = null;
       const query: any = {
         select: () => query,
-        eq: () => query,
+        eq: (key: string, value: any) => { if (key === 'address') address = value; return query; },
         order: () => query,
         limit: () => query,
-        in: () => query,
+        in: (key: string, values: string[]) => { if (key === 'address') requested = values; return query; },
         insert: (row: any) => {
           inserted = row;
           if (table === 'communication_email_messages') state.messages.push(row);
@@ -24,7 +26,7 @@ vi.mock('@/lib/supabase/admin', () => ({
           return query;
         },
         update: () => query,
-        maybeSingle: async () => ({ data: null }),
+        maybeSingle: async () => ({ data: table === 'communication_email_mailboxes' ? state.mailboxes.find(row => row.address === address) || null : null }),
         single: async () => ({
           data: { id: `thread-${inserted.mailbox_id}`, message_count: 0 },
           error: null,
@@ -33,10 +35,7 @@ vi.mock('@/lib/supabase/admin', () => ({
           Promise.resolve({
             data:
               table === 'communication_email_mailboxes'
-                ? [
-                    { id: 'admin', address: 'admissions@elevateforhumanity.org' },
-                    { id: 'holder', address: 'the.cdl.academy@elevateforhumanity.org' },
-                  ]
+                ? state.mailboxes.filter(row => !requested || requested.includes(row.address))
                 : null,
             error: null,
           }).then(resolve),
@@ -62,6 +61,7 @@ describe('interoffice copies preserve conversations', () => {
     route.mockClear();
     state.messages = [];
     state.threads = [];
+    state.mailboxes = [{id:'admin',address:'admissions@elevateforhumanity.org'},{id:'holder',address:'the.cdl.academy@elevateforhumanity.org'}];
     route.mockResolvedValue({
       applicantEmail: 'student@example.com',
       addresses: ['admissions@elevateforhumanity.org', 'the.cdl.academy@elevateforhumanity.org'],
@@ -97,5 +97,18 @@ describe('interoffice copies preserve conversations', () => {
       reply_to: 'student@example.com',
     });
     expect(route).not.toHaveBeenCalled();
+  });
+  it('keeps Testing mail out of Admissions when Testing has an active mailbox', async () => {
+    route.mockResolvedValue(null);
+    state.mailboxes.push({id:'testing',address:'testing@elevateforhumanity.org'});
+    const result = await storeInboundCommunicationEmail({...parsed,to:'testing@elevateforhumanity.org',envelopeRecipients:['testing@elevateforhumanity.org']});
+    expect(result.mailboxCount).toBe(1);
+    expect(state.messages.map(message => message.mailbox_id)).toEqual(['testing']);
+  });
+  it('keeps Admissions fallback for an unknown Elevate recipient', async () => {
+    route.mockResolvedValue(null);
+    const result = await storeInboundCommunicationEmail({...parsed,to:'unknown@elevateforhumanity.org',envelopeRecipients:['unknown@elevateforhumanity.org']});
+    expect(result.mailboxCount).toBe(1);
+    expect(state.messages.map(message => message.mailbox_id)).toEqual(['admin']);
   });
 });

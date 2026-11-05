@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import orientations from '@/lib/orientation/dashboard-orientations.json';
 
 export type OrientationAudience = keyof typeof orientations;
@@ -18,12 +18,41 @@ export default function VisualDashboardOrientation({
 }) {
   const guide = orientations[audience];
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState<'slides' | 'video'>('video');
+  const [mode, setMode] = useState<'slides' | 'video'>('slides');
+  const [speaking, setSpeaking] = useState(false);
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [livePortal, setLivePortal] = useState(false);
+  const speechGeneration = useRef(0);
+  function stopNarration() {
+    speechGeneration.current += 1;
+    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    setSpeaking(false); setActiveStep(null);
+  }
+  function narrateTopic() {
+    stopNarration();
+    if (!window.speechSynthesis) return;
+    const generation = speechGeneration.current;
+    const segments = [slide.title, ...slide.points, slide.narration];
+    setSpeaking(true);
+    const speak = (position: number) => {
+      if (generation !== speechGeneration.current) return;
+      if (position >= segments.length) { setSpeaking(false); setActiveStep(null); return; }
+      setActiveStep(position > 0 && position <= slide.points.length ? position - 1 : null);
+      const utterance = new SpeechSynthesisUtterance(segments[position]);
+      utterance.rate = 0.9;
+      utterance.onend = () => speak(position + 1);
+      utterance.onerror = () => { if (generation === speechGeneration.current) { setSpeaking(false); setActiveStep(null); } };
+      window.speechSynthesis.speak(utterance);
+    };
+    speak(0);
+  }
+  useEffect(() => { stopNarration(); setLivePortal(false); }, [index, audience, mode]);
+  useEffect(() => () => { speechGeneration.current += 1; window.speechSynthesis?.cancel(); }, []);
   const [unavailable, setUnavailable] = useState(false);
   useEffect(() => {
     setIndex(0);
     setUnavailable(false);
-    setMode('video');
+    setMode('slides');
   }, [audience]);
   const slide = guide.slides[Math.min(index, guide.slides.length - 1)];
   const primary = guide.slides.slice(0, 3);
@@ -158,23 +187,28 @@ export default function VisualDashboardOrientation({
           <>
             <div className="grid min-w-0 md:grid-cols-2" aria-live="polite" aria-atomic="true">
               <div className="relative aspect-[16/10] min-w-0 bg-neutral-900 md:aspect-auto md:min-h-80">
-                <Image
+                {livePortal ? <iframe title={`Live portal: ${slide.title}`} src={actionHref} sandbox="allow-scripts allow-same-origin" className="absolute inset-0 h-full w-full border-0 bg-white pointer-events-none" /> : <Image
                   key={slide.image}
                   src={slide.image}
                   alt={slide.title}
                   fill
                   sizes="(max-width: 767px) 100vw, 50vw"
                   className="object-contain p-3"
-                />
+                />}
               </div>
               <div className="min-w-0 p-5 sm:p-8">
                 <p className="text-xs font-bold uppercase tracking-wider text-amber-200">
                   Topic {index + 1} of {guide.slides.length}
                 </p>
                 <h3 className="mt-3 text-2xl font-black leading-tight">{slide.title}</h3>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button type="button" onClick={speaking ? stopNarration : narrateTopic} className="min-h-11 rounded-lg bg-white px-4 py-2 font-bold text-black">{speaking ? 'Stop narration' : 'Narrate this topic step by step'}</button>
+                  <button type="button" onClick={() => setLivePortal(value => !value)} className="min-h-11 rounded-lg border border-white/40 px-4 py-2 font-bold">{livePortal ? 'Show reference picture' : 'Show actual portal'}</button>
+                </div>
+                <p className="mt-3 text-sm text-stone-300">Listen as each instruction is highlighted. The portal preview shows your signed-in view; use the action link to work in the full portal. No training credit is awarded by this guide.</p>
                 <ol className="mt-5 space-y-4">
                   {slide.points.map((point, i) => (
-                    <li key={point} className="flex gap-3 text-base leading-6">
+                    <li key={point} aria-current={activeStep === i ? 'step' : undefined} className={`flex gap-3 rounded-lg p-2 text-base leading-6 ${activeStep === i ? 'bg-amber-100 text-neutral-950' : ''}`}>
                       <span className="font-bold text-amber-200">
                         {String(i + 1).padStart(2, '0')}
                       </span>

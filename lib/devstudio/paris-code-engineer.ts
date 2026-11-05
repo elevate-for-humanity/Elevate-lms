@@ -23,6 +23,10 @@ const GH_API = 'https://api.github.com';
 const MAX_TURNS = 14;
 const MAX_WRITES = 6;
 const MAX_READ_CHARS = 16_000;
+// Keep a reserve for GitHub validation and durable failure reporting within the
+// 40-minute Actions prepare job. The deadline survives planner continuations.
+const REPAIR_PLANNING_BUDGET_MS = 35 * 60_000;
+const REPAIR_TURN_RESERVE_MS = REPAIR_INFERENCE_TIMEOUT_MS + REPAIR_MODEL_PROBE_TIMEOUT_MS + 30_000;
 
 type AgentAction =
   | { type: 'search'; query: string }
@@ -306,7 +310,7 @@ function parseAction(value: Record<string, unknown>): AgentAction {
 }
 
 export type ParisRepairCheckpoint = {
-  version: 1; boundedCpuEdits?: boolean; branch: string; baseSha: string; headSha: string; nextTurn: number;
+  version: 1; boundedCpuEdits?: boolean; startedAt?: string; branch: string; baseSha: string; headSha: string; nextTurn: number;
   observations: string[]; changedFiles: string[]; newRegressionTests: string[];
   inspectionHistory?: string[];
   commits: string[]; writes: number; summary: string; complete: boolean;
@@ -331,6 +335,14 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   }
   const taskId = repairId ?? crypto.randomUUID();
   const saved = continuation?.checkpoint;
+  const startedAt = saved?.startedAt ?? new Date().toISOString();
+  const startedMs = Date.parse(startedAt);
+  if (!Number.isFinite(startedMs) || startedMs > Date.now() + 60_000) {
+    throw Error('PARIS_REPAIR_CHECKPOINT_TIME_INVALID');
+  }
+  if (Date.now() - startedMs > REPAIR_PLANNING_BUDGET_MS - REPAIR_TURN_RESERVE_MS) {
+    return NextResponse.json({error:'PARIS_REPAIR_PLANNING_DEADLINE_REACHED'}, {status:422});
+  }
   if (saved && (saved.version !== 1 || !/^studio\/[a-z0-9-]+$/.test(saved.branch) ||
     !/^[a-f0-9]{40}$/.test(saved.baseSha) || !/^[a-f0-9]{40}$/.test(saved.headSha) ||
     !Number.isInteger(saved.nextTurn) || saved.nextTurn < 0 || saved.nextTurn > MAX_TURNS)) {
@@ -359,7 +371,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     const ref = await githubJson(`/git/ref/heads/${encodeURIComponent(branch)}`);
     headSha = String(ref.object?.sha ?? '');
     if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
-    await continuation.save({version:1,boundedCpuEdits:true,branch,baseSha,headSha,nextTurn,
+    await continuation.save({version:1,boundedCpuEdits:true,startedAt,branch,baseSha,headSha,nextTurn,
       observations:observations.slice(-8),changedFiles:[...changedFiles],inspectionHistory:inspectionHistory.slice(-30),
       newRegressionTests:[...newRegressionTests],commits,writes,summary,complete});
   };
@@ -369,6 +381,12 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     if (continuation && !saved) await checkpoint();
     const stopTurn = continuation ? Math.min(MAX_TURNS, nextTurn + 1) : MAX_TURNS;
     for (let turn = nextTurn; !complete && turn < stopTurn; turn += 1) {
+      // Never start an inference turn that could outlive this workflow's budget.
+      if (Date.now() - startedMs > REPAIR_PLANNING_BUDGET_MS - REPAIR_TURN_RESERVE_MS) {
+        await checkpoint();
+        return NextResponse.json({error:'PARIS_REPAIR_PLANNING_DEADLINE_REACHED',
+          branch:{name:branch},changed_files:[...changedFiles],observations:observations.slice(-6)}, {status:422});
+      }
       try {
       const ownedTier = provider === 'elevate' ? resolveOwnedModelConnection().tier : undefined;
       const inferenceOptions = {

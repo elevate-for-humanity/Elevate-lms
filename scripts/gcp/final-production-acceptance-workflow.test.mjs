@@ -30,3 +30,8 @@ test('production acceptance requires a live unexpired lease as well as a fresh h
  assert.match(source,/Date\.parse\(j\.lease_expires_at\)<=Date\.now\(\)/);
  assert.match(source,/Date\.now\(\)-Date\.parse\(j\.heartbeat_at\)>300000/);
 });
+
+test('production release pagination selects stable IDs',()=>{
+ const source=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
+ assert.ok(source.includes("get('ultimate_release_versions','id,course_id,status'"));
+});

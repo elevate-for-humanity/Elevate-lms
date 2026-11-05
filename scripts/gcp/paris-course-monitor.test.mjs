@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {inspectCourseAutopilot} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
-import {monitorCourseQueue} from './paris-course-monitor.mjs';
+import {monitorCourseQueue,latestRoleJobs} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
 test('waiting role prerequisites do not dispatch or inherit another lesson’s storage failure',()=>{
  const observation=inspectCourseAutopilot({status:'queued',available_at:'infinity',monitor:{enabled:true},payload:{autopilot:{role:'quality'}}},
@@ -224,4 +224,27 @@ test('PARIS wakes verified quality work and never bypasses a saved owner pause',
    assert.equal(actual[0].body.attempts,undefined);
   }
  }
+});
+
+test('quality dependency lookup prefers newest producer by created_at, not UUID',()=>{
+ const rows=[
+  {id:'zzz',build_id:'build',job_type:'lesson_autopilot:a:media',status:'completed',created_at:'2026-11-01T00:00:00Z',execution_generation:1},
+  {id:'aaa',build_id:'build',job_type:'lesson_autopilot:a:media',status:'failed',created_at:'2026-11-05T00:00:00Z',execution_generation:2},
+ ];
+ assert.equal(latestRoleJobs(rows).get('build|lesson_autopilot:a:media').status,'failed');
+ assert.equal(latestRoleJobs([...rows].reverse()).get('build|lesson_autopilot:a:media').status,'failed');
+});
+test('unresolvable duplicate chronology never wakes quality stage',()=>{
+ const rows=[
+  {id:'one',build_id:'build',job_type:'lesson_autopilot:a:media',status:'completed'},
+  {id:'two',build_id:'build',job_type:'lesson_autopilot:a:media',status:'completed'},
+ ];
+ assert.equal(latestRoleJobs(rows).get('build|lesson_autopilot:a:media'),undefined);
+});
+test('a newer completed producer is selectable only after the old failed generation',()=>{
+ const rows=[
+  {id:'old',build_id:'build',job_type:'lesson_autopilot:a:media',status:'failed',created_at:'2026-11-01T00:00:00Z',execution_generation:1},
+  {id:'new',build_id:'build',job_type:'lesson_autopilot:a:media',status:'completed',created_at:'2026-11-02T00:00:00Z',execution_generation:2},
+ ];
+ assert.equal(latestRoleJobs(rows).get('build|lesson_autopilot:a:media').id,'new');
 });

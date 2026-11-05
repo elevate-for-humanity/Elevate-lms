@@ -80,6 +80,28 @@ for(const course of courses.rows){
  else missing.push(course.title);
 }
 add('canonical_publication',missing.length===0,{missing,incrementalWithoutFullVersion:incremental});
+const pacingPlans=await get('course_pacing_plans','course_id,total_weeks,enabled','enabled=eq.true','course_id');
+const releaseWeeks=await get('course_lesson_release_weeks','lesson_id,course_id,release_week','','lesson_id');
+const byLesson=new Map(releaseWeeks.rows.map(row=>[row.lesson_id,row]));
+const chronologyFindings=[];
+for(const plan of pacingPlans.rows){
+ const lessons=allLessons.rows.filter(l=>l.course_id===plan.course_id&&l.is_published===true)
+  .sort((a,b)=>(a.order_index??-1)-(b.order_index??-1));
+ let previousWeek=0,previousOrder=-1;
+ for(const lesson of lessons){
+  const week=byLesson.get(lesson.id);
+  const order=lesson.order_index;
+  if(!Number.isInteger(order)||order<0||order===previousOrder||
+     !week||week.course_id!==plan.course_id||
+     !Number.isInteger(week.release_week)||week.release_week<1||
+     week.release_week>plan.total_weeks||week.release_week<previousWeek){
+   chronologyFindings.push({courseId:plan.course_id,lessonId:lesson.id,code:'PACING_RELEASE_ORDER_OR_MAPPING_INVALID'});
+   continue;
+  }
+  previousWeek=week.release_week;previousOrder=order;
+ }
+}
+add('weekly_release_chronology',chronologyFindings.length===0,{enabledPlans:pacingPlans.count,findings:chronologyFindings});
 const canonicalReconciliation=reconcileCanonicalReleases(allReleases.rows,allLessons.rows);
 add('canonical_release_media_consistency',canonicalReconciliation.ok,{
  checkedReleases:canonicalReconciliation.checkedReleases,

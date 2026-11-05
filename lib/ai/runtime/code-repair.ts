@@ -1,4 +1,5 @@
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
+import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases} from './deployment-repair-events.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
@@ -284,20 +285,14 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    // Keep the immutable release verification receipt while its course runs.
    // A later unrelated deployment must not erase an already verified rollout.
    const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.protectedMerge?['https://store.elevateforhumanity.org']:[])];
-   // A historical exactRuntimeSha receipt cannot certify the currently serving
-   // revision. Probe every required origin again before moving to verified.
-   // Network/JSON errors are negative evidence, not a reason to mark success.
-   const checks=await Promise.all(origins.map(async origin=>{
-    try {
-     const response=await fetch(origin+'/api/health',{cache:'no-store',signal:AbortSignal.timeout(10000)});
-     if(!response.ok)return false;
-     const body=await response.json();
-     return (!repair.verification?.protectedMerge||(body.healthy===true&&body.ready===true))&&
-       (body.commitSha??body.commit??body.sha)===repair.release_sha;
-    } catch {return false;}
-   }));
-   const verification:any={...repair.verification,tests:'passed',deployments:'passed',exactRuntimeSha:checks.every(Boolean),runtimeVerifiedAt:repair.verification?.runtimeVerifiedAt??(checks.every(Boolean)?new Date().toISOString():null)};
-   if(!checks.every(Boolean)){await update(repair.id,{status:'verifying',verification});continue;}
+   // Never reuse a prior receipt to certify the current serving revision.
+   // Failed/unreachable health probes are negative evidence, not success.
+   const runtimeEvidence=await verifyParisRuntimeOrigins({origins,releaseSha:repair.release_sha,protectedMerge:Boolean(repair.verification?.protectedMerge)});
+   const verification:any={...repair.verification,tests:'passed',deployments:'passed',
+    exactRuntimeSha:runtimeEvidence.passed,runtimeLastCheckedAt:runtimeEvidence.checkedAt,
+    runtimeOrigins:runtimeEvidence.origins,
+    runtimeVerifiedAt:runtimeEvidence.passed?runtimeEvidence.checkedAt:null};
+   if(!runtimeEvidence.passed){await update(repair.id,{status:'verifying',verification});continue;}
    if(repair.source_job_id){
     const {data:source,error:sourceError}=await db.from('ultimate_build_jobs').select('*').eq('id',repair.source_job_id).single();
     if(sourceError)throw sourceError;

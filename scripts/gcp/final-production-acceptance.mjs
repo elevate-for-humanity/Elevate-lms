@@ -72,7 +72,7 @@ for(const course of courses.rows){
   return lesson.video_status==='complete'&&Boolean(lesson.video_url)&&
    attachment?.publicationPending===false&&
    typeof attachment.sourceLessonBuildId==='string'&&
-   /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(attachment.sourceLessonBuildId)&&
+   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(attachment.sourceLessonBuildId)&&
    Number.isFinite(Date.parse(attachment.publishedAt??''));
  };
  if(published.length>0&&published.every(validReceipt))incremental.push(course.title);

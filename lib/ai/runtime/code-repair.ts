@@ -397,15 +397,12 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  if(queued.error)throw queued.error;
  let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown}|null=null;
  for(const candidate of queued.data??[]){
-  // Until the reviewed bounded-context DB migration has been independently
-  // verified, do not attempt the exceptional third counter increment that the
-  // older live CHECK constraint rejects with PARIS_DATABASE_23514. Preserve the
-  // queued record and proceed to other eligible repairs; never reset attempts.
-  const contextOnlyThirdAttempt=candidate.attempt_count===2 &&
-   candidate.source_job_id==null && Array.isArray(candidate.attempt_history) &&
-   candidate.attempt_history.some((item:any)=>item?.retryReason==='bounded-context-budget-recovery') &&
-   !candidate.attempt_history.some((item:any)=>item?.retryReason==='bounded-cpu-edit-recovery');
-  if(contextOnlyThirdAttempt && process.env.PARIS_BOUNDED_CONTEXT_DB_READY!=='true')continue;
+  // The production CHECK constraint was reconciled by the reviewed
+  // paris_bounded_context_retry_contract migration. The policy below is the
+  // sole application preflight; Postgres enforces the identical bound.
+  // A missing deployment environment toggle must not starve an authorized
+  // source-free bounded recovery while the underlying DB is already ready.
+  // Never reset or increment attempts outside the atomic claim below.
   if(!canDispatchParisRepairAttempt(candidate)){
    // Preserve the original repair and report a bounded budget block. No claim,
    // attempt reset, worker restart, or data mutation beyond its repair receipt.

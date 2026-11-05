@@ -62,7 +62,7 @@ add('paris_code_repairs',blocked===0,{blocked});
 const courses=await get('courses','id,title,status','status=eq.published');
 const releases=await get('ultimate_release_versions','id,course_id,status','status=eq.released');
 const allReleases=await get('ultimate_release_versions','id,course_id,status,package');
-const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url,media_attachment:content_json->mediaAttachment');
+const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url,order_index,media_attachment:content_json->mediaAttachment');
 const missing=[];
 const incremental=[];
 for(const course of courses.rows){

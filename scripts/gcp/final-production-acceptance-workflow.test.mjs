@@ -30,3 +30,18 @@ test('production acceptance requires a live unexpired lease as well as a fresh h
  assert.match(source,/Date\.parse\(j\.lease_expires_at\)<=Date\.now\(\)/);
  assert.match(source,/Date\.now\(\)-Date\.parse\(j\.heartbeat_at\)>300000/);
 });
+
+test('production release pagination selects stable IDs',()=>{
+ const source=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
+ assert.ok(source.includes("get('ultimate_release_versions','id,course_id,status'"));
+});
+
+test('incremental releases require recorded source and media receipt instead of fabricated full version',()=>{
+ const src=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
+ assert.ok(src.includes('incrementalWithoutFullVersion'));
+ assert.ok(src.includes('attachment?.publicationPending===false'));
+ assert.ok(src.includes("media_attachment:content_json->mediaAttachment"));
+ assert.ok(src.includes("lesson.video_status==='complete'"));
+});
+
+test('pacing audit checks release order',()=>{const s=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');assert.ok(s.includes('weekly_release_chronology'));assert.ok(s.includes('week.release_week<previousWeek'));});

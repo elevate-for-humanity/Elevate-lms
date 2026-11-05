@@ -4,14 +4,15 @@ import {reconcileCanonicalReleases} from './canonical-release-reconciliation.mjs
 const PROJECT='elegant-racer-299721',DB='https://cuxzzpsyufcewtmicszk.supabase.co';
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('PRODUCTION_SUPABASE_AUTH_REQUIRED');
-const get=async(table,select,filter='')=>{
+const get=async(table,select,filter='',keyColumn='id')=>{
+ if(!['id','course_id','lesson_id'].includes(keyColumn) || !select.split(',').includes(keyColumn))throw Error('PRODUCTION_STABLE_KEY_REQUIRED');
  const rows=[];
  const limit=500;
  let expected=null;
  for(let offset=0;offset<100000;offset+=limit){
   const url=new URL(DB+'/rest/v1/'+table);
   url.searchParams.set('select',select);
-  url.searchParams.set('order','id.asc');
+  url.searchParams.set('order',keyColumn+'.asc');
   url.searchParams.set('limit',String(limit));
   url.searchParams.set('offset',String(offset));
   if(filter){
@@ -31,7 +32,7 @@ const get=async(table,select,filter='')=>{
   if(total!==expected)throw Error('PRODUCTION_DATASET_CHANGED_DURING_SCAN:'+table);
   rows.push(...page);
   if(rows.length>=expected){
-   if(rows.length!==expected||new Set(rows.map(row=>row.id)).size!==rows.length)throw Error('PRODUCTION_READ_INCONSISTENT:'+table);
+   if(rows.length!==expected||new Set(rows.map(row=>row[keyColumn])).size!==rows.length)throw Error('PRODUCTION_READ_INCONSISTENT:'+table);
    return {rows,count:expected};
   }
   if(page.length!==limit)throw Error('PRODUCTION_READ_INCOMPLETE:'+table);
@@ -40,7 +41,7 @@ const get=async(table,select,filter='')=>{
 };
 const sha=process.env.IMAGE_SHA||process.env.GITHUB_SHA;
 const checks=[];
-const add=(name,ok,details={})=>checks.push({name,ok,...details});
+const add=(name,ok,details={})=>checks.push({name,ok,observedAt:new Date().toISOString(),...details});
 if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('EXACT_RELEASE_SHA_REQUIRED');
 try{
  const output=execFileSync('node',['scripts/gcp/verify-course-runtime-contract.mjs'],{encoding:'utf8',env:{...process.env,IMAGE_SHA:sha},timeout:360000});
@@ -59,11 +60,48 @@ const repairs=await get('paris_code_repairs','id,status');
 const blocked=repairs.rows.filter(r=>r.status==='blocked').length;
 add('paris_code_repairs',blocked===0,{blocked});
 const courses=await get('courses','id,title,status','status=eq.published');
-const releases=await get('ultimate_release_versions','course_id,status','status=eq.released');
-const missing=courses.rows.filter(c=>!releases.rows.some(r=>r.course_id===c.id)).map(c=>c.title);
-add('canonical_publication',missing.length===0,{missing});
+const releases=await get('ultimate_release_versions','id,course_id,status','status=eq.released');
 const allReleases=await get('ultimate_release_versions','id,course_id,status,package');
-const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url');
+const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url,order_index,media_attachment:content_json->mediaAttachment');
+const missing=[];
+const incremental=[];
+for(const course of courses.rows){
+ if(releases.rows.some(r=>r.course_id===course.id))continue;
+ const flagged=allLessons.rows.filter(l=>l.course_id===course.id&&l.is_published===true);
+ const validReceipt=lesson=>{
+  const attachment=lesson.media_attachment;
+  return lesson.video_status==='complete'&&Boolean(lesson.video_url)&&
+   attachment?.publicationPending===false&&
+   typeof attachment.sourceLessonBuildId==='string'&&
+   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(attachment.sourceLessonBuildId)&&
+   Number.isFinite(Date.parse(attachment.publishedAt??''));
+ };
+ if(flagged.length>0&&flagged.every(l=>l.status==='published'&&validReceipt(l)))incremental.push(course.title);
+ else missing.push(course.title);
+}
+add('canonical_publication',missing.length===0,{missing,incrementalWithoutFullVersion:incremental});
+const pacingPlans=await get('course_pacing_plans','course_id,total_weeks,enabled','enabled=eq.true','course_id');
+const releaseWeeks=await get('course_lesson_release_weeks','lesson_id,course_id,release_week','','lesson_id');
+const byLesson=new Map(releaseWeeks.rows.map(row=>[row.lesson_id,row]));
+const chronologyFindings=[];
+for(const plan of pacingPlans.rows){
+ const lessons=allLessons.rows.filter(l=>l.course_id===plan.course_id&&l.is_published===true)
+  .sort((a,b)=>(a.order_index??-1)-(b.order_index??-1));
+ let previousWeek=0,previousOrder=-1;
+ for(const lesson of lessons){
+  const week=byLesson.get(lesson.id);
+  const order=lesson.order_index;
+  if(!Number.isInteger(order)||order<0||order===previousOrder||
+     !week||week.course_id!==plan.course_id||
+     !Number.isInteger(week.release_week)||week.release_week<1||
+     week.release_week>plan.total_weeks||week.release_week<previousWeek){
+   chronologyFindings.push({courseId:plan.course_id,lessonId:lesson.id,code:'PACING_RELEASE_ORDER_OR_MAPPING_INVALID'});
+   continue;
+  }
+  previousWeek=week.release_week;previousOrder=order;
+ }
+}
+add('weekly_release_chronology',chronologyFindings.length===0,{enabledPlans:pacingPlans.count,findings:chronologyFindings});
 const canonicalReconciliation=reconcileCanonicalReleases(allReleases.rows,allLessons.rows);
 add('canonical_release_media_consistency',canonicalReconciliation.ok,{
  checkedReleases:canonicalReconciliation.checkedReleases,

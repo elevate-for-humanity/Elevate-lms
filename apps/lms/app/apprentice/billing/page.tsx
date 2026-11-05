@@ -55,6 +55,10 @@ function summary(
     schedule?.status === 'active' &&
     schedule.provider_status === 'active' &&
     Boolean(schedule.provider_subscription_id);
+  // Barber subscription money is stored in cents; cosmetology stores dollars.
+  // Normalize once at the boundary; BillingCard receives dollar-denominated totals.
+  const tuitionDollars = (value: number | null | undefined): number | null =>
+    value == null ? null : Number(value) / (program === 'barber' ? 100 : 1);
   return {
     program,
     paymentStatus:
@@ -67,9 +71,9 @@ function summary(
       schedule?.cadence === 'weekly'
         ? Number(schedule.amount_cents)
         : (sub.weekly_payment_cents ?? null),
-    remainingBalance: sub.remaining_balance ?? null,
-    fullTuitionAmount: sub.full_tuition_amount ?? null,
-    amountPaidAtCheckout: sub.amount_paid_at_checkout ?? null,
+    remainingBalance: tuitionDollars(sub.remaining_balance),
+    fullTuitionAmount: tuitionDollars(sub.full_tuition_amount),
+    amountPaidAtCheckout: tuitionDollars(sub.amount_paid_at_checkout),
     nextPaymentDate: schedule?.next_invoice_date ?? sub.next_payment_date ?? null,
     fullyPaid: sub.fully_paid ?? false,
     setupFeePaid: sub.setup_fee_paid ?? false,

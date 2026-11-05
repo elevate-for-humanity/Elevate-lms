@@ -59,7 +59,7 @@ const repairs=await get('paris_code_repairs','id,status');
 const blocked=repairs.rows.filter(r=>r.status==='blocked').length;
 add('paris_code_repairs',blocked===0,{blocked});
 const courses=await get('courses','id,title,status','status=eq.published');
-const releases=await get('ultimate_release_versions','course_id,status','status=eq.released');
+const releases=await get('ultimate_release_versions','id,course_id,status','status=eq.released');
 const missing=courses.rows.filter(c=>!releases.rows.some(r=>r.course_id===c.id)).map(c=>c.title);
 add('canonical_publication',missing.length===0,{missing});
 const allReleases=await get('ultimate_release_versions','id,course_id,status,package');

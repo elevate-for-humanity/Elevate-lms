@@ -21,22 +21,39 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  // A repaired image does not create missing licensed course media. Fail closed
  // when a scene-license failure has no course-scoped, ready entitled source.
  const availableMedia = new Map();
- async function hasReadyEntitledSource(courseId) {
-  if (!courseId) return false;
-  if (availableMedia.has(courseId)) return availableMedia.get(courseId);
-  const mediaUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/course_videos');
+ async function hasReadyEntitledSource(courseId,lessonId) {
+  // A licensed asset for another lesson is not evidence that the failed
+  // lesson has any approved, relevant source media. Require the exact saved
+  // canonical lesson association before allowing an expensive retry.
+  if(!courseId || !lessonId)return false;
+  const key=courseId+':'+lessonId;
+  if(availableMedia.has(key))return availableMedia.get(key);
+  const matchesUrl=new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/course_lesson_media_matches');
+  matchesUrl.searchParams.set('select','entitlement_id,match_score,status');
+  matchesUrl.searchParams.set('course_id','eq.'+courseId);
+  matchesUrl.searchParams.set('lesson_id','eq.'+lessonId);
+  matchesUrl.searchParams.set('status','in.(approved,attached)');
+  matchesUrl.searchParams.set('match_score','gt.0');
+  matchesUrl.searchParams.set('limit','100');
+  const matchesResponse=await request(matchesUrl,{headers,signal:AbortSignal.timeout(15000)});
+  if(!matchesResponse.ok)throw Error('REPAIR_MEDIA_MATCH_READ_HTTP_'+matchesResponse.status);
+  const matches=await matchesResponse.json();
+  if(!Array.isArray(matches))throw Error('REPAIR_MEDIA_MATCH_INVALID');
+  const ids=[...new Set(matches.map(m=>m.entitlement_id).filter(x=>typeof x==='string' && /^[0-9a-f-]{36}$/i.test(x)))];
+  if(!ids.length){availableMedia.set(key,false);return false;}
+  const mediaUrl=new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/course_videos');
   mediaUrl.searchParams.set('select','id');
   mediaUrl.searchParams.set('course_id','eq.'+courseId);
   mediaUrl.searchParams.set('status','eq.ready');
   mediaUrl.searchParams.set('asset_role','eq.source_broll');
-  mediaUrl.searchParams.set('entitlement_id','not.is.null');
+  mediaUrl.searchParams.set('entitlement_id','in.('+ids.join(',')+')');
   mediaUrl.searchParams.set('limit','1');
-  const mediaResponse = await request(mediaUrl,{headers,signal:AbortSignal.timeout(15000)});
-  if (!mediaResponse.ok) throw Error('REPAIR_MEDIA_EVIDENCE_READ_HTTP_'+mediaResponse.status);
-  const mediaRows = await mediaResponse.json();
-  if (!Array.isArray(mediaRows)) throw Error('REPAIR_MEDIA_EVIDENCE_INVALID');
-  const available = mediaRows.length>0;
-  availableMedia.set(courseId,available);
+  const mediaResponse=await request(mediaUrl,{headers,signal:AbortSignal.timeout(15000)});
+  if(!mediaResponse.ok)throw Error('REPAIR_MEDIA_EVIDENCE_READ_HTTP_'+mediaResponse.status);
+  const mediaRows=await mediaResponse.json();
+  if(!Array.isArray(mediaRows))throw Error('REPAIR_MEDIA_EVIDENCE_INVALID');
+  const available=mediaRows.length>0;
+  availableMedia.set(key,available);
   return available;
  }
  const seenBuilds=new Set(active.map(row=>row.build_id));
@@ -78,7 +95,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   // Do not spend another execution generation on scenes with no licensed source.
   // An eligible image still requires normal scene-specific relevance validation.
   if(/ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|licensed third-party scenes are missing entitlement\/license evidence/i.test(error) &&
-     !(await hasReadyEntitledSource(job.build?.course_id))) continue;
+     !(await hasReadyEntitledSource(job.build?.course_id, job.build?.profile?.canonicalLessonIds?.[job.payload?.autopilot?.competencyId]))) continue;
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');
   target.searchParams.set('execution_generation','eq.'+job.execution_generation);

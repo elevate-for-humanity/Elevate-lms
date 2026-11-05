@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import type { SupabaseClient } from '../supabase';
 import { createClient } from '../supabase/server';
-import { publishCourse } from '../lms/course-service';
+import { publishCourse } from '../lms/atomic-publish-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
 import { publicationRequirements, type PublicationRequirement } from '../course-factory/experience-contract';

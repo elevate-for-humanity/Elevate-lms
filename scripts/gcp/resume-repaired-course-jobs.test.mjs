@@ -1,10 +1,13 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
-const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18},status:'failed',execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
- monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false}}};
+const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
+ monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false,canonicalLessonIds:{lesson:'11111111-1111-4111-8111-111111111111'}}}};
 async function run(job,conflict=false,mediaAvailable=true){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
+ if(String(url).includes('/course_lesson_media_matches'))return {ok:true,json:async()=>[{
+  entitlement_id:'22222222-2222-4222-8222-222222222222',match_score:1,status:'attached'
+ }]};
  if(String(url).includes('/course_videos'))return {ok:true,json:async()=>mediaAvailable?[{id:'entitled-source'}]:[]};
  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[job]};
  }});return {writes,result};}
@@ -118,4 +121,11 @@ test('verified deadline repair resumes only the exhausted quality playback check
  assert.equal((await run(job)).writes.length,1);
  assert.equal((await run({...job,monitor:{enabled:true,lastRepairDeployment:{imageSha}}})).writes.length,0);
  for(const last_error of ['ULTIMATE_PROGRESS_STALLED:invalid','ULTIMATE_PROGRESS_STALLED:'+JSON.stringify({phase:'autopilot:media:lesson_film_render'})])assert.equal((await run({...job,last_error})).writes.length,0);
+});
+
+test('ready b-roll for another course lesson cannot trigger a media retry',async()=>{
+ const unrelated={...base,build:{...base.build,profile:{ownerPaused:false,
+  canonicalLessonIds:{another:'11111111-1111-4111-8111-111111111111'}}},
+  last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]'};
+ assert.equal((await run(unrelated)).writes.length,0);
 });

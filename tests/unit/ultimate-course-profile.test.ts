@@ -5,7 +5,7 @@ vi.mock('@/lib/ultimate-course-builder/credential/appendix-a-source',()=>({Ultim
 }}));
 import {buildUltimateProfile, hydrateUltimateProfileSources} from '@/lib/ultimate-course-builder/core/course-profile';
 function dbWithLesson(failure=false, content:any={html:'Pause the service and consult the supervisor.',scenario:{correctAction:'consult'}}) {
- return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},or(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content}],error:null});}};return q;}};
+ return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},or(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content,approved:true,status:'draft',is_published:false}],error:null});}};return q;}};
 }
 describe('shared Ultimate profile used by Studio and builder',()=>{
  it('preserves an explicitly approved reference and presentation during resume',async()=>{
@@ -35,6 +35,17 @@ describe('shared Ultimate profile used by Studio and builder',()=>{
   expect(p.sourceDocuments).toEqual(['Appendix A']);
   expect(p.instructionalSources?.[0]?.id).toBe('course-lesson:lesson-1');
   expect(p.instructionalSources?.[0]?.text).toContain('Pause the service and consult the supervisor.');
+ });
+ it('does not silently authorize an unapproved lesson draft as teaching source',async()=>{
+  const db={from(table:string){const q={
+    select(){return q;},eq(){return q;},order(){return Promise.resolve({
+      data:[{id:'lesson-1',title:'Unsafe draft',content:{html:'Unreviewed instructional body'},approved:false,is_published:false,status:'draft'}],error:null,
+    });},
+  };return q;}};
+  const profile:any={id:'course:example',authority:'course-defined',sourceDocuments:[],
+    competencies:[{id:'lesson-1',title:'Lesson 1',authorityRequirementIds:[]}]};
+  const hydrated=await hydrateUltimateProfileSources(db as never,'course-id',profile);
+  expect(hydrated.instructionalSources??[]).toEqual([]);
  });
  it('propagates source lookup failure instead of constructing an empty successful request',async()=>{
   await expect(buildUltimateProfile(dbWithLesson(true) as never,{courseId:'course',programSlug:'business-administration',title:'Business'})).rejects.toThrow('database unavailable');

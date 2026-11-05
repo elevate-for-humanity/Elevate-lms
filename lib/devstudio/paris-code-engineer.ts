@@ -514,7 +514,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // terminal no-change proposal as a pending repair.
       if (missingRepairDeliverables(changedFiles, newRegressionTests)) {
         observations.push('COMPLETE REJECTED: no source correction and new regression test were both committed.');
-        nextTurn = MAX_TURNS;
+        complete = true;
         break;
       }
       summary = action.summary;

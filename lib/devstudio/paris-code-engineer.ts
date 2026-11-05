@@ -179,7 +179,7 @@ async function writeFile(input: {
   // Use that explicit identity for this operation, before sending any write.
   let workflowHeaders: HeadersInit | undefined;
   if (normalized.startsWith('.github/workflows/')) {
-    const token = await getGitHubAppToken();
+    const token = await getGitHubAppToken({requireWorkflowWrite:true});
     if (!token) throw Error('PARIS_WORKFLOW_APP_AUTHORITY_REQUIRED');
     workflowHeaders = { Authorization: `Bearer ${token}` };
   }

@@ -36,6 +36,23 @@ describe('shared Ultimate profile used by Studio and builder',()=>{
   expect(p.instructionalSources?.[0]?.id).toBe('course-lesson:lesson-1');
   expect(p.instructionalSources?.[0]?.text).toContain('Pause the service and consult the supervisor.');
  });
+ it('recovers already-approved teaching through the exact canonical competency map',async()=>{
+  const db={from(table:string){const q={
+    select(){return q;},eq(){return q;},order(){return Promise.resolve({
+      data:[{id:'canonical-uuid',slug:'different-slug',title:'Procedure',
+        content:{html:'Follow the verified product safety procedures.'},
+        approved:true,is_published:false,status:'draft'}],error:null,
+    });},
+  };return q;}};
+  const profile:any={id:'course:example',authority:'course-defined',sourceDocuments:[],
+    canonicalLessonIds:{'comp-1':'canonical-uuid'},
+    competencies:[{id:'comp-1',title:'Procedure',authorityRequirementIds:[]}]};
+  const hydrated=await hydrateUltimateProfileSources(db as never,'course-id',profile);
+  expect(hydrated.instructionalSources).toEqual([expect.objectContaining({
+    id:'course-lesson:comp-1',
+    text:expect.stringContaining('verified product safety procedures'),
+  })]);
+ });
  it('does not silently authorize an unapproved lesson draft as teaching source',async()=>{
   const db={from(table:string){const q={
     select(){return q;},eq(){return q;},order(){return Promise.resolve({

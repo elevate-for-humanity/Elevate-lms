@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export default async function InterofficeEmail({
   searchParams,
 }: {
-  searchParams: Promise<{ to?: string; subject?: string }>;
+  searchParams: Promise<{ to?: string; subject?: string; mailboxId?: string }>;
 }) {
   const params = await searchParams;
   const initialRecipient =
@@ -52,6 +52,7 @@ export default async function InterofficeEmail({
       <main className="p-4">
         <EmailWorkspace
           roleLabel="account holder"
+          initialMailboxId={typeof params.mailboxId === 'string' && /^[0-9a-f-]{36}$/i.test(params.mailboxId) ? params.mailboxId : undefined}
           initialRecipient={initialRecipient}
           initialSubject={typeof params.subject === 'string' ? params.subject.slice(0, 200) : ''}
         />

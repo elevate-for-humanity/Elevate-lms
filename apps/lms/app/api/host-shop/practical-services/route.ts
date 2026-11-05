@@ -76,6 +76,7 @@ async function authorize(
       studentId: runtime.studentId,
       shop,
       members: ctx.members,
+      supervisorId: runtime.placement.supervisor_user_id,
     });
   return runtime;
 }
@@ -122,7 +123,7 @@ export async function GET(req: NextRequest) {
     practice: practicalServiceProgress(requirements || [], progressRows || []),
   });
 }
-export async function POST(req: NextRequest) {
+async function saveService(req: NextRequest, editing: boolean) {
   const ctx = await context();
   if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (ctx.previewPartnerId)
@@ -142,7 +143,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          'Only the Host Shop owner may check off a service; students have read-only progress.',
+          'Only the Host Shop owner or assigned supervisor may record a service; students have read-only progress.',
       },
       { status: 403 },
     );
@@ -166,6 +167,40 @@ export async function POST(req: NextRequest) {
       { error: 'Valid service, subject and past/current date required' },
       { status: 400 },
     );
+  if (editing) {
+    const entryId = String(body?.entryId || '');
+    if (!/^[0-9a-f-]{36}$/i.test(entryId))
+      return NextResponse.json({ error: 'Valid entry required' }, { status: 400 });
+    const { data: existing, error: readError } = await ctx.db
+      .from('host_shop_practical_service_entries')
+      .select('id,service_name,performed_on,subject_type,mentor_notes')
+      .eq('id', entryId).eq('enrollment_id', enrollmentId)
+      .eq('shop_id', runtime.placement.shop_id)
+      .eq('placement_id', runtime.placement.id)
+      .is('voided_at', null).maybeSingle();
+    if (readError) return NextResponse.json({ error: 'Unable to load entry' }, { status: 500 });
+    if (!existing) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
+    const changes = {
+      service_name: serviceName, performed_on: performedOn, subject_type: subjectType,
+      mentor_notes: String(body?.notes || '').slice(0, 1000),
+    };
+    // Preserve the previous observation before changing it; never invent service counts.
+    const { error: auditError } = await ctx.db.from('audit_logs').insert({
+      action: 'host_shop_practical_edit_requested', actor_id: ctx.user.id,
+      target_type: 'host_shop_practical_service_entries', target_id: entryId,
+      before_state: existing, after_state: changes,
+      metadata: { enrollmentId, shopId: runtime.placement.shop_id },
+    });
+    if (auditError) return NextResponse.json({ error: 'Unable to preserve edit history' }, { status: 500 });
+    const { data: updated, error: updateError } = await ctx.db
+      .from('host_shop_practical_service_entries').update(changes)
+      .eq('id', entryId).eq('enrollment_id', enrollmentId)
+      .eq('shop_id', runtime.placement.shop_id).eq('placement_id', runtime.placement.id)
+      .is('voided_at', null).select('id').maybeSingle();
+    if (updateError) return NextResponse.json({ error: 'Unable to update service' }, { status: 500 });
+    if (!updated) return NextResponse.json({ error: 'Entry changed; refresh before editing' }, { status: 409 });
+    return NextResponse.json({ ok: true, id: updated.id });
+  }
   const { data, error } = await ctx.db
     .from('host_shop_practical_service_entries')
     .insert({
@@ -186,3 +221,6 @@ export async function POST(req: NextRequest) {
     ? NextResponse.json({ error: error.message }, { status: 500 })
     : NextResponse.json({ ok: true, id: data.id }, { status: 201 });
 }
+
+export async function POST(req: NextRequest) { return saveService(req, false); }
+export async function PATCH(req: NextRequest) { return saveService(req, true); }

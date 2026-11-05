@@ -82,6 +82,7 @@ export default function PracticalProgressEntry() {
   const requestedStudent = searchParams.get('studentId');
   const [loading, setLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [apprentices, setApprentices] = useState<Apprentice[]>([]);
   const [selected, setSelected] = useState('');
@@ -139,6 +140,7 @@ export default function PracticalProgressEntry() {
     : [];
   useEffect(() => {
     let current = true;
+    setEditingId(null);
     setCanRecord(false);
     setEntries([]);
     setServiceCounts(null);
@@ -188,9 +190,10 @@ export default function PracticalProgressEntry() {
     try {
       // Practical categories are observational logs, not formal Appendix A approvals.
       const response = await fetch('/api/host-shop/practical-services', {
-        method: 'POST',
+        method: editingId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          entryId: editingId,
           enrollmentId: selected,
           serviceName: service,
           subjectType: subject,
@@ -211,6 +214,7 @@ export default function PracticalProgressEntry() {
       setEntries(data.entries || []);
       setServiceCounts(Array.isArray(data.serviceCounts) ? data.serviceCounts : null);
       setPractice(data.practice || practice);
+      setEditingId(null);
       setNotes('');
       setMessage('Practical service saved. Student progress is updated.');
     } catch (e) {
@@ -231,7 +235,7 @@ export default function PracticalProgressEntry() {
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <h2 className="text-2xl font-black">Record student progress</h2>
       <p className="text-slate-700">
-        Choose your apprentice, enter the service you observed, then save. These entries update
+        Choose your apprentice, enter the service you observed, then submit. You can edit saved services below. These entries update
         hands-on practice progress. Elevate handles formal competency approvals.
       </p>
       {loading && <p role="status">Loading assigned apprentices…</p>}
@@ -262,13 +266,13 @@ export default function PracticalProgressEntry() {
           {loadingProgress && <p role="status">Loading student progress…</p>}
           {!loadingProgress && !canRecord && (
             <p className="rounded-xl border border-amber-300 bg-amber-50 p-4">
-              Read-only preview or staff access. The assigned Host Shop owner records completed
+              Read-only access. The Host Shop owner or assigned supervisor records completed
               services from their own account.
             </p>
           )}
           {!loadingProgress && (
             <section className="rounded-xl border bg-white p-5">
-              <h2 className="text-xl font-bold">Record a completed service</h2>
+              <h2 className="text-xl font-bold">{editingId ? 'Edit completed service' : 'Record a completed service'}</h2>
               <fieldset disabled={!canRecord || busy}>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <label>
@@ -279,7 +283,7 @@ export default function PracticalProgressEntry() {
                       onChange={(e) => setService(e.target.value)}
                     >
                       <option value="">Select service</option>
-                      {options.map((v) => (
+                      {Array.from(new Set([...options, ...entries.map(e => e.service_name)])).map((v) => (
                         <option key={v}>{v}</option>
                       ))}
                     </select>
@@ -322,8 +326,9 @@ export default function PracticalProgressEntry() {
                   onClick={save}
                   className="mt-4 rounded-lg bg-blue-800 px-5 py-3 font-bold text-white disabled:opacity-50"
                 >
-                  {busy ? 'Saving…' : 'Save student progress'}
+                  {busy ? 'Submitting…' : editingId ? 'Submit corrections' : 'Submit student progress'}
                 </button>
+                {editingId && <button type="button" className="ml-3 rounded border px-4 py-3" onClick={() => { setEditingId(null); setService(''); setNotes(''); }}>Cancel edit</button>}
               </fieldset>
             </section>
           )}
@@ -331,7 +336,7 @@ export default function PracticalProgressEntry() {
             <section className="rounded-xl border bg-white p-5" aria-label="Saved student progress">
               <h2 className="text-xl font-bold">Recent saved progress</h2>
               <ul className="mt-3 divide-y">
-                {entries.slice(0, 5).map((entry) => (
+                {entries.map((entry) => (
                   <li key={entry.id} className="py-3">
                     <p className="font-semibold">
                       {entry.service_name} · {entry.performed_on}
@@ -340,6 +345,7 @@ export default function PracticalProgressEntry() {
                       Performed on {entry.subject_type === 'patron' ? 'client' : entry.subject_type}
                     </p>
                     {entry.mentor_notes && <p className="mt-1 text-sm">{entry.mentor_notes}</p>}
+                    {canRecord && <button type="button" disabled={busy} className="mt-2 rounded border px-4 py-2" onClick={() => { setEditingId(entry.id); setService(entry.service_name); setSubject(entry.subject_type); setDate(entry.performed_on); setNotes(entry.mentor_notes || ''); setMessage('Editing saved service. Update the form above and submit corrections.'); }}>Edit service</button>}
                   </li>
                 ))}
               </ul>

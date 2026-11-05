@@ -325,7 +325,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
 
   if(!actorId)return NextResponse.json({error:'PARIS repair actor is required.'},{status:403});
   const db=await requireAdminClient();
-  const provider=(process.env.AI_PROVIDER??'openai').trim().toLowerCase();
+  const provider=(process.env.AI_PROVIDER??'elevate').trim().toLowerCase();
   if(provider==='elevate'){
     const owned = await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS});
     if (!owned.verified) {

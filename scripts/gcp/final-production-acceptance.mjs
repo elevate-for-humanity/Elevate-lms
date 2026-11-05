@@ -60,10 +60,25 @@ const blocked=repairs.rows.filter(r=>r.status==='blocked').length;
 add('paris_code_repairs',blocked===0,{blocked});
 const courses=await get('courses','id,title,status','status=eq.published');
 const releases=await get('ultimate_release_versions','id,course_id,status','status=eq.released');
-const missing=courses.rows.filter(c=>!releases.rows.some(r=>r.course_id===c.id)).map(c=>c.title);
-add('canonical_publication',missing.length===0,{missing});
 const allReleases=await get('ultimate_release_versions','id,course_id,status,package');
-const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url');
+const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url,content_json');
+const missing=[];
+const incremental=[];
+for(const course of courses.rows){
+ if(releases.rows.some(r=>r.course_id===course.id))continue;
+ const published=allLessons.rows.filter(l=>l.course_id===course.id&&l.is_published===true&&l.status==='published');
+ const validReceipt=lesson=>{
+  const attachment=lesson.content_json?.mediaAttachment;
+  return lesson.video_status==='complete'&&Boolean(lesson.video_url)&&
+   attachment?.publicationPending===false&&
+   typeof attachment.sourceLessonBuildId==='string'&&
+   /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(attachment.sourceLessonBuildId)&&
+   Number.isFinite(Date.parse(attachment.publishedAt??''));
+ };
+ if(published.length>0&&published.every(validReceipt))incremental.push(course.title);
+ else missing.push(course.title);
+}
+add('canonical_publication',missing.length===0,{missing,incrementalWithoutFullVersion:incremental});
 const canonicalReconciliation=reconcileCanonicalReleases(allReleases.rows,allLessons.rows);
 add('canonical_release_media_consistency',canonicalReconciliation.ok,{
  checkedReleases:canonicalReconciliation.checkedReleases,

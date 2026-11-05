@@ -5,7 +5,7 @@ const PROJECT='elegant-racer-299721',DB='https://cuxzzpsyufcewtmicszk.supabase.c
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!key)throw Error('PRODUCTION_SUPABASE_AUTH_REQUIRED');
 const get=async(table,select,filter='',keyColumn='id')=>{
- if(!['id','course_id','lesson_id'].includes(keyColumn))throw Error('PRODUCTION_STABLE_KEY_REQUIRED');
+ if(!['id','course_id','lesson_id'].includes(keyColumn) || !select.split(',').includes(keyColumn))throw Error('PRODUCTION_STABLE_KEY_REQUIRED');
  const rows=[];
  const limit=500;
  let expected=null;

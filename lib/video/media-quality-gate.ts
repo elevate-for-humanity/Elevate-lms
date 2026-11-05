@@ -6,6 +6,8 @@ import { captionSampleGroups, captionWordCoverage, charcoalPixelsMatch } from '.
 import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { createHash } from 'node:crypto';
+import {getElevateMediaStorageConfig,getSignedElevateMediaUrl} from '@/lib/storage/elevate-media-storage';
+import {ownedAncillaryCourseKey} from './owned-ancillary-course-key.mjs';
 
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
@@ -339,7 +341,19 @@ async function detectBackwardTimelineReplay(
 }
 
 async function requireTextAsset(url: string, label: string): Promise<string> {
-  const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+  let response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+  // QA may resume after a private object's temporary delivery signature has
+  // expired. Renew a read only for the exact configured storage endpoint,
+  // bucket and immutable caption/transcript key; do not bypass authorization.
+  if (response.status === 401 || response.status === 403) {
+    const config = getElevateMediaStorageConfig();
+    const key = config.endpoint ? ownedAncillaryCourseKey(url, { endpoint: config.endpoint, bucket: config.bucket }) : null;
+    if (key) {
+      const freshUrl = await getSignedElevateMediaUrl(key, 300);
+      if (!freshUrl) throw new Error(`${label} signed read renewal unavailable`);
+      response = await fetch(freshUrl, { signal: AbortSignal.timeout(15_000) });
+    }
+  }
   if (!response.ok) throw new Error(`${label} returned HTTP ${response.status}`);
   const content = (await response.text()).trim();
   if (!content) throw new Error(`${label} is empty`);

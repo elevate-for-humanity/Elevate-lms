@@ -11,7 +11,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -432,7 +432,13 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  }
  if(!pending)return {enabled:true,dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE'};
  const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.id).eq('status','queued').eq('attempt_count',pending.attempt_count).select('id').maybeSingle();
- if(claim.error)throw claim.error;if(!claim.data)return {enabled:true,dispatched:0};
+ if(claim.error){
+  if(isParisAttemptConstraintMismatch(claim.error)){
+    return {enabled:true,dispatched:0,reason:'PARIS_SCHEMA_MIGRATION_REQUIRED',retryAuthorized:false};
+  }
+  throw claim.error;
+ }
+ if(!claim.data)return {enabled:true,dispatched:0};
  if(workflowOwnedDispatch)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:claim.data.id};
  try{await gh(`/actions/workflows/${REPAIR_WORKFLOW}/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',inputs:{repair_id:claim.data.id}})});}
  catch(error){await update(claim.data.id,{status:'blocked',error_code:'REPAIR_DISPATCH_FAILED'});throw error;}

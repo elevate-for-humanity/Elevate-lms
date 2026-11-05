@@ -15,8 +15,8 @@ beforeEach(()=>{
 });
 afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
 function request(){return new NextRequest('https://store.elevateforhumanity.org/api/auth/quickbooks/callback?code=test-code&realmId=123&state='+createQuickBooksOAuthState('test-secret'));}
-function provider(tokens:any={access_token:'test-access',refresh_token:'test-refresh',expires_in:3600},company='123'){
- const send=vi.fn().mockResolvedValueOnce(Response.json(tokens)).mockResolvedValueOnce(Response.json({CompanyInfo:{Id:company}}));vi.stubGlobal('fetch',send);return send;
+function provider(tokens:any={access_token:'test-access',refresh_token:'test-refresh',expires_in:3600},company='1'){
+ const send=vi.fn().mockResolvedValueOnce(Response.json(tokens)).mockResolvedValueOnce(Response.json({CompanyInfo:{Id:company,CompanyName:'Elevate for Humanity'}}));vi.stubGlobal('fetch',send);return send;
 }
 it('all callback hosts use the same verified and durable handler',()=>expect(learnerCallback).toBe(GET));
 it('verifies company authorization, atomically saves tokens and returns Store buyers to Admin',async()=>{
@@ -29,11 +29,22 @@ it('rejects a token response that would leave an old refresh token behind',async
  provider({access_token:'test-access'});const result=await GET(request());
  expect(result.headers.get('location')).toContain('invalid_token_response');expect(m.upsert).not.toHaveBeenCalled();
 });
-it('does not save authorization for a different company',async()=>{
- provider(undefined,'456');const result=await GET(request());
+it('does not save authorization when the company response is missing its record ID',async()=>{
+ provider(undefined,'');const result=await GET(request());
  expect(result.headers.get('location')).toContain('company_verification_failed');expect(m.upsert).not.toHaveBeenCalled();
 });
 it('does not claim connection success when token persistence fails',async()=>{
  provider();m.upsert.mockResolvedValue({error:{message:'test-storage-failure'}});
  expect((await GET(request())).headers.get('location')).toContain('error=unexpected');
+});
+
+it('accepts the documented singleton CompanyInfo ID while querying the selected realm',async()=>{
+ const send=provider(undefined,'1');const result=await GET(request());
+ expect(send.mock.calls[1][0]).toBe('https://quickbooks.api.intuit.com/v3/company/123/companyinfo/123?minorversion=75');
+ expect(result.headers.get('location')).toContain('success=connected&company=123');
+});
+it('rejects provider access failure even with a company-shaped response',async()=>{
+ const send=vi.fn().mockResolvedValueOnce(Response.json({access_token:'test-access',refresh_token:'test-refresh'})).mockResolvedValueOnce(Response.json({CompanyInfo:{Id:'1',CompanyName:'Elevate for Humanity'}},{status:403}));
+ vi.stubGlobal('fetch',send);
+ expect((await GET(request())).headers.get('location')).toContain('company_verification_failed');expect(m.upsert).not.toHaveBeenCalled();
 });

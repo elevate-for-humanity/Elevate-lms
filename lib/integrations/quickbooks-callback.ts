@@ -109,7 +109,10 @@ export async function GET(request: NextRequest) {
       redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(10000),
     });
     const companyBody = await company.json().catch(() => null);
-    if (!company.ok || String(companyBody?.CompanyInfo?.Id || '') !== realm) return redirect('error=company_verification_failed');
+    // CompanyInfo.Id identifies the singleton record (commonly "1"), not realmId.
+    // The authenticated production request above is scoped to the OAuth-selected realm.
+    if (!company.ok || !String(companyBody?.CompanyInfo?.Id || '').trim() ||
+        !String(companyBody?.CompanyInfo?.CompanyName || '').trim()) return redirect('error=company_verification_failed');
 
     await persistToSupabase({
       QB_ACCESS_TOKEN: access_token,

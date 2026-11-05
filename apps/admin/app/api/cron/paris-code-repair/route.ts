@@ -2,7 +2,7 @@ import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
-import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
+import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,reportParisDispatchFailure,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
@@ -25,6 +25,14 @@ export async function POST(request:NextRequest){
    const diagnostic=async()=>NextResponse.json({...await diagnoseParisGitHubCredential(),workflowAuthorization:'temporary-job-v1',plannerContinuation:'durable-turn-v1'},{headers:{'Cache-Control':'no-store'}});
    const token=request.headers.get('x-paris-github-token');
    return token?await withWorkflowGitHubToken(token,diagnostic):await diagnostic();
+  }
+  if(body.phase==='dispatch-failure'){
+   // Only the signed workflow monitor can report an unconfirmed dispatch.
+   // No attempt counters are reset, and no replacement dispatch is issued.
+   const token=request.headers.get('x-paris-github-token');
+   if(!token)return NextResponse.json({error:'Temporary workflow authorization required.'},{status:400});
+   if(!/^[a-f0-9-]{36}$/.test(body.repairId??''))return NextResponse.json({error:'Repair ID required'},{status:400});
+   return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await reportParisDispatchFailure(body.repairId)));
   }
   if(body.phase==='tick'){
    const token=request.headers.get('x-paris-github-token');

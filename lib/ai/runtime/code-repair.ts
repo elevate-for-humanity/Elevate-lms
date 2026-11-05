@@ -1,4 +1,5 @@
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
+import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases} from './deployment-repair-events.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
@@ -135,6 +136,21 @@ export async function publishParisRepair(id:string,runId:number){
  await update(id,{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
  return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
 }
+/**
+ * A signed monitor reports a rejected GitHub dispatch through a guarded
+ * compare-and-swap. An ambiguous upstream result remains blocked: never
+ * silently retry a request that GitHub might have accepted.
+ */
+export async function reportParisDispatchFailure(id:string) {
+ const db=await requireAdminClient();
+ const {data,error}=await db.from('paris_code_repairs')
+  .update({status:'blocked',error_code:'REPAIR_DISPATCH_FAILED_UNCONFIRMED',updated_at:new Date().toISOString()})
+  .eq('id',id).eq('status','dispatched').is('workflow_run_id',null)
+  .select('id').maybeSingle();
+ if(error)throw error;
+ return {recorded:Boolean(data),retryAuthorized:false};
+}
+
 export async function reportParisRepairFailure(id:string,runId:number){
  const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
  if(data?.workflow_run_id!==runId)return;
@@ -284,12 +300,14 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    // Keep the immutable release verification receipt while its course runs.
    // A later unrelated deployment must not erase an already verified rollout.
    const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.protectedMerge?['https://store.elevateforhumanity.org']:[])];
-   const checks=repair.verification?.exactRuntimeSha===true?origins.map(()=>true):await Promise.all(origins.map(async origin=>{
-    const response=await fetch(origin+'/api/health',{cache:'no-store',signal:AbortSignal.timeout(10000)});
-    const body=await response.json();return response.ok&&(!repair.verification?.protectedMerge||(body.healthy===true&&body.ready===true))&&(body.commitSha??body.commit??body.sha)===repair.release_sha;
-   }));
-   const verification:any={...repair.verification,tests:'passed',deployments:'passed',exactRuntimeSha:checks.every(Boolean),runtimeVerifiedAt:repair.verification?.runtimeVerifiedAt??(checks.every(Boolean)?new Date().toISOString():null)};
-   if(!checks.every(Boolean)){await update(repair.id,{status:'verifying',verification});continue;}
+   // Never reuse a prior receipt to certify the current serving revision.
+   // Failed/unreachable health probes are negative evidence, not success.
+   const runtimeEvidence=await verifyParisRuntimeOrigins({origins,releaseSha:repair.release_sha,protectedMerge:Boolean(repair.verification?.protectedMerge)});
+   const verification:any={...repair.verification,tests:'passed',deployments:'passed',
+    exactRuntimeSha:runtimeEvidence.passed,runtimeLastCheckedAt:runtimeEvidence.checkedAt,
+    runtimeOrigins:runtimeEvidence.origins,
+    runtimeVerifiedAt:runtimeEvidence.passed?runtimeEvidence.checkedAt:null};
+   if(!runtimeEvidence.passed){await update(repair.id,{status:'verifying',verification});continue;}
    if(repair.source_job_id){
     const {data:source,error:sourceError}=await db.from('ultimate_build_jobs').select('*').eq('id',repair.source_job_id).single();
     if(sourceError)throw sourceError;

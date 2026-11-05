@@ -47,11 +47,15 @@ test('PARIS deployment routes to existing Google workflows and rejects unknown t
 
 function engineer(statuses) {
   const requests=[];
-  const factory=new Function('fetch','getGitHubHeaders',compile(engineerSource)+'\nreturn {blockedPath,searchCode};');
+  // The source module imports these timeout contracts. The isolated fixture
+  // strips imports, so inject the same published numeric contract explicitly
+  // instead of failing during module evaluation before testing GitHub search.
+  const factory=new Function('fetch','getGitHubHeaders','REPAIR_INFERENCE_TIMEOUT_MS',
+    'REPAIR_MODEL_PROBE_TIMEOUT_MS',compile(engineerSource)+'\nreturn {blockedPath,searchCode};');
   const api=factory(async(url,init)=>{
     requests.push({url,init});
     return Response.json({}, {status:statuses.shift()??200});
-  },async()=>({Authorization:'Bearer workflow-fixture'}));
+  },async()=>({Authorization:'Bearer workflow-fixture'}),210000,55000);
   return {...api,requests};
 }
 test('Search 401 falls back to directory discovery only after exact repository authorization succeeds',async()=>{

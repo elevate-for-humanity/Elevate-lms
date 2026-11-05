@@ -1,3 +1,4 @@
+import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
@@ -507,6 +508,15 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         continue;
       }
 
+      // Do not spend another inference turn after an unsupported "complete".
+      // Final evidence checks below return 422 and preserve all checkpoints.
+      // In continuation mode, returning 202 here would misrepresent a
+      // terminal no-change proposal as a pending repair.
+      if (missingRepairDeliverables(changedFiles, newRegressionTests)) {
+        observations.push('COMPLETE REJECTED: no source correction and new regression test were both committed.');
+        complete = true;
+        break;
+      }
       summary = action.summary;
       complete = true;
       break;

@@ -101,7 +101,14 @@ jobs:
             if result.get('dispatchRequired'):
               repair_id=result['repairId']
               import subprocess
-              subprocess.run(['gh','api','--method','POST','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/workflows/paris-code-repair.yml/dispatches','-f','ref=main','-f','inputs[repair_id]='+repair_id],check=True)
+              try:
+                subprocess.run(['gh','api','--method','POST','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/workflows/paris-code-repair.yml/dispatches','-f','ref=main','-f','inputs[repair_id]='+repair_id],check=True)
+              except subprocess.CalledProcessError:
+                # A failed API call may still have reached GitHub. Block with a
+                # durable unconfirmed receipt; do not retry an ambiguous POST.
+                failure_req=urllib.request.Request(endpoint,data=json.dumps({'phase':'dispatch-failure','repairId':repair_id}).encode(),headers=headers)
+                urllib.request.urlopen(failure_req,timeout=30).read()
+                raise
           except urllib.error.HTTPError as error:
             print(error.read().decode()[:1000])
             raise

@@ -40,7 +40,7 @@ const get=async(table,select,filter='')=>{
 };
 const sha=process.env.IMAGE_SHA||process.env.GITHUB_SHA;
 const checks=[];
-const add=(name,ok,details={})=>checks.push({name,ok,...details});
+const add=(name,ok,details={})=>checks.push({name,ok,observedAt:new Date().toISOString(),...details});
 if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('EXACT_RELEASE_SHA_REQUIRED');
 try{
  const output=execFileSync('node',['scripts/gcp/verify-course-runtime-contract.mjs'],{encoding:'utf8',env:{...process.env,IMAGE_SHA:sha},timeout:360000});

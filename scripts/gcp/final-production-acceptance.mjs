@@ -47,15 +47,15 @@ try{
  const output=execFileSync('node',['scripts/gcp/verify-course-runtime-contract.mjs'],{encoding:'utf8',env:{...process.env,IMAGE_SHA:sha},timeout:360000});
  const result=JSON.parse(output);add('five_worker_digest_and_identity',result.verified===true,{workers:result.workers?.length||0});
 }catch(e){add('five_worker_digest_and_identity',false,{reason:String(e.message).slice(0,160).replace(/Bearer\s+\S+/gi,'[redacted]')});}
-const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at,build:ultimate_course_builds!inner(status,profile)');
+const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at,build:ultimate_course_builds!inner(status,owner_paused:profile->>ownerPaused)');
 const counts=Object.fromEntries(['completed','failed','queued','running'].map(s=>[s,jobs.rows.filter(j=>j.status===s).length]));
 // Historical failures and explicitly owner-paused builds are retained for
 // audit, not reclassified as completed or counted as runnable production work.
 if(jobs.rows.some(j=>!j.build || Array.isArray(j.build) || typeof j.build.status!=='string'))
  throw Error('PRODUCTION_BUILD_SCOPE_EVIDENCE_REQUIRED');
-const eligible=jobs.rows.filter(j=>j.build.profile?.ownerPaused!==true &&
+const eligible=jobs.rows.filter(j=>j.build.owner_paused!=='true' &&
  !['published','archived','cancelled'].includes(j.build.status));
-const paused=jobs.rows.filter(j=>j.build.profile?.ownerPaused===true);
+const paused=jobs.rows.filter(j=>j.build.owner_paused==='true');
 const actionableFailed=eligible.filter(j=>j.status==='failed');
 const actionableQueued=eligible.filter(j=>j.status==='queued');
 const actionableRunning=eligible.filter(j=>j.status==='running');

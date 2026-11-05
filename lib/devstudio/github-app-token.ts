@@ -5,11 +5,11 @@ import { getDecryptedPlatformSecret, getAdminGitHubAppSecret } from '@/lib/secre
 
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 const API = 'https://api.github.com';
-let cached: { identity: string; token: string; expires: number } | undefined;
+let cached: { identity: string; token: string; expires: number; workflowWrite: boolean } | undefined;
 let pending: { identity: string; promise: Promise<string> } | undefined;
 
 /** Server-only, opt-in App authentication. Never persist installation tokens. */
-export async function getGitHubAppToken(): Promise<string | null> {
+export async function getGitHubAppToken(options: { requireWorkflowWrite?: boolean } = {}): Promise<string | null> {
   // Dashboard-managed App credentials are encrypted at rest and resolved by
   // exact key. Never confuse a saved GITHUB_TOKEN/PAT with an RSA App key.
   // A mounted Google secret takes precedence over the Admin dashboard source.
@@ -36,8 +36,15 @@ export async function getGitHubAppToken(): Promise<string | null> {
   } catch {
     throw new Error('GITHUB_APP_PRIVATE_KEY_INVALID');
   }
-  if (cached?.identity === identity && cached.expires > Date.now() + 60_000) return cached.token;
-  if (pending?.identity === identity) return pending.promise;
+  if (cached?.identity === identity && cached.expires > Date.now() + 60_000) {
+    if (options.requireWorkflowWrite && !cached.workflowWrite) throw new Error('GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED');
+    return cached.token;
+  }
+  if (pending?.identity === identity) {
+    const token = await pending.promise;
+    if (options.requireWorkflowWrite && !cached?.workflowWrite) throw new Error('GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED');
+    return token;
+  }
 
   const promise = (async () => {
     const now = Math.floor(Date.now() / 1000);
@@ -87,9 +94,13 @@ export async function getGitHubAppToken(): Promise<string | null> {
         result.permissions?.pull_requests !== 'write') {
       throw new Error('GITHUB_APP_WRITE_PERMISSIONS_REQUIRED');
     }
-    cached = { identity, token: result.token, expires };
+    cached = { identity, token: result.token, expires, workflowWrite: result.permissions?.workflows === 'write' };
     return result.token as string;
   })();
   pending = { identity, promise };
-  try { return await promise; } finally { if (pending?.promise === promise) pending = undefined; }
+  try {
+    const token=await promise;
+    if (options.requireWorkflowWrite && !cached?.workflowWrite) throw new Error('GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED');
+    return token;
+  } finally { if (pending?.promise === promise) pending = undefined; }
 }

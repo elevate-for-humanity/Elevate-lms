@@ -7,9 +7,10 @@ import { stripTypeScriptTypes } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import { infrastructureRepairPath, openInfrastructureRepair, infrastructureMergeEvidence, STORE_REPAIR_DEPLOYMENT, assertDeploymentInvariants } from '../../lib/devstudio/infrastructure-repair.mjs';
 import { REPAIR_DEPLOYMENTS, repairDeploymentState, nextRepairDeployment } from '../../lib/ai/runtime/code-repair-policy.mjs';
+import {REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from '../../lib/devstudio/repair-inference-budget.mjs';
 
 const engineer = readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts', import.meta.url), 'utf8');
-const compiled = stripTypeScriptTypes(engineer).replace(/^import[\s\S]*?;\n/gm, '').replaceAll('export ', '');
+const compiled = `const REPAIR_INFERENCE_TIMEOUT_MS=${REPAIR_INFERENCE_TIMEOUT_MS}; const REPAIR_MODEL_PROBE_TIMEOUT_MS=${REPAIR_MODEL_PROBE_TIMEOUT_MS};\n` + stripTypeScriptTypes(engineer).replace(/^import[\s\S]*?;\n/gm, '').replaceAll('export ', '');
 const blockedPath = new Function(compiled + '\nreturn blockedPath;')();
 const workflow = readFileSync(new URL('../../.github/workflows/paris-code-repair.yml', import.meta.url), 'utf8');
 const validator = workflow.split('      - name: Require an application patch and a new regression test')[1].split("          python - <<'PY'\n")[1].split('\n          PY')[0].split('\n').map(line => line.slice(10)).join('\n');

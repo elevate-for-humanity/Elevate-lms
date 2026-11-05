@@ -61,14 +61,14 @@ add('paris_code_repairs',blocked===0,{blocked});
 const courses=await get('courses','id,title,status','status=eq.published');
 const releases=await get('ultimate_release_versions','id,course_id,status','status=eq.released');
 const allReleases=await get('ultimate_release_versions','id,course_id,status,package');
-const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url,content_json');
+const allLessons=await get('course_lessons','id,course_id,status,is_published,video_status,video_url,media_attachment:content_json->mediaAttachment');
 const missing=[];
 const incremental=[];
 for(const course of courses.rows){
  if(releases.rows.some(r=>r.course_id===course.id))continue;
  const published=allLessons.rows.filter(l=>l.course_id===course.id&&l.is_published===true&&l.status==='published');
  const validReceipt=lesson=>{
-  const attachment=lesson.content_json?.mediaAttachment;
+  const attachment=lesson.media_attachment;
   return lesson.video_status==='complete'&&Boolean(lesson.video_url)&&
    attachment?.publicationPending===false&&
    typeof attachment.sourceLessonBuildId==='string'&&

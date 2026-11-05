@@ -45,8 +45,11 @@ test('production recovery workflow uses protected secrets and never applies migr
   const workflow = readFileSync('.github/workflows/db-backup.yml', 'utf8');
   assert.match(workflow, /environment: production/);
   assert.match(workflow, /Confirm backup-read credential is bound to production/);
-  assert.match(workflow, /SUPABASE_ACCESS_TOKEN: \\$\\{\\{ secrets\\.SUPABASE_ACCESS_TOKEN \\|\\| secrets\\.SUPABASE_MANAGEMENT_API_KEY \\|\\| secrets\\.SUPABASE_TOKEN \\}\\}/);
-  assert.equal((workflow.match(/SUPABASE_ACCESS_TOKEN: \\$\\{\\{ secrets\\.SUPABASE_ACCESS_TOKEN \\|\\| secrets\\.SUPABASE_MANAGEMENT_API_KEY \\|\\| secrets\\.SUPABASE_TOKEN \\}\\}/g) ?? []).length, 2);
+  const exactSecretBinding = 'SUPABASE_ACCESS_TOKEN: ' +
+    '${{ secrets.SUPABASE_ACCESS_TOKEN || secrets.SUPABASE_MANAGEMENT_API_KEY || secrets.SUPABASE_TOKEN }}';
+  // Verify both production steps use the same exact protected secret binding.
+  // Do not weaken this assertion to a generic name-only substring match.
+  assert.equal(workflow.split(exactSecretBinding).length - 1, 2);
   assert.match(workflow, /SUPABASE_PROJECT_ID: cuxzzpsyufcewtmicszk/);
   assert.match(workflow, /check-database-recovery\.mjs/);
   assert.doesNotMatch(workflow, /\bsupabase db push\b|\bpsql\b|\bapply_migration\b/i);

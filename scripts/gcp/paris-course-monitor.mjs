@@ -1,5 +1,37 @@
 import {inspectCourseAutopilot,COURSE_AI_ROLES} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
 
+/** Resolve only the latest job generation for a build/role. UUID sort is not
+ * chronological; an older completed producer cannot certify a newer failure.
+ * Ambiguous duplicate chronology fails closed rather than waking a held QA job.
+ */
+export function latestRoleJobs(rows) {
+  const latest = new Map();
+  const ambiguous = new Set();
+  for (const row of rows) {
+    const key = row.build_id + '|' + row.job_type;
+    if (ambiguous.has(key)) continue;
+    const previous = latest.get(key);
+    if (!previous) { latest.set(key, row); continue; }
+    const a = Date.parse(previous.created_at ?? '');
+    const b = Date.parse(row.created_at ?? '');
+    if (!Number.isFinite(a) || !Number.isFinite(b)) {
+      latest.delete(key);
+      ambiguous.add(key);
+      continue;
+    }
+    if (a !== b) { if (b > a) latest.set(key, row); continue; }
+    const aGen = Number(previous.execution_generation);
+    const bGen = Number(row.execution_generation);
+    if (!Number.isSafeInteger(aGen) || !Number.isSafeInteger(bGen) || aGen === bGen) {
+      latest.delete(key);
+      ambiguous.add(key);
+      continue;
+    }
+    if (bGen > aGen) latest.set(key, row);
+  }
+  return latest;
+}
+
 /** Runs outside Admin so a 503 in the dashboard cannot stop queue supervision. */
 export async function monitorCourseQueue({request=fetch,env=process.env,now=new Date(),dispatchState,jobIds,conflictRetries=2}={}) {
   if(env.GITHUB_REPOSITORY!=='elevate-for-humanity/Elevate-lms'||!env.SUPABASE_SERVICE_ROLE_KEY)
@@ -7,7 +39,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
   const headers={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY};
   const url=new URL(root);
-  url.searchParams.set('select','id,build_id,job_type,status,available_at,payload,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,findings,ownerPaused:profile->ownerPaused)');
+  url.searchParams.set('select','id,build_id,job_type,status,created_at,available_at,payload,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,findings,ownerPaused:profile->ownerPaused)');
   url.searchParams.set('order','id.asc');
   if(jobIds)url.searchParams.set('id','in.('+jobIds.join(',')+')');
   const rows=[];
@@ -30,7 +62,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   // Recover a held quality stage only when its exact instruction and media
   // predecessors have both completed cleanly on the same build. Other held
   // stages remain fenced; owner-paused builds are never resumed implicitly.
-  const siblingKeys=new Map(rows.map(row=>[row.build_id+'|'+row.job_type,row]));
+  const siblingKeys=latestRoleJobs(rows);
   const observations=[];
   for(const job of rows){
     const match=/^lesson_autopilot:(.+):quality$/.exec(job.job_type??'');

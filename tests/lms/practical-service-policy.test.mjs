@@ -18,3 +18,14 @@ test('valid real service dates pass; future and impossible dates fail',()=>{
  assert.equal(validPracticalServiceDate('2026-02-30','2026-10-27'),false);
  assert.equal(validPracticalServiceDate('2026-13-01','2026-10-27'),false);
 });
+
+test('only assigned active supervisors and mentors may record within their shop',()=>{
+ for (const role of ['supervisor','mentor']) {
+  const args={userId:'supervisor',studentId:'student',supervisorId:'supervisor',shop,members:[{role,partner_id:'partner',status:'active'}]};
+  assert.equal(canOwnerRecordService(args),true);
+  assert.equal(canOwnerRecordService({...args,supervisorId:'someone-else'}),false);
+  assert.equal(canOwnerRecordService({...args,members:[{role,partner_id:'other',status:'active'}]}),false);
+  assert.equal(canOwnerRecordService({...args,members:[{role,partner_id:'partner',status:'inactive'}]}),false);
+  assert.equal(canOwnerRecordService({...args,userId:'student',supervisorId:'student'}),false);
+ }
+});

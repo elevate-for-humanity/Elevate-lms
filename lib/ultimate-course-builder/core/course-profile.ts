@@ -55,7 +55,14 @@ export async function hydrateUltimateProfileSources(
     .flatMap((lesson: any) => {
       // Preserve the exact competency identifier used by the instructional
       // generator. A canonical UUID, slug, and content_json key may differ.
-      const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId]
+      // The saved canonical map is authoritative when legacy slugs differ from
+      // competency identifiers. Reuse only that exact lesson association.
+      const mappedCompetencies = Object.entries(
+        (profile as UltimateCredentialProfile & {canonicalLessonIds?: Record<string,string>}).canonicalLessonIds ?? {},
+      ).filter(([competencyId, canonicalId]) =>
+        competencyIds.has(competencyId) && canonicalId === lesson.id,
+      ).map(([competencyId]) => competencyId);
+      const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId, ...mappedCompetencies]
         .filter((key): key is string => typeof key === 'string' && competencyIds.has(key));
       if (!keys.length) return [];
       // Only approved authored drafts or the canonical published lesson may

@@ -60,3 +60,14 @@ it('keeps the latest source excerpt and task inside the private CPU time budget'
  expect(cpu[0].content.length+cpu[1].content.length).toBeLessThanOrEqual((3072-512-512-24)*3);
  expect(gpu[1].content.length).toBeGreaterThan(cpu[1].content.length);
 });
+
+it('preserves a 11965-character source-free repair goal using configured 8K CPU context',()=>{
+ const task='Restore authorized CI repair while preserving student records and approval boundaries. '+ 'x'.repeat(11870);
+ const system={role:'system',content:'Trusted actor and repository authority rules. '.repeat(50)};
+ const messages=[system,{role:'user',content:JSON.stringify({task,turn:2,observations:['READ path: '+ 'source'.repeat(1200)]})}];
+ const output=budgetRepairMessages(messages,8192,512,'cpu');
+ expect(output[0]).toBe(system);
+ expect(JSON.parse(output[1].content).task).toBe(task);
+ expect(output[1].content).toContain('Partial diagnostic excerpt');
+ expect(()=>budgetRepairMessages(messages,4096,512,'cpu')).toThrow('PARIS_REPAIR_TASK_EXCEEDS_MODEL_CONTEXT');
+});

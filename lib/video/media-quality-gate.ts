@@ -347,7 +347,7 @@ async function requireTextAsset(url: string, label: string): Promise<string> {
   // bucket and immutable caption/transcript key; do not bypass authorization.
   if (response.status === 401 || response.status === 403) {
     const config = getElevateMediaStorageConfig();
-    const key = ownedAncillaryCourseKey(url, config);
+    const key = config.endpoint ? ownedAncillaryCourseKey(url, { endpoint: config.endpoint, bucket: config.bucket }) : null;
     if (key) {
       const freshUrl = await getSignedElevateMediaUrl(key, 300);
       if (!freshUrl) throw new Error(`${label} signed read renewal unavailable`);

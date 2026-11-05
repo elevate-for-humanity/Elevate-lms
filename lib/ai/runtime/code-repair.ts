@@ -89,7 +89,7 @@ export async function prepareParisRepair(id:string,runId:number){
  const run=await gh(`/actions/runs/${runId}`);
  if(run.path!==`.github/workflows/${REPAIR_WORKFLOW}`||run.event!=='workflow_dispatch'||run.head_branch!=='main'||run.status!=='in_progress')throw Error('REPAIR_WORKFLOW_AUTHORITY_REQUIRED');
  const db=await requireAdminClient();
- const {data:row,error}=await db.from('paris_code_repairs').update({status:'patching',workflow_run_id:runId,updated_at:new Date().toISOString()}).eq('id',id).in('status',['queued','dispatched']).select('*').maybeSingle();
+ const {data:row,error}=await db.from('paris_code_repairs').update({status:'patching',workflow_run_id:runId,updated_at:new Date().toISOString()}).eq('id',id).eq('status','dispatched').select('*').maybeSingle();
  if(error)throw error;
  let claimed=row;
  if(!claimed){

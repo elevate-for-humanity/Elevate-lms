@@ -139,7 +139,8 @@ function Dashboard({
   discipline: Props['discipline'];
 }) {
   const config = DISCIPLINE_CONFIG[discipline];
-  const isCompetencyBased = false;
+  const isCompetencyBased = discipline !== 'cosmetology';
+  const requiredCompetencies = discipline === 'nail-tech' ? 19 : 20;
   const pct = Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
   const remaining = Math.max(0, config.targetHours - data.totalHours);
 
@@ -160,16 +161,16 @@ function Dashboard({
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-slate-900 p-4">
-                <p className="text-3xl font-black text-white">20</p>
-                <p className="mt-1 text-xs font-semibold text-slate-400">verified competencies</p>
+                <p className="text-3xl font-black text-white">{requiredCompetencies}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-400">required competencies</p>
               </div>
               <div className="rounded-xl bg-slate-900 p-4">
-                <p className="text-3xl font-black text-white">300</p>
+                <p className="text-3xl font-black text-white">{config.requiredRtiHours}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-400">required RTI hours</p>
               </div>
             </div>
             <p className="mt-4 text-sm leading-6 text-slate-300">
-              Esthetician completion is competency-based. Supervised work hours remain auditable evidence and are not a fixed completion denominator.
+              Completion is competency-based. Supervised work hours remain auditable evidence and are not a fixed completion denominator.
             </p>
             <Link href={config.progressHref} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">
               View competency progress <ChevronRight className="h-4 w-4" />
@@ -222,6 +223,15 @@ function Dashboard({
           </Link>
         </div>
 
+        <section className="rounded-2xl bg-slate-800 p-5 text-white">
+          <h2 className="text-lg font-bold">Today’s theory and workbook</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">Study each training day during your approved theory schedule. Clock out of shop work, open your next lesson and start the Theory Timeclock. Complete the matching workbook, save answers and finish the assessment. Stop the clock when you stop studying. Lesson completion, workbook responses, verified theory time and shop practice are separate progress records.</p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <Link href={config.lmsHref} className="rounded-xl bg-cyan-800 p-3 font-bold">Theory &amp; lessons</Link>
+            <Link href="/apprentice/workbook" className="rounded-xl bg-cyan-800 p-3 font-bold">My workbook</Link>
+          </div>
+          <Link href="/apprentice/theory-schedule" className="mt-3 inline-block py-2 font-bold underline">Review my theory schedule</Link>
+        </section>
         {/* Quick actions */}
         <div className="grid grid-cols-2 gap-3">
           {[

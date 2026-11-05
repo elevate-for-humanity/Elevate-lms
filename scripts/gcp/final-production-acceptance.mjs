@@ -48,7 +48,7 @@ try{
  const output=execFileSync('node',['scripts/gcp/verify-course-runtime-contract.mjs'],{encoding:'utf8',env:{...process.env,IMAGE_SHA:sha},timeout:360000});
  const result=JSON.parse(output);add('five_worker_digest_and_identity',result.verified===true,{workers:result.workers?.length||0});
 }catch(e){add('five_worker_digest_and_identity',false,{reason:String(e.message).slice(0,160).replace(/Bearer\s+\S+/gi,'[redacted]')});}
-const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at,build:ultimate_course_builds!inner(status,owner_paused:profile->>ownerPaused)');
+const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at,build:ultimate_course_builds(status,owner_paused:profile->>ownerPaused)');
 const {counts,eligible,paused,actionableFailed,actionableQueued,actionableRunning}=productionWorkScope(jobs.rows);
 const unmonitored=eligible.filter(j=>['failed','queued','running'].includes(j.status)&&j.monitor?.enabled!==true).length;
 const stale=jobs.rows.filter(j=>j.status==='running'&&(!j.heartbeat_at||!Number.isFinite(Date.parse(j.heartbeat_at))||Date.now()-Date.parse(j.heartbeat_at)>300000||!j.lease_expires_at||Date.parse(j.lease_expires_at)<=Date.now())).length;

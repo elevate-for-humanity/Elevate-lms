@@ -136,6 +136,21 @@ export async function publishParisRepair(id:string,runId:number){
  await update(id,{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
  return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
 }
+/**
+ * A signed monitor reports a rejected GitHub dispatch through a guarded
+ * compare-and-swap. An ambiguous upstream result remains blocked: never
+ * silently retry a request that GitHub might have accepted.
+ */
+export async function reportParisDispatchFailure(id:string) {
+ const db=await requireAdminClient();
+ const {data,error}=await db.from('paris_code_repairs')
+  .update({status:'blocked',error_code:'REPAIR_DISPATCH_FAILED_UNCONFIRMED',updated_at:new Date().toISOString()})
+  .eq('id',id).eq('status','dispatched').is('workflow_run_id',null)
+  .select('id').maybeSingle();
+ if(error)throw error;
+ return {recorded:Boolean(data),retryAuthorized:false};
+}
+
 export async function reportParisRepairFailure(id:string,runId:number){
  const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
  if(data?.workflow_run_id!==runId)return;

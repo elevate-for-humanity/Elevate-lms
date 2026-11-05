@@ -98,13 +98,18 @@ export async function POST(req: NextRequest) {
         },
         { status: 409 },
       );
-    if (job.status === 'running' || job.attempts >= job.max_attempts) {
+    if (job.attempts >= job.max_attempts) {
+      return NextResponse.json({
+        error: 'Retry budget exhausted. A verified source repair is required before another attempt.',
+        jobId: job.id,
+      }, { status: 409 });
+    }
+    if (job.status === 'running') {
       const now = new Date().toISOString();
       const recovery = await db
         .from('ultimate_build_jobs')
         .update({
           status: 'queued',
-          attempts: 0,
           execution_generation: job.execution_generation + 1,
           lease_owner: null,
           lease_expires_at: null,

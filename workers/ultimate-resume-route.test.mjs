@@ -5,7 +5,7 @@ import {stripTypeScriptTypes} from 'node:module';
 
 const source=stripTypeScriptTypes(await readFile(new URL('../apps/admin/app/api/admin/ultimate-course-builder/run/route.ts',import.meta.url),'utf8'))
  .replace(/^import .*;\n/gm,'').replace(/export /g,'');
-function fixture({paused=true,status='blocked',conflict=false,running=false,denied=false,limited=false}={}){
+function fixture({paused=true,status='blocked',conflict=false,running=false,denied=false,limited=false,attempts=0}={}){
  const writes=[],limits=[];let launches=0;
  const profile={ownerPaused:paused,competencies:[{id:'lesson'}],presentationContract:{approvedReferenceVideo:{sha256:'approved-hash'}}};
  const build={id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status,profile,updated_at:'2026-10-25T20:00:00.123456+00:00'};
@@ -14,7 +14,7 @@ function fixture({paused=true,status='blocked',conflict=false,running=false,deni
   update(value){write=value;return q;},async single(){return {data:build};},
   then(resolve,reject){if(write)writes.push({table,write,filters});return Promise.resolve({data:conflict?[]:[{id:build.id}]}).then(resolve,reject);}
  };return q;}};
- const job={id:'job',status:running?'running':'queued',attempts:0,max_attempts:5,payload:{},
+ const job={id:'job',status:running?'running':'queued',attempts,max_attempts:5,payload:{},
   heartbeat_at:new Date().toISOString(),lease_expires_at:new Date(Date.now()+60000).toISOString(),lease_owner:running?'existing-worker':null};
  const POST=new Function('NextResponse','apiRequireAdmin','requireAdminClient','UltimateJobQueue','requestCourseWorker','applyRateLimit','safeInternalError','recordCourseDispatch',source+'\nreturn POST;')(
   {json:(body,options={})=>({body,status:options.status??200})},
@@ -57,3 +57,5 @@ test('Resume quota uses authenticated actor scope and retains strict throttling'
  assert.equal(f.writes.length,0);assert.equal(f.launches(),0);
  const denied=fixture({denied:true});await denied.call();assert.deepEqual(denied.limits,[]);
 });
+
+test('exhausted attempts do not launch worker',async()=>{const f=fixture({paused:false,attempts:5}); const response=await f.call();assert.equal(response.status,409);assert.equal(f.writes.length,0);assert.equal(f.launches(),0);});

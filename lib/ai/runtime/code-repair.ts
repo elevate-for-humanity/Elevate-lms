@@ -397,6 +397,15 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  if(queued.error)throw queued.error;
  let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown}|null=null;
  for(const candidate of queued.data??[]){
+  // Until the reviewed bounded-context DB migration has been independently
+  // verified, do not attempt the exceptional third counter increment that the
+  // older live CHECK constraint rejects with PARIS_DATABASE_23514. Preserve the
+  // queued record and proceed to other eligible repairs; never reset attempts.
+  const contextOnlyThirdAttempt=candidate.attempt_count===2 &&
+   candidate.source_job_id==null && Array.isArray(candidate.attempt_history) &&
+   candidate.attempt_history.some((item:any)=>item?.retryReason==='bounded-context-budget-recovery') &&
+   !candidate.attempt_history.some((item:any)=>item?.retryReason==='bounded-cpu-edit-recovery');
+  if(contextOnlyThirdAttempt && process.env.PARIS_BOUNDED_CONTEXT_DB_READY!=='true')continue;
   if(!canDispatchParisRepairAttempt(candidate)){
    // Preserve the original repair and report a bounded budget block. No claim,
    // attempt reset, worker restart, or data mutation beyond its repair receipt.

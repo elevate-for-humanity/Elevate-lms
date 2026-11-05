@@ -1,4 +1,5 @@
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
+import {checkInspectionBudget} from './paris-inspection-budget.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
@@ -307,6 +308,7 @@ function parseAction(value: Record<string, unknown>): AgentAction {
 export type ParisRepairCheckpoint = {
   version: 1; boundedCpuEdits?: boolean; branch: string; baseSha: string; headSha: string; nextTurn: number;
   observations: string[]; changedFiles: string[]; newRegressionTests: string[];
+  inspectionHistory?: string[];
   commits: string[]; writes: number; summary: string; complete: boolean;
 };
 type RepairContinuation = {
@@ -345,6 +347,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   ];
   const changedFiles = new Set<string>(saved?.changedFiles ?? []);
   const newRegressionTests = new Set<string>(saved?.newRegressionTests ?? []);
+  const inspectionHistory = Array.isArray(saved?.inspectionHistory) ? saved.inspectionHistory.slice(-30) : [];
   const commits: string[] = saved?.commits ?? [];
   let writes = saved?.writes ?? 0;
   let summary = saved?.summary ?? '';
@@ -357,7 +360,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     headSha = String(ref.object?.sha ?? '');
     if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
     await continuation.save({version:1,boundedCpuEdits:true,branch,baseSha,headSha,nextTurn,
-      observations:observations.slice(-8),changedFiles:[...changedFiles],
+      observations:observations.slice(-8),changedFiles:[...changedFiles],inspectionHistory:inspectionHistory.slice(-30),
       newRegressionTests:[...newRegressionTests],commits,writes,summary,complete});
   };
 
@@ -418,6 +421,19 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       let action: AgentAction;
       try { action = parseAction(jsonObject(result.content)); }
       catch { observations.push('ACTION_REJECTED: return one valid JSON action from the allowed schema; no write occurred.'); continue; }
+      const inspection = checkInspectionBudget(inspectionHistory, action);
+      if (inspection.key) {
+        inspectionHistory.push(inspection.key);
+        if (inspection.decision === 'stop') {
+          // Stop wasting inference on the same source listing; preserve the branch,
+          // checkpoints and the current job, and return a precise blocked reason.
+          return NextResponse.json({error:'PARIS_PLANNER_REPEATED_INSPECTION',branch:{name:branch},changed_files:[...changedFiles],observations:observations.slice(-6)}, {status:422});
+        }
+        if (inspection.decision === 'redirect') {
+          observations.push('INSPECTION ALREADY COMPLETED: '+inspection.key+'. Select a different exact source file or make a justified patch. Do not repeat broad listings.');
+          continue;
+        }
+      }
       if (action.type === 'search') {
         const matches = await searchCode(action.query);
         if (!matches.length) {

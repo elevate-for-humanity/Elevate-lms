@@ -45,7 +45,7 @@ export async function hydrateUltimateProfileSources(
   if ((profile as any).sourcePolicy === 'frozen-reference-v1') return profile;
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id,slug,title,learning_objectives,content,content_json')
+    .select('id,slug,title,learning_objectives,content,content_json,approved,is_published,status')
     .eq('course_id', courseId)
     .order('order_index');
   if (error) throw error;
@@ -58,6 +58,12 @@ export async function hydrateUltimateProfileSources(
       const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId]
         .filter((key): key is string => typeof key === 'string' && competencyIds.has(key));
       if (!keys.length) return [];
+      // Only approved authored drafts or the canonical published lesson may
+      // supply instructional material. An arbitrary unapproved draft must not
+      // silently become "Authorized course content" on a worker resume.
+      const sourceApproved = lesson.approved === true ||
+        (lesson.is_published === true && lesson.status === 'published');
+      if (!sourceApproved) return [];
       const objectives = Array.isArray(lesson.learning_objectives)
         ? lesson.learning_objectives.filter(Boolean).join('; ') : '';
       // The source reader consumes a JSON envelope. Plain authored text must

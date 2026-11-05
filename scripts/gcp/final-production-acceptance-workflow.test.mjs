@@ -35,3 +35,11 @@ test('production release pagination selects stable IDs',()=>{
  const source=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
  assert.ok(source.includes("get('ultimate_release_versions','id,course_id,status'"));
 });
+
+test('incremental releases require recorded source and media receipt instead of fabricated full version',()=>{
+ const src=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');
+ assert.ok(src.includes('incrementalWithoutFullVersion'));
+ assert.ok(src.includes('attachment?.publicationPending===false'));
+ assert.ok(src.includes("media_attachment:content_json->mediaAttachment"));
+ assert.ok(src.includes("lesson.video_status==='complete'"));
+});

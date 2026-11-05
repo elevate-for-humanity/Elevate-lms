@@ -79,7 +79,8 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   // checkpoint signature. The deployed worker renews that exact object before
   // QA, so it is safe to resume. Other authorization failures remain external.
   const renewableStoredMediaRead =
-   /FINDINGS=.*finished_media_qa.*MP4 returned HTTP 401/i.test(error);
+   /FINDINGS=.*finished_media_qa.*(?:MP4|captions|transcript) returned HTTP 401/i.test(error) &&
+   (!pool || job.payload.autopilot.role === 'quality');
   const durableExternalBlocker =
    (/OWNER_|AUTHORIZ|ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
     !renewableStoredMediaRead) ||

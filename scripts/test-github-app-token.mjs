@@ -134,3 +134,13 @@ test('dashboard-only mode ignores stale deployment App environment and rejects m
   });
   await assert.rejects(missing.get(), { message: 'GITHUB_APP_CONFIGURATION_INVALID' });
 });
+
+test('workflow source edits require a distinct GitHub App workflows permission', async () => {
+  const base = { contents:'write', actions:'write', pull_requests:'write' };
+  const readOnlyWorkflow = fixture({ permissions:{ ...base, workflows:'read' } });
+  assert.equal(await readOnlyWorkflow.get(), 'ghs_fixture_installation_token');
+  await assert.rejects(readOnlyWorkflow.get({requireWorkflowWrite:true}),
+    { message:'GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED' });
+  const writableWorkflow = fixture({ permissions:{ ...base, workflows:'write' } });
+  assert.equal(await writableWorkflow.get({requireWorkflowWrite:true}), 'ghs_fixture_installation_token');
+});

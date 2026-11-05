@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import type { SupabaseClient } from '../supabase';
 import { createClient } from '../supabase/server';
+import { requireAdminClient } from '../supabase/admin';
 import { publishCourse } from '../lms/atomic-publish-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
@@ -453,5 +454,19 @@ export async function publishPersistedCourse(input: {
   label?: string;
   request?: NextRequest;
 }) {
-  return publishPersistedCourseWithClient({ ...input, db: await createClient() });
+  // Public sessions must never receive service-role publication capability.
+  // Resolve the authenticated user before elevating a narrowly scoped,
+  // automated-quality-gated publication to the trusted server client.
+  const session = await createClient();
+  const { data: { user }, error } = await session.auth.getUser();
+  if (error || !user || user.id !== input.actorId)
+    throw new Error('COURSE_PUBLISH_AUTHENTICATION_REQUIRED');
+  const db = await requireAdminClient();
+  const profile = await db.from('profiles').select('role,is_active')
+    .eq('id',user.id).maybeSingle();
+  if (profile.error || !profile.data ||
+      !['admin','super_admin'].includes(profile.data.role) ||
+      profile.data.is_active === false)
+    throw new Error('COURSE_PUBLISH_ADMIN_AUTHORITY_REQUIRED');
+  return publishPersistedCourseWithClient({ ...input, db });
 }

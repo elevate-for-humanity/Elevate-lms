@@ -508,12 +508,14 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         continue;
       }
 
-      // A model declaring completion is not evidence of a repair. Feed the
-      // missing deliverables back to the planner while turns remain, instead
-      // of ending with a misleading no-change 422 after a premature summary.
+      // Do not spend another inference turn after an unsupported "complete".
+      // Final evidence checks below return 422 and preserve all checkpoints.
+      // In continuation mode, returning 202 here would misrepresent a
+      // terminal no-change proposal as a pending repair.
       if (missingRepairDeliverables(changedFiles, newRegressionTests)) {
-        observations.push('COMPLETE REJECTED: commit an application correction AND create a new regression test on the task branch before completing. Read a specific source file and use replace/create actions.');
-        continue;
+        observations.push('COMPLETE REJECTED: no source correction and new regression test were both committed.');
+        nextTurn = MAX_TURNS;
+        break;
       }
       summary = action.summary;
       complete = true;

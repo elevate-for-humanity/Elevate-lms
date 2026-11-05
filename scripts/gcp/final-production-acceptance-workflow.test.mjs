@@ -43,3 +43,5 @@ test('incremental releases require recorded source and media receipt instead of 
  assert.ok(src.includes("media_attachment:content_json->mediaAttachment"));
  assert.ok(src.includes("lesson.video_status==='complete'"));
 });
+
+test('pacing audit checks release order',()=>{const s=readFileSync(new URL('./final-production-acceptance.mjs',import.meta.url),'utf8');assert.ok(s.includes('weekly_release_chronology'));assert.ok(s.includes('week.release_week<previousWeek'));});

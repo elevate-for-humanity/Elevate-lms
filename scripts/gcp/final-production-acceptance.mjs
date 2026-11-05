@@ -47,15 +47,26 @@ try{
  const output=execFileSync('node',['scripts/gcp/verify-course-runtime-contract.mjs'],{encoding:'utf8',env:{...process.env,IMAGE_SHA:sha},timeout:360000});
  const result=JSON.parse(output);add('five_worker_digest_and_identity',result.verified===true,{workers:result.workers?.length||0});
 }catch(e){add('five_worker_digest_and_identity',false,{reason:String(e.message).slice(0,160).replace(/Bearer\s+\S+/gi,'[redacted]')});}
-const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at');
+const jobs=await get('ultimate_build_jobs','id,status,attempts,max_attempts,monitor,heartbeat_at,lease_expires_at,build:ultimate_course_builds!inner(status,profile)');
 const counts=Object.fromEntries(['completed','failed','queued','running'].map(s=>[s,jobs.rows.filter(j=>j.status===s).length]));
-const unmonitored=jobs.rows.filter(j=>['failed','queued','running'].includes(j.status)&&j.monitor?.enabled!==true).length;
+// Historical failures and explicitly owner-paused builds are retained for
+// audit, not reclassified as completed or counted as runnable production work.
+if(jobs.rows.some(j=>!j.build || Array.isArray(j.build) || typeof j.build.status!=='string'))
+ throw Error('PRODUCTION_BUILD_SCOPE_EVIDENCE_REQUIRED');
+const eligible=jobs.rows.filter(j=>j.build.profile?.ownerPaused!==true &&
+ !['published','archived','cancelled'].includes(j.build.status));
+const paused=jobs.rows.filter(j=>j.build.profile?.ownerPaused===true);
+const actionableFailed=eligible.filter(j=>j.status==='failed');
+const actionableQueued=eligible.filter(j=>j.status==='queued');
+const actionableRunning=eligible.filter(j=>j.status==='running');
+const unmonitored=eligible.filter(j=>['failed','queued','running'].includes(j.status)&&j.monitor?.enabled!==true).length;
 const stale=jobs.rows.filter(j=>j.status==='running'&&(!j.heartbeat_at||!Number.isFinite(Date.parse(j.heartbeat_at))||Date.now()-Date.parse(j.heartbeat_at)>300000||!j.lease_expires_at||Date.parse(j.lease_expires_at)<=Date.now())).length;
-const exhausted=jobs.rows.filter(j=>j.status==='failed'&&j.attempts>=j.max_attempts).length;
+const exhausted=actionableFailed.filter(j=>j.attempts>=j.max_attempts).length;
 add('paris_monitoring',unmonitored===0,{unmonitored});
 add('worker_heartbeat',stale===0,{stale});
-add('failed_jobs_reconciled',counts.failed===0,{failed:counts.failed,exhausted});
-add('queue_drained',counts.queued===0&&counts.running===0,{queued:counts.queued,running:counts.running});
+add('failed_jobs_reconciled',actionableFailed.length===0,{failed:actionableFailed.length,historicalOrPausedFailures:counts.failed-actionableFailed.length,exhausted});
+add('queue_drained',actionableQueued.length===0&&actionableRunning.length===0,
+ {queued:actionableQueued.length,running:actionableRunning.length,ownerPaused:paused.length});
 const repairs=await get('paris_code_repairs','id,status');
 const blocked=repairs.rows.filter(r=>r.status==='blocked').length;
 add('paris_code_repairs',blocked===0,{blocked});

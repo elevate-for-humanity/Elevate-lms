@@ -73,6 +73,13 @@ BEGIN
   IF v_modules<>v_expected_modules OR v_lessons<>v_expected_lessons THEN
     RAISE EXCEPTION 'PUBLISH_CANONICAL_VERSION_INCOMPLETE';
   END IF;
+  -- The audit receipt commits in this same transaction or publication rolls
+  -- back. It is never a separate best-effort post-publication request.
+  PERFORM public.log_audit_event(
+    v_actor,'course',p_course_id,'course_published',
+    jsonb_build_object('version_id',v_version.id,
+      'version_number',v_version.version_number,'publication','atomic')
+  );
   RETURN jsonb_build_object('course',to_jsonb(v_course),'version',to_jsonb(v_version));
 END $$;
 

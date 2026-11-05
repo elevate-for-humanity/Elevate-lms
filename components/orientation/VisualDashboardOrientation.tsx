@@ -55,6 +55,12 @@ export default function VisualDashboardOrientation({
             setActiveStep(null);
           }
         },
+        onPlaybackBlocked: () => {
+          if (generation === speechGeneration.current) {
+            setSpeaking(false);
+            setActiveStep(null);
+          }
+        },
       });
     };
     void speak(0);

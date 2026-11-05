@@ -66,7 +66,7 @@ const missing=[];
 const incremental=[];
 for(const course of courses.rows){
  if(releases.rows.some(r=>r.course_id===course.id))continue;
- const published=allLessons.rows.filter(l=>l.course_id===course.id&&l.is_published===true&&l.status==='published');
+ const flagged=allLessons.rows.filter(l=>l.course_id===course.id&&l.is_published===true);
  const validReceipt=lesson=>{
   const attachment=lesson.media_attachment;
   return lesson.video_status==='complete'&&Boolean(lesson.video_url)&&
@@ -75,7 +75,7 @@ for(const course of courses.rows){
    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(attachment.sourceLessonBuildId)&&
    Number.isFinite(Date.parse(attachment.publishedAt??''));
  };
- if(published.length>0&&published.every(validReceipt))incremental.push(course.title);
+ if(flagged.length>0&&flagged.every(l=>l.status==='published'&&validReceipt(l)))incremental.push(course.title);
  else missing.push(course.title);
 }
 add('canonical_publication',missing.length===0,{missing,incrementalWithoutFullVersion:incremental});

@@ -27,6 +27,6 @@ test('missing build association cannot silently certify the production gate',()=
 test('acceptance inventory uses an embedded pause flag without reading sensitive profiles',async()=>{
  const {readFileSync}=await import('node:fs');
  const source=readFileSync(new URL('../../scripts/gcp/final-production-acceptance.mjs',import.meta.url),'utf8');
- assert.ok(source.includes('build:ultimate_course_builds!inner(status,owner_paused:profile->>ownerPaused)'));
+ assert.ok(source.includes('build:ultimate_course_builds(status,owner_paused:profile->>ownerPaused)'));
  assert.ok(source.includes('productionWorkScope(jobs.rows)'));
 });

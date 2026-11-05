@@ -20,7 +20,7 @@ describe('atomic course publication',()=>{
   }
  });
  it('database migration commits publication/version membership and audit atomically',()=>{
-  const sql=readFileSync('supabase/migrations/20261105165000_atomic_persisted_course_publication.sql','utf8');
+  const sql=readFileSync('supabase/migrations/20261105162000_atomic_persisted_course_publication.sql','utf8');
   expect(sql).toMatch(/PERFORM 1 FROM public\.courses WHERE id=p_course_id FOR UPDATE/);
   expect(sql).toMatch(/FROM public\.publish_course\(p_course_id\)/);
   expect(sql).toMatch(/INSERT INTO public\.course_versions/);

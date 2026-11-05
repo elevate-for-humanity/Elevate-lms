@@ -30,3 +30,14 @@ test('repeated workflow job-log inspections are bounded per exact run and job',(
  assert.equal(checkInspectionBudget([first.key,first.key],action).decision,'stop');
  assert.equal(checkInspectionBudget([first.key],{...action,jobId:457}).decision,'inspect');
 });
+
+test('workflow log execution requires failed job on exact main and retains only read authority',async()=>{
+ const {readFileSync}=await import('node:fs');
+ const source=readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts',import.meta.url),'utf8');
+ assert.match(source,/run\.head_branch!=='main'/);
+ assert.match(source,/run\.head_sha!==baseSha/);
+ assert.match(source,/run\.conclusion!=='failure'/);
+ assert.match(source,/item\.run_id===action\.runId/);
+ assert.match(source,/item\.conclusion==='failure'/);
+ assert.match(source,/failedWorkflowLogExcerpt\(body\)/);
+});

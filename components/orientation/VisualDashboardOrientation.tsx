@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import orientations from '@/lib/orientation/dashboard-orientations.json';
 
 export type OrientationAudience = keyof typeof orientations;
@@ -23,31 +24,43 @@ export default function VisualDashboardOrientation({
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [livePortal, setLivePortal] = useState(false);
   const speechGeneration = useRef(0);
+  const voice = useNaturalVoice();
+  const { stop: stopVoice, play: playVoice } = voice;
   function stopNarration() {
     speechGeneration.current += 1;
-    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
-    setSpeaking(false); setActiveStep(null);
+    stopVoice();
+    setSpeaking(false);
+    setActiveStep(null);
   }
   function narrateTopic() {
     stopNarration();
-    if (!window.speechSynthesis) return;
     const generation = speechGeneration.current;
-    const segments = [slide.title, ...slide.points, slide.narration];
+    const current = guide.slides[Math.min(index, guide.slides.length - 1)];
+    const segments = [current.title, ...current.points, current.narration];
     setSpeaking(true);
-    const speak = (position: number) => {
+    const speak = async (position: number) => {
       if (generation !== speechGeneration.current) return;
-      if (position >= segments.length) { setSpeaking(false); setActiveStep(null); return; }
-      setActiveStep(position > 0 && position <= slide.points.length ? position - 1 : null);
-      const utterance = new SpeechSynthesisUtterance(segments[position]);
-      utterance.rate = 0.9;
-      utterance.onend = () => speak(position + 1);
-      utterance.onerror = () => { if (generation === speechGeneration.current) { setSpeaking(false); setActiveStep(null); } };
-      window.speechSynthesis.speak(utterance);
+      if (position >= segments.length) {
+        setSpeaking(false);
+        setActiveStep(null);
+        return;
+      }
+      setActiveStep(position > 0 && position <= current.points.length ? position - 1 : null);
+      await playVoice(segments[position], {
+        style: 'instructor',
+        onEnded: () => { void speak(position + 1); },
+        onError: () => {
+          if (generation === speechGeneration.current) {
+            setSpeaking(false);
+            setActiveStep(null);
+          }
+        },
+      });
     };
-    speak(0);
+    void speak(0);
   }
   useEffect(() => { stopNarration(); setLivePortal(false); }, [index, audience, mode]);
-  useEffect(() => () => { speechGeneration.current += 1; window.speechSynthesis?.cancel(); }, []);
+  useEffect(() => () => { speechGeneration.current += 1; stopVoice(); }, [stopVoice]);
   const [unavailable, setUnavailable] = useState(false);
   useEffect(() => {
     setIndex(0);

@@ -60,19 +60,19 @@ export async function storeInboundCommunicationEmail(
   const route = options.internalCopy
     ? null
     : await programConversationRoute(db, [originalSender || ''], recipients);
-  // Business addresses without their own active mailbox are routed to Admissions.
-  if (
-    !options.internalCopy &&
-    recipients.some((address) => address.endsWith('@elevateforhumanity.org'))
-  )
-    recipients = [...new Set([...recipients, 'admissions@elevateforhumanity.org'])];
   if (route) recipients = [...new Set([...recipients, ...route.addresses])];
-  const { data: mailboxes, error } = await db
-    .from('communication_email_mailboxes')
-    .select('id,address')
-    .in('address', recipients)
-    .eq('active', true);
-  if (error || !mailboxes?.length) return { stored: false, mailboxCount: 0 };
+  // Deliver known addresses to their designated mailbox. Admissions is a fallback
+  // for unknown business addresses, never a copy of every department's mail.
+  const matched = await db.from('communication_email_mailboxes').select('id,address').in('address', recipients).eq('active', true);
+  if (matched.error) throw new Error('Mail routing unavailable');
+  const unknownBusiness = recipients.some(address => address.endsWith('@elevateforhumanity.org') && !(matched.data || []).some(mailbox => mailbox.address === address));
+  let mailboxes = matched.data || [];
+  if (!options.internalCopy && unknownBusiness) {
+    const fallback = await db.from('communication_email_mailboxes').select('id,address').eq('address', 'admissions@elevateforhumanity.org').eq('active', true).maybeSingle();
+    if (fallback.error) throw new Error('Admissions fallback unavailable');
+    if (fallback.data && !mailboxes.some(mailbox => mailbox.id === fallback.data.id)) mailboxes = [...mailboxes, fallback.data];
+  }
+  if (!mailboxes.length) return { stored: false, mailboxCount: 0 };
 
   const senderEmail = parseEmailList(parsed.from)[0];
   if (!senderEmail) return { stored: false, mailboxCount: 0 };
@@ -142,9 +142,9 @@ export async function storeInboundCommunicationEmail(
           members.map((member: any) => ({
             user_id: member.user_id,
             type: 'message',
-            title: 'New interoffice email',
-            message: `${senderEmail}: ${subject}`,
-            action_url: 'https://app.elevateforhumanity.org/communications/email',
+            title: `New interoffice email · ${mailbox.address}`,
+            message: `From ${senderEmail} · To ${mailbox.address} · ${subject}`,
+            action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(mailbox.id)}`,
             action_label: 'Read and reply',
             idempotency_key: `email:${inboundEventId}:${member.user_id}`,
             read: false,

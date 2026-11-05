@@ -11,7 +11,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -174,8 +174,42 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
  let recoveredProviderThisTick=false;
  let providerRecoveryHealth: boolean | undefined;
+ let recoveredAppThisTick=false;
+ let githubAppRecoveryHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
+  // Only a fresh, verified GitHub App identity may revive one historical
+  // source-free auth failure. Do not retry a source-linked job, exhausted
+  // attempt, or a repair that already has a release candidate.
+  if(!recoveredAppThisTick && canRetryVerifiedGithubAppRepair(repair)){
+   if(githubAppRecoveryHealth===undefined){
+    const token=await getGitHubAppToken().catch(()=>null);
+    const diagnostic=token?await diagnoseParisGitHubCredential({
+     Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'
+    }).catch(()=>null):null;
+    githubAppRecoveryHealth=Boolean(token && diagnostic?.repository?.ok &&
+     diagnostic?.contents?.ok && diagnostic?.workflow?.ok);
+   }
+   if(githubAppRecoveryHealth){
+    const updated=await db.from('paris_code_repairs').update({
+     status:'queued',error_code:null,
+     attempt_history:[...(repair.attempt_history??[]),{
+      error:repair.error_code,at:repair.updated_at,
+      retryReason:'verified-github-app-recovery'
+     }],
+     verification:{...repair.verification,credentialRecoveryPreflight:{
+      githubAppVerified:true,repositoryRead:true,workflowEnabled:true,
+      checkedAt:new Date().toISOString()
+     }},
+     updated_at:new Date().toISOString(),
+    }).eq('id',repair.id).eq('status','blocked')
+      .eq('attempt_count',repair.attempt_count).eq('updated_at',repair.updated_at)
+      .select('id').maybeSingle();
+    if(updated.error)throw updated.error;
+    if(updated.data)recoveredAppThisTick=true;
+   }
+   continue;
+  }
   // Provider outages are infrastructure failures, not proof that a source
   // patch passed. A signed repair workflow may retry one historical, unlinked
   // timeout only when the owned model and scoped GitHub read identity recover.

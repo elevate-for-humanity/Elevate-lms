@@ -86,4 +86,4 @@ END $$;
 REVOKE ALL ON FUNCTION public.publish_course_with_version(uuid,uuid,text)
   FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.publish_course_with_version(uuid,uuid,text)
-  TO authenticated,service_role;
+  TO service_role;

@@ -25,7 +25,7 @@ test('quality gate retains hard-fail behavior when URL cannot be renewed',async(
  const {readFileSync}=await import('node:fs');
  const source=readFileSync(new URL('../../lib/video/media-quality-gate.ts',import.meta.url),'utf8');
  assert.match(source,/response\.status === 401 \|\| response\.status === 403/);
- assert.match(source,/ownedAncillaryCourseKey\(url, config\)/);
+ assert.match(source,/config\.endpoint \? ownedAncillaryCourseKey\(url, \{ endpoint: config\.endpoint, bucket: config\.bucket \}\) : null/);
  assert.match(source,/getSignedElevateMediaUrl\(key, 300\)/);
  assert.match(source,/if \(!response\.ok\) throw new Error/);
 });

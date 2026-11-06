@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { assertStorePageChrome } from './store-page-contract.mjs';
-import { assertHomepageHostShopContract } from './homepage-content.mjs';
+// The Store smoke is intentionally dependency-free on the host runner.
+// Only Marketing needs the homepage HTML parser (Cheerio).
 
 const sha = process.env.GITHUB_SHA;
 assert.match(sha ?? '', /^[a-f0-9]{40}$/);
@@ -68,6 +69,7 @@ try {
   if (component === 'marketing') {
     const home = await fetch(root + '/', { signal: AbortSignal.timeout(20000) });
     assert.equal(home.status, 200, 'Packaged homepage must render');
+    const { assertHomepageHostShopContract } = await import('./homepage-content.mjs');
     assertHomepageHostShopContract(await home.text());
   }
   if (component === 'store') {

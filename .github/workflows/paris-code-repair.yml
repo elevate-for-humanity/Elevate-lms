@@ -58,10 +58,10 @@ jobs:
           python - <<'PYCODE'
           import os,json,re,urllib.request,urllib.error
           # Require the deployed control plane, not unrelated UI/browser commit identity.
-          health_req=urllib.request.Request('https://admin.elevateforhumanity.org/api/health',headers={'Cache-Control':'no-store'})
+          health_req=urllib.request.Request('https://admin.elevateforhumanity.org/api/ready',headers={'Cache-Control':'no-store'})
           health=json.load(urllib.request.urlopen(health_req,timeout=30))
           runtime_sha=health.get('commitSha') or health.get('commit')
-          compatible=health.get('healthy') is True and isinstance(runtime_sha,str) and re.fullmatch(r'[a-f0-9]{40}',runtime_sha)
+          compatible=health.get('ready') is True and health.get('agenticExecutorReady') is True and isinstance(runtime_sha,str) and re.fullmatch(r'[a-f0-9]{40}',runtime_sha)
           def affects_control_plane(path):
             # These exact modules are imported only by public Marketing routing.
             # Public navigation updates must not hold an unchanged repair runtime.

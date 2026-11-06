@@ -68,7 +68,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     const match=/^lesson_autopilot:(.+):quality$/.exec(job.job_type??'');
     const build=job.ultimate_course_builds;
     if(job.status==='queued' && job.available_at==='infinity' && match &&
-      build?.ownerPaused!==true && build?.status==='running' && job.monitor?.enabled){
+      (build?.ownerPaused===false || build?.ownerPaused==='false') && build?.status==='running' && job.monitor?.enabled){
       const prefix=job.build_id+'|lesson_autopilot:'+match[1]+':';
       const instruction=siblingKeys.get(prefix+'instruction');
       const media=siblingKeys.get(prefix+'media');

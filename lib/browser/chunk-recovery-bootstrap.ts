@@ -46,9 +46,7 @@ export function installChunkRecovery(win: Window & typeof globalThis): () => voi
   };
   const failedChunk = (value: unknown) => {
     const message = value instanceof Error ? value.message : String(value || '');
-    return /ChunkLoadError|Loading (?:CSS )?chunk|Failed to fetch dynamically imported module/i.test(
-      message,
-    );
+    return /ChunkLoadError|Loading (?:CSS )?chunk|dynamically imported module/i.test(message);
   };
   const error = (event: Event) => {
     const target = event.target;
@@ -65,13 +63,22 @@ export function installChunkRecovery(win: Window & typeof globalThis): () => voi
   const rejection = (event: PromiseRejectionEvent) => {
     if (failedChunk(event.reason)) recover();
   };
+  // React boundaries can catch a chunk rejection before it becomes unhandled.
+  // Acknowledge it here so every recovery uses the same route hint and fence.
+  const caught = (event: Event) => {
+    if (!failedChunk((event as CustomEvent<unknown>).detail)) return;
+    event.preventDefault();
+    recover();
+  };
   win.addEventListener('error', error, true);
   win.addEventListener('unhandledrejection', rejection);
   win.addEventListener('click', click, true);
+  win.addEventListener('elevate:chunk-error', caught);
   return () => {
     win.removeEventListener('error', error, true);
     win.removeEventListener('unhandledrejection', rejection);
     win.removeEventListener('click', click, true);
+    win.removeEventListener('elevate:chunk-error', caught);
   };
 }
 

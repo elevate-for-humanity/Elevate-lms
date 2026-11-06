@@ -93,7 +93,7 @@
     },
     {
       "id": "employer-report-schema-failure",
-      "status": "deployed-owner-session-report-certification-pending",
+      "status": "deployed-verified-scoped-QA-report-rendering-on-five-device-profiles",
       "cause": "reports queried applications.employer_id and referred_by absent in production; errors collapsed to zero",
       "change": "canonical job_postings/job_applications/job_placements/referrals through signed-in RLS and canonical owner employer; query errors explicit",
       "tests": "4 report contract tests plus 85 employer authorization tests passed; reports rendered heading added to portal acceptance"
@@ -107,7 +107,7 @@
     },
     {
       "id": "paypal-mobile-target",
-      "status": "deployed-owner-device-certification-pending",
+      "status": "deployed-verified-scoped-QA-payout-geometry-on-five-device-profiles",
       "cause": "payout PayPal confirmation checkbox used native 13px target",
       "change": "44px target; no approval, verification or saved submission changes"
     }
@@ -421,16 +421,18 @@
       "chunk_recovery": "navigation-aware inline bootstrap observed in rendered page; forced production chunk failure not induced"
     },
     "acceptance": {
-      "lms_run": 42227376279,
+      "lms_run": "42227376279",
       "public_runtime": "passed",
       "authenticated_functional": "passed",
-      "responsive_cross_device": "in progress",
-      "studio_device_step": "failed during staggered release; full browser report pending",
+      "responsive_cross_device": "passed: 48 clean tests and 2 successful retries; 50 total",
+      "studio_device_step": "iPhone Course Builder link remained at dashboard; separate tablet click intercepted by mobile dock; iPhone recovery later interrupted dashboard navigation",
       "coherent_release_employer_run": 42229571050,
       "coherent_release_employer_source": "6ce0c9b664d44ed79bf256d6e9a805c0e731d93f",
       "employer_desktop": "passed",
       "employer_iphone": "failed: unhandled browser auth/notification access-control errors; cancellation evidence observed; not declared repaired",
-      "handoff_success_is_not_acceptance_success": true
+      "handoff_success_is_not_acceptance_success": true,
+      "qa_cleanup": "all three cleanup steps succeeded",
+      "live_revision_remained_attested": true
     },
     "not_verified": [
       "Jamie individual login and Mobile Safari",
@@ -461,5 +463,34 @@
       "conclusion": "narrow source discovery repair is deployed; autonomous recovery remains unverified"
     },
     "platform_production_ready": false
+  },
+  "admin_navigation_followup": {
+    "observed_at": "2026-11-06T14:21:32.606386+00:00",
+    "status": "implemented-narrow-validation-passed-not-deployed",
+    "source_evidence": {
+      "run": 42227376279,
+      "job": 127924193704,
+      "iphone": "/studio/courses remained at /dashboard; later __recover navigation interrupted dashboard goto",
+      "tablet": "Mobile admin navigation Courses span intercepted Open Course Builder click"
+    },
+    "root_causes": [
+      "AdminErrorBoundary owned an independent per-asset automatic reload in parallel with the head bootstrap",
+      "fixed mobile dock was not accounted for by native scroll-into-view clearance"
+    ],
+    "change": [
+      "React-caught chunks delegate to the canonical bounded bootstrap handler",
+      "global-error can install the same handler only when the head owner is absent",
+      "non-chunk server/authentication failures never trigger chunk recovery",
+      "mobile document actions get dock-aware scroll margins and padding; dock remains visible and interactive"
+    ],
+    "validation": {
+      "targeted_tests": 29,
+      "files": 5,
+      "source_lint": "passed",
+      "production_builds": "in progress; final CI must pass before merge"
+    },
+    "branch": "fix/production-recovery-20261106",
+    "duplicate_of_pr_2410": false,
+    "auth_rls_participant_records_changed": false
   }
 }

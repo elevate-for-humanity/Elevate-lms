@@ -330,8 +330,10 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    const state=repairDeploymentState(runs.workflow_runs??[],targetSha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
    if(state!=='passed'){
-    const requested=repair.verification?.requestedDeployments??[];
-    const missing=unobservedRepairDeployment(runs.workflow_runs??[],targetSha,requested,repair.verification?.requestedDeploymentAt??{},repair.updated_at,Date.now(),deployments);
+    const deploymentIntent=repair.verification?.deploymentIntentBySha?.[targetSha];
+    const requested=deploymentIntent?.requestedDeployments??(targetSha===repair.release_sha?repair.verification?.requestedDeployments??[]:[]);
+    const requestedAt=deploymentIntent?.requestedDeploymentAt??(targetSha===repair.release_sha?repair.verification?.requestedDeploymentAt??{}:{});
+    const missing=unobservedRepairDeployment(runs.workflow_runs??[],targetSha,requested,requestedAt,repair.updated_at,Date.now(),deployments);
     if(missing){await update(repair.id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_NOT_OBSERVED',verification:{...repair.verification,missingDeployment:missing}});continue;}
     const next=nextRepairDeployment(runs.workflow_runs??[],targetSha,requested,deployments);
     if(next){
@@ -359,7 +361,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
       continue;
      }
      // Save dispatch intent before sending; a later tick must not duplicate it.
-     await update(repair.id,{verification:{...repair.verification,requestedDeployments:[...requested,next],requestedDeploymentAt:{...repair.verification?.requestedDeploymentAt,[next]:new Date().toISOString()}}});
+     await update(repair.id,{verification:{...repair.verification,deploymentIntentBySha:{...repair.verification?.deploymentIntentBySha,[targetSha]:{requestedDeployments:[...requested,next],requestedDeploymentAt:{...requestedAt,[next]:new Date().toISOString()}}}}});
      const inputs=['deploy-admin.yml','deploy-google-lms-trigger.yml','deploy-google-store-runtime.yml'].includes(next)?{requested_sha:targetSha}:undefined;
      try{await gh(`/actions/workflows/${next}/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',...(inputs?{inputs}:{})})});}
      catch(error){await update(repair.id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_DISPATCH_FAILED'});throw error;}

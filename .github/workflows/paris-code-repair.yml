@@ -29,7 +29,7 @@ concurrency:
   queue: max
 jobs:
   monitor:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'failure'))
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && (github.event.workflow_run.conclusion == 'failure' || (github.event.workflow_run.name == 'Deploy Admin' && github.event.workflow_run.conclusion == 'success'))))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
@@ -82,6 +82,9 @@ jobs:
               for item in files)
           if not compatible:
             print('Repair monitor deferred until compatible Admin control-plane source is serving.')
+            if os.environ.get('GITHUB_OUTPUT'):
+              with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+                output.write('recovery_blocked=admin_source\n')
             raise SystemExit(0)
           endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
@@ -91,6 +94,8 @@ jobs:
           capability=json.load(urllib.request.urlopen(preflight,timeout=60))
           if capability.get('workflowAuthorization')!='temporary-job-v1' or capability.get('diagnosticVersion')!=2 or capability.get('plannerContinuation')!='durable-turn-v1':
             print('Repair monitor deferred until the compatible Admin runtime is deployed.')
+            with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('recovery_blocked=admin_capability\n')
             raise SystemExit(0)
           if not all(capability.get(key,{}).get('ok') is True for key in ['repository','contents','workflow']):
             raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
@@ -113,6 +118,14 @@ jobs:
             print(error.read().decode()[:1000])
             raise
           PYCODE
+      - name: Report blocked recovery as an unsuccessful monitor
+        if: steps.tick.outputs.recovery_blocked != ''
+        env:
+          RECOVERY_BLOCKER: ${{ steps.tick.outputs.recovery_blocked }}
+        run: |
+          echo "::error::PARIS recovery did not execute: $RECOVERY_BLOCKER requires a compatible Admin deployment."
+          echo "PARIS recovery blocked: $RECOVERY_BLOCKER. No repair was dispatched." >> "$GITHUB_STEP_SUMMARY"
+          exit 1
       - name: Verify serving authorization after compatible control-plane updates
         if: github.event_name == 'push' && steps.tick.outputs.runtime_sha != ''
         env:

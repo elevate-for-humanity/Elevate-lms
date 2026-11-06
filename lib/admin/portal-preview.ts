@@ -15,7 +15,7 @@ export async function resolvePortalPreviewSubject(
   const previewSession = verifyPortalPreviewHandoff(
     cookieStore.get(PORTAL_PREVIEW_SESSION_COOKIE)?.value || '',
   );
-  if (previewSession) {
+  if (previewSession && (!authenticatedUserId || previewSession.actorId === authenticatedUserId)) {
     const [{ data: actor }, { data: target }] = await Promise.all([
       db
         .from('profiles')

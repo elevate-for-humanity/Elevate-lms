@@ -343,7 +343,7 @@ export default function MouAdminClient({ partners, partnerMous, mouCount, templa
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">MOU Content <span className="text-red-500">*</span></label>
                 <textarea value={customContent} onChange={(e) => setCustomContent(e.target.value)}
                   rows={10}
-                  placeholder="Enter the full MOU text here. You can use plain text or HTML."
+                  placeholder="Enter the complete MOU terms in plain text."
                   className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none font-mono" />
               </div>
             </>

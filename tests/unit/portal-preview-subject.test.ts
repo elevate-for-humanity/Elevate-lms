@@ -13,3 +13,5 @@ describe('portal preview identity boundary',()=>{
  it('preserves independently authenticated administrator selection',async()=>{state.cookies.set('elevate_portal_preview_user','learner');expect(await resolvePortalPreviewSubject(db,'admin')).toEqual({userId:'learner',previewing:true});});
  it('rejects a signed handoff whose actor no longer has administrator rights',async()=>{state.signed={actorId:'other',targetId:'learner'};expect(await resolvePortalPreviewSubject(db,null)).toEqual({userId:'',previewing:false});});
 });
+
+ it('ignores a retained signed preview after a different user signs in',async()=>{state.signed={actorId:'admin',targetId:'other'};expect(await resolvePortalPreviewSubject(db,'learner')).toEqual({userId:'learner',previewing:false});});

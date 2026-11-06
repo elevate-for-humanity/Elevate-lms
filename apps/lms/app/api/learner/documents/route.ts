@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const requirementId = String(form.get('requirement_id') || '');
   const file = form.get('file');
   if (!requirementId || !(file instanceof File)) return NextResponse.json({ error: 'Requirement and file are required' }, { status: 400 });
-  if (!ALLOWED.has(file.type) || file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'Use a PDF, JPG, PNG, or WebP file up to 10 MB' }, { status: 400 });
+  if (!ALLOWED.has(file.type) || file.size <= 0 || file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'Use a non-empty PDF, JPG, PNG, or WebP file up to 10 MB' }, { status: 400 });
   const { data: requirement } = await supabase.from('enrollment_requirements').select('id,enrollment_id,status,requirement_type,title').eq('id', requirementId).maybeSingle();
   if (!requirement) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   const { data: ownedEnrollment } = await supabase.from('program_enrollments').select('id').eq('id', requirement.enrollment_id).or(`user_id.eq.${user.id},student_id.eq.${user.id}`).maybeSingle();

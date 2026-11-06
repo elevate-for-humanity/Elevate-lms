@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
 const MAX_SIZE = 10 * 1024 * 1024;
@@ -9,17 +10,22 @@ function safeName(value: string) {
 }
 
 export async function POST(request: Request) {
+  const limited = await applyRateLimit(request, 'strict');
+  if (limited) return limited;
   const form = await request.formData();
   const partnerId = String(form.get('partnerId') || '');
   const token = String(form.get('token') || '');
   const documentType = String(form.get('documentType') || '');
   const file = form.get('file');
 
-  if (!partnerId || !token || !documentType || !(file instanceof File)) {
+  if (!/^[0-9a-f-]{36}$/i.test(partnerId) || !/^[A-Za-z0-9_-]{32,128}$/.test(token) || !documentType || !(file instanceof File)) {
     return NextResponse.json({ error: 'Missing upload information.' }, { status: 400 });
   }
   if (!ALLOWED_TYPES.has(file.type)) {
     return NextResponse.json({ error: 'Upload a PDF, JPG, or PNG file.' }, { status: 415 });
+  }
+  if (file.size <= 0) {
+    return NextResponse.json({ error: 'Choose a non-empty document file.' }, { status: 400 });
   }
   if (file.size > MAX_SIZE) {
     return NextResponse.json({ error: 'File must be 10 MB or smaller.' }, { status: 413 });

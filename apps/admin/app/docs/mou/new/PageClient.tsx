@@ -28,7 +28,7 @@ export default function NewMouPage() {
     setSaving(true);
     setError('');
     try {
-      const res = await fetch('/api/docs/mou', {
+      const res = await fetch('/api/admin/docs/mou', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

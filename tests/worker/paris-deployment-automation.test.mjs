@@ -7,12 +7,11 @@ import { stripTypeScriptTypes } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import { infrastructureRepairPath, openInfrastructureRepair, infrastructureMergeEvidence, STORE_REPAIR_DEPLOYMENT, assertDeploymentInvariants } from '../../lib/devstudio/infrastructure-repair.mjs';
 import { REPAIR_DEPLOYMENTS, repairDeploymentState, nextRepairDeployment } from '../../lib/ai/runtime/code-repair-policy.mjs';
-import { REPAIR_INFERENCE_TIMEOUT_MS, REPAIR_MODEL_PROBE_TIMEOUT_MS } from '../../lib/devstudio/repair-inference-budget.mjs';
+import {REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from '../../lib/devstudio/repair-inference-budget.mjs';
 
 const engineer = readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts', import.meta.url), 'utf8');
-const compiled = stripTypeScriptTypes(engineer).replace(/^import[\s\S]*?;\n/gm, '').replaceAll('export ', '');
-const factory = (...args) => new Function('REPAIR_INFERENCE_TIMEOUT_MS','REPAIR_MODEL_PROBE_TIMEOUT_MS',...args);
-const blockedPath = factory(compiled + '\nreturn blockedPath;')(REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS);
+const compiled = `const REPAIR_INFERENCE_TIMEOUT_MS=${REPAIR_INFERENCE_TIMEOUT_MS}; const REPAIR_MODEL_PROBE_TIMEOUT_MS=${REPAIR_MODEL_PROBE_TIMEOUT_MS};\n` + stripTypeScriptTypes(engineer).replace(/^import[\s\S]*?;\n/gm, '').replaceAll('export ', '');
+const blockedPath = new Function(compiled + '\nreturn blockedPath;')();
 const workflow = readFileSync(new URL('../../.github/workflows/paris-code-repair.yml', import.meta.url), 'utf8');
 const validator = workflow.split('      - name: Require an application patch and a new regression test')[1].split("          python - <<'PY'\n")[1].split('\n          PY')[0].split('\n').map(line => line.slice(10)).join('\n');
 
@@ -45,17 +44,17 @@ test('deployment repair does not admit its own validator or access-control edits
 
 test('a workflow file is actually written with App authority and cannot fall back to a job token', async () => {
   const calls = [];
-  const writeFactory = factory('fetch', 'getGitHubHeaders', 'getGitHubAppToken', compiled + '\nreturn writeFile;');
+  const factory = new Function('fetch', 'getGitHubHeaders', 'getGitHubAppToken', compiled + '\nreturn writeFile;');
   const fetcher = async (url, init) => {
     calls.push({ url, init });
     return Response.json({ content: { sha: 'blob' }, commit: { sha: 'b'.repeat(40) } });
   };
   const input = { path: '.github/workflows/deploy-google-store-runtime.yml', content: 'owner-authorized fixture', branch: 'studio/repair', message: 'Correct disk capacity' };
-  const write = writeFactory(REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS,fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => 'app-fixture');
+  const write = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => 'app-fixture');
   assert.equal((await write(input)).commitSha, 'b'.repeat(40));
   assert.equal(calls[0].init.headers.Authorization, 'Bearer app-fixture');
   assert.equal(JSON.parse(calls[0].init.body).branch, 'studio/repair');
-  const denied = writeFactory(REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS,fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => null);
+  const denied = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => null);
   await assert.rejects(denied(input), /WORKFLOW_APP_AUTHORITY_REQUIRED/);
   assert.equal(calls.length, 1);
 });

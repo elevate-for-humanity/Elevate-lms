@@ -109,7 +109,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     classification: 'write',
     risk: 'medium',
     scope: 'platform',
-    allowedAgents: ['LIZZY'],
+    allowedAgents: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'],
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
     requiredInput: ['task'],
     approvalRequired: false,

@@ -3,7 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
-import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent, type AIAgentId } from '@/lib/ai/tools/registry';
+import { canAgentUseTool, getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
 import { logger } from '@/lib/logger';
@@ -119,11 +119,11 @@ async function classifyCommand(command: string, agent: AIAgentId): Promise<Plann
 
 /** Dev Studio is one assistant interface; tool owners remain internal execution adapters. */
 function resolveToolAgent(toolName: string): AIAgentId {
-  const allowed = getAITool(toolName)?.allowedAgents ?? [];
-  for (const candidate of ['LIZZY', 'PARIS', 'ELLIE', 'ZORA'] as const) {
-    if (allowed.includes(candidate)) return candidate;
-  }
-  return 'LIZZY';
+  const tool = getAITool(toolName);
+  // All historical capabilities run under the single PARIS identity. The
+  // executor independently checks the authenticated actor role and approval.
+  if (tool && canAgentUseTool(tool, 'PARIS')) return 'PARIS';
+  return 'ROUTER';
 }
 
 function unifiedToolCatalog(): string {

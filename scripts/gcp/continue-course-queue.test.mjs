@@ -97,3 +97,13 @@ test('startup pending beyond five minutes keeps coordination alive and can later
  },now:()=>clock,delay:async ms=>{clock+=ms;},onState:()=>{}});
  assert.equal(result.status,'empty');assert.equal(calls,14);assert.ok(clock>300000);
 });
+
+test('scheduled course recovery requires an acknowledged empty-body workflow dispatch', async () => {
+  const {readFile}=await import('node:fs/promises');
+  const source=await readFile(new URL('../../.github/workflows/dispatch-google-course-job.yml',import.meta.url),'utf8');
+  const scheduled=source.split('  request-dispatch:')[1].split('\n  dispatch:')[0];
+  assert.match(scheduled,/response\.status\s*!==\s*204/);
+  assert.match(scheduled,/JSON\.stringify\(\{ref:'main'\}\)/);
+  assert.match(scheduled,/COURSE_DISPATCH_NOT_ACCEPTED_HTTP_/);
+  assert.doesNotMatch(scheduled,/gh api --method POST/);
+});

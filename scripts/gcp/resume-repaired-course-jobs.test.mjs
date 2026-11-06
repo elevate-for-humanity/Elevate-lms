@@ -129,3 +129,20 @@ test('ready b-roll for another course lesson cannot trigger a media retry',async
   last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]'};
  assert.equal((await run(unrelated)).writes.length,0);
 });
+
+test('only a verified new worker may retry expired private caption or transcript at quality stage',async()=>{
+ const quality={...base,payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-d',role:'quality'}},
+  build:{...base.build,course_id:'377cd34a-b402-40ab-8ff9-2fcfd394b96d'}};
+ for(const asset of ['captions','transcript']){
+  const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"finished_media_qa","code":"'+asset+' returned HTTP 401"}]';
+  const job={...quality,last_error:error};
+  assert.equal((await run(job)).writes.length,1);
+  assert.equal((await run({...job,monitor:{enabled:true,lastRepairDeployment:{imageSha}}})).writes.length,0);
+  assert.equal((await run({...job,payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-d',role:'media'}}})).writes.length,0);
+ }
+ for(const error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"finished_media_qa","code":"captions returned HTTP 403"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"media","code":"captions returned HTTP 401"}]',
+ ])
+  assert.equal((await run({...quality,last_error:error})).writes.length,0);
+});

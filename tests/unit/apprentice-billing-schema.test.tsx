@@ -46,7 +46,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 import ApprenticeBillingPage from '@/apps/lms/app/apprentice/billing/page';
 beforeEach(() => {
   state.fail = '';
-  state.tables = { barber_subscriptions: [{ remaining_balance: 750, fully_paid: false }] };
+  state.tables = { barber_subscriptions: [{ remaining_balance: 75000, fully_paid: false }] };
 });
 it('renders an existing barber account using columns present in production', async () => {
   const html = renderToStaticMarkup(await ApprenticeBillingPage());

@@ -10,7 +10,7 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
   let values: any;
   let inserted = false;
   const q: any = {
-    select: () => q, order: () => q, limit: () => q, gte: () => q,
+    select: () => q, order: () => q, limit: () => q, range: (from: number,to: number) => { expect(to).toBeGreaterThanOrEqual(from); return q; }, gte: () => q,
     eq: (key: string, value: any) => { filters[key] = value; return q; },
     in: (key: string, value: any) => { filters[key] = value; return q; },
     update: (update: any) => { values = update; return q; },

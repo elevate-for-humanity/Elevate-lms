@@ -18,11 +18,13 @@ export default async function RapidsPage() {
     pendingCompletionResult,
     { data: recentSubmissions },
     { data: actionQueue },
+    { data: licensingEvidence },
   ] = await Promise.all([
     db.from('rapids_progress_updates').select('*', { count: 'exact', head: true }).not('submitted_to_rapids', 'is', true),
     db.from('rapids_registrations').select('*', { count: 'exact', head: true }).eq('status', 'completed').is('submitted_at', null),
     db.from('rapids_submissions').select('id, submission_type, submission_date, record_count, status, submitted_by').order('submission_date', { ascending: false }).limit(10),
     db.from('rapids_action_queue').select('id,entity_type,entity_id,action_type,status,payload,created_at').in('status', ['pending','blocked']).order('created_at', { ascending: true }).limit(100),
+    db.from('apprentice_licensing_evidence').select('student_id,occupation_code,requirement_key,status').limit(1000),
   ]);
 
   const rawQueue = actionQueue ?? [];
@@ -79,6 +81,20 @@ export default async function RapidsPage() {
         {!queue.length ? <p className="py-8 text-center text-sm text-slate-400">No pending automatic RAPIDS actions.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50"><tr>{['Entity','Name / Reference','Action','Created','Status'].map((h) => <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{h}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{queue.map((item: any) => { const p = item.payload || {}; const name = p.name || p.full_name || p.email || apprenticeNames.get(p.student_id) || p.partner_id || `Enrollment ${String(p.enrollment_id || item.entity_id).slice(0, 8)}`; return <tr key={item.id}><td className="px-4 py-3 font-bold capitalize">{item.entity_type.replace('_',' ')}</td><td className="px-4 py-3">{name}</td><td className="px-4 py-3 font-medium">{item.action_type.replaceAll('_',' ')}</td><td className="px-4 py-3 text-slate-500">{new Date(item.created_at).toLocaleDateString()}</td><td className="px-4 py-3"><span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">{item.status}</span></td></tr>; })}</tbody></table></div>}
       </section>
 
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="font-semibold text-slate-900">Licensing evidence review</h2>
+        <p className="mt-1 text-sm text-slate-600">Internal evidence tracking only. No learner is approved for PSI, state licensing, or completion solely by this checklist.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {(['missing','pending_review','verified'] as const).map(status => (
+            <div key={status} className="rounded-lg bg-slate-50 p-3">
+              <p className="text-xs capitalize text-slate-500">{status.replace('_',' ')}</p>
+              <p className="text-xl font-bold">{(licensingEvidence ?? []).filter(row => row.status === status).length}</p>
+            </div>
+          ))}
+        </div>
+        {!licensingEvidence?.length && <p className="mt-3 text-sm text-amber-700">No student evidence has been reconciled yet. Official documents and reviewer verification are required before any readiness determination.</p>}
+        <p className="mt-3 text-xs text-slate-500">Evidence records shown: {licensingEvidence?.length ?? 0} (maximum 1,000). These counts are not a complete eligibility assessment.</p>
+      </section>
       <RapidsExportClient />
 
       <RapidsEmployerImportClient />

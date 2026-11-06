@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { loadInstructorPendingReviews } from '@/lib/instructor/pending-reviews';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
@@ -134,40 +136,14 @@ export default async function InstructorDashboard() {
       completionRate: p.students > 0 ? Math.round((p.completed / p.students) * 100) : 0,
     }));
 
-  const pendingOjtResult = isAdmin
-    ? await supabase
-        .from('competency_log')
-        .select('id, created_at, notes, student_id:apprentice_id')
-        .eq('supervisor_verified', false)
-        .order('created_at', { ascending: false })
-        .limit(10)
-    : scopedStudentIds.length > 0
-      ? await supabase
-          .from('competency_log')
-          .select('id, created_at, notes, student_id:apprentice_id')
-          .eq('supervisor_verified', false)
-          .in('apprentice_id', scopedStudentIds)
-          .order('created_at', { ascending: false })
-          .limit(10)
-      : { data: [] };
+  // These review tables are intentionally unavailable to the browser database role.
+  // requireRole above establishes identity; the reader preserves assignment scope.
+  const reviewDb = await requireAdminClient();
+  const { pendingOjtResult, pendingSignoffsResult } = await loadInstructorPendingReviews(
+    reviewDb, { isAdmin, studentIds: scopedStudentIds },
+  );
   const pendingOjtRows = pendingOjtResult.data ?? [];
 
-  const pendingSignoffsResult = isAdmin
-    ? await supabase
-        .from('barber_instructor_signoffs')
-        .select('id, signoff_type, created_at:signed_at, student_id:user_id')
-        .eq('status', 'pending')
-        .order('signed_at', { ascending: false })
-        .limit(10)
-    : scopedStudentIds.length > 0
-      ? await supabase
-          .from('barber_instructor_signoffs')
-          .select('id, signoff_type, created_at:signed_at, student_id:user_id')
-          .eq('status', 'pending')
-          .in('user_id', scopedStudentIds)
-          .order('signed_at', { ascending: false })
-          .limit(10)
-      : { data: [] };
   const pendingSignoffRows = pendingSignoffsResult.data ?? [];
   if (
     ('error' in pendingOjtResult && pendingOjtResult.error) ||

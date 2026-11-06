@@ -51,7 +51,7 @@ it('loads the only assigned apprentice, saves observed work, and displays the pe
   fireEvent.change(screen.getByRole('textbox', { name: 'Training notes' }), {
     target: { value: 'Practice the blend transition next.' },
   });
-  fireEvent.click(screen.getByRole('button', { name: 'Save student progress' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Submit student progress' }));
   await screen.findByText('Practical service saved. Student progress is updated.');
   expect(screen.getByRole('region', { name: 'Saved student progress' })).toHaveTextContent(
     'Practice the blend transition next.',
@@ -75,8 +75,8 @@ it('lets an administrator inspect the entry fields while keeping preview writes 
   vi.stubGlobal('fetch', request);
   render(<PracticalProgressEntry />);
   expect(await screen.findByRole('combobox', { name: 'Service', exact: true })).toBeDisabled();
-  expect(screen.getByRole('button', { name: 'Save student progress' })).toBeDisabled();
-  expect(screen.getByText(/Read-only preview or staff access/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Submit student progress' })).toBeDisabled();
+  expect(screen.getByText(/Read-only access/)).toBeInTheDocument();
   expect(request.mock.calls.every((call) => call.length === 1 || call[1]?.method !== 'POST')).toBe(
     true,
   );
@@ -147,13 +147,13 @@ it('ignores a late progress response after another apprentice has been selected'
   fireEvent.change(screen.getByRole('combobox', { name: 'Select apprentice' }), {
     target: { value: 'second' },
   });
-  await screen.findByText(/Read-only preview or staff access/);
+  await screen.findByText(/Read-only access/);
   await act(async () => {
     finishFirst(response({ entries: [], canRecord: true, practice }));
     await first;
   });
   expect(screen.getByRole('combobox', { name: 'Select apprentice' })).toHaveValue('second');
-  expect(screen.getByRole('button', { name: 'Save student progress' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Submit student progress' })).toBeDisabled();
 });
 
 it('counts an older lowercase service under its displayed checklist label', async () => {

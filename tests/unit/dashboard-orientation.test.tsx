@@ -41,10 +41,10 @@ describe('dashboard orientation', () => {
     const programGuide = within(
       screen.getByRole('region', { name: 'Student orientation slideshow' }),
     );
-    expect(screen.getByRole('button', { name: 'Watch narrated video' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const videoButton = screen.getByRole('button', { name: 'Watch narrated video' });
+    expect(videoButton).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(videoButton);
+    expect(videoButton).toHaveAttribute('aria-pressed', 'true');
     const headings: string[] = [];
     const images = new Set<string>();
     for (let i = 0; i < 15; i++) {

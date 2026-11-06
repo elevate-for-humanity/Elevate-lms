@@ -16,7 +16,7 @@ describe('canonical dashboard role routing', () => {
   beforeEach(() => { vi.clearAllMocks(); vi.mocked(getAdminDashboardData).mockResolvedValue({} as never); vi.mocked(getAdminDashboardHeroAssets).mockResolvedValue({} as never); });
   for (const role of ['staff', 'org_admin', 'advisor']) {
     it('routes ' + role + ' before privileged reporting or assets load', async () => {
-      vi.mocked(requireRole).mockResolvedValue({ effectiveRoles: [role] } as never);
+      vi.mocked(requireRole).mockResolvedValue({ user: { id: "verified-staff" }, effectiveRoles: [role] } as never);
       await expect(AdminDashboardPage()).rejects.toThrow('redirect:/staff-portal');
       expect(requireRole).toHaveBeenCalledWith(expect.arrayContaining(['admin', 'super_admin', role]));
       expect(getAdminDashboardData).not.toHaveBeenCalled();
@@ -25,7 +25,7 @@ describe('canonical dashboard role routing', () => {
   }
   for (const roles of [['admin'], ['super_admin'], ['staff', 'admin']]) {
     it('permits verified platform role ' + roles.join('/'), async () => {
-      vi.mocked(requireRole).mockResolvedValue({ effectiveRoles: roles } as never);
+      vi.mocked(requireRole).mockResolvedValue({ user: { id: "verified-admin" }, effectiveRoles: roles } as never);
       await AdminDashboardPage();
       expect(redirect).not.toHaveBeenCalled();
       expect(getAdminDashboardData).toHaveBeenCalledOnce();

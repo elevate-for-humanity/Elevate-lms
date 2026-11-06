@@ -57,8 +57,10 @@ describe('homepage hero slideshow rendering', () => {
     expect(narratedTour).toContain('{script}');
     expect(featuredHosts).toContain('Welcome to Salon Saloon in South Bend, Indiana.');
     expect(hostProfiles).toContain('script={videoScript}');
-    expect(barberPage).toContain('KOUNTRY_KUTZ_HERO_TRANSCRIPT');
-    expect(barberPage).toContain('As the video moves through the shop');
+    expect(barberPage).toContain('href="/programs/barber-apprenticeship/host-shops"');
+    expect(featuredHosts).toContain("slug: 'kountry-kutz-barbershop'");
+    expect(featuredHosts).toContain('/videos/partners/kountry-kutz-tour.mp4');
+    expect(hostProfiles).toContain('videoScript={videoScript}');
   });
 
   it('keeps every slide mounted so transitions never expose the placeholder', () => {

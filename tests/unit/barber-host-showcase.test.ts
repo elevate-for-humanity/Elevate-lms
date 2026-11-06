@@ -26,7 +26,11 @@ describe('barber host-shop media governance', () => {
 
   it('uses the canonical barber hero instead of duplicating the Kountry Kutz tour video', () => {
     expect(barberPage).toContain('videoSrcDesktop={heroBanner.videoSrcDesktop}');
-    expect(barberPage).toContain('<KountryKutzTourSlideshow />');
+    expect(barberPage).toContain('href="/programs/barber-apprenticeship/host-shops"');
+    expect(barberPage).not.toContain('<KountryKutzTourSlideshow />');
+    const directory = readFileSync(resolve(process.cwd(), 'apps/marketing/app/programs/barber-apprenticeship/host-shops/page.tsx'), 'utf8');
+    expect(directory).toContain('getHostShopNetwork()');
+    expect(directory).toContain('<HostShopNetworkDirectory shops={shops}');
     expect(barberPage).not.toContain('/videos/partners/kountry-kutz/shop-tour.mp4');
   });
 

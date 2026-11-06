@@ -78,6 +78,7 @@ export function installChunkRecovery(win: Window & typeof globalThis): () => voi
     leaving = true;
   };
   const restore = () => {
+    if (leaving) navigation = undefined;
     leaving = false;
   };
   win.addEventListener('error', error, true);

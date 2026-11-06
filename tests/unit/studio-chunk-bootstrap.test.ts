@@ -180,14 +180,16 @@ describe('Admin recovery before React hydration', () => {
     expect(replace).not.toHaveBeenCalled();
     expect(sessionStorage.getItem('elevate-chunk-reload')).toBeNull();
   });
-  it('re-enables recovery when a document returns from the back/forward cache', () => {
+  it('recovers the restored document without reusing its previous forward navigation', () => {
     const { listeners, replace } = boot();
+    navigate(listeners, 'https://admin.elevateforhumanity.org/studio/courses');
     listeners.get('pagehide')!(new Event('pagehide'));
     listeners.get('pageshow')!(new Event('pageshow'));
     listeners.get('elevate:chunk-error')!(
       new CustomEvent('elevate:chunk-error', { detail: 'ChunkLoadError', cancelable: true }),
     );
     expect(replace).toHaveBeenCalledTimes(1);
+    expect(new URL(replace.mock.calls[0][0]).pathname).toBe('/studio');
   });
 
 });

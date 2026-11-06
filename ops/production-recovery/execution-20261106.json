@@ -56,6 +56,40 @@
       "id": "postgrest-timeout-events",
       "status": "investigating",
       "evidence": "2026-11-06 11:00-12:24Z logs contain repeated Warp timeout-manager events; no connection exhaustion established"
+    },
+    {
+      "id": "cdl-assigned-applicants-hidden",
+      "status": "verified-admin-preview",
+      "cause": "56 existing assigned applicant rows hidden because explicit recruiting_enabled flag absent on active verified Program Holder",
+      "change": "restored explicit recruiting assignment for that organization; existing program and holder filters retained",
+      "database_verification": {
+        "assigned_rows": 56,
+        "audit_record_required_in_same_transaction": true
+      },
+      "runtime_verification": {
+        "path": "/program-holder/students/pending",
+        "observed": "56 applicant records; CDL Training (56)",
+        "method": "signed-in administrator Program Holder preview"
+      },
+      "limitations": [
+        "individual Kirtan account/device not tested",
+        "applicant follow-up actions not performed"
+      ],
+      "rollback": "remove only newly added recruiting_enabled and recruiting_assignment keys if the saved assignment marker still matches this recovery directive; preserve all other features"
+    },
+    {
+      "id": "chunk-recovery-transition-destination",
+      "status": "validated-awaiting-ci-and-production",
+      "cause": "recovery uses location.href while App Router still displays previous route during failed navigation",
+      "evidence": "current production WebKit trace: orientation click, chunk 39189 cancellation/error, recovery to employer/setup?__elevate_reload",
+      "change": "retain recent same-origin navigation intent for recovery; ignore external links, modified clicks, downloads and new tabs",
+      "tests": "8 bootstrap tests and 4 strict WebKit cancellation tests passed; full LMS production compilation and generated-route typecheck passed"
+    },
+    {
+      "id": "employer-reports-schema-drift",
+      "status": "confirmed-open",
+      "cause": "reports query applications.employer_id, which does not exist in production; errors become zero counts",
+      "action": "repair canonical job-posting/application query and scope after current recovery validation"
     }
   ],
   "acceptance": "incomplete; no production-ready claim",
@@ -167,6 +201,12 @@
     {
       "name": "public route and redirect invariants",
       "status": "passed"
+    },
+    {
+      "name": "PR 2409 initial required CI gate",
+      "source_sha": "7ba47f83406722feeeef4df02d3d03bcb575a128",
+      "status": "passed",
+      "next_step": "rerun required CI after adding the verified chunk-transition correction"
     }
   ],
   "migration_inventory": {

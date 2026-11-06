@@ -11,6 +11,7 @@ describe('Admin recovery before React hydration', () => {
       location: { href, replace },
       HTMLScriptElement,
       HTMLLinkElement,
+      Element,
       addEventListener: (type: string, listener: (event: Event) => void) =>
         listeners.set(type, listener),
       removeEventListener: vi.fn(),
@@ -61,9 +62,12 @@ describe('Admin recovery before React hydration', () => {
     expect(replace).not.toHaveBeenCalled();
   });
   it('recovers a Host Shop form chunk without losing its route or query parameters', () => {
-    const { listeners, replace } = boot('https://lms.elevateforhumanity.org/host-shop/onboarding/profile?error=required');
+    const { listeners, replace } = boot(
+      'https://lms.elevateforhumanity.org/host-shop/onboarding/profile?error=required',
+    );
     const script = document.createElement('script');
-    script.src = 'https://lms.elevateforhumanity.org/_next/static/chunks/app/host-shop/onboarding/profile/page-stale.js';
+    script.src =
+      'https://lms.elevateforhumanity.org/_next/static/chunks/app/host-shop/onboarding/profile/page-stale.js';
     const event = new Event('error');
     Object.defineProperty(event, 'target', { value: script });
     listeners.get('error')!(event);
@@ -79,5 +83,48 @@ describe('Admin recovery before React hydration', () => {
       reason: new Error('ChunkLoadError: Loading chunk 7177 failed'),
     } as unknown as Event);
     expect(replace).toHaveBeenCalledTimes(1);
+  });
+  function navigate(
+    listeners: Map<string, (event: Event) => void>,
+    href: string,
+    options: MouseEventInit = {},
+  ) {
+    const anchor = document.createElement('a');
+    anchor.href = href;
+    const event = new MouseEvent('click', { button: 0, ...options });
+    Object.defineProperty(event, 'target', { value: anchor });
+    listeners.get('click')!(event);
+  }
+  it('recovers the requested employer orientation when its chunk fails before history commits', () => {
+    const { listeners, replace } = boot('https://lms.elevateforhumanity.org/employer/setup');
+    navigate(listeners, 'https://lms.elevateforhumanity.org/employer/orientation?from=setup');
+    listeners.get('unhandledrejection')!({
+      reason: new Error('ChunkLoadError: Loading chunk 39189 failed'),
+    } as unknown as Event);
+    const recovered = new URL(replace.mock.calls[0][0]);
+    expect(recovered.pathname).toBe('/employer/orientation');
+    expect(recovered.searchParams.get('from')).toBe('setup');
+    expect(recovered.searchParams.has('__elevate_reload')).toBe(true);
+  });
+  it('never follows third-party links or new-tab gestures during recovery', () => {
+    const { listeners, replace } = boot('https://lms.elevateforhumanity.org/employer/setup');
+    navigate(listeners, 'https://example.org/outside');
+    navigate(listeners, 'https://lms.elevateforhumanity.org/employer/orientation', {
+      metaKey: true,
+    });
+    listeners.get('unhandledrejection')!({
+      reason: new Error('ChunkLoadError'),
+    } as unknown as Event);
+    expect(new URL(replace.mock.calls[0][0]).pathname).toBe('/employer/setup');
+  });
+  it('does not reuse an expired navigation hint', () => {
+    const { listeners, replace } = boot('https://lms.elevateforhumanity.org/employer/documents');
+    navigate(listeners, 'https://lms.elevateforhumanity.org/employer/orientation');
+    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 16000);
+    listeners.get('unhandledrejection')!({
+      reason: new Error('ChunkLoadError'),
+    } as unknown as Event);
+    expect(new URL(replace.mock.calls[0][0]).pathname).toBe('/employer/documents');
+    vi.restoreAllMocks();
   });
 });

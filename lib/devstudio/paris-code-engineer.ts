@@ -427,6 +427,8 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
               maximumWrites: MAX_WRITES,
               observations: observations.slice(-8),
               changedFiles: [...changedFiles],
+              inspectionAlreadyPerformed: [...new Set(inspectionHistory)].slice(-20),
+              nextActionConstraint: 'Do not repeat an inspectionAlreadyPerformed action. Use a different exact source file or produce a justified source patch plus a new regression test. If evidence is insufficient, complete with the limitation.',
             }),
           },
         ],

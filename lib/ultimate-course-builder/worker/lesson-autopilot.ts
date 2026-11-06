@@ -1,5 +1,5 @@
 import type {SupabaseClient} from '@supabase/supabase-js';
-import {lessonAutopilotIdentity, LESSON_AUTOPILOT_VERSION} from './lesson-autopilot-policy.mjs';
+import {lessonAutopilotIdentity, LESSON_AUTOPILOT_VERSION, immutableAutopilotSourceProfile} from './lesson-autopilot-policy.mjs';
 import {createUltimateRuntime} from '../core/runtime-factory';
 import {createProductionHandlers} from '../core/production-handlers';
 import {UltimateBuildRunner} from '../core/build-runner';
@@ -89,11 +89,8 @@ export async function processLessonAutopilot({db,job,workerId,generation,build,q
     if (current.error) throw current.error;
     if (current.data?.profile?.ownerPaused === true) throw Error('OWNER_PAUSED_REFERENCE_BUILD');
     // Parallel workers cannot silently mix an edited source with saved media.
-    const stripOperational = (p:any) => {
-      const {ownerPaused,pauseResumeAudit,publishCompletedLessons,preservedPublishedLessonIds,parallelAutopilot,...source} = p;
-      return source;
-    };
-    if (contractHash(stripOperational(current.data.profile)) !== contractHash(stripOperational(profile)))
+    if (contractHash(immutableAutopilotSourceProfile(current.data.profile)) !==
+        contractHash(immutableAutopilotSourceProfile(profile)))
       throw Error('ULTIMATE_AUTOPILOT_SOURCE_REVISION_REQUIRED');
   };
   await ensureActive();

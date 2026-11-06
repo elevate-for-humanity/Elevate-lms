@@ -1,10 +1,9 @@
+/** Small, accessible progress indicator; keep the underlying dashboard mounted. */
 export default function LmsLoading() {
   return (
-    <main aria-busy="true" aria-live="polite" aria-label="Loading Elevate LMS" className="min-h-[50vh] bg-slate-50 px-4 py-10 text-slate-950">
-      <section role="status" className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6">
-        <h1 className="text-2xl font-black">Opening your dashboard…</h1>
-        <p className="mt-3">Loading your saved records and available tools. Please keep this page open.</p>
-      </section>
-    </main>
+    <div role="status" aria-live="polite" aria-label="Loading dashboard" className="pointer-events-none fixed inset-x-0 top-0 z-50 h-1 overflow-hidden bg-slate-100">
+      <div className="h-full w-1/3 animate-pulse bg-blue-600" />
+      <span className="sr-only">Loading your saved dashboard records</span>
+    </div>
   );
 }

@@ -19,7 +19,7 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:s
 import {tickParisCodeRepairs} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
  h.workflowToken=true;h.courseStatus='running';h.workerStatus='running';h.verifiedRuntime=false;h.healthSha='a'.repeat(40);h.updates=[];
- vi.stubGlobal('fetch',vi.fn(async(url:string)=>new Response(JSON.stringify(url.includes('/actions/runs?')?{workflow_runs:['Deploy Admin','Deploy LMS automatically on Google','Deploy Google Marketing on trigger','Deploy Google Course Builder on source changes'].map(name=>({name,head_sha:'sha',event:'workflow_dispatch',status:'completed',conclusion:'success'}))}:{commit:h.healthSha}))));
+ vi.stubGlobal('fetch',vi.fn(async(url:string)=>new Response(JSON.stringify(url.includes('/actions/runs?')?{workflow_runs:[['Deploy Admin','deploy-admin.yml'],['Deploy LMS automatically on Google','deploy-google-lms-trigger.yml'],['Deploy Google Marketing on trigger','deploy-google-marketing-trigger.yml'],['Deploy Google Course Builder on source changes','deploy-google-course-worker.yml']].map(([name,workflow])=>({name,path:'.github/workflows/'+workflow,head_sha:'a'.repeat(40),event:'workflow_dispatch',status:'completed',conclusion:'success'}))}:url.includes('/git/ref/heads/main')?{object:{sha:'a'.repeat(40)}}:{commit:h.healthSha}))));
 });
 it('deployed healthy applications leave an unfinished course repair verifying',async()=>{
  await tickParisCodeRepairs({workflowOwnedDispatch:true});expect(h.updates).toContainEqual(expect.objectContaining({status:'verifying',verification:expect.objectContaining({courseExecution:expect.objectContaining({state:'pending'})})}));

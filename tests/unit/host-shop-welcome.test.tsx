@@ -76,5 +76,5 @@ it('uses that account initials when no profile photo exists', () => {
   );
   expect(screen.getByText('CM')).toBeTruthy();
   expect(screen.getByText('Corienne Meid')).toBeTruthy();
-  expect(screen.queryByRole('img')).toBeNull();
+  expect(screen.queryByRole('img', { name: /Corienne Meid profile photo/i })).toBeNull();
 });

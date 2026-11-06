@@ -10,6 +10,7 @@ afterEach(cleanup);
 
 it('opens a narrated learner guide and removes playback when switching to pictures', () => {
   const { container } = render(<VisualDashboardOrientation audience="learner" compact />);
+  fireEvent.click(screen.getByRole('button', { name: 'Watch narrated video' }));
   expect(container.querySelector('video')?.hasAttribute('playsinline')).toBe(true);
   expect(container.querySelector('source')?.getAttribute('src')).toBe(
     '/api/orientation/media/learner?format=mp4',
@@ -21,10 +22,12 @@ it('opens a narrated learner guide and removes playback when switching to pictur
 
 it('keeps a picture guide available after playback fails and resets for a different role', () => {
   const view = render(<VisualDashboardOrientation audience="learner" compact />);
+  fireEvent.click(screen.getByRole('button', { name: 'Watch narrated video' }));
   fireEvent.error(view.container.querySelector('video')!);
   fireEvent.click(screen.getByRole('button', { name: 'Open the visual guide' }));
   expect(screen.getByRole('heading', { name: 'Your first five minutes' })).toBeTruthy();
   view.rerender(<VisualDashboardOrientation audience="host-shop" compact />);
+  fireEvent.click(screen.getByRole('button', { name: 'Watch narrated video' }));
   expect(view.container.querySelector('source')?.getAttribute('src')).toBe(
     '/api/orientation/media/host-shop?format=mp4',
   );

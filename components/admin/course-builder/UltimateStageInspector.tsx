@@ -269,7 +269,7 @@ export default function UltimateStageInspector({
         if(detail?.preview)setLessons(previous=>previous.map(row=>row.id===lesson.id?{...row,preview:detail.preview}:row));
       }).catch(reason=>{if(!controller.signal.aborted)setError(reason instanceof Error?reason.message:'Preview unavailable');});
     return()=>controller.abort();
-  },[buildId,selectedLesson,updatedAt,retry]); // eslint-disable-line react-hooks/exhaustive-deps
+  },[buildId,selectedLesson,updatedAt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(()=>{
     const requested=workspace.requestedLessonId;

@@ -85,6 +85,9 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     page.locator('[data-elevate-dashboard-shell]:visible'),
     `${target} must settle to one canonical dashboard shell`,
   ).toHaveCount(1, { timeout: 15_000 });
+  if (new URL(target).pathname === '/employer/reports') {
+    await expect(page.locator('h1')).toHaveText('Reports & Analytics', { timeout: 30_000 });
+  }
 
   // The shell can be visible while Next streams the authenticated Studio page
   // inside a hidden Suspense segment. Measure the workspace only after it is
@@ -451,7 +454,7 @@ test.describe('Authenticated portal responsive design certification', () => {
     ],
     '/manifest-program-holder.json',
   );
-  roleSuite('Employer', 'employer', BASE, ['/employer/dashboard'], '/manifest-employer.json');
+  roleSuite('Employer', 'employer', BASE, ['/employer/dashboard', '/employer/reports'], '/manifest-employer.json');
   roleSuite(
     'Instructor',
     'instructor',

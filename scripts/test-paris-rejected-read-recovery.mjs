@@ -29,12 +29,21 @@ test('protected paths do not disclose parent directory contents',async()=>{
 });
 test('missing parents recover through bounded ancestor discovery',async()=>{
  const missing=()=>Error('GitHub API 404 for /contents/missing');
- const f=fixture({results:[missing(),missing(),[{path:'lib/ai',type:'dir'}]]});
+ const f=fixture({results:[missing(),[{path:'lib/ai',type:'dir'}]]});
  assert.match(await f.feedback('lib/missing/deep/chat.ts','studio/task'),/LIST lib:/);
- assert.equal(f.calls.length,3);
+ assert.deepEqual(f.calls,[{path:'lib/missing/deep',branch:'studio/task'},{path:'lib',branch:'studio/task'}]);
  const exhausted=fixture({results:[missing(),missing(),missing()]});
  assert.match(await exhausted.feedback('lib/a/b/c/d.ts','studio/task'),/READ_REJECTED/);
  assert.equal(exhausted.calls.length,3);
+});
+test('deep task paths reach repository root within the original three-read bound',async()=>{
+ const missing=()=>Error('GitHub API 404 for /contents/missing');
+ const f=fixture({results:[missing(),missing(),[{path:'lib',type:'dir'}]]});
+ const result=await f.feedback('apps/course-builder/studio/task/visual.ts','studio/task');
+ assert.match(result,/LIST \/:/);
+ assert.match(result,/"path":"lib"/);
+ assert.deepEqual(f.calls.map(call=>call.path),['apps/course-builder/studio/task','apps','']);
+ assert.ok(f.calls.every(call=>call.branch==='studio/task'));
 });
 test('authorization and network failures are propagated without discovery retries',async()=>{
  for(const message of ['GitHub API 401 for /contents/lib: Bad credentials','GitHub API 403 for /contents/lib: Forbidden','request timed out']){

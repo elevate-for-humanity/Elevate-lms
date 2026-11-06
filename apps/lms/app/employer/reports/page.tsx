@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { loadEmployerHiringReport } from '@/lib/employer/report-data';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
@@ -12,59 +14,28 @@ export const metadata: Metadata = {
 };
 
 export default async function EmployerReportsPage() {
-  const { user, profile } = await requireRole(['employer', 'admin', 'staff']);
-  const db = await requireAdminClient();
-
-  const employerId = (profile as any)?.employer_id;
-
-  // Active job postings
-  const { count: activePostings } = await db
-    .from('jobs')
-    .select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id)
-    .eq('status', 'active');
-
-  // Applications scoped to this employer's jobs
-  const { count: totalApplications } = await db
-    .from('applications')
-    .select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id);
-
-  // Pipeline breakdown
-  const { count: newApps } = await db.from('applications').select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id).eq('status', 'submitted');
-  const { count: underReview } = await db.from('applications').select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id).in('status', ['in_review', 'under_review']);
-  const { count: approved } = await db.from('applications').select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id).eq('status', 'approved');
-
-  // Hires = enrolled applications
-  const { count: hires } = await db.from('applications').select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id).eq('status', 'enrolled');
-
-  // Job placements
-  const { data: placements } = await db
-    .from('job_placements')
-    .select('start_date, created_at')
-    .eq('employer_id', employerId ?? user.id)
-    .eq('status', 'placed')
-    .order('start_date', { ascending: false })
-    .limit(100);
-
-  // Avg days to hire
-  let avgDaysToHire: number | null = null;
-  if (placements && placements.length > 0) {
-    const diffs = placements
-      .filter((p: any) => p.start_date && p.created_at)
-      .map((p: any) => Math.round((new Date(p.start_date).getTime() - new Date(p.created_at).getTime()) / (1000 * 60 * 60 * 24)));
-    if (diffs.length > 0) avgDaysToHire = Math.round(diffs.reduce((a, b) => a + b, 0) / diffs.length);
-  }
-
-  // Candidate sources
-  const { count: directApps } = await db.from('applications').select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id).is('referred_by', null);
-  const { count: referrals } = await db.from('applications').select('*', { count: 'exact', head: true })
-    .eq('employer_id', employerId ?? user.id).not('referred_by', 'is', null);
+  const { user } = await requireRole(['employer', 'admin', 'staff']);
+  const db = await createClient();
+  const employer = await getEmployerRecord(db, user.id);
+  if (!employer)
+    return (
+      <main className="p-6">
+        <h1>Employer profile required</h1>
+        <p>Complete employer setup before opening your hiring reports.</p>
+        <Link href="/employer/setup">Open employer setup</Link>
+      </main>
+    );
+  const {
+    activePostings,
+    totalApplications,
+    newApps,
+    underReview,
+    hires,
+    rejected,
+    placementCount,
+    referrals,
+    avgDaysToHire,
+  } = await loadEmployerHiringReport(db, employer.id);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -81,7 +52,9 @@ export default async function EmployerReportsPage() {
             <div className="text-sm text-slate-700">Active Postings</div>
           </div>
           <div className="border rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-brand-green-600 mb-2">{totalApplications ?? 0}</div>
+            <div className="text-3xl font-bold text-brand-green-600 mb-2">
+              {totalApplications ?? 0}
+            </div>
             <div className="text-sm text-slate-700">Applications</div>
           </div>
           <div className="border rounded-lg p-4 text-center">
@@ -98,7 +71,7 @@ export default async function EmployerReportsPage() {
             {[
               ['New Applications', newApps ?? 0],
               ['Under Review', underReview ?? 0],
-              ['Approved', approved ?? 0],
+              ['Rejected', rejected ?? 0],
               ['Hired', hires ?? 0],
             ].map(([label, val]) => (
               <div key={label as string} className="flex justify-between items-center">
@@ -113,22 +86,26 @@ export default async function EmployerReportsPage() {
           <h3 className="text-lg font-semibold mb-4">Time to Hire</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-slate-700">Average Days</span>
-              <span className="font-semibold">{avgDaysToHire != null ? `${avgDaysToHire}d` : '—'}</span>
+              <span className="text-slate-700">
+                Average days from record to start (latest 100 placements)
+              </span>
+              <span className="font-semibold">
+                {avgDaysToHire != null ? `${avgDaysToHire}d` : '—'}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-700">Total Placements</span>
-              <span className="font-semibold">{placements?.length ?? 0}</span>
+              <span className="font-semibold">{placementCount}</span>
             </div>
           </div>
         </div>
 
         <div className="border rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Candidate Sources</h3>
+          <h3 className="text-lg font-semibold mb-4">Candidate Activity</h3>
           <div className="space-y-3">
             {[
-              ['Direct Applications', directApps ?? 0],
-              ['Referrals', referrals ?? 0],
+              ['Job Applications', totalApplications],
+              ['Routed Candidates', referrals],
             ].map(([label, val]) => (
               <div key={label as string} className="flex justify-between items-center">
                 <span className="text-slate-700">{label}</span>
@@ -141,9 +118,24 @@ export default async function EmployerReportsPage() {
         <div className="border rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
           <div className="space-y-2">
-            <Link href="/employer/candidates" className="block text-brand-blue-600 hover:underline text-sm">View All Applications →</Link>
-            <Link href="/employer/jobs" className="block text-brand-blue-600 hover:underline text-sm">Manage Job Postings →</Link>
-            <Link href="/employer/compliance" className="block text-brand-blue-600 hover:underline text-sm">Compliance & WIOA →</Link>
+            <Link
+              href="/employer/applications"
+              className="block text-brand-blue-600 hover:underline text-sm"
+            >
+              View All Applications →
+            </Link>
+            <Link
+              href="/employer/jobs"
+              className="block text-brand-blue-600 hover:underline text-sm"
+            >
+              Manage Job Postings →
+            </Link>
+            <Link
+              href="/employer/compliance"
+              className="block text-brand-blue-600 hover:underline text-sm"
+            >
+              Compliance & WIOA →
+            </Link>
           </div>
         </div>
       </div>

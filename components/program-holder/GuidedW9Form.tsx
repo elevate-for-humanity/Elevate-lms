@@ -147,7 +147,7 @@ export function GuidedW9Form() {
               />
             </label>
             <label className="flex min-h-12 gap-3 text-sm">
-              <input name="foreignOwners" type="checkbox" className="h-6 w-6 shrink-0" />
+              <input name="foreignOwners" type="checkbox" className="h-11 w-11 shrink-0" />
               Line 3b: I have foreign partners, owners or beneficiaries AND I am providing this form
               to a partnership, trust or estate in which I have an ownership interest, with an
               eligible classification on line 3a. Leave unchecked when not applicable; see IRS
@@ -214,7 +214,7 @@ export function GuidedW9Form() {
                 type="checkbox"
                 checked={backup}
                 onChange={(e) => setBackup(e.target.checked)}
-                className="h-6 w-6 shrink-0"
+                className="h-11 w-11 shrink-0"
               />
               The IRS has notified me that I am currently subject to backup withholding for failure
               to report interest or dividends. Cross out certification item 2.
@@ -232,7 +232,7 @@ export function GuidedW9Form() {
                 name="usPerson"
                 type="checkbox"
                 required={step === 3}
-                className="h-6 w-6 shrink-0"
+                className="h-11 w-11 shrink-0"
               />
               I am a U.S. person. If you are not a U.S. person, contact Elevate for the appropriate
               W-8 form.
@@ -242,7 +242,7 @@ export function GuidedW9Form() {
                 name="certified"
                 type="checkbox"
                 required={step === 3}
-                className="h-6 w-6 shrink-0"
+                className="h-11 w-11 shrink-0"
               />
               I reviewed this W-9 and certify it under penalties of perjury, with item 2 crossed out
               if indicated above. I consent to sign electronically.

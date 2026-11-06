@@ -153,8 +153,13 @@ async function rejectedReadFeedback(path: string, branch: string): Promise<strin
   const message = `READ_REJECTED ${path}: use list to discover an allowed application path. No source was read or changed.`;
   // Protected paths remain opaque. Only discover ancestors of allowed paths.
   if (blockedPath(path)) return message;
-  let directory = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  const parts = path.replace(/\/+$/, '').split('/').filter(Boolean);
+  // A guessed path can contain a task-branch name several directories deep.
+  // Preserve the three-read discovery bound, but always reach a real boundary:
+  // nearest parent, top-level application directory, then repository root.
+  // Every listing retains protected-path and credential filtering.
+  const directories = [...new Set([parts.slice(0, -1).join('/'), parts[0] || '', ''])];
+  for (const directory of directories) {
     try {
       const entries = await listDirectory(directory, branch);
       return `${message}\nLIST ${directory || '/'}: ${JSON.stringify(entries)}`;
@@ -162,7 +167,6 @@ async function rejectedReadFeedback(path: string, branch: string): Promise<strin
       // Authorization, timeouts and provider failures must still fail closed.
       if (!rejectedSourceRead(error)) throw error;
       if (!directory) return message;
-      directory = directory.includes('/') ? directory.slice(0, directory.lastIndexOf('/')) : '';
     }
   }
   return message;

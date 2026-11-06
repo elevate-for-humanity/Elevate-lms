@@ -159,7 +159,9 @@ jobs:
             --build-arg NEXT_PUBLIC_SUPABASE_URL --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
       - name: Test actual Store container identity and health routing
         timeout-minutes: 5
-        run: node scripts/gcp/smoke-marketing-container.mjs
+        run: |
+          node --test scripts/gcp/store-smoke-import-boundary.test.mjs
+          node scripts/gcp/smoke-marketing-container.mjs
       - name: Refresh Google credentials after build
         uses: google-github-actions/auth@v3
         with:

@@ -11,7 +11,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -178,6 +178,20 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  let githubAppRecoveryHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
+  if(canResumePlannerInspectionRepair(repair)){
+   const now=new Date().toISOString();
+   const restored=await db.from('paris_code_repairs').update({
+    status:'queued',error_code:null,
+    attempt_history:[...(repair.attempt_history??[]),{
+     error:repair.error_code,at:repair.updated_at,retryReason:'planner-inspection-fix'
+    }],
+    updated_at:now,
+   }).eq('id',repair.id).eq('status','blocked')
+     .eq('attempt_count',repair.attempt_count).eq('updated_at',repair.updated_at)
+     .select('id').maybeSingle();
+   if(restored.error)throw restored.error;
+   continue;
+  }
   // Only a fresh, verified GitHub App identity may revive one historical
   // source-free auth failure. Do not retry a source-linked job, exhausted
   // attempt, or a repair that already has a release candidate.

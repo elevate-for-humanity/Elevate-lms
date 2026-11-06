@@ -59,20 +59,22 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(!nextCursor || (cursor && nextCursor<=cursor))throw Error('PARIS_MONITOR_CURSOR_NOT_ADVANCING');
     cursor=nextCursor;
   }
-  // Recover a held quality stage only when its exact instruction and media
-  // predecessors have both completed cleanly on the same build. Other held
-  // stages remain fenced; owner-paused builds are never resumed implicitly.
+  // Wake held media after its exact instruction completes, and held quality
+  // only after instruction AND media complete. The latest stage generation
+  // must be clean, and paused/unknown owners remain fenced. This is a
+  // dependency wakeup, not a fabricated worker claim or completion.
   const siblingKeys=latestRoleJobs(rows);
   const observations=[];
   for(const job of rows){
-    const match=/^lesson_autopilot:(.+):quality$/.exec(job.job_type??'');
+    const match=/^lesson_autopilot:(.+):(media|quality)$/.exec(job.job_type??'');
     const build=job.ultimate_course_builds;
     if(job.status==='queued' && job.available_at==='infinity' && match &&
       (build?.ownerPaused===false || build?.ownerPaused==='false') && build?.status==='running' && job.monitor?.enabled){
       const prefix=job.build_id+'|lesson_autopilot:'+match[1]+':';
       const instruction=siblingKeys.get(prefix+'instruction');
       const media=siblingKeys.get(prefix+'media');
-      if([instruction,media].every(upstream=>upstream?.status==='completed' && !upstream.last_error)){
+      const prerequisites=match[2]==='media'?[instruction]:[instruction,media];
+      if(prerequisites.every(upstream=>upstream?.status==='completed' && !upstream.last_error)){
         const wake=new URL(root);
         wake.searchParams.set('id','eq.'+job.id);
         wake.searchParams.set('status','eq.queued');

@@ -36,6 +36,7 @@ function buildPreview(topic: string, type: ContentType, style: InstructorStyle) 
 
 export default function AIStudioDemoClient({ embedded = false }: { embedded?: boolean }) {
   const Root = embedded ? 'section' : 'main';
+  const Heading = embedded ? 'h2' : 'h1';
   const [topic, setTopic] = useState('Introduction to HIPAA Compliance for Healthcare Workers');
   const [contentType, setContentType] = useState<ContentType>('Training Video');
   const [style, setStyle] = useState<InstructorStyle>('Professional');
@@ -64,7 +65,7 @@ export default function AIStudioDemoClient({ embedded = false }: { embedded?: bo
           <div className="border-b border-slate-200 bg-slate-900 px-6 py-6 text-white">
             <div className="flex items-center gap-3">
               <Sparkles className="h-6 w-6" />
-              <h1 className="text-2xl font-black">AI Studio Demo</h1>
+              <Heading className="text-2xl font-black">AI Studio Demo</Heading>
             </div>
             <p className="mt-2 text-slate-200">
               Change the topic, content type, and instructor style, then preview a sample draft.

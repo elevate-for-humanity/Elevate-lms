@@ -92,9 +92,9 @@ export default async function SuccessStoriesPage() {
         <div className="mx-auto max-w-7xl px-4">
           <div className="mx-auto mb-12 max-w-3xl text-center">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-700">Approved for publication</p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">
               Real progress, in their own words
-            </h1>
+            </h2>
           </div>
 
           {stories.length ? (

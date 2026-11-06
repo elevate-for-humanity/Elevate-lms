@@ -53,7 +53,12 @@ for (const [path, target] of [
     assert.equal(response.headers.get('location'), targetUrl.toString());
   });
 }
-for (const path of ['/programs/bookkeeping','/programs/financial-literacy','/apply/student?program=bookkeeping']) {
+test('bookkeeping information page remains public without reopening enrollment', async () => {
+  const response = await middleware(new NextRequest('https://www.elevateforhumanity.org/programs/bookkeeping'));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('x-middleware-next'), '1');
+});
+for (const path of ['/programs/financial-literacy','/apply/student?program=bookkeeping','/enroll/bookkeeping']) {
   test(`${path} withdraws the offering before auth or tenant lookup`, async () => {
     const response = await middleware(new NextRequest('https://www.elevateforhumanity.org'+path));
     assert.equal(response.status,410);

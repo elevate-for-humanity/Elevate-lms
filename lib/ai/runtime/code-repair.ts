@@ -335,7 +335,23 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
     const next=nextRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested,deployments);
     if(next){
      const currentMain=await gh('/git/ref/heads/main');
-     if(currentMain.object?.sha!==repair.release_sha){await update(repair.id,{status:'blocked',error_code:'REPAIR_RELEASE_SUPERSEDED_BEFORE_DEPLOYMENT'});continue;}
+     if(currentMain.object?.sha!==repair.release_sha){
+      // A later main commit is not evidence that the repair disappeared.
+      // Preserve the immutable release receipt and defer deployment until
+      // ancestry and independent validation establish a safe new target.
+      const currentSha=String(currentMain.object?.sha??'');
+      const comparison=/^[a-f0-9]{40}$/.test(currentSha)
+       ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
+      const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
+      await update(repair.id,{status:'verifying',verification:{
+       ...repair.verification,releaseReconciliation:{
+        state:ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
+        immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
+        checkedAt:new Date().toISOString()
+       }
+      }});
+      continue;
+     }
      // Save dispatch intent before sending; a later tick must not duplicate it.
      await update(repair.id,{verification:{...repair.verification,requestedDeployments:[...requested,next],requestedDeploymentAt:{...repair.verification?.requestedDeploymentAt,[next]:new Date().toISOString()}}});
      const inputs=['deploy-admin.yml','deploy-google-lms-trigger.yml','deploy-google-store-runtime.yml'].includes(next)?{requested_sha:repair.release_sha}:undefined;

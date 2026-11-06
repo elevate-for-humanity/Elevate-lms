@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {stripTypeScriptTypes} from 'node:module';
 import {describeWorkerError} from '../../lib/ultimate-course-builder/core/worker-error.mjs';
 import {repairDirective} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
-import {lessonAutopilotIdentity,lessonAutopilotType} from '../../lib/ultimate-course-builder/worker/lesson-autopilot-policy.mjs';
+import {lessonAutopilotIdentity,lessonAutopilotType,immutableAutopilotSourceProfile} from '../../lib/ultimate-course-builder/worker/lesson-autopilot-policy.mjs';
 const strip=path=>stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
 test('coordinator reserves canonical rows and creates the pool before instruction authoring',async()=>{
  const profile={parallelAutopilot:'three-role-v1',competencies:[{id:'first'},{id:'later'}]},events=[];
@@ -84,8 +84,8 @@ test('resumed quality hands the measured visual repair back to its producer',()=
 test('an undelegated deterministic role failure stops without burning identical attempts',async()=>{
  const profile={competencies:[{id:'c'}]},failures=[],dispatches=[];
  const findings=[{step:'visual_assignment',severity:'error',code:'REPAIR_PRODUCER_UNCHANGED',message:'REPAIR_PRODUCER_UNCHANGED:visual_assignment'}];
- const process=new Function('lessonAutopilotIdentity','contractHash','createUltimateRuntime','createProductionHandlers','runUltimateCourse','isDurableExternalBlocker','notifyCourseDispatcher','isTransientCourseFailure','requestFirstFailureRepair',strip('../../lib/ultimate-course-builder/worker/lesson-autopilot.ts')+';return processLessonAutopilot;')(
-  ()=>({poolId:'pool',competencyId:'c',role:'quality'}),JSON.stringify,async()=>({}),()=>({}),async()=>({completed:false,findings,lessons:[]}),()=>false,async()=>dispatches.push('dispatch'),()=>false,async()=>({id:'repair'}));
+ const process=new Function('lessonAutopilotIdentity','contractHash','createUltimateRuntime','createProductionHandlers','runUltimateCourse','isDurableExternalBlocker','notifyCourseDispatcher','isTransientCourseFailure','requestFirstFailureRepair','immutableAutopilotSourceProfile',strip('../../lib/ultimate-course-builder/worker/lesson-autopilot.ts')+';return processLessonAutopilot;')(
+  ()=>({poolId:'pool',competencyId:'c',role:'quality'}),JSON.stringify,async()=>({}),()=>({}),async()=>({completed:false,findings,lessons:[]}),()=>false,async()=>dispatches.push('dispatch'),()=>false,async()=>({id:'repair'}),immutableAutopilotSourceProfile);
  const db={from(table){const query={select(){return query},eq(){return query},async single(){return {data:table==='ultimate_autopilot_pools'?{id:'pool',state:'active',profile}:{profile},error:null}}};return query;}};
  const result=await process({db,job:{id:'job'},workerId:'worker',generation:2,build:{id:'build',course_id:'course'},queue:{fail:async(...args)=>failures.push(args)},assertActive(){}});
  assert.equal(failures.length,1);assert.equal(failures[0][4],false);

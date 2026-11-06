@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
-const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
+const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',attempts:1,max_attempts:5,execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
  monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false,canonicalLessonIds:{lesson:'11111111-1111-4111-8111-111111111111'}}}};
 async function run(job,conflict=false,mediaAvailable=true){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
@@ -13,9 +13,27 @@ async function run(job,conflict=false,mediaAvailable=true){const writes=[];const
  }});return {writes,result};}
 test('new verified repair queues an exhausted internal failure, retaining checkpoints and previous error',async()=>{
  const {writes,result}=await run(base);assert.deepEqual(result.jobIds,['job']);
- const b=writes[0].body;assert.equal(b.attempts,0);assert.equal(b.execution_generation,9);assert.equal(b.payload,undefined);assert.equal(b.artifacts,undefined);
+ const b=writes[0].body;assert.equal(b.attempts,undefined);assert.equal(b.max_attempts,5);assert.equal(b.execution_generation,9);assert.equal(b.payload,undefined);assert.equal(b.artifacts,undefined);
  assert.equal(b.monitor.lastRepairDeployment.previousError,base.last_error);
  assert.match(writes[0].url,/execution_generation=eq.8/);
+});
+test('exhausted attempt budgets gain at most one claimed execution without zeroing the counter',async()=>{
+ const exhausted={...base,attempts:5,max_attempts:5};
+ const {writes}=await run(exhausted);
+ assert.equal(writes.length,1);
+ assert.equal(writes[0].body.attempts,undefined);
+ assert.equal(writes[0].body.max_attempts,6);
+ assert.match(writes[0].url,/attempts=eq.5/);
+ assert.match(writes[0].url,/max_attempts=eq.5/);
+ assert.equal(writes[0].body.monitor.lastRepairDeployment.previousError,base.last_error);
+});
+test('malformed or excessive retry budgets remain blocked',async()=>{
+ for(const job of [
+  {...base,attempts:11,max_attempts:11},
+  {...base,attempts:-1},
+  {...base,attempts:7,max_attempts:5},
+  {...base,max_attempts:null},
+ ])assert.equal((await run(job)).writes.length,0);
 });
 test('same image cannot continuously retry the same unresolved defect',async()=>{
  const {writes}=await run({...base,monitor:{...base.monitor,lastRepairDeployment:{imageSha}}});assert.equal(writes.length,0);

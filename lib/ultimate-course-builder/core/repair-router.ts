@@ -67,7 +67,13 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[], 
       if (visual) targets.set('visual_assignment', [...(targets.get('visual_assignment') ?? []), f.code]);
       if (assembly) targets.set('lesson_film_render', [...(targets.get('lesson_film_render') ?? []), f.code]);
       const captions = /captions do not cover rendered narration/i.test(f.message);
-      if (captions) targets.set('synchronization', [...(targets.get('synchronization') ?? []), f.code]);
+      if (captions) {
+        // Captions are delivered in the encoded film. A deterministic timeline
+        // alone can remain unchanged while the old MP4 still has incomplete
+        // captions. Rebuild the dependent film and re-run independent QA.
+        targets.set('synchronization', [...(targets.get('synchronization') ?? []), f.code]);
+        targets.set('lesson_film_render', [...(targets.get('lesson_film_render') ?? []), f.code]);
+      }
       if (!visual && !assembly && !captions) targets.set('finished_media_qa', [...(targets.get('finished_media_qa') ?? []), f.code]);
       continue;
     }

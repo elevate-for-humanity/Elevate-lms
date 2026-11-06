@@ -67,6 +67,17 @@ function fixture(rows){
 }
 const launches=s=>s.calls.filter(args=>args[2]==='execute');
 
+test('an already covered quality pool cannot consume all free capacity before an uncovered instruction pool',async()=>{
+ const live={...waiting('quality','live-quality'),status:'running',heartbeat_at:'2026-10-27T17:59:00Z',lease_expires_at:'2026-10-27T18:05:00Z'};
+ const s=fixture([live,waiting('quality','next-quality'),waiting('instruction','i1'),waiting('instruction','i2')]);
+ s.active.set(LESSON_ROLE_JOBS.quality.name,[{status:{}}]);
+ const inspect=s.options.capacityCheck;
+ s.options.capacityCheck=async input=>{const c=await inspect(input);return {...c,granted:{cpu:4000,memory:12*Gi}};};
+ const result=await dispatchLessonAutopilots(s.options);
+ assert.ok(result.assignments.some(a=>a.role==='instruction'),'runnable instruction must receive a worker before filling the already active quality pool');
+ assert.equal(s.records.get('live-quality').status,'running');
+});
+
 test('multiple lessons receive a worker each before waiting for any assignment',async()=>{
  const rows=Object.entries({instruction:8,media:6,quality:3}).flatMap(([role,count])=>Array.from({length:count},(_,i)=>waiting(role,role+'-'+i)));
  const s=fixture(rows),result=await dispatchLessonAutopilots(s.options);
@@ -104,9 +115,9 @@ test('the capacity reservation includes launches from different role pools',asyn
  const s=fixture(['quality','media','instruction'].flatMap(role=>Array.from({length:4},(_,i)=>waiting(role,role+'-'+i))));
  s.options.capacityCheck=async({task})=>({fits:true,required:{cpu:Number(task.containers[0].resources.limits.cpu)*1000,memory:Number(task.containers[0].resources.limits.memory.replace('Gi',''))*Gi},granted:{cpu:10000,memory:16*Gi}});
  const result=await dispatchLessonAutopilots(s.options);
- // Two 6-Gi quality workers leave room for two 2-Gi instruction workers;
- // no 8-Gi renderer can reuse the same remaining four GiB.
- assert.deepEqual(result.assignments.map(a=>a.role),['quality','quality','instruction','instruction']);
+ // One worker per role uses 2 + 8 + 6 GiB. No later role may spend
+ // acknowledged capacity again, even when cloud inventory is stale.
+ assert.deepEqual(result.assignments.map(a=>a.role),['instruction','media','quality']);
 });
 
 test('a worker can claim a different queue position without borrowing another execution heartbeat',async()=>{

@@ -13,6 +13,7 @@ import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 import { ClientProviders } from '@/components/ClientProviders';
+import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <script
+          id="lms-chunk-recovery"
+          dangerouslySetInnerHTML={{ __html: chunkRecoveryBootstrap() }}
+        />
         <SupabasePublicConfigScript />
       </head>
       <body className="lms-portal efh-contrast">

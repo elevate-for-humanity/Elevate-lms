@@ -60,6 +60,19 @@ describe('Admin recovery before React hydration', () => {
     } as unknown as Event);
     expect(replace).not.toHaveBeenCalled();
   });
+  it('recovers a Host Shop form chunk without losing its route or query parameters', () => {
+    const { listeners, replace } = boot('https://lms.elevateforhumanity.org/host-shop/onboarding/profile?error=required');
+    const script = document.createElement('script');
+    script.src = 'https://lms.elevateforhumanity.org/_next/static/chunks/app/host-shop/onboarding/profile/page-stale.js';
+    const event = new Event('error');
+    Object.defineProperty(event, 'target', { value: script });
+    listeners.get('error')!(event);
+    const recovered = new URL(replace.mock.calls[0][0]);
+    expect(recovered.pathname).toBe('/host-shop/onboarding/profile');
+    expect(recovered.searchParams.get('error')).toBe('required');
+    listeners.get('error')!(event);
+    expect(replace).toHaveBeenCalledTimes(1);
+  });
   it('also recovers a deferred chunk rejection before components can mount', () => {
     const { listeners, replace } = boot();
     listeners.get('unhandledrejection')!({

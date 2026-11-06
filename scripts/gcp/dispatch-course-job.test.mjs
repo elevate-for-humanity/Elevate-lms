@@ -186,7 +186,7 @@ test('paused builds are excluded by the database before the 50-row queue limit',
   if(url.searchParams.has('id')) return base(url);
   assert.equal(url.searchParams.get('build.profile->>ownerPaused'),'eq.false');
   // Model PostgREST applying the embedded filter before the top-level limit.
-  return {ok:true,json:async()=>[...paused,{id:'queued',build:{owner_paused:null}}]
+  return {ok:true,json:async()=>[...paused,{id:'queued',build:{owner_paused:'false'}}]
    .filter(job=>job.build.owner_paused==='false').slice(0,Number(url.searchParams.get('limit')))};
  };
  const result=await dispatchQueuedCourseJob(s.options);

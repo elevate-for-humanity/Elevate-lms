@@ -324,18 +324,19 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    if(run.status==='completed'&&run.conclusion!=='success')await update(repair.id,{status:'blocked',error_code:'REPAIR_WORKFLOW_'+run.conclusion});
   }
   if(repair.release_sha&&['deploying','verifying'].includes(repair.status)){
+   const targetSha=repair.verification?.releaseReconciliation?.state==='validated-newer-target' ? repair.verification.releaseReconciliation.currentMainSha : repair.release_sha;
    const deployments=repair.verification?.protectedMerge?[...REPAIR_DEPLOYMENTS,STORE_REPAIR_DEPLOYMENT]:REPAIR_DEPLOYMENTS;
-   const runs=await gh(`/actions/runs?head_sha=${repair.release_sha}&per_page=100`);
-   const state=repairDeploymentState(runs.workflow_runs??[],repair.release_sha,deployments);
+   const runs=await gh(`/actions/runs?head_sha=${targetSha}&per_page=100`);
+   const state=repairDeploymentState(runs.workflow_runs??[],targetSha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
    if(state!=='passed'){
     const requested=repair.verification?.requestedDeployments??[];
-    const missing=unobservedRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested,repair.verification?.requestedDeploymentAt??{},repair.updated_at,Date.now(),deployments);
+    const missing=unobservedRepairDeployment(runs.workflow_runs??[],targetSha,requested,repair.verification?.requestedDeploymentAt??{},repair.updated_at,Date.now(),deployments);
     if(missing){await update(repair.id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_NOT_OBSERVED',verification:{...repair.verification,missingDeployment:missing}});continue;}
-    const next=nextRepairDeployment(runs.workflow_runs??[],repair.release_sha,requested,deployments);
+    const next=nextRepairDeployment(runs.workflow_runs??[],targetSha,requested,deployments);
     if(next){
      const currentMain=await gh('/git/ref/heads/main');
-     if(currentMain.object?.sha!==repair.release_sha){
+     if(currentMain.object?.sha!==targetSha){
       // A later main commit is not evidence that the repair disappeared.
       // Preserve the immutable release receipt and defer deployment until
       // ancestry and independent validation establish a safe new target.
@@ -343,9 +344,14 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
       const comparison=/^[a-f0-9]{40}$/.test(currentSha)
        ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
       const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
+       const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
+       const candidateChecks=candidateRuns?.workflow_runs??[];
+       const independentlyValidated=candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='CI'&&run.status==='completed'&&run.conclusion==='success')&&candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='Integrity Gate'&&run.status==='completed'&&run.conclusion==='success');
+       const candidatePassed=ancestry&&independentlyValidated&&repairDeploymentState(candidateChecks,currentSha,deployments)==='passed';
       await update(repair.id,{status:'verifying',verification:{
        ...repair.verification,releaseReconciliation:{
-        state:ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
+        state:candidatePassed?'validated-newer-target':ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
+        independentlyValidated,
         immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
         checkedAt:new Date().toISOString()
        }
@@ -354,7 +360,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
      }
      // Save dispatch intent before sending; a later tick must not duplicate it.
      await update(repair.id,{verification:{...repair.verification,requestedDeployments:[...requested,next],requestedDeploymentAt:{...repair.verification?.requestedDeploymentAt,[next]:new Date().toISOString()}}});
-     const inputs=['deploy-admin.yml','deploy-google-lms-trigger.yml','deploy-google-store-runtime.yml'].includes(next)?{requested_sha:repair.release_sha}:undefined;
+     const inputs=['deploy-admin.yml','deploy-google-lms-trigger.yml','deploy-google-store-runtime.yml'].includes(next)?{requested_sha:targetSha}:undefined;
      try{await gh(`/actions/workflows/${next}/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',...(inputs?{inputs}:{})})});}
      catch(error){await update(repair.id,{status:'blocked',error_code:'REPAIR_DEPLOYMENT_DISPATCH_FAILED'});throw error;}
     }
@@ -366,7 +372,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    const origins=['https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org','https://www.elevateforhumanity.org',...(repair.verification?.protectedMerge?['https://store.elevateforhumanity.org']:[])];
    // Never reuse a prior receipt to certify the current serving revision.
    // Failed/unreachable health probes are negative evidence, not success.
-   const runtimeEvidence=await verifyParisRuntimeOrigins({origins,releaseSha:repair.release_sha,protectedMerge:Boolean(repair.verification?.protectedMerge)});
+   const runtimeEvidence=await verifyParisRuntimeOrigins({origins,releaseSha:targetSha,protectedMerge:Boolean(repair.verification?.protectedMerge)});
    const verification:any={...repair.verification,tests:'passed',deployments:'passed',
     exactRuntimeSha:runtimeEvidence.passed,runtimeLastCheckedAt:runtimeEvidence.checkedAt,
     runtimeOrigins:runtimeEvidence.origins,
@@ -377,13 +383,13 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
     if(sourceError)throw sourceError;
     const {data:build,error:buildError}=await db.from('ultimate_course_builds').select('id,course_id,status,profile').eq('id',source.build_id).single();
     if(buildError)throw buildError;
-    const alreadyResumed=source.payload?.codeRepairId===repair.id && source.payload?.codeRepairSha===repair.release_sha;
+    const alreadyResumed=source.payload?.codeRepairId===repair.id && source.payload?.codeRepairSha===targetSha;
     if(!verification.resumedJobId && (source.status==='failed'||alreadyResumed) && source.monitor?.enabled && !['published','archived'].includes(build.status) && build?.profile?.ownerPaused!==true && !/owner|pause/i.test(source.monitor?.reason??'')){
      // enqueue() preserves the failed lesson cursor and reuses any active job.
      // Persist correlation before dispatch so retries cannot launch a second job.
      const {resumeRepairedJob}=await import('@/lib/ultimate-course-builder/worker/resume-repaired-job.mjs');
      const resumed=await resumeRepairedJob({db,source,repair:{...repair,verification}});
-     if(resumed?.payload?.codeRepairId===repair.id && resumed?.payload?.codeRepairSha===repair.release_sha){
+     if(resumed?.payload?.codeRepairId===repair.id && resumed?.payload?.codeRepairSha===targetSha){
       verification.resumedJobId=resumed.id;
       await update(repair.id,{status:'verifying',verification});
       const {requestCourseWorker}=await import('@/lib/gcp/course-worker-launch');await requestCourseWorker();
@@ -407,7 +413,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
      if(learner.error)throw learner.error;
      lessonAcceptance={published:lesson.data?.status==='published'&&lesson.data.is_published===true&&lesson.data.video_status==='complete'&&Boolean(lesson.data.video_url),learnerPassed:learner.data?.state==='passed'};
     }
-    const outcome=courseRepairOutcome({repairId:repair.id,releaseSha:repair.release_sha,sourceJobId:repair.source_job_id,job:resumed,build,lessonAcceptance});
+    const outcome=courseRepairOutcome({repairId:repair.id,releaseSha:targetSha,sourceJobId:repair.source_job_id,job:resumed,build,lessonAcceptance});
     verification.courseExecution=outcome;
     verification.symptom=outcome.reason;
     await update(repair.id,{status:outcome.state==='passed'?'verified':outcome.state==='failed'?'blocked':'verifying',verification,

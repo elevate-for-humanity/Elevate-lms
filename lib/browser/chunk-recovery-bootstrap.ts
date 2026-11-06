@@ -1,6 +1,7 @@
 /** Runs before React loads, so a missing layout chunk cannot disable recovery. */
 export function installChunkRecovery(win: Window & typeof globalThis): () => void {
   const key = 'elevate-chunk-reload';
+  let leaving = false;
   let navigation: { from: string; to: string; at: number } | undefined;
   const click = (event: MouseEvent) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
@@ -26,6 +27,9 @@ export function installChunkRecovery(win: Window & typeof globalThis): () => voi
     }
   };
   const recover = () => {
+    // A canceled lazy import must not replace a navigation already leaving this
+    // document. Restored back/forward-cache pages can recover normally.
+    if (leaving) return;
     try {
       const previous = Number(win.sessionStorage.getItem(key) || '0');
       if (Date.now() - previous < 120000) return;
@@ -70,15 +74,27 @@ export function installChunkRecovery(win: Window & typeof globalThis): () => voi
     event.preventDefault();
     recover();
   };
+  const leave = () => {
+    leaving = true;
+  };
+  const restore = () => {
+    leaving = false;
+  };
   win.addEventListener('error', error, true);
   win.addEventListener('unhandledrejection', rejection);
   win.addEventListener('click', click, true);
   win.addEventListener('elevate:chunk-error', caught);
+  win.addEventListener('beforeunload', leave);
+  win.addEventListener('pagehide', leave);
+  win.addEventListener('pageshow', restore);
   return () => {
     win.removeEventListener('error', error, true);
     win.removeEventListener('unhandledrejection', rejection);
     win.removeEventListener('click', click, true);
     win.removeEventListener('elevate:chunk-error', caught);
+    win.removeEventListener('beforeunload', leave);
+    win.removeEventListener('pagehide', leave);
+    win.removeEventListener('pageshow', restore);
   };
 }
 

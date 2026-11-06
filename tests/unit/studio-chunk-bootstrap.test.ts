@@ -168,4 +168,26 @@ describe('Admin recovery before React hydration', () => {
     }
     expect(replace).not.toHaveBeenCalled();
   });
+  it('lets an in-flight document navigation win over a late caught chunk failure', () => {
+    const { listeners, replace } = boot('https://admin.elevateforhumanity.org/studio/courses');
+    listeners.get('beforeunload')!(new Event('beforeunload'));
+    const caught = new CustomEvent('elevate:chunk-error', {
+      detail: 'ChunkLoadError',
+      cancelable: true,
+    });
+    listeners.get('elevate:chunk-error')!(caught);
+    expect(caught.defaultPrevented).toBe(true);
+    expect(replace).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem('elevate-chunk-reload')).toBeNull();
+  });
+  it('re-enables recovery when a document returns from the back/forward cache', () => {
+    const { listeners, replace } = boot();
+    listeners.get('pagehide')!(new Event('pagehide'));
+    listeners.get('pageshow')!(new Event('pageshow'));
+    listeners.get('elevate:chunk-error')!(
+      new CustomEvent('elevate:chunk-error', { detail: 'ChunkLoadError', cancelable: true }),
+    );
+    expect(replace).toHaveBeenCalledTimes(1);
+  });
+
 });

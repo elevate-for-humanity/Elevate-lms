@@ -481,16 +481,20 @@
       "React-caught chunks delegate to the canonical bounded bootstrap handler",
       "global-error can install the same handler only when the head owner is absent",
       "non-chunk server/authentication failures never trigger chunk recovery",
-      "mobile document actions get dock-aware scroll margins and padding; dock remains visible and interactive"
+      "mobile document actions get dock-aware scroll margins and padding; dock remains visible and interactive",
+      "Late recovery yields to full-document navigation; restored back/forward-cache pages can recover."
     ],
     "validation": {
-      "targeted_tests": 29,
-      "files": 5,
-      "source_lint": "passed",
-      "production_builds": "in progress; final CI must pass before merge"
+      "targeted_tests_before_leave_fence": 29,
+      "source_lint_before_leave_fence": "passed",
+      "added_leave_fence_regressions": 2,
+      "final_validation": "GitHub CI required; local exec-server transport disconnected during builds",
+      "local_executor": "unavailable",
+      "signed_in_browser": "unavailable after execution environment disconnected"
     },
     "branch": "fix/production-recovery-20261106",
     "duplicate_of_pr_2410": false,
-    "auth_rls_participant_records_changed": false
+    "auth_rls_participant_records_changed": false,
+    "pr": 2411
   }
 }

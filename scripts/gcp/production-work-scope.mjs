@@ -5,10 +5,12 @@ export function productionWorkScope(rows) {
   throw Error('PRODUCTION_BUILD_SCOPE_EVIDENCE_REQUIRED');
  const counts=Object.fromEntries(['completed','failed','queued','running']
   .map(status=>[status,rows.filter(row=>row.status===status).length]));
- const paused=rows.filter(row=>row.build.owner_paused==='true');
- const eligible=rows.filter(row=>row.build.owner_paused!=='true' &&
+ const paused=rows.filter(row=>row.build.owner_paused===true || row.build.owner_paused==='true');
+ // Missing pause evidence is not permission to dispatch production work.
+ const unknownPause=rows.filter(row=>![true,false,'true','false'].includes(row.build.owner_paused));
+ const eligible=rows.filter(row=>(row.build.owner_paused===false || row.build.owner_paused==='false') &&
   !['published','archived','cancelled'].includes(row.build.status));
- return {counts,paused,eligible,
+ return {counts,paused,unknownPause,eligible,
   actionableFailed:eligible.filter(row=>row.status==='failed'),
   actionableQueued:eligible.filter(row=>row.status==='queued'),
   actionableRunning:eligible.filter(row=>row.status==='running')};

@@ -226,6 +226,22 @@ test('PARIS wakes verified quality work and never bypasses a saved owner pause',
  }
 });
 
+test('unknown owner pause cannot wake a held quality job even with completed predecessors',async()=>{
+ const base={build_id:'build-unknown',attempts:0,max_attempts:5,execution_generation:3,monitor:{enabled:true}};
+ const quality={...base,id:'quality',job_type:'lesson_autopilot:lesson-x:quality',status:'queued',available_at:'infinity',ultimate_course_builds:{status:'running',ownerPaused:null}};
+ const instruction={...base,id:'instruction',job_type:'lesson_autopilot:lesson-x:instruction',status:'completed',last_error:null};
+ const media={...base,id:'media',job_type:'lesson_autopilot:lesson-x:media',status:'completed',last_error:null};
+ const writes=[];
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+  request:async(url,options={})=>{
+   if(!options.method)return {ok:true,json:async()=>[quality,instruction,media]};
+   writes.push({url:String(url),body:JSON.parse(options.body)});
+   return {ok:true,json:async()=>[{id:'saved'}]};
+  }});
+ assert.equal(writes.filter(w=>w.url.includes('available_at=eq.infinity')).length,0);
+ assert.equal(writes.filter(w=>w.body.available_at!==undefined).length,0);
+});
+
 test('quality dependency lookup prefers newest producer by created_at, not UUID',()=>{
  const rows=[
   {id:'zzz',build_id:'build',job_type:'lesson_autopilot:a:media',status:'completed',created_at:'2026-11-01T00:00:00Z',execution_generation:1},

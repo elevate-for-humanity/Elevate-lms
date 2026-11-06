@@ -20,6 +20,18 @@ test('renew known immutable UUID-suffixed caption and transcript keys',()=>{
  assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/other/'+uuidKey,config),null);
  assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/elevate-media/'+uuidKey.replace('.vtt','.mp4'),config),null);
 });
+test('accept only the real course-videos namespace inside the owned B2 bucket',()=>{
+ const owned={endpoint:'https://s3.us-east-005.backblazeb2.com',bucket:'elevate-course-media'};
+ const key='course-videos/generated-lessons/lesson-27f2878f-a8a2-424e-ba3e-ee78911274e5-1793719690588.vtt';
+ for(const path of [key,key.replace('.vtt','.txt')]) {
+  assert.equal(ownedAncillaryCourseKey('https://elevate-course-media.s3.us-east-005.backblazeb2.com/'+path+'?X-Amz-Signature=expired',owned),path);
+  assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/elevate-course-media/'+path+'?X-Amz-Signature=expired',owned),path);
+ }
+ assert.equal(ownedAncillaryCourseKey('https://untrusted.s3.us-east-005.backblazeb2.com/'+key,owned),null);
+ assert.equal(ownedAncillaryCourseKey('https://elevate-course-media.s3.us-east-005.backblazeb2.com/other/'+key,owned),null);
+ assert.equal(ownedAncillaryCourseKey('https://elevate-course-media.s3.us-east-005.backblazeb2.com/'+key.replace('.vtt','.mp4'),owned),null);
+ assert.equal(ownedAncillaryCourseKey('https://elevate-course-media.s3.us-east-005.backblazeb2.com/some-other-folder/generated-lessons/'+key.split('/').at(-1),owned),null);
+});
 test('do not re-sign foreign, user-controlled or non-caption assets',()=>{
  for(const u of [
   'https://evil.example/elevate-media/'+file,

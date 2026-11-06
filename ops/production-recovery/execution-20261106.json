@@ -1,0 +1,249 @@
+{
+  "observed_at": "2026-11-06T12:17:41Z",
+  "scope": "full-production-recovery",
+  "source_sha": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+  "production_admin_sha": "83ab4e87df0d9cb5217031fbab445a5b0ddc57ad",
+  "production_admin_revision": "elevate-admin-migration-00485-2pb",
+  "production_migration_records": 1474,
+  "repository_migration_files": 1432,
+  "pr_2407": {
+    "status": "merged",
+    "merge_sha": "652e85cac08daae06bbcaefa6b0f12d08c97730b"
+  },
+  "queues": {
+    "paris": {
+      "queued": 31,
+      "blocked": 26
+    },
+    "studio": {
+      "planning": 224,
+      "failed": 48,
+      "blocked": 6,
+      "completed": 10
+    },
+    "course_builder": {
+      "completed": 244,
+      "failed": 74,
+      "queued": 70,
+      "running": 2
+    }
+  },
+  "findings": [
+    {
+      "id": "w9-mobile-target",
+      "status": "validated-awaiting-ci-and-production",
+      "cause": "24px native checkbox targets below mobile minimum",
+      "change": "44px controls; preserve certification and saved data contracts"
+    },
+    {
+      "id": "employer-webkit",
+      "status": "investigating",
+      "evidence": "textarea fill and orientation checkbox fail in existing production WebKit suite; root cause not yet proved"
+    },
+    {
+      "id": "main-ci-readiness-fixture",
+      "status": "validated-awaiting-full-ci",
+      "cause": "test routes /api/ready request to comparison fixture and supplies obsolete healthy flag",
+      "tests": "production readiness guard unchanged; three isolated guard cases passed; negative executor readiness cases added"
+    },
+    {
+      "id": "paris-runtime-drift",
+      "status": "runtime-sha-aligned-autonomous-task-not-yet-verified",
+      "evidence": "monitor job 127886852714 deferred because compatible Admin control-plane source is not serving",
+      "action": "release through existing required CI; no bypass"
+    },
+    {
+      "id": "postgrest-timeout-events",
+      "status": "investigating",
+      "evidence": "2026-11-06 11:00-12:24Z logs contain repeated Warp timeout-manager events; no connection exhaustion established"
+    }
+  ],
+  "acceptance": "incomplete; no production-ready claim",
+  "phases": [
+    {
+      "phase": 1,
+      "status": "in_progress"
+    },
+    {
+      "phase": 2,
+      "status": "in_progress"
+    },
+    {
+      "phase": 3,
+      "status": "in_progress"
+    },
+    {
+      "phase": 4,
+      "status": "in_progress"
+    },
+    {
+      "phase": 5,
+      "status": "pending"
+    },
+    {
+      "phase": 6,
+      "status": "pending"
+    },
+    {
+      "phase": 7,
+      "status": "pending"
+    },
+    {
+      "phase": 8,
+      "status": "in_progress"
+    },
+    {
+      "phase": 9,
+      "status": "pending"
+    },
+    {
+      "phase": 10,
+      "status": "pending"
+    },
+    {
+      "phase": 11,
+      "status": "pending"
+    },
+    {
+      "phase": 12,
+      "status": "in_progress"
+    },
+    {
+      "phase": 13,
+      "status": "pending"
+    },
+    {
+      "phase": 14,
+      "status": "pending"
+    },
+    {
+      "phase": 15,
+      "status": "in_progress"
+    },
+    {
+      "phase": 16,
+      "status": "pending"
+    },
+    {
+      "phase": 17,
+      "status": "pending"
+    }
+  ],
+  "checks": [
+    {
+      "name": "release safety node regressions",
+      "passed": 38,
+      "failed": 0
+    },
+    {
+      "name": "readiness guard Python fixture cases",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "name": "targeted Vitest W9 authorization, schema and UI plus PARIS readiness",
+      "files": 4,
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "name": "LMS typecheck",
+      "status": "passed"
+    },
+    {
+      "name": "changed-file ESLint",
+      "status": "passed"
+    },
+    {
+      "name": "changed-file formatting",
+      "status": "passed"
+    },
+    {
+      "name": "LMS production build",
+      "status": "passed",
+      "build_identity": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+      "initial_setup_failure": "missing GIT_SHA; rerun with actual baseline SHA"
+    },
+    {
+      "name": "public route and redirect invariants",
+      "status": "passed"
+    }
+  ],
+  "migration_inventory": {
+    "top_level_sql_files": 1432,
+    "pending_subdirectory_sql_files": 3,
+    "exact_matches": 904,
+    "same_version_different_name": 42,
+    "files_with_absent_version": 486,
+    "distinct_absent_versions": 469,
+    "production_only_versions": 569,
+    "names_present_under_other_version": 366,
+    "repository_names_absent": 159,
+    "production_names_absent": 200,
+    "object_reconciliation": "pending"
+  },
+  "security_baseline": {
+    "public_and_storage_tables": 1814,
+    "rls_disabled_tables": 0,
+    "policies": 7809,
+    "health_advisories": 0,
+    "meaning": "inventory only; no tenant-authorization acceptance inferred"
+  },
+  "pooling_baseline": {
+    "max_connections": 160,
+    "idle_transactions_followup": 0,
+    "ungranted_locks": 0,
+    "deadlocks": 0,
+    "database_timeout_ms": 120000,
+    "authenticated_role_statement_timeout": "8s",
+    "anon_role_statement_timeout": "3s",
+    "leak_confirmed": false
+  },
+  "learner_acceptance_baseline": {
+    "signed_evidence_records": 112,
+    "distinct_lesson_builds": 56,
+    "temporary_run_records": 0,
+    "acceptance": "evidence records do not alone prove current learner playback"
+  },
+  "repository_inventory_counts": {
+    "api_routes": 1223,
+    "page_sources": 1655,
+    "worker_named_files": 216,
+    "workflows": 278,
+    "environment_variable_references": 4232,
+    "todo_fixme_placeholder_stub_matches": 2178,
+    "interpretation": "candidate inventory; matches do not automatically establish defects"
+  },
+  "runtime_snapshot": {
+    "marketing": "652e85cac08daae06bbcaefa6b0f12d08c97730b",
+    "admin": "83ab4e87df0d9cb5217031fbab445a5b0ddc57ad",
+    "lms": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+    "store": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+    "meaning": "health endpoint identities; authenticated rendering not inferred"
+  },
+  "active_admin_release": {
+    "run_id": 42214167873,
+    "source_sha": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+    "image_build": "passed",
+    "deployment": "verified",
+    "duplicate_release_started": false,
+    "observed_live_ready_sha": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f"
+  },
+  "scheduler_evidence": {
+    "guarded_recovery": {
+      "status": "succeeded",
+      "observed_start": "2026-11-06T12:30:00Z"
+    },
+    "application_router": {
+      "status": "succeeded",
+      "observed_start": "2026-11-06T12:31:00Z"
+    },
+    "note": "scheduler receipt is not proof of course completion or applicant processing"
+  },
+  "local_webkit": {
+    "browser_download": "succeeded",
+    "host_dependencies": "unavailable",
+    "error": "install-deps requires root; su failed",
+    "fallback": "existing isolated Google/GitHub WebKit acceptance environment"
+  }
+}

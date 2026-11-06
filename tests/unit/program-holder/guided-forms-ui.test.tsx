@@ -9,34 +9,32 @@ afterEach(() => {
 it('fills student details and the agreed stage amount while allowing an edited request', async () => {
   vi.stubGlobal(
     'fetch',
-    vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            providerName: 'Example Business',
-            students: [
-              {
-                id: 'student-a',
-                name: 'Assigned Learner',
-                trainingStart: '2026-11-01',
-                trainingEnd: '2026-12-01',
-                start: {
-                  amountCents: 40000,
-                  source: 'Individual schedule',
-                  reason: 'Start installment',
-                },
-                completion: {
-                  amountCents: 60000,
-                  source: 'Individual schedule',
-                  reason: 'Completion installment',
-                },
+    vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          providerName: 'Example Business',
+          students: [
+            {
+              id: 'student-a',
+              name: 'Assigned Learner',
+              trainingStart: '2026-11-01',
+              trainingEnd: '2026-12-01',
+              start: {
+                amountCents: 40000,
+                source: 'Individual schedule',
+                reason: 'Start installment',
               },
-            ],
-          }),
-          { headers: { 'content-type': 'application/json' } },
-        ),
+              completion: {
+                amountCents: 60000,
+                source: 'Individual schedule',
+                reason: 'Completion installment',
+              },
+            },
+          ],
+        }),
+        { headers: { 'content-type': 'application/json' } },
       ),
+    ),
   );
   render(<GuidedInvoiceFields />);
   await waitFor(() => expect(screen.getByLabelText('Student from your dashboard')).toBeEnabled());
@@ -68,4 +66,24 @@ it('keeps the W-9 signature and certification as the final step without uploadin
   expect(form.querySelector('input[type="file"]')).toBeNull();
   expect(form.querySelector('input[name="signature"]')).toBeRequired();
   expect(form.querySelector('input[name="certified"]')).toBeRequired();
+});
+
+it('preserves W-9 entries and certifications when navigating back to review', () => {
+  render(<GuidedW9Form />);
+  fireEvent.click(screen.getByText('Complete and save my W-9'));
+  const name = screen.getByLabelText(/Line 1/);
+  fireEvent.change(name, { target: { value: 'Isolated QA Holder' } });
+  const form = name.closest('form')!;
+  fireEvent.submit(form);
+  fireEvent.change(screen.getByLabelText(/Line 5/), { target: { value: '123 Test Street' } });
+  fireEvent.submit(form);
+  const certification = form.querySelector<HTMLInputElement>('input[name="certified"]')!;
+  fireEvent.click(certification);
+  fireEvent.click(screen.getByRole('button', { name: 'Back and review' }));
+  expect(screen.getByLabelText(/Line 5/)).toHaveValue('123 Test Street');
+  fireEvent.click(screen.getByRole('button', { name: 'Back and review' }));
+  expect(name).toHaveValue('Isolated QA Holder');
+  fireEvent.submit(form);
+  fireEvent.submit(form);
+  expect(certification).toBeChecked();
 });

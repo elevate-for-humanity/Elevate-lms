@@ -99,7 +99,8 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   const config=LESSON_ROLE_JOBS[role];
   let active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));
   const cancelled=await reapUnclaimedLessonExecutions({executions:active,role,now,request,root,headers,
-   cancel:name=>run(['run','jobs','executions','cancel',name,...scope,'--quiet'])});
+   cancel:name=>run(['run','jobs','executions','cancel',name,...scope,'--quiet']),
+   onCancelFailure:({name,code})=>console.warn(JSON.stringify({event:'unclaimed_execution_cancel_unconfirmed',role,execution:name,code,capacityFreed:false}))});
   if(cancelled.length) {
    console.info(JSON.stringify({event:'unclaimed_lesson_executions_cancelled',role,executions:cancelled}));
    active=read(['run','jobs','executions','list','--job='+config.name]).filter(e=>!isTerminalExecution(e));

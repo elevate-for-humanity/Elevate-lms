@@ -464,10 +464,21 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         }
       }
       if (action.type === 'workflow_log') {
-        const run=await githubJson('/actions/runs/'+action.runId);
+        // Historical workflow IDs are untrusted planner suggestions. An obsolete
+        // or inaccessible run is not a repair failure: redirect to current source.
+        let run:any;
+        try { run=await githubJson('/actions/runs/'+action.runId); }
+        catch (error) {
+          const message=String(error instanceof Error?error.message:error);
+          if (!/404|not found/i.test(message)) throw error;
+          observations.push('WORKFLOW_LOG_UNAVAILABLE: requested run is missing. Inspect exact current source and do not request this historical run again.');
+          continue;
+        }
         if(run.head_branch!=='main' || run.head_sha!==baseSha ||
-           run.status!=='completed' || run.conclusion!=='failure')
-          throw Error('PARIS_WORKFLOW_LOG_CURRENT_MAIN_FAILURE_REQUIRED');
+           run.status!=='completed' || run.conclusion!=='failure') {
+          observations.push('WORKFLOW_LOG_STALE: requested run does not prove a failed job on the current main SHA. Inspect exact current source instead.');
+          continue;
+        }
         const inventory=await githubJson('/actions/runs/'+action.runId+'/jobs?per_page=100');
         if(!Array.isArray(inventory.jobs) || inventory.total_count>100)
           throw Error('PARIS_WORKFLOW_JOB_INVENTORY_INCOMPLETE');

@@ -16,3 +16,9 @@ test('pipeline skips hidden-tab polling and uses 30-second refresh',()=>{
  assert.match(source,/\}, 30000\)/);
  assert.doesNotMatch(source,/\}, 15000\)/);
 });
+
+test('lesson detail fetch is not restarted by each 30-second checkpoint poll',()=>{
+ const inspector=readFileSync(new URL('../../components/admin/course-builder/UltimateStageInspector.tsx',import.meta.url),'utf8');
+ assert.match(inspector,/\},\[buildId,selectedLesson,updatedAt\]\)/);
+ assert.doesNotMatch(inspector,/\},\[buildId,selectedLesson,updatedAt,retry\]\)/);
+});

@@ -12,27 +12,33 @@ export async function EmailAccountNotice({
   href,
   userId,
   accountName,
+  personalOnly = false,
 }: {
   href: string;
   userId?: string;
   accountName?: string;
+  personalOnly?: boolean;
 }) {
   const authDb = await createClient();
   const {
     data: { user },
   } = await authDb.auth.getUser();
   const db = await requireAdminClient();
-  const preview = await resolvePortalPreviewSubject(db, user?.id ?? null);
-  const effectiveUserId = userId || (preview.previewing ? preview.userId : user?.id);
+  const preview = userId ? null : await resolvePortalPreviewSubject(db, user?.id ?? null);
+  const effectiveUserId = userId || (preview?.previewing ? preview.userId : user?.id);
   if (!effectiveUserId) return null;
 
-  const { data } = await db
+  let query = db
     .from('communication_email_mailbox_members')
     .select(
-      'mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active)',
+      'mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active,owner_user_id)',
     )
     .eq('user_id', effectiveUserId)
     .eq('mailbox.active', true);
+  if (personalOnly) {
+    query = query.eq('mailbox.owner_user_id', effectiveUserId).eq('mailbox.mailbox_kind', 'individual');
+  }
+  const { data } = await query;
   const mailboxes = (data ?? [])
     .map((row: any) => (Array.isArray(row.mailbox) ? row.mailbox[0] : row.mailbox))
     .filter(Boolean)

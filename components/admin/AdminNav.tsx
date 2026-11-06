@@ -41,6 +41,13 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
     currentSection?.label ?? NAV[0]?.label ?? '',
   );
   const section = NAV.find((item) => item.label === selectedSection) ?? currentSection ?? NAV[0];
+  const visibleRoutes = new Set(NAV.flatMap((group) => group.items.map((item) => item.href)));
+  const shortcuts = [
+    ['/dashboard', 'Dashboard'], ['/portals', 'All dashboards'],
+    ['/applications', 'Applications'], ['/students', 'Students'],
+    ['/programs', 'Programs'], ['/documents/review', 'Documents'],
+    ['/mou', 'Agreements'], ['/store', 'Store'],
+  ].filter(([href]) => visibleRoutes.has(href));
   const notifRef = useRef<HTMLDivElement>(null);
   const unread = notifs.filter((n) => n.unread).length;
 
@@ -223,6 +230,9 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           </div>
         </div>
 
+        <nav aria-label="Dashboard shortcuts" className="flex min-w-0 gap-2 overflow-x-auto border-t border-slate-200 px-2 py-2 sm:px-4 lg:px-6">
+          {shortcuts.map(([href, label]) => <Link key={href} href={href} aria-current={isActive(pathname, href) ? 'page' : undefined} className={`inline-flex min-h-11 shrink-0 items-center rounded-lg border px-4 text-sm font-bold ${isActive(pathname, href) ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-200 bg-white text-slate-800 hover:bg-blue-50'}`}>{label}</Link>)}
+        </nav>
         <nav
           aria-label="Admin workspace"
           className="grid min-w-0 grid-cols-1 gap-2 border-t border-slate-200 bg-slate-50 px-2 py-2 sm:flex sm:items-center sm:px-4 lg:px-6"

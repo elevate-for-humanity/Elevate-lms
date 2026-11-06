@@ -34,7 +34,10 @@ jobs:
           gcloud run services list --project=elegant-racer-299721 --platform=managed --format='json(metadata.name,metadata.labels,status.url,status.latestReadyRevisionName,status.conditions)' > services.json
           cat services.json
           gcloud billing projects describe elegant-racer-299721 --format='json(projectId,billingEnabled)' || true
-          gcloud beta run domain-mappings list --project=elegant-racer-299721 --region=us-central1 --format='json(metadata.name,spec.routeName,status.resourceRecords,status.conditions)' || true
+          gcloud --quiet beta run domain-mappings list --project=elegant-racer-299721 --region=us-central1 --format='json(metadata.name,spec.routeName,status.resourceRecords,status.conditions)' || true
+          gcloud dns managed-zones list --project=elegant-racer-299721 --format='json(name,dnsName)' || true
+          gcloud iam service-accounts describe curvature-runtime@elegant-racer-299721.iam.gserviceaccount.com --project=elegant-racer-299721 --format='json(email,disabled)' || true
+          gcloud secrets versions describe latest --secret=curvature-supabase-service-role-key --project=elegant-racer-299721 --format='json(name,state)' || true
       - uses: actions/upload-artifact@v4
         with:
           name: platform-runtime-bindings

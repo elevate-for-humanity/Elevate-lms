@@ -1,4 +1,6 @@
 import { headers } from 'next/headers';
+import { recordMouSignature } from '@/lib/signatures/electronic-signature-service';
+import { hostShopMouSnapshot } from '@/lib/partners/host-shop-mou-snapshot';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AlertTriangle, CheckCircle2, FileSignature } from 'lucide-react';
@@ -52,25 +54,14 @@ async function signHostShopMou(formData: FormData) {
   const authorityVersion = meta.registered && meta.rapidsId ? meta.rapidsId : `${program}-host-site-pathway`;
   const mouVersion = partner.mou_version || `${authorityVersion}-2026-08`;
 
-  const { error: signatureError } = await db.from('mou_signatures').insert({
-    user_id: user.id,
-    signature_data: signerName,
-    digital_signature: signerName,
-    signer_name: signerName,
-    signer_title: signerTitle || null,
-    organization_name: partner.dba || partner.name,
-    contact_name: signerName,
-    contact_title: signerTitle || null,
-    contact_email: user.email || partner.contact_email || null,
-    agreed: true,
-    agreed_at: signedAt,
-    signed_at: signedAt,
-    ip_address: ipAddress,
-    user_agent: userAgent,
-    partner_type: program,
-    mou_version: mouVersion,
+  await recordMouSignature(db, {
+    userId: user.id, signerName, signerTitle,
+    organizationName: partner.dba || partner.name,
+    contactEmail: user.email || partner.contact_email || null,
+    partnerType: program, documentVersion: mouVersion, signedAt,
+    ipAddress, userAgent,
+    payload: hostShopMouSnapshot({ partnerId: partner.id, organizationName: partner.dba || partner.name, program, documentVersion: mouVersion, signerName, signerTitle, signedAt }),
   });
-  if (signatureError) throw new Error(`HOST_SHOP_MOU_SIGNATURE_FAILED:${signatureError.message}`);
 
   const { error: partnerUpdateError } = await db.from('partners').update({
     mou_signed: true,
@@ -92,7 +83,7 @@ export default async function HostShopMouPage({ searchParams }: { searchParams: 
   const sections = getHostShopMouSections(program);
 
   if (partner.mou_signed) {
-    return <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6"><div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-green-950"><CheckCircle2 className="h-10 w-10 text-green-700" /><h1 className="mt-4 text-3xl font-black">MOU already signed</h1><p className="mt-2">{partner.dba || partner.name} has a signed Host Shop MOU on file.</p><Link href="/host-shop/onboarding/profile" className="mt-6 inline-flex rounded-xl bg-green-700 px-5 py-3 font-bold text-white hover:bg-green-800">Continue onboarding</Link></div></main>;
+    return <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6"><div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-green-950"><CheckCircle2 className="h-10 w-10 text-green-700" /><h1 className="mt-4 text-3xl font-black">MOU already signed</h1><p className="mt-2">{partner.dba || partner.name} has a signed Host Shop MOU on file.</p><div className="mt-5 flex flex-wrap gap-3"><Link href="/host-shop/dashboard/documents" className="inline-flex min-h-11 rounded-xl border border-green-300 bg-white px-5 py-3 font-bold">View stored documents and signed files</Link><Link href="/host-shop/dashboard" className="inline-flex min-h-11 rounded-xl border border-green-300 bg-white px-5 py-3 font-bold">Open dashboard</Link></div><Link href="/host-shop/onboarding/profile" className="mt-6 inline-flex rounded-xl bg-green-700 px-5 py-3 font-bold text-white hover:bg-green-800">Continue onboarding</Link></div><details className="mt-5 rounded-2xl border border-slate-200 bg-white p-6"><summary className="min-h-11 cursor-pointer font-bold">Read current {meta.title} reference terms</summary><p className="mt-3 text-sm text-slate-600">These are the current reference terms. Your original executed agreement remains the controlling record; current text does not replace an earlier signed document.</p><div className="mt-5 space-y-5">{sections.map(section => <section key={section.title}><h2 className="text-xl font-bold">{section.title}</h2><p className="mt-2 whitespace-pre-line text-sm leading-7">{section.content}</p></section>)}</div></details></main>;
   }
 
   return (

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
  * platform aggregates. Only platform administrators receive global reporting.
  */
 export default async function AdminDashboardPage() {
-  const { effectiveRoles } = await requireRole([
+  const { user, effectiveRoles } = await requireRole([
     'super_admin',
     'admin',
     'org_admin',
@@ -45,7 +45,7 @@ export default async function AdminDashboardPage() {
   return (
     <>
       <div className="px-3 pt-4 sm:px-5 lg:px-6">
-        <EmailAccountNotice href="/phone/email" />
+        <EmailAccountNotice href="/phone/email" userId={user.id} personalOnly />
         <div className="mt-3 flex flex-wrap gap-3">
           <Link href="/calendar" className="rounded-lg bg-blue-700 px-4 py-3 font-bold text-white">Calendar and Google appointments</Link>
           <Link href="/settings/notifications" className="rounded-lg border bg-white px-4 py-3 font-bold">Cellphone email alerts</Link>

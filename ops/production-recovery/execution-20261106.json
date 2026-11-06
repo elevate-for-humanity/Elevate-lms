@@ -31,7 +31,7 @@
   "findings": [
     {
       "id": "w9-mobile-target",
-      "status": "validated-awaiting-ci-and-production",
+      "status": "deployed-verified-desktop-control-size-mobile-certification-pending",
       "cause": "24px native checkbox targets below mobile minimum",
       "change": "44px controls; preserve certification and saved data contracts"
     },
@@ -42,7 +42,7 @@
     },
     {
       "id": "main-ci-readiness-fixture",
-      "status": "validated-awaiting-full-ci",
+      "status": "verified-full-ci",
       "cause": "test routes /api/ready request to comparison fixture and supplies obsolete healthy flag",
       "tests": "production readiness guard unchanged; three isolated guard cases passed; negative executor readiness cases added"
     },
@@ -93,21 +93,21 @@
     },
     {
       "id": "employer-report-schema-failure",
-      "status": "unit-validated-awaiting-release",
+      "status": "deployed-owner-session-report-certification-pending",
       "cause": "reports queried applications.employer_id and referred_by absent in production; errors collapsed to zero",
       "change": "canonical job_postings/job_applications/job_placements/referrals through signed-in RLS and canonical owner employer; query errors explicit",
       "tests": "4 report contract tests plus 85 employer authorization tests passed; reports rendered heading added to portal acceptance"
     },
     {
       "id": "paris-invented-deep-path-feedback",
-      "status": "unit-and-admin-build-validated-awaiting-release",
+      "status": "deployed-narrow-tests-passed-autonomous-outcome-not-verified",
       "cause": "fresh repair 08c1ab64 repeated nonexistent nested paths after parent-only feedback exhausted",
       "change": "bounded credential-filtered root listing fallback; inspection and retry guards unchanged",
       "tests": "19 targeted tests passed; full Admin compile and generated route typecheck passed"
     },
     {
       "id": "paypal-mobile-target",
-      "status": "unit-validated-awaiting-mobile-runtime",
+      "status": "deployed-owner-device-certification-pending",
       "cause": "payout PayPal confirmation checkbox used native 13px target",
       "change": "44px target; no approval, verification or saved submission changes"
     }
@@ -356,5 +356,110 @@
     ],
     "participant_data_mutated": false,
     "external_messages_sent": false
+  },
+  "release_verification_20261106": {
+    "observed_at": "2026-11-06T14:07:00Z",
+    "pr": 2409,
+    "validated_head": "369762c182a1ba92eef68422e01c0cdc8bc7c77e",
+    "merge_sha": "6ce0c9b664d44ed79bf256d6e9a805c0e731d93f",
+    "all_premerge_checks_passed": true,
+    "vitest": {
+      "files_passed": 1096,
+      "tests_passed": 6626,
+      "existing_skips": 8
+    },
+    "post_merge_ci": {
+      "run": 42225951378,
+      "status": "success"
+    },
+    "services": {
+      "lms": {
+        "revision": "elevate-lms-migration-00505-mrd",
+        "release_run": 42226003305,
+        "deployment": "success"
+      },
+      "admin": {
+        "revision": "elevate-admin-migration-00488-pn2",
+        "release_run": 42225983963,
+        "deployment": "success"
+      },
+      "marketing": {
+        "revision": "elevate-marketing-migration-r6ce0c9b6-42226009647-1",
+        "release_run": 42226009647,
+        "deployment": "success"
+      }
+    },
+    "authenticated_desktop_rendering": {
+      "method": "existing signed-in administrator session and authorized preview; rendered content inspected after activation",
+      "types": [
+        "host-shop",
+        "learner read-only preview",
+        "apprentice neutral administrator preview",
+        "program-holder",
+        "admin",
+        "instructor",
+        "staff",
+        "testing-center",
+        "parent oversight",
+        "workforce",
+        "workforce-board oversight",
+        "case-manager",
+        "provider oversight"
+      ],
+      "jamie_j_noelle": [
+        "dashboard rendered",
+        "document upload form and required records rendered",
+        "existing signed MOU status rendered",
+        "onboarding profile fields rendered"
+      ],
+      "program_holder": [
+        "CDL assigned applicants: 56; existing scope retained",
+        "W-9 visible checkbox measured 44 by 44 pixels",
+        "banking preview correctly read only"
+      ],
+      "studio": "heading and private model verified-reachable state rendered after Admin activation",
+      "chunk_recovery": "navigation-aware inline bootstrap observed in rendered page; forced production chunk failure not induced"
+    },
+    "acceptance": {
+      "lms_run": 42227376279,
+      "public_runtime": "passed",
+      "authenticated_functional": "passed",
+      "responsive_cross_device": "in progress",
+      "studio_device_step": "failed during staggered release; full browser report pending",
+      "coherent_release_employer_run": 42229571050,
+      "coherent_release_employer_source": "6ce0c9b664d44ed79bf256d6e9a805c0e731d93f",
+      "employer_desktop": "passed",
+      "employer_iphone": "failed: unhandled browser auth/notification access-control errors; cancellation evidence observed; not declared repaired",
+      "handoff_success_is_not_acceptance_success": true
+    },
+    "not_verified": [
+      "Jamie individual login and Mobile Safari",
+      "every individual account or device",
+      "approved Creator account workflow",
+      "real customer saves/uploads/submissions",
+      "forced chunk recovery against authenticated production account",
+      "autonomous PARIS task completion"
+    ],
+    "protections": {
+      "customer_forms_submitted_during_manual_checks": false,
+      "participant_records_altered_merely_to_test": false,
+      "emails_sent": false,
+      "rls_or_authorization_weakened": false,
+      "financial_verification_or_approvals_changed": false,
+      "existing_isolated_ci_qa_framework": "standard deployment acceptance ran; active QA and cleanup were not interrupted"
+    },
+    "other_active_repair": {
+      "pr": 2410,
+      "title": "P0 Cloud Run dispatcher orphan cancellation and owner authorization",
+      "duplicate_created": false
+    },
+    "paris_latest_observation": {
+      "queued": 30,
+      "blocked": 28,
+      "latest_blocked_at": "2026-11-06T14:01:40Z",
+      "error": "PARIS_PLANNER_REPEATED_INSPECTION",
+      "conclusion": "narrow source discovery repair is deployed; autonomous recovery remains unverified"
+    },
+    "platform_production_ready": false
   }
 }

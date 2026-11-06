@@ -345,10 +345,13 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
        ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
       const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
        const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
-       const candidatePassed=ancestry&&repairDeploymentState(candidateRuns?.workflow_runs??[],currentSha,deployments)==='passed';
+       const candidateChecks=candidateRuns?.workflow_runs??[];
+       const independentlyValidated=candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='CI'&&run.status==='completed'&&run.conclusion==='success')&&candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='Integrity Gate'&&run.status==='completed'&&run.conclusion==='success');
+       const candidatePassed=ancestry&&independentlyValidated&&repairDeploymentState(candidateChecks,currentSha,deployments)==='passed';
       await update(repair.id,{status:'verifying',verification:{
        ...repair.verification,releaseReconciliation:{
         state:candidatePassed?'validated-newer-target':ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
+        independentlyValidated,
         immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
         checkedAt:new Date().toISOString()
        }

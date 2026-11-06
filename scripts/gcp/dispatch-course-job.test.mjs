@@ -150,7 +150,7 @@ test('a fresh heartbeat with an expired lease is not a confirmed assignment',asy
  const s=setup([],[{id:'queued'}]);
  s.options.assignmentAttempts=1;
  s.options.request=async url=>({ok:true,json:async()=>url.searchParams.has('id')
-  ? [{id:'queued',status:'running',lease_owner:'old-worker',heartbeat_at:'2026-10-06T10:00:01Z',lease_expires_at:'2026-10-06T09:59:00Z'}]
+  ? [{id:'queued',status:'running',lease_owner:'old-worker',heartbeat_at:'2026-10-06T10:00:01Z',lease_expires_at:'2026-10-06T09:59:00Z',build:{owner_paused:'false'}}]
   : [{id:'queued'}]});
  assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
 });

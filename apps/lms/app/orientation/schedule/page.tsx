@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/orientation/schedule' },
   title: 'Schedule Orientation',
   description:
-    'Schedule a virtual orientation session or a barbershop walk-through. Sessions are 2 hours apart and added to Google Calendar automatically.',
+    'Schedule an orientation or host shop consultation using the available appointment booking calendar.',
 };
 
 export default function OrientationSchedulePage() {
@@ -43,7 +43,7 @@ export default function OrientationSchedulePage() {
           <h1 className="text-3xl md:text-4xl font-black text-black mb-3">Schedule Your Session</h1>
           <p className="text-black text-lg max-w-2xl mx-auto">
             Virtual orientations and barbershop walk-throughs are available by appointment. Pick
-            your session type below — you'll receive a Google Calendar invite with a Zoom link.
+            a time on the booking page. Staff will confirm your meeting details.
           </p>
         </div>
       </section>

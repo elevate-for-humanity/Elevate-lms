@@ -1,4 +1,4 @@
-name: Deploy isolated Curvature website and request backend
+name: Verify isolated Curvature deployment prerequisites
 on:
   push:
     branches: [main]
@@ -46,44 +46,10 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
-      - name: Provision only the dedicated Curvature runtime identity
+      - name: Verify isolated runtime prerequisites without changing access
         run: |
           set -euo pipefail
-          # Never substitute an Elevate or Store runtime for this business.
+          # Provisioning requires the Google project owner. Never substitute a shared runtime.
           gcloud secrets versions describe latest --secret=curvature-supabase-service-role-key --project="$PROJECT" --format='value(state)' | grep -Fx ENABLED
-          if ! gcloud iam service-accounts describe "$RUNTIME" --project="$PROJECT" >/dev/null 2> runtime-error.txt; then
-            grep -q NOT_FOUND runtime-error.txt || { cat runtime-error.txt >&2; exit 1; }
-            gcloud iam service-accounts create curvature-runtime --project="$PROJECT" --display-name='Curvature isolated runtime' --quiet
-          fi
-          gcloud secrets add-iam-policy-binding curvature-supabase-service-role-key --project="$PROJECT" --member="serviceAccount:$RUNTIME" --role=roles/secretmanager.secretAccessor --condition=None --quiet >/dev/null
-          gcloud iam service-accounts add-iam-policy-binding "$RUNTIME" --project="$PROJECT" --member=serviceAccount:elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com --role=roles/iam.serviceAccountUser --condition=None --quiet >/dev/null
-      - name: Build and resolve immutable tested image
-        id: image
-        run: |
-          set -euo pipefail
-          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-          IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/curvature-body-sculpting:$SOURCE_SHA"
-          docker build --label "org.opencontainers.image.revision=$SOURCE_SHA" -t "$IMAGE" .
-          docker push "$IMAGE"
-          DIGEST="$(gcloud artifacts docker images describe "$IMAGE" --project="$PROJECT" --format='value(image_summary.digest)')"
-          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          echo "image=us-central1-docker.pkg.dev/$PROJECT/elevate/curvature-body-sculpting@$DIGEST" >> "$GITHUB_OUTPUT"
-      - name: Deploy isolated service and verify database readiness
-        env:
-          IMAGE: ${{ steps.image.outputs.image }}
-        run: |
-          set -euo pipefail
-          gcloud run deploy curvature-body-sculpting --project="$PROJECT" --region="$REGION" --image="$IMAGE" --service-account="$RUNTIME" \
-            --set-env-vars="SUPABASE_URL=https://pztctqvzvsitcsvdolqr.supabase.co,CURVATURE_SOURCE_SHA=$SOURCE_SHA,ALLOWED_ORIGINS=https://curvaturebodysculpting.store" \
-            --set-secrets=SUPABASE_SERVICE_ROLE_KEY=curvature-supabase-service-role-key:latest \
-            --cpu=1 --memory=512Mi --min-instances=0 --max-instances=1 --port=8080 --timeout=60s --no-allow-unauthenticated --quiet
-          URL="$(gcloud run services describe curvature-body-sculpting --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
-          TOKEN="$(gcloud auth print-identity-token)"
-          echo "::add-mask::$TOKEN"
-          curl --fail --silent --show-error --max-time 60 -H "Authorization: Bearer $TOKEN" "$URL/readyz" > ready.json
-          node --input-type=module -e 'import fs from "node:fs"; import assert from "node:assert/strict"; assert.equal(JSON.parse(fs.readFileSync("ready.json","utf8")).ready,true);'
-          for path in / /shop /contact /services /book-appointment /careers /apply; do
-            curl --fail --silent --show-error --max-time 30 -H "Authorization: Bearer $TOKEN" "$URL$path" > page.html
-            grep -q '<h1>' page.html
-          done
-          gcloud run services describe curvature-body-sculpting --project="$PROJECT" --region="$REGION" --format='yaml(status.latestReadyRevisionName,status.url)'
+          gcloud iam service-accounts describe "$RUNTIME" --project="$PROJECT" --format='value(email)'
+          echo 'Curvature source tests passed and the dedicated runtime exists. Image admission, deployment and custom-domain acceptance remain required.'

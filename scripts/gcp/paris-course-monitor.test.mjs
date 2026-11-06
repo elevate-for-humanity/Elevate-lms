@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {inspectCourseAutopilot} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
 import {monitorCourseQueue,latestRoleJobs} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
+test('source revision failures require reconciliation even when a PARIS repair receipt exists',()=>{
+ const blocked=inspectCourseAutopilot({status:'failed',last_error:'ULTIMATE_AUTOPILOT_SOURCE_REVISION_REQUIRED',
+  monitor:{enabled:true,repairId:'saved-repair'}},{status:'running',profile:{ownerPaused:false}},now.getTime());
+ assert.equal(blocked.state,'source_revision_blocked');
+ assert.equal(blocked.action,'needs_source_reconciliation');
+ assert.match(blocked.reason,/provenance and approval/);
+ assert.notEqual(blocked.state,'repairing');
+});
 test('waiting role prerequisites do not dispatch or inherit another lesson’s storage failure',()=>{
  const observation=inspectCourseAutopilot({status:'queued',available_at:'infinity',monitor:{enabled:true},payload:{autopilot:{role:'quality'}}},
   {status:'running',findings:[{message:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'}]},now.getTime());

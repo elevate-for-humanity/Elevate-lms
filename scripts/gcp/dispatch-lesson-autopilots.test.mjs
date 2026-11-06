@@ -204,6 +204,22 @@ test('slow startup uses bounded claim polling and rechecks never launch duplicat
 });
 
 
+test('unknown and explicitly paused owners cannot consume a paid lesson worker',async()=>{
+ const rows=[{...waiting('media','unknown'),build:{status:'running',owner_paused:null}},
+   {...waiting('media','paused'),build:{status:'running',owner_paused:'true'}}];
+ const s=fixture(rows);
+ // Production REST query must filter explicit false before applying limit.
+ s.options.request=async(url,init)=>{
+  if(url.pathname.endsWith('/ultimate_build_jobs') && !url.searchParams.has('id')){
+    assert.equal(url.searchParams.get('build.profile->>ownerPaused'),'eq.false');
+    return {ok:true,json:async()=>rows};
+  }
+  return {ok:true,json:async()=>[]};
+ };
+ assert.equal((await dispatchLessonAutopilots(s.options)).status,'empty');
+ assert.equal(launches(s).length,0);
+});
+
 test('archived and published builds cannot consume a worker execution',async()=>{
  const rows=[{...waiting('media','archived'),build:{status:'archived',owner_paused:false}},
   {...waiting('media','published'),build:{status:'published',owner_paused:false}}];

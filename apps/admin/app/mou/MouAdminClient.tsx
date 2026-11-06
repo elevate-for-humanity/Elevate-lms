@@ -36,6 +36,7 @@ interface Signature {
 }
 
 interface Props {
+  partners: Array<{id:string;name:string}>;
   partnerMous: PartnerMou[];
   mouCount: number;
   templates: Template[];
@@ -53,7 +54,7 @@ const STATUS_STYLE: Record<string, string> = {
 
 type Tab = 'agreements' | 'signatures' | 'templates' | 'create';
 
-export default function MouAdminClient({ partnerMous, mouCount, templates, signatures, sigCount }: Props) {
+export default function MouAdminClient({ partners, partnerMous, mouCount, templates, signatures, sigCount }: Props) {
   const [tab, setTab] = useState<Tab>('agreements');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -63,6 +64,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
   const [customTitle, setCustomTitle] = useState('');
   const [customContent, setCustomContent] = useState('');
   const [partnerName, setPartnerName] = useState('');
+  const [partnerId, setPartnerId] = useState('');
   const [partnerEmail, setPartnerEmail] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [saving, setSaving] = useState(false);
@@ -82,14 +84,14 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
       const res = await fetch('/api/admin/mou', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'create', ...body }),
+        body: JSON.stringify({ action: 'create', partner_id: partnerId, ...body }),
       });
       const d = await res.json();
       if (!res.ok) { setErr(d.error ?? 'Failed to create MOU'); return; }
-      setMsg(`MOU created${partnerEmail ? ` — sending to ${partnerEmail}` : ''}`);
+      setMsg('Agreement draft saved. Review the completed document before issuing it for signature.');
       if (d.mou) setLocalMous((prev) => [d.mou, ...prev]);
       // Reset form
-      setCustomTitle(''); setCustomContent(''); setPartnerName(''); setPartnerEmail(''); setExpiryDate(''); setSelectedTemplateId('');
+      setCustomTitle(''); setCustomContent(''); setPartnerName(''); setPartnerId(''); setPartnerEmail(''); setExpiryDate(''); setSelectedTemplateId('');
       setTimeout(() => { setTab('agreements'); setMsg(''); }, 2000);
     } catch { setErr('Network error'); }
     finally { setSaving(false); }
@@ -143,7 +145,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-slate-200 mb-6">
+      <div className="flex flex-wrap gap-1 border-b border-slate-200 mb-6">
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition ${
@@ -174,8 +176,8 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
             <div className="divide-y divide-slate-50">
               {localMous.map((mou) => (
                 <div key={mou.id}>
-                  <div
-                    className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 cursor-pointer"
+                  <button type="button" aria-expanded={expandedId === mou.id}
+                    className="flex w-full items-center justify-between px-5 py-3.5 text-left hover:bg-slate-50"
                     onClick={() => setExpandedId(expandedId === mou.id ? null : mou.id)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -197,7 +199,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
                       </span>
                       {expandedId === mou.id ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                     </div>
-                  </div>
+                  </button>
                   {expandedId === mou.id && (
                     <div className="px-5 pb-4 pt-2 bg-slate-50 border-t border-slate-100 flex gap-2">
                       <Link href={`/mou/${mou.id}`}
@@ -296,7 +298,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
           <div className="flex gap-2">
             {[
               { id: 'from_template' as const, label: 'From Template' },
-              { id: 'custom' as const, label: 'Custom / Blank' },
+              { id: 'custom' as const, label: 'Write complete terms' },
             ].map((m) => (
               <button key={m.id} onClick={() => setCreateMode(m.id)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg border transition ${
@@ -322,7 +324,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
               </select>
               {selectedTemplate?.content && (
                 <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 max-h-40 overflow-y-auto whitespace-pre-wrap">
-                  {selectedTemplate.content.slice(0, 600)}…
+                  {selectedTemplate.content}
                 </div>
               )}
             </div>
@@ -351,12 +353,12 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
           <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Partner / Company Name</label>
-              <input value={partnerName} onChange={(e) => setPartnerName(e.target.value)}
-                placeholder="ACME Corporation"
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
+              <select value={partnerId} onChange={e => {setPartnerId(e.target.value);setPartnerName(partners.find(p=>p.id===e.target.value)?.name||'');}} className="min-h-11 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                <option value="">Select an existing partner</option>{partners.map(partner=><option key={partner.id} value={partner.id}>{partner.name}</option>)}
+              </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Partner Email (to send)</label>
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Partner contact email</label>
               <input type="email" value={partnerEmail} onChange={(e) => setPartnerEmail(e.target.value)}
                 placeholder="contact@partner.com"
                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none" />
@@ -369,12 +371,12 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button onClick={createMou} disabled={saving ||
+            <button onClick={createMou} disabled={saving || !partnerId ||
               (createMode === 'from_template' && !selectedTemplateId) ||
               (createMode === 'custom' && (!customTitle || !customContent))}
               className="flex items-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-brand-blue-700 transition disabled:opacity-50">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-              {saving ? 'Creating…' : partnerEmail ? 'Create & Send' : 'Create MOU'}
+              {saving ? 'Creating…' : 'Save agreement draft'}
             </button>
             <button onClick={() => setTab('agreements')}
               className="text-sm text-slate-500 hover:text-slate-800">Cancel</button>

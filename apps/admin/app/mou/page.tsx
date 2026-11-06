@@ -18,6 +18,7 @@ export default async function MOUPage() {
     { data: partnerMous, count: mouCount },
     { data: templates },
     { data: signatures, count: sigCount },
+    { data: partners },
   ] = await Promise.all([
     supabase
       .from('partner_mous')
@@ -34,10 +35,12 @@ export default async function MOUPage() {
       .select('id, signer_name, signer_title, signed_at, mou_version, compensation_model, compensation_rate', { count: 'exact' })
       .order('signed_at', { ascending: false })
       .limit(50),
+    supabase.from('partners').select('id,name').order('name'),
   ]);
 
   return (
     <MouAdminClient
+      partners={partners ?? []}
       partnerMous={partnerMous ?? []}
       mouCount={mouCount ?? 0}
       templates={templates ?? []}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Brain, CheckCircle2, Clock3, Cpu, Database, FileText, GitBranch, PackageOpen, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 
 type Overlay = 'critical' | 'storage' | 'stale' | 'retry';
@@ -48,9 +48,11 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
   const [mediaGaps, setMediaGaps] = useState<MediaGap[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const pendingRequest = useRef(false);
 
   async function load() {
-    if (!courseId) return;
+    if (!courseId || pendingRequest.current) return;
+    pendingRequest.current = true;
     setLoading(true);
     setError('');
     try {
@@ -62,6 +64,7 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to load pipeline status');
     } finally {
+      pendingRequest.current = false;
       setLoading(false);
     }
   }

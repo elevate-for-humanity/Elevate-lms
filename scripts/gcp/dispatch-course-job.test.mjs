@@ -179,18 +179,25 @@ test('unpaused builds still dispatch while owner-paused builds are excluded',asy
 
 test('paused builds are excluded by the database before the 50-row queue limit', async()=>{
  const paused=Array.from({length:50},(_,i)=>({id:'paused-'+i,build:{owner_paused:'true'}}));
- const s=setup([],[...paused,{id:'queued',build:{owner_paused:null}}]);
+ const s=setup([],[...paused,{id:'queued',build:{owner_paused:'false'}}]);
  const base=s.options.request;
  s.options.request=async url=>{
   if(url.searchParams.has('id')) return base(url);
-  assert.equal(url.searchParams.get('build.or'),'(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
+  assert.equal(url.searchParams.get('build.profile->>ownerPaused'),'eq.false');
   // Model PostgREST applying the embedded filter before the top-level limit.
   return {ok:true,json:async()=>[...paused,{id:'queued',build:{owner_paused:null}}]
-   .filter(job=>job.build.owner_paused!=='true').slice(0,Number(url.searchParams.get('limit')))};
+   .filter(job=>job.build.owner_paused==='false').slice(0,Number(url.searchParams.get('limit')))};
  };
  const result=await dispatchQueuedCourseJob(s.options);
  assert.deepEqual(result.jobIds,['queued']);
  assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
+});
+
+test('unknown owner pause does not authorize a course worker',async()=>{
+ const s=setup([],[{id:'unknown',status:'queued',available_at:'2026-10-06T09:59:00Z',build:{owner_paused:null}}]);
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.equal(result.status,'empty');
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
 });
 
 test('a full page of storage-blocked jobs cannot hide runnable work',async()=>{

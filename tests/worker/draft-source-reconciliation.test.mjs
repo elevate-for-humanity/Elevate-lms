@@ -13,9 +13,14 @@ function fixture(){
 test('plans exact draft-source recovery while retaining publication refusal',()=>{
  const f=fixture();const plan=planDraftSourceReconciliation(f);
  assert.equal(plan.sourceCount,1);assert.equal(plan.publicationApproved,false);
+ assert.equal(plan.publishCompletedLessons,false);
  assert.deepEqual(plan.jobIds,['instruction']);assert.notEqual(plan.newPoolHash,plan.previousPoolHash);
  assert.equal(recoveredSourcePublicationAllowed(f.build.profile),false);
  assert.match(plan.sql,/Owner''s restored draft/);
+});
+test('the independently deployed partial-publication guard also requires publication disabled',()=>{
+ const f=fixture();f.publicationGuardVersion='partial-publication-disabled-v1';
+ assert.equal(planDraftSourceReconciliation(f).publishCompletedLessons,false);
 });
 test('rejects changed, published, leased, unrelated and incomplete source snapshots before any recovery',()=>{
  for(const mutate of [f=>f.build.status='published',f=>f.build.profile.ownerPaused=true,

@@ -13,7 +13,7 @@ const quoted=v=>"'"+String(v).replaceAll("'","''")+"'";
 export function planDraftSourceReconciliation({build,pool,jobs,imageSha,imageDigest,publicationGuardVersion,now=Date.now()}) {
  assert.match(imageSha??'',/^[a-f0-9]{40}$/,'verified worker commit required');
  assert.match(imageDigest??'',/^sha256:[a-f0-9]{64}$/,'verified immutable image required');
- assert.equal(publicationGuardVersion,'draft-recovery-v1','deployed draft publication guard required');
+ assert.ok(['draft-recovery-v1','partial-publication-disabled-v1'].includes(publicationGuardVersion),'deployed publication guard required');
  assert.equal(build?.status,'running');assert.equal(build.profile?.ownerPaused,false);
  assert.equal(pool?.build_id,build.id);assert.equal(pool.state,'active');
  assert.equal(pool.profile_hash,hash(pool.profile),'pool snapshot hash mismatch');
@@ -35,9 +35,12 @@ export function planDraftSourceReconciliation({build,pool,jobs,imageSha,imageDig
  assert.ok(instruction.every(j=>j.status==='failed'&&j.last_error==='ULTIMATE_AUTOPILOT_SOURCE_REVISION_REQUIRED'&&
   Number.isSafeInteger(j.execution_generation)&&Number.isSafeInteger(j.attempts)&&j.attempts>=0&&j.attempts<10),
   'only exact failed source-revision generations may resume');
- const newHash=hash(build.profile);
+ // The existing deployed release service also rejects partial publication
+ // when this flag is false. Keep that independent barrier during rollout.
+ const reconciledProfile={...build.profile,publishCompletedLessons:false};
+ const newHash=hash(reconciledProfile);
  const delimiter='$source_'+newHash+'$';
- const snapshot=literal({poolProfile:pool.profile,poolHash:pool.profile_hash,imageSha,imageDigest});
+ const snapshot=literal({poolProfile:pool.profile,poolHash:pool.profile_hash,previousPublishCompletedLessons:build.profile.publishCompletedLessons,imageSha,imageDigest,publicationGuardVersion});
  assert.ok(!JSON.stringify({build,pool}).includes(delimiter),'source delimiter collision');
  const sql=`BEGIN;
 SET LOCAL lock_timeout='5s';
@@ -59,7 +62,8 @@ BEGIN
  INSERT INTO public.ultimate_job_attempt_history(job_id,execution_generation,event_type,details)
  SELECT p.coordinator_job_id,execution_generation,'source_pool_revision_archived',${snapshot}
  FROM public.ultimate_build_jobs WHERE id=p.coordinator_job_id;
- UPDATE public.ultimate_autopilot_pools SET profile=b.profile,profile_hash=${quoted(newHash)},updated_at=now() WHERE id=p.id;
+ UPDATE public.ultimate_course_builds SET profile=${literal(reconciledProfile)},updated_at=now() WHERE id=b.id;
+ UPDATE public.ultimate_autopilot_pools SET profile=${literal(reconciledProfile)},profile_hash=${quoted(newHash)},updated_at=now() WHERE id=p.id;
  FOR j IN SELECT * FROM public.ultimate_build_jobs WHERE build_id=b.id AND payload#>>'{autopilot,role}'='instruction' LOOP
   IF j.status<>'failed' OR j.last_error IS DISTINCT FROM 'ULTIMATE_AUTOPILOT_SOURCE_REVISION_REQUIRED' OR j.attempts>=10
   THEN RAISE EXCEPTION 'SOURCE_RECONCILIATION_JOB_CHANGED'; END IF;
@@ -76,5 +80,5 @@ BEGIN
 END ${delimiter};
 SELECT status,count(*) FROM public.ultimate_build_jobs WHERE build_id=${quoted(build.id)}::uuid GROUP BY status;
 COMMIT;`;
- return {buildId:build.id,sourceCount:ids.length,jobIds:instruction.map(j=>j.id),previousPoolHash:pool.profile_hash,newPoolHash:newHash,publicationApproved:false,sql};
+ return {buildId:build.id,sourceCount:ids.length,jobIds:instruction.map(j=>j.id),previousPoolHash:pool.profile_hash,newPoolHash:newHash,publicationApproved:false,publishCompletedLessons:false,sql};
 }

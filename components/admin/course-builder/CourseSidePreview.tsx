@@ -135,7 +135,10 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
       }
     }
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 15000);
+    // Background tabs must not keep issuing two database reads every interval.
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") void refresh();
+    }, 30000);
     return () => {
       disposed = true;
       controller.abort();

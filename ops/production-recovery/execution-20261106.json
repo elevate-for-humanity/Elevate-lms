@@ -317,9 +317,11 @@
     "targeted_tests_passed": 109,
     "files": 6,
     "admin_build_and_generated_typecheck": "passed",
-    "lms_build_and_generated_typecheck": "running",
+    "lms_build_and_generated_typecheck": "passed",
     "required_ci_0375c21": "all required checks passed",
-    "production_verification_of_source_repairs": "pending"
+    "production_verification_of_source_repairs": "pending",
+    "full_paris_preflight_tests_passed": 94,
+    "read_discovery_bound": "original three listing calls preserved; regression adds actual root recovery"
   },
   "dashboard_runtime_check_20261106": {
     "checked_at": "2026-11-06T13:15:00Z",

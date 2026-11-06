@@ -154,16 +154,11 @@ async function rejectedReadFeedback(path: string, branch: string): Promise<strin
   // Protected paths remain opaque. Only discover ancestors of allowed paths.
   if (blockedPath(path)) return message;
   const parts = path.replace(/\/+$/, '').split('/').filter(Boolean);
-  const ancestors: string[] = [];
-  for (let length = parts.length - 1; length > 0; length -= 1) {
-    ancestors.push(parts.slice(0, length).join('/'));
-  }
   // A guessed path can contain a task-branch name several directories deep.
-  // Three missing ancestors otherwise leave the model with no real filenames,
-  // so it repeats the rejected list until the inspection guard correctly stops.
-  // Always include a known discovery boundary in at most five reads. Every
-  // listing still passes the same protected-path and credential filters.
-  const directories = [...new Set([...ancestors.slice(0, 3), parts[0] || '', ''])];
+  // Preserve the three-read discovery bound, but always reach a real boundary:
+  // nearest parent, top-level application directory, then repository root.
+  // Every listing retains protected-path and credential filtering.
+  const directories = [...new Set([parts.slice(0, -1).join('/'), parts[0] || '', ''])];
   for (const directory of directories) {
     try {
       const entries = await listDirectory(directory, branch);

@@ -228,7 +228,7 @@ export function WageProgressionCalculator({
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold"
-                onClick={() => window.location.href = '/apply/barbering-apprenticeship'}
+                onClick={() => window.location.href = '/apply/student/form?program=barber-apprenticeship&intent=enrollment'}
               >
                 Apply for Barbering Apprenticeship
               </Button>

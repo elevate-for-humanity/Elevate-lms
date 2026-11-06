@@ -10,6 +10,16 @@ test('recover only existing signed private caption key on configured endpoint',(
  assert.equal(ownedAncillaryCourseKey('https://elevate-media.s3.us-east-005.backblazeb2.com/'+file+'?X-Amz-Signature=expired',config),file);
  assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/elevate-media/'+file.replace('.vtt','.txt'),config),file.replace('.vtt','.txt'));
 });
+test('renew known immutable UUID-suffixed caption and transcript keys',()=>{
+ const uuidKey='generated-lessons/lesson-38150e5f-6f6a-40cd-b470-ba64bda30068-f2618e12-1e35-435b-b40f-08cabd016b96.vtt';
+ for(const key of [uuidKey,uuidKey.replace('.vtt','.txt')]) {
+  assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/elevate-media/'+key+'?X-Amz-Signature=expired',config),key);
+ }
+ // A foreign/altered bucket, different host or non-caption asset still fails closed.
+ assert.equal(ownedAncillaryCourseKey('https://other.example/elevate-media/'+uuidKey,config),null);
+ assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/other/'+uuidKey,config),null);
+ assert.equal(ownedAncillaryCourseKey('https://s3.us-east-005.backblazeb2.com/elevate-media/'+uuidKey.replace('.vtt','.mp4'),config),null);
+});
 test('do not re-sign foreign, user-controlled or non-caption assets',()=>{
  for(const u of [
   'https://evil.example/elevate-media/'+file,

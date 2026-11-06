@@ -14,6 +14,7 @@ export default function BookkeepingVideoPage() {
       <PublicPageLead
         image="/images/refresh-20261014/business.webp"
         alt="Instructor and learners reviewing business and bookkeeping records on laptops"
+        actions={[]}
       />
       <section className="mx-auto max-w-5xl space-y-6 px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-sm font-bold uppercase tracking-widest text-blue-800">Elevate for Humanity</p>

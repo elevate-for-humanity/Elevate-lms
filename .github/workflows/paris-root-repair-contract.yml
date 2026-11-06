@@ -4,6 +4,12 @@ on:
     paths:
       - 'lib/ai/runtime/code-repair.ts'
       - 'lib/ai/runtime/code-repair-policy.mjs'
+      - 'lib/ai/runtime/course-repair-policy.mjs'
+      - 'lib/devstudio/repair-checkpoint-recovery.mjs'
+      - 'lib/ultimate-course-builder/release/recovered-source-policy.mjs'
+      - 'scripts/gcp/reconcile-draft-source-pool.mjs'
+      - 'tests/worker/paris-recovery-admission.test.mjs'
+      - 'tests/worker/draft-source-reconciliation.test.mjs'
       - 'lib/ai/runtime/paris-attempt-contract.test.mjs'
       - 'supabase/migrations/*paris_bounded_context_retry_contract.sql'
       - '.github/workflows/paris-root-repair-contract.yml'
@@ -20,4 +26,4 @@ jobs:
         with:
           node-version: '22'
       - name: Verify PARIS repair budget and existing repair policy
-        run: node --test lib/ai/runtime/paris-attempt-contract.test.mjs lib/ai/runtime/code-repair-policy.test.mjs
+        run: node --test lib/ai/runtime/paris-attempt-contract.test.mjs lib/ai/runtime/code-repair-policy.test.mjs lib/ai/runtime/course-repair-policy.test.mjs tests/worker/paris-recovery-admission.test.mjs tests/worker/draft-source-reconciliation.test.mjs

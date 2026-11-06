@@ -8,7 +8,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  const token=env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('DATABASE_AUTH_REQUIRED');
  const headers={apikey:token,Authorization:'Bearer '+token};
  const url=new URL(ROOT);
- url.searchParams.set('select','id,build_id,payload,status,execution_generation,lease_expires_at,last_error,monitor,build:ultimate_course_builds!inner(course_id,status,profile)');
+ url.searchParams.set('select','id,build_id,payload,status,attempts,max_attempts,execution_generation,lease_expires_at,last_error,monitor,build:ultimate_course_builds!inner(course_id,status,profile)');
  url.searchParams.set('status','eq.failed');
  const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw Error('REPAIR_RESUME_READ_HTTP_'+response.status);
@@ -71,7 +71,10 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    ['published','archived','cancelled'].includes(job.build?.status)||job.monitor?.enabled!==true||
    job.monitor?.lastRepairDeployment?.imageSha===imageSha||
    (job.lease_expires_at && !(Date.parse(job.lease_expires_at)<=now.getTime()))||
-   !Number.isSafeInteger(job.execution_generation))continue;
+   !Number.isSafeInteger(job.execution_generation)||
+   !Number.isSafeInteger(job.attempts)||job.attempts<0||
+   !Number.isSafeInteger(job.max_attempts)||job.max_attempts<1||
+   job.attempts>job.max_attempts||job.max_attempts>10)continue;
   const error=String(job.last_error??'');
   // New tested code can recover internal defects. Missing evidence, permissions,
   // storage quota and intentional pauses still need their real remedy.
@@ -100,9 +103,15 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');
   target.searchParams.set('execution_generation','eq.'+job.execution_generation);
+  target.searchParams.set('attempts','eq.'+job.attempts);
+  target.searchParams.set('max_attempts','eq.'+job.max_attempts);
   target.searchParams.set('or','(lease_expires_at.is.null,lease_expires_at.lte.'+now.toISOString()+')');
   target.searchParams.set('monitor',job.monitor==null?'is.null':'eq.'+JSON.stringify(job.monitor));
-  const body={status:'queued',attempts:0,execution_generation:job.execution_generation+1,
+  // Recovery grants only one additional claim if the current retry budget was
+  // exhausted. Never erase cumulative attempts or historical claim evidence.
+  const nextMaxAttempts=Math.max(job.max_attempts,job.attempts+1);
+  if(nextMaxAttempts>10)continue;
+  const body={status:'queued',max_attempts:nextMaxAttempts,execution_generation:job.execution_generation+1,
    lease_owner:null,lease_expires_at:null,last_error:null,available_at:now.toISOString(),updated_at:now.toISOString(),
    monitor:{...job.monitor,lastRepairDeployment:{imageSha,imageDigest,at:now.toISOString(),previousError:error}}};
   // Once an eligible cursor is selected, a lost admission race must not

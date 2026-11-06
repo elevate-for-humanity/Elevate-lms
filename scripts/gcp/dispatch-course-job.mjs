@@ -27,8 +27,8 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const retryHorizon = new Date(now.getTime() + 5 * 60_000);
   url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + retryHorizon.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
   // Filter the joined build before the queue limit so paused rows cannot
-  // hide eligible work. Missing pause flags retain their existing eligibility.
-  url.searchParams.set('build.or','(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
+  // hide eligible work. Missing pause flags must not imply consent.
+  url.searchParams.set('build.profile->>ownerPaused','eq.false');
   url.searchParams.set('limit','50');
   const candidates = [];
   // Exhausted and storage-blocked rows may fill an entire page. Continue the
@@ -48,8 +48,8 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const blockedByStorage = job => /storage cap exceeded|COURSE_OBJECT_STORAGE_UPLOAD_FAILED|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED/i.test(job.last_error ?? '');
   // Respect explicit owner pauses before launching paid Cloud Run work.
   // The worker independently enforces this pause if it changes after dispatch.
-  const ownerPaused = job => job.build?.owner_paused === true || job.build?.owner_paused === 'true';
-  const eligible = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job) && !ownerPaused(job));
+  const ownerAuthorized = job => job.build?.owner_paused === false || job.build?.owner_paused === 'false';
+  const eligible = candidates.filter(job => (job.max_attempts === undefined || job.attempts < job.max_attempts) && !blockedByStorage(job) && ownerAuthorized(job));
   const availableTime = job => {
     if (job.available_at == null) return 0;
     const timestamp = Date.parse(job.available_at);

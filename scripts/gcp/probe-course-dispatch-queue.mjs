@@ -37,11 +37,12 @@ export async function probeCourseDispatchQueue({env=process.env,request=fetch,
   // cannot conceal an invalid relationship shape or JSON projection.
   const sample=new URL(url);
   sample.searchParams.delete('or');sample.searchParams.delete('build.or');
+  sample.searchParams.delete('build.profile->>ownerPaused');
   sample.searchParams.set('limit','1');
   sampled=(await read(sample)).length;
   assert.ok(sampled>0,'COURSE_QUEUE_PROJECTION_NO_SAMPLE');
   const rows=await read(url);
-  assert.ok(rows.every(row=>row.build.owner_paused!==true && row.build.owner_paused!=='true'),
+  assert.ok(rows.every(row=>row.build.owner_paused===false || row.build.owner_paused==='false'),
    'COURSE_QUEUE_PAUSED_FILTER_FAILED');
   eligible=rows.length;
   return {ok:true,json:async()=>[]};

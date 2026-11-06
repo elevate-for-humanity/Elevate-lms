@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { dispatchQueuedCourseJob } from './dispatch-course-job.mjs';
 
 function setup(executions, queued, httpStatus=200) {
+  queued=queued.map(job=>({...job,build:job.build??{owner_paused:'false'}}));
   const calls=[];
   const run=(_command,args)=>{calls.push(args); return JSON.stringify(args[2] === 'describe' ? {spec:{template:{spec:{parallelism:2,template:{spec:{containers:[{resources:{limits:{cpu:'8',memory:'32Gi'}}}]}}}}}} : executions);};
   const request=async url=>({ok:httpStatus===200,status:httpStatus,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-test',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}] : queued});
@@ -66,7 +67,7 @@ test('queue outage fails closed rather than launching blind work',async()=>{
 
 test('slow container startup remains pending instead of failing or reporting assigned',async()=>{
   const s=setup([], [{id:'queued'}]);
-  s.options.request=async()=>({ok:true,status:200,json:async()=>[{id:'queued',status:'queued',heartbeat_at:null}]});
+  s.options.request=async()=>({ok:true,status:200,json:async()=>[{id:'queued',status:'queued',heartbeat_at:null,build:{owner_paused:'false'}}]});
   s.options.assignmentAttempts=2;
   s.options.delay=async()=>{};
   assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
@@ -102,7 +103,7 @@ test('insufficient approved regional capacity leaves queued work untouched and d
 
 test('two eligible builds request two parallel Google Cloud Run worker tasks',async()=>{
  const s=setup([],[{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]);
- s.options.request=async url=>({ok:true,status:200,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-a',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'},{id:'queued-2',status:'running',lease_owner:'worker-b',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}] : [{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]});
+ s.options.request=async url=>({ok:true,status:200,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-a',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'},{id:'queued-2',status:'running',lease_owner:'worker-b',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}] : [{id:'queued',attempts:0,max_attempts:5,build:{owner_paused:'false'}},{id:'queued-2',attempts:0,max_attempts:5,build:{owner_paused:'false'}}]});
  const result=await dispatchQueuedCourseJob(s.options);
  assert.equal(result.tasks,2);
  assert.ok(s.calls[2].includes('--tasks=2'));
@@ -149,8 +150,8 @@ test('a fresh heartbeat with an expired lease is not a confirmed assignment',asy
  const s=setup([],[{id:'queued'}]);
  s.options.assignmentAttempts=1;
  s.options.request=async url=>({ok:true,json:async()=>url.searchParams.has('id')
-  ? [{id:'queued',status:'running',lease_owner:'old-worker',heartbeat_at:'2026-10-06T10:00:01Z',lease_expires_at:'2026-10-06T09:59:00Z'}]
-  : [{id:'queued'}]});
+  ? [{id:'queued',status:'running',lease_owner:'old-worker',heartbeat_at:'2026-10-06T10:00:01Z',lease_expires_at:'2026-10-06T09:59:00Z',build:{owner_paused:'false'}}]
+  : [{id:'queued',build:{owner_paused:'false'}}]});
  assert.equal((await dispatchQueuedCourseJob(s.options)).reason,'awaiting_worker_assignment');
 });
 
@@ -179,18 +180,25 @@ test('unpaused builds still dispatch while owner-paused builds are excluded',asy
 
 test('paused builds are excluded by the database before the 50-row queue limit', async()=>{
  const paused=Array.from({length:50},(_,i)=>({id:'paused-'+i,build:{owner_paused:'true'}}));
- const s=setup([],[...paused,{id:'queued',build:{owner_paused:null}}]);
+ const s=setup([],[...paused,{id:'queued',build:{owner_paused:'false'}}]);
  const base=s.options.request;
  s.options.request=async url=>{
   if(url.searchParams.has('id')) return base(url);
-  assert.equal(url.searchParams.get('build.or'),'(profile->>ownerPaused.is.null,profile->>ownerPaused.neq.true)');
+  assert.equal(url.searchParams.get('build.profile->>ownerPaused'),'eq.false');
   // Model PostgREST applying the embedded filter before the top-level limit.
-  return {ok:true,json:async()=>[...paused,{id:'queued',build:{owner_paused:null}}]
-   .filter(job=>job.build.owner_paused!=='true').slice(0,Number(url.searchParams.get('limit')))};
+  return {ok:true,json:async()=>[...paused,{id:'queued',build:{owner_paused:'false'}}]
+   .filter(job=>job.build.owner_paused==='false').slice(0,Number(url.searchParams.get('limit')))};
  };
  const result=await dispatchQueuedCourseJob(s.options);
  assert.deepEqual(result.jobIds,['queued']);
  assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
+});
+
+test('unknown owner pause does not authorize a course worker',async()=>{
+ const s=setup([],[{id:'unknown',status:'queued',available_at:'2026-10-06T09:59:00Z',build:{owner_paused:null}}]);
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.equal(result.status,'empty');
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
 });
 
 test('a full page of storage-blocked jobs cannot hide runnable work',async()=>{
@@ -198,7 +206,7 @@ test('a full page of storage-blocked jobs cannot hide runnable work',async()=>{
  s.options.request=async url=>{
   if(url.searchParams.has('id'))return {ok:true,json:async()=>[{id:'queued',status:'running',lease_owner:'worker',lease_expires_at:'2026-10-06T10:05:00Z',heartbeat_at:'2026-10-06T10:00:01Z'}]};
   const offset=Number(url.searchParams.get('offset'));offsets.push(offset);
-  return {ok:true,json:async()=>offset===0?Array.from({length:50},(_,i)=>({id:'blocked-'+i,last_error:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'})):[{id:'queued'}]};
+  return {ok:true,json:async()=>offset===0?Array.from({length:50},(_,i)=>({id:'blocked-'+i,last_error:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED',build:{owner_paused:'false'}})):[{id:'queued',build:{owner_paused:'false'}}]};
  };
  const result=await dispatchQueuedCourseJob(s.options);
  assert.deepEqual(offsets,[0,50]);assert.equal(result.status,'assigned');assert.deepEqual(result.jobIds,['queued']);

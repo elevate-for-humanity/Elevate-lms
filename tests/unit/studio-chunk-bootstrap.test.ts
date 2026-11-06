@@ -127,4 +127,69 @@ describe('Admin recovery before React hydration', () => {
     expect(new URL(replace.mock.calls[0][0]).pathname).toBe('/employer/documents');
     vi.restoreAllMocks();
   });
+  it('recovers a React-caught Course Builder chunk through the shared destination hint', () => {
+    const { listeners, replace } = boot('https://admin.elevateforhumanity.org/dashboard');
+    navigate(listeners, 'https://admin.elevateforhumanity.org/studio/courses?tab=ultimate');
+    const caught = new CustomEvent('elevate:chunk-error', {
+      detail: 'ChunkLoadError: Loading chunk 4321 failed',
+      cancelable: true,
+    });
+    listeners.get('elevate:chunk-error')!(caught);
+    expect(caught.defaultPrevented).toBe(true);
+    expect(replace).toHaveBeenCalledTimes(1);
+    const destination = new URL(replace.mock.calls[0][0]);
+    expect(destination.pathname).toBe('/studio/courses');
+    expect(destination.searchParams.get('tab')).toBe('ultimate');
+  });
+  it('does not let a React boundary start a second recovery after the early handler', () => {
+    const { listeners, replace } = boot('https://admin.elevateforhumanity.org/dashboard');
+    navigate(listeners, 'https://admin.elevateforhumanity.org/studio/courses');
+    listeners.get('unhandledrejection')!({
+      reason: new Error('ChunkLoadError: Loading chunk 1 failed'),
+    } as unknown as Event);
+    const caught = new CustomEvent('elevate:chunk-error', {
+      detail: 'ChunkLoadError: Loading chunk 2 failed',
+      cancelable: true,
+    });
+    listeners.get('elevate:chunk-error')!(caught);
+    expect(caught.defaultPrevented).toBe(true);
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(new URL(replace.mock.calls[0][0]).pathname).toBe('/studio/courses');
+  });
+  it('does not acknowledge database or authentication failures as caught chunks', () => {
+    const { listeners, replace } = boot();
+    for (const detail of [
+      'Database unavailable',
+      'Fetch API cannot load auth/v1/user due to access control checks.',
+    ]) {
+      const caught = new CustomEvent('elevate:chunk-error', { detail, cancelable: true });
+      listeners.get('elevate:chunk-error')!(caught);
+      expect(caught.defaultPrevented).toBe(false);
+    }
+    expect(replace).not.toHaveBeenCalled();
+  });
+  it('lets an in-flight document navigation win over a late caught chunk failure', () => {
+    const { listeners, replace } = boot('https://admin.elevateforhumanity.org/studio/courses');
+    listeners.get('beforeunload')!(new Event('beforeunload'));
+    const caught = new CustomEvent('elevate:chunk-error', {
+      detail: 'ChunkLoadError',
+      cancelable: true,
+    });
+    listeners.get('elevate:chunk-error')!(caught);
+    expect(caught.defaultPrevented).toBe(true);
+    expect(replace).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem('elevate-chunk-reload')).toBeNull();
+  });
+  it('recovers the restored document without reusing its previous forward navigation', () => {
+    const { listeners, replace } = boot();
+    navigate(listeners, 'https://admin.elevateforhumanity.org/studio/courses');
+    listeners.get('pagehide')!(new Event('pagehide'));
+    listeners.get('pageshow')!(new Event('pageshow'));
+    listeners.get('elevate:chunk-error')!(
+      new CustomEvent('elevate:chunk-error', { detail: 'ChunkLoadError', cancelable: true }),
+    );
+    expect(replace).toHaveBeenCalledTimes(1);
+    expect(new URL(replace.mock.calls[0][0]).pathname).toBe('/studio');
+  });
+
 });

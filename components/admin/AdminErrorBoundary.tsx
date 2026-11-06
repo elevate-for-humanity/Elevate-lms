@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { installChunkRecovery } from '@/lib/browser/chunk-recovery-bootstrap';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 function isStaleDeploymentAsset(error: Error & { digest?: string }): boolean {
@@ -25,21 +26,20 @@ export default function AdminErrorBoundary({
   useEffect(() => {
     if (!staleDeploymentAsset || typeof window === 'undefined') return;
 
-    const assetMatch = error.message?.match(/(?:chunks?\/|chunk\s+)([^\s)]+)/i);
-    const assetKey = assetMatch?.[1] ?? error.digest ?? 'unknown';
-    const recoveryKey = `admin-stale-asset-recovery:${assetKey}`;
+    const notify = () =>
+      new CustomEvent('elevate:chunk-error', {
+        detail: `${error.message ?? ''} ${error.digest ?? ''}`,
+        cancelable: true,
+      });
+    // The head bootstrap owns automatic recovery. A second per-asset fence can
+    // race that navigation and send Course Builder back to the old dashboard.
+    if (!window.dispatchEvent(notify())) return;
 
-    try {
-      if (sessionStorage.getItem(recoveryKey) === '1') return;
-      sessionStorage.setItem(recoveryKey, '1');
-    } catch {
-      // Without a durable recovery fence, use the explicit refresh button.
-      return;
-    }
-
-    const url = new URL(window.location.href);
-    url.searchParams.set('__recover', Date.now().toString());
-    window.location.replace(url.toString());
+    // A root-layout failure can render global-error without the head script.
+    // Install the same bounded handler only when no existing owner acknowledged.
+    const cleanup = installChunkRecovery(window);
+    window.dispatchEvent(notify());
+    return cleanup;
   }, [error, staleDeploymentAsset]);
 
   return (

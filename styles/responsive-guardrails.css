@@ -31,6 +31,15 @@ body {
   body.admin-portal:has([aria-label='Mobile admin navigation']) {
     --elevate-pwa-bottom-offset: 5rem;
   }
+  /* Native focus and scroll-into-view must leave actions above the fixed dock. */
+  html:has(body.admin-portal [aria-label='Mobile admin navigation']) {
+    scroll-padding-block-end: calc(5rem + env(safe-area-inset-bottom));
+  }
+  body.admin-portal:has([aria-label='Mobile admin navigation'])
+    [data-elevate-dashboard-content]
+    :is(a, button, input, select, textarea, [tabindex]) {
+    scroll-margin-block-end: calc(5rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* An update takes priority; two fixed banners must not cover each other. */

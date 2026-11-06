@@ -66,7 +66,7 @@ export function AdminApplicationChrome({
         className={
           studioOwnsViewport
             ? 'admin-studio-viewport min-h-0 min-w-0 flex-1 overflow-hidden'
-            : 'min-w-0 overflow-x-clip pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0'
+            : 'min-w-0 overflow-x-clip pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0'
         }
       >
         {children}

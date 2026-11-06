@@ -264,3 +264,36 @@ test('a newer completed producer is selectable only after the old failed generat
  ];
  assert.equal(latestRoleJobs(rows).get('build|lesson_autopilot:a:media').id,'new');
 });
+
+
+test('PARIS wakes media after verified instruction, then quality only after verified media',async()=>{
+ const base={build_id:'build-media',attempts:0,max_attempts:5,execution_generation:3,created_at:'2026-10-14T17:00:00Z',
+  monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const instruction={...base,id:'instruction',job_type:'lesson_autopilot:lesson-m:instruction',status:'completed',last_error:null};
+ const media={...base,id:'media',job_type:'lesson_autopilot:lesson-m:media',status:'queued',available_at:'infinity'};
+ const quality={...base,id:'quality',job_type:'lesson_autopilot:lesson-m:quality',status:'queued',available_at:'infinity'};
+ const env={GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'};
+ const wakeups=async(rows)=>{
+  const writes=[];
+  await monitorCourseQueue({env,now,request:async(url,options={})=>{
+   if(!options.method)return {ok:true,json:async()=>rows};
+   writes.push({url:String(url),body:JSON.parse(options.body)});
+   return {ok:true,json:async()=>[{id:'saved'}]};
+  }});
+  return writes.filter(write=>write.url.includes('available_at=eq.infinity'));
+ };
+ const initial=await wakeups([instruction,media,quality]);
+ assert.equal(initial.length,1);
+ assert.match(initial[0].url,/id=eq.media/);
+ assert.equal(initial[0].body.available_at,now.toISOString());
+ assert.equal(initial[0].body.status,undefined);
+ assert.equal(initial[0].body.attempts,undefined);
+ const afterMedia=await wakeups([instruction,{...media,status:'completed',last_error:null},quality]);
+ assert.equal(afterMedia.length,1);
+ assert.match(afterMedia[0].url,/id=eq.quality/);
+ for(const upstream of [{...instruction,status:'failed'}, {...instruction,last_error:'prior failure'}]){
+  assert.equal((await wakeups([upstream,media,quality])).length,0);
+ }
+ assert.equal((await wakeups([instruction,{...media,ultimate_course_builds:{status:'running',ownerPaused:true}},quality]))
+  .some(w=>w.url.includes('id=eq.media')),false);
+});

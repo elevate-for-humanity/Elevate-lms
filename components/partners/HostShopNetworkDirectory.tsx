@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { MapPin, Search } from 'lucide-react';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';

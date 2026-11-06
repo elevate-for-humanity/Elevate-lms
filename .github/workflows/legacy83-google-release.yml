@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      SOURCE_SHA: 57203ff3675c44c15c669dba0b2e301abbfa3997
+      SOURCE_SHA: 23d7207a2f9b1c5a32325be637468f6ecca3937e
       NEXT_PUBLIC_SUPABASE_URL: https://vhulnzcfmlnsmoxixjco.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_lb8-f5trWyOLdTY-ElpX9A_ImDp8eGe
       PROJECT: elegant-racer-299721
@@ -59,8 +59,8 @@ jobs:
           import {decryptLegacy83Runtime,verifyLegacy83Runtime} from './scripts/gcp/legacy83-runtime-config.mjs';
           import {createHash,privateDecrypt,createDecipheriv,constants} from 'node:crypto';
           const manifest=JSON.parse(readFileSync('.deploy/legacy83-source/manifest.json','utf8'));
-          const expected="57203ff3675c44c15c669dba0b2e301abbfa3997";
-          if(manifest.sourceSha!==expected || manifest.sha256!=="845f288f3dbf31646a8d53cfb905806bb6244b56dde92bba44405519f9b4d3a0")throw Error('Unexpected source revision');
+          const expected="23d7207a2f9b1c5a32325be637468f6ecca3937e";
+          if(manifest.sourceSha!==expected || manifest.sha256!=="8e92f4c9099a81b0287365a5efcdcc87e13bd4de03dd7529b2ec66b5e446c18e")throw Error('Unexpected source revision');
           const envelopeText=manifest.chunks.map(name=>{
            if(!/^part-[0-9]{3}[.]txt$/.test(name))throw Error('Invalid encrypted chunk path');
            return readFileSync('.deploy/legacy83-source/'+name,'utf8');

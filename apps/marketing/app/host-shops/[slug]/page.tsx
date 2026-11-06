@@ -1,3 +1,5 @@
+import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
+import HostShopOnboardingProfile from '@/components/partners/HostShopOnboardingProfile';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
@@ -51,7 +53,10 @@ function dedupeMedia(items: Array<{ url: string; alt?: string; source?: string }
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
-  if (!approved) return {};
+  if (!approved) {
+    const onboarding = onboardingProfiles.find(shop => shop.slug === slug);
+    return onboarding ? { title: `${onboarding.name} | Host Shop Onboarding`, description: `Location and contact details for ${onboarding.name}. Host Shop onboarding is in progress.` } : {};
+  }
   if (!profile || !approved) {
     const featured = getFeaturedHostPartnerBySlug(slug);
     if (!featured && approved) {
@@ -108,7 +113,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HostShopProfilePage({ params }: PageProps) {
   const { slug } = await params;
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
-  if (!approved) return notFound();
+  if (!approved) {
+    const onboarding = onboardingProfiles.find(shop => shop.slug === slug);
+    return onboarding ? <HostShopOnboardingProfile shop={onboarding} /> : notFound();
+  }
   if (!profile || !approved) {
     const featured = getFeaturedHostPartnerBySlug(slug);
     if (!featured && approved) return <ApprovedHostShopProfile shop={approved} />;

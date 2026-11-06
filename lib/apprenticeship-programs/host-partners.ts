@@ -399,6 +399,7 @@ export function getFeaturedHostPartnerBySlug(slug: string) {
     'j-noelle-co': 'j-noelle-co',
     'style-and-scissors-salon': 'style-and-scissor-salon',
     'generations-hair-llc-dba-generations-wedding-co': 'generations-hair-llc',
+    'generations-wedding-co-cat-eye-collective': 'generations-hair-llc',
   };
   const canonical = aliases[normalized] ?? normalized;
   return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === canonical);

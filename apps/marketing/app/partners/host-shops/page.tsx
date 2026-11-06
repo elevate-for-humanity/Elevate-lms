@@ -1,3 +1,6 @@
+import { hostShopBusinessKey } from '@/lib/partners/dedupe-host-shops.mjs';
+import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
+import HostShopPageNavigation from '@/components/partners/HostShopPageNavigation';
 import DowntownTrainingGallery from '@/components/partners/DowntownTrainingGallery';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -71,6 +74,7 @@ const CALLER_CHECKLIST = [
 
 export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
+  const onboardingShops = onboardingProfiles.filter(shop => !networkShops.some(active => hostShopBusinessKey(active.name) === hostShopBusinessKey(shop.name)));
 
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
@@ -100,7 +104,7 @@ export default async function HostShopsPage() {
         narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, required documents, and the free Host Shop application."
       />
 
-      <section className="bg-white px-4 py-10 sm:py-14" aria-labelledby="host-trades-heading">
+      <section className="bg-white px-4 py-10 sm:py-9" aria-labelledby="host-trades-heading">
         <div className="mx-auto max-w-7xl">
           <h2 id="host-trades-heading" className="text-3xl font-black">Barbering. Cosmetology. Nails. Esthetics.</h2>
           <p className="mt-3 max-w-3xl leading-7 text-slate-700">Discover your training community or help the next generation grow. We're looking for new Host Shops in every pathway.</p>
@@ -120,7 +124,7 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
+      <section className="border-b border-slate-200 bg-slate-50 px-4 py-9">
         <div className="mx-auto max-w-7xl">
           <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Statewide Indiana recruitment</p>
           <h2 className="mt-2 text-3xl font-black">We’re recruiting Host Shops in cities and communities across Indiana</h2>
@@ -129,7 +133,7 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-white px-4 py-14" aria-labelledby="host-site-overview">
+      <section className="border-b border-slate-200 bg-white px-4 py-9" aria-labelledby="host-site-overview">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-4xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Host Site overview</p>
@@ -196,9 +200,10 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
+      <HostShopPageNavigation />
       <DowntownTrainingGallery />
       <HostShopBenefits />
-      <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-14 text-white">
+      <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-9 text-white">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-red-400">Elevate Host Shop Network</p>
@@ -206,12 +211,13 @@ export default async function HostShopsPage() {
             <p className="mt-3 leading-7 text-slate-300">Explore real shop portfolios, get directions, and contact or book directly with the business. Ask the shop about hours and walk-ins before visiting. Students can explore participating training locations; apprentice capacity is confirmed separately.</p>
           </div>
           <HostShopNetworkDirectory shops={networkShops} />
+          <section className="mt-6 border-t border-slate-700 pt-5"><h3 className="text-xl font-bold">Shops completing onboarding</h3><p className="mt-2 text-sm text-slate-300">These businesses are not yet confirmed for apprentice placement.</p><ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{onboardingShops.map(shop => <li key={shop.slug} className="rounded-xl border border-slate-700 p-4"><Link href={`/host-shops/${shop.slug}`} className="font-bold text-white underline">{shop.name}</Link><p className="mt-2 text-sm text-slate-300">{shop.address || `${shop.city}, IN — street address awaiting confirmation`}</p>{shop.phone && <p className="mt-1 text-sm text-slate-300">{shop.phone}</p>}</li>)}</ul></section>
         </div>
       </section>
 
-      <section className="px-4 py-14">
+      <section className="px-4 py-9">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Approval requirements</p>
               <h2 className="mt-2 text-3xl font-black">What a Host Site must provide</h2>
@@ -226,7 +232,7 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
-      <section className="border-y border-brand-red-200 bg-brand-red-50 px-4 py-14 text-center text-slate-950">
+      <section className="border-y border-brand-red-200 bg-brand-red-50 px-4 py-9 text-center text-slate-950">
         <div className="mx-auto grid max-w-7xl items-center gap-8 md:grid-cols-2"><div className="relative aspect-[4/3] overflow-hidden rounded-2xl"><Image src="/images/pages/barber-hands-on-bright.webp" alt="Barber training and mentorship" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div><div>
           <h2 className="text-3xl font-black">Want your business in the Host Site network?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>

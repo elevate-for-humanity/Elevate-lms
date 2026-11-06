@@ -18,7 +18,6 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
-import KountryKutzTourSlideshow from '@/components/programs/beauty/KountryKutzTourSlideshow';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
@@ -33,8 +32,6 @@ export const fetchCache = 'force-no-store';
 const BARBER_HERO_IMAGE = getProgramHeroImage('barber-apprenticeship');
 const BARBER_STANDARD = getRegisteredProgramStandard('barber-apprenticeship')!.standard;
 const BARBER_RTI_HOURS = BARBER_STANDARD.relatedInstructionHours;
-const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
-  'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. As the video moves through the shop, notice the professional stations, working barbershop environment, and approved Host Shop where eligible apprentices may build supervised barbering skills.';
 const FLOW = [
   {
     icon: BookOpen,
@@ -73,13 +70,7 @@ const VISUAL_STORY = [
     title: 'Build skill through supervised practice.',
     body: 'Apprentices develop barbering skills through real practice, documented competencies, and structured supervision.',
   },
-  {
-    image: '/images/partners/kountry-kutz-official.webp',
-    alt: 'Licensed host barbershop supporting apprenticeship training',
-    label: 'Host Shop Experience',
-    title: 'Train in the environment where the job happens.',
-    body: 'Approved host shops provide the workplace setting for supervised on-the-job learning and progress verification.',
-  },
+
 ] as const;
 
 export default async function BarberApprenticeshipPage() {
@@ -210,10 +201,6 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
-        <KountryKutzTourSlideshow />
-      </div>
-
       <section
         data-scroll-narration
         data-narration="Explore the barber Host Shop network. Approved shops provide the supervised work setting, while placement availability is confirmed during enrollment."
@@ -221,7 +208,7 @@ export default async function BarberApprenticeshipPage() {
         className="border-b border-slate-200 bg-sky-50 px-4 py-8 sm:py-10"
       >
         <div className="mx-auto max-w-7xl">
-          <div className="mb-8 max-w-3xl">
+          <div className="mb-5 max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Host-shop network
             </p>
@@ -257,7 +244,7 @@ export default async function BarberApprenticeshipPage() {
       <section
         data-scroll-narration
         data-narration="Here is how the pathway works. Complete the theory, train under approved supervision, record your skills and hours, and prepare for the licensing requirements connected to the program."
-        className="px-4 py-14 sm:py-18"
+        className="px-4 py-9 sm:py-18"
       >
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
@@ -300,7 +287,7 @@ export default async function BarberApprenticeshipPage() {
       <section
         data-scroll-narration
         data-narration="See how related instruction, hands-on barbering practice, and workplace learning work together throughout the apprenticeship."
-        className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:py-18"
+        className="border-y border-slate-200 bg-slate-50 px-4 py-9 sm:py-18"
         aria-labelledby="barber-visual-story-heading"
       >
         <div className="mx-auto max-w-7xl">
@@ -318,7 +305,7 @@ export default async function BarberApprenticeshipPage() {
               More views of classroom instruction, hands-on barbering, and the host-shop experience.
             </p>
           </div>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
             {VISUAL_STORY.map((item) => (
               <article
                 key={item.title}
@@ -330,7 +317,7 @@ export default async function BarberApprenticeshipPage() {
                     alt={item.alt}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     loading="lazy"
                   />
                 </div>
@@ -352,7 +339,7 @@ export default async function BarberApprenticeshipPage() {
       <section
         data-scroll-narration
         data-narration="Before checkout, review self-pay tuition and payment terms. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
-        className="border-y border-orange-200 bg-orange-50 px-4 py-14 sm:py-18"
+        className="border-y border-orange-200 bg-orange-50 px-4 py-9 sm:py-18"
         aria-labelledby="barber-payment-heading"
       >
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
@@ -397,7 +384,7 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <section className="border-y border-sky-200 bg-sky-50 px-4 py-14 text-slate-950">
+      <section className="border-y border-sky-200 bg-sky-50 px-4 py-9 text-slate-950">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
@@ -431,18 +418,8 @@ export default async function BarberApprenticeshipPage() {
       <BeautyTheoryDailyPolicy programTitle="Barber Apprenticeship" />
       <BeautyApprenticeshipAuthority program={program} />
 
-      <section className="border-t border-sky-200 bg-white px-4 py-14 text-slate-950">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-2">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-            <Image
-              src={getProgramHeroImage('barber-apprenticeship')}
-              alt={getProgramImageAlt('barber-apprenticeship')}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              loading="lazy"
-              className="object-cover"
-            />
-          </div>
+      <section className="border-t border-sky-200 bg-white px-4 py-9 text-slate-950">
+        <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-black sm:text-4xl">
               Ready to start the barber apprenticeship?

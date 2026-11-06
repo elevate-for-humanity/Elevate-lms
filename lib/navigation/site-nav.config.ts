@@ -250,9 +250,9 @@ export const headerNavigation: NavGroup[] = [
         description: 'Sales and partnership inquiries',
       },
       {
-        label: 'Barber Shop Partners',
+        label: 'All Host Shops',
         href: '/partners/host-shops',
-        description: 'Barber apprenticeship shops',
+        description: 'Every shop, address, contact and individual profile',
       },
       {
         label: 'Cosmetology Salon Partners',

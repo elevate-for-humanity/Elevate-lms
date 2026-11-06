@@ -3,8 +3,6 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
-import Image from 'next/image';
-import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { MapPin, Search } from 'lucide-react';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
@@ -60,7 +58,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
       </p>
 
       {visible.length ? (
-        <div data-host-shop-directory className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div data-host-shop-directory className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visible.map((shop) => (
             <article
               key={shop.id}
@@ -69,31 +67,9 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
               <HostShopMediaCarousel
                 shopName={shop.name}
                 compact
-                spacious
-                items={
-                  shop.gallery?.length
-                    ? shop.gallery
-                    : [
-                        {
-                          url:
-                            shop.image ||
-                            getProgramHeroImage(
-                              shop.primaryProgram ??
-                                shop.programs[0] ??
-                                'cosmetology-apprenticeship',
-                            ),
-                          alt: shop.image
-                            ? `${shop.name} portfolio`
-                            : getProgramImageAlt(
-                                shop.primaryProgram ??
-                                  shop.programs[0] ??
-                                  'cosmetology-apprenticeship',
-                              ),
-                        },
-                      ]
-                }
+                items={shop.gallery?.length ? shop.gallery : shop.image ? [{ url: shop.image, alt: `${shop.name} portfolio` }] : []}
               />
-              <div className="flex flex-1 flex-col p-5 sm:p-6">
+              <div className="flex flex-1 flex-col p-4">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
                   {shop.state}
@@ -106,7 +82,9 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                     {shop.name}
                   </Link>
                 </h3>
-                <p className="mt-4 text-base leading-7 text-slate-700">{shop.description}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{shop.address}</p>
+                {shop.phone && <p className="mt-1 text-sm text-slate-700">{shop.phone}</p>}
+                <p className="mt-2 text-sm leading-6 text-slate-700">{shop.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {shop.programs.map((slug) => (
                     <span

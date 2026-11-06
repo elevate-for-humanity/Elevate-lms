@@ -98,8 +98,8 @@ function parseMedia(value: unknown): HostShopMedia[] {
 function isPubliclyListedHostShop(shop: HostShop): boolean {
   const identity = [shop.name, shop.email, shop.publicSlug, shop.address].filter(Boolean).join(' ').toLowerCase();
   if (!shop.name.trim()) return false;
-  if (/\\[qa(?:\\s+e2e)?\\]|qa[ -]?e2e|qa test|100 qa test way|@qa\\.invalid|@example\\.(?:com|org|net)|@test\\.|\\.invalid\\b/.test(identity)) return false;
-  if (/razor[’'\\s-]*s?\\s+image|razorsimage/.test(identity)) return false;
+  if (/\[qa(?:\s+e2e)?\]|qa[ -]?e2e|qa test|test only|100 qa test way|@qa\.invalid|@example\.(?:com|org|net)|@test\.|\.invalid\b/.test(identity)) return false;
+  if (/razor[’'\s-]*s?\s+image|razorsimage/.test(identity)) return false;
   return true;
 }
 
@@ -206,13 +206,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     .map((shop) => {
       const profile = (publicRows ?? []).find((row) => {
         const phoneMatch = digits(shop.phone) && digits(shop.phone) === digits(row.phone);
-        const addressMatch =
-          businessKey(shop.address) &&
-          businessKey(shop.address) === businessKey(row.address_line1) &&
-          businessKey(shop.city) === businessKey(row.city);
         const nameMatch =
           businessKey(shop.name) && businessKey(shop.name) === businessKey(row.display_name);
-        return Boolean(phoneMatch || addressMatch || nameMatch);
+        return Boolean(phoneMatch || nameMatch);
       });
 
       const sourceVerifiedPublicPhone =
@@ -257,7 +253,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       return {
         id: row.id,
         name: row.display_name,
-        address: row.address_line1 ?? '',
+        address: [row.address_line1, row.address_line2].filter(Boolean).join(', '),
         city: row.city ?? '',
         state: row.state ?? 'IN',
         zip: row.zip ?? '',
@@ -273,7 +269,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         googleMapsUrl: approvedMapsUrl({
           id: row.id,
           name: row.display_name,
-          address: row.address_line1 ?? '',
+          address: [row.address_line1, row.address_line2].filter(Boolean).join(', '),
           city: row.city ?? '',
           state: row.state ?? 'IN',
           zip: row.zip ?? '',

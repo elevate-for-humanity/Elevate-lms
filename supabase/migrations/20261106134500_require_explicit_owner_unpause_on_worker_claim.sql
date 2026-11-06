@@ -14,6 +14,8 @@ BEGIN
   IF v_definition IS NULL THEN
     RAISE EXCEPTION 'ULTIMATE_CLAIM_FUNCTION_NOT_FOUND';
   END IF;
+  -- Safe to replay once if an authorized hotfix already recorded this guard.
+  IF position(v_new IN v_definition)>0 AND position(v_old IN v_definition)=0 THEN RETURN; END IF;
   IF (length(v_definition)-length(replace(v_definition,v_old,'')))<>length(v_old)
      OR position(v_new IN v_definition)>0 THEN
     RAISE EXCEPTION 'ULTIMATE_CLAIM_FUNCTION_CHANGED_REVIEW_REQUIRED';

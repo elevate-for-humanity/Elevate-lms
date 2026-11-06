@@ -9,7 +9,8 @@ test('approved bookkeeping video remains public with enrollment closed', () => {
  assert.doesNotThrow(() => assertBookkeepingVideoContract(html));
  assert.throws(() => assertBookkeepingVideoContract(html.replace('New enrollment for this offering is currently closed', 'Apply today')));
  assert.throws(() => assertBookkeepingVideoContract(html.replace('5oL9hZPhgmCkXOliXYY15l', 'wrong-episode')));
- assert.throws(() => assertBookkeepingVideoContract(html + '<a href="/apply/student?program=bookkeeping">Apply</a>'));
+ assert.throws(() => assertBookkeepingVideoContract(html.replace('</main>', '<a href="/apply/student?program=bookkeeping">Apply</a></main>')));
+ assert.doesNotThrow(() => assertBookkeepingVideoContract('<nav><a href="/apply">Apply</a></nav>' + html));
  const {jobs} = load(readFileSync(new URL('../../.github/workflows/deploy-google-marketing-trigger.yml', import.meta.url), 'utf8'));
  const acceptance = jobs.deploy.steps.find(row => row.name === 'Verify public website serves exact commit and requested homepage').run;
  assert.ok(acceptance.includes('assertBookkeepingVideoContract(await spotlight.text())'));

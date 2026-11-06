@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 
 export const metadata: Metadata = {
   title: 'Bookkeeping & Financial Literacy | Elevate for Humanity',
@@ -10,6 +11,11 @@ export const metadata: Metadata = {
 export default function BookkeepingVideoPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Instructor and learners reviewing business and bookkeeping records on laptops"
+        actions={[]}
+      />
       <section className="mx-auto max-w-5xl space-y-6 px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-sm font-bold uppercase tracking-widest text-blue-800">Elevate for Humanity</p>
         <h1 className="text-3xl font-black sm:text-5xl">Bookkeeping &amp; financial literacy</h1>

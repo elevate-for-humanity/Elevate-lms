@@ -1,10 +1,11 @@
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
+import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases} from './deployment-repair-events.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
-import {isRepairableCourseFailure,courseRepairOutcome} from './course-repair-policy.mjs';
+import {isRepairableCourseFailure,isCourseDependencyFailure,courseRepairOutcome} from './course-repair-policy.mjs';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
@@ -100,6 +101,18 @@ export async function prepareParisRepair(id:string,runId:number){
  if(!claimed)throw Error('REPAIR_ALREADY_CLAIMED');
  try{
   let candidate=claimed.candidate;
+  if(untouchedPlannerNeedsFreshGeneration(claimed)) {
+   // Only a newly admitted attempt may replan. Keep the complete previous
+   // checkpoint in history; never reset attempts or discard committed work.
+   const history=[...(claimed.attempt_history??[]),{event:'unmodified-planner-generation-rebased',
+    at:new Date().toISOString(),attempt:claimed.attempt_count,checkpoint:candidate.checkpoint}];
+   const archived=await db.from('paris_code_repairs').update({candidate:null,attempt_history:history,
+    updated_at:new Date().toISOString()}).eq('id',id).eq('workflow_run_id',runId).eq('status','patching')
+    .eq('attempt_count',claimed.attempt_count).select('id').maybeSingle();
+   if(archived.error)throw archived.error;
+   if(!archived.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
+   candidate=null;
+  }
   if(!candidate || candidate.kind==='planner-checkpoint') {
    const {stageParisCodeRepair}=await import('@/lib/devstudio/paris-code-engineer');
    const response=await stageParisCodeRepair(claimed.goal,id,claimed.actor_id,{
@@ -521,10 +534,10 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   if(latest.error)throw latest.error;
   const build=await db.from('ultimate_course_builds').select('id,status,profile,findings').eq('id',source.data.build_id).single();
   if(build.error)throw build.error;
-  const disposition=courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
+  const disposition=isCourseDependencyFailure(source.data.last_error)?'dependency':courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
   if(disposition==='repair'){pending=candidate;break;}
   const blocked=await db.from('paris_code_repairs').update({
-   status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
+   status:'blocked',error_code:disposition==='dependency'?'SOURCE_DEPENDENCY_EVIDENCE_REQUIRED':disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
    updated_at:new Date().toISOString(),
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
   if(blocked.error)throw blocked.error;

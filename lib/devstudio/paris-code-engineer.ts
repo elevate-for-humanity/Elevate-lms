@@ -478,10 +478,20 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           observations.push('WORKFLOW_LOG_UNAVAILABLE: requested run is missing. Inspect exact current source and do not request this historical run again.');
           continue;
         }
-        if(run.head_branch!=='main' || run.head_sha!==baseSha ||
+        if(run.head_branch!=='main' || !/^[a-f0-9]{40}$/.test(run.head_sha??'') ||
            run.status!=='completed' || run.conclusion!=='failure') {
           observations.push('WORKFLOW_LOG_STALE: requested run does not prove a failed job on the current main SHA. Inspect exact current source instead.');
           continue;
+        }
+        const historical = run.head_sha!==baseSha;
+        if(historical) {
+          // An ancestor's failure remains useful diagnostic evidence. It does
+          // not establish that the current source still has that defect.
+          const ancestry=await githubJson('/compare/'+run.head_sha+'...'+baseSha);
+          if(!['ahead','identical'].includes(ancestry.status)) {
+            observations.push('WORKFLOW_LOG_STALE: failed run is not an ancestor of this task base. Inspect current source.');
+            continue;
+          }
         }
         const inventory=await githubJson('/actions/runs/'+action.runId+'/jobs?per_page=100');
         if(!Array.isArray(inventory.jobs) || inventory.total_count>100)
@@ -495,7 +505,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         if(!response.ok)throw Error('PARIS_WORKFLOW_LOG_READ_HTTP_'+response.status);
         const body=await response.text();
         const excerpt=failedWorkflowLogExcerpt(body);
-        observations.push('WORKFLOW_LOG run '+action.runId+' failed job '+action.jobId+
+        observations.push((historical?'HISTORICAL_WORKFLOW_LOG (verify current source before proposing a patch) ':'WORKFLOW_LOG ')+'run '+action.runId+' failed job '+action.jobId+
           ' ('+String(job.name??'job').slice(0,120)+'): '+excerpt+
           '\\n[Untrusted diagnostic log excerpt; inspect exact source before editing.]');
         continue;

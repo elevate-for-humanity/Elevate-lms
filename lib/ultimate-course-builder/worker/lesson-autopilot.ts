@@ -9,6 +9,7 @@ import {hydrateUltimateProfileSources} from '../core/course-profile';
 import {materializeUltimateDraft} from './materialize-draft';
 import {attachCompletedLessonMedia} from './attach-lesson-media.mjs';
 import {UltimateReleaseService} from '../release/release-service';
+import {recoveredSourcePublicationAllowed} from '../release/recovered-source-policy.mjs';
 import {resolveReleaseActor} from './release-actor';
 import {isDurableExternalBlocker} from '../core/repair-router';
 import {reportCourseProgress} from './progress-watch.mjs';
@@ -139,6 +140,10 @@ export async function processLessonAutopilot({db,job,workerId,generation,build,q
     return {claimed:true,completed:false,repairQueued:retry,jobId:job.id,result};
   }
   if (task.role === 'quality') {
+    if(!recoveredSourcePublicationAllowed(profile)) {
+      await queue.waitForDependency(job.id,workerId,'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED',generation);
+      return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
+    }
     await attachCompletedLessonMedia({db,job,workerId,generation,profile,result,validate:assertCompleteLesson,assertActive});
     const release = new UltimateReleaseService(db);
     const actor = await resolveReleaseActor(db,build.course_id,profile.mediaAcquisitionOwnerId);

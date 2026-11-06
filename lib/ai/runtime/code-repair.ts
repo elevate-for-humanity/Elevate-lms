@@ -102,6 +102,11 @@ export async function prepareParisRepair(id:string,runId:number){
  try{
   let candidate=claimed.candidate;
   if(untouchedPlannerNeedsFreshGeneration(claimed)) {
+   const priorCheckpoint=candidate.checkpoint;
+   if(typeof priorCheckpoint.branch!=='string'||!/^studio\/[a-z0-9-]+$/.test(priorCheckpoint.branch))
+    throw Error('PARIS_REPAIR_CHECKPOINT_INVALID');
+   const priorRef=await gh('/git/ref/heads/'+encodeURIComponent(priorCheckpoint.branch));
+   if(priorRef.object?.sha!==priorCheckpoint.headSha)throw Error('PARIS_REPAIR_CHECKPOINT_BRANCH_CHANGED');
    // Only a newly admitted attempt may replan. Keep the complete previous
    // checkpoint in history; never reset attempts or discard committed work.
    const history=[...(claimed.attempt_history??[]),{event:'unmodified-planner-generation-rebased',

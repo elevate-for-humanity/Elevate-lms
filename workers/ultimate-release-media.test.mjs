@@ -3,15 +3,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { renderMediaUrl, renderPlaybackUrl } from '../lib/ultimate-course-builder/media/playback-source.mjs';
+import { recoveredSourcePublicationAllowed } from '../lib/ultimate-course-builder/release/recovered-source-policy.mjs';
 
 const prepareSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/release/prepare-publication.ts', import.meta.url), 'utf8'), { mode: 'transform' })
   .replace(/^import .*;\n/gm, '').replace('export function ', 'function ');
-const prepare = new Function('assertCompleteLesson', 'ULTIMATE_LESSON_CONTRACT_VERSION', 'renderMediaUrl', 'renderPlaybackUrl', prepareSource + '\nreturn prepareUltimatePublication;')(
-  a => { if (!a.verified) throw new Error('QA_FAILED'); }, 'current', renderMediaUrl, renderPlaybackUrl);
+const prepare = new Function('assertCompleteLesson', 'ULTIMATE_LESSON_CONTRACT_VERSION', 'renderMediaUrl', 'renderPlaybackUrl', 'recoveredSourcePublicationAllowed', prepareSource + '\nreturn prepareUltimatePublication;')(
+  a => { if (!a.verified) throw new Error('QA_FAILED'); }, 'current', renderMediaUrl, renderPlaybackUrl, recoveredSourcePublicationAllowed);
 const serviceSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/release/release-service.ts', import.meta.url), 'utf8'), { mode: 'transform' })
   .replace(/^import .*;\n/gm, '').replace('export class ', 'class ');
-const Service = new Function('prepareUltimatePublication','assertCompleteLesson','ULTIMATE_LESSON_CONTRACT_VERSION','renderMediaUrl','renderPlaybackUrl', serviceSource + '\nreturn UltimateReleaseService;')(
-  prepare,a=>{if(!a.verified)throw new Error('QA_FAILED');},'current',renderMediaUrl,renderPlaybackUrl);
+const Service = new Function('prepareUltimatePublication','assertCompleteLesson','ULTIMATE_LESSON_CONTRACT_VERSION','renderMediaUrl','renderPlaybackUrl','recoveredSourcePublicationAllowed', serviceSource + '\nreturn UltimateReleaseService;')(
+  prepare,a=>{if(!a.verified)throw new Error('QA_FAILED');},'current',renderMediaUrl,renderPlaybackUrl,recoveredSourcePublicationAllowed);
 const lesson = () => ({
   title: 'Lesson', videoUrl: 'https://media.example/film.mp4', script: 'Verified narration',
   canonicalLessonId: 'lesson', slug: 'lesson', orderIndex: 1, competencyId: 'competency',
@@ -31,6 +32,11 @@ function scenario({ error = null, film = lesson() } = {}) {
   service.derive = async () => ({ courseId: 'course', buildId: 'build', profile: {}, contractVersion: 'current', lessons: [film] });
   return { service, calls };
 }
+test('disabled partial publication makes no RPC even for an otherwise ready lesson',async()=>{
+ const {service,calls}=scenario();
+ await assert.rejects(service.applyPackage({profile:{publishCompletedLessons:false},lessons:[lesson()]},'actor'),/ULTIMATE_PARTIAL_PUBLICATION_NOT_ENABLED/);
+ assert.equal(calls.length,0);
+});
 test('sends the verified finished film with its QA evidence in the one release transaction', async () => {
   const { service, calls } = scenario();
   await service.publish('build', 'actor');

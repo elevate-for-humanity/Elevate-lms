@@ -2,6 +2,7 @@ import 'server-only';
 import { prepareUltimatePublication } from './prepare-publication';
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { recoveredSourcePublicationAllowed } from './recovered-source-policy.mjs';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 const slug = (v: string) =>
   v
@@ -21,6 +22,7 @@ export class UltimateReleaseService {
     if ((!lessonBuildId && !['built','published'].includes(b.status)) || (lessonBuildId && ['archived','cancelled'].includes(b.status)))
       throw new Error('ULTIMATE_BUILD_NOT_RELEASE_READY');
     const profile = b.profile as any;
+    if(!recoveredSourcePublicationAllowed(profile))throw new Error('ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED');
     const preservedIds: string[] = !lessonBuildId && profile.publishCompletedLessons === true
       ? [...new Set<string>(profile.preservedPublishedLessonIds ?? [])] : [];
     let preservedRows: any[] = [];

@@ -1,5 +1,17 @@
 import { load } from 'cheerio';
 import assert from 'node:assert/strict';
+
+/** The approved spotlight is public; closed enrollment must stay closed. */
+export function assertBookkeepingVideoContract(html) {
+  const page = load(html);
+  page('script,style,template').remove();
+  assert.ok(page('iframe[src^="https://open.spotify.com/embed/episode/5oL9hZPhgmCkXOliXYY15l"]').length,
+    'Bookkeeping spotlight must render the approved Michael Hoover video');
+  assert.match(page.root().text(), /New enrollment for this offering is currently closed/);
+  const enrollmentLinks = page('a[href]').filter((_, node) =>
+    /^\/(?:apply|enroll|checkout)(?:[/?#]|$)/i.test(page(node).attr('href') || ''));
+  assert.equal(enrollmentLinks.length, 0, 'Closed bookkeeping page must not offer enrollment');
+}
 /** Read page content, excluding scripts and treating discretionary hyphens as layout. */
 export function normalizeHomepageText(html) {
   const page = load(html);

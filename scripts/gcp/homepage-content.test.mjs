@@ -2,7 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {load} from 'js-yaml';
-import {normalizeHomepageText, assertHomepageHostShopContract} from './homepage-content.mjs';
+import {normalizeHomepageText, assertHomepageHostShopContract, assertBookkeepingVideoContract} from './homepage-content.mjs';
+
+test('approved bookkeeping video remains public with enrollment closed', () => {
+ const html = '<main><h2>Meet Michael Hoover of Regions Bank</h2><iframe src="https://open.spotify.com/embed/episode/5oL9hZPhgmCkXOliXYY15l?utm_source=generator"></iframe><p>New enrollment for this offering is currently closed.</p><a href="https://app.elevateforhumanity.org/learner/dashboard">Open student dashboard</a></main>';
+ assert.doesNotThrow(() => assertBookkeepingVideoContract(html));
+ assert.throws(() => assertBookkeepingVideoContract(html.replace('New enrollment for this offering is currently closed', 'Apply today')));
+ assert.throws(() => assertBookkeepingVideoContract(html.replace('5oL9hZPhgmCkXOliXYY15l', 'wrong-episode')));
+ assert.throws(() => assertBookkeepingVideoContract(html + '<a href="/apply/student?program=bookkeeping">Apply</a>'));
+ const {jobs} = load(readFileSync(new URL('../../.github/workflows/deploy-google-marketing-trigger.yml', import.meta.url), 'utf8'));
+ const acceptance = jobs.deploy.steps.find(row => row.name === 'Verify public website serves exact commit and requested homepage').run;
+ assert.ok(acceptance.includes('assertBookkeepingVideoContract(await spotlight.text())'));
+ assert.ok(acceptance.includes("'/programs/bookkeeping/apply'"));
+});
 test('finds the business heading across responsive spans and soft hyphens',()=>{
  const html='<h3>Business &amp; <span class="sm:hidden">Entrepre&shy;neurship</span><span class="hidden sm:inline">Entrepreneurship</span></h3>';
  assert.ok(normalizeHomepageText(html).includes('Business & Entrepreneurship'));

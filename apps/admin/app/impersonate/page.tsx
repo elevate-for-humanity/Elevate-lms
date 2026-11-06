@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ImpersonateForm from './ImpersonateForm';
@@ -17,7 +18,10 @@ export default async function ImpersonatePage() {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!hasPermission(profile?.role as UserRole, 'impersonate_users')) redirect('/unauthorized');
 
-  const { data: recentSessions, error: sessionsError } = await supabase
+  // Audit records are server-only. The explicit impersonation permission above
+  // is required before reading them; no public database grant is introduced.
+  const auditDb = await requireAdminClient();
+  const { data: recentSessions, error: sessionsError } = await auditDb
     .from('audit_logs')
     .select('id, actor_user_id:user_id, entity_id:resource_id, new_data:metadata, created_at')
     .eq('resource_type', 'impersonation_session')

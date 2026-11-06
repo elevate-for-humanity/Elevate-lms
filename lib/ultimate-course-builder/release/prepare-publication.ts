@@ -1,8 +1,10 @@
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
+import { recoveredSourcePublicationAllowed } from './recovered-source-policy.mjs';
 
 /** Prepare deterministic rows without changing live canonical records. */
 export function prepareUltimatePublication(p: any, actorId: string) {
+  if(!recoveredSourcePublicationAllowed(p.profile))throw new Error('ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED');
   if (p.contractVersion !== ULTIMATE_LESSON_CONTRACT_VERSION || !p.lessons?.length)
     throw new Error('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
   const now = new Date().toISOString();

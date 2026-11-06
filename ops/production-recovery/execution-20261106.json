@@ -452,8 +452,9 @@
     },
     "other_active_repair": {
       "pr": 2410,
-      "title": "P0 Cloud Run dispatcher orphan cancellation and owner authorization",
-      "duplicate_created": false
+      "status": "merged independently",
+      "merge_sha": "bca58282b83a53191b545831cdc78807c01d9a94",
+      "preserved_in_followup": true
     },
     "paris_latest_observation": {
       "queued": 30,
@@ -495,6 +496,7 @@
     "branch": "fix/production-recovery-20261106",
     "duplicate_of_pr_2410": false,
     "auth_rls_participant_records_changed": false,
-    "pr": 2411
+    "pr": 2411,
+    "base_main": "bca58282b83a53191b545831cdc78807c01d9a94"
   }
 }

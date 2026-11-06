@@ -1,6 +1,6 @@
 /** Reclaim only an old, identifiable execution with no live database owner.
  * Cloud cancellation is re-read by the caller before capacity is reused. */
-export async function reapUnclaimedLessonExecutions({executions,role,now,request,root,headers,cancel}) {
+export async function reapUnclaimedLessonExecutions({executions,role,now,request,root,headers,cancel,onCancelFailure=()=>{}}) {
  const cancelled=[];
  for(const execution of executions) {
   const prefix=execution.spec?.template?.spec?.containers?.[0]?.env?.find(e=>e.name==='ULTIMATE_WORKER_ID')?.value;
@@ -15,7 +15,18 @@ export async function reapUnclaimedLessonExecutions({executions,role,now,request
   if(!response.ok)throw Error('ULTIMATE_ORPHAN_LEASE_READ_HTTP_'+response.status);
   const owners=await response.json();if(!Array.isArray(owners))throw Error('ULTIMATE_ORPHAN_LEASE_READ_INVALID');
   if(owners.length)continue;
-  await cancel(name);cancelled.push(name);
+  // The execution can finish between Cloud inventory and cancellation, or
+  // the deploy identity can lack run.executions.cancel. Neither is proof that
+  // capacity was freed. Keep the existing execution in inventory and continue
+  // examining other roles; never abort the whole production dispatcher.
+  try {
+   await cancel(name);
+   cancelled.push(name);
+  } catch(error) {
+   const code=typeof error?.code==='string' && /^[a-z_]{1,48}$/.test(error.code)
+    ? error.code : 'cancel_unconfirmed';
+   onCancelFailure({name,code});
+  }
  }
  return cancelled;
 }

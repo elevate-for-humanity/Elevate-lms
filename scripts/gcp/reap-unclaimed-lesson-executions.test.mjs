@@ -17,3 +17,12 @@ test('startup grace, unknown identity, and other roles are never cancelled',asyn
 test('unavailable or malformed ownership inventory cannot authorize cancellation',async()=>{
  for(const response of [{ok:false,status:503},{ok:true,json:async()=>null}]){const f=fixture();f.options.request=async()=>response;await assert.rejects(reapUnclaimedLessonExecutions(f.options),/ULTIMATE_ORPHAN_LEASE/);assert.equal(f.cancelled.length,0);}
 });
+
+test('Cloud Run cancellation failure does not fabricate freed capacity or kill scheduling',async()=>{
+ const f=fixture();const failures=[];
+ f.options.cancel=async()=>{const error=new Error('opaque provider error');error.code='command_failed';throw error;};
+ f.options.onCancelFailure=failure=>failures.push(failure);
+ const cancelled=await reapUnclaimedLessonExecutions(f.options);
+ assert.deepEqual(cancelled,[]);
+ assert.deepEqual(failures,[{name:'elevate-course-quality-old',code:'command_failed'}]);
+});

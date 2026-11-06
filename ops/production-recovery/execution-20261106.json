@@ -90,6 +90,26 @@
       "status": "confirmed-open",
       "cause": "reports query applications.employer_id, which does not exist in production; errors become zero counts",
       "action": "repair canonical job-posting/application query and scope after current recovery validation"
+    },
+    {
+      "id": "employer-report-schema-failure",
+      "status": "unit-validated-awaiting-release",
+      "cause": "reports queried applications.employer_id and referred_by absent in production; errors collapsed to zero",
+      "change": "canonical job_postings/job_applications/job_placements/referrals through signed-in RLS and canonical owner employer; query errors explicit",
+      "tests": "4 report contract tests plus 85 employer authorization tests passed; reports rendered heading added to portal acceptance"
+    },
+    {
+      "id": "paris-invented-deep-path-feedback",
+      "status": "unit-and-admin-build-validated-awaiting-release",
+      "cause": "fresh repair 08c1ab64 repeated nonexistent nested paths after parent-only feedback exhausted",
+      "change": "bounded credential-filtered root listing fallback; inspection and retry guards unchanged",
+      "tests": "19 targeted tests passed; full Admin compile and generated route typecheck passed"
+    },
+    {
+      "id": "paypal-mobile-target",
+      "status": "unit-validated-awaiting-mobile-runtime",
+      "cause": "payout PayPal confirmation checkbox used native 13px target",
+      "change": "44px target; no approval, verification or saved submission changes"
     }
   ],
   "acceptance": "incomplete; no production-ready claim",
@@ -285,5 +305,54 @@
     "host_dependencies": "unavailable",
     "error": "install-deps requires root; su failed",
     "fallback": "existing isolated Google/GitHub WebKit acceptance environment"
+  },
+  "live_schema_audit": {
+    "relations": 1870,
+    "select_calls": 5670,
+    "current_signatures": 27,
+    "new_signatures": 6,
+    "host_shop_legacy_guards": "no callers found; not proven Jamie runtime defect; no migration replayed"
+  },
+  "validation_latest": {
+    "targeted_tests_passed": 109,
+    "files": 6,
+    "admin_build_and_generated_typecheck": "passed",
+    "lms_build_and_generated_typecheck": "running",
+    "required_ci_0375c21": "all required checks passed",
+    "production_verification_of_source_repairs": "pending"
+  },
+  "dashboard_runtime_check_20261106": {
+    "checked_at": "2026-11-06T13:15:00Z",
+    "method": "authenticated desktop Chrome administrator/authorized read-only preview; no submissions",
+    "rendered": [
+      "host-shop dashboard J Noelle & Co.",
+      "host-shop onboarding documents",
+      "host-shop signed MOU status",
+      "host-shop onboarding profile",
+      "learner read-only Jamie preview",
+      "apprentice neutral admin preview",
+      "parent admin oversight",
+      "workforce overview",
+      "instructor dashboard",
+      "staff dashboard",
+      "testing center",
+      "workforce board oversight",
+      "case manager dashboard",
+      "provider oversight",
+      "admin dashboard",
+      "program-holder CDL assigned applications (earlier verified)"
+    ],
+    "access_limits": {
+      "employer": "Admin session routes to employer registry; individual employer reports require isolated employer acceptance",
+      "creator": "Admin session redirected with creator-access-required; creator account workflow unverified"
+    },
+    "not_verified": [
+      "Jamie own login/session",
+      "mobile Safari",
+      "real account write/save/upload behavior",
+      "every individual account/device"
+    ],
+    "participant_data_mutated": false,
+    "external_messages_sent": false
   }
 }

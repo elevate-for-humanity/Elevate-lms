@@ -112,3 +112,18 @@ it('recovers a genuine missing-file read while retaining HTTP status classificat
   expect(response.status).toBe(200);
   expect(h.writes).toEqual(['lib/example.ts', 'tests/unit/example-regression.test.ts']);
 });
+
+it('returns real allowed roots after a deeply guessed task-branch path is rejected', async () => {
+  h.actions = [
+    { type: 'read', path: 'apps/course-builder/studio/08c1ab64-task/visual_assignment.ts' },
+    ...patch,
+  ];
+  const response = await stageParisCodeRepair('Repair the confirmed visual assignment defect', 'repair', 'owner');
+  expect(response.status).toBe(200);
+  const observations = h.prompts.flatMap(prompt => JSON.parse(prompt.messages[1].content).observations);
+  const feedback = observations.find((entry: string) => entry.startsWith('READ_REJECTED'));
+  expect(feedback).toContain('LIST /:');
+  expect(feedback).toContain('"path":"lib"');
+  expect(feedback).not.toContain('.env.production');
+  expect(h.writes).toEqual(['lib/example.ts', 'tests/unit/example-regression.test.ts']);
+});

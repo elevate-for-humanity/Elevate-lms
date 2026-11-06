@@ -77,7 +77,7 @@ export function PayoutAccessPanel() {
             <h3 className="text-lg font-black">PayPal payouts</h3>
             <form className="space-y-3" onSubmit={event => { event.preventDefault(); void act({ provider: 'paypal', action: 'save_paypal', email, confirm: true }); }}>
               <label className="block text-sm font-bold">Your PayPal email<input type="email" maxLength={254} autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy || verified} className="mt-1 min-h-11 w-full min-w-0 rounded-lg border px-3 font-normal" /></label>
-              <label className="flex items-start gap-2 text-sm"><input type="checkbox" required disabled={busy || verified} className="mt-1" />I control this email and want approved payments delivered to this PayPal account.</label>
+              <label className="flex min-h-12 items-start gap-2 text-sm"><input type="checkbox" required disabled={busy || verified} className="mt-1 h-11 w-11 shrink-0" />I control this email and want approved payments delivered to this PayPal account.</label>
               <button disabled={busy || verified} className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white disabled:opacity-50">Save PayPal destination</button>
             </form>
             <a href="https://www.paypal.com/myaccount/money" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center font-bold text-blue-800 underline">Link or manage a bank in PayPal</a>

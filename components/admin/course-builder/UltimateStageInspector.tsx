@@ -243,7 +243,10 @@ export default function UltimateStageInspector({
   }, [buildId, selected, updatedAt, retry, followActive]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setRetry((value) => value + 1), 15000);
+    // Avoid repeated checkpoint queries while the browser tab is hidden.
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") setRetry((value) => value + 1);
+    }, 30000);
     return () => window.clearInterval(timer);
   }, [buildId]);
 

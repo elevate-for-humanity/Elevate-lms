@@ -179,6 +179,26 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
   if(canResumePlannerInspectionRepair(repair)){
+   // A source-linked planner failure may receive exactly one additional
+   // bounded planning attempt, but only while the exact source defect remains
+   // failed on the current active, explicitly unpaused build. Never revive
+   // published work, a currently leased worker or a superseded incident.
+   if(repair.source_job_id){
+    const source=await db.from('ultimate_build_jobs')
+     .select('id,build_id,job_type,status,lease_owner,lease_expires_at')
+     .eq('id',repair.source_job_id).maybeSingle();
+    if(source.error)throw source.error;
+    if(source.data?.status!=='failed' || source.data.lease_owner &&
+       Date.parse(source.data.lease_expires_at??'')>Date.now())continue;
+    const [build,latest]=await Promise.all([
+     db.from('ultimate_course_builds').select('id,status,profile').eq('id',source.data.build_id).maybeSingle(),
+     db.from('ultimate_build_jobs').select('id').eq('build_id',source.data.build_id)
+      .eq('job_type',source.data.job_type).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+    ]);
+    if(build.error||latest.error)throw build.error??latest.error;
+    if(build.data?.status!=='running' ||
+       build.data?.profile?.ownerPaused!==false || latest.data?.id!==source.data.id)continue;
+   }
    const now=new Date().toISOString();
    const restored=await db.from('paris_code_repairs').update({
     status:'queued',error_code:null,

@@ -8,9 +8,10 @@ const condition=source.match(/  monitor:\n    if: (.+)/)?.[1];
 function monitor(eventName,repairId='',ref='refs/heads/main',workflowRun={}) {
  return vm.runInNewContext(condition,{github:{ref,event_name:eventName,event:{workflow_run:workflowRun}},inputs:{repair_id:repairId}});
 }
-test('a failed main workflow wakes repair; successful, skipped and feature runs cannot',()=>{
- assert.equal(monitor('workflow_run','','refs/heads/main',{head_branch:'main',conclusion:'failure'}),true);
- for(const workflowRun of [{head_branch:'feature',conclusion:'failure'},{head_branch:'main',conclusion:'success'},{head_branch:'main',conclusion:'skipped'}])
+test('completed main workflows wake recovery on success or failure, but skipped and feature events cannot',()=>{
+ for(const conclusion of ['failure','success'])
+  assert.equal(monitor('workflow_run','','refs/heads/main',{head_branch:'main',conclusion}),true);
+ for(const workflowRun of [{head_branch:'feature',conclusion:'failure'},{head_branch:'feature',conclusion:'success'},{head_branch:'main',conclusion:'skipped'},{head_branch:'main',conclusion:'cancelled'}])
   assert.equal(monitor('workflow_run','','refs/heads/main',workflowRun),false);
 });
 test('verified live authorization explicitly wakes a monitor without an invented repair ID',()=>{

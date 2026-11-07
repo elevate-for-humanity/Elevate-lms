@@ -8,7 +8,7 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'scripts/gcp/configure-owned-voicemail.py', 'infra/pbx/paris/turn-adapter.mjs', 'infra/pbx/paris/ari-media.mjs', 'infra/pbx/paris/menu.mjs', '.github/workflows/repair-paris-saved-settings.yml']
+    paths: ['scripts/gcp/repair-paris-turn-proxy.py', 'scripts/gcp/repair-paris-settings.py', 'infra/pbx/paris/turn-adapter.mjs', 'infra/pbx/paris/ari-media.mjs', 'infra/pbx/paris/menu.mjs', '.github/workflows/repair-paris-saved-settings.yml']
   pull_request:
     paths: ['scripts/gcp/*repair-paris-turn-proxy.py', 'scripts/gcp/*repair-paris-settings.py', 'infra/pbx/paris/**', '.github/workflows/repair-paris-saved-settings.yml']
 permissions:

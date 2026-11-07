@@ -3,6 +3,25 @@ from pathlib import Path
 spec=importlib.util.spec_from_file_location('v',Path(__file__).with_name('configure-owned-voicemail.py'));v=importlib.util.module_from_spec(spec);spec.loader.exec_module(v)
 GOOD="-= Info about Application 'VoiceMail' =-\n[Synopsis]\nLeave a voicemail message"
 class Registration(unittest.TestCase):
+ def test_cellular_fallback_is_only_for_verified_owner_and_number(self):
+  system={'id':'341f59a3-b1d6-4360-8463-0ce0402f86fe','tenant_id':None,'status':'active','admin_extension':'0'}
+  owner={'profile_id':v.OWNER,'extension':'0','enabled':True,'admin_external_fallback':True,'external_fallback_number':v.FORWARD_NUMBER,'ring_mode':'ring'}
+  plan=v.operator_route(system,owner)
+  self.assertLess(plan.index('Gosub(elevate-pwa-extensions,0,1)'),plan.index('Dial(PJSIP/'))
+  self.assertIn('Dial(PJSIP/+13179562748@twilio,25,U(elevate-owner-accept))',plan)
+  self.assertIn('CALLERID(name)=Elevate for Humanity',plan)
+  self.assertIn('Read(ELEVATE_ACCEPT,custom/elevate-owner-call,1,,1,8)',plan)
+  self.assertIn('Set(GOSUB_RESULT=CONTINUE)',plan)
+  self.assertIn('GotoIf($["${ELEVATE_OWNER_ACCEPTED}"="1"]?done)',plan)
+  self.assertIn('VoiceMail(0@elevate,u)',plan)
+  self.assertNotIn('3177607908',plan)
+  for bad in [{**owner,'profile_id':'other'},{**owner,'extension':'104'},{**owner,'external_fallback_number':'+13177607908'}]:
+   with self.assertRaises(ValueError):v.operator_route(system,bad)
+  for bad in [{**system,'tenant_id':'customer'},{**system,'admin_extension':'104'}]:
+   with self.assertRaises(ValueError):v.operator_route(bad,owner)
+  for mode in ['offline','do_not_disturb']:
+   self.assertEqual(v.operator_route(system,{**owner,'ring_mode':mode}),v.OPERATOR)
+  self.assertEqual(v.operator_route(system,{**owner,'admin_external_fallback':False}),v.OPERATOR)
  def test_module_running_and_mailbox_definitions_do_not_prove_application_registration(self):
   self.assertFalse(v.application_registered('app_voicemail.so Comedian Mail 0 Not Running'))
   self.assertFalse(v.application_registered('Your application(s) is (are) not registered'))

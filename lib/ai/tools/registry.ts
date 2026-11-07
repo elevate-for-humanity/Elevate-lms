@@ -804,7 +804,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     risk: 'critical',
     scope: 'platform',
     allowedAgents: ['LIZZY'],
-    allowedRoles: ['super_admin'],
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
     approvalRequired: true,
     confirmationPhrase: 'CONFIRM PUSH',
     idempotent: false,

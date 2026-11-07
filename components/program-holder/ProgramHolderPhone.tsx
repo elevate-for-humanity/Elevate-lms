@@ -899,7 +899,7 @@ export function ProgramHolderPhone({
           </div>
           <p className="mt-4 text-sm font-black uppercase tracking-widest text-cyan-300">
             {callState === 'ringing'
-              ? 'Incoming call'
+              ? 'Elevate for Humanity — incoming call'
               : callState === 'calling'
                 ? 'Calling'
                 : 'Call connected'}

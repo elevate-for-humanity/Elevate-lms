@@ -28,7 +28,18 @@ const nextConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
-  images: { unoptimized: true },
+  images: {
+    unoptimized: false,
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
+    remotePatterns: [
+      { protocol: 'https', hostname: 'www.elevateforhumanity.org' },
+      { protocol: 'https', hostname: '*.supabase.co' },
+      { protocol: 'https', hostname: '*.r2.dev' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'images.pexels.com' },
+    ],
+  },
   experimental: { staticGenerationRetryCount: 3 },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
@@ -114,10 +125,7 @@ const nextConfig = {
 
   webpack: (config, { dev, isServer }) => {
     config.parallelism = 1;
-    // The production image is rebuilt from source in CI; disabling webpack's
-    // persistent pack cache avoids serializing large generated route strings
-    // and removes its big-string performance warning. Development keeps cache.
-    if (!dev) config.cache = false;
+    // Keep Next.js-managed webpack caching. CI can reuse its build cache when persisted.
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),

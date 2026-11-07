@@ -10,7 +10,7 @@ describe('apprenticeship public price authority',()=>{
    const result=await GET(new NextRequest('https://www.elevateforhumanity.org/api/programs/pricing?slug=nail-technician-apprenticeship'));
    const data=await result.json();
    expect(data.tuition_cents).toBe(600000);
-   expect(data.deposit_default_cents).toBe(150000);
+   expect(data.deposit_default_cents).toBe(60000);
    expect(data.payment_frequency).toBe('monthly');
    expect(fixture.tables).toEqual(['programs']);
  });

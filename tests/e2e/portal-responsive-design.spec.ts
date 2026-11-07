@@ -560,7 +560,8 @@ test.describe('Studio single-session access and composer', () => {
     }
     await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
-    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThanOrEqual(480);
+    await expect(page.getByLabel('Browser zoom')).toHaveText('100%');
+    await expect.poll(async () => Math.abs((await stream.evaluate(el => el.getBoundingClientRect().width)) - initialWidth)).toBeLessThanOrEqual(1);
     const normalWidth = await stream.evaluate(el => el.getBoundingClientRect().width);
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
     await expect(page.getByLabel('Browser zoom')).toHaveText('75%');

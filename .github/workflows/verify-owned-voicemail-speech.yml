@@ -9,10 +9,9 @@ permissions:
   actions: write
   id-token: write
 jobs:
-  verify:
-    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+  dispatch-after-deployment:
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
-    environment: production
     steps:
       - name: Require successful real Admin deployment for automatic acceptance
         if: github.event_name == 'workflow_run'
@@ -24,6 +23,15 @@ jobs:
           set -euo pipefail
           count="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$DEPLOY_RUN_ID/jobs" --paginate --jq '[.jobs[] | select(.name == "Deploy and verify Admin on Google" and .conclusion == "success")] | length' | awk '{sum+=$1} END{print sum+0}')"
           test "$count" -ge 1 || { echo '::error::Successful dispatcher is not a successful Admin deployment'; exit 1; }
+      - name: Dispatch verification through the authorized Google identity event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run verify-owned-voicemail-speech.yml --ref main
+  verify:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false

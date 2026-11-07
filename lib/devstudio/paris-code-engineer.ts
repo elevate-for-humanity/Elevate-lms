@@ -256,8 +256,8 @@ async function searchCode(query: string) {
   }));
 }
 
-function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = []) {
-  return rankSourcePaths(query, tree.filter(entry => !blockedPath(entry.path)));
+function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = [], task = '') {
+  return rankSourcePaths(query, tree.filter(entry => !blockedPath(entry.path)), task);
 }
 
 function parseAction(value: Record<string, unknown>): AgentAction {
@@ -530,7 +530,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         const matches = await searchCode(action.query);
         if (!matches.length) {
           const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
-          const paths = suggestedSourcePaths(task + ' ' + action.query, tree.tree);
+          const paths = suggestedSourcePaths(action.query, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));
           discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
           observations.push(`SEARCH ${action.query}: no content matches. Candidate filenames from the task branch: ${JSON.stringify(paths)}. Read an exact file before proposing a change.`);
         } else {

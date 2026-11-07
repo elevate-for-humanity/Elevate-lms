@@ -41,3 +41,26 @@ test('relevant middle source survives the CPU prompt budget rather than hiding b
   {role:'user',content:JSON.stringify({task:goal,observations:['READ '+producer+':\n'+excerpt]})}],8192,768,'cpu');
  assert.match(JSON.parse(messages[1].content).observations.join('\n'),/actualProducer/);
 });
+
+test('a refined authenticated search outranks older broad inventory after checkpoint rollover',()=>{
+ const alignment='lib/ultimate-course-builder/instructional/picture-timeline.mjs';
+ const noise='lib/ultimate-course-builder/quality/lesson-quality.ts';
+ const previous=rememberSourcePaths([], [producer,noise]);
+ const fresh=rankSourcePaths('PICTURE_CUE_NOT_ALIGNED_TO_SPEECH',[producer,noise,alignment].map(path=>({path,type:'blob'})),goal);
+ const inventory=JSON.parse(JSON.stringify(rememberSourcePaths(previous,fresh)));
+ const history=['read:'+producer,'search:picture_cue_not_aligned_to_speech'];
+ assert.deepEqual(recoverRepeatedInspection(history,{type:'search',query:'PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'},[],inventory),{type:'read',path:alignment});
+});
+test('exact source paths in the task stay read hints from the authenticated tree',()=>{
+ const exact='lib/ultimate-course-builder/instructional/approved-presentation.mjs';
+ const tree=[producer,exact].map(path=>({type:'blob',path}));
+ assert.equal(rankSourcePaths('unknown failure',tree,goal+' Source location: '+exact)[0],exact);
+ assert.deepEqual(rankSourcePaths(exact,[]),[]);
+});
+test('binary fixtures never displace source files in the bounded inventory',()=>{
+ const previous=Array.from({length:64},(_,i)=>'lib/old-'+i+'.ts');
+ const inventory=rememberSourcePaths(previous,[producer,'tests/video/fixture.png']);
+ assert.equal(inventory[0],producer);assert.equal(inventory.length,64);
+ assert.ok(!inventory.includes('tests/video/fixture.png'));
+ assert.deepEqual(rankSourcePaths('fixture',[{type:'blob',path:'tests/video/fixture.png'}]),[]);
+});

@@ -18,14 +18,30 @@ const forbidden = [
   ['fake-publish-queue', "success: true, result: { message: 'Content queued for publishing' }"],
   ['fabricated-api-server', "'https://api.example.com'"],
 ];
+// Structural regression checks supplement literal markers. An identifier that
+// concatenates a label onto a UUID cannot be inserted into a UUID column.
+const semanticGuards = [
+  {file:'lib/paris/marketing/content-generator.ts', rule:'non-uuid-content-variation',
+    pattern:/id\s*:\s*`\$\{original\.id\}_(?:short|emoji|question)`/},
+  {file:'lib/paris/workforce/index.ts',rule:'dispatched-reported-as-completed',
+    pattern:/success\s*:\s*execution\.executed\s*===\s*true\s*[,}]/},
+  {file:'lib/paris/marketing/index.ts',rule:'fixed-performance-score',
+    pattern:/score\s*:\s*75\s*[,}]/},
+];
 const findings = [];
 const inventory = [];
 for (const path of [...new Set(paths)].sort()) {
   const text = readFileSync(path,'utf8');
   const source = ts.createSourceFile(path,text,ts.ScriptTarget.Latest,true);
   const claims = [];
+  const rel = relative(root,path).replaceAll('\\','/');
+  for (const guard of semanticGuards) {
+    if (rel !== guard.file) continue;
+    const match = guard.pattern.exec(text);
+    if (match) findings.push({path:rel,line:text.slice(0,match.index).split('\\n').length,rule:guard.rule});
+  }
   function walk(node) {
-    if (ts.isPropertyAssignment(node) && ['success','ok','executed','isReady','productionReady'].includes(node.name.getText(source))) {
+    if (ts.isPropertyAssignment(node) && ['success','ok','executed','isReady','productionReady','ready','status','published','completed'].includes(node.name.getText(source))) {
       const position = source.getLineAndCharacterOfPosition(node.getStart(source));
       claims.push({line:position.line+1,claim:node.getText(source)});
     }

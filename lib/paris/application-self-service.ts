@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { requireSavedRow, requireQuerySuccess } from './database-receipt';
 
 export type ParisApplicationDecision = {
   applicationId: string;
@@ -90,17 +91,19 @@ export async function evaluateAndAdvanceApplication(
     else missing.push(label);
   }
 
-  const { data: requirements } = await supabase
+  const { data: requirements, error: requirementsError } = await supabase
     .from('document_requirements')
     .select('id, document_type, name, required, is_required, due_stage')
     .or(`program_id.eq.${application.program_id},program_id.is.null`)
     .eq('role', 'student');
+  requireQuerySuccess({error: requirementsError}, 'read_application_requirements');
 
   const requiredDocuments = (requirements || []).filter((row: any) => row.required !== false && row.is_required !== false);
-  const { data: documents } = await supabase
+  const { data: documents, error: documentsError } = await supabase
     .from('documents')
     .select('id, document_type, requirement_id, status, verification_status, verified, reviewed_at, verified_at')
     .eq('application_id', application.id);
+  requireQuerySuccess({error: documentsError}, 'read_application_documents');
 
   for (const req of requiredDocuments) {
     const doc = (documents || []).find((candidate: any) =>
@@ -116,11 +119,12 @@ export async function evaluateAndAdvanceApplication(
     else pendingReview.push(`${label} document review`);
   }
 
-  const { data: signatures } = await supabase
+  const { data: signatures, error: signaturesError } = await supabase
     .from('signatures')
     .select('id, status, signed_at, document_type')
     .eq('user_id', application.user_id)
     .not('signed_at', 'is', null);
+  requireQuerySuccess({error: signaturesError}, 'read_application_signatures');
 
   if ((signatures || []).length > 0) completed.push('Required signature');
   else missing.push('Required signature');
@@ -184,12 +188,13 @@ export async function evaluateAndAdvanceApplication(
   };
 
   if (changed) {
-    await supabase
+    const saved = await supabase
       .from('applications')
       .update({ status: decidedStatus, metadata, updated_at: now })
-      .eq('id', application.id);
+      .eq('id', application.id).select('id').single();
+    requireSavedRow(saved, 'save_application_decision');
 
-    await supabase.from('application_state_events').insert({
+    const event = await supabase.from('application_state_events').insert({
       application_type: application.application_type || 'student',
       application_id: application.id,
       from_state: application.status || null,
@@ -199,8 +204,10 @@ export async function evaluateAndAdvanceApplication(
       reason: 'PARIS self-service requirements evaluation',
       metadata: { progress, missing, pendingReview, complete, requiresAuthorizedReview: complete && decidedStatus !== 'approved', source: 'paris_self_service' },
     });
+    requireQuerySuccess(event, 'record_application_decision');
   } else {
-    await supabase.from('applications').update({ metadata, updated_at: now }).eq('id', application.id);
+    const saved = await supabase.from('applications').update({ metadata, updated_at: now }).eq('id', application.id).select('id').single();
+    requireSavedRow(saved, 'save_application_evaluation');
   }
 
   const nextAction = workOne.applicable && workOne.nextQuestion
@@ -232,13 +239,14 @@ export async function evaluateAndAdvanceApplication(
 }
 
 export async function getCurrentApplicantApplication(supabase: SupabaseClient, userId: string) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('applications')
     .select('*')
     .eq('user_id', userId)
     .order('updated_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+  requireQuerySuccess({error}, 'read_current_application');
   return data || null;
 }
 
@@ -269,8 +277,9 @@ export async function saveWorkOneAnswer(
   if (field === 'workone_visited') update.has_workone_appointment = value;
   if (field === 'voucher_approved' && value) update.has_workone_approval = true;
 
-  await supabase.from('applications').update(update).eq('id', application.id);
-  await supabase.from('application_state_events').insert({
+  const saved = await supabase.from('applications').update(update).eq('id', application.id).select('id').single();
+  requireSavedRow(saved, 'save_workone_answer');
+  const event = await supabase.from('application_state_events').insert({
     application_type: application.application_type || 'student',
     application_id: application.id,
     from_state: application.status || null,
@@ -280,6 +289,7 @@ export async function saveWorkOneAnswer(
     reason: `Applicant confirmed ${field}`,
     metadata: { field, value, source: 'paris_interview' },
   });
+  requireQuerySuccess(event, 'record_workone_answer');
 
   return { ...application, ...update };
 }

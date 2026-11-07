@@ -108,9 +108,10 @@ export async function executeAgentTask(
       );
       if (approval?.status === 'pending') {
         return {
-          success: true,
+          success: false,
+          error: 'Approval is pending; the task has not executed.',
           approvalId: approval.id,
-          result: { status: 'pending_approval', approvalId: approval.id },
+          result: { status: 'pending_approval', executed: false, approvalId: approval.id },
         };
       }
     }
@@ -148,7 +149,7 @@ export async function executeAgentTask(
       action: task.action,
       input: task.details,
       output: execution.payload as Record<string, unknown> | undefined,
-      status: execution.ok ? 'completed' : execution.status === 'approval_required' ? 'pending' : 'failed',
+      status: execution.status === 'completed' && execution.executed ? 'completed' : ['running', 'advisory', 'approval_required'].includes(execution.status) ? 'pending' : 'failed',
       duration: Date.now() - started,
       userId: actorId,
       requiresApproval: execution.status === 'approval_required',
@@ -157,10 +158,12 @@ export async function executeAgentTask(
 
     if (execution.status === 'approval_required') {
       return {
-        success: true,
+        success: false,
+        error: 'Approval is required; the task has not executed.',
         requiredConfirmation: execution.requiredConfirmation,
         result: {
           status: 'pending_approval',
+          executed: false,
           tool: execution.tool,
           risk: execution.risk,
           traceId: execution.traceId,
@@ -181,7 +184,7 @@ export async function executeAgentTask(
     }
 
     return {
-      success: true,
+      success: execution.executed === true,
       result: {
         status: execution.status,
         executed: execution.executed,
@@ -235,8 +238,7 @@ export async function reassignAgentRole(
   agentId: string,
   newRole: AgentRole,
 ): Promise<AIAgent | null> {
-  void newRole;
-  return updateAgent(agentId, {});
+  throw new Error('PARIS_ROLE_REASSIGNMENT_NOT_IMPLEMENTED: No agent role was changed. Use the authenticated agent configuration controller.');
 }
 
 export async function pauseAgent(agentId: string): Promise<AIAgent | null> {

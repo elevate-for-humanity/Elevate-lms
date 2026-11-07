@@ -189,24 +189,7 @@ export async function analyzeContentPerformance(
   improvements: string[];
   recommendations: string[];
 }> {
-  // Placeholder - would integrate with analytics
-  return {
-    score: 75,
-    strengths: [
-      'Clear call-to-action',
-      'Good use of hashtags',
-      'Engaging hook',
-    ],
-    improvements: [
-      'Consider adding a video',
-      'Post timing could be optimized',
-    ],
-    recommendations: [
-      'Add more visual elements',
-      'Test different posting times',
-      'Include user-generated content',
-    ],
-  };
+  throw new Error('PARIS_ANALYTICS_NOT_CONNECTED: No measured performance is available for this content. Connect its publishing analytics before scoring it.');
 }
 
 /**

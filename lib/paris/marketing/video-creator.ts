@@ -28,6 +28,9 @@ export async function generateVideoScript(
 
   // Generate script
   const script: VideoScript = {
+    status: 'draft',
+    generationMethod: 'template',
+    rendered: false,
     id: `script_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     title: generateTitle(topic, type),
     hook: generateHook(topic, style, guidelines),

@@ -11,7 +11,7 @@ export interface CurriculumLicense {
   curriculumName: string;
   version: string;
   copyright: string;
-  licenseType: LicenseType;
+  licenseType: string;
   schoolId?: string;
   schoolName?: string;
   issuedAt: string;
@@ -101,8 +101,8 @@ export function generateCurriculumLicense(params: {
     schoolName: params.schoolName,
     issuedAt: now.toISOString(),
     expiresAt: expires.toISOString(),
-    autoRenew: true,
-    maintenanceIncluded: true,
+    autoRenew: false,
+    maintenanceIncluded: false,
     updateChannel: 'standard',
     entitlements: {
       studentSeats: params.studentSeats,
@@ -118,9 +118,9 @@ export function generateCurriculumLicense(params: {
       sublicense: false,
       transfer: false,
     },
-    status: 'active',
-    renewalEligible: true,
-    renewalDiscount: 0.1, // 10% discount
+    status: 'pending',
+    renewalEligible: false,
+    renewalDiscount: 0,
   };
 }
 
@@ -196,11 +196,11 @@ export function generateCurriculumMetadata(params: {
     licenseRequired: true,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
-    status: 'published',
-    productionReady: true,
-    qualityScore: 0, // Will be updated after QA
+    status: 'draft',
+    productionReady: false,
+    qualityScore: null,
     readinessReport: null,
-    wioaEligible: true,
+    wioaEligible: false,
     etplApproved: false,
     accredited: false,
     credentials: [],
@@ -213,14 +213,14 @@ export function generateCurriculumMetadata(params: {
       {
         version: `v${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`,
         date: now.toISOString(),
-        changes: ['Initial release'],
+        changes: ['Initial draft; publication and eligibility unverified'],
         author: 'PARIS AI',
       },
     ],
     schools: [],
     totalEnrollments: 0,
-    averageCompletion: 0,
-    averageSatisfaction: 0,
+    averageCompletion: null,
+    averageSatisfaction: null,
     renewalDue: new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()).toISOString(),
   };
 }
@@ -240,7 +240,7 @@ export interface CurriculumMetadata {
   updatedAt: string;
   status: 'draft' | 'review' | 'published' | 'archived';
   productionReady: boolean;
-  qualityScore: number;
+  qualityScore: number | null;
   readinessReport: string | null;
   wioaEligible: boolean;
   etplApproved: boolean;
@@ -254,8 +254,8 @@ export interface CurriculumMetadata {
   changeLog: ChangeLogEntry[];
   schools: string[];
   totalEnrollments: number;
-  averageCompletion: number;
-  averageSatisfaction: number;
+  averageCompletion: number | null;
+  averageSatisfaction: number | null;
   renewalDue: string;
 }
 
@@ -291,10 +291,11 @@ export function getExpiringLicenses(licenses: CurriculumLicense[], daysThreshold
 /**
  * Generate renewal quote
  */
-export function generateRenewalQuote(license: CurriculumLicense): RenewalQuote {
+export function generateRenewalQuote(license: CurriculumLicense, terms?: { licenseType: LicenseType; studentSeats: number }): RenewalQuote {
+  if (!terms) throw new Error('PARIS_RENEWAL_TERMS_REQUIRED: Supply the current offer and actual seat count before quoting renewal.');
   const basePrice = calculateLicensePrice({
-    licenseType: { name: license.licenseType, durationMonths: 12, pricePerStudent: 25, minimumStudents: 10, annualMaintenanceFee: 500 },
-    studentSeats: license.entitlements.studentSeats === 'unlimited' ? 100 : license.entitlements.studentSeats,
+    licenseType: terms.licenseType,
+    studentSeats: terms.studentSeats,
   });
 
   const discount = license.renewalEligible ? basePrice.total * license.renewalDiscount : 0;

@@ -158,7 +158,7 @@ function parseOpenAPI3(spec: Record<string, unknown>): APIAnalysis {
     name: info.title as string || 'API',
     version: info.version as string,
     description: info.description as string,
-    baseUrl: servers[0]?.url || 'https://api.example.com',
+    baseUrl: servers[0]?.url || '/',
     endpoints,
     schemas: extractedSchemas,
     security: (spec.security as string[][])?.flat() || [],
@@ -179,7 +179,7 @@ function parseSwagger2(spec: Record<string, unknown>): APIAnalysis {
   const definitions = spec.definitions as Record<string, unknown> || {};
   const tags = spec.tags as Array<{ name: string }> || [];
 
-  const baseUrl = `${schemes[0]}://${host}${basePath}`;
+  const baseUrl = host ? `${schemes[0]}://${host}${basePath}` : basePath || '/';
 
   const endpoints: APIEndpoint[] = [];
 
@@ -234,7 +234,7 @@ function parseSwagger2(spec: Record<string, unknown>): APIAnalysis {
     name: info.title as string || 'API',
     version: info.version as string,
     description: info.description as string,
-    baseUrl: baseUrl || 'https://api.example.com',
+    baseUrl,
     endpoints,
     schemas: definitions,
     security: [],
@@ -484,7 +484,10 @@ export async function importAPI(
       };
     }
 
-    // Generate TypeScript client
+    // Resolve the specification's actual relative server against its source URL.
+    analysis.baseUrl = new URL(analysis.baseUrl, specUrl).href;
+    if (/\{[^}]+\}/.test(analysis.baseUrl)) throw new Error('API_SERVER_VARIABLES_REQUIRE_VALUES');
+    // Generate TypeScript client; this does not establish a live API connection.
     const clientCode = generateTypeScriptClient(analysis);
 
     return {
@@ -545,17 +548,14 @@ serve(async (req) => {
     // Get request body
     const requestBody = await req.json()
 
-    // TODO: Implement ${endpoint.method} ${endpoint.path} logic here
-    // ${endpoint.description || ''}
-
     const result = {
-      success: true,
-      message: 'Edge function placeholder',
-      endpoint: '${endpoint.method} ${endpoint.path}',
-      data: requestBody,
+      success: false,
+      error: 'IMPORTED_ENDPOINT_NOT_IMPLEMENTED',
+      message: 'The imported schema does not implement this operation. No business action was executed.',
     }
 
     return new Response(JSON.stringify(result), {
+      status: 501,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {

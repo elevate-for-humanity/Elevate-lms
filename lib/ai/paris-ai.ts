@@ -40,18 +40,15 @@ export class ParisAI {
     systemPrompt?: string
   ): Promise<string> {
     if (!this.apiKey) {
-      console.warn('⚠️  ANTHROPIC_API_KEY not set, using demo response');
-      return this.getDemoResponse(messages[messages.length - 1]?.content || '');
+      throw new Error('PARIS_AI_PROVIDER_NOT_CONFIGURED: ANTHROPIC_API_KEY is missing. No command was executed.');
     }
 
-    try {
-      const response = await fetch(ANTHROPIC_API_URL, {
+    const response = await fetch(ANTHROPIC_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': this.apiKey,
           'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model: this.model,
@@ -62,17 +59,15 @@ export class ParisAI {
       });
 
       if (!response.ok) {
-        const error = await response.text();
-        console.error('Claude API error:', error);
-        return this.getDemoResponse(messages[messages.length - 1]?.content || '');
+        throw new Error(`PARIS_AI_PROVIDER_HTTP_${response.status}: No command was executed.`);
       }
 
-      const data: ClaudeResponse = await response.json();
-      return data.content;
-    } catch (error) {
-      console.error('Claude request failed:', error);
-      return this.getDemoResponse(messages[messages.length - 1]?.content || '');
-    }
+      const data = await response.json();
+      const content = Array.isArray(data.content)
+        ? data.content.filter((block: { type: string; text?: string }) => block.type === 'text' && typeof block.text === 'string').map((block: { text: string }) => block.text).join('\n')
+        : '';
+      if (!content.trim()) throw new Error('PARIS_AI_PROVIDER_EMPTY_RESPONSE');
+      return content;
   }
 
   /**
@@ -100,15 +95,19 @@ Analyze this command and determine what PARIS should do. Return a JSON response 
     ]);
 
     try {
-      // Try to parse as JSON
       const parsed = JSON.parse(response);
-      return parsed;
-    } catch {
-      // Return as message
       return {
-        success: true,
-        message: response,
-        actions: ['analyze', 'execute'],
+        success: false,
+        message: 'Command analyzed only. Execute it through the authenticated PARIS tool controller to obtain an execution receipt.',
+        data: { proposal: parsed, executed: false },
+        actions: [],
+      };
+    } catch {
+      return {
+        success: false,
+        message: 'Command analysis returned no executable tool receipt. No command was executed.',
+        data: { analysis: response, executed: false },
+        actions: [],
       };
     }
   }
@@ -207,46 +206,6 @@ You help with:
 Be helpful, efficient, and follow brand guidelines.`;
   }
 
-  /**
-   * Demo response when API key is not set
-   */
-  private getDemoResponse(input: string): string {
-    const lower = input.toLowerCase();
-    
-    if (lower.includes('hire') || lower.includes('agent')) {
-      return JSON.stringify({
-        success: true,
-        message: "I'll create an AI agent for you. In production, this would use Claude to create the agent with the specified role and permissions.",
-        data: { status: 'demo' },
-        actions: ['create_agent', 'configure_permissions'],
-      });
-    }
-    
-    if (lower.includes('import') || lower.includes('github')) {
-      return JSON.stringify({
-        success: true,
-        message: "I'll analyze and import the repository. In production, this would use Claude to understand the codebase structure.",
-        data: { status: 'demo' },
-        actions: ['analyze_repo', 'detect_framework', 'generate_report'],
-      });
-    }
-    
-    if (lower.includes('content') || lower.includes('generate') || lower.includes('post')) {
-      return JSON.stringify({
-        success: true,
-        message: "I'll generate content for you. Here's a sample post:",
-        content: "🚀 Exciting news! Elevate is helping career changers achieve their dreams. Apply today! #CareerChange #WorkforceDev",
-        hashtags: ['#ElevateForHumanity', '#CareerChange'],
-        suggestions: ['Add image', 'Schedule post'],
-      });
-    }
-
-    return JSON.stringify({
-      success: true,
-      message: "I understand. In production with Claude AI, I would execute this command for you.",
-      actions: ['process_command'],
-    });
-  }
 }
 
 // Export singleton instance

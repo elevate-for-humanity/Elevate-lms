@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { requireSavedRow, requireQuerySuccess } from '../database-receipt';
 import { logActivity } from './agent-manager';
 import type { ApprovalWorkflow, AIAgent } from './types';
 
@@ -215,7 +216,7 @@ export async function requestApproval(
   if (canAutoApprove) {
     // Auto-approve
     const workflow: ApprovalWorkflow = {
-      id: `approval_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: crypto.randomUUID(),
       agentId,
       taskId,
       type,
@@ -240,7 +241,7 @@ export async function requestApproval(
 
   // Create pending approval
   const workflow: ApprovalWorkflow = {
-    id: `approval_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: crypto.randomUUID(),
     agentId,
     taskId,
     type,
@@ -282,15 +283,18 @@ function checkAutoApproval(
 
   // Check amount limits
   if (conditions.maxAmount !== undefined) {
-    const amount = details.amount as number || details.total as number || 0;
-    if (amount > conditions.maxAmount) return false;
+    const amount = details.amount ?? details.total;
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount < 0 || amount > conditions.maxAmount) return false;
   }
 
   // Check record limits
   if (conditions.maxRecords !== undefined) {
-    const records = details.records as unknown[] || [];
-    if (records.length > conditions.maxRecords) return false;
+    const records = details.records;
+    if (!Array.isArray(records) || records.length > conditions.maxRecords) return false;
   }
+
+  // No rate-window query exists here, so a window allowance is unverified.
+  if (conditions.timeWindow !== undefined) return false;
 
   // Check required roles
   if (conditions.requiresUser) {
@@ -310,11 +314,12 @@ export async function approveWorkflow(
   reviewerId: string,
   comments?: string
 ): Promise<ApprovalWorkflow | null> {
-  const { data: existing } = await supabase
+  const { data: existing, error: readError } = await supabase
     .from('approval_workflows')
     .select('*')
     .eq('id', workflowId)
     .single();
+  requireQuerySuccess({error: readError}, 'read_approval');
 
   if (!existing) return null;
 
@@ -336,7 +341,7 @@ export async function approveWorkflow(
     comments,
   };
 
-  await supabase
+  const saved = await supabase
     .from('approval_workflows')
     .update({
       status: 'approved',
@@ -344,7 +349,8 @@ export async function approveWorkflow(
       reviewed_by: reviewerId,
       comments,
     })
-    .eq('id', workflowId);
+    .eq('id', workflowId).eq('status', 'pending').select('id').single();
+  requireSavedRow(saved, 'approve_workflow');
 
   await logActivity(existing.agent_id, {
     type: 'approval_request',
@@ -365,11 +371,12 @@ export async function rejectWorkflow(
   reviewerId: string,
   comments: string
 ): Promise<ApprovalWorkflow | null> {
-  const { data: existing } = await supabase
+  const { data: existing, error: readError } = await supabase
     .from('approval_workflows')
     .select('*')
     .eq('id', workflowId)
     .single();
+  requireQuerySuccess({error: readError}, 'read_approval');
 
   if (!existing) return null;
 
@@ -377,7 +384,7 @@ export async function rejectWorkflow(
     throw new Error('Workflow is not pending');
   }
 
-  await supabase
+  const saved = await supabase
     .from('approval_workflows')
     .update({
       status: 'rejected',
@@ -385,7 +392,8 @@ export async function rejectWorkflow(
       reviewed_by: reviewerId,
       comments,
     })
-    .eq('id', workflowId);
+    .eq('id', workflowId).eq('status', 'pending').select('id').single();
+  requireSavedRow(saved, 'reject_workflow');
 
   await logActivity(existing.agent_id, {
     type: 'approval_request',
@@ -440,9 +448,8 @@ export async function getPendingApprovals(
 
   const { data, error } = await query.order('requested_at', { ascending: true });
 
-  if (error || !data) {
-    return [];
-  }
+  requireQuerySuccess({error}, 'read_approval_records');
+  if (!data) return [];
 
   return data.map(row => ({
     id: row.id,
@@ -489,9 +496,8 @@ export async function getApprovalHistory(
 
   const { data, error } = await query.order('requested_at', { ascending: false });
 
-  if (error || !data) {
-    return [];
-  }
+  requireQuerySuccess({error}, 'read_approval_records');
+  if (!data) return [];
 
   return data.map(row => ({
     id: row.id,
@@ -515,10 +521,11 @@ export async function expireOldApprovals(): Promise<number> {
   const now = new Date();
   
   // Find pending approvals older than their escalation timeout
-  const { data: pending } = await supabase
+  const { data: pending, error: pendingError } = await supabase
     .from('approval_workflows')
     .select('*')
     .eq('status', 'pending');
+  requireQuerySuccess({error: pendingError}, 'read_expiring_approvals');
 
   if (!pending) return 0;
 
@@ -532,10 +539,11 @@ export async function expireOldApprovals(): Promise<number> {
     const escalationTime = new Date(requestedAt.getTime() + config.escalationTimeout * 60 * 60 * 1000);
 
     if (now > escalationTime) {
-      await supabase
+      const saved = await supabase
         .from('approval_workflows')
         .update({ status: 'expired' })
-        .eq('id', workflow.id);
+        .eq('id', workflow.id).eq('status', 'pending').select('id').single();
+      requireSavedRow(saved, 'expire_approval');
       
       expiredCount++;
 
@@ -555,7 +563,7 @@ export async function expireOldApprovals(): Promise<number> {
  * Helper: Save workflow to database
  */
 async function saveWorkflow(workflow: ApprovalWorkflow): Promise<void> {
-  await supabase.from('approval_workflows').insert({
+  const saved = await supabase.from('approval_workflows').insert({
     id: workflow.id,
     agent_id: workflow.agentId,
     task_id: workflow.taskId,
@@ -568,7 +576,8 @@ async function saveWorkflow(workflow: ApprovalWorkflow): Promise<void> {
     reviewed_by: workflow.reviewedBy,
     comments: workflow.comments,
     auto_approved: workflow.autoApproved,
-  });
+  }).select('id').single();
+  if (requireSavedRow(saved, 'save_approval').id !== workflow.id) throw new Error('PARIS_APPROVAL_RECEIPT_MISMATCH');
 }
 
 /**
@@ -577,9 +586,8 @@ async function saveWorkflow(workflow: ApprovalWorkflow): Promise<void> {
 async function sendApprovalNotification(workflow: ApprovalWorkflow): Promise<void> {
   const config = APPROVAL_CONFIGS[workflow.type];
   
-  // Would integrate with notification system
-  // For now, just log
-  console.info(`[Approval Notification] New approval request:
+  // This log is not a notification delivery receipt.
+  console.info(`[Approval recorded; notification delivery unavailable] New approval request:
     Type: ${config?.label || workflow.type}
     Description: ${workflow.description}
     From: ${workflow.agentId}
@@ -609,7 +617,8 @@ export async function getApprovalStats(
 
   const { data, error } = await query;
 
-  if (error || !data) {
+  requireQuerySuccess({error}, 'read_approval_statistics');
+  if (!data) {
     return {
       total: 0,
       pending: 0,

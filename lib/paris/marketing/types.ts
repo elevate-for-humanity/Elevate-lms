@@ -75,6 +75,8 @@ export interface ContentTemplate {
 
 // Generated Content
 export interface GeneratedContent {
+  status?: 'draft';
+  generationMethod?: 'template';
   id: string;
   type: ContentType;
   platform: SocialPlatform[];
@@ -169,6 +171,9 @@ export interface CalendarEntry {
 
 // Video/Reel Generation
 export interface VideoScript {
+  status?: 'draft';
+  generationMethod?: 'template';
+  rendered?: false;
   id: string;
   title: string;
   hook: string;

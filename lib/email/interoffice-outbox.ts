@@ -1,3 +1,4 @@
+import { notifyParisMailResult } from './paris-mail-notification';
 import { storeInboundCommunicationEmail } from './communication-inbound';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from './sendgrid';
@@ -39,10 +40,19 @@ export async function processInterofficeOutbox(limit = 20) {
     }
     let certificateAttachments;
     try {
-      certificateAttachments = await enrollmentCertificateAttachments(db, row.campaign_key, row.recipient_email);
+      certificateAttachments = await enrollmentCertificateAttachments(
+        db,
+        row.campaign_key,
+        row.recipient_email,
+      );
     } catch {
-      await db.from('communication_email_outbox')
-        .update({ status: 'failed', error_message: 'Certificate payment, identity or recipient verification failed; email not sent' })
+      await db
+        .from('communication_email_outbox')
+        .update({
+          status: 'failed',
+          error_message:
+            'Certificate payment, identity or recipient verification failed; email not sent',
+        })
         .eq('id', row.id);
       failed++;
       continue;
@@ -110,7 +120,20 @@ export async function processInterofficeOutbox(limit = 20) {
       sent_at: result.success ? now : null,
     };
     await db.from('communication_email_outbox').update(receipt).eq('id', row.id);
-    await db.from('communication_email_messages').update(receipt).eq('id', record.id);
+    const { error: messageReceiptError } = await db
+      .from('communication_email_messages')
+      .update(receipt)
+      .eq('id', record.id);
+    if (messageReceiptError) throw Error('Outbox delivery receipt could not be saved');
+    if (String(row.campaign_key || '').startsWith('paris-followup-'))
+      await notifyParisMailResult(db, {
+        messageId: record.id,
+        mailboxId: row.mailbox_id,
+        mailboxAddress: mailbox.address,
+        recipient: row.recipient_email,
+        subject: row.subject,
+        status: result.success ? 'sent' : 'failed',
+      });
     await db
       .from('communication_email_threads')
       .update({ message_count: 1, last_message_at: now })

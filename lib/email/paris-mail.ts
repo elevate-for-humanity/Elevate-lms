@@ -1,4 +1,5 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { notifyParisMailResult } from './paris-mail-notification';
 import { sendEmail } from './sendgrid';
 import { parseEmailList, textToEmailHtml } from './communication-email';
 import { canParisRespond, emailLikeLiteral } from './mail-filters';
@@ -67,12 +68,23 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
   const responseEvent = `${parsed.eventId}:paris-mail`;
   const existing = await db
     .from('communication_email_messages')
-    .select('status')
+    .select('id,status')
     .eq('inbound_event_id', responseEvent)
     .maybeSingle();
   if (existing.error) throw new Error('PARIS event lookup unavailable');
-  if (existing.data)
+  if (existing.data) {
+    // A retry repairs a missing notification without sending the reply again.
+    if (['sent', 'failed'].includes(existing.data.status))
+      await notifyParisMailResult(db, {
+        messageId: existing.data.id,
+        mailboxId: mailbox.id,
+        mailboxAddress: mailbox.address,
+        recipient: sender,
+        subject: /^re:/i.test(parsed.subject) ? parsed.subject : `Re: ${parsed.subject}`,
+        status: existing.data.status as 'sent' | 'failed',
+      });
     return { responded: existing.data.status === 'sent', reason: 'already_claimed' };
+  }
   const { data: app, error: appError } = await db
     .from('applications')
     .select('id,first_name,program_interest,status,interview_responses,interview_completed')
@@ -168,6 +180,14 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     })
     .eq('id', record.id);
   if (savedError) throw new Error('PARIS delivery receipt could not be saved');
+  await notifyParisMailResult(db, {
+    messageId: record.id,
+    mailboxId: mailbox.id,
+    mailboxAddress: mailbox.address,
+    recipient: sender,
+    subject,
+    status: sent.success ? 'sent' : 'failed',
+  });
   // Use a count query so concurrent staff replies cannot overwrite the counter.
   const receipt = await db
     .from('communication_email_messages')

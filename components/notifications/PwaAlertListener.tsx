@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
   alertKind,
+  alertPresentation,
   DEFAULT_PWA_ALERTS,
   normalizeAlertSettings,
 } from '@/lib/notifications/pwa-alert-settings';
@@ -59,7 +60,12 @@ export function PwaAlertListener() {
         if (Date.now() - lastAudioAt < 2500) return;
         lastAudioAt = Date.now();
         try {
-          await playAlert(settings, kind);
+          const preview = alertPresentation(row, kind);
+          await playAlert(
+            settings,
+            kind,
+            `You have a message from Elevate for Humanity. ${preview.title}. ${preview.body}`,
+          );
         } catch {
           /* Device autoplay can require Test sound after reopening. */
         }
@@ -73,7 +79,7 @@ export function PwaAlertListener() {
       try {
         const { data, error } = await db
           .from('notifications')
-          .select('id,title,metadata,idempotency_key,created_at')
+          .select('id,title,message,metadata,idempotency_key,created_at')
           .eq('user_id', userId)
           .gt('created_at', since)
           .order('created_at', { ascending: true })

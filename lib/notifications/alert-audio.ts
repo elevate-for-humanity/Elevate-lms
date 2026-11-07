@@ -5,10 +5,14 @@ let context: AudioContext | undefined;
 export async function playAlert(
   settings: PwaAlertSettings,
   kind: keyof typeof ALERT_PHRASES = 'email',
+  description?: string,
 ) {
   if (settings.sound === 'silent' || settings.volume === 0) return;
   if (settings.sound === 'voice') {
-    const played = await playNaturalVoiceNotification(ALERT_PHRASES[kind], settings.volume);
+    const played = await playNaturalVoiceNotification(
+      description || ALERT_PHRASES[kind],
+      settings.volume,
+    );
     if (!played)
       throw Error('Spoken alerts are unavailable on this device. Choose a chime instead.');
     return;

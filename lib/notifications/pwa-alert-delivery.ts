@@ -2,7 +2,7 @@ import 'server-only';
 import webpush from 'web-push';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getSecrets } from '@/lib/secrets';
-import { ALERT_PHRASES, isPushEndpoint } from './pwa-alert-settings';
+import { alertPresentation, isPushEndpoint } from './pwa-alert-settings';
 export async function processPwaAlerts() {
   const db = await requireAdminClient();
   const { error: emitError } = await db.rpc('emit_recorded_student_alerts');
@@ -20,6 +20,14 @@ export async function processPwaAlerts() {
       let state = 'skipped',
         acceptedDevices = 0;
       try {
+        const { data: notification, error: noticeError } = await db
+          .from('notifications')
+          .select('title,message,metadata')
+          .eq('id', row.notification_id)
+          .eq('user_id', row.user_id)
+          .maybeSingle();
+        if (noticeError || !notification) throw Error('Notification details unavailable');
+        const presentation = alertPresentation(notification, row.kind);
         const { data: preferences } = await db
           .from('pwa_alert_preferences')
           .select('sound,volume,profile:profiles!user_id(role)')
@@ -43,9 +51,9 @@ export async function processPwaAlerts() {
                 await webpush.sendNotification(
                   { endpoint: device.endpoint, keys: { p256dh: device.p256dh, auth: device.auth } },
                   JSON.stringify({
-                    title: 'PARIS · Elevate',
+                    title: presentation.title,
                     silent: preferences?.sound === 'silent' || Number(preferences?.volume) === 0,
-                    body: ALERT_PHRASES[row.kind as keyof typeof ALERT_PHRASES],
+                    body: presentation.body,
                     url:
                       row.kind === 'email'
                         ? ['admin', 'super_admin'].includes(profile?.role)

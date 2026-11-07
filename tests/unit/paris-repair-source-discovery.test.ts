@@ -7,6 +7,8 @@ const h = vi.hoisted(() => ({
   writes: [] as string[],
   sha: 'a'.repeat(40),
   denyReads: false,
+  corruptReadback: false,
+  movedBranch: false,
 }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
@@ -27,12 +29,13 @@ import { stageParisCodeRepair } from '@/lib/devstudio/paris-code-engineer';
 
 beforeEach(() => {
   h.actions = []; h.prompts = []; h.writes = []; h.sha = 'a'.repeat(40); h.denyReads = false;
+  h.corruptReadback = false; h.movedBranch = false;
   h.files = { 'lib/example.ts': 'export const retries = 0;\n' };
   vi.stubEnv('AI_PROVIDER', 'openai');
   vi.stubGlobal('fetch', vi.fn(async (input: string, init: RequestInit = {}) => {
     const url = new URL(input);
     if (url.pathname.includes('/git/ref/heads/main')) return Response.json({ object: { sha: 'a'.repeat(40) } });
-    if (url.pathname.includes('/git/ref/heads/')) return Response.json({ object: { sha: h.sha } });
+    if (url.pathname.includes('/git/ref/heads/')) return Response.json({ object: { sha: h.movedBranch && h.writes.length ? 'd'.repeat(40) : h.sha } });
     if (url.pathname.endsWith('/git/refs')) return Response.json({ ref: 'refs/heads/studio/task' }, { status: 201 });
     if (url.pathname === '/search/code') return Response.json({ message: 'API rate limit exceeded' }, { status: 429 });
     const path = decodeURIComponent(url.pathname.split('/contents/')[1] ?? '');
@@ -40,7 +43,7 @@ beforeEach(() => {
       const body = JSON.parse(String(init.body));
       h.files[path] = Buffer.from(body.content, 'base64').toString('utf8');
       h.writes.push(path); h.sha = h.writes.length === 1 ? 'b'.repeat(40) : 'c'.repeat(40);
-      return Response.json({ content: { sha: 'blob' }, commit: { sha: h.sha } });
+      return Response.json({ content: { sha: 'e'.repeat(40) }, commit: { sha: h.sha } });
     }
     if (h.denyReads) return Response.json({ message: 'Forbidden' }, { status: 403 });
     if (!path) return Response.json([
@@ -50,7 +53,9 @@ beforeEach(() => {
       { path: 'lib/example.ts', type: 'file' }, { path: 'lib/secrets.ts', type: 'file' },
     ]);
     if (!(path in h.files)) return Response.json({ message: 'Not Found' }, { status: 404 });
-    return Response.json({ type: 'file', sha: 'file-blob', content: Buffer.from(h.files[path]).toString('base64') });
+    const content = h.corruptReadback && /^[a-f0-9]{40}$/.test(url.searchParams.get('ref') ?? '')
+      ? 'different committed bytes' : h.files[path];
+    return Response.json({ type: 'file', sha: 'e'.repeat(40), content: Buffer.from(content).toString('base64') });
   }));
 });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
@@ -95,6 +100,16 @@ it('will not hand off a patch without a new regression test', async () => {
   const response = await stageParisCodeRepair('Fix the known retry defect', 'repair', 'owner');
   expect(response.status).toBe(422);
   expect(await response.json()).toMatchObject({ error: expect.stringContaining('new regression test') });
+});
+
+it.each(['corruptReadback', 'movedBranch'] as const)('does not count or hand off a GitHub PUT when %s invalidates its receipt', async failure => {
+  h[failure] = true;
+  h.actions = [...patch];
+  const response = await stageParisCodeRepair('Fix the known retry defect', 'repair', 'owner');
+  expect(response.status).toBe(500);
+  expect(await response.json()).toMatchObject({ error: 'PARIS_SOURCE_WRITE_READBACK_MISMATCH', changed_files: [], commits: [] });
+  expect(h.writes).toEqual(['lib/example.ts']);
+  expect(h.prompts).toHaveLength(1);
 });
 
 it.each(['lib/ai/runtime/repair-events.ts', 'lib/control-plane/workflow-repairs.ts', 'lib/control-plane/index.ts'])(

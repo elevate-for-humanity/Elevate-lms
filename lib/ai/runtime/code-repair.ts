@@ -2,7 +2,7 @@ import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/rep
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases} from './deployment-repair-events.mjs';
-import {recordFailedRepairWorkflow} from './repair-workflow-reconciliation.mjs';
+import {recordFailedRepairWorkflow,repairDispatchValues} from './repair-workflow-reconciliation.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
@@ -547,11 +547,11 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // Inspect a bounded page; disposition decisions preserve source evidence.
  // An ineligible source is a state/eligibility decision, never missing owner authorization.
  // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
- const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history')
+ const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history,workflow_run_id')
   .eq('status','queued').order('created_at',{ascending:true}).limit(1000);
  if(queued.data?.length===1000)throw Error('PARIS_QUEUED_REPAIR_SCAN_LIMIT');
  if(queued.error)throw queued.error;
- let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown}|null=null;
+ let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown;workflow_run_id:number|null}|null=null;
  for(const candidate of queued.data??[]){
   // The production CHECK constraint was reconciled by the reviewed
   // paris_bounded_context_retry_contract migration. The policy below is the
@@ -593,7 +593,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   if(!health.verified)return {enabled:true,dispatched:0,awaitingProvider:true,
    reason:'OWNED_MODEL_READINESS_UNVERIFIED',providerStatus:health.status??'request_failed'};
  }
- const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.id).eq('status','queued').eq('attempt_count',pending.attempt_count).select('id').maybeSingle();
+ const claim=await db.from('paris_code_repairs').update(repairDispatchValues(pending)).eq('id',pending.id).eq('status','queued').eq('attempt_count',pending.attempt_count).select('id').maybeSingle();
  if(claim.error){
   if(isParisAttemptConstraintMismatch(claim.error)){
     return {enabled:true,dispatched:0,reason:'PARIS_SCHEMA_MIGRATION_REQUIRED',retryAuthorized:false};

@@ -26,7 +26,8 @@ test('multiple failed jobs, no run ID and unrelated writes never fabricate job a
   assert.equal(repairWorkflowRunHint('Fix Store deployment'),null);
   assert.equal(await bindVerifiedFailedWorkflowInspection('Fix Store deployment',discovery,[],async()=>{throw Error('called')},async()=>jobs),discovery);
   const ambiguous={total_count:2,jobs:[...jobs.jobs.slice(0,1),{id:128397381254,run_id:runId,conclusion:'failure'}]};
-  assert.equal(await bindVerifiedFailedWorkflowInspection('Failed production release 41920417830',discovery,[],async()=>fail,async()=>ambiguous),discovery);
+  assert.deepEqual(await bindVerifiedFailedWorkflowInspection('Failed production release 41920417830',discovery,[],async()=>fail,async()=>ambiguous),
+    {type:'workflow_log',runId,jobId:128397380474});
   const write={type:'replace',path:'lib/safe.ts',old:'a',replacement:'b'};
   assert.equal(await bindVerifiedFailedWorkflowInspection('Failed production release 41920417830',write,[],async()=>fail,async()=>jobs),write);
 });

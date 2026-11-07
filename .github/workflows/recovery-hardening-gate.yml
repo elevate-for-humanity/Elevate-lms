@@ -47,7 +47,9 @@ jobs:
 
       - name: Recovery gate regression guard
         if: ${{ always() }}
-        run: node scripts/verify-recovery-gate-hardening.mjs
+        run: |
+          node scripts/verify-recovery-gate-hardening.mjs
+          node --test scripts/gcp/legacy-repair-gates.test.mjs
 
       - name: Migration discipline
         if: ${{ always() }}

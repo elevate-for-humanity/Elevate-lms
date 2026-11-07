@@ -72,7 +72,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     job.monitor?.enabled && !job.monitor?.repairId && !job.external_execution_id &&
     !job.lease_owner && (!job.lease_expires_at || Date.parse(job.lease_expires_at)<=now.getTime());
   const readinessCandidates=rows.filter(job=>
-    (job.status==='queued' && job.payload?.autopilot && job.available_at!=='infinity') ||
+    (job.status==='queued' && job.payload?.autopilot && job.available_at != null) ||
     savedPauseRecovered(job));
   const readyRoleIds=new Set();
   for(let i=0;i<readinessCandidates.length;i+=1000){
@@ -88,40 +88,10 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
        new Set(ids).size!==ids.length)throw Error('PARIS_ROLE_READINESS_INVALID');
     for(const id of ids)readyRoleIds.add(id);
   }
-  // Wake held media after its exact instruction completes, and held quality
-  // only after instruction AND media complete. The latest stage generation
-  // must be clean, and paused/unknown owners remain fenced. This is a
-  // dependency wakeup, not a fabricated worker claim or completion.
-  const siblingKeys=latestRoleJobs(rows);
+  // Queue availability is always finite; canonical readiness in Postgres
+  // decides which stage may be assigned. Monitoring does not wake by timestamp.
   const observations=[];
   for(const job of rows){
-    const match=/^lesson_autopilot:(.+):(media|quality)$/.exec(job.job_type??'');
-    const build=job.ultimate_course_builds;
-    if(job.status==='queued' && job.available_at==='infinity' && match &&
-      (build?.ownerPaused===false || build?.ownerPaused==='false') && build?.status==='running' && job.monitor?.enabled){
-      const prefix=job.build_id+'|lesson_autopilot:'+match[1]+':';
-      const instruction=siblingKeys.get(prefix+'instruction');
-      const media=siblingKeys.get(prefix+'media');
-      const prerequisites=match[2]==='media'?[instruction]:[instruction,media];
-      if(prerequisites.every(upstream=>upstream?.status==='completed' && !upstream.last_error)){
-        const wake=new URL(root);
-        wake.searchParams.set('id','eq.'+job.id);
-        wake.searchParams.set('status','eq.queued');
-        wake.searchParams.set('available_at','eq.infinity');
-        wake.searchParams.set('execution_generation','eq.'+job.execution_generation);
-        const response=await request(wake,{method:'PATCH',
-          headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
-          body:JSON.stringify({available_at:now.toISOString(),updated_at:now.toISOString()}),
-          signal:AbortSignal.timeout(15000)});
-        if(!response.ok)throw Error('PARIS_PREREQUISITE_WAKE_HTTP_'+response.status);
-        const saved=await response.json();
-        if(Array.isArray(saved)&&saved.length===1){
-          observations.push({jobId:job.id,state:'prerequisites_verified',action:'dispatch',saved:true});
-          continue;
-        }
-      }
-    }
-    
     let observation=inspectCourseAutopilot(job,job.ultimate_course_builds,now.getTime());
     // A previously owner-paused role may be recovered only after explicit
     // unpause persisted and the *same* SQL predicate as worker claim passes.
@@ -129,7 +99,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(savedPauseRecovered(job) && readyRoleIds.has(job.id))
       observation={state:'recovering',action:'requeue',
         reason:'Saved owner pause cleared; canonical prerequisite readiness verified'};
-    if(job.status==='queued' && job.payload?.autopilot && job.available_at!=='infinity' &&
+    if(job.status==='queued' && job.payload?.autopilot && job.available_at != null &&
        observation.state==='awaiting_assignment' && !readyRoleIds.has(job.id))
       observation={state:'prerequisite_wait',action:'observe',
         reason:'Canonical prerequisite, active pool or worker-lease readiness is not satisfied'};

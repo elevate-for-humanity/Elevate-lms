@@ -192,6 +192,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
  let recoveredProviderThisTick=false;
  let providerRecoveryHealth: boolean | undefined;
+ let ownedProviderReadiness: {verified:boolean;status?:string} | undefined;
  let recoveredAppThisTick=false;
  let githubAppRecoveryHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
@@ -272,6 +273,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    if(providerRecoveryHealth===undefined){
     const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
     const health=await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false}));
+    ownedProviderReadiness=health;
     const identity=health.verified?await diagnoseParisGitHubCredential().catch(()=>null):null;
     providerRecoveryHealth=Boolean(health.verified&&identity?.repository?.ok&&identity?.contents?.ok&&identity?.workflow?.ok);
    }
@@ -548,6 +550,15 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   if(blocked.error)throw blocked.error;
  }
  if(!pending)return {enabled:true,dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE'};
+ // A provider outage or occupied single-instance CPU service must not spend
+ // the repair's bounded attempt budget before planning can even start.
+ // The prepare phase still probes again: readiness is not a reservation.
+ if((process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
+  const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
+  const health=ownedProviderReadiness??await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false,status:'request_failed'}));
+  if(!health.verified)return {enabled:true,dispatched:0,awaitingProvider:true,
+   reason:'OWNED_MODEL_READINESS_UNVERIFIED',providerStatus:health.status??'request_failed'};
+ }
  const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.id).eq('status','queued').eq('attempt_count',pending.attempt_count).select('id').maybeSingle();
  if(claim.error){
   if(isParisAttemptConstraintMismatch(claim.error)){

@@ -35,7 +35,7 @@ export async function POST(request:NextRequest){
     const actor=await resolveAdminOrganization(auth);
     const db=await requireAdminClient();
     const paid=input.operation==='describe'||(input.operation==='edit'&&!['crop','upscale','filter'].includes(input.edit!.action));
-    const run=async()=>input.operation==='describe'?describeImageBytes(input.source):input.operation==='optimize'?optimizeImageBytes(input.source,input.optimize):editImageBytes(input.source,input.edit!);
+    const run=async()=>input.operation==='describe'?describeImageBytes(input.source):input.operation==='optimize'?optimizeImageBytes(input.source,input.optimize ?? {format:'webp'}):editImageBytes(input.source,input.edit!);
     let output:string;
     if(paid){
       // The cap is an operator-configured budget, not an invented provider price.

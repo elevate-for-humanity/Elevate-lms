@@ -288,7 +288,9 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
 
   if (new URL(target).pathname === '/studio') {
     const studioGeometry = await page.evaluate(() => {
-      const workspace = document.querySelector<HTMLElement>('#admin-ai-workspace');
+      // The command surface is fixed to the visual viewport; its parent wrapper
+      // remains in document flow and does not describe the visible workspace.
+      const workspace = document.querySelector<HTMLElement>('[data-studio-root="unified"]');
       const composer = document.querySelector<HTMLTextAreaElement>(
         'textarea[aria-label="Tell Paris what you need done..."]',
       );

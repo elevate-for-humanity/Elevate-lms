@@ -3,13 +3,16 @@ import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
 const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',attempts:1,max_attempts:5,execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
  monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false,canonicalLessonIds:{lesson:'11111111-1111-4111-8111-111111111111'}}}};
-async function run(job,conflict=false,mediaAvailable=true,runEnv=env){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env:runEnv,request:async(url,options)=>{
+async function run(job,conflict=false,mediaAvailable=true,runEnv=env,activeJobs=[],repairStatus='blocked'){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env:runEnv,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
+ if(String(url).includes('/paris_code_repairs'))return {ok:true,json:async()=>[{
+  id:new URL(url).searchParams.get('id').slice(3),status:repairStatus,source_job_id:job.id
+ }]};
  if(String(url).includes('/course_lesson_media_matches'))return {ok:true,json:async()=>[{
   entitlement_id:'22222222-2222-4222-8222-222222222222',match_score:1,status:'attached'
  }]};
  if(String(url).includes('/course_videos'))return {ok:true,json:async()=>mediaAvailable?[{id:'entitled-source'}]:[]};
- return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[job]};
+ return {ok:true,json:async()=>String(url).includes('status=in.')?activeJobs:[job]};
  }});return {writes,result};}
 test('new verified repair queues an exhausted internal failure, retaining checkpoints and previous error',async()=>{
  const {writes,result}=await run(base);assert.deepEqual(result.jobIds,['job']);
@@ -181,4 +184,43 @@ test('retries isolated B2 internal incident only after exact release preflight a
   error+';OWNER_PAUSED',
   error.replace('COURSE_OBJECT_STORAGE_UPLOAD_FAILED','COURSE_OBJECT_STORAGE_READBACK_MISMATCH')
  ]) assert.equal((await run({...media,last_error:unsafe},false,true,verified)).writes.length,0);
+});
+
+function pooled(role='media') {return {...base,payload:{nextCompetencyIndex:18,autopilot:{version:'three-role-v1',competencyId:'lesson',role}}};}
+function waiter(id,prerequisite,role='quality') {return {id,build_id:'build',status:'queued',lease_owner:null,lease_expires_at:null,
+ payload:{autopilot:{version:'three-role-v1',competencyId:'lesson',role,prerequisiteJobId:prerequisite}}};}
+test('a queued quality waiter cannot deadlock recovery of its exact failed media prerequisite',async()=>{
+ const {writes,result}=await run(pooled(),false,true,env,[waiter('quality','job')]);
+ assert.deepEqual(result.jobIds,['job']);assert.equal(writes.length,1);
+ assert.equal(writes[0].body.attempts,undefined);assert.equal(writes[0].body.max_attempts,5);
+});
+test('queued transitive role waiters allow their failed upstream producer to recover once',async()=>{
+ const {writes}=await run(pooled('instruction'),false,true,env,[waiter('media','job','media'),waiter('quality','media')]);
+ assert.equal(writes.length,1);
+});
+test('running, leased, unrelated, cyclic or superseding work still fences the failed producer',async()=>{
+ for(const active of [
+  [{...waiter('quality','job'),status:'running'}],
+  [{...waiter('quality','job'),lease_owner:'live-worker'}],
+  [{...waiter('quality','job'),lease_expires_at:'2999-01-01'}],
+  [waiter('quality','newer-media')],
+  [waiter('a','b'),waiter('b','a')],
+  [waiter('quality','job'),waiter('newer-media','newer-plan','media')],
+ ])assert.equal((await run(pooled(),false,true,env,active)).writes.length,0);
+});
+test('a lost admission CAS never opens an older failed cursor in the same lesson',async()=>{
+ const first={...pooled(),id:'current'},older={...pooled(),id:'older'};let writes=0;
+ await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options?.method==='PATCH'){writes++;return {ok:true,json:async()=>[]};}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[first,older]};
+ }});
+ assert.equal(writes,1);
+});
+
+test('a PARIS-owned source cannot resume while its code repair is queued or executing',async()=>{
+ const job={...pooled(),monitor:{enabled:true,repairId:'11111111-1111-4111-8111-111111111111'}};
+ for(const state of ['queued','dispatched','patching','validating','deploying','verifying'])
+  assert.equal((await run(job,false,true,env,[waiter('quality','job')],state)).writes.length,0);
+ assert.equal((await run(job,false,true,env,[waiter('quality','job')],'blocked')).writes.length,1);
+ assert.equal((await run({...job,monitor:{enabled:true,repairId:'invalid-owner'}},false,true,env,[waiter('quality','job')])).writes.length,0);
 });

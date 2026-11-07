@@ -13,7 +13,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw Error('REPAIR_RESUME_READ_HTTP_'+response.status);
  const jobs=await response.json();if(!Array.isArray(jobs))throw Error('REPAIR_RESUME_INVENTORY_INVALID');
- const activeUrl=new URL(ROOT);activeUrl.searchParams.set('select','build_id,payload,status,available_at,lease_expires_at');
+ const activeUrl=new URL(ROOT);activeUrl.searchParams.set('select','id,build_id,payload,status,available_at,lease_owner,lease_expires_at');
  activeUrl.searchParams.set('status','in.(queued,running)');
  const activeResponse=await request(activeUrl,{headers,signal:AbortSignal.timeout(15000)});
  if(!activeResponse.ok)throw Error('REPAIR_ACTIVE_READ_HTTP_'+activeResponse.status);
@@ -56,9 +56,49 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   availableMedia.set(key,available);
   return available;
  }
+ const repairOwnerCache=new Map();
+ async function hasUnfinishedCodeRepair(job) {
+  const id=job.monitor?.repairId;
+  if(!id)return false;
+  if(typeof id!=='string'||!/^[a-f0-9-]{36}$/i.test(id))return true;
+  const key=id+':'+job.id;
+  if(repairOwnerCache.has(key))return repairOwnerCache.get(key);
+  const ownerUrl=new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/paris_code_repairs');
+  ownerUrl.searchParams.set('select','id,status,source_job_id');ownerUrl.searchParams.set('id','eq.'+id);
+  const ownerResponse=await request(ownerUrl,{headers,signal:AbortSignal.timeout(15000)});
+  if(!ownerResponse.ok)throw Error('REPAIR_OWNER_READ_HTTP_'+ownerResponse.status);
+  const rows=await ownerResponse.json();
+  if(!Array.isArray(rows))throw Error('REPAIR_OWNER_INVENTORY_INVALID');
+  const unfinished=rows.length!==1||rows[0].id!==id||rows[0].source_job_id!==job.id||
+    !['blocked','verified'].includes(rows[0].status);
+  repairOwnerCache.set(key,unfinished);return unfinished;
+ }
  const seenBuilds=new Set(active.map(row=>row.build_id));
  const seenLessons=new Set(active.filter(row=>row.payload?.autopilot)
   .map(row=>row.build_id+':'+row.payload.autopilot.competencyId));
+ const admittedLessons=new Set();
+ const activeById=new Map(active.filter(row=>typeof row.id==='string').map(row=>[row.id,row]));
+ function hasBlockingLessonWork(job) {
+  const competency=job.payload?.autopilot?.competencyId;
+  return active.filter(row=>row.build_id===job.build_id && row.payload?.autopilot?.competencyId===competency)
+   .some(row=>{
+    const visited=new Set();
+    while(row) {
+     // Ignore only exact, unleased queued descendants of this failed job.
+     // A newer producer, a live worker, or an unproved dependency still fences it.
+     if(typeof row.id!=='string'||visited.has(row.id)||row.status!=='queued'||
+       row.lease_owner||row.lease_expires_at||row.build_id!==job.build_id||
+       row.payload?.autopilot?.version!=='three-role-v1'||
+       typeof competency!=='string'||row.payload.autopilot.competencyId!==competency)return true;
+     visited.add(row.id);
+     const prerequisite=row.payload.autopilot.prerequisiteJobId;
+     if(prerequisite===job.id)return false;
+     row=activeById.get(prerequisite);
+    }
+    return true;
+   });
+ }
+
  // Historical attempts remain evidence. Recover the furthest saved cursor
  // once per build, never an older attempt alongside an active continuation.
  jobs.sort((a,b)=>Number(b.payload?.nextCompetencyIndex??0)-Number(a.payload?.nextCompetencyIndex??0));
@@ -66,7 +106,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  for(const job of jobs){
   const pool=job.payload?.autopilot?.version==='three-role-v1';
   const key=job.build_id+':'+job.payload?.autopilot?.competencyId;
-  if(!job.build_id||(pool?seenLessons.has(key):seenBuilds.has(job.build_id)))continue;
+  if(!job.build_id||(pool?(admittedLessons.has(key)||(seenLessons.has(key)&&hasBlockingLessonWork(job))):seenBuilds.has(job.build_id)))continue;
   if(job.status!=='failed'||(!pool&&!COURSES.has(job.build?.course_id))||job.build?.profile?.ownerPaused===true||
    ['published','archived','cancelled'].includes(job.build?.status)||job.monitor?.enabled!==true||
    job.monitor?.lastRepairDeployment?.imageSha===imageSha||
@@ -109,6 +149,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   // An eligible image still requires normal scene-specific relevance validation.
   if(/ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED|licensed third-party scenes are missing entitlement\/license evidence/i.test(error) &&
      !(await hasReadyEntitledSource(job.build?.course_id, job.build?.profile?.canonicalLessonIds?.[job.payload?.autopilot?.competencyId]))) continue;
+  if(await hasUnfinishedCodeRepair(job))continue;
   const target=new URL(ROOT);target.searchParams.set('id','eq.'+job.id);
   target.searchParams.set('status','eq.failed');
   target.searchParams.set('execution_generation','eq.'+job.execution_generation);
@@ -125,6 +166,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    monitor:{...job.monitor,lastRepairDeployment:{imageSha,imageDigest,at:now.toISOString(),previousError:error}}};
   // Once an eligible cursor is selected, a lost admission race must not
   // reopen an older historical attempt from the same build or lesson.
+  if(pool){seenLessons.add(key);admittedLessons.add(key);}else seenBuilds.add(job.build_id);
   const changed=await request(target,{method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
    body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
   if(!changed.ok){
@@ -133,14 +175,12 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    if(changed.status===409){
     // The active-build uniqueness constraint already admitted a continuation.
     // Fence every older saved cursor in this scan as well; never race it next.
-    if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
     continue;
    }
    throw Error('REPAIR_RESUME_WRITE_HTTP_'+changed.status);
   }
   const saved=await changed.json();if(!Array.isArray(saved))throw Error('REPAIR_RESUME_READBACK_INVALID');
   if(saved.length===1&&saved[0].id===job.id&&saved[0].status==='queued'&&saved[0].execution_generation===job.execution_generation+1){
-   if(pool)seenLessons.add(key);else seenBuilds.add(job.build_id);
    resumed.push(job.id);
   }
   else if(saved.length)throw Error('REPAIR_RESUME_READBACK_INVALID');

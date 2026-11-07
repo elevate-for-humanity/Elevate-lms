@@ -59,6 +59,26 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(!nextCursor || (cursor && nextCursor<=cursor))throw Error('PARIS_MONITOR_CURSOR_NOT_ADVANCING');
     cursor=nextCursor;
   }
+  // Availability is now finite for every queued job. A timestamp being due
+  // does NOT establish that media/quality prerequisites are satisfied. Ask the
+  // same canonical readiness predicate used by worker claims, so PARIS does
+  // not advertise or repeatedly dispatch an unready lesson stage.
+  const finiteQueuedRoles=rows.filter(job=>job.status==='queued' &&
+    job.payload?.autopilot && job.available_at!=='infinity');
+  const readyRoleIds=new Set();
+  for(let i=0;i<finiteQueuedRoles.length;i+=1000){
+    const batch=finiteQueuedRoles.slice(i,i+1000).map(job=>job.id);
+    const result=await request(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready_jobs',
+      {method:'POST',headers:{...headers,'Content-Type':'application/json'},
+       body:JSON.stringify({p_jobs:batch}),signal:AbortSignal.timeout(15000)});
+    if(!result.ok)throw Error('PARIS_ROLE_READINESS_HTTP_'+result.status);
+    const ids=await result.json();
+    const expected=new Set(batch);
+    if(!Array.isArray(ids)||ids.some(id=>typeof id!=='string'||!expected.has(id))||
+       new Set(ids).size!==ids.length)throw Error('PARIS_ROLE_READINESS_INVALID');
+    for(const id of ids)readyRoleIds.add(id);
+  }
   // Wake held media after its exact instruction completes, and held quality
   // only after instruction AND media complete. The latest stage generation
   // must be clean, and paused/unknown owners remain fenced. This is a
@@ -94,6 +114,10 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     }
     
     let observation=inspectCourseAutopilot(job,job.ultimate_course_builds,now.getTime());
+    if(job.status==='queued' && job.payload?.autopilot && job.available_at!=='infinity' &&
+       observation.state==='awaiting_assignment' && !readyRoleIds.has(job.id))
+      observation={state:'prerequisite_wait',action:'observe',
+        reason:'Canonical prerequisite, active pool or worker-lease readiness is not satisfied'};
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='capacity_wait')
       observation={state:'capacity_wait',action:'wait_for_capacity',reason:dispatchState.reason || 'Google regional capacity is unavailable; saved work is preserved'};
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='dispatch_failed')

@@ -453,13 +453,13 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       const result=paid?paid.value!:await infer();usedProvider=result.provider;
 
       let action: AgentAction;
-      try {
-        action = parseAction(jsonObject(result.content));
-        action = await bindVerifiedFailedWorkflowInspection(task, action, inspectionHistory,
-          async runId => githubJson('/actions/runs/'+runId),
-          async runId => githubJson('/actions/runs/'+runId+'/jobs?per_page=100')) as AgentAction;
-      }
+      try { action = parseAction(jsonObject(result.content)); }
       catch { observations.push('ACTION_REJECTED: return one valid JSON action from the allowed schema; no write occurred.'); continue; }
+      // Do not conceal upstream authorization failures as malformed planner JSON.
+      // Verified run/job lookup is operational evidence, not a model action.
+      action = await bindVerifiedFailedWorkflowInspection(task, action, inspectionHistory,
+        async runId => githubJson('/actions/runs/'+runId),
+        async runId => githubJson('/actions/runs/'+runId+'/jobs?per_page=100')) as AgentAction;
       // Repeated empty searches can exhaust the durable planner budget without
       // inspecting any of the exact filenames already discovered on this branch.
       // Redirect once to a verified filename; normal read authorization and

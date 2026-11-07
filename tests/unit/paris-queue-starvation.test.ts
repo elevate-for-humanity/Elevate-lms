@@ -1,6 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false, stageLookups: [] as any[], releases: [] as any[], enqueues: [] as any[] }));
 vi.mock('server-only', () => ({}));
+vi.mock('@/lib/ai/providers/owned-model-health.mjs', () => ({ probeOwnedModel: async () => ({ verified: true, status: 'reachable' }) }));
 vi.mock('@/lib/ai/runtime/repair-reconciliation', () => ({ reconcileRecoveredRepairs: vi.fn() }));
 vi.mock('@/lib/ai/runtime/repair-events', () => ({ readRecentRepairEvents: async () => [] }));
 vi.mock('@/lib/devstudio/workflow-github-context', () => ({ currentWorkflowGitHubToken: () => h.token ? 'workflow-only-test' : null }));

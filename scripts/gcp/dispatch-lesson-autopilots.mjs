@@ -55,8 +55,8 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  const rows=await response.json();if(!Array.isArray(rows))throw Error('ULTIMATE_AUTOPILOT_QUEUE_INVALID');
  const eligible=rows.filter(j=>j.attempts<j.max_attempts && ['running','queued'].includes(j.build?.status) && (j.build?.owner_paused===false || j.build?.owner_paused==='false') &&
   !/storage cap exceeded|COURSE_OBJECT_STORAGE_UPLOAD_FAILED|COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED/i.test(j.last_error??''));
- // An empty queue needs no Google inventory calls. Infinite prerequisite waits
- // are excluded by available_at and cannot trigger a paid execution.
+ // An empty queue needs no Google inventory calls. Canonical readiness is
+ // checked before launches so a finite timestamp never bypasses prerequisites.
  if(!eligible.length && !rows.some(j=>j.status==='running' && Date.parse(j.lease_expires_at)>now.getTime()))return {status:'empty',activeExecutions:0};
  const scope=['--project='+PROJECT,'--region='+LESSON_ROLE_REGION];
  const read=args=>JSON.parse(run([...args,...scope,'--format=json']));

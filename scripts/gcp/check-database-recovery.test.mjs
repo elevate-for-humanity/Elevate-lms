@@ -41,6 +41,17 @@ test('transport and malformed responses never disclose provider error text', asy
 });
 
 import { readFileSync } from 'node:fs';
+test('a populated expired token does not shadow another configured credential', async () => {
+  const seen=[];
+  const report=await checkDatabaseRecovery({env:{SUPABASE_PROJECT_ID:'cuxzzpsyufcewtmicszk',SUPABASE_ACCESS_TOKEN:'expired',SUPABASE_MANAGEMENT_API_KEY:'expired',SUPABASE_TOKEN:'valid'},request:async(url,options)=>{
+    seen.push(options.headers.Authorization);
+    return options.headers.Authorization==='Bearer valid'
+      ? {ok:true,json:async()=>({backups:[{status:'COMPLETED',inserted_at:new Date().toISOString()}]})}
+      : {ok:false,status:401};
+  }});
+  assert.deepEqual(seen,['Bearer expired','Bearer valid']);
+  assert.equal(report.databaseRecovery,'recent_recovery_point');
+});
 test('an expired Actions token falls back to encrypted runtime management authority without leaking either credential', async () => {
   const requests=[];
   const report=await checkDatabaseRecovery({env:{SUPABASE_PROJECT_ID:'cuxzzpsyufcewtmicszk',SUPABASE_ACCESS_TOKEN:'expired',SUPABASE_SERVICE_ROLE_KEY:'service'},request:async(url,options)=>{

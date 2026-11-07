@@ -59,8 +59,8 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
           SKIP_ENV_VALIDATION: 'true'
 
-      - name: Enforce strict Platform Doctor on recovery PR
-        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/production-recovery-')
+      - name: Enforce strict Platform Doctor on every PR
+        if: github.event_name == 'pull_request'
         run: node scripts/run-platform-doctor-strict.mjs
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}

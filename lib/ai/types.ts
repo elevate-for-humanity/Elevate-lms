@@ -352,6 +352,7 @@ export interface AIProvider {
 }
 
 export interface AIImageProvider {
+  editImage?(input: {bytes: Buffer; mime: string; prompt: string; transparent?: boolean}): Promise<GeneratedImage[]>;
   isAvailable(): boolean;
   generateImage(options: ImageGenerationOptions): Promise<GeneratedImage[]>;
 }

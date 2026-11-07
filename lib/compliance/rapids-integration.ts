@@ -1,3 +1,8 @@
+import 'server-only';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { decryptSSN, formatSSN } from '@/lib/security/ssn-helper';
+import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
+import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progress-service';
 /**
  * RAPIDS Integration (Registered Apprenticeship Partners Information Data System)
  *
@@ -28,7 +33,7 @@ export interface RAPIDSApprentice {
 
   // Progress
   hours_completed: number;
-  hours_required: number;
+  hours_required: number | null;
   related_instruction_hours: number;
 
   // Employment
@@ -51,7 +56,33 @@ export interface RAPIDSSubmission {
  * Prepare apprentice data for RAPIDS submission
  */
 export async function prepareRAPIDSData(enrollmentIds: string[]): Promise<RAPIDSApprentice[]> {
-  throw new Error('RAPIDS_DATA_PREPARATION_UNAVAILABLE: no verified enrollment export adapter is connected.');
+  if (!enrollmentIds.length) return [];
+  const ids = [...new Set(enrollmentIds)];
+  const db = await requireAdminClient();
+  const {data:rows,error} = await db.from('rapids_apprentices').select('*').in('enrollment_id',ids);
+  if (error) throw error;
+  if (rows?.length !== ids.length) throw new Error('RAPIDS_APPRENTICE_RECORDS_MISSING');
+  const result: RAPIDSApprentice[] = [];
+  for (const row of rows) {
+    const context = await resolveApprenticeshipRuntimeContext(db,{enrollmentId:row.enrollment_id,requireRegisteredStandard:true});
+    if (!context?.contract) throw new Error('RAPIDS_REGISTERED_CONTRACT_MISSING');
+    const progress = await loadRegisteredApprenticeshipProgress(db,context);
+    if (!row.ssn_encrypted || !['M','F','X'].includes(row.gender) || typeof row.veteran_status !== 'boolean' || row.wage_at_entry == null || row.current_wage == null) throw new Error('RAPIDS_REQUIRED_PERSONAL_OR_WAGE_DATA_MISSING');
+    const record: RAPIDSApprentice = {
+      first_name:row.first_name,last_name:row.last_name,ssn:formatSSN(decryptSSN(row.ssn_encrypted)),date_of_birth:row.date_of_birth,
+      gender:row.gender,race_ethnicity:row.race_ethnicity,veteran_status:row.veteran_status,
+      program_number:context.contract.sponsor.registrationNumber,sponsor_name:context.contract.sponsor.sponsor,
+      occupation_code:context.contract.standard.rapidsCode,occupation_title:context.contract.standard.occupationTitle,
+      registration_date:row.registration_date,completion_date:row.completion_date,cancellation_date:row.cancellation_date,cancellation_reason:row.cancellation_reason,
+      hours_completed:progress.ojl.approvedHours,hours_required:context.contract.completion.fixedOjlCompletionHours,
+      related_instruction_hours:progress.rti.verifiedHours,employer_name:row.employer_name,employer_fein:row.employer_fein,
+      wage_at_entry:Number(row.wage_at_entry),current_wage:Number(row.current_wage),
+    };
+    const validation=validateRAPIDSData(record);
+    if (!validation.valid) throw new Error(`RAPIDS_DATA_INVALID:${row.enrollment_id}:${validation.errors.join('; ')}`);
+    result.push(record);
+  }
+  return result;
 }
 
 /**
@@ -102,7 +133,21 @@ export async function generateRAPIDSReport(): Promise<{
   cancelled_apprentices: number; average_completion_rate: string; pending_submissions: number;
   last_submission_date: string | null; next_submission_due: string | null;
 }> {
-  throw new Error('RAPIDS_REPORT_UNAVAILABLE: verified reporting data is not connected.');
+  const db = await requireAdminClient();
+  const counts = await Promise.all([
+    db.from('rapids_apprentices').select('id',{count:'exact',head:true}),
+    db.from('rapids_apprentices').select('id',{count:'exact',head:true}).eq('status','active'),
+    db.from('rapids_apprentices').select('id',{count:'exact',head:true}).eq('status','completed'),
+    db.from('rapids_apprentices').select('id',{count:'exact',head:true}).eq('status','cancelled'),
+    db.from('rapids_submissions').select('id',{count:'exact',head:true}).eq('status','pending'),
+  ]);
+  for (const count of counts) { if(count.error) throw count.error; if(count.count == null) throw new Error('RAPIDS_REPORT_COUNT_MISSING'); }
+  const {data:last,error} = await db.from('rapids_submissions').select('submission_date').not('rapids_confirmation_number','is',null).order('submission_date',{ascending:false}).limit(1).maybeSingle();
+  if(error) throw error;
+  const [total,active,completed,cancelled,pending] = counts.map(row=>row.count!);
+  return {total_apprentices:total,active_apprentices:active,completed_apprentices:completed,cancelled_apprentices:cancelled,
+    average_completion_rate:total?`${(completed/total*100).toFixed(1)}%`:'0%',pending_submissions:pending,
+    last_submission_date:last?.submission_date ?? null,next_submission_due:null};
 }
 
 /**
@@ -142,10 +187,10 @@ export function validateRAPIDSData(apprentice: RAPIDSApprentice): {
   if (apprentice.hours_completed < 0) {
     errors.push('Hours completed cannot be negative');
   }
-  if (apprentice.hours_required <= 0) {
+  if (apprentice.hours_required != null && apprentice.hours_required <= 0) {
     errors.push('Hours required must be positive');
   }
-  if (apprentice.hours_completed > apprentice.hours_required) {
+  if (apprentice.hours_required != null && apprentice.hours_completed > apprentice.hours_required) {
     errors.push('Hours completed cannot exceed hours required');
   }
 

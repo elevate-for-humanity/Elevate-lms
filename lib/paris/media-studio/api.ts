@@ -1,3 +1,5 @@
+import { searchPixabay } from '@/lib/media/pixabay';
+import { editImageBytes, optimizeImageBytes, describeImageBytes } from '@/lib/media/image-operations';
 import 'server-only';
 import { aiGenerateImage } from '@/lib/ai/ai-service';
 /**
@@ -19,7 +21,6 @@ import type {
 } from './types';
 
 // Pexels API (free stock photos)
-const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 const PEXELS_URL = 'https://api.pexels.com/v1';
 
 function mediaFromRow(row: Record<string, any>): MediaItem {
@@ -45,10 +46,11 @@ export async function searchStockPhotos(
     source?: 'pexels' | 'pixabay';
   }
 ): Promise<MediaSearchResult> {
+  const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
   const page = options?.page || 1;
   const perPage = options?.perPage || 20;
 
-  if (options?.source === 'pixabay') throw new Error('PIXABAY_SEARCH_UNAVAILABLE');
+  if (options?.source === 'pixabay') return searchPixabay(query, options);
   if (!PEXELS_API_KEY) throw new Error('PEXELS_API_KEY is not configured.');
 
   // Search Pexels
@@ -107,6 +109,7 @@ export async function searchStockPhotos(
 
 // Get curated photos from Pexels
 export async function getCuratedPhotos(page = 1, perPage = 20): Promise<MediaSearchResult> {
+  const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
   if (!PEXELS_API_KEY) {
     throw new Error('PEXELS_API_KEY is not configured.');
   }
@@ -191,13 +194,13 @@ export async function generateImage(
   }
 }
 
-// No edit provider is connected to this legacy library. Never relabel an
-// unchanged source or unrelated stock image as a successful edit.
+// Transform actual image bytes locally or use the authorized image-edit provider.
 export async function editImage(
   imageUrl: string,
   request: ImageEditRequest,
 ): Promise<{ success: boolean; imageUrl?: string; error?: string }> {
-  return { success: false, error: `IMAGE_EDIT_UNAVAILABLE: ${request.action} requires a configured editing provider.` };
+  try { return { success: true, imageUrl: await editImageBytes(imageUrl, request) }; }
+  catch (error) { return { success: false, error: error instanceof Error ? error.message : 'Image editing failed.' }; }
 }
 
 // Save image to brand library
@@ -422,12 +425,12 @@ export async function optimizeImage(
   }
 ): Promise<string> {
   if (!options || Object.keys(options).length === 0) return url;
-  throw new Error('IMAGE_OPTIMIZATION_UNAVAILABLE: use the platform image pipeline to transform image bytes.');
+  return optimizeImageBytes(url, options);
 }
 
-// Vision inference is not wired into this legacy API. Do not invent alt text.
+// Describe the actual normalized image through the authorized vision provider.
 export async function generateAltText(imageUrl: string): Promise<string> {
-  throw new Error('IMAGE_DESCRIPTION_UNAVAILABLE: a configured vision provider is required.');
+  return describeImageBytes(imageUrl);
 }
 
 // Search with unified results

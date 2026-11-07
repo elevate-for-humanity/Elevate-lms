@@ -1,3 +1,4 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
 /**
  * Blueprint Monitoring Service
  * 
@@ -365,5 +366,14 @@ export function recommendUpdates(status: BlueprintStatus): UpdateRecommendation 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function notifyAdmins(recommendation: UpdateRecommendation): Promise<void> {
-  throw new Error('BLUEPRINT_NOTIFICATION_UNAVAILABLE: no delivery adapter is connected.');
+  const db = await requireAdminClient();
+  const {data: admins,error: lookupError} = await db.from('profiles').select('id').in('role',['admin','super_admin']).eq('is_active',true);
+  if (lookupError) throw lookupError;
+  if (!admins?.length) throw new Error('BLUEPRINT_NOTIFICATION_RECIPIENTS_MISSING');
+  const rows = admins.map(admin => ({user_id:admin.id,type:'system',title:'Credential blueprint review required',
+    message:`${recommendation.credentialSlug}: ${recommendation.changes.length} change(s); ${recommendation.recommendedAction}; priority ${recommendation.priority}.`,
+    action_url:'/studio',read:false,metadata:{kind:'blueprint-review',recommendation}}));
+  const {data:saved,error} = await db.from('notifications').insert(rows).select('id');
+  if (error) throw error;
+  if (saved?.length !== rows.length) throw new Error('BLUEPRINT_NOTIFICATION_RECEIPT_MISSING');
 }

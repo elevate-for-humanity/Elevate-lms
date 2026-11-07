@@ -1,3 +1,4 @@
+import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-source-discovery.mjs';
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
@@ -111,7 +112,7 @@ async function createTaskBranch(taskId: string) {
   return { branch, baseSha };
 }
 
-async function readFile(path: string, branch: string) {
+async function readFile(path: string, branch: string, task = '') {
   const normalized = normalizePath(path);
   if (blockedPath(normalized)) throw new Error('Repository path is not allowed.');
   const data = await githubJson(
@@ -123,10 +124,7 @@ async function readFile(path: string, branch: string) {
     path: normalized,
     sha: String(data.sha ?? ''),
     content,
-    excerpt:
-      content.length <= MAX_READ_CHARS
-        ? content
-        : `${content.slice(0, MAX_READ_CHARS / 2)}\n\n…[truncated]…\n\n${content.slice(-MAX_READ_CHARS / 2)}`,
+    excerpt: focusedSourceExcerpt(content, task, MAX_READ_CHARS),
   };
 }
 
@@ -259,16 +257,7 @@ async function searchCode(query: string) {
 }
 
 function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = []) {
-  const terms = [...new Set(query.toLowerCase().match(/[a-z0-9]{2,}/g) ?? [])];
-  return tree.filter(entry => entry.type === 'blob' && !blockedPath(entry.path))
-    .map(({path}) => {
-      const parts = path.toLowerCase().split(/[^a-z0-9]+/);
-      const score = terms.filter(term => parts.includes(term)).length;
-      return {path, score};
-    })
-    .filter(match => match.score > 0)
-    .sort((a,b) => b.score - a.score || a.path.length - b.path.length || a.path.localeCompare(b.path))
-    .slice(0,12).map(match => match.path);
+  return rankSourcePaths(query, tree.filter(entry => !blockedPath(entry.path)));
 }
 
 function parseAction(value: Record<string, unknown>): AgentAction {
@@ -326,11 +315,12 @@ function parseAction(value: Record<string, unknown>): AgentAction {
 export type ParisRepairCheckpoint = {
   version: 1; boundedCpuEdits?: boolean; startedAt?: string; branch: string; baseSha: string; headSha: string; nextTurn: number;
   observations: string[]; changedFiles: string[]; newRegressionTests: string[];
-  inspectionHistory?: string[];
+  inspectionHistory?: string[]; discoveredFiles?: string[]; sourceEvidence?: Record<string, unknown>;
   commits: string[]; writes: number; summary: string; complete: boolean;
 };
 type RepairContinuation = {
   checkpoint?: ParisRepairCheckpoint;
+  sourceEvidence?: Record<string, unknown>;
   save: (checkpoint: ParisRepairCheckpoint) => Promise<void>;
 };
 
@@ -371,9 +361,15 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const observations: string[] = saved?.observations ?? [
     `Repository: ${REPOSITORY}`, `Base: ${BASE_BRANCH}@${baseSha}`, `Working branch: ${branch}`,
   ];
+  const sourceEvidence = saved?.sourceEvidence ?? continuation?.sourceEvidence;
   const changedFiles = new Set<string>(saved?.changedFiles ?? []);
   const newRegressionTests = new Set<string>(saved?.newRegressionTests ?? []);
   const inspectionHistory = Array.isArray(saved?.inspectionHistory) ? saved.inspectionHistory.slice(-30) : [];
+  let discoveredFiles: string[] = rememberSourcePaths(saved?.discoveredFiles ?? []);
+  if (!saved && /REPAIR_PRODUCER_UNCHANGED/.test(task)) {
+    const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
+    discoveredFiles = rememberSourcePaths(discoveredFiles, suggestedSourcePaths(task, tree.tree));
+  }
   const commits: string[] = saved?.commits ?? [];
   let writes = saved?.writes ?? 0;
   let summary = saved?.summary ?? '';
@@ -386,7 +382,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     headSha = String(ref.object?.sha ?? '');
     if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
     await continuation.save({version:1,boundedCpuEdits:true,startedAt,branch,baseSha,headSha,nextTurn,
-      observations:observations.slice(-8),changedFiles:[...changedFiles],inspectionHistory:inspectionHistory.slice(-30),
+      observations:observations.slice(-8),discoveredFiles,sourceEvidence,changedFiles:[...changedFiles],inspectionHistory:inspectionHistory.slice(-30),
       newRegressionTests:[...newRegressionTests],commits,writes,summary,complete});
   };
 
@@ -427,10 +423,12 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
             role: 'user',
             content: JSON.stringify({
               task,
+              sourceEvidence,
               turn: turn + 1,
               writes,
               maximumWrites: MAX_WRITES,
               observations: observations.slice(-8),
+              discoveredFiles,
               changedFiles: [...changedFiles],
               inspectionAlreadyPerformed: [...new Set(inspectionHistory)].slice(-20),
               nextActionConstraint: 'Do not repeat an inspectionAlreadyPerformed action. Use a different exact source file or produce a justified source patch plus a new regression test. If evidence is insufficient, complete with the limitation.',
@@ -464,7 +462,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // inspecting any of the exact filenames already discovered on this branch.
       // Redirect once to a verified filename; normal read authorization and
       // duplicate-inspection limits remain enforced below.
-      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations);
+      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles);
       if (recovered) {
         observations.push('INSPECTION REDIRECTED to previously discovered source: '+recovered.path);
         action = recovered as AgentAction;
@@ -532,7 +530,8 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         const matches = await searchCode(action.query);
         if (!matches.length) {
           const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
-          const paths = suggestedSourcePaths(action.query, tree.tree);
+          const paths = suggestedSourcePaths(task + ' ' + action.query, tree.tree);
+          discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
           observations.push(`SEARCH ${action.query}: no content matches. Candidate filenames from the task branch: ${JSON.stringify(paths)}. Read an exact file before proposing a change.`);
         } else {
           observations.push(`SEARCH ${action.query}: ${JSON.stringify(matches).slice(0, 12_000)}`);
@@ -544,9 +543,10 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         try {
           if (action.type === 'list') {
             const entries = await listDirectory(action.path, branch);
+            discoveredFiles = rememberSourcePaths(discoveredFiles, entries.filter((entry: any) => entry.type === 'file').map((entry: any) => entry.path));
             observations.push(`LIST ${action.path || '/'}: ${JSON.stringify(entries)}`);
           } else {
-            const file = await readFile(action.path, branch);
+            const file = await readFile(action.path, branch, task + JSON.stringify(sourceEvidence ?? {}));
             observations.push(`READ ${file.path} (sha ${file.sha}):\n${file.excerpt}`);
           }
         } catch (error) {

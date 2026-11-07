@@ -1,3 +1,4 @@
+import {courseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
@@ -120,9 +121,16 @@ export async function prepareParisRepair(id:string,runId:number){
    candidate=null;
   }
   if(!candidate || candidate.kind==='planner-checkpoint') {
+   let sourceEvidence;
+   if(claimed.source_job_id){
+    const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,last_error,payload,monitor').eq('id',claimed.source_job_id).single();
+    if(source.error)throw source.error;
+    sourceEvidence=courseRepairEvidence(claimed.source_job_id,source.data);
+   }
    const {stageParisCodeRepair}=await import('@/lib/devstudio/paris-code-engineer');
    const response=await stageParisCodeRepair(claimed.goal,id,claimed.actor_id,{
     checkpoint:candidate?.kind==='planner-checkpoint'?candidate.checkpoint:undefined,
+    sourceEvidence,
     save:async checkpoint=>{
      const saved=await db.from('paris_code_repairs').update({candidate:{kind:'planner-checkpoint',checkpoint},updated_at:new Date().toISOString()}).eq('id',id).eq('workflow_run_id',runId).eq('status','patching').select('id').maybeSingle();
      if(saved.error)throw saved.error;

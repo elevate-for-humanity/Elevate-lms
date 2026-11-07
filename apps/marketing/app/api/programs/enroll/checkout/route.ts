@@ -1,3 +1,4 @@
+import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**
  * CANONICAL PROGRAM ENROLLMENT CHECKOUT
@@ -210,7 +211,7 @@ export async function POST(request: NextRequest) {
     }
     const amountCents =
       funding_source === 'self_pay' && payment_plan === 'installments'
-        ? Math.ceil(fullAmountCents / 4)
+        ? getInitialProgramInvoiceCents(program.slug, fullAmountCents)
         : fullAmountCents;
 
     // Get user profile for customer details
@@ -370,7 +371,9 @@ export async function POST(request: NextRequest) {
           canonical_product_key: `program-installments-${program.id}`,
           product_name: `${program.title} installment`,
           provider: 'quickbooks',
-          amount_cents: amountCents,
+          amount_cents: program.slug === 'nail-technician-apprenticeship'
+            ? Math.ceil((fullAmountCents - amountCents) / 3)
+            : amountCents,
           cadence: 'monthly',
           next_invoice_date: next.toISOString().slice(0, 10),
           remaining_invoices: 3,
@@ -378,7 +381,9 @@ export async function POST(request: NextRequest) {
           fulfillment_type: 'program_enrollment',
           fulfillment_payload: {
             enrollment_id: pending.data.id,
-            amount_cents: amountCents,
+            amount_cents: program.slug === 'nail-technician-apprenticeship'
+              ? Math.ceil((fullAmountCents - amountCents) / 3)
+              : amountCents,
             program_id: program.id,
             student_id: user.id,
           },

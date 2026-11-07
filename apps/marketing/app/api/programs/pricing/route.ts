@@ -4,7 +4,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { safeError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getStaticProgram } from '@/data/programs/index';
-import { getMinimumDepositCents } from '@/lib/programs/deposit-policy';
+import { getMinimumDepositCents, getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 
 export const runtime = 'nodejs';
 export const revalidate = 300;
@@ -38,8 +38,8 @@ function buildStaticPricing(slug: string) {
     program_slug: program.slug,
     program_name: program.title,
     tuition_cents: tuitionCents,
-    deposit_min_cents: slug.includes('apprenticeship') ? Math.ceil(tuitionCents / 4) : depositMinCents,
-    deposit_default_cents: slug.includes('apprenticeship') ? Math.ceil(tuitionCents / 4) : depositDefaultCents,
+    deposit_min_cents: slug.includes('apprenticeship') ? getInitialProgramInvoiceCents(slug, tuitionCents) : depositMinCents,
+    deposit_default_cents: slug.includes('apprenticeship') ? getInitialProgramInvoiceCents(slug, tuitionCents) : depositDefaultCents,
     payment_frequency: slug.includes('apprenticeship') ? 'monthly' as const : 'weekly' as const,
     payment_weeks: slug.includes('apprenticeship') ? 16 : paymentWeeks,
     stripe_deposit_url: null,
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       if (!programError && program) {
         const tuitionCents = Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100);
         if (Number.isFinite(tuitionCents) && tuitionCents > 0)
-          return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:Math.ceil(tuitionCents/4),deposit_default_cents:Math.ceil(tuitionCents/4),payment_frequency:'monthly',payment_weeks:16,source:'programs',notes:'Pay in full or four monthly invoices. Final payment terms are shown before payment; provider-approved BNPL is separate.'});
+          return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:getInitialProgramInvoiceCents(slug, tuitionCents),deposit_default_cents:getInitialProgramInvoiceCents(slug, tuitionCents),payment_frequency:'monthly',payment_weeks:16,source:'programs',notes:'Pay in full or four monthly invoices. Final payment terms are shown before payment; provider-approved BNPL is separate.'});
       }
       const fallback = buildStaticPricing(slug);
       return fallback ? NextResponse.json(fallback) : safeError('Pricing not found',404);

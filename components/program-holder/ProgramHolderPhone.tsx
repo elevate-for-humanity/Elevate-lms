@@ -154,6 +154,13 @@ export function ProgramHolderPhone({
     if (data) ringModeRef.current = data.extension.ringMode;
   }, [data]);
 
+  useEffect(() => {
+    // Launcher shortcuts may arrive before the asynchronous phone data renders.
+    if (!loading && window.location.hash === '#incoming-call-alert-mode') {
+      document.getElementById('incoming-call-alert-mode')?.scrollIntoView({ block: 'center' });
+    }
+  }, [loading, data?.extension.id]);
+
   const load = useCallback(async () => {
     setLoading(true);
     const response = await fetch(apiBase, { cache: 'no-store' });

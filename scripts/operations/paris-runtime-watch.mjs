@@ -26,7 +26,7 @@ export function summarizeJobs(rows, now=Date.now(), previous=null) {
        staleHeartbeatCount++;alerts.push({type:'stale_worker',jobId:job.id});
      }
    }
-   if(job.status==='queued' && job.available_at && job.available_at!=='infinity'){
+   if(job.status==='queued' && job.available_at){
       const eligible=Date.parse(job.available_at);
       if(Number.isFinite(eligible) && now-eligible>30*60*1000){
         overdueEligibleCount++;alerts.push({type:'overdue_queue',jobId:job.id});

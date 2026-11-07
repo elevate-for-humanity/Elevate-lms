@@ -92,7 +92,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
    job.payload?.autopilot?.role==='media' &&
    env.COURSE_B2_VERIFIED_FOR_THIS_RELEASE==='true' &&
    !job.monitor?.repairId &&
-   /^ULTIMATE_INTERNAL_REPAIR_REQUIRED:[^:]+:FINDINGS=\\[\\{"step":"lesson_film_render","severity":"error","code":"ULTIMATE_VIDEO_RENDER_FAILED","message":"ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:internal incident"\\}\\]$/.test(error);
+   /^ULTIMATE_INTERNAL_REPAIR_REQUIRED:[^:]+:FINDINGS=\[\{"step":"lesson_film_render","severity":"error","code":"ULTIMATE_VIDEO_RENDER_FAILED","message":"ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:internal incident"\}\]$/.test(error);
   const durableExternalBlocker =
    (/OWNER_|AUTHORIZ|ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
     !renewableStoredMediaRead && !verifiedTransientB2Incident) ||

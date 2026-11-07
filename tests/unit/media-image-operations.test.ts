@@ -6,7 +6,16 @@ vi.mock('@/lib/ai/ai-service',()=>({aiEditImage:ai.edit,aiDescribeImage:ai.descr
 import {editImageBytes,optimizeImageBytes,describeImageBytes,readImageBytes} from '@/lib/media/image-operations';
 const dataUrl = (b:Buffer) => 'data:image/png;base64,'+b.toString('base64');
 const bytes = (url:string) => Buffer.from(url.split(',')[1], 'base64');
-afterEach(()=>vi.unstubAllGlobals());
+afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs();});
+it.each(['ELEVATE_MEDIA_PUBLIC_URL','NEXT_PUBLIC_ELEVATE_MEDIA_URL','S3_PUBLIC_URL','CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL'])('accepts the actual media origin configured through %s',async key=>{
+ for(const name of ['ELEVATE_MEDIA_PUBLIC_URL','NEXT_PUBLIC_ELEVATE_MEDIA_URL','S3_PUBLIC_URL','CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL','MEDIA_PUBLIC_BASE_URL','B2_PUBLIC_BASE_URL'])vi.stubEnv(name,'');
+ vi.stubEnv(key,'https://actual-storage.example/course-media');
+ const fetcher=vi.fn(async()=>new Response(new Uint8Array([1,2,3])));vi.stubGlobal('fetch',fetcher);
+ expect(await readImageBytes('https://actual-storage.example/course-media/image.png')).toEqual(Buffer.from([1,2,3]));
+ expect(fetcher).toHaveBeenCalledOnce();
+ await expect(readImageBytes('https://unapproved.example/image.png')).rejects.toThrow('IMAGE_SOURCE_NOT_ALLOWED');
+ expect(fetcher).toHaveBeenCalledOnce();
+});
 it('crops, scales and optimizes actual image bytes to requested dimensions',async()=>{
  const source=dataUrl(await sharp({create:{width:12,height:8,channels:4,background:'red'}}).png().toBuffer());
  const crop=await editImageBytes(source,{action:'crop',cropArea:{x:0,y:0,width:6,height:4}});

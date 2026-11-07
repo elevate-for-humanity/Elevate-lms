@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {rankSourcePaths} from '../lib/devstudio/paris-source-discovery.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
@@ -59,7 +60,7 @@ test('planner records recovered directory evidence in durable observations',()=>
 test('empty content searches can suggest real task-branch paths without exposing protected files',()=>{
  const pathGuard=source.slice(source.indexOf('function normalizePath('),source.indexOf('async function githubHeaders('));
  const selector=source.slice(source.indexOf('function suggestedSourcePaths('),source.indexOf('function parseAction('));
- const suggest=new Function(pathGuard+selector+';return suggestedSourcePaths;')();
+ const suggest=new Function('rankSourcePaths',pathGuard+selector+';return suggestedSourcePaths;')(rankSourcePaths);
  const tree=['lib/ai/chat.ts','lib/ai/providers/elevate.ts','lib/ai/auth/chat.ts','.env','lib/ai/github-token.ts'].map(path=>({type:'blob',path}));
  assert.deepEqual(suggest('ai.chat unknown failure',tree),['lib/ai/chat.ts','lib/ai/providers/elevate.ts']);
  assert.deepEqual(suggest('doesnotexist',tree),[]);

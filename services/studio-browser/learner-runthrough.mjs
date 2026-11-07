@@ -50,6 +50,27 @@ export function visibleStagedLesson(page) {
 export function stagedCompletionStatus(page) {
   return visibleStagedLesson(page).getByRole('status').filter({ hasText: 'Lesson completed' });
 }
+/**
+ * The staged player saves asynchronously and throttles writes to once every
+ * three seconds. Poll the real server readback rather than failing after an
+ * arbitrary four-second delay. This never advances playback or fabricates
+ * watched time; the authenticated backend must persist both fields itself.
+ */
+export async function waitForPersistedPlayback(state, {
+  attempts = 12,
+  pause = ms => new Promise(resolve => setTimeout(resolve, ms)),
+} = {}) {
+  if (!Number.isSafeInteger(attempts) || attempts < 1 || attempts > 20)
+    throw new Error('INVALID_PROGRESS_READBACK_ATTEMPTS');
+  let last;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    last = await state();
+    if (Number(last?.position) >= 3 && Number(last?.watchedSeconds) > 0)
+      return last;
+    if (attempt + 1 < attempts) await pause(2500);
+  }
+  throw new Error('Playback was not persisted: authenticated server readback missing position or watched time');
+}
 export async function completeStagedLesson(page, state) {
   // Streamed/hydrated copies can remain mounted but hidden. Scope learner
   // actions to the first visible staged root while retaining strict matching
@@ -282,9 +303,7 @@ export async function runLearnerTest(
           'progress_save',
           'Read server-saved learner position after playback',
           async () => {
-            await page.waitForTimeout(4000);
-            const p = await state();
-            assert(p.position >= 3 && p.watchedSeconds > 0, 'Playback was not persisted');
+            const p = await waitForPersistedPlayback(state);
             return JSON.stringify({ position: p.position, watched: p.watchedSeconds });
           },
         );

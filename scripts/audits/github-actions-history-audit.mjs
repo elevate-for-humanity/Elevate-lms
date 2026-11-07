@@ -4,7 +4,8 @@
 import {mkdir,writeFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 const ROOT='https://api.github.com/repos/elevate-for-humanity/Elevate-lms';
-export async function auditHistory({start,end,request=fetch,maxRequests=300,maxJobRequests=75}={}){
+export async function auditHistory({start,end,request=fetch,maxRequests=300,maxJobRequests=75,status='skipped'}={}){
+ if(!['skipped','all'].includes(status))throw Error('HISTORY_STATUS_FILTER_INVALID');
  const a=Date.parse(start),b=Date.parse(end);
  if(!Number.isFinite(a)||!Number.isFinite(b)||a>=b)throw Error('HISTORY_WINDOW_INVALID');
  if(!Number.isInteger(maxRequests)||maxRequests<1||!Number.isInteger(maxJobRequests)||maxJobRequests<0||maxJobRequests>maxRequests)throw Error('HISTORY_BUDGET_INVALID');
@@ -23,7 +24,7 @@ export async function auditHistory({start,end,request=fetch,maxRequests=300,maxJ
   if(to<=from)return;
   const interval={from:new Date(from).toISOString(),to:new Date(to).toISOString()};
   const created=interval.from+'..'+new Date(to-1).toISOString();
-  const url='/actions/runs?created='+encodeURIComponent(created)+'&per_page=100&page=';
+  const url='/actions/runs?created='+encodeURIComponent(created)+(status==='all'?'':'&status=skipped')+'&per_page=100&page=';
   let first;
   try{first=await get(url+'1');}catch(e){remaining.push({...interval,error:String(e.message)});return;}
   if(!Array.isArray(first.workflow_runs)){remaining.push({...interval,error:'HISTORY_INVALID_PAGE'});return;}
@@ -66,7 +67,7 @@ export async function auditHistory({start,end,request=fetch,maxRequests=300,maxJ
   const key=r.conclusion==='skipped'?'skipped':r.conclusion==='failure'?'failed':r.conclusion==='cancelled'?'cancelled':r.conclusion==='success'?'success':'other';
   g[key]++;
  }
- return {schema:'historical-actions-v1',repository:'elevate-for-humanity/Elevate-lms',
+ return {schema:'historical-actions-v1',repository:'elevate-for-humanity/Elevate-lms',statusFilter:status,
   start,end,requests,maxRequests,jobRequests,maxJobRequests,
   runInventoryComplete:remaining.length===0,jobInventoryComplete:uninspectedJobs.length===0&&jobs.every(x=>x.complete),
   runs,jobDetails:jobs,windows,remainingWindows:remaining,uninspectedJobRuns:[...new Set(uninspectedJobs)],errors,
@@ -74,7 +75,7 @@ export async function auditHistory({start,end,request=fetch,maxRequests=300,maxJ
 }
 export function summary(a){
  const rows=a.byWorkflow.slice(0,40).map(w=>'| '+w.workflow.replaceAll('|','/')+' | '+w.total+' | '+w.skipped+' | '+w.failed+' | '+w.cancelled+' |').join('\n');
- return '# Historical GitHub Actions audit\n\nPeriod: '+a.start+' to '+a.end+
+ return '# Historical GitHub Actions audit\n\nFiltered status: **'+a.statusFilter+'**. Period: '+a.start+' to '+a.end+
   '\n\nRun inventory complete: **'+a.runInventoryComplete+'**; job inventory complete: **'+a.jobInventoryComplete+
   '**. Runs: '+a.runs.length+'. Uninspected job runs: '+a.uninspectedJobRuns.length+
   '. Pending time windows: '+a.remainingWindows.length+'. API requests: '+a.requests+'.\n\n'+
@@ -84,7 +85,7 @@ export function summary(a){
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  const end=process.env.AUDIT_END||new Date().toISOString();
  const start=process.env.AUDIT_START||new Date(Date.parse(end)-86400000).toISOString();
- const result=await auditHistory({start,end,maxRequests:Number(process.env.AUDIT_MAX_REQUESTS||300),maxJobRequests:Number(process.env.AUDIT_MAX_JOB_REQUESTS||75)});
+ const result=await auditHistory({start,end,status:process.env.AUDIT_STATUS||'skipped',maxRequests:Number(process.env.AUDIT_MAX_REQUESTS||300),maxJobRequests:Number(process.env.AUDIT_MAX_JOB_REQUESTS||75)});
  await mkdir('audit-output',{recursive:true});
  await writeFile('audit-output/actions-history.json',JSON.stringify(result,null,2));
  await writeFile('audit-output/actions-history.md',summary(result));

@@ -136,7 +136,7 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
       image: await toFile(input.bytes, 'source.png', {type: input.mime}),
       prompt: input.prompt, n: 1, output_format: 'png',
       ...(input.transparent ? {background: 'transparent' as const} : {}),
-    });
+    }, {timeout:120_000,maxRetries:0});
     const images = (result.data ?? []).filter(image => image.b64_json).map(image => ({b64Json: image.b64_json}));
     if (!images.length) throw new Error('IMAGE_EDIT_EMPTY_RESPONSE');
     return images;
@@ -152,7 +152,7 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
         {type: 'input_text', text: 'Write concise accessible alt text describing only what is visibly present in this image. Do not infer identities or hidden facts. Return only the description.'},
         {type: 'input_image', image_url: imageDataUrl, detail: 'low'},
       ]}],
-    });
+    }, {timeout:60_000,maxRetries:0});
     if (!response.output_text?.trim()) throw new Error('IMAGE_DESCRIPTION_EMPTY_RESPONSE');
     return response.output_text.trim();
   }

@@ -284,9 +284,9 @@ export async function aiGenerateImage(options: ImageGenerationOptions): Promise<
 
 /** Image edits use the configured image provider and its paid-dispatch gate. */
 export async function aiEditImage(input: {bytes: Buffer; mime: string; prompt: string; transparent?: boolean}): Promise<GeneratedImage[]> {
-  const provider = resolveImageProvider();
-  if (!provider.editImage) throw new Error('Selected image provider does not support editing.');
-  return provider.editImage(input);
+  const selected = process.env.AI_IMAGE_EDIT_PROVIDER || 'openai';
+  if (selected !== 'openai') throw new Error('Selected image-edit provider is not supported.');
+  return new OpenAIProvider().editImage(input);
 }
 
 export async function aiDescribeImage(imageDataUrl: string): Promise<string> {

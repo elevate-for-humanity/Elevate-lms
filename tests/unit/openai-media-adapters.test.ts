@@ -17,7 +17,7 @@ it('returns real provider output and sends source pixels instead of a text-only 
  const provider=new OpenAIProvider();
  sdk.edit.mockResolvedValueOnce({data:[{b64_json:'actual-provider-output'}]});
  expect(await runWithPaidInferenceContext('approved-test',()=>provider.editImage({bytes:Buffer.from('source'),mime:'image/png',prompt:'remove background',transparent:true}))).toEqual([{b64Json:'actual-provider-output'}]);
- expect(sdk.edit).toHaveBeenCalledWith(expect.objectContaining({image:{bytes:Buffer.from('source')},background:'transparent'}));
+ expect(sdk.edit).toHaveBeenCalledWith(expect.objectContaining({image:{bytes:Buffer.from('source')},background:'transparent'}),{timeout:120_000,maxRetries:0});
  sdk.describe.mockResolvedValueOnce({output_text:'A classroom.'});
  expect(await runWithPaidInferenceContext('approved-test',()=>provider.describeImage('data:image/png;base64,AAAA'))).toBe('A classroom.');
  expect(sdk.describe.mock.calls[0][0].input[0].content[1]).toMatchObject({type:'input_image',image_url:'data:image/png;base64,AAAA'});

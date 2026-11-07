@@ -333,3 +333,36 @@ test('finite-availability media remains prerequisite_wait until canonical readin
  assert.equal(ready.state,'awaiting_assignment');
  assert.equal(ready.action,'dispatch');
 });
+
+test('cleared saved owner pause requeues only a canonically ready failed role',async()=>{
+ const base={id:'saved-media',build_id:'build',job_type:'lesson_autopilot:a:media',
+  payload:{autopilot:{role:'media',prerequisiteJobId:'producer'}},
+  status:'failed',available_at:'2026-10-14T16:00:00Z',execution_generation:3,
+  last_error:'OWNER_PAUSED_REFERENCE_BUILD',attempts:1,max_attempts:5,
+  lease_owner:null,lease_expires_at:null,external_execution_id:null,
+  monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const run=async(ready,override={})=>{
+  let written;
+  await monitorCourseQueue({now,env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',
+   SUPABASE_SERVICE_ROLE_KEY:'test'},request:async(url,options={})=>{
+    if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs'))
+      return {ok:true,json:async()=>ready?['saved-media']:[]};
+    if(options.method==='PATCH'){
+      written=JSON.parse(options.body);
+      return {ok:true,json:async()=>[{id:'saved-media'}]};
+    }
+    return {ok:true,json:async()=>[{...base,...override}]};
+   }});
+  return written;
+ };
+ const blocked=await run(false);
+ assert.equal(blocked.status,undefined);
+ assert.equal(blocked.monitor.action,'none');
+ const recovered=await run(true);
+ assert.equal(recovered.status,'queued');
+ assert.equal(recovered.execution_generation,4);
+ assert.equal(recovered.attempts,undefined);
+ assert.equal(recovered.payload,undefined);
+ const ownerPaused=await run(true,{ultimate_course_builds:{status:'running',ownerPaused:true}});
+ assert.equal(ownerPaused.status,undefined);
+});

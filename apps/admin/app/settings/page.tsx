@@ -1,3 +1,4 @@
+import { platformSettingDisplayValue } from '@/lib/settings-display.mjs';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -19,10 +20,13 @@ export default async function AdminSettingsPage() {
   await hydrateProcessEnv();
   const db = await requireAdminClient();
 
-  const [{ data: settingsRows }, { data: socialRows }] = await Promise.all([
+  const [{ data: rawSettingsRows }, { data: socialRows }] = await Promise.all([
     db.from('platform_settings').select('key, value, updated_at').order('key'),
     db.from('social_media_settings').select('platform, access_token, expires_at'),
   ]);
+  const settingsRows = (rawSettingsRows ?? []).map((row: any) => ({
+    ...row, value: platformSettingDisplayValue(row.key, row.value),
+  }));
   const settings: Record<string, string> = Object.fromEntries(
     (settingsRows ?? []).map((r: any) => [r.key, r.value]),
   );
@@ -44,8 +48,6 @@ export default async function AdminSettingsPage() {
   );
   const socialStatus = (platform: string) =>
     connectedSocial.has(platform) ? 'Connected' : 'Not connected';
-  const isSensitiveSetting = (key: string) =>
-    /(?:secret|token|password|api[_-]?key|private[_-]?key|webhook)/i.test(key);
 
   const sections = [
     {
@@ -203,7 +205,7 @@ export default async function AdminSettingsPage() {
                   <tr key={r.key} className="hover:bg-slate-50">
                     <td className="py-3 px-5 font-mono text-xs text-slate-700">{r.key}</td>
                     <td className="py-3 px-5 text-slate-600 text-xs max-w-xs truncate">
-                      {isSensitiveSetting(r.key) && r.value ? '••••••••' : (r.value ?? '—')}
+                      {r.value ?? '—'}
                     </td>
                     <td className="py-3 px-5 text-slate-400 text-xs">
                       {r.updated_at ? new Date(r.updated_at).toLocaleDateString() : '—'}

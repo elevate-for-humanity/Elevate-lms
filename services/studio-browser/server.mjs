@@ -11,6 +11,8 @@ import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { launchBrowser } from './cdp-browser.mjs';
+import { artifactDirectory, listArtifacts, readArtifact, createArtifact } from './workspace-artifacts.mjs';
+import { pushWorkspaceRepository } from './repository-push.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import {WorkspaceCheckpoint} from './workspace-checkpoint.mjs';
@@ -156,7 +158,7 @@ async function ensureRepository(body = {}) {
   return result;
 }
 
-async function executeWorkspaceCommand(body) {
+async function executeWorkspaceCommand(body, owner = 'legacy') {
   await ensureWorkspaceReady({mutation:true});
   const command = String(body.command || '').trim();
   if (!command) throw new BrowserServiceError('command_required', 400);
@@ -171,7 +173,7 @@ async function executeWorkspaceCommand(body) {
     cwd,
     timeout: Math.min(120_000, Math.max(1_000, Number(body.timeoutMs || 30_000))),
     maxBuffer: 10 * 1024 * 1024,
-    env: { ...process.env, HOME: '/home/studio' },
+    env: { ...process.env, HOME: '/home/studio', STUDIO_EXPORT_DIR: artifactDirectory(workspaceRoot, owner) },
   }); } catch (error) {
     // Failed commands can still write files. Save them without replaying the command.
     try { await checkpointWorkspace(); } catch {
@@ -1599,6 +1601,40 @@ const server = http.createServer(async (req, res) => {
         ready,
       });
     }
+    if (url.pathname === '/workspace/repository/push' && req.method === 'POST') {
+      if (!authorizedService(req)) return json(res, 401, {error:'unauthorized'});
+      await ensureWorkspaceReady({mutation:true});
+      const body=await readBody(req);
+      try {
+        const result=await pushWorkspaceRepository({root:workspaceRoot,branch:body.branch,expectedSha:body.expectedSha,token:body.githubToken});
+        await checkpointWorkspace();
+        return json(res,200,result);
+      } catch { return json(res,409,{error:'Repository push was not verified. Check the branch, GitHub permissions and remote revision before retrying.'}); }
+    }
+    if (url.pathname === '/workspace/artifacts' && req.method === 'POST') {
+      if (!authorizedService(req)) return json(res,401,{error:'unauthorized'});
+      await ensureWorkspaceReady({mutation:true});
+      const input=await readBody(req);
+      try {
+        const artifact=await createArtifact(workspaceRoot,terminalOwner(req),input,(destination,spec)=>new Promise((resolve,reject)=>{
+          const child=execFile('python3',['/app/create-artifact.py',destination],{timeout:30000,maxBuffer:1024*1024},error=>error?reject(Error('artifact_render_failed')):resolve());
+          child.stdin.end(spec);
+        }));
+        await checkpointWorkspace();
+        return json(res,201,{ok:true,...artifact});
+      }catch{return json(res,422,{error:'File creation failed. Check the content and document toolchain.'});}
+    }
+    if (url.pathname === '/workspace/artifacts' && req.method === 'GET') {
+      if (!authorizedService(req)) return json(res,401,{error:'unauthorized'});
+      await ensureWorkspaceReady();
+      const owner=terminalOwner(req), name=url.searchParams.get('name');
+      try {
+        if(!name)return json(res,200,{files:await listArtifacts(workspaceRoot,owner)});
+        const artifact=await readArtifact(workspaceRoot,owner,name);
+        res.writeHead(200,{'Content-Type':artifact.contentType,'Content-Length':artifact.bytes.length,'Content-Disposition':'attachment; filename="'+artifact.name+'"','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"});
+        return res.end(artifact.bytes);
+      }catch{return json(res,404,{error:'Artifact not available'});}
+    }
     if (url.pathname === '/workspace/repository/sync' && req.method === 'POST') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
       return json(res, 200, await ensureRepository(await readBody(req)));
@@ -1656,7 +1692,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/workspace/exec' && req.method === 'POST') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
       try {
-        return json(res, 200, await executeWorkspaceCommand(await readBody(req)));
+        return json(res, 200, await executeWorkspaceCommand(await readBody(req),terminalOwner(req)));
       } catch (error) {
         if (error instanceof BrowserServiceError) throw error;
         return json(res, 200, { stdout: error?.stdout || '', stderr: error?.stderr || sanitizeReason(error), exitCode: Number(error?.code) || 1 });

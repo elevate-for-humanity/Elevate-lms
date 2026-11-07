@@ -37,6 +37,8 @@ const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
     </div>
   ),
 });
+const RepositoryWorkspace = dynamic(() => import('./RepositoryStudioWorkspace'), { ssr: false });
+
 const WorkflowsWorkspace = dynamic(
   () => import('@/apps/admin/app/studio/workflows/WorkflowsClient'),
   { ssr: false },
@@ -60,10 +62,16 @@ const UnifiedCourseBuilder = dynamic(
 );
 
 type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability';
-type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser';
+type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser' | 'repository';
 
 function isNativeCapability(id: string): id is NativeCapability {
-  return id === 'workflows' || id === 'intelligence' || id === 'tasks' || id === 'browser';
+  return (
+    id === 'workflows' ||
+    id === 'intelligence' ||
+    id === 'tasks' ||
+    id === 'browser' ||
+    id === 'repository'
+  );
 }
 
 export function buildConversationWorkspaceUrl(
@@ -131,6 +139,15 @@ export default function StudioCommandWorkspace({
   const [focusMode, setFocusMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [toolQuery, setToolQuery] = useState('');
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1023px)');
+    const update = () => setCompact(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Array<{ id: string; title: string }>>([]);
   const [historyError, setHistoryError] = useState('');
@@ -276,7 +293,7 @@ export default function StudioCommandWorkspace({
           <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-blue-50 sm:flex text-brand-blue-700">
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
-          <div className="min-w-0 flex-1 basis-3/4 sm:basis-auto">
+          <div className="min-w-0 flex-1">
             <span className="block truncate text-xl font-black tracking-tight sm:text-2xl">
               Elevate Studio
             </span>
@@ -361,7 +378,26 @@ export default function StudioCommandWorkspace({
           >
             <Menu className="h-4 w-4" aria-hidden="true" /> Tools
           </button>
-          <span className="ml-2 hidden text-sm font-semibold text-slate-500 sm:inline">
+          {workspaces
+            .filter(({ id }) => ['browser', 'repository', 'media', 'tasks'].includes(id))
+            .map((workspace) => (
+              <button
+                key={workspace.id}
+                type="button"
+                onClick={() => openCapability(workspace.id)}
+                aria-pressed={currentTool === workspace.id}
+                className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-base font-semibold text-slate-700 hover:bg-slate-100 aria-pressed:bg-slate-100"
+              >
+                {workspace.id === 'repository'
+                  ? 'Files & terminal'
+                  : workspace.id === 'media'
+                    ? 'Library'
+                    : workspace.id === 'tasks'
+                      ? 'Tasks'
+                      : 'Browser'}
+              </button>
+            ))}
+          <span className="ml-2 hidden text-sm font-semibold text-slate-500 xl:inline">
             One workspace · governed workflow · verified evidence
           </span>
         </nav>
@@ -369,24 +405,38 @@ export default function StudioCommandWorkspace({
           hidden={!toolsOpen}
           id="studio-tool-navigation"
           aria-label="Studio tools"
-          className={`${toolsOpen ? 'flex' : 'hidden'} min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-white px-2 py-1 [scrollbar-width:thin]`}
+          className={`${toolsOpen ? 'block' : 'hidden'} max-h-[45dvh] min-w-0 overflow-y-auto overscroll-contain border-t border-slate-200 bg-white p-2`}
         >
-          {workspaces.map((workspace) => (
-            <button
-              type="button"
-              key={workspace.id}
-              onClick={() => {
-                openCapability(workspace.id);
-                setToolsOpen(false);
-              }}
-              aria-pressed={
-                currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course')
-              }
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-base font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-slate-900 text-white' : 'text-slate-800 hover:bg-slate-100'}`}
-            >
-              {workspace.label}
-            </button>
-          ))}
+          <input
+            type="search"
+            aria-label="Find a Studio tool"
+            placeholder="Find a tool…"
+            value={toolQuery}
+            onChange={(event) => setToolQuery(event.target.value)}
+            className="mb-2 min-h-11 w-full rounded-lg border border-slate-300 px-3 text-base"
+          />
+          <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
+            {workspaces
+              .filter(({ label }) => label.toLowerCase().includes(toolQuery.toLowerCase()))
+              .map((workspace) => (
+                <button
+                  type="button"
+                  key={workspace.id}
+                  onClick={() => {
+                    openCapability(workspace.id);
+                    setToolsOpen(false);
+                    setToolQuery('');
+                  }}
+                  aria-pressed={
+                    currentTool === workspace.id ||
+                    (workspace.id === 'courses' && surface === 'course')
+                  }
+                  className={`inline-flex min-h-11 shrink-0 items-center min-w-0 break-words rounded-lg px-3 text-left text-base font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-slate-900 text-white' : 'text-slate-800 hover:bg-slate-100'}`}
+                >
+                  {workspace.label}
+                </button>
+              ))}
+          </div>
         </nav>
       </header>
 
@@ -443,7 +493,7 @@ export default function StudioCommandWorkspace({
         </div>
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
           <ResizableWorkspace
-            mobileExclusive
+            activePane={compact ? (surface === 'commands' ? 'primary' : 'panel') : undefined}
             hideClosedToolbar
             initialPanelSize={65}
             className="h-full"
@@ -570,6 +620,15 @@ export default function StudioCommandWorkspace({
                         targetLabel="Active capability"
                       />
                     ) : null}
+                  </div>
+                  <div
+                    className={
+                      surface === 'capability' && activeCapability === 'repository'
+                        ? 'h-full'
+                        : 'hidden'
+                    }
+                  >
+                    {hasOpenedTool('repository') ? <RepositoryWorkspace /> : null}
                   </div>
                   <div className={surface === 'course' ? 'h-full' : 'hidden'}>
                     {hasOpenedTool('course') ? <UnifiedCourseBuilder embedded /> : null}

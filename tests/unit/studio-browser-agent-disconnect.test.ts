@@ -158,3 +158,19 @@ it('does not requeue an administrator-cancelled task when the client disconnects
   expect(updates.some(update => update.status === 'queued' || update.status === 'failed')).toBe(false);
   expect(fixture.plan).toHaveBeenCalledTimes(1);
 });
+
+it('persists a completed observation after disconnect without requeueing inference', async () => {
+  const { updates, request } = setup();
+  const entered = deferred<void>(), plan = deferred<any>();
+  fixture.plan.mockImplementation(() => { entered.resolve(); return plan.promise; });
+  vi.stubGlobal('fetch', vi.fn(async (url: string) => url.endsWith('/identity')
+    ? response({ ownerId: 'admin' }) : response({ url: 'https://fixture.test', controls: [] })));
+  const result = await POST(request);
+  await entered.promise;
+  await result.body!.cancel();
+  plan.resolve({ status: 'complete', actions: [], summary: 'Title: Elevate; heading: Career training', provider: 'elevate', model: 'fixture', usage: { totalTokens: 9 } });
+  await vi.waitFor(() => expect(updates.some(update => update.status === 'completed')).toBe(true));
+  expect(updates.find(update => update.status === 'completed').result_json.output).toContain('Career training');
+  expect(updates.some(update => update.status === 'queued')).toBe(false);
+  expect(fixture.plan).toHaveBeenCalledTimes(1);
+});

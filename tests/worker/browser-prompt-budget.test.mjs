@@ -16,3 +16,8 @@ test('large page and history fit the model without truncating the owner command 
 test('oversized immutable task fails before inference instead of silently changing scope',()=>{
  assert.throws(()=>budgetBrowserPlannerMessages('policy',{command:'x'.repeat(30000),policy:'no purchases',currentPage:{}},2048),/BROWSER_TASK_EXCEEDS_MODEL_CONTEXT/);
 });
+test('preserves actual headings before filling the page-text budget',()=>{
+ const headings=[{level:1,text:'Train for your next career.'}];
+ const messages=budgetBrowserPlannerMessages('policy',{command:'Report the main heading',currentPage:{title:'Elevate',url:'https://example.com',headings,visibleText:'body '.repeat(30000),controls:[]}},2048);
+ assert.deepEqual(JSON.parse(messages[1].content).currentPage.headings,headings);
+});

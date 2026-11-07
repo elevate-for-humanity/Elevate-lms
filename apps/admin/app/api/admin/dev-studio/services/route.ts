@@ -3,7 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
-import { getDecryptedPlatformSecret } from '@/lib/secrets';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 import {
   getGoogleService,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     );
   if (body.action === 'deploy' && !/^[a-f0-9]{40}$/.test(String(body.image_sha || '')))
     return safeError('A full commit SHA of a successfully uploaded image is required', 400);
-  const token = await getDecryptedPlatformSecret('GITHUB_TOKEN');
+  const token = await getGitHubToken();
   if (!token) return safeError('GitHub deployment credentials are not configured', 503);
   const workflow =
     body.action === 'build' ? 'build-google-migration-images.yml' : 'deploy-google-repaired.yml';

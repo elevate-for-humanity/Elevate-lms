@@ -41,6 +41,19 @@ test('transport and malformed responses never disclose provider error text', asy
 });
 
 import { readFileSync } from 'node:fs';
+test('an expired Actions token falls back to encrypted runtime management authority without leaking either credential', async () => {
+  const requests=[];
+  const report=await checkDatabaseRecovery({env:{SUPABASE_PROJECT_ID:'cuxzzpsyufcewtmicszk',SUPABASE_ACCESS_TOKEN:'expired',SUPABASE_SERVICE_ROLE_KEY:'service'},request:async(url,options)=>{
+    requests.push({url,options});
+    if(requests.length===1)return {ok:false,status:401};
+    if(requests.length===2){assert.match(url,/\/rest\/v1\/rpc\/get_platform_secret$/);assert.equal(options.headers.apikey,'service');return {ok:true,json:async()=>'runtime-management'};}
+    assert.equal(options.headers.Authorization,'Bearer runtime-management');
+    return {ok:true,json:async()=>({backups:[{status:'COMPLETED',inserted_at:new Date().toISOString()}]})};
+  }});
+  assert.equal(report.databaseRecovery,'recent_recovery_point');
+  assert.equal(requests.length,3);
+  assert.ok(!JSON.stringify(report).includes('runtime-management'));
+});
 test('production recovery workflow uses protected secrets and never applies migrations', () => {
   const workflow = readFileSync('.github/workflows/db-backup.yml', 'utf8');
   assert.match(workflow, /environment: production/);

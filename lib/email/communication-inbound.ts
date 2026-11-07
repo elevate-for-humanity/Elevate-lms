@@ -147,6 +147,7 @@ export async function storeInboundCommunicationEmail(
             action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(mailbox.id)}`,
             action_label: 'Read and reply',
             idempotency_key: `email:${inboundEventId}:${member.user_id}`,
+            metadata: { alert_kind: 'email', sender_name: senderName(parsed.from), sender_email: senderEmail, subject, mailbox_address: mailbox.address },
             read: false,
           })),
           { onConflict: 'idempotency_key', ignoreDuplicates: true },

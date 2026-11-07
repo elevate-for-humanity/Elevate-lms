@@ -45,11 +45,43 @@ export function alertKind(notification: any): 'email' | 'sign_in' | 'sign_out' |
     : null;
 }
 export const ALERT_PHRASES = {
-  email: 'Elevate, you have a new email.',
+  email: 'You have a message from Elevate for Humanity.',
   sign_in: 'Elevate, a student sign-in was recorded.',
   sign_out: 'Elevate, a student sign-out was recorded.',
   inactive: 'Elevate, a student needs an activity check.',
 };
+
+/** Sender and subject previews are explicitly requested; never include message bodies. */
+export function alertPresentation(notification: any, kind: keyof typeof ALERT_PHRASES) {
+  const clean = (value: unknown, max: number) =>
+    String(value ?? '')
+      .replace(/[\u202a-\u202e\u2066-\u2069]/g, ' ')
+      .split('')
+      .map((char) => (char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 ? ' ' : char))
+      .join('')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, max);
+  if (kind !== 'email') return { title: 'PARIS · Elevate', body: ALERT_PHRASES[kind] };
+  const meta = notification?.metadata ?? {};
+  const status = meta.email_status;
+  const who = clean(status ? meta.recipient : meta.sender_name || meta.sender_email, 100);
+  const subject = clean(meta.subject, 180);
+  const mailbox = clean(meta.mailbox_address, 100);
+  const title =
+    status === 'sent'
+      ? `PARIS replied${who ? ' to ' + who : ''}`
+      : status === 'failed'
+        ? `PARIS reply failed${who ? ' to ' + who : ''}`
+        : `New email${who ? ' from ' + who : ''}`;
+  return {
+    title,
+    body:
+      [mailbox, subject].filter(Boolean).join(' · ') ||
+      clean(notification?.message, 300) ||
+      ALERT_PHRASES.email,
+  };
+}
 
 export function isPushEndpoint(endpoint: unknown): boolean {
   try {

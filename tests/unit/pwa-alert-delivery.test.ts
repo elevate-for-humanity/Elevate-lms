@@ -18,6 +18,26 @@ beforeEach(() => {
           : null,
     })),
     from: (name: string) => {
+      if (name === 'notifications')
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({
+                  data: {
+                    message: 'From Andrew · EPA application',
+                    metadata: {
+                      sender_name: 'Andrew',
+                      subject: 'EPA application',
+                      mailbox_address: 'info@elevateforhumanity.org',
+                    },
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          }),
+        };
       if (name === 'pwa_alert_preferences')
         return {
           select: () => ({
@@ -48,12 +68,16 @@ beforeEach(() => {
     },
   };
 });
-it('sends a generic private alert and honors silent mode without claiming the person heard it', async () => {
+it('sends sender and subject previews and honors silent mode without claiming the person heard it', async () => {
   mocks.send.mockResolvedValue({});
   const result = await processPwaAlerts();
   expect(result.accepted).toBe(1);
   const payload = JSON.parse(mocks.send.mock.calls[0][1]);
-  expect(payload).toMatchObject({ silent: true, body: 'Elevate, you have a new email.' });
+  expect(payload).toMatchObject({
+    silent: true,
+    title: 'New email from Andrew',
+    body: 'info@elevateforhumanity.org · EPA application',
+  });
   expect(payload.body).not.toContain('subject');
   expect(mocks.patch).toHaveBeenCalledWith(
     expect.objectContaining({ status: 'accepted', accepted_devices: 1 }),

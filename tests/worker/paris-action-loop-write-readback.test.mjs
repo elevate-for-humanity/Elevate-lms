@@ -18,7 +18,7 @@ test('source discovery retains actual authorized workflow and GCP script paths',
 });
 test('rank real course producer ahead of unrelated test files',()=>{
  const files=['tests/e2e/course-builder.spec.ts','lib/ultimate-course-builder/core/production-handlers.ts'].map(path=>({path,type:'blob'}));
- assert.equal(rankSourcePaths('repair synchronization producer',files)[0],'lib/ultimate-course-builder/core/production-handlers.ts');
+ assert.equal(rankSourcePaths('REPAIR_PRODUCER_UNCHANGED:synchronization',files)[0],'lib/ultimate-course-builder/core/production-handlers.ts');
 });
 test('CPU inference receives a meaningful edit budget after source inspection',()=>{
  assert.equal(repairCompletionTokens('cpu',[]),384);

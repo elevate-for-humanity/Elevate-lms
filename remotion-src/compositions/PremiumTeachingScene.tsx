@@ -2,6 +2,7 @@ import { AbsoluteFill, Audio, Img, Video, Sequence, interpolate, useCurrentFrame
 import type { SceneData, SlideLessonProps } from './SlideLesson';
 import { measuredTeachingStep } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import { activePictureCue, quoteStartSeconds } from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
+import { premiumCaptionFontSize } from '../premium-caption-layout.mjs';
 import { useMemo } from 'react';
 import { fitTeachingPanel } from '../../lib/ultimate-course-builder/instructional/teaching-panel-layout.mjs';
 
@@ -68,7 +69,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
    <div style={{flexShrink:layout?0:undefined,fontSize:layout?.valueSize??(recap?56:(step?.value?.length??0)>100?52:64),lineHeight:1.25}}>{value}</div>
    <div style={{flexShrink:layout?0:undefined,fontSize:22,lineHeight:layout?1.25:undefined,color:'#cdb795',wordSpacing:0}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>
   </div>
-  <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',color:'#ffffff',fontSize:60,fontWeight:700,lineHeight:1.25,textAlign:'center',textShadow:'0 2px 4px #000'}}>{caption}</div>
+  <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',color:'#ffffff',fontSize:premiumCaptionFontSize(caption),fontWeight:700,lineHeight:1.15,textAlign:'center',overflowWrap:'break-word',textShadow:'0 2px 4px #000'}}>{caption}</div>
   {scene.audioSrc&&<Audio src={scene.audioSrc} volume={1}/>}
  </AbsoluteFill>;
 }

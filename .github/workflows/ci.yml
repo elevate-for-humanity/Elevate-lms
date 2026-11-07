@@ -118,6 +118,9 @@ jobs:
       - name: PARIS durable source discovery regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tests/worker/paris-durable-source-discovery.test.mjs tests/worker/paris-bounded-planner-recovery.test.mjs tests/worker/paris-repeated-search-recovery.test.mjs tests/worker/paris-planner-history-contract.test.mjs tests/worker/paris-search-fallback-source.test.mjs
+      - name: Encoded premium caption producer regression
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test tests/worker/premium-caption-encoded-repair.test.mjs
       - name: Course database contract version parity
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tests/worker/database-contract-version.test.mjs

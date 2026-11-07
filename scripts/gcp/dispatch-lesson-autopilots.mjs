@@ -92,7 +92,8 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  const admissionDeadline=clock()+120000;
  let admissionLimited=false,rolloutPending=false;
  let activeCount=0,capacityWait=false,reserved=null;const launches=[],assigned=[];
- roleLoop: for(const role of ['quality','media','instruction']){
+ const pools=[];
+ for(const role of ['instruction','media','quality']){
   if(clock()>=admissionDeadline){admissionLimited=true;break;}
   const candidates=ready.filter(j=>j.payload?.autopilot?.role===role && Date.parse(j.available_at)<=now.getTime() &&
    (j.status==='queued' || Date.parse(j.lease_expires_at)<=now.getTime()));
@@ -114,18 +115,26 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
   if(!slots)continue;
   const job=read(['run','jobs','describe',config.name]),envelope=job.spec?.template?.spec,task=envelope?.template?.spec;
   if(!validateTemplate(job,role)){rolloutPending=true;break;}
-  for(let slot=0;slot<slots;slot++){
-   if(clock()>=admissionDeadline){admissionLimited=true;break roleLoop;}
+  pools.push({role,config,task,candidates,slots,active:active.length,demand:candidates.length+leased});
+ }
+ // Admit one execution at a time from the least-covered role. Filling every
+ // quality or media slot first can consume the regional quota forever while
+ // runnable instructions have no worker. Booting executions count as covered
+ // here, so fairness never spends their reserved allocation a second time.
+ while(!rolloutPending && pools.some(pool=>pool.slots>0)){
+   if(clock()>=admissionDeadline){admissionLimited=true;break;}
+   const pool=pools.filter(pool=>pool.slots>0).sort((a,b)=>a.active/a.demand-b.active/b.demand)[0];
+   const {role,config,task,candidates}=pool;
    const capacity=await capacityCheck({region:LESSON_ROLE_REGION,task,taskCount:1,run,request});
    const next=reserveCapacity(capacity,task,reserved);
    if(!next){
     console.info(JSON.stringify({event:'lesson_pool_capacity_wait',role,required:capacity.required,granted:capacity.granted,reserved}));
-    capacityWait=true;break;
+    capacityWait=true;pool.slots=0;continue;
    }
    const prefix='autopilot-'+role+'-'+randomUUID();
    run(['run','jobs','execute',config.name,...scope,'--tasks=1','--update-env-vars=ULTIMATE_WORKER_ID='+prefix,'--async','--quiet']);
    reserved=next;launches.push({role,prefix,candidates:new Map(candidates.map(j=>[j.id,j]))});activeCount++;
-  }
+   pool.slots--;pool.active++;
  }
  // Launch the admitted workers first, then verify their claims together. Each
  // execution gets a unique worker prefix; its immutable claim history proves

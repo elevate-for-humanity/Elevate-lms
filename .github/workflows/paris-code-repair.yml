@@ -82,11 +82,27 @@ jobs:
             files=comparison.get('files')
             # GitHub returns at most 300 changed files. A full page cannot prove
             # the absence of an omitted control-plane change; defer safely.
-            compatible=comparison.get('status') in ('ahead','identical') and isinstance(files,list) and len(files)<300 and all(
+            unchanged_control_plane=comparison.get('status') in ('ahead','identical') and isinstance(files,list) and len(files)<300 and all(
               isinstance(item,dict) and isinstance(item.get('filename'),str) and
               not affects_control_plane(item['filename']) and
               not affects_control_plane(str(item.get('previous_filename','')))
               for item in files)
+            compatible=unchanged_control_plane
+            if comparison.get('status')=='behind':
+              # A queued monitor may run after a newer main release is live.
+              # The authenticated comparison proves runtime_sha contains this
+              # workflow commit. Require its exact completed Admin release;
+              # readiness alone must not authorize an unverified descendant.
+              releases_url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs?head_sha='+runtime_sha+'&event=workflow_dispatch&status=completed&per_page=100'
+              releases_req=urllib.request.Request(releases_url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              releases=json.load(urllib.request.urlopen(releases_req,timeout=20))
+              runs=releases.get('workflow_runs')
+              compatible=isinstance(runs,list) and any(
+                run.get('head_sha')==runtime_sha and run.get('head_branch')=='main' and
+                run.get('path')=='.github/workflows/deploy-admin.yml' and
+                run.get('event')=='workflow_dispatch' and run.get('status')=='completed' and
+                run.get('conclusion')=='success'
+                for run in runs if isinstance(run,dict))
           if not compatible:
             print('Repair monitor deferred until compatible Admin control-plane source is serving.')
             if os.environ.get('GITHUB_OUTPUT'):

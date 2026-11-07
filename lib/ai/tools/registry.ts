@@ -799,7 +799,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     name: 'devstudio.gitPush',
     description: 'Push approved Dev Studio changes through the canonical git endpoint.',
     method: 'POST',
-    path: '/api/admin/dev-studio/git/push',
+    path: '/api/admin/dev-studio/runtime',
     classification: 'write',
     risk: 'critical',
     scope: 'platform',

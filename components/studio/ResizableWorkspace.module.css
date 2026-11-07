@@ -90,19 +90,19 @@
   cursor: grabbing;
 }
 @container workspace (max-width: 760px) {
-  .open:not(.expanded) {
+  .open:not(.expanded):not(.sideBySide) {
     flex-direction: column;
   }
-  .open:not(.expanded) > .secondary {
+  .open:not(.expanded):not(.sideBySide) > .secondary {
     flex: 0 0 var(--panel-height);
     width: 100%;
   }
-  .separator {
+  .body:not(.sideBySide) > .separator {
     flex-basis: 16px;
     width: 100%;
     cursor: row-resize;
   }
-  .separator span {
+  .body:not(.sideBySide) > .separator span {
     transform: rotate(90deg);
   }
 }
@@ -152,3 +152,5 @@
   .mobileExclusive > .body > .primary { display: none; }
 }
 
+
+.sideBySide { flex-direction: row; }

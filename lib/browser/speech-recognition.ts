@@ -33,3 +33,12 @@ export function createBrowserSpeechRecognition(): BrowserSpeechRecognition | nul
   const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
   return Recognition ? new Recognition() : null;
 }
+
+/** Recognition results are cumulative; interim words replace earlier hypotheses. */
+export function speechSessionText(prefix: string, results: BrowserSpeechRecognitionResultList): string {
+  const transcript = Array.from({ length: results.length }, (_, index) =>
+    results[index][0]?.transcript ?? '',
+  ).join(' ').trim();
+  const before = prefix.trimEnd();
+  return `${before}${before && transcript ? ' ' : ''}${transcript}`;
+}

@@ -68,6 +68,17 @@ describe('One Studio conversation workspace', () => {
     fireEvent.click(screen.getAllByRole('button', { name: 'Chat', exact: true })[0]);
     expect(screen.getByRole('region', { name: 'Elevate Studio conversation' })).toBeVisible();
   });
+  it('shows conversation and browser together when split screen is selected on a phone', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ conversations: [], tasks: [], checks: [] }) })));
+    render(<StudioCommandWorkspace workspaces={[]} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Split screen', exact: true }));
+    expect(screen.getByRole('region', { name: 'Elevate Studio conversation' })).toBeVisible();
+    expect(screen.getByRole('region', { name: 'Active Studio tool' })).toBeVisible();
+    expect(screen.getAllByTestId('studio-browser-panel')).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Split screen', exact: true }));
+    expect(screen.getByRole('region', { name: 'Elevate Studio conversation', hidden: true })).not.toBeVisible();
+  });
   it('mounts existing tools, opens an owned saved conversation, and restores its exact checkpoint', async () => {
     vi.stubGlobal(
       'fetch',

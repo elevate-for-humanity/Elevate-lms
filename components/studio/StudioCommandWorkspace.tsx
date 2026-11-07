@@ -140,6 +140,7 @@ export default function StudioCommandWorkspace({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [toolQuery, setToolQuery] = useState('');
+  const [splitView, setSplitView] = useState(false);
   const [compact, setCompact] = useState(false);
   useEffect(() => {
     const query = window.matchMedia('(max-width: 1023px)');
@@ -371,6 +372,17 @@ export default function StudioCommandWorkspace({
           </button>
           <button
             type="button"
+            aria-pressed={splitView}
+            onClick={() => {
+              setSplitView((value) => !value);
+              if (surface === 'commands') setSurface(lastSurface);
+            }}
+            className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-base font-bold text-slate-700 hover:bg-slate-100 aria-pressed:bg-blue-100"
+          >
+            Split screen
+          </button>
+          <button
+            type="button"
             aria-expanded={toolsOpen}
             aria-controls="studio-tool-navigation"
             onClick={() => setToolsOpen((open) => !open)}
@@ -493,9 +505,10 @@ export default function StudioCommandWorkspace({
         </div>
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
           <ResizableWorkspace
-            activePane={compact ? (surface === 'commands' ? 'primary' : 'panel') : undefined}
+            sideBySide={splitView}
+            activePane={compact && !splitView ? (surface === 'commands' ? 'primary' : 'panel') : undefined}
             hideClosedToolbar
-            initialPanelSize={65}
+            initialPanelSize={50}
             className="h-full"
             title="Studio side panel"
             open={surface !== 'commands'}

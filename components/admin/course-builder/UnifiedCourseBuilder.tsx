@@ -949,7 +949,7 @@ export function UltimateBuildPanel({
   );
   const activeJob = jobs.find((job) => courseExecutionState(job).active) ??
     jobs.find((job) => job.status === 'running') ??
-    jobs.find((job) => job.status === 'queued' && job.available_at !== 'infinity');
+    jobs.find((job) => job.status === 'queued');
   const savedWorkerJob = activeJob ?? jobs[0];
   const observed = courseExecutionState(savedWorkerJob);
   const workerJob =

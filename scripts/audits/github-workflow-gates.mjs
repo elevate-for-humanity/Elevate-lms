@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const folder='.github/workflows';
 export function inspectWorkflow(name,source){
- const active=source.replace(/^\s*#.*$/gm,'');
+ const active=source.replace(/^[ \t]*#.*$/gm,'');
  const jobsPart=active.split(/^jobs:\s*$/m)[1]??'';
  const jobBlocks=jobsPart.split(/(?=^  [A-Za-z0-9_-]+:\s*$)/gm);
  const jobs=jobBlocks.map(block=>{
@@ -28,7 +28,7 @@ export function inspectWorkflow(name,source){
  for(const cron of scheduled)if(!coversAllSchedules&&!scheduledUsed.includes(cron))
   findings.push({code:'ORPHAN_CRON',detail:cron,severity:'high'});
  for(const [i,line] of active.split('\n').entries()){
-  if(/^\s*if:\s*.*&&\s*false(?:\b|[)]|$)/.test(line))
+  if(/^\s*if:\s*(?:\$\{\{\s*)?\(*\s*false\s*\)*(?:\s*\}\})?\s*$/.test(line) || /^\s*if:\s*.*&&\s*false(?:\b|[)]|$)/.test(line))
    findings.push({code:'PERMANENTLY_SKIPPED_JOB',line:i+1,detail:line.trim(),severity:'high'});
   if(/head_sha\s*==\s*['"][a-f0-9]{40}['"]/.test(line))
    findings.push({code:'HISTORICAL_SHA_GATE',line:i+1,detail:line.trim(),severity:'high'});

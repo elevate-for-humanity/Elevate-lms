@@ -124,7 +124,8 @@ export function ProgramHolderPhone({
   roleLabel = 'Program Holder',
   calendarHref = '/lms/calendar',
   emailHref = '/communications/email',
-}: { apiBase?: string; roleLabel?: string; calendarHref?: string; emailHref?: string } = {}) {
+  textsHref = '/communications/texts',
+}: { apiBase?: string; roleLabel?: string; calendarHref?: string; emailHref?: string; textsHref?: string } = {}) {
   const [data, setData] = useState<PhoneData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -723,8 +724,9 @@ export function ProgramHolderPhone({
       <audio ref={remoteAudioRef} autoPlay playsInline />
       <AudioOutputControl audio={remoteAudioRef} />
       <nav aria-label="Phone communication tools" className="flex gap-2 overflow-x-auto">
+        <a href="#incoming-call-alert-mode" className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900">Ringer &amp; alerts</a>
         <a
-          href="/communications/texts"
+          href={textsHref}
           className="shrink-0 rounded-lg border bg-white p-3 font-bold text-blue-900"
         >
           Text messages
@@ -870,7 +872,7 @@ export function ProgramHolderPhone({
             below.
           </p>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-2" aria-label="Incoming call alert mode">
+        <div id="incoming-call-alert-mode" className="mt-4 grid scroll-mt-24 grid-cols-3 gap-2" aria-label="Incoming call alert mode">
           {(
             [
               ['ring', 'Ring on'],

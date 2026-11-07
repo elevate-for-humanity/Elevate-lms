@@ -90,8 +90,31 @@ export async function POST(request: NextRequest) {
     for (const line of pdf.splitTextToSize(text, 178)) { if (y > 275) { pdf.addPage(); y = 20; } pdf.text(line, 15, y); y += 6; }
     file = new File([pdf.output('arraybuffer')], 'training-plan.pdf', { type: 'application/pdf' });
   }
-  if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
-    return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
+  // The upload form explicitly offers a text-only syllabus, so persist that
+  // submission as a protected PDF instead of rejecting it for missing a file.
+  // The original readable text is still stored in the document's ocr_text.
+  const inlineSyllabus = ['training_plan', 'hvac_training_plan'].includes(documentType);
+  if (inlineSyllabus && (!(file instanceof File) || file.size === 0)) {
+    const suppliedText = String(form.get('syllabusText') || '').trim();
+    if (suppliedText.length < 100 || suppliedText.length > 250000)
+      return NextResponse.json({
+        error: 'Paste at least 100 readable syllabus characters, or attach a readable PDF or image.',
+      }, { status: 422 });
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF();
+    pdf.setFontSize(11);
+    let y = 18;
+    for (const line of pdf.splitTextToSize(suppliedText, 176)) {
+      if (y > 275) { pdf.addPage(); y = 18; }
+      pdf.text(line, 16, y);
+      y += 5.5;
+    }
+    file = new File([pdf.output('arraybuffer')], 'syllabus-from-text.pdf', {
+      type: 'application/pdf',
+    });
+  }
+  if (!(file instanceof File) || !file.size || !DOCUMENT_TYPES.has(documentType as any))
+    return NextResponse.json({ error: 'Choose a required document and file, or enter your syllabus text.' }, { status: 400 });
   if (
     documentType === 'testing_evidence' &&
     !['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)

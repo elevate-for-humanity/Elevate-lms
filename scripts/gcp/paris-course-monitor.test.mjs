@@ -305,3 +305,31 @@ test('PARIS wakes media after verified instruction, then quality only after veri
  assert.equal((await wakeups([instruction,{...media,ultimate_course_builds:{status:'running',ownerPaused:true}},quality]))
   .some(w=>w.url.includes('id=eq.media')),false);
 });
+
+test('finite-availability media remains prerequisite_wait until canonical readiness passes',async()=>{
+ const base={id:'media-1',build_id:'build',job_type:'lesson_autopilot:a:media',
+  payload:{autopilot:{role:'media',prerequisiteJobId:'instruction-1'}},
+  status:'queued',available_at:'2026-10-14T17:00:00Z',execution_generation:0,
+  attempts:0,max_attempts:5,monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const check=async(allowed)=>{
+  let written,readiness=0;
+  const result=await monitorCourseQueue({
+   env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},
+   now,request:async(url,options={})=>{
+    if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs')){
+     readiness++;assert.deepEqual(JSON.parse(options.body),{p_jobs:['media-1']});
+     return {ok:true,json:async()=>allowed?['media-1']:[]};
+    }
+    if(options.method==='PATCH'){written=JSON.parse(options.body);return {ok:true,json:async()=>[{id:'media-1'}]};}
+    return {ok:true,json:async()=>[base]};
+   }});
+  assert.equal(readiness,1);assert.equal(result.length,1);return written.monitor;
+ };
+ const blocked=await check(false);
+ assert.equal(blocked.state,'prerequisite_wait');
+ assert.equal(blocked.action,'observe');
+ assert.equal(blocked.recoveryRequest,null);
+ const ready=await check(true);
+ assert.equal(ready.state,'awaiting_assignment');
+ assert.equal(ready.action,'dispatch');
+});

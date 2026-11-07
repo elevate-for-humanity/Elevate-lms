@@ -10,3 +10,10 @@ function db(){return{from:(table:string)=>{const q:any={select:()=>q,eq:()=>q,ma
 beforeEach(()=>{vi.clearAllMocks();m.pushEnabled=true;m.push.mockResolvedValue(1);});
 it('an explicitly disabled phone push preference does not claim or send an alert',async()=>{m.pushEnabled=false;await notifyAssignee(db(),{profileId:'owner',taskId:'message',caller:'unknown',urgency:'normal',source:'voicemail'},{id:'system'});expect(m.push).not.toHaveBeenCalled();expect(m.delivery).not.toHaveBeenCalled();});
 it('an enabled phone push preference uses the already authorized database and owner',async()=>{const database=db();await notifyAssignee(database,{profileId:'owner',taskId:'message',caller:'unknown',urgency:'normal',source:'voicemail'},{id:'system'});expect(m.push).toHaveBeenCalledWith(database,'owner',expect.objectContaining({tag:'phone-callback-message'}));expect(m.delivery).toHaveBeenCalledWith(expect.objectContaining({profileId:'owner',channel:'push'}));});
+it('labels the business, message type and source inbox without putting a transcript on the lock screen',async()=>{
+ await notifyAssignee(db(),{profileId:'owner',taskId:'message',caller:'Caller',urgency:'normal',source:'voicemail',extension:'0',transcript:'Private transcript'}, {id:'system'});
+ const alert=m.push.mock.calls[0][2];
+ expect(alert.title).toBe('Elevate for Humanity · voicemail');
+ expect(alert.body).toContain('Voicemail inbox · Extension 0');
+ expect(alert.body).not.toContain('Private transcript');
+});

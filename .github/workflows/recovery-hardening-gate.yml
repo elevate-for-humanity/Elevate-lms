@@ -2,17 +2,10 @@ name: Recovery Hardening Gate
 
 on:
   workflow_dispatch:
+  # Validate every PR into main; never depend on a special source branch name
+  # or a path filter that could silently skip a production recovery change.
   pull_request:
     branches: [main]
-    paths:
-      - '.github/workflows/**'
-      - 'scripts/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'apps/**'
-      - 'components/**'
-      - 'lib/**'
-      - 'supabase/**'
 
 permissions:
   contents: read
@@ -26,7 +19,6 @@ concurrency:
 
 jobs:
   hardening:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/production-recovery-')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

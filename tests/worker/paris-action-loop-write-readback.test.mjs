@@ -48,7 +48,7 @@ test('live planner wires edit-specific guidance and exact committed readback wit
  assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes\)/);
  assert.match(source,/assertCommittedWriteReadback\(/);
  assert.match(source,/if\(next===file\.content\)/);
- assert.match(source,/if\(blockedPath\(normalized\)\)/);
+ assert.match(source,/if\s*\(blockedPath\(normalized\)\)/);
  assert.match(source,/getGitHubAppToken\(\{requireWorkflowWrite:true\}\)/);
  assert.match(source,/newRegressionTests\.add\(action\.path\)/);
 });

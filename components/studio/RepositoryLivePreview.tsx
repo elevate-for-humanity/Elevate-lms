@@ -120,12 +120,12 @@ export default function RepositoryLivePreview({
       : (targetLabel ?? (allowManualTarget ? 'Manual URL preview' : 'Active run preview'));
 
   return (
-    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-950 text-slate-100">
-      <header className="shrink-0 border-b border-slate-800 bg-slate-900 p-3">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900">
+      <header className="shrink-0 border-b border-slate-200 bg-slate-50 p-3">
         <div className="flex flex-wrap items-center gap-2">
           <div className="mr-auto min-w-0">
-            <p className="text-xs font-bold text-white">Live Preview</p>
-            <p className="truncate text-[11px] text-slate-400">{modeLabel}</p>
+            <p className="text-base font-bold text-slate-950">Live Preview</p>
+            <p className="truncate text-base text-slate-600">{modeLabel}</p>
           </div>
           {(['desktop', 'tablet', 'mobile'] as Viewport[]).map((size) => {
             const Icon = size === 'desktop' ? Monitor : size === 'tablet' ? Tablet : Smartphone;
@@ -134,7 +134,7 @@ export default function RepositoryLivePreview({
                 key={size}
                 type="button"
                 onClick={() => setViewport(size)}
-                className={`rounded-md p-1.5 ${viewport === size ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                className={`rounded-md p-1.5 ${viewport === size ? 'bg-cyan-100 text-slate-950' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`}
                 title={`${size} preview`}
               >
                 <Icon className="h-4 w-4" />
@@ -144,7 +144,7 @@ export default function RepositoryLivePreview({
           <button
             type="button"
             onClick={() => setRefreshKey((value) => value + 1)}
-            className="rounded-md p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+            className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-950"
             title="Refresh preview"
           >
             <RefreshCw className="h-4 w-4" />
@@ -154,7 +154,7 @@ export default function RepositoryLivePreview({
               href={previewUrl}
               target="_blank"
               rel="noreferrer"
-              className="rounded-md p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+              className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-950"
               title="Open preview in a new tab"
             >
               <ExternalLink className="h-4 w-4" />
@@ -167,29 +167,29 @@ export default function RepositoryLivePreview({
             <input
               value={manualUrl}
               onChange={(event) => setManualUrl(event.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 font-mono text-[11px] text-slate-200 outline-none focus:border-cyan-500"
+              className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 font-mono text-base text-slate-800 outline-none focus:border-cyan-500"
               placeholder="https://www.elevateforhumanity.org/..."
             />
-            {target && !target.dynamic && <p className="mt-2 text-xs text-amber-200">This Next.js preview shows the deployed page. Saved container edits appear after a successful build and deployment.</p>}
+            {target && !target.dynamic && <p className="mt-2 text-base text-amber-200">This Next.js preview shows the deployed page. Saved container edits appear after a successful build and deployment.</p>}
             {target?.dynamic ? (
-              <p className="mt-1 text-[10px] text-amber-300">
+              <p className="mt-1 text-base text-amber-300">
                 Dynamic route detected. Enter a real record URL above to preview that page.
               </p>
             ) : null}
           </div>
         ) : sourcePreview ? (
-          <p className="mt-2 rounded-lg border border-emerald-900 bg-emerald-950/40 px-2 py-1.5 text-[10px] text-emerald-200">
+          <p className="mt-2 rounded-lg border border-emerald-900 bg-emerald-950/40 px-2 py-1.5 text-base text-emerald-200">
             HTML/SVG changes render directly from the unsaved editor buffer. They do not need a
             commit or deployment.
           </p>
         ) : (
-          <p className="mt-2 truncate rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-[11px] text-slate-300">
+          <p className="mt-2 truncate rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-base text-slate-700">
             {previewUrl || 'Waiting for the active run target'}
           </p>
         )}
       </header>
 
-      <div className="min-h-0 flex-1 overflow-auto bg-slate-800">
+      <div className="min-h-0 flex-1 overflow-auto bg-slate-100">
         <div
           className={`mx-auto h-full min-h-[480px] overflow-hidden bg-white transition-[width] ${viewport === 'desktop' ? '' : 'rounded-lg shadow-2xl'}`}
           style={{ width: VIEWPORT_WIDTH[viewport], maxWidth: '100%' }}
@@ -218,7 +218,7 @@ export default function RepositoryLivePreview({
               className="h-full min-h-[480px] w-full border-0 bg-white"
             />
           ) : (
-            <div className="flex h-full min-h-[480px] items-center justify-center p-8 text-center text-sm text-slate-500">
+            <div className="flex h-full min-h-[480px] items-center justify-center p-8 text-center text-base text-slate-500">
               Select an HTML/SVG file for immediate source preview, select a Next page to infer its
               deployed route, or enter a URL above.
             </div>
@@ -227,7 +227,7 @@ export default function RepositoryLivePreview({
       </div>
 
       {!sourcePreview && target ? (
-        <footer className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 py-2 text-[10px] text-slate-400">
+        <footer className="shrink-0 border-t border-slate-200 bg-slate-50 px-3 py-2 text-base text-slate-600">
           React/Next preview is the deployed route. Unsaved TSX cannot be executed safely without
           mounting the full dependency graph; use Runtime + Terminal to execute code before
           committing.

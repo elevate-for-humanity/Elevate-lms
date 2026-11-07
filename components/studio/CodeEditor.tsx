@@ -6,7 +6,7 @@ import { detectDevStudioLanguage } from '@/lib/devstudio/language-registry';
 // Monaco is large, so load it only when the editor is actually rendered.
 const Editor = dynamic(() => import('@monaco-editor/react').then((m) => m.Editor), {
   ssr: false,
-  loading: () => <div className="h-full bg-[#1e1e1e] animate-pulse" />,
+  loading: () => <div className="h-full bg-slate-50 animate-pulse" />,
 });
 
 interface CodeEditorProps {
@@ -32,10 +32,12 @@ export default function CodeEditor({
       language={resolvedLanguage}
       value={value}
       onChange={onChange}
-      theme="vs-dark"
+      theme="vs"
       options={{
-        minimap: { enabled: true },
-        fontSize: 14,
+        minimap: { enabled: false },
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+        lineHeight: 26,
+        fontSize: 16,
         lineNumbers: 'on',
         readOnly,
         automaticLayout: true,

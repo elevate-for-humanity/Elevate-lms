@@ -43,21 +43,21 @@ export default function StudioIntelligencePanel({
   }, [load]);
 
   return (
-    <div className="h-full overflow-y-auto bg-slate-950 p-4 text-white sm:p-6">
+    <div className="h-full overflow-y-auto bg-white p-4 text-slate-950 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-cyan-400" />
+            <Brain className="h-5 w-5 text-cyan-700" />
             <h2 className="text-lg font-black">Operational intelligence</h2>
           </div>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-600">
             Live findings share Admin AI’s task, approval, workflow, and evidence system.
           </p>
         </div>
         <button
           type="button"
           onClick={() => void load()}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-700 px-3 text-sm font-bold"
+          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-bold"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -66,7 +66,7 @@ export default function StudioIntelligencePanel({
       {error ? (
         <p
           role="alert"
-          className="mt-5 rounded-xl border border-red-800 bg-red-950/50 p-4 text-sm text-red-200"
+          className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
         >
           {error}
         </p>
@@ -77,9 +77,9 @@ export default function StudioIntelligencePanel({
           ['Failed AI tasks', snapshot?.counts.failedTasks ?? 0],
           ['Open alerts', snapshot?.counts.alerts ?? 0],
         ].map(([label, value]) => (
-          <div key={String(label)} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+          <div key={String(label)} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-2xl font-black">{value}</p>
-            <p className="mt-1 text-xs text-slate-400">{label}</p>
+            <p className="mt-1 text-xs text-slate-600">{label}</p>
           </div>
         ))}
       </div>
@@ -87,17 +87,17 @@ export default function StudioIntelligencePanel({
         {snapshot?.findings.map((finding) => (
           <article
             key={`${finding.kind}-${finding.id}`}
-            className="rounded-xl border border-slate-800 bg-slate-900 p-4"
+            className="rounded-xl border border-slate-200 bg-slate-50 p-4"
           >
             <div className="flex items-start gap-3">
               {finding.kind === 'workflow' ? (
-                <Workflow className="mt-0.5 h-5 w-5 text-violet-400" />
+                <Workflow className="mt-0.5 h-5 w-5 text-violet-700" />
               ) : (
-                <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-400" />
+                <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-700" />
               )}
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{finding.title}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-400">{finding.detail}</p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">{finding.detail}</p>
                 <button
                   type="button"
                   onClick={() =>
@@ -114,7 +114,7 @@ export default function StudioIntelligencePanel({
           </article>
         ))}
         {!loading && !error && !snapshot?.findings.length ? (
-          <p className="rounded-xl border border-slate-800 bg-slate-900 p-6 text-sm text-slate-400">
+          <p className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">
             No active intelligence findings.
           </p>
         ) : null}

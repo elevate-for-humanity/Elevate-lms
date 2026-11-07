@@ -307,7 +307,11 @@ export async function POST(req: NextRequest) {
   // Transport lifetime must not invalidate the action already submitted to the
   // worker. Finish its checkpoint, then release this same task for resumption.
   let disconnected = req.signal.aborted;
-  const disconnect = () => { disconnected = true; };
+  let heartbeat: ReturnType<typeof setInterval> | undefined;
+  const disconnect = () => {
+    disconnected = true;
+    if (heartbeat) clearInterval(heartbeat);
+  };
   req.signal.addEventListener('abort', disconnect, { once: true });
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -317,6 +321,9 @@ export async function POST(req: NextRequest) {
         try { controller.enqueue(encoder.encode(`data: ${JSON.stringify({ ...event, taskId })}\n\n`)); }
         catch { disconnect(); }
       };
+      // Keep ingress from closing an otherwise idle stream while the private
+      // CPU model plans. Heartbeats never start another inference or action.
+      heartbeat = setInterval(() => emit({ type: 'heartbeat' }), 15_000);
       void (async () => {
         const steps: BrowserStep[] = Array.isArray(task.result_json?.steps)
           ? task.result_json.steps
@@ -451,7 +458,9 @@ export async function POST(req: NextRequest) {
             await appendLog(
               `Browser plan ${turn + 1}: ${plan.status} via ${plan.provider}/${plan.model}.`,
             );
-            if (await pauseIfDisconnected()) return;
+            // A completed read-only observation is still valid after a lost
+            // client connection. Persist it instead of paying to plan it again.
+            await assertNotCancelled();
             if (plan.status === 'complete') {
               const completedAt = new Date().toISOString();
               await db
@@ -501,6 +510,7 @@ export async function POST(req: NextRequest) {
               });
               return;
             }
+            if (await pauseIfDisconnected()) return;
             if (plan.status === 'blocked') {
               if (browserTurnRequiresAuthentication(plan)) {
                 const reason = plan.reason || plan.summary;
@@ -631,6 +641,7 @@ export async function POST(req: NextRequest) {
           await appendLog(message, cancelled ? 'warn' : 'error');
           emit({ type: 'error', error: message, steps });
         } finally {
+          if (heartbeat) clearInterval(heartbeat);
           req.signal.removeEventListener('abort', disconnect);
           if (!disconnected) {
             try { controller.close(); } catch { disconnect(); }

@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import {artifactDirectory} from './workspace-artifacts.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
@@ -113,7 +114,7 @@ export class TerminalSessions {
       // Stop/shutdown can run while persistence or directory resolution awaits.
       // Recheck immediately before spawning so a closed terminal stays closed.
       if(s.state!=='starting')throw new TerminalSessionError(s.state==='closed'?'terminal_session_closed':'terminal_resume_required',409);
-      const shell=this.spawnShell('/bin/bash',['--noprofile','--norc'],{cwd,env:{...process.env,HOME:'/home/studio',TERM:'xterm-256color',BASH_ENV:bootstrap},stdio:['pipe','pipe','pipe','pipe']});
+      const shell=this.spawnShell('/bin/bash',['--noprofile','--norc'],{cwd,env:{...process.env,HOME:'/home/studio',TERM:'xterm-256color',STUDIO_EXPORT_DIR:artifactDirectory(this.cwd,s.owner),BASH_ENV:bootstrap},stdio:['pipe','pipe','pipe','pipe']});
       s.shell=shell;s.state='running';s.version++;
       let directoryBytes='';
       shell.stdio?.[3]?.on('data',chunk=>{

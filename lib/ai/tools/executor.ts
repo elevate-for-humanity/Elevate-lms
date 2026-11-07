@@ -157,6 +157,27 @@ async function dispatchToolRequest(
     const request = new NextRequest(url, init);
     return tool.method === 'GET' ? route.GET(request) : route.POST(request);
   }
+  if (tool.name === 'devstudio.gitPush') {
+    const input = JSON.parse(typeof init.body === 'string' ? init.body : '{}');
+    const { readContainerRepository } = await import('@/lib/studio/container-repository');
+    const checkout = await readContainerRepository();
+    if ((input.branch && input.branch !== checkout.branch) ||
+        (input.expectedSha && input.expectedSha !== checkout.commitSha)) {
+      return Response.json({ error: 'Container checkout changed. Review its branch and commit before pushing.' }, { status: 409 });
+    }
+    const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/runtime/route');
+    return POST(new NextRequest(url, {
+      ...init,
+      body: JSON.stringify({
+        operation: 'repository-push',
+        branch: checkout.branch,
+        expectedSha: checkout.commitSha,
+        confirmation: input.confirmationText,
+        studioRunId: input.studioRunId,
+        studioRunStepId: input.studioRunStepId,
+      }),
+    }));
+  }
   if (tool.name === 'browser.launch') {
     const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/session/route');
     return POST(new NextRequest(url, init));

@@ -114,6 +114,7 @@ export default function CloudBrowserWorkspace({
   const [agentTask, setAgentTask] = useState('');
   const [agentResult, setAgentResult] = useState('');
   const [agentRunning, setAgentRunning] = useState(false);
+  const [recoveringTaskId, setRecoveringTaskId] = useState('');
   const [approvalRequested, setApprovalRequested] = useState(false);
   const [authenticationRequired, setAuthenticationRequired] = useState(false);
   const [interactionRequired, setInteractionRequired] = useState(false);
@@ -331,6 +332,12 @@ export default function CloudBrowserWorkspace({
         conversationId: conversationId || undefined,
         taskId: unifiedTask?.taskId || undefined,
       },
+    }).catch((cause) => {
+      if (lifecycle === lifecycleRef.current) {
+        setError(cause instanceof Error ? cause.message : 'Could not start browser');
+        setStatus('Unavailable');
+      }
+      return null;
     });
     if (!result) return;
     const { response, payload } = result;
@@ -587,9 +594,53 @@ export default function CloudBrowserWorkspace({
     setContinuationTaskId('');
   }
 
+  useEffect(() => {
+    if (!recoveringTaskId) return;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    const check = async () => {
+      try {
+        const response = await fetch(`/api/admin/dev-studio/tasks/${encodeURIComponent(recoveringTaskId)}`, {
+          cache: 'no-store', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]),
+        });
+        if (!response.ok) throw new Error('Could not read the saved browser task.');
+        const { task } = await response.json();
+        if (controller.signal.aborted) return;
+        if (task?.status === 'completed') {
+          setAgentResult(task.result_json?.output || task.tool_output?.output || 'Browser task completed.');
+          setStatus('Connected');
+          setError('');
+          setRecoveringTaskId('');
+          return;
+        }
+        if (['failed', 'cancelled'].includes(task?.status)) {
+          setError(task.error_message || `Browser task ${task.status}.`);
+          setRecoveringTaskId('');
+          return;
+        }
+        if (['queued', 'awaiting_approval'].includes(task?.status)) {
+          setInteractionRequired(true);
+          setStatus('Saved browser task ready to resume');
+          setError('The connection was interrupted. Resume this same saved task to continue.');
+          setRecoveringTaskId('');
+          return;
+        }
+        setStatus('Waiting for saved browser result…');
+        timer = setTimeout(() => void check(), 5000);
+      } catch {
+        if (controller.signal.aborted) return;
+        setInteractionRequired(true);
+        setError('Could not read the saved result. Resume this same browser task to check its state.');
+        setRecoveringTaskId('');
+      }
+    };
+    void check();
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [recoveringTaskId]);
+
   async function runAgent(taskId = '', taskOverride = '') {
     const command = taskOverride.trim() || agentTask.trim();
-    if (!session || !command) return;
+    if (!session || !command || recoveringTaskId) return;
     // Explicitly starting/resuming a task hands this same browser back to automation.
     if (!(await action({ type: 'resume_automation' }))) return;
     if (!taskId) setActiveTaskId('');
@@ -599,6 +650,7 @@ export default function CloudBrowserWorkspace({
     setApprovalRequested(false);
     setAuthenticationRequired(false);
     setInteractionRequired(false);
+    let canonicalTaskId = '';
     try {
       const response = await fetch('/api/admin/dev-studio/browser/agent', {
         method: 'POST',
@@ -629,7 +681,7 @@ export default function CloudBrowserWorkspace({
         }
         throw new Error(payload.error || 'AI browser task failed');
       }
-      const canonicalTaskId = response.headers.get('x-studio-task-id') || '';
+      canonicalTaskId = response.headers.get('x-studio-task-id') || '';
       if (!canonicalTaskId) throw new Error('AI browser task response is missing its canonical ID');
       setActiveTaskId(canonicalTaskId);
       const reader = response.body.getReader();
@@ -683,7 +735,10 @@ export default function CloudBrowserWorkspace({
       }
       if (!settled) throw new Error('AI browser task ended without a result');
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'AI browser task failed');
+      if (canonicalTaskId) {
+        setStatus('Checking saved browser result…');
+        setRecoveringTaskId(canonicalTaskId);
+      } else setError(cause instanceof Error ? cause.message : 'AI browser task failed');
     } finally {
       setAgentRunning(false);
     }
@@ -1608,10 +1663,10 @@ export default function CloudBrowserWorkspace({
               />
               <button
                 onClick={() => runAgent()}
-                disabled={!session || !agentTask.trim() || agentRunning}
+                disabled={!session || !agentTask.trim() || agentRunning || Boolean(recoveringTaskId)}
                 className="mt-2 w-full rounded bg-violet-600 px-3 py-2 text-xs font-black disabled:opacity-50"
               >
-                {agentRunning ? 'Running approved task…' : 'Run AI browser task'}
+                {recoveringTaskId ? 'Checking saved result…' : agentRunning ? 'Running approved task…' : 'Run AI browser task'}
               </button>
               {(authenticationRequired || interactionRequired) && activeTaskId ? (
                 <button

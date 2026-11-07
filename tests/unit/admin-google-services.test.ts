@@ -11,7 +11,7 @@ vi.mock('next/server', () => ({
 }));
 vi.mock('@/lib/devstudio/api-auth', () => ({ apiRequireDevStudio: mocks.auth }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: mocks.rate }));
-vi.mock('@/lib/secrets', () => ({ getDecryptedPlatformSecret: mocks.secret }));
+vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubToken: mocks.secret }));
 vi.mock('@/lib/logger', () => ({ logger: { info: vi.fn() } }));
 vi.mock('@/lib/api/safe-error', () => ({
   safeError: (error: string, status: number) => new Response(JSON.stringify({ error }), { status }),

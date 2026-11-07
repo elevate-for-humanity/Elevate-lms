@@ -184,9 +184,9 @@ export default function DevStudioEditorWorkspace({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-[#1e1e1e] text-[#cccccc]">
+    <div className="flex h-full min-h-0 flex-col bg-white text-slate-900">
       <div
-        className="shrink-0 border-b border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
+        className="shrink-0 border-b border-slate-200 bg-slate-50 px-3 py-2 text-base text-slate-950"
         role="status"
         aria-label="Repository connection"
       >
@@ -218,32 +218,32 @@ export default function DevStudioEditorWorkspace({
             Sync container with main
           </button>
         </div>
-        <p className="mt-1 text-xs text-slate-300">
+        <p className="mt-1 text-base text-slate-700">
           Save pending editor changes before syncing. Synchronization uses a fast-forward merge and
           refuses conflicting or divergent work.
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2 border-b border-[#3c3c3c] bg-[#252526] px-3 py-2">
+      <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2">
         <button
           type="button"
           onClick={() => setSidebar('files')}
-          className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] ${sidebar === 'files' ? 'bg-[#094771] text-white' : ''}`}
+          className={`inline-flex items-center gap-1 rounded px-2 py-1 text-base ${sidebar === 'files' ? 'bg-blue-100 text-slate-950' : ''}`}
         >
           <FolderOpen className="h-3.5 w-3.5" /> Files
         </button>
         <button
           type="button"
           onClick={() => setSidebar('git')}
-          className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] ${sidebar === 'git' ? 'bg-[#094771] text-white' : ''}`}
+          className={`inline-flex items-center gap-1 rounded px-2 py-1 text-base ${sidebar === 'git' ? 'bg-blue-100 text-slate-950' : ''}`}
         >
           <GitBranch className="h-3.5 w-3.5" /> Git
         </button>
-        <span className="ml-auto truncate text-[10px] text-[#858585]">{status}</span>
+        <span className="ml-auto truncate text-base text-slate-600">{status}</span>
         <button
           type="button"
           onClick={() => void saveFile()}
           disabled={!selected || loading}
-          className="inline-flex items-center gap-1 rounded bg-[#0078d4] px-2 py-1 text-[11px] text-white disabled:opacity-40"
+          className="inline-flex items-center gap-1 rounded bg-blue-100 px-2 py-1 text-base text-slate-950 disabled:opacity-40"
         >
           {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
           {branch === 'main' && confirmMainCommit ? 'Confirm Main Commit' : 'Commit'}
@@ -273,7 +273,7 @@ export default function DevStudioEditorWorkspace({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="inline-flex items-center gap-1 rounded border border-[#555] px-2 py-1 text-[11px]"
+          className="inline-flex items-center gap-1 rounded border border-[#555] px-2 py-1 text-base"
         >
           <Upload className="h-3 w-3" /> Upload
         </button>
@@ -283,35 +283,35 @@ export default function DevStudioEditorWorkspace({
         type="button"
         disabled={!selected || loading}
         onClick={() => void saveContainerFile()}
-        className="self-start rounded border border-slate-500 px-3 py-2 text-xs text-white disabled:opacity-40"
+        className="self-start rounded border border-slate-500 px-3 py-2 text-base text-slate-950 disabled:opacity-40"
       >
         Save in container
       </button>
       <div className="flex min-h-0 flex-1">
-        <div className="w-56 shrink-0 overflow-y-auto border-r border-[#3c3c3c] bg-[#252526]">
+        <div className="w-56 shrink-0 overflow-y-auto border-r border-slate-200 bg-slate-50">
           {sidebar === 'git' ? (
             <GitPanel />
           ) : (
             <>
-              <div className="sticky top-0 bg-[#252526] p-2">
+              <div className="sticky top-0 bg-slate-50 p-2">
                 <input
                   aria-label="Search repository files"
                   placeholder="Search file path…"
                   value={fileSearch}
                   onChange={(event) => setFileSearch(event.target.value)}
-                  className="w-full rounded border border-slate-500 bg-slate-950 px-2 py-2 text-xs text-white"
+                  className="w-full rounded border border-slate-500 bg-white px-2 py-2 text-base text-slate-950"
                 />
-                <p className="mt-1 text-[10px] text-slate-300">
+                <p className="mt-1 text-base text-slate-700">
                   {matchingFiles.length} matches · showing up to 200. Search to narrow files.
                 </p>
               </div>
-              <ul className="py-1 text-[11px]">
+              <ul className="py-1 text-base">
                 {matchingFiles.slice(0, 200).map((path) => (
                   <li key={path}>
                     <button
                       type="button"
                       onClick={() => void loadFile(path)}
-                      className={`block w-full truncate px-3 py-1 text-left hover:bg-[#2a2d2e] ${selected === path ? 'bg-[#094771] text-white' : ''}`}
+                      className={`block w-full truncate px-3 py-1 text-left hover:bg-slate-100 ${selected === path ? 'bg-blue-100 text-slate-950' : ''}`}
                     >
                       {path}
                     </button>
@@ -332,14 +332,14 @@ export default function DevStudioEditorWorkspace({
               filePath={selected}
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-[#858585]">
+            <div className="flex h-full items-center justify-center text-base text-slate-600">
               Select a file or switch to Git
             </div>
           )}
         </div>
       </div>
       {message && (
-        <div className="shrink-0 border-t border-[#3c3c3c] px-3 py-1 text-[10px] text-[#858585]">
+        <div className="shrink-0 border-t border-slate-200 px-3 py-1 text-base text-slate-600">
           Commit message: {message}
         </div>
       )}

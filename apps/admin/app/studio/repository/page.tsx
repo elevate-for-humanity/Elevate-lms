@@ -7,7 +7,7 @@ const RepositoryStudioWorkspace = nextDynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex min-h-[60vh] items-center justify-center bg-slate-950 text-slate-300">
+      <div className="flex min-h-[60vh] items-center justify-center bg-white text-slate-700">
         Connecting repository workspace…
       </div>
     ),

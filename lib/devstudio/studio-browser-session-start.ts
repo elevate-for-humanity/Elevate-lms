@@ -27,6 +27,7 @@ export async function startStudioBrowserSession<T extends object = Record<string
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: serializedBody,
+      signal: AbortSignal.timeout(45_000),
     });
     const payload = await response.json() as T & { retryable?: unknown };
     if (!isCurrent()) return null;

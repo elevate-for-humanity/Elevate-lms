@@ -124,3 +124,20 @@ it('surfaces an unreadable status response without an unhandled polling rejectio
     false,
   );
 });
+it('recovers a completed task after its stream disconnects without submitting another task', async () => {
+  const fixture = await setup();
+  const original = fixture.fetcher.getMockImplementation()!;
+  fixture.fetcher.mockImplementation(async (url: string, options: RequestInit = {}) => {
+    if (url.endsWith('/browser/agent')) return new Response(new ReadableStream({
+      start(controller) { controller.error(new Error('network error')); },
+    }), { headers: { 'x-studio-task-id': 'saved-task' } });
+    if (url.endsWith('/tasks/saved-task')) return Response.json({ task: {
+      status: 'completed', result_json: { output: 'Observed title: Elevate' },
+    } });
+    return original(url, options);
+  });
+  fireEvent.change(screen.getByPlaceholderText(/Example: inspect every navigation/), { target: { value: 'Read page title' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Run AI browser task' }));
+  expect(await screen.findByText('Observed title: Elevate')).toBeInTheDocument();
+  expect(fixture.fetcher.mock.calls.filter(([url]) => url.endsWith('/browser/agent'))).toHaveLength(1);
+});

@@ -105,7 +105,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     progressModel: 'competency_based',
     competencyCount: 19,
     probationHours: 500,
-    depositCents: 150000,
+    depositCents: 60000,
     fullTuitionCents: 600000,
     stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
     stripeFullLink: 'https://buy.stripe.com/bJedR91QQgzAfsD0wVgIo05',

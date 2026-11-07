@@ -33,7 +33,7 @@ const programs = [
   ['barber-apprenticeship', 498000, 124500],
   ['cosmetology-apprenticeship', 600000, 150000],
   ['esthetician-apprenticeship', 600000, 150000],
-  ['nail-technician-apprenticeship', 600000, 150000],
+  ['nail-technician-apprenticeship', 600000, 60000],
 ];
 for (const [slug, tuition, installment] of programs) {
   await check('program:' + slug, async () => {

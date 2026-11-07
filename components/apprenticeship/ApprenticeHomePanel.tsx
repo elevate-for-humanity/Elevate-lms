@@ -297,6 +297,31 @@ export default async function ApprenticeHomePanel({
             training access.
           </p>
         )}
+        <section aria-label="Theory schedule and clock-in rules" className="mt-5 rounded-xl border border-cyan-300 bg-cyan-50 p-5 text-slate-950">
+          <h3 className="text-lg font-bold">When to study and how to record theory hours</h3>
+          <p className="mt-2 leading-7">
+            Current and new apprentices follow their individual theory schedule. Study on your
+            saved days and times and complete lessons in order. Future lessons remain locked
+            until their release date and earlier required work is complete, so the full course
+            cannot be completed all at once.
+          </p>
+          <p className="mt-2 leading-7">
+            A release date that has passed does not override your study window or unfinished
+            prerequisites. Open your course outline and theory schedule to check both.
+          </p>
+          <p className="mt-2 leading-7">
+            Clock in with Start theory timeclock inside your lesson or workbook before studying,
+            then choose Stop theory timeclock when finished. Active study time is recorded for
+            theory/RTI review. Signing in or saving workbook answers alone does not record hours.
+          </p>
+          <p className="mt-2 font-semibold leading-7">
+            Theory can be completed from any location; no geofence is required for theory.
+            Host Shop work uses its separate OJL timeclock. Clock out of OJL before starting theory.
+          </p>
+          <Link href="/apprentice/theory-schedule" className="mt-3 inline-flex min-h-12 items-center font-bold underline">
+            View or confirm my theory days and times →
+          </Link>
+        </section>
         <details className="mt-5 rounded-xl border border-slate-200 p-4">
           <summary className="cursor-pointer font-bold text-slate-900">
             Assignments, feedback & training records

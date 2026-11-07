@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { installPlaybackResume } from '../../lib/lms/playback-resume.mjs';
@@ -28,4 +29,10 @@ test('failed early seek retries at loaded data; old media listeners are removed'
 test('invalid/zero resume does not seek or manufacture progress/completion',()=>{
  for(const position of [0,-1,NaN]){const m=media();let done=0;installPlaybackResume(m,position,()=>done++);assert.equal(done,1);assert.equal(m.seeks.length,0);}
  const m=media({readyState:1,duration:10});installPlaybackResume(m,50,()=>{});assert.equal(m.currentTime,9.75);
+});
+
+test('player keeps the Next client directive before all imports',()=>{
+ const source=readFileSync(new URL('../../components/lms/InteractiveVideoPlayer.tsx',import.meta.url),'utf8');
+ const directive=source.indexOf("'use client';"), firstImport=source.search(/^import /m);
+ assert.ok(directive>=0 && directive<firstImport);
 });

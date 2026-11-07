@@ -1,5 +1,5 @@
-import { installPlaybackResume } from '@/lib/lms/playback-resume.mjs';
 'use client';
+import { installPlaybackResume } from '@/lib/lms/playback-resume.mjs';
 
 import { createClient } from '@/lib/supabase/client';
 import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessibility/lms-runtime-accessibility';

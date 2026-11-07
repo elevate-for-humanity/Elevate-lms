@@ -63,11 +63,20 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   // does NOT establish that media/quality prerequisites are satisfied. Ask the
   // same canonical readiness predicate used by worker claims, so PARIS does
   // not advertise or repeatedly dispatch an unready lesson stage.
-  const finiteQueuedRoles=rows.filter(job=>job.status==='queued' &&
-    job.payload?.autopilot && job.available_at!=='infinity');
+  const savedPauseRecovered=job=>job.status==='failed' &&
+    job.last_error==='OWNER_PAUSED_REFERENCE_BUILD' &&
+    job.payload?.autopilot && job.attempts<job.max_attempts &&
+    job.ultimate_course_builds?.status==='running' &&
+    (job.ultimate_course_builds?.ownerPaused===false ||
+     job.ultimate_course_builds?.ownerPaused==='false') &&
+    job.monitor?.enabled && !job.monitor?.repairId && !job.external_execution_id &&
+    !job.lease_owner && (!job.lease_expires_at || Date.parse(job.lease_expires_at)<=now.getTime());
+  const readinessCandidates=rows.filter(job=>
+    (job.status==='queued' && job.payload?.autopilot && job.available_at!=='infinity') ||
+    savedPauseRecovered(job));
   const readyRoleIds=new Set();
-  for(let i=0;i<finiteQueuedRoles.length;i+=1000){
-    const batch=finiteQueuedRoles.slice(i,i+1000).map(job=>job.id);
+  for(let i=0;i<readinessCandidates.length;i+=1000){
+    const batch=readinessCandidates.slice(i,i+1000).map(job=>job.id);
     const result=await request(
       'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready_jobs',
       {method:'POST',headers:{...headers,'Content-Type':'application/json'},
@@ -114,6 +123,12 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     }
     
     let observation=inspectCourseAutopilot(job,job.ultimate_course_builds,now.getTime());
+    // A previously owner-paused role may be recovered only after explicit
+    // unpause persisted and the *same* SQL predicate as worker claim passes.
+    // This requeues work; it does not mark a predecessor complete or reset history.
+    if(savedPauseRecovered(job) && readyRoleIds.has(job.id))
+      observation={state:'recovering',action:'requeue',
+        reason:'Saved owner pause cleared; canonical prerequisite readiness verified'};
     if(job.status==='queued' && job.payload?.autopilot && job.available_at!=='infinity' &&
        observation.state==='awaiting_assignment' && !readyRoleIds.has(job.id))
       observation={state:'prerequisite_wait',action:'observe',

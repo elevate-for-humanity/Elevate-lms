@@ -280,3 +280,12 @@ jobs:
           docker pull "$IMAGE"
           docker run --rm --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --test /app/scripts/gcp/inspect-course-media.test.mjs
           gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --import=tsx /app/scripts/gcp/audit-course-storage.ts
+      - name: Prove private Backblaze B2 upload, HEAD, authenticated GET and cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:$GITHUB_SHA"
+          # Do not print secrets. This uses the same approved runtime envelope
+          # as the read-only audit and deletes only its random test object.
+          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i -e COURSE_B2_CONFIG_STDIN=true --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" /app/scripts/gcp/verify-private-b2-caption.mjs
+

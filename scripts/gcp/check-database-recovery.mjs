@@ -22,11 +22,17 @@ export async function checkDatabaseRecovery({ env = process.env, request = fetch
   if (project !== 'cuxzzpsyufcewtmicszk' || !env.SUPABASE_ACCESS_TOKEN)
     throw new Error('Expected production project and backup-read token are required; recovery is unverified.');
   let response;
+  const candidates = [...new Set([env.SUPABASE_ACCESS_TOKEN,
+    env.SUPABASE_MANAGEMENT_API_KEY, env.SUPABASE_TOKEN]
+    .filter(value => typeof value === 'string' && value.trim()).map(value => value.trim()))];
   try {
-    response = await request(`https://api.supabase.com/v1/projects/${project}/database/backups`, {
-      method: 'GET', headers: { Authorization: `Bearer ${env.SUPABASE_ACCESS_TOKEN}` },
-      signal: AbortSignal.timeout(30000),
-    });
+    for (const token of candidates) {
+      response = await request(`https://api.supabase.com/v1/projects/${project}/database/backups`, {
+        method: 'GET', headers: { Authorization: `Bearer ${token}` },
+        redirect: 'error', signal: AbortSignal.timeout(30000),
+      });
+      if (response.status !== 401) break;
+    }
   } catch { throw new Error('Database recovery metadata request failed; no success inferred.'); }
   // A populated but expired Actions token must not shadow the encrypted runtime
   // management credential. Read it only after an authentication rejection.

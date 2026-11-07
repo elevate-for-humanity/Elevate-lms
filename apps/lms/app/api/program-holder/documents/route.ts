@@ -82,17 +82,8 @@ export async function POST(request: NextRequest) {
     }
     file = new File([pdf.output('arraybuffer')], 'training-invoice.pdf', { type: 'application/pdf' });
   }
-  if (['training_plan', 'hvac_training_plan'].includes(documentType) && (!(file instanceof File) || file.size === 0)) {
-    const text = String(form.get('syllabusText') || '').trim();
-    if (text.length < 100 || text.length > 250000) return NextResponse.json({ error: 'Complete your training plan (at least 100 characters), or attach the original file.' }, { status: 400 });
-    const { jsPDF } = await import('jspdf'); const pdf = new jsPDF(); let y = 20;
-    pdf.setFontSize(11);
-    for (const line of pdf.splitTextToSize(text, 178)) { if (y > 275) { pdf.addPage(); y = 20; } pdf.text(line, 15, y); y += 6; }
-    file = new File([pdf.output('arraybuffer')], 'training-plan.pdf', { type: 'application/pdf' });
-  }
-  // The upload form explicitly offers a text-only syllabus, so persist that
-  // submission as a protected PDF instead of rejecting it for missing a file.
-  // The original readable text is still stored in the document's ocr_text.
+  // Text-only syllabi must be persisted as private PDFs before document-row
+  // creation; the original source text remains in ocr_text for faithful retries.
   const inlineSyllabus = ['training_plan', 'hvac_training_plan'].includes(documentType);
   if (inlineSyllabus && (!(file instanceof File) || file.size === 0)) {
     const suppliedText = String(form.get('syllabusText') || '').trim();

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from '../../lib/devstudio/paris-source-discovery.mjs';
 import {recoverRepeatedInspection} from '../../lib/devstudio/paris-inspection-budget.mjs';
 import {budgetRepairMessages} from '../../lib/devstudio/repair-inference-budget.mjs';
-import {courseRepairEvidence} from '../../lib/devstudio/paris-course-repair-evidence.mjs';
+import {courseRepairEvidence,courseDiagnosticQuery,loadCourseRepairEvidence} from '../../lib/devstudio/paris-course-repair-evidence.mjs';
 const producer='lib/ultimate-course-builder/core/production-handlers.ts';
 const goal='Repair job 9a7a6ab9-5223-4d96-9293-68300f089f78: REPAIR_PRODUCER_UNCHANGED:synchronization';
 test('actual course producer outranks UUID and generic id filenames in authenticated tree',()=>{
@@ -63,4 +63,49 @@ test('binary fixtures never displace source files in the bounded inventory',()=>
  assert.equal(inventory[0],producer);assert.equal(inventory.length,64);
  assert.ok(!inventory.includes('tests/video/fixture.png'));
  assert.deepEqual(rankSourcePaths('fixture',[{type:'blob',path:'tests/video/fixture.png'}]),[]);
+});
+
+const evidenceJob={id:'job',build_id:'build',payload:{competencyId:'cap'},monitor:{lastTimingRepair:{at:'2026-10-31T00:00:00Z',previousError:'OLD_PICTURE_FAILURE'}}};
+const lesson={id:'lesson',build_id:'build',lesson_key:'cap',competency_id:'cap',steps:[
+ {step:'natural_narration',state:'passed',completed_at:'2026-11-03T21:00:00Z',findings:[]},
+ {step:'narration_qa',state:'failed',completed_at:'2026-11-03T20:00:00Z',findings:[{severity:'error',code:'OLD_PACE',message:'old recording'}]},
+ {step:'lesson_film_render',state:'passed',completed_at:'2026-11-07T04:01:00Z',findings:[]},
+ {step:'finished_media_qa',state:'failed',completed_at:'2026-11-07T04:25:00Z',findings:[{severity:'error',code:'Media quality gate failed',message:'captions do not cover rendered narration'}]},
+ {step:'synchronization',state:'failed',completed_at:'2026-11-07T04:41:00Z',findings:[{severity:'error',code:'REPAIR_PRODUCER_UNCHANGED',message:'unchanged'}]},
+]};
+test('current persisted gate replaces superseded monitor history and older narration QA',()=>{
+ const evidence=courseRepairEvidence('job',evidenceJob,structuredClone(lesson));
+ assert.equal(evidence.blockedStep.step,'synchronization');
+ assert.equal(evidence.latestFailedGate.step,'finished_media_qa');
+ assert.match(courseDiagnosticQuery(goal,evidence),/captions do not cover/);
+ assert.doesNotMatch(JSON.stringify(evidence),/OLD_PICTURE_FAILURE|OLD_PACE/);
+});
+test('a later passed producer cannot promote its superseded failed gate as current',()=>{
+ const revised=structuredClone(lesson);revised.steps.find(s=>s.step==='lesson_film_render').completed_at='2026-11-07T05:00:00Z';
+ assert.equal(courseRepairEvidence('job',evidenceJob,revised).latestFailedGate,null);
+ const undated=structuredClone(lesson);undated.steps.find(s=>s.step==='finished_media_qa').completed_at='unknown';
+ assert.equal(courseRepairEvidence('job',evidenceJob,undated).latestFailedGate,null);
+});
+test('lesson diagnostics remain bound to the exact source build and competency',()=>{
+ for(const patch of [{build_id:'other'},{competency_id:'other'},{lesson_key:'other'}])
+  assert.throws(()=>courseRepairEvidence('job',evidenceJob,{...lesson,...patch}),/LESSON_EVIDENCE_MISMATCH/);
+ assert.equal(courseRepairEvidence('job',evidenceJob).previousTimingErrorStatus,'historical-only');
+});
+test('evidence loader queries the linked lesson and propagates database failures',async()=>{
+ const calls=[];
+ const db={from(table){calls.push(table);const query={select(){return query;},eq(k,v){calls.push([k,v]);return query;},order(){return query;},limit(){return query;},async maybeSingle(){return {data:lesson};},then(resolve){return Promise.resolve({data:lesson.steps}).then(resolve);}};return query;}};
+ const result=await loadCourseRepairEvidence(db,'job',evidenceJob);
+ assert.equal(result.lessonBuildId,'lesson');assert.ok(calls.some(c=>Array.isArray(c)&&c[0]==='lesson_build_id'&&c[1]==='lesson'));
+ const failing={from(){const query={select(){return query;},eq(){return query;},order(){return query;},limit(){return query;},async maybeSingle(){return {error:Error('database unavailable')};}};return query;}};
+ await assert.rejects(loadCourseRepairEvidence(failing,'job',evidenceJob),/database unavailable/);
+});
+
+test('superseded or malformed gates are not silently promoted through the fallback diagnostic',()=>{
+ const stale={...lesson,steps:lesson.steps.filter(s=>['natural_narration','narration_qa'].includes(s.step))};
+ const evidence=courseRepairEvidence('job',evidenceJob,stale);
+ assert.equal(evidence.latestFailedGate,null);assert.equal(evidence.blockedStep,null);
+ assert.equal(courseDiagnosticQuery('original task',evidence),'original task');
+ assert.doesNotMatch(JSON.stringify(evidence),/OLD_PICTURE_FAILURE|OLD_PACE/);
+ const malformed={...lesson,steps:[null,{step:'__proto__',state:'failed',completed_at:'2026-11-07T00:00:00Z',findings:[null]}]};
+ assert.equal(courseRepairEvidence('job',evidenceJob,malformed).latestFailedGate,null);
 });

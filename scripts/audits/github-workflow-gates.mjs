@@ -10,7 +10,6 @@ export function inspectWorkflow(name,source){
  const jobsPart=active.split(/^jobs:\s*$/m)[1]??'';
  const jobBlocks=jobsPart.split(/(?=^  [A-Za-z0-9_-]+:\s*$)/gm);
  const jobs=jobBlocks.map(block=>({name:block.match(/^  ([A-Za-z0-9_-]+):/m)?.[1],
-  conditions:([...(block.match(/^\s+if:\s*(.*)$/m)?.[0]??'')].length?[]:[]),
   hasConditional:/^\s+if:\s*/m.test(block)})).filter(j=>j.name);
  const scheduled=[...active.matchAll(/^\s*- cron:\s*['"]([^'"]+)['"]/gm)].map(x=>x[1]);
  const scheduledUsed=[...active.matchAll(/github\.event\.schedule\s*==\s*['"]([^'"]+)['"]/g)].map(x=>x[1]);

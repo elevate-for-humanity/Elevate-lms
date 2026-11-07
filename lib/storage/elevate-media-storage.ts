@@ -233,7 +233,7 @@ export function isTransientElevateMediaUploadFailure(error: unknown): boolean {
   const e = error as { $metadata?: { httpStatusCode?: number }; name?: string; code?: string; message?: string };
   if ([429, 500, 502, 503, 504].includes(e.$metadata?.httpStatusCode ?? 0)) return true;
   return /^(InternalError|ServiceUnavailable|SlowDown|RequestTimeout|Throttling|TooManyRequestsException)$/i.test(e.name ?? e.code ?? '') ||
-    /\\binternal incident\\b/i.test(e.message ?? '');
+    /\binternal incident\b/i.test(e.message ?? '');
 }
 
 async function transientUploadRetry<T>(write: () => Promise<T>): Promise<T> {
@@ -294,7 +294,7 @@ export async function uploadToElevateMedia(
       // write authorization/capacity failures from a caption readback mismatch.
       throw new Error(`COURSE_OBJECT_STORAGE_PUT_FAILED_HTTP_${status ?? 'UNKNOWN'}`, {cause: error});
     }
-    const verifyBytes = body.length <= 1024*1024 && /^(text\\/|application\\/x-subrip)/.test(contentType)
+    const verifyBytes = body.length <= 1024*1024 && /^(text\/|application\/x-subrip)/.test(contentType)
       ? body : body.subarray(0, Math.min(body.length, 1024));
     await transientUploadRetry(() => verifyElevateMediaReadback(key, contentType, body.length, verifyBytes));
 
@@ -449,7 +449,7 @@ export async function uploadFileToElevateMedia(filePath: string, key: string, co
       } finally { body.destroy(); }
     });
     let verifyBytes: Buffer;
-    if(info.size <= 1024*1024 && /^(text\\/|application\\/x-subrip)/.test(contentType)) {
+    if(info.size <= 1024*1024 && /^(text\/|application\/x-subrip)/.test(contentType)) {
       verifyBytes = await readFile(filePath);
     } else {
       const fh = await open(filePath, 'r');

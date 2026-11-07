@@ -38,7 +38,7 @@ for (const path of [...new Set(paths)].sort()) {
   for (const guard of semanticGuards) {
     if (rel !== guard.file) continue;
     const match = guard.pattern.exec(text);
-    if (match) findings.push({path:rel,line:text.slice(0,match.index).split('\\n').length,rule:guard.rule});
+    if (match) findings.push({path:rel,line:text.slice(0,match.index).split('\n').length,rule:guard.rule});
   }
   function walk(node) {
     if (ts.isPropertyAssignment(node) && ['success','ok','executed','isReady','productionReady','ready','status','published','completed'].includes(node.name.getText(source))) {

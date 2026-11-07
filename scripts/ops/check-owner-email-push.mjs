@@ -13,7 +13,9 @@ const [publicKey,privateKey]=await Promise.all(['VAPID_PUBLIC_KEY','VAPID_PRIVAT
 if(!publicKey||!privateKey)throw Error('Push keys unavailable');
 const curve=createECDH('prime256v1');curve.setPrivateKey(Buffer.from(privateKey,'base64url'));
 if(curve.getPublicKey().toString('base64url')!==publicKey)throw Error('Configured public/private push keys do not match');
-const profiles=await api('profiles?email=in.(curvaturebodysculpting@gmail.com,elizabethpowell6262@gmail.com)&select=id');
+const profiles=await api('profiles?id=eq.964dc85a-bce8-4e67-92eb-198ffafb2384&email=eq.curvaturebodysculpting@gmail.com&select=id');
+if(profiles.length!==1)throw Error('Owner identity not verified');
+const testId='owner-phone-delivery-test-'+new Date().toISOString();
 const result={registered:0,accepted:0,expired:0,failed:[]};
 for(const profile of profiles){
   const devices=await api(`push_subscriptions?user_id=eq.${profile.id}&active=eq.true&select=id,endpoint,p256dh,auth`);
@@ -22,7 +24,7 @@ for(const profile of profiles){
     const endpoint=new URL(device.endpoint);
     if(endpoint.protocol!=='https:'||endpoint.port||endpoint.username||endpoint.password||!/^(fcm\.googleapis\.com|updates\.push\.services\.mozilla\.com|(?:[a-z0-9-]+\.)*push\.apple\.com|(?:[a-z0-9-]+\.)+notify\.windows\.com)$/.test(endpoint.hostname)) { result.failed.push({status:0});continue; }
     try{
-      await webpush.sendNotification({endpoint:device.endpoint,keys:{p256dh:device.p256dh,auth:device.auth}},JSON.stringify({title:'Elevate email alerts',body:'Your incoming-mail notification connection was checked. Open Elevate to view your inbox.',url:'https://admin.elevateforhumanity.org/phone/email',tag:'owner-mail-connection-check-20261028'}),{TTL:300,timeout:5000,vapidDetails:{subject:'mailto:admin@elevateforhumanity.org',publicKey,privateKey}});
+      await webpush.sendNotification({endpoint:device.endpoint,keys:{p256dh:device.p256dh,auth:device.auth}},JSON.stringify({title:'Elevate for Humanity — test alert',body:'TEST • Voicemail inbox. Please check whether this alert appears and makes a sound.',url:'https://admin.elevateforhumanity.org/phone/inbox',tag:testId,vibrate:[350,150,350],requireInteraction:true}),{TTL:300,timeout:5000,vapidDetails:{subject:'mailto:admin@elevateforhumanity.org',publicKey,privateKey}});
       result.accepted++;
     }catch(e){
       const status=Number(e.statusCode)||0;
@@ -31,4 +33,6 @@ for(const profile of profiles){
     }
   }
 }
-console.log(JSON.stringify(result));
+console.log(JSON.stringify({...result,testId,deviceDisplayVerified:false,audibleSoundVerified:false}));
+await api('push_notification_send_log','POST',{user_id:profiles[0].id,action:'owner_phone_delivery_test',details:{...result,testId,deviceDisplayVerified:false,audibleSoundVerified:false}});
+if(result.registered===0||result.accepted===0||result.failed.length)process.exitCode=1;

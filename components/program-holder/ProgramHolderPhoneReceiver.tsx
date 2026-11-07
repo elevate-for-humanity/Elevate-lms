@@ -250,7 +250,7 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
         <section className="fixed inset-x-3 bottom-4 z-[90] mx-auto max-w-xl rounded-3xl border-2 border-cyan-300 bg-slate-950 p-6 text-center text-white shadow-2xl sm:bottom-8">
           <PhoneCall className="mx-auto h-10 w-10 text-cyan-300" />
           <p className="mt-3 text-xs font-black uppercase tracking-widest text-cyan-300">
-            {state === 'ringing' ? 'Incoming Elevate call' : 'Call connected'}
+            {state === 'ringing' ? 'Elevate for Humanity — incoming call' : 'Call connected'}
           </p>
           <h2 className="mt-2 text-3xl font-black">{friendlyNumber(number)}</h2>
           {error && (

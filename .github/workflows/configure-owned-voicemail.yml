@@ -3,7 +3,9 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/configure-owned-voicemail.yml']
+    paths: ['.github/workflows/configure-owned-voicemail.yml', 'scripts/gcp/configure-owned-voicemail.py', 'lib/phone/forwarding-policy.ts']
+  pull_request:
+    paths: ['.github/workflows/configure-owned-voicemail.yml', 'scripts/gcp/*configure-owned-voicemail.py']
 permissions:
   contents: read
   actions: write
@@ -12,6 +14,13 @@ concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('voicemail-setup-{0}', github.ref) }}
   cancel-in-progress: false
 jobs:
+  contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: python3 scripts/gcp/test-configure-owned-voicemail.py
   dispatch:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
@@ -31,6 +40,7 @@ jobs:
       - name: Validate installer and worker
         run: |
           python3 -m py_compile scripts/gcp/configure-owned-voicemail.py
+          python3 scripts/gcp/test-configure-owned-voicemail.py
           node --check infra/pbx/voicemail/worker.mjs
       - uses: google-github-actions/auth@v3
         with:
@@ -63,6 +73,8 @@ jobs:
           set -euo pipefail
           test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/configure-owned-voicemail.py | tee phone-owned-mailbox-evidence.json
+      - name: Read actual operator and voicemail delivery readiness
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
       - name: Install bounded voicemail worker without changing Asterisk containers
         run: |
           set -euo pipefail

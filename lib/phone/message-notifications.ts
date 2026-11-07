@@ -65,13 +65,14 @@ async function notifyRecipient(
     ? new URL('/phone/inbox', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').toString()
     : input.profileId ? appUrl('/communications/phone') : appUrl('/phone/inbox');
   const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
+  const inboxLabel = input.source === 'voicemail' ? 'Voicemail inbox' : 'PARIS phone inbox';
   if (!input.profileId || !input.taskId) return;
   const identity = { taskId: input.taskId, profileId: input.profileId, kind: input.source || 'paris' as const };
   const deliveries: Array<Promise<unknown>> = [];
   const sendPush = () => deliverPhoneNotification(db, { ...identity, channel: 'push' }, async () => {
     const acceptedDeviceCount = await push.sendToUserWithDatabase(db, input.profileId!, {
-    title: input.adminCopy ? 'Admin copy: new phone message' : input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
-    body: `${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
+    title: `Elevate for Humanity · ${input.urgency === 'urgent' ? 'Urgent ' : ''}${input.source === 'voicemail' ? 'voicemail' : 'PARIS message'}${input.adminCopy ? ' · Admin copy' : ''}`,
+    body: `${inboxLabel}${input.extension ? ` · Extension ${input.extension}` : ''}: ${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
     icon: '/icon-192x192.png',
     badge: '/icon-72.png',
     url,

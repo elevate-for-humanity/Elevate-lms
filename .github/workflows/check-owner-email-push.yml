@@ -1,4 +1,4 @@
-name: Check owner incoming mail push connection
+name: Test owner phone alert delivery
 on:
   push:
     branches: [main]

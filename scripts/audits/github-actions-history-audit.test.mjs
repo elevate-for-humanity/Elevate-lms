@@ -31,3 +31,15 @@ test('search truncation cannot be called an exhaustive scan',async()=>{
  assert.equal(result.runInventoryComplete,false);
  assert.ok(result.remainingWindows.length>0);
 });
+
+test('skip-only history backfill scopes GitHub search and all mode remains available',async()=>{
+ for(const status of ['skipped','all']){
+  const paths=[];
+  const result=await auditHistory({start,end,status,maxRequests:2,maxJobRequests:0,
+   request:async(url)=>{paths.push(url);return {ok:true,json:async()=>({total_count:0,workflow_runs:[]})};}});
+  assert.equal(result.statusFilter,status);
+  assert.equal(paths.length,1);
+  assert.equal(paths[0].includes('status=skipped'),status==='skipped');
+ }
+ await assert.rejects(auditHistory({start,end,status:'untrusted'}),/HISTORY_STATUS_FILTER_INVALID/);
+});

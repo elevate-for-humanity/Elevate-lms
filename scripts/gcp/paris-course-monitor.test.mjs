@@ -316,3 +316,22 @@ test('cleared saved owner pause requeues only a canonically ready failed role',a
  const ownerPaused=await run(true,{ultimate_course_builds:{status:'running',ownerPaused:true}});
  assert.equal(ownerPaused.status,undefined);
 });
+
+test('source publication approval stays blocked despite historical PARIS repair receipt',()=>{
+ for(const monitor of [{enabled:true,repairId:'historical-paris-repair'},{enabled:true}]) {
+  const blocked=inspectCourseAutopilot({
+   status:'failed',last_error:'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED',
+   monitor,attempts:1,max_attempts:5
+  },{status:'running',profile:{ownerPaused:false}},now.getTime());
+  assert.equal(blocked.state,'attention_required');
+  assert.equal(blocked.action,'none');
+  assert.equal(blocked.reason,'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED');
+ }
+ // Genuine source-repair failures can still be observed through PARIS.
+ const codeRepair=inspectCourseAutopilot({
+  status:'failed',last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:REPAIR_PRODUCER_UNCHANGED',
+  monitor:{enabled:true,repairId:'verified-repair'}
+ },{status:'running',profile:{ownerPaused:false}},now.getTime());
+ assert.equal(codeRepair.state,'repairing');
+ assert.equal(codeRepair.action,'observe');
+});

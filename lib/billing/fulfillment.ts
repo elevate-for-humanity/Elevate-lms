@@ -1,5 +1,6 @@
 import { fulfillHvacCourseBundle } from '@/lib/store/fulfill-hvac-course';
 import 'server-only';
+import { queueApprenticeshipWelcome, queuePaidProgramWelcome } from '@/lib/enrollment/apprenticeship-welcome';
 import { randomBytes } from 'node:crypto';
 import { nextInvoiceDate } from '@/lib/billing/schedule';
 import { fulfillPlatformSaasSubscription } from '@/lib/platform/fulfillment';
@@ -401,6 +402,11 @@ export async function fulfillPaidBillingInvoice(
       })
       .eq('id', profile.data.id);
     if (portal.error) throw new Error(portal.error.message);
+    await queueApprenticeshipWelcome(db, {
+      enrollmentId: enrollmentId!, email,
+      name: profile.data.full_name || 'Apprentice',
+      programName: program.data.title || programSlug,
+    });
     return;
   }
 
@@ -421,6 +427,7 @@ export async function fulfillPaidBillingInvoice(
       .eq('payment_status', 'pending');
     if (result.error) throw new Error(result.error.message);
     await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
+    if (!schoolOrder) await queuePaidProgramWelcome(db, payload.enrollment_id);
     if (schoolOrder) {
       const { sendSchoolRegistrationEmail } =
         await import('@/lib/billing/school-registration-email');

@@ -523,6 +523,7 @@ test.describe('Studio single-session access and composer', () => {
     const envato = access.getByRole('link', { name: 'Open Envato', exact: true });
     await expect(envato).toHaveAttribute('href', '/studio/browser?provider=envato');
     await envato.click();
+    await expect(page).toHaveURL(`${ADMIN_BASE}/studio/browser?provider=envato`, { timeout: 30_000 });
     // Envato may require its own provider login, but Studio must reuse the Admin session.
     await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
     await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);
@@ -566,9 +567,15 @@ test.describe('Studio single-session access and composer', () => {
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
     await expect(page.getByLabel('Browser zoom')).toHaveText('75%');
     await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThan(normalWidth);
-    await page.getByRole('button', { name: 'Fit screen' }).click();
-    if ((page.viewportSize()?.width || 1280) < 1024)
-      await page.getByRole('button', { name: 'Website login' }).click();
+    // Browsing fits the viewport width; the compact website-login pane has
+    // its own Fit screen control. Certify both modes using their real labels.
+    await page.getByRole('button', { name: 'Fit width', exact: true }).click();
+    await expect(page.getByLabel('Browser zoom')).toHaveText('100%');
+    await expect.poll(async () => Math.abs((await stream.evaluate(el => el.getBoundingClientRect().width)) - initialWidth)).toBeLessThanOrEqual(1);
+    if ((page.viewportSize()?.width || 1280) < 1024) {
+      await page.getByRole('button', { name: 'Website login', exact: true }).click();
+      await page.getByRole('button', { name: 'Fit screen', exact: true }).click();
+    }
     const input = page.getByLabel('Secure browser input');
     await expect(input).toBeVisible();
     const geometry = await input.evaluate(el => {

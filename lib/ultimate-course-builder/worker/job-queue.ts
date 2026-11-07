@@ -126,6 +126,10 @@ export class UltimateJobQueue {
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    // A completed producer can unlock downstream media or quality stages. The
+    // dispatch worker rechecks the canonical readiness predicate, so this is
+    // a wake-up notification—not a fabricated claim or approval.
+    await notifyCourseDispatcher({});
   }
 
   async waitForDependency(jobId: string, workerId: string, message: string, generation: number, resumePayload?: unknown) {

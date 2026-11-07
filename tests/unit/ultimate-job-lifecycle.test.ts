@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
 
 function database(attempts: number) {
@@ -23,6 +23,27 @@ function database(attempts: number) {
 }
 
 describe('terminal Ultimate job lifecycle', () => {
+  it('wakes the trusted dispatcher after a producer completes, without claiming downstream jobs', async () => {
+    const {db,writes}=database(1);
+    const requests:any[]=[];
+    vi.stubEnv('COURSE_DISPATCH_GITHUB_TOKEN','test-course-dispatch-token');
+    vi.stubEnv('COURSE_DISPATCH_DISABLED','false');
+    vi.stubGlobal('fetch',async (url:string,options:any)=>{
+      requests.push({url,options});
+      return {status:204};
+    });
+    try {
+      await new UltimateJobQueue(db).complete('producer','owner',2);
+      expect(writes).toHaveLength(1);
+      expect(writes[0].values.status).toBe('completed');
+      expect(writes[0].filters).toContainEqual(['execution_generation',2]);
+      expect(requests).toHaveLength(1);
+      expect(requests[0].url).toContain('/actions/workflows/dispatch-google-course-job.yml/dispatches');
+    } finally {
+      vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    }
+  });
   it('hands terminal failure to the atomic database transition when repairs are exhausted', async () => {
     const { db, writes } = database(3);
     await new UltimateJobQueue(db).fail('job', 'owner', 'missing source', 1);

@@ -1,5 +1,6 @@
 import { fulfillHvacCourseBundle } from '@/lib/store/fulfill-hvac-course';
 import 'server-only';
+import { queueApprenticeshipWelcome } from '@/lib/enrollment/apprenticeship-welcome';
 import { randomBytes } from 'node:crypto';
 import { nextInvoiceDate } from '@/lib/billing/schedule';
 import { fulfillPlatformSaasSubscription } from '@/lib/platform/fulfillment';
@@ -401,6 +402,11 @@ export async function fulfillPaidBillingInvoice(
       })
       .eq('id', profile.data.id);
     if (portal.error) throw new Error(portal.error.message);
+    await queueApprenticeshipWelcome(db, {
+      enrollmentId: enrollmentId!, email,
+      name: profile.data.full_name || 'Apprentice',
+      programName: program.data.title || programSlug,
+    });
     return;
   }
 

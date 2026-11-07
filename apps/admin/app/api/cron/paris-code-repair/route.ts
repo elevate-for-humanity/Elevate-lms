@@ -1,4 +1,5 @@
 import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
+import {classifyParisPhaseError} from '@/lib/devstudio/paris-phase-error.mjs';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
@@ -48,11 +49,9 @@ export async function POST(request:NextRequest){
   if(body.phase==='failure'){await reportParisRepairFailure(body.repairId,body.runId);return NextResponse.json({recorded:true});}
   return NextResponse.json({error:'Unsupported phase'},{status:400});
  }catch(error){
-  const detail=error as {message?:unknown;code?:unknown}|null;
-  const message=String(detail?.message??'');
-  const errorCode=(/^PARIS_GITHUB_HTTP_[1-5][0-9]{2}$/.test(message)||message==='PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED')?message:/^[A-Z0-9]{5}$/.test(String(detail?.code??''))?'PARIS_DATABASE_'+detail!.code:'PARIS_REPAIR_PHASE_FAILED';
+  const {errorCode,status}=classifyParisPhaseError(error);
   console.error('[PARIS] repair phase failed',errorCode);
-  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode},{status:502});
+  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode},{status});
  }
 
 }

@@ -8,7 +8,7 @@ function state(job:Job|undefined){
  if(job.status==='completed')return 'Finished';
  if(job.status==='failed')return 'Needs repair';
  if(job.status==='running')return courseExecutionState(job).active?'Working':'Checking worker';
- return job.available_at==='infinity'?'Waiting for prior job':'Ready / retry scheduled';
+ return job.status==='queued'?'Queued / checking prerequisites':'Checking status';
 }
 export default function ParallelLessonAutopilots({jobs,busy,onStart}:{jobs:Job[];busy:boolean;onStart:()=>void}){
  const grouped=new Map<string,Job[]>();

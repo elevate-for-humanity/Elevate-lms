@@ -513,7 +513,8 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // An ineligible source is a state/eligibility decision, never missing owner authorization.
  // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
  const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history')
-  .eq('status','queued').order('created_at',{ascending:true}).limit(100);
+  .eq('status','queued').order('created_at',{ascending:true}).limit(1000);
+ if(queued.data?.length===1000)throw Error('PARIS_QUEUED_REPAIR_SCAN_LIMIT');
  if(queued.error)throw queued.error;
  let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown}|null=null;
  for(const candidate of queued.data??[]){

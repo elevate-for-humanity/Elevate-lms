@@ -111,9 +111,8 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
 
   images: {
-    // Enable unoptimized for standalone/docker deployments
-    // Next.js image optimization doesn't work in standalone mode without external image optimization API
-    unoptimized: true,
+    // Sharp is installed; allow Next.js to serve responsive optimized images.
+    unoptimized: false,
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

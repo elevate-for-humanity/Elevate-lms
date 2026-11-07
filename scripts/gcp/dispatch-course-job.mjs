@@ -121,7 +121,9 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
       if (!Number.isSafeInteger(before.generation) || !Number.isSafeInteger(Number(job.execution_generation)) ||
           Number(job.execution_generation)<=before.generation) continue;
       if (job.status==='completed') {pending.delete(job.id);continue;}
-      if (job.status==='queued' && job.available_at==='infinity') {
+      if (job.status==='queued') {
+        // A coordinator's active lesson pool, not an infinity timestamp,
+        // establishes its handoff after a verified claimed generation.
         const graphUrl=new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_autopilot_pools');
         graphUrl.searchParams.set('select','id,state');graphUrl.searchParams.set('coordinator_job_id','eq.'+job.id);
         const graph=await request(graphUrl,{headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});

@@ -216,6 +216,21 @@ export async function planBrowserTurn(input: {
   snapshot: BrowserSnapshot;
   history: Array<{ actions: BrowserActionRecord[]; summary: string; url: string }>;
 }): Promise<BrowserTurn> {
+  // Exact, read-only observations are already available in the authenticated
+  // snapshot. Do not spend minutes or inference tokens restating DOM fields.
+  // Any extra instruction falls through to the governed planner.
+  const observation = input.command.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[.!?]+$/, '');
+  const titleOnly = ['return the current page title', 'return current page title', 'show the current page title'];
+  const titleAndHeading = ['return the current page title and main heading', 'return current page title and main heading', 'show the current page title and main heading'];
+  if (titleOnly.includes(observation) || titleAndHeading.includes(observation)) {
+    const heading = input.snapshot.headings.find(row => row.level === 1);
+    return {
+      status: 'complete', actions: [], provider: 'browser-dom', model: 'authenticated-snapshot',
+      summary: `Page title: ${input.snapshot.title || '(empty document title)'}` +
+        (titleAndHeading.includes(observation) ? `\nMain heading: ${heading?.text || '(no H1 heading in this snapshot)'}` : ''),
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+    };
+  }
   const result = await aiChat(plannerRequest(input));
   try {
     return {

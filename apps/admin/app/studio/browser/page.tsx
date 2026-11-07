@@ -27,8 +27,10 @@ export default function StudioBrowserPage() {
   } | null>(null);
   const [error, setError] = useState('');
   const [envatoSignIn, setEnvatoSignIn] = useState(false);
+  const [envatoLibrary, setEnvatoLibrary] = useState(false);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    setEnvatoLibrary(params.get('provider') === 'envato');
     setEnvatoSignIn(params.get('provider') === 'envato' && params.get('signin') === '1');
     const runId = params.get('acquisitionRunId');
     if (!runId) return;
@@ -88,10 +90,10 @@ export default function StudioBrowserPage() {
       )}
       <div className="min-h-0 flex-1 overflow-hidden">
         <CloudBrowserWorkspace
-          autoStart={Boolean(request) || envatoSignIn}
+          autoStart={Boolean(request) || envatoLibrary}
           autoRunTask={Boolean(request)}
           acquisitionRunId={request?.id || ''}
-          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://account.envato.com/sign_in' : '')}
+          initialTarget={request?.context.browser_target || (envatoLibrary ? (envatoSignIn ? 'https://account.envato.com/sign_in' : 'https://app.envato.com/') : '')}
           initialSignIn={envatoSignIn}
           initialTask={request?.command || ''}
         />

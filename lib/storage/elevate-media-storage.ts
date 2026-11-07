@@ -225,6 +225,26 @@ export function getElevateMediaPublicUrl(key: string): string | null {
   return `${base}/${key.replace(/^\/+/, '')}`;
 }
 
+/** Retry only transient provider writes. Never retry an auth, bucket or
+ * configuration failure; completed render bytes are reused, not re-rendered. */
+export function isTransientElevateMediaUploadFailure(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const e = error as { $metadata?: { httpStatusCode?: number }; name?: string; code?: string; message?: string };
+  if ([429, 500, 502, 503, 504].includes(e.$metadata?.httpStatusCode ?? 0)) return true;
+  return /^(InternalError|ServiceUnavailable|SlowDown|RequestTimeout|Throttling|TooManyRequestsException)$/i.test(e.name ?? e.code ?? '') ||
+    /\\binternal incident\\b/i.test(e.message ?? '');
+}
+
+async function transientUploadRetry<T>(write: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try { return await write(); }
+    catch (error) {
+      if (attempt >= 2 || !isTransientElevateMediaUploadFailure(error)) throw error;
+      await new Promise(resolve => setTimeout(resolve, 350 * 2 ** attempt));
+    }
+  }
+}
+
 export async function uploadToElevateMedia(
   body: Buffer | Uint8Array,
   key: string,
@@ -234,7 +254,7 @@ export async function uploadToElevateMedia(
     const config = getElevateMediaStorageConfig();
     const client = getElevateMediaStorageClient();
     try {
-      await client.send(
+      await transientUploadRetry(() => client.send(
         new PutObjectCommand({
           Bucket: config.bucket,
           Key: key,
@@ -242,7 +262,7 @@ export async function uploadToElevateMedia(
           ContentType: contentType,
           CacheControl: config.provider === 'backblaze-b2' ? 'private, max-age=0' : 'public, max-age=31536000, immutable',
         }),
-      );
+      ));
     } catch (error) {
       const status = typeof error === 'object' && error !== null && '$metadata' in error
         ? (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode
@@ -404,16 +424,23 @@ export function getContentType(filename: string): string {
 
 /** Stream a completed film without allocating its full size in the JS heap. */
 export async function uploadFileToElevateMedia(filePath: string, key: string, contentType: string): Promise<ElevateMediaUploadResult> {
-  const body = createReadStream(filePath);
   try {
     const config = getElevateMediaStorageConfig();
     const info = await stat(filePath);
-    await getElevateMediaStorageClient().send(new PutObjectCommand({
-      Bucket: config.bucket, Key: key, Body: body, ContentLength: info.size,
-      ContentType: contentType, CacheControl: 'public, max-age=31536000, immutable',
-    }));
+    await transientUploadRetry(async () => {
+      // Reopen the source stream for each transient retry. A consumed stream
+      // cannot be safely sent twice, and the completed render stays on disk.
+      const body = createReadStream(filePath);
+      try {
+        await getElevateMediaStorageClient().send(new PutObjectCommand({
+          Bucket: config.bucket, Key: key, Body, ContentLength: info.size,
+          ContentType: contentType,
+          CacheControl: config.provider === 'backblaze-b2' ? 'private, max-age=0' : 'public, max-age=31536000, immutable',
+        }));
+      } finally { body.destroy(); }
+    });
     return {success: true, key, url: getElevateMediaPublicUrl(key) ?? undefined};
   } catch (error) {
     return {success: false, error: error instanceof Error ? error.message : 'Upload failed'};
-  } finally { body.destroy(); }
+  }
 }

@@ -456,11 +456,13 @@ export default function InteractiveVideoPlayer({
     onCompleteRef.current = onComplete;
   }, [onComplete]);
   const lastProgressRef = useRef(-1);
+  const lastProgressNotifyBucketRef = useRef(-1);
   const completeFiredRef = useRef(false);
 
   // Reset progress tracking when video changes
   useEffect(() => {
     lastProgressRef.current = -1;
+    lastProgressNotifyBucketRef.current = -1;
     completeFiredRef.current = false;
     playbackSessionRef.current = null;
     lastPlaybackHeartbeatBucketRef.current = -1;
@@ -509,12 +511,20 @@ export default function InteractiveVideoPlayer({
     if (dur > 0) {
       const pct = Math.round((ct / dur) * 100);
 
-      // Only notify when the rounded percentage actually changes
-      if (pct !== lastProgressRef.current) {
+      // Server-side learner progress needs periodic playback time, not only
+      // whole-percent changes. For a long film, 1% can exceed the staged
+      // learner QA readback window. Notify on a bounded three-second clock
+      // bucket while preserving the existing percentage callback contract.
+      const progressBucket = Math.floor(ct / 3);
+      const percentChanged = pct !== lastProgressRef.current;
+      if (!readOnly && (percentChanged ||
+          progressBucket !== lastProgressNotifyBucketRef.current)) {
+        lastProgressNotifyBucketRef.current = progressBucket;
+        onProgressRef.current?.(pct);
+      }
+      if (percentChanged) {
         lastProgressRef.current = pct;
-        if(!readOnly)onProgressRef.current?.(pct);
-
-        // Save to DB every 10%
+        // Canonical learner-video progress remains throttled to every 10%.
         if (pct % 10 === 0) {
           saveProgress(pct);
         }

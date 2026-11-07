@@ -1,230 +1,60 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import {
-  ArrowLeft,
-  CheckCircle2,
-  XCircle,
-  RefreshCw,
-  Settings,
-  Users,
-  Database,
-  Zap,
-  AlertTriangle,
-} from 'lucide-react';
 
-interface SyncStatus {
-  contacts: number | null;
-  leads: number | null;
-  lastSync: string | null;
-  connected: boolean;
-}
-
+type Compatibility = { connected: boolean; instance: string; apiVersion: string; checkedAt: string;
+  objects: Record<string, { createable: boolean; updateable: boolean; fields: string[] }> };
+const errors: Record<string, string> = {
+  SALESFORCE_INSTANCE_URL_INVALID: 'Configure your Salesforce My Domain instance URL in secure environment settings.',
+  SALESFORCE_CREDENTIALS_REQUIRED: 'Configure a Salesforce access token or a client ID and client secret with the client credentials flow enabled for your integration user.',
+  SALESFORCE_AUTH_REJECTED: 'Salesforce rejected the configured credentials. Check the integration user and connected app settings.',
+  SALESFORCE_PERMISSION_DENIED: 'The integration user needs Salesforce API access and permissions for the listed objects.',
+};
 export default function SalesforceClient() {
-  const [status, setStatus] = useState<SyncStatus>({
-    contacts: null,
-    leads: null,
-    lastSync: null,
-    connected: false,
-  });
-  const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
+  const [result, setResult] = useState<Compatibility | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    checkStatus();
-  }, []);
-
-  async function checkStatus() {
-    setLoading(true);
+  async function check() {
+    setLoading(true); setError(null); setResult(null);
     try {
-      const res = await fetch('/api/admin/integrations?provider=salesforce');
-      if (res.ok) {
-        const data = await res.json();
-        setStatus({
-          contacts: data.contacts ?? null,
-          leads: data.leads ?? null,
-          lastSync: data.last_sync ?? null,
-          connected: data.connected ?? false,
-        });
-      } else {
-        setError('Integration status could not be verified.');
-      }
-    } catch {
-      setError('Integration status could not be verified.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function triggerSync() {
-    setSyncing(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/admin/integrations?provider=salesforce', { method: 'POST' });
-      const result = await response.json();
-      if (!response.ok || result.success !== true) {
-        setError(result.error || 'Synchronization was not confirmed.');
+      const response = await fetch('/api/admin/integrations/salesforce', { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok || data.connected !== true) {
+        setError(errors[data.error] || 'Salesforce compatibility could not be verified. Check the integration settings and try again.');
         return;
       }
-      await checkStatus();
-    } catch {
-      setError('Synchronization was not confirmed.');
-    } finally {
-      setSyncing(false);
-    }
+      setResult(data);
+    } catch { setError('Salesforce compatibility could not be verified. Try again.'); }
+    finally { setLoading(false); }
   }
-
-  const configFields = [
-    {
-      label: 'Salesforce Instance URL',
-      placeholder: 'https://yourorg.my.salesforce.com',
-      type: 'url',
-    },
-    { label: 'Client ID', placeholder: 'Connected App Consumer Key', type: 'text' },
-    { label: 'Client Secret', placeholder: '••••••••', type: 'password' },
-    { label: 'Callback URL', placeholder: '/api/integrations/salesforce/callback', type: 'text' },
-  ];
-
-  return (
-    <div className="min-h-screen bg-white p-6">
-      {error && <p role="alert" className="mb-4 text-red-700">{error}</p>}
-      {/* Hero Image */}
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-4">
-          <Breadcrumbs
-            items={[
-              { label: 'Admin', href: '/dashboard' },
-              { label: 'Integrations', href: '/integrations' },
-              { label: 'Salesforce' },
-            ]}
-          />
-        </div>
-
-        <Link
-          href="/integrations"
-          className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Integrations
-        </Link>
-
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-            <Database className="w-6 h-6 text-brand-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Salesforce Integration</h1>
-            <p className="text-sm text-slate-500">
-              Sync contacts, leads, and enrollment data with Salesforce CRM
-            </p>
-          </div>
-        </div>
-
-        {/* Connection Status */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-slate-400" /> Connection Status
-          </h2>
-          {loading ? (
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <RefreshCw className="w-4 h-4 animate-spin" /> Checking connection...
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Status</span>
-                {status.connected ? (
-                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-brand-green-100 text-brand-green-700 font-medium">
-                    <CheckCircle2 className="w-3 h-3" /> Connected
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">
-                    <XCircle className="w-3 h-3" /> Not Connected
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Synced Contacts</span>
-                <span className="text-sm font-medium text-slate-900">{status.contacts ?? 'Unverified'}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Synced Leads</span>
-                <span className="text-sm font-medium text-slate-900">{status.leads ?? 'Unverified'}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Last Sync</span>
-                <span className="text-sm text-slate-500">
-                  {status.lastSync ? new Date(status.lastSync).toLocaleString() : 'Never'}
-                </span>
-              </div>
-              {status.connected && (
-                <button
-                  onClick={triggerSync}
-                  disabled={syncing}
-                  className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-                  {syncing ? 'Syncing...' : 'Sync Now'}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Configuration */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <Settings className="w-4 h-4 text-slate-400" /> Configuration
-          </h2>
-          <div className="space-y-4">
-            {configFields.map((field) => (
-              <div key={field.label}>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {field.label}
-                </label>
-                <input
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                />
-              </div>
-            ))}
-            <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-700">
-                Store credentials securely. Use environment variables for production deployments.
-                Never commit secrets to source control.
-              </p>
-            </div>
-            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
-              Save Configuration
-            </button>
-          </div>
-        </div>
-
-        {/* Sync Mapping */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <Users className="w-4 h-4 text-slate-400" /> Field Mapping
-          </h2>
-          <div className="space-y-3">
-            {[
-              { local: 'profiles.full_name', remote: 'Contact.Name' },
-              { local: 'profiles.email', remote: 'Contact.Email' },
-              { local: 'profiles.phone', remote: 'Contact.Phone' },
-              { local: 'enrollments.status', remote: 'Opportunity.Stage' },
-              { local: 'programs.name', remote: 'Campaign.Name' },
-            ].map((m) => (
-              <div key={m.local} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                <span className="text-xs font-mono text-slate-600 flex-1">{m.local}</span>
-                <span className="text-xs text-slate-400">→</span>
-                <span className="text-xs font-mono text-brand-blue-600 flex-1">{m.remote}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+  return <main className="min-h-screen bg-white p-4 text-lg leading-relaxed text-slate-900 sm:p-8">
+    <div className="mx-auto max-w-5xl space-y-6">
+      <Link href="/integrations" className="text-blue-700 underline">Back to integrations</Link>
+      <h1 className="text-3xl font-semibold">Salesforce</h1>
+      <p>Check your organization’s authenticated API access, object permissions, and writable fields before connecting a workflow.</p>
+      <section className="space-y-4 rounded-2xl border border-slate-200 p-5" aria-label="Salesforce connection">
+        <h2 className="text-xl font-semibold">Connection and compatibility</h2>
+        <p>This check reads metadata only. It does not transfer learner records.</p>
+        <button type="button" disabled={loading} onClick={() => void check()} className="min-h-11 rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white disabled:opacity-50">{loading ? 'Checking Salesforce…' : 'Check Salesforce connection'}</button>
+        {loading && <p role="status">Authenticating and checking Contact, Account, Opportunity and Lead permissions…</p>}
+        {error && <p role="alert" className="text-red-700">{error}</p>}
+        {result && <div className="space-y-4">
+          <p role="status" className="font-semibold text-green-800">Authenticated: {result.instance} · API {result.apiVersion}</p>
+          <p>Checked {new Date(result.checkedAt).toLocaleString()}. Record delivery remains unverified until a specific workflow completes and its Salesforce records are read back.</p>
+          <div className="overflow-x-auto"><table className="w-full text-left"><caption className="sr-only">Salesforce object access</caption><thead><tr><th className="p-2">Object</th><th className="p-2">Create</th><th className="p-2">Update</th></tr></thead><tbody>{Object.entries(result.objects).map(([name, object]) => <tr key={name} className="border-t"><th className="p-2">{name}</th><td className="p-2">{object.createable ? 'Allowed' : 'Unavailable'}</td><td className="p-2">{object.updateable ? 'Allowed' : 'Unavailable'}</td></tr>)}</tbody></table></div>
+        </div>}
+      </section>
+      <section className="space-y-3 rounded-2xl border border-slate-200 p-5">
+        <h2 className="text-xl font-semibold">Secure configuration</h2>
+        <p>Set SALESFORCE_INSTANCE_URL to your My Domain URL. Configure SALESFORCE_CLIENT_ID and SALESFORCE_CLIENT_SECRET for a server integration user, or SALESFORCE_API_KEY for an existing access token.</p>
+        <Link href="/integrations/env-manager" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2 font-semibold text-blue-800">Open secure environment settings</Link>
+        <p>Production services must receive these values through their configured secret authority before the connection check can pass.</p>
+      </section>
+      <section className="space-y-3 rounded-2xl border border-slate-200 p-5">
+        <h2 className="text-xl font-semibold">Workflow field mapping</h2>
+        <p>Contact names use FirstName and LastName. Email and phone use Contact.Email and Contact.Phone. Opportunities use StageName, with a stage from your organization’s allowed values and a CloseDate.</p>
+        <p>Enrollment, program and course mappings require your organization’s chosen Salesforce objects and fields. They are not automatically synchronized by this connection check.</p>
+      </section>
     </div>
-  );
+  </main>;
 }

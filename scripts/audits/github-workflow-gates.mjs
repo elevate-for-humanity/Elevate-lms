@@ -22,6 +22,9 @@ export function inspectWorkflow(name,source){
  const conditions=jobs.map(j=>j.condition).join('\n');
  const scheduledUsed=[...conditions.matchAll(/github\.event\.schedule\s*==\s*['"]([^'"]+)['"]/g)].map(x=>x[1]);
  const coversAllSchedules=jobs.some(job=>!job.hasConditional ||
+  // These main-branch and non-workflow-run predicates permit scheduled runs.
+  (/^    if:\s*github\.ref == 'refs\/heads\/main'(?:\s*&&\s*github\.event_name != 'workflow_dispatch')?\s*$/.test(job.condition)) ||
+  (/^    if:\s*github\.event_name != 'workflow_run'\s*\|\|/.test(job.condition)) ||
   (/(?:github\.event_name\s*==\s*['"]schedule['"]|always\(\))/.test(job.condition) &&
    !/github\.event\.schedule\s*==/.test(job.condition)));
  const findings=[];

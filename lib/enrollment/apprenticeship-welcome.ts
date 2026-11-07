@@ -1,19 +1,6 @@
+/** Both paid checkout paths share one verified, idempotent welcome. */
 export async function queueApprenticeshipWelcome(db: any, input: {enrollmentId: string; email: string; name: string; programName: string}) {
-  const {error} = await db.from('notification_outbox').upsert({
-    notification_key: 'apprenticeship-welcome:' + input.enrollmentId,
-    to_email: input.email,
-    template_key: 'enrollment_welcome',
-    template_data: {
-      name: input.name, email: input.email, username: input.email,
-      program_name: input.programName,
-      dashboard_url: 'https://app.elevateforhumanity.org/apprentice',
-      login_url: 'https://app.elevateforhumanity.org/login',
-      password_setup_url: 'https://app.elevateforhumanity.org/forgot-password',
-      security_url: 'https://app.elevateforhumanity.org/account/settings/security',
-    },
-    entity_type: 'program_enrollment', entity_id: input.enrollmentId,
-  }, {onConflict: 'notification_key', ignoreDuplicates: true});
-  if (error) throw new Error('Apprenticeship welcome could not be queued.');
+  await queuePaidProgramWelcome(db, input.enrollmentId);
 }
 
 /** Send only after the paid enrollment is persisted and active. */
@@ -30,7 +17,12 @@ export async function queuePaidProgramWelcome(db: any, enrollmentId: string) {
   ]);
   if (profile.error || program.error || !profile.data?.email || !program.data)
     throw new Error('Paid enrollment welcome recipient could not be verified.');
-  const apprentice = program.data.is_apprenticeship === true;
+  const apprentice = program.data.is_apprenticeship === true || /apprentice/i.test(row.program_slug || '');
+  // Preserve any legacy queued/sent welcome; never replay it under the new key.
+  const legacy = await db.from('notification_outbox').select('id')
+    .eq('notification_key', 'apprenticeship-welcome:' + enrollmentId).maybeSingle();
+  if (legacy.error) throw new Error('Existing enrollment welcome could not be verified.');
+  if (legacy.data?.id) return;
   const {error} = await db.from('notification_outbox').upsert({
     notification_key: 'paid-program-welcome:' + enrollmentId,
     to_email: profile.data.email, template_key: 'enrollment_welcome',

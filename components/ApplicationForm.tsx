@@ -90,6 +90,12 @@ export function ApplicationForm() {
         throw new Error(`Application could not be confirmed. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
       }
 
+      if (result.recordType === 'lead') {
+        if (typeof result.nextStepUrl !== 'string' || !result.nextStepUrl.startsWith('/enroll/'))
+          throw new Error('Secure deposit checkout could not be opened.');
+        window.location.assign(result.nextStepUrl);
+        return;
+      }
       setApplicationId(result.referenceNumber);
       setStep(6);
     } catch (err: unknown) {

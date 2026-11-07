@@ -32,6 +32,17 @@ vi.mock('@/lib/supabase/admin', () => ({
           return query;
         },
         async maybeSingle() {
+          // Retry tests must satisfy the same catalog/payment boundary as a
+          // real paid application before reaching saved-application recovery.
+          if (table === 'programs') return { data: {
+            id: 'hvac-program', slug: 'hvac-technician', title: 'HVAC Technician',
+            is_apprenticeship: false, is_free: false,
+          }, error: null };
+          if (table === 'billing_invoices') return { data: {
+            id: 'paid-hvac-invoice', status: 'paid', total_cents: 350000,
+            customer_email: 'test@example.test', fulfillment_type: 'program_enrollment',
+            fulfillment_payload: { program_id: 'hvac-program', program_slug: 'hvac-technician' },
+          }, error: null };
           if (table !== 'applications') return { data: null, error: null };
           const saved = {
             id: 'saved-application',
@@ -67,6 +78,7 @@ const submit = () =>
         email: 'test@example.test',
         phone: '3175550100',
         program: 'hvac-technician',
+        billingInvoiceId: 'paid-hvac-invoice',
       }),
     }),
   );

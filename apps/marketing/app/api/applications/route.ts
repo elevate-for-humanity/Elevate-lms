@@ -1,3 +1,6 @@
+import { POST as submitProgramInquiry } from '../inquiries/route';
+import { resolveCanonicalSlug } from '@/lib/programs/slug';
+import { paidInvoiceMatchesProgram, requiresSelfPayProgramPayment } from '@/lib/programs/paid-intake-policy.mjs';
 import { copyApplicationToProgramHolders } from '@/lib/program-holder/application-copy';
 import {
   apprenticeshipPaymentError,
@@ -27,12 +30,6 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-const PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS = new Set([
-  'barber-apprenticeship',
-  'cosmetology-apprenticeship',
-  'nail-technician-apprenticeship',
-  'esthetician-apprenticeship',
-]);
 
 function getAllowedOrigins(): Set<string> {
   const configured = (process.env.APPLICATION_INTAKE_ALLOWED_ORIGINS || '')
@@ -234,7 +231,9 @@ async function _POST(req: Request) {
     const coreRequired = ['firstName', 'lastName', 'phone', 'email'];
 
     // Program is required but can come from different field names
-    const program = body.program || body.programSlug;
+    const program = resolveCanonicalSlug(String(body.program || body.programSlug || ''));
+    body.program = program;
+    body.programSlug = program;
     if (!program) {
       return NextResponse.json(
         { error: 'Missing required field: program' },
@@ -277,43 +276,29 @@ async function _POST(req: Request) {
       );
     }
 
-    const applicationIntent = body.applicationIntent === 'enrollment' ? 'enrollment' : 'inquiry';
-    if (applicationIntent === 'enrollment' && PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(program)) {
-      const billingInvoiceId = String(
-        body.billingInvoiceId || body.billing_invoice_id || '',
-      ).trim();
-      if (!billingInvoiceId) {
-        return NextResponse.json(
-          {
-            error:
-              'Verified payment is required before this enrollment application can be submitted.',
-          },
-          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-        );
-      }
-      const { data: paidInvoice } = await supabase
-        .from('billing_invoices')
-        .select('id,status,customer_email,fulfillment_type,fulfillment_payload')
-        .eq('id', billingInvoiceId)
-        .eq('status', 'paid')
-        .maybeSingle();
-      const paidProgram = String((paidInvoice?.fulfillment_payload as any)?.program_slug || '');
-      const applicantEmail = String(body.email || '')
-        .toLowerCase()
-        .trim();
-      if (
-        !paidInvoice ||
-        paidInvoice.fulfillment_type !== 'program_enrollment' ||
-        (paidProgram && paidProgram !== program) ||
-        String(paidInvoice.customer_email || '')
-          .toLowerCase()
-          .trim() !== applicantEmail
-      ) {
-        return NextResponse.json(
-          { error: 'Payment could not be verified for this applicant and program.' },
-          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-        );
-      }
+    const catalogResult = await supabase.from('programs')
+      .select('id,slug,is_apprenticeship,is_free,price,tuition,total_cost')
+      .eq('slug', program).maybeSingle();
+    if (catalogResult.error)
+      return NextResponse.json({ error: 'Program payment details are temporarily unavailable.' },
+        { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) });
+    if (!catalogResult.data)
+      return NextResponse.json({ error: 'Program not found.' },
+        { status: 404, headers: corsHeadersForOrigin(origin, allowedOrigins) });
+    const requiresSelfPayPayment = requiresSelfPayProgramPayment(catalogResult.data, body.fundingType);
+    const billingInvoiceId = String(body.billingInvoiceId || body.billing_invoice_id || '').trim();
+    let verifiedPaidInvoice: any = null;
+    if (requiresSelfPayPayment && billingInvoiceId) {
+      const paidResult = await supabase.from('billing_invoices')
+        .select('id,status,total_cents,paid_at,customer_email,fulfillment_type,fulfillment_payload')
+        .eq('id', billingInvoiceId).eq('status', 'paid').maybeSingle();
+      if (paidResult.error)
+        return NextResponse.json({ error: 'Payment verification is temporarily unavailable.' },
+          { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) });
+      if (!paidInvoiceMatchesProgram(paidResult.data, catalogResult.data, body.email))
+        return NextResponse.json({ error: 'Payment could not be verified for this applicant and program.' },
+          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) });
+      verifiedPaidInvoice = paidResult.data;
     }
 
     // Program state gate - reject submissions for waitlisted or closed programs
@@ -334,6 +319,29 @@ async function _POST(req: Request) {
         { error: 'This program is not currently accepting applications.' },
         { status: 410, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
+    }
+
+    // Unpaid paid-program intake is an inquiry, never an admissions application.
+    // Reuse canonical lead persistence and deduplicated inquiry notifications.
+    if (requiresSelfPayPayment && !verifiedPaidInvoice) {
+      const inquiryResponse = await submitProgramInquiry(new Request(
+        new URL('/api/inquiries', req.url), {
+          method: 'POST', headers: req.headers,
+          body: JSON.stringify({ ...body,
+            name: `${body.firstName} ${body.lastName}`.trim(),
+            email: String(body.email).trim().toLowerCase(), program,
+            source: 'paid-program-inquiry', fundingInterest: body.fundingType,
+          }),
+        }));
+      const inquiry = await inquiryResponse.json();
+      return NextResponse.json(inquiryResponse.ok ? {
+        ...inquiry, applicationStatus: 'inquiry',
+        referenceNumber: inquiry.leadId, paymentRequired: true,
+        nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
+        message: 'Inquiry received. Complete the secure deposit checkout before submitting enrollment.',
+      } : inquiry, {
+        status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
+      });
     }
 
     // Dedup: block same email + program within 24 hours.
@@ -400,7 +408,7 @@ async function _POST(req: Request) {
               ? `/apply/pending-workone?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
               : String(activeApp.funding_type || '').startsWith('self_pay') &&
                   activeApp.payment_status !== 'paid' &&
-                  PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(activeApp.program_interest ?? program)
+                  requiresSelfPayPayment
                 ? `/programs/${encodeURIComponent(activeApp.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
                 : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
         },
@@ -523,6 +531,9 @@ async function _POST(req: Request) {
       funding_eligibility_status: eligibilityStatus,
       reference_number: referenceNumber,
       type: 'student',
+      ...(verifiedPaidInvoice ? { payment_status: 'paid', payment_provider: 'quickbooks',
+        payment_amount_cents: verifiedPaidInvoice.total_cents,
+        payment_received_at: verifiedPaidInvoice.paid_at } : {}),
       date_of_birth: body.dateOfBirth || null,
       county_of_residence: body.countyOfResidence || null,
       household_income: body.householdIncome ? Number(body.householdIncome) : null,
@@ -979,8 +990,9 @@ async function _POST(req: Request) {
     }
 
     const requiresSelfPayCheckout =
+      !verifiedPaidInvoice &&
       String(fundingType || '').startsWith('self_pay') &&
-      PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(data.program_interest ?? program);
+      requiresSelfPayPayment;
     const nextStepUrl = needsWorkOne
       ? `/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`
       : requiresSelfPayCheckout

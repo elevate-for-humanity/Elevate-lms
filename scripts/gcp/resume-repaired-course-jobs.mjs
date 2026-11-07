@@ -84,9 +84,18 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   const renewableStoredMediaRead =
    /FINDINGS=.*finished_media_qa.*(?:MP4|captions|transcript) returned HTTP 401/i.test(error) &&
    (!pool || job.payload.autopilot.role === 'quality');
+  // Retry an isolated transient B2 PUT incident only after this exact
+  // deployment has independently proved private PUT/HEAD/GET/delete. Do not
+  // retry a provider outage using a new paid renderer, and never compete with
+  // a PARIS-owned code repair or retry an approval/license failure.
+  const verifiedTransientB2Incident = pool &&
+   job.payload?.autopilot?.role==='media' &&
+   env.COURSE_B2_VERIFIED_FOR_THIS_RELEASE==='true' &&
+   !job.monitor?.repairId &&
+   /^ULTIMATE_INTERNAL_REPAIR_REQUIRED:[^:]+:FINDINGS=\\[\\{"step":"lesson_film_render","severity":"error","code":"ULTIMATE_VIDEO_RENDER_FAILED","message":"ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:internal incident"\\}\\]$/.test(error);
   const durableExternalBlocker =
    (/OWNER_|AUTHORIZ|ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED|SOURCE_GAP|DEPENDENCIES|storage cap exceeded|COURSE_OBJECT_STORAGE|HTTP (401|403)/i.test(error) &&
-    !renewableStoredMediaRead) ||
+    !renewableStoredMediaRead && !verifiedTransientB2Incident) ||
    /\b(?:LICENSE_APPROVAL_REQUIRED|MEDIA_LICENSE_REQUIRED|MEDIA_SOURCE_APPROVAL_REQUIRED)\b/i.test(error);
   // Per-scene license metadata and saved-assignment findings are internal
   // contract defects after an approved-source deployment, so the verified new

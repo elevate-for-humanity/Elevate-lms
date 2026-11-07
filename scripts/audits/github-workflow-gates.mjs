@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const folder='.github/workflows';
 export function inspectWorkflow(name,source){
- const active=source.replace(/^\s*#.*$/gm,'');
+ const active=source.replace(/^[ \t]*#.*$/gm,'');
  const jobsPart=active.split(/^jobs:\s*$/m)[1]??'';
  const jobBlocks=jobsPart.split(/(?=^  [A-Za-z0-9_-]+:\s*$)/gm);
  const jobs=jobBlocks.map(block=>{
@@ -22,13 +22,16 @@ export function inspectWorkflow(name,source){
  const conditions=jobs.map(j=>j.condition).join('\n');
  const scheduledUsed=[...conditions.matchAll(/github\.event\.schedule\s*==\s*['"]([^'"]+)['"]/g)].map(x=>x[1]);
  const coversAllSchedules=jobs.some(job=>!job.hasConditional ||
+  // These main-branch and non-workflow-run predicates permit scheduled runs.
+  (/^    if:\s*github\.ref == 'refs\/heads\/main'(?:\s*&&\s*github\.event_name != 'workflow_dispatch')?\s*$/.test(job.condition)) ||
+  (/^    if:\s*github\.event_name != 'workflow_run'\s*\|\|/.test(job.condition)) ||
   (/(?:github\.event_name\s*==\s*['"]schedule['"]|always\(\))/.test(job.condition) &&
    !/github\.event\.schedule\s*==/.test(job.condition)));
  const findings=[];
  for(const cron of scheduled)if(!coversAllSchedules&&!scheduledUsed.includes(cron))
   findings.push({code:'ORPHAN_CRON',detail:cron,severity:'high'});
  for(const [i,line] of active.split('\n').entries()){
-  if(/^\s*if:\s*.*&&\s*false(?:\b|[)]|$)/.test(line))
+  if(/^\s*if:\s*(?:\$\{\{\s*)?\(*\s*false\s*\)*(?:\s*\}\})?\s*$/.test(line) || /^\s*if:\s*.*&&\s*false(?:\b|[)]|$)/.test(line))
    findings.push({code:'PERMANENTLY_SKIPPED_JOB',line:i+1,detail:line.trim(),severity:'high'});
   if(/head_sha\s*==\s*['"][a-f0-9]{40}['"]/.test(line))
    findings.push({code:'HISTORICAL_SHA_GATE',line:i+1,detail:line.trim(),severity:'high'});

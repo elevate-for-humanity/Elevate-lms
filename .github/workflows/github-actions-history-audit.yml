@@ -22,6 +22,8 @@ on:
       - 'scripts/audits/github-actions-history-audit.mjs'
       - 'scripts/audits/github-actions-history-audit.test.mjs'
       - 'scripts/audits/ci-independent-steps.test.mjs'
+      - 'scripts/audits/github-workflow-gates.mjs'
+      - 'scripts/audits/github-workflow-gates.test.mjs'
   schedule:
     # New runs are checked daily; older history is segmented by explicit dates.
     - cron: '13 4 * * *'
@@ -62,6 +64,11 @@ jobs:
             export AUDIT_START
           fi
           node scripts/audits/github-actions-history-audit.mjs
+      - name: Inventory every checked-in workflow and its skip/routing conditions
+        if: always()
+        run: |
+          node --test scripts/audits/github-workflow-gates.test.mjs
+          node scripts/audits/github-workflow-gates.mjs
       - name: Preserve historical evidence regardless of incomplete scan or failing checks
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,6 +77,8 @@ jobs:
           path: |
             audit-output/actions-history.json
             audit-output/actions-history.md
+            audit-output/workflow-source-gates.json
+            audit-output/workflow-source-gates.md
           if-no-files-found: warn
           retention-days: 30
       - name: Record exact audit coverage and missing pages
@@ -78,6 +87,7 @@ jobs:
         run: |
           if [ -f audit-output/actions-history.md ]; then
             cat audit-output/actions-history.md >> "$GITHUB_STEP_SUMMARY"
+            if [ -f audit-output/workflow-source-gates.md ]; then cat audit-output/workflow-source-gates.md >> "$GITHUB_STEP_SUMMARY"; fi
           else
             echo 'Audit artifact missing; no historical coverage verified.' >> "$GITHUB_STEP_SUMMARY"
             exit 1

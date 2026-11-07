@@ -156,14 +156,14 @@ export async function createEnrollmentFromPayment(
           program_id: programId,
           ...(programSlug ? { program_slug: programSlug } : {}),
           ...(courseId ? { course_id: courseId } : {}),
-          status: 'pending_review',
+          status: 'active',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
           payment_amount_cents: paymentAmountCents,
           funding_source: fundingSource,
           enrolled_at: new Date().toISOString(),
-          access_granted_at: null,
+          access_granted_at: new Date().toISOString(),
         })
         .select('id')
         .maybeSingle();
@@ -181,11 +181,11 @@ export async function createEnrollmentFromPayment(
         enrollmentId,
         paymentProvider,
       });
-    } else if (existing.status !== 'active' && existing.status !== 'pending_review') {
+    } else if (existing.status !== 'active') {
       await supabaseAdmin
         .from('program_enrollments')
         .update({
-          status: 'pending_review',
+          status: 'active',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
@@ -197,7 +197,7 @@ export async function createEnrollmentFromPayment(
 
       enrollmentId = existing.id;
       isNewEnrollment = true;
-      logger.info('[Enrollment] Moved paid enrollment to pending review', {
+      logger.info('[Enrollment] Activated confirmed-payment enrollment', {
         enrollmentId: existing.id,
         paymentProvider,
       });
@@ -293,18 +293,18 @@ async function sendEnrollmentWelcomeEmail(params: {
       },
       body: JSON.stringify({
         to: email,
-        subject: `Payment Received - ${programDetails?.name || 'Your Program'} Enrollment Review`,
+        subject: `Payment Received - ${programDetails?.name || 'Your Program'} Enrollment Confirmed`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1e3a8a;">Payment received by ${PLATFORM_DEFAULTS.orgName}</h2>
             <p>Hi ${firstName || 'there'},</p>
-            <p>We received your payment for <strong>${programDetails?.name || 'your program'}</strong>. Your enrollment is now <strong>pending final review</strong>. Course access is granted after the enrollment review is completed.</p>
+            <p>We received your payment for <strong>${programDetails?.name || 'your program'}</strong>. Your enrollment is now <strong>active</strong>. Sign in to your student dashboard to complete orientation and begin your assigned coursework.</p>
             ${loginSection}
             <h3>What's Next?</h3>
             <ul>
               <li>Log in to your student portal</li>
               <li>Complete or review your profile</li>
-              <li>Watch your portal and email for the enrollment approval notice</li>
+              <li>Complete orientation, required documents, and your assigned next steps</li>
             </ul>
             <p>If you have any questions, please contact our support team.</p>
             <p>Best regards,<br>The ${PLATFORM_DEFAULTS.orgName} Team</p>

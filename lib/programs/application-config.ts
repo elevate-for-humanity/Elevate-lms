@@ -1,3 +1,4 @@
+import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { resolveCanonicalSlug } from '@/lib/programs/slug';
 /**
  * Central application-routing contract.
@@ -77,10 +78,8 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
       available: ['wioa', 'employer', 'self_pay', 'unsure'],
       supportsWioa: true,
       supportsBnpl: false,
-      depositCents: 210000,
-      fullTuitionCents: 600000,
-      stripeDepositLink: 'https://buy.stripe.com/fZu00j2UUdnofsDcfDgIo0a',
-      stripeFullLink: 'https://buy.stripe.com/9B600jbrq1EGdkvgvTgIo09',
+      depositCents: Math.round(BARBER_PRICING.minDownPayment * 100),
+      fullTuitionCents: Math.round(BARBER_PRICING.fullPrice * 100),
     },
   },
   'cosmetology-apprenticeship': canonicalProgram(

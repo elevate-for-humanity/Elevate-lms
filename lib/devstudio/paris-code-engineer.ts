@@ -1,3 +1,4 @@
+import {courseDiagnosticQuery} from './paris-course-repair-evidence.mjs';
 import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-source-discovery.mjs';
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
@@ -256,8 +257,8 @@ async function searchCode(query: string) {
   }));
 }
 
-function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = []) {
-  return rankSourcePaths(query, tree.filter(entry => !blockedPath(entry.path)));
+function suggestedSourcePaths(query: string, tree: Array<{ type: string; path: string }> = [], task = '') {
+  return rankSourcePaths(query, tree.filter(entry => !blockedPath(entry.path)), task);
 }
 
 function parseAction(value: Record<string, unknown>): AgentAction {
@@ -361,14 +362,15 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const observations: string[] = saved?.observations ?? [
     `Repository: ${REPOSITORY}`, `Base: ${BASE_BRANCH}@${baseSha}`, `Working branch: ${branch}`,
   ];
-  const sourceEvidence = saved?.sourceEvidence ?? continuation?.sourceEvidence;
+  const sourceEvidence = continuation?.sourceEvidence ?? saved?.sourceEvidence;
+  const evidenceChanged = JSON.stringify(sourceEvidence) !== JSON.stringify(saved?.sourceEvidence);
   const changedFiles = new Set<string>(saved?.changedFiles ?? []);
   const newRegressionTests = new Set<string>(saved?.newRegressionTests ?? []);
   const inspectionHistory = Array.isArray(saved?.inspectionHistory) ? saved.inspectionHistory.slice(-30) : [];
   let discoveredFiles: string[] = rememberSourcePaths(saved?.discoveredFiles ?? []);
-  if (!saved && /REPAIR_PRODUCER_UNCHANGED/.test(task)) {
+  if ((!saved || evidenceChanged) && /REPAIR_PRODUCER_UNCHANGED/.test(task)) {
     const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
-    discoveredFiles = rememberSourcePaths(discoveredFiles, suggestedSourcePaths(task, tree.tree));
+    discoveredFiles = rememberSourcePaths(discoveredFiles, suggestedSourcePaths(courseDiagnosticQuery(task,sourceEvidence), tree.tree, task));
   }
   const commits: string[] = saved?.commits ?? [];
   let writes = saved?.writes ?? 0;
@@ -530,7 +532,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         const matches = await searchCode(action.query);
         if (!matches.length) {
           const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
-          const paths = suggestedSourcePaths(task + ' ' + action.query, tree.tree);
+          const paths = suggestedSourcePaths(action.query, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));
           discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
           observations.push(`SEARCH ${action.query}: no content matches. Candidate filenames from the task branch: ${JSON.stringify(paths)}. Read an exact file before proposing a change.`);
         } else {

@@ -1,3 +1,4 @@
+import {recoverCaptionCoverageInspection} from '../instructional/caption-coverage-repair.mjs';
 import { inheritCourseProductionPolicy } from '../core/production-policy.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
@@ -102,6 +103,12 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     if (savedErrors.some((finding: any) => finding.code === 'REPAIR_PRODUCER_UNCHANGED')) {
       const teachingRepair = recoverTeachingVisibilityRepair(artifacts, steps ?? [], savedErrors, currentEvidence);
       if (teachingRepair) artifacts.__repairState = teachingRepair;
+    }
+    const captionInspection = recoverCaptionCoverageInspection(artifacts, steps ?? [], savedErrors, currentEvidence);
+    if (captionInspection) {
+      artifacts.__repairState = captionInspection;
+      if (!passed.some((row: any) => row.step === 'synchronization'))
+        passed.push({step:'synchronization',state:'passed',artifacts:artifacts.synchronization,findings:[],completed_at:null});
     }
     const sourceSteps = ['instructor_script', 'natural_narration', 'storyboard'].map(step =>
       passed.find((row: any) => row.step === step));
@@ -266,7 +273,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     return {
       artifacts,
       passedSteps: reusable.map((x: any) => String(x.step)),
-      recoveredSteps: (narrationInspectorRetry || legacyPictureCueRetry) && reusable.some((step: any) => step.step === 'synchronization')
+      recoveredSteps: (captionInspection || narrationInspectorRetry || legacyPictureCueRetry) && reusable.some((step: any) => step.step === 'synchronization')
         ? ['synchronization' as const] : legacyTitleRetry && reusable.some((step: any) => step.step === 'scene_construction')
         ? ['scene_construction' as const] : [],
       findings: Array.isArray(lesson?.findings) ? lesson.findings : [],

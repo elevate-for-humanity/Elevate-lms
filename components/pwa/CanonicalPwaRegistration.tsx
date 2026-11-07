@@ -73,22 +73,9 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
         await removeStaleWorkers(config.workerPath, config.cachePrefix);
         if (cancelled) return;
 
-        // Marketing uses native registration to fetch and validate its same-origin
-        // worker once. A second page fetch can race navigation in WebKit.
-        if (application !== 'marketing') {
-          const probe = await fetch(`${config.workerPath}?v=${encodeURIComponent(process.env.NEXT_PUBLIC_GIT_SHA || 'current')}`, {
-            cache: 'no-store',
-            credentials: 'same-origin',
-            headers: { 'cache-control': 'no-cache' },
-          });
-
-          if (!probe.ok) {
-            await purgeBrokenPwaState();
-            return;
-          }
-        }
-        if (cancelled) return;
-
+        // Native registration validates the same-origin script and its response.
+        // Extra page probes and an immediate update duplicate that work and can
+        // race navigation in WebKit on every dashboard mount.
         const registration = await navigator.serviceWorker.register(config.workerPath, {
           scope: '/',
           updateViaCache: 'none',
@@ -128,9 +115,8 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
           window.removeEventListener('online', checkForUpdate);
         });
 
-        // register() just checked the public worker. A second native update in
-        // the same navigation can fail origin checks in WebKit even after a 200.
-        if (application !== 'marketing') checkForUpdate();
+        // register() already checked the worker; subsequent checks are driven
+        // by reconnect/visibility events rather than this same navigation.
       } catch (error) {
         if (cancelled) return;
         // A registration exception must not leave an obsolete worker controlling

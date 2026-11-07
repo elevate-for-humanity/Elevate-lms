@@ -114,7 +114,8 @@ export function HvacProgramFilm({ assistance = true }: { assistance?: boolean })
 export default function HvacTrainingShowcase({ compact = false }: { compact?: boolean }) {
   const Heading = 'h2';
   const headingId = compact ? 'hvac-home-showcase' : 'hvac-training-gallery';
-  const selectedScenes = compact ? scenes.slice(0, 3) : scenes;
+  // Keep homepage previews distinct from the full program gallery.
+  const selectedScenes = compact ? scenes.slice(0, 3) : scenes.slice(3);
   return (
     <section
       aria-labelledby={headingId}
@@ -164,7 +165,7 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
                   src={`${imageRoot}/${scene.image}.webp`}
                   alt={scene.alt}
                   fill
-                  priority={compact && index === 0}
+                  loading="lazy"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px"
                   className={compact ? "object-cover object-[center_35%]" : "object-contain"}
                 />

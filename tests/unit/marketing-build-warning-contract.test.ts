@@ -19,6 +19,12 @@ describe('marketing build warning boundary', () => {
     expect(config).toContain("'@opentelemetry/instrumentation'");
     expect(config).toContain("'require-in-the-middle'");
     expect(config).toContain("'@sentry/node'");
+    // Production builds use Next-managed cache; the previous unconditional
+    // cache disable was removed deliberately. The real contract is bounded
+    // webpack parallelism with no ignored build diagnostics.
+    expect(config).toContain('config.parallelism = 1');
+    expect(config).toContain('return config;');
+    expect(config).not.toContain('if (!dev) config.cache = false');
     expect(config).not.toContain('config.ignoreWarnings');
   });
 

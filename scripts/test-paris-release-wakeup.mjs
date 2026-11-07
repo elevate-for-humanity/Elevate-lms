@@ -4,10 +4,13 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const source=readFileSync(new URL('../.github/workflows/paris-code-repair.yml',import.meta.url),'utf8');
 const verifier=readFileSync(new URL('../.github/workflows/verify-paris-production-authorization.yml',import.meta.url),'utf8');
-const monitorJob=source.split(/^  monitor:\s*$/m)[1]?.split(/^  prepare:\s*$/m)[0];
-const prepareJob=source.split(/^  prepare:\s*$/m)[1]?.split(/^  validate:\s*$/m)[0];
-const condition=monitorJob?.match(/^    if: (.+)$/m)?.[1];
-assert.ok(condition,'monitor condition must be present before evaluating event eligibility');
+// The monitor has its own concurrency block; the if predicate no longer
+// immediately follows the job key. Parse only the monitor job, fail closed
+// if its guard disappears, and never interpret a prepare-job condition.
+const monitorBody=source.split(/^  monitor:\s*$/m)[1]?.split(/^  prepare:\s*$/m)[0];
+assert.ok(monitorBody,'PARIS monitor job is required');
+const condition=monitorBody.match(/^    if: (.+)$/m)?.[1];
+assert.ok(condition,'PARIS monitor authority condition is required');
 function monitor(eventName,repairId='',ref='refs/heads/main',workflowRun={}) {
  return vm.runInNewContext(condition,{github:{ref,event_name:eventName,event:{workflow_run:workflowRun}},inputs:{repair_id:repairId}});
 }
@@ -43,8 +46,14 @@ test('the update verification bridge cannot recurse from a manually dispatched m
  assert.ok(bridge.includes("if: github.event_name == 'push' && steps.tick.outputs.runtime_sha != ''"));
  assert.match(bridge,/verify-paris-production-authorization\.yml\/dispatches/);
 });
-test('later monitors coalesce separately while explicit repair dispatches remain serialized',()=>{
- assert.doesNotMatch(source,/^concurrency:/m);
- assert.match(monitorJob,/group: paris-code-repair-monitor\s+cancel-in-progress: false\s+queue: single/);
- assert.match(prepareJob,/group: paris-code-repair-prepare\s+cancel-in-progress: false\s+queue: max/);
+test('monitor backlog coalesces without discarding owner-authorized repair dispatches',()=>{
+ const prepare=source.split(/^  prepare:\s*$/m)[1]?.split(/^  validate:\s*$/m)[0];
+ assert.ok(prepare,'durable PARIS repair prepare job is required');
+ assert.match(monitorBody,/group: paris-code-repair-monitor/);
+ assert.match(monitorBody,/cancel-in-progress: false/);
+ assert.match(monitorBody,/queue: single/);
+ assert.match(prepare,/group: paris-code-repair-prepare/);
+ assert.match(prepare,/cancel-in-progress: false/);
+ assert.match(prepare,/queue: max/);
+ assert.match(prepare,/inputs.repair_id != ''/);
 });

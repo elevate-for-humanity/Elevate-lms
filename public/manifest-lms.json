@@ -11,7 +11,11 @@
   "theme_color": "#1E3A5F",
   "lang": "en-US",
   "dir": "ltr",
-  "categories": ["education", "business", "productivity"],
+  "categories": [
+    "education",
+    "business",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
@@ -33,7 +37,43 @@
     }
   ],
   "shortcuts": [
-    {"name":"Interoffice Email","short_name":"Email","url":"/communications/email"},
+    {
+      "name": "Phone & ringer",
+      "short_name": "Phone & ringer",
+      "description": "Open the dial pad and incoming call alert controls.",
+      "url": "/communications/phone#incoming-call-alert-mode",
+      "icons": [
+        {
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Text messages",
+      "short_name": "Texts",
+      "url": "/communications/texts",
+      "icons": [
+        {
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Interoffice email",
+      "short_name": "Email",
+      "url": "/communications/email",
+      "icons": [
+        {
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
     {
       "name": "Learner Dashboard",
       "short_name": "Learner",

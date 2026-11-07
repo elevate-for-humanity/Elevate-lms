@@ -7,6 +7,7 @@ import {
   CHECKS,
   learnerSetupReady,
   completeStagedLesson,
+  waitForPersistedPlayback,
 } from './learner-runthrough.mjs';
 test('evidence hashes are stable across object ordering but change with lesson contents', () => {
   assert.equal(
@@ -240,4 +241,36 @@ test('completion requires visible staged status and persisted completion after r
   'visible-completion',
  ]);
  await assert.rejects(completeStagedLesson(page,async()=>({completed:false})),/Completion not persistent/);
+});
+
+test('staged progress waits for an actual second saved playback tick', async () => {
+  const states=[
+    {position:0,watchedSeconds:0},
+    {position:5,watchedSeconds:0},
+    {position:7,watchedSeconds:3},
+  ];
+  let reads=0,pauses=0;
+  const result=await waitForPersistedPlayback(async()=>states[reads++],{
+    attempts:5,pause:async(ms)=>{assert.equal(ms,2500);pauses++;}
+  });
+  assert.deepEqual(result,{position:7,watchedSeconds:3});
+  assert.equal(reads,3);
+  assert.equal(pauses,2);
+});
+
+test('staged progress refuses missing authenticated evidence after a bounded poll', async () => {
+  let calls=0;
+  await assert.rejects(waitForPersistedPlayback(async()=>{calls++;return {position:5,watchedSeconds:0};},{
+    attempts:3,pause:async()=>{}
+  }),/Playback was not persisted/);
+  assert.equal(calls,3);
+  await assert.rejects(waitForPersistedPlayback(async()=>({position:5,watchedSeconds:2}),{
+    attempts:0,
+  }),/INVALID_PROGRESS_READBACK_ATTEMPTS/);
+});
+
+test('readback helper fails closed when progress API read fails', async () => {
+  await assert.rejects(waitForPersistedPlayback(async()=>{throw Error('HTTP_503');},{
+    attempts:2,pause:async()=>{}
+  }),/HTTP_503/);
 });

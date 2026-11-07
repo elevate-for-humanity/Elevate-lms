@@ -1,4 +1,5 @@
 import 'server-only';
+import {narrationCoverage} from './narration-coverage.mjs';
 import {independentSpeechWindows} from './independent-speech-windows.mjs';
 import {reportCourseProgress} from '../ultimate-course-builder/worker/progress-watch.mjs';
 import { narrationCoverageSeverity, verifiedTeachingPhotoScene } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
@@ -173,12 +174,7 @@ function normalizedWords(value: string): string[] {
   return value.toLowerCase().match(/[a-z0-9]+/g) ?? [];
 }
 
-function narrationCoverage(script: string, deliveredTranscript: string): number {
-  const expected = normalizedWords(script);
-  if (!expected.length) return 1;
-  const delivered = new Set(normalizedWords(deliveredTranscript));
-  return expected.filter((word) => delivered.has(word)).length / expected.length;
-}
+
 
 function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'): number {
   const expression =

@@ -1,4 +1,4 @@
-import {courseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
+import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
@@ -125,7 +125,7 @@ export async function prepareParisRepair(id:string,runId:number){
    if(claimed.source_job_id){
     const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,last_error,payload,monitor').eq('id',claimed.source_job_id).single();
     if(source.error)throw source.error;
-    sourceEvidence=courseRepairEvidence(claimed.source_job_id,source.data);
+    sourceEvidence=await loadCourseRepairEvidence(db,claimed.source_job_id,source.data);
    }
    const {stageParisCodeRepair}=await import('@/lib/devstudio/paris-code-engineer');
    const response=await stageParisCodeRepair(claimed.goal,id,claimed.actor_id,{

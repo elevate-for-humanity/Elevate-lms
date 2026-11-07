@@ -3,6 +3,7 @@ import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
+import {nextRepairActionConstraint,assertCommittedWriteReadback} from './paris-action-loop.mjs';
 import {bindRepairWorkflowInspection,bindVerifiedFailedWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
@@ -202,11 +203,23 @@ async function writeFile(input: {
       }),
     },
   );
-  return {
-    path: normalized,
-    contentSha: String(result?.content?.sha ?? ''),
-    commitSha: String(result?.commit?.sha ?? ''),
-  };
+  const contentSha=String(result?.content?.sha ?? '');
+  const commitSha=String(result?.commit?.sha ?? '');
+  if(!/^[a-f0-9]{40}$/.test(contentSha)||!/^[a-f0-9]{40}$/.test(commitSha))
+    throw Error('PARIS_SOURCE_WRITE_RECEIPT_REQUIRED');
+  // Read the actual committed Git object and current task-branch ref before
+  // telling the planner a write succeeded. A successful PUT alone is not a
+  // validated source change; an ambiguous result stays a failed operation.
+  const committed=await githubJson(
+    `/contents/${normalized.split('/').map(encodeURIComponent).join('/')}?ref=${commitSha}`);
+  const ref=await githubJson(`/git/ref/heads/${encodeURIComponent(input.branch)}`);
+  const observedContent=Buffer.from(String(committed?.content??''),'base64').toString('utf8');
+  assertCommittedWriteReadback({
+    expectedContent:input.content,observedContent,
+    commitSha,branchSha:String(ref?.object?.sha??''),
+    expectedBlobSha:contentSha,observedBlobSha:String(committed?.sha??''),
+  });
+  return {path:normalized,contentSha,commitSha};
 }
 
 async function searchCode(query: string) {
@@ -368,7 +381,9 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const newRegressionTests = new Set<string>(saved?.newRegressionTests ?? []);
   const inspectionHistory = Array.isArray(saved?.inspectionHistory) ? saved.inspectionHistory.slice(-30) : [];
   let discoveredFiles: string[] = rememberSourcePaths(saved?.discoveredFiles ?? []);
-  if ((!saved || evidenceChanged) && /REPAIR_PRODUCER_UNCHANGED/.test(task)) {
+  if ((!saved || evidenceChanged) &&
+      (/REPAIR_PRODUCER_UNCHANGED/.test(task) || Boolean(sourceEvidence?.blockedStep) ||
+       /(?:failed production release|failed check|workflow)/i.test(task))) {
     const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
     discoveredFiles = rememberSourcePaths(discoveredFiles, suggestedSourcePaths(courseDiagnosticQuery(task,sourceEvidence), tree.tree, task));
   }
@@ -417,7 +432,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
               '{"type":"replace","path":"...","old":"exact existing text","replacement":"new text","message":"commit message"}, ' +
               '{"type":"create","path":"...","content":"...","message":"commit message"}, ' +
               '{"type":"complete","summary":"..."}. ' +
-              'Use small, self-contained edits. The old text must be exact and sufficiently specific. ' +
+              'Use small, self-contained edits. The old text must be exact and sufficiently specific. Once a relevant source file is read, prefer a justified exact replacement immediately over additional broad discovery; read and write are separately GitHub-verified. Do not invent a change when evidence is insufficient. ' +
               'Do not touch secrets, .env files, generated dependencies, or unrelated features. ' +
               'Do not claim success until the required source changes are committed to the task branch.',
           },
@@ -433,7 +448,8 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
               discoveredFiles,
               changedFiles: [...changedFiles],
               inspectionAlreadyPerformed: [...new Set(inspectionHistory)].slice(-20),
-              nextActionConstraint: 'Do not repeat an inspectionAlreadyPerformed action. Use a different exact source file or produce a justified source patch plus a new regression test. If evidence is insufficient, complete with the limitation.',
+              nextActionConstraint: nextRepairActionConstraint(inspectionHistory,writes) +
+                ' Do not repeat an inspectionAlreadyPerformed action. Every write must pass GitHub commit readback. No authorized modification means a blocked repair, never success.',
             }),
           },
         ],
@@ -574,6 +590,10 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           continue;
         }
         const next = file.content.replace(action.old, action.replacement);
+        if(next===file.content) {
+          observations.push('REPLACE NO_CHANGE '+file.path+': proposed replacement did not modify source; inspect evidence or provide a changed implementation.');
+          continue;
+        }
         const written = await writeFile({
           path: file.path,
           content: next,
@@ -602,6 +622,10 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         }
         if (exists) {
           observations.push(`CREATE BLOCKED ${action.path}: file already exists; read and replace it instead.`);
+          continue;
+        }
+        if(!action.content.trim()) {
+          observations.push('CREATE NO_CHANGE '+action.path+': an empty source file is not a verified repair.');
           continue;
         }
         const written = await writeFile({

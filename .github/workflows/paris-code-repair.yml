@@ -8,6 +8,13 @@ on:
       - 'lib/devstudio/paris-code-engineer.ts'
       - 'lib/ai/runtime/supervision.ts'
       - 'lib/ai/runtime/code-repair-policy.mjs'
+      - 'lib/ai/providers/**'
+      - 'lib/devstudio/paris-inspection-budget.mjs'
+      - 'lib/devstudio/repair-inference-budget.mjs'
+      - 'lib/devstudio/paris-repair-deliverables.mjs'
+      - 'lib/devstudio/paris-workflow-evidence.mjs'
+      - 'lib/paris-workflow-identity.ts'
+      - 'supabase/migrations/*paris*.sql'
   schedule:
     - cron: '*/10 * * * *'
   workflow_run:
@@ -29,7 +36,7 @@ concurrency:
   queue: max
 jobs:
   monitor:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && (github.event.workflow_run.conclusion == 'failure' || (github.event.workflow_run.name == 'Deploy Admin' && github.event.workflow_run.conclusion == 'success'))))
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && (github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success')))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:

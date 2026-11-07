@@ -332,6 +332,7 @@ test('source publication approval stays blocked despite historical PARIS repair 
   status:'failed',last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:REPAIR_PRODUCER_UNCHANGED',
   monitor:{enabled:true,repairId:'verified-repair'}
  },{status:'running',profile:{ownerPaused:false}},now.getTime());
- assert.equal(codeRepair.state,'repairing');
+ assert.equal(codeRepair.state,'repair_requested');
  assert.equal(codeRepair.action,'observe');
+ assert.match(codeRepair.reason,/dispatch, execution, and validation remain unverified/);
 });

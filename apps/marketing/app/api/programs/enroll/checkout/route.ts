@@ -349,6 +349,7 @@ export async function POST(request: NextRequest) {
           enrollment_id: pending.data.id,
           amount_cents: amountCents,
           program_id: program.id,
+          program_slug: program.slug,
           student_id: user.id,
           program_holder_id: partnerHolderId,
           coupon_code: appliedCoupon?.code || null,
@@ -385,6 +386,7 @@ export async function POST(request: NextRequest) {
               ? Math.ceil((fullAmountCents - amountCents) / 3)
               : amountCents,
             program_id: program.id,
+            program_slug: program.slug,
             student_id: user.id,
           },
         },

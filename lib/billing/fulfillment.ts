@@ -332,11 +332,13 @@ export async function fulfillPaidBillingInvoice(
 
     const existing = await db
       .from('program_enrollments')
-      .select('id')
+      .select('id,status,revoked_at')
       .eq('user_id', profile.data.id)
       .eq('program_id', program.data.id)
       .maybeSingle();
     if (existing.error) throw new Error(existing.error.message);
+    if (existing.data && (existing.data.revoked_at || !['pending', 'checkout_pending', 'active'].includes(existing.data.status)))
+      throw new Error('Existing enrollment requires authorized reactivation review.');
 
     const enrollmentValues = {
       user_id: profile.data.id,
@@ -351,6 +353,8 @@ export async function fulfillPaidBillingInvoice(
       funding_source: 'self_pay',
       amount_paid_cents: Number(payload.amount_cents || 0),
       billing_provider: 'quickbooks',
+      payment_provider: 'quickbooks',
+      payment_reference: job.billing_invoice_id,
       organization_id: program.data.organization_id,
       tenant_id: program.data.tenant_id,
       enrolled_at: new Date().toISOString(),
@@ -421,6 +425,9 @@ export async function fulfillPaidBillingInvoice(
         next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : 'ONBOARDING',
         amount_paid_cents: payload.amount_cents,
         billing_provider: 'quickbooks',
+        payment_provider: 'quickbooks',
+        payment_reference: job.billing_invoice_id,
+        ...(schoolOrder ? {} : { access_granted_at: new Date().toISOString() }),
         updated_at: new Date().toISOString(),
       })
       .eq('id', payload.enrollment_id)

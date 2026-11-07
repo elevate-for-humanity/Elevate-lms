@@ -5,6 +5,34 @@ import os from 'node:os';
 import path from 'node:path';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 
+test('reopening an Elevate workspace restores the owner connection after a process restart', async t => {
+  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'envato-reopen-'));
+  t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+  const config={secret:'fixture-only',directory};
+  const writer=new ProviderSessionStore(config),scope=writer.scope('admin-a','https://app.envato.com/');
+  const provider={cookies:[{name:'session',value:'saved-provider',domain:'.envato.com'}],origins:[{origin:'https://account.envato.com',localStorage:[{name:'account',value:'saved'}],indexedDB:[]}]};
+  await writer.save(scope,{storageState:async()=>provider});
+  // Visiting only Elevate must not erase the existing provider connection.
+  await writer.save(scope,{storageState:async()=>({cookies:[],origins:[{origin:'https://www.elevateforhumanity.org',localStorage:[]}]})});
+  const reader=new ProviderSessionStore(config);
+  const workspace={cookies:[{name:'old',value:'stale-provider',domain:'.envato.com'},{name:'workspace',value:'keep',domain:'example.com'}],origins:[{origin:'https://app.envato.com',localStorage:[{name:'stale',value:'remove'}]},{origin:'https://example.com',localStorage:[{name:'draft',value:'keep'}]}]};
+  const restored=await reader.restoreWorkspace(scope,workspace);
+  assert.deepEqual(restored.cookies,[workspace.cookies[1],...provider.cookies]);
+  assert.deepEqual(restored.origins,[workspace.origins[1],...provider.origins]);
+  assert.equal(await reader.restoreWorkspace('envato:admin-b',undefined),undefined);
+  assert.deepEqual(await reader.restoreWorkspace(scope,undefined),provider);
+});
+
+test('an observed provider logout replaces saved authentication instead of reviving it',async t=>{
+ const directory=await fs.mkdtemp(path.join(os.tmpdir(),'envato-logout-'));t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+ const config={secret:'fixture-only',directory},store=new ProviderSessionStore(config),scope='envato:admin-a';
+ const signedIn={cookies:[{name:'session',value:'old',domain:'.envato.com'}],origins:[]};
+ await store.save(scope,{storageState:async()=>signedIn});
+ const signedOut={cookies:[],origins:[{origin:'https://account.envato.com',localStorage:[],indexedDB:[]}]};
+ await store.save(scope,{storageState:async()=>signedOut});
+ assert.deepEqual(await new ProviderSessionStore(config).restoreWorkspace(scope,signedIn),signedOut);
+});
+
 test('account-scoped encrypted connection excludes LMS and other provider state', async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'provider-state-test-'));
   try {

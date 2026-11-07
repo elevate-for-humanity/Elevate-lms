@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+const isEnvato = host => host === 'envato.com' || host.endsWith('.envato.com');
 
 // One shared account connection for Studio and course acquisition. Never store
 // unrelated LMS cookies, return provider cookies, or accept client-chosen owners.
@@ -68,11 +69,13 @@ export class ProviderSessionStore {
     // Provider authentication can live in IndexedDB as well as cookies and
     // localStorage. Preserve it in the same encrypted, account-scoped state.
     const source = await context.storageState({ indexedDB: true });
-    const isEnvato = host => host === 'envato.com' || host.endsWith('.envato.com');
     const state = {
       cookies: source.cookies.filter(cookie => isEnvato(cookie.domain.replace(/^\./, ''))),
       origins: source.origins.filter(origin => isEnvato(new URL(origin.origin).hostname)),
     };
+    // An unrelated starting page has not visited or signed out of Envato.
+    // Do not replace an existing connection with its empty provider snapshot.
+    if (!state.cookies.length && !state.origins.length) return;
     if (!this.directory) {
       this.states.set(scope, state);
       return;
@@ -92,5 +95,17 @@ export class ProviderSessionStore {
     } finally {
       await fs.unlink(temporary).catch(() => undefined);
     }
+  }
+  async restoreWorkspace(scope, workspace) {
+    const provider = await this.load(scope);
+    if (!provider) return workspace;
+    if (!workspace) return provider;
+    // The separately saved provider connection is canonical for Envato only.
+    // Preserve the same owner's other tabs/storage without reviving stale
+    // Envato credentials from an older general-workspace checkpoint.
+    return {
+      cookies: [...workspace.cookies.filter(cookie => !isEnvato(cookie.domain.replace(/^\./, ''))), ...provider.cookies],
+      origins: [...workspace.origins.filter(origin => !isEnvato(new URL(origin.origin).hostname)), ...provider.origins],
+    };
   }
 }

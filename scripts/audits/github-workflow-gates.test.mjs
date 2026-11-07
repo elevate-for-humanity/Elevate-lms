@@ -9,6 +9,15 @@ test('matching cron and jobs are inventoried without false alarm',()=>{
  const row=inspectWorkflow('healthy.yml',"on:\n  schedule:\n    - cron: '*/5 * * * *'\njobs:\n  dispatcher:\n    if: github.event.schedule == '*/5 * * * *'\n    runs-on: ubuntu-latest\n");
  assert.equal(row.job_count,1);assert.equal(row.findings.length,0);
 });
+test('unconditional and general schedule jobs cover all configured cron entries',()=>{
+ for(const block of [
+  "jobs:\n  all:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo ok\n",
+  "jobs:\n  all:\n    if: github.event_name == 'schedule'\n    runs-on: ubuntu-latest\n",
+ ]){
+  const row=inspectWorkflow('generic.yml',"on:\n  schedule:\n    - cron: '0 1 * * *'\n"+block);
+  assert.ok(!row.findings.some(x=>x.code==='ORPHAN_CRON'));
+ }
+});
 test('hardcoded legacy source gates and disabled jobs are detected',()=>{
  const row=inspectWorkflow('bad.yml',"jobs:\n  dispatch:\n    if: github.event_name == 'push' && false\n    runs-on: ubuntu-latest\n  resume:\n    if: github.event.workflow_run.head_sha == '"+'a'.repeat(40)+"'\n    runs-on: ubuntu-latest\n");
  assert.ok(row.findings.some(x=>x.code==='PERMANENTLY_SKIPPED_JOB'));

@@ -85,7 +85,11 @@ test('a release requests the serialized dispatcher instead of racing its capacit
  const deploy=release.split('\n  deploy:\n')[1];assert.ok(deploy);
  assert.match(deploy,/group: google-course-worker-release/);
  assert.doesNotMatch(deploy,/dispatchApprovedRegionalCourses/);
- assert.match(deploy,/gh api --method POST .*actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
+ const postDeploy=release.split('\n  dispatch:\n')[1]?.split('\n  build:\n')[0];assert.ok(postDeploy);
+ assert.match(postDeploy,/needs: deploy/);
+ assert.match(postDeploy,/needs\.deploy\.result == 'success'/);
+ assert.match(postDeploy,/gh api --method POST .*actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
+ assert.doesNotMatch(deploy,/gh api --method POST .*actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
  assert.match(dispatcher,/group: google-course-runtime-operations\n\s+cancel-in-progress: false/);
 });
 

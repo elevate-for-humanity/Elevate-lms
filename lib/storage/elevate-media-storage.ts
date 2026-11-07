@@ -433,7 +433,7 @@ export async function uploadFileToElevateMedia(filePath: string, key: string, co
       const body = createReadStream(filePath);
       try {
         await getElevateMediaStorageClient().send(new PutObjectCommand({
-          Bucket: config.bucket, Key: key, Body, ContentLength: info.size,
+          Bucket: config.bucket, Key: key, Body: body, ContentLength: info.size,
           ContentType: contentType,
           CacheControl: config.provider === 'backblaze-b2' ? 'private, max-age=0' : 'public, max-age=31536000, immutable',
         }));

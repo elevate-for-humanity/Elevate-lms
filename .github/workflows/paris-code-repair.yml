@@ -176,7 +176,7 @@ jobs:
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
-          import json,os,re,urllib.request,urllib.parse
+          import json,os,re,urllib.request,urllib.parse,urllib.error
           if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
           body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
           def fresh_identity():
@@ -196,7 +196,18 @@ jobs:
             # Renew authority before every mutation; never replay an ambiguous POST.
             token=fresh_identity()
             req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+token,'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
-            result=json.load(urllib.request.urlopen(req,timeout=285))
+            try:
+              result=json.load(urllib.request.urlopen(req,timeout=285))
+            except urllib.error.HTTPError as error:
+              # The Admin route emits a bounded, allow-listed failure code.
+              # Preserve the failed mutation without retrying an ambiguous POST.
+              raw=error.read(1024)
+              try: code=json.loads(raw).get('errorCode','PARIS_REPAIR_PHASE_FAILED')
+              except (ValueError,TypeError): code='PARIS_REPAIR_PHASE_FAILED'
+              if not isinstance(code,str) or not re.fullmatch(r'[A-Z0-9_]{5,64}',code):
+                code='PARIS_REPAIR_PHASE_FAILED'
+              print('PARIS_PREPARE_REJECTED HTTP '+str(error.code)+' '+code,flush=True)
+              raise
             if result.get('pending') is True:
               print('Saved PARIS planner turn',result.get('turn'),flush=True)
               continue

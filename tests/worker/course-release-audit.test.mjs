@@ -19,6 +19,17 @@ test('historical media recovery audit runs beside release without replacing requ
  assert.doesNotMatch(audit,/continue-on-error/);
 });
 
+test('verified course image deploy gates the only direct dispatch job',()=>{
+ const deploy=job('deploy'),dispatch=job('dispatch');
+ assert.ok(deploy&&dispatch);
+ assert.match(deploy,/Verify all five deployed worker image digests and runtime identities/);
+ assert.match(dispatch,/needs: deploy/);
+ assert.match(dispatch,/needs\.deploy\.result == 'success'/);
+ assert.match(dispatch,/actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
+ assert.doesNotMatch(dispatch,/deploy-google-course-worker\.yml\/dispatches|&& false/);
+ assert.doesNotMatch(deploy,/actions\/workflows\/dispatch-google-course-job\.yml\/dispatches/);
+});
+
 import { stripTypeScriptTypes } from 'node:module';
 const accessibilitySource = stripTypeScriptTypes(
   readFileSync(new URL('../../lib/ultimate-course-builder/accessibility/accessibility-contract.ts', import.meta.url), 'utf8'),

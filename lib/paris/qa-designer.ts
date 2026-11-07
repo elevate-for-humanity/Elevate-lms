@@ -5,6 +5,9 @@ export interface CurriculumReadinessReport {
   courseName: string;
   generatedAt: string;
   isReady: boolean;
+  structuralChecksPassed: boolean;
+  assessmentBasis: 'static-heuristic';
+  runtimeVerified: false;
   overallScore: number;
   threshold: number;
   categories: ReadinessCategory[];
@@ -12,7 +15,7 @@ export interface CurriculumReadinessReport {
   blueprintCoverage: BlueprintCoverage;
   competencyCoverage: CompetencyCoverageMap;
   mediaComplete: MediaCompleteness;
-  licensingMetadata: LicensingMetadata;
+  licensingMetadata: LicensingMetadata | null;
 }
 
 export interface ReadinessCategory {
@@ -65,7 +68,7 @@ type Params = {
 };
 
 function percent(part: number, whole: number) {
-  return whole > 0 ? Math.round((part / whole) * 100) : 100;
+  return whole > 0 ? Math.round((part / whole) * 100) : 0;
 }
 
 function category(name: string, score: number, threshold: number, details: string, issues: string[] = []): ReadinessCategory {
@@ -119,7 +122,7 @@ export function generateReadinessReport(params: Params): CurriculumReadinessRepo
     issues.push({ severity: inaccessibleVideos ? 'high' : 'medium', category: 'Accessibility', description: `${inaccessibleVideos} videos lack captions; ${missingAlt} image-bearing lessons lack alt-text confirmation`, recommendation: 'Complete captioning and descriptive alt-text review before publishing.' });
   }
 
-  const licensingMetadata = generateLicensingMetadata(params.courseId);
+  const licensingMetadata = null;
   const categories = [
     category('Credential Alignment', credentialScore, 90, `${mappedLessons}/${params.lessons.length} lessons mapped`),
     category('Blueprint Coverage', blueprintCoverage.percentage, 95, `${blueprintCoverage.coveredTopics}/${blueprintCoverage.totalTopics} topics covered`, missingTopics),
@@ -128,24 +131,12 @@ export function generateReadinessReport(params: Params): CurriculumReadinessRepo
     category('Hands-on Skills', handsOnScore, 80, `${handsOnLessons} hands-on lessons; ${safetyLessons} safety lessons`),
     category('Media Complete', mediaComplete.percentage, 90, `${completedAssets}/${params.mediaAssets.length} required media assets complete`, pending),
     category('Accessibility', accessibilityScore, 90, `${inaccessibleVideos} uncaptioned videos; ${missingAlt} alt-text gaps`),
-    category('Licensing Metadata', 100, 100, `${licensingMetadata.curriculumId} · ${licensingMetadata.version}`),
+    category('Licensing Metadata', 0, 100, 'No verified license record supplied. Generating metadata is not license verification.'),
   ];
 
   const weights: Record<string, number> = { 'Credential Alignment': 0.15, 'Blueprint Coverage': 0.20, 'Competency Coverage': 0.20, 'Assessment Quality': 0.15, 'Hands-on Skills': 0.10, 'Media Complete': 0.10, Accessibility: 0.05, 'Licensing Metadata': 0.05 };
   const overallScore = Math.round(categories.reduce((sum, item) => sum + item.score * (weights[item.name] ?? 0), 0));
-  const isReady = overallScore >= 95 && categories.every((item) => item.passed) && !issues.some((issue) => issue.severity === 'critical');
+  const structuralChecksPassed = overallScore >= 95 && categories.every((item) => item.passed) && !issues.some((issue) => issue.severity === 'critical');
 
-  return { courseId: params.courseId, courseName: params.courseName, generatedAt: new Date().toISOString(), isReady, overallScore, threshold: 95, categories, issues, blueprintCoverage, competencyCoverage, mediaComplete, licensingMetadata };
-}
-
-function generateLicensingMetadata(courseId: string): LicensingMetadata {
-  const date = new Date();
-  return {
-    curriculumId: `${courseId.toUpperCase()}-${date.toISOString().split('T')[0]}`,
-    version: `v${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`,
-    copyright: `© ${date.getFullYear()} Elevate for Humanity`,
-    licenseType: 'Annual Subscription',
-    updateChannel: 'Standard',
-    maintenanceIncluded: true,
-  };
+  return { courseId: params.courseId, courseName: params.courseName, generatedAt: new Date().toISOString(), isReady: false, structuralChecksPassed, assessmentBasis: 'static-heuristic', runtimeVerified: false, overallScore, threshold: 95, categories, issues, blueprintCoverage, competencyCoverage, mediaComplete, licensingMetadata };
 }

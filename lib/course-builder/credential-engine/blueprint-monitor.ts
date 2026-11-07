@@ -53,6 +53,7 @@ export async function monitorAllBlueprints(): Promise<MonitorResult> {
       const status = await monitorCredential(slug);
       results.push(status);
       if (status.status === 'updated') updated++;
+      if (status.status === 'error') errors++;
     } catch (err) {
       errors++;
       results.push({
@@ -110,7 +111,9 @@ export async function monitorCredential(credentialSlug: string): Promise<Bluepri
     credentialSlug,
     credentialName: credential.name,
     lastChecked: new Date().toISOString(),
-    status: changes.length > 0 ? 'updated' : 'current',
+    // The comparisons above use local registry snapshots only. No external
+    // provider observation has established currency or a verified update.
+    status: 'error',
     lastVersion: getVersion(credentialSlug),
     changes,
   };
@@ -362,13 +365,5 @@ export function recommendUpdates(status: BlueprintStatus): UpdateRecommendation 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function notifyAdmins(recommendation: UpdateRecommendation): Promise<void> {
-  // Send notification to admin dashboard
-  // Email, Slack, etc.
-  
-  console.info('Blueprint update notification:', {
-    credential: recommendation.credentialSlug,
-    changes: recommendation.changes.length,
-    action: recommendation.recommendedAction,
-    priority: recommendation.priority,
-  });
+  throw new Error('BLUEPRINT_NOTIFICATION_UNAVAILABLE: no delivery adapter is connected.');
 }

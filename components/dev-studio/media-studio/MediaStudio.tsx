@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { 
-  Search, 
-  Image, 
-  Video, 
-  Upload, 
+import { useState, useCallback, useEffect } from 'react';
+import {
+  Search,
+  Image,
+  Video,
+  Upload,
   Wand2,
   Heart,
   Download,
@@ -21,12 +21,29 @@ import {
   Copy,
   Layers
 } from 'lucide-react';
-import type { 
-  MediaItem, 
-  MediaSource, 
-  MEDIA_CATEGORIES,
-  PLATFORM_DIMENSIONS
+import type {
+  MediaItem,
+  MediaSource,
 } from './types';
+
+async function loadSavedImages(query: string): Promise<MediaItem[]> {
+  const params = new URLSearchParams({ type: 'image', limit: '100', search: query });
+  const response = await fetch(`/api/admin/media-assets?${params}`, { credentials: 'include', cache: 'no-store' });
+  const payload = await response.json();
+  if (!response.ok || !payload.ok || !Array.isArray(payload.assets)) throw new Error('Unable to load saved images.');
+  return payload.assets.flatMap((asset: { id: string; title?: string; created_at: string; metadata?: { public_url?: string; width?: number; height?: number; kind?: string } }) => {
+    const url = asset.metadata?.public_url;
+    if (!url) return [];
+    const width = asset.metadata?.width || 0;
+    const height = asset.metadata?.height || 0;
+    return [{ id: asset.id, type: 'image' as const, url, thumbnailUrl: url,
+      title: asset.title || 'Saved image', source: asset.metadata?.kind === 'ai-image' ? 'ai_generated' as const : 'brand_library' as const,
+      width, height, aspectRatio: width && height ? `${width}:${height}` : '',
+      tags: [], seoKeywords: [], usedOn: [], usedCount: 0,
+      createdAt: asset.created_at, updatedAt: asset.created_at,
+      license: 'See saved asset rights', requiresAttribution: false }];
+  });
+}
 
 interface MediaStudioProps {
   onSelectMedia?: (item: MediaItem) => void;
@@ -45,6 +62,7 @@ export function MediaStudio({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationPrompt, setGenerationPrompt] = useState('');
+  const [error, setError] = useState('');
 
   const handleSelect = useCallback((item: MediaItem) => {
     if (selectionMode) {
@@ -62,14 +80,24 @@ export function MediaStudio({
   const handleGenerate = async () => {
     if (!generationPrompt.trim()) return;
     setIsGenerating(true);
-    // Simulate generation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsGenerating(false);
-    setGenerationPrompt('');
+    setError('');
+    try {
+      const response = await fetch('/api/admin/media-studio/image', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectName: 'Media Studio', title: generationPrompt.slice(0, 180), prompt: generationPrompt, usage: 'general' }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.ok || !payload.publicUrl) throw new Error('Image generation or saving failed.');
+      setGenerationPrompt('');
+      setActiveTab('library');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Image generation failed.');
+    } finally { setIsGenerating(false); }
   };
 
   return (
     <div className="flex flex-col h-full bg-white rounded-xl overflow-hidden border border-slate-200">
+      {error && <p role="alert" className="p-3 text-red-700">{error}</p>}
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
         <div className="flex items-center gap-2">
@@ -111,7 +139,7 @@ export function MediaStudio({
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'search' && (
-          <SearchTab 
+          <SearchTab
             query={searchQuery}
             onQueryChange={setSearchQuery}
             viewMode={viewMode}
@@ -120,7 +148,7 @@ export function MediaStudio({
             selectionMode={selectionMode}
           />
         )}
-        
+
         {activeTab === 'generate' && (
           <GenerateTab
             prompt={generationPrompt}
@@ -129,7 +157,7 @@ export function MediaStudio({
             onGenerate={handleGenerate}
           />
         )}
-        
+
         {activeTab === 'library' && (
           <LibraryTab
             viewMode={viewMode}
@@ -150,7 +178,7 @@ export function MediaStudio({
             <button className="px-4 py-2 text-slate-700 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors">
               Cancel
             </button>
-            <button 
+            <button
               className="px-4 py-2 bg-brand-red-600 text-white rounded-lg text-sm font-medium hover:bg-brand-red-700 transition-colors"
               disabled={selectedItems.length === 0}
             >
@@ -182,67 +210,32 @@ function SearchTab({
   const [results, setResults] = useState<MediaItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeSource, setActiveSource] = useState<MediaSource | 'all'>('all');
+  const [error, setError] = useState('');
 
   const handleSearch = async () => {
     if (!query.trim()) return;
     setIsLoading(true);
-    // Simulate search
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setResults([
-      {
-        id: '1',
-        type: 'image',
-        url: 'https://picsum.photos/800/600',
-        thumbnailUrl: 'https://picsum.photos/400/300',
-        title: 'Professional in workplace',
-        source: 'pexels',
-        sourceCredit: 'Photo by John Doe',
-        width: 800,
-        height: 600,
-        aspectRatio: '4:3',
-        tags: ['professional', 'workplace', 'business'],
-        seoKeywords: ['business', 'professional'],
-        usedOn: [],
-        usedCount: 3,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        license: 'Pexels License',
-        requiresAttribution: true,
-      },
-      {
-        id: '2',
-        type: 'image',
-        url: 'https://picsum.photos/800/600?random=2',
-        thumbnailUrl: 'https://picsum.photos/400/300?random=2',
-        title: 'Team collaboration',
-        source: 'pexels',
-        sourceCredit: 'Photo by Jane Smith',
-        width: 800,
-        height: 600,
-        aspectRatio: '4:3',
-        tags: ['team', 'collaboration', 'office'],
-        seoKeywords: ['team', 'office'],
-        usedOn: [],
-        usedCount: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        license: 'Pexels License',
-        requiresAttribution: true,
-      },
-    ]);
-    setIsLoading(false);
+    setError('');
+    try {
+      const items = await loadSavedImages(query);
+      setResults(items.filter(item => activeSource === 'all' || item.source === activeSource));
+    } catch (cause) {
+      setResults([]);
+      setError(cause instanceof Error ? cause.message : 'Media search failed.');
+    } finally { setIsLoading(false); }
   };
 
   const sourceFilters = [
     { id: 'all' as const, label: 'All', icon: '🌐' },
-    { id: 'pexels' as const, label: 'Pexels', icon: '📷' },
+
     { id: 'brand_library' as const, label: 'Brand', icon: '🎨' },
     { id: 'ai_generated' as const, label: 'AI', icon: '✨' },
-    { id: 'favorites' as const, label: 'Favorites', icon: '❤️' },
+
   ];
 
   return (
     <div className="p-4 space-y-4">
+      {error && <p role="alert" className="text-red-700">{error}</p>}
       {/* Search Bar */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
@@ -467,11 +460,18 @@ function LibraryTab({
     { id: 'brand', label: 'Brand', icon: '🎨' },
   ];
 
-  // Mock library items
-  const libraryItems: MediaItem[] = [];
+  const [libraryItems, setLibraryItems] = useState<MediaItem[]>([]);
+  const [libraryError, setLibraryError] = useState('');
+  useEffect(() => {
+    let active = true;
+    loadSavedImages('').then(items => { if (active) setLibraryItems(items); })
+      .catch(cause => { if (active) setLibraryError(cause instanceof Error ? cause.message : 'Unable to load saved media.'); });
+    return () => { active = false; };
+  }, []);
 
   return (
     <div className="p-4 space-y-4">
+      {libraryError && <p role="alert" className="text-red-700">{libraryError}</p>}
       {/* Categories */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {categories.map(cat => (
@@ -540,8 +540,8 @@ function MediaCard({
       className={`group relative rounded-lg overflow-hidden cursor-pointer transition-all ${
         viewMode === 'grid' ? 'aspect-square' : 'h-20'
       } ${
-        isSelected 
-          ? 'ring-2 ring-brand-red-600 ring-offset-2' 
+        isSelected
+          ? 'ring-2 ring-brand-red-600 ring-offset-2'
           : 'hover:ring-2 hover:ring-slate-300'
       }`}
     >
@@ -550,21 +550,21 @@ function MediaCard({
         alt={item.title}
         className={`w-full h-full object-cover ${viewMode === 'list' ? 'w-20 h-20 object-cover' : ''}`}
       />
-      
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      
+
       {/* Checkbox */}
       {showCheckbox && (
         <div className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-          isSelected 
-            ? 'bg-brand-red-600 border-brand-red-600' 
+          isSelected
+            ? 'bg-brand-red-600 border-brand-red-600'
             : 'bg-white/80 border-white'
         }`}>
           {isSelected && <Check className="w-4 h-4 text-white" />}
         </div>
       )}
-      
+
       {/* Actions */}
       <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button className="p-1.5 bg-white/90 rounded hover:bg-white transition-colors">
@@ -574,12 +574,12 @@ function MediaCard({
           <Download className="w-4 h-4 text-slate-600" />
         </button>
       </div>
-      
+
       {/* Source Badge */}
       <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-black/50 text-white text-xs rounded">
         {item.source === 'pexels' ? '📷' : item.source === 'ai_generated' ? '✨' : '🎨'}
       </div>
-      
+
       {/* Info for list view */}
       {viewMode === 'list' && (
         <div className="flex-1 p-2">

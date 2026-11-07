@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { requireQuerySuccess } from '../database-receipt';
 import {
   PLATFORM_LIMITS,
   PLATFORM_BEST_PRACTICES,
@@ -37,17 +38,15 @@ const platformLimits: Record<SocialPlatform, { characters: number; hashtags: num
 /**
  * Get brand guidelines from database
  */
-export async function getBrandGuidelines(orgId: string): Promise<BrandGuidelines | null> {
+export async function getBrandGuidelines(orgId: string): Promise<BrandGuidelines> {
   const { data, error } = await supabase
     .from('brand_guidelines')
     .select('*')
     .eq('org_id', orgId)
     .single();
 
-  if (error || !data) {
-    // Return default Elevate guidelines
-    return getDefaultGuidelines();
-  }
+  requireQuerySuccess({error}, 'read_brand_guidelines');
+  if (!data) throw new Error('PARIS_BRAND_GUIDELINES_MISSING');
 
   return data as BrandGuidelines;
 }
@@ -174,8 +173,7 @@ async function generateForPlatform(
   prompt += `\n\nBrand voice: ${guidelines.voice.tone}`;
   prompt += `\nBrand values: ${guidelines.voice.values.join(', ')}`;
 
-  // Generate content (would call AI model here)
-  // For now, generate template-based content
+  // This is a template draft, not an AI execution or publication receipt.
   const text = generateFromTemplate(template, variables, platform, guidelines);
   
   // Ensure character limit
@@ -186,7 +184,9 @@ async function generateForPlatform(
 
   // Build content object
   const content: GeneratedContent = {
-    id: `content_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    status: 'draft',
+    generationMethod: 'template',
+    id: crypto.randomUUID(),
     type: template.type,
     platform: [platform],
     text: truncatedText,
@@ -208,22 +208,8 @@ function generateFromTemplate(
   platform: SocialPlatform,
   guidelines: BrandGuidelines
 ): string {
-  // Use example if available
-  if (template.examples.length > 0) {
-    let text = template.examples[0];
-    
-    // Replace variables
-    for (const [key, value] of Object.entries(variables)) {
-      text = text.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
-    }
-    
-    // Add brand elements
-    text = applyBrandElements(text, guidelines);
-    
-    return text;
-  }
-
-  // Fallback: generate simple text
+  // Examples can contain invented people, amounts or outcomes. Draft only from
+  // supplied facts; never copy example copy into publishable content.
   return generateSimpleContent(template, variables, guidelines);
 }
 
@@ -496,7 +482,11 @@ async function saveGeneratedContent(contents: GeneratedContent[]): Promise<void>
     created_at: new Date().toISOString(),
   }));
 
-  await supabase.from('generated_content').insert(records);
+  const result = await supabase.from('generated_content').insert(records).select('id');
+  requireQuerySuccess(result, 'save_generated_content');
+  if (!result.data || result.data.length !== records.length || records.some(row => !result.data.some(saved => saved.id === row.id))) {
+    throw new Error('PARIS_CONTENT_SAVE_RECEIPT_MISSING');
+  }
 }
 
 /**

@@ -33,7 +33,7 @@ it('accepts a successful void log RPC and surfaces RPC failure', async () => {
 });
 it('surfaces failed database writes', async () => {
   chain.maybeSingle.mockResolvedValueOnce({ data: { id }, error: null }).mockResolvedValueOnce({ data: null, error: { code: 'XX000' } });
-  expect((await PATCH(request({ jobId: id, status: 'completed' }))).status).toBe(500);
+  expect((await PATCH(request({ jobId: id, status: 'failed' }))).status).toBe(500);
 });
 it('rejects invalid input before database access', async () => {
   for (const fields of [{ lines: [4] }, { status: 'invented' }, { finished_at: 'bad-date' }]) expect((await PATCH(request({ jobId: id, ...fields }))).status).toBe(400);
@@ -54,4 +54,10 @@ it('reports event query failures with an error status', async () => {
 it('rejects invalid event timestamps before database access', async () => {
   expect((await events(new NextRequest('http://localhost/api/admin/dev-studio/events?since=invalid'))).status).toBe(400);
   expect(mocks.db.from).not.toHaveBeenCalled();
+});
+
+it('rejects browser completion claims before any database mutation', async () => {
+  expect((await PATCH(request({ jobId: id, status: 'completed', lines: ['success'] }))).status).toBe(409);
+  expect(mocks.db.from).not.toHaveBeenCalled();
+  expect(mocks.db.rpc).not.toHaveBeenCalled();
 });

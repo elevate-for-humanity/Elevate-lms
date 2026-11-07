@@ -1,4 +1,3 @@
-import { logger } from '@/lib/logger';
 /**
  * RAPIDS Integration (Registered Apprenticeship Partners Information Data System)
  *
@@ -47,56 +46,19 @@ export interface RAPIDSSubmission {
   errors?: string[];
 }
 
-import { RAPIDS_CONFIG } from './rapids-config';
 
 /**
  * Prepare apprentice data for RAPIDS submission
  */
 export async function prepareRAPIDSData(enrollmentIds: string[]): Promise<RAPIDSApprentice[]> {
-  // In production, this would:
-  // 1. Query enrollments for apprenticeship programs
-  // 2. Format data according to RAPIDS specifications
-  // 3. Validate all required fields
-  // 4. Encrypt sensitive data (SSN)
-
-  const programNumber = RAPIDS_CONFIG.programNumber;
-  const sponsorName = RAPIDS_CONFIG.sponsorOfRecord;
-
-  logger.info('Fetching RAPIDS enrollments:', {
-    program_number: programNumber,
-    sponsor_name: sponsorName,
-    enrollment_count: enrollmentIds.length,
-  });
-
-  // Placeholder - in production, fetch from database
-  return [];
+  throw new Error('RAPIDS_DATA_PREPARATION_UNAVAILABLE: no verified enrollment export adapter is connected.');
 }
 
 /**
  * Submit apprentice data to RAPIDS
  */
 export async function submitToRAPIDS(apprentices: RAPIDSApprentice[]): Promise<RAPIDSSubmission> {
-  // In production, this would:
-  // 1. Format data as XML or JSON per RAPIDS spec
-  // 2. Submit via RAPIDS API or web portal
-  // 3. Receive confirmation number
-  // 4. Store submission record
-
-  const submission: RAPIDSSubmission = {
-    submission_id: `RAPIDS-${Date.now()}`,
-    submission_date: new Date().toISOString(),
-    apprentices,
-    status: 'pending',
-  };
-
-  logger.info('RAPIDS submission created:', {
-    submission_id: submission.submission_id,
-    apprentice_count: apprentices.length,
-    program_number: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER,
-  });
-
-  // Placeholder response
-  return submission;
+  throw new Error('RAPIDS_SUBMISSION_UNAVAILABLE: no submission was sent and no agency receipt exists.');
 }
 
 /**
@@ -107,18 +69,7 @@ export async function updateRAPIDSProgress(
   hoursCompleted: number,
   relatedInstructionHours: number,
 ): Promise<{ success: boolean; error?: string }> {
-  // In production, this would:
-  // 1. Submit progress update to RAPIDS
-  // 2. Update local database
-  // 3. Trigger notifications if milestones reached
-
-  logger.info('Updating RAPIDS apprentice progress:', {
-    apprentice_id: apprenticeId,
-    hours_completed: hoursCompleted,
-    related_instruction_hours: relatedInstructionHours,
-  });
-
-  return { success: true };
+  return { success: false, error: 'RAPIDS_PROGRESS_UNAVAILABLE: no agency update was submitted.' };
 }
 
 /**
@@ -129,19 +80,7 @@ export async function reportRAPIDSCompletion(
   completionDate: string,
   finalWage: number,
 ): Promise<{ success: boolean; error?: string }> {
-  // In production, this would:
-  // 1. Submit completion report to RAPIDS
-  // 2. Update local database
-  // 3. Generate completion certificate
-  // 4. Notify relevant parties
-
-  logger.info('Reporting RAPIDS completion:', {
-    apprentice_id: apprenticeId,
-    completion_date: completionDate,
-    final_wage: finalWage,
-  });
-
-  return { success: true };
+  return { success: false, error: 'RAPIDS_COMPLETION_UNAVAILABLE: no completion was reported to the agency.' };
 }
 
 /**
@@ -152,41 +91,18 @@ export async function reportRAPIDSCancellation(
   cancellationDate: string,
   reason: string,
 ): Promise<{ success: boolean; error?: string }> {
-  // In production, this would:
-  // 1. Submit cancellation report to RAPIDS
-  // 2. Update local database
-  // 3. Document reason
-  // 4. Notify relevant parties
-
-  logger.info('Reporting RAPIDS cancellation:', {
-    apprentice_id: apprenticeId,
-    cancellation_date: cancellationDate,
-    reason,
-  });
-
-  return { success: true };
+  return { success: false, error: 'RAPIDS_CANCELLATION_UNAVAILABLE: no cancellation was reported to the agency.' };
 }
 
 /**
  * Generate RAPIDS compliance report
  */
-export async function generateRAPIDSReport() {
-  // In production, this would:
-  // 1. Query all apprenticeship enrollments
-  // 2. Calculate completion rates
-  // 3. Track hours completed
-  // 4. Identify overdue submissions
-
-  return {
-    total_apprentices: 0,
-    active_apprentices: 0,
-    completed_apprentices: 0,
-    cancelled_apprentices: 0,
-    average_completion_rate: '0%',
-    pending_submissions: 0,
-    last_submission_date: null,
-    next_submission_due: null,
-  };
+export async function generateRAPIDSReport(): Promise<{
+  total_apprentices: number; active_apprentices: number; completed_apprentices: number;
+  cancelled_apprentices: number; average_completion_rate: string; pending_submissions: number;
+  last_submission_date: string | null; next_submission_due: string | null;
+}> {
+  throw new Error('RAPIDS_REPORT_UNAVAILABLE: verified reporting data is not connected.');
 }
 
 /**

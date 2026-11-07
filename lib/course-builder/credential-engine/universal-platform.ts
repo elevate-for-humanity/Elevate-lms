@@ -694,11 +694,12 @@ export async function monitorCredentialBlueprints(): Promise<BlueprintMonitorRes
   const results: BlueprintMonitorResult[] = [];
   
   for (const credential of getAvailableCredentials()) {
-    // In production, this would check external APIs
+    // No provider fetch occurs here. Registry presence is not verification.
     results.push({
       credentialSlug: credential.slug,
       lastChecked: new Date().toISOString(),
-      status: 'current',
+      status: 'error',
+      recommendedUpdates: ['External provider verification is unavailable; review the official blueprint.'],
     });
   }
   

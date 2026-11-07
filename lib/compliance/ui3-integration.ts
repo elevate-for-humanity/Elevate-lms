@@ -59,22 +59,7 @@ export async function submitUI3Request(
   // See lib/compliance/data-governance.ts for the authorization procedure.
   assertNoAutoSubmit('UI3 wage match → Indiana DWD', opts);
 
-  // When authorized, this would:
-  // 1. Encrypt SSNs using approved key management
-  // 2. Submit to DWD UI-3 API under formal agency agreement
-  // 3. Receive request ID
-  // 4. Poll for results and write to audit_logs
-
-  logger.info('Submitting UI-3 wage match request:', {
-    student_count: students.length,
-    timestamp: new Date().toISOString(),
-  });
-
-  // Placeholder response
-  return {
-    request_id: `UI3-${Date.now()}`,
-    status: 'pending',
-  };
+  throw new Error('UI3_SUBMISSION_UNAVAILABLE: no DWD request was sent and no agency request ID exists.');
 }
 
 /**

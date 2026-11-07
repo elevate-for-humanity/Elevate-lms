@@ -57,6 +57,7 @@ describe('PARIS diagnostic persistence', () => {
     const response = await POST(request());
     expect(response.status).toBe(200);
     expect((await response.json()).results).toEqual([{ id: job.id, status: 'review_required' }]);
+    expect(writes.find(op => op.table === 'devstudio_jobs' && op.values.status === 'completed')?.values.result).toMatchObject({kind: 'diagnostic_handoff', repaired: false, approvalRequired: true});
     expect(writes.find(op => op.table === 'platform_control_actions')?.values).toMatchObject({
       action_type: 'workflow_repair', tenant_id: 'tenant-1', requires_approval: true,
       approval_status: 'pending', parameters: { incident_id: 'incident-1', devstudio_job_id: job.id },

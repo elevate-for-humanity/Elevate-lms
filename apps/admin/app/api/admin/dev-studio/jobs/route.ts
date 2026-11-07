@@ -135,6 +135,11 @@ export async function PATCH(request: NextRequest) {
     if (status !== undefined && !['queued', 'running', 'completed', 'failed', 'cancelled'].includes(status)) {
       return safeError('Invalid job status', 400);
     }
+    // Browser-supplied status/logs are not execution evidence. Only a server
+    // executor may persist completion together with its verified result.
+    if (status === 'completed') {
+      return safeError('Completion must be recorded by the verified server executor', 409);
+    }
     if (finished_at !== undefined && (typeof finished_at !== 'string' || !Number.isFinite(Date.parse(finished_at)))) {
       return safeError('Invalid finish time', 400);
     }

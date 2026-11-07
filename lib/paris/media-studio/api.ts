@@ -1,9 +1,12 @@
+import 'server-only';
+import { aiGenerateImage } from '@/lib/ai/ai-service';
 /**
  * PARIS Media Studio - API Functions
  * Handles media search, generation, and management
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireSavedRow, requireQuerySuccess } from '../database-receipt';
 import type {
   MediaItem,
   MediaCollection,
@@ -13,16 +16,24 @@ import type {
   ImageEditRequest,
   BrandAssets,
   MediaStats,
-} from '../types';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+} from './types';
 
 // Pexels API (free stock photos)
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 const PEXELS_URL = 'https://api.pexels.com/v1';
+
+function mediaFromRow(row: Record<string, any>): MediaItem {
+  return { id: row.id, type: row.type, url: row.url, title: row.title, source: row.source,
+    thumbnailUrl: row.thumbnail_url, description: row.description, altText: row.alt_text,
+    sourceCredit: row.source_credit, sourceUrl: row.source_url, width: row.width, height: row.height,
+    aspectRatio: row.aspect_ratio, fileSize: row.file_size == null ? null : Number(row.file_size), format: row.format,
+    tags: row.tags ?? [], seoKeywords: row.seo_keywords ?? [], usedOn: row.used_on ?? [], usedCount: row.used_count ?? null,
+    createdAt: row.created_at, updatedAt: row.updated_at, license: row.license, requiresAttribution: row.requires_attribution };
+}
+function collectionFromRow(row: Record<string, any>): MediaCollection {
+  return {id:row.id,name:row.name,description:row.description,coverImage:row.cover_image,items:row.items ?? [],
+    type:row.type,category:row.category,createdAt:row.created_at,updatedAt:row.updated_at};
+}
 
 // Search stock photos
 export async function searchStockPhotos(
@@ -37,15 +48,17 @@ export async function searchStockPhotos(
   const page = options?.page || 1;
   const perPage = options?.perPage || 20;
 
+  if (options?.source === 'pixabay') throw new Error('PIXABAY_SEARCH_UNAVAILABLE');
+  if (!PEXELS_API_KEY) throw new Error('PEXELS_API_KEY is not configured.');
+
   // Search Pexels
-  if (PEXELS_API_KEY && options?.source !== 'pixabay') {
-    try {
+  {
       const params = new URLSearchParams({
         query,
         page: String(page),
         per_page: String(perPage),
       });
-      if (options?.orientation) {
+      if (options?.orientation && options.orientation !== 'any') {
         params.set('orientation', options.orientation);
       }
 
@@ -55,6 +68,7 @@ export async function searchStockPhotos(
         },
       });
 
+      if (!response.ok) throw new Error(`Pexels search failed (${response.status}).`);
       if (response.ok) {
         const data = await response.json();
         return {
@@ -86,34 +100,24 @@ export async function searchStockPhotos(
           source: 'pexels',
         };
       }
-    } catch (error) {
-      console.error('Pexels search failed:', error);
-    }
   }
 
-  // Return empty result if both sources fail
-  return {
-    items: [],
-    total: 0,
-    page,
-    perPage,
-    source: 'pexels',
-  };
+  throw new Error('PARIS_STOCK_SEARCH_UNAVAILABLE: Provider access failed or the selected source is not configured.');
 }
 
 // Get curated photos from Pexels
 export async function getCuratedPhotos(page = 1, perPage = 20): Promise<MediaSearchResult> {
   if (!PEXELS_API_KEY) {
-    return { items: [], total: 0, page, perPage, source: 'pexels' };
+    throw new Error('PEXELS_API_KEY is not configured.');
   }
 
-  try {
     const response = await fetch(`${PEXELS_URL}/curated?page=${page}&per_page=${perPage}`, {
       headers: {
         Authorization: PEXELS_API_KEY,
       },
     });
 
+    if (!response.ok) throw new Error(`Pexels curated search failed (${response.status}).`);
     if (response.ok) {
       const data = await response.json();
       return {
@@ -143,11 +147,8 @@ export async function getCuratedPhotos(page = 1, perPage = 20): Promise<MediaSea
         source: 'pexels',
       };
     }
-  } catch (error) {
-    console.error('Pexels curated failed:', error);
-  }
 
-  return { items: [], total: 0, page, perPage, source: 'pexels' };
+  throw new Error('PARIS_STOCK_SEARCH_UNAVAILABLE');
 }
 
 // Search brand library
@@ -155,6 +156,7 @@ export async function searchBrandLibrary(
   query: string,
   orgId: string
 ): Promise<MediaItem[]> {
+  const supabase = await requireAdminClient();
   const { data, error } = await supabase
     .from('media_items')
     .select('*')
@@ -162,55 +164,40 @@ export async function searchBrandLibrary(
     .eq('source', 'brand_library')
     .or(`title.ilike.%${query}%,tags.cs.{${query}}`);
 
-  if (error || !data) return [];
-  return data as MediaItem[];
+  requireQuerySuccess({error}, 'search_brand_library');
+  if (!data) return [];
+  return data.map(mediaFromRow);
 }
 
 // Generate image with AI
 export async function generateImage(
   request: GenerationRequest
 ): Promise<{ success: boolean; imageUrl?: string; error?: string }> {
-  // This would integrate with an AI image generation API
-  // For now, return a placeholder
-  
-  const { type, dimensions, style } = request;
-  
-  // Simulate generation
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  // Return a placeholder image URL
-  const width = dimensions?.width || 1920;
-  const height = dimensions?.height || 1080;
-  
-  return {
-    success: true,
-    imageUrl: `https://picsum.photos/${width}/${height}?random=${Date.now()}`,
-  };
+  if (!request.prompt?.trim()) return { success: false, error: 'An image prompt is required.' };
+  const dimensions = request.dimensions;
+  const size = !dimensions || dimensions.width === dimensions.height ? '1024x1024'
+    : dimensions.width > dimensions.height ? '1792x1024' : '1024x1792';
+  try {
+    const images = await aiGenerateImage({
+      prompt: [request.prompt, request.style, request.text].filter(Boolean).join('\n'),
+      count: 1, size, format: 'url',
+    });
+    const image = images[0];
+    const imageUrl = image?.url || (image?.b64Json ? `data:image/png;base64,${image.b64Json}` : undefined);
+    if (!imageUrl) throw new Error('Image provider returned no image.');
+    return { success: true, imageUrl };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Image generation failed.' };
+  }
 }
 
-// Edit existing image
+// No edit provider is connected to this legacy library. Never relabel an
+// unchanged source or unrelated stock image as a successful edit.
 export async function editImage(
   imageUrl: string,
-  request: ImageEditRequest
+  request: ImageEditRequest,
 ): Promise<{ success: boolean; imageUrl?: string; error?: string }> {
-  // This would integrate with image editing APIs
-  // For background removal, could use remove.bg or similar
-  
-  switch (request.action) {
-    case 'remove_background':
-      // Would call remove.bg API
-      return { success: true, imageUrl: imageUrl + '?nobg=true' };
-    
-    case 'upscale':
-      const scale = request.scale || 2;
-      return { 
-        success: true, 
-        imageUrl: `https://picsum.photos/${1920 * scale}/${1080 * scale}` 
-      };
-    
-    default:
-      return { success: true, imageUrl };
-  }
+  return { success: false, error: `IMAGE_EDIT_UNAVAILABLE: ${request.action} requires a configured editing provider.` };
 }
 
 // Save image to brand library
@@ -218,9 +205,10 @@ export async function saveToBrandLibrary(
   item: Omit<MediaItem, 'id' | 'createdAt' | 'updatedAt'>,
   orgId: string
 ): Promise<MediaItem | null> {
+  const supabase = await requireAdminClient();
   const newItem: MediaItem = {
     ...item,
-    id: `media_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -228,69 +216,54 @@ export async function saveToBrandLibrary(
   const { data, error } = await supabase
     .from('media_items')
     .insert({
-      ...newItem,
+      id: newItem.id, type: newItem.type, url: newItem.url, title: newItem.title, source: newItem.source,
+      thumbnail_url: newItem.thumbnailUrl, description: newItem.description, alt_text: newItem.altText,
+      source_credit: newItem.sourceCredit, source_url: newItem.sourceUrl,
+      width: newItem.width, height: newItem.height, aspect_ratio: newItem.aspectRatio, file_size: newItem.fileSize,
+      format: newItem.format, tags: newItem.tags, seo_keywords: newItem.seoKeywords,
+      used_on: newItem.usedOn, used_count: newItem.usedCount, created_at: newItem.createdAt, updated_at: newItem.updatedAt,
+      license: newItem.license, requires_attribution: newItem.requiresAttribution,
       org_id: orgId,
+      ai_generated: newItem.source === 'ai_generated',
     })
     .select()
     .single();
 
-  if (error || !data) return null;
-  return data as MediaItem;
+  if (error) throw error;
+  if (!data) return null;
+  return mediaFromRow(data);
 }
 
 // Get brand assets
 export async function getBrandAssets(orgId: string): Promise<BrandAssets | null> {
+  const supabase = await requireAdminClient();
   const { data, error } = await supabase
     .from('brand_assets')
     .select('*')
     .eq('org_id', orgId)
     .single();
 
-  if (error || !data) {
-    // Return default Elevate brand assets
-    return getDefaultBrandAssets();
+  requireQuerySuccess({error}, 'read_brand_assets');
+  if (!data) {
+    return null;
   }
 
-  return data as BrandAssets;
-}
-
-// Default Elevate brand assets
-function getDefaultBrandAssets(): BrandAssets {
-  return {
-    logos: {
-      primary: '/images/brand/logo-primary.svg',
-      secondary: '/images/brand/logo-secondary.svg',
-      icon: '/images/brand/logo-icon.svg',
-      dark: '/images/brand/logo-dark.svg',
-      light: '/images/brand/logo-light.svg',
-    },
-    colors: {
-      primary: '#DC2626',
-      secondary: '#1E3A5F',
-      accent: '#F59E0B',
-      text: '#1F2937',
-      background: '#FFFFFF',
-    },
-    fonts: {
-      heading: 'Inter',
-      body: 'Inter',
-    },
-    icons: [],
-    backgrounds: [],
-    textures: [],
-    templates: [],
-    watermarks: [],
-  };
+  return { logos:{primary:data.logo_primary,secondary:data.logo_secondary,icon:data.logo_icon,dark:data.logo_dark,light:data.logo_light},
+    colors:{primary:data.color_primary,secondary:data.color_secondary,accent:data.color_accent,text:data.color_text,background:data.color_background},
+    fonts:{heading:data.font_heading,body:data.font_body},icons:data.icons ?? [],backgrounds:data.backgrounds ?? [],
+    textures:data.textures ?? [],templates:data.templates ?? [],watermarks:data.watermarks ?? [] };
 }
 
 // Get media statistics
 export async function getMediaStats(orgId: string): Promise<MediaStats> {
+  const supabase = await requireAdminClient();
   const { data, error } = await supabase
     .from('media_items')
     .select('*')
     .eq('org_id', orgId);
 
-  if (error || !data) {
+  requireQuerySuccess({error}, 'read_media_statistics');
+  if (!data) {
     return {
       totalItems: 0,
       totalStorage: 0,
@@ -301,10 +274,10 @@ export async function getMediaStats(orgId: string): Promise<MediaStats> {
     };
   }
 
-  const items = data as MediaItem[];
+  const items = data.map(mediaFromRow);
 
   // Sort by usage
-  const mostUsed = [...items].sort((a, b) => b.usedCount - a.usedCount).slice(0, 10);
+  const mostUsed = [...items].sort((a, b) => (b.usedCount ?? -1) - (a.usedCount ?? -1)).slice(0, 10);
   
   // Sort by date
   const recentUploads = [...items].sort(
@@ -326,7 +299,7 @@ export async function getMediaStats(orgId: string): Promise<MediaStats> {
 
   return {
     totalItems: items.length,
-    totalStorage: items.reduce((sum, item) => sum + (item.fileSize || 0), 0),
+    totalStorage: items.some(item => item.fileSize == null) ? null : items.reduce((sum, item) => sum + item.fileSize!, 0),
     mostUsed,
     recentUploads,
     usageByCategory,
@@ -336,23 +309,27 @@ export async function getMediaStats(orgId: string): Promise<MediaStats> {
 
 // Delete media item
 export async function deleteMediaItem(id: string): Promise<boolean> {
+  const supabase = await requireAdminClient();
   // Check if used on any pages
-  const { data } = await supabase
+  const { data, error: readError } = await supabase
     .from('media_items')
     .select('used_on')
     .eq('id', id)
     .single();
+  requireQuerySuccess({error: readError}, 'read_media_before_delete');
+  if (!data) return false;
 
+  if (readError) throw readError;
   if (data && (data.used_on as string[]).length > 0) {
     throw new Error(`This image is used on ${(data.used_on as string[]).length} pages`);
   }
 
-  const { error } = await supabase
+  const { data: deleted, error } = await supabase
     .from('media_items')
     .delete()
-    .eq('id', id);
+    .eq('id', id).select('id').single();
 
-  return !error;
+  return !error && Boolean(deleted?.id);
 }
 
 // Update media usage
@@ -361,16 +338,17 @@ export async function trackMediaUsage(
   pageUrl: string,
   action: 'add' | 'remove'
 ): Promise<void> {
-  const { data } = await supabase
+  const supabase = await requireAdminClient();
+  const { data, error: readError } = await supabase
     .from('media_items')
     .select('used_on, used_count')
     .eq('id', id)
     .single();
+  requireQuerySuccess({error: readError}, 'read_media_usage');
 
-  if (!data) return;
+  if (!data) throw new Error('PARIS_MEDIA_USAGE_ROW_MISSING');
 
   let usedOn = data.used_on as string[] || [];
-  const usedCount = data.used_count || 0;
 
   if (action === 'add' && !usedOn.includes(pageUrl)) {
     usedOn.push(pageUrl);
@@ -378,13 +356,14 @@ export async function trackMediaUsage(
     usedOn = usedOn.filter(url => url !== pageUrl);
   }
 
-  await supabase
+  const saved = await supabase
     .from('media_items')
     .update({
       used_on: usedOn,
-      used_count: action === 'add' ? usedCount + 1 : Math.max(0, usedCount - 1),
+      used_count: usedOn.length,
     })
-    .eq('id', id);
+    .eq('id', id).select('id').single();
+  requireSavedRow(saved, 'track_media_usage');
 }
 
 // Create collection
@@ -393,8 +372,9 @@ export async function createCollection(
   orgId: string,
   type: 'auto' | 'manual' = 'manual'
 ): Promise<MediaCollection | null> {
+  const supabase = await requireAdminClient();
   const collection: MediaCollection = {
-    id: `collection_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: crypto.randomUUID(),
     name,
     items: [],
     type,
@@ -405,26 +385,30 @@ export async function createCollection(
   const { data, error } = await supabase
     .from('media_collections')
     .insert({
-      ...collection,
+      id:collection.id,name:collection.name,items:collection.items,type:collection.type,
+      created_at:collection.createdAt,updated_at:collection.updatedAt,
       org_id: orgId,
     })
     .select()
     .single();
 
-  if (error || !data) return null;
-  return data as MediaCollection;
+  if (error) throw error;
+  if (!data) return null;
+  return collectionFromRow(data);
 }
 
 // Get collections
 export async function getCollections(orgId: string): Promise<MediaCollection[]> {
+  const supabase = await requireAdminClient();
   const { data, error } = await supabase
     .from('media_collections')
     .select('*')
     .eq('org_id', orgId)
     .order('created_at', { ascending: false });
 
-  if (error || !data) return [];
-  return data as MediaCollection[];
+  requireQuerySuccess({error}, 'get_media_collections');
+  if (!data) return [];
+  return data.map(collectionFromRow);
 }
 
 // Optimize image for web
@@ -437,27 +421,13 @@ export async function optimizeImage(
     format?: 'webp' | 'jpeg' | 'png';
   }
 ): Promise<string> {
-  // In production, this would use an image optimization service
-  // like Cloudinary, imgix, or a custom solution
-  
-  const params = new URLSearchParams();
-  if (options?.width) params.set('w', String(options.width));
-  if (options?.height) params.set('h', String(options.height));
-  if (options?.quality) params.set('q', String(options.quality));
-  if (options?.format) params.set('f', options.format);
-
-  const queryString = params.toString();
-  return queryString ? `${url}?${queryString}` : url;
+  if (!options || Object.keys(options).length === 0) return url;
+  throw new Error('IMAGE_OPTIMIZATION_UNAVAILABLE: use the platform image pipeline to transform image bytes.');
 }
 
-// Generate alt text with AI
+// Vision inference is not wired into this legacy API. Do not invent alt text.
 export async function generateAltText(imageUrl: string): Promise<string> {
-  // In production, this would use a vision AI API
-  // For now, return a placeholder
-  
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return 'Generated alt text for this image';
+  throw new Error('IMAGE_DESCRIPTION_UNAVAILABLE: a configured vision provider is required.');
 }
 
 // Search with unified results
@@ -493,11 +463,16 @@ export async function unifiedMediaSearch(
     };
   }
 
-  // AI generated would be a separate search
+  // Search actual saved AI artifacts within the requested organization.
   if (sources.includes('ai_generated')) {
+    if (!options?.orgId) throw new Error('PARIS_MEDIA_ORGANIZATION_REQUIRED');
+    const supabase = await requireAdminClient();
+    const {data,error} = await supabase.from('media_items').select('*').eq('org_id',options.orgId).eq('ai_generated',true).ilike('title',`%${query}%`);
+    requireQuerySuccess({error}, 'search_generated_media');
+    const items = (data ?? []).map(mediaFromRow);
     results.ai_generated = {
-      items: [],
-      total: 0,
+      items,
+      total: items.length,
       page: options?.page || 1,
       perPage: options?.perPage || 20,
       source: 'ai_generated',

@@ -201,6 +201,8 @@ export interface APIAnalysis {
 
 // Import Compatibility Types
 export interface CompatibilityReport {
+  assessmentBasis?: 'static-heuristic';
+  runtimeVerified?: false;
   importable: ImportableFeature[];
   needsModification: ModifiedFeature[];
   conflicts: ConflictFeature[];

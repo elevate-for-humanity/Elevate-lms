@@ -4,6 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { requireSavedRow, requireQuerySuccess } from '../database-receipt';
 import {
   AIAgent,
   AgentRole,
@@ -40,7 +41,7 @@ export async function createAgent(
   }
 
   const agent: AIAgent = {
-    id: `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: crypto.randomUUID(),
     name: customConfig?.systemPrompt ? extractNameFromPrompt(customConfig.systemPrompt) : template.name!,
     role,
     status: 'training',
@@ -93,12 +94,12 @@ export async function createAgent(
     .select()
     .single();
 
-  if (error) {
+  if (error || !data) {
     console.error('Failed to create agent:', error);
     return null;
   }
 
-  return agent;
+  return formatAgentFromDb(data);
 }
 
 /**
@@ -148,9 +149,8 @@ export async function listAgents(
 
   const { data, error } = await query.order('created_at', { ascending: false });
 
-  if (error || !data) {
-    return [];
-  }
+  requireQuerySuccess({error}, 'read_agent_records');
+  if (!data) return [];
 
   return data.map(formatAgentFromDb);
 }
@@ -193,32 +193,34 @@ export async function updateAgentMetrics(
   agentId: string,
   metrics: Partial<AgentMetrics>
 ): Promise<void> {
-  await supabase.rpc('update_agent_metrics', {
+  const result = await supabase.rpc('update_agent_metrics', {
     p_agent_id: agentId,
     p_metrics: metrics,
   });
+  requireQuerySuccess(result, 'update_agent_metrics');
 }
 
 /**
  * Delete agent
  */
 export async function deleteAgent(agentId: string): Promise<boolean> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('ai_agents')
     .delete()
-    .eq('id', agentId);
+    .eq('id', agentId).select('id').single();
 
-  if (error) {
+  if (error || !data) {
     return false;
   }
 
   // Clean up related data
-  await Promise.all([
+  const cleanup = await Promise.all([
     supabase.from('agent_activities').delete().eq('agent_id', agentId),
     supabase.from('agent_memories').delete().eq('agent_id', agentId),
     supabase.from('agent_knowledge').delete().eq('agent_id', agentId),
     supabase.from('approval_workflows').delete().eq('agent_id', agentId),
   ]);
+  for (const result of cleanup) requireQuerySuccess(result, 'delete_agent_related_data');
 
   return true;
 }
@@ -256,30 +258,33 @@ export async function cloneAgent(
   cloned.cloneOf = originalAgentId;
   cloned.name = name || `${original.name} (Clone)`;
 
-  await supabase
+  const cloneUpdate = await supabase
     .from('ai_agents')
     .update({
       is_clone: true,
       clone_of: originalAgentId,
       name: cloned.name,
     })
-    .eq('id', cloned.id);
+    .eq('id', cloned.id).select('id').single();
+  requireSavedRow(cloneUpdate, 'clone_agent_metadata');
 
   // Copy knowledge base
-  const { data: knowledge } = await supabase
+  const { data: knowledge, error: knowledgeError } = await supabase
     .from('agent_knowledge')
     .select('*')
     .eq('agent_id', originalAgentId);
+  requireQuerySuccess({ error: knowledgeError }, 'read_clone_knowledge');
 
   if (knowledge && knowledge.length > 0) {
-    await supabase.from('agent_knowledge').insert(
+    const copied = await supabase.from('agent_knowledge').insert(
       knowledge.map(k => ({
         ...k,
-        id: `knowledge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: crypto.randomUUID(),
         agent_id: cloned.id,
         created_at: new Date().toISOString(),
       }))
     );
+    requireQuerySuccess(copied, 'copy_clone_knowledge');
   }
 
   return cloned;
@@ -292,9 +297,9 @@ export async function logActivity(
   agentId: string,
   activity: Omit<AgentActivity, 'id' | 'agentId' | 'timestamp'>
 ): Promise<string> {
-  const id = `activity_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id = crypto.randomUUID();
 
-  await supabase.from('agent_activities').insert({
+  const result = await supabase.from('agent_activities').insert({
     id,
     agent_id: agentId,
     type: activity.type,
@@ -308,9 +313,9 @@ export async function logActivity(
     approved_by: activity.approvedBy,
     error: activity.error,
     timestamp: new Date().toISOString(),
-  });
+  }).select('id').single();
 
-  return id;
+  return requireSavedRow(result, 'log_agent_activity').id;
 }
 
 /**
@@ -343,9 +348,8 @@ export async function getAgentActivity(
 
   const { data, error } = await query.order('timestamp', { ascending: false });
 
-  if (error || !data) {
-    return [];
-  }
+  requireQuerySuccess({error}, 'read_agent_records');
+  if (!data) return [];
 
   return data.map(row => ({
     id: row.id,
@@ -373,9 +377,9 @@ export async function addAgentKnowledge(
   source: AgentKnowledge['source'] = 'manual',
   metadata?: Record<string, unknown>
 ): Promise<string> {
-  const id = `knowledge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id = crypto.randomUUID();
 
-  await supabase.from('agent_knowledge').insert({
+  const result = await supabase.from('agent_knowledge').insert({
     id,
     agent_id: agentId,
     source,
@@ -385,9 +389,9 @@ export async function addAgentKnowledge(
     updated_at: new Date().toISOString(),
     usage_count: 0,
     relevance: 0.5,
-  });
+  }).select('id').single();
 
-  return id;
+  return requireSavedRow(result, 'add_agent_knowledge').id;
 }
 
 /**
@@ -406,19 +410,19 @@ export async function searchAgentKnowledge(
     .order('relevance', { ascending: false })
     .limit(limit);
 
-  if (error || !data) {
-    return [];
-  }
+  requireQuerySuccess({error}, 'read_agent_records');
+  if (!data) return [];
 
   // Update usage count
   for (const row of data) {
-    await supabase
+    const usage = await supabase
       .from('agent_knowledge')
       .update({ 
         usage_count: row.usage_count + 1,
         last_used_at: new Date().toISOString(),
       })
       .eq('id', row.id);
+    requireQuerySuccess(usage, 'update_knowledge_usage');
   }
 
   return data.map(row => ({
@@ -444,14 +448,14 @@ export async function addAgentMemory(
   content: AgentMemory['content'],
   importance: number = 0.5
 ): Promise<string> {
-  const id = `memory_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id = crypto.randomUUID();
 
   // Calculate expiration for short-term memory
   const expiresAt = type === 'short_term' 
     ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
     : undefined;
 
-  await supabase.from('agent_memories').insert({
+  const result = await supabase.from('agent_memories').insert({
     id,
     agent_id: agentId,
     type,
@@ -460,9 +464,9 @@ export async function addAgentMemory(
     created_at: new Date().toISOString(),
     expires_at: expiresAt,
     access_count: 0,
-  });
+  }).select('id').single();
 
-  return id;
+  return requireSavedRow(result, 'add_agent_memory').id;
 }
 
 /**
@@ -484,9 +488,8 @@ export async function getAgentMemories(
 
   const { data, error } = await query.order('importance', { ascending: false });
 
-  if (error || !data) {
-    return [];
-  }
+  requireQuerySuccess({error}, 'read_agent_records');
+  if (!data) return [];
 
   return data.map(row => ({
     id: row.id,

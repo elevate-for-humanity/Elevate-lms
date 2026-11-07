@@ -183,7 +183,7 @@ export async function executeCommand(
         return await executeCreateCampaign(parsed.entities);
       
       case 'publish_content':
-        return { success: true, result: { message: 'Content queued for publishing' } };
+        return { success: false, error: 'PUBLISH_INPUT_REQUIRED: select saved content and a destination in the authenticated publishing workspace. No content was queued.' };
       
       case 'analyze_repo':
         return await executeAnalyze(parsed.entities.url!);
@@ -215,7 +215,7 @@ async function executeImport(url: string) {
     return {
       success: true,
       result: {
-        message: 'Import complete!',
+        message: 'Repository analysis complete. No source files were imported.',
         analysis: result.analysis,
         compatibility: result.compatibility,
       },
@@ -239,7 +239,7 @@ async function executeApiConnection(url: string) {
     return {
       success: true,
       result: {
-        message: 'API connected!',
+        message: 'API specification analyzed. No live connection was tested.',
         endpoints: (result.analysis as any)?.endpoints?.length || 0,
       },
     };
@@ -262,7 +262,7 @@ async function executeHireAgent(role: AgentRole, userId: string) {
         agentId: agent.id,
         role: agent.role,
       },
-      followUp: `${agent.name} is ready. Would you like to train them with any specific knowledge or set up their permissions?`,
+      followUp: `${agent.name} configuration was saved with status ${agent.status}. Would you like to train them with any specific knowledge or set up their permissions?`,
     };
   }
 
@@ -285,7 +285,7 @@ async function executeGenerateContent(entities: Record<string, string | undefine
   return {
     success: true,
     result: {
-      message: 'Content generated!',
+      message: 'Video script drafted; no video has been rendered or published.',
       video,
     },
     followUp: 'Would you like me to publish this or make any adjustments?',
@@ -308,7 +308,7 @@ async function executeCreateCampaign(entities: Record<string, string | undefined
   return {
     success: true,
     result: {
-      message: 'Campaign created!',
+      message: 'Campaign content drafted; no publishing or scheduling receipt was requested.',
       contentCount: campaign.content.length,
       videos: campaign.videos?.length,
     },

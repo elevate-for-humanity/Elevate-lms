@@ -40,45 +40,15 @@ export function BeforePublishModal({
 
   if (!isOpen) return null;
 
-  // Mock report data if none provided
-  const mockReport: BeforePublishReport = report || {
-    preview: {
-      url: '/preview',
-      screenshot: undefined,
-    },
-    comparison: {
-      current: 'Production (Live)',
-      proposed: 'Development Build #42',
-      changes: [
-        'Added Student Dashboard page',
-        'Updated Hero component',
-        'New Stripe integration',
-        'Fixed navigation bug',
-      ],
-    },
-    codeChanges: [
-      { id: '1', file: 'pages/student-dashboard.tsx', type: 'added', linesAdded: 245, linesRemoved: 0 },
-      { id: '2', file: 'components/Hero.tsx', type: 'modified', linesAdded: 12, linesRemoved: 3 },
-      { id: '3', file: 'lib/stripe.ts', type: 'modified', linesAdded: 89, linesRemoved: 12 },
-      { id: '4', file: 'app/nav.tsx', type: 'modified', linesAdded: 5, linesRemoved: 8 },
-    ],
-    databaseChanges: [
-      { id: '1', type: 'table', name: 'student_credentials', sql: 'CREATE TABLE student_credentials (...)' },
-      { id: '2', type: 'column', name: 'students.avatar_url', sql: 'ALTER TABLE students ADD COLUMN avatar_url TEXT' },
-    ],
-    newIntegrations: ['Stripe', 'Adzuna Jobs API'],
-    metrics: {
-      performanceScore: 87,
-      accessibilityScore: 92,
-      seoScore: 85,
-      securityScore: 94,
-      deploymentTime: '~3 minutes',
-    },
-    risks: [
-      { severity: 'low', description: 'New dependencies added (Stripe SDK)' },
-      { severity: 'low', description: 'Database migration will lock table briefly' },
-    ],
-  };
+  if (!report) return (
+    <div role="dialog" aria-modal="true" aria-label="Publish verification unavailable" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="rounded-xl bg-white p-6 text-slate-900">
+        <h2 className="text-xl font-bold">Publish verification unavailable</h2>
+        <p>A verified change report is required before publishing.</p>
+        <button type="button" onClick={onClose} className="mt-4 rounded border px-4 py-2">Close</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -132,16 +102,16 @@ export function BeforePublishModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'overview' && (
-            <OverviewTab report={mockReport} />
+            <OverviewTab report={report} />
           )}
           {activeTab === 'code' && (
-            <CodeTab changes={mockReport.codeChanges} />
+            <CodeTab changes={report.codeChanges} />
           )}
           {activeTab === 'database' && (
-            <DatabaseTab changes={mockReport.databaseChanges} />
+            <DatabaseTab changes={report.databaseChanges} />
           )}
           {activeTab === 'security' && (
-            <SecurityTab report={mockReport} />
+            <SecurityTab report={report} />
           )}
         </div>
 
@@ -153,7 +123,7 @@ export function BeforePublishModal({
               All checks passed
             </div>
             <span className="text-sm text-slate-500">
-              {mockReport.metrics.deploymentTime} estimated deployment
+              {report.metrics.deploymentTime} estimated deployment
             </span>
           </div>
           <div className="flex items-center gap-3">

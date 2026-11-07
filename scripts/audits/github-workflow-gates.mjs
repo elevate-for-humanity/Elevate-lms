@@ -9,12 +9,23 @@ export function inspectWorkflow(name,source){
  const active=source.replace(/^\s*#.*$/gm,'');
  const jobsPart=active.split(/^jobs:\s*$/m)[1]??'';
  const jobBlocks=jobsPart.split(/(?=^  [A-Za-z0-9_-]+:\s*$)/gm);
- const jobs=jobBlocks.map(block=>({name:block.match(/^  ([A-Za-z0-9_-]+):/m)?.[1],
-  hasConditional:/^\s+if:\s*/m.test(block)})).filter(j=>j.name);
+ const jobs=jobBlocks.map(block=>{
+  const name=block.match(/^  ([A-Za-z0-9_-]+):/m)?.[1];
+  // Only a four-space job-level condition restricts a scheduled job.
+  // Step-level conditions do not prevent the job itself from starting.
+  const match=block.match(/^    if:\s*(.*)$/m);
+  const condition=match?block.slice(block.indexOf(match[0]))
+    .split(/\n    [A-Za-z][A-Za-z_-]*:/)[0]:'';
+  return {name,hasConditional:Boolean(match),condition};
+ }).filter(j=>j.name);
  const scheduled=[...active.matchAll(/^\s*- cron:\s*['"]([^'"]+)['"]/gm)].map(x=>x[1]);
- const scheduledUsed=[...active.matchAll(/github\.event\.schedule\s*==\s*['"]([^'"]+)['"]/g)].map(x=>x[1]);
+ const conditions=jobs.map(j=>j.condition).join('\n');
+ const scheduledUsed=[...conditions.matchAll(/github\.event\.schedule\s*==\s*['"]([^'"]+)['"]/g)].map(x=>x[1]);
+ const coversAllSchedules=jobs.some(job=>!job.hasConditional ||
+  (/(?:github\.event_name\s*==\s*['"]schedule['"]|always\(\))/.test(job.condition) &&
+   !/github\.event\.schedule\s*==/.test(job.condition)));
  const findings=[];
- for(const cron of scheduled)if(!scheduledUsed.includes(cron))
+ for(const cron of scheduled)if(!coversAllSchedules&&!scheduledUsed.includes(cron))
   findings.push({code:'ORPHAN_CRON',detail:cron,severity:'high'});
  for(const [i,line] of active.split('\n').entries()){
   if(/^\s*if:\s*.*&&\s*false(?:\b|[)]|$)/.test(line))

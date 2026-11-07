@@ -287,10 +287,10 @@ describe('Admin Dashboard and Studio surface contract', () => {
     );
   });
 
-  it('commits only finalized browser speech results to the composer', () => {
+  it('renders live browser dictation through the session transcript reconciler', () => {
     const chat = source('components/studio/UnifiedEllieChat.tsx');
-    expect(chat).toContain('recognition.interimResults = false');
-    expect(chat).toContain('event.results[index].isFinal !== false');
+    expect(chat).toContain('recognition.interimResults = true');
+    expect(chat).toContain('setInput(speechSessionText(prefix, event.results))');
   });
 
   it('does not frame the full-screen Studio command workspace twice', () => {

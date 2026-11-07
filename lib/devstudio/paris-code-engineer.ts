@@ -1,6 +1,6 @@
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
-import {checkInspectionBudget,recoverRepeatedSearch} from './paris-inspection-budget.mjs';
+import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
 import {bindRepairWorkflowInspection,bindVerifiedFailedWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
@@ -464,9 +464,9 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // inspecting any of the exact filenames already discovered on this branch.
       // Redirect once to a verified filename; normal read authorization and
       // duplicate-inspection limits remain enforced below.
-      const recovered = recoverRepeatedSearch(inspectionHistory, action, observations);
+      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations);
       if (recovered) {
-        observations.push('SEARCH REDIRECTED to previously discovered source: '+recovered.path);
+        observations.push('INSPECTION REDIRECTED to previously discovered source: '+recovered.path);
         action = recovered as AgentAction;
       }
       const inspection = checkInspectionBudget(inspectionHistory, action);

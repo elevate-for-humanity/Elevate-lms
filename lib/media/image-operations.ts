@@ -1,6 +1,7 @@
 import 'server-only';
 import sharp from 'sharp';
 import { aiEditImage, aiDescribeImage } from '@/lib/ai/ai-service';
+import { getElevateMediaStorageConfig } from '@/lib/storage/elevate-media-storage';
 import type { ImageEditRequest } from '@/lib/paris/media-studio/types';
 
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -15,7 +16,9 @@ export async function readImageBytes(source: string): Promise<Buffer> {
   }
   const url = new URL(source);
   const hosts = new Set(['images.pexels.com', 'cdn.pixabay.com', 'www.elevateforhumanity.org']);
-  for (const configured of [process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SITE_URL, process.env.MEDIA_PUBLIC_BASE_URL, process.env.B2_PUBLIC_BASE_URL]) {
+  // Reuse the uploader's canonical media URL and its established S3/R2 names.
+  // Keep the newer explicit origin settings compatible with existing callers.
+  for (const configured of [getElevateMediaStorageConfig().publicUrl, process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SITE_URL, process.env.MEDIA_PUBLIC_BASE_URL, process.env.B2_PUBLIC_BASE_URL]) {
     if (configured) hosts.add(new URL(configured).hostname);
   }
   if (url.protocol !== 'https:' || url.username || url.password || url.port || !hosts.has(url.hostname)) throw new Error('IMAGE_SOURCE_NOT_ALLOWED');

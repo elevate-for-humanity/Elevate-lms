@@ -19,8 +19,15 @@ describe('marketing build warning boundary', () => {
     expect(config).toContain("'@opentelemetry/instrumentation'");
     expect(config).toContain("'require-in-the-middle'");
     expect(config).toContain("'@sentry/node'");
-    expect(config).toContain('if (!dev) config.cache = false');
     expect(config).not.toContain('config.ignoreWarnings');
+  });
+
+  it('preserves the production cache selected by Next.js', () => {
+    const cache = { type: 'filesystem', name: 'production-server' };
+    const config = { cache, plugins: [], resolve: {} };
+    const result = marketingConfig.webpack(config, { dev: false, isServer: true });
+    expect(result.cache).toBe(cache);
+    expect(result.parallelism).toBe(1);
   });
 
   it('bounds build concurrency for standalone metadata generation', () => {

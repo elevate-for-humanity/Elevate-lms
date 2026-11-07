@@ -4,7 +4,10 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const source=readFileSync(new URL('../.github/workflows/paris-code-repair.yml',import.meta.url),'utf8');
 const verifier=readFileSync(new URL('../.github/workflows/verify-paris-production-authorization.yml',import.meta.url),'utf8');
-const condition=source.match(/  monitor:\n    if: (.+)/)?.[1];
+const monitorJob=source.split(/^  monitor:\s*$/m)[1]?.split(/^  prepare:\s*$/m)[0];
+const prepareJob=source.split(/^  prepare:\s*$/m)[1]?.split(/^  validate:\s*$/m)[0];
+const condition=monitorJob?.match(/^    if: (.+)$/m)?.[1];
+assert.ok(condition,'monitor condition must be present before evaluating event eligibility');
 function monitor(eventName,repairId='',ref='refs/heads/main',workflowRun={}) {
  return vm.runInNewContext(condition,{github:{ref,event_name:eventName,event:{workflow_run:workflowRun}},inputs:{repair_id:repairId}});
 }
@@ -40,9 +43,8 @@ test('the update verification bridge cannot recurse from a manually dispatched m
  assert.ok(bridge.includes("if: github.event_name == 'push' && steps.tick.outputs.runtime_sha != ''"));
  assert.match(bridge,/verify-paris-production-authorization\.yml\/dispatches/);
 });
-test('later monitors retain queued repair dispatches in the serialized workflow',()=>{
- const policy=source.split('concurrency:')[1].split('jobs:')[0];
- assert.match(policy,/group: paris-code-repair/);
- assert.match(policy,/cancel-in-progress: false/);
- assert.match(policy,/queue: max/);
+test('later monitors coalesce separately while explicit repair dispatches remain serialized',()=>{
+ assert.doesNotMatch(source,/^concurrency:/m);
+ assert.match(monitorJob,/group: paris-code-repair-monitor\s+cancel-in-progress: false\s+queue: single/);
+ assert.match(prepareJob,/group: paris-code-repair-prepare\s+cancel-in-progress: false\s+queue: max/);
 });

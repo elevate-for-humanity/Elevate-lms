@@ -65,7 +65,15 @@ export function ProgramHolderDocumentUpload({
         return;
       }
       if (isSyllabus && data.buildStarted !== true) {
-        setMessage(data.courseBuild?.error || 'Syllabus saved, but Course Builder did not start. Use Retry syllabus build below.');
+        // The document write succeeded independently from the optional build.
+        // Refresh the saved-document list so the holder can immediately retry
+        // without uploading the same private file a second time.
+        if (!data.document?.id) {
+          setMessage('Could not confirm the saved syllabus record. Reload before retrying.');
+          return;
+        }
+        setMessage('Syllabus saved. Course Builder did not start. Your document will appear below with a Retry syllabus build button.');
+        window.setTimeout(() => window.location.reload(), 1800);
         return;
       }
       setMessage(

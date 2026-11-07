@@ -1,7 +1,7 @@
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
-import {checkInspectionBudget} from './paris-inspection-budget.mjs';
-import {bindRepairWorkflowInspection} from './paris-workflow-target.mjs';
+import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
+import {bindRepairWorkflowInspection,bindVerifiedFailedWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
@@ -453,8 +453,22 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       const result=paid?paid.value!:await infer();usedProvider=result.provider;
 
       let action: AgentAction;
-      try { action = bindRepairWorkflowInspection(task, parseAction(jsonObject(result.content)), inspectionHistory) as AgentAction; }
+      try { action = parseAction(jsonObject(result.content)); }
       catch { observations.push('ACTION_REJECTED: return one valid JSON action from the allowed schema; no write occurred.'); continue; }
+      // Do not conceal upstream authorization failures as malformed planner JSON.
+      // Verified run/job lookup is operational evidence, not a model action.
+      action = await bindVerifiedFailedWorkflowInspection(task, action, inspectionHistory,
+        async runId => githubJson('/actions/runs/'+runId),
+        async runId => githubJson('/actions/runs/'+runId+'/jobs?per_page=100')) as AgentAction;
+      // Repeated empty searches can exhaust the durable planner budget without
+      // inspecting any of the exact filenames already discovered on this branch.
+      // Redirect once to a verified filename; normal read authorization and
+      // duplicate-inspection limits remain enforced below.
+      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations);
+      if (recovered) {
+        observations.push('INSPECTION REDIRECTED to previously discovered source: '+recovered.path);
+        action = recovered as AgentAction;
+      }
       const inspection = checkInspectionBudget(inspectionHistory, action);
       if (inspection.key) {
         inspectionHistory.push(inspection.key);

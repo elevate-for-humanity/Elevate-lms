@@ -2,16 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
+import { classifyParisPhaseError } from '../lib/devstudio/paris-phase-error.mjs';
 
 const source = stripTypeScriptTypes(await readFile(new URL('../apps/admin/app/api/cron/paris-code-repair/route.ts', import.meta.url), 'utf8'))
   .replace(/^import .*;\n/gm, '').replaceAll('export ', '');
 function route({ authorized = true, token = 'ghs_fixture_app_installation', error } = {}) {
   let appCalls = 0, contextCalls = 0, headers;
-  const factory = new Function('authorizeParisWorkflow', 'authorizeParisDeploymentAppDiagnostic', 'getGitHubAppToken', 'diagnoseParisGitHubCredential', 'withWorkflowGitHubToken', 'NextResponse', source + '\nreturn POST;');
+  const factory = new Function('authorizeParisWorkflow', 'authorizeParisDeploymentAppDiagnostic', 'getGitHubAppToken', 'diagnoseParisGitHubCredential', 'withWorkflowGitHubToken', 'NextResponse', 'classifyParisPhaseError', source + '\nreturn POST;');
   const post = factory(async () => authorized, async () => false, async () => { appCalls++; if (error) throw error; return token; },
     async h => { headers = h; return { diagnosticVersion: 2, repository: { ok: true } }; },
     () => { contextCalls++; throw Error('must not use workflow token'); },
-    { json: (body, options = {}) => ({ body, status: options.status ?? 200, headers: options.headers }) });
+    { json: (body, options = {}) => ({ body, status: options.status ?? 200, headers: options.headers }) }, classifyParisPhaseError);
   return { post: () => post({ headers: new Headers({ authorization: 'Bearer identity', 'x-paris-github-token': 'different-workflow-token' }), json: async () => ({ phase: 'app-auth-diagnostic' }) }),
     calls: () => ({ appCalls, contextCalls, headers }) };
 }

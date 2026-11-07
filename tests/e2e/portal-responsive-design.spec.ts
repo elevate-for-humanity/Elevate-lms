@@ -520,7 +520,9 @@ test.describe('Studio single-session access and composer', () => {
     };
     page.on('response', captureSession);
     try {
-    await access.getByRole('link', { name: 'Enter Envato credentials' }).click();
+    const envato = access.getByRole('link', { name: 'Open Envato', exact: true });
+    await expect(envato).toHaveAttribute('href', '/studio/browser?provider=envato');
+    await envato.click();
     // Envato may require its own provider login, but Studio must reuse the Admin session.
     await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
     await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);

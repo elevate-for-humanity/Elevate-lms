@@ -942,7 +942,9 @@ export function createSessionCapacityGuard(limit, activeCount) {
 const admitSession = createSessionCapacityGuard(maxSessions, () => sessions.size);
 
 async function createSession(target, viewport, authCookies = [], ownerId, disposableQa = false) {
-  const providerScope = providerSessions.scope(ownerId, target);
+  // Studio and acquisition share the verified owner's saved Envato connection,
+  // even when the browser is first opened at the Elevate homepage.
+  const providerScope = providerSessions.scope(ownerId, 'https://app.envato.com/');
   const persistentOwner=typeof ownerId==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(ownerId)?ownerId:null;
   // Reuse the live worker session, including its workspace and downloads.
   const shared =
@@ -1005,7 +1007,7 @@ async function createSession(target, viewport, authCookies = [], ownerId, dispos
         viewport,
         ignoreHTTPSErrors: false,
         acceptDownloads: true,
-        storageState: restored?.storageState || await providerSessions.load(providerScope),
+        storageState: await providerSessions.restoreWorkspace(providerScope, restored?.storageState),
       });
       if (
         safeAuthCookies.length &&

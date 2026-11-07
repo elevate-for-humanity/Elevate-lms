@@ -338,15 +338,15 @@ export function AdminDashboardContent({
         >
           <h2 className="text-xl font-bold text-slate-950">Course Builder and Envato</h2>
           <p className="mt-1 text-base text-slate-700">
-            Open these tools on your phone or desktop. Enter your Envato sign-in in the protected
-            Studio browser.
+            Open Course Builder and your saved Envato subscription connection inside Admin,
+            on your phone or desktop.
           </p>
           <div className="mt-3 flex flex-wrap gap-3">
             <Link
-              href="/studio/browser?provider=envato&signin=1"
+              href="/studio/browser?provider=envato"
               className="inline-flex min-h-12 items-center rounded-lg bg-emerald-700 px-4 py-3 text-base font-bold text-white"
             >
-              Enter Envato credentials
+              Open Envato
             </Link>
             <Link
               href="/studio/courses"

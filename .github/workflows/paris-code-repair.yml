@@ -30,12 +30,16 @@ permissions:
   contents: read
   id-token: write
   actions: write
-concurrency:
-  group: paris-code-repair
-  cancel-in-progress: false
-  queue: max
+# Monitor observations are coalescible; explicit per-repair dispatches are not.
+# Keep the protected source-release transaction serialized by its durable
+# active-repair DB claim, while leaving a fresh monitor runnable during
+# independent repair validation/deployment.
 jobs:
   monitor:
+    concurrency:
+      group: paris-code-repair-monitor
+      cancel-in-progress: false
+      queue: single
     if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && (github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success')))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
@@ -156,6 +160,12 @@ jobs:
           EXPECTED_SHA: ${{ steps.tick.outputs.runtime_sha }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-paris-production-authorization.yml/dispatches" -f ref=main -f "inputs[expected_sha]=$EXPECTED_SHA" -f 'inputs[credential_source]=runtime-token'
   prepare:
+    # A manual repair_id is durable and must not be discarded by a later
+    # workflow_run monitor event; keep all requested prepares serialized.
+    concurrency:
+      group: paris-code-repair-prepare
+      cancel-in-progress: false
+      queue: max
     permissions:
       contents: write
       actions: read

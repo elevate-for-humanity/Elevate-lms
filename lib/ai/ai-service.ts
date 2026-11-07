@@ -282,6 +282,20 @@ export async function aiGenerateImage(options: ImageGenerationOptions): Promise<
   });
 }
 
+/** Image edits use the configured image provider and its paid-dispatch gate. */
+export async function aiEditImage(input: {bytes: Buffer; mime: string; prompt: string; transparent?: boolean}): Promise<GeneratedImage[]> {
+  const selected = process.env.AI_IMAGE_EDIT_PROVIDER || 'openai';
+  if (selected !== 'openai') throw new Error('Selected image-edit provider is not supported.');
+  return new OpenAIProvider().editImage(input);
+}
+
+export async function aiDescribeImage(imageDataUrl: string): Promise<string> {
+  const selected = process.env.AI_VISION_PROVIDER || 'openai';
+  if (selected !== 'openai') throw new Error('Selected vision provider is not supported.');
+  // getClient() enforces the same paid-inference authorization as chat/images.
+  return new OpenAIProvider().describeImage(imageDataUrl);
+}
+
 export async function aiGenerateQuiz(options: QuizGenerationOptions): Promise<QuizQuestion[]> {
   const count = options.count || 5;
   const difficulty = options.difficulty || 'medium';

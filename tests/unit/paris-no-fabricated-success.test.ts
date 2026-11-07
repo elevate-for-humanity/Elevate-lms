@@ -41,8 +41,8 @@ it('uses actual image provider output and never returns a stock fallback', async
 it('never reports unperformed edits, descriptions, or URL-only optimization as success', async () => {
   for (const action of ['remove_background', 'upscale', 'crop'] as const)
     expect(await editImage('https://assets.example.test/source.png', {action, parameters: {}})).toMatchObject({success: false});
-  await expect(generateAltText('https://assets.example.test/source.png')).rejects.toThrow('IMAGE_DESCRIPTION_UNAVAILABLE');
-  await expect(optimizeImage('https://assets.example.test/source.png', {width: 80})).rejects.toThrow('IMAGE_OPTIMIZATION_UNAVAILABLE');
+  await expect(generateAltText('https://assets.example.test/source.png')).rejects.toThrow('IMAGE_SOURCE_NOT_ALLOWED');
+  await expect(optimizeImage('https://assets.example.test/source.png', {width: 80})).rejects.toThrow('IMAGE_SOURCE_NOT_ALLOWED');
 });
 it('generated endpoint scaffolds return HTTP 501 instead of pretending to execute', async () => {
   const source = generateSupabaseEdgeFunction({method: 'POST', path: '/orders', responses: [], security: []}, 'unused');

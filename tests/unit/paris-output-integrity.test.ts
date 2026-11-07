@@ -90,8 +90,8 @@ it.each(['remove_background','upscale','crop'])('cannot claim %s without an edit
   expect(await editImage('https://original.example/image.png',{action} as any)).toMatchObject({success:false});
 });
 it('cannot invent image descriptions, optimization, or measured analytics', async () => {
-  await expect(generateAltText('https://original.example/image.png')).rejects.toThrow('IMAGE_DESCRIPTION_UNAVAILABLE');
-  await expect(optimizeImage('https://original.example/image.png',{width:400})).rejects.toThrow('IMAGE_OPTIMIZATION_UNAVAILABLE');
+  await expect(generateAltText('https://original.example/image.png')).rejects.toThrow('IMAGE_SOURCE_NOT_ALLOWED');
+  await expect(optimizeImage('https://original.example/image.png',{width:400})).rejects.toThrow('IMAGE_SOURCE_NOT_ALLOWED');
   await expect(analyzeContentPerformance('content')).rejects.toThrow('CONTENT_METRICS_UNAVAILABLE');
 });
 it('cannot claim content was queued without a publishing receipt', async () => {

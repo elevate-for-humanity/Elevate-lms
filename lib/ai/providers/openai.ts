@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import OpenAI, { toFile } from 'openai';
 import type {
   AIProvider,
   AIImageProvider,
@@ -127,6 +127,34 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
         }
       }
     }
+  }
+
+  async editImage(input: { bytes: Buffer; mime: string; prompt: string; transparent?: boolean }): Promise<GeneratedImage[]> {
+    const client = this.getClient();
+    const result = await client.images.edit({
+      model: process.env.OPENAI_IMAGE_EDIT_MODEL || 'gpt-image-1.5',
+      image: await toFile(input.bytes, 'source.png', {type: input.mime}),
+      prompt: input.prompt, n: 1, output_format: 'png',
+      ...(input.transparent ? {background: 'transparent' as const} : {}),
+    }, {timeout:120_000,maxRetries:0});
+    const images = (result.data ?? []).filter(image => image.b64_json).map(image => ({b64Json: image.b64_json}));
+    if (!images.length) throw new Error('IMAGE_EDIT_EMPTY_RESPONSE');
+    return images;
+  }
+
+  async describeImage(imageDataUrl: string): Promise<string> {
+    const client = this.getClient();
+    const response = await client.responses.create({
+      model: process.env.OPENAI_VISION_MODEL || 'gpt-4.1-mini',
+      store: false,
+      max_output_tokens: 180,
+      input: [{role: 'user', content: [
+        {type: 'input_text', text: 'Write concise accessible alt text describing only what is visibly present in this image. Do not infer identities or hidden facts. Return only the description.'},
+        {type: 'input_image', image_url: imageDataUrl, detail: 'low'},
+      ]}],
+    }, {timeout:60_000,maxRetries:0});
+    if (!response.output_text?.trim()) throw new Error('IMAGE_DESCRIPTION_EMPTY_RESPONSE');
+    return response.output_text.trim();
   }
 
   async generateImage(options: ImageGenerationOptions): Promise<GeneratedImage[]> {

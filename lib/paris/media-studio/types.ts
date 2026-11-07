@@ -16,7 +16,11 @@ export interface MediaSearchResult {
   items: MediaItem[]; total: number | null; page: number; perPage: number; source: MediaSource; error?: string;
 }
 export interface GenerationRequest { prompt: string; type?: string; text?: string; dimensions?: {width:number;height:number}; style?: string; }
-export interface ImageEditRequest { action: string; scale?: number; }
+export interface ImageEditRequest {
+  action: string; scale?: number; parameters?: Record<string, unknown>;
+  cropArea?: {x:number;y:number;width:number;height:number}; text?: string;
+  backgroundPrompt?: string; targetColor?: string; sourceColor?: string;
+}
 export interface BrandAssets {
   logos: {primary?: string; secondary?: string; icon?: string; dark?: string; light?: string};
   colors: {primary?: string; secondary?: string; accent?: string; text?: string; background?: string};

@@ -94,15 +94,23 @@ jobs:
           const task=job.spec.template.spec.template.spec;
           console.log(JSON.stringify({teachingPhotoProvider:'google',courseServiceIdentityConfigured:Boolean(task.serviceAccountName)}));
           NODE
+  # Dispatch only after the exact tested image is deployed and its five worker
+  # identities are verified. Never dispatch this deployment workflow recursively.
   dispatch:
-    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && false)
+    needs: deploy
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
     steps:
-      - name: Dispatch Google-trusted workflow event
+      - name: Request serialized course and lesson-pool coordination after verified deployment
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-course-worker.yml/dispatches" -f ref=main
+          set -euo pipefail
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main
+          echo 'Canonical course dispatcher requested after successful five-worker deployment; claims and completions require runtime evidence.' >> "$GITHUB_STEP_SUMMARY"
   build:
     concurrency:
       group: google-course-worker-image
@@ -236,16 +244,9 @@ jobs:
         run: |
           node --test scripts/gcp/resume-repaired-course-jobs.test.mjs
           node scripts/gcp/resume-repaired-course-jobs.mjs
-      - name: Request serialized course and lesson-pool coordination
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Image replacement has its own lane; every worker launch must use
-          # the dispatcher's shared capacity/launch lane, including releases.
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main
       - name: Record deployment boundary
         run: |
-          echo 'Exact CPU worker image deployed and dispatcher invoked. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Exact CPU worker image deployed; gated canonical dispatcher follows successful deployment. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"
       - name: Read worker resource and failure evidence without exposing credentials
         run: |
           node --test scripts/gcp/audit-course-production.test.mjs

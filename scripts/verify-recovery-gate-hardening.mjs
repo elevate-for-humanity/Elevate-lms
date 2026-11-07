@@ -98,6 +98,10 @@ requireText('.github/workflows/design-policy-enforcement.yml', 'image-contract-b
 forbidText('.github/workflows/design-policy-enforcement.yml', 'Image contract strict audit\n        run: node scripts/image-contract.mjs --strict', 'Historical image STRICT findings must not block without a base comparison.');
 forbidText('.github/workflows/design-policy-enforcement.yml', 'WARNING: Heavy overlays detected (non-blocking)', 'Design policy must not regress to warning-only legacy checks.');
 
+requireText('.github/workflows/recovery-hardening-gate.yml', 'pull_request:\\n    branches: [main]'.replace('\\n','\n'), 'Recovery hardening must run for PRs to main.');
+forbidText('.github/workflows/recovery-hardening-gate.yml', "startsWith(github.head_ref", 'Recovery hardening must never depend on a particular PR branch name.');
+forbidText('.github/workflows/recovery-hardening-gate.yml', '    paths:', 'Recovery hardening must not silently skip PRs due to path filters.');
+
 requireText('.github/workflows/recovery-hardening-gate.yml', 'Stripe implementation integrity\n        if: ${{ always() }}', 'Stripe hardening must run even after an earlier domain fails.');
 requireText('.github/workflows/recovery-hardening-gate.yml', 'Platform Doctor strict enforcement\n        if: ${{ always() }}', 'Platform Doctor hardening must run even after an earlier domain fails.');
 requireText('.github/workflows/recovery-hardening-gate.yml', 'group: recovery-hardening-${{ github.sha }}', 'Hardening validation must be keyed to exact SHA so later commits cannot cancel it.');

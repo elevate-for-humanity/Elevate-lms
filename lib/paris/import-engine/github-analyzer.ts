@@ -67,12 +67,9 @@ export function parseGitHubUrl(url: string): { owner: string; repo: string } | n
 /**
  * Fetch repository metadata from GitHub API
  */
-async function fetchRepoInfo(owner: string, repo: string): Promise<RepositoryInfo> {
+async function fetchRepoInfo(owner: string, repo: string, headers: Record<string, string>): Promise<RepositoryInfo> {
   const response = await fetch(`${GITHUB_API}/repos/${owner}/${repo}`, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'PARIS-Import-Engine',
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -101,24 +98,18 @@ async function listContents(
   owner: string,
   repo: string,
   path: string = '',
-  branch: string = 'main'
+  branch: string,
+  headers: Record<string, string>,
 ): Promise<GitHubContentsResponse[]> {
   const response = await fetch(
     `${GITHUB_API}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,
     {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'PARIS-Import-Engine',
-      },
+      headers,
     }
   );
 
   if (!response.ok) {
-    // Try 'master' branch if 'main' fails
-    if (branch === 'main') {
-      return listContents(owner, repo, path, 'master');
-    }
-    return [];
+    throw new Error(`PARIS_REPOSITORY_CONTENTS_HTTP_${response.status}`);
   }
 
   return response.json();
@@ -131,14 +122,15 @@ async function fetchFileContent(
   owner: string,
   repo: string,
   path: string,
-  branch: string = 'main'
+  branch: string,
+  headers: Record<string, string>,
 ): Promise<string> {
   const response = await fetch(
     `${GITHUB_API}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,
     {
       headers: {
-        'Accept': 'application/vnd.github.v3.raw',
-        'User-Agent': 'PARIS-Import-Engine',
+        ...headers,
+        Accept: 'application/vnd.github.v3.raw',
       },
     }
   );
@@ -227,7 +219,7 @@ function detectDatabase(
   if (deps['@supabase/supabase-js']) return 'supabase';
   if (deps.firebase) return 'firebase';
   if (deps['@aws-sdk/client-dynamodb']) return 'dynamodb';
-  if (deps.apollo-server || deps['@apollo/server'] || deps.graphql) return 'graphql';
+  if (deps['apollo-server'] || deps['@apollo/server'] || deps.graphql) return 'graphql';
 
   // Check for config files
   if (files.includes('supabase') || files.some(f => f.includes('supabase'))) return 'supabase';
@@ -256,9 +248,11 @@ function detectAuth(pkg: Record<string, unknown>, files: string[]): AuthProvider
 }
 
 interface SecurityFlag {
+  type: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   location: string;
   description: string;
+  recommendation: string;
 }
 
 /**
@@ -270,39 +264,43 @@ function analyzeSecurityRisks(files: string[], pkg: Record<string, unknown>): Se
 
   // Check for sensitive files
   // eslint-disable-next-line no-useless-escape
-  const sensitivePatterns: Array<{ pattern: RegExp; severity: string; desc: string }> = [
+  const sensitivePatterns: Array<{ pattern: RegExp; severity: SecurityFlag['severity']; desc: string }> = [
     { pattern: /\.env$/, severity: 'high' as const, desc: 'Environment file without .gitignore' },
     { pattern: /\.env\.local$/, severity: 'medium' as const, desc: 'Local env file present' },
     { pattern: /\.env\.example$/, severity: 'low' as const, desc: 'Example env file found' },
-    { pattern: 'id_rsa', severity: 'critical' as const, desc: 'SSH private key found' },
+    { pattern: /(?:^|\/)id_rsa$/, severity: 'critical' as const, desc: 'SSH private key filename found; inspect securely' },
     // eslint-disable-next-line no-useless-escape
-    { pattern: 'config\.php', severity: 'high' as const, desc: 'PHP config file may contain credentials' },
+    { pattern: /config\.php$/, severity: 'high' as const, desc: 'PHP config file may contain credentials' },
     // eslint-disable-next-line no-useless-escape
-    { pattern: 'credentials\.json', severity: 'high' as const, desc: 'Google credentials file' },
+    { pattern: /credentials\.json$/, severity: 'high' as const, desc: 'Possible Google credentials filename' },
     // eslint-disable-next-line no-useless-escape
-    { pattern: 'secrets\.json', severity: 'critical' as const, desc: 'Secrets file found' },
+    { pattern: /secrets\.json$/, severity: 'critical' as const, desc: 'Possible secrets filename' },
   ];
 
   for (const file of files) {
     for (const { pattern, severity, desc } of sensitivePatterns) {
-      if (file.includes(pattern.replace(/^\./, ''))) {
+      if (pattern.test(file)) {
         risks.push({
+          type: 'filename_indicator',
           severity,
           location: file,
           description: desc,
+          recommendation: 'Inspect the actual file securely; a filename alone does not establish exposed credentials.',
         });
       }
     }
   }
 
   // Check for outdated or vulnerable packages
-  const knownVulnerable = ['event-stream', 'flatmap-stream', 'lodash'];
+  const knownVulnerable = ['event-stream', 'flatmap-stream'];
   for (const pkgName of knownVulnerable) {
     if (deps[pkgName]) {
       risks.push({
+        type: 'dependency_indicator',
         severity: 'critical',
         location: `package.json:${pkgName}`,
-        description: `Known vulnerable package: ${pkgName}`,
+        description: `Dependency requires version-specific advisory review: ${pkgName}`,
+        recommendation: 'Check the locked version against current official advisories before asserting a vulnerability.',
       });
     }
   }
@@ -562,7 +560,7 @@ function detectDesignSystem(files: string[], pkg: Record<string, unknown>): Repo
 
   return {
     cssFramework,
-    fonts: ['Inter', 'system-ui'], // Default assumption
+    fonts: [], // Fonts require source inspection; dependency names do not prove them.
   };
 }
 
@@ -583,16 +581,15 @@ export async function analyzeGitHubRepository(
     headers['Authorization'] = `Bearer ${options.token}`;
   }
 
-  const branch = options?.branch || 'main';
-
   // Fetch repo info
-  const info = await fetchRepoInfo(owner, repo);
+  const info = await fetchRepoInfo(owner, repo, headers);
+  const branch = options?.branch || info.defaultBranch;
 
   // Get file tree
   const allFiles: string[] = [];
   
   async function traverseDir(path: string) {
-    const contents = await listContents(owner, repo, path, branch);
+    const contents = await listContents(owner, repo, path, branch, headers);
     for (const item of contents) {
       if (item.type === 'file') {
         allFiles.push(item.path);
@@ -606,11 +603,9 @@ export async function analyzeGitHubRepository(
 
   // Fetch package.json
   let pkg: Record<string, unknown> = {};
-  try {
-    const pkgContent = await fetchFileContent(owner, repo, 'package.json', branch);
+  if (allFiles.includes('package.json')) {
+    const pkgContent = await fetchFileContent(owner, repo, 'package.json', branch, headers);
     pkg = JSON.parse(pkgContent);
-  } catch (e) {
-    console.warn('No package.json found');
   }
 
   // Detect framework and database
@@ -649,20 +644,18 @@ export async function analyzeGitHubRepository(
   };
 
   // Check licensing
-  let licensing = { name: 'Unknown', compatible: true, notes: 'Please review LICENSE file' };
-  try {
-    const licenseContent = await fetchFileContent(owner, repo, 'LICENSE', branch);
+  let licensing = { name: 'Unknown', compatible: false, notes: 'License compatibility requires independent review' };
+  if (allFiles.includes('LICENSE')) {
+    const licenseContent = await fetchFileContent(owner, repo, 'LICENSE', branch, headers);
     if (licenseContent.toLowerCase().includes('mit')) {
-      licensing = { name: 'MIT', compatible: true };
+      licensing = { name: 'MIT', compatible: false, notes: 'Detected text; compatibility requires review' };
     } else if (licenseContent.toLowerCase().includes('apache')) {
-      licensing = { name: 'Apache 2.0', compatible: true };
+      licensing = { name: 'Apache 2.0', compatible: false, notes: 'Detected text; compatibility requires review' };
     } else if (licenseContent.toLowerCase().includes('gpl')) {
-      licensing = { name: 'GPL', compatible: true, notes: 'May require derivative works to be open source' };
+      licensing = { name: 'GPL', compatible: false, notes: 'May require derivative works to be open source; review required' };
     } else if (licenseContent.toLowerCase().includes('bsd')) {
-      licensing = { name: 'BSD', compatible: true };
+      licensing = { name: 'BSD', compatible: false, notes: 'Detected text; compatibility requires review' };
     }
-  } catch (e) {
-    // No LICENSE file found
   }
 
   // Generate warnings

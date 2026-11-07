@@ -696,7 +696,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       branch,
       branchSha,
       changedFiles: [...changedFiles],
-      mainSha: release.sha,
+      candidateSha: release.sha,
     });
 
     return NextResponse.json({

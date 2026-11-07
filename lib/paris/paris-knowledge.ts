@@ -35,7 +35,7 @@ export interface ProgramBlueprint {
   };
 }
 
-export const PARS_KNOWLEDGE: Record<string, ProgramBlueprint> = {
+const CORE_PROGRAM_BLUEPRINTS: Record<string, ProgramBlueprint> = {
   data_science: {
     id: "data_science",
     name: "Data Science & Machine Learning",
@@ -162,7 +162,7 @@ export const PARS_KNOWLEDGE: Record<string, ProgramBlueprint> = {
   }
 };
 
-export const PROGRAM_IDS = Object.keys(PARS_KNOWLEDGE);
+// Canonical exports are initialized after both legacy blueprint collections.
 
 export function getProgram(id: string): ProgramBlueprint | undefined {
   return PARS_KNOWLEDGE[id];
@@ -192,7 +192,8 @@ export function calculateWeightedScore(responses: Record<string, number>, progra
 
 export function determineFundingTier(score: number, programId: string): string {
   const program = PARS_KNOWLEDGE[programId];
-  if (!program) return "tier1";
+  if (!program) throw new Error('PARIS_PROGRAM_NOT_FOUND');
+  if (!Number.isFinite(score) || score < 0 || score > 100) throw new Error('PARIS_INTERVIEW_SCORE_INVALID');
   
   const { fundingTiers } = program;
   
@@ -203,22 +204,18 @@ export function determineFundingTier(score: number, programId: string): string {
 
 export function getFundingRecommendation(score: number, programId: string): {
   tier: string;
-  percentage: number;
+  percentage: number | null;
+  status: 'requires_funder_verification';
   reasoning: string[];
 } {
   const tier = determineFundingTier(score, programId);
   const program = PARS_KNOWLEDGE[programId];
   
-  const percentages: Record<string, number> = {
-    tier1: 25,
-    tier2: 50,
-    tier3: 75
-  };
-  
   return {
     tier,
-    percentage: percentages[tier],
-    reasoning: program.fundingTiers[tier as keyof typeof program.fundingTiers].criteria
+    percentage: null,
+    status: 'requires_funder_verification',
+    reasoning: ['Interview rubric only; funding eligibility and amounts require actual funder authorization.', ...program.fundingTiers[tier as keyof typeof program.fundingTiers].criteria]
   };
 }
 
@@ -248,7 +245,7 @@ export interface ProgramBlueprint {
     background: string[];
     goals: string[];
   };
-  interviewquestions: InterviewQuestion[];
+  interviewQuestions: InterviewQuestion[];
   fundingTiers: {
     tier1: { min: number; max: number; criteria: string[]; };
     tier2: { min: number; max: number; criteria: string[]; };
@@ -256,7 +253,7 @@ export interface ProgramBlueprint {
   };
 }
 
-export const PARS_KNOWLEDGE: Record<string, ProgramBlueprint> = {
+const EXTENDED_PROGRAM_BLUEPRINTS: Record<string, ProgramBlueprint> = {
   data_science: {
     id: "data_science",
     name: "Data Science & Machine Learning",
@@ -421,3 +418,8 @@ export const PARS_KNOWLEDGE: Record<string, ProgramBlueprint> = {
     fundingTiers: { tier1: { min: 50, max: 69, criteria: ["Basic business knowledge"] }, tier2: { min: 70, max: 89, criteria: ["Some product experience"] }, tier3: { min: 90, max: 100, criteria: ["Strong PM skills"] } }
   }
 };
+
+// Preserve the original question bank for overlapping programs and retain
+// additional program definitions. These are interview rubrics, not approvals.
+export const PARS_KNOWLEDGE: Record<string, ProgramBlueprint> = { ...EXTENDED_PROGRAM_BLUEPRINTS, ...CORE_PROGRAM_BLUEPRINTS };
+export const PROGRAM_IDS = Object.keys(PARS_KNOWLEDGE);

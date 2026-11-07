@@ -141,7 +141,7 @@ export interface AgentActivity {
   action: string;
   input?: Record<string, unknown>;
   output?: Record<string, unknown>;
-  status: 'pending' | 'completed' | 'failed' | 'approved' | 'rejected';
+  status: 'pending' | 'completed' | 'failed' | 'approved' | 'rejected' | 'expired';
   duration?: number;
   timestamp: string;
   userId?: string;

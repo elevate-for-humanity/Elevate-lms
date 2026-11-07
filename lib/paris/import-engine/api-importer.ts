@@ -179,7 +179,7 @@ function parseSwagger2(spec: Record<string, unknown>): APIAnalysis {
   const definitions = spec.definitions as Record<string, unknown> || {};
   const tags = spec.tags as Array<{ name: string }> || [];
 
-  const baseUrl = `${schemes[0]}://${host}${basePath}`;
+  const baseUrl = host ? `${schemes[0]}://${host}${basePath}` : basePath || '/';
 
   const endpoints: APIEndpoint[] = [];
 
@@ -488,9 +488,10 @@ export async function importAPI(
       };
     }
 
-    analysis.baseUrl = new URL(analysis.baseUrl || '/', specUrl).href;
-
-    // Generate TypeScript client
+    // Resolve the specification's actual relative server against its source URL.
+    if (/\{[^}]+\}/.test(analysis.baseUrl)) throw new Error('API_SERVER_VARIABLES_REQUIRE_VALUES');
+    analysis.baseUrl = new URL(analysis.baseUrl, specUrl).href;
+    // Generate TypeScript client; this does not establish a live API connection.
     const clientCode = generateTypeScriptClient(analysis);
 
     return {

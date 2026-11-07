@@ -285,7 +285,7 @@ async function executeGenerateContent(entities: Record<string, string | undefine
   return {
     success: true,
     result: {
-      message: 'Content generated!',
+      message: 'Video script drafted; no video has been rendered or published.',
       video,
     },
     followUp: 'Would you like me to publish this or make any adjustments?',
@@ -308,7 +308,7 @@ async function executeCreateCampaign(entities: Record<string, string | undefined
   return {
     success: true,
     result: {
-      message: 'Campaign created!',
+      message: 'Campaign content drafted; no publishing or scheduling receipt was requested.',
       contentCount: campaign.content.length,
       videos: campaign.videos?.length,
     },

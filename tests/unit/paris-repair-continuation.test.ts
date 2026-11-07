@@ -40,7 +40,7 @@ beforeEach(() => {
       const body = JSON.parse(String(init.body));
       h.files[path] = Buffer.from(body.content, 'base64').toString('utf8');
       h.writes.push(path); h.sha = h.writes.length === 1 ? 'b'.repeat(40) : 'c'.repeat(40);
-      return Response.json({ content: { sha: 'blob' }, commit: { sha: h.sha } });
+      return Response.json({ content: { sha: 'e'.repeat(40) }, commit: { sha: h.sha } });
     }
     if (h.denyReads) return Response.json({ message: 'Forbidden' }, { status: 403 });
     if (!path) return Response.json([
@@ -50,7 +50,7 @@ beforeEach(() => {
       { path: 'lib/example.ts', type: 'file' }, { path: 'lib/secrets.ts', type: 'file' },
     ]);
     if (!(path in h.files)) return Response.json({ message: 'Not Found' }, { status: 404 });
-    return Response.json({ type: 'file', sha: 'file-blob', content: Buffer.from(h.files[path]).toString('base64') });
+    return Response.json({ type: 'file', sha: 'e'.repeat(40), content: Buffer.from(h.files[path]).toString('base64') });
   }));
 });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });

@@ -6,6 +6,7 @@ import { aiGenerateImage } from '@/lib/ai/ai-service';
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireSavedRow, requireQuerySuccess } from '../database-receipt';
 import type {
   MediaItem,
   MediaCollection,
@@ -15,11 +16,24 @@ import type {
   ImageEditRequest,
   BrandAssets,
   MediaStats,
-} from '@/components/dev-studio/media-studio/types';
+} from './types';
 
 // Pexels API (free stock photos)
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 const PEXELS_URL = 'https://api.pexels.com/v1';
+
+function mediaFromRow(row: Record<string, any>): MediaItem {
+  return { id: row.id, type: row.type, url: row.url, title: row.title, source: row.source,
+    thumbnailUrl: row.thumbnail_url, description: row.description, altText: row.alt_text,
+    sourceCredit: row.source_credit, sourceUrl: row.source_url, width: row.width, height: row.height,
+    aspectRatio: row.aspect_ratio, fileSize: row.file_size == null ? null : Number(row.file_size), format: row.format,
+    tags: row.tags ?? [], seoKeywords: row.seo_keywords ?? [], usedOn: row.used_on ?? [], usedCount: row.used_count ?? null,
+    createdAt: row.created_at, updatedAt: row.updated_at, license: row.license, requiresAttribution: row.requires_attribution };
+}
+function collectionFromRow(row: Record<string, any>): MediaCollection {
+  return {id:row.id,name:row.name,description:row.description,coverImage:row.cover_image,items:row.items ?? [],
+    type:row.type,category:row.category,createdAt:row.created_at,updatedAt:row.updated_at};
+}
 
 // Search stock photos
 export async function searchStockPhotos(
@@ -88,14 +102,7 @@ export async function searchStockPhotos(
       }
   }
 
-  // Return empty result if both sources fail
-  return {
-    items: [],
-    total: 0,
-    page,
-    perPage,
-    source: 'pexels',
-  };
+  throw new Error('PARIS_STOCK_SEARCH_UNAVAILABLE: Provider access failed or the selected source is not configured.');
 }
 
 // Get curated photos from Pexels
@@ -141,7 +148,7 @@ export async function getCuratedPhotos(page = 1, perPage = 20): Promise<MediaSea
       };
     }
 
-  return { items: [], total: 0, page, perPage, source: 'pexels' };
+  throw new Error('PARIS_STOCK_SEARCH_UNAVAILABLE');
 }
 
 // Search brand library
@@ -157,9 +164,9 @@ export async function searchBrandLibrary(
     .eq('source', 'brand_library')
     .or(`title.ilike.%${query}%,tags.cs.{${query}}`);
 
-  if (error) throw error;
+  requireQuerySuccess({error}, 'search_brand_library');
   if (!data) return [];
-  return data as MediaItem[];
+  return data.map(mediaFromRow);
 }
 
 // Generate image with AI
@@ -201,7 +208,7 @@ export async function saveToBrandLibrary(
   const supabase = await requireAdminClient();
   const newItem: MediaItem = {
     ...item,
-    id: `media_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -209,15 +216,22 @@ export async function saveToBrandLibrary(
   const { data, error } = await supabase
     .from('media_items')
     .insert({
-      ...newItem,
+      id: newItem.id, type: newItem.type, url: newItem.url, title: newItem.title, source: newItem.source,
+      thumbnail_url: newItem.thumbnailUrl, description: newItem.description, alt_text: newItem.altText,
+      source_credit: newItem.sourceCredit, source_url: newItem.sourceUrl,
+      width: newItem.width, height: newItem.height, aspect_ratio: newItem.aspectRatio, file_size: newItem.fileSize,
+      format: newItem.format, tags: newItem.tags, seo_keywords: newItem.seoKeywords,
+      used_on: newItem.usedOn, used_count: newItem.usedCount, created_at: newItem.createdAt, updated_at: newItem.updatedAt,
+      license: newItem.license, requires_attribution: newItem.requiresAttribution,
       org_id: orgId,
+      ai_generated: newItem.source === 'ai_generated',
     })
     .select()
     .single();
 
   if (error) throw error;
   if (!data) return null;
-  return data as MediaItem;
+  return mediaFromRow(data);
 }
 
 // Get brand assets
@@ -229,42 +243,15 @@ export async function getBrandAssets(orgId: string): Promise<BrandAssets | null>
     .eq('org_id', orgId)
     .single();
 
-  if (error) throw error;
+  requireQuerySuccess({error}, 'read_brand_assets');
   if (!data) {
-    // Return default Elevate brand assets
-    return getDefaultBrandAssets();
+    return null;
   }
 
-  return data as BrandAssets;
-}
-
-// Default Elevate brand assets
-function getDefaultBrandAssets(): BrandAssets {
-  return {
-    logos: {
-      primary: '/images/brand/logo-primary.svg',
-      secondary: '/images/brand/logo-secondary.svg',
-      icon: '/images/brand/logo-icon.svg',
-      dark: '/images/brand/logo-dark.svg',
-      light: '/images/brand/logo-light.svg',
-    },
-    colors: {
-      primary: '#DC2626',
-      secondary: '#1E3A5F',
-      accent: '#F59E0B',
-      text: '#1F2937',
-      background: '#FFFFFF',
-    },
-    fonts: {
-      heading: 'Inter',
-      body: 'Inter',
-    },
-    icons: [],
-    backgrounds: [],
-    textures: [],
-    templates: [],
-    watermarks: [],
-  };
+  return { logos:{primary:data.logo_primary,secondary:data.logo_secondary,icon:data.logo_icon,dark:data.logo_dark,light:data.logo_light},
+    colors:{primary:data.color_primary,secondary:data.color_secondary,accent:data.color_accent,text:data.color_text,background:data.color_background},
+    fonts:{heading:data.font_heading,body:data.font_body},icons:data.icons ?? [],backgrounds:data.backgrounds ?? [],
+    textures:data.textures ?? [],templates:data.templates ?? [],watermarks:data.watermarks ?? [] };
 }
 
 // Get media statistics
@@ -275,7 +262,7 @@ export async function getMediaStats(orgId: string): Promise<MediaStats> {
     .select('*')
     .eq('org_id', orgId);
 
-  if (error) throw error;
+  requireQuerySuccess({error}, 'read_media_statistics');
   if (!data) {
     return {
       totalItems: 0,
@@ -287,10 +274,10 @@ export async function getMediaStats(orgId: string): Promise<MediaStats> {
     };
   }
 
-  const items = data as MediaItem[];
+  const items = data.map(mediaFromRow);
 
   // Sort by usage
-  const mostUsed = [...items].sort((a, b) => b.usedCount - a.usedCount).slice(0, 10);
+  const mostUsed = [...items].sort((a, b) => (b.usedCount ?? -1) - (a.usedCount ?? -1)).slice(0, 10);
   
   // Sort by date
   const recentUploads = [...items].sort(
@@ -312,7 +299,7 @@ export async function getMediaStats(orgId: string): Promise<MediaStats> {
 
   return {
     totalItems: items.length,
-    totalStorage: items.reduce((sum, item) => sum + (item.fileSize || 0), 0),
+    totalStorage: items.some(item => item.fileSize == null) ? null : items.reduce((sum, item) => sum + item.fileSize!, 0),
     mostUsed,
     recentUploads,
     usageByCategory,
@@ -329,18 +316,20 @@ export async function deleteMediaItem(id: string): Promise<boolean> {
     .select('used_on')
     .eq('id', id)
     .single();
+  requireQuerySuccess({error: readError}, 'read_media_before_delete');
+  if (!data) return false;
 
   if (readError) throw readError;
   if (data && (data.used_on as string[]).length > 0) {
     throw new Error(`This image is used on ${(data.used_on as string[]).length} pages`);
   }
 
-  const { error } = await supabase
+  const { data: deleted, error } = await supabase
     .from('media_items')
     .delete()
-    .eq('id', id);
+    .eq('id', id).select('id').single();
 
-  return !error;
+  return !error && Boolean(deleted?.id);
 }
 
 // Update media usage
@@ -355,12 +344,11 @@ export async function trackMediaUsage(
     .select('used_on, used_count')
     .eq('id', id)
     .single();
+  requireQuerySuccess({error: readError}, 'read_media_usage');
 
-  if (readError) throw readError;
-  if (!data) throw new Error('Media item not found.');
+  if (!data) throw new Error('PARIS_MEDIA_USAGE_ROW_MISSING');
 
   let usedOn = data.used_on as string[] || [];
-  const usedCount = data.used_count || 0;
 
   if (action === 'add' && !usedOn.includes(pageUrl)) {
     usedOn.push(pageUrl);
@@ -368,14 +356,14 @@ export async function trackMediaUsage(
     usedOn = usedOn.filter(url => url !== pageUrl);
   }
 
-  const { error: updateError } = await supabase
+  const saved = await supabase
     .from('media_items')
     .update({
       used_on: usedOn,
-      used_count: action === 'add' ? usedCount + 1 : Math.max(0, usedCount - 1),
+      used_count: usedOn.length,
     })
-    .eq('id', id);
-  if (updateError) throw updateError;
+    .eq('id', id).select('id').single();
+  requireSavedRow(saved, 'track_media_usage');
 }
 
 // Create collection
@@ -386,7 +374,7 @@ export async function createCollection(
 ): Promise<MediaCollection | null> {
   const supabase = await requireAdminClient();
   const collection: MediaCollection = {
-    id: `collection_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: crypto.randomUUID(),
     name,
     items: [],
     type,
@@ -397,7 +385,8 @@ export async function createCollection(
   const { data, error } = await supabase
     .from('media_collections')
     .insert({
-      ...collection,
+      id:collection.id,name:collection.name,items:collection.items,type:collection.type,
+      created_at:collection.createdAt,updated_at:collection.updatedAt,
       org_id: orgId,
     })
     .select()
@@ -405,7 +394,7 @@ export async function createCollection(
 
   if (error) throw error;
   if (!data) return null;
-  return data as MediaCollection;
+  return collectionFromRow(data);
 }
 
 // Get collections
@@ -417,9 +406,9 @@ export async function getCollections(orgId: string): Promise<MediaCollection[]> 
     .eq('org_id', orgId)
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  requireQuerySuccess({error}, 'get_media_collections');
   if (!data) return [];
-  return data as MediaCollection[];
+  return data.map(collectionFromRow);
 }
 
 // Optimize image for web
@@ -474,11 +463,16 @@ export async function unifiedMediaSearch(
     };
   }
 
-  // AI generated would be a separate search
+  // Search actual saved AI artifacts within the requested organization.
   if (sources.includes('ai_generated')) {
+    if (!options?.orgId) throw new Error('PARIS_MEDIA_ORGANIZATION_REQUIRED');
+    const supabase = await requireAdminClient();
+    const {data,error} = await supabase.from('media_items').select('*').eq('org_id',options.orgId).eq('ai_generated',true).ilike('title',`%${query}%`);
+    requireQuerySuccess({error}, 'search_generated_media');
+    const items = (data ?? []).map(mediaFromRow);
     results.ai_generated = {
-      items: [],
-      total: 0,
+      items,
+      total: items.length,
       page: options?.page || 1,
       perPage: options?.perPage || 20,
       source: 'ai_generated',

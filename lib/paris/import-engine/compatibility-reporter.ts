@@ -18,6 +18,7 @@ import type {
  * Framework compatibility scores
  */
 const FRAMEWORK_COMPATIBILITY: Record<Framework, { score: number; effort: 'low' | 'medium' | 'high' | 'very_high'; notes: string[] }> = {
+  angular: { score: 0, effort: 'very_high', notes: ['Different framework; independent migration assessment required.'] },
   nextjs: {
     score: 95,
     effort: 'low',
@@ -684,7 +685,9 @@ export function generateCompatibilityReport(
   const recommendations = generateRecommendations(analysis, importable, modified, conflicts);
 
   return {
-    importable,
+    assessmentBasis: 'static-heuristic',
+    runtimeVerified: false,
+    importable: importable.map(feature => ({ ...feature, status: feature.status === 'ready' ? 'test_needed' : feature.status })),
     needsModification: modified,
     conflicts,
     securityRisks,
@@ -705,7 +708,9 @@ export function formatReportMarkdown(
 
   lines.push(`# Import Compatibility Report`);
   lines.push('');
-  lines.push(`## Repository: ${analysis.info.full_name}`);
+  lines.push('Static heuristic assessment only. Confidence and effort are estimates, not measured runtime results. Imports, security, licensing, and deployment require independent verification.');
+  lines.push('');
+  lines.push(`## Repository: ${analysis.info.owner}/${analysis.info.repo}`);
   lines.push(`**Framework:** ${analysis.framework}`);
   lines.push(`**Database:** ${analysis.database}`);
   lines.push(`**Authentication:** ${analysis.auth}`);

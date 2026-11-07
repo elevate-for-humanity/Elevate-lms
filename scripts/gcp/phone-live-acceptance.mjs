@@ -16,6 +16,9 @@ const report=value=>console.log(JSON.stringify(value));
 export function verifyOwner(system,extension,profile){
  if(system?.id!==SYSTEM||system.status!=='active'||system.admin_extension!=='0'||system.voicemail_enabled!==true||extension?.id!==EXTENSION||extension.profile_id!==PROFILE||extension.extension!=='0'||extension.enabled!==true||extension.webrtc_provider!=='asterisk'||profile?.id!==PROFILE||profile.email?.toLowerCase()!=='curvaturebodysculpting@gmail.com'||profile.full_name!=='Elizabeth Greene')throw Error('PHONE_ACCEPTANCE_OWNER_UNVERIFIED');
 }
+export function verifyHandsetAuthorization(extension,preflight,authorization,attempt){
+ if(authorization!=='317-956-2748'||attempt!=='1'||extension.id!==EXTENSION||extension.profile_id!==PROFILE||extension.extension!=='0'||extension.enabled!==true||extension.admin_external_fallback!==true||extension.external_fallback_number!=='+13179562748'||preflight.adminCellularFallbackConfigured!==true||preflight.adminBrandCallerIdConfigured!==true)throw Error('PHONE_ACCEPTANCE_HANDSET_AUTHORIZATION_REQUIRED');
+}
 export function verifyCredential(value,identity){
  const endpoint='pwa-'+createHash('sha256').update(identity.profileId+':'+identity.deviceId).digest('hex').slice(0,40);
  if(value?.provider!=='asterisk'||value.endpointId!==endpoint||value.sipUsername!==endpoint||value.extensionId!==EXTENSION||value.extension!=='0'||value.sipDomain!=='phone.elevateforhumanity.org'||value.wsUrl!=='wss://phone.elevateforhumanity.org/ws'||!/^[A-Za-z0-9_-]{43}$/.test(value.sipPassword||''))throw Error('PHONE_ACCEPTANCE_DEVICE_UNVERIFIED');
@@ -104,7 +107,7 @@ async function receiver(credential,wavPath){
 }
 async function main(){
  const mode=process.env.PHONE_ACCEPTANCE_MODE;
- if(!['preflight','operator','voicemail','mailbox'].includes(mode)||process.env.AUTHORIZED_SELF_TEST_DID!=='+14632401404')throw Error('PHONE_ACCEPTANCE_AUTHORIZATION_REQUIRED');
+ if(!['preflight','operator','voicemail','mailbox','handset'].includes(mode)||process.env.AUTHORIZED_SELF_TEST_DID!=='+14632401404')throw Error('PHONE_ACCEPTANCE_AUTHORIZATION_REQUIRED');
  const config=loadGoogleConfig('admin'),env=config.runtimeEnvironment;
  if((env.SUPABASE_URL||env.NEXT_PUBLIC_SUPABASE_URL)!==DB||!env.SUPABASE_SERVICE_ROLE_KEY)throw Error('PHONE_ACCEPTANCE_DATABASE_UNVERIFIED');
  async function db(path,{method='GET',body}={}){
@@ -113,7 +116,7 @@ async function main(){
   if(!response.ok)throw Error('PHONE_ACCEPTANCE_DATABASE_HTTP_'+response.status);return response.json();
  }
  const systems=await db('phone_systems?id=eq.'+SYSTEM+'&select=id,status,admin_extension,voicemail_enabled,greeting');
- const extensions=await db('communication_extensions?id=eq.'+EXTENSION+'&select=id,workspace_id,profile_id,extension,enabled,webrtc_provider');
+ const extensions=await db('communication_extensions?id=eq.'+EXTENSION+'&select=id,workspace_id,profile_id,extension,enabled,webrtc_provider,admin_external_fallback,external_fallback_number');
  const profiles=await db('profiles?id=eq.'+PROFILE+'&select=id,email,full_name');
  if(systems.length!==1||extensions.length!==1||profiles.length!==1)throw Error('PHONE_ACCEPTANCE_OWNER_UNVERIFIED');
  verifyOwner(systems[0],extensions[0],profiles[0]);
@@ -122,6 +125,11 @@ async function main(){
  const sourceHash=createHash('sha256').update(readFileSync(new URL('../../infra/pbx/paris/ari-media.mjs',import.meta.url))).digest('hex');
  if(!preflight.idle||!preflight.gatewayARIApplicationRegistered||!preflight.operatorEntryVerified||!preflight.operatorDeviceRouteVerified||!preflight.operatorVoicemailFallbackVerified||!preflight.operatorMailboxConfigured||!preflight.operatorVoicemailPromptsReady||!preflight.operatorVoicemailApplicationRegistered||!preflight.voicemailWorkerActive||preflight.sourceSha256?.gateway!==sourceHash)throw Error('PHONE_ACCEPTANCE_PREFLIGHT_NOT_READY');
  if(mode==='preflight'){report({phoneAcceptance:'PREFLIGHT_PASS',callsPlaced:0,recipientVerified:true});return;}
+ if(mode==='handset'){
+  verifyHandsetAuthorization(extensions[0],preflight,process.env.AUTHORIZED_OWNER_HANDSET_TEST,process.env.GITHUB_RUN_ATTEMPT);
+  const call=await exerciseSelfCall(await verifiedTwilioBindings(config),{expectedGreeting:systems[0].greeting,handsetTest:true,report});
+  report({phoneAcceptance:'HANDSET_TEST_PLACED',...call,callsPlaced:1,forwardingTargetVerified:true,verifiedLive:false});return;
+ }
  if(mode==='mailbox'){await voicemailAcceptance(config,systems[0],db,{directMailbox:true});return;}
  if(preflight.operatorRegisteredContacts!==0||preflight.operatorLeasedEndpointCount!==0)throw Error('PHONE_ACCEPTANCE_OTHER_OPERATOR_DEVICES_PRESENT');
  if(mode==='voicemail'){await voicemailAcceptance(config,systems[0],db);return;}

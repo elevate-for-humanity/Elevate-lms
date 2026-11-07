@@ -22,6 +22,18 @@ function fixture({active=false,secure=true,createError=false,callStatus='complet
  return {requests,request};
 }
 const options=f=>({request:f.request,wait:async()=>{},expectedGreeting:greeting,transcribe:async()=>greeting});
+test('handset exercise uses operator zero once without recording or treating completion as audible delivery',async()=>{
+ const f=fixture();const result=await exerciseSelfCall(bindings,{...options(f),handsetTest:true,transcribe:async()=>{throw Error('must not record or transcribe handset');}});
+ const creates=f.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');assert.equal(creates.length,1);
+ const params=new URLSearchParams(creates[0].options.body);
+ assert.equal(params.get('To'),number);assert.equal(params.get('From'),number);assert.equal(params.get('TimeLimit'),'105');assert.equal(params.get('Record'),'false');
+ assert.match(params.get('Twiml'),/<Play digits="w0"\/>/);assert.match(params.get('Twiml'),/authorized Elevate for Humanity handset test/);
+ assert.equal(f.requests.some(r=>r.url.includes('/Recordings')),false);
+ assert.equal(result.handsetRingingAcceptance,'REQUIRES_OWNER_CONFIRMATION');assert.equal(result.operatorTransferAcceptance,'REQUIRES_OWNER_CONFIRMATION');
+ await assert.rejects(exerciseSelfCall(bindings,{...options(f),handsetTest:true,operatorTest:true}),/SCENARIO_INVALID/);
+ const uncertain=fixture({createError:true});await assert.rejects(exerciseSelfCall(bindings,{...options(uncertain),handsetTest:true}),/network failed/);
+ assert.equal(uncertain.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST').length,1);
+});
 test('a long stereo menu recording is recognized in bounded chunks with original channel and word timing',()=>{
  const samples=Buffer.alloc(75*8000*2*2,1),wav=Buffer.alloc(44+samples.length);
  wav.write('RIFF',0);wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(2,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(32000,28);wav.writeUInt16LE(4,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(samples.length,40);samples.copy(wav,44);

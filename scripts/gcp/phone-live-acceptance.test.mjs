@@ -1,11 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {verifyOwner,verifyCredential,operatorAudioPassed,verifyVoicemailEvidence} from './phone-live-acceptance.mjs';
+import {verifyOwner,verifyCredential,operatorAudioPassed,verifyVoicemailEvidence,verifyHandsetAuthorization} from './phone-live-acceptance.mjs';
 const profileId='964dc85a-bce8-4e67-92eb-198ffafb2384',extensionId='ea5439e0-014b-4020-8e25-e305f20c53d6';
 const system={id:'341f59a3-b1d6-4360-8463-0ce0402f86fe',status:'active',admin_extension:'0',voicemail_enabled:true};
 const extension={id:extensionId,profile_id:profileId,extension:'0',enabled:true,webrtc_provider:'asterisk'};
 const profile={id:profileId,full_name:'Elizabeth Greene',email:'curvaturebodysculpting@gmail.com'};
+test('handset call requires exact stored owner forwarding, live brand route and a first authorized attempt',()=>{
+ const owner={...extension,admin_external_fallback:true,external_fallback_number:'+13179562748'};
+ const live={adminCellularFallbackConfigured:true,adminBrandCallerIdConfigured:true};
+ verifyHandsetAuthorization(owner,live,'317-956-2748','1');
+ for(const bad of [{...owner,external_fallback_number:'+15555555555'},{...owner,admin_external_fallback:false},{...owner,profile_id:extensionId},{...owner,enabled:false}])assert.throws(()=>verifyHandsetAuthorization(bad,live,'317-956-2748','1'),/HANDSET_AUTHORIZATION_REQUIRED/);
+ for(const [config,authority,attempt] of [[live,'','1'],[live,'317-956-2748','2'],[{...live,adminBrandCallerIdConfigured:false},'317-956-2748','1']])assert.throws(()=>verifyHandsetAuthorization(owner,config,authority,attempt),/HANDSET_AUTHORIZATION_REQUIRED/);
+});
 test('ownership must match the approved phone system, extension and Elizabeth before any call',()=>{
  verifyOwner(system,extension,profile);
  for(const bad of [{...profile,email:'someone@example.org'},{...profile,id:extensionId}])assert.throws(()=>verifyOwner(system,extension,bad),/OWNER_UNVERIFIED/);

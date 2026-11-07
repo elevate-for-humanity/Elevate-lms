@@ -5,7 +5,7 @@ on:
       mode:
         description: Inspect current routing or run one explicitly authorized owned-number test
         type: choice
-        options: [preflight, operator, voicemail, mailbox]
+        options: [preflight, operator, voicemail, mailbox, handset]
         default: preflight
   push:
     branches: [main]
@@ -67,7 +67,7 @@ jobs:
         if: inputs.mode != 'preflight'
         run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo env OWNED_PHONE_TRACE_PREFLIGHT=1 python3 -' < scripts/gcp/observe-voicemail-self-call.py
       - name: Verify only the approved owner and exercise the selected phone path
-        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}'}
+        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}', AUTHORIZED_OWNER_HANDSET_TEST: '${{ inputs.mode == ''handset'' && ''317-956-2748'' || '''' }}'}
         run: node scripts/gcp/phone-live-acceptance.mjs
       - name: Read voicemail worker receipts and retries after the acceptance run
         if: always()

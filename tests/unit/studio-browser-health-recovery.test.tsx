@@ -73,3 +73,17 @@ it('never retries rejected Admin authorization', async () => {
   });
   expect(f.calls()).toBe(1);
 });
+it('reports a manual session transport failure instead of remaining stuck starting or replaying admission',async()=>{
+ const fetcher=vi.fn(async(url:string,options:RequestInit={})=>{
+  if(url.endsWith('/config'))return Response.json({defaultPreviewUrl:'https://example.org'});
+  if(options.method==='POST')throw Error('Browser connection interrupted');
+  return Response.json({configured:true,ready:true});
+ });
+ vi.stubGlobal('fetch',fetcher);
+ render(<CloudBrowserWorkspace initialTarget="https://example.org" />);
+ await screen.findByText('Ready to start');
+ fireEvent.click(screen.getByRole('button',{name:'Start Chromium'}));
+ expect(await screen.findByText('Unavailable')).toBeInTheDocument();
+ expect(screen.getByText('Browser connection interrupted')).toBeInTheDocument();
+ expect(fetcher.mock.calls.filter(([,options])=>options?.method==='POST')).toHaveLength(1);
+});

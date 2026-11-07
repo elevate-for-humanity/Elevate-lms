@@ -332,6 +332,12 @@ export default function CloudBrowserWorkspace({
         conversationId: conversationId || undefined,
         taskId: unifiedTask?.taskId || undefined,
       },
+    }).catch((cause) => {
+      if (lifecycle === lifecycleRef.current) {
+        setError(cause instanceof Error ? cause.message : 'Could not start browser');
+        setStatus('Unavailable');
+      }
+      return null;
     });
     if (!result) return;
     const { response, payload } = result;

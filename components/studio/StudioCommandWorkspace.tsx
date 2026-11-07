@@ -431,7 +431,7 @@ export default function StudioCommandWorkspace({
                     currentTool === workspace.id ||
                     (workspace.id === 'courses' && surface === 'course')
                   }
-                  className={`inline-flex min-h-11 shrink-0 items-center min-w-0 break-words rounded-lg px-3 text-left text-base font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-slate-900 text-white' : 'text-slate-800 hover:bg-slate-100'}`}
+                  className={`inline-flex min-h-11 shrink-0 items-center min-w-0 break-words rounded-lg px-3 text-left text-base font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-blue-100 text-slate-950' : 'text-slate-800 hover:bg-slate-100'}`}
                 >
                   {workspace.label}
                 </button>

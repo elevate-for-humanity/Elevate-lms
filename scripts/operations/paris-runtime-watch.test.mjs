@@ -11,7 +11,7 @@ test('reports new failure, completion and completed reversal by job id',()=>{
 });
 test('flags stale leases and eligible overdue queue without waking anything',()=>{
  const s=summarizeJobs([job('a','running',{heartbeat_at:new Date(t-600000).toISOString(),lease_expires_at:new Date(t-1000).toISOString()}),
- job('b','queued',{available_at:new Date(t-3600000).toISOString()}),job('c','queued',{available_at:'infinity'})],t);
+ job('b','queued',{available_at:new Date(t-3600000).toISOString()}),job('c','queued',{available_at:new Date(t+3600000).toISOString()})],t);
  assert.equal(s.staleHeartbeatCount,1);assert.equal(s.overdueEligibleCount,1);
 });
 test('rejects duplicate IDs and missing monitoring coverage',()=>{

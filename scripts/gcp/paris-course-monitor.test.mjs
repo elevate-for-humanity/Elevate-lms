@@ -11,10 +11,14 @@ test('source revision failures require reconciliation even when a PARIS repair r
  assert.match(blocked.reason,/provenance and approval/);
  assert.notEqual(blocked.state,'repairing');
 });
-test('waiting role prerequisites do not dispatch or inherit another lesson’s storage failure',()=>{
- const observation=inspectCourseAutopilot({status:'queued',available_at:'infinity',monitor:{enabled:true},payload:{autopilot:{role:'quality'}}},
-  {status:'running',findings:[{message:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'}]},now.getTime());
- assert.equal(observation.state,'prerequisite_wait');assert.equal(observation.action,'observe');
+test('queue timestamps never assert stage readiness without canonical RPC',()=>{
+ const observation=inspectCourseAutopilot({
+  status:'queued',available_at:'2026-10-14T17:00:00Z',
+  monitor:{enabled:true},attempts:0,max_attempts:5,
+  payload:{autopilot:{role:'quality'}}
+ },{status:'running',findings:[{message:'COURSE_OBJECT_STORAGE_UPLOAD_FAILED'}]},now.getTime());
+ assert.equal(observation.state,'awaiting_assignment');
+ // PARIS only labels this runnable after the separate canonical readiness RPC.
 });
 const job=(extra={})=>({id:'job',status:'queued',attempts:1,max_attempts:5,execution_generation:2,monitor:{enabled:true},...extra});
 test('saved pause never attributes an actor and finished revisions have distinct states',()=>{
@@ -205,51 +209,29 @@ test('an exhausted expired lease retains a real stop reason without resetting or
 });
 
 
-test('PARIS wakes verified quality work and never bypasses a saved owner pause',async()=>{
- const base={build_id:'build-1',attempts:0,max_attempts:5,execution_generation:3,monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
- const quality={...base,id:'quality',job_type:'lesson_autopilot:lesson-a:quality',status:'queued',available_at:'infinity'};
- const instruction={...base,id:'instruction',job_type:'lesson_autopilot:lesson-a:instruction',status:'completed',last_error:null};
- const media={...base,id:'media',job_type:'lesson_autopilot:lesson-a:media',status:'completed',last_error:null};
- for(const {rows,wakes} of [
-  {rows:[quality,instruction,media],wakes:1},
-  {rows:[quality,instruction,{...media,status:'failed'}],wakes:0},
-  {rows:[{...quality,ultimate_course_builds:{status:'running',ownerPaused:true}},instruction,media],wakes:0},
- ]){
-  const writes=[];let selected='';
-  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
-   request:async(url,options={})=>{
-    if(!options.method){selected=new URL(url).searchParams.get('select');return {ok:true,json:async()=>rows};}
-    writes.push({url:String(url),body:JSON.parse(options.body)});
-    return {ok:true,json:async()=>[{id:'quality'}]};
-   }});
-  assert.match(selected,/\bjob_type\b/);
-  const actual=writes.filter(w=>w.url.includes('available_at=eq.infinity'));
-  assert.equal(actual.length,wakes);
-  if(wakes){
-   assert.equal(actual[0].body.available_at,now.toISOString());
-   assert.match(actual[0].url,/execution_generation=eq.3/);
-   assert.equal(actual[0].body.status,undefined);
-   assert.equal(actual[0].body.attempts,undefined);
-  }
- }
-});
-
-test('unknown owner pause cannot wake a held quality job even with completed predecessors',async()=>{
- const base={build_id:'build-unknown',attempts:0,max_attempts:5,execution_generation:3,monitor:{enabled:true}};
- const quality={...base,id:'quality',job_type:'lesson_autopilot:lesson-x:quality',status:'queued',available_at:'infinity',ultimate_course_builds:{status:'running',ownerPaused:null}};
- const instruction={...base,id:'instruction',job_type:'lesson_autopilot:lesson-x:instruction',status:'completed',last_error:null};
- const media={...base,id:'media',job_type:'lesson_autopilot:lesson-x:media',status:'completed',last_error:null};
+test('PARIS never uses timestamp patches to wake an unready quality stage',async()=>{
+ const quality={
+  id:'quality',build_id:'build-1',job_type:'lesson_autopilot:lesson-a:quality',
+  payload:{autopilot:{role:'quality',prerequisiteJobId:'media'}},
+  attempts:0,max_attempts:5,execution_generation:3,
+  monitor:{enabled:true},status:'queued',available_at:'2026-10-14T17:00:00Z',
+  ultimate_course_builds:{status:'running',ownerPaused:false}
+ };
  const writes=[];
  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
   request:async(url,options={})=>{
-   if(!options.method)return {ok:true,json:async()=>[quality,instruction,media]};
-   writes.push({url:String(url),body:JSON.parse(options.body)});
-   return {ok:true,json:async()=>[{id:'saved'}]};
+   if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs'))
+    return {ok:true,json:async()=>[]};
+   if(options.method==='PATCH'){
+    writes.push(JSON.parse(options.body));return {ok:true,json:async()=>[{id:'quality'}]};
+   }
+   return {ok:true,json:async()=>[quality]};
   }});
- assert.equal(writes.filter(w=>w.url.includes('available_at=eq.infinity')).length,0);
- assert.equal(writes.filter(w=>w.body.available_at!==undefined).length,0);
+ assert.equal(writes.length,1);
+ assert.equal(writes[0].status,undefined);
+ assert.equal(writes[0].available_at,undefined);
+ assert.equal(writes[0].monitor.state,'prerequisite_wait');
 });
-
 test('quality dependency lookup prefers newest producer by created_at, not UUID',()=>{
  const rows=[
   {id:'zzz',build_id:'build',job_type:'lesson_autopilot:a:media',status:'completed',created_at:'2026-11-01T00:00:00Z',execution_generation:1},
@@ -274,34 +256,63 @@ test('a newer completed producer is selectable only after the old failed generat
 });
 
 
-test('PARIS wakes media after verified instruction, then quality only after verified media',async()=>{
- const base={build_id:'build-media',attempts:0,max_attempts:5,execution_generation:3,created_at:'2026-10-14T17:00:00Z',
-  monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
- const instruction={...base,id:'instruction',job_type:'lesson_autopilot:lesson-m:instruction',status:'completed',last_error:null};
- const media={...base,id:'media',job_type:'lesson_autopilot:lesson-m:media',status:'queued',available_at:'infinity'};
- const quality={...base,id:'quality',job_type:'lesson_autopilot:lesson-m:quality',status:'queued',available_at:'infinity'};
- const env={GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'};
- const wakeups=async(rows)=>{
-  const writes=[];
-  await monitorCourseQueue({env,now,request:async(url,options={})=>{
-   if(!options.method)return {ok:true,json:async()=>rows};
-   writes.push({url:String(url),body:JSON.parse(options.body)});
-   return {ok:true,json:async()=>[{id:'saved'}]};
-  }});
-  return writes.filter(write=>write.url.includes('available_at=eq.infinity'));
+test('finite-availability media remains prerequisite_wait until canonical readiness passes',async()=>{
+ const base={id:'media-1',build_id:'build',job_type:'lesson_autopilot:a:media',
+  payload:{autopilot:{role:'media',prerequisiteJobId:'instruction-1'}},
+  status:'queued',available_at:'2026-10-14T17:00:00Z',execution_generation:0,
+  attempts:0,max_attempts:5,monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const check=async(allowed)=>{
+  let written,readiness=0;
+  const result=await monitorCourseQueue({
+   env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},
+   now,request:async(url,options={})=>{
+    if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs')){
+     readiness++;assert.deepEqual(JSON.parse(options.body),{p_jobs:['media-1']});
+     return {ok:true,json:async()=>allowed?['media-1']:[]};
+    }
+    if(options.method==='PATCH'){written=JSON.parse(options.body);return {ok:true,json:async()=>[{id:'media-1'}]};}
+    return {ok:true,json:async()=>[base]};
+   }});
+  assert.equal(readiness,1);assert.equal(result.length,1);return written.monitor;
  };
- const initial=await wakeups([instruction,media,quality]);
- assert.equal(initial.length,1);
- assert.match(initial[0].url,/id=eq.media/);
- assert.equal(initial[0].body.available_at,now.toISOString());
- assert.equal(initial[0].body.status,undefined);
- assert.equal(initial[0].body.attempts,undefined);
- const afterMedia=await wakeups([instruction,{...media,status:'completed',last_error:null},quality]);
- assert.equal(afterMedia.length,1);
- assert.match(afterMedia[0].url,/id=eq.quality/);
- for(const upstream of [{...instruction,status:'failed'}, {...instruction,last_error:'prior failure'}]){
-  assert.equal((await wakeups([upstream,media,quality])).length,0);
- }
- assert.equal((await wakeups([instruction,{...media,ultimate_course_builds:{status:'running',ownerPaused:true}},quality]))
-  .some(w=>w.url.includes('id=eq.media')),false);
+ const blocked=await check(false);
+ assert.equal(blocked.state,'prerequisite_wait');
+ assert.equal(blocked.action,'observe');
+ assert.equal(blocked.recoveryRequest,null);
+ const ready=await check(true);
+ assert.equal(ready.state,'awaiting_assignment');
+ assert.equal(ready.action,'dispatch');
+});
+
+test('cleared saved owner pause requeues only a canonically ready failed role',async()=>{
+ const base={id:'saved-media',build_id:'build',job_type:'lesson_autopilot:a:media',
+  payload:{autopilot:{role:'media',prerequisiteJobId:'producer'}},
+  status:'failed',available_at:'2026-10-14T16:00:00Z',execution_generation:3,
+  last_error:'OWNER_PAUSED_REFERENCE_BUILD',attempts:1,max_attempts:5,
+  lease_owner:null,lease_expires_at:null,external_execution_id:null,
+  monitor:{enabled:true},ultimate_course_builds:{status:'running',ownerPaused:false}};
+ const run=async(ready,override={})=>{
+  let written;
+  await monitorCourseQueue({now,env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',
+   SUPABASE_SERVICE_ROLE_KEY:'test'},request:async(url,options={})=>{
+    if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs'))
+      return {ok:true,json:async()=>ready?['saved-media']:[]};
+    if(options.method==='PATCH'){
+      written=JSON.parse(options.body);
+      return {ok:true,json:async()=>[{id:'saved-media'}]};
+    }
+    return {ok:true,json:async()=>[{...base,...override}]};
+   }});
+  return written;
+ };
+ const blocked=await run(false);
+ assert.equal(blocked.status,undefined);
+ assert.equal(blocked.monitor.action,'none');
+ const recovered=await run(true);
+ assert.equal(recovered.status,'queued');
+ assert.equal(recovered.execution_generation,4);
+ assert.equal(recovered.attempts,undefined);
+ assert.equal(recovered.payload,undefined);
+ const ownerPaused=await run(true,{ultimate_course_builds:{status:'running',ownerPaused:true}});
+ assert.equal(ownerPaused.status,undefined);
 });

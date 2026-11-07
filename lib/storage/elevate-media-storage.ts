@@ -9,11 +9,12 @@
 
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { open, readFile, stat } from 'node:fs/promises';
 import { logger } from '../logger';
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
@@ -225,6 +226,48 @@ export function getElevateMediaPublicUrl(key: string): string | null {
   return `${base}/${key.replace(/^\/+/, '')}`;
 }
 
+/** Retry only transient provider writes. Never retry an auth, bucket or
+ * configuration failure; completed render bytes are reused, not re-rendered. */
+export function isTransientElevateMediaUploadFailure(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const e = error as { $metadata?: { httpStatusCode?: number }; name?: string; code?: string; message?: string };
+  if ([429, 500, 502, 503, 504].includes(e.$metadata?.httpStatusCode ?? 0)) return true;
+  return /^(InternalError|ServiceUnavailable|SlowDown|RequestTimeout|Throttling|TooManyRequestsException)$/i.test(e.name ?? e.code ?? '') ||
+    /\binternal incident\b/i.test(e.message ?? '');
+}
+
+async function transientUploadRetry<T>(write: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try { return await write(); }
+    catch (error) {
+      if (attempt >= 2 || !isTransientElevateMediaUploadFailure(error)) throw error;
+      await new Promise(resolve => setTimeout(resolve, 350 * 2 ** attempt));
+    }
+  }
+}
+
+/** Verify a durable object before marking media delivery successful.
+ * HEAD verifies exact length/MIME; authenticated ranged GET verifies bytes.
+ * Never infer successful readback from an accepted PUT or signed URL. */
+async function verifyElevateMediaReadback(
+  key: string, contentType: string, length: number, prefix: Uint8Array,
+): Promise<void> {
+  const config = getElevateMediaStorageConfig();
+  const client = getElevateMediaStorageClient();
+  const head = await client.send(new HeadObjectCommand({Bucket: config.bucket, Key: key}));
+  if (head.ContentLength !== length) throw new Error('COURSE_OBJECT_STORAGE_READBACK_LENGTH_MISMATCH');
+  if ((head.ContentType ?? '').split(';')[0].trim().toLowerCase() !== contentType.toLowerCase())
+    throw new Error('COURSE_OBJECT_STORAGE_MIME_MISMATCH');
+  if (prefix.length) {
+    const retrieved = await client.send(new GetObjectCommand({
+      Bucket: config.bucket, Key: key, Range: `bytes=0-${prefix.length - 1}`,
+    }));
+    if (!retrieved.Body) throw new Error('COURSE_OBJECT_STORAGE_READBACK_EMPTY');
+    const bytes = Buffer.from(await retrieved.Body.transformToByteArray());
+    if (!bytes.equals(Buffer.from(prefix))) throw new Error('COURSE_OBJECT_STORAGE_READBACK_MISMATCH');
+  }
+}
+
 export async function uploadToElevateMedia(
   body: Buffer | Uint8Array,
   key: string,
@@ -234,7 +277,7 @@ export async function uploadToElevateMedia(
     const config = getElevateMediaStorageConfig();
     const client = getElevateMediaStorageClient();
     try {
-      await client.send(
+      await transientUploadRetry(() => client.send(
         new PutObjectCommand({
           Bucket: config.bucket,
           Key: key,
@@ -242,7 +285,7 @@ export async function uploadToElevateMedia(
           ContentType: contentType,
           CacheControl: config.provider === 'backblaze-b2' ? 'private, max-age=0' : 'public, max-age=31536000, immutable',
         }),
-      );
+      ));
     } catch (error) {
       const status = typeof error === 'object' && error !== null && '$metadata' in error
         ? (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode
@@ -251,23 +294,9 @@ export async function uploadToElevateMedia(
       // write authorization/capacity failures from a caption readback mismatch.
       throw new Error(`COURSE_OBJECT_STORAGE_PUT_FAILED_HTTP_${status ?? 'UNKNOWN'}`, {cause: error});
     }
-    // Caption/transcript uploads must be verified with a real authenticated
-    // read, not inferred from a signed URL or a successful PUT alone.
-    if (body.length <= 1024 * 1024 && /^(text\/|application\/x-subrip)/.test(contentType)) {
-      const stored = await client.send(new GetObjectCommand({ Bucket: config.bucket, Key: key }))
-        .catch((error: unknown) => {
-          const status = typeof error === 'object' && error !== null && '$metadata' in error
-            ? (error as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode
-            : undefined;
-          throw new Error(`COURSE_OBJECT_STORAGE_READBACK_HTTP_${status ?? 'UNKNOWN'}`, {cause: error});
-        });
-      if (!stored.Body) throw new Error('COURSE_OBJECT_STORAGE_READBACK_EMPTY');
-      const bytes = Buffer.from(await stored.Body.transformToByteArray());
-      const expected = Buffer.from(body);
-      if (!bytes.equals(expected)) throw new Error('COURSE_OBJECT_STORAGE_READBACK_MISMATCH');
-      if (stored.ContentType?.split(';')[0].trim().toLowerCase() !== contentType.toLowerCase())
-        throw new Error('COURSE_OBJECT_STORAGE_MIME_MISMATCH');
-    }
+    const verifyBytes = body.length <= 1024*1024 && /^(text\/|application\/x-subrip)/.test(contentType)
+      ? body : body.subarray(0, Math.min(body.length, 1024));
+    await transientUploadRetry(() => verifyElevateMediaReadback(key, contentType, body.length, verifyBytes));
 
     return {
       success: true,
@@ -404,16 +433,34 @@ export function getContentType(filename: string): string {
 
 /** Stream a completed film without allocating its full size in the JS heap. */
 export async function uploadFileToElevateMedia(filePath: string, key: string, contentType: string): Promise<ElevateMediaUploadResult> {
-  const body = createReadStream(filePath);
   try {
     const config = getElevateMediaStorageConfig();
     const info = await stat(filePath);
-    await getElevateMediaStorageClient().send(new PutObjectCommand({
-      Bucket: config.bucket, Key: key, Body: body, ContentLength: info.size,
-      ContentType: contentType, CacheControl: 'public, max-age=31536000, immutable',
-    }));
+    await transientUploadRetry(async () => {
+      // Reopen the source stream for each transient retry. A consumed stream
+      // cannot be safely sent twice, and the completed render stays on disk.
+      const body = createReadStream(filePath);
+      try {
+        await getElevateMediaStorageClient().send(new PutObjectCommand({
+          Bucket: config.bucket, Key: key, Body: body, ContentLength: info.size,
+          ContentType: contentType,
+          CacheControl: config.provider === 'backblaze-b2' ? 'private, max-age=0' : 'public, max-age=31536000, immutable',
+        }));
+      } finally { body.destroy(); }
+    });
+    let verifyBytes: Buffer;
+    if(info.size <= 1024*1024 && /^(text\/|application\/x-subrip)/.test(contentType)) {
+      verifyBytes = await readFile(filePath);
+    } else {
+      const fh = await open(filePath, 'r');
+      verifyBytes = Buffer.alloc(Math.min(info.size, 1024));
+      try {
+        if (verifyBytes.length) await fh.read(verifyBytes, 0, verifyBytes.length, 0);
+      } finally { await fh.close(); }
+    }
+    await transientUploadRetry(() => verifyElevateMediaReadback(key, contentType, info.size, verifyBytes));
     return {success: true, key, url: getElevateMediaPublicUrl(key) ?? undefined};
   } catch (error) {
     return {success: false, error: error instanceof Error ? error.message : 'Upload failed'};
-  } finally { body.destroy(); }
+  }
 }

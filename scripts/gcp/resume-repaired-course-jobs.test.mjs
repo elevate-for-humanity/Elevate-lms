@@ -3,7 +3,7 @@ import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
 const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',attempts:1,max_attempts:5,execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
  monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false,canonicalLessonIds:{lesson:'11111111-1111-4111-8111-111111111111'}}}};
-async function run(job,conflict=false,mediaAvailable=true){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+async function run(job,conflict=false,mediaAvailable=true,runEnv=env){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env:runEnv,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
  if(String(url).includes('/course_lesson_media_matches'))return {ok:true,json:async()=>[{
   entitlement_id:'22222222-2222-4222-8222-222222222222',match_score:1,status:'attached'
@@ -163,4 +163,22 @@ test('only a verified new worker may retry expired private caption or transcript
   'ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"media","code":"captions returned HTTP 401"}]',
  ])
   assert.equal((await run({...quality,last_error:error})).writes.length,0);
+});
+
+test('retries isolated B2 internal incident only after exact release preflight and without PARIS-owned repair',async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-n:FINDINGS=[{"step":"lesson_film_render","severity":"error","code":"ULTIMATE_VIDEO_RENDER_FAILED","message":"ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:internal incident"}]';
+ const media={...base,
+  payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-n',role:'media'}},
+  build:{...base.build,status:'running',profile:{ownerPaused:false}},
+  last_error:error};
+ const verified={...env,COURSE_B2_VERIFIED_FOR_THIS_RELEASE:'true'};
+ assert.equal((await run(media)).writes.length,0);
+ assert.equal((await run(media,false,true,verified)).writes.length,1);
+ assert.equal((await run({...media,monitor:{...media.monitor,repairId:'owned'}},false,true,verified)).writes.length,0);
+ assert.equal((await run({...media,payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-n',role:'quality'}}},false,true,verified)).writes.length,0);
+ for(const unsafe of [
+  error.replace('internal incident','HTTP 403'),
+  error+';OWNER_PAUSED',
+  error.replace('COURSE_OBJECT_STORAGE_UPLOAD_FAILED','COURSE_OBJECT_STORAGE_READBACK_MISMATCH')
+ ]) assert.equal((await run({...media,last_error:unsafe},false,true,verified)).writes.length,0);
 });

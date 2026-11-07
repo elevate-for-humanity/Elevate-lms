@@ -225,7 +225,7 @@ for(const graphExists of [true,false])test('a fast parked pool coordinator requi
    assert.equal(url.searchParams.get('coordinator_job_id'),'eq.queued');
    return {ok:true,json:async()=>graphExists?[{id:'real-pool',state:'active'}]:[]};
   }
-  if(url.searchParams.has('id'))return {ok:true,json:async()=>[{id:'queued',status:'queued',available_at:'infinity',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:5}]};
+  if(url.searchParams.has('id'))return {ok:true,json:async()=>[{id:'queued',status:'queued',available_at:'2026-10-06T10:00:01Z',heartbeat_at:'2026-10-06T10:00:01Z',execution_generation:5}]};
   return base(url);
  };
  if(graphExists)assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');

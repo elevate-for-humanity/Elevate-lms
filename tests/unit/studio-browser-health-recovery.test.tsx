@@ -81,8 +81,10 @@ it('reports a manual session transport failure instead of remaining stuck starti
  });
  vi.stubGlobal('fetch',fetcher);
  render(<CloudBrowserWorkspace initialTarget="https://example.org" />);
- await waitFor(()=>expect(screen.getByRole('button',{name:'Start Chromium'})).toBeEnabled());
- fireEvent.click(screen.getByRole('button',{name:'Start Chromium'}));
+ await screen.findByText('Ready to start');
+ const start=screen.getByRole('button',{name:'Start Chromium'});
+ await waitFor(()=>expect(start).toBeEnabled());
+ await act(async()=>{fireEvent.click(start);});
  expect(await screen.findByText('Unavailable')).toBeInTheDocument();
  expect(screen.getByText('Browser connection interrupted')).toBeInTheDocument();
  expect(fetcher.mock.calls.filter(([,options])=>options?.method==='POST')).toHaveLength(1);

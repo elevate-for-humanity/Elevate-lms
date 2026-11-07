@@ -57,7 +57,7 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
   return available;
  }
  const seenBuilds=new Set(active.map(row=>row.build_id));
- const seenLessons=new Set(active.filter(row=>row.payload?.autopilot && row.available_at!=='infinity')
+ const seenLessons=new Set(active.filter(row=>row.payload?.autopilot)
   .map(row=>row.build_id+':'+row.payload.autopilot.competencyId));
  // Historical attempts remain evidence. Recover the furthest saved cursor
  // once per build, never an older attempt alongside an active continuation.

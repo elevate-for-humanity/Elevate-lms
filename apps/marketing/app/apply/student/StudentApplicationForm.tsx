@@ -391,7 +391,9 @@ export default function StudentApplicationForm({
         const duplicateWarning = data.duplicateWarning || undefined;
         setResult({
           success: true,
-          message: 'Application submitted successfully. Your application is now in the review workflow.',
+          message: data.recordType === 'lead'
+            ? 'Inquiry received. Opening secure deposit checkout; enrollment is not yet submitted.'
+            : 'Application submitted successfully. Your application is now in the review workflow.',
           ...(duplicateWarning ? { warning: duplicateWarning } : {}),
         });
         const ref = data.referenceNumber || '';

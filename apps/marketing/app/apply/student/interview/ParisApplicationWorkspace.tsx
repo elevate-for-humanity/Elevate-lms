@@ -361,10 +361,6 @@ export default function ParisApplicationWorkspace({
 
   async function submitApplication() {
     if (!session?.readyForSubmission || !session.applicationPayload || submitting) return;
-    if (applicationIntent === 'enrollment' && !paymentSessionId) {
-      setError('Complete the verified payment or BNPL checkout before submitting this enrollment application.');
-      return;
-    }
     const answers = session.state.answers;
     const claimed = transferHours(answers.transferHours);
     if (isApprenticeship(answers.program) && claimed > 0 && !transferEvidence) {
@@ -402,13 +398,22 @@ export default function ParisApplicationWorkspace({
         referenceNumber?: string;
         program?: string;
         error?: string;
+        recordType?: string;
+        nextStepUrl?: string;
       };
       if (!response.ok || !data.ok || !data.id) throw new Error(data.error || 'Application could not be submitted.');
+      if (data.recordType === 'lead') {
+        if (!data.nextStepUrl?.startsWith('/enroll/'))
+          throw new Error('Secure deposit checkout could not be opened.');
+        router.push(data.nextStepUrl);
+        return; // An inquiry ID must never be linked as an application.
+      }
       await callInterview({ action: 'link_application', applicationId: data.id, locale });
       const query = new URLSearchParams();
       if (data.referenceNumber) query.set('ref', data.referenceNumber);
       if (data.program) query.set('program', data.program);
-      router.push(`/apply/success${query.toString() ? `?${query.toString()}` : ''}`);
+      router.push(data.nextStepUrl?.startsWith('/') && !data.nextStepUrl.startsWith('//')
+        ? data.nextStepUrl : `/apply/success${query.toString() ? `?${query.toString()}` : ''}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Application could not be submitted.');
     } finally {
@@ -633,9 +638,9 @@ export default function ParisApplicationWorkspace({
             <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 flex-none" /><p>{t.review}</p></div>
           </div>
 
-          {applicationIntent === 'enrollment' && !paymentSessionId ? (
+          {applicationIntent === 'enrollment' ? (
             <div className="mt-4 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-950">
-              Complete the verified deposit, full-payment, or eligible BNPL checkout below before submitting this enrollment application.
+              Until payment is verified, this is saved only as an inquiry. Continue to secure deposit, full-payment, or eligible BNPL checkout.
             </div>
           ) : null}
 
@@ -643,10 +648,10 @@ export default function ParisApplicationWorkspace({
             <button
               type="button"
               onClick={() => void submitApplication()}
-              disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)}
+              disabled={submitting}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3.5 text-sm font-black text-white hover:bg-brand-red-700 disabled:opacity-60"
             >
-              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> {t.submitting}</> : <><UserRound className="h-4 w-4" /> {applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment required to submit' : t.submit}</>}
+              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> {t.submitting}</> : <><UserRound className="h-4 w-4" /> {applicationIntent === 'enrollment' ? 'Continue to secure enrollment' : t.submit}</>}
             </button>
           ) : null}
           {error && session.readyForSubmission ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { requiresSelfPayProgramPayment, paidInvoiceMatchesProgram } from '../../lib/programs/paid-intake-policy.mjs';
@@ -56,4 +57,15 @@ test('legacy welcome is preserved; unpaid, inactive and failed outbox do not cla
  for(const options of [{status:'pending'},{paid:'pending'},{queueError:true}]){
   const f=fixture(true,options);await assert.rejects(queuePaidProgramWelcome(f.db,'e'));
  }
+});
+
+test('all intake clients preserve inquiry classification and follow the server deposit handoff',()=>{
+ const paris=readFileSync(new URL('../../apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx',import.meta.url),'utf8');
+ const legacy=readFileSync(new URL('../../components/ApplicationForm.tsx',import.meta.url),'utf8');
+ const form=readFileSync(new URL('../../apps/marketing/app/apply/student/StudentApplicationForm.tsx',import.meta.url),'utf8');
+ assert.ok(paris.indexOf("data.recordType === 'lead'")<paris.indexOf("await callInterview({ action: 'link_application'"));
+ assert.match(paris,/router.push\(data.nextStepUrl\)/);
+ assert.doesNotMatch(paris,/applicationIntent === 'enrollment' && !paymentSessionId/);
+ assert.match(legacy,/window.location.assign\(result.nextStepUrl\)/);
+ assert.match(form,/data.recordType === 'lead'/);
 });

@@ -75,7 +75,9 @@ on:
     - cron: '*/5 * * * *' # every-5-min (queue processors)
     - cron: '0 9 * * 1' # weekly-monday-9am
     - cron: '0 2 * * *' # daily-2am (maintenance: guardrails + memory cleanup)
-    - cron: '*/30 * * * *' # every-30-min (missed clock-out enforcement)
+    # Retired orphan */30 trigger: no job handled it, so entire runs were skipped.
+    # Clock-out enforcement belongs to the separate Supabase timeclock-enforcer
+    # (verify its live schedule independently; do not invent a missing Admin route).
     - cron: '0 14,22 * * *' # twice daily, Indiana daytime hours
 
 env:

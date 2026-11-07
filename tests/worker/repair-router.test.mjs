@@ -33,11 +33,13 @@ test('phone-size unreadable text routes to the scene producer', () => {
   );
 });
 
-test('encoded caption OCR retries QA on the durable film instead of rerendering it', () => {
-  assert.deepEqual(
-    routeSelectiveRepairs([{code:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED',message:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED:scene:seg-check:390'}]),
-    [{step:'finished_media_qa',codes:['APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED'],rebuildOnlyThisStage:true}],
-  );
+test('failed encoded caption pixels require a changed film producer, not repeated unchanged OCR', () => {
+  for (const width of [390,1280]) {
+    assert.deepEqual(
+      routeSelectiveRepairs([{code:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED',message:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED:scene:seg-check:'+width}]),
+      [{step:'lesson_film_render',codes:['APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED'],rebuildOnlyThisStage:true}],
+    );
+  }
 });
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import CloudBrowserWorkspace from '@/components/studio/CloudBrowserWorkspace';
 afterEach(() => {
@@ -81,7 +81,7 @@ it('reports a manual session transport failure instead of remaining stuck starti
  });
  vi.stubGlobal('fetch',fetcher);
  render(<CloudBrowserWorkspace initialTarget="https://example.org" />);
- await screen.findByText('Ready to start');
+ await waitFor(()=>expect(screen.getByRole('button',{name:'Start Chromium'})).toBeEnabled());
  fireEvent.click(screen.getByRole('button',{name:'Start Chromium'}));
  expect(await screen.findByText('Unavailable')).toBeInTheDocument();
  expect(screen.getByText('Browser connection interrupted')).toBeInTheDocument();

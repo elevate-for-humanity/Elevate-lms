@@ -38,3 +38,10 @@ test('literal false expressions are visible and retain source line numbers',()=>
  const row=inspectWorkflow('normal.yml','jobs:\n  build:\n    if: inputs.dry_run == false\n    runs-on: ubuntu-latest\n');
  assert.equal(row.findings.length,0);
 });
+
+test('main and non-workflow-run conditions permit scheduled jobs',()=>{
+ for(const condition of ["github.ref == 'refs/heads/main'", "github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch'", "github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'"]){
+  const row=inspectWorkflow('scheduled.yml', "on:\n  schedule:\n    - cron: '0 * * * *'\njobs:\n  check:\n    if: "+condition+'\n    runs-on: ubuntu-latest\n');
+  assert.ok(!row.findings.some(f=>f.code==='ORPHAN_CRON'));
+ }
+});

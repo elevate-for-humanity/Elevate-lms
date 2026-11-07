@@ -28,6 +28,25 @@ export async function checkDatabaseRecovery({ env = process.env, request = fetch
       signal: AbortSignal.timeout(30000),
     });
   } catch { throw new Error('Database recovery metadata request failed; no success inferred.'); }
+  // A populated but expired Actions token must not shadow the encrypted runtime
+  // management credential. Read it only after an authentication rejection.
+  if (response.status === 401 && env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const secret = await request(`https://${project}.supabase.co/rest/v1/rpc/get_platform_secret`, {
+        method: 'POST', headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({p_key:'SUPABASE_ACCESS_TOKEN'}),
+        redirect:'error', signal:AbortSignal.timeout(15000),
+      });
+      const token = secret.ok ? await secret.json() : null;
+      if (typeof token === 'string' && token.trim() && token !== env.SUPABASE_ACCESS_TOKEN) {
+        response = await request(`https://api.supabase.com/v1/projects/${project}/database/backups`, {
+          method:'GET', headers:{Authorization:`Bearer ${token.trim()}`},
+          redirect:'error', signal:AbortSignal.timeout(30000),
+        });
+      }
+    } catch { throw new Error('Database recovery credential fallback failed; no success inferred.'); }
+  }
   if (!response.ok) throw new Error(`Database recovery metadata unavailable (HTTP ${response.status}); no success inferred.`);
   let body;
   try { body = await response.json(); }

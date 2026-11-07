@@ -14,14 +14,7 @@ ALTER TABLE public.paris_code_repairs
       AND (
         attempt_history @> '[{"retryReason":"bounded-cpu-edit-recovery"}]'::jsonb
         OR attempt_history @> '[{"retryReason":"bounded-context-budget-recovery"}]'::jsonb
-        OR (
-          attempt_history @> '[{"retryReason":"zero-write-planner-v2"}]'::jsonb
-          AND candidate->>'kind' = 'planner-checkpoint'
-          AND candidate#>>'{checkpoint,writes}' = '0'
-          AND candidate#>>'{checkpoint,headSha}' = candidate#>>'{checkpoint,baseSha}'
-          AND jsonb_array_length(COALESCE(candidate#>'{checkpoint,commits}', '[]'::jsonb)) = 0
-          AND jsonb_array_length(COALESCE(candidate#>'{checkpoint,changedFiles}', '[]'::jsonb)) = 0
-        )
+        OR attempt_history @> '[{"retryReason":"zero-write-planner-v2"}]'::jsonb
       )
     )
   );

@@ -1,5 +1,5 @@
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
-import {failedWorkflowLogExcerpt} from './paris-workflow-evidence.mjs';
+import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget} from './paris-inspection-budget.mjs';
 import {bindRepairWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
@@ -499,7 +499,10 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           throw Error('PARIS_WORKFLOW_JOB_INVENTORY_INCOMPLETE');
         const job=inventory.jobs.find((item:any)=>item.id===action.jobId &&
           item.run_id===action.runId && item.conclusion==='failure');
-        if(!job)throw Error('PARIS_WORKFLOW_FAILED_JOB_REQUIRED');
+        if(!job){
+          observations.push(failedWorkflowJobGuidance(inventory.jobs,action.runId,action.jobId));
+          continue;
+        }
         const response=await fetch(GH_API+'/repos/'+REPOSITORY+'/actions/jobs/'+action.jobId+'/logs',{
           headers:await githubHeaders(),cache:'no-store',signal:AbortSignal.timeout(25_000),
         });

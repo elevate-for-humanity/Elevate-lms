@@ -2,6 +2,7 @@ import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/rep
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
 import {failedCurrentReleases} from './deployment-repair-events.mjs';
+import {recordFailedRepairWorkflow} from './repair-workflow-reconciliation.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {reconcileRecoveredRepairs} from './repair-reconciliation';
@@ -393,7 +394,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   if(repair.status==='dispatched'&&!repair.workflow_run_id&&Date.now()-Date.parse(repair.updated_at)>15*60000){await update(repair.id,{status:'blocked',error_code:'REPAIR_DISPATCH_NOT_CLAIMED'});continue;}
   if(['dispatched','patching','validating'].includes(repair.status)&&repair.workflow_run_id){
    const run=await gh(`/actions/runs/${repair.workflow_run_id}`);
-   if(run.status==='completed'&&run.conclusion!=='success')await update(repair.id,{status:'blocked',error_code:'REPAIR_WORKFLOW_'+run.conclusion});
+   await recordFailedRepairWorkflow(db,repair,run);
   }
   if(repair.release_sha&&['deploying','verifying'].includes(repair.status)){
    const targetSha=repair.verification?.releaseReconciliation?.state==='validated-newer-target' ? repair.verification.releaseReconciliation.currentMainSha : repair.release_sha;

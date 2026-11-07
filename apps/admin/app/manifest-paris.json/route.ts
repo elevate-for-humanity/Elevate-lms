@@ -8,6 +8,7 @@ export function GET() {
     short_name: 'PARIS',
     description: 'Secure Elevate for Humanity workspace',
     start_url: '/paris',
+    shortcuts: [{"name":"Phone & ringer","short_name":"Phone & ringer","description":"Open the dial pad and incoming call alert controls.","url":"/phone/dial-pad#incoming-call-alert-mode","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},{"name":"Text messages","short_name":"Texts","url":"/phone/texts","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},{"name":"Interoffice email","short_name":"Email","url":"/phone/email","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]}],
     scope: '/',
     display: 'standalone',
     background_color: '#0f172a',

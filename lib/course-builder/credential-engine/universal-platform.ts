@@ -1,3 +1,4 @@
+import { monitorCredential, type BlueprintStatus } from './blueprint-monitor';
 /**
  * Universal Credential Platform
  * 
@@ -218,7 +219,9 @@ export interface ComplianceBuild {
 export interface BlueprintMonitorResult {
   credentialSlug: string;
   lastChecked: string;
-  status: 'current' | 'updated' | 'error';
+  status: BlueprintStatus['status'];
+  sourceUrl?: string;
+  verificationScope?: 'official-source-bytes';
   changes?: string[];
   recommendedUpdates?: string[];
 }
@@ -694,13 +697,10 @@ export async function monitorCredentialBlueprints(): Promise<BlueprintMonitorRes
   const results: BlueprintMonitorResult[] = [];
   
   for (const credential of getAvailableCredentials()) {
-    // No provider fetch occurs here. Registry presence is not verification.
-    results.push({
-      credentialSlug: credential.slug,
-      lastChecked: new Date().toISOString(),
-      status: 'error',
-      recommendedUpdates: ['External provider verification is unavailable; review the official blueprint.'],
-    });
+    const observed = await monitorCredential(credential.slug);
+    results.push({credentialSlug:credential.slug,lastChecked:observed.lastChecked,status:observed.status,
+      sourceUrl:observed.sourceUrl,verificationScope:observed.verificationScope,
+      changes:observed.changes.map(change=>change.description)});
   }
   
   return results;

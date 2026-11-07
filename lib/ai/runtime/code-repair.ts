@@ -12,7 +12,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -197,6 +197,38 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  let githubAppRecoveryHealth: boolean | undefined;
  const ownedTier=resolveOwnedModelConnection().tier;
  for(const repair of blocked.data??[]){
+  // One post-fix replay for a source-free planner with an immutable zero-write
+  // checkpoint. Do not reset attempts or override an existing source approval.
+  if(!recoveredProviderThisTick && canResumeZeroWritePlannerRepair(repair)){
+   const checkpoint=repair.candidate.checkpoint;
+   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
+   if(providerRecoveryHealth===undefined){
+    const health=await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false}));
+    ownedProviderReadiness=health;
+    const identity=health.verified?await diagnoseParisGitHubCredential().catch(()=>null):null;
+    providerRecoveryHealth=Boolean(health.verified && identity?.repository?.ok &&
+     identity?.contents?.ok && identity?.workflow?.ok);
+   }
+   if(!providerRecoveryHealth)continue;
+   const ref=await gh('/git/ref/heads/'+encodeURIComponent(checkpoint.branch)).catch(()=>null);
+   if(ref?.object?.sha!==checkpoint.headSha)continue;
+   const updated=await db.from('paris_code_repairs').update({
+    status:'queued',error_code:null,
+    attempt_history:[...(repair.attempt_history??[]),{
+     error:repair.error_code,at:repair.updated_at,retryReason:'zero-write-planner-v2',
+     checkpointHeadSha:checkpoint.headSha
+    }],
+    verification:{...repair.verification,zeroWriteRecoveryPreflight:{
+     ownedModelVerified:true,githubRepositoryRead:true,workflowEnabled:true,
+     checkpointHeadSha:checkpoint.headSha,checkedAt:new Date().toISOString()
+    }},
+    updated_at:new Date().toISOString(),
+   }).eq('id',repair.id).eq('status','blocked')
+    .eq('attempt_count',2).eq('updated_at',repair.updated_at).select('id').maybeSingle();
+   if(updated.error)throw updated.error;
+   if(updated.data)recoveredProviderThisTick=true;
+   continue;
+  }
   if(canResumePlannerInspectionRepair(repair)){
    // A source-linked planner failure may receive exactly one additional
    // bounded planning attempt, but only while the exact source defect remains

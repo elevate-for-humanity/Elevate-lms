@@ -44,8 +44,8 @@ afterEach(() => {
 });
 
 describe('PWA updates across dashboard applications', () => {
-  it('makes one initial Marketing worker request and checks again when the browser reconnects', async () => {
-    render(<CanonicalPwaRegistration application="marketing" />);
+  it.each(['marketing', 'admin', 'lms'] as const)('makes one initial %s worker request and checks again when the browser reconnects', async (application) => {
+    render(<CanonicalPwaRegistration application={application} />);
     await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledTimes(1));
     expect(fetch).not.toHaveBeenCalled();
     expect(registration.update).not.toHaveBeenCalled();
@@ -56,15 +56,25 @@ describe('PWA updates across dashboard applications', () => {
   it('keeps a healthy registration when an update check is offline', async () => {
     registration.update.mockRejectedValue(new TypeError('Network unavailable'));
     render(<CanonicalPwaRegistration application="lms" />);
+    await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledOnce());
+    act(() => window.dispatchEvent(new Event('online')));
     await waitFor(() => expect(registration.update).toHaveBeenCalled());
     expect(registration.unregister).not.toHaveBeenCalled();
+  });
+
+  it('cleans broken state when native registration rejects the worker', async () => {
+    serviceWorker.register.mockRejectedValue(new TypeError('Invalid worker response'));
+    render(<CanonicalPwaRegistration application="lms" />);
+    await waitFor(() => expect(registration.unregister).toHaveBeenCalledOnce());
+    expect(fetch).not.toHaveBeenCalled();
+    expect(registration.update).not.toHaveBeenCalled();
   });
 
   it('removes worker listeners when the application unmounts', async () => {
     const ready = vi.fn();
     window.addEventListener('elevate-pwa-update-ready', ready);
     const { unmount } = render(<CanonicalPwaRegistration application="lms" />);
-    await waitFor(() => expect(registration.update).toHaveBeenCalled());
+    await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledOnce());
     const worker = new Worker();
     act(() => {
       registration.installing = worker;
@@ -81,7 +91,7 @@ describe('PWA updates across dashboard applications', () => {
     const ready = vi.fn();
     window.addEventListener('elevate-pwa-update-ready', ready);
     render(<CanonicalPwaRegistration application="lms" />);
-    await waitFor(() => expect(registration.update).toHaveBeenCalled());
+    await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledOnce());
     const worker = new Worker();
     act(() => {
       registration.installing = worker;
@@ -101,7 +111,7 @@ describe('PWA updates across dashboard applications', () => {
     const ready = vi.fn();
     window.addEventListener('elevate-pwa-update-ready', ready);
     render(<CanonicalPwaRegistration application="lms" />);
-    await waitFor(() => expect(registration.update).toHaveBeenCalled());
+    await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledOnce());
     expect(ready).toHaveBeenCalledOnce();
     window.removeEventListener('elevate-pwa-update-ready', ready);
   });
@@ -111,7 +121,7 @@ describe('PWA updates across dashboard applications', () => {
     const changed = vi.fn();
     window.addEventListener('elevate-pwa-controller-changed', changed);
     render(<CanonicalPwaRegistration application="lms" />);
-    await waitFor(() => expect(registration.update).toHaveBeenCalled());
+    await waitFor(() => expect(serviceWorker.register).toHaveBeenCalledOnce());
     act(() => {
       serviceWorker.controller = registration.active;
       serviceWorker.dispatchEvent(new Event('controllerchange'));

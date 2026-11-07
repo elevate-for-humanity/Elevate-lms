@@ -9,11 +9,12 @@
 
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { open, stat } from 'node:fs/promises';
 import { logger } from '../logger';
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
@@ -245,6 +246,28 @@ async function transientUploadRetry<T>(write: () => Promise<T>): Promise<T> {
   }
 }
 
+/** Verify a durable object before marking media delivery successful.
+ * HEAD verifies exact length/MIME; authenticated ranged GET verifies bytes.
+ * Never infer successful readback from an accepted PUT or signed URL. */
+async function verifyElevateMediaReadback(
+  key: string, contentType: string, length: number, prefix: Uint8Array,
+): Promise<void> {
+  const config = getElevateMediaStorageConfig();
+  const client = getElevateMediaStorageClient();
+  const head = await client.send(new HeadObjectCommand({Bucket: config.bucket, Key: key}));
+  if (head.ContentLength !== length) throw new Error('COURSE_OBJECT_STORAGE_READBACK_LENGTH_MISMATCH');
+  if ((head.ContentType ?? '').split(';')[0].trim().toLowerCase() !== contentType.toLowerCase())
+    throw new Error('COURSE_OBJECT_STORAGE_MIME_MISMATCH');
+  if (prefix.length) {
+    const retrieved = await client.send(new GetObjectCommand({
+      Bucket: config.bucket, Key: key, Range: `bytes=0-${prefix.length - 1}`,
+    }));
+    if (!retrieved.Body) throw new Error('COURSE_OBJECT_STORAGE_READBACK_EMPTY');
+    const bytes = Buffer.from(await retrieved.Body.transformToByteArray());
+    if (!bytes.equals(Buffer.from(prefix))) throw new Error('COURSE_OBJECT_STORAGE_READBACK_MISMATCH');
+  }
+}
+
 export async function uploadToElevateMedia(
   body: Buffer | Uint8Array,
   key: string,
@@ -271,6 +294,7 @@ export async function uploadToElevateMedia(
       // write authorization/capacity failures from a caption readback mismatch.
       throw new Error(`COURSE_OBJECT_STORAGE_PUT_FAILED_HTTP_${status ?? 'UNKNOWN'}`, {cause: error});
     }
+    await transientUploadRetry(() => verifyElevateMediaReadback(key, contentType, body.length, body.subarray(0, Math.min(body.length, 1024))));
     // Caption/transcript uploads must be verified with a real authenticated
     // read, not inferred from a signed URL or a successful PUT alone.
     if (body.length <= 1024 * 1024 && /^(text\/|application\/x-subrip)/.test(contentType)) {
@@ -439,6 +463,12 @@ export async function uploadFileToElevateMedia(filePath: string, key: string, co
         }));
       } finally { body.destroy(); }
     });
+    const fh = await open(filePath, 'r');
+    const first = Buffer.alloc(Math.min(info.size, 1024));
+    try {
+      if (first.length) await fh.read(first, 0, first.length, 0);
+    } finally { await fh.close(); }
+    await transientUploadRetry(() => verifyElevateMediaReadback(key, contentType, info.size, first));
     return {success: true, key, url: getElevateMediaPublicUrl(key) ?? undefined};
   } catch (error) {
     return {success: false, error: error instanceof Error ? error.message : 'Upload failed'};

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {recoverRepeatedSearch,checkInspectionBudget,inspectActionKey} from '../../lib/devstudio/paris-inspection-budget.mjs';
+import {recoverRepeatedSearch,recoverRepeatedInspection,checkInspectionBudget,inspectActionKey} from '../../lib/devstudio/paris-inspection-budget.mjs';
 
 const search={type:'search',query:'ai.command unknown failure'};
 const observation='SEARCH ai.command unknown failure: no content matches. Candidate filenames from the task branch: ["lib/ai/command-intent.ts","lib/ai/runtime/command-executor.ts"]. Read an exact file before proposing a change.';
@@ -25,7 +25,23 @@ test('new searches, non-search actions and malformed or missing evidence do not 
 });
 
 test('third duplicate and unsafe candidates remain blocked',()=>{
- assert.equal(recoverRepeatedSearch([inspectActionKey(search),inspectActionKey(search)],search,[observation]),null);
+ assert.deepEqual(recoverRepeatedSearch([inspectActionKey(search),inspectActionKey(search)],search,[observation]),{type:'read',path:'lib/ai/command-intent.ts'});
  assert.equal(checkInspectionBudget([inspectActionKey(search),inspectActionKey(search)],search).decision,'stop');
  assert.equal(recoverRepeatedSearch([inspectActionKey(search)],search,['Candidate filenames from the task branch: ["../secrets","lib/../secret","lib/.env"]']),null);
+});
+
+test('repeated directory listing and repeated source reads progress to an authenticated inventory alternative',()=>{
+  const history=['list:lib/','read:lib/api-client.ts'];
+  const list='LIST lib/: [{"path":"lib/api-client.ts","type":"file"},{"path":"lib/api-error-handler.ts","type":"file"}]';
+  assert.deepEqual(recoverRepeatedInspection(history,{type:'list',path:'lib/'},[list]),
+    {type:'read',path:'lib/api-error-handler.ts'});
+  assert.deepEqual(recoverRepeatedInspection(history,{type:'read',path:'lib/api-client.ts'},[list]),
+    {type:'read',path:'lib/api-error-handler.ts'});
+});
+
+test('previously inspected failed-job logs use other known source, not an invented run ID',()=>{
+  const history=['workflow_log:41920417830:128397380474'];
+  const log={type:'workflow_log',runId:41920417830,jobId:128397380474};
+  assert.deepEqual(recoverRepeatedInspection(history,log,[observation]),
+    {type:'read',path:'lib/ai/command-intent.ts'});
 });

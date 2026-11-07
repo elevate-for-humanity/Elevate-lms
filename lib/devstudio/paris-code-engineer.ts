@@ -1,6 +1,7 @@
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
 import {failedWorkflowLogExcerpt} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget} from './paris-inspection-budget.mjs';
+import {bindRepairWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
@@ -452,7 +453,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       const result=paid?paid.value!:await infer();usedProvider=result.provider;
 
       let action: AgentAction;
-      try { action = parseAction(jsonObject(result.content)); }
+      try { action = bindRepairWorkflowInspection(task, parseAction(jsonObject(result.content)), inspectionHistory) as AgentAction; }
       catch { observations.push('ACTION_REJECTED: return one valid JSON action from the allowed schema; no write occurred.'); continue; }
       const inspection = checkInspectionBudget(inspectionHistory, action);
       if (inspection.key) {

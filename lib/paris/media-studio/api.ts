@@ -38,7 +38,7 @@ export async function searchStockPhotos(
   if (!PEXELS_API_KEY) throw new Error('PEXELS_API_KEY is not configured.');
 
   // Search Pexels
-  if (PEXELS_API_KEY && options?.source !== 'pixabay') {
+  {
       const params = new URLSearchParams({
         query,
         page: String(page),

@@ -326,7 +326,7 @@ export function generateTypeScriptClient(analysis: APIAnalysis): string {
 
     lines.push('');
     
-    const hasBody = endpoint.method !== 'GET' && endpoint.method !== 'HEAD' && endpoint.requestBody;
+    const hasBody = endpoint.method !== 'GET' && endpoint.requestBody;
     
     lines.push('    const options: RequestInit = {');
     lines.push(`      method: '${endpoint.method}',`);

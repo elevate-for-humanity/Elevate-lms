@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from '../../lib/devstudio/paris-source-discovery.mjs';
 import {recoverRepeatedInspection} from '../../lib/devstudio/paris-inspection-budget.mjs';
+import {budgetRepairMessages} from '../../lib/devstudio/repair-inference-budget.mjs';
 import {courseRepairEvidence} from '../../lib/devstudio/paris-course-repair-evidence.mjs';
 const producer='lib/ultimate-course-builder/core/production-handlers.ts';
 const goal='Repair job 9a7a6ab9-5223-4d96-9293-68300f089f78: REPAIR_PRODUCER_UNCHANGED:synchronization';
@@ -31,4 +32,12 @@ test('source evidence is job-bound, allowlisted, and redacts credentials and sig
  const evidence=courseRepairEvidence('job',job);
  assert.match(evidence.previousTimingError,/BAD_CUE/);assert.doesNotMatch(JSON.stringify(evidence),/private|never/);
  assert.throws(()=>courseRepairEvidence('other',job),/MISMATCH/);
+});
+
+test('relevant middle source survives the CPU prompt budget rather than hiding behind the header',()=>{
+ const content='h'.repeat(20000)+'\n synchronization: async () => { actualProducer(); }\n'+'t'.repeat(40000);
+ const excerpt=focusedSourceExcerpt(content,goal);
+ const messages=budgetRepairMessages([{role:'system',content:'rule '.repeat(650)},
+  {role:'user',content:JSON.stringify({task:goal,observations:['READ '+producer+':\n'+excerpt]})}],8192,768,'cpu');
+ assert.match(JSON.parse(messages[1].content).observations.join('\n'),/actualProducer/);
 });

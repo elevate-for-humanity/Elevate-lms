@@ -23,7 +23,7 @@ const base = 'https://billingbudgets.googleapis.com/v1/'+billing.billingAccountN
 const budgets = [];
 let pageToken;
 do {
-  const page = await api(base+'?pageSize=100'+(pageToken ? '&pageToken='+encodeURIComponent(pageToken) : ''));
+  const page = await api(base+'?scope=projects%2F484736877039&pageSize=100'+(pageToken ? '&pageToken='+encodeURIComponent(pageToken) : ''));
   budgets.push(...(page.budgets ?? [])); pageToken=page.nextPageToken;
 } while (pageToken);
 const matching = budgets.filter(b => b.displayName === name);

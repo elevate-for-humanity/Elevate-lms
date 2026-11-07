@@ -12,7 +12,8 @@ import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 
-export const revalidate = 300;
+// Marketing content can be regenerated hourly; enrollment and account APIs remain dynamic.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: {

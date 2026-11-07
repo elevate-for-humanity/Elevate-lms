@@ -197,5 +197,13 @@ export async function dispatchLessonAutopilots({run=google,request=fetch,env=pro
  if(assigned.length)return {status:'assigned',activeExecutions:activeCount,assignments:assigned,...coverage};
  if(activeCount)return {status:'busy',activeExecutions:activeCount};
  if(eligible.some(j=>Date.parse(j.available_at)>now.getTime()))return {status:'retry_wait',activeExecutions:0};
+ // A queued stage whose canonical prerequisite is unfinished is not an empty
+ // queue. Preserve the existing retry_wait coordinator contract, and report
+ // the evidence without claiming, reopening, or marking any lesson complete.
+ if(readyCandidates.length && ready.length===0)return {
+  status:'retry_wait',reason:'canonical_prerequisites_not_satisfied',
+  activeExecutions:0,queuedStagesWaitingForPrerequisites:readyCandidates.length,
+  canonicalReadyStages:0,
+ };
  return capacityWait?{status:'capacity_wait',reason:'approved_regional_capacity_unavailable',activeExecutions:0}:{status:'empty',activeExecutions:0};
 }

@@ -41,6 +41,7 @@ jobs:
           fi
       - name: Verify a recent provider recovery point
         env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN || secrets.SUPABASE_MANAGEMENT_API_KEY || secrets.SUPABASE_TOKEN }}
           SUPABASE_PROJECT_ID: cuxzzpsyufcewtmicszk
         run: node scripts/gcp/check-database-recovery.mjs

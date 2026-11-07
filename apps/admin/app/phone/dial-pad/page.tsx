@@ -4,5 +4,5 @@ import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPho
 export const dynamic = 'force-dynamic';
 export default async function AdminDialPad() {
   await requireRole(PHONE_MANAGER_ROLES);
-  return <ProgramHolderPhone roleLabel="Administrator" calendarHref="/phone/meetings" emailHref="/phone/email" />;
+  return <ProgramHolderPhone roleLabel="Administrator" calendarHref="/phone/meetings" emailHref="/phone/email" textsHref="/phone/texts" />;
 }

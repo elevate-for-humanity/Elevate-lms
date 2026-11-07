@@ -1,4 +1,4 @@
-import { assertCommittedWriteReadback } from '../../lib/devstudio/paris-action-loop.mjs';
+import {assertCommittedWriteReadback} from '../../lib/devstudio/paris-action-loop.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -48,9 +48,9 @@ test('a workflow file is actually written with App authority and cannot fall bac
   const factory = new Function('fetch', 'getGitHubHeaders', 'getGitHubAppToken', 'assertCommittedWriteReadback', compiled + '\nreturn writeFile;');
   const fetcher = async (url, init) => {
     calls.push({ url, init });
-    if (url.includes('/git/ref/')) return Response.json({object: {sha: 'b'.repeat(40)}});
-    if (init.method !== 'PUT') return Response.json({sha: 'c'.repeat(40), content: Buffer.from('owner-authorized fixture').toString('base64')});
-    return Response.json({ content: { sha: 'c'.repeat(40) }, commit: { sha: 'b'.repeat(40) } });
+    if (init?.method === 'PUT') return Response.json({ content: { sha: 'c'.repeat(40) }, commit: { sha: 'b'.repeat(40) } });
+    if (url.includes('/git/ref/heads/')) return Response.json({ object: { sha: 'b'.repeat(40) } });
+    return Response.json({ sha: 'c'.repeat(40), content: Buffer.from('owner-authorized fixture').toString('base64') });
   };
   const input = { path: '.github/workflows/deploy-google-store-runtime.yml', content: 'owner-authorized fixture', branch: 'studio/repair', message: 'Correct disk capacity' };
   const write = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => 'app-fixture', assertCommittedWriteReadback);
@@ -60,6 +60,8 @@ test('a workflow file is actually written with App authority and cannot fall bac
   const denied = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => null, assertCommittedWriteReadback);
   await assert.rejects(denied(input), /WORKFLOW_APP_AUTHORITY_REQUIRED/);
   assert.equal(calls.length, 3);
+  assert.match(calls[1].url, /ref=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/);
+  assert.match(calls[2].url, /git\/ref\/heads\/studio%2Frepair/);
 });
 
 const candidate = { branch: { name: 'studio/repair-abc', sha: 'b'.repeat(40) }, summary: 'Correct Store disk capacity.' };

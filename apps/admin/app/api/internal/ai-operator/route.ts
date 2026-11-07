@@ -83,7 +83,9 @@ async function _POST(req: NextRequest) {
           remediation: result.reason,
         }).eq('id', args.incident_id), 'DIAGNOSTIC_INCIDENT_UPDATE_FAILED');
         await persist(db.from('devstudio_jobs').update({
-          status: 'completed',
+          status: result.repaired ? 'completed' : 'failed',
+          result: { kind: 'billing_diagnostic', repaired: result.repaired, reason: result.reason, incidentId: args.incident_id },
+          error: result.repaired ? null : 'BILLING_REPAIR_INCOMPLETE',
           finished_at: new Date().toISOString(),
           log_lines: ['PARIS captured the authenticated workflow failure.', `Billing setup result: ${result.reason}`],
         }).eq('id', job.id), 'DIAGNOSTIC_COMPLETION_UPDATE_FAILED');
@@ -108,6 +110,7 @@ async function _POST(req: NextRequest) {
       }), 'DIAGNOSTIC_REPAIR_HANDOFF_FAILED');
       await persist(db.from('devstudio_jobs').update({
         status: 'completed',
+        result: { kind: 'diagnostic_handoff', repaired: false, incidentId: args.incident_id, approvalRequired: true },
         finished_at: new Date().toISOString(),
         log_lines: ['PARIS captured the authenticated workflow failure.', 'Dev Studio diagnosed the workflow and opened an approval-gated repair action.'],
       }).eq('id', job.id), 'DIAGNOSTIC_COMPLETION_UPDATE_FAILED');

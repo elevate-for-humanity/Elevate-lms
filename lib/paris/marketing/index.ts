@@ -1,3 +1,5 @@
+import 'server-only';
+import { requireAdminClient } from '@/lib/supabase/admin';
 /**
  * PARIS Marketing Studio
  * AI-powered content generation and social media management
@@ -184,29 +186,21 @@ export function generateHashtagStrategy(
 export async function analyzeContentPerformance(
   contentId: string
 ): Promise<{
-  score: number;
+  score: number | null;
+  metrics: Array<{ platform: string; post_id: string; metrics: unknown; updated_at: string | null }>;
   strengths: string[];
   improvements: string[];
   recommendations: string[];
 }> {
-  // Placeholder - would integrate with analytics
-  return {
-    score: 75,
-    strengths: [
-      'Clear call-to-action',
-      'Good use of hashtags',
-      'Engaging hook',
-    ],
-    improvements: [
-      'Consider adding a video',
-      'Post timing could be optimized',
-    ],
-    recommendations: [
-      'Add more visual elements',
-      'Test different posting times',
-      'Include user-generated content',
-    ],
-  };
+  const db = await requireAdminClient();
+  const { data, error } = await db.from('published_posts')
+    .select('platform,post_id,metrics,updated_at').eq('content_id', contentId);
+  if (error) throw error;
+  const measured = (data ?? []).filter(post => post.metrics !== null);
+  if (!measured.length) throw new Error('CONTENT_METRICS_UNAVAILABLE: no stored post measurements exist for this content.');
+  // Expose the actual measurements. A normalized quality score requires an
+  // approved methodology; absence of one is not a score of 75 (or zero).
+  return { score: null, metrics: measured, strengths: [], improvements: [], recommendations: [] };
 }
 
 /**

@@ -1,3 +1,4 @@
+import { assertCommittedWriteReadback } from '../../lib/devstudio/paris-action-loop.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -44,19 +45,21 @@ test('deployment repair does not admit its own validator or access-control edits
 
 test('a workflow file is actually written with App authority and cannot fall back to a job token', async () => {
   const calls = [];
-  const factory = new Function('fetch', 'getGitHubHeaders', 'getGitHubAppToken', compiled + '\nreturn writeFile;');
+  const factory = new Function('fetch', 'getGitHubHeaders', 'getGitHubAppToken', 'assertCommittedWriteReadback', compiled + '\nreturn writeFile;');
   const fetcher = async (url, init) => {
     calls.push({ url, init });
-    return Response.json({ content: { sha: 'blob' }, commit: { sha: 'b'.repeat(40) } });
+    if (url.includes('/git/ref/')) return Response.json({object: {sha: 'b'.repeat(40)}});
+    if (init.method !== 'PUT') return Response.json({sha: 'c'.repeat(40), content: Buffer.from('owner-authorized fixture').toString('base64')});
+    return Response.json({ content: { sha: 'c'.repeat(40) }, commit: { sha: 'b'.repeat(40) } });
   };
   const input = { path: '.github/workflows/deploy-google-store-runtime.yml', content: 'owner-authorized fixture', branch: 'studio/repair', message: 'Correct disk capacity' };
-  const write = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => 'app-fixture');
+  const write = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => 'app-fixture', assertCommittedWriteReadback);
   assert.equal((await write(input)).commitSha, 'b'.repeat(40));
   assert.equal(calls[0].init.headers.Authorization, 'Bearer app-fixture');
   assert.equal(JSON.parse(calls[0].init.body).branch, 'studio/repair');
-  const denied = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => null);
+  const denied = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => null, assertCommittedWriteReadback);
   await assert.rejects(denied(input), /WORKFLOW_APP_AUTHORITY_REQUIRED/);
-  assert.equal(calls.length, 1);
+  assert.equal(calls.length, 3);
 });
 
 const candidate = { branch: { name: 'studio/repair-abc', sha: 'b'.repeat(40) }, summary: 'Correct Store disk capacity.' };

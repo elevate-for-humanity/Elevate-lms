@@ -158,7 +158,7 @@ function parseOpenAPI3(spec: Record<string, unknown>): APIAnalysis {
     name: info.title as string || 'API',
     version: info.version as string,
     description: info.description as string,
-    baseUrl: servers[0]?.url || 'https://api.example.com',
+    baseUrl: servers[0]?.url || '/',
     endpoints,
     schemas: extractedSchemas,
     security: (spec.security as string[][])?.flat() || [],
@@ -234,7 +234,7 @@ function parseSwagger2(spec: Record<string, unknown>): APIAnalysis {
     name: info.title as string || 'API',
     version: info.version as string,
     description: info.description as string,
-    baseUrl: baseUrl || 'https://api.example.com',
+    baseUrl,
     endpoints,
     schemas: definitions,
     security: [],
@@ -289,7 +289,7 @@ export function generateTypeScriptClient(analysis: APIAnalysis): string {
   lines.push('  private headers: Record<string, string>;');
   lines.push('');
   lines.push(`  constructor(config: { baseUrl?: string; apiKey?: string }) {`);
-  lines.push(`    this.baseUrl = config.baseUrl || '${analysis.baseUrl}';`);
+  lines.push(`    this.baseUrl = config.baseUrl || ${JSON.stringify(analysis.baseUrl)};`);
   lines.push('    this.headers = {');
   lines.push(`      'Content-Type': 'application/json',`);
   lines.push('    };');
@@ -303,26 +303,30 @@ export function generateTypeScriptClient(analysis: APIAnalysis): string {
   for (const endpoint of analysis.endpoints) {
     const methodName = generateMethodName(endpoint);
     const params = generateMethodParams(endpoint);
-    const bodyType = endpoint.requestBody ? extractTypeName(endpoint.requestBody.schema) : 'unknown';
+    const responseType = extractTypeName(endpoint.responses.find(r => r.statusCode >= 200 && r.statusCode < 300)?.schema);
     
     lines.push(`  /**`);
     if (endpoint.description) lines.push(`   * ${endpoint.description}`);
     lines.push(`   */`);
-    lines.push(`  async ${methodName}(${params}): Promise<${bodyType}> {`);
-    lines.push(`    const url = new URL(\`\${this.baseUrl}${endpoint.path}\`);`);
+    lines.push(`  async ${methodName}(${params}): Promise<${responseType}> {`);
+    let pathExpression = JSON.stringify(endpoint.path);
+    for (const param of endpoint.parameters?.filter(p => p.in === 'path') || []) {
+      pathExpression += `.replace(${JSON.stringify(`{${param.name}}`)}, encodeURIComponent(String(${param.name})))`;
+    }
+    lines.push(`    const path = ${pathExpression};`);
+    lines.push("    const url = new URL(this.baseUrl.replace(/\\/$/, '') + '/' + path.replace(/^\\//, '')); ");
     
     // Add query parameters
     const queryParams = endpoint.parameters?.filter(p => p.in === 'query') || [];
     for (const param of queryParams) {
-      lines.push(`    if (${param.name} !== undefined) {`);
-      lines.push(`      url.searchParams.set('${param.name}', String(${param.name}));`);
+      lines.push(`    if (queryParams?.[${JSON.stringify(param.name)}] !== undefined) {`);
+      lines.push(`      url.searchParams.set(${JSON.stringify(param.name)}, String(queryParams[${JSON.stringify(param.name)}]));`);
       lines.push('    }');
     }
 
     lines.push('');
     
-    const hasBody = endpoint.method !== 'GET' && endpoint.method !== 'DELETE' && endpoint.requestBody;
-    const hasPathParams = endpoint.parameters?.some(p => p.in === 'path');
+    const hasBody = endpoint.method !== 'GET' && endpoint.method !== 'HEAD' && endpoint.requestBody;
     
     lines.push('    const options: RequestInit = {');
     lines.push(`      method: '${endpoint.method}',`);
@@ -338,13 +342,13 @@ export function generateTypeScriptClient(analysis: APIAnalysis): string {
     lines.push('');
     
     // Handle different response types
-    const successCodes = endpoint.responses.filter(r => r.statusCode >= 200 && r.statusCode < 300);
-    if (successCodes.length > 0) {
+    {
       lines.push('    if (!response.ok) {');
       lines.push('      const error = await response.json().catch(() => ({}));');
       lines.push('      throw new Error(error.message || `HTTP error! status: ${response.status}`);');
       lines.push('    }');
       lines.push('');
+      lines.push('    if (response.status === 204) return undefined;');
       lines.push('    return response.json();');
     }
     
@@ -437,19 +441,19 @@ function generateMethodParams(endpoint: APIEndpoint): string {
     params.push(`${param.name}: ${mapOpenAPIType(param.type, undefined)}`);
   }
   
-  // Query parameters
+  // Required arguments must precede optional query/body arguments.
+  if (endpoint.requestBody?.required) {
+    params.push(`requestBody: ${extractTypeName(endpoint.requestBody.schema)}`);
+  }
   const queryParams = endpoint.parameters?.filter(p => p.in === 'query') || [];
   if (queryParams.length > 0) {
-    const queryInterface = `{\n      ${queryParams.map(p => `${p.name}?: ${mapOpenAPIType(p.type, undefined)}`).join(',\n      ')}\n    }`;
+    const queryInterface = `{ ${queryParams.map(p => `${JSON.stringify(p.name)}?: ${mapOpenAPIType(p.type, undefined)}`).join('; ')} }`;
     params.push(`queryParams?: ${queryInterface}`);
   }
-  
-  // Request body
-  if (endpoint.requestBody) {
-    const bodyType = extractTypeName(endpoint.requestBody.schema);
-    params.push(`requestBody: ${bodyType}`);
+  if (endpoint.requestBody && !endpoint.requestBody.required) {
+    params.push(`requestBody?: ${extractTypeName(endpoint.requestBody.schema)}`);
   }
-  
+
   return params.join(', ');
 }
 
@@ -483,6 +487,8 @@ export async function importAPI(
         errors: ['Unable to parse API specification. Please ensure it is valid OpenAPI 3.x or Swagger 2.0.'],
       };
     }
+
+    analysis.baseUrl = new URL(analysis.baseUrl || '/', specUrl).href;
 
     // Generate TypeScript client
     const clientCode = generateTypeScriptClient(analysis);
@@ -545,17 +551,14 @@ serve(async (req) => {
     // Get request body
     const requestBody = await req.json()
 
-    // TODO: Implement ${endpoint.method} ${endpoint.path} logic here
-    // ${endpoint.description || ''}
-
-    const result = {
-      success: true,
-      message: 'Edge function placeholder',
-      endpoint: '${endpoint.method} ${endpoint.path}',
-      data: requestBody,
-    }
-
-    return new Response(JSON.stringify(result), {
+    // Generated scaffolds do not implement an upstream integration. Fail
+    // explicitly until an authenticated endpoint handler has been supplied.
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'ENDPOINT_HANDLER_NOT_IMPLEMENTED',
+      endpoint: ${JSON.stringify(`${endpoint.method} ${endpoint.path}`)},
+    }), {
+      status: 501,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {

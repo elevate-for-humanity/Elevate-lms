@@ -690,7 +690,7 @@ export function generateCompatibilityReport(
     securityRisks,
     licensingConcerns: licensing,
     estimatedEffort: effort,
-    recommendations,
+    recommendations: ['This is a heuristic assessment of repository metadata, not a build, import, security audit, or runtime acceptance result.', ...recommendations],
   };
 }
 

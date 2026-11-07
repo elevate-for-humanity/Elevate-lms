@@ -35,6 +35,7 @@ import {
 } from '@/lib/devstudio/user-facing-status';
 import {
   createBrowserSpeechRecognition,
+  speechSessionText,
   type BrowserSpeechRecognition,
 } from '@/lib/browser/speech-recognition';
 import {
@@ -964,20 +965,12 @@ export default function UnifiedEllieChat({
 
     recognition.lang = 'en-US';
     recognition.continuous = true;
-    // Chrome re-emits interim hypotheses as they improve. Appending those
-    // hypotheses duplicates the same spoken phrase many times, so only consume
-    // finalized recognition results.
-    recognition.interimResults = false;
+    // Rebuild this recognition session rather than append changing hypotheses.
+    const prefix = input.trimEnd();
+    recognition.interimResults = true;
     recognition.onresult = (event) => {
-      let transcript = '';
-      for (let index = event.resultIndex ?? 0; index < event.results.length; index += 1) {
-        if (event.results[index].isFinal !== false) {
-          transcript += event.results[index][0]?.transcript ?? '';
-        }
-      }
-      if (transcript.trim()) {
-        setInput((current) => `${current}${current.trim() ? ' ' : ''}${transcript.trim()}`);
-      }
+      if (recognitionRef.current !== recognition) return;
+      setInput(speechSessionText(prefix, event.results));
     };
     recognition.onerror = (event) => {
       setSpeechError(
@@ -991,7 +984,12 @@ export default function UnifiedEllieChat({
     recognitionRef.current = recognition;
     setSpeechError(null);
     setListening(true);
-    recognition.start();
+    try { recognition.start(); }
+    catch {
+      recognitionRef.current = null;
+      setListening(false);
+      setSpeechError('Microphone could not start. Try again or continue typing.');
+    }
   }
 
   function speakAssistantResponse(text: string) {
@@ -1069,6 +1067,9 @@ export default function UnifiedEllieChat({
     const text = input.trim();
     if (!text || loading || restoringConversation || restoreError) return;
 
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setListening(false);
     setInput('');
     setLoading(true);
     const route = attachment ? 'platform' : routeEllieMessage(text);
@@ -1294,6 +1295,24 @@ export default function UnifiedEllieChat({
         </div>
       </div>
 
+      <nav className="shrink-0 border-b border-slate-200 bg-white px-3 py-2" aria-label="Paris actions">
+            <div className="flex min-w-0 gap-2 overflow-x-auto" aria-label="Paris shortcuts">
+              {QUICK.map((quick) => (
+                <button
+                  key={quick.label}
+                  type="button"
+                  onClick={() => {
+                    setInput(quick.text);
+                    inputRef.current?.focus();
+                  }}
+                  className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-base font-semibold text-slate-800 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-600"
+                >
+                  {quick.label}
+                </button>
+              ))}
+            </div>
+      </nav>
+
       {restoringConversation ? (
         <p role="status" className="px-4 py-2 text-sm text-slate-600">
           Restoring your conversation…
@@ -1359,7 +1378,7 @@ export default function UnifiedEllieChat({
         className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 px-3 py-5 sm:px-8 sm:py-8"
       >
         {messages.length === 0 ? (
-          <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-8 text-center sm:py-20">
+          <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-4 text-center sm:py-6">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue-700 shadow-lg shadow-brand-blue-700/20 ring-4 ring-brand-blue-100">
               <Bot className="h-8 w-8 text-white" aria-hidden="true" />
             </div>
@@ -1379,21 +1398,7 @@ export default function UnifiedEllieChat({
                   : 'configuration required'}
             </p>
 
-            <div className="mt-5 grid w-full min-w-0 grid-cols-1 gap-2 sm:mt-7 sm:grid-cols-2">
-              {QUICK.map((quick) => (
-                <button
-                  key={quick.label}
-                  type="button"
-                  onClick={() => {
-                    setInput(quick.text);
-                    inputRef.current?.focus();
-                  }}
-                  className="w-full min-w-0 rounded-2xl border border-brand-blue-100 bg-white px-4 py-4 text-left text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-blue-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-600 focus-visible:ring-offset-2"
-                >
-                  {quick.label}
-                </button>
-              ))}
-            </div>
+
           </div>
         ) : (
           <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
@@ -1556,16 +1561,21 @@ export default function UnifiedEllieChat({
               ref={inputRef}
               aria-label="Tell Paris what you need done..."
               value={input}
-              onChange={(event) => setInput(event.target.value)}
+              onChange={(event) => {
+                recognitionRef.current?.stop();
+                recognitionRef.current = null;
+                setListening(false);
+                setInput(event.target.value);
+              }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
                   void send();
                 }
               }}
-              rows={1}
+              rows={6}
               placeholder="Tell Paris what you need done..."
-              className={`${styles.composer} order-first min-h-[60px] max-h-[20dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
+              className={`${styles.composer} order-first min-h-[180px] max-h-[45dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
             />
             <button
               type="button"

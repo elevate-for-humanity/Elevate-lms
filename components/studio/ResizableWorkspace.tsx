@@ -26,6 +26,7 @@ interface Props {
   panelLabel?: string;
   /** A parent-owned compact view; keeps both panes mounted without a second toolbar. */
   activePane?: "primary" | "panel";
+  sideBySide?: boolean;
 }
 
 /** Keeps both workspaces mounted while resizing, hiding, or expanding a panel. */
@@ -44,6 +45,7 @@ export function ResizableWorkspace({
   primaryLabel = "Editor",
   panelLabel = "Preview",
   activePane,
+  sideBySide = false,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
@@ -62,7 +64,7 @@ export function ResizableWorkspace({
     const element = root.current;
     if (!element) return;
     const observe = () =>
-      setStacked(element.getBoundingClientRect().width <= 760);
+      setStacked(!sideBySide && element.getBoundingClientRect().width <= 760);
     observe();
     if (typeof ResizeObserver === "undefined") {
       window.addEventListener("resize", observe);
@@ -71,7 +73,7 @@ export function ResizableWorkspace({
     const observer = new ResizeObserver(observe);
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [sideBySide]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -174,7 +176,7 @@ export function ResizableWorkspace({
       </div>
       <div
         ref={body}
-        className={`${styles.body} ${panelPosition === "start" ? styles.panelStart : ""} ${open ? styles.open : ""} ${full ? styles.expanded : ""} ${tabbed || controlledPane ? styles.tabbed : ""}`}
+        className={`${styles.body} ${sideBySide ? styles.sideBySide : ""} ${panelPosition === "start" ? styles.panelStart : ""} ${open ? styles.open : ""} ${full ? styles.expanded : ""} ${tabbed || controlledPane ? styles.tabbed : ""}`}
         style={
           {
             "--panel-width": `${width}%`,

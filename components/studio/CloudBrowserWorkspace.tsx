@@ -74,6 +74,9 @@ export default function CloudBrowserWorkspace({
   const reconnectingRef = useRef(false);
   const launchTargetRef = useRef(initialTarget);
   const lifecycleRef = useRef(0);
+  // A late read-only health response must not overwrite the result of a
+  // manually requested browser admission (particularly an unknown POST outcome).
+  const admissionStartedRef = useRef(false);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
   const [imageZoom, setImageZoom] = useState(1);
@@ -249,7 +252,7 @@ export default function CloudBrowserWorkspace({
         const ready = response.ok && payload.configured === true && payload.ready === true;
         setRuntimeReady(ready);
         setStatus((current) =>
-          current === 'Admin session expired'
+          admissionStartedRef.current || current === 'Admin session expired'
             ? current
             : ready
               ? 'Ready to start'
@@ -259,8 +262,8 @@ export default function CloudBrowserWorkspace({
                   ? 'Runtime is offline'
                   : 'Runtime is not configured',
         );
-        if (ready) setError('');
-        else
+        if (ready && !admissionStartedRef.current) setError('');
+        else if (!ready && !admissionStartedRef.current)
           setError(
             typeof payload.error === 'string'
               ? payload.error
@@ -276,6 +279,7 @@ export default function CloudBrowserWorkspace({
       } catch (cause) {
         if (cancelled) return;
         setRuntimeReady(false);
+        if (admissionStartedRef.current) return;
         setStatus('Runtime check failed');
         setError(
           cause instanceof Error ? cause.message : 'Could not verify the isolated browser runtime.',
@@ -318,6 +322,7 @@ export default function CloudBrowserWorkspace({
 
   async function start(overrideTarget = target, compact = false) {
     const lifecycle = ++lifecycleRef.current;
+    admissionStartedRef.current = true;
     const startingTarget = overrideTarget;
     launchTargetRef.current = startingTarget;
     setError('');
@@ -1087,6 +1092,7 @@ export default function CloudBrowserWorkspace({
               <button
                 type="button"
                 onClick={() => {
+                  admissionStartedRef.current = false;
                   setRuntimeReady(null);
                   setRuntimeCheckRevision((value) => value + 1);
                 }}

@@ -1,4 +1,4 @@
-:root { color-scheme: light; font: 1rem/1.55 system-ui, sans-serif; color: #18304a; background: #f3f6fa; }
+:root { color-scheme: light; font: 17px/1.6 "OpenAI Sans", ui-sans-serif, system-ui, sans-serif; color: #18304a; background: #f3f6fa; }
 * { box-sizing: border-box; }
 body { margin: 0; }
 main { max-width: 42rem; margin: auto; padding: 1.1rem; }

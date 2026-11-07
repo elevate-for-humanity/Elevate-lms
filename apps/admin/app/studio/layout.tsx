@@ -1,5 +1,6 @@
 import '@/apps/admin/styles/studio-workspace.css';
 import type { ReactNode } from 'react';
+export const metadata = { manifest: '/manifest-dev-studio.json' };
 import StudioNavigation from './StudioNavigation.client';
 
 export const dynamic = 'force-dynamic';

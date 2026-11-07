@@ -16,7 +16,9 @@ if (process.env.COURSE_B2_CONFIG_STDIN === 'true') {
     input += chunk;
     if (input.length > 100_000) throw Error('B2_PROBE_CONFIG_INPUT_TOO_LARGE');
   }
-  const parsed = JSON.parse(input);
+  const saved = JSON.parse(input);
+  const parsed = saved.runtimeEnvironment ?? saved;
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw Error('B2_PROBE_RUNTIME_CONFIGURATION_REQUIRED');
   const names = ['ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_REGION','ELEVATE_MEDIA_BUCKET',
     'ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY'];
   runtime = Object.fromEntries(names.map(name => [name, parsed[name]]));

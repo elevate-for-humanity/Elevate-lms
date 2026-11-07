@@ -30,6 +30,14 @@ beforeEach(()=>{
 afterEach(()=>{cleanup();vi.useRealTimers();vi.unstubAllGlobals();});
 async function connected(){render(<ProgramHolderPhone/>);await screen.findByRole('button',{name:'Disconnect'});}
 describe('phone connection lifecycle',()=>{
+  it('keeps the administrator text and email actions on their actual portal routes',async()=>{
+    render(<ProgramHolderPhone textsHref="/phone/texts" emailHref="/phone/email"/>);
+    await screen.findByRole('button',{name:'Disconnect'});
+    expect(screen.getByRole('link',{name:'Text messages'}).getAttribute('href')).toBe('/phone/texts');
+    expect(screen.getByRole('link',{name:'Interoffice email'}).getAttribute('href')).toBe('/phone/email');
+    expect(screen.getByRole('link',{name:'Ringer & alerts'}).getAttribute('href')).toBe('#incoming-call-alert-mode');
+    expect(screen.getByLabelText('Incoming call alert mode').id).toBe('incoming-call-alert-mode');
+  });
   function pendingProvider() {
     const disconnect = vi.fn().mockResolvedValue(undefined);
     mock.create.mockResolvedValue({on:(event:string,callback:any)=>{mock.handlers[event]=callback;},

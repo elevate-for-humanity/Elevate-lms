@@ -71,7 +71,7 @@ export async function prepareRAPIDSData(enrollmentIds: string[]): Promise<RAPIDS
     const record: RAPIDSApprentice = {
       first_name:row.first_name,last_name:row.last_name,ssn:formatSSN(decryptSSN(row.ssn_encrypted)),date_of_birth:row.date_of_birth,
       gender:row.gender,race_ethnicity:row.race_ethnicity,veteran_status:row.veteran_status,
-      program_number:context.contract.sponsor.registrationNumber,sponsor_name:context.contract.sponsor.sponsor,
+      program_number:context.contract.sponsor.registrationNumber,sponsor_name:context.contract.sponsor.legalName,
       occupation_code:context.contract.standard.rapidsCode,occupation_title:context.contract.standard.occupationTitle,
       registration_date:row.registration_date,completion_date:row.completion_date,cancellation_date:row.cancellation_date,cancellation_reason:row.cancellation_reason,
       hours_completed:progress.ojl.approvedHours,hours_required:context.contract.completion.fixedOjlCompletionHours,

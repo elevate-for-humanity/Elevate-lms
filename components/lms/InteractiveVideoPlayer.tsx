@@ -1,5 +1,6 @@
 'use client';
 import { installPlaybackResume } from '@/lib/lms/playback-resume.mjs';
+import { playbackProgressSignal } from '@/lib/lms/playback-progress-signal.mjs';
 
 import { createClient } from '@/lib/supabase/client';
 import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessibility/lms-runtime-accessibility';
@@ -515,11 +516,15 @@ export default function InteractiveVideoPlayer({
       // whole-percent changes. For a long film, 1% can exceed the staged
       // learner QA readback window. Notify on a bounded three-second clock
       // bucket while preserving the existing percentage callback contract.
-      const progressBucket = Math.floor(ct / 3);
-      const percentChanged = pct !== lastProgressRef.current;
-      if (!readOnly && (percentChanged ||
-          progressBucket !== lastProgressNotifyBucketRef.current)) {
-        lastProgressNotifyBucketRef.current = progressBucket;
+      const signal = playbackProgressSignal({
+        timeSeconds: ct,
+        percent: pct,
+        lastPercent: lastProgressRef.current,
+        lastBucket: lastProgressNotifyBucketRef.current,
+      });
+      const percentChanged = signal.percentChanged;
+      if (!readOnly && signal.notify) {
+        lastProgressNotifyBucketRef.current = signal.bucket;
         onProgressRef.current?.(pct);
       }
       if (percentChanged) {

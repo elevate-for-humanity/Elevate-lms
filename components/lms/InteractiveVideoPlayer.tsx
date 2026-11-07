@@ -1,3 +1,4 @@
+import { installPlaybackResume } from '@/lib/lms/playback-resume.mjs';
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
@@ -6,7 +7,7 @@ import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessib
 import React from 'react';
 import { sendPlaybackEvent } from '@/lib/video/send-playback-event.mjs';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import {
   Play,
   Pause,
@@ -144,7 +145,20 @@ export default function InteractiveVideoPlayer({
   const [checkpointChoice, setCheckpointChoice] = useState<number | null>(null);
   const [checkpointFeedback, setCheckpointFeedback] = useState('');
   const [completedCheckpointKeys, setCompletedCheckpointKeys] = useState<Set<string>>(new Set());
-  const resumePositionRef = useRef(initialPositionSeconds);
+  const resumePendingRef = useRef(initialPositionSeconds > 0);
+  const resumeCleanupRef = useRef<() => void>(() => {});
+  const restorePosition = useCallback((position: number) => {
+    resumeCleanupRef.current();
+    resumePendingRef.current = Number.isFinite(position) && position > 0;
+    resumeCleanupRef.current = installPlaybackResume(videoRef.current, position, () => {
+      resumePendingRef.current = false;
+      if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
+    });
+  }, []);
+  useEffect(() => {
+    restorePosition(initialPositionSeconds);
+    return () => resumeCleanupRef.current();
+  }, [videoUrl, initialPositionSeconds, restorePosition]);
   const playbackSessionRef = useRef<string | null>(null);
   const lastPlaybackHeartbeatBucketRef = useRef(-1);
 
@@ -282,7 +296,7 @@ export default function InteractiveVideoPlayer({
         );
         return;
       }
-      resumePositionRef.current = Number(progressResult.data?.last_position_seconds ?? 0);
+      restorePosition(Number(progressResult.data?.last_position_seconds ?? 0));
       setCompletedCheckpointKeys(
         new Set([
           ...(quizResult.data ?? []).map((row) => `quiz:${Number(row.timestamp_sec)}`),
@@ -291,7 +305,7 @@ export default function InteractiveVideoPlayer({
       );
     };
     void loadPlaybackState();
-  }, [courseId, lessonRecordId, readOnly]);
+  }, [courseId, lessonRecordId, readOnly, restorePosition]);
 
   // Save note to database
   const saveNote = async () => {
@@ -477,6 +491,7 @@ export default function InteractiveVideoPlayer({
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
+    if (resumePendingRef.current || videoRef.current.seeking) return;
     const { currentTime: ct, duration: dur } = videoRef.current;
     setCurrentTime(ct);
 
@@ -524,19 +539,8 @@ export default function InteractiveVideoPlayer({
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
-      const resumeAt = Math.min(
-        resumePositionRef.current,
-        Math.max(0, videoRef.current.duration - 0.25),
-      );
-      if (resumeAt > 0) {
-        videoRef.current.currentTime = resumeAt;
-        setCurrentTime(resumeAt);
-      }
-      if(!readOnly)onProgressRef.current?.(
-        videoRef.current.duration > 0
-          ? Math.round((videoRef.current.currentTime / videoRef.current.duration) * 100)
-          : 0,
-      );
+      // Metadata is not playback evidence. The resume controller observes a
+      // completed seek before time updates may persist progress.
       syncAudioOutput();
     }
   };

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {imageCleanupPlan} from './cleanup-old-images.mjs';
+import {imageCleanupPlan,listRegistryImages} from './cleanup-old-images.mjs';
 const pkg='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin';
 const now=Date.parse('2026-11-08T00:00:00Z');
 const rows=()=>Array.from({length:16},(_,i)=>({package:pkg,version:'sha256:'+i.toString(16).padStart(64,'0'),tags:[],createTime:new Date(now-(i+40)*86400000).toISOString()}));
@@ -20,4 +20,19 @@ test('an old version updated recently cannot be removed',()=>{
  const images=rows();images[12].updateTime=new Date(now-86400000).toISOString();
  images[13].updateTime='unknown';
  assert.ok(!imageCleanupPlan(images,{now}).remove.some(x=>[12,13].some(i=>x.image.endsWith(images[i].version))));
+});
+test('registry API normalizes upload timestamps and omitted empty tags with complete pagination',async()=>{
+ const uri=pkg+'@sha256:'+'a'.repeat(64);let pages=0;
+ const result=await listRegistryImages('private-token',{request:async(url,options)=>{
+  assert.equal(options.headers.Authorization,'Bearer private-token');pages++;
+  return Response.json(pages===1?{dockerImages:[{uri,uploadTime:'2026-09-01T00:00:00Z'}],nextPageToken:'next'}:{dockerImages:[]});
+ }});
+ assert.equal(pages,2);assert.equal(result[0].createTime,'2026-09-01T00:00:00Z');assert.deepEqual(result[0].tags,[]);assert.ok(!JSON.stringify(result).includes('private-token'));
+ await assert.rejects(listRegistryImages('token',{request:async()=>Response.json({images:[]})}),/SCHEMA_UNVERIFIED/);
+});
+test('seven-day policy keeps recent versions and metadata gaps cannot appear as a complete review',()=>{
+ const images=rows();images[12].updateTime=new Date(now-6*86400000).toISOString();
+ images[13].tags=undefined;
+ const plan=imageCleanupPlan(images,{now});assert.equal(plan.retention.minimumAgeDays,7);assert.equal(plan.eligibilityReviewComplete,false);assert.equal(plan.summary.unverifiableMetadata,1);
+ assert.ok(!plan.remove.some(x=>[12,13].some(i=>x.image.endsWith(images[i].version))));
 });

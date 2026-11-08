@@ -203,3 +203,19 @@ it('keeps known fabrication markers out of production PARIS libraries', () => {
   expect(result.files).toBeGreaterThan(40);
   expect(result.findings).toEqual([]);
 });
+
+it('uses database-valid UUIDs and persists provenance for marketing variations', async () => {
+  h.result = { data: null, error: { code: 'write_failed' } };
+  const template = CONTENT_TEMPLATES[0];
+  await expect(generateContent(template.id, {
+    title: 'Authorized program', description: 'Verified details',
+  }, {platforms:['facebook'],includeVariations:true})).rejects.toThrow('PARIS_DATABASE_OPERATION_FAILED');
+  const records = h.calls.find(call => call.method === 'insert')?.args[0];
+  expect(records).toHaveLength(4);
+  expect(new Set(records.map((row: any) => row.id)).size).toBe(4);
+  for (const row of records) expect(row.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  for (const row of records.slice(1)) {
+    expect(row.meta.parentContentId).toBe(records[0].id);
+    expect(['short','emoji','question']).toContain(row.meta.variationKind);
+  }
+});

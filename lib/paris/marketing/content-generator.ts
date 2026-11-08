@@ -355,7 +355,8 @@ async function generateVariations(
   // Short version
   const shortVersion: GeneratedContent = {
     ...original,
-    id: `${original.id}_short`,
+    id: crypto.randomUUID(),
+    meta: { ...original.meta, parentContentId: original.id, variationKind: 'short' },
     text: shortenContent(original.text, platform),
     variations: [],
   };
@@ -364,7 +365,8 @@ async function generateVariations(
   // With emoji
   const withEmoji: GeneratedContent = {
     ...original,
-    id: `${original.id}_emoji`,
+    id: crypto.randomUUID(),
+    meta: { ...original.meta, parentContentId: original.id, variationKind: 'emoji' },
     text: addEmoji(original.text),
     hashtags: original.hashtags.map(h => `✨ ${h}`),
     variations: [],
@@ -374,7 +376,8 @@ async function generateVariations(
   // Question format
   const questionFormat: GeneratedContent = {
     ...original,
-    id: `${original.id}_question`,
+    id: crypto.randomUUID(),
+    meta: { ...original.meta, parentContentId: original.id, variationKind: 'question' },
     text: convertToQuestion(original.text),
     hashtags: [...original.hashtags, '#Question'],
     variations: [],
@@ -478,6 +481,7 @@ async function saveGeneratedContent(contents: GeneratedContent[]): Promise<void>
     platform: content.platform,
     text: content.text,
     hashtags: content.hashtags,
+    meta: content.meta ?? null,
     word_count: content.word_count,
     created_at: new Date().toISOString(),
   }));

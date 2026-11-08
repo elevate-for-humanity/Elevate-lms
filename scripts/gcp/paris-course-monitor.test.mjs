@@ -73,6 +73,26 @@ test('an incomplete predecessor stage requeues the role within its retry budget'
  assert.equal(inspectCourseAutopilot(job({status:'failed',monitor:{enabled:true,recoveries:3},
    last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization'}),{},+now).action,'none');
 });
+test('a stale repair receipt cannot park work that a plain re-run can recover',()=>{
+ // Production deadlock: jobs carried BOTH a saved repairId and a resumable
+ // failure. The repair receipt was checked first, so PARIS reported
+ // repair_requested/observe forever and the queue never drained.
+ for(const last_error of [
+   'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization',
+   'fetch failed',
+ ]) {
+  const observation=inspectCourseAutopilot(job({status:'failed',last_error,
+    monitor:{enabled:true,repairId:'stale-repair'}}),{},+now);
+  assert.equal(observation.state,'recovering');
+  assert.equal(observation.action,'requeue');
+ }
+ // A genuinely non-resumable failure with a receipt is still reported, not requeued.
+ const blocked=inspectCourseAutopilot(job({status:'failed',
+   last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:REPAIR_PRODUCER_UNCHANGED',
+   monitor:{enabled:true,repairId:'verified-repair'}}),{},+now);
+ assert.equal(blocked.state,'repair_requested');
+ assert.equal(blocked.action,'observe');
+});
 test('monitor uses fenced changes and never resets attempts or changes worker payload',async()=>{
  const calls=[];const row=job({status:'failed',last_error:'fetch failed'});
  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,

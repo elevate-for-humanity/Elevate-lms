@@ -34,6 +34,13 @@ await check('saved speech playback and reuse',async()=>{
  return {passed:samples.length===2&&samples.every(x=>x.audio)&&samples[1].cache==='hit'&&samples[0].hash===samples[1].hash,samples};
 });
 const cli=args=>JSON.parse(execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',maxBuffer:32*1024*1024,timeout:120000,stdio:['ignore','pipe','pipe']}));
+await check('Legacy83 client website',async()=>{
+ const address=cli(['compute','addresses','describe','legacy83-website-ip','--region=us-central1']).address;
+ if(!/^(?:\d{1,3}\.){3}\d{1,3}$/.test(address||'')||address.split('.').some(x=>Number(x)>255))throw Error('LEGACY83_ENDPOINT_UNVERIFIED');
+ const base='https://legacy83-'+address.replaceAll('.','-')+'.sslip.io';
+ const response=await request(base+'/api/health'),body=await response.json();
+ return {passed:response.ok&&body.service==='legacy83'&&/^[a-f0-9]{40}$/.test(body.revision||''),httpStatus:response.status,revision:body.revision,base,scope:'public application identity; SSH is deliberately restricted by the existing client deployment'};
+});
 for(const region of ['us-central1','us-east1']){
  await check('Cloud Run paid services '+region,async()=>{
   const services=cli(['run','services','list','--region='+region]);

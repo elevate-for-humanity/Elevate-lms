@@ -6,6 +6,7 @@ import {COST_ASSET_SCOPE,inventoryFailureReason} from './audit-cost-resources.mj
 const project='elegant-racer-299721';
 const root='us-central1-docker.pkg.dev/'+project+'/elevate';
 const digestPattern=/^sha256:[a-f0-9]{64}$/;
+export const MINIMUM_IMAGE_AGE_DAYS=7;
 export function imageCleanupPlan(images,{referenced=[],children=[],now=Date.now()}={}) {
  const protectedImages=new Set([...referenced,...children]);
  const packages=new Map();
@@ -18,14 +19,41 @@ export function imageCleanupPlan(images,{referenced=[],children=[],now=Date.now(
   rows.sort((a,b)=>Date.parse(b.createTime)-Date.parse(a.createTime));
   for(const [index,item] of rows.entries()){
    const full=item.package+'@'+item.version,created=Date.parse(item.createTime);
+   const updated=item.updateTime===undefined?created:Date.parse(item.updateTime);
    // Keep every tagged image, every retained revision/job/VM reference, every
-   // manifest child, at least ten versions per package, and thirty days.
-   if(index<10||!Number.isFinite(created)||now-created<30*86400000||
+   // manifest child, at least ten versions per package, and seven days.
+   if(index<10||!Number.isFinite(created)||!Number.isFinite(updated)||now-Math.max(created,updated)<MINIMUM_IMAGE_AGE_DAYS*86400000||
       !Array.isArray(item.tags)||item.tags.length||protectedImages.has(full))continue;
    remove.push({image:full,createdAt:item.createTime});
   }
  }
- return {repository:root,imagesInspected:images.length,retention:{minimumVersionsPerPackage:10,minimumAgeDays:30,allTaggedImages:true,allRuntimeReferences:true,allManifestChildren:true},remove};
+ const known=images.filter(x=>Array.isArray(x.tags)&&Number.isFinite(Date.parse(x.createTime))&&Number.isFinite(Date.parse(x.updateTime||x.createTime)));
+ return {repository:root,imagesInspected:images.length,eligibilityReviewComplete:known.length===images.length,
+  summary:{tagged:images.filter(x=>Array.isArray(x.tags)&&x.tags.length).length,untagged:images.filter(x=>Array.isArray(x.tags)&&!x.tags.length).length,unverifiableMetadata:images.length-known.length},
+  retention:{minimumVersionsPerPackage:10,minimumAgeDays:MINIMUM_IMAGE_AGE_DAYS,allTaggedImages:true,allRuntimeReferences:true,allManifestChildren:true},remove};
+}
+
+/** Normalize the documented DockerImage API instead of formatter-dependent
+ * gcloud display rows. Empty protobuf tag arrays can be omitted in JSON. */
+export async function listRegistryImages(token,{request=fetch}={}){
+ const images=[],seen=new Set();let next='';
+ do{
+  if(seen.has(next))throw Error('IMAGE_PAGINATION_CYCLE');seen.add(next);
+  const url=new URL('https://artifactregistry.googleapis.com/v1/projects/'+project+'/locations/us-central1/repositories/elevate/dockerImages');
+  url.searchParams.set('pageSize','1000');if(next)url.searchParams.set('pageToken',next);
+  const response=await request(url,{headers:{Authorization:'Bearer '+token},redirect:'error',signal:AbortSignal.timeout(30000)});
+  if(!response.ok)throw Error('IMAGE_API_HTTP_'+response.status);
+  const body=await response.json();
+  if(Object.keys(body).some(k=>!['dockerImages','nextPageToken'].includes(k))||!Array.isArray(body.dockerImages||[]))throw Error('IMAGE_API_SCHEMA_UNVERIFIED');
+  for(const row of body.dockerImages||[]){
+   const [pkg,version,...extra]=(row.uri||'').split('@');
+   if(extra.length||!pkg?.startsWith(root+'/')||!digestPattern.test(version||'')||!Array.isArray(row.tags||[]))throw Error('IMAGE_API_SCHEMA_UNVERIFIED');
+   images.push({package:pkg,version,tags:row.tags||[],createTime:row.uploadTime,updateTime:row.updateTime||row.uploadTime});
+  }
+  next=body.nextPageToken||'';
+  if(typeof next!=='string'||images.length>4000)throw Error('IMAGE_MANIFEST_AUDIT_LIMIT');
+ }while(next);
+ return images;
 }
 
 const cli=args=>{try{return execFileSync('gcloud',args,{encoding:'utf8',timeout:120000,maxBuffer:64*1024*1024,stdio:['ignore','pipe','pipe']}).trim();}
@@ -35,9 +63,9 @@ function runtimeReferences(){
  const assets=json(['asset','search-all-resources',...COST_ASSET_SCOPE]);
  if(!Array.isArray(assets))throw Error('ASSET_INVENTORY_INCOMPLETE');
  if(assets.some(a=>a.assetType==='container.googleapis.com/Cluster'))throw Error('GKE_IMAGE_DEPENDENCIES_REQUIRE_REVIEW');
- // Active builds may be publishing an untagged parent before its final tag.
- const builds=json(['builds','list','--filter=status=QUEUED OR status=WORKING']);
- if(!Array.isArray(builds)||builds.length)throw Error('ACTIVE_BUILDS_IMAGE_CLEANUP_DEFERRED');
+ // Repository builds publish through GitHub Actions. Eligibility is fenced by
+ // version age/update time, retained runtime references, manifest children and
+ // live tags. It does not require access to the separate Cloud Build service.
  const regions=new Set(['us-central1','us-east1',...assets.filter(a=>/^run.googleapis.com\/(Service|Job|Revision)$/.test(a.assetType)).map(a=>a.location)]);
  const references=new Set();
  function collect(value){
@@ -87,19 +115,21 @@ async function manifestChildren(images){
 
 export async function cleanupOldImages({apply=false}={}){
  const references=runtimeReferences();
- const images=json(['artifacts','docker','images','list',root,'--include-tags']);
+ const token=cli(['auth','print-access-token']);
+ const images=await listRegistryImages(token);
  if(!Array.isArray(images)||images.length>4000)throw Error('IMAGE_MANIFEST_AUDIT_LIMIT');
  const children=await manifestChildren(images);
  const plan=imageCleanupPlan(images,{referenced:references,children});
+ if(!plan.eligibilityReviewComplete)throw Error('IMAGE_VERSION_METADATA_INCOMPLETE');
  mkdirSync('audit-reports',{recursive:true});
  writeFileSync('audit-reports/image-cleanup-plan.json',JSON.stringify(plan,null,2));
  const receipts=[];
  if(apply){
   // Recheck dependencies immediately before mutation. Abort if a deployment
-  // appeared during manifest inspection; concurrent builds are also rejected.
+  // appeared during manifest inspection. Never force-delete a concurrent tag.
   const fresh=runtimeReferences();
   if(JSON.stringify([...fresh].sort())!==JSON.stringify([...references].sort()))throw Error('RUNTIME_REFERENCES_CHANGED');
-  const latest=json(['artifacts','docker','images','list',root,'--include-tags']);
+  const latest=await listRegistryImages(token);
   const stillSafe=new Set(imageCleanupPlan(latest,{referenced:fresh,children}).remove.map(x=>x.image));
   for(const item of plan.remove.slice(0,100)){
    if(!stillSafe.has(item.image))continue;
@@ -107,9 +137,10 @@ export async function cleanupOldImages({apply=false}={}){
    cli(['artifacts','docker','images','delete',item.image,'--project='+project,'--quiet']);
    receipts.push({image:item.image,deleted:true,at:new Date().toISOString()});
    writeFileSync('audit-reports/image-cleanup-receipts.json',JSON.stringify(receipts,null,2));
+   console.log(JSON.stringify({action:'image_deleted',...receipts.at(-1)}));
   }
  }
- return {...plan,apply,deleted:receipts.length,receipts};
+ return {...plan,apply,deleted:receipts.length,eligibleNotAttempted:apply?Math.max(0,plan.remove.length-100):plan.remove.length,receipts};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  try{console.log(JSON.stringify(await cleanupOldImages({apply:process.argv.includes('--apply')})));}

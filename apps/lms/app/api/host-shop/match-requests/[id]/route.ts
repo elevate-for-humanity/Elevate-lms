@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,16 +132,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { data: updated, error: loadError } = await db
     .from('host_shop_match_requests')
     .select(`
-      id, apprentice_id, host_shop_id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
-      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, zip_code, phone, image_url, owner_name, owner_email, owner_phone, approval_status, is_approved),
-      placement:apprentice_placements!host_shop_match_requests_placement_id_fkey(id, status, start_date, student_id, shop_id, program_slug)
+      id, apprentice_id, host_shop_id, status, created_at, program_slug,
+      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(full_name, email)
     `)
     .eq('id', id)
     .single();
 
-  if (loadError) return NextResponse.json({ result });
-  return NextResponse.json({ request: updated, result });
+  if (loadError || !updated) return NextResponse.json({ error: 'Match updated; reload to verify the saved status.' }, { status: 503 });
+  return NextResponse.json({ request: hostShopMatchSummary(updated) });
 }
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -168,14 +167,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { data, error } = await db
     .from('host_shop_match_requests')
     .select(`
-      id, apprentice_id, host_shop_id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
-      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, zip_code, phone, image_url, owner_name, owner_email, owner_phone, approval_status, is_approved),
-      placement:apprentice_placements!host_shop_match_requests_placement_id_fkey(id, status, start_date, student_id, shop_id, program_slug)
+      id, apprentice_id, host_shop_id, status, created_at, program_slug,
+      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(full_name, email)
     `)
     .eq('id', id)
     .single();
 
   if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json({ request: data });
+  return NextResponse.json({ request: hostShopMatchSummary(data) });
 }

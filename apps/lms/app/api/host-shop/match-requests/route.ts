@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,16 +93,13 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Math.max(1, Number.parseInt(searchParams.get('limit') || '10', 10) || 10));
   const offset = (page - 1) * limit;
   const { user, db, role } = ctx;
-  const subject = await resolvePortalPreviewSubject(db, user.id);
 
   let query = db
     .from('host_shop_match_requests')
     .select(
       `
-      id, apprentice_id, host_shop_id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
-      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, zip_code, phone, image_url, owner_name, owner_email, owner_phone, approval_status, is_approved),
-      placement:apprentice_placements!host_shop_match_requests_placement_id_fkey(id, status, start_date, student_id, shop_id, program_slug)
+      id, apprentice_id, host_shop_id, status, created_at, program_slug,
+      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(full_name, email)
     `,
       { count: 'exact' },
     )
@@ -113,11 +110,9 @@ export async function GET(req: NextRequest) {
   const selectedHostShop = PLATFORM_ADMIN_ROLES.has(role)
     ? (await cookies()).get(HOST_SHOP_ADMIN_COOKIE)?.value
     : null;
-  // A shop preview also sets a communication-account preview; that account is
-  // the shop owner, not an apprentice requesting a placement.
-  if (subject.previewing && !selectedHostShop) {
-    query = query.eq('apprentice_id', subject.userId);
-  } else if (PLATFORM_ADMIN_ROLES.has(role) || HOST_ROLES.has(role)) {
+  // Never take a student/applicant identity from an Admin preview cookie
+  // into a Host Shop query. The exact approved shop relation owns this filter.
+  if (PLATFORM_ADMIN_ROLES.has(role) || HOST_ROLES.has(role)) {
     const shopIds = await getAuthorizedHostShopIds(db, user.id, role);
     if (!shopIds.length) {
       return NextResponse.json({ requests: [], pagination: { page, limit, total: 0, pages: 0 } });
@@ -134,7 +129,7 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({
-    requests: data || [],
+    requests: (data || []).map(hostShopMatchSummary),
     pagination: {
       page,
       limit,

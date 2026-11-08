@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
+import { canonicalHostShopProgram, canonicalHostShopPrograms } from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -16,16 +17,14 @@ export default async function HostShopApprenticesPage() {
   // reading active, non-revoked apprentice placements. Never fall back to a
   // global program roster or unscoped application query.
   const board = await getHostShopBoard(user.id);
-  const permittedPrograms = new Set(
-    (board.partner.programs || []).filter(
-      (program): program is string => typeof program === 'string',
-    ),
-  );
-  const assigned = board.apprentices.filter(
-    apprentice => permittedPrograms.size > 0 &&
-      typeof apprentice.program_slug === 'string' &&
-      permittedPrograms.has(apprentice.program_slug),
-  );
+  // Historical approved partners may store 'BARBER' or 'cosmetology'
+  // while placements use canonical *-apprenticeship slugs. Normalize only
+  // known aliases; never broaden scope by generic salon classification.
+  const permittedPrograms = new Set(canonicalHostShopPrograms(board.partner.programs));
+  const assigned = board.apprentices.filter(apprentice => {
+    const program = canonicalHostShopProgram(apprentice.program_slug);
+    return Boolean(program && permittedPrograms.has(program));
+  });
 
   return (
     <main className="mx-auto w-full max-w-4xl space-y-4 px-3 py-5 sm:px-6 sm:py-8">

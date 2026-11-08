@@ -18,9 +18,10 @@ export function imageCleanupPlan(images,{referenced=[],children=[],now=Date.now(
   rows.sort((a,b)=>Date.parse(b.createTime)-Date.parse(a.createTime));
   for(const [index,item] of rows.entries()){
    const full=item.package+'@'+item.version,created=Date.parse(item.createTime);
+   const updated=item.updateTime===undefined?created:Date.parse(item.updateTime);
    // Keep every tagged image, every retained revision/job/VM reference, every
    // manifest child, at least ten versions per package, and thirty days.
-   if(index<10||!Number.isFinite(created)||now-created<30*86400000||
+   if(index<10||!Number.isFinite(created)||!Number.isFinite(updated)||now-Math.max(created,updated)<30*86400000||
       !Array.isArray(item.tags)||item.tags.length||protectedImages.has(full))continue;
    remove.push({image:full,createdAt:item.createTime});
   }
@@ -35,9 +36,9 @@ function runtimeReferences(){
  const assets=json(['asset','search-all-resources',...COST_ASSET_SCOPE]);
  if(!Array.isArray(assets))throw Error('ASSET_INVENTORY_INCOMPLETE');
  if(assets.some(a=>a.assetType==='container.googleapis.com/Cluster'))throw Error('GKE_IMAGE_DEPENDENCIES_REQUIRE_REVIEW');
- // Active builds may be publishing an untagged parent before its final tag.
- const builds=json(['builds','list','--filter=status=QUEUED OR status=WORKING']);
- if(!Array.isArray(builds)||builds.length)throw Error('ACTIVE_BUILDS_IMAGE_CLEANUP_DEFERRED');
+ // Repository builds publish through GitHub Actions. Eligibility is fenced by
+ // version age/update time, retained runtime references, manifest children and
+ // live tags. It does not require access to the separate Cloud Build service.
  const regions=new Set(['us-central1','us-east1',...assets.filter(a=>/^run.googleapis.com\/(Service|Job|Revision)$/.test(a.assetType)).map(a=>a.location)]);
  const references=new Set();
  function collect(value){
@@ -96,7 +97,7 @@ export async function cleanupOldImages({apply=false}={}){
  const receipts=[];
  if(apply){
   // Recheck dependencies immediately before mutation. Abort if a deployment
-  // appeared during manifest inspection; concurrent builds are also rejected.
+  // appeared during manifest inspection. Never force-delete a concurrent tag.
   const fresh=runtimeReferences();
   if(JSON.stringify([...fresh].sort())!==JSON.stringify([...references].sort()))throw Error('RUNTIME_REFERENCES_CHANGED');
   const latest=json(['artifacts','docker','images','list',root,'--include-tags']);

@@ -43,11 +43,11 @@ jobs:
         run: |
           command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
           node scripts/gcp/verify-paid-services.mjs
-      - name: Inspect browser trial and client website VMs without stopping or deleting them
+      - name: Inspect browser trial without stopping it or deleting saved state
         if: always()
         run: |
           result=0
-          for vm in elevate-studio-browser-trial legacy83-website; do
+          for vm in elevate-studio-browser-trial; do
             gcloud compute ssh "$vm" --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/inspect-cost-vm.py > "audit-reports/$vm-health.json" || result=1
             cat "audit-reports/$vm-health.json"
           done

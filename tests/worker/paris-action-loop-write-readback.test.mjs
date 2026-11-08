@@ -35,6 +35,10 @@ test('model gets action-specific progression after one or two reads',()=>{
  assert.match(nextRepairActionConstraint(['read:lib/foo.ts','read:lib/bar.ts'],0),/already read source files/);
  assert.match(nextRepairActionConstraint([],1),/source write was committed/);
 });
+test('duplicate reads do not manufacture independent source inspection evidence',()=>{
+ assert.match(nextRepairActionConstraint(['read:lib/foo.ts','read:lib/foo.ts'],0),/NEXT JSON action should be replace/);
+ assert.match(nextRepairActionConstraint(['read:lib/foo.ts','read:lib/foo.ts','read:lib/bar.ts'],0),/already read source files/);
+});
 test('GitHub write only counts when committed file, blob, branch ref and bytes all match',()=>{
  const sha='a'.repeat(40),blob='b'.repeat(40);
  const receipt={expectedContent:'export const fixed=true;',observedContent:'export const fixed=true;',commitSha:sha,branchSha:sha,expectedBlobSha:blob,observedBlobSha:blob};

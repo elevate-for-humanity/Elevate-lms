@@ -38,6 +38,7 @@ import {
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
+import { logger } from '@/lib/logger';
 import { NotificationBell } from '@/components/lms/NotificationBell';
 import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
@@ -318,7 +319,11 @@ export default async function StudentDashboard() {
         .select('id, title, description, status, is_active')
         .in('id', courseIds)
     : { data: [], error: null };
-  if (courseRowsError) throw new Error(`STUDENT_COURSES_FAILED:${courseRowsError.message}`);
+  if (courseRowsError) {
+    // A transient catalog read must not strand the whole dashboard. Render the
+    // workspace without course titles rather than throwing the page away.
+    logger.error('STUDENT_COURSES_FAILED', courseRowsError);
+  }
 
   const courseMap = new Map(
     ((courseRows ?? []) as CourseRow[]).map((course) => [course.id, course]),
@@ -373,11 +378,12 @@ export default async function StudentDashboard() {
         .eq('course_id', activeCourseId),
     ]);
 
-    if (lessonsRes.error) throw new Error(`STUDENT_LESSONS_FAILED:${lessonsRes.error.message}`);
-    if (progressRes.error)
-      throw new Error(`STUDENT_LESSON_PROGRESS_FAILED:${progressRes.error.message}`);
+    if (lessonsRes.error) logger.error('STUDENT_LESSONS_FAILED', lessonsRes.error);
+    if (progressRes.error) logger.error('STUDENT_LESSON_PROGRESS_FAILED', progressRes.error);
 
-    lessons = (lessonsRes.data ?? []) as LessonRow[];
+    // Keep only usable lesson data; a failed read degrades progress to empty
+    // instead of replacing the learner's dashboard with an error page.
+    lessons = (lessonsRes.error ? [] : (lessonsRes.data ?? [])) as LessonRow[];
     completedLessonIds = new Set(
       (progressRes.data ?? [])
         .filter(

@@ -122,8 +122,16 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
 }
 
 async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
-  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
-  return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
+  // Durable run/plan bookkeeping is supporting evidence, not a precondition for
+  // answering or executing a command. A transient write failure here must never
+  // take down the entire Studio request, so it degrades to a null execution.
+  try {
+    const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
+    return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
+  } catch (error) {
+    logger.warn('[devstudio/chat] unified studio run could not be recorded', normalizeError(error));
+    return null;
+  }
 }
 
 async function recordUnifiedCapabilityUse(

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
-import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
+import { permittedHostShopProgramScopes, hostShopScopeAllowsRequest } from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,7 +103,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   if (!PLATFORM_ADMIN_ROLES.has(role) &&
-      !(await permittedHostShopProgramSlugs(db, user.id)).includes(requestRecord.program_slug)) {
+      !hostShopScopeAllowsRequest(
+        await permittedHostShopProgramScopes(db, user.id),
+        requestRecord.host_shop_id,
+        requestRecord.program_slug,
+      )) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -159,7 +163,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     if (!PLATFORM_ADMIN_ROLES.has(role) &&
-        !(await permittedHostShopProgramSlugs(db, user.id)).includes(requestRecord.program_slug)) {
+        !hostShopScopeAllowsRequest(
+        await permittedHostShopProgramScopes(db, user.id),
+        requestRecord.host_shop_id,
+        requestRecord.program_slug,
+      )) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   } else {

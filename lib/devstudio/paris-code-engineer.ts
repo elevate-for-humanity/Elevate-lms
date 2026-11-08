@@ -617,7 +617,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         if (writes >= MAX_WRITES) throw new Error('Internal engineering write limit reached.');
         // A test-only patch cannot validate a production repair. Preserve the
         // checkpoint and redirect the planner before creating a test artifact.
-        if (action.path.startsWith('tests/') && !hasApplicationSourceCorrection(changedFiles)) {
+        if (action.path.startsWith('tests/') && !hasApplicationSourceCorrection([...changedFiles])) {
           observations.push('CREATE BLOCKED '+action.path+': first commit a justified application correction, then create a new regression test. No test-only repair was staged.');
           continue;
         }

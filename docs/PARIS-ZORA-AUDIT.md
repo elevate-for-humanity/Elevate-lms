@@ -174,7 +174,7 @@ The Elevate LMS platform has built substantial **PARIS** components for the stud
 | **Competency tracker** | ⚠️ PARTIAL | DOL competencies exist | Database exists |
 | **Mentor assignment** | ❌ MISSING | — | No assignment |
 | **Host Shop assignment** | ❌ MISSING | — | No routing |
-| **RAPIDS documentation** | ⚠️ PARTIAL | API exists | Not connected |
+| **RAPIDS documentation** | ⚠️ MANUAL | Authenticated RAPIDS sponsor portal | No verified EFH sponsor API transport; prepare reviewed uploads and retain agency receipts |
 | **Time clock** | ❌ MISSING | — | No clock in/out |
 | **Evaluations** | ❌ MISSING | — | No evaluation forms |
 

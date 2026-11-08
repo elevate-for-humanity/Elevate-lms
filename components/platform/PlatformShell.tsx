@@ -3,6 +3,7 @@
 import { DashboardVideoCalls } from '@/components/communications/DashboardVideoCalls';
 
 import { PortalToolSearch } from './PortalToolSearch';
+import { NarratedTabWalkthrough } from './NarratedTabWalkthrough';
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
@@ -483,6 +484,8 @@ export function PlatformShell({
               </div>
             </div>
           )}
+          {['program_holder', 'site_coordinator', 'host_shop', 'host_shop_admin', 'partner', 'partner_admin'].includes(role) &&
+            <NarratedTabWalkthrough sections={sections} />}
           <div className="min-w-0 w-full max-w-none overflow-x-auto break-words p-3 sm:p-4 lg:p-6">
             {children}
           </div>

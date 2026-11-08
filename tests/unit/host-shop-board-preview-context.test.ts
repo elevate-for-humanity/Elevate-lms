@@ -4,7 +4,10 @@ const state = vi.hoisted(() => ({cookie: undefined as string|undefined, preview:
 vi.mock('next/headers',()=>({cookies:async()=>({get:()=>state.cookie?{value:state.cookie}:undefined})}));
 vi.mock('@/lib/admin/host-shop-preview',()=>({resolveHostShopAdminPreview:async()=>state.preview}));
 import { resolvePartnerForBoard } from '@/lib/partner/board';
-const db={from(table:string){let id='';const q:any={};q.select=()=>q;q.eq=(key:string,value:string)=>{if(key==='id')id=value;state.filters.push([table,key,value]);return q};q.maybeSingle=async()=>({data:table==='profiles'?{role:state.role}:{id},error:null});q.then=(resolve:any)=>Promise.resolve({data:[{partner_id:'owner-partner',partners:{id:'owner-partner'}}],error:null}).then(resolve);return q}};
+const db={from(table:string){let id='';const q:any={};q.select=()=>q;q.eq=(key:string,value:string)=>{if(key==='id')id=value;state.filters.push([table,key,value]);return q};q.maybeSingle=async()=>({data:table==='profiles'?{role:state.role}:{id},error:null});q.then=(resolve:any)=>Promise.resolve({data:[{
+  partner_id:'owner-partner', role:'owner', status:'active',
+  partners:{id:'owner-partner', status:'active', approval_status:'approved', is_active:true},
+}],error:null}).then(resolve);return q}};
 beforeEach(()=>{state.cookie=undefined;state.preview=null;state.role='admin';state.filters=[]});
 it('resolves the signed Styles selection when the companion selector cookie is missing',async()=>{
  state.preview={actorId:'admin',partnerId:'styles'};
@@ -22,7 +25,8 @@ it('does not borrow another administrators signed selection',async()=>{
 it('retains the existing authenticated administrator selector fallback',async()=>{
  state.cookie='styles';expect((await resolvePartnerForBoard(db,'admin')).id).toBe('styles');
 });
-it('ordinary shop owners still resolve only their active membership',async()=>{
+// An admin preview cookie never grants a regular owner access to another shop.
+it('ordinary shop owners still resolve only their active approved management membership',async()=>{
  state.role='host_shop';state.cookie='country';state.preview={actorId:'admin',partnerId:'styles'};
  expect((await resolvePartnerForBoard(db,'owner')).id).toBe('owner-partner');
 });

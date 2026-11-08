@@ -33,7 +33,9 @@ function owned(vm){return vm.name===name&&/^[1-9][0-9]*$/.test(vm.id||'')&&vm.la
 const disks=vm=>(vm.disks||[]).map(d=>({source:d.source,autoDelete:d.autoDelete,boot:d.boot})).sort((a,b)=>a.source.localeCompare(b.source));
 function empty(proof){return proof.ready===true&&proof.cookieStoragePersistent===true&&proof.dataDiskMounted===true&&proof.activeBrowserSessions===0&&proof.files===0&&proof.symlinks===0&&proof.directChildShells===0&&proof.directNonBrowserProcesses===0&&proof.processInventoryReadable===true;}
 export async function parkBrowserTrial({read,inspect,bindings,production,stop,start}){
- const before=read();if(!owned(before))throw Error('TRIAL_OWNERSHIP_UNVERIFIED');
+ const before=read();
+ if(before.name===name&&before.labels?.purpose==='studio-browser-ready')return {vm:name,parked:false,unchanged:true,reason:'production_browser_role_preserved',disksDeleted:false};
+ if(!owned(before))throw Error('TRIAL_OWNERSHIP_UNVERIFIED');
  if(before.status==='TERMINATED')return {vm:name,parked:true,unchanged:true,disksDeleted:false};
  if(before.status!=='RUNNING')throw Error('TRIAL_STATE_NOT_STABLE');
  if((await bindings())!==true||(await production())!==true)throw Error('TRIAL_PRODUCTION_BINDINGS_UNVERIFIED');

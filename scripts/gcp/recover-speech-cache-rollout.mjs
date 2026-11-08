@@ -24,10 +24,13 @@ export async function recoverSpeech({run=google,request=fetch,activate=activateT
  const revisions=read(['run','revisions','list','--service='+service,'--region=us-central1']);
  const candidates=revisions.filter(r=>r.metadata?.name?.startsWith(service+'-r38fa72ef-')&&r.status?.conditions?.some(c=>c.type==='Ready'&&c.status==='True'));
  if(candidates.length!==1)throw Error('SPEECH_ROLLBACK_REVISION_UNVERIFIED');
- const result=await activate({service,revision:candidates[0].metadata.name,commit:previous,attempts:2,fetcher:async(url,options)=>{
+ const result=await activate({service,revision:candidates[0].metadata.name,commit:previous,fetcher:async(url,options)=>{
   const response=await request(url,options);
+  // Finish the short health fetch before the separate, longer audio probe.
+  // Its abort signal must not invalidate an unread body during synthesis.
+  const body=await response.arrayBuffer();
   if(url.endsWith('/api/health')&&!(await voice(new URL(url).origin)).passed)throw Error('SPEECH_ROLLBACK_AUDIO_UNVERIFIED');
-  return response;
+  return new Response(body,{status:response.status,headers:{'Content-Type':'application/json'}});
  }});
  const acceptance=await voice(canonical);
  if(!acceptance.passed)throw Error('SPEECH_ROLLBACK_PUBLIC_AUDIO_UNVERIFIED');

@@ -21,6 +21,10 @@ RUN apk add --no-cache util-linux
 
 FROM base AS dependencies
 
+# CPU web runtimes retain bundled ONNX CPU support and skip optional GPU downloads.
+ENV ONNXRUNTIME_NODE_INSTALL=skip
+ENV ONNXRUNTIME_NODE_INSTALL_CUDA=skip
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY apps/lms/package.json ./apps/lms/package.json

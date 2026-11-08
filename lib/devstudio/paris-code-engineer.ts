@@ -327,7 +327,7 @@ function parseAction(value: Record<string, unknown>): AgentAction {
 }
 
 export type ParisRepairCheckpoint = {
-  version: 1; boundedCpuEdits?: boolean; startedAt?: string; branch: string; baseSha: string; headSha: string; nextTurn: number;
+  version: 1; boundedCpuEdits?: boolean; verifiedSourceRead?: boolean; startedAt?: string; branch: string; baseSha: string; headSha: string; nextTurn: number;
   observations: string[]; changedFiles: string[]; newRegressionTests: string[];
   inspectionHistory?: string[]; discoveredFiles?: string[]; sourceEvidence?: Record<string, unknown>;
   commits: string[]; writes: number; summary: string; complete: boolean;
@@ -380,6 +380,10 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   const changedFiles = new Set<string>(saved?.changedFiles ?? []);
   const newRegressionTests = new Set<string>(saved?.newRegressionTests ?? []);
   const inspectionHistory = Array.isArray(saved?.inspectionHistory) ? saved.inspectionHistory.slice(-30) : [];
+  // Only successful GitHub readFile() calls may raise the CPU edit allowance.
+  // A read: inspection key is an attempt, not evidence that source was read.
+  let verifiedSourceRead = saved?.verifiedSourceRead === true ||
+    (saved?.observations ?? []).some(value => typeof value === 'string' && value.startsWith('READ '));
   let discoveredFiles: string[] = rememberSourcePaths(saved?.discoveredFiles ?? []);
   if ((!saved || evidenceChanged) &&
       (/REPAIR_PRODUCER_UNCHANGED/.test(task) || Boolean(sourceEvidence?.blockedStep) ||
@@ -400,7 +404,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
     await continuation.save({version:1,boundedCpuEdits:true,startedAt,branch,baseSha,headSha,nextTurn,
       observations:observations.slice(-8),discoveredFiles,sourceEvidence,changedFiles:[...changedFiles],inspectionHistory:inspectionHistory.slice(-30),
-      newRegressionTests:[...newRegressionTests],commits,writes,summary,complete});
+      newRegressionTests:[...newRegressionTests],commits,writes,summary,complete,verifiedSourceRead});
   };
 
   try {
@@ -454,7 +458,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           },
         ],
         temperature: 0.1,
-        maxTokens: repairCompletionTokens(ownedTier, observations),
+        maxTokens: repairCompletionTokens(ownedTier, observations, verifiedSourceRead),
         jsonMode: true,
         signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
       } as Parameters<typeof aiChat>[0];
@@ -565,6 +569,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
             observations.push(`LIST ${action.path || '/'}: ${JSON.stringify(entries)}`);
           } else {
             const file = await readFile(action.path, branch, task + JSON.stringify(sourceEvidence ?? {}));
+            verifiedSourceRead = true;
             observations.push(`READ ${file.path} (sha ${file.sha}):\n${file.excerpt}`);
           }
         } catch (error) {

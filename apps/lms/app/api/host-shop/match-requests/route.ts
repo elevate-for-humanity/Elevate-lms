@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   const hostShopId = typeof body?.host_shop_id === 'string' ? body.host_shop_id.trim() : '';
-  const programSlug = canonicalHostShopProgram(body?.program_slug || 'barber-apprenticeship');
+  const programSlug = canonicalHostShopProgram(body?.program_slug);
   if (!programSlug) return NextResponse.json({ error: 'Valid apprenticeship program required.' }, { status: 400 });
   const message = typeof body?.message === 'string' ? body.message.trim().slice(0, 4000) : null;
   const apprenticeNotes = typeof body?.apprentice_notes === 'string'

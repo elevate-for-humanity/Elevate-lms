@@ -330,16 +330,23 @@ test('cleared saved owner pause requeues only a canonically ready failed role',a
  assert.equal(ownerPaused.status,undefined);
 });
 
-test('source publication approval stays blocked despite historical PARIS repair receipt',()=>{
+test('publication-approval restriction is removed so the quality role can release validated lessons',()=>{
  for(const monitor of [{enabled:true,repairId:'historical-paris-repair'},{enabled:true}]) {
-  const blocked=inspectCourseAutopilot({
+  const recovered=inspectCourseAutopilot({
    status:'failed',last_error:'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED',
    monitor,attempts:1,max_attempts:5
   },{status:'running',profile:{ownerPaused:false}},now.getTime());
-  assert.equal(blocked.state,'attention_required');
-  assert.equal(blocked.action,'none');
-  assert.equal(blocked.reason,'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED');
+  assert.equal(recovered.state,'recovering');
+  assert.equal(recovered.action,'requeue');
+  assert.match(recovered.reason,/Publication-approval restriction removed/);
  }
+ // A job that already exhausted its retry budget is still reported, not requeued.
+ const exhausted=inspectCourseAutopilot({
+  status:'failed',last_error:'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED',
+  monitor:{enabled:true},attempts:5,max_attempts:5
+ },{status:'running',profile:{ownerPaused:false}},now.getTime());
+ assert.equal(exhausted.state,'attention_required');
+ assert.equal(exhausted.action,'none');
  // Genuine source-repair failures can still be observed through PARIS.
  const codeRepair=inspectCourseAutopilot({
   status:'failed',last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:REPAIR_PRODUCER_UNCHANGED',

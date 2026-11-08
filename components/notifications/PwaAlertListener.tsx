@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
   alertKind,
@@ -8,9 +8,11 @@ import {
   normalizeAlertSettings,
 } from '@/lib/notifications/pwa-alert-settings';
 import { playAlert } from '@/lib/notifications/alert-audio';
-export function PwaAlertListener() {
+export function PwaAlertListener({ authenticatedUserId }: { authenticatedUserId?: string } = {}) {
+  const [connectionError, setConnectionError] = useState(false);
   useEffect(() => {
     const db = createClient();
+    const reads = new AbortController();
     let stopped = false,
       channel: any,
       userId = '',
@@ -20,7 +22,7 @@ export function PwaAlertListener() {
       lastAudioAt = 0;
     async function refresh() {
       try {
-        const r = await fetch('/api/notifications/preferences', { cache: 'no-store' });
+        const r = await fetch('/api/notifications/preferences', { cache: 'no-store', signal: reads.signal });
         if (r.ok) {
           const data = await r.json();
           settings = normalizeAlertSettings(data.settings);
@@ -83,38 +85,53 @@ export function PwaAlertListener() {
           .eq('user_id', userId)
           .gt('created_at', since)
           .order('created_at', { ascending: true })
-          .limit(50);
+          .limit(50)
+          .abortSignal(reads.signal);
+        if (stopped) return;
+        setConnectionError(Boolean(error));
         if (!error && data)
           for (const row of data) {
             await announce(row);
             if (row.created_at > since) since = row.created_at;
           }
+      } catch {
+        if (!stopped) setConnectionError(true);
       } finally {
         polling = false;
       }
     }
+    setConnectionError(false);
     void (async () => {
-      const {
-        data: { user },
-      } = await db.auth.getUser();
-      if (stopped || !user) return;
-      userId = user.id;
+      // CommunicationTodos has already verified this identity with getUser.
+      // Reuse it instead of starting another auth request as the page navigates.
+      // Standalone listeners still verify their own user; database RLS remains
+      // the authority for every notification read and realtime subscription.
+      let verifiedUserId = authenticatedUserId;
+      if (!verifiedUserId) {
+        const { data: { user }, error } = await db.auth.getUser();
+        if (error) throw error;
+        verifiedUserId = user?.id;
+      }
+      if (stopped || !verifiedUserId) return;
+      userId = verifiedUserId;
       await refresh();
       if (stopped) return;
       channel = db
-        .channel(`pwa-alerts:${user.id}`)
+        .channel(`pwa-alerts:${verifiedUserId}`)
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
             table: 'notifications',
-            filter: `user_id=eq.${user.id}`,
+            filter: `user_id=eq.${verifiedUserId}`,
           },
           (payload: any) => void announce(payload.new),
         )
         .subscribe();
-    })();
+    })().catch(() => {
+      if (!stopped) setConnectionError(true);
+    });
     const timer = setInterval(() => void poll(), 30000);
     const onFocus = () => {
       void refresh();
@@ -124,11 +141,14 @@ export function PwaAlertListener() {
     window.addEventListener('elevate-alert-settings', refresh);
     return () => {
       stopped = true;
+      reads.abort();
       clearInterval(timer);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('elevate-alert-settings', refresh);
       if (channel) void db.removeChannel(channel);
     };
-  }, []);
-  return null;
+  }, [authenticatedUserId]);
+  return connectionError
+    ? <p role="status">Notification alerts are temporarily unavailable. Please refresh to reconnect.</p>
+    : null;
 }

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
+import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,6 +119,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ requests: [], pagination: { page, limit, total: 0, pages: 0 } });
     }
     query = query.in('host_shop_id', shopIds);
+    if (!PLATFORM_ADMIN_ROLES.has(role)) {
+      const allowedPrograms = await permittedHostShopProgramSlugs(db, user.id);
+      if (!allowedPrograms.length) {
+        return NextResponse.json({ requests: [], pagination: { page, limit, total: 0, pages: 0 } });
+      }
+      query = query.in('program_slug', allowedPrograms);
+    }
   } else if (APPRENTICE_ROLES.has(role)) {
     query = query.eq('apprentice_id', user.id);
   } else {

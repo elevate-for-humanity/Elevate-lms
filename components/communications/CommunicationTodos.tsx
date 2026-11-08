@@ -165,7 +165,7 @@ export function CommunicationTodos({
       aria-label="New email and communication to-dos"
       className="mx-auto my-3 w-full min-w-0 max-w-7xl space-y-2 overflow-x-hidden px-4"
     >
-      {!embedded && <PwaAlertListener key={activeUserId} />}
+      {!embedded && <PwaAlertListener key={activeUserId} authenticatedUserId={activeUserId} />}
       {learnerPage ? (
         <details className="rounded-xl border border-slate-200 bg-white p-3">
           <summary className="cursor-pointer text-sm font-bold text-slate-700">

@@ -4,7 +4,7 @@
  * Covers:
  * 1. hasLmsAccess — all enrollment states that should grant/deny LMS access
  * 2. onboarding/learner page — handles null profile without crashing
- * 3. requireRole source — uses user-facing client (RLS applies), not admin client
+ * 3. requireRole source — profile/roles remain RLS-scoped; exceptional archived-holder read is user-bound
  * 4. Enrollment state contract — proxy.ts and hasLmsAccess agree on access states
  */
 
@@ -206,10 +206,40 @@ describe('requireRole — uses user-facing client', () => {
     expect(src).toContain("import { createClient } from '@/lib/supabase/server'");
   });
 
-  it('does not import requireAdminClient (would bypass RLS)', () => {
-    // requireRole intentionally uses the user-facing client so students can only
-    // read their own profile row. requireUser uses admin client — different helper.
-    expect(src).not.toContain('requireAdminClient');
+  it('keeps primary profile and all role/membership reads RLS-scoped', () => {
+    // The privileged archive flag lookup is allowed only in a separate narrow
+    // helper. Do not move profile, role grants, or membership reads to admin.
+    const pageGuard = src.slice(
+      src.indexOf('export async function requireRole('),
+      src.indexOf('export async function hasRole('),
+    );
+    const secondaryGuard = src.slice(src.indexOf('export async function hasRole('));
+    for (const guard of [pageGuard, secondaryGuard]) {
+      expect(guard).toContain("const supabase = await createClient()");
+      expect(guard).toContain("supabase.from('profiles')");
+      expect(guard).toContain("supabase.from('user_roles')");
+      expect(guard).toContain(".from('partner_users')");
+      expect(guard).not.toContain('requireAdminClient');
+    }
+  });
+
+  it('limits the exceptional privileged read to the archived flag for the current user', () => {
+    // Archived accounts may no longer be able to read their historic
+    // program_holders record through ordinary RLS. The server checks only
+    // the marker and never returns its underlying record to the browser.
+    const helper = src.slice(
+      src.indexOf('async function enforceArchivedHostShopScope('),
+      src.indexOf('async function resolveCurrentPath('),
+    );
+    expect(helper).toContain("profileRole !== 'host_shop'");
+    expect(helper).toContain('const db = await requireAdminClient()');
+    expect(helper).toContain(".from('program_holders')");
+    expect(helper).toContain(".select('features')");
+    expect(helper).toContain(".eq('user_id', userId)");
+    expect(helper).toContain("if (error) throw new Error('HOST_SHOP_ARCHIVE_SCOPE_UNAVAILABLE')");
+    expect(helper).toContain('scopeArchivedHostShopRoles(');
+    expect(helper).not.toContain('.update(');
+    expect(helper).not.toContain('.delete(');
   });
 
   it('profile select uses maybeSingle (returns null, not error, when missing)', () => {

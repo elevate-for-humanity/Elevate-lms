@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
+import { permittedHostShopProgramScopes, hostShopScopeAllowsRequest } from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,35 +50,28 @@ async function getContext() {
 }
 
 async function authorizedShopIds(db: any, userId: string, role: string) {
-  let partnerId: string | null = null;
-
+  let partnerIds: string[] = [];
   if (PLATFORM_ADMIN_ROLES.has(role)) {
-    const cookieStore = await cookies();
-    partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || null;
+    const selected = (await cookies()).get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    if (selected) partnerIds = [selected];
   } else if (HOST_ROLES.has(role)) {
-    const { data: partnerUser } = await db
-      .from('partner_users')
-      .select('partner_id, status')
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .maybeSingle();
-    partnerId = partnerUser?.partner_id || null;
-  } else {
-    return [];
+    const { data: links, error } = await db.from('partner_users')
+      .select('partner_id,role').eq('user_id', userId).eq('status', 'active');
+    if (error) throw new Error('HOST_SHOP_MEMBERSHIP_LOOKUP_FAILED');
+    partnerIds = Array.from(new Set((links || [])
+      .filter((row: any) => ['owner','partner_admin','admin','supervisor','mentor','manager'].includes(
+        String(row.role || '').toLowerCase(),
+      )).map((row: any) => row.partner_id).filter(Boolean)));
   }
-
-  let query = db
-    .from('shops')
+  if (!partnerIds.length) return [];
+  const { data, error } = await db.from('shops')
     .select('id, partner_id, active, partners!inner(id, status, approval_status, is_active)')
     .eq('active', true)
     .eq('partners.status', 'active')
     .eq('partners.approval_status', 'approved')
-    .neq('partners.is_active', false);
-
-  if (partnerId) query = query.eq('partner_id', partnerId);
-  else return [];
-
-  const { data } = await query;
+    .neq('partners.is_active', false)
+    .in('partner_id', partnerIds);
+  if (error) throw new Error('HOST_SHOP_AUTHORIZED_SHOPS_UNAVAILABLE');
   return (data || []).map((shop: any) => shop.id).filter(Boolean);
 }
 
@@ -107,6 +102,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!requestRecord.host_shop_id || !shopIds.includes(requestRecord.host_shop_id)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+  if (!PLATFORM_ADMIN_ROLES.has(role) &&
+      !hostShopScopeAllowsRequest(
+        await permittedHostShopProgramScopes(db, user.id),
+        requestRecord.host_shop_id,
+        requestRecord.program_slug,
+      )) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await req.json().catch(() => null);
   const status = typeof body?.status === 'string' ? body.status.trim().toLowerCase() : '';
@@ -131,16 +134,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { data: updated, error: loadError } = await db
     .from('host_shop_match_requests')
     .select(`
-      id, apprentice_id, host_shop_id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
-      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, zip_code, phone, image_url, owner_name, owner_email, owner_phone, approval_status, is_approved),
-      placement:apprentice_placements!host_shop_match_requests_placement_id_fkey(id, status, start_date, student_id, shop_id, program_slug)
+      id, apprentice_id, host_shop_id, status, created_at, program_slug,
+      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(full_name, email)
     `)
     .eq('id', id)
     .single();
 
-  if (loadError) return NextResponse.json({ result });
-  return NextResponse.json({ request: updated, result });
+  if (loadError || !updated) return NextResponse.json({ error: 'Match updated; reload to verify the saved status.' }, { status: 503 });
+  return NextResponse.json({ request: hostShopMatchSummary(updated) });
 }
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -161,6 +162,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (!requestRecord.host_shop_id || !shopIds.includes(requestRecord.host_shop_id)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+    if (!PLATFORM_ADMIN_ROLES.has(role) &&
+        !hostShopScopeAllowsRequest(
+        await permittedHostShopProgramScopes(db, user.id),
+        requestRecord.host_shop_id,
+        requestRecord.program_slug,
+      )) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   } else {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -168,14 +177,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { data, error } = await db
     .from('host_shop_match_requests')
     .select(`
-      id, apprentice_id, host_shop_id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
-      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, zip_code, phone, image_url, owner_name, owner_email, owner_phone, approval_status, is_approved),
-      placement:apprentice_placements!host_shop_match_requests_placement_id_fkey(id, status, start_date, student_id, shop_id, program_slug)
+      id, apprentice_id, host_shop_id, status, created_at, program_slug,
+      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(full_name, email)
     `)
     .eq('id', id)
     .single();
 
   if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json({ request: data });
+  return NextResponse.json({ request: hostShopMatchSummary(data) });
 }

@@ -132,8 +132,10 @@ export function normalizeHostShopProgram(value: unknown): HostShopProgramType | 
 export function resolveHostShopProgram(partner: Record<string, unknown> | null | undefined): HostShopProgramType {
   return (
     normalizeHostShopProgram(partner?.program_type) ??
-    normalizeHostShopProgram(partner?.partner_type) ??
+    // An approved multi-program salon must use its explicit current program
+    // list before the generic partner_type='salon' (cosmetology) fallback.
     normalizeHostShopProgram(partner?.programs) ??
+    normalizeHostShopProgram(partner?.partner_type) ??
     'barber'
   );
 }

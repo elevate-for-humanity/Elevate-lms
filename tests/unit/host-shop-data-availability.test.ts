@@ -12,8 +12,13 @@ vi.mock('@/lib/supabase/admin', () => ({
         partner_users: [
           {
             partner_id: 'partner',
+            role: 'owner',
+            status: 'active',
             partners: {
               id: 'partner',
+              status: 'active',
+              approval_status: 'approved',
+              is_active: true,
               state: 'IN',
               program_type: 'cosmetology',
               programs: ['cosmetology'],

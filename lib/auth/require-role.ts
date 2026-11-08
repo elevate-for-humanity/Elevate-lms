@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
 import { hasAnyRole, normalizeRoles, type UserRole } from '@/lib/rbac/role-matrix';
@@ -47,6 +48,43 @@ function membershipDerivedRoles(rows: any[] | null | undefined): UserRole[] {
       ),
   );
   return hasActiveHostShopMembership ? ['host_shop'] : [];
+}
+
+/**
+ * An archived Program Holder who is now Host Shop-only must not regain
+ * Employer/Admin/Program Holder access from legacy user_roles grants.
+ * Preserve those historical grant rows in the database for audit; only
+ * constrain effective session permissions. Other multi-role shops are untouched.
+ */
+export function scopeArchivedHostShopRoles(
+  effectiveRoles: UserRole[],
+  profileRole: unknown,
+  holderArchived: boolean,
+): UserRole[] {
+  return profileRole === 'host_shop' && holderArchived
+    ? ['host_shop']
+    : effectiveRoles;
+}
+
+async function enforceArchivedHostShopScope(
+  userId: string,
+  profileRole: unknown,
+  effectiveRoles: UserRole[],
+): Promise<UserRole[]> {
+  if (profileRole !== 'host_shop' || !effectiveRoles.some(role => role !== 'host_shop')) {
+    return effectiveRoles;
+  }
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('program_holders')
+    .select('features')
+    .eq('user_id', userId);
+  if (error) throw new Error('HOST_SHOP_ARCHIVE_SCOPE_UNAVAILABLE');
+  return scopeArchivedHostShopRoles(
+    effectiveRoles,
+    profileRole,
+    (data || []).some((row: any) => row.features?.portal_access_archived === true),
+  );
 }
 
 async function resolveCurrentPath(): Promise<string> {
@@ -116,11 +154,11 @@ export async function requireRole(
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
     .filter((value: unknown): value is string => typeof value === 'string');
-  const effectiveRoles = normalizeRoles([
+  const effectiveRoles = await enforceArchivedHostShopScope(user.id, profile.role, normalizeRoles([
     profile.role,
     ...secondaryRoles,
     ...membershipDerivedRoles(partnerMembershipRows),
-  ]);
+  ]));
 
   if (!hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true })) {
     redirect('/unauthorized');
@@ -163,11 +201,16 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
     .filter((value: unknown): value is string => typeof value === 'string');
-  const effectiveRoles = normalizeRoles([
-    profile?.role,
-    ...secondaryRoles,
-    ...membershipDerivedRoles(partnerMembershipRows),
-  ]);
-
-  return hasAnyRole(effectiveRoles, [requiredRole], { adminOverride: true });
+  // Background role checks must use the same archived-portal restriction
+  // as full page guards; do not revive legacy grants through hasRole().
+  try {
+    const effectiveRoles = await enforceArchivedHostShopScope(user.id, profile.role, normalizeRoles([
+      profile.role,
+      ...secondaryRoles,
+      ...membershipDerivedRoles(partnerMembershipRows),
+    ]));
+    return hasAnyRole(effectiveRoles, [requiredRole], { adminOverride: true });
+  } catch {
+    return false;
+  }
 }

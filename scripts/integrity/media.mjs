@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LEGACY_IMAGE_ALIASES } from '../../lib/media/legacy-image-aliases.mjs';
 import { VERIFIED_IMAGE_ALIASES } from '../../lib/media/verified-image-aliases.mjs';
+import {verifiedGoogleNaturalVoiceChain} from './natural-voice-provider-contract.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
@@ -217,13 +218,12 @@ if (unauthorizedBrowserSpeech.length) {
 }
 
 const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
+const cachedGoogleVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/saved-google-speech.ts'), 'utf8');
 const googleVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/google-natural-voice.ts'), 'utf8');
-if (!naturalRoute.includes('generateGoogleNaturalVoice')) {
-  fail('Natural voice handler is not using the shared Google natural-voice provider');
-} else if (!googleVoice.includes("https://texttospeech.googleapis.com/v1/text:synthesize") || !googleVoice.includes("en-US-Neural2-F")) {
-  fail('Google natural-voice provider has no production speech endpoint or voice');
+if (!verifiedGoogleNaturalVoiceChain({route:naturalRoute,saved:cachedGoogleVoice,google:googleVoice})) {
+  fail('Natural voice must call the canonical Google provider directly or through the private speech cache');
 } else {
-  pass('Shared natural AI voice handler is configured with the Google provider');
+  pass('Shared natural AI voice handler uses the canonical Google provider with verified cache boundaries');
 }
 
 console.log('\n────────────────────────────');

@@ -39,7 +39,10 @@ export async function POST(req: NextRequest) {
     if (typeof build.updated_at !== 'string')
       return NextResponse.json({ error: 'The saved revision is unavailable. Refresh before changing the build.' }, { status: 409 });
     const profile = build.profile as Record<string, unknown>;
-    if (profile?.ownerPaused === true) {
+    // Claims require an explicit ownerPaused:false. An explicit pause and a
+    // missing/unknown flag both fail closed, so an authenticated Resume must
+    // record the explicit unpause in either case.
+    if (profile?.ownerPaused !== false) {
       const now = new Date().toISOString();
       const resumed = await db
         .from('ultimate_course_builds')
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
             ...profile,
             ownerPaused: false,
             pauseResumeAudit: {
-              previousPauseFlag: true,
+              previousPauseFlag: profile?.ownerPaused ?? null,
               resumedBy: auth.id,
               resumedAt: now,
               action: 'explicit-admin-resume',

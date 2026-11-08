@@ -16,9 +16,13 @@ test('owner holds and historical failures remain raw evidence, not runnable back
  assert.equal(result.actionableRunning.length,1);
 });
 test('unpaused blocked builds remain actionable, including jobs waiting on a repair',()=>{
- const result=productionWorkScope([make('failed','blocked',null),make('queued','blocked',null)]);
+ // Actionability requires an explicit unpause; an unknown pause flag fails closed.
+ const result=productionWorkScope([make('failed','blocked','false'),make('queued','blocked','false')]);
  assert.equal(result.actionableFailed.length,1);
  assert.equal(result.actionableQueued.length,1);
+ const unknown=productionWorkScope([make('failed','blocked',null),make('queued','blocked',null)]);
+ assert.equal(unknown.eligible.length,0);
+ assert.equal(unknown.unknownPause.length,2);
 });
 test('missing build association cannot silently certify the production gate',()=>{
  assert.throws(()=>productionWorkScope([{id:'orphan',status:'failed'}]),/PRODUCTION_BUILD_SCOPE_EVIDENCE_REQUIRED/);

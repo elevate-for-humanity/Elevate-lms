@@ -35,4 +35,24 @@ describe('production start retry', () => {
     expect((await startCanonicalCourse(db, { courseId: 'course' }, 'actor')).status).toBe(409);
     expect(mocks.dispatch).not.toHaveBeenCalled();
   });
+  it('records an explicit owner unpause on a newly created build so the worker may claim it', async () => {
+    // The worker-claim guard and dispatcher both require exactly ownerPaused:false.
+    // A new build without that key is never claimed, so it sits queued forever.
+    const course = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), maybeSingle: vi.fn().mockResolvedValue({ data: { id: 'course', title: 'Safety', slug: 'safety', status: 'draft' }, error: null }) };
+    let inserted: Record<string, unknown> | null = null;
+    const builds = {
+      select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(), limit: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      insert: vi.fn((row: Record<string, unknown>) => {
+        inserted = row;
+        return { select: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: { id: 'new-build', ...row }, error: null }) };
+      }),
+    };
+    const db = { from: vi.fn((table: string) => table === 'courses' ? course : builds) } as unknown as SupabaseClient;
+    const response = await startCanonicalCourse(db, { courseId: 'course' }, 'actor');
+    expect(response.status).toBe(202);
+    expect(builds.insert).toHaveBeenCalledTimes(1);
+    expect((inserted!.profile as Record<string, unknown>).ownerPaused).toBe(false);
+  });
 });

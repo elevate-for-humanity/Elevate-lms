@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # scripts/audit-env-vars.sh
 # Reports env vars referenced in code but absent from checked-in env example files.
-# These are undocumented runtime dependencies - missing any of them
-# causes silent failures or 500s in production.
+# This is a documentation check, not a runtime secret-presence or endpoint test.
+# Some variables are optional selectors, model defaults, or allow-list URLs.
 # Usage: bash scripts/audit-env-vars.sh
 # Exit code: 0 = all documented, 1 = gaps found
 

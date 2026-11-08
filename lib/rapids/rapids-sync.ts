@@ -1,13 +1,12 @@
 /**
- * RAPIDS Integration Service
- * Department of Labor Registered Apprenticeship System
- * 
- * DOC: https://dol.gov/agencies/vets/registered-apprenticeship
- * API: https://www.dol.gov/agencies/vets/registered-apprenticeship-programs/rapids-api
+ * Legacy RAPIDS service compatibility surface; no agency transport is implemented.
+ *
+ * Sponsors use the authenticated RAPIDS portal and reviewed uploads. DOL documents
+ * restricted agency integrations, which do not establish an EFH sponsor API.
+ * https://www.apprenticeship.gov/help/what-rapids
+ * https://www.dol.gov/agencies/oasam/centers-offices/ocio/privacy/eta/rapids
+ * Keep submission disabled until an agency-approved interface is implemented.
  */
-
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
-import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 
 export interface RAPIDSConfig {
@@ -61,248 +60,34 @@ export interface RAPIDSHoursUpdate {
   approvedBy: string;
 }
 
+const UNAVAILABLE = 'RAPIDS_MANUAL_SUBMISSION_REQUIRED: no verified sponsor API transport is implemented; use the authenticated RAPIDS portal and retain the agency receipt.';
+
 class RAPIDSService {
-  private config: RAPIDSConfig | null = null;
-  private isConfigured = false;
+  /** Retained for callers; supplying a URL/key must never enable guessed endpoints. */
+  configure(_config: RAPIDSConfig): void {}
 
-  configure(config: RAPIDSConfig) {
-    this.config = config;
-    this.isConfigured = true;
-    logger.info('[rapids] Configured with agency', { agencyId: config.agencyId });
+  async registerApprentice(_data: ApprenticeData): Promise<RAPIDSRegistrationResult> {
+    return { success: false, error: UNAVAILABLE };
   }
 
-  private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    if (!this.config) {
-      throw new Error('RAPIDS not configured');
-    }
-
-    const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'X-Agency-ID': this.config.agencyId,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`RAPIDS API error: ${response.status} - ${error}`);
-    }
-
-    return response.json();
+  async submitHours(_update: RAPIDSHoursUpdate): Promise<{ success: boolean; error?: string }> {
+    return { success: false, error: UNAVAILABLE };
   }
 
-  /**
-   * Register a new apprentice with DOL
-   */
-  async registerApprentice(data: ApprenticeData): Promise<RAPIDSRegistrationResult> {
-    if (!this.isConfigured) {
-      logger.warn('[rapids] Not configured - storing locally for sync later');
-      return {
-        success: false,
-        error: 'RAPIDS not configured - enrollment created locally',
-      };
-    }
-
-    try {
-      const payload = {
-        registration: {
-          programId: data.programId,
-          occupationCode: data.occupationCode,
-          relatedInstructionProvider: data.relatedInstructionProvider,
-          sponsorId: data.sponsorId,
-          apprentice: {
-            ssn4: data.ssn?.slice(-4) || '', // Last 4 digits only
-            firstName: data.firstName,
-            lastName: data.lastName,
-            dateOfBirth: data.dateOfBirth,
-            gender: data.gender,
-            ethnicity: data.ethnicity,
-            address: data.address,
-            phone: data.phone,
-            email: data.email,
-          },
-          terms: {
-            startDate: data.startDate,
-            termMonths: data.termMonths || 12,
-            probationMonths: data.probationMonths || 3,
-          },
-          wages: data.wageRate,
-        },
-      };
-
-      const result = await this.makeRequest<{ registrationId: string; status: string }>(
-        '/api/v1/registrations',
-        { method: 'POST', body: JSON.stringify(payload) }
-      );
-
-      logger.info('[rapids] Apprentice registered', {
-        rapidsId: result.registrationId,
-        localId: data.programId,
-      });
-
-      return {
-        success: true,
-        rapidsId: result.registrationId,
-        registeredAt: new Date().toISOString(),
-      };
-    } catch (error) {
-      logger.error('[rapids] Registration failed', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Registration failed',
-      };
-    }
-  }
-
-  /**
-   * Submit hours for an apprentice
-   */
-  async submitHours(update: RAPIDSHoursUpdate): Promise<{ success: boolean; error?: string }> {
-    if (!this.isConfigured) {
-      logger.warn('[rapids] Hours sync deferred - not configured');
-      return { success: false, error: 'RAPIDS not configured' };
-    }
-
-    try {
-      await this.makeRequest(
-        `/api/v1/apprentices/${update.apprenticeId}/hours`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            periodStart: update.periodStart,
-            periodEnd: update.periodEnd,
-            regularHours: update.totalHours,
-            overtimeHours: update.overtimeHours || 0,
-            approvedBy: update.approvedBy,
-            submittedAt: new Date().toISOString(),
-          }),
-        }
-      );
-
-      logger.info('[rapids] Hours submitted', {
-        apprenticeId: update.apprenticeId,
-        hours: update.totalHours,
-      });
-
-      return { success: true };
-    } catch (error) {
-      logger.error('[rapids] Hours submission failed', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Submission failed',
-      };
-    }
-  }
-
-  /**
-   * Update apprentice completion status
-   */
   async completeApprentice(
-    apprenticeId: string,
-    completionDate: string,
-    certificateNumber?: string
+    _apprenticeId: string,
+    _completionDate: string,
+    _certificateNumber?: string,
   ): Promise<{ success: boolean; error?: string }> {
-    if (!this.isConfigured) {
-      return { success: false, error: 'RAPIDS not configured' };
-    }
-
-    try {
-      await this.makeRequest(
-        `/api/v1/apprentices/${apprenticeId}/completion`,
-        {
-          method: 'PUT',
-          body: JSON.stringify({
-            completionDate,
-            certificateNumber,
-          }),
-        }
-      );
-
-      logger.info('[rapids] Apprentice completed', { apprenticeId });
-      return { success: true };
-    } catch (error) {
-      logger.error('[rapids] Completion update failed', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Update failed' };
-    }
+    return { success: false, error: UNAVAILABLE };
   }
 
-  /**
-   * Sync pending enrollments to RAPIDS
-   * Called by cron job
-   */
-  async syncPendingEnrollments(supabase: SupabaseClient): Promise<{ synced: number; failed: number }> {
-    // Only unsynced enrollments without a RAPIDS id belong in the registration queue.
-    const { data: pending } = await supabase
-      .from('program_enrollments')
-      .select('id, user_id, program_id, enrolled_at, programs(rapids_code)')
-      .eq('rapids_registered', false)
-      .is('rapids_id', null)
-      .limit(50);
-
-    if (!pending?.length) {
-      return { synced: 0, failed: 0 };
-    }
-
-    let synced = 0;
-    let failed = 0;
-
-    for (const enrollment of pending) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', enrollment.user_id)
-        .single();
-
-      if (!profile) {
-        failed++;
-        continue;
-      }
-
-      const occupationCode = (enrollment.programs as { rapids_code?: string })?.rapids_code?.trim();
-      if (!occupationCode) {
-        logger.error('[rapids] Pending enrollment is missing a RAPIDS occupation code', {
-          enrollmentId: enrollment.id,
-          programId: enrollment.program_id,
-        });
-        failed++;
-        continue;
-      }
-
-      const result = await this.registerApprentice({
-        firstName: profile.first_name || '',
-        lastName: profile.last_name || '',
-        dateOfBirth: profile.date_of_birth || '',
-        address: {
-          street: profile.address || '',
-          city: profile.city || '',
-          state: profile.state || RAPIDS_CONFIG.stateCode,
-          zip: profile.zip || '',
-        },
-        phone: profile.phone || '',
-        email: profile.email || '',
-        programId: enrollment.program_id,
-        occupationCode,
-        sponsorId: RAPIDS_CONFIG.registrationId,
-        startDate: enrollment.enrolled_at || new Date().toISOString(),
-        wageRate: { initial: 12.00, progression: [] },
-      });
-
-      if (result.success) {
-        await supabase
-          .from('program_enrollments')
-          .update({ rapids_registered: true, rapids_id: result.rapidsId })
-          .eq('id', enrollment.id);
-        synced++;
-      } else {
-        failed++;
-      }
-    }
-
-    logger.info('[rapids] Batch sync complete', { synced, failed });
-    return { synced, failed };
+  async syncPendingEnrollments(_supabase: SupabaseClient): Promise<{
+    synced: number; failed: number; blocked: boolean; error: string;
+  }> {
+    // Nothing was attempted. Do not read PII, invent wages/start dates, or mark
+    // local enrollments as agency-registered without an actual agency receipt.
+    return { synced: 0, failed: 0, blocked: true, error: UNAVAILABLE };
   }
 }
 

@@ -2,6 +2,11 @@ import Link from 'next/link';
 export function PartnerFormsLibrary() {
   const cards = [
     [
+      'W-9 — fill, electronically sign and submit',
+      '/program-holder/payouts#online-w9',
+      'Complete the secure IRS substitute W-9 on your phone. The signed document goes to Elevate for review—no printing or scanning.',
+    ],
+    [
       'Your MOU and assigned terms',
       '/program-holder/sign-mou',
       'Review your organization, program scope, payment terms and recorded signature.',
@@ -14,7 +19,7 @@ export function PartnerFormsLibrary() {
     [
       'Handbook and professional standards',
       '/program-holder/handbook',
-      'Read together with your team; print or save a copy.',
+      'Read online and acknowledge your individual requirements.',
     ],
     [
       'Non-compete and confidentiality',
@@ -36,7 +41,7 @@ export function PartnerFormsLibrary() {
     <section className="rounded-2xl border bg-white p-5">
       <h2 className="text-2xl font-black">Forms, handbooks and templates</h2>
       <p className="mt-2 text-sm">
-        Complete Elevate forms here. Existing licenses, ID and insurance certificates still need the
+        Complete and electronically sign available Elevate forms online. Existing licenses, ID and insurance certificates still need the
         issuing organization’s original evidence.
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">

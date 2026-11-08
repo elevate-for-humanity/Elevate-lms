@@ -37,6 +37,7 @@ export function NarratedTabWalkthrough({ sections }: { sections: NavSection[] })
   const [steps, setSteps] = useState<Step[]>([]);
   const [step, setStep] = useState(0);
   const [speaking, setSpeaking] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(false);
   const tab = useMemo(() => sections.flatMap(section => section.items)
     .filter(item => {
       try {
@@ -53,7 +54,7 @@ export function NarratedTabWalkthrough({ sections }: { sections: NavSection[] })
     setSpeaking(false);
   }
 
-  useEffect(() => { stop(); setOpen(false); setSteps([]); setStep(0); }, [pathname]);
+  useEffect(() => { stop(); setAutoPlay(false); setOpen(false); setSteps([]); setStep(0); }, [pathname]);
   useEffect(() => () => { generation.current += 1; stopVoice(); }, [stopVoice]);
 
   function start() {
@@ -87,6 +88,7 @@ export function NarratedTabWalkthrough({ sections }: { sections: NavSection[] })
     ]);
     setStep(0);
     setOpen(true);
+    setAutoPlay(false);
   }
 
   const current = steps[step];
@@ -104,21 +106,33 @@ export function NarratedTabWalkthrough({ sections }: { sections: NavSection[] })
     };
   }, [open, current]);
 
-  function narrate() {
+  function narrate(continueTour = false) {
     if (!current) return;
     stop();
     const ticket = generation.current;
     setSpeaking(true);
     void playVoice(current.label + '. ' + current.detail, {
       style: 'instructor',
-      onEnded: () => { if (ticket === generation.current) setSpeaking(false); },
-      onError: () => { if (ticket === generation.current) setSpeaking(false); },
-      onPlaybackBlocked: () => { if (ticket === generation.current) setSpeaking(false); },
+      onEnded: () => {
+        if (ticket !== generation.current) return;
+        setSpeaking(false);
+        if (continueTour) {
+          if (step < steps.length - 1) setStep(previous => previous + 1);
+          else setAutoPlay(false);
+        }
+      },
+      onError: () => { if (ticket === generation.current) { setSpeaking(false); setAutoPlay(false); } },
+      onPlaybackBlocked: () => { if (ticket === generation.current) { setSpeaking(false); setAutoPlay(false); } },
     });
   }
 
+  useEffect(() => {
+    if (open && autoPlay && current) narrate(true);
+  }, [open, autoPlay, step]);
+
   function move(next: number) {
     stop();
+    setAutoPlay(false);
     setStep(Math.max(0, Math.min(steps.length - 1, next)));
   }
 
@@ -128,7 +142,7 @@ export function NarratedTabWalkthrough({ sections }: { sections: NavSection[] })
         <p className="min-w-0 text-sm font-semibold text-slate-800">
           {tab?.label || 'Dashboard'} <span className="hidden text-slate-500 sm:inline">· Guided training</span>
         </p>
-        <button type="button" onClick={open ? () => { stop(); setOpen(false); } : start}
+        <button type="button" onClick={open ? () => { stop(); setAutoPlay(false); setOpen(false); } : start}
           className="min-h-10 shrink-0 rounded-lg bg-blue-700 px-3 py-2 text-sm font-bold text-white">
           {open ? 'Close guide' : 'Show me this tab'}
         </button>
@@ -142,9 +156,13 @@ export function NarratedTabWalkthrough({ sections }: { sections: NavSection[] })
           <h2 className="mt-1 text-base font-bold text-slate-950">{current.label}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-800">{current.detail}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" onClick={speaking ? stop : narrate}
+            <button type="button" onClick={() => { if (autoPlay) { setAutoPlay(false); stop(); } else { setStep(0); setAutoPlay(true); } }}
               className="min-h-11 rounded-lg bg-blue-800 px-3 text-sm font-semibold text-white">
-              {speaking ? 'Stop narration' : 'Listen to this step'}
+              {autoPlay ? 'Pause tour' : 'Play narrated tour'}
+            </button>
+            <button type="button" onClick={speaking ? stop : () => narrate(false)}
+              className="min-h-11 rounded-lg border border-blue-300 bg-white px-3 text-sm font-semibold text-blue-900">
+              {speaking ? 'Stop voice' : 'Repeat this step'}
             </button>
             <button type="button" onClick={() => move(step - 1)} disabled={step === 0}
               className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold disabled:opacity-40">Previous</button>

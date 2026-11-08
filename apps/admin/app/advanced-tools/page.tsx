@@ -105,9 +105,8 @@ const TOOL_SECTIONS = [
     description: 'Developer utilities, debugging, and studio tools.',
     tools: [
       { label: 'Operations Hub', href: '/operations', desc: 'Cron jobs, workflows, dead letters, and admin alerts' },
-      { label: 'Dev Studio', href: '/studio', desc: 'Container, deploy, secrets, terminal, and live preview' },
+      { label: 'Dev Studio', href: '/studio', desc: 'One workspace: course builder, website content, media, repository, browser, deploy, and PARIS' },
       { label: 'Workflows', href: '/studio/workflows', desc: 'Automated workflow definitions' },
-      { label: 'Studio', href: '/studio', desc: 'Course Studio — builder, curriculum, video, and AI copilot' },
       { label: 'HVAC AI Instructor', href: '/integrations/gemini', desc: 'Marcus Johnson — Gemini-powered HVAC lesson instructor' },
       { label: 'Monitoring', href: '/monitoring', desc: 'Review platform alerts, error tracking, and schema health' },
     ],

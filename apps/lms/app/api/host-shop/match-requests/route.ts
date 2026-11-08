@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
-import { permittedHostShopProgramScopes, hostShopMatchScopeFilter } from '@/lib/partners/host-shop-match-access';
+import {
+  canonicalHostShopProgram, canonicalHostShopPrograms, permittedHostShopProgramScopes,
+  hostShopMatchScopeFilter,
+} from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,9 +163,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   const hostShopId = typeof body?.host_shop_id === 'string' ? body.host_shop_id.trim() : '';
-  const programSlug = typeof body?.program_slug === 'string' && body.program_slug.trim()
-    ? body.program_slug.trim()
-    : 'barber-apprenticeship';
+  const programSlug = canonicalHostShopProgram(body?.program_slug || 'barber-apprenticeship');
+  if (!programSlug) return NextResponse.json({ error: 'Valid apprenticeship program required.' }, { status: 400 });
   const message = typeof body?.message === 'string' ? body.message.trim().slice(0, 4000) : null;
   const apprenticeNotes = typeof body?.apprentice_notes === 'string'
     ? body.apprentice_notes.trim().slice(0, 4000)
@@ -182,6 +184,21 @@ export async function POST(req: NextRequest) {
 
   if (!canonicalShop) {
     return NextResponse.json({ error: 'Host Shop is not active and approved.' }, { status: 404 });
+  }
+
+  // Student-created requests must match an approved program of the exact
+  // receiving shop. Never default a beauty request into an unrelated barber
+  // match or leave a private pending request in another shop's queue.
+  const { data: receivingPartner, error: receivingPartnerError } = await db
+    .from('partners')
+    .select('programs')
+    .eq('id', canonicalShop.partner_id)
+    .eq('status', 'active')
+    .eq('approval_status', 'approved')
+    .neq('is_active', false)
+    .maybeSingle();
+  if (receivingPartnerError || !canonicalHostShopPrograms(receivingPartner?.programs).includes(programSlug)) {
+    return NextResponse.json({ error: 'This Host Shop is not approved for the selected program.' }, { status: 400 });
   }
 
   const { data: shop } = await db
@@ -234,9 +251,15 @@ export async function POST(req: NextRequest) {
       status: 'pending',
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     })
-    .select()
+    .select('id, status, program_slug, created_at')
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ request: data }, { status: 201 });
+  // Do not echo phone, application notes, private intake or admin metadata.
+  return NextResponse.json({
+    request: hostShopMatchSummary({
+      ...data,
+      apprentice: { full_name: profile?.full_name || 'Student', email: profile?.email || user.email || null },
+    }),
+  }, { status: 201 });
 }

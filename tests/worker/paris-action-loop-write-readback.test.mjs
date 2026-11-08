@@ -22,7 +22,7 @@ test('rank real course producer ahead of unrelated test files',()=>{
 });
 test('CPU inference receives a meaningful edit budget after source inspection',()=>{
  assert.equal(repairCompletionTokens('cpu',[]),384);
- assert.equal(repairCompletionTokens('cpu',['READ lib/ultimate-course-builder/core/production-handlers.ts: exact source']),2048);
+ assert.equal(repairCompletionTokens('cpu',['READ lib/ultimate-course-builder/core/production-handlers.ts: exact source']),1280);
  assert.equal(repairCompletionTokens('gpu',['READ lib/x.ts']),2400);
  const messages=budgetRepairMessages([
   {role:'system',content:'Authorize only reviewed changes. '.repeat(75)},

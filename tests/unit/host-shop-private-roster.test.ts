@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { hasAnyRole } from '@/lib/rbac/role-matrix';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
 import { resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
-import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
+import {
+  canonicalHostShopProgram, canonicalHostShopPrograms,
+  hostShopMatchScopeFilter, hostShopScopeAllowsRequest,
+  permittedHostShopProgramScopes, permittedHostShopProgramSlugs,
+} from '@/lib/partners/host-shop-match-access';
 
 describe('Host Shop application privacy', () => {
   it('reveals only assigned student name/email and basic request status', () => {
@@ -56,6 +60,7 @@ describe('Host Shop assigned-program routing', () => {
           select: () => query,
           eq: () => query,
           in: () => query,
+          neq: () => query,
           then: (resolve: (value: unknown) => void) =>
             Promise.resolve(
               table === 'partner_users'
@@ -82,5 +87,70 @@ describe('archived Program Holder cannot inherit privileged dashboards', () => {
     expect(hasAnyRole(['host_shop'], ['host_shop'])).toBe(true);
     expect(hasAnyRole(['host_shop'], ['program_holder', 'site_coordinator'])).toBe(false);
     expect(hasAnyRole(['host_shop'], ['admin', 'super_admin', 'org_admin'])).toBe(false);
+  });
+});
+
+describe('independent exact approved shop + program privacy regressions', () => {
+  const barberPartner = 'a1111111-1111-4111-8111-111111111111';
+  const salonPartner = 'b2222222-2222-4222-8222-222222222222';
+  const barberShop = 'c3333333-3333-4333-8333-333333333333';
+  const salonShop = 'd4444444-4444-4444-8444-444444444444';
+
+  function twoPartnerDb() {
+    const rows: Record<string, unknown[]> = {
+      partner_users: [
+        { partner_id: barberPartner, role: 'partner_admin' },
+        { partner_id: salonPartner, role: 'owner' },
+      ],
+      partners: [
+        { id: barberPartner, status: 'active', approval_status: 'approved', is_active: true, programs: ['BARBER'] },
+        { id: salonPartner, status: 'active', approval_status: 'approved', is_active: true,
+          programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'] },
+      ],
+      shops: [
+        { id: barberShop, partner_id: barberPartner, active: true },
+        { id: salonShop, partner_id: salonPartner, active: true },
+      ],
+    };
+    return { from: (table: string) => {
+      const query: any = {
+        select: () => query, eq: () => query, neq: () => query, in: () => query,
+        then: (resolve: (value: unknown) => void) =>
+          Promise.resolve({ data: rows[table] || [], error: null }).then(resolve),
+      };
+      return query;
+    } };
+  }
+
+  it('canonicalizes only approved legacy program labels, not generic salon or arbitrary input', () => {
+    expect(canonicalHostShopPrograms(['BARBER', 'barber-apprenticeship', 'cosmetology', 'nail_technician']))
+      .toEqual(['barber-apprenticeship', 'cosmetology-apprenticeship', 'nail-technician-apprenticeship']);
+    expect(canonicalHostShopProgram('salon')).toBeNull();
+    expect(canonicalHostShopProgram('barber),host_shop_id.not.is.null')).toBeNull();
+  });
+
+  it('does not let access to an esthetics shop grant esthetics access at a separate barber shop', async () => {
+    const scopes = await permittedHostShopProgramScopes(twoPartnerDb(), 'shared-owner');
+    expect(scopes).toEqual([
+      { shopId: barberShop, partnerId: barberPartner, programSlugs: ['barber-apprenticeship'] },
+      { shopId: salonShop, partnerId: salonPartner,
+        programSlugs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'] },
+    ]);
+    expect(hostShopScopeAllowsRequest(scopes, barberShop, 'barber-apprenticeship')).toBe(true);
+    expect(hostShopScopeAllowsRequest(scopes, barberShop, 'esthetician-apprenticeship')).toBe(false);
+    expect(hostShopScopeAllowsRequest(scopes, salonShop, 'barber-apprenticeship')).toBe(false);
+    expect(hostShopScopeAllowsRequest(scopes, salonShop, 'nail-technician-apprenticeship')).toBe(true);
+    expect(hostShopScopeAllowsRequest(scopes, 'another-shop', 'esthetician-apprenticeship')).toBe(false);
+
+    const filter = hostShopMatchScopeFilter(scopes);
+    expect(filter).toContain('and(host_shop_id.eq.' + barberShop + ',program_slug.eq.barber-apprenticeship)');
+    expect(filter).toContain('and(host_shop_id.eq.' + salonShop + ',program_slug.eq.esthetician-apprenticeship)');
+    expect(filter).not.toContain('and(host_shop_id.eq.' + barberShop + ',program_slug.eq.esthetician-apprenticeship)');
+    expect(filter).not.toContain('and(host_shop_id.eq.' + salonShop + ',program_slug.eq.barber-apprenticeship)');
+  });
+
+  it('does not emit a PostgREST filter for invalid or unapproved shop identifiers', () => {
+    expect(hostShopMatchScopeFilter([{ shopId: 'not-a-uuid', partnerId: barberPartner,
+      programSlugs: ['barber-apprenticeship'] }])).toBe('');
   });
 });

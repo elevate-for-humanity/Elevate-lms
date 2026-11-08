@@ -95,6 +95,7 @@ type PartnerRecord = {
   programs?: string[] | null;
   approval_status?: string | null;
   status?: string | null;
+  is_active?: boolean | null;
   mou_signed?: boolean | null;
   onboarding_completed?: boolean | null;
   documents_verified?: boolean | null;
@@ -171,7 +172,7 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
     const { data: selectedPartner, error: selectedPartnerError } = await db
       .from('partners')
       .select(
-        'id, partner_application_id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, logo_url, media_gallery, public_slug, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state',
+        'id, partner_application_id, partner_type, program_type, programs, approval_status, status, is_active, mou_signed, onboarding_completed, documents_verified, verification_status, name, logo_url, media_gallery, public_slug, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state',
       )
       .eq('id', selectedPartnerId)
       .maybeSingle();
@@ -183,7 +184,7 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
   const { data: partnerLinks, error: partnerLinkError } = await db
     .from('partner_users')
     .select(
-      'partner_id, status, partners(id, partner_application_id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, logo_url, media_gallery, public_slug, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state)',
+      'partner_id, role, status, partners(id, partner_application_id, partner_type, program_type, programs, approval_status, status, is_active, mou_signed, onboarding_completed, documents_verified, verification_status, name, logo_url, media_gallery, public_slug, phone, supervisor_name, supervisor_license_number, compensation_model, workers_comp_status, has_general_liability, can_supervise_and_verify, city, state)',
     )
     .eq('user_id', userId)
     .eq('status', 'active');
@@ -191,7 +192,15 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
   if (partnerLinkError)
     throw new Error(`HOST_SHOP_MEMBERSHIP_QUERY_FAILED:${partnerLinkError.message}`);
 
-  const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
+  // Never select an unapproved partner or a membership without a Host Shop
+  // management role, even if the user had historical staff access.
+  const hostMemberRoles = new Set(['owner', 'partner_admin', 'admin', 'supervisor', 'mentor', 'manager']);
+  const partnerLink = (partnerLinks || []).find((row: any) =>
+    row?.partner_id && row?.partners &&
+    hostMemberRoles.has(String(row.role || '').toLowerCase()) &&
+    row.partners.status === 'active' &&
+    row.partners.approval_status === 'approved' &&
+    row.partners.is_active !== false);
   if (partnerLink?.partner_id && partnerLink.partners) {
     return partnerLink.partners as unknown as PartnerRecord;
   }
@@ -234,7 +243,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         .from('shops')
         .select('id, name, city, state, active, partner_id')
         .eq('partner_id', partner.id)
-        .neq('active', false),
+        .eq('active', true),
       db
         .from('shop_staff')
         .select('shop_id, shops(id, name, city, state, active, partner_id)')
@@ -252,10 +261,10 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
 
   const shopMap = new Map<string, any>();
   for (const shop of partnerShops || [])
-    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+    if (shop?.id && shop.active === true) shopMap.set(shop.id, shop);
   for (const row of staffLinks || []) {
     const shop = (row as any).shops;
-    if (shop?.id && shop.active !== false && shop.partner_id === partner.id)
+    if (shop?.id && shop.active === true && shop.partner_id === partner.id)
       shopMap.set(shop.id, shop);
   }
   const shops = Array.from(shopMap.values());

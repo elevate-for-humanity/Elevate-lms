@@ -38,6 +38,8 @@ jobs:
         run: |
           set -o pipefail
           node scripts/gcp/audit-cost-resources.mjs | tee audit-reports/cost-resources.json
+      - name: Diagnose current speech and trial ownership blockers without private output
+        run: node scripts/gcp/diagnose-cost-blockers.mjs
       - name: Verify public services and durable speech reuse
         if: always()
         run: |

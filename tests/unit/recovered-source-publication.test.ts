@@ -15,7 +15,7 @@ it('recovered-source approval fails closed for incomplete or malformed metadata'
  for(const recovery of [{},{publicationApproved:true},{learnerPublicationApproved:true},
   {publicationApproved:false,learnerPublicationApproved:true},
   {publicationApproved:true,learnerPublicationApproved:null},
-  {draftSourceForProductionOnly:false},'invalid',[]]) {
+  {draftSourceForProductionOnly:false},null,'invalid',[]]) {
   expect(recoveredSourcePublicationAllowed({existingLessonSourceRecovery:recovery})).toBe(false);
  }
  // Ordinary non-recovery lessons remain governed by their existing release contract.

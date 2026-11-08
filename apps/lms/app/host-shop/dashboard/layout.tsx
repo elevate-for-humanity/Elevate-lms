@@ -153,8 +153,12 @@ export default async function HostShopDashboardLayout({ children }: { children: 
     .eq('id', user.id)
     .maybeSingle();
 
+  const holderAccount = await db.from('program_holders')
+    .select('id,status').eq('user_id',user.id).in('status',['active','approved']).limit(1).maybeSingle();
+  const hasProgramHolderWorkspace = !holderAccount.error && Boolean(holderAccount.data?.id);
   return (
     <PlatformShell
+      alternateWorkspace={hasProgramHolderWorkspace ? { label: 'Program Holder', href: '/program-holder/dashboard' } : undefined}
       user={{
         id: user.id,
         email: user.email || '',

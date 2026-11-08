@@ -5,6 +5,7 @@ export function PartnerOrientationPlayer() {
   const video = useRef<HTMLVideoElement>(null);
   const saved = useRef(0),
     saving = useRef(false),
+    pendingFinalProgress = useRef(false),
     lastSent = useRef(0);
   const [loaded, setLoaded] = useState(false),
     [complete, setComplete] = useState(false),
@@ -38,12 +39,17 @@ export function PartnerOrientationPlayer() {
     if (
       !loaded ||
       !player ||
-      saving.current ||
       player.seeking ||
       (!force && (player.paused || Date.now() - lastSent.current < 8000))
     )
       return;
     const position = player.currentTime;
+    if (saving.current) {
+      // The final onEnded event can arrive while an eight-second checkpoint is
+      // still being saved. Queue it instead of permanently losing completion.
+      if (force && player.ended) pendingFinalProgress.current = true;
+      return;
+    }
     if (position <= saved.current && !force) return;
     saving.current = true;
     lastSent.current = Date.now();
@@ -62,6 +68,10 @@ export function PartnerOrientationPlayer() {
       setMessage(e instanceof Error ? e.message : 'Playback could not be saved.');
     } finally {
       saving.current = false;
+      if (pendingFinalProgress.current) {
+        pendingFinalProgress.current = false;
+        void progress(true);
+      }
     }
   }
   async function acknowledge(event: FormEvent<HTMLFormElement>) {
@@ -112,7 +122,10 @@ export function PartnerOrientationPlayer() {
         }}
         onTimeUpdate={() => void progress()}
         onPause={() => void progress(true)}
-        onEnded={() => void progress(true)}
+        onEnded={() => {
+          pendingFinalProgress.current = true;
+          void progress(true);
+        }}
         onSeeking={() => {
           if (video.current && video.current.currentTime > saved.current + 2)
             video.current.currentTime = saved.current;

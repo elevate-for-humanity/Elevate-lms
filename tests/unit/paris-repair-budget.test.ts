@@ -43,7 +43,7 @@ it('gives owned inference its supported deadline with workflow headroom',()=>{
 
 it('bounds private CPU discovery and editing while preserving GPU capacity',()=>{
  expect(repairCompletionTokens('cpu',['SEARCH ai.chat','READ_REJECTED lib/ai/chat'])).toBe(384);
- expect(repairCompletionTokens('cpu',['READ lib/ai/ai-service.ts (sha verified):'])).toBe(2048);
+ expect(repairCompletionTokens('cpu',['READ lib/ai/ai-service.ts (sha verified):'])).toBe(1280);
  expect(repairCompletionTokens('gpu',[])).toBe(2400);
 });
 

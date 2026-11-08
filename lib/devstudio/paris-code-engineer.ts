@@ -454,7 +454,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           },
         ],
         temperature: 0.1,
-        maxTokens: repairCompletionTokens(ownedTier, observations),
+        maxTokens: repairCompletionTokens(ownedTier, observations, inspectionHistory),
         jsonMode: true,
         signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
       } as Parameters<typeof aiChat>[0];

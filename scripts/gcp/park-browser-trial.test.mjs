@@ -21,3 +21,8 @@ test('production failure after parking restarts the same retained VM',async()=>{
  const f=fixture();let checks=0;f.production=async()=>++checks===1;
  await assert.rejects(parkBrowserTrial(f),/PARK_ROLLED_BACK/);assert.deepEqual(f.calls,['stop','start']);assert.equal(f.current.status,'RUNNING');
 });
+
+test('a trial promoted to the current production-ready role is preserved without retirement probes',async()=>{
+ const f=fixture();f.current.labels.purpose='studio-browser-ready';f.inspect=()=>assert.fail('production role must not enter trial retirement');
+ const result=await parkBrowserTrial(f);assert.equal(result.parked,false);assert.equal(result.reason,'production_browser_role_preserved');assert.deepEqual(f.calls,[]);
+});

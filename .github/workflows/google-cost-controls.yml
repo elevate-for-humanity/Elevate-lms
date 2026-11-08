@@ -2,7 +2,7 @@ name: Verify services and reduce Google waste
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs', 'scripts/gcp/reduce-model-idle.mjs', 'scripts/gcp/release-empty-browser-aliases.mjs', 'scripts/gcp/park-browser-trial.mjs']
+    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs', 'scripts/gcp/reduce-model-idle.mjs', 'scripts/gcp/release-empty-browser-aliases.mjs', 'scripts/gcp/park-browser-trial.mjs', 'scripts/gcp/recover-speech-cache-rollout.mjs']
   workflow_dispatch:
 permissions:
   contents: read

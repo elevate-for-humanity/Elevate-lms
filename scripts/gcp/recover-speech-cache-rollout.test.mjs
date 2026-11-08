@@ -8,3 +8,18 @@ test('requires decoded candidate speech before promoting the known-good rollback
  const r=await recoverSpeech({run,request,decode:()=>true,activate:async options=>{await options.fetcher('https://candidate.run.app/api/health',{});activated=true;return {revision:previous,traffic:100};}});
  assert.equal(r.publicAudioVerified,true);assert.equal(r.cacheReuseVerified,false);
 });
+
+test('consumes health before a longer audio probe can invalidate the original response',async()=>{
+ let activated=false,health;
+ const run=args=>JSON.stringify(args[2]==='list'?[{metadata:{name:previous},status:{conditions:[{type:'Ready',status:'True'}]}}]:{status:{url:'https://canonical.run.app',traffic:[{percent:100,revisionName:revision}]}});
+ const request=async url=>{
+  if(url.endsWith('/api/health')){const r=Response.json({commit:url.includes('candidate')?'38fa72efea936554e964b10849ac4f66e5942964':'4e32ccff1b09d020c9eaed3a9bc5bec525082de2'});if(url.includes('candidate'))health=r;return r;}
+  if(url.includes('candidate')&&!health.bodyUsed)await health.body.cancel();
+  return new Response(activated||url.includes('candidate')?Buffer.alloc(2000):'unavailable',{status:activated||url.includes('candidate')?200:503,headers:{'Content-Type':'audio/mpeg'}});
+ };
+ await recoverSpeech({run,request,decode:()=>true,activate:async options=>{
+  assert.equal(options.attempts,undefined,'use the existing bounded standard activation retry window');
+  const r=await options.fetcher('https://candidate.run.app/api/health',{});
+  assert.equal((await r.json()).commit,'38fa72efea936554e964b10849ac4f66e5942964');activated=true;return {revision:previous,traffic:100};
+ }});
+});

@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {DISCOVERABLE_REPAIR_SOURCE,rememberSourcePaths,rankSourcePaths} from '../../lib/devstudio/paris-source-discovery.mjs';
 import {recoverRepeatedInspection,checkInspectionBudget} from '../../lib/devstudio/paris-inspection-budget.mjs';
 import {repairCompletionTokens,budgetRepairMessages} from '../../lib/devstudio/repair-inference-budget.mjs';
-import {nextRepairActionConstraint,assertCommittedWriteReadback} from '../../lib/devstudio/paris-action-loop.mjs';
+import {hasApplicationSourceCorrection,nextRepairActionConstraint,assertCommittedWriteReadback} from '../../lib/devstudio/paris-action-loop.mjs';
 
 test('source discovery retains actual authorized workflow and GCP script paths',()=>{
  const workflow='.github/workflows/deploy-google-store-runtime.yml',script='scripts/gcp/repair-studio-browser-cloud-run.mjs';
@@ -33,7 +33,8 @@ test('CPU inference receives a meaningful edit budget after source inspection',(
 test('model gets action-specific progression after one or two reads',()=>{
  assert.match(nextRepairActionConstraint(['read:lib/foo.ts'],0),/NEXT JSON action should be replace/);
  assert.match(nextRepairActionConstraint(['read:lib/foo.ts','read:lib/bar.ts'],0),/already read source files/);
- assert.match(nextRepairActionConstraint([],1),/source write was committed/);
+ assert.match(nextRepairActionConstraint([],1,['tests/regression.test.ts']),/Only non-application changes/);
+ assert.match(nextRepairActionConstraint([],1,['lib/ultimate-course-builder/core/producer.ts']),/source correction was committed/);
 });
 test('duplicate reads do not manufacture independent source inspection evidence',()=>{
  assert.match(nextRepairActionConstraint(['read:lib/foo.ts','read:lib/foo.ts'],0),/NEXT JSON action should be replace/);
@@ -55,4 +56,15 @@ test('live planner wires edit-specific guidance and exact committed readback wit
  assert.match(source,/if\s*\(blockedPath\(normalized\)\)/);
  assert.match(source,/getGitHubAppToken\(\{requireWorkflowWrite:true\}\)/);
  assert.match(source,/newRegressionTests\.add\(action\.path\)/);
+});
+
+test('source-first admission separates real application edits from test-only or fixture writes',()=>{
+ assert.equal(hasApplicationSourceCorrection([]),false);
+ assert.equal(hasApplicationSourceCorrection(['tests/9-integrity-gate-regression.test.ts']),false);
+ assert.equal(hasApplicationSourceCorrection(['lib/example.spec.ts']),false);
+ assert.equal(hasApplicationSourceCorrection(['tests/9-integrity-gate-regression.test.ts','lib/course-builder/producer.ts']),true);
+ assert.match(nextRepairActionConstraint(['read:lib/a.ts'],1,['tests/regression.test.ts']),/NEXT action must correct/);
+ const source=readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts',import.meta.url),'utf8');
+ assert.match(source,/action\.path\.startsWith\('tests\/'\) && !hasApplicationSourceCorrection\(changedFiles\)/);
+ assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes,\[\.\.\.changedFiles\]\)/);
 });

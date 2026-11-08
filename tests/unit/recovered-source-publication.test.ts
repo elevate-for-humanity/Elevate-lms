@@ -10,3 +10,14 @@ it('draft restoration cannot publish through an externally supplied release pack
  expect(recoveredSourcePublicationAllowed({existingLessonSourceRecovery:{...recovery,publicationApproved:true,learnerPublicationApproved:true}})).toBe(true);
  expect(recoveredSourcePublicationAllowed({})).toBe(true);
 });
+
+it('recovered-source approval fails closed for incomplete or malformed metadata',()=>{
+ for(const recovery of [{},{publicationApproved:true},{learnerPublicationApproved:true},
+  {publicationApproved:false,learnerPublicationApproved:true},
+  {publicationApproved:true,learnerPublicationApproved:null},
+  {draftSourceForProductionOnly:false},'invalid',[]]) {
+  expect(recoveredSourcePublicationAllowed({existingLessonSourceRecovery:recovery})).toBe(false);
+ }
+ // Ordinary non-recovery lessons remain governed by their existing release contract.
+ expect(recoveredSourcePublicationAllowed({})).toBe(true);
+});

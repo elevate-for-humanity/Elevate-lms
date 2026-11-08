@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const project='elegant-racer-299721';
+export const COST_ASSET_SCOPE=['--scope=projects/'+project,'--asset-types=run.googleapis.com/Service,run.googleapis.com/Job,compute.googleapis.com/Instance,container.googleapis.com/Cluster','--read-mask=name,assetType,location,state','--page-size=500'];
 const leaf=value=>typeof value==='string'?value.split('/').at(-1):null;
 export function inventoryFailureReason(error) {
   const message=String(error?.message??'');
@@ -18,7 +19,7 @@ export function inventoryFailureReason(error) {
   return 'unknown_gcloud_failure';
 }
 const definitions=[
-  ['assets',['asset','search-all-resources','--scope=projects/'+project],a=>({name:a.name,type:a.assetType,location:a.location,state:a.state})],
+  ['assets',['asset','search-all-resources',...COST_ASSET_SCOPE],a=>({name:a.name,type:a.assetType,location:a.location,state:a.state})],
   ['virtualMachines',['compute','instances','list'],v=>({name:v.name,zone:leaf(v.zone),machineType:leaf(v.machineType),status:v.status,disks:(v.disks||[]).map(d=>({name:leaf(d.source),boot:d.boot,autoDelete:d.autoDelete}))})],
   ['disks',['compute','disks','list'],d=>({name:d.name,zone:leaf(d.zone),region:leaf(d.region),type:leaf(d.type),sizeGb:d.sizeGb,status:d.status,attached:(d.users||[]).length>0})],
   ['addresses',['compute','addresses','list'],a=>({name:a.name,region:leaf(a.region),status:a.status,type:a.addressType})],

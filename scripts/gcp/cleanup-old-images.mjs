@@ -1,6 +1,7 @@
 import {execFileSync} from 'node:child_process';
 import {writeFileSync,mkdirSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
+import {COST_ASSET_SCOPE,inventoryFailureReason} from './audit-cost-resources.mjs';
 
 const project='elegant-racer-299721';
 const root='us-central1-docker.pkg.dev/'+project+'/elevate';
@@ -27,16 +28,17 @@ export function imageCleanupPlan(images,{referenced=[],children=[],now=Date.now(
  return {repository:root,imagesInspected:images.length,retention:{minimumVersionsPerPackage:10,minimumAgeDays:30,allTaggedImages:true,allRuntimeReferences:true,allManifestChildren:true},remove};
 }
 
-const cli=args=>execFileSync('gcloud',args,{encoding:'utf8',timeout:120000,maxBuffer:64*1024*1024,stdio:['ignore','pipe','pipe']}).trim();
+const cli=args=>{try{return execFileSync('gcloud',args,{encoding:'utf8',timeout:120000,maxBuffer:64*1024*1024,stdio:['ignore','pipe','pipe']}).trim();}
+ catch(error){throw Object.assign(Error('IMAGE_INVENTORY_'+inventoryFailureReason(error).toUpperCase()),{operation:args.slice(0,3).join(' ')});}};
 const json=args=>JSON.parse(cli([...args,'--project='+project,'--format=json']));
 function runtimeReferences(){
- const assets=json(['asset','search-all-resources','--scope=projects/'+project]);
+ const assets=json(['asset','search-all-resources',...COST_ASSET_SCOPE]);
  if(!Array.isArray(assets))throw Error('ASSET_INVENTORY_INCOMPLETE');
  if(assets.some(a=>a.assetType==='container.googleapis.com/Cluster'))throw Error('GKE_IMAGE_DEPENDENCIES_REQUIRE_REVIEW');
  // Active builds may be publishing an untagged parent before its final tag.
  const builds=json(['builds','list','--filter=status=QUEUED OR status=WORKING']);
  if(!Array.isArray(builds)||builds.length)throw Error('ACTIVE_BUILDS_IMAGE_CLEANUP_DEFERRED');
- const regions=new Set(assets.filter(a=>/^run.googleapis.com\/(Service|Job|Revision)$/.test(a.assetType)).map(a=>a.location));
+ const regions=new Set(['us-central1','us-east1',...assets.filter(a=>/^run.googleapis.com\/(Service|Job|Revision)$/.test(a.assetType)).map(a=>a.location)]);
  const references=new Set();
  function collect(value){
   const raw=JSON.stringify(value);
@@ -111,5 +113,5 @@ export async function cleanupOldImages({apply=false}={}){
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  try{console.log(JSON.stringify(await cleanupOldImages({apply:process.argv.includes('--apply')})));}
- catch(error){console.error('IMAGE_CLEANUP_STOPPED: '+(/^[A-Z_]+$/.test(error.message||'')?error.message:'INVENTORY_ACCESS_OR_COMMAND_FAILED'));process.exitCode=1;}
+ catch(error){console.error(JSON.stringify({action:'IMAGE_CLEANUP_STOPPED',reason:/^[A-Z_]+$/.test(error.message||'')?error.message:'INVENTORY_ACCESS_OR_COMMAND_FAILED',operation:error.operation||null}));process.exitCode=1;}
 }

@@ -2,7 +2,7 @@ name: Verify services and reduce Google waste
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs']
+    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs', 'scripts/gcp/reduce-model-idle.mjs']
   workflow_dispatch:
 permissions:
   contents: read
@@ -47,6 +47,15 @@ jobs:
         run: |
           command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
           node scripts/gcp/verify-paid-services.mjs
+      - name: Inspect browser trial and client website VMs without stopping or deleting them
+        if: always()
+        run: |
+          result=0
+          for vm in elevate-studio-browser-trial legacy83-website; do
+            gcloud compute ssh "$vm" --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/inspect-cost-vm.py > "audit-reports/$vm-health.json" || result=1
+            cat "audit-reports/$vm-health.json"
+          done
+          exit "$result"
       - name: Release eligible idle capacity on exact healthy images
         if: always()
         run: |
@@ -55,6 +64,25 @@ jobs:
       - name: Remove only verified old untagged image roots
         if: always()
         run: node scripts/gcp/cleanup-old-images.mjs --apply
+      - name: Verify model idle policy guards
+        if: always()
+        run: node --test scripts/gcp/reduce-model-idle.test.mjs scripts/gcp/deploy-owned-cpu-model.test.mjs
+      - uses: google-github-actions/auth@v3
+        if: always()
+        id: model-invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+      - name: Release request-driven model reservation only after functional acceptance
+        if: always()
+        env: {MODEL_INVOKER_TOKEN: '${{ steps.model-invocation.outputs.id_token }}'}
+        run: |
+          set -o pipefail
+          node scripts/gcp/reduce-model-idle.mjs | tee audit-reports/model-idle.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

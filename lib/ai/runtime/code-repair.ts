@@ -56,6 +56,19 @@ async function update(id:string,values:Record<string,unknown>){
  const db=await requireAdminClient();const {error}=await db.from('paris_code_repairs').update({...values,updated_at:new Date().toISOString()}).eq('id',id);
  if(error)throw error;
 }
+/** Transitions originating in a signed repair run must retain that run's
+ * ownership and expected state. A stale worker can never overwrite a newer
+ * validation, release, or verified recovery receipt. */
+async function updateOwnedRepair(id:string,runId:number,expectedStatus:string,values:Record<string,unknown>,allowMissing=false){
+ const db=await requireAdminClient();
+ const {data,error}=await db.from('paris_code_repairs')
+  .update({...values,updated_at:new Date().toISOString()})
+  .eq('id',id).eq('workflow_run_id',runId).eq('status',expectedStatus)
+  .select('id').maybeSingle();
+ if(error)throw error;
+ if(!data&&!allowMissing)throw Error('PARIS_REPAIR_STATE_OWNERSHIP_LOST');
+ return Boolean(data);
+}
 async function infrastructureGitHub(path:string,init:RequestInit={}) {
  const token=await getGitHubAppToken();
  if(!token)throw Error('PARIS_INFRASTRUCTURE_APP_AUTHORITY_REQUIRED');
@@ -141,9 +154,16 @@ export async function prepareParisRepair(id:string,runId:number){
    if(!response.ok)throw Error('PARIS_PATCH_FAILED: '+String(candidate.error??'no patch').slice(0,300));
   }
   if(!/^[a-f0-9]{40}$/.test(candidate.branch?.sha??'')||!/^[a-f0-9]{40}$/.test(candidate.base_sha??''))throw Error('REPAIR_CANDIDATE_EVIDENCE_REQUIRED');
-  await update(id,{status:'validating',candidate});
+  await updateOwnedRepair(id,runId,'patching',{status:'validating',candidate});
   return {sha:candidate.branch.sha,baseSha:candidate.base_sha,branch:candidate.branch.name};
- }catch(error){await update(id,{status:'blocked',error_code:String(error instanceof Error?error.message:error).slice(0,500)});throw error;}
+ }catch(error){
+  // Failure reporting is conditional: an expired prepare must not clobber an
+  // independent validation, protected release, or another owner's attempt.
+  await updateOwnedRepair(id,runId,'patching',{
+   status:'blocked',error_code:String(error instanceof Error?error.message:error).slice(0,500)
+  },true);
+  throw error;
+ }
 }
 export async function publishParisRepair(id:string,runId:number){
  const db=await requireAdminClient();const {data:row,error}=await db.from('paris_code_repairs').select('*').eq('id',id).single();
@@ -160,7 +180,7 @@ export async function publishParisRepair(id:string,runId:number){
  if(!Array.isArray(comparison.files)||comparison.files.length>=300)throw Error('COMPLETE_REPAIR_FILE_INVENTORY_REQUIRED');
  const infrastructureRepair=comparison.files.some((file:any)=>infrastructureRepairPath(file.filename));
  const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub,graphql:(body:any)=>infrastructureGitHub('/graphql',{method:'POST',body:JSON.stringify(body)})});
- await update(id,{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
+ await updateOwnedRepair(id,runId,'validating',{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
  return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
 }
 /**
@@ -181,7 +201,7 @@ export async function reportParisDispatchFailure(id:string) {
 export async function reportParisRepairFailure(id:string,runId:number){
  const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
  if(data?.workflow_run_id!==runId)return;
- if(['patching','validating'].includes(data.status))await update(id,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'});
+ if(['patching','validating'].includes(data.status))await updateOwnedRepair(id,runId,data.status,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'},true);
 }
 export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
  const db=await requireAdminClient();

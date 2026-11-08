@@ -88,6 +88,8 @@ export interface GeneratedContent {
     description?: string;
     link?: string;
     cta?: string;
+    parentContentId?: string;
+    variationKind?: 'short' | 'emoji' | 'question';
   };
   variations?: string[];
   best_practice_tips?: string[];

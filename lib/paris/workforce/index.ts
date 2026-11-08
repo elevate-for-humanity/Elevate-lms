@@ -184,7 +184,8 @@ export async function executeAgentTask(
     }
 
     return {
-      success: execution.executed === true,
+      // Dispatch/running is not completion; preserve status in result.
+      success: execution.ok && execution.executed === true && execution.status === 'completed',
       result: {
         status: execution.status,
         executed: execution.executed,

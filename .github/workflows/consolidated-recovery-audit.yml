@@ -1,0 +1,56 @@
+name: Consolidated October 17 recovery audit
+run-name: Audit all 3056 unresolved deployment workflow records
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/consolidated-recovery-audit.yml'
+      - 'scripts/audits/consolidated-recovery-audit.mjs'
+      - 'scripts/audits/consolidated-recovery-audit.test.mjs'
+      - 'scripts/audits/recovery-manifest-20261107.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: consolidated-october17-recovery-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Verify every original record and current production evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate audit evidence contracts
+        run: node --test scripts/audits/consolidated-recovery-audit.test.mjs
+      - name: Authenticate read-only Google evidence collection
+        id: google
+        continue-on-error: true
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        if: steps.google.outcome == 'success'
+        continue-on-error: true
+      - name: Audit all 650 failed, 2301 canceled, 101 skipped and 4 unfinished records
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/audits/consolidated-recovery-audit.mjs
+      - name: Preserve complete and incomplete evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidated-recovery-evidence-${{ github.run_id }}
+          path: audit-output/consolidated-recovery.*
+          if-no-files-found: error
+          retention-days: 30

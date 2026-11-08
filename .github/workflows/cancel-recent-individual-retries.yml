@@ -1,0 +1,50 @@
+name: Cancel only the recent individual retries
+run-name: Force cancel seven unresponsive individual retries and retain consolidated audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cancel-recent-individual-retries.yml'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: force-cancel-exact-individual-retries-20261108
+  cancel-in-progress: false
+jobs:
+  cancel:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - name: Force cancel the seven exact unresponsive retry requests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const targets = [{"id":42428204567,"attempt":2,"sha":"b35b7b7a2eaa92dec94236567c5a7b78e5ac3559","started":"2026-11-08T01:37:35Z"},{"id":42425432712,"attempt":2,"sha":"46acb48d9e714c0dc6d0250c7835d797122bc595","started":"2026-11-08T01:38:00Z"},{"id":42423764855,"attempt":2,"sha":"a47636fcd92560cbe07ee4f3f8d70a87cad92297","started":"2026-11-08T01:38:04Z"},{"id":42423411936,"attempt":2,"sha":"a47636fcd92560cbe07ee4f3f8d70a87cad92297","started":"2026-11-08T01:38:05Z"},{"id":42423231530,"attempt":2,"sha":"963288aa1916ecf40a8c7db06b5e79acc67a62b5","started":"2026-11-08T01:38:08Z"},{"id":42406600646,"attempt":2,"sha":"acee8cc57fd78a8071e37abb99e6bb22b8b5c1a3","started":"2026-11-08T01:38:52Z"},{"id":42415876528,"attempt":2,"sha":"6f9d5be3fc2649e27426774500a4b35d0ef1ba68","started":"2026-11-08T01:38:16Z"}];
+            const keep=42435395623;
+            const {owner,repo}=context.repo;
+            const receipts=[];
+            for(const t of targets){
+             if(t.id===keep)throw Error('AUDIT_MUST_BE_RETAINED');
+             const {data:r}=await github.rest.actions.getWorkflowRun({owner,repo,run_id:t.id});
+             if(r.run_attempt!==t.attempt||r.head_sha!==t.sha||r.run_started_at!==t.started){receipts.push({id:t.id,status:'identity_changed'});continue;}
+             if(r.status==='completed'){receipts.push({id:t.id,status:'already_completed',conclusion:r.conclusion});continue;}
+             try{
+              await github.request('POST /repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel',{owner,repo,run_id:t.id});
+              receipts.push({id:t.id,status:'requested'});
+             }catch(e){receipts.push({id:t.id,status:'request_failed',httpStatus:e.status});}
+            }
+            for(let n=0;n<12;n++){
+             let active=0;
+             for(const receipt of receipts.filter(x=>x.status==='requested'||x.status==='still_active')){
+              const {data:r}=await github.rest.actions.getWorkflowRun({owner,repo,run_id:receipt.id});
+              if(r.status==='completed'){receipt.status=r.conclusion==='cancelled'?'canceled_verified':'completed_before_cancellation';receipt.conclusion=r.conclusion;}
+              else{receipt.status='still_active';active++;}
+             }
+             if(!active)break;
+             await new Promise(resolve=>setTimeout(resolve,3000));
+            }
+            const {data:audit}=await github.rest.actions.getWorkflowRun({owner,repo,run_id:keep});
+            console.log(JSON.stringify({receipts,keptAudit:{id:keep,status:audit.status}},null,2));
+            await core.summary.addHeading('Force cancellation of unresponsive individual retries').addTable([['Run','Outcome'],...receipts.map(x=>[String(x.id),x.status])]).addRaw('\nKept consolidated audit '+keep+': '+audit.status+'\n').write();
+            if(receipts.some(x=>['still_active','identity_changed','request_failed'].includes(x.status)))core.setFailed('Cancellation remains unverified; inspect receipts.');

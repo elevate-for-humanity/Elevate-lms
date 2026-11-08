@@ -1,5 +1,5 @@
 import { fetchOnetOccupation, isOnetConfigured } from '../../industry/onet';
-import { getOnetSnapshot } from '../../onet/client';
+import { getOnetSnapshot, searchOnetOccupations } from '../../onet/client';
 import { fetchCareerOneStopData, isCareerOneStopConfigured } from '../../industry/careeronestop';
 import { fetchUsaJobs } from '../../industry/usajobs';
 import type { UltimateWorkforcePort } from '../core/ports';
@@ -8,7 +8,21 @@ export class UltimatePlatformWorkforce implements UltimateWorkforcePort {
   async load(input: { socCodes: string[]; jurisdiction?: string; occupationTitle?: string }) {
     const occupations = [];
     const sources = new Set<string>();
-    for (const socCode of input.socCodes) {
+    // A course with no registered apprenticeship standard carries no SOC code,
+    // so the builder would ship with empty workforce evidence. Resolve one from
+    // the occupation title so the course is still grounded in real O*NET labor
+    // data. Best-effort: a lookup failure leaves the feed empty, never blocks.
+    let socCodes = input.socCodes ?? [];
+    if (!socCodes.length && input.occupationTitle && isOnetConfigured()) {
+      try {
+        const keyword = input.occupationTitle.replace(/\s+Registered Apprenticeship.*$/i, '').trim();
+        const matches = await searchOnetOccupations(keyword, 1);
+        if (matches[0]?.code) socCodes = [matches[0].code];
+      } catch {
+        // Leave empty; workforce evidence is context, not a build gate.
+      }
+    }
+    for (const socCode of socCodes) {
       let onet: any = null;
       let career: Awaited<ReturnType<typeof fetchCareerOneStopData>> | null = null;
       let federalJobs: Awaited<ReturnType<typeof fetchUsaJobs>> = [];

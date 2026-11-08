@@ -50,35 +50,28 @@ async function getContext() {
 }
 
 async function authorizedShopIds(db: any, userId: string, role: string) {
-  let partnerId: string | null = null;
-
+  let partnerIds: string[] = [];
   if (PLATFORM_ADMIN_ROLES.has(role)) {
-    const cookieStore = await cookies();
-    partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || null;
+    const selected = (await cookies()).get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    if (selected) partnerIds = [selected];
   } else if (HOST_ROLES.has(role)) {
-    const { data: partnerUser } = await db
-      .from('partner_users')
-      .select('partner_id, status')
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .maybeSingle();
-    partnerId = partnerUser?.partner_id || null;
-  } else {
-    return [];
+    const { data: links, error } = await db.from('partner_users')
+      .select('partner_id,role').eq('user_id', userId).eq('status', 'active');
+    if (error) throw new Error('HOST_SHOP_MEMBERSHIP_LOOKUP_FAILED');
+    partnerIds = Array.from(new Set((links || [])
+      .filter((row: any) => ['owner','partner_admin','admin','supervisor','mentor','manager'].includes(
+        String(row.role || '').toLowerCase(),
+      )).map((row: any) => row.partner_id).filter(Boolean)));
   }
-
-  let query = db
-    .from('shops')
+  if (!partnerIds.length) return [];
+  const { data, error } = await db.from('shops')
     .select('id, partner_id, active, partners!inner(id, status, approval_status, is_active)')
     .eq('active', true)
     .eq('partners.status', 'active')
     .eq('partners.approval_status', 'approved')
-    .neq('partners.is_active', false);
-
-  if (partnerId) query = query.eq('partner_id', partnerId);
-  else return [];
-
-  const { data } = await query;
+    .neq('partners.is_active', false)
+    .in('partner_id', partnerIds);
+  if (error) throw new Error('HOST_SHOP_AUTHORIZED_SHOPS_UNAVAILABLE');
   return (data || []).map((shop: any) => shop.id).filter(Boolean);
 }
 

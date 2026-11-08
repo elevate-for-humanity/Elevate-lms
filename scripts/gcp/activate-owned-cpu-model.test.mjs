@@ -91,8 +91,8 @@ test('every consumer surface receives the same owned-model connection as admin',
    return JSON.stringify({name:'projects/test/secrets/config/versions/9'});
   }
   if(args[0]==='secrets'&&args.includes('get-iam-policy'))return JSON.stringify({bindings:[{role:'roles/secretmanager.secretAccessor',members:['serviceAccount:'+identity]}]});
-  if(args.includes('describe'))return JSON.stringify({spec:{template:{spec:{serviceAccountName:identity}}},status:{url:base}});
-  if(args.includes('update')||args.includes('add-iam-policy-binding')){writes.push({args});return '';}
+  if(args.includes('describe'))return JSON.stringify({spec:{template:{spec:{serviceAccountName:identity}}},status:{url:base,traffic:[{latestRevision:true,percent:100,revisionName:'elevate-x-migration-1'}]}});
+  if(args.includes('update-traffic')||args.includes('update')||args.includes('add-iam-policy-binding')){writes.push({args});return '';}
   throw Error('Unexpected operation: '+args.slice(0,3).join(' '));
  };
  // prepareOwnedModelConfiguration keeps unrelated keys and sets the shared model
@@ -103,8 +103,12 @@ test('every consumer surface receives the same owned-model connection as admin',
  const results=await configureOwnedModelConsumers({base,token,run});
  assert.deepEqual(results.map(r=>r.component),OWNED_MODEL_CONSUMERS);
  assert.ok(results.every(r=>r.configured));
- const updates=writes.filter(w=>w.args.includes('update')&&w.args.includes('run'));
+ assert.ok(results.every(r=>r.trafficRouted));
+ const updates=writes.filter(w=>w.args.includes('update')&&w.args.includes('run')&&!w.args.includes('update-traffic'));
  assert.equal(updates.length,OWNED_MODEL_CONSUMERS.length);
+ const trafficMoves=writes.filter(w=>w.args.includes('update-traffic'));
+ assert.equal(trafficMoves.length,OWNED_MODEL_CONSUMERS.length);
+ assert.ok(trafficMoves.every(w=>w.args.includes('--to-latest')));
  for(const update of updates){
   const envVar=update.args.find(a=>a.startsWith('--update-env-vars='));
   assert.match(envVar,/AI_PROVIDER=elevate/);

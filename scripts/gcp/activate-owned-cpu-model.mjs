@@ -43,7 +43,7 @@ function ensureOwnedModelSecretReader(run,member) {
 /** Bind the shared owned model into a consumer service and grant it access.
  *  Best-effort per consumer: a grant that needs a project owner is reported,
  *  never allowed to abort the already-verified admin activation. */
-export async function configureOwnedModelConsumers({base,token,run=google,components=OWNED_MODEL_CONSUMERS,region='us-central1',grantInvoker=true}={}) {
+export async function configureOwnedModelConsumers({base,token,run=google,components=OWNED_MODEL_CONSUMERS,region='us-central1',grantInvoker=true,routedToLatest=true}={}) {
  const results=[];
  for(const component of components) {
   const service=`elevate-${component}-migration`;
@@ -70,7 +70,18 @@ export async function configureOwnedModelConsumers({base,token,run=google,compon
      invokerGranted=true;
     } catch(error) { invokerGranted=false; }
    }
-   results.push({component,service,identity,version,configured:true,invokerGranted});
+   // The update above created a new revision that carries the model connection.
+   // Route traffic to it so the configured revision actually serves; otherwise a
+   // service pinned to an older revision keeps running without the model.
+   let trafficRouted=false;
+   if(routedToLatest) {
+    try {
+     run(['run','services','update-traffic',service,'--project',PROJECT,'--region',region,'--to-latest','--quiet']);
+     const routed=JSON.parse(run(['run','services','describe',service,'--project',PROJECT,'--region',region,'--format=json']));
+     trafficRouted=Boolean(routed.status?.traffic?.some(item=>item.latestRevision===true&&item.percent>0));
+    } catch(error) { trafficRouted=false; }
+   }
+   results.push({component,service,identity,version,configured:true,invokerGranted,trafficRouted});
   } catch(error) {
    results.push({component,service,configured:false,code:error.message?.startsWith('PRIVATE_CPU_ACTIVATION_')?error.message:(error.code||'consumer_configuration_failed')});
   }

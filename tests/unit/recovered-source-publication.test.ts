@@ -1,21 +1,14 @@
 import {expect,it} from 'vitest';
 import {prepareUltimatePublication} from '@/lib/ultimate-course-builder/release/prepare-publication';
 import {recoveredSourcePublicationAllowed} from '@/lib/ultimate-course-builder/release/recovered-source-policy.mjs';
-
-// The publication-approval restriction was removed: a recovered draft source no
-// longer blocks publication. The canonical release checks (lesson contract,
-// media render, quality role) remain the real gate and still throw.
-it('recovered draft sources are publishable once the release contract passes',()=>{
+it('recovered draft publication requires source and learner approvals before release validation',()=>{
  const recovery={draftSourceForProductionOnly:true,publicationApproved:false,learnerPublicationApproved:false};
  const profile={existingLessonSourceRecovery:recovery};
- expect(recoveredSourcePublicationAllowed(profile)).toBe(true);
+ expect(()=>prepareUltimatePublication({profile},'actor')).toThrow('ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED');
+ for(const entry of [{},{publicationApproved:true},{learnerPublicationApproved:true},null,[],false,'invalid',recovery])
+  expect(recoveredSourcePublicationAllowed({existingLessonSourceRecovery:entry})).toBe(false);
+ const approved={existingLessonSourceRecovery:{...recovery,publicationApproved:true,learnerPublicationApproved:true}};
+ expect(recoveredSourcePublicationAllowed(approved)).toBe(true);
+ expect(()=>prepareUltimatePublication({profile:approved},'actor')).toThrow('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
  expect(recoveredSourcePublicationAllowed({})).toBe(true);
- expect(recoveredSourcePublicationAllowed({existingLessonSourceRecovery:{...recovery,publicationApproved:true}})).toBe(true);
 });
-
-it('the release contract is still enforced independently of source provenance',()=>{
- const profile={existingLessonSourceRecovery:{draftSourceForProductionOnly:true,publicationApproved:false,learnerPublicationApproved:false}};
- // No lessons / wrong contract version still throws: publication is not a rubber stamp.
- expect(()=>prepareUltimatePublication({profile},'actor')).toThrow('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
-});
-

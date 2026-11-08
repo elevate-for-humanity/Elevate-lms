@@ -1,4 +1,5 @@
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
+import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
@@ -61,13 +62,7 @@ async function update(id:string,values:Record<string,unknown>){
  * validation, release, or verified recovery receipt. */
 async function updateOwnedRepair(id:string,runId:number,expectedStatus:string,values:Record<string,unknown>,allowMissing=false){
  const db=await requireAdminClient();
- const {data,error}=await db.from('paris_code_repairs')
-  .update({...values,updated_at:new Date().toISOString()})
-  .eq('id',id).eq('workflow_run_id',runId).eq('status',expectedStatus)
-  .select('id').maybeSingle();
- if(error)throw error;
- if(!data&&!allowMissing)throw Error('PARIS_REPAIR_STATE_OWNERSHIP_LOST');
- return Boolean(data);
+ return applyOwnedParisRepairTransition(db,{id,runId,expectedStatus,values,allowMissing});
 }
 async function infrastructureGitHub(path:string,init:RequestInit={}) {
  const token=await getGitHubAppToken();

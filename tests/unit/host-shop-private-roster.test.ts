@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
 import { resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
+import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
 
 describe('Host Shop application privacy', () => {
   it('reveals only assigned student name/email and basic request status', () => {
@@ -32,5 +33,45 @@ describe('Host Shop application privacy', () => {
       program_type: 'beauty-multi-program',
       programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
     })).toBe('esthetician');
+  });
+});
+
+describe('Host Shop assigned-program routing', () => {
+  it('denies program visibility when no authorized active membership exists', async () => {
+    const db = { from: () => ({
+      select: () => ({
+        eq: () => ({
+          eq: async () => ({ data: [], error: null }),
+        }),
+      }),
+    }) };
+    expect(await permittedHostShopProgramSlugs(db, 'user-a')).toEqual([]);
+  });
+
+  it('returns only exact programs of approved active partner memberships', async () => {
+    const db = {
+      from: (table: string) => {
+        const query: any = {
+          select: () => query,
+          eq: () => query,
+          in: () => query,
+          then: (resolve: (value: unknown) => void) =>
+            Promise.resolve(
+              table === 'partner_users'
+                ? { data: [{ partner_id: 'approved-shop', role: 'partner_admin' }], error: null }
+                : { data: [{
+                  id: 'approved-shop',
+                  status: 'active',
+                  approval_status: 'approved',
+                  programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
+                }], error: null },
+            ).then(resolve),
+        };
+        return query;
+      },
+    };
+    expect(await permittedHostShopProgramSlugs(db, 'user-a')).toEqual([
+      'esthetician-apprenticeship', 'nail-technician-apprenticeship',
+    ]);
   });
 });

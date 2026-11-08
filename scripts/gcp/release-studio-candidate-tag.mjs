@@ -40,9 +40,9 @@ export async function releaseStudioCandidateTag({revision,tag='studio-verify',ru
     for(const value of urls){const url=new URL(value);if(url.hostname.startsWith(tag+'---'))throw Error('STUDIO_CANDIDATE_STILL_REFERENCED');}
   };
   assertNoAdminReference();
-  if(tag==='studio-verify'){
+  {
     const state=await inventory({tag,run});
-    if(state.activeBrowserSessions!==0||state.workspace?.files!==0||state.workspace?.symlinks!==0||state.directChildShells!==0||state.directNonBrowserProcesses!==0||state.processInventoryReadable!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
+    if(state.activeBrowserSessions!==0||state.workspace?.files!==0||state.workspace?.symlinks!==0||state.directChildShells!==0||state.directNonBrowserProcesses!==0||state.processInventoryReadable!==true||state.providerAuthStorage?.ready!==true||state.providerAuthStorage?.persistent!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
   }
   const current=read();
   if(!isDeepStrictEqual(current.status?.traffic,before.status?.traffic)||!isDeepStrictEqual(current.spec,before.spec))throw Error('STUDIO_CANDIDATE_TAG_CHANGED');

@@ -25,6 +25,12 @@ test('inventory uses exact Google endpoint and authorized metadata probe; return
  const request=async(url,opts={})=>{calls.push({url:String(url),opts});return {ok:true,json:async()=>String(url).endsWith('/health')?{commit:'serving',activeSessions:2}:{exitCode:0,stdout:JSON.stringify({files:1,directories:0,symlinks:0,bytes:15,excludedDependencyCaches:true,directChildShells:1,processInventoryReadable:true,fileContentsRead:false,commandsRead:false})}};};
  const r=await inventoryStudioLiveState({run,request});assert.equal(r.activeBrowserSessions,2);assert.equal(r.stateChanged,false);assert.equal(r.directChildShells,1);assert.ok(!JSON.stringify(r).includes('test-secret'));assert.deepEqual(JSON.parse(calls[1].opts.body).args,['-e',METADATA_PROBE]);
 });
+test('generated old aliases can be inspected without returning provider auth contents',async()=>{
+ const tag='sc-aaaaaaaa-bbbbbbbb';const endpoint='https://'+tag+'---elevate-studio-browser-aabnh2y32a-uc.a.run.app';
+ const run=args=>args[0]==='run'?JSON.stringify({status:{url:'https://elevate-studio-browser-aabnh2y32a-uc.a.run.app',traffic:[{revisionName:'elevate-studio-browser-old',tag,url:endpoint,percent:0}]}}):'private-fixture';
+ const request=async url=>Response.json(String(url).endsWith('/health')?{activeSessions:0,providerAuthStorage:{ready:true,persistent:true,cookie:'private-cookie'}}:{exitCode:0,stdout:JSON.stringify({files:0,symlinks:0,directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true,fileContentsRead:false,commandsRead:false})});
+ const state=await inventoryStudioLiveState({tag,run,request});assert.deepEqual(state.providerAuthStorage,{ready:true,persistent:true});assert.ok(!JSON.stringify(state).includes('private-cookie'));
+});
 
 test('inventory uses the durable checkpoint boundary for interrupted Git transfers',async t=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'studio-inventory-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));

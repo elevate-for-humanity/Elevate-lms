@@ -47,6 +47,7 @@ interface PlatformShellProps {
   breadcrumbs?: BreadcrumbItem[];
   actions?: ActionItem[];
   recruitingEnabled?: boolean;
+  alternateWorkspace?: { label: string; href: string };
   notifications?: number;
   children: React.ReactNode;
   paris?: Partial<ParisLearnerContext> | false;
@@ -71,6 +72,7 @@ export function PlatformShell({
   paris,
   showLanguageSwitcher = true,
   recruitingEnabled = false,
+  alternateWorkspace,
 }: PlatformShellProps) {
   const pathname = usePathname();
   const isWorkforce = role === 'workforce' || role === 'workforce_partner';
@@ -484,6 +486,20 @@ export function PlatformShell({
               </div>
             </div>
           )}
+          {alternateWorkspace ? (
+            <nav aria-label="Switch between my approved dashboards" className="mx-auto w-full max-w-6xl px-3 pt-3 sm:px-4">
+              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-blue-200 bg-white p-2">
+                <span className="px-2 text-xs font-semibold text-slate-600">Your dashboards</span>
+                <span aria-current="page" className="rounded-lg bg-blue-700 px-3 py-2 text-sm font-bold text-white">
+                  {role === 'host_shop' ? 'Host Shop' : 'Program Holder'}
+                </span>
+                <Link href={alternateWorkspace.href}
+                  className="inline-flex min-h-10 items-center rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-bold text-blue-900">
+                  {alternateWorkspace.label}
+                </Link>
+              </div>
+            </nav>
+          ) : null}
           {['program_holder', 'site_coordinator', 'host_shop', 'host_shop_admin', 'partner', 'partner_admin'].includes(role) &&
             <NarratedTabWalkthrough sections={sections} />}
           <div className="min-w-0 w-full max-w-none overflow-x-auto break-words p-3 sm:p-4 lg:p-6">

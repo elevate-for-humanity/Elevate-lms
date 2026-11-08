@@ -59,5 +59,19 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/login?error=forbidden', requestUrl.origin));
   }
 
+  // Tell the owner an administrator signed in through SSO. Best-effort.
+  try {
+    const { notifyPortalAuthEvent } = await import('@/lib/auth/portal-auth-notify');
+    await notifyPortalAuthEvent({
+      event: 'signin',
+      portal: 'Admin',
+      userId: data.user.id,
+      email: data.user.email,
+      extra: { role: profile.role, method: 'sso' },
+    });
+  } catch {
+    // Sign-in succeeded; monitoring is best-effort and isolated.
+  }
+
   return NextResponse.redirect(new URL(next, requestUrl.origin));
 }

@@ -44,6 +44,23 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.internal('Authentication failed');
   }
 
+  // Tell the owner a user signed in. Best-effort; never blocks authentication.
+  try {
+    const { notifyPortalAuthEvent, resolvePortalKind } = await import(
+      '@/lib/auth/portal-auth-notify'
+    );
+    const { requireAdminClient } = await import('@/lib/supabase/admin');
+    const db = await requireAdminClient();
+    await notifyPortalAuthEvent({
+      event: 'signin',
+      portal: await resolvePortalKind(db, data.user.id),
+      userId: data.user.id,
+      email: data.user.email,
+    });
+  } catch {
+    // Authentication succeeded; monitoring is best-effort and isolated.
+  }
+
   return NextResponse.json({
     success: true,
     user: {

@@ -6,7 +6,8 @@ import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progr
 /**
  * RAPIDS Integration (Registered Apprenticeship Partners Information Data System)
  *
- * Integrates with DOL RAPIDS for apprenticeship reporting.
+ * Prepares local records for reviewed reporting through the RAPIDS sponsor portal.
+ * No automated agency submission transport is implemented.
  * RAPIDS is the U.S. Department of Labor's system for tracking registered apprenticeships.
  */
 

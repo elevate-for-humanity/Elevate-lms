@@ -46,9 +46,9 @@ export function GuidedW9Form() {
     }
   }
   return (
-    <details className="rounded-2xl border border-blue-200 bg-white p-5">
+    <details id="online-w9" className="min-w-0 scroll-mt-24 rounded-2xl border border-blue-200 bg-white p-4 sm:p-5">
       <summary className="min-h-12 cursor-pointer text-xl font-black">
-        Complete and save my W-9
+        Fill, sign and submit my W-9 online
       </summary>
       <p className="my-3 text-sm">
         No printing or uploading needed. Complete three steps, then sign. Your tax number is saved

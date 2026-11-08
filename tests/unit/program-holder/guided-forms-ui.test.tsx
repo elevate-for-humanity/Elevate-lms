@@ -55,7 +55,7 @@ it('fills student details and the agreed stage amount while allowing an edited r
 });
 it('keeps the W-9 signature and certification as the final step without uploading a file', () => {
   render(<GuidedW9Form />);
-  fireEvent.click(screen.getByText('Complete and save my W-9'));
+  fireEvent.click(screen.getByText('Fill, sign and submit my W-9 online'));
   const name = screen.getByLabelText(/Line 1/);
   expect(name).toBeVisible();
   const form = name.closest('form')!;
@@ -70,7 +70,7 @@ it('keeps the W-9 signature and certification as the final step without uploadin
 
 it('preserves W-9 entries and certifications when navigating back to review', () => {
   render(<GuidedW9Form />);
-  fireEvent.click(screen.getByText('Complete and save my W-9'));
+  fireEvent.click(screen.getByText('Fill, sign and submit my W-9 online'));
   const name = screen.getByLabelText(/Line 1/);
   fireEvent.change(name, { target: { value: 'Isolated QA Holder' } });
   const form = name.closest('form')!;

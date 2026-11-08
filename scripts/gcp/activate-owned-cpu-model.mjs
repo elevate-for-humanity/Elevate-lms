@@ -15,7 +15,7 @@ const fail=code=>{throw Error('PRIVATE_CPU_ACTIVATION_'+code);};
 // connection the admin service has, otherwise they cannot reach the shared
 // brain and silently fall back to canned text.
 export const OWNED_MODEL_CONSUMERS=['lms','marketing','store'];
-export const OWNED_MODEL_ENV_KEYS=['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL','ELEVATE_LLM_GOOGLE_IAM','PARIS_INFERENCE_TIER','PARIS_GPU_ENABLED','AI_PROVIDER','AI_PROVIDER_ORDER','ELEVATE_LLM_TIMEOUT_MS','ELEVATE_LLM_CONTEXT_TOKENS'];
+export const OWNED_MODEL_ENV_KEYS=['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL','ELEVATE_LLM_GOOGLE_IAM','PARIS_INFERENCE_TIER','PARIS_GPU_ENABLED','AI_PROVIDER','AI_PROVIDER_ORDER','ELEVATE_LLM_TIMEOUT_MS','ELEVATE_LLM_CONTEXT_TOKENS','OWNED_MODEL_RUNTIME_CONFIG_PROVIDER'];
 const OWNED_MODEL_TOKEN_SECRET='elevate-owned-llm-token';
 const IDENTITY_RE=/^[a-z0-9-]+@elegant-racer-299721\.iam\.gserviceaccount\.com$/;
 
@@ -26,6 +26,7 @@ export function prepareOwnedModelConfiguration(config,component,base,token) {
   ELEVATE_LLM_URL:base,ELEVATE_LLM_CPU_URL:base,ELEVATE_LLM_SECRET:token,ELEVATE_LLM_CPU_SECRET:token,
   ELEVATE_LLM_GOOGLE_IAM:'true',PARIS_INFERENCE_TIER:'cpu',PARIS_GPU_ENABLED:'false',
   AI_PROVIDER:'elevate',AI_PROVIDER_ORDER:'elevate',ELEVATE_LLM_TIMEOUT_MS:'300000',ELEVATE_LLM_CONTEXT_TOKENS:'8192',
+  OWNED_MODEL_RUNTIME_CONFIG_PROVIDER:'google-secret-manager',
  }},component);
 }
 
@@ -113,7 +114,7 @@ export async function activatePrivateCpuModel({base,invokerToken,run=google,requ
   // Keep the serving image, identity, resource limits and traffic unchanged
   // until the new binding revision passes the standard activation checks.
   run(['run','services','update','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--no-traffic',
-   '--update-env-vars='+Object.entries(next.runtimeEnvironment).filter(([key])=>['ELEVATE_LLM_URL','ELEVATE_LLM_CPU_URL','ELEVATE_LLM_GOOGLE_IAM','PARIS_INFERENCE_TIER','PARIS_GPU_ENABLED','AI_PROVIDER','AI_PROVIDER_ORDER','ELEVATE_LLM_TIMEOUT_MS','ELEVATE_LLM_CONTEXT_TOKENS'].includes(key)).map(([key,value])=>key+'='+value).join(','),
+   '--update-env-vars='+OWNED_MODEL_ENV_KEYS.map(key=>key+'='+next.runtimeEnvironment[key]).join(','),
    '--remove-env-vars=ELEVATE_LLM_SECRET,ELEVATE_LLM_CPU_SECRET',
    '--update-secrets=ELEVATE_LLM_SECRET=elevate-owned-llm-token:latest,ELEVATE_LLM_CPU_SECRET=elevate-owned-llm-token:latest','--quiet']);
   const after=JSON.parse(run(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region','us-central1','--format=json']));

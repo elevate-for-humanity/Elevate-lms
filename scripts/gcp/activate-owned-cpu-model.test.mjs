@@ -43,6 +43,7 @@ test('only accepted inference can update aliases and activate the existing verif
  assert.equal(f.current().runtimeEnvironment.ELEVATE_LLM_CPU_URL,base);
  assert.ok(f.writes.find(x=>x.args.includes('update')).args.includes('--no-traffic'));
  assert.match(f.writes.find(x=>x.args.includes('update')).args.find(x=>x.startsWith('--update-env-vars=')),/ELEVATE_LLM_CONTEXT_TOKENS=8192/);
+ assert.match(f.writes.find(x=>x.args.includes('update')).args.find(x=>x.startsWith('--update-env-vars=')),/OWNED_MODEL_RUNTIME_CONFIG_PROVIDER=google-secret-manager/);
  assert.ok(f.writes.every(x=>!JSON.stringify(x.args).includes('a'.repeat(32))));
 });
 

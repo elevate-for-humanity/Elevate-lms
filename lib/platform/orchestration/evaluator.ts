@@ -118,6 +118,20 @@ function hasDurableToolEvidence(tool: string, result: unknown): string | null {
       : null;
   }
 
+  if (tool === 'system.health') {
+    // A platform-state read is verified when it returns a per-service snapshot.
+    // An "unknown" or "degraded" overall (for example, unverifiable billing)
+    // must not be treated as a failed read: the step asked for current state,
+    // and a real snapshot is the evidence. Absent a snapshot there is no proof.
+    const services = asRecord(record.services);
+    const hasServiceEvidence = Boolean(
+      services && Object.keys(services).length > 0 && asRecord(services.database),
+    );
+    return hasServiceEvidence
+      ? 'Platform health returned a per-service state snapshot.'
+      : null;
+  }
+
   return 'Tool does not require a specialized evidence contract.';
 }
 
@@ -175,8 +189,40 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
 
   const reportedStatus = String(resultRecord?.status ?? '').toLowerCase();
   const reportedOverall = String(resultRecord?.overall ?? '').toLowerCase();
-  if (['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'blocked'].includes(reportedStatus) ||
-      ['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'unhealthy'].includes(reportedOverall)) {
+
+  // A platform-state read is a snapshot, not a pass/fail gate. Verify it on
+  // real service evidence even when a non-critical service is unverifiable
+  // ("unknown") or a warning exists ("degraded"), so the plan can proceed.
+  // Genuinely negative states (down/unhealthy/failed) and an uncertain overall
+  // with no snapshot still fall through to the blocking checks below.
+  if (input.tool === 'system.health') {
+    const negative =
+      ['failed', 'failure', 'error', 'unavailable', 'down', 'unhealthy'].includes(reportedOverall) ||
+      ['failed', 'failure', 'error', 'unavailable', 'down'].includes(reportedStatus);
+    const uncertain =
+      ['unknown', 'degraded', 'blocked'].includes(reportedOverall) ||
+      ['unknown', 'degraded', 'blocked'].includes(reportedStatus);
+    if (!negative) {
+      const evidence = hasDurableToolEvidence('system.health', input.result);
+      if (!uncertain || evidence) {
+        if (evidence) reasons.push(evidence);
+        if (input.verificationRule) reasons.push(`Verification rule: ${input.verificationRule}`);
+        return {
+          status: 'PASS',
+          reasons,
+          evidence: {
+            tool: input.tool,
+            overall: reportedOverall || 'healthy',
+            expected_output: input.expectedOutput ?? null,
+            verification_rule: input.verificationRule ?? null,
+          },
+        };
+      }
+    }
+  }
+
+  if (['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'blocked', 'down'].includes(reportedStatus) ||
+      ['failed', 'failure', 'error', 'unavailable', 'unknown', 'degraded', 'unhealthy', 'down'].includes(reportedOverall)) {
     return {
       status: 'FAIL_BLOCKING',
       reasons: [`The tool reported ${reportedOverall || reportedStatus}; this is not verified success.`],

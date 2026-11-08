@@ -15,7 +15,7 @@ test('promotes unchanged healthy image before releasing idle reservation',async(
  assert.equal(activated,true);assert.equal(result.imageUnchanged,true);assert.equal(result.idleReservationRemovedGiB,4);
 });
 test('rejects unexpected resource sizing before mutation',async()=>{
- const s=state();s.spec.template.spec.containers[0].resources.limits.memory='8Gi';
+ const s=state();s.spec.template.spec.containers[0].resources.limits.memory='32Gi';
  await assert.rejects(reduceIdleCapacity('store',{read:()=>s,update:()=>assert.fail('must not update')}),/Unexpected topology/);
 });
 test('refuses promotion if runtime configuration changes concurrently',async()=>{
@@ -26,4 +26,16 @@ test('refuses promotion if runtime configuration changes concurrently',async()=>
 });
 test('does not reduce Admin or active browser capacity',async()=>{
  await assert.rejects(reduceIdleCapacity('admin',{}),/Only request-driven/);
+});
+test('preserves larger known memory allocations while removing service-only minimums',async()=>{
+ let reads=0;const before=state('0'),candidate=state('0','new'),after=state('0','new');
+ before.metadata.annotations['run.googleapis.com/minScale']='1';
+ for(const s of [before,candidate,after])s.spec.template.spec.containers[0].resources.limits.memory='8Gi';
+ const result=await reduceIdleCapacity('lms',{read:()=>[before,candidate,after][reads++],update:()=>{},
+ fetcher:async()=>({ok:true,json:async()=>({service:'lms',healthy:true,commit,dependencies:{supabase:{ok:true}}})}),activate:async args=>args});
+ assert.equal(result.idleReservationRemovedGiB,8);assert.equal(result.imageUnchanged,true);
+});
+test('does not change capacity when the newest revision is not the serving revision',async()=>{
+ const s=state();s.status.traffic[0].revisionName='older';
+ await assert.rejects(reduceIdleCapacity('store',{read:()=>s,update:()=>assert.fail('must not change')}),/Unexpected topology/);
 });

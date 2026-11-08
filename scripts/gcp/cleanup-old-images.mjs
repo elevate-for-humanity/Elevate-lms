@@ -1,0 +1,115 @@
+import {execFileSync} from 'node:child_process';
+import {writeFileSync,mkdirSync} from 'node:fs';
+import {pathToFileURL} from 'node:url';
+
+const project='elegant-racer-299721';
+const root='us-central1-docker.pkg.dev/'+project+'/elevate';
+const digestPattern=/^sha256:[a-f0-9]{64}$/;
+export function imageCleanupPlan(images,{referenced=[],children=[],now=Date.now()}={}) {
+ const protectedImages=new Set([...referenced,...children]);
+ const packages=new Map();
+ for(const image of images){
+  if(!image.package?.startsWith(root+'/')||!digestPattern.test(image.version||''))throw Error('IMAGE_INVENTORY_INVALID');
+  const list=packages.get(image.package)||[];list.push(image);packages.set(image.package,list);
+ }
+ const remove=[];
+ for(const rows of packages.values()){
+  rows.sort((a,b)=>Date.parse(b.createTime)-Date.parse(a.createTime));
+  for(const [index,item] of rows.entries()){
+   const full=item.package+'@'+item.version,created=Date.parse(item.createTime);
+   // Keep every tagged image, every retained revision/job/VM reference, every
+   // manifest child, at least ten versions per package, and thirty days.
+   if(index<10||!Number.isFinite(created)||now-created<30*86400000||
+      !Array.isArray(item.tags)||item.tags.length||protectedImages.has(full))continue;
+   remove.push({image:full,createdAt:item.createTime});
+  }
+ }
+ return {repository:root,imagesInspected:images.length,retention:{minimumVersionsPerPackage:10,minimumAgeDays:30,allTaggedImages:true,allRuntimeReferences:true,allManifestChildren:true},remove};
+}
+
+const cli=args=>execFileSync('gcloud',args,{encoding:'utf8',timeout:120000,maxBuffer:64*1024*1024,stdio:['ignore','pipe','pipe']}).trim();
+const json=args=>JSON.parse(cli([...args,'--project='+project,'--format=json']));
+function runtimeReferences(){
+ const assets=json(['asset','search-all-resources','--scope=projects/'+project]);
+ if(!Array.isArray(assets))throw Error('ASSET_INVENTORY_INCOMPLETE');
+ if(assets.some(a=>a.assetType==='container.googleapis.com/Cluster'))throw Error('GKE_IMAGE_DEPENDENCIES_REQUIRE_REVIEW');
+ // Active builds may be publishing an untagged parent before its final tag.
+ const builds=json(['builds','list','--filter=status=QUEUED OR status=WORKING']);
+ if(!Array.isArray(builds)||builds.length)throw Error('ACTIVE_BUILDS_IMAGE_CLEANUP_DEFERRED');
+ const regions=new Set(assets.filter(a=>/^run.googleapis.com\/(Service|Job|Revision)$/.test(a.assetType)).map(a=>a.location));
+ const references=new Set();
+ function collect(value){
+  const raw=JSON.stringify(value);
+  for(const match of raw.matchAll(/us-central1-docker\.pkg\.dev\/elegant-racer-299721\/elevate\/[a-zA-Z0-9_./-]+(?:@sha256:[a-f0-9]{64}|:[a-zA-Z0-9_.-]+)/g))references.add(match[0]);
+ }
+ for(const region of regions){
+  if(!/^[a-z]+-[a-z]+\d$/.test(region||''))throw Error('RUNTIME_LOCATION_UNRESOLVED');
+  collect(json(['run','revisions','list','--region='+region]));
+  collect(json(['run','jobs','list','--region='+region]));
+ }
+ // Metadata is inspected only in memory. It can contain secrets and must never
+ // enter logs or artifacts. Container references are the only retained fields.
+ collect(json(['compute','instances','list']));
+ const resolved=[];
+ for(const image of references){
+  if(image.includes('@sha256:'))resolved.push(image);
+  else {
+   const data=json(['artifacts','docker','images','describe',image]);
+   const digest=data.image_summary?.digest||data.imageSummary?.digest;
+   if(!digestPattern.test(digest||''))throw Error('MUTABLE_RUNTIME_IMAGE_UNRESOLVED');
+   resolved.push(image.slice(0,image.lastIndexOf(':'))+'@'+digest);
+  }
+ }
+ return resolved;
+}
+async function manifestChildren(images){
+ const token=cli(['auth','print-access-token']);
+ const children=new Set();let cursor=0;
+ await Promise.all(Array.from({length:8},async()=>{
+  while(cursor<images.length){
+   const item=images[cursor++];
+   if(!item.package?.startsWith(root+'/')||!digestPattern.test(item.version||''))throw Error('IMAGE_INVENTORY_INVALID');
+   const path=item.package.slice('us-central1-docker.pkg.dev/'.length);
+   const response=await fetch('https://us-central1-docker.pkg.dev/v2/'+path+'/manifests/'+item.version,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json'},signal:AbortSignal.timeout(20000),redirect:'error'});
+   if(!response.ok)throw Error('MANIFEST_DEPENDENCIES_UNVERIFIED');
+   const body=await response.json();
+   if(body.schemaVersion!==2)throw Error('MANIFEST_SCHEMA_UNVERIFIED');
+   for(const child of body.manifests||[]){
+    if(!digestPattern.test(child.digest||''))throw Error('MANIFEST_CHILD_UNVERIFIED');
+    children.add(item.package+'@'+child.digest);
+   }
+  }
+ }));
+ return [...children];
+}
+
+export async function cleanupOldImages({apply=false}={}){
+ const references=runtimeReferences();
+ const images=json(['artifacts','docker','images','list',root,'--include-tags']);
+ if(!Array.isArray(images)||images.length>4000)throw Error('IMAGE_MANIFEST_AUDIT_LIMIT');
+ const children=await manifestChildren(images);
+ const plan=imageCleanupPlan(images,{referenced:references,children});
+ mkdirSync('audit-reports',{recursive:true});
+ writeFileSync('audit-reports/image-cleanup-plan.json',JSON.stringify(plan,null,2));
+ const receipts=[];
+ if(apply){
+  // Recheck dependencies immediately before mutation. Abort if a deployment
+  // appeared during manifest inspection; concurrent builds are also rejected.
+  const fresh=runtimeReferences();
+  if(JSON.stringify([...fresh].sort())!==JSON.stringify([...references].sort()))throw Error('RUNTIME_REFERENCES_CHANGED');
+  const latest=json(['artifacts','docker','images','list',root,'--include-tags']);
+  const stillSafe=new Set(imageCleanupPlan(latest,{referenced:fresh,children}).remove.map(x=>x.image));
+  for(const item of plan.remove.slice(0,100)){
+   if(!stillSafe.has(item.image))continue;
+   // No --delete-tags: a concurrently applied tag makes deletion fail safely.
+   cli(['artifacts','docker','images','delete',item.image,'--project='+project,'--quiet']);
+   receipts.push({image:item.image,deleted:true,at:new Date().toISOString()});
+   writeFileSync('audit-reports/image-cleanup-receipts.json',JSON.stringify(receipts,null,2));
+  }
+ }
+ return {...plan,apply,deleted:receipts.length,receipts};
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
+ try{console.log(JSON.stringify(await cleanupOldImages({apply:process.argv.includes('--apply')})));}
+ catch(error){console.error('IMAGE_CLEANUP_STOPPED: '+(/^[A-Z_]+$/.test(error.message||'')?error.message:'INVENTORY_ACCESS_OR_COMMAND_FAILED'));process.exitCode=1;}
+}

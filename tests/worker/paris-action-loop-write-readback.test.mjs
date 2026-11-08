@@ -50,7 +50,7 @@ test('GitHub write only counts when committed file, blob, branch ref and bytes a
 });
 test('live planner wires edit-specific guidance and exact committed readback without weakening security',()=>{
  const source=readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts',import.meta.url),'utf8');
- assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes\)/);
+ assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes,\[\.\.\.changedFiles\]\)/);
  assert.match(source,/assertCommittedWriteReadback\(/);
  assert.match(source,/if\(next===file\.content\)/);
  assert.match(source,/if\s*\(blockedPath\(normalized\)\)/);
@@ -65,6 +65,6 @@ test('source-first admission separates real application edits from test-only or 
  assert.equal(hasApplicationSourceCorrection(['tests/9-integrity-gate-regression.test.ts','lib/course-builder/producer.ts']),true);
  assert.match(nextRepairActionConstraint(['read:lib/a.ts'],1,['tests/regression.test.ts']),/NEXT action must correct/);
  const source=readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts',import.meta.url),'utf8');
- assert.match(source,/action\.path\.startsWith\('tests\/'\) && !hasApplicationSourceCorrection\(changedFiles\)/);
+ assert.match(source,/action\.path\.startsWith\('tests\/'\) && !hasApplicationSourceCorrection\(\[\.\.\.changedFiles\]\)/);
  assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes,\[\.\.\.changedFiles\]\)/);
 });

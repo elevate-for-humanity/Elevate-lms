@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
+import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -108,6 +109,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!requestRecord.host_shop_id || !shopIds.includes(requestRecord.host_shop_id)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+  if (!PLATFORM_ADMIN_ROLES.has(role) &&
+      !(await permittedHostShopProgramSlugs(db, user.id)).includes(requestRecord.program_slug)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await req.json().catch(() => null);
   const status = typeof body?.status === 'string' ? body.status.trim().toLowerCase() : '';
@@ -158,6 +163,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   } else if (PLATFORM_ADMIN_ROLES.has(role) || HOST_ROLES.has(role)) {
     const shopIds = await authorizedShopIds(db, user.id, role);
     if (!requestRecord.host_shop_id || !shopIds.includes(requestRecord.host_shop_id)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (!PLATFORM_ADMIN_ROLES.has(role) &&
+        !(await permittedHostShopProgramSlugs(db, user.id)).includes(requestRecord.program_slug)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   } else {

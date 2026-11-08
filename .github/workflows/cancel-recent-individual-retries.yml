@@ -1,0 +1,66 @@
+name: Cancel only the recent individual retries
+run-name: Keep consolidated audit and cancel its 17 individual retry requests
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cancel-recent-individual-retries.yml'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: cancel-exact-individual-retries-20261108
+  cancel-in-progress: false
+jobs:
+  cancel:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - name: Cancel exact retry identities and verify retained audit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const targets = [{"id":42428204567,"attempt":2,"sha":"b35b7b7a2eaa92dec94236567c5a7b78e5ac3559","started":"2026-11-08T01:37:35Z"},{"id":42425432712,"attempt":2,"sha":"46acb48d9e714c0dc6d0250c7835d797122bc595","started":"2026-11-08T01:38:00Z"},{"id":42424365172,"attempt":2,"sha":"46acb48d9e714c0dc6d0250c7835d797122bc595","started":"2026-11-08T01:38:03Z"},{"id":42423764855,"attempt":2,"sha":"a47636fcd92560cbe07ee4f3f8d70a87cad92297","started":"2026-11-08T01:38:04Z"},{"id":42423410202,"attempt":2,"sha":"a47636fcd92560cbe07ee4f3f8d70a87cad92297","started":"2026-11-08T01:38:06Z"},{"id":42422974535,"attempt":2,"sha":"963288aa1916ecf40a8c7db06b5e79acc67a62b5","started":"2026-11-08T01:38:10Z"},{"id":42422167416,"attempt":2,"sha":"cdd6afbd8d18456771d5f71aa75920c90079a4eb","started":"2026-11-08T01:38:12Z"},{"id":42417050058,"attempt":2,"sha":"fa4843aed86556884d829c58567db9c3fa754039","started":"2026-11-08T01:38:14Z"},{"id":42413526430,"attempt":2,"sha":"feb4185e41fcfe6adf64b4587c51091546086342","started":"2026-11-08T01:38:45Z"},{"id":42405822677,"attempt":2,"sha":"ebbb2db0a02a8e56ab75e56b76495032373004b8","started":"2026-11-08T01:39:01Z"},{"id":42405822823,"attempt":2,"sha":"ebbb2db0a02a8e56ab75e56b76495032373004b8","started":"2026-11-08T01:39:02Z"},{"id":42405822768,"attempt":2,"sha":"ebbb2db0a02a8e56ab75e56b76495032373004b8","started":"2026-11-08T01:39:00Z"},{"id":42423411936,"attempt":2,"sha":"a47636fcd92560cbe07ee4f3f8d70a87cad92297","started":"2026-11-08T01:38:05Z"},{"id":42423231530,"attempt":2,"sha":"963288aa1916ecf40a8c7db06b5e79acc67a62b5","started":"2026-11-08T01:38:08Z"},{"id":42406600646,"attempt":2,"sha":"acee8cc57fd78a8071e37abb99e6bb22b8b5c1a3","started":"2026-11-08T01:38:52Z"},{"id":42415876528,"attempt":2,"sha":"6f9d5be3fc2649e27426774500a4b35d0ef1ba68","started":"2026-11-08T01:38:16Z"},{"id":42414054128,"attempt":2,"sha":"fe424b2bafce7a97e600fba59f9d4e7c5b3ab890","started":"2026-11-08T01:38:17Z"}];
+            const keep = 42435395623;
+            const {owner, repo} = context.repo;
+            const receipts = [];
+            if (targets.some(x => x.id === keep) || new Set(targets.map(x => x.id)).size !== targets.length) {
+              throw new Error('Unsafe cancellation manifest');
+            }
+            for (const target of targets) {
+              const {data: run} = await github.rest.actions.getWorkflowRun({owner,repo,run_id:target.id});
+              if (run.run_attempt !== target.attempt || run.head_sha !== target.sha || run.run_started_at !== target.started) {
+                receipts.push({id:target.id,status:'identity_changed_not_canceled'});
+                continue;
+              }
+              if (run.status === 'completed') {
+                receipts.push({id:target.id,status:'already_completed',conclusion:run.conclusion});
+                continue;
+              }
+              try {
+                await github.rest.actions.cancelWorkflowRun({owner,repo,run_id:target.id});
+                receipts.push({id:target.id,status:'cancellation_requested'});
+              } catch (e) {
+                receipts.push({id:target.id,status:'request_failed',httpStatus:e.status});
+              }
+            }
+            for (let round=0;round<20;round++) {
+              let active=0;
+              for (const receipt of receipts.filter(x=>x.status==='cancellation_requested'||x.status==='still_active')) {
+                const {data:run} = await github.rest.actions.getWorkflowRun({owner,repo,run_id:receipt.id});
+                if (run.status==='completed') {
+                  receipt.status=run.conclusion==='cancelled'?'canceled_verified':'completed_before_cancellation';
+                  receipt.conclusion=run.conclusion;
+                } else { receipt.status='still_active'; active++; }
+              }
+              if (!active) break;
+              await new Promise(resolve=>setTimeout(resolve,3000));
+            }
+            const {data:audit} = await github.rest.actions.getWorkflowRun({owner,repo,run_id:keep});
+            console.log(JSON.stringify({receipts,keptAudit:{id:keep,status:audit.status,conclusion:audit.conclusion}},null,2));
+            await core.summary.addHeading('Individual retry cleanup')
+            .addTable([['Run','Verified outcome'],...receipts.map(x=>[String(x.id),x.status])])
+            .addRaw('\nConsolidated audit '+keep+' retained: '+audit.status+'\n').write();
+            if (receipts.some(x=>['still_active','request_failed','identity_changed_not_canceled'].includes(x.status))) {
+             core.setFailed('Some requested cancellations are not verified. Inspect receipts.');
+            }

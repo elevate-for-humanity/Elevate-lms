@@ -660,7 +660,7 @@ export const AVAILABLE_TOOLS: AgentTool[] = [
   // API tools
   { id: 'eligibility_check', name: 'Eligibility Checker', description: 'Check WIOA and funding eligibility', category: 'api' },
   { id: 'adzuna_api', name: 'Adzuna Jobs API', description: 'Search job listings', category: 'api' },
-  { id: 'rapids_api', name: 'RAPIDS API', description: 'DOL registered apprenticeship reporting', category: 'api' },
+  { id: 'rapids_api', name: 'RAPIDS manual reporting', description: 'Prepare records for reviewed portal submission; no automated agency API transport', category: 'external' },
   { id: 'wioa_api', name: 'WIOA API', description: 'WIOA reporting and eligibility', category: 'api' },
   { id: 'stripe', name: 'Stripe Payments', description: 'Process payments and invoices', category: 'api' },
 

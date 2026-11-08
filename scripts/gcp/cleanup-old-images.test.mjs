@@ -16,3 +16,8 @@ test('unknown tags or timestamps never qualify for deletion; foreign repository 
  assert.ok(!imageCleanupPlan(images,{now}).remove.some(x=>[10,11].some(i=>x.image.endsWith(images[i].version))));
  assert.throws(()=>imageCleanupPlan([{...images[0],package:'foreign/repo'}]),/INVENTORY_INVALID/);
 });
+test('an old version updated recently cannot be removed',()=>{
+ const images=rows();images[12].updateTime=new Date(now-86400000).toISOString();
+ images[13].updateTime='unknown';
+ assert.ok(!imageCleanupPlan(images,{now}).remove.some(x=>[12,13].some(i=>x.image.endsWith(images[i].version))));
+});

@@ -54,6 +54,11 @@ export default function AuthCallbackPage() {
           if (!session) throw new Error('No valid sign-in session was returned.');
         }
 
+        // Best-effort owner notification; never blocks sign-in.
+        void fetch('/api/auth/notify-signin', { method: 'POST', cache: 'no-store' }).catch(
+          () => {},
+        );
+
         window.location.replace(destination);
       } catch {
         if (!active) return;

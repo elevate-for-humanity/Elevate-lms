@@ -60,6 +60,19 @@ test('only bounded transient failures requeue; no fabricated sources or endless 
   assert.equal(inspectCourseAutopilot(job({status:'failed',last_error}),{},+now).action,'none');
  assert.equal(inspectCourseAutopilot(job({status:'failed',last_error:'timeout',monitor:{enabled:true,recoveries:3}}),{},+now).action,'none');
 });
+test('an incomplete predecessor stage requeues the role within its retry budget',()=>{
+ // A media/quality role that stopped on ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE
+ // deadlocked the pool: it can never become claimable until the stage passes.
+ const observation=inspectCourseAutopilot(job({status:'failed',
+   last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization'}),{},+now);
+ assert.equal(observation.state,'recovering');
+ assert.equal(observation.action,'requeue');
+ // The retry budget and recovery cap still bound it; it is never unbounded.
+ assert.equal(inspectCourseAutopilot(job({status:'failed',attempts:5,
+   last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization'}),{},+now).action,'none');
+ assert.equal(inspectCourseAutopilot(job({status:'failed',monitor:{enabled:true,recoveries:3},
+   last_error:'ULTIMATE_AUTOPILOT_STAGE_NOT_COMPLETE:synchronization'}),{},+now).action,'none');
+});
 test('monitor uses fenced changes and never resets attempts or changes worker payload',async()=>{
  const calls=[];const row=job({status:'failed',last_error:'fetch failed'});
  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,

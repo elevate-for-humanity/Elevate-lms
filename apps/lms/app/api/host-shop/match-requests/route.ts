@@ -50,38 +50,35 @@ async function getSessionContext() {
   };
 }
 
-async function activeApprovedShopIds(db: any, partnerId?: string | null) {
-  let query = db
-    .from('shops')
+async function activeApprovedShopIds(db: any, partnerIds: string[]) {
+  if (!partnerIds.length) return [];
+  const { data, error } = await db.from('shops')
     .select('id, partner_id, active, partners!inner(id, status, approval_status, is_active)')
     .eq('active', true)
     .eq('partners.status', 'active')
     .eq('partners.approval_status', 'approved')
-    .neq('partners.is_active', false);
-
-  if (partnerId) query = query.eq('partner_id', partnerId);
-  const { data } = await query;
+    .neq('partners.is_active', false)
+    .in('partner_id', partnerIds);
+  if (error) throw new Error('HOST_SHOP_AUTHORIZED_SHOPS_UNAVAILABLE');
   return (data || []).map((shop: any) => shop.id).filter(Boolean);
 }
 
 async function getAuthorizedHostShopIds(db: any, userId: string, role: string) {
   if (PLATFORM_ADMIN_ROLES.has(role)) {
-    const cookieStore = await cookies();
-    const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || null;
-    return selectedPartnerId ? activeApprovedShopIds(db, selectedPartnerId) : [];
+    const selectedPartnerId = (await cookies()).get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    return selectedPartnerId ? activeApprovedShopIds(db, [selectedPartnerId]) : [];
   }
-
   if (!HOST_ROLES.has(role)) return [];
-
-  const { data: partnerUser } = await db
-    .from('partner_users')
-    .select('partner_id, status')
-    .eq('user_id', userId)
-    .eq('status', 'active')
-    .maybeSingle();
-  if (!partnerUser?.partner_id) return [];
-
-  return activeApprovedShopIds(db, partnerUser.partner_id);
+  // One owner may be authorized for multiple shops; maybeSingle() previously
+  // discarded the entire roster on a legitimate multi-partner membership.
+  const { data: memberships, error } = await db.from('partner_users')
+    .select('partner_id,role').eq('user_id', userId).eq('status', 'active');
+  if (error) throw new Error('HOST_SHOP_MEMBERSHIP_LOOKUP_FAILED');
+  const partnerIds = Array.from(new Set((memberships || [])
+    .filter((row: any) => ['owner','partner_admin','admin','supervisor','mentor','manager'].includes(
+      String(row.role || '').toLowerCase(),
+    )).map((row: any) => row.partner_id).filter(Boolean))) as string[];
+  return activeApprovedShopIds(db, partnerIds);
 }
 
 export async function GET(req: NextRequest) {

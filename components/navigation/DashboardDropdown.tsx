@@ -99,7 +99,7 @@ export function DashboardDropdown({ className }: Props) {
 
         if (!user) return;
 
-        const [{ data: profile }, { data: roleRows }, { data: recentVisits }] = await Promise.all([
+        const [{ data: profile }, { data: roleRows }, { data: recentVisits }, { data: partnerMemberships, error: membershipError }] = await Promise.all([
           supabase.from('profiles').select('role, roles').eq('id', user.id).maybeSingle(),
           supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
           supabase
@@ -109,6 +109,11 @@ export function DashboardDropdown({ className }: Props) {
             .eq('activity_type', 'dashboard_visit')
             .order('created_at', { ascending: false })
             .limit(3),
+          supabase
+            .from('partner_users')
+            .select('partner_id, role, status')
+            .eq('user_id', user.id)
+            .eq('status', 'active'),
         ]);
 
         const profileRole = typeof profile?.role === 'string' ? profile.role : 'student';
@@ -119,8 +124,22 @@ export function DashboardDropdown({ className }: Props) {
           .map((row: any) => row.roles?.name)
           .filter((role: unknown): role is string => typeof role === 'string');
 
+        // Host Shop is an additional workspace granted by an active partner
+        // membership, not a replacement for the Program Holder's primary role.
+        // A failed membership lookup cannot grant access; server guards remain
+        // authoritative for every destination.
+        const hasHostShopMembership = !membershipError && (partnerMemberships ?? []).some(
+          (membership) =>
+            membership.status === 'active' &&
+            ['owner', 'partner_admin', 'admin', 'supervisor', 'mentor', 'manager'].includes(
+              String(membership.role || '').toLowerCase(),
+            ),
+        );
         setPrimaryRole(profileRole);
-        setUserRoles(Array.from(new Set([profileRole, ...jsonRoles, ...secondaryRoles])));
+        setUserRoles(Array.from(new Set([
+          profileRole, ...jsonRoles, ...secondaryRoles,
+          ...(hasHostShopMembership ? ['host_shop'] : []),
+        ])));
         setRecentDashboards(
           (recentVisits || [])
             .map((visit: any) => visit.metadata?.dashboard_href)

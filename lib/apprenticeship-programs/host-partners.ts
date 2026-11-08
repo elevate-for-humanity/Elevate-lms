@@ -324,30 +324,31 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialUrl: 'https://www.instagram.com/midwesternmanes/',
     socialLabel: 'Contact / view shop photos',
   },
-  /* Mesmerized by Beauty Host Shop archived 2026-10-01; Jozanna George remains a Program Holder only.
   {
     slug: 'mesmerized-by-beauty-cosmetology-academy',
     name: 'Mesmerized by Beauty Cosmetology Academy',
-    businessType: 'HairSalon',
     city: 'Indianapolis',
     state: 'IN',
-    zip: '46268',
-    address: 'Indianapolis, IN 46268',
-    programs: ['cosmetology-apprenticeship'],
-    note: 'Published cosmetology apprenticeship host site in Indianapolis.',
-    marketingBlurb:
-      'An Indianapolis cosmetology training and host-site option in Elevate’s published apprenticeship network. Current placement capacity is confirmed during enrollment.',
+    zip: '',
+    address: '120 East Market Street, Suite 560',
+    programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
+    primaryProgram: 'esthetician-apprenticeship',
+    note: 'Published downtown Indianapolis Host Shop profile for esthetics and nail apprenticeship pathways.',
+    marketingBlurb: 'Mesmerized by Beauty supports Elevate esthetics and nail apprenticeship pathways at 120 East Market Street, Suite 560 in downtown Indianapolis. Contact Elevate to confirm schedules, requirements, and training availability.',
     media: [
       {
-        src: '/images/jozanna-george.jpg',
-        alt: 'Jozanna George of Mesmerized by Beauty Cosmetology Academy',
+        src: '/images/partners/mesmerized-by-beauty/downtown-nail-program.webp',
+        alt: 'Mesmerized by Beauty nail apprenticeship training space in downtown Indianapolis',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/mesmerized-by-beauty/downtown-esthetician-program.webp',
+        alt: 'Mesmerized by Beauty esthetics apprenticeship training space in downtown Indianapolis',
         kind: 'photo',
       },
     ],
-    websiteUrl: '/schools/mesmerized-by-beauty',
-    websiteLabel: 'Visit Mesmerized by Beauty school page',
   },
-  */
+
   {
     slug: 'salon-saloon',
     name: 'Salon Saloon LLC',

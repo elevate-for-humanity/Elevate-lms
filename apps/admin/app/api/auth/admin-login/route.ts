@@ -177,6 +177,20 @@ export async function POST(req: NextRequest) {
       return json({ error: 'You do not have permission to access the admin portal.' }, 403);
     }
 
+    // Tell the owner an administrator signed in. Best-effort; never blocks login.
+    try {
+      const { notifyPortalAuthEvent } = await import('@/lib/auth/portal-auth-notify');
+      await notifyPortalAuthEvent({
+        event: 'signin',
+        portal: 'Admin',
+        userId: authData.user.id,
+        email: authData.user.email,
+        extra: { role: profile.role },
+      });
+    } catch {
+      // Login succeeded; monitoring is best-effort and isolated.
+    }
+
     return json({ ok: true, role: profile.role, effectiveRoles });
   } catch (error) {
     return jsonError(error);

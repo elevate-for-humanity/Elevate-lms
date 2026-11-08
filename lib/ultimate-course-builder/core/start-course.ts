@@ -117,6 +117,9 @@ export async function startCanonicalCourse(db: SupabaseClient, body: StartCourse
       if (body.syllabusPlan) generatedProfile = applySyllabusPlan(generatedProfile, body.syllabusPlan);
       const profile = {
         ...generatedProfile,
+        // Worker claims require an explicit unpause. This authenticated start
+        // action is that authorization, so record it or the build never claims.
+        ownerPaused: false,
         mediaAcquisitionOwnerId: actorId,
         publicationPolicy: 'automatic-quality-verified',
         ...(instructionalAuthoring ? { instructionalAuthoring } : {}),

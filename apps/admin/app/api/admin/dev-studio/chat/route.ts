@@ -29,6 +29,16 @@ import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
 import { aiChat, aiChatStream, getActiveProviderName } from '@/lib/ai/ai-service';
 import { isXAIConfigured } from '@/lib/ai/xai-config';
+import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
+import {
+  CloudflareProvider,
+  GroqProvider,
+  OpenAIProvider,
+  AnthropicProvider,
+  GeminiProvider,
+  XAIProvider,
+} from '@/lib/ai/providers';
+import type { AIProvider } from '@/lib/ai/types';
 import {
   executePaidInference,
   paidArtifactFingerprint,
@@ -122,8 +132,16 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
 }
 
 async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string, conversationId?: string) {
-  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
-  return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
+  // Durable run/plan bookkeeping is supporting evidence, not a precondition for
+  // answering or executing a command. A transient write failure here must never
+  // take down the entire Studio request, so it degrades to a null execution.
+  try {
+    const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command, conversationId });
+    return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
+  } catch (error) {
+    logger.warn('[devstudio/chat] unified studio run could not be recorded', normalizeError(error));
+    return null;
+  }
 }
 
 async function recordUnifiedCapabilityUse(
@@ -187,6 +205,112 @@ function toChatMessages(messages: ChatMessage[]) {
       role: m.role as 'user' | 'assistant',
       content: String(m.content ?? ''),
     }));
+}
+
+/**
+ * Cached ownership probe. Auto mode prefers the owned PARIS model; when it is
+ * unreachable we fall back to a governed external provider instead of refusing
+ * to answer. The result is cached briefly so a down endpoint cannot add a probe
+ * round-trip to every message.
+ */
+let ownedProbeCache: { at: number; verified: boolean; status?: string; configured?: boolean } | null =
+  null;
+async function ownedModelReachable(ttlMs = 30_000) {
+  const now = Date.now();
+  if (ownedProbeCache && now - ownedProbeCache.at < ttlMs) return ownedProbeCache;
+  const result = await probeOwnedModel({ timeoutMs: 3500 }).catch(() => ({
+    verified: false,
+    status: 'request_failed',
+    configured: false,
+  }));
+  ownedProbeCache = {
+    at: now,
+    verified: Boolean((result as { verified?: boolean }).verified),
+    status: (result as { status?: string }).status,
+    configured: (result as { configured?: boolean }).configured,
+  };
+  return ownedProbeCache;
+}
+
+// Auto mode degrades to the first reachable external provider that works inside
+// the paid-inference authorization boundary. Ordering is Cloudflare-first (the
+// platform's own Workers AI), then the other configured providers. External
+// metered providers that require a paid context are still only reached through
+// executePaidInference, so this preserves the provider authorization boundary.
+const GOVERNED_PROVIDER_FACTORIES: ReadonlyArray<readonly [string, () => AIProvider]> = [
+  ['cloudflare', () => new CloudflareProvider()],
+  ['groq', () => new GroqProvider()],
+  ['openai', () => new OpenAIProvider()],
+  ['anthropic', () => new AnthropicProvider()],
+  ['gemini', () => new GeminiProvider()],
+  ['xai', () => new XAIProvider()],
+];
+
+/**
+ * Run one governed, tool-capable external completion for auto mode. External
+ * metered providers are only reached inside a paid-inference authorization, and
+ * the request is fully audited. Returns null when no provider is authorized or
+ * available so the caller can continue its own fallbacks.
+ */
+async function governedExternalCompletion(input: {
+  messages: ChatMessage[];
+  systemPrompt: string;
+  toolsAllowed: boolean;
+  tools: unknown[];
+  userId: string;
+  req: NextRequest;
+  runId?: string;
+  toolCalls: ToolCallRecord[];
+}): Promise<{ content: string; provider: string; model: string } | null> {
+  const providers = GOVERNED_PROVIDER_FACTORIES.map(([name, create]) => ({ name, provider: create() }));
+  for (const { name, provider } of providers) {
+    try {
+      if (!provider.isAvailable()) continue;
+    } catch {
+      continue;
+    }
+    try {
+      const db = await requireAdminClient();
+      const requestNonce = input.req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
+      const projectedCostMicros = Math.max(
+        0,
+        Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS ?? '100000'),
+      );
+      const artifactFingerprint = paidArtifactFingerprint({
+        operation: 'studio-chat',
+        actorId: input.userId,
+        provider: name,
+        message: input.messages.at(-1)?.content ?? '',
+        requestNonce,
+      });
+      const completion = await executePaidInference({
+        db,
+        authorize: () =>
+          reservePaidInference(db, {
+            scopeKey: 'studio-chat',
+            actorId: input.userId,
+            artifactFingerprint,
+            idempotencyKey: `studio-chat:${name}:${requestNonce}`,
+            provider: name,
+            model: name,
+            operation: 'studio-chat',
+            projectedCostMicros,
+          }),
+        dispatch: () =>
+          provider.chat({
+            messages: [{ role: 'system', content: input.systemPrompt }, ...input.messages],
+            temperature: 0.4,
+            maxTokens: 2048,
+            provider: name,
+          }),
+      });
+      if (completion.decision !== 'approved' || !completion.value?.content) continue;
+      return { content: completion.value.content, provider: name, model: completion.value.model ?? name };
+    } catch (error) {
+      logger.warn(`[devstudio/chat] governed fallback provider "${name}" failed`, normalizeError(error));
+    }
+  }
+  return null;
 }
 
 const TOOLS: any[] = [
@@ -1471,6 +1595,30 @@ async function _POST(req: NextRequest) {
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
 
+    // Auto mode prefers the owned PARIS model. When it is unreachable, degrade
+    // to a governed external provider instead of leaving the operator with no
+    // answer. Explicit provider selections skip this and stay pinned below.
+    if (effectiveProvider === 'elevate') {
+      const owned = await ownedModelReachable();
+      if (!owned.verified) {
+        const governed = await governedExternalCompletion({
+          messages: toChatMessages(messages),
+          systemPrompt,
+          toolsAllowed,
+          tools: TOOLS,
+          userId: auth.userId,
+          req,
+          runId: masterExecution?.studioRunId,
+          toolCalls,
+        });
+        if (governed) {
+          assistantMessage = governed.content;
+          provider = governed.provider;
+          model = governed.model;
+        }
+      }
+    }
+
     // True model streaming for the default Admin conversation. The response is
     // returned immediately; OpenAI deltas are forwarded as they arrive instead
     // of waiting for a completed answer and replaying it word-by-word.
@@ -1607,49 +1755,59 @@ async function _POST(req: NextRequest) {
     }
 
     if (effectiveProvider === 'elevate') {
-      return studioTextStreamResponse({
-        signal: req.signal,
-        tokens: (signal) => aiChatStream({
-          providerPolicy: 'owned-only',
-          messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
-          temperature: 0.4,
-          maxTokens: 2048,
-          signal,
-        }),
-        complete: async (content) => {
-          const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
-          try {
-            const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
-              user_id: auth.userId,
-              user_message: lastUserMessage,
-              assistant_response: content,
-              file_context: fileContext || null,
+      const owned = await ownedModelReachable();
+      if (owned.verified) {
+        return studioTextStreamResponse({
+          signal: req.signal,
+          tokens: (signal) => aiChatStream({
+            providerPolicy: 'owned-only',
+            messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+            temperature: 0.4,
+            maxTokens: 2048,
+            signal,
+          }),
+          complete: async (content) => {
+            const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+            try {
+              const { error: logError } = await masterDb.from('devstudio_chat_log').insert({
+                user_id: auth.userId,
+                user_message: lastUserMessage,
+                assistant_response: content,
+                file_context: fileContext || null,
+                provider: 'elevate',
+                model: 'elevate-local',
+              });
+              if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
+              await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
+            } catch (error) {
+              logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
+            }
+            return {
               provider: 'elevate',
               model: 'elevate-local',
-            });
-            if (logError) logger.warn('[devstudio/chat] owned response log failed', { reason: logError.message });
-            await recordUnifiedCapabilityUse(masterDb, capabilitiesUsed, 'elevate', 'elevate-local', toolCalls);
-          } catch (error) {
-            logger.warn('[devstudio/chat] owned response audit failed', normalizeError(error));
-          }
-          return {
-            provider: 'elevate',
-            model: 'elevate-local',
-            providerPreference,
-            availableProviders: {
-              xai: isXAIConfigured(),
-              groq: isGroqConfigured(),
-              openai: isOpenAIConfigured(),
-              anthropic: isAnthropicConfigured(),
-              gemini: isGeminiConfigured(),
-            },
-            toolCalls,
-            capabilitiesUsed,
-            studioRun: masterExecution,
-          };
-        },
-        onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
-        errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
+              providerPreference,
+              availableProviders: {
+                xai: isXAIConfigured(),
+                groq: isGroqConfigured(),
+                openai: isOpenAIConfigured(),
+                anthropic: isAnthropicConfigured(),
+                gemini: isGeminiConfigured(),
+              },
+              toolCalls,
+              capabilitiesUsed,
+              studioRun: masterExecution,
+            };
+          },
+          onError: (error) => logger.warn('[devstudio/chat] owned stream failed', normalizeError(error)),
+          errorMessage: 'Paris could not complete this response. No outside AI provider was used.',
+        });
+      }
+      // Auto mode preferred the owned model, but it is not reachable. Degrade to
+      // a governed external provider instead of refusing to answer; owned-only
+      // streaming policy is preserved for callers that explicitly set ELEVATE_LLM_*.
+      logger.warn('[devstudio/chat] owned model unreachable; using governed provider fallback', {
+        status: owned.status,
+        configured: owned.configured,
       });
     }
 
@@ -1880,7 +2038,9 @@ async function _POST(req: NextRequest) {
               messages: [{ role: 'system', content: systemPrompt }, ...messages],
               temperature: 0.4,
               maxTokens: 2048,
-              provider: effectiveProvider,
+              // Auto mode lets the canonical resolver pick the first reachable
+              // provider; explicit selections stay pinned to their provider.
+              provider: effectiveProvider === 'elevate' ? undefined : effectiveProvider,
             }),
         });
         if (paidExecution.decision === 'approved' && paidExecution.value) {

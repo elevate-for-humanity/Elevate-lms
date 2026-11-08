@@ -2,7 +2,7 @@ name: Verify services and reduce Google waste
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs', 'scripts/gcp/reduce-model-idle.mjs', 'scripts/gcp/release-empty-browser-aliases.mjs', 'scripts/gcp/park-browser-trial.mjs']
+    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs', 'scripts/gcp/reduce-model-idle.mjs', 'scripts/gcp/release-empty-browser-aliases.mjs', 'scripts/gcp/park-browser-trial.mjs', 'scripts/gcp/recover-speech-cache-rollout.mjs']
   workflow_dispatch:
 permissions:
   contents: read
@@ -197,3 +197,31 @@ jobs:
           name: google-browser-idle-${{ github.run_id }}
           path: audit-reports/
           retention-days: 30
+
+  recover-speech:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-runtime-us-central1
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/recover-speech-cache-rollout.test.mjs
+      - name: Install and verify audio decoder before any synthesis probe
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
+          ffmpeg -version >/dev/null
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/recover-speech-cache-rollout.mjs

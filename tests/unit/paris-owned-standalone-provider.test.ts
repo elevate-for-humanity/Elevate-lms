@@ -10,14 +10,21 @@ describe('PARIS-owned inference default across Admin and learner surfaces', () =
     expect(source).toContain("options.providerPolicy === 'owned-only'");
   });
 
-  it('does not route Admin Studio auto traffic to paid OpenAI', () => {
+  it('prefers owned inference but degrades to a governed provider when it is unreachable', () => {
     const source = read('apps/admin/app/api/admin/dev-studio/chat/route.ts');
     expect(source).not.toContain("providerPreference === 'auto' ? 'openai'");
     expect(source).toContain("providerPreference === 'auto' ? 'elevate'");
+    // Owned-only streaming policy is preserved for a reachable owned model.
     expect(source).toContain("providerPolicy: 'owned-only'");
     expect(source).toContain("if (effectiveProvider === 'elevate')");
     expect(source).toContain('return studioTextStreamResponse({');
     expect(source).toContain('Paris could not complete this response. No outside AI provider was used.');
+    // Auto mode probes the owned model and, when unreachable, routes through the
+    // paid-inference authorization to a governed external provider instead of
+    // refusing to answer.
+    expect(source).toContain('ownedModelReachable');
+    expect(source).toContain('governedExternalCompletion');
+    expect(source).toContain('executePaidInference');
   });
 
   it('keeps learner chat on owned-only inference', () => {

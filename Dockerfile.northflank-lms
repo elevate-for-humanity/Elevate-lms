@@ -18,6 +18,10 @@ ARG BUILD_ID
 
 FROM node:22-bookworm AS builder
 
+# CPU web runtimes retain bundled ONNX CPU support and skip optional GPU downloads.
+ENV ONNXRUNTIME_NODE_INSTALL=skip
+ENV ONNXRUNTIME_NODE_INSTALL_CUDA=skip
+
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID

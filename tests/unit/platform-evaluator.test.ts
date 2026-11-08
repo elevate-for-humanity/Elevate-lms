@@ -80,13 +80,40 @@ describe('platform execution evidence', () => {
 
 
 describe('semantic execution failures', () => {
-  it.each([{overall: 'unknown'}, {overall: 'unhealthy'}, {status: 'failed'}, {status: 'unavailable'}, {status: 'degraded'}])('rejects %j as verified success', result => {
-    expect(evaluateExecution({tool: 'system.health', result}).status).toBe('FAIL_BLOCKING');
+  const snapshot = {
+    overall: 'unknown',
+    services: {
+      database: { status: 'healthy' },
+      redis: { status: 'healthy' },
+      billing: { status: 'unknown' },
+    },
+  };
+
+  it('verifies a platform-state read on real service evidence even when a service is unknown', () => {
+    // A platform snapshot is evidence of current state, not a pass/fail gate.
+    // An unverifiable billing service must not deadlock every plan at step 1.
+    expect(evaluateExecution({ tool: 'system.health', result: snapshot }).status).toBe('PASS');
+  });
+
+  it('still blocks a platform-state read that reports the platform is down', () => {
+    expect(
+      evaluateExecution({ tool: 'system.health', result: { ...snapshot, overall: 'down' } }).status,
+    ).toBe('FAIL_BLOCKING');
+  });
+
+  it('does not verify an unknown platform-state read that returns no service snapshot', () => {
+    expect(evaluateExecution({ tool: 'system.health', result: { overall: 'unknown' } }).status).toBe(
+      'FAIL_BLOCKING',
+    );
+  });
+
+  it.each([{ overall: 'unhealthy' }, { status: 'failed' }, { status: 'unavailable' }, { status: 'degraded' }])('rejects %j as verified success', result => {
+    expect(evaluateExecution({ tool: 'system.health', result }).status).toBe('FAIL_BLOCKING');
   });
   it.each(['pending', 'queued', 'running', 'awaiting_approval'])('does not verify an unfinished %s operation', status => {
-    expect(evaluateExecution({tool: 'advisory', result: {status}}).status).toBe('REQUIRES_HUMAN_REVIEW');
+    expect(evaluateExecution({ tool: 'advisory', result: {status}}).status).toBe('REQUIRES_HUMAN_REVIEW');
   });
   it('still accepts a healthy observed result', () => {
-    expect(evaluateExecution({tool: 'system.health', result: {overall: 'healthy', timestamp: new Date().toISOString()}}).status).toBe('PASS');
+    expect(evaluateExecution({ tool: 'system.health', result: {overall: 'healthy', timestamp: new Date().toISOString()}}).status).toBe('PASS');
   });
 });

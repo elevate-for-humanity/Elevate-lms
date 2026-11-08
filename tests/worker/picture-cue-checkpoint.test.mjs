@@ -3,8 +3,11 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {measuredNarrationRepair} from '../../lib/ultimate-course-builder/instructional/narration-checkpoint-repair.mjs';
+import {recoverCaptionCoverageInspection} from '../../lib/ultimate-course-builder/instructional/caption-coverage-repair.mjs';
+import {instructionView,recoverTeachingVisibilityRepair} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
+import {inheritCourseProductionPolicy} from '../../lib/ultimate-course-builder/core/production-policy.mjs';
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/persistence/supabase-persistence.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import .*;\n/gm,'').replace('export class ','class ');
-const Persistence=new Function('currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair',source+';return UltimateSupabasePersistence;')(value=>value?.certified===true,['standards_lock','storyboard','visual_assignment','synchronization','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair);
+const Persistence=new Function('currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair','recoverCaptionCoverageInspection','instructionView','recoverTeachingVisibilityRepair','inheritCourseProductionPolicy',source+';return UltimateSupabasePersistence;')(value=>value?.certified===true,['standards_lock','storyboard','visual_assignment','synchronization','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair,recoverCaptionCoverageInspection,instructionView,recoverTeachingVisibilityRepair,inheritCourseProductionPolicy);
 async function checkpoint({valid=true,failedStep='lesson_film_render',message='ULTIMATE_VIDEO_RENDER_FAILED:PICTURE_CUE_NOT_ALIGNED_TO_SPEECH',extra=[]}={}){
  const previous={certified:valid,timeline:{durationSeconds:30}};
  const artifacts={storyboard:{certified:true,storyboard:{scenes:[{id:'saved-cue'}]}},visual_assignment:{certified:true,media:{saved:true}},__repairState:{status:'diagnosed',directive:{failedStep,target:'synchronization',previous,requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message},...extra]}}};

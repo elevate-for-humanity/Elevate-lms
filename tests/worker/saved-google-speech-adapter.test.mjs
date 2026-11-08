@@ -11,6 +11,7 @@ const source=readFileSync(new URL('../../lib/ai/saved-google-speech.ts',import.m
 const {generateSavedGoogleSpeech}=await import('data:text/javascript;base64,'+Buffer.from(stripTypeScriptTypes(source)).toString('base64'));
 test('private storage adapter stores bytes and reuses them through the real cache',async()=>{
  let stored;globalThis.speechAdapterTest={calls:0,audio,db:{storage:{getBucket:async()=>({data:{public:false}}),from:()=>({
+  info:async()=>stored?{data:{}}:{error:{statusCode:'404',message:'Object not found'}},
   download:async()=>stored?{data:new Blob([stored])}:{error:{statusCode:'404',message:'Object not found'}},
   upload:async(key,bytes,opts)=>{assert.equal(opts.upsert,false);assert.equal(opts.contentType,'audio/mpeg');stored=bytes;return {};},
  })}}};
@@ -24,4 +25,12 @@ test('public or denied storage never incurs a synthesis request',async()=>{
  globalThis.speechAdapterTest.db.storage.getBucket=async()=>({error:{message:'denied'}});
  await assert.rejects(generateSavedGoogleSpeech('Denied bucket.'),/PRIVATE_BUCKET_REQUIRED/);
  assert.equal(globalThis.speechAdapterTest.calls,0);
+});
+
+test('a metadata denial or server failure cannot be mistaken for an absent object',async()=>{
+ for(const statusCode of ['400','401','403','500']){
+  globalThis.speechAdapterTest={calls:0,audio,db:{storage:{getBucket:async()=>({data:{public:false}}),from:()=>({info:async()=>({error:{statusCode,message:'unavailable'}}),download:()=>assert.fail('must not download after denied metadata')})}}};
+  await assert.rejects(generateSavedGoogleSpeech('Denied metadata '+statusCode),/READ_UNAVAILABLE/);
+  assert.equal(globalThis.speechAdapterTest.calls,0);
+ }
 });

@@ -15,7 +15,9 @@ test('plans exact draft-source recovery while retaining publication refusal',()=
  assert.equal(plan.sourceCount,1);assert.equal(plan.publicationApproved,false);
  assert.equal(plan.publishCompletedLessons,false);
  assert.deepEqual(plan.jobIds,['instruction']);assert.notEqual(plan.newPoolHash,plan.previousPoolHash);
- assert.equal(recoveredSourcePublicationAllowed(f.build.profile),false);
+ // Source reconciliation still preserves the snapshot, but the removed
+ // publication restriction no longer forces publishCompletedLessons=false.
+ assert.equal(recoveredSourcePublicationAllowed(f.build.profile),true);
  assert.match(plan.sql,/Owner''s restored draft/);
 });
 test('the independently deployed partial-publication guard also requires publication disabled',()=>{

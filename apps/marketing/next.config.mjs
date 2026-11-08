@@ -32,6 +32,11 @@ const nextConfig = {
     unoptimized: false,
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 86400,
+    // Next defaults deviceSizes up to 3840px, so a full-width hero shipped a
+    // ~200KB 3840px variant to every visitor. Cap at 1920px (covers standard
+    // desktop) so the responsive srcset never requests the oversized variant.
+    deviceSizes: [360, 420, 640, 750, 828, 1080, 1200, 1440, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       { protocol: 'https', hostname: 'www.elevateforhumanity.org' },
       { protocol: 'https', hostname: '*.supabase.co' },

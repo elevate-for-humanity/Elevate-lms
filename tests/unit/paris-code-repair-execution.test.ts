@@ -4,24 +4,18 @@ vi.mock('server-only',()=>({}));
 vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'})}));
 vi.mock('@/lib/devstudio/github-app-token',()=>({getGitHubAppToken:async()=> 'app-only-fixture'}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{
- let values:any;
- const predicates:Array<[string,unknown]>=[];
- // Model the conditional Supabase UPDATE ... WHERE id/run/status ... RETURNING.
- // Writes must be observed through maybeSingle(), not only through .then().
- const apply=()=>{
-  if(values&&h.onOwnedWrite){const hook=h.onOwnedWrite;h.onOwnedWrite=null;hook();}
-  const allowed=predicates.every(([key,value])=>h.row?.[key]===value);
-  if(!allowed)return {data:null,error:null};
-  if(values){h.updates.push(values);h.row={...h.row,...values};}
-  return {data:h.row,error:null};
- };
- const q:any={
-  select:()=>q,eq:(key:string,value:unknown)=>{predicates.push([key,value]);return q;},
-  in:()=>q,update:(v:any)=>{values=v;return q;},
-  single:async()=>({data:h.row,error:null}),
-  maybeSingle:async()=>apply(),
-  then:(resolve:any)=>Promise.resolve(resolve(apply())),
- };return q;
+ let values:any;const eqs:any[]=[];
+ const q:any={select:()=>q,eq:(k:any,v:any)=>{eqs.push([k,v]);return q;},in:()=>q,update:(v:any)=>{values=v;return q;},single:async()=>({data:h.row,error:null}),
+  maybeSingle:async()=>{
+   // A read has no pending update; only a compare-and-swap transition records a
+   // write, and it must match the owning run and expected state (eq filters).
+   if(!values)return {data:h.row,error:null};
+   if(h.onOwnedWrite){const hook=h.onOwnedWrite;h.onOwnedWrite=null;hook();}
+   if(!eqs.every(([k,v])=>h.row?.[k]===v))return {data:null,error:null};
+   h.updates.push(values);h.row={...h.row,...values};values=undefined;eqs.length=0;
+   return {data:{id:h.row.id},error:null};
+  },
+  then:(resolve:any)=>{if(values)h.updates.push(values);return Promise.resolve(resolve({data:h.row,error:null}));}};return q;
 }})}));
 import {publishParisRepair,prepareParisRepair} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{

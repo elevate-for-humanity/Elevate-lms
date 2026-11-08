@@ -20,12 +20,14 @@ export function ProgramHolderDocumentUpload({
   insuranceRequired = true,
   materialsOnly = false,
   students = [],
+  onFile = [],
 }: {
   isHvac?: boolean;
   invoiceOnly?: boolean;
   insuranceRequired?: boolean;
   materialsOnly?: boolean;
   students?: any[];
+  onFile?: string[];
 }) {
   const materialOptions = [
     ['lab_tracker', 'Lab tracker — Excel or CSV'],
@@ -111,6 +113,22 @@ export function ProgramHolderDocumentUpload({
             ? 'Fill out and submit your invoice below, or upload an existing invoice. Submission sends it for review and does not mark it paid.'
             : 'PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected storage.'}
       </p>
+      {!materialsOnly && !invoiceOnly && onFile.length > 0 && (
+        <p className="mt-2 rounded-lg bg-white/70 p-3 text-sm font-semibold text-blue-950">
+          Already on file, so you do not need to upload it again:{' '}
+          {onFile
+            .map(
+              (type) =>
+                [
+                  ...commonOptions,
+                  ['epa_608', 'EPA Section 608 certification'],
+                  ['hvac_training_plan', 'HVAC syllabus and training plan'],
+                ].find(([value]) => value === type)?.[1] || type,
+            )
+            .join(', ')}
+          . Upload another copy only if the previous file changed or was rejected.
+        </p>
+      )}
       {!materialsOnly && !invoiceOnly && (
         <div className="mt-4 rounded-xl border border-blue-200 bg-white p-4 text-sm leading-6 text-slate-700">
           <p className="font-black text-slate-950">What should I upload?</p>
@@ -209,6 +227,7 @@ export function ProgramHolderDocumentUpload({
           ).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
+              {onFile.includes(value) ? ' — already on file' : ''}
             </option>
           ))}
         </select>

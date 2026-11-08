@@ -5,7 +5,7 @@ import {activateTestedRevision} from './activate-tested-public-revision.mjs';
 const service='elevate-marketing-migration';
 const bad='4e32ccff1b09d020c9eaed3a9bc5bec525082de2';
 const previous='38fa72efea936554e964b10849ac4f66e5942964';
-export async function recoverSpeech({run=google,request=fetch,activate=activateTestedRevision,decode=bytes=>spawnSync('ffmpeg',['-v','error','-i','pipe:0','-f','null','-'],{input:bytes}).status===0}={}){
+export async function recoverSpeech({run=google,request=fetch,activate=activateTestedRevision,checkDecoder=()=>{if(spawnSync('ffmpeg',['-version'],{stdio:'ignore'}).status!==0)throw Error('SPEECH_DECODER_UNAVAILABLE');},decode=bytes=>spawnSync('ffmpeg',['-v','error','-i','pipe:0','-f','null','-'],{input:bytes}).status===0}={}){
  const read=args=>JSON.parse(run([...args,'--project='+PROJECT,'--format=json']));
  const state=read(['run','services','describe',service,'--region=us-central1']);
  const active=(state.status?.traffic||[]).filter(t=>t.percent>0);
@@ -18,6 +18,7 @@ export async function recoverSpeech({run=google,request=fetch,activate=activateT
   const audio=Buffer.from(await response.arrayBuffer());
   return {status:response.status,passed:response.ok&&/^audio\/mpeg\b/i.test(response.headers.get('content-type')||'')&&audio.length>1000&&decode(audio)};
  };
+ checkDecoder(); // A missing verification tool must fail before any synthesis charge.
  const current=await voice(canonical);
  if(current.passed)return {changed:false,reason:'speech_already_works'};
  if(current.status!==503)throw Error('SPEECH_FAILURE_NOT_THE_KNOWN_CACHE_REGRESSION');

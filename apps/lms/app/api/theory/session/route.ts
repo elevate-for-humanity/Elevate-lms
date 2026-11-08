@@ -93,8 +93,11 @@ async function _POST(request: NextRequest) {
     return NextResponse.json(responseBody, { status });
   }
 
-  const [{ data: apprentice }, { data: lesson }, enrollment] = await Promise.all([
+  const [apprenticeResult, scheduleResult, lessonResult, enrollment] = await Promise.all([
     db.from('apprentices').select('id').eq('user_id', user.id).eq('status', 'active').maybeSingle(),
+    db.from('apprenticeship_theory_schedules').select('id')
+      .eq('user_id', user.id).eq('course_id', body.courseId).eq('active', true)
+      .order('updated_at', { ascending: false }).limit(1).maybeSingle(),
     db
       .from('course_lessons')
       .select('id,course_id')
@@ -103,7 +106,13 @@ async function _POST(request: NextRequest) {
       .maybeSingle(),
     resolveCourseEnrollment(user.id, body.courseId),
   ]);
-  if (!apprentice) return NextResponse.json({ tracked: false, reason: 'NOT_APPRENTICE' });
+  if (apprenticeResult.error || scheduleResult.error || lessonResult.error)
+    return NextResponse.json({ error: 'Unable to verify theory enrollment.' }, { status: 503 });
+  const lesson = lessonResult.data;
+  // Active enrollment and lesson access remain required below. An inherited
+  // theory schedule must not depend on a duplicate legacy apprentice profile.
+  if (!apprenticeResult.data && !scheduleResult.data)
+    return NextResponse.json({ tracked: false, reason: 'NOT_APPRENTICE' });
   if (
     !lesson ||
     !enrollment ||

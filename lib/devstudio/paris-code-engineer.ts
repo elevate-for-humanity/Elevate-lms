@@ -1,6 +1,7 @@
 import {courseDiagnosticQuery} from './paris-course-repair-evidence.mjs';
 import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-source-discovery.mjs';
 import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
+import {rememberVerifiedRepairSource,discardChangedRepairSource,repairPlannerObservations} from './paris-source-evidence.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
 import {hasApplicationSourceCorrection,nextRepairActionConstraint,assertCommittedWriteReadback} from './paris-action-loop.mjs';
@@ -330,6 +331,7 @@ export type ParisRepairCheckpoint = {
   version: 1; boundedCpuEdits?: boolean; verifiedSourceRead?: boolean; startedAt?: string; branch: string; baseSha: string; headSha: string; nextTurn: number;
   observations: string[]; changedFiles: string[]; newRegressionTests: string[];
   inspectionHistory?: string[]; discoveredFiles?: string[]; sourceEvidence?: Record<string, unknown>;
+  verifiedSourceExcerpts?: Array<{path:string;sha:string;excerpt:string}>;
   commits: string[]; writes: number; summary: string; complete: boolean;
 };
 type RepairContinuation = {
@@ -385,6 +387,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   let verifiedSourceRead = saved?.verifiedSourceRead === true ||
     (saved?.observations ?? []).some(value => typeof value === 'string' && value.startsWith('READ '));
   let discoveredFiles: string[] = rememberSourcePaths(saved?.discoveredFiles ?? []);
+  let verifiedSourceExcerpts = Array.isArray(saved?.verifiedSourceExcerpts) ? saved.verifiedSourceExcerpts : [];
   if ((!saved || evidenceChanged) &&
       (/REPAIR_PRODUCER_UNCHANGED/.test(task) || Boolean(sourceEvidence?.blockedStep) ||
        /(?:failed production release|failed check|workflow)/i.test(task))) {
@@ -404,7 +407,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
     if (!/^[a-f0-9]{40}$/.test(headSha)) throw Error('PARIS_REPAIR_CHECKPOINT_SHA_REQUIRED');
     await continuation.save({version:1,boundedCpuEdits:true,startedAt,branch,baseSha,headSha,nextTurn,
       observations:observations.slice(-8),discoveredFiles,sourceEvidence,changedFiles:[...changedFiles],inspectionHistory:inspectionHistory.slice(-30),
-      newRegressionTests:[...newRegressionTests],commits,writes,summary,complete,verifiedSourceRead});
+      newRegressionTests:[...newRegressionTests],commits,writes,summary,complete,verifiedSourceRead,verifiedSourceExcerpts});
   };
 
   try {
@@ -448,7 +451,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
               turn: turn + 1,
               writes,
               maximumWrites: MAX_WRITES,
-              observations: observations.slice(-8),
+              observations: repairPlannerObservations(observations,verifiedSourceExcerpts),
               discoveredFiles,
               changedFiles: [...changedFiles],
               inspectionAlreadyPerformed: [...new Set(inspectionHistory)].slice(-20),
@@ -570,6 +573,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           } else {
             const file = await readFile(action.path, branch, task + JSON.stringify(sourceEvidence ?? {}));
             verifiedSourceRead = true;
+            verifiedSourceExcerpts = rememberVerifiedRepairSource(verifiedSourceExcerpts,file);
             observations.push(`READ ${file.path} (sha ${file.sha}):\n${file.excerpt}`);
           }
         } catch (error) {
@@ -607,6 +611,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
           message: action.message?.trim() || `fix: update ${file.path} via internal Studio engineering`,
         });
         writes += 1;
+        verifiedSourceExcerpts = discardChangedRepairSource(verifiedSourceExcerpts,file.path);
         changedFiles.add(file.path);
         if (written.commitSha) commits.push(written.commitSha);
         observations.push(`UPDATED ${file.path}; commit ${written.commitSha || 'created'}`);

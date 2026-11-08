@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { hasAnyRole } from '@/lib/rbac/role-matrix';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
 import { resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
 import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
@@ -73,5 +74,13 @@ describe('Host Shop assigned-program routing', () => {
     expect(await permittedHostShopProgramSlugs(db, 'user-a')).toEqual([
       'esthetician-apprenticeship', 'nail-technician-apprenticeship',
     ]);
+  });
+});
+
+describe('archived Program Holder cannot inherit privileged dashboards', () => {
+  it('keeps the Host Shop role separate from Program Holder and platform Admin', () => {
+    expect(hasAnyRole(['host_shop'], ['host_shop'])).toBe(true);
+    expect(hasAnyRole(['host_shop'], ['program_holder', 'site_coordinator'])).toBe(false);
+    expect(hasAnyRole(['host_shop'], ['admin', 'super_admin', 'org_admin'])).toBe(false);
   });
 });

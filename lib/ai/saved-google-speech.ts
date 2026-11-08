@@ -11,6 +11,14 @@ export async function generateSavedGoogleSpeech(text: string, speaker='warm') {
   const bucket=db.storage.from('speech-cache');
   return savedSpeech({text,voice,
     read:async(key: string)=>{
+      // The download API deliberately does not parse JSON error bodies and can
+      // wrap an absent object as StorageUnknownError without its 404 status.
+      // Use the JSON metadata endpoint to establish an actual cache miss first.
+      const {error: infoError}=await bucket.info(key);
+      if(infoError){
+        if(String((infoError as {statusCode?: string}).statusCode)==='404')return null;
+        throw Error('SPEECH_CACHE_READ_UNAVAILABLE');
+      }
       const {data,error}=await bucket.download(key);
       if(error){
         if(String((error as {statusCode?: string}).statusCode)==='404'||error.message==='Object not found')return null;

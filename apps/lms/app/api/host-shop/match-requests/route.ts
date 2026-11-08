@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
-import { permittedHostShopProgramSlugs } from '@/lib/partners/host-shop-match-access';
+import { permittedHostShopProgramScopes, hostShopMatchScopeFilter } from '@/lib/partners/host-shop-match-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,11 +117,16 @@ export async function GET(req: NextRequest) {
     }
     query = query.in('host_shop_id', shopIds);
     if (!PLATFORM_ADMIN_ROLES.has(role)) {
-      const allowedPrograms = await permittedHostShopProgramSlugs(db, user.id);
-      if (!allowedPrograms.length) {
+      // A user may administer two partners with different programs. Do not
+      // combine shopIds and a union of program slugs: that leaks cross-shop
+      // match records. Filter every approved shop + its own programs together,
+      // before database pagination and count.
+      const scopes = await permittedHostShopProgramScopes(db, user.id);
+      const exactFilter = hostShopMatchScopeFilter(scopes);
+      if (!exactFilter) {
         return NextResponse.json({ requests: [], pagination: { page, limit, total: 0, pages: 0 } });
       }
-      query = query.in('program_slug', allowedPrograms);
+      query = query.or(exactFilter);
     }
   } else if (APPRENTICE_ROLES.has(role)) {
     query = query.eq('apprentice_id', user.id);

@@ -200,7 +200,7 @@ export function DashboardDropdown({ className }: Props) {
     <div className={`relative ${className || ''}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-900 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+        className="flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 sm:px-4"
       >
         <LayoutDashboard className="w-4 h-4" />
         <span>Dashboards</span>
@@ -210,13 +210,13 @@ export function DashboardDropdown({ className }: Props) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 z-20 overflow-hidden">
+          <div className="absolute right-0 z-20 mt-2 w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl sm:left-0 sm:right-auto sm:w-80">
             <div className="p-2">
               <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                 <span>Your Dashboards</span>
                 {loading && <Loader2 className="w-3 h-3 animate-spin" />}
               </div>
-              <div className="space-y-1 max-h-96 overflow-y-auto">
+              <div className="max-h-[min(65dvh,24rem)] space-y-1 overflow-y-auto overscroll-contain">
                 {sortedDashboards.map((dashboard) => {
                   const Icon = ICON_MAP[dashboard.icon] || LayoutDashboard;
                   const isRecent = recentDashboards.includes(dashboard.href);
@@ -225,7 +225,7 @@ export function DashboardDropdown({ className }: Props) {
                       key={dashboard.id}
                       href={dashboard.href}
                       onClick={() => void trackVisit(dashboard)}
-                      className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition group ${isRecent ? 'bg-brand-blue-50/50' : ''}`}
+                      className={`group flex min-h-12 items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-slate-50 ${isRecent ? 'bg-brand-blue-50/50' : ''}`}
                     >
                       <Icon className={`w-5 h-5 mt-0.5 ${dashboard.color} group-hover:scale-110 transition`} />
                       <div className="flex-1 min-w-0">
@@ -233,7 +233,7 @@ export function DashboardDropdown({ className }: Props) {
                           {dashboard.name}
                           {isRecent && <span className="text-xs bg-brand-blue-100 text-brand-blue-600 px-1.5 py-0.5 rounded">Recent</span>}
                         </div>
-                        <div className="text-xs text-slate-500">{dashboard.description}</div>
+                        <div className="hidden text-xs text-slate-500 sm:block">{dashboard.description}</div>
                       </div>
                     </Link>
                   );

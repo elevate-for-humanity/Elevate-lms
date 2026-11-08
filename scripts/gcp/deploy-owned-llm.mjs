@@ -121,7 +121,11 @@ async function main(){
   // Replace the old environment binding with a scoped Secret Manager reference.
   google(['run','services','update','elevate-admin-migration','--project',PROJECT,'--region',REGION,
     `--update-env-vars=ELEVATE_LLM_URL=${url}`,'--remove-env-vars=ELEVATE_LLM_SECRET',`--update-secrets=ELEVATE_LLM_SECRET=${SECRET}:latest`,'--quiet']);
-  console.log(JSON.stringify({service:SERVICE,revision:resource.status?.latestReadyRevisionName,imageDigest:digest,minInstances:0,maxInstances:1,...acceptance,adminConnectionUpdated:true}));
+  // Bind the same owned model into the other surfaces so the platform runs as
+  // one system; a failure here never rolls back the verified admin cutover.
+  const {configureOwnedModelConsumers}=await import('./activate-owned-cpu-model.mjs');
+  const consumers=await configureOwnedModelConsumers({base:url,token});
+  console.log(JSON.stringify({service:SERVICE,revision:resource.status?.latestReadyRevisionName,imageDigest:digest,minInstances:0,maxInstances:1,...acceptance,adminConnectionUpdated:true,consumers}));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)
   main().catch(error=>{console.error(JSON.stringify({operation:'deploy_owned_llm',code:error.code??error.message,detail:error.message}));process.exitCode=1;});

@@ -29,4 +29,25 @@ gcloud run services add-iam-policy-binding elevate-owned-cpu-llm \
 
 ```
 
-The service retains Cloud Run IAM and its existing application token. After actual Admin invocation is verified, `scripts/gcp/activate-owned-cpu-model.mjs` verifies private inference and requires the live Admin image to contain commit `56f8e7f693d94048c550b32efca71dcf8be2eacc` or a descendant. This includes the bounded CPU prompt and retrieval policy that prevents private chat from calling vendor embeddings. The script updates both `ELEVATE_LLM_CPU_URL` and the compatibility alias `ELEVATE_LLM_URL` with paired credentials, sets the 8192-token context limit, and health-checks the exact Admin revision before routing traffic. Validation failures restore the previous configuration. Other components without an owned inference endpoint retain their existing configuration. A missing explicit service-level binding is not treated as a missing capability when effective inherited permissions and actual invocation prove access.
+The service retains Cloud Run IAM and its existing application token. After actual Admin invocation is verified, `scripts/gcp/activate-owned-cpu-model.mjs` verifies private inference and requires the live Admin image to contain commit `56f8e7f693d94048c550b32efca71dcf8be2eacc` or a descendant. This includes the bounded CPU prompt and retrieval policy that prevents private chat from calling vendor embeddings. The script updates both `ELEVATE_LLM_CPU_URL` and the compatibility alias `ELEVATE_LLM_URL` with paired credentials, sets the 8192-token context limit, and health-checks the exact Admin revision before routing traffic. Validation failures restore the previous configuration. A missing explicit service-level binding is not treated as a missing capability when effective inherited permissions and actual invocation prove access.
+
+## One shared model across every surface
+
+The platform is one AI system. After the Admin revision is verified and serving,
+the same activation binds the identical owned-model connection into every other
+user-facing surface so they do not fall back to canned text:
+
+| Component | Service | Runtime config secret |
+| --- | --- | --- |
+| admin | `elevate-admin-migration` | `elevate-admin-runtime-config` |
+| lms | `elevate-lms-migration` | `elevate-lms-runtime-config` |
+| marketing | `elevate-marketing-migration` | `elevate-marketing-runtime-config` |
+| store | `elevate-store-migration` | `elevate-store-runtime-config` |
+
+`configureOwnedModelConsumers` writes the same endpoint, credentials, provider
+selection, and context limits into each consumer's runtime configuration, grants
+the consumer identity `roles/secretmanager.secretAccessor` on the model token,
+and attempts `roles/run.invoker` on the private model. It runs best-effort per
+consumer: a grant that requires a project owner is reported in the activation
+output rather than aborting the already-verified Admin cutover. The chat surface
+stays portal-specific; only the model connection is shared.

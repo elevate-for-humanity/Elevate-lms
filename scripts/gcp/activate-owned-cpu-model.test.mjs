@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareAdminCpuConfiguration,activatePrivateCpuModel,REQUIRED_ADMIN_CPU_COMMIT} from './activate-owned-cpu-model.mjs';
+import {prepareAdminCpuConfiguration,prepareOwnedModelConfiguration,activatePrivateCpuModel,configureOwnedModelConsumers,OWNED_MODEL_CONSUMERS,REQUIRED_ADMIN_CPU_COMMIT} from './activate-owned-cpu-model.mjs';
 const config={version:1,component:'admin',runtimeEnvironment:{ELEVATE_LLM_URL:'https://retired.code.run',ELEVATE_LLM_SECRET:'a'.repeat(32),UNRELATED:'keep'},volumes:[],runtimeFiles:{}};
 const base='https://elevate-owned-cpu-llm-123.run.app';
 test('updates both endpoint aliases and paired credentials without mutating the source or unrelated settings',()=>{
@@ -67,4 +67,63 @@ test('effective inherited access can pass without adding redundant service-level
  const result=await activatePrivateCpuModel({base,invokerToken:'test-identity',run,request,accept:async()=>({passed:true}),probeAdmin:async()=>({verified:true,execution:'probe-success'}),activate:async()=>({traffic:100})});
  assert.equal(result.productionTrafficChanged,true);assert.equal(result.adminInvocation.verified,true);
  assert.ok(f.writes.every(x=>!x.args.includes('add-iam-policy-binding')));
+});
+
+test('every consumer surface receives the same owned-model connection as admin',async()=>{
+ const token='b'.repeat(32);
+ const consumerConfig=component=>({version:1,component,runtimeEnvironment:{KEEP:'1'},volumes:[],runtimeFiles:{}});
+ const identity=`elevate-${'x'}-runtime@elegant-racer-299721.iam.gserviceaccount.com`;
+ const writes=[];
+ const saved=new Map();
+ const run=(args,input)=>{
+  if(args[0]==='secrets'&&args.includes('access')){
+   const name=args[args.indexOf('--secret')+1];
+   if(name==='elevate-owned-llm-token')return token;
+   if(saved.has(name))return saved.get(name);
+   const component=name.replace(/^elevate-/,'').replace(/-runtime-config$/,'');
+   return JSON.stringify(consumerConfig(component));
+  }
+  if(args[0]==='secrets'&&args.includes('add')){
+   const name=args[3];
+   saved.set(name,input);
+   writes.push({args,input});
+   return JSON.stringify({name:'projects/test/secrets/config/versions/9'});
+  }
+  if(args[0]==='secrets'&&args.includes('get-iam-policy'))return JSON.stringify({bindings:[{role:'roles/secretmanager.secretAccessor',members:['serviceAccount:'+identity]}]});
+  if(args.includes('describe'))return JSON.stringify({spec:{template:{spec:{serviceAccountName:identity}}},status:{url:base}});
+  if(args.includes('update')||args.includes('add-iam-policy-binding')){writes.push({args});return '';}
+  throw Error('Unexpected operation: '+args.slice(0,3).join(' '));
+ };
+ // prepareOwnedModelConfiguration keeps unrelated keys and sets the shared model
+ const next=prepareOwnedModelConfiguration(consumerConfig('lms'),'lms',base,token);
+ assert.equal(next.runtimeEnvironment.AI_PROVIDER,'elevate');
+ assert.equal(next.runtimeEnvironment.ELEVATE_LLM_CPU_URL,base);
+ assert.equal(next.runtimeEnvironment.KEEP,'1');
+ const results=await configureOwnedModelConsumers({base,token,run});
+ assert.deepEqual(results.map(r=>r.component),OWNED_MODEL_CONSUMERS);
+ assert.ok(results.every(r=>r.configured));
+ const updates=writes.filter(w=>w.args.includes('update')&&w.args.includes('run'));
+ assert.equal(updates.length,OWNED_MODEL_CONSUMERS.length);
+ for(const update of updates){
+  const envVar=update.args.find(a=>a.startsWith('--update-env-vars='));
+  assert.match(envVar,/AI_PROVIDER=elevate/);
+  assert.match(envVar,/ELEVATE_LLM_CPU_URL=/);
+  assert.ok(update.args.includes('--remove-env-vars=ELEVATE_LLM_SECRET,ELEVATE_LLM_CPU_SECRET'));
+  assert.ok(update.args.some(a=>a.startsWith('--update-secrets=ELEVATE_LLM_SECRET=elevate-owned-llm-token:latest')));
+ }
+});
+
+test('a consumer without a verified identity is reported, never silently misconfigured',async()=>{
+ const token='c'.repeat(32);
+ let saved=JSON.stringify({version:1,component:'store',runtimeEnvironment:{},volumes:[],runtimeFiles:{}});
+ const run=(args,input)=>{
+  if(args[0]==='secrets'&&args.includes('access'))return args.includes('elevate-owned-llm-token')?token:saved;
+  if(args[0]==='secrets'&&args.includes('add')){saved=input;return JSON.stringify({name:'projects/test/secrets/config/versions/3'});}
+  if(args.includes('describe'))return JSON.stringify({spec:{template:{spec:{serviceAccountName:'allUsers'}}}});
+  throw Error('Unexpected operation');
+ };
+ const results=await configureOwnedModelConsumers({base,token,run,components:['store']});
+ assert.equal(results.length,1);
+ assert.equal(results[0].configured,false);
+ assert.match(results[0].code,/CONSUMER_IDENTITY_UNVERIFIED/);
 });

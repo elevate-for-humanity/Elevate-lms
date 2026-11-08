@@ -51,7 +51,9 @@ describe('PARIS dashboard introduction', () => {
 
   it('routes live PARIS narration through the current Google speech adapter', () => {
     const route = fs.readFileSync(path.resolve('lib/ai/natural-voice-route.ts'), 'utf8');
-    expect(route).toContain('generateGoogleNaturalVoice');
+    expect(route).toContain('generateSavedGoogleSpeech');
+    const saved = fs.readFileSync(path.resolve('lib/ai/saved-google-speech.ts'), 'utf8');
+    expect(saved).toContain('generateGoogleNaturalVoice');
     expect(route).not.toContain('gpt-4o-mini-tts');
     expect(route).not.toContain('getOpenAIClient');
   });

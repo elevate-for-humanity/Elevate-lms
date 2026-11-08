@@ -8,9 +8,10 @@ export async function reduceIdleCapacity(component,{read,update,activate,fetcher
   const serving=(before.status?.traffic||[]).filter(x=>x.percent>0);
   const container=before.spec?.template?.spec?.containers?.[0];
   if(serving.length!==1 || serving[0].percent!==100 ||
+     serving[0].revisionName!==before.status.latestReadyRevisionName ||
      before.status.latestReadyRevisionName!==before.status.latestCreatedRevisionName ||
      !before.status.conditions?.some(x=>x.type==='Ready'&&x.status==='True') ||
-     container?.resources?.limits?.cpu!=='2' || container?.resources?.limits?.memory!=='4Gi' ||
+     !/^[1-4]$/.test(String(container?.resources?.limits?.cpu||'')) || !['2Gi','4Gi','8Gi'].includes(container?.resources?.limits?.memory) ||
      !/@sha256:[a-f0-9]{64}$/.test(container?.image||'')) throw Error('Unexpected topology; no capacity change made');
   const url=before.status.url;
   if(!url || !new URL(url).hostname.endsWith('.run.app')) throw Error('Expected Google service URL');
@@ -37,7 +38,7 @@ export async function reduceIdleCapacity(component,{read,update,activate,fetcher
   if(rows.length!==1 || rows[0].revisionName!==result.revision || rows[0].percent!==100 ||
      (after.metadata?.annotations?.['run.googleapis.com/minScale']||'0')!=='0')
     throw Error('Capacity promotion readback failed');
-  return {...result,minimumInstances:0,previousMinimumInstances:Number(min),idleReservationRemovedGiB:4,
+  return {...result,minimumInstances:0,previousMinimumInstances:Number(min),idleReservationRemovedGiB:Math.max(Number(min),Number(serviceMin))*Number(container.resources.limits.memory.replace('Gi','')),
     imageUnchanged:container.image===after.spec.template.spec.containers[0].image};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
@@ -45,11 +46,16 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   const scope=['--project=elegant-racer-299721','--region=us-central1'];
   const cli=args=>execFileSync('gcloud',args,{encoding:'utf8',timeout:180000,stdio:['ignore','pipe','pipe']}).trim();
   for(const component of ['store','lms']) {
+   try {
     const result=await reduceIdleCapacity(component,{
       read:service=>JSON.parse(cli(['run','services','describe',service,...scope,'--format=json'])),
       update:service=>cli(['run','services','update',service,...scope,'--min=0','--min-instances=0','--no-traffic','--quiet']),
       activate:activateTestedRevision
     });
     console.log(JSON.stringify(result));
+   } catch {
+    console.log(JSON.stringify({service:'elevate-'+component+'-migration',changed:false,blocked:true,reason:'safe_topology_or_health_verification_failed'}));
+    process.exitCode=1;
+   }
   }
 }

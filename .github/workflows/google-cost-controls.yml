@@ -1,0 +1,63 @@
+name: Verify services and reduce Google waste
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/google-cost-controls.yml/dispatches" -f ref=main
+  cost-controls:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-runtime-us-central1
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test tests/worker/saved-speech.test.mjs tests/worker/saved-google-speech-adapter.test.mjs scripts/gcp/reduce-idle-capacity.test.mjs scripts/gcp/cleanup-old-images.test.mjs scripts/gcp/audit-cost-resources.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: mkdir -p audit-reports
+      - name: Inventory servers and paid dependencies
+        run: |
+          set -o pipefail
+          node scripts/gcp/audit-cost-resources.mjs | tee audit-reports/cost-resources.json
+      - name: Verify public services and durable speech reuse
+        if: always()
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
+          node scripts/gcp/verify-paid-services.mjs
+      - name: Release eligible idle capacity on exact healthy images
+        if: always()
+        run: |
+          set -o pipefail
+          node scripts/gcp/reduce-idle-capacity.mjs | tee audit-reports/idle-capacity.jsonl
+      - name: Remove only verified old untagged image roots
+        if: always()
+        run: node scripts/gcp/cleanup-old-images.mjs --apply
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-cost-and-service-evidence-${{ github.run_id }}
+          path: audit-reports/
+          retention-days: 30

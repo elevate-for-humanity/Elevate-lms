@@ -32,9 +32,20 @@ export default async function ProgramHolderPortalLayout({
         .eq('id', context.holderId)
         .maybeSingle()
     : { data: null };
+  const memberships = context.mode === 'holder'
+    ? await context.db.from('partner_users').select('role,status,partner_id')
+        .eq('user_id', context.user.id).eq('status','active')
+    : { data: [], error: null };
+  // An approved Host Shop may be opened as a second workspace without
+  // replacing the holder's signed agreements or student scope.
+  const eligibleHostShop = !memberships.error && (memberships.data || []).some(
+    membership => ['owner','partner_admin','admin','supervisor','mentor','manager']
+      .includes(String(membership.role || '').toLowerCase()),
+  );
   return (
     <PlatformShell
       recruitingEnabled={hasRecruitingAssignment(assignment.data?.features)}
+      alternateWorkspace={eligibleHostShop ? { label: 'Host Shop', href: '/host-shop/dashboard' } : undefined}
       user={{
         id: context.profile.id,
         email: context.user.email || '',

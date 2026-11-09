@@ -601,7 +601,10 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   const disposition=isCourseDependencyFailure(source.data.last_error)?'dependency':courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
   if(disposition==='repair'){pending=candidate;break;}
   const blocked=await db.from('paris_code_repairs').update({
-   status:'blocked',error_code:disposition==='dependency'?'SOURCE_DEPENDENCY_EVIDENCE_REQUIRED':disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
+   status:'blocked',error_code:disposition==='dependency'?'SOURCE_DEPENDENCY_EVIDENCE_REQUIRED':
+    disposition==='acceptance_pending'?'SOURCE_WORKER_COMPLETED_ACCEPTANCE_PENDING':
+    disposition==='evidence_required'?'SOURCE_DEFECT_EVIDENCE_REQUIRED':
+    'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
    updated_at:new Date().toISOString(),
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
   if(blocked.error)throw blocked.error;

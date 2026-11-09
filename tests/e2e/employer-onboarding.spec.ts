@@ -124,7 +124,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
       { message: 'Employer setup images must load', timeout: 15000 },
     )
     .toBe(true);
-  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName, completedRequests, appOrigin));
+  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName, completedRequests));
   if (unhandledErrors.length) {
     await test.info().attach('browser-runtime-errors.json', {
       body: Buffer.from(JSON.stringify({ runtimeErrors, cancelledRequests, completedRequests })),

@@ -5,9 +5,9 @@ import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
 import { buildOpenHandsContextPrompt } from '@/lib/devstudio/openhands/context';
 import {
   getHydratedOpenHandsConfig,
-  getOpenHandsLifecycle,
 } from '@/lib/devstudio/openhands/client';
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
+import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some((role) =>
@@ -104,8 +104,12 @@ export async function GET(request: NextRequest) {
         { status: 403 },
       );
     }
+    // Reading a task also triggers a durable reconciliation write, so
+    // authorization must be checked before calling the refresher.
+    const owned = await findOwnedOpenHandsTask({ actorId: auth.userId, taskId });
+    if (!owned) return NextResponse.json({ error: 'OpenHands task not found' }, { status: 404 });
     try {
-      const lifecycle = await refreshOpenHandsTask({ taskId, actorId: auth.userId });
+      const lifecycle = await refreshOpenHandsTask({ taskId: owned.taskId, actorId: auth.userId });
       return NextResponse.json({ success: true, taskId, provider: 'openhands', lifecycle });
     } catch (error) {
       return NextResponse.json(
@@ -116,15 +120,12 @@ export async function GET(request: NextRequest) {
   }
 
   if (startTaskId || conversationId) {
-    try {
-      const lifecycle = await getOpenHandsLifecycle({ startTaskId, conversationId });
-      return NextResponse.json({ success: true, provider: 'openhands', lifecycle });
-    } catch (error) {
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'OpenHands status lookup failed' },
-        { status: 502 },
-      );
-    }
+    // External conversation IDs are not scoped to the authenticated user.
+    // Require the canonical, owner-scoped taskId instead.
+    return NextResponse.json(
+      { error: 'Use the owned taskId to query OpenHands status' },
+      { status: 400 },
+    );
   }
 
   return NextResponse.json({

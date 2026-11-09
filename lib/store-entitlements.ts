@@ -39,23 +39,44 @@ export async function hasEntitlement(userId: string, entitlementKey: string): Pr
 }
 
 /**
- * Get all active entitlements for a user
+ * Get all active entitlements for a user.
+ *
+ * Purchases are recorded on user_entitlements (entitlement_type / product_id);
+ * legacy store_entitlements rows are included for older records. Must stay in
+ * step with the has_entitlement RPC.
  */
 export async function getUserEntitlements(userId: string): Promise<string[]> {
   const supabaseAdmin = await getSupabaseAdmin();
-  const { data, error }: any = await supabaseAdmin
-    .from('store_entitlements')
-    .select('entitlement_key')
-    .eq('user_id', userId)
-    .eq('is_active', true)
-    .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
+  const nowIso = new Date().toISOString();
 
-  if (error) {
-    logger.error('Error fetching entitlement:', error);
-    return [];
+  const [canonical, legacy] = await Promise.all([
+    supabaseAdmin
+      .from('user_entitlements')
+      .select('entitlement_type,product_id,status,revoked_at')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .is('revoked_at', null),
+    supabaseAdmin
+      .from('store_entitlements')
+      .select('entitlement_key,entitlement_code')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .or(`expires_at.is.null,expires_at.gt.${nowIso}`),
+  ]);
+
+  if (canonical.error) logger.error('Error fetching user entitlements:', canonical.error);
+  if (legacy.error) logger.error('Error fetching store entitlements:', legacy.error);
+
+  const keys = new Set<string>();
+  for (const row of (canonical.data ?? []) as any[]) {
+    if (row.entitlement_type) keys.add(row.entitlement_type);
+    if (row.product_id) keys.add(String(row.product_id));
   }
-
-  return data.map((e: any) => e.entitlement_key);
+  for (const row of (legacy.data ?? []) as any[]) {
+    const key = row.entitlement_key ?? row.entitlement_code;
+    if (key) keys.add(key);
+  }
+  return [...keys];
 }
 
 /**

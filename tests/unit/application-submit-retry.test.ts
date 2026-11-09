@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const state = vi.hoisted(() => ({ existing: false, phone: '3175550100', inserts: 0, provision: vi.fn() }));
+const state = vi.hoisted(() => ({ existing: false, phone: '3175550100', inserts: 0, paid: true, provision: vi.fn() }));
+vi.mock('@/lib/enrollment/paid-application', () => ({
+  verifyPaidApplication: async () => state.paid ? { user: { id: 'learner' } } : null,
+  activatePaidApplication: async () => 'https://app.elevateforhumanity.org/learner/dashboard',
+}));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: async () => null }));
 vi.mock('@/lib/rate-limit', () => ({ getRedisClient: () => null }));
 vi.mock('@/lib/programs/program-state', () => ({ getProgramEnrollmentState: () => 'open' }));
@@ -21,6 +25,8 @@ vi.mock('@/lib/supabase/admin', () => ({
           return query;
         },
         eq: () => query,
+        ilike: () => query,
+        update: () => query,
         neq: () => query,
         gte: () => query,
         not: () => query,
@@ -78,12 +84,15 @@ const submit = () =>
         email: 'test@example.test',
         phone: '3175550100',
         program: 'hvac-technician',
+        dateOfBirth: '1990-01-01', address: '123 Test Street', city: 'Indianapolis', state: 'IN', zip: '46204',
+        applicationIntent: 'enrollment',
+        applicationCertification: true,
         billingInvoiceId: 'paid-hvac-invoice',
       }),
     }),
   );
 beforeEach(() => {
-  state.existing = false;
+  state.existing = false; state.paid = true;
   state.phone = '3175550100';
   state.inserts = 0;
   state.provision.mockReset();
@@ -102,10 +111,10 @@ describe('saved application recovery', () => {
     expect(state.inserts).toBe(0);
     expect(state.provision).not.toHaveBeenCalled();
   });
-  it('does not disclose the saved application or create a duplicate when contact information differs', async () => {
-    state.existing = true; state.phone = '3175550199';
+  it('does not disclose an existing application or create a duplicate without owned verified payment', async () => {
+    state.existing = true; state.paid = false;
     const response = await submit();
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(402);
     expect(await response.json()).not.toHaveProperty('id');
     expect(state.inserts).toBe(0);
   });

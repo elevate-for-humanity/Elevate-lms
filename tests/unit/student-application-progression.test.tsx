@@ -19,7 +19,7 @@ it('saves each step without interrupting the active application or submitting on
   const continueButton = screen.getByRole('button', { name:'Continue' });
   fireEvent.click(continueButton);
   expect(screen.getByRole('heading', { name:'Review and certify' })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name:'Submit Application' })).not.toBe(continueButton);
+  expect(screen.getByRole('button', { name:'Submit Intake Application' })).not.toBe(continueButton);
   expect(screen.queryByText('Confirm the application certification and information-verification consent before submitting.')).toBeNull();
   expect(fetch).not.toHaveBeenCalled();
 });

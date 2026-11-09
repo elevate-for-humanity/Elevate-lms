@@ -30,6 +30,7 @@ export default async function StudentApplicationPage({
     payment?: string;
     funding?: string;
     session_id?: string;
+    billing_invoice_id?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -44,9 +45,9 @@ export default async function StudentApplicationPage({
   if (['self_pay', 'workone', 'wioa', 'grant', 'employer'].includes(params?.funding || '')) {
     query.set('funding', params.funding as string);
   }
-  if (params?.session_id) query.set('session_id', params.session_id);
+  if (params?.billing_invoice_id) query.set('billing_invoice_id', params.billing_invoice_id);
   // HVAC uses the standard application independently of PARIS.
   // Other programs retain the existing guided interview behavior.
-  const destination = program === 'hvac-technician' ? '/apply/student/form' : '/apply/student/interview';
+  const destination = params?.intent === 'enrollment' || program === 'hvac-technician' ? '/apply/student/form' : '/apply/student/interview';
   redirect(`${destination}${query.toString() ? `?${query.toString()}` : ''}`);
 }

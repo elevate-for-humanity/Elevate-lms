@@ -1,3 +1,4 @@
+import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
 import { POST as submitProgramInquiry } from '../inquiries/route';
 import { resolveCanonicalSlug } from '@/lib/programs/slug';
 import { paidInvoiceMatchesProgram, requiresSelfPayProgramPayment } from '@/lib/programs/paid-intake-policy.mjs';
@@ -288,7 +289,9 @@ async function _POST(req: Request) {
     const requiresSelfPayPayment = requiresSelfPayProgramPayment(catalogResult.data, body.fundingType);
     const billingInvoiceId = String(body.billingInvoiceId || body.billing_invoice_id || '').trim();
     let verifiedPaidInvoice: any = null;
-    if (requiresSelfPayPayment && billingInvoiceId) {
+    if (billingInvoiceId) {
+      if (!await verifyPaidApplication(program, billingInvoiceId))
+        return NextResponse.json({ error: 'Payment could not be verified for this signed-in applicant.' }, { status: 402 });
       const paidResult = await supabase.from('billing_invoices')
         .select('id,status,total_cents,paid_at,customer_email,fulfillment_type,fulfillment_payload')
         .eq('id', billingInvoiceId).eq('status', 'paid').maybeSingle();
@@ -321,9 +324,16 @@ async function _POST(req: Request) {
       );
     }
 
-    // Unpaid paid-program intake is an inquiry, never an admissions application.
+    const fullEnrollment = body.applicationIntent === 'enrollment';
+    const paidEvidence = fullEnrollment ? await verifyPaidApplication(program, billingInvoiceId) : null;
+    if (fullEnrollment && catalogResult.data.is_free !== true && !paidEvidence) {
+      return NextResponse.json({ error: 'Verified payment is required before submitting the Full Enrollment Application.',
+        paymentRequired: true, nextStepUrl: `/enroll/${encodeURIComponent(program)}` }, { status: 402 });
+    }
+    // Intake is an inquiry, never a full enrollment application.
+
     // Reuse canonical lead persistence and deduplicated inquiry notifications.
-    if (requiresSelfPayPayment && !verifiedPaidInvoice) {
+    if (!fullEnrollment) {
       const inquiryResponse = await submitProgramInquiry(new Request(
         new URL('/api/inquiries', req.url), {
           method: 'POST', headers: req.headers,
@@ -338,10 +348,19 @@ async function _POST(req: Request) {
         ...inquiry, applicationStatus: 'inquiry',
         referenceNumber: inquiry.leadId, paymentRequired: true,
         nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
-        message: 'Inquiry received. Complete the secure deposit checkout before submitting enrollment.',
+        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application to activate enrollment and your dashboard.',
       } : inquiry, {
         status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
       });
+    }
+
+    if (fullEnrollment && body.applicationCertification !== true)
+      return NextResponse.json({ error: 'Confirm the application certification before submitting.' }, { status: 400 });
+
+    if (fullEnrollment) {
+      const requiredDetails = ['dateOfBirth', 'address', 'city', 'state', 'zip'];
+      const missing = requiredDetails.find(field => !String(body[field] || '').trim());
+      if (missing) return NextResponse.json({ error: `Complete the full enrollment application: ${missing} is required.` }, { status: 400 });
     }
 
     // Dedup: block same email + program within 24 hours.
@@ -351,7 +370,7 @@ async function _POST(req: Request) {
     const { data: recentApp } = await supabase
       .from('applications')
       .select('id')
-      .eq('email', body.email.toLowerCase().trim())
+      .ilike('email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .neq('source', 'intake-form')
       .gte('created_at', oneDayAgo)
@@ -379,14 +398,33 @@ async function _POST(req: Request) {
     // create a second admissions record.
     const { data: activeApp } = await supabase
       .from('applications')
-      .select('id, reference_number, status, program_interest, funding_type, payment_status, normalized_phone, phone')
-      .eq('email', body.email.toLowerCase().trim())
+      .select('id, reference_number, status, program_interest, funding_type, payment_status, normalized_phone, phone, metadata')
+      .ilike('email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .not('status', 'in', '("rejected","withdrawn","duplicate")')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
+    if (activeApp && paidEvidence) {
+      const saved = await supabase.from('applications').update({
+        first_name: body.firstName, last_name: body.lastName,
+        phone: body.phone, address: body.address || null, city: body.city || null,
+        state: body.state || null, zip: body.zip || null,
+        date_of_birth: body.dateOfBirth || null, funding_type: 'self_pay',
+        support_notes: body.supportNeeds || null, modality_preference: modalityPreference,
+        transfer_hours_claimed: Math.max(0, parseInt(body.transferHours || '0') || 0),
+        metadata: { ...(activeApp.metadata || {}), full_application_submitted_at: new Date().toISOString(),
+          has_host_shop: body.hasHostShop || null, host_shop_name: body.hostShopName || null,
+          application_certification: body.applicationCertification === true },
+        updated_at: new Date().toISOString(),
+      }).eq('id', activeApp.id);
+      if (saved.error) throw new Error('Full application could not be saved.');
+      const dashboardUrl = await activatePaidApplication(paidEvidence, activeApp.id);
+      return NextResponse.json({ ok: true, existing: true, id: activeApp.id,
+        program, referenceNumber: activeApp.reference_number, applicationStatus: 'submitted',
+        nextStepUrl: dashboardUrl });
+    }
     if (activeApp) {
       const contactPhone = (value: unknown) => String(value || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
       if (contactPhone(activeApp.normalized_phone || activeApp.phone) !== contactPhone(normalizedPhone)) {
@@ -531,6 +569,9 @@ async function _POST(req: Request) {
       funding_eligibility_status: eligibilityStatus,
       reference_number: referenceNumber,
       type: 'student',
+      intake_stage: fullEnrollment ? 'enrollment' : 'inquiry',
+      metadata: { full_application_submitted_at: fullEnrollment ? new Date().toISOString() : null,
+        has_host_shop: body.hasHostShop || null, host_shop_name: body.hostShopName || null },
       ...(verifiedPaidInvoice ? { payment_status: 'paid', payment_provider: 'quickbooks',
         payment_amount_cents: verifiedPaidInvoice.total_cents,
         payment_received_at: verifiedPaidInvoice.paid_at } : {}),
@@ -989,6 +1030,7 @@ async function _POST(req: Request) {
       logger.error('[Applications] Program Holder copy failed', copyError instanceof Error ? copyError : undefined, { applicationId: data.id });
     }
 
+    const dashboardUrl = paidEvidence ? await activatePaidApplication(paidEvidence, data.id) : null;
     const requiresSelfPayCheckout =
       !verifiedPaidInvoice &&
       String(fundingType || '').startsWith('self_pay') &&
@@ -1007,7 +1049,7 @@ async function _POST(req: Request) {
         program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
         applicationStatus,
-        nextStepUrl,
+        nextStepUrl: dashboardUrl || nextStepUrl,
         emailStatus,
       },
       { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },

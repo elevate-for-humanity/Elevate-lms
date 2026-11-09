@@ -7,6 +7,7 @@ interface ProgramPricing {
   program_slug: string;
   program_name: string;
   tuition_cents: number;
+  deposit_default_cents?: number;
   source?: string;
 }
 
@@ -99,7 +100,7 @@ export default function PaymentPlanCalculator({
     );
   }
 
-  const installmentCents = Math.ceil(pricing.tuition_cents / 4);
+  const installmentCents = pricing.deposit_default_cents ?? Math.ceil(pricing.tuition_cents / 4);
   const selectedPlan =
     initialPaymentMode === 'full'
       ? 'full'
@@ -110,7 +111,7 @@ export default function PaymentPlanCalculator({
     initialPaymentMode === 'full'
       ? 'Pay in full'
       : initialPaymentMode === 'plan'
-        ? 'Four installments'
+        ? 'Deposit + payment plan'
         : initialPaymentMode === 'bnpl'
           ? 'Buy Now, Pay Later (provider approval required)'
           : null;
@@ -142,7 +143,7 @@ export default function PaymentPlanCalculator({
           >
             <span className="text-xs font-black uppercase tracking-wide text-slate-500">Pay in full</span>
             <span className="mt-2 block text-2xl font-black text-slate-950">{fmt(pricing.tuition_cents)}</span>
-            <span className="mt-1 block text-sm text-slate-600">One QuickBooks invoice</span>
+            <span className="mt-1 block text-sm text-slate-600">One secure payment</span>
           </button>
 
           <button
@@ -155,9 +156,9 @@ export default function PaymentPlanCalculator({
                 : 'border-slate-200 hover:border-slate-400'
             }`}
           >
-            <span className="text-xs font-black uppercase tracking-wide text-slate-500">Four installments</span>
+            <span className="text-xs font-black uppercase tracking-wide text-slate-500">Deposit + payment plan</span>
             <span className="mt-2 block text-2xl font-black text-slate-950">{fmt(installmentCents)}</span>
-            <span className="mt-1 block text-sm text-slate-600">Initial invoice, then three monthly invoices</span>
+            <span className="mt-1 block text-sm text-slate-600">Required deposit; review the remaining balance and schedule before payment</span>
           </button>
         </div>
 
@@ -176,8 +177,8 @@ export default function PaymentPlanCalculator({
         </div>
 
         <p className="text-sm leading-6 text-slate-600">
-          Secure enrollment uses QuickBooks. Online card or ACH availability is shown on the invoice.
-          The installment option is Elevate&apos;s four-invoice plan; it is not third-party BNPL.
+          Pay securely online as part of enrollment. Available payment methods are shown at checkout.
+          The deposit is credited toward tuition. A lower promotional deposit requires a valid coupon.
           BNPL appears only when an enabled provider is configured and separately approves the applicant.
         </p>
 
@@ -189,7 +190,7 @@ export default function PaymentPlanCalculator({
         ) : (
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <CreditCard className="h-4 w-4" />
-            Sign-in is required before an invoice is created.
+            Sign in to pay, then complete the Full Enrollment Application. No separate invoice request is needed.
           </div>
         )}
 

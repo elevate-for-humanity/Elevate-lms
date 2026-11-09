@@ -362,7 +362,7 @@ export default function StudentApplicationForm({
       source: 'student-application',
       applicationCertification: true,
       applicationIntent,
-      paymentSessionId: paymentSessionId || undefined,
+      billingInvoiceId: paymentSessionId || undefined,
       apprenticeshipFundingApprovalAcknowledged: apprenticeshipFundingSelected
         ? apprenticeshipFundingConfirmed
         : undefined,
@@ -403,7 +403,7 @@ export default function StudentApplicationForm({
         if (prog) q.set('program', prog);
         const suffix = q.toString() ? `?${q.toString()}` : '';
         const nextStepUrl =
-          typeof data.nextStepUrl === 'string' && data.nextStepUrl.startsWith('/')
+          typeof data.nextStepUrl === 'string' && (data.nextStepUrl.startsWith('/') && !data.nextStepUrl.startsWith('//') || ['https://app.elevateforhumanity.org/apprentice', 'https://app.elevateforhumanity.org/learner/dashboard'].includes(data.nextStepUrl))
             ? data.nextStepUrl
             : `/apply/success${suffix}`;
         setTimeout(() => router.push(nextStepUrl), 1200);
@@ -448,7 +448,7 @@ export default function StudentApplicationForm({
 
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-slate-300 bg-white p-6 sm:p-8">
-      <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Enrollment application — request for admission' : 'Free inquiry — request information'}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{applicationIntent === 'enrollment' ? 'Complete the verified payment step and required documents. Submission does not automatically enroll you. Elevate confirms admission, agreements, payment arrangements, and any required placement before training starts.' : 'Ask questions and let admissions help you compare programs. No payment is required for this inquiry. It does not enroll you or reserve a Host Shop placement.'}</p></div>
+      <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Full Enrollment Application' : 'Intake Application — request information'}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{applicationIntent === 'enrollment' ? 'Payment must be verified before submission. Submitting your paid full application activates your enrollment and dashboard. Complete orientation, required documents, and any required training placement before training starts.' : 'Ask questions and let admissions help you compare programs. No payment is required for this inquiry. It does not enroll you or reserve a Host Shop placement.'}</p></div>
       {showResume && savedData && (
         <div className="mb-6 rounded-xl border border-blue-300 bg-blue-50 p-4 text-slate-950">
           <p className="font-black">You have a saved application</p>
@@ -627,7 +627,7 @@ export default function StudentApplicationForm({
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
         {step > 1 ? <button type="button" onClick={previousStep} className="min-h-12 w-full rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900 sm:w-auto">Back</button> : <span />}
-        {step < 5 ? <button key="continue" type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button key="submit" type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
+        {step < 5 ? <button key="continue" type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button key="submit" type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : applicationIntent === 'enrollment' ? 'Submit Full Enrollment Application' : 'Submit Intake Application'}</button>}
       </div>
     </form>
   );

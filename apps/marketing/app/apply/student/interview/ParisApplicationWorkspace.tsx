@@ -171,7 +171,7 @@ export default function ParisApplicationWorkspace({
             listening: 'Listening…',
             typeAnswer: 'Type your answer…',
             voiceDraft: 'Voice transcription ready. Review or correct it, then press Send.',
-            submit: 'Submit application for review',
+            submit: 'Submit Intake Application',
             submitting: 'Submitting application…',
             saved: 'Saved automatically',
             requiredEvidence: 'Evidence is required for claimed transfer hours.',
@@ -389,7 +389,7 @@ export default function ParisApplicationWorkspace({
         body: JSON.stringify({
           ...session.applicationPayload,
           applicationIntent,
-          paymentSessionId: paymentSessionId || undefined,
+          billingInvoiceId: paymentSessionId || undefined,
         }),
       });
       const data = (await response.json().catch(() => ({}))) as {

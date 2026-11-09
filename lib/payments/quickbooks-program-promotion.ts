@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 export type QuickBooksProgramPromotion = {
   code: string;
   discountAmountCents: number;
+  scope: 'deposit' | 'tuition';
 };
 
 /** Validate an Elevate promotion without creating or consulting any Stripe object. */
@@ -11,6 +12,7 @@ export async function resolveQuickBooksProgramPromotion(options: {
   code: string;
   amountCents: number;
   maximumDiscountCents?: number;
+  depositCents?: number;
 }): Promise<{ promotion: QuickBooksProgramPromotion } | { error: string }> {
   const code = options.code.trim().toUpperCase();
   const now = new Date();
@@ -24,7 +26,7 @@ export async function resolveQuickBooksProgramPromotion(options: {
     .maybeSingle();
 
   if (error || !row) return { error: 'That coupon code is invalid or inactive.' };
-  if (!['all', 'career_courses', 'programs'].includes(String(row.applies_to || 'all'))) {
+  if (!['all', 'career_courses', 'programs', 'program_deposit'].includes(String(row.applies_to || 'all'))) {
     return { error: 'That coupon code does not apply to program tuition.' };
   }
   if (row.valid_from && new Date(row.valid_from) > now)
@@ -41,15 +43,19 @@ export async function resolveQuickBooksProgramPromotion(options: {
     };
   }
 
+  const scope = row.applies_to === 'program_deposit' ? 'deposit' : 'tuition';
+  if (scope === 'deposit' && !options.depositCents) return { error: 'This coupon requires the deposit payment option.' };
+  const basis = scope === 'deposit' ? options.depositCents! : options.amountCents;
   const value = Number(row.discount_value);
+  if (!Number.isFinite(value) || value <= 0) return { error: 'That coupon has an invalid discount.' };
   const requested =
     row.discount_type === 'fixed'
       ? Math.round(value * 100)
-      : Math.round((options.amountCents * value) / 100);
+      : Math.round((basis * value) / 100);
   const discountAmountCents = Math.max(
     0,
-    Math.min(options.amountCents, options.maximumDiscountCents ?? options.amountCents, requested),
+    Math.min(scope === 'deposit' ? Math.max(0, basis - 100) : basis, options.maximumDiscountCents ?? basis, requested),
   );
   if (!discountAmountCents) return { error: 'That coupon does not produce a valid discount.' };
-  return { promotion: { code, discountAmountCents } };
+  return { promotion: { code, discountAmountCents, scope } };
 }

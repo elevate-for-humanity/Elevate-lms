@@ -416,25 +416,26 @@ export async function fulfillPaidBillingInvoice(
 
   if (job.fulfillment_type === 'program_enrollment') {
     const schoolOrder = await recordSchoolInvoiceOrder(db, job.billing_invoice_id, payload);
+    const needsApplication = payload.full_application_required === true;
     const result = await db
       .from('program_enrollments')
       .update({
-        status: schoolOrder ? 'pending' : 'active',
+        status: schoolOrder || needsApplication ? 'pending' : 'active',
         payment_status: 'paid',
-        enrollment_state: schoolOrder ? 'onboarding' : 'active',
-        next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : 'ONBOARDING',
+        enrollment_state: schoolOrder || needsApplication ? 'onboarding' : 'active',
+        next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : needsApplication ? 'FULL_APPLICATION' : 'ONBOARDING',
         amount_paid_cents: payload.amount_cents,
         billing_provider: 'quickbooks',
         payment_provider: 'quickbooks',
         payment_reference: job.billing_invoice_id,
-        ...(schoolOrder ? {} : { access_granted_at: new Date().toISOString() }),
+        ...(schoolOrder || needsApplication ? {} : { access_granted_at: new Date().toISOString() }),
         updated_at: new Date().toISOString(),
       })
       .eq('id', payload.enrollment_id)
       .eq('payment_status', 'pending');
     if (result.error) throw new Error(result.error.message);
     await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
-    if (!schoolOrder) await queuePaidProgramWelcome(db, payload.enrollment_id);
+    if (!schoolOrder && !needsApplication) await queuePaidProgramWelcome(db, payload.enrollment_id);
     if (schoolOrder) {
       const { sendSchoolRegistrationEmail } =
         await import('@/lib/billing/school-registration-email');

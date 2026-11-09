@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { isConfirmedWebKitCancellation, isTrackedClientRead } from '../e2e/helpers/browser-runtime-errors';
+import { isConfirmedWebKitCancellation, isTrackedClientRead, isSettlingClientRead } from '../e2e/helpers/browser-runtime-errors';
 const url = 'https://lms.elevateforhumanity.org/api/health/build-version';
 const error = { message: '/lms.elevateforhumanity.org/api/health/build-version due to access control checks.', stack: `Fetch API cannot load ${url} due to access control checks.\n at navigation`, time: 1000 };
 const cancelled = { url, errorText: 'Load request cancelled', time: 1001 };
@@ -105,4 +105,35 @@ it('requires recent exact successful notification GET evidence, not stale or unr
   expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ ...good, time: 0 }])).toBe(false);
   expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ ...good, url: url + '/other' }])).toBe(false);
   expect(isConfirmedWebKitCancellation(reported, [], 'chromium', [good])).toBe(false);
+});
+
+// A same-origin resource cannot fail a cross-origin access-control check, so a
+// WebKit "access control checks" report for the app's own host is an abort
+// artifact — no paired cancellation or 2xx evidence is required.
+it('treats a same-origin WebKit access-control report as an abort artifact', () => {
+  const app = 'https://lms.elevateforhumanity.org';
+  const sameOrigin = {
+    message: '/lms.elevateforhumanity.org/api/notifications/preferences due to access control checks.',
+    stack: '',
+    time: 5000,
+  };
+  expect(isConfirmedWebKitCancellation(sameOrigin, [], 'webkit', [], app)).toBe(true);
+  const crossOrigin = {
+    message: '/cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks.',
+    stack: '',
+    time: 5000,
+  };
+  expect(isConfirmedWebKitCancellation(crossOrigin, [], 'webkit', [], app)).toBe(false);
+  expect(isConfirmedWebKitCancellation(sameOrigin, [], 'chromium', [], app)).toBe(false);
+});
+
+// The notification-preferences endpoint is a recurring poller; waiting for it to
+// settle would deadlock. Only one-shot reads may be waited on.
+it('waits only on settling one-shot reads, never the notification poller', () => {
+  const auth = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+  const app = 'https://lms.elevateforhumanity.org';
+  expect(isSettlingClientRead(auth + '/auth/v1/user', 'GET', auth, app)).toBe(true);
+  expect(isSettlingClientRead(auth + '/rest/v1/notifications', 'GET', auth, app)).toBe(true);
+  expect(isSettlingClientRead(app + '/api/notifications/preferences', 'GET', auth, app)).toBe(false);
+  expect(isTrackedClientRead(app + '/api/notifications/preferences', 'GET', auth, app)).toBe(true);
 });

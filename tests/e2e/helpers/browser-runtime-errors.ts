@@ -37,27 +37,48 @@ export function isTrackedClientRead(
 }
 
 /**
+ * Reads that settle once and can be waited on before leaving a document.
+ * Excludes recurring pollers (e.g. /api/notifications/preferences, refreshed on
+ * a timer and on window focus) which never stop and would deadlock a wait.
+ */
+export function isSettlingClientRead(
+  requestUrl: string,
+  method: string,
+  authOrigin: string,
+  appOrigin: string,
+): boolean {
+  if (!isTrackedClientRead(requestUrl, method, authOrigin, appOrigin)) return false;
+  try {
+    return new URL(requestUrl).origin === authOrigin;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Decide whether a WebKit "due to access control checks" page error is a
  * spurious abort report rather than a real access-control failure.
  *
  * WebKit reports a `pageError` in this format when an in-flight fetch is
- * superseded or abandoned during navigation. Two independent forms of evidence
- * prove the resource actually loaded:
+ * superseded or abandoned during navigation. Three independent forms of
+ * evidence prove the resource was not actually blocked:
  *
- *  1. A paired `requestfailed` cancellation ("Load request cancelled").
- *  2. The exact URL completed with a 2xx response. A genuine CORS failure would
- *     stop the app's own authenticated reads, so a successful response for the
- *     same URL — scoped by the caller to the app's auth origin — shows the read
- *     worked and the page error is a WebKit artifact.
+ *  1. The offending URL is same-origin with the page. A same-origin request
+ *     cannot fail a cross-origin access-control check, so the message is always
+ *     an abort artifact (e.g. a poll aborted on navigation).
+ *  2. A paired `requestfailed` cancellation ("Load request cancelled").
+ *  3. The exact URL completed with a 2xx response, scoped by the caller to the
+ *     tracked read endpoints.
  *
- * Without either form of evidence the error stays a failure, so an actual CORS
- * or authorization regression is never hidden.
+ * Without any of this evidence the error stays a failure, so an actual CORS or
+ * authorization regression is never hidden.
  */
 export function isConfirmedWebKitCancellation(
   error: CapturedBrowserError,
   requests: CancelledBrowserRequest[],
   browserName: string,
   completedRequests: CompletedBrowserRequest[] = [],
+  appOrigin = '',
 ): boolean {
   if (browserName !== 'webkit') return false;
   // WebKit puts the offending URL in the page error message (the stack is often
@@ -70,6 +91,8 @@ export function isConfirmedWebKitCancellation(
   )?.[1];
   if (!fragment) return false;
   const normalize = (value: string) => value.replace(/^https?:\/\//, '');
+  const appHost = hostOf(appOrigin);
+  if (appHost && fragment.split('/')[0].toLowerCase() === appHost) return true;
   const cancelled = requests.some(
     (request) =>
       normalize(request.url) === fragment &&
@@ -83,4 +106,13 @@ export function isConfirmedWebKitCancellation(
       Math.abs(request.time - error.time) <= 3000,
   );
 }
+
+function hostOf(origin: string): string {
+  try {
+    return new URL(origin).host.toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
 

@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Request as BrowserRequest } from '@playwright/test';
-import { isConfirmedWebKitCancellation, isTrackedClientRead, type CapturedBrowserError, type CancelledBrowserRequest, type CompletedBrowserRequest } from './helpers/browser-runtime-errors';
+import { isConfirmedWebKitCancellation, isTrackedClientRead, isSettlingClientRead, type CapturedBrowserError, type CancelledBrowserRequest, type CompletedBrowserRequest } from './helpers/browser-runtime-errors';
 const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
 const password = process.env.E2E_EMPLOYER_PASSWORD || '';
@@ -19,7 +19,10 @@ test('Employer setup saves company and hiring needs, opens private files and ack
     if (pendingClientReads.delete(request)) lastClientReadActivity = Date.now();
   };
   page.on('request', request => {
-    if (isTrackedClientRead(request.url(), request.method(), authOrigin, appOrigin)) {
+    // Only one-shot reads are waited on. /api/notifications/preferences is a
+    // recurring poller (timer + window focus) that never settles; waiting on it
+    // would deadlock. It is still recorded as a completed read below.
+    if (isSettlingClientRead(request.url(), request.method(), authOrigin, appOrigin)) {
       pendingClientReads.add(request);
       lastClientReadActivity = Date.now();
     }
@@ -121,7 +124,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
       { message: 'Employer setup images must load', timeout: 15000 },
     )
     .toBe(true);
-  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName, completedRequests));
+  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName, completedRequests, appOrigin));
   if (unhandledErrors.length) {
     await test.info().attach('browser-runtime-errors.json', {
       body: Buffer.from(JSON.stringify({ runtimeErrors, cancelledRequests, completedRequests })),

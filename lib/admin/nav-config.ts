@@ -55,12 +55,10 @@ export const DEFAULT_NAV: NavSection[] = [
   },
   {
     label: 'Intelligence',
-    href: '/studio',
+    href: '/intelligence',
     items: [
-      { label: 'PARIS', href: '/studio' },
-      { label: 'Risk Dashboard', href: '/studio?workspace=intelligence' },
+      { label: 'Intelligence', href: '/intelligence' },
       { label: 'Completion Forecast', href: '/intelligence/forecast' },
-      { label: 'Workflows', href: '/studio?workspace=workflows' },
       { label: 'System Health', href: '/system-health' },
       { label: 'Snapshots', href: '/snapshots' },
     ],
@@ -155,8 +153,6 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Program Administration', href: '/programs' },
       { label: 'Create Program', href: '/programs/new' },
       { label: 'Programs — Catalog', href: '/programs/catalog' },
-      { label: 'Studio', href: '/studio' },
-      { label: 'Ultimate Course Builder', href: '/studio/courses' },
       { label: 'All Courses', href: '/courses' },
       { label: 'Career Courses', href: '/career-courses' },
       { label: 'Modules', href: '/modules' },
@@ -211,7 +207,6 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Jobs', href: '/jobs' },
       { label: 'Affiliates', href: '/affiliates' },
       { label: 'Marketplace', href: '/marketplace' },
-      { label: 'Host Shops', href: '/partners' },
       { label: 'Delegates', href: '/delegates' },
     ],
   },
@@ -230,7 +225,6 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Social Media Accounts', href: '/settings/social-media' },
       { label: 'Blog', href: '/blog' },
       { label: 'Content Management', href: '/content' },
-      { label: 'Page Builder', href: '/studio' },
       { label: 'Store', href: '/store' },
       { label: 'Live Chat', href: '/live-chat' },
     ],
@@ -299,6 +293,33 @@ export function isNavSections(v: unknown): v is NavSection[] {
           (i as NavItem).href.startsWith('/'),
       ),
   );
+}
+
+/**
+ * A route must appear once. The Dev Studio section owns every /studio route, so
+ * the same workspace is never listed under Intelligence, Programs, Marketing,
+ * and Dev Studio at the same time. Remaining collisions keep the first
+ * occurrence in source order. Applied after the DB/canonical merge so a stale
+ * saved nav can never reintroduce duplicates.
+ */
+export function dedupeNavSections(sections: NavSection[]): NavSection[] {
+  const studioSection = sections.find((section) => section.label === 'Dev Studio');
+  const studioOwns = (href: string) =>
+    href === '/studio' || href.startsWith('/studio/') || href.startsWith('/studio?');
+  const studioHrefs = new Set((studioSection?.items ?? []).map((item) => item.href).filter(studioOwns));
+  const seen = new Set<string>();
+  return sections
+    .map((section) => {
+      const isStudio = section.label === 'Dev Studio';
+      const items = section.items.filter((item) => {
+        if (!isStudio && studioHrefs.has(item.href)) return false;
+        if (seen.has(item.href)) return false;
+        seen.add(item.href);
+        return true;
+      });
+      return { ...section, items };
+    })
+    .filter((section) => section.items.length > 0);
 }
 
 /** Required portal entry points survive saved navigation customizations. */

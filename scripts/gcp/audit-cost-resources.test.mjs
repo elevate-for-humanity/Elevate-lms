@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {auditCostResources,inventoryFailureReason} from './audit-cost-resources.mjs';
+import {auditCostResources,inventoryFailureReason,COST_ASSET_SCOPE} from './audit-cost-resources.mjs';
 
 test('inventory is read-only, reports review candidates and excludes secrets',()=>{
   const calls=[];
@@ -42,4 +42,9 @@ test('classifies Cloud Asset permission, disabled API, timeout, and wrapper fail
  assert.equal(result.sections.assets.available,false);
  assert.equal(result.sections.assets.reason,'permission_denied');
  assert.equal(result.sections.virtualMachines.available,true);
+});
+test('asset lookup bounds metadata and resource kinds without truncating results',()=>{
+ assert.ok(COST_ASSET_SCOPE.includes('--read-mask=name,assetType,location,state'));
+ assert.ok(COST_ASSET_SCOPE.some(x=>x.startsWith('--asset-types=')&&x.includes('container.googleapis.com/Cluster')));
+ assert.ok(!COST_ASSET_SCOPE.some(x=>x.startsWith('--limit=')));
 });

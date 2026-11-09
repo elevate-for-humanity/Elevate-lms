@@ -2,7 +2,7 @@ name: Verify services and reduce Google waste
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs']
+    paths: ['.github/workflows/google-cost-controls.yml', 'scripts/gcp/cleanup-old-images.mjs', 'scripts/gcp/reduce-idle-capacity.mjs', 'scripts/gcp/reduce-model-idle.mjs', 'scripts/gcp/release-empty-browser-aliases.mjs', 'scripts/gcp/park-browser-trial.mjs', 'scripts/gcp/recover-speech-cache-rollout.mjs']
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,10 +17,6 @@ jobs:
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/google-cost-controls.yml/dispatches" -f ref=main
   cost-controls:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-    concurrency:
-      group: google-runtime-us-central1
-      queue: max
-      cancel-in-progress: false
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 25
@@ -42,22 +38,190 @@ jobs:
         run: |
           set -o pipefail
           node scripts/gcp/audit-cost-resources.mjs | tee audit-reports/cost-resources.json
+      - name: Diagnose current speech and trial ownership blockers without private output
+        run: node scripts/gcp/diagnose-cost-blockers.mjs
       - name: Verify public services and durable speech reuse
         if: always()
         run: |
           command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
           node scripts/gcp/verify-paid-services.mjs
-      - name: Release eligible idle capacity on exact healthy images
+      - name: Inspect browser trial without stopping it or deleting saved state
         if: always()
         run: |
-          set -o pipefail
-          node scripts/gcp/reduce-idle-capacity.mjs | tee audit-reports/idle-capacity.jsonl
-      - name: Remove only verified old untagged image roots
+          result=0
+          for vm in elevate-studio-browser-trial; do
+            gcloud compute ssh "$vm" --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/inspect-cost-vm.py > "audit-reports/$vm-health.json" || result=1
+            cat "audit-reports/$vm-health.json"
+          done
+          exit "$result"
+      - uses: actions/upload-artifact@v4
         if: always()
+        with:
+          name: google-cost-readiness-${{ github.run_id }}
+          path: audit-reports/
+          retention-days: 30
+  idle-apps:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-runtime-us-central1
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: mkdir -p audit-reports
+      - run: node --test scripts/gcp/reduce-idle-capacity.test.mjs
+      - name: Release only healthy request-driven app reservations
+        run: |
+          set -o pipefail
+          node scripts/gcp/reduce-idle-capacity.mjs | tee audit-reports/idle-apps.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-idle-apps-${{ github.run_id }}
+          path: audit-reports/
+          retention-days: 30
+  old-images:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-artifact-cleanup
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: mkdir -p audit-reports
+      - run: node --test scripts/gcp/cleanup-old-images.test.mjs scripts/gcp/audit-cost-resources.test.mjs
+      - name: Clean old images after complete reference and manifest verification
         run: node scripts/gcp/cleanup-old-images.mjs --apply
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: google-cost-and-service-evidence-${{ github.run_id }}
+          name: google-image-cleanup-${{ github.run_id }}
           path: audit-reports/
           retention-days: 30
+  idle-model:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-private-cpu-model-release
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        id: model-invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: mkdir -p audit-reports
+      - run: node --test scripts/gcp/reduce-model-idle.test.mjs scripts/gcp/deploy-owned-cpu-model.test.mjs
+      - name: Release model reservation only after real functional acceptance
+        env: {MODEL_INVOKER_TOKEN: '${{ steps.model-invocation.outputs.id_token }}'}
+        run: |
+          set -o pipefail
+          node scripts/gcp/reduce-model-idle.mjs | tee audit-reports/model-idle.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-idle-model-${{ github.run_id }}
+          path: audit-reports/
+          retention-days: 30
+  idle-browsers:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-studio-browser
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/park-browser-trial.test.mjs scripts/gcp/release-empty-browser-aliases.test.mjs scripts/gcp/release-studio-candidate-tag.test.mjs scripts/gcp/inventory-studio-live-state.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: mkdir -p audit-reports
+      - name: Release only empty old generated browser aliases after preservation checks
+        run: |
+          set -o pipefail
+          node scripts/gcp/release-empty-browser-aliases.mjs | tee audit-reports/empty-browser-aliases.json
+      - name: Park only an unused isolated trial with retained disks and verified production bindings
+        if: always()
+        run: |
+          set -o pipefail
+          node scripts/gcp/park-browser-trial.mjs | tee audit-reports/browser-trial-parking.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-browser-idle-${{ github.run_id }}
+          path: audit-reports/
+          retention-days: 30
+
+  recover-speech:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-runtime-us-central1
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/recover-speech-cache-rollout.test.mjs
+      - name: Install and verify audio decoder before any synthesis probe
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
+          ffmpeg -version >/dev/null
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/recover-speech-cache-rollout.mjs

@@ -44,7 +44,7 @@ export default async function CourseImportPage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'Dev Studio', href: '/dashboard' },
+              { label: 'Dev Studio', href: '/studio' },
               { label: 'Course Import' },
             ]}
           />

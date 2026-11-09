@@ -46,7 +46,8 @@ export async function GET(req: NextRequest) {
       catch(error){return databaseFailure(error);}
     }
     const {data,error}=await db.from('ultimate_course_builds')
-      .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))').eq('id',buildId).single();
+      .select('id,course_id,status,current_step,created_at,updated_at,owner_paused:profile->ownerPaused,ultimate_lesson_builds(id,lesson_key,competency_id,status,ultimate_lesson_steps(step,state,completed_at))')
+      .eq('id',buildId).single();
     return error?databaseFailure(error):NextResponse.json({build:data});
   }
 

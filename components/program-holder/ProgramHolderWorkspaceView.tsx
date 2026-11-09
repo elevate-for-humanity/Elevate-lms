@@ -1770,6 +1770,7 @@ function Documents({
   requiresEnchantedHeartsTerms: boolean;
   insuranceRequired: boolean;
 }) {
+  const onFile = [...new Set((rows || []).map((row) => row.document_type).filter(Boolean))] as string[];
   return (
     <div className="space-y-6">
       <Hero
@@ -1779,7 +1780,7 @@ function Documents({
       />
       <PartnerFormsLibrary />
       <GuidedW9Form />
-      <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} />
+      <ProgramHolderDocumentUpload isHvac={isHvac} insuranceRequired={insuranceRequired} onFile={onFile} />
       <SyllabusUploadStatus documents={rows} courseAssignments={courseAssignments} />
       <ProgramHolderDocumentUpload materialsOnly students={students} />
       <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />

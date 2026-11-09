@@ -45,3 +45,20 @@ test('previously inspected failed-job logs use other known source, not an invent
   assert.deepEqual(recoverRepeatedInspection(history,log,[observation]),
     {type:'read',path:'lib/ai/command-intent.ts'});
 });
+
+
+test('embedded fallback inventory from rejected read recovers a verified source path',()=>{
+  const history=['read:lib/ai.chat','list:lib/ai.chat'];
+  const action={type:'list',path:'lib/ai.chat'};
+  const inventory='[{"path":"lib/.env","type":"file"},{"path":"lib/ai/chat.ts","type":"file"}]';
+  for (const separator of ['\\n','\n']) {
+    const feedback='READ_REJECTED lib/ai.chat: no source was read or changed.'+
+      separator+'LIST lib: '+inventory;
+    const recovered=recoverRepeatedInspection(history,action,[feedback]);
+    assert.deepEqual(recovered,{type:'read',path:'lib/ai/chat.ts'});
+    assert.equal(checkInspectionBudget(history,recovered).decision,'inspect');
+  }
+  // A LIST embedded in arbitrary model/log text does not become inventory.
+  assert.equal(recoverRepeatedInspection(history,action,
+    ['WORKFLOW_LOG untrusted text\\nLIST lib: '+inventory]),null);
+});

@@ -46,26 +46,38 @@ export async function fetchUsaJobs(keyword: string, location: string, limit: num
   url.searchParams.set('ResultsPerPage', String(Math.min(limit, 100)));
   url.searchParams.set('DatePosted', '30');
 
-  const response = await fetch(url, {
-    headers: {
-      Host: 'data.usajobs.gov',
-      'User-Agent': userAgent,
-      'Authorization-Key': apiKey,
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(20_000),
-  });
-  if (!response.ok) throw new Error(`USAJobs returned HTTP ${response.status}`);
-
-  const payload = (await response.json()) as {
-    SearchResult?: {
-      SearchResultItems?: Array<{
-        MatchedObjectId?: string;
-        MatchedObjectDescriptor?: Record<string, any>;
-      }>;
+  const headers = {
+    Host: 'data.usajobs.gov',
+    'User-Agent': userAgent,
+    'Authorization-Key': apiKey,
+    Accept: 'application/json',
+  };
+  const search = async (u: URL) => {
+    const response = await fetch(u, {
+      headers,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!response.ok) throw new Error(`USAJobs returned HTTP ${response.status}`);
+    return (await response.json()) as {
+      SearchResult?: {
+        SearchResultItems?: Array<{
+          MatchedObjectId?: string;
+          MatchedObjectDescriptor?: Record<string, any>;
+        }>;
+      };
     };
   };
+
+  let payload = await search(url);
+  // USAJOBS treats a bare state name as a narrow filter that returns nothing
+  // for most keywords, even when nationwide results exist. Fall back to a
+  // nationwide search rather than reporting an empty government feed.
+  if (location && !(payload.SearchResult?.SearchResultItems ?? []).length) {
+    const nationwide = new URL(url);
+    nationwide.searchParams.delete('LocationName');
+    payload = await search(nationwide);
+  }
 
   return (payload.SearchResult?.SearchResultItems ?? []).flatMap((item) => {
     const d = item.MatchedObjectDescriptor ?? {};

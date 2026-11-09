@@ -15,10 +15,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { signInSchema } from '@/lib/api/validation-schemas';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { emailService } from '@/lib/notifications/email';
 import { isQaE2EIdentity } from '@/lib/qa/is-qa-e2e-identity';
-
-const OWNER_ALERT_PROFILE_ID = '964dc85a-bce8-4e67-92eb-198ffafb2384';
+import { notifyPortalAuthEvent, resolvePortalKind } from '@/lib/auth/portal-auth-notify';
 
 const _POST = withErrorHandling(async (request: NextRequest) => {
   const rateLimited = await applyRateLimit(request, 'auth');
@@ -67,8 +65,8 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.internal('Authentication failed');
   }
 
-  // Notify the platform owner when a real apprentice or Host Shop user signs in.
-  // Alert delivery is isolated so a mail-provider failure never blocks authentication.
+  // Notify the platform owner when a real user signs in to any portal.
+  // Delivery is isolated so a mail-provider failure never blocks authentication.
   try {
     if (isQaE2EIdentity(data.user.email)) {
       return NextResponse.json(
@@ -85,24 +83,22 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
       );
     }
     const db = await requireAdminClient();
-    const [{ data: profile }, { data: apprentice }, { data: partnerLinks }, { data: owner }] =
-      await Promise.all([
-        db.from('profiles').select('full_name,email').eq('id', data.user.id).maybeSingle(),
-        db
-          .from('apprentices')
-          .select('id')
-          .eq('user_id', data.user.id)
-          .eq('status', 'active')
-          .maybeSingle(),
-        db
-          .from('partner_users')
-          .select(
-            'partner_id,status,partners(name,shop_name,status,approval_status,is_active,partner_type)',
-          )
-          .eq('user_id', data.user.id)
-          .in('status', ['active', 'approved']),
-        db.from('profiles').select('email').eq('id', OWNER_ALERT_PROFILE_ID).maybeSingle(),
-      ]);
+    const [{ data: profile }, { data: apprentice }, { data: partnerLinks }] = await Promise.all([
+      db.from('profiles').select('full_name,email').eq('id', data.user.id).maybeSingle(),
+      db
+        .from('apprentices')
+        .select('id')
+        .eq('user_id', data.user.id)
+        .eq('status', 'active')
+        .maybeSingle(),
+      db
+        .from('partner_users')
+        .select(
+          'partner_id,status,partners(name,shop_name,status,approval_status,is_active,partner_type)',
+        )
+        .eq('user_id', data.user.id)
+        .in('status', ['active', 'approved']),
+    ]);
     const activeHostLink = (partnerLinks ?? []).find((link: any) => {
       const partner = link.partners;
       return (
@@ -115,20 +111,20 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
         )
       );
     });
-    const portalKind = apprentice ? 'Apprentice' : activeHostLink ? 'Host Shop' : null;
-    if (portalKind && owner?.email) {
-      const displayName = profile?.full_name || profile?.email || data.user.email || 'Portal user';
-      const shopName = activeHostLink
-        ? (activeHostLink as any).partners?.shop_name || (activeHostLink as any).partners?.name
-        : null;
-      const signedInAt = new Date().toISOString();
-      await emailService.send({
-        to: owner.email,
-        subject: `${portalKind} portal sign-in: ${displayName}`,
-        text: `${displayName}${shopName ? ` (${shopName})` : ''} signed into the ${portalKind} portal at ${signedInAt}.`,
-        html: `<p><strong>${String(displayName).replace(/[&<>"]/g, '')}</strong>${shopName ? ` (${String(shopName).replace(/[&<>"]/g, '')})` : ''} signed into the ${portalKind} portal.</p><p>Time: ${signedInAt}</p>`,
-      });
-    }
+    const rolePortal = await resolvePortalKind(db, data.user.id);
+    const portal = apprentice ? 'Apprentice' : activeHostLink ? 'Host Shop' : rolePortal;
+    const displayName = profile?.full_name || profile?.email || data.user.email || 'Portal user';
+    const shopName = activeHostLink
+      ? (activeHostLink as any).partners?.shop_name || (activeHostLink as any).partners?.name
+      : null;
+    await notifyPortalAuthEvent({
+      event: 'signin',
+      portal,
+      userId: data.user.id,
+      email: data.user.email,
+      name: displayName,
+      extra: shopName ? { shop: shopName } : undefined,
+    });
   } catch {
     // Authentication succeeded; monitoring is best-effort and isolated.
   }

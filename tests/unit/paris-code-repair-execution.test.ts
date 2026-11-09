@@ -1,15 +1,25 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const h=vi.hoisted(()=>({row:null as any,updates:[] as any[],validation:'success',branchSha:'b'.repeat(40),infrastructure:false}));
+const h=vi.hoisted(()=>({row:null as any,updates:[] as any[],validation:'success',branchSha:'b'.repeat(40),infrastructure:false,onOwnedWrite:null as null|(()=>void)}));
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'})}));
 vi.mock('@/lib/devstudio/github-app-token',()=>({getGitHubAppToken:async()=> 'app-only-fixture'}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{
- let values:any;
- const q:any={select:()=>q,eq:()=>q,in:()=>q,update:(v:any)=>{values=v;return q;},single:async()=>({data:h.row,error:null}),maybeSingle:async()=>({data:h.row,error:null}),then:(resolve:any)=>{if(values)h.updates.push(values);return Promise.resolve(resolve({data:h.row,error:null}));}};return q;
+ let values:any;const eqs:any[]=[];
+ const q:any={select:()=>q,eq:(k:any,v:any)=>{eqs.push([k,v]);return q;},in:()=>q,update:(v:any)=>{values=v;return q;},single:async()=>({data:h.row,error:null}),
+  maybeSingle:async()=>{
+   // A read has no pending update; only a compare-and-swap transition records a
+   // write, and it must match the owning run and expected state (eq filters).
+   if(!values)return {data:h.row,error:null};
+   if(h.onOwnedWrite){const hook=h.onOwnedWrite;h.onOwnedWrite=null;hook();}
+   if(!eqs.every(([k,v])=>h.row?.[k]===v))return {data:null,error:null};
+   h.updates.push(values);h.row={...h.row,...values};values=undefined;eqs.length=0;
+   return {data:{id:h.row.id},error:null};
+  },
+  then:(resolve:any)=>{if(values)h.updates.push(values);return Promise.resolve(resolve({data:h.row,error:null}));}};return q;
 }})}));
 import {publishParisRepair,prepareParisRepair} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
- h.row={id:'repair',status:'validating',workflow_run_id:7,candidate:{base_sha:'a'.repeat(40),branch:{name:'studio/task',sha:'b'.repeat(40)}}};h.updates=[];h.validation='success';h.branchSha='b'.repeat(40);h.infrastructure=false;
+ h.row={id:'repair',status:'validating',workflow_run_id:7,candidate:{base_sha:'a'.repeat(40),branch:{name:'studio/task',sha:'b'.repeat(40)}}};h.updates=[];h.validation='success';h.branchSha='b'.repeat(40);h.infrastructure=false;h.onOwnedWrite=null;
  vi.stubGlobal('fetch',vi.fn(async(url:string,init:any={})=>{
   if(url.includes('/artifacts?'))return new Response(JSON.stringify({artifacts:[{name:'paris-validated-repair-'+'b'.repeat(40),expired:false}]}));
   if(url.includes('/jobs?'))return new Response(JSON.stringify({jobs:[{name:'validate',status:'completed',conclusion:h.validation}]}));
@@ -68,4 +78,12 @@ it('a rejected protected merge cannot be reported as a published or deployed rep
  vi.mocked(fetch).mockImplementation(async(input:any,init:any)=>String(input).endsWith('/graphql')?new Response(null,{status:403}):original(input,init));
  await expect(publishParisRepair('repair',7)).rejects.toThrow('PARIS_INFRASTRUCTURE_GITHUB_HTTP_403');
  expect(h.updates.some(value=>value.release_sha||value.status==='verified')).toBe(false);
+});
+
+it('does not persist a publication receipt when a concurrent repair supersedes its workflow',async()=>{
+ h.onOwnedWrite=()=>{h.row.status='blocked';};
+ await expect(publishParisRepair('repair',7)).rejects.toThrow('PARIS_REPAIR_STATE_OWNERSHIP_LOST');
+ expect(h.updates).toHaveLength(0);
+ expect(h.row.status).toBe('blocked');
+ expect(vi.mocked(fetch).mock.calls.some(([,init])=>init?.method==='PATCH')).toBe(false);
 });

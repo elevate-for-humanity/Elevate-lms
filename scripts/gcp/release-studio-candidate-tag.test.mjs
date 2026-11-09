@@ -15,7 +15,7 @@ function fixture({target=revision,tag='studio-verify',percent=0,absent=false,dri
       ...(courseQa||(removed&&concurrentQa)?[{revisionName:revision,tag:'course-qa-approved',percent:0}]:[]),
     ]}});
   };
-  return {run,calls,readConfig:()=>({runtimeEnvironment:{STUDIO_BROWSER_URL:'https://studio.run.app'}}),inventory:async()=>({activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true})};
+  return {run,calls,readConfig:()=>({runtimeEnvironment:{STUDIO_BROWSER_URL:'https://studio.run.app'}}),inventory:async()=>({activeBrowserSessions:0,providerAuthStorage:{ready:true,persistent:true},workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true})};
 }
 test('releases only the exact unused verification alias without deployment or state changes',async()=>{
   const f=fixture();assert.deepEqual(await releaseStudioCandidateTag({revision,...f}),{changed:true,revision,removedTag:'studio-verify',revisionRetained:true,servingTrafficPreserved:true});
@@ -54,7 +54,7 @@ test('a candidate pinned for course QA cannot be treated as unused headroom',asy
 test('a non-serving verification alias with active browser or shell work remains protected',async()=>{
  for(const change of [{activeBrowserSessions:1},{directChildShells:1},{directNonBrowserProcesses:1},{workspace:{files:1,symlinks:0}},{processInventoryReadable:false}]){
   const f=fixture();
-  await assert.rejects(async()=>releaseStudioCandidateTag({revision,...f,inventory:async()=>({activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true,...change})}),/LIVE_STATE_REQUIRES_PRESERVATION/);
+  await assert.rejects(async()=>releaseStudioCandidateTag({revision,...f,inventory:async()=>({activeBrowserSessions:0,providerAuthStorage:{ready:true,persistent:true},workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true,...change})}),/LIVE_STATE_REQUIRES_PRESERVATION/);
   assert.equal(f.calls.some(c=>c[2]==='update-traffic'),false);
  }
 });
@@ -64,5 +64,12 @@ test('serving Admin references remain protected when its pending template alread
   const f=fixture({tag,servingAdminUrl:'https://'+tag+'---studio.run.app'});
   await assert.rejects(releaseStudioCandidateTag({revision,tag,...f}),/STILL_REFERENCED/);
   assert.equal(f.calls.some(c=>c[2]==='update-traffic'),false);
+ }
+});
+test('generated aliases with user files or unverified cookie persistence cannot bypass preservation',async()=>{
+ const tag='sc-2aba3de5-c8976733';
+ for(const change of [{workspace:{files:1,symlinks:0}},{providerAuthStorage:{ready:true,persistent:false}},{directChildShells:1}]){
+  const f=fixture({tag});const original=f.inventory;f.inventory=async()=>({...await original(),...change});
+  await assert.rejects(releaseStudioCandidateTag({revision,tag,...f}),/LIVE_STATE_REQUIRES_PRESERVATION/);assert.equal(f.calls.some(x=>x[2]==='update-traffic'),false);
  }
 });

@@ -3,7 +3,7 @@ import { apiRequireAdmin, apiRequireRoles } from '@/lib/admin/guards';
 import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { DEFAULT_NAV, isNavSections, type NavSection } from '@/lib/admin/nav-config';
+import { DEFAULT_NAV, dedupeNavSections, isNavSections, type NavSection } from '@/lib/admin/nav-config';
 import { safeError } from '@/lib/api/safe-error';
 
 function normalizeAdminHref(href: string): string {
@@ -40,7 +40,7 @@ function mergeWithCanonicalNav(configured: NavSection[]): NavSection[] {
       if (!knownHrefs.has(item.href)) existing.items.push(item);
     }
   }
-  return merged;
+  return dedupeNavSections(merged);
 }
 
 /**

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { DEFAULT_NAV } from '@/lib/admin/nav-config';
+import { DEFAULT_NAV, dedupeNavSections } from '@/lib/admin/nav-config';
 import { STUDIO_WORKSPACES } from '@/lib/devstudio/workspace-registry';
 
 const ADMIN_APP_DIR = path.join(process.cwd(), 'apps/admin/app');
@@ -62,5 +62,35 @@ describe('admin DEFAULT_NAV coverage', () => {
 
     expect(staticRoutes.size).toBeGreaterThan(350);
     expect(missing).toEqual([]);
+  });
+  it('never lists the same route twice, and Dev Studio solely owns /studio routes', () => {
+    // A stale saved nav merged with canonical previously produced ~35 duplicate
+    // routes and the course builder under three names. De-dupe must collapse it.
+    const merged = dedupeNavSections([
+      ...DEFAULT_NAV,
+      {
+        label: 'Programs',
+        href: '/programs',
+        items: [
+          { label: 'Ultimate Course Builder', href: '/studio/courses' },
+          { label: 'Studio', href: '/studio' },
+        ],
+      },
+      {
+        label: 'Intelligence',
+        href: '/studio',
+        items: [{ label: 'PARIS', href: '/studio' }],
+      },
+    ]);
+    const hrefs = merged.flatMap((section) => section.items.map((item) => item.href));
+    expect(hrefs.length).toBe(new Set(hrefs).size);
+    const studio = merged.find((section) => section.label === 'Dev Studio');
+    for (const section of merged) {
+      if (section.label === 'Dev Studio') continue;
+      for (const item of section.items) {
+        expect(item.href.startsWith('/studio')).toBe(false);
+      }
+    }
+    expect(studio?.items.some((item) => item.href === '/studio/courses')).toBe(true);
   });
 });

@@ -1,0 +1,80 @@
+name: Verify paid model browser and phone work
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-billable-workloads.yml', 'scripts/gcp/verify-vertex-work.mjs']
+  workflow_dispatch:
+permissions: {contents: read, actions: write, id-token: write}
+jobs:
+  dispatch:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-billable-workloads.yml/dispatches" -f ref=main
+  functional-checks:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/accept-owned-cpu-model.test.mjs scripts/gcp/inventory-studio-live-state.test.mjs
+      - uses: google-github-actions/auth@v3
+        id: invocation
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: mkdir -p audit-reports
+      - name: Prove actual private model inference tools and streaming
+        env: {MODEL_INVOKER_TOKEN: '${{ steps.invocation.outputs.id_token }}'}
+        run: |
+          set -o pipefail
+          node --input-type=module <<'NODE' | tee audit-reports/model-work.json
+          import {loadGoogleConfig,google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          import {modelCredential} from './scripts/gcp/deploy-owned-llm.mjs';
+          import {acceptOwnedCpuModel} from './scripts/gcp/accept-owned-cpu-model.mjs';
+          const base='https://elevate-owned-cpu-llm-aabnh2y32a-ue.a.run.app';
+          try{
+            const service=JSON.parse(google(['run','services','describe','elevate-owned-cpu-llm','--region=us-east1','--project='+PROJECT,'--format=json']));
+            if(service.status?.url!==base)throw Error('MODEL_ENDPOINT_CHANGED');
+            const result=await acceptOwnedCpuModel({base,token:modelCredential(loadGoogleConfig('admin')),invokerToken:process.env.MODEL_INVOKER_TOKEN});
+            console.log(JSON.stringify({checkedAt:new Date().toISOString(),...result,scope:'existing model service; not proof of application routing or a completed PARIS repair'}));
+          }catch(error){console.log(JSON.stringify({passed:false,error:/^(OWNED_CPU_MODEL_[A-Z_]+|MODEL_ENDPOINT_CHANGED)$/.test(error.message||'')?error.message:error.code||'MODEL_ACCEPTANCE_UNAVAILABLE'}));process.exitCode=1;}
+          NODE
+      - name: Verify authenticated browser workspace access and retained state
+        if: always()
+        run: |
+          set -o pipefail
+          node scripts/gcp/inventory-studio-live-state.mjs | tee audit-reports/studio-work.json
+      - name: Verify public service dependencies and saved speech reuse
+        if: always()
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
+          node scripts/gcp/verify-paid-services.mjs
+      - name: Verify configured Vertex model using the existing course worker identity
+        if: always()
+        run: |
+          set -o pipefail
+          node --test scripts/gcp/verify-vertex-work.test.mjs
+          node scripts/gcp/verify-vertex-work.mjs | tee audit-reports/vertex-work.json
+      - name: Verify phone VM routing and voicemail worker without dialing
+        if: always()
+        run: |
+          set -o pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py | tee audit-reports/phone-work.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paid-workload-functional-evidence-${{ github.run_id }}
+          path: audit-reports/
+          retention-days: 30

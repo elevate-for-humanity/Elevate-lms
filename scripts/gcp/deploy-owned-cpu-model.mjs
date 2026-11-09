@@ -19,7 +19,7 @@ export function privateCpuDeploymentArguments(digest) {
   return ['run','deploy',CPU_SERVICE,'--project',PROJECT,'--region',CPU_REGION,
     '--image',`us-central1-docker.pkg.dev/${PROJECT}/elevate/owned-cpu-llm@${digest}`,
     '--service-account',MODEL_IDENTITY,'--port','8080','--cpu','4','--memory','8Gi',
-    '--min-instances','0','--max-instances','1','--concurrency','1','--timeout','300s','--no-cpu-boost',
+    '--min','0','--min-instances','0','--max-instances','1','--concurrency','1','--timeout','300s','--no-cpu-boost',
     '--update-env-vars='+Object.entries(CPU_CACHE_ENV).map(([key,value])=>key+'='+value).join(','),
     '--startup-probe','httpGet.path=/health,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=24',
     '--set-secrets',`LLM_WORKER_SECRET=${SECRET}:latest`,'--quiet'];

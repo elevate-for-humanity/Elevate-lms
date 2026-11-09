@@ -89,7 +89,7 @@ test('a lesson outside the selected course is rejected before any write',async()
 });
 test('checkpoint polling returns all canonical lessons without producer artifacts or version scans',async()=>{
  const selections=[],tables=[];
- const build={id:id(8),course_id:id(1),profile:{competencies:[{id:'first'},{id:'second'}],canonicalLessonIds:{first:id(2),second:id(4)}}};
+ const build={id:id(8),course_id:id(1),competencies:[{id:'first'},{id:'second'}],canonicalLessonIds:{first:id(2),second:id(4)}};
  const db={from(table){tables.push(table);let fields;const q={select(v){fields=v;selections.push(v);return q;},eq(){return q;},order(){return q;},single:async()=>({data:build,error:null}),then(resolve){return Promise.resolve({data:table==='course_lessons'?[{id:id(2),title:'First',is_published:true,video_url:'https://example.com/film.mp4'},{id:id(4),title:'Second',is_published:true,video_url:'https://example.com/second.mp4'},{id:id(5),title:'Additional published lesson',lesson_type:'lesson',is_published:true},{id:id(6),title:'Published quiz',lesson_type:'quiz',is_published:true},{id:id(7),title:'Unpublished',is_published:false}]:[{id:id(9),competency_id:'first',status:'built'}],error:null}).then(resolve);}};return q;}};
  const result=await loadCheckpointPage(db,id(8));assert.equal(result.ultimate_lesson_builds.length,2);
  assert.deepEqual(result.publishedItems.map(x=>x.id),[id(2),id(4),id(5),id(6)]);
@@ -97,6 +97,9 @@ test('checkpoint polling returns all canonical lessons without producer artifact
  assert.equal(result.publishedItems[2].previewUrl,'/api/admin/course-builder/preview?courseId='+id(1)+'&lessonId='+id(5));
  assert.equal(result.ultimate_lesson_builds[1].hasCheckpoint,false);
  assert.ok(result.ultimate_lesson_builds.every(row=>row.preview.videoUrl));
+ assert.ok(selections[0].includes('competencies:profile->competencies,canonicalLessonIds:profile->canonicalLessonIds'));
+ assert.ok(!selections[0].split(',').includes('profile'));
+ assert.deepEqual(result.profile,{competencies:build.competencies,canonicalLessonIds:build.canonicalLessonIds});
  assert.ok(selections.every(s=>!s.includes('artifacts')));assert.ok(!tables.includes('ultimate_artifact_versions'));
 });
 

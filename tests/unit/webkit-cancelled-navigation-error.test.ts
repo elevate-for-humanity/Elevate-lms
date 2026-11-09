@@ -36,3 +36,48 @@ it('never hides JavaScript exceptions or errors from other browsers', () => {
   expect(isConfirmedWebKitCancellation(jsError, [cancelled], 'webkit')).toBe(false);
   expect(isConfirmedWebKitCancellation(error, [cancelled], 'chromium')).toBe(false);
 });
+
+// Reproduced from the employer-onboarding iPhone-WebKit run: WebKit reported
+// "/cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks."
+// three times, but the trace showed 19 identical requests all returning HTTP
+// 200 and zero cancelled requests. The page error is a spurious abort report.
+it('recognizes a WebKit abort report when the same URL completed successfully', () => {
+  const authError = {
+    message: '/cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks.',
+    stack: 'Fetch API cannot load https://cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks.',
+    time: 1000,
+  };
+  const completed = {
+    url: 'https://cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user',
+    status: 200,
+    time: 900,
+  };
+  expect(isConfirmedWebKitCancellation(authError, [], 'webkit', [completed])).toBe(true);
+});
+it('still fails when the same URL never returned a success status', () => {
+  const authError = {
+    message: '/cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks.',
+    stack: '',
+    time: 1000,
+  };
+  // A 4xx/5xx response is not proof the app's read worked.
+  expect(isConfirmedWebKitCancellation(authError, [], 'webkit', [
+    { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user', status: 403, time: 900 },
+  ])).toBe(false);
+  // A successful response for a different path proves nothing about this URL.
+  expect(isConfirmedWebKitCancellation(authError, [], 'webkit', [
+    { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/auth/v1/other', status: 200, time: 900 },
+  ])).toBe(false);
+  // No evidence at all remains a failure.
+  expect(isConfirmedWebKitCancellation(authError, [], 'webkit', [])).toBe(false);
+});
+it('does not use completed-request evidence for non-WebKit browsers', () => {
+  const authError = {
+    message: '/cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks.',
+    stack: '',
+    time: 1000,
+  };
+  const completed = { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user', status: 200, time: 900 };
+  expect(isConfirmedWebKitCancellation(authError, [], 'chromium', [completed])).toBe(false);
+});
+

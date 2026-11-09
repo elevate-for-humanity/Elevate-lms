@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Request as BrowserRequest } from '@playwright/test';
-import { isConfirmedWebKitCancellation, type CapturedBrowserError, type CancelledBrowserRequest } from './helpers/browser-runtime-errors';
+import { isConfirmedWebKitCancellation, type CapturedBrowserError, type CancelledBrowserRequest, type CompletedBrowserRequest } from './helpers/browser-runtime-errors';
 const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
 const password = process.env.E2E_EMPLOYER_PASSWORD || '';
@@ -10,6 +10,7 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   test.skip(!email || !password, 'Provision the isolated QA employer identity first');
   const runtimeErrors: CapturedBrowserError[] = [];
   const cancelledRequests: CancelledBrowserRequest[] = [];
+  const completedRequests: CompletedBrowserRequest[] = [];
   const pendingClientReads = new Set<BrowserRequest>();
   let lastClientReadActivity = Date.now();
   const clientReadPaths = new Set(['/auth/v1/user', '/rest/v1/notifications']);
@@ -26,6 +27,14 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   });
   page.on('requestfinished', finishClientRead);
   page.on('pageerror', (error) => runtimeErrors.push({ message: error.message, stack: error.stack, time: Date.now() }));
+  page.on('response', (response) => {
+    // Record a successful read of the app's own auth origin so a spurious
+    // WebKit abort report can be distinguished from a real CORS failure.
+    const url = new URL(response.url());
+    if (url.origin === authOrigin && clientReadPaths.has(url.pathname)) {
+      completedRequests.push({ url: response.url(), status: response.status(), time: Date.now() });
+    }
+  });
   page.on('requestfailed', (request) => {
     cancelledRequests.push({ url: request.url(), errorText: request.failure()?.errorText || '', time: Date.now() });
     finishClientRead(request);
@@ -114,10 +123,10 @@ test('Employer setup saves company and hiring needs, opens private files and ack
       { message: 'Employer setup images must load', timeout: 15000 },
     )
     .toBe(true);
-  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName));
+  const unhandledErrors = runtimeErrors.filter(error => !isConfirmedWebKitCancellation(error, cancelledRequests, browserName, completedRequests));
   if (unhandledErrors.length) {
     await test.info().attach('browser-runtime-errors.json', {
-      body: Buffer.from(JSON.stringify({ runtimeErrors, cancelledRequests })),
+      body: Buffer.from(JSON.stringify({ runtimeErrors, cancelledRequests, completedRequests })),
       contentType: 'application/json',
     });
   }

@@ -8,6 +8,7 @@ import {hasApplicationSourceCorrection,nextRepairActionConstraint,assertCommitte
 import {bindRepairWorkflowInspection,bindVerifiedFailedWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
 import {budgetRepairMessages,repairCompletionTokens,REPAIR_INFERENCE_TIMEOUT_MS,REPAIR_MODEL_PROBE_TIMEOUT_MS} from './repair-inference-budget.mjs';
+import {retryRepairInference} from './repair-inference-retry.mjs';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
@@ -33,9 +34,6 @@ const MAX_READ_CHARS = 16_000;
 // and understood the source. Retry the same turn a few times, and only treat it
 // as a retryable infrastructure failure (never a "no verifiable change") when
 // the provider stays down.
-const MAX_TRANSIENT_INFERENCE_RETRIES = 3;
-const TRANSIENT_INFERENCE_RETRY_MS = 5_000;
-const TRANSIENT_INFERENCE_ERROR = /HTTP (?:502|503|504)|ECONNRESET|socket hang up|fetch failed|network error|aborted due to timeout|timed out|temporarily unavailable|overloaded|rate limit|HTTP 429/i;
 // Keep a reserve for GitHub validation and durable failure reporting within the
 // 40-minute Actions prepare job. The deadline survives planner continuations.
 const REPAIR_PLANNING_BUDGET_MS = 35 * 60_000;
@@ -470,40 +468,35 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         temperature: 0.1,
         maxTokens: repairCompletionTokens(ownedTier, observations, verifiedSourceRead),
         jsonMode: true,
-        signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
       } as Parameters<typeof aiChat>[0];
       if (provider === 'elevate') {
         inferenceOptions.messages = budgetRepairMessages(inferenceOptions.messages,
           Number(process.env.ELEVATE_LLM_CONTEXT_TOKENS ?? 8192), inferenceOptions.maxTokens, ownedTier);
       }
-      const infer=()=>aiChat(inferenceOptions);
+      const infer=(signal: AbortSignal)=>aiChat({...inferenceOptions,signal});
       // A single transient gateway fault (e.g. HTTP 502) must not discard a
       // repair that has already inspected the source. Retry the same turn a few
       // times; if the provider stays down, surface a retryable infrastructure
       // error instead of a misleading "no verifiable repository change".
       let result: Awaited<ReturnType<typeof aiChat>>;
-      for (let attempt = 0; ; attempt += 1) {
-        try {
-          const paid=provider==='elevate'?null:await executePaidInference({db,authorize:()=>reservePaidInference(db,{scopeKey:'studio-chat',actorId,runId:taskId,artifactFingerprint:paidArtifactFingerprint({taskId,turn,task}),idempotencyKey:`paris-repair:${taskId}:${turn}`,provider,model:'canonical',operation:'paris-code-repair',projectedCostMicros:Math.max(0,Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS??'100000'))}),dispatch:infer});
+      try {
+        result = await retryRepairInference(async (signal: AbortSignal) => {
+          const dispatch=()=>infer(signal);
+          const paid=provider==='elevate'?null:await executePaidInference({db,authorize:()=>reservePaidInference(db,{scopeKey:'studio-chat',actorId,runId:taskId,artifactFingerprint:paidArtifactFingerprint({taskId,turn,task}),idempotencyKey:`paris-repair:${taskId}:${turn}`,provider,model:'canonical',operation:'paris-code-repair',projectedCostMicros:Math.max(0,Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS??'100000'))}),dispatch});
           if(paid&&paid.decision!=='approved')throw Error('PARIS_INFERENCE_'+paid.decision.toUpperCase());
           if(paid&&!paid.value)throw Error('PARIS_INFERENCE_RESULT_REQUIRED');
-          result=paid?paid.value!:await infer();
-          break;
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          const budgetLeft = REPAIR_PLANNING_BUDGET_MS - (Date.now() - startedMs) - REPAIR_TURN_RESERVE_MS;
-          const transient = TRANSIENT_INFERENCE_ERROR.test(message);
-          // A non-transient failure (budget, authorization, malformed task) keeps
-          // its existing error handling and must not be relabelled.
-          if (!transient) throw error;
-          if (attempt >= MAX_TRANSIENT_INFERENCE_RETRIES || budgetLeft < TRANSIENT_INFERENCE_RETRY_MS) {
-            await checkpoint();
-            return NextResponse.json({error:'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE',
-              branch:{name:branch},changed_files:[...changedFiles],observations:observations.slice(-6)}, {status:503});
-          }
-          observations.push(`INFERENCE_TRANSIENT: retrying turn ${turn + 1} after a gateway fault (attempt ${attempt + 1}).`);
-          await new Promise(resolve => setTimeout(resolve, TRANSIENT_INFERENCE_RETRY_MS));
-        }
+          return paid?paid.value!:await dispatch();
+        }, {
+          timeoutMs: REPAIR_INFERENCE_TIMEOUT_MS,
+          onRetry: (attempt: number, delay: number) => {
+            observations.push(`INFERENCE_TRANSIENT: retrying turn ${turn + 1} after ${delay}ms (attempt ${attempt}).`);
+          },
+        });
+      } catch (error) {
+        if (!(error instanceof Error) || error.message !== 'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE') throw error;
+        await checkpoint();
+        return NextResponse.json({error:'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE',
+          branch:{name:branch},changed_files:[...changedFiles],observations:observations.slice(-6)}, {status:503});
       }
       usedProvider=result.provider;
 

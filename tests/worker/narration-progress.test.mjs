@@ -21,6 +21,21 @@ function harness(fail=false,{alignmentError,recognizerError}={}){
  return{provider:new Provider(),progress,recognitions,rates,speech,cleaned:()=>cleaned};
 }
 const input={lessonId:'lesson',artifacts:{instructor_script:{script:{segments:[{id:'scene',narrationParts:[{text:'Primary recording',isRecap:false},{text:'Fresh recap',isRecap:true}]}]}}}};
+test('measured silent-gap repair trims only recording boundaries and retains interior pauses',()=>{
+ const args=new Function(source+';return narrationBoundaryRepairArgs;')();
+ const finding={code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:PREMIUM_NARRATION_SILENT_GAP'};
+ const directive={target:'natural_narration',requirements:[finding]};
+ assert.deepEqual(args(undefined),[]);
+ assert.deepEqual(args({...directive,target:'lesson_film_render'}),[]);
+ assert.deepEqual(args({...directive,requirements:[finding,{code:'OTHER',message:'Other defect'}]}),[]);
+ const filter=args(directive);assert.equal(filter[0],'-af');
+ const result=execFileSync('ffmpeg',['-v','error','-f','lavfi','-i','aevalsrc=if(between(t\\,0.8\\,1.8)+between(t\\,3.8\\,4.8)\\,0.2*sin(2*PI*440*t)\\,0):s=24000:d=5.6',...filter,'-f','s16le','-acodec','pcm_s16le','-']);
+ const duration=result.length/2/24000;
+ assert.ok(duration>4&&duration<4.5,'only leading/trailing padding should be removed');
+ let silent=0,longest=0;
+ for(let i=0;i<result.length;i+=2){if(Math.abs(result.readInt16LE(i))<30){silent++;longest=Math.max(longest,silent);}else silent=0;}
+ assert.ok(longest/24000>1.9,'interior pause must remain for independent quality inspection');
+});
 test('long narration exposes real recording, alignment, and stored-segment progress',async()=>{
  const h=harness();const result=await h.provider.generate(input);assert.equal(result.segments.length,1);
  assert.deepEqual(h.progress.filter(p=>p.phase.startsWith('narration:recording')).map(p=>p.completed),[1,2]);

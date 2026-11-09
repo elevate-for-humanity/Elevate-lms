@@ -57,6 +57,10 @@ test('ffmpeg assembly failures stay at render stage', () => {
  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'FFmpeg output missing'}];
  assert.equal(routeSelectiveRepairs(findings)[0].step,'lesson_film_render');
 });
+test('silent or inaudible approved recordings return to the narration producer',()=>{
+ for(const code of ['PREMIUM_NARRATION_SILENT_GAP','PREMIUM_NARRATION_INAUDIBLE','PREMIUM_NARRATION_MISSING'])
+  assert.deepEqual(routeSelectiveRepairs([{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:'+code}]),[{step:'natural_narration',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+});
 
 
 test('combined freeze and backward replay repair both media assembly and visuals', () => {

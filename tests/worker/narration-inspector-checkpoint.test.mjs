@@ -6,9 +6,41 @@ import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {instructionView,recoverTeachingVisibilityRepair} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
 import {deriveSavedErrors} from '../../lib/ultimate-course-builder/persistence/saved-errors.mjs';
+import {createHash} from 'node:crypto';
+import {STORYBOARD_RENDER_PRODUCER} from '../../lib/video/render-checkpoint-contract.mjs';
+import {recoveredSourcePublicationAllowed} from '../../lib/ultimate-course-builder/release/recovered-source-policy.mjs';
 import {measuredNarrationRepair} from '../../lib/ultimate-course-builder/instructional/narration-checkpoint-repair.mjs';
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/persistence/supabase-persistence.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import .*;\n/gm,'').replace('export class ','class ');
 const Persistence=new Function('instructionView','currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair','recoverCaptionCoverageInspection','deriveSavedErrors','recoverTeachingVisibilityRepair',source+';return UltimateSupabasePersistence;')(instructionView,value=>value?.certified===true,['standards_lock','synchronization','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair,recoverCaptionCoverageInspection,deriveSavedErrors,recoverTeachingVisibilityRepair);
+test('owner publication approval preserves certified lesson inputs without approving changed instruction',()=>{
+ const contract=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/lesson-contract.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
+ const types=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/types.ts',import.meta.url),'utf8'),{mode:'transform'}).replaceAll('export ','');
+ const steps=new Function(types+';return ULTIMATE_BUILD_STEPS;')();
+ const {stepInputHash,contractHash}=new Function('createHash','ULTIMATE_BUILD_STEPS','STORYBOARD_RENDER_PRODUCER',contract+';return {stepInputHash,contractHash};')(createHash,steps,STORYBOARD_RENDER_PRODUCER);
+ const draft={title:'Approved existing course',publicationPolicy:'owner-review-required',instructionalSources:[{id:'one',text:'Authored teaching'}],existingLessonSourceRecovery:{source:'course_lessons.content',version:'draft-v1',publicationApproved:false,learnerPublicationApproved:false,draftSourceForProductionOnly:true}};
+ const approved={...draft,existingLessonSourceRecovery:{...draft.existingLessonSourceRecovery,publicationApproved:true,learnerPublicationApproved:true,draftSourceForProductionOnly:false,ownerPublicationApproval:{name:'Owner',approvedAt:'2026-11-09T09:40:00Z'}}};
+ const original=JSON.stringify(approved);
+ for(const step of steps)assert.equal(stepInputHash(step,draft,{}),stepInputHash(step,approved,{}),step);
+ assert.equal(JSON.stringify(approved),original,'hashing cannot mutate the approval receipt');
+ assert.equal(recoveredSourcePublicationAllowed(draft),false);
+ assert.equal(recoveredSourcePublicationAllowed(approved),true);
+ for(const changed of [{...approved,instructionalSources:[{id:'one',text:'Different instruction'}]},{...approved,existingLessonSourceRecovery:{...approved.existingLessonSourceRecovery,version:'another-source'}}])
+  assert.notEqual(stepInputHash('standards_lock',draft,{}),stepInputHash('standards_lock',changed,{}));
+ // Preserve the exact historical draft profile identity, not just equivalence
+ // between two hashes produced by the new normalization.
+ assert.equal(stepInputHash('standards_lock',approved,{}),contractHash({version:'ultimate-lesson-2026-10-29.1',profile:draft,step:'standards_lock',dependencies:[]}));
+});
+test('saved silent-gap renderer diagnosis returns to narration without certifying new audio',async()=>{
+ const audio={certified:true,narration:{segments:[{text:'Approved teaching'}]}};
+ const artifacts={natural_narration:audio,__repairState:{status:'diagnosed',attempts:[{reason:'retained'}],directive:{failedStep:'lesson_film_render',target:'lesson_film_render',requirements:[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:PREMIUM_NARRATION_SILENT_GAP'}]}}};
+ const db={from:()=>{const q={select:()=>q,eq:()=>q,single:async()=>({data:{artifacts,findings:[]}}),then:resolve=>resolve({data:[]})};return q;}};
+ const result=await new Persistence(db).loadLessonCheckpoint({lessonBuildId:'lesson'});
+ assert.equal(result.artifacts.__repairState.directive.target,'natural_narration');
+ assert.equal(result.artifacts.__repairState.directive.previous,audio);
+ assert.equal(result.artifacts.__repairState.attempts.length,1);
+ assert.equal(artifacts.__repairState.directive.target,'lesson_film_render');
+ assert.ok(!result.passedSteps.includes('natural_narration'));
+});
 test('failed QA row retains measured repair when the lesson snapshot no longer contains QA',async()=>{
  const narration={certified:true,narration:{rate:'0%'}};
  const qa={source:'delivered-mp4',mediaSha256:'actual-film',pass:false,failures:['PACE_OUT_OF_RANGE'],metrics:{wordsPerMinute:{value:108,measured:true}}};

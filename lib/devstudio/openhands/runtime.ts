@@ -103,7 +103,29 @@ export async function dispatchOpenHandsTask(
 ): Promise<OpenHandsDispatchResult> {
   const db = await requireAdminClient();
   const existing = await findExistingTask(input.correlationId);
-  let taskId = existing?.id as string | undefined;
+  // Never issue a second Cloud conversation for a previously recorded
+  // correlation. Ambiguous startup must be investigated, not blindly replayed.
+  if (existing) {
+    if (existing.tool_name !== 'openhands.execute' ||
+        existing.user_id !== input.actorId ||
+        (existing.tenant_id ?? null) !== (input.tenantId ?? null) ||
+        existing.command !== input.task) {
+      throw new Error('OPENHANDS_CORRELATION_OWNERSHIP_MISMATCH');
+    }
+    const external = existing.tool_output && typeof existing.tool_output === 'object'
+      ? existing.tool_output as Record<string, unknown> : {};
+    const startTaskId = typeof external.start_task_id === 'string' ? external.start_task_id : '';
+    if (!startTaskId) {
+      throw new Error('OPENHANDS_EXISTING_TASK_START_UNCONFIRMED');
+    }
+    return {
+      taskId: existing.id as string,
+      startTaskId,
+      conversationId: typeof external.conversation_id === 'string' ? external.conversation_id : null,
+      status: existing.status === 'running' ? 'running' : 'queued',
+    };
+  }
+  let taskId: string | undefined;
 
   if (!taskId) {
     const agentId = await findDeveloperAgentId();

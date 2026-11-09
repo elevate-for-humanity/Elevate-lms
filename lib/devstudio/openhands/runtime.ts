@@ -118,6 +118,10 @@ export async function dispatchOpenHandsTask(
     if (!startTaskId) {
       throw new Error('OPENHANDS_EXISTING_TASK_START_UNCONFIRMED');
     }
+    if (!['running', 'queued'].includes(existing.status)) {
+      // A terminal or approval-gated run is not eligible for implicit replay.
+      throw new Error('OPENHANDS_EXISTING_TASK_NOT_DISPATCHABLE');
+    }
     return {
       taskId: existing.id as string,
       startTaskId,

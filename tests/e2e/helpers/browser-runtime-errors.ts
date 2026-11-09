@@ -18,6 +18,25 @@ export interface CompletedBrowserRequest {
 }
 
 /**
+ * Track only the small set of authenticated GETs involved in navigation:
+ * Supabase account/notification reads and the app notification-preferences API.
+ * A successful unrelated request must never hide a genuine access failure.
+ */
+export function isTrackedClientRead(
+  requestUrl: string,
+  method: string,
+  authOrigin: string,
+  appOrigin: string,
+): boolean {
+  if (method !== 'GET') return false;
+  let url: URL;
+  try { url = new URL(requestUrl); } catch { return false; }
+  return (url.origin === authOrigin &&
+      (url.pathname === '/auth/v1/user' || url.pathname === '/rest/v1/notifications')) ||
+    (url.origin === appOrigin && url.pathname === '/api/notifications/preferences');
+}
+
+/**
  * Decide whether a WebKit "due to access control checks" page error is a
  * spurious abort report rather than a real access-control failure.
  *
@@ -60,7 +79,8 @@ export function isConfirmedWebKitCancellation(
   if (cancelled) return true;
   return completedRequests.some(
     (request) =>
-      normalize(request.url) === fragment && request.status >= 200 && request.status < 300,
+      normalize(request.url) === fragment && request.status >= 200 && request.status < 300 &&
+      Math.abs(request.time - error.time) <= 3000,
   );
 }
 

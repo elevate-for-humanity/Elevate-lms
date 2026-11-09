@@ -18,13 +18,18 @@ export function isConfirmedWebKitCancellation(
   browserName: string,
 ): boolean {
   if (browserName !== 'webkit') return false;
-  const url = error.stack?.match(
-    /^Fetch API cannot load (https?:\/\/\S+) due to access control checks\.$/m,
+  // WebKit puts the offending URL in the page error message (the stack is often
+  // empty), and the URL may appear with or without a scheme. Read both fields
+  // and normalize to host+path so either form matches the cancelled request.
+  const text = `${error.message ?? ''}\n${error.stack ?? ''}`;
+  if (!/due to access control checks\./.test(text)) return false;
+  const fragment = text.match(
+    /(?:https?:\/\/|\/\/|\/)([a-z0-9.-]+\.[a-z]{2,}\/\S+?)\s+due to access control checks\./i,
   )?.[1];
-  if (!url) return false;
+  if (!fragment) return false;
   return requests.some(
     (request) =>
-      request.url === url &&
+      request.url.replace(/^https?:\/\//, '') === fragment &&
       request.errorText === 'Load request cancelled' &&
       Math.abs(request.time - error.time) <= 250,
   );

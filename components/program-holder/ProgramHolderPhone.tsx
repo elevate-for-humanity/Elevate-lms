@@ -157,13 +157,18 @@ export function ProgramHolderPhone({
 
   // Mobile browsers suspend WebAudio until a gesture; unlock on the first one so
   // an inbound call can ring without the operator touching the phone first.
-  useEffect(() => installAudioUnlock(), []);
+  useEffect(() => {
+    const removeAudioUnlock = installAudioUnlock();
+    return () => {
+      removeAudioUnlock();
+      stopRingtone();
+    };
+  }, []);
 
   // Belt-and-braces: never leave a synthesized ringtone running once the call
   // is answered, declined, missed, or the page is left.
   useEffect(() => {
     if (callState !== 'ringing') stopRingtone();
-    return () => stopRingtone();
   }, [callState]);
 
   useEffect(() => {
@@ -354,12 +359,8 @@ export function ProgramHolderPhone({
           );
           setCallState('ringing');
           if (ringModeRef.current === 'ring') {
-            try {
-              call.playRingtone();
-            } catch {
-              // The visible incoming-call screen remains available if autoplay is blocked.
-            }
-            // WebAudio fallback so a mobile PWA that blocked the SDK ringtone still rings.
+            // Use the gesture-primed context once, rather than also starting a
+            // second SDK AudioContext that mobile autoplay may keep suspended.
             startRingtone();
           }
           if (ringModeRef.current === 'vibrate') navigator.vibrate?.([350, 150, 350, 150, 700]);
@@ -462,7 +463,10 @@ export function ProgramHolderPhone({
       setData((current) =>
         current ? { ...current, extension: { ...current.extension, ringMode: mode } } : current,
       );
-      if (mode !== 'ring') callRef.current?.stopRingtone();
+      if (mode !== 'ring') {
+        callRef.current?.stopRingtone();
+        stopRingtone();
+      }
       if (mode !== 'vibrate') navigator.vibrate?.(0);
       if (mode === 'vibrate' && !navigator.vibrate)
         setMessage(
@@ -503,6 +507,7 @@ export function ProgramHolderPhone({
     const call = callRef.current;
     if (!call) return;
     call.stopRingtone();
+    stopRingtone();
     navigator.vibrate?.(0);
     try {
       await call.answer({ audio: true, remoteElement: remoteAudioRef.current || undefined });
@@ -515,6 +520,7 @@ export function ProgramHolderPhone({
     const call = callRef.current;
     if (!call) return;
     call.stopRingtone();
+    stopRingtone();
     navigator.vibrate?.(0);
     await call.hangup();
     await outboundClientRef.current?.disconnect().catch(() => {});

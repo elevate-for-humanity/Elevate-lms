@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 
+export const metadata = { robots: { index: false, follow: false } };
+
 /** Compatibility entry; prices and checkout live in the shared enrollment flow. */
 export default async function EnrollmentPaymentPage({ searchParams }: {
   searchParams: Promise<{ program?: string }>;

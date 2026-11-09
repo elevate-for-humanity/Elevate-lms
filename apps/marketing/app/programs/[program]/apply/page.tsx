@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 
+export const metadata = { robots: { index: false, follow: false } };
+
 /** All program application aliases share the two-stage admissions flow. */
 export default async function ProgramApplicationPage({ params }: {
   params: Promise<{ program: string }>;

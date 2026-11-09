@@ -104,6 +104,18 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     // visibility recoveries never fired, so the media role repeated the same
     // unchanged producer until its attempts ran out. Merge both, step first.
     const savedErrors = deriveSavedErrors(steps, lesson);
+    const silentGapRequirements = (artifacts.__repairState as any)?.directive?.requirements;
+    const silentGapRepair = (artifacts.__repairState as any)?.directive?.failedStep === 'lesson_film_render' &&
+      (artifacts.__repairState as any)?.directive?.target === 'lesson_film_render' &&
+      Array.isArray(silentGapRequirements) && silentGapRequirements.length > 0 &&
+      silentGapRequirements.every((finding:any) => finding.code === 'ULTIMATE_VIDEO_RENDER_FAILED' &&
+        finding.message === 'ULTIMATE_VIDEO_RENDER_FAILED:PREMIUM_NARRATION_SILENT_GAP') &&
+      currentEvidence(artifacts.natural_narration as any);
+    if (silentGapRepair) {
+      const repair = artifacts.__repairState as any;
+      artifacts.__repairState = {...repair,status:'diagnosed',directive:{...repair.directive,
+        target:'natural_narration',previousTarget:'lesson_film_render',previous:artifacts.natural_narration}};
+    }
     if (savedErrors.some((finding: any) => finding.code === 'REPAIR_PRODUCER_UNCHANGED')) {
       const teachingRepair = recoverTeachingVisibilityRepair(
         artifacts,

@@ -12,6 +12,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { reportCourseProgress } from '../worker/progress-watch.mjs';
 const execute=promisify(execFile);
+// A measured silent-gap render failure may come from padding at the boundary
+// between a teaching recording and its recap. Trim only the recording edges,
+// retain a short speech buffer, and measure/align the resulting PCM afresh.
+// Interior pauses remain untouched and the delivered-audio gate still runs.
+function narrationBoundaryRepairArgs(directive:any):string[] {
+ const requirements=directive?.requirements;
+ if(directive?.target!=='natural_narration'||!Array.isArray(requirements)||!requirements.length||
+  !requirements.every((r:any)=>r.code==='ULTIMATE_VIDEO_RENDER_FAILED'&&
+   r.message==='ULTIMATE_VIDEO_RENDER_FAILED:PREMIUM_NARRATION_SILENT_GAP'))return [];
+ const trim='silenceremove=start_periods=1:start_duration=0.05:start_threshold=-50dB:start_silence=0.1';
+ return ['-af',trim+',areverse,'+trim+',areverse'];
+}
 export class UltimatePlatformNarration implements UltimateNarrationPort {
  async generate(input:any){
   const approved=input.artifacts?.instructor_script?.script?.segments;
@@ -34,7 +46,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      reportCourseProgress('narration:recording:'+index,partIndex+1,recordings.length);
      const source=join(directory,index+'-'+partIndex+'.mp3'),pcm=join(directory,index+'-'+partIndex+'.wav');
      await writeFile(source,audio);
-     await execute('ffmpeg',['-v','error','-y','-i',source,'-ac','1','-ar','24000','-c:a','pcm_s16le',pcm]);
+     await execute('ffmpeg',['-v','error','-y','-i',source,...narrationBoundaryRepairArgs(input.repairDirective),'-ac','1','-ar','24000','-c:a','pcm_s16le',pcm]);
      const {stdout}=await execute('ffprobe',['-v','error','-show_entries','format=duration','-of','default=noprint_wrappers=1:nokey=1',pcm]);
      const durationSeconds=Number(stdout.trim());
      if(!(durationSeconds>0))throw Error('ULTIMATE_NARRATION_DURATION_REQUIRED');

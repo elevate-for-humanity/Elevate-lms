@@ -45,6 +45,21 @@ export function stepInputHash(
   // Publication settings and resume history do not change instructional inputs.
   const { pauseResumeAudit: _resumeAudit, publishCompletedLessons: _publishAsYouGo,
     preservedPublishedLessonIds: _preservedPublications, parallelAutopilot: _parallelAutopilot, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
+  // Owner publication approval changes release authority, not the authored
+  // lesson. Keep the original draft-recovery input identity so granting that
+  // approval cannot invalidate every certified producer. Preserve all source
+  // provenance and instructional content in the hash; release-service still
+  // checks the actual approval flags independently before any publication.
+  const recovery = instructionalProfile.existingLessonSourceRecovery;
+  if (recovery && typeof recovery === 'object' && !Array.isArray(recovery)) {
+    const { ownerPublicationApproval: _approvalReceipt, ...provenance } = recovery as Record<string, unknown>;
+    instructionalProfile.existingLessonSourceRecovery = {
+      ...provenance,
+      publicationApproved: false,
+      learnerPublicationApproved: false,
+      draftSourceForProductionOnly: true,
+    };
+  }
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,

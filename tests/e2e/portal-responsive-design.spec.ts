@@ -603,3 +603,22 @@ test.describe('Studio single-session access and composer', () => {
     }
   });
 });
+
+
+test.describe('Admin PWA mobile keyboard clearance', () => {
+  test.skip(!creds.admin[0] || !creds.admin[1], 'Disposable admin identity is required');
+
+  test('bottom dock clears focused form controls and returns after editing', async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 1280) >= 768, 'Phone viewport required');
+    await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
+    await page.goto(`${ADMIN_BASE}/dashboard`, { waitUntil: 'domcontentloaded' });
+    const dock = page.getByRole('navigation', { name: 'Mobile admin navigation' });
+    const section = page.getByRole('combobox', { name: 'Admin section' });
+    await expect(dock).toBeVisible();
+    await expect(section).toBeVisible();
+    await section.focus();
+    await expect(dock).toBeHidden();
+    await section.blur();
+    await expect(dock).toBeVisible();
+  });
+});

@@ -86,12 +86,14 @@ test('a stale repair receipt cannot park work that a plain re-run can recover',(
   assert.equal(observation.state,'recovering');
   assert.equal(observation.action,'requeue');
  }
- // A genuinely non-resumable failure with a receipt is still reported, not requeued.
- const blocked=inspectCourseAutopilot(job({status:'failed',
+ // A producer that re-ran unchanged is resumable: the checkpoint loader now
+ // reconstructs the saved caption/visibility diagnosis from the failing-step
+ // findings, so a receipt must not park it either.
+ const resumable=inspectCourseAutopilot(job({status:'failed',
    last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:REPAIR_PRODUCER_UNCHANGED',
    monitor:{enabled:true,repairId:'verified-repair'}}),{},+now);
- assert.equal(blocked.state,'repair_requested');
- assert.equal(blocked.action,'observe');
+ assert.equal(resumable.state,'recovering');
+ assert.equal(resumable.action,'requeue');
 });
 test('monitor uses fenced changes and never resets attempts or changes worker payload',async()=>{
  const calls=[];const row=job({status:'failed',last_error:'fetch failed'});
@@ -367,12 +369,12 @@ test('publication approval stays blocked despite retry capacity and historical r
  },{status:'running',profile:{ownerPaused:false}},now.getTime());
  assert.equal(exhausted.state,'attention_required');
  assert.equal(exhausted.action,'none');
- // Genuine source-repair failures can still be observed through PARIS.
+ // A producer that re-ran unchanged is resumable through the recovered
+ // diagnosis, so PARIS requeues it instead of parking on the receipt.
  const codeRepair=inspectCourseAutopilot({
   status:'failed',last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:REPAIR_PRODUCER_UNCHANGED',
-  monitor:{enabled:true,repairId:'verified-repair'}
+  monitor:{enabled:true,repairId:'verified-repair'},attempts:1,max_attempts:5
  },{status:'running',profile:{ownerPaused:false}},now.getTime());
- assert.equal(codeRepair.state,'repair_requested');
- assert.equal(codeRepair.action,'observe');
- assert.match(codeRepair.reason,/dispatch, execution, and validation remain unverified/);
+ assert.equal(codeRepair.state,'recovering');
+ assert.equal(codeRepair.action,'requeue');
 });

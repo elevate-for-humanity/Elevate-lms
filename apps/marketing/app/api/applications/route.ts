@@ -422,7 +422,7 @@ async function _POST(req: Request) {
       if (saved.error) throw new Error('Full application could not be saved.');
       const dashboardUrl = await activatePaidApplication(paidEvidence, activeApp.id);
       return NextResponse.json({ ok: true, existing: true, id: activeApp.id,
-        program, referenceNumber: activeApp.reference_number, applicationStatus: 'submitted',
+        program, referenceNumber: activeApp.reference_number, applicationStatus: 'enrolled',
         nextStepUrl: dashboardUrl });
     }
     if (activeApp) {
@@ -1048,7 +1048,7 @@ async function _POST(req: Request) {
         email: data.email,
         program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
-        applicationStatus,
+        applicationStatus: dashboardUrl ? 'enrolled' : applicationStatus,
         nextStepUrl: dashboardUrl || nextStepUrl,
         emailStatus,
       },

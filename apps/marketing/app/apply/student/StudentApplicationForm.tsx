@@ -393,7 +393,7 @@ export default function StudentApplicationForm({
           success: true,
           message: data.recordType === 'lead'
             ? 'Inquiry received. Opening secure deposit checkout; enrollment is not yet submitted.'
-            : 'Application submitted successfully. Your application is now in the review workflow.',
+            : applicationIntent === 'enrollment' ? 'Enrollment activated. Opening your dashboard.' : 'Intake Application received. Your enrollment is not yet active.',
           ...(duplicateWarning ? { warning: duplicateWarning } : {}),
         });
         const ref = data.referenceNumber || '';
@@ -434,7 +434,7 @@ export default function StudentApplicationForm({
   if (result?.success) {
     return (
       <div className="rounded-xl border border-green-300 bg-white p-8 text-center sm:p-12">
-        <h3 className="text-2xl font-black text-slate-950">Application Submitted</h3>
+        <h3 className="text-2xl font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Enrollment Activated' : 'Intake Application Received'}</h3>
         <p className="mt-3 text-base text-slate-800">{result.message}</p>
         {result.warning && (
           <div className="mx-auto mt-4 max-w-md rounded-lg border border-amber-300 bg-amber-50 p-3 text-left text-sm text-amber-950">
@@ -618,7 +618,7 @@ export default function StudentApplicationForm({
           </div>
           <label className="flex items-start gap-3 rounded-xl border border-slate-300 p-4 text-sm font-semibold leading-6 text-slate-900">
             <input type="checkbox" checked={consentAcknowledged} onChange={(event) => setConsentAcknowledged(event.target.checked)} className="mt-1 h-5 w-5 shrink-0" />
-            <span>I certify that the information provided is accurate to the best of my knowledge. I authorize Elevate for Humanity to use this information for admissions, program placement, funding coordination, credential verification, and necessary communication with workforce or training partners involved in my enrollment. I understand that submitting an application does not guarantee admission or public funding.</span>
+            <span>I certify that the information provided is accurate to the best of my knowledge. I authorize Elevate for Humanity to use this information for admissions, program placement, funding coordination, credential verification, and necessary communication with workforce or training partners involved in my enrollment. {applicationIntent === 'enrollment' ? 'I understand that submitting this full application after verified payment activates my enrollment and dashboard. Required onboarding and any training placement must be completed before training begins.' : 'I understand that intake does not activate enrollment or a dashboard.'} Public funding is not guaranteed.</span>
           </label>
         </section>
       )}

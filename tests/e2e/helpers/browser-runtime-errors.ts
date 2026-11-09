@@ -60,14 +60,12 @@ export function isSettlingClientRead(
  * spurious abort report rather than a real access-control failure.
  *
  * WebKit reports a `pageError` in this format when an in-flight fetch is
- * superseded or abandoned during navigation. Three independent forms of
- * evidence prove the resource was not actually blocked:
+ * superseded or abandoned during navigation. Require independent evidence
+ * of a harmless abort instead of trusting the hostname. Even a same-origin
+ * request can fail due to redirects, response policy or transport errors:
  *
- *  1. The offending URL is same-origin with the page. A same-origin request
- *     cannot fail a cross-origin access-control check, so the message is always
- *     an abort artifact (e.g. a poll aborted on navigation).
- *  2. A paired `requestfailed` cancellation ("Load request cancelled").
- *  3. The exact URL completed with a 2xx response, scoped by the caller to the
+ *  1. A paired `requestfailed` cancellation ("Load request cancelled").
+ *  2. The exact URL completed with a 2xx response, scoped by the caller to the
  *     tracked read endpoints.
  *
  * Without any of this evidence the error stays a failure, so an actual CORS or
@@ -78,7 +76,6 @@ export function isConfirmedWebKitCancellation(
   requests: CancelledBrowserRequest[],
   browserName: string,
   completedRequests: CompletedBrowserRequest[] = [],
-  appOrigin = '',
 ): boolean {
   if (browserName !== 'webkit') return false;
   // WebKit puts the offending URL in the page error message (the stack is often
@@ -91,8 +88,6 @@ export function isConfirmedWebKitCancellation(
   )?.[1];
   if (!fragment) return false;
   const normalize = (value: string) => value.replace(/^https?:\/\//, '');
-  const appHost = hostOf(appOrigin);
-  if (appHost && fragment.split('/')[0].toLowerCase() === appHost) return true;
   const cancelled = requests.some(
     (request) =>
       normalize(request.url) === fragment &&

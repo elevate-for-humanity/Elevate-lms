@@ -107,24 +107,23 @@ it('requires recent exact successful notification GET evidence, not stale or unr
   expect(isConfirmedWebKitCancellation(reported, [], 'chromium', [good])).toBe(false);
 });
 
-// A same-origin resource cannot fail a cross-origin access-control check, so a
-// WebKit "access control checks" report for the app's own host is an abort
-// artifact — no paired cancellation or 2xx evidence is required.
-it('treats a same-origin WebKit access-control report as an abort artifact', () => {
+// Same-origin alone is not independent proof that a request succeeded. A
+// blocked/redirected response can still be reported as an access-control error.
+it('never waives a same-origin WebKit failure without matching evidence', () => {
   const app = 'https://lms.elevateforhumanity.org';
-  const sameOrigin = {
+  const url = app + '/api/notifications/preferences';
+  const reported = {
     message: '/lms.elevateforhumanity.org/api/notifications/preferences due to access control checks.',
     stack: '',
     time: 5000,
   };
-  expect(isConfirmedWebKitCancellation(sameOrigin, [], 'webkit', [], app)).toBe(true);
-  const crossOrigin = {
-    message: '/cuxzzpsyufcewtmicszk.supabase.co/auth/v1/user due to access control checks.',
-    stack: '',
-    time: 5000,
-  };
-  expect(isConfirmedWebKitCancellation(crossOrigin, [], 'webkit', [], app)).toBe(false);
-  expect(isConfirmedWebKitCancellation(sameOrigin, [], 'chromium', [], app)).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit')).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ url, status: 403, time: 4900 }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ url, status: 200, time: 0 }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ url: url + '/other', status: 200, time: 4900 }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ url, status: 200, time: 4900 }])).toBe(true);
+  expect(isConfirmedWebKitCancellation(reported, [{ url, errorText: 'Load request cancelled', time: 5001 }], 'webkit')).toBe(true);
+  expect(isConfirmedWebKitCancellation(reported, [], 'chromium', [{ url, status: 200, time: 4900 }])).toBe(false);
 });
 
 // The notification-preferences endpoint is a recurring poller; waiting for it to

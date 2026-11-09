@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Request as BrowserRequest } from '@playwright/test';
-import { isConfirmedWebKitCancellation, type CapturedBrowserError, type CancelledBrowserRequest, type CompletedBrowserRequest } from './helpers/browser-runtime-errors';
+import { isConfirmedWebKitCancellation, isTrackedClientRead, type CapturedBrowserError, type CancelledBrowserRequest, type CompletedBrowserRequest } from './helpers/browser-runtime-errors';
 const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
 const password = process.env.E2E_EMPLOYER_PASSWORD || '';
@@ -13,14 +13,13 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   const completedRequests: CompletedBrowserRequest[] = [];
   const pendingClientReads = new Set<BrowserRequest>();
   let lastClientReadActivity = Date.now();
-  const clientReadPaths = new Set(['/auth/v1/user', '/rest/v1/notifications']);
   const authOrigin = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://unused.invalid').origin;
+  const appOrigin = new URL(base).origin;
   const finishClientRead = (request: BrowserRequest) => {
     if (pendingClientReads.delete(request)) lastClientReadActivity = Date.now();
   };
   page.on('request', request => {
-    const url = new URL(request.url());
-    if (request.method() === 'GET' && url.origin === authOrigin && clientReadPaths.has(url.pathname)) {
+    if (isTrackedClientRead(request.url(), request.method(), authOrigin, appOrigin)) {
       pendingClientReads.add(request);
       lastClientReadActivity = Date.now();
     }
@@ -28,10 +27,9 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   page.on('requestfinished', finishClientRead);
   page.on('pageerror', (error) => runtimeErrors.push({ message: error.message, stack: error.stack, time: Date.now() }));
   page.on('response', (response) => {
-    // Record a successful read of the app's own auth origin so a spurious
-    // WebKit abort report can be distinguished from a real CORS failure.
-    const url = new URL(response.url());
-    if (url.origin === authOrigin && clientReadPaths.has(url.pathname)) {
+    // Playwright's production trace proved successful notification-preferences GETs
+    // despite WebKit page-error reports. Capture only these exact trusted reads.
+    if (isTrackedClientRead(response.url(), response.request().method(), authOrigin, appOrigin)) {
       completedRequests.push({ url: response.url(), status: response.status(), time: Date.now() });
     }
   });

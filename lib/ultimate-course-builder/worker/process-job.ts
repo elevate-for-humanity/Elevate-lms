@@ -15,6 +15,7 @@ import { runUltimateCourse } from '../core/full-course-runner';
 import type { UltimateCredentialProfile } from '../core/types';
 import { assertCompleteLesson } from '../core/lesson-contract';
 import { UltimateReleaseService } from '../release/release-service';
+import { ensureCourseAssessmentLesson } from '../release/course-assessment-lesson.mjs';
 import { nextCourseWork } from './course-cursor';
 import { resolveReleaseActor } from './release-actor';
 import { hydrateUltimateProfileSources } from '../core/course-profile';
@@ -333,6 +334,18 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
       assertActive();
+      // Guarantee a gradable assessment lesson before the course is released so
+      // learners are automatically graded. Idempotent; skips courses that
+      // already carry a graded assessment.
+      try {
+        const assessment = await ensureCourseAssessmentLesson(db, {
+          courseId: build.course_id, courseTitle: profile.title,
+        });
+        console.info('[UltimateWorker] course assessment lesson', { jobId: job.id, ...assessment });
+      } catch (error) {
+        console.error('[UltimateWorker] course assessment lesson failed', error);
+        throw error;
+      }
       await new UltimateReleaseService(db).publish(build.id, releaseActor, {jobId: job.id, workerId, generation});
     }
     if (targeted) {

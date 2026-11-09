@@ -28,6 +28,10 @@ export async function processPwaAlerts() {
           .maybeSingle();
         if (noticeError || !notification) throw Error('Notification details unavailable');
         const presentation = alertPresentation(notification, row.kind);
+        // Call/voicemail alerts must survive the lock screen and ring loudly.
+        const important = ['call', 'missed_call', 'voicemail'].includes(
+          String(notification.metadata?.alert_kind ?? row.kind ?? ''),
+        );
         const { data: preferences } = await db
           .from('pwa_alert_preferences')
           .select('sound,volume,profile:profiles!user_id(role)')
@@ -54,6 +58,9 @@ export async function processPwaAlerts() {
                     title: presentation.title,
                     silent: preferences?.sound === 'silent' || Number(preferences?.volume) === 0,
                     body: presentation.body,
+                    important,
+                    requireInteraction: important,
+                    ...(important ? { vibrate: [400, 200, 400, 200, 400] } : {}),
                     url:
                       row.kind === 'email'
                         ? ['admin', 'super_admin'].includes(profile?.role)

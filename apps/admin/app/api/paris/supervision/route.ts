@@ -27,12 +27,34 @@ export async function GET(req: NextRequest) {
   const repairs=await repairQuery;
   if (events.error || jobs.error) return NextResponse.json({identity:PARIS_IDENTITY,status:'unavailable',
     error:'PARIS could not read its durable supervision records.'}, {status:503});
+  // Aggregate repair counts so a silent stall is visible without reading rows:
+  // queued work with zero verified is the signature of the deadlock that went
+  // unnoticed for days.
+  const REPAIR_STATUSES = ['queued','dispatched','patching','validating','deploying','verifying','verified','blocked'];
+  const repairCounts = await Promise.all(
+    REPAIR_STATUSES.map((status) =>
+      db.from('paris_code_repairs').select('id', { head: true, count: 'exact' }).eq('status', status),
+    ),
+  );
+  const summary = Object.fromEntries(
+    REPAIR_STATUSES.map((status, index) => [status, repairCounts[index].count ?? 0]),
+  );
+  const inFlight = ['dispatched','patching','validating','deploying','verifying'].reduce(
+    (total, status) => total + (summary[status] ?? 0),
+    0,
+  );
+  const repairSummary = {
+    ...summary,
+    inFlight,
+    // Never report healthy while work waits and nothing is completing.
+    stalled: summary.queued > 0 && inFlight === 0 && summary.verified === 0,
+  };
   return NextResponse.json({identity:PARIS_IDENTITY,observedAt:new Date().toISOString(),
     status:events.data.length ? 'observed' : 'no_observations',
     coverage:{inference:'shared aiChat gateway',commands:'shared governed command executor',
       workflows:'API handlers using withApiAudit',courses:'canonical course queue monitor'},
     events:events.data,courses:jobs.data,
-    codeRepair:{available:!repairs.error&&!repairPolicy.error,policy:repairPolicy.data,repairs:repairs.data??[]},
+    codeRepair:{available:!repairs.error&&!repairPolicy.error,policy:repairPolicy.data,summary:repairSummary,repairs:repairs.data??[]},
     limits:['Recent failures are historical observations, not proof a service is still failing.',
       'Uninstrumented endpoints and external services are not covered.',
       'Code repair uses independent tests, bounded dispatch and exact deployment verification; protected failures remain blocked.']},

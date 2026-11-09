@@ -4,10 +4,9 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
 import {
   getHydratedOpenHandsConfig,
-  getOpenHandsLifecycle,
   sendOpenHandsMessage,
 } from '@/lib/devstudio/openhands/client';
-import { dispatchOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
+import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
@@ -123,9 +122,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'OpenHands start is not confirmed' }, { status: 409 });
     }
     try {
-      const lifecycle = await getOpenHandsLifecycle({
-        startTaskId: owned.startTaskId,
-        conversationId: owned.conversationId,
+      // Reconciliation persists the provider-issued conversation ID before
+      // a later follow-up can prove ownership against the canonical ledger.
+      const lifecycle = await refreshOpenHandsTask({
+        taskId: owned.taskId,
+        actorId: auth.userId,
       });
       return NextResponse.json({ success: true, provider: 'openhands', taskId: owned.taskId, lifecycle });
     } catch (error) {

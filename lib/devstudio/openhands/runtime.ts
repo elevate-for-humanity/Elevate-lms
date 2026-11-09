@@ -11,6 +11,7 @@ import {
 } from './client';
 import { verifyOpenHandsGitHubOutcome, type OpenHandsGitHubEvidence } from './github-verifier';
 import { loadOpenHandsReconciliationQueue } from './reconciliation-queue';
+import { mayAutoRetryOpenHandsTask } from './retry-authorization';
 
 export type OpenHandsDispatchInput = {
   actorId: string;
@@ -328,6 +329,9 @@ async function retryOpenHandsTask(input: {
   reasons: string[];
   attempt: number;
 }): Promise<void> {
+  if (!mayAutoRetryOpenHandsTask(input.task)) {
+    throw new Error('OPENHANDS_AUTO_RETRY_APPROVAL_REQUIRED');
+  }
   const db = await requireAdminClient();
   const taskInput =
     input.task.tool_input && typeof input.task.tool_input === 'object'
@@ -367,9 +371,8 @@ async function retryOpenHandsTask(input: {
     .update({
       attempts: attempt,
       status: 'running',
-      requires_approval: false,
-      approval_status: 'approved',
-      approval_reason: null,
+      // Keep the original, auditable approval decision intact. A retry
+      // must never manufacture an approval or clear an approval reason.
       error_message: null,
       completed_at: null,
       updated_at: new Date().toISOString(),
@@ -482,7 +485,8 @@ export async function reconcileOpenHandsTasks(
       if (
         refreshed.status === 'failed' &&
         evaluation?.status === 'FAIL_RETRYABLE' &&
-        attempts < maxAttempts
+        attempts < maxAttempts &&
+        mayAutoRetryOpenHandsTask(refreshed)
       ) {
         const nextAttempt = attempts + 1;
         const { data: claimed, error: claimError } = await db
@@ -495,6 +499,10 @@ export async function reconcileOpenHandsTasks(
           .eq('id', refreshed.id)
           .eq('status', 'failed')
           .eq('attempts', attempts)
+          // Atomic eligibility guard: an intervening approval change must
+          // prevent this worker from claiming a new external execution.
+          .eq('requires_approval', false)
+          .eq('approval_status', 'not_required')
           .select('id')
           .maybeSingle();
         if (claimError) throw claimError;

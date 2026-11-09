@@ -1,9 +1,10 @@
 vi.mock('@/components/communications/DashboardVideoCalls', () => ({ DashboardVideoCalls: () => null }));
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), handlers:{} as Record<string,(value?: any)=>void> }));
+const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), ringStart:vi.fn(), ringStop:vi.fn(), audioCleanup:vi.fn(), handlers:{} as Record<string,(value?: any)=>void> }));
 vi.mock('@/lib/phone/browser-client',()=>({createPhoneClient:mock.create,phoneDestination:(value:string)=>value}));
 vi.mock('@/lib/notifications/push-client',()=>({getPushNotificationClient:vi.fn()}));
+vi.mock('@/lib/notifications/audio-unlock',()=>({installAudioUnlock:()=>mock.audioCleanup,startRingtone:mock.ringStart,stopRingtone:mock.ringStop}));
 vi.mock('@/components/program-holder/ProgramHolderPhoneIntroduction',()=>({ProgramHolderPhoneIntroduction:()=>null}));
 import { ProgramHolderPhone } from '@/components/program-holder/ProgramHolderPhone';
 const data={readOnly:false,phoneNumber:'',system:{name:'Isolated fixture',timezone:'UTC',status:'active'},
@@ -14,6 +15,7 @@ const data={readOnly:false,phoneNumber:'',system:{name:'Isolated fixture',timezo
 let laterHeartbeat:(response:Response)=>void;
 let disconnectOk:boolean;
 beforeEach(()=>{
+  mock.ringStart.mockClear();mock.ringStop.mockClear();mock.audioCleanup.mockClear();
   mock.handlers={};disconnectOk=true;let heartbeats=0;
   mock.newCall.mockResolvedValue({id:'outbound-call'});
   mock.create.mockResolvedValue({on:(event:string,callback:any)=>{mock.handlers[event]=callback;},
@@ -30,6 +32,46 @@ beforeEach(()=>{
 afterEach(()=>{cleanup();vi.useRealTimers();vi.unstubAllGlobals();});
 async function connected(){render(<ProgramHolderPhone/>);await screen.findByRole('button',{name:'Disconnect'});}
 describe('phone connection lifecycle',()=>{
+  it('keeps the incoming ringtone active across the ringing state render and stops on answer or unmount',async()=>{
+    await connected();mock.ringStop.mockClear();
+    const call={id:'incoming',state:'ringing',direction:'inbound',playRingtone:vi.fn()};
+    await act(async()=>mock.handlers.call({call}));
+    expect(mock.ringStart).toHaveBeenCalledOnce();
+    expect(call.playRingtone).not.toHaveBeenCalled();
+    expect(mock.ringStop).not.toHaveBeenCalled();
+    await act(async()=>mock.handlers.call({call:{...call,state:'active'}}));
+    expect(mock.ringStop).toHaveBeenCalled();
+    mock.ringStop.mockClear();cleanup();
+    expect(mock.ringStop).toHaveBeenCalled();
+    expect(mock.audioCleanup).toHaveBeenCalledOnce();
+  });
+  it('preserves silent mode without starting either incoming ringtone',async()=>{
+    vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({...data,extension:{...data.extension,ringMode:'silent'}}));
+    await connected();
+    const playRingtone=vi.fn();
+    await act(async()=>mock.handlers.call({call:{id:'silent',state:'ringing',direction:'inbound',playRingtone}}));
+    expect(playRingtone).not.toHaveBeenCalled();
+    expect(mock.ringStart).not.toHaveBeenCalled();
+  });
+  it('stops shared ringing immediately when Ring muted is saved during an incoming call',async()=>{
+    await connected();
+    const stop=vi.fn();
+    await act(async()=>mock.handlers.call({call:{id:'ringing',state:'ringing',direction:'inbound',stopRingtone:stop}}));
+    mock.ringStop.mockClear();
+    vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({}));
+    fireEvent.click(screen.getByRole('button',{name:'Ring muted'}));
+    await screen.findByText('Incoming call sound is muted.');
+    expect(stop).toHaveBeenCalled();expect(mock.ringStop).toHaveBeenCalled();
+  });
+  it('stops shared ringing on Answer before the provider reports an active call',async()=>{
+    await connected();
+    const answer=vi.fn().mockResolvedValue(undefined);
+    await act(async()=>mock.handlers.call({call:{id:'answer',state:'ringing',direction:'inbound',stopRingtone:vi.fn(),answer}}));
+    mock.ringStop.mockClear();
+    fireEvent.click(screen.getByRole('button',{name:'Answer',exact:true}));
+    await waitFor(()=>expect(answer).toHaveBeenCalled());
+    expect(mock.ringStop).toHaveBeenCalled();
+  });
   it('keeps the administrator text and email actions on their actual portal routes',async()=>{
     render(<ProgramHolderPhone textsHref="/phone/texts" emailHref="/phone/email"/>);
     await screen.findByRole('button',{name:'Disconnect'});

@@ -10,6 +10,8 @@ type AudioContextCtor = typeof AudioContext;
 
 let context: AudioContext | null = null;
 let ringTimer: ReturnType<typeof setInterval> | null = null;
+let ringGeneration = 0;
+const activeTones = new Set<OscillatorNode>();
 
 function audioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
@@ -23,9 +25,9 @@ function audioContext(): AudioContext | null {
 
 /** Resume the shared context. Returns true only when it is actually running. */
 export async function unlockAudio(): Promise<boolean> {
-  const ctx = audioContext();
-  if (!ctx) return false;
   try {
+    const ctx = audioContext();
+    if (!ctx) return false;
     if (ctx.state === 'suspended') await ctx.resume();
     return ctx.state === 'running';
   } catch {
@@ -56,25 +58,43 @@ function beep(ctx: AudioContext, volume: number) {
   gain.gain.linearRampToValueAtTime(Math.min(1, Math.max(0, volume)), now + 0.02);
   gain.gain.linearRampToValueAtTime(0, now + 0.4);
   osc.connect(gain).connect(ctx.destination);
+  activeTones.add(osc);
+  osc.onended = () => {
+    activeTones.delete(osc);
+    osc.disconnect();
+    gain.disconnect();
+  };
   osc.start(now);
   osc.stop(now + 0.42);
 }
 
 /** Start a repeating ringtone. Safe to call when audio is not yet unlocked. */
 export function startRingtone(volume = 0.6): void {
+  stopRingtone();
+  const generation = ringGeneration;
   void unlockAudio().then((ok) => {
-    if (!ok) return;
+    if (!ok || generation !== ringGeneration) return;
     const ctx = audioContext();
     if (!ctx) return;
     beep(ctx, volume);
-    if (ringTimer) clearInterval(ringTimer);
-    ringTimer = setInterval(() => beep(ctx, volume), 1500);
+    ringTimer = setInterval(() => {
+      if (generation === ringGeneration) beep(ctx, volume);
+    }, 1500);
+  }).catch(() => {
+    if (generation === ringGeneration) stopRingtone();
   });
 }
 
 export function stopRingtone(): void {
+  // Invalidate an outstanding resume() before it can start a late ringtone.
+  ringGeneration += 1;
   if (ringTimer) {
     clearInterval(ringTimer);
     ringTimer = null;
   }
+  for (const tone of activeTones) {
+    try { tone.stop(); } catch { /* The tone may already have ended. */ }
+    tone.disconnect();
+  }
+  activeTones.clear();
 }

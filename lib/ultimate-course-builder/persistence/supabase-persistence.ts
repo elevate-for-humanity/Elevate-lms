@@ -1,4 +1,5 @@
 import {recoverCaptionCoverageInspection} from '../instructional/caption-coverage-repair.mjs';
+import {deriveSavedErrors} from './saved-errors.mjs';
 import { inheritCourseProductionPolicy } from '../core/production-policy.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
@@ -98,13 +99,28 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     // saved failure, never an unrelated or superseded historical observation.
     const savedRenderFailure = (steps ?? []).find((row: any) =>
       row.step === 'lesson_film_render' && row.state === 'failed');
-    const savedErrors = Array.isArray(lesson?.findings)
-      ? lesson.findings.filter((finding: any) => finding.severity === 'error') : [];
+    // The authoritative current finding lives on the failing step. Reading only
+    // lesson.findings (usually empty) meant the caption-coverage and teaching
+    // visibility recoveries never fired, so the media role repeated the same
+    // unchanged producer until its attempts ran out. Merge both, step first.
+    const savedErrors = deriveSavedErrors(steps, lesson);
     if (savedErrors.some((finding: any) => finding.code === 'REPAIR_PRODUCER_UNCHANGED')) {
-      const teachingRepair = recoverTeachingVisibilityRepair(artifacts, steps ?? [], savedErrors, currentEvidence);
+      const teachingRepair = recoverTeachingVisibilityRepair(
+        artifacts,
+        steps ?? [],
+        savedErrors.filter((finding: any) =>
+          finding.step === 'scene_construction' && finding.code === 'REPAIR_PRODUCER_UNCHANGED'),
+        currentEvidence,
+      );
       if (teachingRepair) artifacts.__repairState = teachingRepair;
     }
-    const captionInspection = recoverCaptionCoverageInspection(artifacts, steps ?? [], savedErrors, currentEvidence);
+    const captionInspection = recoverCaptionCoverageInspection(
+      artifacts,
+      steps ?? [],
+      savedErrors.filter((finding: any) =>
+        finding.step === 'synchronization' && finding.code === 'REPAIR_PRODUCER_UNCHANGED'),
+      currentEvidence,
+    );
     if (captionInspection) {
       artifacts.__repairState = captionInspection;
       if (!passed.some((row: any) => row.step === 'synchronization'))

@@ -14,6 +14,7 @@ test('known OpenHands correlation is resolved before any external start',()=>{
 test('an ambiguous prior start fails closed, never replays work',()=>{
  assert.match(source,/OPENHANDS_EXISTING_TASK_START_UNCONFIRMED/);
  assert.match(source,/OPENHANDS_CORRELATION_OWNERSHIP_MISMATCH/);
+ assert.match(source,/OPENHANDS_EXISTING_TASK_NOT_DISPATCHABLE/);
  assert.match(source,/existing\.user_id !== input\.actorId/);
  assert.match(source,/existing\.command !== input\.task/);
 });

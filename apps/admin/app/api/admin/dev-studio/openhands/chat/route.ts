@@ -1,29 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
+import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
 import {
   getHydratedOpenHandsConfig,
   getOpenHandsLifecycle,
   sendOpenHandsMessage,
-  startOpenHandsTask,
 } from '@/lib/devstudio/openhands/client';
+import { dispatchOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
+import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
+
+function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
+  return normalizeRoles([...effectiveRoles]).some(role =>
+    hasPermission(role, 'access_dev_tools'),
+  );
+}
 
 export async function POST(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
+  if (!canAccessDevTools(auth.effectiveRoles)) {
+    return NextResponse.json({ error: 'Admin dev-tool access required' }, { status: 403 });
+  }
 
   try {
     const body = await request.json();
     const message = typeof body?.message === 'string' ? body.message.trim() : '';
     const repository = typeof body?.repository === 'string' ? body.repository.trim() : undefined;
     const conversationId = typeof body?.conversationId === 'string' ? body.conversationId.trim() : '';
+    const taskId = typeof body?.taskId === 'string' ? body.taskId.trim() : '';
 
-    if (!message) {
-      return NextResponse.json({ error: 'message is required' }, { status: 400 });
-    }
+    if (!message) return NextResponse.json({ error: 'message is required' }, { status: 400 });
 
     const config = await getHydratedOpenHandsConfig();
     if (!config.configured) {
@@ -31,11 +41,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (conversationId) {
+      // A provider conversation ID is not an access token. Require the same
+      // authenticated owner and the exact persisted external conversation.
+      const task = await findOwnedOpenHandsTask({ actorId: auth.userId, taskId, conversationId });
+      if (!task) return NextResponse.json({ error: 'OpenHands task not found' }, { status: 404 });
+      if (!['running', 'queued'].includes(task.status)) {
+        return NextResponse.json({
+          error: 'This OpenHands task is not active; a new approved run is required',
+        }, { status: 409 });
+      }
       const result = await sendOpenHandsMessage(conversationId, message);
       return NextResponse.json({
         success: true,
         provider: 'openhands',
         apiVersion: 'v1',
+        taskId: task.taskId,
         conversationId,
         status: 'running',
         sandboxStatus: result.sandbox_status ?? null,
@@ -43,24 +63,30 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const start = await startOpenHandsTask({
-      message,
-      repository,
-      traceId: request.headers.get('x-correlation-id') || crypto.randomUUID(),
-      tags: ['chat'],
-    });
+    if (taskId) {
+      return NextResponse.json({ error: 'conversationId is required to continue a task' }, { status: 400 });
+    }
 
-    return NextResponse.json(
-      {
-        success: true,
-        provider: 'openhands',
-        apiVersion: 'v1',
-        startTaskId: start.id,
-        conversationId: start.app_conversation_id ?? null,
-        status: String(start.status).toUpperCase() === 'READY' ? 'running' : 'queued',
-      },
-      { status: 202 },
-    );
+    // Chat must create the same canonical task record as Admin engineering
+    // dispatch. Direct Cloud starts created unowned, untracked conversations.
+    const dispatched = await dispatchOpenHandsTask({
+      actorId: auth.userId,
+      task: message,
+      repository,
+      correlationId: request.headers.get('idempotency-key') ||
+        request.headers.get('x-correlation-id') ||
+        crypto.randomUUID(),
+      tenantId: null,
+    });
+    return NextResponse.json({
+      success: true,
+      provider: 'openhands',
+      apiVersion: 'v1',
+      taskId: dispatched.taskId,
+      startTaskId: dispatched.startTaskId,
+      conversationId: dispatched.conversationId ?? null,
+      status: dispatched.status,
+    }, { status: 202 });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'OpenHands chat failed' },
@@ -80,11 +106,28 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const startTaskId = url.searchParams.get('startTaskId');
   const conversationId = url.searchParams.get('conversationId');
+  const taskId = url.searchParams.get('taskId');
 
-  if (startTaskId || conversationId) {
+  if (taskId || startTaskId || conversationId) {
+    if (!canAccessDevTools(auth.effectiveRoles)) {
+      return NextResponse.json({ error: 'Admin dev-tool access required' }, { status: 403 });
+    }
+    const owned = await findOwnedOpenHandsTask({
+      actorId: auth.userId,
+      taskId: taskId ?? '',
+      startTaskId,
+      conversationId,
+    });
+    if (!owned) return NextResponse.json({ error: 'OpenHands task not found' }, { status: 404 });
+    if (!owned.startTaskId && !owned.conversationId) {
+      return NextResponse.json({ error: 'OpenHands start is not confirmed' }, { status: 409 });
+    }
     try {
-      const lifecycle = await getOpenHandsLifecycle({ startTaskId, conversationId });
-      return NextResponse.json({ success: true, provider: 'openhands', lifecycle });
+      const lifecycle = await getOpenHandsLifecycle({
+        startTaskId: owned.startTaskId,
+        conversationId: owned.conversationId,
+      });
+      return NextResponse.json({ success: true, provider: 'openhands', taskId: owned.taskId, lifecycle });
     } catch (error) {
       return NextResponse.json(
         { error: error instanceof Error ? error.message : 'OpenHands status lookup failed' },

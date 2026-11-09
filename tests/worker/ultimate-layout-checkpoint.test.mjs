@@ -1,3 +1,4 @@
+import {deriveSavedErrors} from '../../lib/ultimate-course-builder/persistence/saved-errors.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -8,8 +9,8 @@ import {instructionView,recoverTeachingVisibilityRepair} from '../../lib/ultimat
 import {inheritCourseProductionPolicy} from '../../lib/ultimate-course-builder/core/production-policy.mjs';
 const text=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/persistence/supabase-persistence.ts',import.meta.url),'utf8'),{mode:'transform'})
  .replace(/^import .*;\n/gm,'').replace('export class ','class ');
-const Persistence=new Function('currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair','recoverCaptionCoverageInspection','instructionView','recoverTeachingVisibilityRepair','inheritCourseProductionPolicy',text+'\nreturn UltimateSupabasePersistence;')(
- ()=>true,['standards_lock','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair,recoverCaptionCoverageInspection,instructionView,recoverTeachingVisibilityRepair,inheritCourseProductionPolicy);
+const Persistence=new Function('currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair','recoverCaptionCoverageInspection','instructionView','recoverTeachingVisibilityRepair','inheritCourseProductionPolicy','deriveSavedErrors',text+'\nreturn UltimateSupabasePersistence;')(
+ ()=>true,['standards_lock','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair,recoverCaptionCoverageInspection,instructionView,recoverTeachingVisibilityRepair,inheritCourseProductionPolicy,deriveSavedErrors);
 function db(layoutVersion){return {from:table=>{
  const value=table==='ultimate_lesson_builds'?{artifacts:{lesson_film_render:{render:{layoutVersion}}},findings:[]}:
   ['standards_lock','lesson_film_render','finished_media_qa'].map(step=>({step,state:'passed',artifacts:step==='lesson_film_render'?{render:{layoutVersion}}:{}}));

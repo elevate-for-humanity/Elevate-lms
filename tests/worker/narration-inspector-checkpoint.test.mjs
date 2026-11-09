@@ -4,10 +4,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {instructionView} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
+import {instructionView,recoverTeachingVisibilityRepair} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
+import {deriveSavedErrors} from '../../lib/ultimate-course-builder/persistence/saved-errors.mjs';
 import {measuredNarrationRepair} from '../../lib/ultimate-course-builder/instructional/narration-checkpoint-repair.mjs';
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/persistence/supabase-persistence.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import .*;\n/gm,'').replace('export class ','class ');
-const Persistence=new Function('instructionView','currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair','recoverCaptionCoverageInspection',source+';return UltimateSupabasePersistence;')(instructionView,value=>value?.certified===true,['standards_lock','synchronization','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair,recoverCaptionCoverageInspection);
+const Persistence=new Function('instructionView','currentEvidence','ULTIMATE_BUILD_STEPS','MIN_LESSON_VIDEO_SCENES','measuredNarrationRepair','recoverCaptionCoverageInspection','deriveSavedErrors','recoverTeachingVisibilityRepair',source+';return UltimateSupabasePersistence;')(instructionView,value=>value?.certified===true,['standards_lock','synchronization','lesson_film_render','finished_media_qa'],1,measuredNarrationRepair,recoverCaptionCoverageInspection,deriveSavedErrors,recoverTeachingVisibilityRepair);
 test('failed QA row retains measured repair when the lesson snapshot no longer contains QA',async()=>{
  const narration={certified:true,narration:{rate:'0%'}};
  const qa={source:'delivered-mp4',mediaSha256:'actual-film',pass:false,failures:['PACE_OUT_OF_RANGE'],metrics:{wordsPerMinute:{value:108,measured:true}}};

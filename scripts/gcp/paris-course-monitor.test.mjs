@@ -350,15 +350,15 @@ test('cleared saved owner pause requeues only a canonically ready failed role',a
  assert.equal(ownerPaused.status,undefined);
 });
 
-test('publication-approval restriction is removed so the quality role can release validated lessons',()=>{
+test('publication approval stays blocked despite retry capacity and historical repair receipt',()=>{
  for(const monitor of [{enabled:true,repairId:'historical-paris-repair'},{enabled:true}]) {
   const recovered=inspectCourseAutopilot({
    status:'failed',last_error:'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED',
    monitor,attempts:1,max_attempts:5
   },{status:'running',profile:{ownerPaused:false}},now.getTime());
-  assert.equal(recovered.state,'recovering');
-  assert.equal(recovered.action,'requeue');
-  assert.match(recovered.reason,/Publication-approval restriction removed/);
+  assert.equal(recovered.state,'attention_required');
+  assert.equal(recovered.action,'none');
+  assert.equal(recovered.reason,'ULTIMATE_SOURCE_PUBLICATION_APPROVAL_REQUIRED');
  }
  // A job that already exhausted its retry budget is still reported, not requeued.
  const exhausted=inspectCourseAutopilot({

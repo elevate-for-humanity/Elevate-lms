@@ -34,9 +34,9 @@ it('renders and grades the canonical saved lesson assessment returned by checkpo
  const canonical={id:'lesson',title:'Tool care',is_published:true,passing_score:80,
   quiz_questions:[{id:'saved-question',question:question.prompt,options:question.choices,
    correctAnswer:0,explanation:question.explanation}]};
- const build={id:'build',course_id:'course',profile:{competencies:[{id:'tool-care'}],canonicalLessonIds:{'tool-care':'lesson'}}};
+ const build={id:'build',course_id:'course',competencies:[{id:'tool-care'}],canonicalLessonIds:{'tool-care':'lesson'}};
  const db={from(table:string){const result={data:table==='ultimate_course_builds'?build:table==='course_lessons'?[canonical]:[],error:null};
-  const query={select:()=>query,eq:()=>query,order:()=>query,single:async()=>result,
+  const query={select:(fields:string)=>{if(table==='ultimate_course_builds')expect(fields).toContain('competencies:profile->competencies,canonicalLessonIds:profile->canonicalLessonIds');return query;},eq:()=>query,order:()=>query,single:async()=>result,
    then:(resolve:(value:typeof result)=>unknown)=>Promise.resolve(result).then(resolve)};
   return query;}};
  const page=await loadCheckpointPage(db,'build');

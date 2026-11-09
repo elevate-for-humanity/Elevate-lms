@@ -3,6 +3,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { startWorkspaceTrial } from '@/lib/workspace/start-workspace-trial';
 import { ensureTrialOwnerAccess } from '@/lib/workspace/ensure-trial-owner-access';
+import { resolveDemoProductEntitlement } from '@/lib/store/demo-product-entitlement.mjs';
 import { mergeSiteConfig, type TenantSiteConfigPatch } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig, TenantSiteProduct } from '@/lib/tenant/site-types';
 
@@ -208,6 +209,7 @@ export async function POST(request: NextRequest) {
 
   const state = object(demo.state);
   const industry = text(state.industry, 100) || 'Business Services';
+  const entitlement = resolveDemoProductEntitlement(demo.product_key);
   const trial = await startWorkspaceTrial({ organizationName, ownerEmail, ownerName, industry });
   if (trial.ok === false) {
     return NextResponse.json({ error: trial.error }, { status: typeof trial.status === 'number' ? trial.status : 500 });
@@ -219,6 +221,7 @@ export async function POST(request: NextRequest) {
     workspaceId: trial.workspaceId,
     ownerEmail,
     ownerName,
+    appSlug: entitlement.kind === 'individual_app' ? entitlement.appSlug : undefined,
     builderUrl: '/apps/website-builder',
     websiteMode: 'new',
     reference,

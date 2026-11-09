@@ -24,6 +24,8 @@ export type EnsureTrialOwnerAccessInput = {
   websiteMode?: 'new' | 'existing';
   existingUrl?: string | null;
   programs?: string | null;
+  /** Individual app the customer demoed, granted as its own 14-day trial. */
+  appSlug?: 'website-builder' | 'sam-gov' | 'grants';
   reference: string;
   source: 'managed_trial' | 'demo_conversion' | 'guided_setup';
   db?: AdminClient;
@@ -142,14 +144,17 @@ export async function ensureTrialOwnerAccess(
   if (tenantMembershipError) return fail('tenant_access_ready', 'Tenant access could not be provisioned.', tenantMembershipError);
   await recordStage(db, input.workspaceId, 'tenant_access_ready', input.source, input.reference).catch(() => {});
 
-  const builderTrial = await startAppTrial(authUser.id, 'website-builder', db);
-  if (builderTrial.status === 'error') return fail('entitlements_ready', 'Website Builder access could not be provisioned.');
+  // Grant the app the customer actually demoed. Website Builder is the default
+  // entry point, but a SAM.gov or Grants demo must receive that app's access.
+  const appSlug = input.appSlug ?? 'website-builder';
+  const appTrial = await startAppTrial(authUser.id, appSlug, db);
+  if (appTrial.status === 'error') return fail('entitlements_ready', `${appSlug} access could not be provisioned.`);
 
-  const effectiveSubscription = await syncIndividualAppSubscription(authUser.id, 'website-builder', db);
+  const effectiveSubscription = await syncIndividualAppSubscription(authUser.id, appSlug, db);
   if (!hasIndividualAppAccess(effectiveSubscription)) {
     const reason = effectiveSubscription?.access_reason === 'trial_expired'
-      ? 'Website Builder trial has expired. Choose a paid plan to continue.'
-      : 'Website Builder access is not active.';
+      ? `${appSlug} trial has expired. Choose a paid plan to continue.`
+      : `${appSlug} access is not active.`;
     return fail('entitlements_ready', reason);
   }
   await recordStage(db, input.workspaceId, 'entitlements_ready', input.source, input.reference).catch(() => {});

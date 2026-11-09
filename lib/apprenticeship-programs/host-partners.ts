@@ -325,7 +325,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialLabel: 'Contact / view shop photos',
   },
   {
-    slug: 'mesmerized-by-beauty-cosmetology-academy',
+    slug: 'mesmerized-by-beauty-cosmetology-academy-8420fefa',
     name: 'Mesmerized by Beauty Cosmetology Academy',
     city: 'Indianapolis',
     state: 'IN',

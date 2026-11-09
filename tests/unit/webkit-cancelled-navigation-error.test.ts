@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { isConfirmedWebKitCancellation } from '../e2e/helpers/browser-runtime-errors';
+import { isConfirmedWebKitCancellation, isTrackedClientRead } from '../e2e/helpers/browser-runtime-errors';
 const url = 'https://lms.elevateforhumanity.org/api/health/build-version';
 const error = { message: '/lms.elevateforhumanity.org/api/health/build-version due to access control checks.', stack: `Fetch API cannot load ${url} due to access control checks.\n at navigation`, time: 1000 };
 const cancelled = { url, errorText: 'Load request cancelled', time: 1001 };
@@ -81,3 +81,28 @@ it('does not use completed-request evidence for non-WebKit browsers', () => {
   expect(isConfirmedWebKitCancellation(authError, [], 'chromium', [completed])).toBe(false);
 });
 
+// Nov 9 iPhone-WebKit production trace: nine GET 200 responses for this exact
+// app notification route despite scheme-less WebKit access-control page errors.
+it('tracks only authorized exact GET read endpoints', () => {
+  const auth = 'https://cuxzzpsyufcewtmicszk.supabase.co';
+  const app = 'https://lms.elevateforhumanity.org';
+  expect(isTrackedClientRead(app + '/api/notifications/preferences', 'GET', auth, app)).toBe(true);
+  expect(isTrackedClientRead(auth + '/auth/v1/user', 'GET', auth, app)).toBe(true);
+  expect(isTrackedClientRead(auth + '/rest/v1/notifications?select=id', 'GET', auth, app)).toBe(true);
+  expect(isTrackedClientRead(app + '/api/notifications/preferences', 'POST', auth, app)).toBe(false);
+  expect(isTrackedClientRead('https://evil.example/api/notifications/preferences', 'GET', auth, app)).toBe(false);
+  expect(isTrackedClientRead(app + '/api/admin/users', 'GET', auth, app)).toBe(false);
+  expect(isTrackedClientRead(app + '/api/notifications/preferences/other', 'GET', auth, app)).toBe(false);
+  expect(isTrackedClientRead('not-a-url', 'GET', auth, app)).toBe(false);
+});
+
+it('requires recent exact successful notification GET evidence, not stale or unrelated 2xx', () => {
+  const url = 'https://lms.elevateforhumanity.org/api/notifications/preferences';
+  const reported = { message: '/lms.elevateforhumanity.org/api/notifications/preferences due to access control checks.', stack: '', time: 5000 };
+  const good = { url, status: 200, time: 4500 };
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [good])).toBe(true);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ ...good, status: 403 }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ ...good, time: 0 }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ ...good, url: url + '/other' }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'chromium', [good])).toBe(false);
+});

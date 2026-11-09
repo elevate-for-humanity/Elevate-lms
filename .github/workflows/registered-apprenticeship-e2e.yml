@@ -242,6 +242,7 @@ jobs:
           echo "::error::Production LMS never reached ready state"
           exit 1
       - name: Install dependencies
+        id: install-dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Require Supabase QA provisioning authority
         shell: bash
@@ -310,13 +311,13 @@ jobs:
           ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
         run: node scripts/gcp/production-acceptance.mjs verify
       - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
-        if: always()
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
       - name: Clean isolated Learner + Program Holder identities
-        if: always()
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Clean disposable Host Shop + Apprentice identities
-        if: always()
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
         run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Upload QA evidence
         if: always()

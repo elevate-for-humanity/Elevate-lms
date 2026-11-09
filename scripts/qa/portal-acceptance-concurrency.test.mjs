@@ -60,6 +60,19 @@ test('only the admitted test job owns concurrency and runs this regression befor
   assert.ok(check >= 0 && check < job.indexOf('Provision disposable Host Shop'));
 });
 
+test('cleanup cannot run before the dependency boundary that makes it executable', () => {
+  const install = job.slice(job.indexOf('- name: Install dependencies'), job.indexOf('- name: Require Supabase QA provisioning authority'));
+  assert.match(install, /id: install-dependencies/);
+  for (const name of [
+    'Clean Employer + Instructor + Staff + Case Manager + Admin identities',
+    'Clean isolated Learner + Program Holder identities',
+    'Clean disposable Host Shop + Apprentice identities',
+  ]) {
+    const step = job.slice(job.indexOf('- name: '+name)).split('\n      - name:')[0];
+    assert.match(step, /if: \$\{\{ always\(\) && steps\.install-dependencies\.outcome == 'success' \}\}/);
+  }
+});
+
 const mediaJob = workflow.slice(workflow.indexOf('\n  hvac-public-playback:'), workflow.indexOf('\n  production-authenticated-e2e:'));
 const mediaCondition = mediaJob.match(/^    if: (.+)$/m)?.[1];
 

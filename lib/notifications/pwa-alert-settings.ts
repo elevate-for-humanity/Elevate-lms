@@ -36,9 +36,12 @@ export function normalizeAlertSettings(input: any): PwaAlertSettings {
     result.inactive_days = Math.max(14, Math.min(90, input.inactive_days));
   return result;
 }
-export function alertKind(notification: any): 'email' | 'sign_in' | 'sign_out' | 'inactive' | null {
+export function alertKind(
+  notification: any,
+): 'email' | 'sign_in' | 'sign_out' | 'inactive' | 'call' | 'missed_call' | 'voicemail' | null {
   const kind = notification.metadata?.alert_kind;
-  if (['sign_in', 'sign_out', 'inactive'].includes(kind)) return kind;
+  if (['sign_in', 'sign_out', 'inactive', 'call', 'missed_call', 'voicemail'].includes(kind))
+    return kind;
   return String(notification.idempotency_key ?? '').startsWith('email:') ||
     notification.title === 'New interoffice email'
     ? 'email'
@@ -49,6 +52,9 @@ export const ALERT_PHRASES = {
   sign_in: 'Elevate, a student sign-in was recorded.',
   sign_out: 'Elevate, a student sign-out was recorded.',
   inactive: 'Elevate, a student needs an activity check.',
+  call: 'Elevate, you have an incoming call.',
+  missed_call: 'Elevate, you missed a call.',
+  voicemail: 'Elevate, you have a new voicemail.',
 };
 
 /** Sender and subject previews are explicitly requested; never include message bodies. */

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPushNotificationClient } from '@/lib/notifications/push-client';
+import { installAudioUnlock, startRingtone, stopRingtone } from '@/lib/notifications/audio-unlock';
 import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
 import { phonePresenceDisplay } from '@/lib/phone/presence-display';
@@ -153,6 +154,17 @@ export function ProgramHolderPhone({
   useEffect(() => {
     if (data) ringModeRef.current = data.extension.ringMode;
   }, [data]);
+
+  // Mobile browsers suspend WebAudio until a gesture; unlock on the first one so
+  // an inbound call can ring without the operator touching the phone first.
+  useEffect(() => installAudioUnlock(), []);
+
+  // Belt-and-braces: never leave a synthesized ringtone running once the call
+  // is answered, declined, missed, or the page is left.
+  useEffect(() => {
+    if (callState !== 'ringing') stopRingtone();
+    return () => stopRingtone();
+  }, [callState]);
 
   useEffect(() => {
     // Launcher shortcuts may arrive before the asynchronous phone data renders.
@@ -347,15 +359,19 @@ export function ProgramHolderPhone({
             } catch {
               // The visible incoming-call screen remains available if autoplay is blocked.
             }
+            // WebAudio fallback so a mobile PWA that blocked the SDK ringtone still rings.
+            startRingtone();
           }
           if (ringModeRef.current === 'vibrate') navigator.vibrate?.([350, 150, 350, 150, 700]);
         } else if (state === 'active') {
+          stopRingtone();
           callRef.current = call;
           setCallState('active');
           setMuted(false);
           setHeld(false);
           navigator.vibrate?.(0);
         } else if (state === 'hangup' || state === 'destroy' || state === 'purge') {
+          stopRingtone();
           if (callRef.current?.id === call.id) {
             callRef.current = null;
             setCallState('idle');

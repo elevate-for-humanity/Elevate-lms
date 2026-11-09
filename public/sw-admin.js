@@ -156,9 +156,10 @@ self.addEventListener('push', (event) => {
     silent: data.silent === true,
     icon: '/icon-192.png',
     badge: '/icon-96.png',
-    ...(data.silent === true ? {} : { vibrate: [100, 50, 100] }),
+    ...(data.silent === true ? {} : { vibrate: data.vibrate || [100, 50, 100] }),
     tag: data.tag || 'elevate-admin',
     renotify: true,
+    requireInteraction: data.requireInteraction === true || data.important === true,
     data: { url: data.url || '/', type: data.type },
     actions: data.actions || [],
   };

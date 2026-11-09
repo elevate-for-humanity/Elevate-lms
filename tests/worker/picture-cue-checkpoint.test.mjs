@@ -1,4 +1,3 @@
-import {deriveSavedErrors} from '../../lib/ultimate-course-builder/persistence/saved-errors.mjs';
 import test from 'node:test';
 import {deriveSavedErrors} from '../../lib/ultimate-course-builder/persistence/saved-errors.mjs';
 import assert from 'node:assert/strict';

@@ -48,11 +48,13 @@ test('creates one published final assessment lesson from the authored questions'
   const written = [];
   const db = {
     from(table) {
-      assert.equal(table, 'course_lessons');
       const q = {
         select() { return q; },
         eq() { return q; },
+        order() { return q; },
+        limit() { return q; },
         then(resolve) {
+          if (table === 'course_modules') return resolve({ data: [{ id: 'module-1', order_index: 1 }] });
           return resolve({
             data: [
               { id: 'l1', order_index: 1, lesson_type: 'lesson', content_json: { experience: { knowledgeChecks: [
@@ -75,7 +77,8 @@ test('creates one published final assessment lesson from the authored questions'
   assert.equal(result.created, true);
   assert.equal(result.questionCount, 5);
   assert.equal(written.length, 1);
-  assert.equal(written[0].lesson_type, 'final_exam');
+  assert.equal(written[0].lesson_type, "exam");
+  assert.equal(written[0].module_id, 'module-1');
   assert.equal(written[0].is_published, true);
   assert.equal(written[0].passing_score, 70);
   assert.equal(written[0].slug, 'course-assessment');
@@ -87,11 +90,16 @@ test('creates one published final assessment lesson from the authored questions'
 test('skips a course that already has a graded assessment', async () => {
   let upserted = false;
   const db = {
-    from() {
+    from(table) {
       const q = {
         select() { return q; },
         eq() { return q; },
-        then(resolve) { return resolve({ data: [{ id: 'q1', lesson_type: 'final_exam', order_index: 9 }] }); },
+        order() { return q; },
+        limit() { return q; },
+        then(resolve) {
+          if (table === 'course_modules') return resolve({ data: [{ id: 'module-1' }] });
+          return resolve({ data: [{ id: 'q1', lesson_type: 'exam', order_index: 9 }] });
+        },
         upsert() { upserted = true; return Promise.resolve({ error: null }); },
       };
       return q;
@@ -104,13 +112,18 @@ test('skips a course that already has a graded assessment', async () => {
 
 test('skips when there are too few authored questions to grade', async () => {
   const db = {
-    from() {
+    from(table) {
       const q = {
         select() { return q; },
         eq() { return q; },
-        then(resolve) { return resolve({ data: [lesson([
-          { id: 'q1', prompt: 'A', choices: ['1', '2'], correct: 0 },
-        ])] }); },
+        order() { return q; },
+        limit() { return q; },
+        then(resolve) {
+          if (table === 'course_modules') return resolve({ data: [{ id: 'module-1' }] });
+          return resolve({ data: [lesson([
+            { id: 'q1', prompt: 'A', choices: ['1', '2'], correct: 0 },
+          ])] });
+        },
         upsert() { throw new Error('must not write'); },
       };
       return q;

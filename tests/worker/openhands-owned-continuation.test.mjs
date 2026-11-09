@@ -37,7 +37,8 @@ test('new chat uses tracked dispatcher rather than unowned direct Cloud start', 
 test('all chat lifecycle reads require task ownership, not arbitrary external IDs', () => {
   const get = chat.slice(chat.indexOf('export async function GET('));
   assert.match(get, /findOwnedOpenHandsTask\(/);
-  assert.ok(get.indexOf('findOwnedOpenHandsTask(') < get.indexOf('getOpenHandsLifecycle('));
+  assert.ok(get.indexOf('findOwnedOpenHandsTask(') < get.indexOf('refreshOpenHandsTask('));
+  assert.match(get, /taskId: owned\.taskId/);
 });
 
 test('Admin agent status verifies ownership before mutating task reconciliation', () => {

@@ -31,6 +31,14 @@ body {
   body.admin-portal:has([aria-label='Mobile admin navigation']) {
     --elevate-pwa-bottom-offset: 5rem;
   }
+  /* On phones the software keyboard occupies the same bottom edge as the
+   * persistent dock. Hide the dock while editing instead of covering inputs,
+   * submit controls, and the keyboard's suggestion/accessory region.
+   * This does not affect desktop navigation or non-editing dashboard pages. */
+  body.admin-portal:has(:is(input:not([type='checkbox']):not([type='radio']), textarea, select, [contenteditable='true']):focus)
+    [aria-label='Mobile admin navigation'] {
+    display: none;
+  }
   /* Native focus and scroll-into-view must leave actions above the fixed dock. */
   html:has(body.admin-portal [aria-label='Mobile admin navigation']) {
     scroll-padding-block-end: calc(5rem + env(safe-area-inset-bottom));

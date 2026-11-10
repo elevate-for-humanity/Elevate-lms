@@ -121,3 +121,32 @@ it('reads every chunk of a long screen and waits at the activity', () => {
   }
   expect(voice.play).toHaveBeenCalledTimes(chunks.length);
 });
+
+it('allows writing in another available chapter without falsely marking an earlier chapter reviewed', async () => {
+  const fetchMock = vi.fn().mockResolvedValue(
+    new Response(JSON.stringify({ section_id: 'two', version: 1 }), { status: 200 }),
+  );
+  vi.stubGlobal('fetch', fetchMock);
+  render(
+    <DigitalWorkbook
+      accountId="learner"
+      workbook={book}
+      sections={[section, { ...section, id: 'two', section_number: 2, title: 'Refrigeration practice' }]}
+      responses={[]}
+      readOnly={false}
+    />,
+  );
+  fireEvent.change(screen.getByRole('combobox', { name: 'Choose a workbook section' }), {
+    target: { value: 'two' },
+  });
+  expect(screen.getByRole('heading', { name: '2. Refrigeration practice' })).toBeVisible();
+  fireEvent.change(screen.getByRole('textbox'), {
+    target: { value: 'My own practice answer for the later chapter' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Save answers' }));
+  await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+  expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
+    reviewed: false,
+    answers: { notes: 'My own practice answer for the later chapter' },
+  });
+});

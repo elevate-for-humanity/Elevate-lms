@@ -55,7 +55,7 @@ it('shows one section at a time and restores saved answers on reopening', async 
   );
   // Independent chapter drafts may be opened without clearing saved answers.
   // Saving chapter writing alone still does not grant a completed review.
-  expect(screen.getByRole('option', { name: /2\\. Study topic 2/ })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: '2. Study topic 2' })).toBeInTheDocument();
   fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
     target: { value: 'section-2' },
   });

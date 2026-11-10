@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useId, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useId, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './LearningWorkspace.module.css';
 
@@ -29,11 +29,20 @@ export default function LearningWorkspace({
 }) {
   const id = useId();
   const [view, setView] = useState(initialView);
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    if (!expanded) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setExpanded(false);
+    };
+    document.addEventListener('keydown', close);
+    return () => document.removeEventListener('keydown', close);
+  }, [expanded]);
   const [previewTarget, setPreviewTarget] = useState<HTMLDivElement | null>(null);
 
   return (
     <PreviewTarget.Provider value={previewTarget}>
-      <div className={`${styles.workspace} min-w-0`} data-learning-workspace data-view={view}>
+      <div className={`${styles.workspace} min-w-0`} data-learning-workspace data-view={view} data-expanded={expanded ? 'true' : 'false'}>
         <div
           className={`${styles.views} mb-4 gap-2`}
           role="group"
@@ -57,6 +66,19 @@ export default function LearningWorkspace({
                   : previewLabel}
             </button>
           ))}
+          <button
+            type="button"
+            aria-pressed={expanded}
+            onClick={() => {
+              setExpanded((previous) => !previous);
+              // Give the lesson video/illustration the full available canvas;
+              // keep the instruction editor mounted for lossless restoration.
+              if (!expanded) setView('preview');
+            }}
+            className="min-h-12 rounded-xl border border-teal-700 bg-white px-4 py-3 text-sm font-bold text-teal-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800"
+          >
+            {expanded ? 'Exit full screen' : 'Full screen lesson'}
+          </button>
         </div>
         <div className={`${styles.panels} grid min-w-0 items-start gap-6`}>
           <section

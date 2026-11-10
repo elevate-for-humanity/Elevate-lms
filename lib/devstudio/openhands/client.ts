@@ -32,6 +32,7 @@ export type OpenHandsConversation = {
 };
 
 export type OpenHandsLifecycle = {
+  // Normalized execution evidence only; provider records may contain credentials.
   status: OpenHandsLifecycleStatus;
   startTaskId?: string | null;
   conversationId?: string | null;
@@ -41,7 +42,6 @@ export type OpenHandsLifecycle = {
   branch?: string | null;
   prNumbers?: number[];
   error?: string | null;
-  raw?: unknown;
 };
 
 export type StartOpenHandsTaskInput = {
@@ -300,7 +300,6 @@ function lifecycleFromConversation(
     branch: conversation.selected_branch ?? null,
     prNumbers: normalizePrNumbers(conversation.pr_number),
     error: conversation.error ?? null,
-    raw: conversation,
   };
 }
 
@@ -327,7 +326,6 @@ export async function getOpenHandsLifecycle(input: {
         startTaskId: startTask.id,
         conversationId: startTask.app_conversation_id ?? null,
         error: startTask.error || 'OpenHands conversation startup failed',
-        raw: startTask,
       };
     }
     conversationId = startTask.app_conversation_id?.trim() || null;
@@ -335,7 +333,6 @@ export async function getOpenHandsLifecycle(input: {
       return {
         status: startStatus === 'READY' ? 'running' : 'queued',
         startTaskId: startTask.id,
-        raw: startTask,
       };
     }
   }

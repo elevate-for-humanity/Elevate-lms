@@ -339,9 +339,10 @@ export default async function CourseLandingPage({
             >
               <h2 className="text-xl font-bold">Your workbook is inside each lesson</h2>
               <p className="mt-2 leading-relaxed">
-                Start or continue the course above. The matching workbook chapter appears directly
-                below each lesson video. Complete and save its activities and chapter review before
-                finishing the lesson.
+                Start or continue the course above. In a lesson, select Workbook &amp; lesson
+                activities to open its matching chapter. Select Theory lesson &amp; video to return
+                to the full-width lesson, or use Split view to see both. Save the chapter activities
+                and review before finishing the lesson.
               </p>
               <Link
                 href="/workbooks/hvac-epa608-guided-practice"

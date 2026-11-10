@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getCurrentUser } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import CanonicalHvacCourseHome from './CanonicalHvacCourseHome';
+import { loadCourseActivity } from '@/lib/learner/course-activity';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Course',
@@ -71,6 +72,7 @@ export default async function HvacCoursePage() {
 
   let completedLessonIds: string[] = [];
   let totalTimeSeconds = 0;
+  let savedActivity: { assessmentsPassed: number; videosCompleted: number } | null = null;
   const user = await getCurrentUser();
 
   if (user) {
@@ -80,11 +82,15 @@ export default async function HvacCoursePage() {
       .eq('user_id', user.id)
       .eq('course_id', course.id);
 
-    if (!progressError && progress) {
-      completedLessonIds = progress
+    if (progressError) throw new Error('HVAC_PROGRESS_UNAVAILABLE');
+    const publishedIds = new Set((lessons ?? []).map(lesson => String(lesson.id)));
+    savedActivity = await loadCourseActivity(db, user.id, course.id, [...publishedIds]);
+    if (progress) {
+      const publishedProgress = progress.filter(row => publishedIds.has(String(row.lesson_id)));
+      completedLessonIds = publishedProgress
         .filter((row) => row.completed === true && row.lesson_id)
         .map((row) => String(row.lesson_id));
-      totalTimeSeconds = progress.reduce(
+      totalTimeSeconds = publishedProgress.reduce(
         (sum, row) => sum + Number(row.time_spent_seconds ?? 0),
         0,
       );
@@ -99,6 +105,7 @@ export default async function HvacCoursePage() {
       modules={moduleModels}
       completedLessonIds={completedLessonIds}
       totalTimeSeconds={totalTimeSeconds}
+      savedActivity={savedActivity}
     />
   );
 }

@@ -28,6 +28,7 @@ type Props = {
   modules: Module[];
   completedLessonIds: string[];
   totalTimeSeconds: number;
+  savedActivity?: { assessmentsPassed: number; videosCompleted: number } | null;
 };
 
 function lessonHref(courseId: string, lessonId: string) {
@@ -41,6 +42,7 @@ export default function CanonicalHvacCourseHome({
   modules,
   completedLessonIds,
   totalTimeSeconds,
+  savedActivity,
 }: Props) {
   const [query, setQuery] = useState('');
   const completed = useMemo(() => new Set(completedLessonIds), [completedLessonIds]);
@@ -85,7 +87,7 @@ export default function CanonicalHvacCourseHome({
             <span className="rounded-full bg-white/10 px-3 py-2">{lessons.length} lessons</span>
             <span className="rounded-full bg-white/10 px-3 py-2">EPA Section 608 preparation</span>
             <span className="rounded-full bg-white/10 px-3 py-2">
-              {Math.round(totalTimeSeconds / 3600)} tracked hours
+              {(totalTimeSeconds / 3600).toFixed(1)} hours of recorded lesson activity
             </span>
           </div>
 
@@ -98,6 +100,14 @@ export default function CanonicalHvacCourseHome({
               <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
             </div>
           </div>
+
+          {savedActivity ? (
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-200">
+              {savedActivity.assessmentsPassed} lesson assessments passed · {savedActivity.videosCompleted} lesson videos completed.
+              {' '}These results stay saved while you finish the matching workbook reviews and remaining activities.
+              {' '}Recorded lesson activity is separate from instructor-verified hands-on training hours.
+            </p>
+          ) : null}
 
           <div className="mt-7 flex flex-wrap gap-3">
             {nextLesson ? (

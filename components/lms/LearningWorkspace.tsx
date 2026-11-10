@@ -19,14 +19,16 @@ export default function LearningWorkspace({
   preview,
   instructionLabel = 'Instructions & activities',
   previewLabel = 'Lesson preview',
+  initialView = 'split',
 }: {
   instructions: ReactNode;
   preview: ReactNode;
   instructionLabel?: string;
   previewLabel?: string;
+  initialView?: 'split' | 'instructions' | 'preview';
 }) {
   const id = useId();
-  const [view, setView] = useState<'split' | 'instructions' | 'preview'>('split');
+  const [view, setView] = useState(initialView);
   const [previewTarget, setPreviewTarget] = useState<HTMLDivElement | null>(null);
 
   return (

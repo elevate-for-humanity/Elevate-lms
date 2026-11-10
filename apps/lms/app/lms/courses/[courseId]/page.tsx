@@ -200,6 +200,8 @@ export default async function CourseLandingPage({
   );
   const courseCover = getPrestigeCourseCover(course.id);
   const registeredContract = course.slug ? getRegisteredProgramStandard(course.slug) : null;
+  const courseWidth =
+    course.id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' ? 'w-full min-w-0' : 'mx-auto max-w-6xl';
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -209,7 +211,7 @@ export default async function CourseLandingPage({
         </div>
       ) : null}
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className={`${courseWidth} px-4 py-10 sm:px-6`}>
           {courseCover ? (
             <figure className="mb-5 max-w-24 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
               <Image
@@ -411,7 +413,7 @@ export default async function CourseLandingPage({
 
       {readiness.length > 0 ? (
         <section
-          className="mx-auto max-w-6xl px-4 pt-8 sm:px-6"
+          className={`${courseWidth} px-4 pt-8 sm:px-6`}
           aria-labelledby="course-readiness-heading"
         >
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -465,7 +467,7 @@ export default async function CourseLandingPage({
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-6xl space-y-5 px-4 py-8 sm:px-6">
+      <section className={`${courseWidth} space-y-5 px-4 py-8 sm:px-6`}>
         {publishedModules.map((module) => {
           const moduleLessons = syllabusLessons.filter((lesson) => lesson.module_id === module.id);
           return (

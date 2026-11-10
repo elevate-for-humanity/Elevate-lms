@@ -75,7 +75,7 @@ export default function CanonicalHvacCourseHome({
           className="-z-20 object-cover opacity-45"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/45" />
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="w-full min-w-0 px-4 py-14 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-300">HVAC Technician</p>
           <h1 className="mt-2 max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">{title}</h1>
           {description ? <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200">{description}</p> : null}
@@ -120,7 +120,7 @@ export default function CanonicalHvacCourseHome({
         </div>
       </section>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <main className="w-full min-w-0 px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8 max-w-2xl">
           <label htmlFor="hvac-course-search" className="mb-2 block text-sm font-semibold text-slate-800">
             Search this course

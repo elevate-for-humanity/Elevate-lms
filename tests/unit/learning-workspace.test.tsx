@@ -90,3 +90,25 @@ it('expands either panel and restores split view without losing state', () => {
   );
   expect(answer).toHaveValue('Saved practice');
 });
+
+it('opens a course at full width when requested and keeps activities available', () => {
+  const { container } = render(
+    <LearningWorkspace
+      initialView="preview"
+      instructionLabel="Workbook & lesson activities"
+      previewLabel="Theory lesson & video"
+      instructions={<textarea aria-label="Lesson answer" />}
+      preview={<video aria-label="Lesson film" />}
+    />,
+  );
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'preview',
+  );
+  expect(screen.getByRole('button', { name: 'Theory lesson & video' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Workbook & lesson activities' }));
+  expect(screen.getByRole('textbox', { name: 'Lesson answer' })).toBeInTheDocument();
+});

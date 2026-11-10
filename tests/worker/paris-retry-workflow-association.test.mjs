@@ -36,6 +36,6 @@ test('malformed attempt history is never erased to launch a new attempt',()=>{
 });
 test('the production compare-and-swap uses the new dispatch payload and reads the prior association',()=>{
  const code=readFileSync(new URL('../../lib/ai/runtime/code-repair.ts',import.meta.url),'utf8');
- assert.match(code,/select\('id,attempt_count,source_job_id,attempt_history,workflow_run_id'\)/);
+ assert.match(code,/select\('id,attempt_count,source_job_id,attempt_history,workflow_run_id,candidate'\)/);
  assert.match(code,/update\(repairDispatchValues\(pending\)\)\.eq\('id',pending.id\)\.eq\('status','queued'\)\.eq\('attempt_count',pending.attempt_count\)/);
 });

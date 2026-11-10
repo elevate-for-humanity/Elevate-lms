@@ -112,3 +112,23 @@ it('opens a course at full width when requested and keeps activities available',
   fireEvent.click(screen.getByRole('button', { name: 'Workbook & lesson activities' }));
   expect(screen.getByRole('textbox', { name: 'Lesson answer' })).toBeInTheDocument();
 });
+
+it('expands the complete lesson across the viewport and restores the same mounted player and answers', () => {
+  const { container } = render(
+    <LearningWorkspace
+      instructions={<textarea aria-label="Workbook answer" />}
+      preview={<video aria-label="Full lesson video" />}
+    />,
+  );
+  const textarea = screen.getByRole('textbox', { name: 'Workbook answer' });
+  const video = screen.getByLabelText('Full lesson video');
+  fireEvent.change(textarea, { target: { value: 'Unsubmitted saved work stays mounted' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Full screen lesson' }));
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-expanded', 'true');
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-view', 'preview');
+  expect(screen.getByLabelText('Full lesson video')).toBe(video);
+  fireEvent.keyDown(document, { key: 'Escape' });
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-expanded', 'false');
+  expect(screen.getByRole('textbox', { name: 'Workbook answer' })).toBe(textarea);
+  expect(textarea).toHaveValue('Unsubmitted saved work stays mounted');
+});

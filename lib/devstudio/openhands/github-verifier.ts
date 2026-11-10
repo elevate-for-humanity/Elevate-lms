@@ -78,6 +78,7 @@ export async function verifyOpenHandsGitHubOutcome(input: {
   repository?: string | null;
   branch?: string | null;
   prNumbers?: number[] | null;
+  startedAt?: string | null;
 }): Promise<OpenHandsGitHubEvidence> {
   const repository = normalizeRepo(input.repository);
   const token = await githubToken(repository);
@@ -107,6 +108,7 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         state: string;
         draft?: boolean;
         merged?: boolean;
+        created_at?: string;
         head?: { sha?: string; ref?: string };
         base?: { ref?: string };
       }>(`/repos/${repository}/pulls/${number}`, token);
@@ -132,6 +134,13 @@ export async function verifyOpenHandsGitHubOutcome(input: {
       // When OpenHands supplied a branch, the PR must actually use it.
       if (input.branch && pr.head?.ref !== input.branch) {
         reasons.push(`PR #${number} head does not match the OpenHands branch.`);
+        continue;
+      }
+      // Only evidence created after the canonical task started may establish completion.
+      const startedAt = input.startedAt ? Date.parse(input.startedAt) : NaN;
+      const prCreatedAt = pr.created_at ? Date.parse(pr.created_at) : NaN;
+      if (!Number.isFinite(startedAt) || !Number.isFinite(prCreatedAt) || prCreatedAt < startedAt) {
+        reasons.push(`PR #${number} predates the task or has no trustworthy creation timestamp.`);
         continue;
       }
       const changedFiles = files.map((file) => file.filename).filter((name): name is string => Boolean(name));

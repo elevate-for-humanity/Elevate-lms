@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {prepareOpenHandsRepair, parisRepairEngine, assertOpenHandsRepairDiff, assertOpenHandsBlobReadback} from '../../lib/devstudio/paris-openhands-repair.mjs';
+import {prepareOpenHandsRepair, parisRepairEngine, openHandsRepairPrompt, assertOpenHandsRepairDiff, assertOpenHandsBlobReadback} from '../../lib/devstudio/paris-openhands-repair.mjs';
 import {classifyParisPhaseError} from '../../lib/devstudio/paris-phase-error.mjs';
 
 const input = {repairId: '11111111-1111-4111-8111-111111111111', actorId: 'owner', attempt: 1, runId: 12, goal: 'Correct the confirmed layout bug.'};
@@ -49,6 +49,11 @@ test('new PARIS repairs select OpenHands while an internal checkpoint retains it
   assert.equal(parisRepairEngine(null), 'openhands');
   assert.equal(parisRepairEngine({kind: 'openhands-checkpoint'}), 'openhands');
   assert.equal(parisRepairEngine({kind: 'planner-checkpoint', checkpoint: {writes: 2}}), 'internal');
+});
+test('external task diagnostics retain the defect and log URL while removing credentials and signed query strings',()=>{
+ const text=openHandsRepairPrompt({...input,branch:'studio/repair',baseSha:base,
+  goal:'Fix layout. Bearer private-fixture-token api_key=private-fixture-key "token": "private-fixture-json" https://example.test/logs?signature=private-fixture-signature'});
+ assert.match(text,/Fix layout/);assert.match(text,/example.test\/logs/);assert.doesNotMatch(text,/private-fixture/);
 });
 test('OpenHands failures expose only exact safe state codes and retain approval and ambiguous-start distinctions', () => {
   for (const [message, status] of [['PARIS_OPENHANDS_APPROVAL_REQUIRED',403], ['PARIS_OPENHANDS_START_UNCONFIRMED',409],

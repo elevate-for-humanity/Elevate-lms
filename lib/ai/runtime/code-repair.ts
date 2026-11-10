@@ -266,8 +266,11 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
       courseDefectDisposition({source:source.data,latest:latest.data,build:build.data})==='repair';
     },
     record:async(verification:any)=>{
-     const saved=await owned({verification,updated_at:new Date().toISOString()});
+     // A stale compare-and-swap may update zero rows without a database error.
+     // Read back the affected row before reporting a recorded observation.
+     const saved=await owned({verification,updated_at:new Date().toISOString()}).select('id').maybeSingle();
      if(saved.error)throw saved.error;
+     if(!saved.data?.id)throw Error('PARIS_OPENHANDS_OBSERVATION_LOST_CAS');
     },
     claim:async(values:any)=>{
      const saved=await owned(values).select('id').maybeSingle();

@@ -9,6 +9,9 @@ const source=stripTypeScriptTypes(await readFile(new URL('../lib/devstudio/paris
 const start=source.indexOf('async function rejectedReadFeedback(');
 assert.ok(start>=0);
 const helper=source.slice(start,source.indexOf('async function writeFile(',start));
+// Execute the same guard body when it is shared as a module export. A dynamic
+// Function fixture cannot parse ESM export syntax; path restrictions stay real.
+const pathGuard=source.slice(source.indexOf('function normalizePath('),source.indexOf('async function githubHeaders(')).replace(/^export\s+/gm,'');
 function fixture({protectedPath=false,results=[]}={}) {
  const calls=[];
  const feedback=new Function('blockedPath','listDirectory','rejectedSourceRead',helper+';return rejectedReadFeedback;')(
@@ -59,7 +62,6 @@ test('planner records recovered directory evidence in durable observations',()=>
 });
 
 test('empty content searches can suggest real task-branch paths without exposing protected files',()=>{
- const pathGuard=source.slice(source.indexOf('function normalizePath('),source.indexOf('async function githubHeaders('));
  const selector=source.slice(source.indexOf('function suggestedSourcePaths('),source.indexOf('function parseAction('));
  const suggest=new Function('rankSourcePaths',pathGuard+selector+';return suggestedSourcePaths;')(rankSourcePaths);
  const tree=['lib/ai/chat.ts','lib/ai/providers/elevate.ts','lib/ai/auth/chat.ts','.env','lib/ai/github-token.ts'].map(path=>({type:'blob',path}));
@@ -68,7 +70,6 @@ test('empty content searches can suggest real task-branch paths without exposing
 });
 
 test('real fallback keeps a refined diagnostic query ahead of broad task words and stale inventory',async()=>{
- const pathGuard=source.slice(source.indexOf('function normalizePath('),source.indexOf('async function githubHeaders('));
  const selector=source.slice(source.indexOf('function suggestedSourcePaths('),source.indexOf('function parseAction('));
  const start=source.indexOf("      if (action.type === 'search') {",source.indexOf('export async function stageParisCodeRepair'));
  const end=source.indexOf("      if (action.type === 'read' || action.type === 'list')",start);

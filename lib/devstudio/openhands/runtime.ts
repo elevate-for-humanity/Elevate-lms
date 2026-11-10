@@ -17,8 +17,10 @@ export type OpenHandsDispatchInput = {
   actorId: string;
   task: string;
   repository?: string | null;
+  branch?: string | null;
   correlationId?: string | null;
   tenantId?: string | null;
+  maxAttempts?: number;
 };
 
 export type OpenHandsDispatchResult = {
@@ -102,6 +104,10 @@ async function attachStartTask(
 export async function dispatchOpenHandsTask(
   input: OpenHandsDispatchInput,
 ): Promise<OpenHandsDispatchResult> {
+  const maxAttempts = input.maxAttempts ?? 3;
+  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 3) {
+    throw new Error('OPENHANDS_ATTEMPT_LIMIT_INVALID');
+  }
   const db = await requireAdminClient();
   const existing = await findExistingTask(input.correlationId);
   // Never issue a second Cloud conversation for a previously recorded
@@ -110,6 +116,7 @@ export async function dispatchOpenHandsTask(
     if (existing.tool_name !== 'openhands.execute' ||
         existing.user_id !== input.actorId ||
         (existing.tenant_id ?? null) !== (input.tenantId ?? null) ||
+        (existing.tool_input?.branch ?? null) !== (input.branch ?? null) ||
         existing.command !== input.task) {
       throw new Error('OPENHANDS_CORRELATION_OWNERSHIP_MISMATCH');
     }
@@ -169,9 +176,9 @@ export async function dispatchOpenHandsTask(
         trace_id: input.correlationId ?? null,
         correlation_id: input.correlationId ?? null,
         tool_name: 'openhands.execute',
-        tool_input: { task: input.task, repository: input.repository ?? null },
+        tool_input: { task: input.task, repository: input.repository ?? null, branch: input.branch ?? null },
         attempts: 1,
-        max_attempts: 3,
+        max_attempts: maxAttempts,
         timeout_ms: 3_600_000,
         started_at: now,
         updated_at: now,
@@ -201,6 +208,7 @@ export async function dispatchOpenHandsTask(
   const start = await startOpenHandsTask({
     message: input.task,
     repository: input.repository,
+    branch: input.branch,
     traceId: input.correlationId,
     taskId,
     tags: ['engineering'],
@@ -363,6 +371,7 @@ async function retryOpenHandsTask(input: {
   const start = await startOpenHandsTask({
     message: retryMessage,
     repository,
+    branch: typeof taskInput.branch === 'string' ? taskInput.branch : null,
     traceId: input.task.correlation_id ?? input.task.trace_id ?? null,
     taskId: input.task.id,
     tags: ['engineering', 'verification-repair', `attempt-${attempt}`],

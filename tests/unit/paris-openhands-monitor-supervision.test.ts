@@ -40,6 +40,16 @@ it('actual signed monitor records pending provider evidence without dispatching 
  expect(h.updates[0].values.attempt_count).toBeUndefined();
  expect(vi.mocked(fetch).mock.calls.every(([,init])=>!init?.method||init.method==='GET')).toBe(true);
 });
+it('refuses to report a provider observation when the guarded database write loses its CAS',async()=>{
+ h.lose=true;
+ await expect(tickParisCodeRepairs({workflowOwnedDispatch:true})).rejects.toThrow('PARIS_OPENHANDS_OBSERVATION_LOST_CAS');
+ expect(h.observations).toBe(1);
+ expect(h.updates).toHaveLength(1);
+ expect(h.updates[0].eqs).toEqual(expect.arrayContaining([
+  ['id',h.repair.id],['status','blocked'],['actor_id','owner'],['workflow_run_id',12],
+  ['attempt_count',1],['updated_at',h.repair.updated_at],
+ ]));
+});
 it('actual monitor claims completed output with owner/run/state/attempt/version fencing before requesting validation',async()=>{
  h.mode='ready';expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:h.repair.id});
  const write=h.updates[0];expect(write.eqs).toEqual(expect.arrayContaining([

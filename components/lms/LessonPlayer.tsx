@@ -464,7 +464,12 @@ export default function LessonPlayer({
   /* Video player */
 
   return (
-    <div ref={containerRef} className="w-full" onMouseMove={resetControlsTimer}>
+    <div
+      ref={containerRef}
+      className="w-full"
+      onPointerMove={resetControlsTimer}
+      onFocusCapture={resetControlsTimer}
+    >
       <div className="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
         <div className="relative aspect-video">
           <video
@@ -605,7 +610,7 @@ export default function LessonPlayer({
           {/* Controls overlay */}
           {hasStarted && !ended && (
             <div
-              className={`absolute bottom-0 left-0 right-0 bg-black/60 px-3 pb-2 pt-4 transition-opacity duration-300 sm:px-5 sm:pb-3 ${
+              className={`absolute bottom-0 left-0 right-0 bg-black/60 px-3 pb-2 pt-4 transition-opacity duration-300 sm:px-5 sm:pb-3 [@media(hover:none)]:opacity-100 [@media(hover:none)]:pointer-events-auto focus-within:opacity-100 focus-within:pointer-events-auto ${
                 showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
               onClick={(e) => e.stopPropagation()}
@@ -616,7 +621,7 @@ export default function LessonPlayer({
                   <button
                     type="button"
                     onClick={ended ? restart : togglePlay}
-                    className="rounded-full p-1.5 text-slate-900/80 transition hover:bg-white/10 hover:text-slate-900"
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                     aria-label={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (
@@ -628,7 +633,7 @@ export default function LessonPlayer({
                   <button
                     type="button"
                     onClick={() => skip(-10)}
-                    className="hidden rounded-full p-1.5 text-slate-900/60 transition hover:bg-white/10 hover:text-slate-900 sm:block"
+                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:inline-flex"
                     aria-label="Back 10 seconds"
                   >
                     <SkipBack className="h-4 w-4" />
@@ -636,7 +641,7 @@ export default function LessonPlayer({
                   <button
                     type="button"
                     onClick={() => skip(10)}
-                    className="hidden rounded-full p-1.5 text-slate-900/60 transition hover:bg-white/10 hover:text-slate-900 sm:block"
+                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:inline-flex"
                     aria-label="Forward 10 seconds"
                   >
                     <SkipForward className="h-4 w-4" />
@@ -644,7 +649,7 @@ export default function LessonPlayer({
                   <button
                     type="button"
                     onClick={toggleMute}
-                    className="rounded-full p-1.5 text-slate-900/60 transition hover:bg-white/10 hover:text-slate-900"
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                     aria-label={muted ? 'Unmute' : 'Mute'}
                   >
                     {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
@@ -662,7 +667,7 @@ export default function LessonPlayer({
                   <button
                     type="button"
                     onClick={toggleFullscreen}
-                    className="rounded-full p-1.5 text-slate-900/60 transition hover:bg-white/10 hover:text-slate-900"
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                     aria-label="Fullscreen"
                   >
                     {isFullscreen ? (

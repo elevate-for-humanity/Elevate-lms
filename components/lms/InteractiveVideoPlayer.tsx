@@ -470,17 +470,15 @@ export default function InteractiveVideoPlayer({
   }, [videoUrl]);
 
   const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        syncAudioOutput();
-        void videoRef.current.play().then(
-          () => {},
-          () => {},
-        );
-      }
-      setIsPlaying(!isPlaying);
+    const media = videoRef.current;
+    if (!media || showQuiz || activeCheckpoint) return;
+    if (!media.paused) {
+      media.pause();
+    } else {
+      syncAudioOutput();
+      // onPlay/onPause own the icon state. A rejected mobile play request
+      // must not leave a Pause icon on media that never started.
+      void media.play().catch(() => setIsPlaying(false));
     }
   };
 
@@ -873,7 +871,7 @@ export default function InteractiveVideoPlayer({
             onContextMenu={event => event.preventDefault()}
             crossOrigin={captionsUrl ? 'anonymous' : undefined}
             aria-label={title}
-            className="w-full aspect-video"
+            className="w-full aspect-video object-contain bg-black"
             controls
             preload="metadata"
             playsInline
@@ -1111,7 +1109,7 @@ export default function InteractiveVideoPlayer({
 
         {/* Video Controls */}
         {showPlayerChrome && (
-          <div className="absolute bottom-0 left-0 right-0    p-4">
+          <div data-lesson-playback-controls className="relative bg-slate-950 p-3 sm:p-4">
             {/* Progress Bar */}
             <div className="mb-4">
               <input
@@ -1150,11 +1148,11 @@ export default function InteractiveVideoPlayer({
             </div>
 
             {/* Control Buttons */}
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-white">
+              <div className="flex min-w-0 flex-wrap items-center gap-1 sm:gap-3">
                 <button
                   onClick={togglePlay}
-                  className="hover:text-brand-blue-400"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   aria-label={
                     isPlaying ? LMS_VIDEO_CONTROL_LABELS.pause : LMS_VIDEO_CONTROL_LABELS.play
                   }
@@ -1164,7 +1162,7 @@ export default function InteractiveVideoPlayer({
 
                 <button
                   onClick={() => skip(-10)}
-                  className="hover:text-brand-blue-400"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   aria-label={LMS_VIDEO_CONTROL_LABELS.skipBack}
                 >
                   <SkipBack className="w-5 h-5" />
@@ -1172,7 +1170,7 @@ export default function InteractiveVideoPlayer({
 
                 <button
                   onClick={() => skip(10)}
-                  className="hover:text-brand-blue-400"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   aria-label={LMS_VIDEO_CONTROL_LABELS.skipForward}
                 >
                   <SkipForward className="w-5 h-5" />
@@ -1181,7 +1179,7 @@ export default function InteractiveVideoPlayer({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleMute}
-                    className="hover:text-brand-blue-400"
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                     aria-label={
                       isMuted ? LMS_VIDEO_CONTROL_LABELS.unmute : LMS_VIDEO_CONTROL_LABELS.mute
                     }
@@ -1196,16 +1194,16 @@ export default function InteractiveVideoPlayer({
                     step="0.1"
                     value={volume}
                     onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                    className="w-20 h-1"
+                    className="hidden h-5 w-20 sm:block"
                   />
                 </div>
 
-                <span className="text-sm">
+                <span className="whitespace-nowrap text-xs sm:text-sm">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex min-w-0 flex-wrap items-center gap-1 sm:gap-3">
                 <select
                   aria-label={LMS_VIDEO_CONTROL_LABELS.playbackSpeed}
                   value={playbackRate}
@@ -1214,7 +1212,7 @@ export default function InteractiveVideoPlayer({
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
                   ) => changePlaybackRate(parseFloat(e.target.value))}
-                  className="bg-transparent border border-slate-600 rounded px-2 py-2 text-sm"
+                  className="min-h-11 rounded border border-slate-600 bg-slate-900 px-2 py-2 text-sm"
                 >
                   <option value="0.5">0.5x</option>
                   <option value="0.75">0.75x</option>
@@ -1226,7 +1224,7 @@ export default function InteractiveVideoPlayer({
 
                 <button
                   onClick={() => setShowCaptions(!showCaptions)}
-                  className={`hover:text-brand-blue-400 ${showCaptions ? 'text-brand-blue-400' : ''}`}
+                  className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${showCaptions ? 'text-brand-blue-400' : 'text-white'}`}
                   aria-label={
                     showCaptions
                       ? LMS_VIDEO_CONTROL_LABELS.captionsOn
@@ -1239,7 +1237,7 @@ export default function InteractiveVideoPlayer({
 
                 <button
                   onClick={toggleFullscreen}
-                  className="hover:text-brand-blue-400"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   aria-label={LMS_VIDEO_CONTROL_LABELS.fullscreen}
                 >
                   <Maximize className="w-5 h-5" />

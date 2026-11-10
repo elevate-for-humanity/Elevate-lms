@@ -15,6 +15,7 @@ if (!supabaseUrl || !serviceRoleKey) {
 const db = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const runId = String(process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-portal-e2e-${runId}`;
+const QA_HVAC_COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 
 function password() { return `Qa!${randomBytes(18).toString('base64url')}9x`; }
 async function must(resultPromise, label) { const result = await resultPromise; if (result.error) throw new Error(`${label}: ${result.error.message}`); return result.data; }
@@ -30,9 +31,26 @@ async function createQaUser(kind, role, fullName, tenantId) {
 async function provision() {
   const anchor = await must(db.from('programs').select('organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(), 'load tenant anchor');
   if (!anchor?.tenant_id) throw new Error('Canonical tenant anchor is missing');
-  let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null };
+  let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null };
   try {
     const learner = await createQaUser('learner', 'student', '[QA E2E] Learner', anchor.tenant_id); state.learner = learner;
+    // A disposable learner has real enrolled-course access for the live HVAC
+    // playback test. No real learner scores, hours or approvals are touched.
+    const hvac = await must(db.from('courses').select('id,program_id')
+      .eq('id', QA_HVAC_COURSE_ID).eq('is_active', true).maybeSingle(), 'verify published HVAC course');
+    if (!hvac?.program_id) throw new Error('Canonical active HVAC course unavailable for live QA');
+    const qaHvac = await must(db.from('program_enrollments').insert({
+      user_id: learner.id, student_id: learner.id, email: learner.email,
+      full_name: '[QA E2E] Learner', program_id: hvac.program_id, course_id: hvac.id,
+      program_slug: 'hvac-technician', status: 'active', enrollment_state: 'active',
+      funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
+      funding_verified: false, amount_paid_cents: 0,
+      source: 'qa-e2e', tenant_id: anchor.tenant_id,
+      training_start_date: new Date().toISOString().slice(0, 10),
+    }).select('id').single(), 'enroll isolated QA learner in HVAC playback course');
+    state.hvacEnrollmentId = qaHvac.id;
+    // Preserve the cleanup receipt even if later QA provisioning fails.
+    await writeFile(statePath, JSON.stringify(state, null, 2));
     const programHolder = await createQaUser('program-holder', 'program_holder', '[QA E2E] Program Holder', anchor.tenant_id); state.programHolder = programHolder;
     const qaProgram = await must(db.from('programs').insert({ slug: `${marker}-program`, title: '[QA E2E] Isolated Program Holder Program', name: '[QA E2E] Isolated Program Holder Program', category: 'qa', description: 'Disposable isolated program used only for responsive production QA.', is_active: false, published: false, status: 'draft', review_status: 'draft', tenant_id: anchor.tenant_id, organization_id: anchor.organization_id, funding_eligible: false, is_free: true, enrollment_state: 'closed' }).select('id,slug').single(), 'create isolated QA program'); state.qaProgramId = qaProgram.id;
     const holder = await must(db.from('program_holders').insert({ user_id: programHolder.id, organization_name: '[QA E2E] Isolated Program Holder', name: '[QA E2E] Program Holder', contact_name: '[QA E2E] Program Holder', contact_email: programHolder.email, status: 'approved', approved_at: new Date().toISOString(), mou_signed: true, mou_signed_at: new Date().toISOString(), mou_status: 'signed', is_using_internal_lms: true, payout_status: 'not_started', primary_program_id: qaProgram.id, teaches_multiple: false, features: { qa_e2e: true, qa_run_id: runId, isolated: true } }).select('id').single(), 'create isolated QA program holder'); state.holderId = holder.id;
@@ -49,6 +67,20 @@ async function provision() {
 
 async function cleanup() {
   let state; try { state = JSON.parse(await readFile(statePath, 'utf8')); } catch { console.log('No Learner/Program Holder QA state file found; nothing to clean up.'); return; }
+  if (state.learner?.id) {
+    // Playback stores QA events, never formal credits. Remove only this run's
+    // disposable learner rows before its profile and login are removed.
+    for (const table of ['video_playback_events','learner_video_progress']) {
+      const { error } = await db.from(table).delete().eq('user_id', state.learner.id);
+      if (error) throw new Error('QA playback cleanup failed for ' + table + ': ' + error.message);
+    }
+  }
+  if (state.hvacEnrollmentId) {
+    const { data, error } = await db.from('program_enrollments').delete()
+      .eq('id', state.hvacEnrollmentId).eq('user_id', state.learner.id).select('id');
+    if (error || data?.length !== 1)
+      throw new Error('QA HVAC enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
+  }
   if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
   if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);
   if (state.qaProgramId) await db.from('programs').delete().eq('id', state.qaProgramId);

@@ -149,3 +149,36 @@ test('the push dispatcher requires a healthy live version and a matching success
   await assert.rejects(execute(github,context,async()=>Response.json(health)),/must attest/);
   assert.equal(calls.length,0);
 });
+
+test('LMS course playback is not skipped by the Marketing-film admission gate', () => {
+  const marker = '- name: Verify authenticated HVAC course video playback and full-screen layout on devices';
+  const section = job.split(marker)[1]?.split('\n      - name:')[0];
+  assert.ok(section, 'Missing independent LMS playback step');
+  const condition = section.match(/^        if: \$\{\{ (.+) \}\}$/m)?.[1];
+  assert.ok(condition, 'Missing signed-release admission condition');
+  const check = context => Function('github','inputs','cancelled',
+    'return (' + condition + ');')(context.github, context.inputs, () => false);
+  const run = {
+    name:'Deploy LMS automatically on Google',
+    conclusion:'success',event:'workflow_dispatch',head_branch:'main',
+  };
+  assert.equal(check(event('workflow_run',run)),true);
+  assert.equal(check(event('workflow_dispatch',{},{
+    component:'lms',deployed_sha:'a'.repeat(40),deployment_run_id:'123',
+  })),true);
+  assert.equal(check(event('workflow_run',{...run,conclusion:'failure'})),false);
+  assert.equal(check(event('workflow_run',{...run,name:'Deploy Google Marketing on trigger'})),false);
+  assert.equal(check(event('workflow_dispatch',{},{
+    component:'marketing',deployed_sha:'a'.repeat(40),deployment_run_id:'123',
+  })),false);
+  assert.equal(check(event('workflow_dispatch',{},{
+    component:'lms',deployed_sha:'',deployment_run_id:'',
+  })),false);
+  assert.match(section,/EXPECTED_LMS_SHA:/);
+  assert.match(section,/hvac-live-lesson-playback\.spec\.ts/);
+  const learnerTest = readFileSync(new URL('../../tests/e2e/hvac-live-lesson-playback.spec.ts',import.meta.url),'utf8');
+  assert.doesNotMatch(learnerTest,/test\.skip\(/);
+  assert.match(learnerTest,/currentTime/);
+  assert.match(learnerTest,/videoWidth/);
+  assert.match(learnerTest,/data-expanded/);
+});

@@ -43,7 +43,9 @@ async function provision() {
       user_id: learner.id, student_id: learner.id, email: learner.email,
       full_name: '[QA E2E] Learner', program_id: hvac.program_id, course_id: hvac.id,
       program_slug: 'hvac-technician', status: 'active', enrollment_state: 'active',
-      funding_source: 'qa-e2e', source: 'qa-e2e', tenant_id: anchor.tenant_id,
+      funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
+      funding_verified: false, amount_paid_cents: 0,
+      source: 'qa-e2e', tenant_id: anchor.tenant_id,
       training_start_date: new Date().toISOString().slice(0, 10),
     }).select('id').single(), 'enroll isolated QA learner in HVAC playback course');
     state.hvacEnrollmentId = qaHvac.id;

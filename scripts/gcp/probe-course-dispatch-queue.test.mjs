@@ -8,7 +8,7 @@ test('probe reads both projection and filtered queue without launching or claimi
   calls.push(new URL(url));
   assert.equal(options.method,undefined);
   assert.match(url.searchParams.get('select'),/owner_paused:profile->>ownerPaused/);
-  return {ok:true,json:async()=>[{id:'job',build:{owner_paused:url.searchParams.has('build.profile->>ownerPaused')?'false':'true',active_pools:[]}}]};
+  return {ok:true,json:async()=>[{id:'job',build:{owner_paused:url.searchParams.has('build.profile->>ownerPaused')?'false':'true',active_pools:null}}]};
  }});
  assert.equal(calls.length,2);
  assert.equal(calls[0].searchParams.has('or'),false);
@@ -35,7 +35,7 @@ test('probe retries bounded transient timeouts and still validates both projecti
  const result=await probeCourseDispatchQueue({env,wait:async ms=>{waits.push(ms);},request:async()=>{
   requests++;
   if(requests===1)throw Object.assign(new Error('network timeout'),{name:'TimeoutError'});
-  return {ok:true,json:async()=>[{build:{owner_paused:requests===2?'true':'false',active_pools:[]}}]};
+  return {ok:true,json:async()=>[{build:{owner_paused:requests===2?'true':'false',active_pools:null}}]};
  }});
  assert.equal(requests,3);assert.deepEqual(waits,[500]);
  assert.equal(result.projectionVerified,true);assert.equal(result.pausedFilterVerified,true);
@@ -49,8 +49,8 @@ test('probe never turns persistent timeouts into a passing gate',async()=>{
  assert.equal(requests,3);assert.deepEqual(waits,[500,1000]);
 });
 
-test('probe rejects an active pool leaking through the coordinator anti-join',async()=>{
+for(const active_pools of [{id:'pool'},undefined,[]])test('probe requires a null one-to-one pool after the anti-join: '+JSON.stringify(active_pools),async()=>{
  await assert.rejects(probeCourseDispatchQueue({env,request:async()=>({ok:true,json:async()=>[
-  {build:{owner_paused:'false',active_pools:[{id:'pool'}]}}
+  {build:{owner_paused:'false',active_pools}}
  ]})}),/ACTIVE_POOL_FILTER_FAILED/);
 });

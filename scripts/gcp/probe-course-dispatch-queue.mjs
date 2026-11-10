@@ -45,7 +45,9 @@ export async function probeCourseDispatchQueue({env=process.env,request=fetch,
   const rows=await read(url);
   assert.ok(rows.every(row=>row.build.owner_paused===false || row.build.owner_paused==='false'),
    'COURSE_QUEUE_PAUSED_FILTER_FAILED');
-  assert.ok(rows.every(row=>Array.isArray(row.build.active_pools) && row.build.active_pools.length===0),
+  // build_id is UNIQUE in ultimate_autopilot_pools: PostgREST projects this
+  // inverse relationship as an object, or null after the active-pool anti-join.
+  assert.ok(rows.every(row=>row.build.active_pools===null),
    'COURSE_QUEUE_ACTIVE_POOL_FILTER_FAILED');
   eligible=rows.length;
   return {ok:true,json:async()=>[]};

@@ -4,7 +4,7 @@ import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
-import {failedCurrentReleases} from './deployment-repair-events.mjs';
+import {failedCurrentReleases,queuedWorkflowRepairTarget,queuedWorkflowRepairDisposition} from './deployment-repair-events.mjs';
 import {recordFailedRepairWorkflow,repairDispatchValues} from './repair-workflow-reconciliation.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
@@ -591,11 +591,13 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // Inspect a bounded page; disposition decisions preserve source evidence.
  // An ineligible source is a state/eligibility decision, never missing owner authorization.
  // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
-  const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history,workflow_run_id,candidate')
+ const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history,workflow_run_id,candidate,goal,verification')
   .eq('status','queued').order('created_at',{ascending:true}).limit(1000);
  if(queued.data?.length===1000)throw Error('PARIS_QUEUED_REPAIR_SCAN_LIMIT');
  if(queued.error)throw queued.error;
  let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown;workflow_run_id:number|null;candidate:unknown}|null=null;
+ let awaitingCurrentWorkflowEvidence=0;
+ const sourceRunCache=new Map<number,any>();
  for(const candidate of queued.data??[]){
   // The production CHECK constraint was reconciled by the reviewed
   // paris_bounded_context_retry_contract migration. The policy below is the
@@ -612,7 +614,28 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    if(limited.error)throw limited.error;
    continue;
   }
-  if(!candidate.source_job_id){pending=candidate;break;}
+  if(!candidate.source_job_id){
+   const target=queuedWorkflowRepairTarget(candidate.goal);
+   if(target){
+    if(!sourceRunCache.has(target.runId)){
+     try{sourceRunCache.set(target.runId,await gh(`/actions/runs/${target.runId}`));}
+     catch(error){if(error instanceof Error&&error.message==='PARIS_GITHUB_HTTP_404')sourceRunCache.set(target.runId,null);else throw error;}
+    }
+    const disposition=queuedWorkflowRepairDisposition(target,sourceRunCache.get(target.runId),releaseRuns,sha);
+    if(disposition.state==='awaiting-current-execution'){awaitingCurrentWorkflowEvidence++;continue;}
+    if(disposition.state!=='current-failure'){
+     // Historical evidence remains a blocked record, never a successful repair.
+     // A current failed execution already has its own canonical incident above.
+     const retained=await db.from('paris_code_repairs').update({status:'blocked',
+      error_code:disposition.state==='invalid-source'?'SOURCE_WORKFLOW_EVIDENCE_INVALID':'SOURCE_WORKFLOW_SUPERSEDED_NOT_REPAIR_VERIFIED',
+      verification:{...((candidate.verification??{}) as Record<string,unknown>),queuedWorkflowEvidence:disposition},updated_at:new Date().toISOString()})
+      .eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+     if(retained.error)throw retained.error;
+     continue;
+    }
+   }
+   pending=candidate;break;
+  }
   const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,status,last_error').eq('id',candidate.source_job_id).single();
   if(source.error)throw source.error;
   const latest=await db.from('ultimate_build_jobs').select('id,build_id,status').eq('build_id',source.data.build_id).eq('job_type',source.data.job_type).order('created_at',{ascending:false}).limit(1).maybeSingle();
@@ -630,7 +653,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
   if(blocked.error)throw blocked.error;
  }
- if(!pending)return {enabled:true,dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE'};
+ if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
  // New repairs use OpenHands; the local inference service is not an admission
  // dependency for that engine. Configuration permits an attempt, never proves
  // provider acceptance or a completed repair. Old planner checkpoints retain

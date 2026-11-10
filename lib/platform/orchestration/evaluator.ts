@@ -79,14 +79,21 @@ function hasDurableToolEvidence(tool: string, result: unknown): string | null {
 
   if (tool === 'openhands.execute') {
     const github = asRecord(record.github_verification);
-    const branch = asRecord(github?.branch);
     const pullRequests = Array.isArray(github?.pullRequests) ? github.pullRequests : [];
-    const repositoryEvidence = Boolean(
-      github?.verified === true &&
-      ((typeof branch?.sha === 'string' && branch.sha.length >= 7) || pullRequests.length > 0),
-    );
+    const verifiedPullRequest = pullRequests.some((item) => {
+      const pr = asRecord(item);
+      if (!pr || typeof pr.headSha !== 'string' || pr.headSha.length < 7) return false;
+      const files = Array.isArray(pr.changedFiles) ? pr.changedFiles : [];
+      const checks = Array.isArray(pr.checkRuns) ? pr.checkRuns : [];
+      return files.length > 0 && checks.length > 0 &&
+        checks.every((item) => {
+          const check = asRecord(item);
+          return check?.status === 'completed' && check?.conclusion === 'success';
+        }) && ['success', 'pending'].includes(String(pr.combinedStatus ?? ''));
+    });
+    const repositoryEvidence = github?.verified === true && verifiedPullRequest;
     return repositoryEvidence
-      ? 'Verified repository branch or pull request evidence was returned.'
+      ? 'Verified changed pull request and completed successful CI checks were returned.'
       : null;
   }
 

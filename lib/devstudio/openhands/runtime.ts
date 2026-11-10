@@ -117,6 +117,7 @@ export async function dispatchOpenHandsTask(
         existing.user_id !== input.actorId ||
         (existing.tenant_id ?? null) !== (input.tenantId ?? null) ||
         (existing.tool_input?.branch ?? null) !== (input.branch ?? null) ||
+        (existing.tool_input?.repository ?? null) !== (input.repository ?? null) ||
         existing.command !== input.task) {
       throw new Error('OPENHANDS_CORRELATION_OWNERSHIP_MISMATCH');
     }
@@ -572,6 +573,7 @@ export async function refreshOpenHandsTask(input: {
         repository: lifecycle.repository,
         branch: lifecycle.branch,
         prNumbers: lifecycle.prNumbers,
+        startedAt: task.started_at ?? task.created_at ?? null,
       });
     } catch (verificationError) {
       githubEvidence = {

@@ -262,6 +262,28 @@ jobs:
           node scripts/qa/require-portal-e2e-identities.mjs
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install chromium webkit --with-deps
+      # LMS lesson media and public Marketing films are different acceptance
+      # surfaces. The marketing-only hvac-public-playback matrix is deliberately
+      # skipped on LMS releases; this independent test certifies REAL authenticated
+      # playback of the published LMS video and learner full-screen layout.
+      # Provisioned QA credentials are mandatory: missing data FAILS, never skips.
+      - name: Verify authenticated HVAC course video playback and full-screen layout on devices
+        if: ${{ !cancelled() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms' && inputs.deployed_sha != '' && inputs.deployment_run_id != '') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main')) }}
+        env:
+          PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
+          EXPECTED_LMS_SHA: ${{ inputs.deployed_sha || github.event.workflow_run.head_sha }}
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/hvac-lms-playback
+        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --trace retain-on-failure --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+      - name: Preserve authenticated LMS playback and full-screen acceptance evidence
+        if: ${{ always() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google')) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: hvac-authenticated-lms-playback-evidence
+          path: |
+            test-results/hvac-lms-playback/
+            playwright-report/hvac-lms-playback/
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Verify employer onboarding persistence and private documents after deployment
         if: github.event_name == 'workflow_run' || inputs.deployment_run_id != ''
         env:

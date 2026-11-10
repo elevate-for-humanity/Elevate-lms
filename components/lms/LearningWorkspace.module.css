@@ -14,7 +14,7 @@
 
 /* A narrow screen stacks both course panels in Split view rather than
  * accidentally hiding the video below the 900px container threshold. */
-.workspace[data-view='split'] .panel {
+.workspace[data-view='split'] > .panels > .panel {
   display: block;
 }
 .panel[data-active='true'] {

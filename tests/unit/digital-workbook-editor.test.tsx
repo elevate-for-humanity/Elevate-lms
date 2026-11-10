@@ -53,11 +53,14 @@ it('shows one section at a time and restores saved answers on reopening', async 
   await waitFor(() =>
     expect(within(region).getByRole('status')).toHaveTextContent('Saved to your account'),
   );
-  // Workbook progression is sequential. A newly opened account must not
-  // silently jump into section 2 just because that section exists.
-  expect(screen.queryByRole('option', { name: /2\. Study topic 2/ })).toBeNull();
+  // Independent drafts are selectable while review/progression remains gated.
+  expect(screen.getByRole('option', { name: /2\\. Study topic 2/ })).toBeInTheDocument();
   fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
     target: { value: 'section-2' },
+  });
+  expect(screen.getByRole('region', { name: '2. Study topic 2' })).toBeVisible();
+  fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
+    target: { value: 'section-1' },
   });
   expect(screen.getByRole('region', { name: '1. Study topic 1' })).toBeVisible();
   view.unmount();

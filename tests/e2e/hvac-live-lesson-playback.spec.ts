@@ -7,6 +7,7 @@ const COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 const LESSON_ID = 'f1d32b7f-7cd4-44c4-9858-6b756ef21b89';
 const email = process.env.E2E_LEARNER_EMAIL || '';
 const password = process.env.E2E_LEARNER_PASSWORD || '';
+const expectedLmsSha = process.env.EXPECTED_LMS_SHA || '';
 
 async function signIn(page: Page) {
   expect(email, 'Provisioned QA learner email is mandatory').toBeTruthy();
@@ -26,7 +27,15 @@ async function signIn(page: Page) {
 test.describe('Authenticated live HVAC lesson media', () => {
   test.describe.configure({ timeout: 150_000 });
   test('plays actual frames and uses the full screen without losing workbook controls', async ({ page }, info) => {
-    test.skip(!email || !password, 'Provisioned QA learner credentials required');
+    // Fail rather than silently skipping when a disposable QA login is missing.
+    expect(email, 'QA learner missing: do not skip this acceptance').toBeTruthy();
+    expect(password, 'QA learner password missing: do not skip this acceptance').toBeTruthy();
+    expect(expectedLmsSha, 'A trusted exact deployed LMS SHA is required').toMatch(/^[a-f0-9]{40}$/);
+    const healthResponse = await page.request.get(`${BASE}/api/health`, { failOnStatusCode: false });
+    expect(healthResponse.status()).toBe(200);
+    const health = await healthResponse.json();
+    expect(health.ready, 'Serving LMS must report ready').toBe(true);
+    expect(health.commit, 'Test must target the verified serving release').toBe(expectedLmsSha);
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
 

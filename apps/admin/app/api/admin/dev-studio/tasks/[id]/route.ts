@@ -4,6 +4,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { isMissingTable, jsonOk, tableNotReadyResponse } from '@/lib/devstudio/os/api-helpers';
+import { publicOpenHandsEvidence } from '@/lib/devstudio/openhands/public-lifecycle';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -43,12 +44,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
       db.from('ai_approvals').select('*').eq('task_id', id),
     ]);
 
-    return jsonOk({
+    const detail = {
       task,
       steps: steps.data ?? [],
       logs: logs.data ?? [],
       approvals: approvals.data ?? [],
-    });
+    };
+    return jsonOk(task.tool_name === 'openhands.execute' ? publicOpenHandsEvidence(detail) : detail,
+      { headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return safeInternalError(err, 'Failed to load task');
   }

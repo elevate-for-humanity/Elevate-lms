@@ -8,6 +8,7 @@ import {
 } from '@/lib/devstudio/openhands/client';
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
+import { publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some(role =>
@@ -86,9 +87,9 @@ export async function POST(request: NextRequest) {
       conversationId: dispatched.conversationId ?? null,
       status: dispatched.status,
     }, { status: 202 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'OpenHands chat failed' },
+      { error: 'OpenHands chat failed' },
       { status: 502 },
     );
   }
@@ -128,11 +129,12 @@ export async function GET(request: NextRequest) {
         taskId: owned.taskId,
         actorId: auth.userId,
       });
-      return NextResponse.json({ success: true, provider: 'openhands', taskId: owned.taskId, lifecycle });
-    } catch (error) {
+      return NextResponse.json({ success: true, provider: 'openhands', taskId: owned.taskId, lifecycle: publicOpenHandsLifecycle(lifecycle) },
+        { headers: { 'Cache-Control': 'no-store' } });
+    } catch {
       return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'OpenHands status lookup failed' },
-        { status: 502 },
+        { error: 'OpenHands status lookup failed' },
+        { status: 502, headers: { 'Cache-Control': 'no-store' } },
       );
     }
   }

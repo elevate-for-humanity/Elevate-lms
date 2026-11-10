@@ -8,6 +8,7 @@ import {
 } from '@/lib/devstudio/openhands/client';
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 import { findOwnedOpenHandsTask } from '@/lib/devstudio/openhands/task-access';
+import { publicOpenHandsLifecycle } from '@/lib/devstudio/openhands/public-lifecycle';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some((role) =>
@@ -76,9 +77,9 @@ export async function POST(request: NextRequest) {
       },
       { status: 202 },
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'OpenHands connection failed' },
+      { error: 'OpenHands connection failed' },
       { status: 502 },
     );
   }
@@ -110,11 +111,12 @@ export async function GET(request: NextRequest) {
     if (!owned) return NextResponse.json({ error: 'OpenHands task not found' }, { status: 404 });
     try {
       const lifecycle = await refreshOpenHandsTask({ taskId: owned.taskId, actorId: auth.userId });
-      return NextResponse.json({ success: true, taskId, provider: 'openhands', lifecycle });
-    } catch (error) {
+      return NextResponse.json({ success: true, taskId, provider: 'openhands', lifecycle: publicOpenHandsLifecycle(lifecycle) },
+        { headers: { 'Cache-Control': 'no-store' } });
+    } catch {
       return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'OpenHands status refresh failed' },
-        { status: 502 },
+        { error: 'OpenHands status refresh failed' },
+        { status: 502, headers: { 'Cache-Control': 'no-store' } },
       );
     }
   }

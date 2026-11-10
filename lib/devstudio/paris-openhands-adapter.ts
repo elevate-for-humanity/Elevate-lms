@@ -4,7 +4,7 @@ import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {dispatchOpenHandsTask, refreshOpenHandsTask} from './openhands/runtime';
 import {getHydratedOpenHandsConfig} from './openhands/client';
 import {blockedPath} from './paris-code-engineer';
-import {prepareOpenHandsRepair, assertOpenHandsRepairDiff, assertOpenHandsBlobReadback} from './paris-openhands-repair.mjs';
+import {prepareOpenHandsRepair, observeAcceptedOpenHandsRepair, assertOpenHandsRepairDiff, assertOpenHandsBlobReadback} from './paris-openhands-repair.mjs';
 
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 
@@ -17,10 +17,12 @@ async function github(path: string, init: RequestInit = {}) {
   return response.json();
 }
 
-export async function stageParisOpenHandsRepair(input: {
+type RepairInput = {
   repairId: string; actorId: string; attempt: number; runId: number; goal: string;
   checkpoint?: any; save: (checkpoint: any, expectedSequence: number|null) => Promise<void>;
-}) {
+};
+
+async function repairDependencies(input: RepairInput) {
   const db = await requireAdminClient();
   const {data: owner, error: ownerError} = await db.from('profiles').select('role').eq('id', input.actorId).maybeSingle();
   if (ownerError) throw ownerError;
@@ -34,7 +36,7 @@ export async function stageParisOpenHandsRepair(input: {
     if ((data?.length ?? 0) > 1) throw Error('PARIS_OPENHANDS_DUPLICATE_CORRELATION');
     return data?.[0] ?? null;
   };
-  return prepareOpenHandsRepair(input, {
+  return {
     now: Date.now,
     save: input.save,
     mainSha: async () => (await github('/git/ref/heads/main')).object?.sha,
@@ -75,5 +77,17 @@ export async function stageParisOpenHandsRepair(input: {
         release: {branch: checkpoint.branch, sha: head, status: 'pending-validation', verifiedLive: false},
         summary: 'OpenHands branch read back; independent PARIS validation and protected publication are still required.'};
     },
-  });
+  };
+}
+
+export async function stageParisOpenHandsRepair(input: RepairInput) {
+  return prepareOpenHandsRepair(input, await repairDependencies(input));
+}
+
+export async function observeParisOpenHandsRepair(repair: any) {
+  const input: RepairInput = {repairId: repair.id, actorId: repair.actor_id,
+    attempt: repair.attempt_count, runId: repair.workflow_run_id, goal: repair.goal,
+    checkpoint: repair.candidate.checkpoint,
+    save: async () => { throw Error('PARIS_OPENHANDS_OBSERVATION_CANNOT_WRITE_CHECKPOINT'); }};
+  return observeAcceptedOpenHandsRepair(input, await repairDependencies(input));
 }

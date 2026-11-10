@@ -54,7 +54,7 @@ it('shows one section at a time and restores saved answers on reopening', async 
     expect(within(region).getByRole('status')).toHaveTextContent('Saved to your account'),
   );
   // Independent drafts are selectable while review/progression remains gated.
-  expect(screen.getByRole('option', { name: /2\\. Study topic 2/ })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: '2. Study topic 2' })).toBeInTheDocument();
   fireEvent.change(screen.getByLabelText('Choose a workbook section'), {
     target: { value: 'section-2' },
   });

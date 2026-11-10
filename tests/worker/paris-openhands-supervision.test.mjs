@@ -93,3 +93,12 @@ test('internal, published, approval-blocked and exhausted-without-receipt repair
  const h=fixture();mutate(h);assert.equal(Boolean(acceptedOpenHandsNeedsObservation(h.repair)),false);
  }
 });
+
+test('a source that pauses during terminal readback cannot be claimed',async()=>{
+ const h=fixture();h.lifecycle.status='completed';let checks=0;
+ const result=await superviseAcceptedOpenHandsRepair(h.repair,{now:()=>now,workflow:async()=>h.run,
+  sourceEligible:async()=>++checks===1,observe:h.observe,record:async value=>h.records.push(value),
+  claim:async value=>{h.claims.push(value);return true}});
+ assert.equal(result.dispatchRequired,undefined);assert.equal(h.claims.length,0);assert.equal(checks,2);
+ assert.equal(h.records[0].openhandsObservation.state,'source_ineligible');
+});

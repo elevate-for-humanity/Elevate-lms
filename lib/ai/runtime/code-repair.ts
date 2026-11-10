@@ -261,7 +261,9 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
       db.from('ultimate_course_builds').select('id,status,profile,findings').eq('id',source.data.build_id).single(),
      ]);
      if(latest.error||build.error)throw latest.error??build.error;
-     return courseDefectDisposition({source:source.data,latest:latest.data,build:build.data})==='repair';
+     return latest.data?.id===source.data.id && build.data.status==='running' &&
+      build.data.profile?.ownerPaused===false &&
+      courseDefectDisposition({source:source.data,latest:latest.data,build:build.data})==='repair';
     },
     record:async(verification:any)=>{
      const saved=await owned({verification,updated_at:new Date().toISOString()});

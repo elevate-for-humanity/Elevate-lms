@@ -70,3 +70,12 @@ it('a paused source build is retained without provider refresh or workflow dispa
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'});
  expect(h.observations).toBe(0);expect(h.updates[0].values.verification.openhandsObservation.state).toBe('source_ineligible');
 });
+
+it('a superseding failed source job cannot admit the older repair',async()=>{
+ h.repair.source_job_id='source';
+ h.source={id:'source',build_id:'build',job_type:'quality',status:'failed',last_error:'quality failed',monitor:{enabled:true}};
+ h.latest={id:'newer-source',build_id:'build',status:'failed'};
+ h.build={id:'build',status:'running',profile:{ownerPaused:false},findings:[{code:'QUALITY',message:'quality failure'}]};
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'});
+ expect(h.observations).toBe(0);
+});

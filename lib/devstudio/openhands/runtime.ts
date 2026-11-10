@@ -594,6 +594,10 @@ export async function refreshOpenHandsTask(input: {
     Number(task.max_attempts ?? 1),
   );
   const now = new Date().toISOString();
+  // A pending provider execution has no completion outcome yet. The shared
+  // evaluation vocabulary calls it retryable, but that must not close the
+  // accepted task or trigger another external execution.
+  const executionStillRunning = lifecycle.status === 'queued' || lifecycle.status === 'running';
   const verificationStillRunning =
     lifecycle.status === 'completed' &&
     githubEvidence !== null &&
@@ -601,17 +605,19 @@ export async function refreshOpenHandsTask(input: {
   const needsHumanApproval =
     evaluation.status === 'REQUIRES_HUMAN_REVIEW' && !verificationStillRunning;
   const taskStatus =
-    evaluation.status === 'PASS'
-      ? 'completed'
-      : evaluation.status === 'FAIL_BLOCKING'
-        ? 'failed'
-        : evaluation.status === 'FAIL_RETRYABLE'
+    executionStillRunning
+      ? 'running'
+      : evaluation.status === 'PASS'
+        ? 'completed'
+        : evaluation.status === 'FAIL_BLOCKING'
           ? 'failed'
-          : needsHumanApproval
-            ? 'awaiting_approval'
-            : verificationStillRunning
-              ? 'running'
-              : lifecycleTaskStatus(lifecycle);
+          : evaluation.status === 'FAIL_RETRYABLE'
+            ? 'failed'
+            : needsHumanApproval
+              ? 'awaiting_approval'
+              : verificationStillRunning
+                ? 'running'
+                : lifecycleTaskStatus(lifecycle);
 
   const mergedExternal = {
     ...external,
@@ -688,13 +694,15 @@ export async function refreshOpenHandsTask(input: {
       .from('ai_task_steps')
       .update({
         status:
-          evaluation.status === 'PASS'
-            ? 'completed'
-            : needsHumanApproval
-              ? 'awaiting_approval'
-              : evaluation.status === 'FAIL_BLOCKING' || evaluation.status === 'FAIL_RETRYABLE'
-                ? 'failed'
-                : 'pending',
+          executionStillRunning
+            ? 'pending'
+            : evaluation.status === 'PASS'
+              ? 'completed'
+              : needsHumanApproval
+                ? 'awaiting_approval'
+                : evaluation.status === 'FAIL_BLOCKING' || evaluation.status === 'FAIL_RETRYABLE'
+                  ? 'failed'
+                  : 'pending',
         output: evaluation.reasons.join(' '),
         output_json: { evaluation, github: githubEvidence },
         completed_at: evaluation.status === 'PASS' ? now : null,

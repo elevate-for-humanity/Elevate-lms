@@ -21,7 +21,9 @@ test.describe('Canonical application flow', () => {
     await page.goto('/apply');
     await expect(page.getByRole('heading', { name: 'Choose your application' })).toBeVisible();
     await expect(page.getByRole('link', { name: /^Host Shop/ })).toHaveAttribute('href', '/partners/host-shop/apply');
-    await page.getByRole('link', { name: /^Student or apprentice/ }).click();
+    // The canonical entry is now a two-stage flow: inquiry first, paid enrollment separately.
+    await expect(page.getByRole('link', { name: /^Full Enrollment Application/ })).toHaveAttribute('href', '/programs');
+    await page.getByRole('link', { name: /^Intake Application/ }).click();
     await expect(page).toHaveURL(/\/apply\/student\/interview/);
     await expect(page.getByRole('heading', { name: /Talk with PARIS/i })).toBeVisible();
     await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible({ timeout: 20_000 });

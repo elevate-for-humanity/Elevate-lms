@@ -43,6 +43,9 @@ jobs:
     name: Agentic Admissions Acceptance
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,6 +81,12 @@ jobs:
 
       - name: Typecheck LMS compatibility boundary
         run: pnpm run typecheck:lms
+
+      - name: Verify public Supabase build configuration
+        run: |
+          set -euo pipefail
+          test "$NEXT_PUBLIC_SUPABASE_URL" = 'https://cuxzzpsyufcewtmicszk.supabase.co'
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
 
       - name: Build marketing application
         run: pnpm run build:marketing

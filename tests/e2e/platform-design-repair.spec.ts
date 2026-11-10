@@ -59,9 +59,12 @@ for (const route of [
     if (route === '/apply/student') {
       await expect(
         page.getByRole('heading', {
-          name: 'Talk with PARIS while your application builds beside you.',
+          name: 'Intake Application — talk with PARIS',
           exact: true,
         }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/No payment, enrollment, dashboard activation, or Host Shop placement is completed by intake\./),
       ).toBeVisible();
     }
     if (route === '/') {

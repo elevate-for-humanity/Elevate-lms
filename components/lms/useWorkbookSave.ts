@@ -1,6 +1,10 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { emptyWorkbookAnswers, type WorkbookAnswers } from '@/lib/lms/workbook-validation';
+import {
+  emptyWorkbookAnswers,
+  validWorkbookSave,
+  type WorkbookAnswers,
+} from '@/lib/lms/workbook-validation';
 import type { WorkbookResponse } from '@/lib/lms/digital-workbooks';
 
 type Draft = { answers: WorkbookAnswers; reviewed: boolean };
@@ -22,6 +26,64 @@ export function useWorkbookSave(
   const version = useRef(initial?.version ?? 0);
   const running = useRef<Promise<boolean> | null>(null);
   const conflict = useRef(false);
+  const [recoveryText, setRecoveryText] = useState('');
+  const recoveryKey = `workbook-unsaved:${ownerId}:${sectionId}`;
+  const preserve = useCallback(() => {
+    if (readOnly || !ownerId) return;
+    try {
+      sessionStorage.setItem(
+        recoveryKey,
+        JSON.stringify({
+          ...current.current,
+          expectedVersion: version.current,
+        }),
+      );
+    } catch {
+      /* Saving to the account still works when browser storage is unavailable. */
+    }
+  }, [readOnly, ownerId, recoveryKey]);
+  useEffect(() => {
+    if (readOnly || !ownerId) return;
+    try {
+      const raw = sessionStorage.getItem(recoveryKey);
+      if (!raw) return;
+      const cached: unknown = JSON.parse(raw);
+      if (!validWorkbookSave(cached)) return;
+      const saved = {
+        answers: { ...emptyWorkbookAnswers(), ...initial?.answers },
+        reviewed: initial?.reviewed ?? false,
+      };
+      if (
+        JSON.stringify(cached.answers) === JSON.stringify(saved.answers) &&
+        cached.reviewed === saved.reviewed
+      ) {
+        sessionStorage.removeItem(recoveryKey);
+        return;
+      }
+      // A reload after a timeout may find a newer server version. Never overwrite it.
+      if (cached.expectedVersion !== version.current) {
+        setRecoveryText(
+          Object.entries(cached.answers)
+            .map(([field, value]) => `${field}:\n${value}`)
+            .join('\n\n'),
+        );
+        setStatus(
+          'An unsaved browser copy is available below. Your account has a different version; compare and copy the answers you want to keep.',
+        );
+        setError(true);
+        return;
+      }
+      const recovered = { answers: cached.answers, reviewed: cached.reviewed };
+      current.current = recovered;
+      revision.current += 1;
+      setDraft(recovered);
+      setStatus('Recovered unsaved answers from this browser. Saving to your account…');
+    } catch {
+      /* Malformed or unavailable recovery storage must not replace account data. */
+    }
+    // The editor is keyed by account and section; do not rehydrate over active typing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recoveryKey, readOnly, ownerId]);
   const save = useCallback((): Promise<boolean> => {
     if (running.current) return running.current;
     if (readOnly || savedRevision.current === revision.current) return Promise.resolve(true);
@@ -42,7 +104,8 @@ export function useWorkbookSave(
           });
           const body = await response.json();
           if (!response.ok) {
-            if (response.status === 409) conflict.current = true;
+            if (response.status === 409 && body.code !== 'WORKBOOK_REVIEW_PREREQUISITE')
+              conflict.current = true;
             throw new Error(
               body.error ||
                 'Save failed. Your changes are still on this page. Retry before leaving.',
@@ -52,10 +115,19 @@ export function useWorkbookSave(
             throw new Error('Save was not confirmed. Please retry.');
           version.current = body.version;
           savedRevision.current = sentRevision;
+          if (savedRevision.current < revision.current) preserve();
+        }
+        if (ownerId) {
+          try {
+            sessionStorage.removeItem(recoveryKey);
+          } catch {
+            /* Optional recovery copy. */
+          }
         }
         setStatus('Saved to your account');
         return true;
       } catch (cause) {
+        preserve();
         setError(true);
         setStatus(
           cause instanceof Error ? cause.message : 'Save failed. Please retry before leaving.',
@@ -66,17 +138,18 @@ export function useWorkbookSave(
       }
     });
     return running.current;
-  }, [sectionId, readOnly, ownerId]);
+  }, [sectionId, readOnly, ownerId, preserve, recoveryKey]);
   const edit = useCallback(
     (next: Draft) => {
       if (readOnly) return;
       current.current = next;
       revision.current += 1;
+      preserve();
       setDraft(next);
       if (!conflict.current) setStatus('Unsaved changes');
       setError(conflict.current);
     },
-    [readOnly],
+    [readOnly, preserve],
   );
   useEffect(() => {
     if (revision.current === savedRevision.current) return;
@@ -107,5 +180,5 @@ export function useWorkbookSave(
       void save();
     };
   }, [save]);
-  return { draft, edit, save, status, error };
+  return { draft, edit, save, status, error, recoveryText };
 }

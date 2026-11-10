@@ -1,4 +1,5 @@
 import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
+import { loadCourseActivity } from '@/lib/learner/course-activity';
 import { loadLessonAvailability } from '@/lib/lms/lesson-availability';
 import Image from 'next/image';
 import { getPrestigeCourseCover } from '@/lib/lms/prestige-course-covers';
@@ -171,11 +172,16 @@ export default async function CourseLandingPage({
           .range(from, to),
       );
   const publishedIds = new Set(publishedLessons.map((lesson) => lesson.id));
+  const savedActivity =
+    !preview.active && user
+      ? await loadCourseActivity(db, user.id, course.id, [...publishedIds])
+      : null;
   const completedIds = new Set(
     progressRows.map((row) => row.lesson_id).filter((id) => publishedIds.has(id)),
   );
   const nextLesson = syllabusLessons.find(
-    (lesson) => (preview.active || lesson.published) && lesson.available && !completedIds.has(lesson.id),
+    (lesson) =>
+      (preview.active || lesson.published) && lesson.available && !completedIds.has(lesson.id),
   );
   const firstLesson = nextLesson ?? null;
   const heroMetadata =
@@ -194,6 +200,8 @@ export default async function CourseLandingPage({
   );
   const courseCover = getPrestigeCourseCover(course.id);
   const registeredContract = course.slug ? getRegisteredProgramStandard(course.slug) : null;
+  const courseWidth =
+    course.id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' ? 'w-full min-w-0' : 'mx-auto max-w-6xl';
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -203,7 +211,7 @@ export default async function CourseLandingPage({
         </div>
       ) : null}
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className={`${courseWidth} px-4 py-10 sm:px-6`}>
           {courseCover ? (
             <figure className="mb-5 max-w-24 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
               <Image
@@ -269,6 +277,14 @@ export default async function CourseLandingPage({
           <p className="mt-4 max-w-4xl text-base font-medium leading-7 text-slate-700">
             {course.description || 'Course lessons, checkpoints, and required assessments.'}
           </p>
+          {savedActivity && (
+            <p className="mt-4 rounded-xl border border-teal-300 bg-teal-50 p-4 font-semibold">
+              {savedActivity.assessmentsPassed} lesson assessments passed ·{' '}
+              {savedActivity.videosCompleted} lesson videos completed. These results stay saved.
+              Finish each matching workbook review and required activities before saving full lesson
+              completion; you do not need to repeat a passed assessment.
+            </p>
+          )}
           <div className="mt-6 flex flex-wrap gap-3 text-sm font-bold text-slate-800">
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
               <BookOpen className="h-4 w-4" />{' '}
@@ -317,10 +333,23 @@ export default async function CourseLandingPage({
             </section>
           ) : null}
           {course.id === 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' && (
-            <section aria-label="Course workbook" className="mt-4 rounded-xl border border-teal-300 bg-white p-4">
+            <section
+              aria-label="Course workbook"
+              className="mt-4 rounded-xl border border-teal-300 bg-white p-4"
+            >
               <h2 className="text-xl font-bold">Your workbook is inside each lesson</h2>
-              <p className="mt-2 leading-relaxed">Start or continue the course above. The matching workbook chapter appears directly below each lesson video. Complete and save its activities and chapter review before finishing the lesson.</p>
-              <Link href="/workbooks/hvac-epa608-guided-practice" className="mt-3 inline-flex min-h-12 items-center font-bold underline">Review the full HVAC workbook</Link>
+              <p className="mt-2 leading-relaxed">
+                Start or continue the course above. In a lesson, select Workbook &amp; lesson
+                activities to open its matching chapter. Select Theory lesson &amp; video to return
+                to the full-width lesson, or use Split view to see both. Save the chapter activities
+                and review before finishing the lesson.
+              </p>
+              <Link
+                href="/workbooks/hvac-epa608-guided-practice"
+                className="mt-3 inline-flex min-h-12 items-center font-bold underline"
+              >
+                Review the full HVAC workbook
+              </Link>
             </section>
           )}
           {(pacing as any)?.theoryWindow ? (
@@ -385,7 +414,7 @@ export default async function CourseLandingPage({
 
       {readiness.length > 0 ? (
         <section
-          className="mx-auto max-w-6xl px-4 pt-8 sm:px-6"
+          className={`${courseWidth} px-4 pt-8 sm:px-6`}
           aria-labelledby="course-readiness-heading"
         >
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -439,7 +468,7 @@ export default async function CourseLandingPage({
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-6xl space-y-5 px-4 py-8 sm:px-6">
+      <section className={`${courseWidth} space-y-5 px-4 py-8 sm:px-6`}>
         {publishedModules.map((module) => {
           const moduleLessons = syllabusLessons.filter((lesson) => lesson.module_id === module.id);
           return (
@@ -482,7 +511,9 @@ export default async function CourseLandingPage({
                         ) : null}
                         <p className="mt-1 text-sm font-medium text-slate-600">
                           {!lesson.published
-                            ? preview.active ? 'Unpublished · Open for administrator review' : 'In production · Available after completion and verification'
+                            ? preview.active
+                              ? 'Unpublished · Open for administrator review'
+                              : 'In production · Available after completion and verification'
                             : completedIds.has(lesson.id) && !preview.active
                               ? 'Completed'
                               : !lesson.available && !preview.active

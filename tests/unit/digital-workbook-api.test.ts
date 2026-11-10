@@ -19,7 +19,11 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: async () => ({ auth: { getUser: mocks.getUser }, from: mocks.from, rpc: mocks.rpc }),
+  createClient: async () => ({
+    auth: { getUser: mocks.getUser },
+    from: mocks.from,
+    rpc: mocks.rpc,
+  }),
 }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn() } }));
 import { POST } from '@/apps/lms/app/api/workbooks/sections/[sectionId]/route';
@@ -140,13 +144,24 @@ describe('Workbook API', () => {
       (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
     ).toBe(status);
   });
-  it('requires the current learner to review all earlier sections before saving', async () => {
+  it('requires earlier chapter review before advancing the reviewed checklist', async () => {
     mocks.sections.maybeSingle.mockResolvedValue({
       data: { workbook_id: 'workbook', section_number: 2, prompts: [] },
       error: null,
     });
     mocks.sections.lt.mockResolvedValue({ data: [{ id: 'earlier' }], error: null });
-    const response = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+    const response = await POST(
+      request({
+        ...save,
+        reviewed: true,
+        answers: {
+          ...save.answers,
+          notes: 'Meaningful study notes',
+          nextGoal: 'My next learning goal',
+        },
+      }),
+      { params: Promise.resolve({ sectionId: section }) },
+    );
     expect(response.status).toBe(409);
     expect(mocks.sections.eq).toHaveBeenCalledWith('workbook_id', 'workbook');
     expect(mocks.sections.lt).toHaveBeenCalledWith('section_number', 2);
@@ -157,9 +172,35 @@ describe('Workbook API', () => {
 
     mocks.reviews.in.mockResolvedValue({ data: [{ section_id: 'earlier' }], error: null });
     mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
-    const allowed = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+    const allowed = await POST(
+      request({
+        ...save,
+        reviewed: true,
+        answers: {
+          ...save.answers,
+          notes: 'Meaningful study notes',
+          nextGoal: 'My next learning goal',
+        },
+      }),
+      { params: Promise.resolve({ sectionId: section }) },
+    );
     expect(allowed.status).toBe(200);
     expect(mocks.rpc).toHaveBeenCalledOnce();
+  });
+  it('preserves drafts in accessible later chapters without advancing their review', async () => {
+    mocks.sections.maybeSingle.mockResolvedValue({
+      data: { workbook_id: 'workbook', section_number: 7, prompts: [] },
+      error: null,
+    });
+    mocks.sections.lt.mockResolvedValue({ data: [{ id: 'earlier' }], error: null });
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    const response = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+    expect(response.status).toBe(200);
+    expect(mocks.reviews.in).not.toHaveBeenCalled();
+    expect(mocks.rpc).toHaveBeenCalledWith(
+      'save_digital_workbook_section',
+      expect.objectContaining({ p_reviewed: false }),
+    );
   });
   it('does not mark unfinished writing as reviewed', async () => {
     const response = await POST(request({ ...save, reviewed: true }), {

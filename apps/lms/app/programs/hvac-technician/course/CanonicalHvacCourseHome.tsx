@@ -28,6 +28,7 @@ type Props = {
   modules: Module[];
   completedLessonIds: string[];
   totalTimeSeconds: number;
+  savedActivity?: { assessmentsPassed: number; videosCompleted: number } | null;
 };
 
 function lessonHref(courseId: string, lessonId: string) {
@@ -41,6 +42,7 @@ export default function CanonicalHvacCourseHome({
   modules,
   completedLessonIds,
   totalTimeSeconds,
+  savedActivity,
 }: Props) {
   const [query, setQuery] = useState('');
   const completed = useMemo(() => new Set(completedLessonIds), [completedLessonIds]);
@@ -75,7 +77,7 @@ export default function CanonicalHvacCourseHome({
           className="-z-20 object-cover opacity-45"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/45" />
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="w-full min-w-0 px-4 py-14 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-300">HVAC Technician</p>
           <h1 className="mt-2 max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">{title}</h1>
           {description ? <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200">{description}</p> : null}
@@ -85,7 +87,7 @@ export default function CanonicalHvacCourseHome({
             <span className="rounded-full bg-white/10 px-3 py-2">{lessons.length} lessons</span>
             <span className="rounded-full bg-white/10 px-3 py-2">EPA Section 608 preparation</span>
             <span className="rounded-full bg-white/10 px-3 py-2">
-              {Math.round(totalTimeSeconds / 3600)} tracked hours
+              {(totalTimeSeconds / 3600).toFixed(1)} hours of recorded lesson activity
             </span>
           </div>
 
@@ -98,6 +100,14 @@ export default function CanonicalHvacCourseHome({
               <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
             </div>
           </div>
+
+          {savedActivity ? (
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-200">
+              {savedActivity.assessmentsPassed} lesson assessments passed · {savedActivity.videosCompleted} lesson videos completed.
+              {' '}These results stay saved while you finish the matching workbook reviews and remaining activities.
+              {' '}Recorded lesson activity is separate from instructor-verified hands-on training hours.
+            </p>
+          ) : null}
 
           <div className="mt-7 flex flex-wrap gap-3">
             {nextLesson ? (
@@ -120,7 +130,7 @@ export default function CanonicalHvacCourseHome({
         </div>
       </section>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <main className="w-full min-w-0 px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8 max-w-2xl">
           <label htmlFor="hvac-course-search" className="mb-2 block text-sm font-semibold text-slate-800">
             Search this course

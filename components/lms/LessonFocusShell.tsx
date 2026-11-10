@@ -14,17 +14,24 @@ export default function LessonFocusShell({
 
   useEffect(() => {
     if (!focused) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setFocused(false);
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [focused]);
 
   return (
     <main
       className={
-        focused ? 'min-h-screen bg-white text-slate-950' : 'min-h-screen bg-slate-50 text-slate-950'
+        focused
+          ? 'fixed inset-0 z-[100] overflow-y-auto bg-white text-slate-950'
+          : 'min-h-screen bg-slate-50 text-slate-950'
       }
       data-focus-mode={focused ? 'active' : 'inactive'}
     >

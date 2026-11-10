@@ -5,6 +5,7 @@ import { emptyWorkbookAnswers, validWorkbookSave } from '@/lib/lms/workbook-vali
 
 afterEach(() => {
   cleanup();
+  sessionStorage.clear();
   vi.unstubAllGlobals();
 });
 const initial = {
@@ -146,6 +147,73 @@ describe('Account workbook saving', () => {
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(result.current.draft.answers.notes).toBe('My draft');
+  });
+  it('can save writing after a review prerequisite fails, without bypassing review', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ error: 'Earlier review needed', code: 'WORKBOOK_REVIEW_PREREQUISITE' }),
+          { status: 409 },
+        ),
+      )
+      .mockResolvedValueOnce(ok(4));
+    vi.stubGlobal('fetch', fetchMock);
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
+    act(() =>
+      result.current.edit({
+        answers: { ...emptyWorkbookAnswers(), notes: 'Keep these answers' },
+        reviewed: true,
+      }),
+    );
+    await act(async () => {
+      expect(await result.current.save()).toBe(false);
+    });
+    act(() => result.current.edit({ ...result.current.draft, reviewed: false }));
+    await act(async () => {
+      expect(await result.current.save()).toBe(true);
+    });
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body).reviewed).toBe(false);
+  });
+  it('recovers a failed save after reopening in the same account and section', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
+    const first = renderHook(() => useWorkbookSave('section-one', initial, false, 'current-user'));
+    act(() =>
+      first.result.current.edit({
+        answers: { ...emptyWorkbookAnswers(), practice1: 'My unsaved practice response' },
+        reviewed: false,
+      }),
+    );
+    await act(async () => {
+      await first.result.current.save();
+    });
+    first.unmount();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const second = renderHook(() => useWorkbookSave('section-one', initial, false, 'current-user'));
+    expect(second.result.current.draft.answers.practice1).toBe('My unsaved practice response');
+    const other = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'different-user'),
+    );
+    expect(other.result.current.draft.answers.practice1).toBe('');
+  });
+  it('offers a recovery copy without replacing a newer account version', () => {
+    sessionStorage.setItem(
+      'workbook-unsaved:current-user:section-one',
+      JSON.stringify({
+        answers: { ...emptyWorkbookAnswers(), notes: 'Old unsaved draft' },
+        reviewed: false,
+        expectedVersion: 2,
+      }),
+    );
+    const { result } = renderHook(() =>
+      useWorkbookSave('section-one', initial, false, 'current-user'),
+    );
+    expect(result.current.draft.answers.notes).toBe('Previously saved');
+    expect(result.current.recoveryText).toContain('Old unsaved draft');
   });
   it('autosaves after typing and leaves read-only previews unchanged', async () => {
     const fetchMock = vi.fn().mockResolvedValue(ok(4));

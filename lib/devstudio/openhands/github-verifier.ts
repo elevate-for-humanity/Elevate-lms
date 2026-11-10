@@ -122,12 +122,28 @@ export async function verifyOpenHandsGitHubOutcome(input: {
       const status = await gh<{ state?: string }>(
         `/repos/${repository}/commits/${encodeURIComponent(headSha)}/status`,
         token,
-      ).catch(() => ({ state: undefined }));
+      );
       const checks = await gh<{ check_runs?: Array<{ name?: string; status?: string; conclusion?: string | null }> }>(
         `/repos/${repository}/commits/${encodeURIComponent(headSha)}/check-runs?per_page=100`,
         token,
-      ).catch(() => ({ check_runs: [] }));
+      );
 
+      // A branch name or unrelated PR is not evidence that this task changed code.
+      // When OpenHands supplied a branch, the PR must actually use it.
+      if (input.branch && pr.head?.ref !== input.branch) {
+        reasons.push(`PR #${number} head does not match the OpenHands branch.`);
+        continue;
+      }
+      const changedFiles = files.map((file) => file.filename).filter((name): name is string => Boolean(name));
+      const checkRuns = checks.check_runs ?? [];
+      const successfulChecks = checkRuns.length > 0 && checkRuns.every(
+        (check) => check.status === 'completed' && check.conclusion === 'success',
+      );
+      if (changedFiles.length === 0 || !successfulChecks ||
+          !['success', 'pending'].includes(status.state ?? '') || status.state === 'failure') {
+        reasons.push(`PR #${number} has no changed files, successful completed checks, or valid commit status.`);
+        continue;
+      }
       pullRequests.push({
         number: pr.number,
         state: pr.state,
@@ -136,7 +152,7 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         headSha,
         headRef: pr.head?.ref || '',
         baseRef: pr.base?.ref || '',
-        changedFiles: files.map((file) => file.filename).filter((name): name is string => Boolean(name)),
+        changedFiles,
         combinedStatus: status.state ?? null,
         checkRuns: (checks.check_runs ?? []).map((check) => ({
           name: check.name || 'unnamed',
@@ -150,9 +166,10 @@ export async function verifyOpenHandsGitHubOutcome(input: {
     }
   }
 
-  const verified = Boolean(branchEvidence || pullRequests.length);
+  // Branch existence alone is never an engineering completion gate.
+  const verified = pullRequests.length > 0;
   if (!verified) {
-    reasons.push('OpenHands reported no GitHub branch or pull request that could be independently verified.');
+    reasons.push('OpenHands did not provide a task-matching pull request with changed files and successful CI checks.');
   }
 
   return {

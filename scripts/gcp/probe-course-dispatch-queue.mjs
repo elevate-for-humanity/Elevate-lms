@@ -38,12 +38,17 @@ export async function probeCourseDispatchQueue({env=process.env,request=fetch,
   const sample=new URL(url);
   sample.searchParams.delete('or');sample.searchParams.delete('build.or');
   sample.searchParams.delete('build.profile->>ownerPaused');
+  sample.searchParams.delete('build.active_pools');
   sample.searchParams.set('limit','1');
   sampled=(await read(sample)).length;
   assert.ok(sampled>0,'COURSE_QUEUE_PROJECTION_NO_SAMPLE');
   const rows=await read(url);
   assert.ok(rows.every(row=>row.build.owner_paused===false || row.build.owner_paused==='false'),
    'COURSE_QUEUE_PAUSED_FILTER_FAILED');
+  // build_id is UNIQUE in ultimate_autopilot_pools: PostgREST projects this
+  // inverse relationship as an object, or null after the active-pool anti-join.
+  assert.ok(rows.every(row=>row.build.active_pools===null),
+   'COURSE_QUEUE_ACTIVE_POOL_FILTER_FAILED');
   eligible=rows.length;
   return {ok:true,json:async()=>[]};
  }});

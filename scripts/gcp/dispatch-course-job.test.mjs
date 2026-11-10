@@ -20,6 +20,25 @@ test('empty queue does not start a paid execution',async()=>{
   assert.equal(s.calls.length,1);
 });
 
+test('active lesson pools exclude parked coordinators before pagination while independent work launches',async()=>{
+ const s=setup([],[{id:'queued'}]);const base=s.options.request;
+ s.options.request=async url=>{
+  if(url.searchParams.has('id'))return base(url);
+  assert.match(url.searchParams.get('select'),/active_pools:ultimate_autopilot_pools\(id\)/);
+  assert.equal(url.searchParams.get('build.active_pools.state'),'eq.active');
+  assert.equal(url.searchParams.get('build.active_pools'),'is.null');
+  // Model the REST anti-join before its limit: any number of parked parent
+  // coordinators must not consume the first page or authorize a paid launch.
+  const rows=[...Array.from({length:60},(_,i)=>({id:'parked-'+i,pool:'active'})),
+   {id:'queued',pool:'completed',build:{owner_paused:'false'}}];
+  return {ok:true,json:async()=>rows.filter(j=>j.pool!=='active')
+   .slice(Number(url.searchParams.get('offset')),Number(url.searchParams.get('offset'))+50)};
+ };
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.deepEqual(result.jobIds,['queued']);
+ assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
+});
+
 test('imminent queued retry keeps coordination alive without an early paid execution',async()=>{
  const s=setup([],[{id:'retry',status:'queued',available_at:'2026-10-06T10:01:30Z',attempts:4,max_attempts:7}]);
  const base=s.options.request;

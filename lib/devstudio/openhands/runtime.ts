@@ -3,6 +3,7 @@ import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconcile
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { evaluateExecution, type EvaluationResult } from '@/lib/platform/orchestration/evaluator';
+import { isParisProviderBranchCandidate } from '@/lib/devstudio/openhands/paris-provider-candidate';
 import {
   getOpenHandsLifecycle,
   startOpenHandsTask,
@@ -604,10 +605,20 @@ export async function refreshOpenHandsTask(input: {
     lifecycle.status === 'completed' &&
     githubEvidence !== null &&
     pendingChecks(githubEvidence).length > 0;
+  // A PARIS-owned task requests branch-only source work. Its completed provider
+  // branch is not finished engineering: only PARIS may independently read back
+  // committed blobs, validate, open a protected PR, verify CI and release.
+  // Keep the canonical task RUNNING and its verification step PENDING so the
+  // same original provider receipt can progress without a fabricated approval.
+  // All general Dev Studio OpenHands tasks retain strict PR+CI completion.
+  const parisProviderCandidatePendingValidation =
+    evaluation.status === 'REQUIRES_HUMAN_REVIEW' &&
+    isParisProviderBranchCandidate(task, lifecycle, githubEvidence);
   const needsHumanApproval =
-    evaluation.status === 'REQUIRES_HUMAN_REVIEW' && !verificationStillRunning;
+    evaluation.status === 'REQUIRES_HUMAN_REVIEW' &&
+    !verificationStillRunning && !parisProviderCandidatePendingValidation;
   const taskStatus =
-    executionStillRunning
+    executionStillRunning || parisProviderCandidatePendingValidation
       ? 'running'
       : evaluation.status === 'PASS'
         ? 'completed'
@@ -644,6 +655,7 @@ export async function refreshOpenHandsTask(input: {
         provider: 'openhands',
         external_run: mergedExternal,
         evaluation,
+        paris_provider_candidate_pending_validation: parisProviderCandidatePendingValidation,
       },
       result:
         evaluation.status === 'PASS'

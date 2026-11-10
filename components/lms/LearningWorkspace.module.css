@@ -12,6 +12,11 @@
   display: none;
 }
 
+/* A narrow screen stacks both course panels in Split view rather than
+ * accidentally hiding the video below the 900px container threshold. */
+.workspace[data-view='split'] > .panels > .panel {
+  display: block;
+}
 .panel[data-active='true'] {
   display: block;
 }
@@ -24,14 +29,13 @@
 
   .panel {
     display: block;
-    max-height: calc(100dvh - 7rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    /* Do not crop a long course inside a half-viewport scroll pane. */
+    max-height: none;
+    overflow: visible;
   }
 
   .preview {
-    position: sticky;
-    top: 1rem;
+    position: static;
   }
 }
 
@@ -48,4 +52,38 @@
 .workspace[data-view='instructions'] > .panels > .preview,
 .workspace[data-view='preview'] > .panels > .panel:not(.preview) {
   display: none;
+}
+
+/* Explicit full-screen course display on desktop, tablets and phones.
+ * Keep original answer/video DOM mounted while maximized, preserving state. */
+.workspace[data-expanded='true'] {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  padding: 1rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: white;
+}
+.workspace[data-expanded='true'] > .panels {
+  grid-template-columns: minmax(0, 1fr);
+}
+.workspace[data-expanded='true'] > .panels > .panel {
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  position: static;
+}
+.workspace[data-expanded='true'] video,
+.workspace[data-expanded='true'] iframe,
+.workspace[data-expanded='true'] img,
+.workspace[data-expanded='true'] canvas {
+  max-width: 100%;
+}
+@media (max-width: 639px) {
+  .workspace[data-expanded='true'] { padding: 0.5rem; }
 }

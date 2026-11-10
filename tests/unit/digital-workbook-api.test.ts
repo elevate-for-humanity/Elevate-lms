@@ -56,7 +56,7 @@ beforeEach(() => {
 });
 describe('Workbook API', () => {
   it('rejects a workbook left open under a different signed-in account', async () => {
-    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1, answers: save.answers, reviewed: false }], error: null });
     const stale = request(save);
     stale.headers.set('x-workbook-owner', 'previous-account');
     expect((await POST(stale, { params: Promise.resolve({ sectionId: section }) })).status).toBe(
@@ -65,7 +65,7 @@ describe('Workbook API', () => {
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
   it('accepts the canonical LMS origin behind the Google service proxy', async () => {
-    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1, answers: save.answers, reviewed: false }], error: null });
     const forwarded = new NextRequest('http://localhost:8080/api/workbooks/sections/' + section, {
       method: 'POST',
       headers: {
@@ -81,7 +81,7 @@ describe('Workbook API', () => {
   });
   it('accepts the live LMS hostname when the configured app origin uses the legacy alias', async () => {
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://app.elevateforhumanity.org');
-    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1, answers: save.answers, reviewed: false }], error: null });
     try {
       const forwarded = new NextRequest('http://localhost:8080/api/workbooks/sections/' + section, {
         method: 'POST',
@@ -119,7 +119,7 @@ describe('Workbook API', () => {
   );
   it('passes no client user ID to the session-scoped RPC', async () => {
     mocks.rpc.mockResolvedValue({
-      data: [{ section_id: section, version: 1, updated_at: 'now' }],
+      data: [{ section_id: section, version: 1, answers: save.answers, reviewed: false, updated_at: 'now' }],
       error: null,
     });
     const result = await POST(request({ ...save, user_id: 'someone-else' }), {
@@ -144,6 +144,16 @@ describe('Workbook API', () => {
       (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
     ).toBe(status);
   });
+  it('does not acknowledge a successful version when the stored practice answers are missing', async () => {
+    mocks.rpc.mockResolvedValue({
+      data: [{ section_id: section, version: 1, answers: { ...save.answers, practice1: 'Different data' }, reviewed: false }],
+      error: null,
+    });
+    const result = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+    expect(result.status).toBe(503);
+    expect((await result.json()).error).toContain('could not be verified');
+  });
+
   it('requires earlier chapter review before advancing the reviewed checklist', async () => {
     mocks.sections.maybeSingle.mockResolvedValue({
       data: { workbook_id: 'workbook', section_number: 2, prompts: [] },
@@ -171,7 +181,12 @@ describe('Workbook API', () => {
     expect(mocks.rpc).not.toHaveBeenCalled();
 
     mocks.reviews.in.mockResolvedValue({ data: [{ section_id: 'earlier' }], error: null });
-    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    const reviewedAnswers = {
+      ...save.answers,
+      notes: 'Meaningful study notes',
+      nextGoal: 'My next learning goal',
+    };
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1, answers: reviewedAnswers, reviewed: true }], error: null });
     const allowed = await POST(
       request({
         ...save,
@@ -193,7 +208,7 @@ describe('Workbook API', () => {
       error: null,
     });
     mocks.sections.lt.mockResolvedValue({ data: [{ id: 'earlier' }], error: null });
-    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1 }], error: null });
+    mocks.rpc.mockResolvedValue({ data: [{ section_id: section, version: 1, answers: save.answers, reviewed: false }], error: null });
     const response = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
     expect(response.status).toBe(200);
     expect(mocks.reviews.in).not.toHaveBeenCalled();

@@ -94,6 +94,18 @@ try {
       assert.equal(await page.getByRole('textbox', { name: 'Practice response' }).inputValue(), 'Keep my workbook answers');
       assert.equal(await nested.getAttribute('data-view'), 'preview');
       await controls.getByRole('button', { name: 'Split view', exact: true }).click();
+      // Split mode must not hide the video when container width is below 900px.
+      const panes = workspace.locator(':scope > div:last-child > section');
+      assert.equal(await panes.count(), 2);
+      assert(await panes.nth(0).isVisible() && await panes.nth(1).isVisible(),
+        'Split mode must show both instruction and video panels on narrow screens');
+      await controls.getByRole('button', { name: 'Full screen lesson' }).click();
+      const fullscreen = await workspace.boundingBox();
+      assert(fullscreen && Math.abs(fullscreen.width - width) <= 1 && Math.abs(fullscreen.x) <= 1,
+        JSON.stringify(fullscreen));
+      await page.screenshot({ path: join(evidence, `full-screen-${width}.png`) });
+      await page.keyboard.press('Escape');
+      assert.equal(await workspace.getAttribute('data-expanded'), 'false');
       assert.equal(await page.locator('body').getAttribute('data-video-mounts'), '1');
       await page.getByRole('button', { name: 'Enter focus mode' }).click();
       const focus = await page.locator('[data-focus-mode="active"]').boundingBox();

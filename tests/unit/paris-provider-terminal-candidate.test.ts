@@ -41,7 +41,11 @@ describe('PARIS provider stage is distinct from final OpenHands/PR/CI acceptance
     expect(isParisProviderBranchCandidate(f.task, f.lifecycle, { ...f.github, branch: null })).toBe(false);
     expect(isParisProviderBranchCandidate(f.task, f.lifecycle, { ...f.github, branch: {name: branch, sha: 'short'} })).toBe(false);
     expect(isParisProviderBranchCandidate(f.task, f.lifecycle, { ...f.github, verified: true })).toBe(false);
-    expect(isParisProviderBranchCandidate(f.task, f.lifecycle, { ...f.github, pullRequests: [{}] })).toBe(false);
+    expect(isParisProviderBranchCandidate(f.task, f.lifecycle, { ...f.github, pullRequests: [{
+      number: 2541, state: 'open', draft: false, merged: false,
+      headSha: 'b'.repeat(40), headRef: branch, baseRef: 'main',
+      changedFiles: ['lib/example.ts'], combinedStatus: 'pending', checkRuns: [],
+    }] })).toBe(false);
     expect(isParisProviderBranchCandidate(f.task, { ...f.lifecycle, prNumbers: [2541] }, f.github)).toBe(false);
   });
 

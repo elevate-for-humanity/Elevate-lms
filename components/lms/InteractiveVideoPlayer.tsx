@@ -1,6 +1,7 @@
 'use client';
 import { installPlaybackResume } from '@/lib/lms/playback-resume.mjs';
 import { playbackProgressSignal } from '@/lib/lms/playback-progress-signal.mjs';
+import { captionTrackMode, captionTrackModeAfterLoad } from '@/lib/lms/lesson-caption-track.mjs';
 
 import { createClient } from '@/lib/supabase/client';
 import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessibility/lms-runtime-accessibility';
@@ -439,11 +440,13 @@ export default function InteractiveVideoPlayer({
 
   // Use one caption surface. A VTT track has short synchronized cues; the
   // transcript contains whole teaching segments and must not cover the film.
+  // This effect is the only place a track is disabled, so an enabled track that
+  // finishes loading keeps its cues instead of reverting to the default mode.
   useEffect(() => {
     const tracks = videoRef.current?.textTracks;
     if (!tracks) return;
     for (const track of Array.from(tracks)) {
-      if (track.kind === 'captions') track.mode = showCaptions ? 'showing' : 'disabled';
+      if (track.kind === 'captions') track.mode = captionTrackMode(showCaptions);
     }
   }, [captionsUrl, showCaptions]);
 
@@ -923,7 +926,8 @@ export default function InteractiveVideoPlayer({
                 srcLang="en"
                 label="English"
                 onLoad={(event) => {
-                  event.currentTarget.track.mode = showCaptions ? 'showing' : 'disabled';
+                  const mode = captionTrackModeAfterLoad(showCaptions);
+                  if (mode) event.currentTarget.track.mode = mode;
                 }}
               />
             ) : null}

@@ -103,6 +103,7 @@ test.describe('Authenticated live HVAC lesson media', () => {
     const pauseResume = [];
     for (let cycle = 0; cycle < 2; cycle++) {
       const pause = workspace.getByRole('button', { name: 'Pause lesson video', exact: true });
+      await pause.scrollIntoViewIfNeeded();
       // Touch devices have no hover: their Pause control must remain reachable
       // even after the desktop auto-hide interval has elapsed.
       if (await page.evaluate(() => matchMedia('(hover: none)').matches)) {

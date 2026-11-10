@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
+      - 'scripts/gcp/verify-public-entry.*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'

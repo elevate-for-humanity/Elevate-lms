@@ -62,7 +62,7 @@ describe('school invoice tuition checkout', () => {
     expect(state.schedule).toHaveBeenCalledWith(expect.objectContaining({ amount_cents: 180000, remaining_invoices: 3, fulfillment_payload: expect.objectContaining({ amount_cents: 180000 }) }));
   });
   it('rejects a reused QuickBooks invoice with mismatched payment terms', async () => {
-    // The approved installment path applies to apprenticeships only.
+    // This case must use an apprenticeship: ordinary programs cannot choose installments.
     state.nail = true;
     state.createInvoice.mockResolvedValueOnce({ providerInvoiceId: 'old', paymentUrl: 'https://example.test/old', totalCents: 35000 });
     const response = await POST(request({ program_id: 'nails', payment_plan: 'installments' }));

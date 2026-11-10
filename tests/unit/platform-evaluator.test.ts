@@ -32,7 +32,7 @@ describe('platform execution evidence', () => {
     expect(result.reasons.join(' ')).toContain('Generic success flags are not verification');
   });
 
-  it('blocks OpenHands branch-only evidence without a reviewable patch and CI', () => {
+  it('rejects branch-only OpenHands evidence even when GitHub reports verified', () => {
     const result = evaluateExecution({
       tool: 'openhands.execute',
       result: {
@@ -48,10 +48,11 @@ describe('platform execution evidence', () => {
       attempts: 1,
       maxAttempts: 1,
     });
+
     expect(result.status).toBe('FAIL_BLOCKING');
   });
 
-  it('accepts verified OpenHands changed-PR evidence with completed CI', () => {
+  it('accepts a verified OpenHands PR with real changed-file and completed successful CI evidence', () => {
     const result = evaluateExecution({
       tool: 'openhands.execute',
       result: {

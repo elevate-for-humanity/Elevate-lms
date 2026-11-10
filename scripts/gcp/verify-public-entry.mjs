@@ -30,9 +30,9 @@ await check('live-version', async () => {
   return { status: response.status, commit: data.commitSha };
 });
 const programs = [
-  ['barber-apprenticeship', 498000, 124500],
-  ['cosmetology-apprenticeship', 600000, 150000],
-  ['esthetician-apprenticeship', 600000, 150000],
+  ['barber-apprenticeship', 498000, 60000],
+  ['cosmetology-apprenticeship', 600000, 60000],
+  ['esthetician-apprenticeship', 600000, 60000],
   ['nail-technician-apprenticeship', 600000, 60000],
 ];
 for (const [slug, tuition, installment] of programs) {

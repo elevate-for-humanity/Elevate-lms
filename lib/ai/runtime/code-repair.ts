@@ -655,14 +655,17 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  }
  if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
  // New repairs use OpenHands; the local inference service is not an admission
- // dependency for that engine. Configuration permits an attempt, never proves
- // provider acceptance or a completed repair. Old planner checkpoints retain
+ // dependency for that engine. A read-only Cloud response is required before
+ // spending an attempt; it never proves execution or a completed repair.
+ // Old planner checkpoints retain
  // their original engine and its readiness check.
  if(parisRepairEngine(pending.candidate)==='openhands'){
-  const {getHydratedOpenHandsConfig}=await import('@/lib/devstudio/openhands/client');
-  const config=await getHydratedOpenHandsConfig();
-  if(!config.configured || config.configuredRepository!==REPAIR_REPOSITORY)return {
-   enabled:true,dispatched:0,awaitingProvider:true,reason:'OPENHANDS_CONFIGURATION_REQUIRED',providerStatus:'not_configured'};
+  const {probeOpenHandsReadiness}=await import('@/lib/devstudio/paris-openhands-readiness');
+  const readiness=await probeOpenHandsReadiness();
+  if(!readiness.verified)return {
+   enabled:true,dispatched:0,awaitingProvider:true,
+   reason:readiness.status==='not_configured'?'OPENHANDS_CONFIGURATION_REQUIRED':'OPENHANDS_READINESS_UNVERIFIED',
+   providerStatus:readiness.status,readiness};
  }else if((process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
   const health=ownedProviderReadiness??await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false,status:'request_failed'}));

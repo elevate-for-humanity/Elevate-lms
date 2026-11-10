@@ -314,7 +314,9 @@ function evaluateOpenHandsCompletion(
 
   return evaluateExecution({
     tool: 'openhands.execute',
-    result: github,
+    // The shared evaluator accepts OpenHands evidence under github_verification.
+    // Passing the raw GitHub object incorrectly makes valid runs FAIL_BLOCKING.
+    result: { github_verification: github },
     attempts,
     maxAttempts,
     expectedOutput:

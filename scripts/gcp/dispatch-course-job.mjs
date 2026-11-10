@@ -17,7 +17,12 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
   // Role jobs use separate resource profiles and role-filtered claims.
   url.searchParams.set('job_type','not.like.lesson_autopilot:*');
-  url.searchParams.set('select','id,status,available_at,heartbeat_at,execution_generation,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused)');
+  url.searchParams.set('select','id,status,available_at,heartbeat_at,execution_generation,attempts,max_attempts,last_error,build:ultimate_course_builds!inner(owner_paused:profile->>ownerPaused,active_pools:ultimate_autopilot_pools(id))');
+  // Match claim_ultimate_course_role_job: a parked coordinator cannot claim
+  // while its build has an active lesson pool. Apply the anti-join before
+  // pagination so blocked coordinators cannot hide independent work.
+  url.searchParams.set('build.active_pools.state','eq.active');
+  url.searchParams.set('build.active_pools','is.null');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
   // A stopped execution leaves an expired running lease. Claim RPC performs
   // recovery, but it cannot run unless the dispatcher launches a worker.

@@ -356,7 +356,40 @@ export default async function LessonPage({
     </header>
   );
 
-  const lessonWorkbook = await loadLessonWorkbook(db, course.id, lesson.id, user?.id, preview.active);
+  const lessonWorkbook = await loadLessonWorkbook(
+    db,
+    course.id,
+    lesson.id,
+    user?.id,
+    preview.active,
+  );
+  const [savedAssessment, savedCompletion] =
+    !preview.active && user
+      ? await Promise.all([
+          db
+            .from('checkpoint_scores')
+            .select('score')
+            .eq('user_id', user.id)
+            .eq('course_id', course.id)
+            .eq('lesson_id', lesson.id)
+            .eq('passed', true)
+            .order('score', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          db
+            .from('lesson_progress')
+            .select('completed')
+            .eq('user_id', user.id)
+            .eq('course_id', course.id)
+            .eq('lesson_id', lesson.id)
+            .maybeSingle(),
+        ])
+      : [
+          { data: null, error: null },
+          { data: null, error: null },
+        ];
+  if (savedAssessment.error || savedCompletion.error)
+    throw new Error('Saved lesson progress could not be loaded.');
   return (
     <LessonFocusShell header={lessonHeader}>
       <TheoryWindowBoundary courseId={course.id} readOnly={preview.active}>
@@ -515,6 +548,9 @@ export default async function LessonPage({
                       lessonId={lesson.id}
                     />
                     <LessonProgressClient
+                      key={lesson.id}
+                      savedPassingScore={savedAssessment.data?.score ?? null}
+                      initiallyCompleted={savedCompletion.data?.completed === true}
                       theoryClockEnabled={!handsOnClockOnly}
                       courseId={course.id}
                       lessonId={lesson.id}

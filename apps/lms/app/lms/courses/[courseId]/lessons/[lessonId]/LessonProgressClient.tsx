@@ -19,6 +19,8 @@ type QuizQuestion = {
 };
 
 interface Props {
+  savedPassingScore?: number | null;
+  initiallyCompleted?: boolean;
   theoryClockEnabled?: boolean;
   courseId: string;
   lessonId: string;
@@ -29,6 +31,8 @@ interface Props {
 }
 
 export default function LessonProgressClient({
+  savedPassingScore = null,
+  initiallyCompleted = false,
   theoryClockEnabled = true,
   courseId,
   lessonId,
@@ -41,8 +45,11 @@ export default function LessonProgressClient({
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<string>('');
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<Array<{question:string;correct:boolean;correctAnswer:string|null;explanation:string}>>([]);
-  const [completed, setCompleted] = useState(false);
+  const [feedback, setFeedback] = useState<
+    Array<{ question: string; correct: boolean; correctAnswer: string | null; explanation: string }>
+  >([]);
+  const [completed, setCompleted] = useState(initiallyCompleted);
+  const [retaking, setRetaking] = useState(false);
   const clock = useTheoryTimeclock(courseId, lessonId, theoryClockEnabled);
   const [clockTarget, setClockTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -138,13 +145,48 @@ export default function LessonProgressClient({
   const clockPanel = <TheoryTimeclockPanel clock={clock} />;
   return (
     <>
-      {theoryClockEnabled ? (clockTarget ? createPortal(clockPanel, clockTarget) : clockPanel) : null}
+      {theoryClockEnabled
+        ? clockTarget
+          ? createPortal(clockPanel, clockTarget)
+          : clockPanel
+        : null}
       <section
         id="lesson-completion"
         tabIndex={-1}
         className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
       >
-        {(isGated || normalized.length > 0) && (
+        {savedPassingScore !== null && (
+          <div
+            className="mb-5 rounded-xl border border-emerald-300 bg-emerald-50 p-4"
+            role="status"
+          >
+            <p className="font-bold">Saved passing result: {savedPassingScore}%.</p>
+            <p className="mt-2">
+              You do not need to repeat this assessment. Lesson completion also checks the required
+              workbook, video and other learning activities.
+            </p>
+            {!completed && !retaking && (
+              <button
+                type="button"
+                onClick={() => setRetaking(true)}
+                className="mt-3 min-h-11 rounded-lg border border-emerald-700 px-4 py-2 font-bold"
+              >
+                Optional assessment retake
+              </button>
+            )}
+            {isGated && !completed && (
+              <button
+                type="button"
+                onClick={completeStandardLesson}
+                disabled={saving}
+                className="mt-3 min-h-11 rounded-lg bg-cyan-700 px-4 py-3 font-bold text-white disabled:opacity-60"
+              >
+                {saving ? 'Saving…' : 'Finish assessment completion'}
+              </button>
+            )}
+          </div>
+        )}
+        {(isGated || normalized.length > 0) && (savedPassingScore === null || retaking) && (
           <>
             <h2 className="text-xl font-extrabold text-slate-950">
               {lessonType === 'exam'
@@ -165,7 +207,16 @@ export default function LessonProgressClient({
                   <legend className="px-1 font-bold text-slate-950">
                     {questionIndex + 1}. {q.text}
                   </legend>
-                  {HVAC_PRACTICE_LESSONS.some(test => test.id === lessonId) && <details className="my-3"><summary className="cursor-pointer py-2 font-semibold">Listen to this question with PARIS</summary><WorkbookNarration text={`Question ${questionIndex + 1}. ${q.text} ${q.options.map((option,index)=>`${String.fromCharCode(65+index)}. ${option}`).join(' ')}`} /></details>}
+                  {HVAC_PRACTICE_LESSONS.some((test) => test.id === lessonId) && (
+                    <details className="my-3">
+                      <summary className="cursor-pointer py-2 font-semibold">
+                        Listen to this question with PARIS
+                      </summary>
+                      <WorkbookNarration
+                        text={`Question ${questionIndex + 1}. ${q.text} ${q.options.map((option, index) => `${String.fromCharCode(65 + index)}. ${option}`).join(' ')}`}
+                      />
+                    </details>
+                  )}
                   <div className="mt-3 space-y-2">
                     {q.options.map((option, optionIndex) => (
                       <label
@@ -225,7 +276,30 @@ export default function LessonProgressClient({
           </>
         )}
 
-        {feedback.length > 0 && <section className="mt-6 space-y-3" aria-label="Assessment answer feedback"><h3 className="text-xl font-bold">Check your answers</h3>{feedback.map((item,index)=><article key={index} className={`rounded-lg border p-4 ${item.correct ? 'border-emerald-400 bg-emerald-50' : 'border-amber-400 bg-amber-50'}`}><p className="font-bold">{index+1}. {item.question}</p><p className="mt-2 font-semibold">{item.correct ? 'Correct answer.' : 'Not quite. Try again.'}</p>{!item.correct && item.correctAnswer && <p className="mt-2">Correct answer: <strong>{item.correctAnswer}</strong></p>}<p className="mt-2">{item.explanation}</p></article>)}</section>}
+        {feedback.length > 0 && (
+          <section className="mt-6 space-y-3" aria-label="Assessment answer feedback">
+            <h3 className="text-xl font-bold">Check your answers</h3>
+            {feedback.map((item, index) => (
+              <article
+                key={index}
+                className={`rounded-lg border p-4 ${item.correct ? 'border-emerald-400 bg-emerald-50' : 'border-amber-400 bg-amber-50'}`}
+              >
+                <p className="font-bold">
+                  {index + 1}. {item.question}
+                </p>
+                <p className="mt-2 font-semibold">
+                  {item.correct ? 'Correct answer.' : 'Not quite. Try again.'}
+                </p>
+                {!item.correct && item.correctAnswer && (
+                  <p className="mt-2">
+                    Correct answer: <strong>{item.correctAnswer}</strong>
+                  </p>
+                )}
+                <p className="mt-2">{item.explanation}</p>
+              </article>
+            ))}
+          </section>
+        )}
         {result ? (
           <p
             className={`mt-4 rounded-lg px-4 py-3 text-sm font-bold ${completed ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-950'}`}
@@ -237,4 +311,3 @@ export default function LessonProgressClient({
     </>
   );
 }
-

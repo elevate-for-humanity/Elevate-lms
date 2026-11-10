@@ -66,3 +66,27 @@ it('updates the HVAC circuit preview from the controls in the instruction panel'
   fireEvent.change(within(left).getByRole('slider'), { target: { value: '24' } });
   expect(within(right).getByRole('img', { name: /current 1.00/ })).toBeInTheDocument();
 });
+
+it('expands either panel and restores split view without losing state', () => {
+  const { container } = render(
+    <LearningWorkspace
+      instructions={<textarea aria-label="Written answer" />}
+      preview={<video aria-label="Lesson film" />}
+    />,
+  );
+  const answer = screen.getByRole('textbox');
+  const video = container.querySelector('video');
+  fireEvent.change(answer, { target: { value: 'Saved practice' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Lesson preview' }));
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'preview',
+  );
+  expect(container.querySelector('video')).toBe(video);
+  fireEvent.click(screen.getByRole('button', { name: 'Split view' }));
+  expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute(
+    'data-view',
+    'split',
+  );
+  expect(answer).toHaveValue('Saved practice');
+});

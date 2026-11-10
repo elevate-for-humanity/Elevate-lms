@@ -1,4 +1,5 @@
 import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
+import { loadCourseActivity } from '@/lib/learner/course-activity';
 import { CareerPlan } from '@/components/career/CareerPlan';
 import { loadCareerPlan } from '@/lib/career/plan';
 import ProgramGuideResources from '@/components/resources/ProgramGuideResources';
@@ -397,6 +398,22 @@ export default async function StudentDashboard() {
   }
 
   const totalLessons = lessons.length;
+  let savedActivity: { assessmentsPassed: number; videosCompleted: number } | null = null;
+  if (activeCourseId && lessons.length && !isPartnerCourse) {
+    try {
+      savedActivity = await loadCourseActivity(
+        supabase,
+        subjectId,
+        activeCourseId,
+        lessons.map((lesson) => lesson.id),
+      );
+    } catch (error) {
+      logger.error(
+        'STUDENT_SAVED_ACTIVITY_FAILED',
+        error instanceof Error ? error : new Error(String(error)),
+      );
+    }
+  }
   const completedLessons = completedLessonIds.size;
   const courseProgress =
     totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;
@@ -567,6 +584,13 @@ export default async function StudentDashboard() {
                     </span>
                     <span>{courseProgress}%</span>
                   </div>
+                  <p className="mb-3 text-sm leading-6 text-slate-100">
+                    {savedActivity
+                      ? `${savedActivity.assessmentsPassed} lesson assessments passed · ${savedActivity.videosCompleted} lesson videos completed. `
+                      : 'Saved assessment and video activity could not be loaded. '}
+                    Passing results stay saved while required workbook reviews and other lesson
+                    activities are finished. These counts do not award hands-on hours.
+                  </p>
                   <div
                     className="h-3 overflow-hidden rounded-full bg-slate-700"
                     role="progressbar"

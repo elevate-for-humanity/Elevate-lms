@@ -22,10 +22,7 @@ import {
 import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digital-workbooks';
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
-import {
-  workbookWritingComplete,
-  firstWorkbookUnreviewedIndex,
-} from '@/lib/lms/workbook-progression';
+import { workbookWritingComplete } from '@/lib/lms/workbook-progression';
 
 export function SectionEditor({
   section,
@@ -365,23 +362,19 @@ export default function DigitalWorkbook({
   // Existing writing is preserved, but a saved browser slide position must never
   // teleport a learner to Week 7 or conceal earlier sections.
   const [active, setActive] = useState(sections[0]?.id ?? '');
-  const [reviewedIds, setReviewedIds] = useState<Set<string>>(
+  const [, setReviewedIds] = useState<Set<string>>(
     () => new Set(responses.filter((row) => row.reviewed).map((row) => row.section_id)),
-  );
-  const unlockedIndex = firstWorkbookUnreviewedIndex(
-    sections.map((section) => section.id),
-    reviewedIds,
   );
   useEffect(() => {
     function selectLinkedSection() {
       const requested = window.location.hash.replace(/^#section-/, '');
       const index = sections.findIndex((section) => section.id === requested);
-      if (index >= 0 && index <= unlockedIndex) setActive(requested);
+      if (index >= 0) setActive(requested);
     }
     selectLinkedSection();
     window.addEventListener('hashchange', selectLinkedSection);
     return () => window.removeEventListener('hashchange', selectLinkedSection);
-  }, [sections, unlockedIndex]);
+  }, [sections]);
   const reviewSaved = (id: string, reviewed: boolean) => {
     setReviewedIds((previous) => {
       const next = new Set(previous);
@@ -508,22 +501,21 @@ export default function DigitalWorkbook({
                           const index = sections.findIndex(
                             (section) => section.id === event.target.value,
                           );
-                          if (index >= 0 && index <= unlockedIndex) setActive(event.target.value);
+                          if (index >= 0) setActive(event.target.value);
                         }}
                         className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
                       >
-                        {sections
-                          .filter((_, index) => index <= unlockedIndex)
-                          .map((section) => (
+                        {sections.map((section) => (
                             <option key={section.id} value={section.id}>
                               {section.section_number}. {section.title}
                             </option>
                           ))}
                       </select>
                       <p className="mb-6 leading-relaxed text-slate-600">
-                        Use these published exercises alongside your course. Workbook study is
-                        available outside video study windows. Saving answers does not complete
-                        lessons or award training hours.
+                        You can open and save writing in any available workbook chapter without
+                        repeating earlier lesson quizzes. Chapter review still requires completed
+                        writing and earlier reviews; saving answers alone does not mark a course
+                        lesson complete or award training hours.
                       </p>
                     </>
                   ) : null

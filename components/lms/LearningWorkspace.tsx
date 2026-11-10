@@ -19,34 +19,42 @@ export default function LearningWorkspace({
   preview,
   instructionLabel = 'Instructions & activities',
   previewLabel = 'Lesson preview',
+  initialView = 'split',
 }: {
   instructions: ReactNode;
   preview: ReactNode;
   instructionLabel?: string;
   previewLabel?: string;
+  initialView?: 'split' | 'instructions' | 'preview';
 }) {
   const id = useId();
-  const [view, setView] = useState<'instructions' | 'preview'>('instructions');
+  const [view, setView] = useState(initialView);
   const [previewTarget, setPreviewTarget] = useState<HTMLDivElement | null>(null);
 
   return (
     <PreviewTarget.Provider value={previewTarget}>
-      <div className={`${styles.workspace} min-w-0`} data-learning-workspace>
+      <div className={`${styles.workspace} min-w-0`} data-learning-workspace data-view={view}>
         <div
           className={`${styles.views} mb-4 gap-2`}
           role="group"
           aria-label="Learning workspace view"
         >
-          {(['instructions', 'preview'] as const).map((panel) => (
+          {(['split', 'instructions', 'preview'] as const).map((panel) => (
             <button
               key={panel}
               type="button"
               aria-pressed={view === panel}
-              aria-controls={`${id}-${panel}`}
+              aria-controls={
+                panel === 'split' ? `${id}-instructions ${id}-preview` : `${id}-${panel}`
+              }
               onClick={() => setView(panel)}
               className={`min-h-12 flex-1 rounded-xl border px-3 py-3 text-sm font-bold ${view === panel ? 'border-teal-800 bg-teal-800 text-white' : 'border-slate-300 bg-white text-slate-900'}`}
             >
-              {panel === 'instructions' ? instructionLabel : previewLabel}
+              {panel === 'split'
+                ? 'Split view'
+                : panel === 'instructions'
+                  ? instructionLabel
+                  : previewLabel}
             </button>
           ))}
         </div>
@@ -54,7 +62,7 @@ export default function LearningWorkspace({
           <section
             id={`${id}-instructions`}
             aria-label={instructionLabel}
-            data-active={view === 'instructions'}
+            data-active={view !== 'preview'}
             tabIndex={0}
             className={`${styles.panel} min-w-0 space-y-5 rounded-2xl border border-slate-200 bg-white p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 sm:p-6`}
           >

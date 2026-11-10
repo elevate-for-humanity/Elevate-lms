@@ -1,9 +1,11 @@
 .workspace {
   container-type: inline-size;
+  container-name: learning-workspace;
 }
 
 .views {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .panel {
@@ -15,11 +17,7 @@
 }
 
 /* Use the available workspace width, including when the portal sidebar is open. */
-@container (min-width: 900px) {
-  .views {
-    display: none;
-  }
-
+@container learning-workspace (min-width: 900px) {
   .panels {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
   }
@@ -35,4 +33,19 @@
     position: sticky;
     top: 1rem;
   }
+}
+
+/* Expand either panel to the available width without unmounting its editor/player.
+ * Direct-child selectors keep a workbook nested inside a lesson independent. */
+.workspace:not([data-view='split']) > .panels {
+  grid-template-columns: minmax(0, 1fr);
+}
+.workspace:not([data-view='split']) > .panels > .panel {
+  max-height: none;
+  overflow-y: visible;
+  position: static;
+}
+.workspace[data-view='instructions'] > .panels > .preview,
+.workspace[data-view='preview'] > .panels > .panel:not(.preview) {
+  display: none;
 }

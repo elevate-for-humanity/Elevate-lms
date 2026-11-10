@@ -194,6 +194,7 @@ export default async function LessonPage({
   const handsOnClockOnly =
     program?.slug === 'hvac-technician' ||
     /^(hvac(?:-|$)|epa-?608(?:-|$))/i.test(course.slug || '');
+  const lessonWidth = handsOnClockOnly ? 'w-full min-w-0' : 'mx-auto max-w-[1600px]';
 
   if (!preview.active && user) {
     const { data: pacing, error: pacingError } = await supabase.rpc('get_my_course_pacing', {
@@ -323,7 +324,7 @@ export default async function LessonPage({
 
   const lessonHeader = (
     <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+      <div className={`${lessonWidth} px-4 py-6 sm:px-6`}>
         <Link
           href={`/lms/courses/${course.id}`}
           className="inline-flex items-center gap-2 text-sm font-bold text-cyan-800 hover:underline"
@@ -356,17 +357,51 @@ export default async function LessonPage({
     </header>
   );
 
-  const lessonWorkbook = await loadLessonWorkbook(db, course.id, lesson.id, user?.id, preview.active);
+  const lessonWorkbook = await loadLessonWorkbook(
+    db,
+    course.id,
+    lesson.id,
+    user?.id,
+    preview.active,
+  );
+  const [savedAssessment, savedCompletion] =
+    !preview.active && user
+      ? await Promise.all([
+          db
+            .from('checkpoint_scores')
+            .select('score')
+            .eq('user_id', user.id)
+            .eq('course_id', course.id)
+            .eq('lesson_id', lesson.id)
+            .eq('passed', true)
+            .order('score', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          db
+            .from('lesson_progress')
+            .select('completed')
+            .eq('user_id', user.id)
+            .eq('course_id', course.id)
+            .eq('lesson_id', lesson.id)
+            .maybeSingle(),
+        ])
+      : [
+          { data: null, error: null },
+          { data: null, error: null },
+        ];
+  if (savedAssessment.error || savedCompletion.error)
+    throw new Error('Saved lesson progress could not be loaded.');
   return (
     <LessonFocusShell header={lessonHeader}>
       <TheoryWindowBoundary courseId={course.id} readOnly={preview.active}>
-        <div className="mx-auto max-w-[1600px] space-y-6 px-4 py-8 sm:px-6">
+        <div className={`${lessonWidth} space-y-6 px-4 py-8 sm:px-6`}>
           {preview.active ? (
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700">
               Administrator lesson view · Full content, playback and assessment inspection
             </div>
           ) : null}
           <LearningWorkspace
+            initialView={handsOnClockOnly ? 'preview' : 'split'}
             instructionLabel="Workbook & lesson activities"
             previewLabel="Theory lesson & video"
             instructions={
@@ -515,6 +550,9 @@ export default async function LessonPage({
                       lessonId={lesson.id}
                     />
                     <LessonProgressClient
+                      key={lesson.id}
+                      savedPassingScore={savedAssessment.data?.score ?? null}
+                      initiallyCompleted={savedCompletion.data?.completed === true}
                       theoryClockEnabled={!handsOnClockOnly}
                       courseId={course.id}
                       lessonId={lesson.id}

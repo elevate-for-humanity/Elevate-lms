@@ -48,7 +48,7 @@ export function SectionEditor({
   onReviewSaved?: (sectionId: string, reviewed: boolean) => void;
   sectionPicker: ReactNode;
 }) {
-  const { draft, edit, save, status, error } = useWorkbookSave(
+  const { draft, edit, save, status, error, recoveryText } = useWorkbookSave(
     section.id,
     initial,
     readOnly,
@@ -161,6 +161,7 @@ export function SectionEditor({
                         edit({
                           ...draft,
                           answers: { ...draft.answers, [slide.field!]: event.target.value },
+                          reviewed: false,
                         })
                       }
                       onBlur={() => {
@@ -281,6 +282,24 @@ export function SectionEditor({
                 Finish each writing activity with at least 10 characters before checking this
                 section as reviewed. Personal reflections are saved without right-or-wrong grades.
               </p>
+            )}
+            {recoveryText && (
+              <details className="my-4 rounded-xl border border-amber-400 bg-amber-50 p-4">
+                <summary className="cursor-pointer font-bold">
+                  Copy unsaved answers from this browser
+                </summary>
+                <p className="my-3">
+                  Compare this copy with your saved work before editing. It has not replaced your
+                  account answers.
+                </p>
+                <textarea
+                  aria-label="Unsaved workbook recovery copy"
+                  readOnly
+                  value={recoveryText}
+                  rows={12}
+                  className="w-full rounded-lg border border-slate-400 bg-white p-3"
+                />
+              </details>
             )}
             <button
               type="button"

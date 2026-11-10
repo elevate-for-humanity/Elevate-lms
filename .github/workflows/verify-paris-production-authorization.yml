@@ -126,3 +126,38 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/paris-code-repair.yml/dispatches" -f ref=main
+      - name: Verify actual OpenHands runtime configuration and read-only Cloud authorization
+        # Independent of the monitor's eligible queue. Never creates a task or
+        # blocks continuation of an existing internal planner checkpoint.
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error
+          token=os.environ.get('PARIS_ID_TOKEN','')
+          if not token: raise SystemExit('PARIS_WORKFLOW_IDENTITY_UNAVAILABLE')
+          request=urllib.request.Request(
+            'https://admin.elevateforhumanity.org/api/cron/paris-code-repair',
+            data=json.dumps({'phase':'openhands-auth-diagnostic'}).encode(),
+            headers={'Authorization':'Bearer '+token,'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
+          try:
+            with urllib.request.urlopen(request,timeout=45) as response:
+              body=json.load(response)
+          except urllib.error.HTTPError as error:
+            print(json.dumps({'type':'openhands_runtime_readiness','httpStatus':error.code,'verified':False}))
+            raise SystemExit('OPENHANDS_RUNTIME_DIAGNOSTIC_HTTP_FAILURE')
+          except Exception:
+            raise SystemExit('OPENHANDS_RUNTIME_DIAGNOSTIC_UNAVAILABLE')
+          fields=['diagnosticVersion','readOnly','agentStarted','writeAuthority','commit','revision',
+            'credentialAuthority','apiKeyResolved','repositoryMatches','providerRequestMade','httpStatus','status','verified']
+          receipt={field:body.get(field) for field in fields}
+          print(json.dumps({'type':'openhands_runtime_readiness',**receipt}))
+          if receipt['commit']!=os.environ['EXPECTED_SHA']:
+            raise SystemExit('OPENHANDS_DIAGNOSTIC_LIVE_REVISION_MISMATCH')
+          if (receipt['diagnosticVersion']!=1 or receipt['readOnly'] is not True
+              or receipt['agentStarted'] is not False or receipt['writeAuthority']!='not_exercised'
+              or receipt['apiKeyResolved'] is not True or receipt['repositoryMatches'] is not True
+              or receipt['providerRequestMade'] is not True or receipt['httpStatus']!=200
+              or receipt['verified'] is not True):
+            raise SystemExit('OPENHANDS_RUNTIME_READ_AUTHORIZATION_UNVERIFIED')
+          PY

@@ -1,6 +1,7 @@
 import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {classifyParisPhaseError} from '@/lib/devstudio/paris-phase-error.mjs';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
+import {probeOpenHandsReadiness} from '@/lib/devstudio/paris-openhands-readiness';
 import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
 import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,reportParisDispatchFailure,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
@@ -15,6 +16,11 @@ export async function POST(request:NextRequest){
  const body=await request.json().catch(()=>({}));
  if(deploymentDiagnosticOnly && !['app-auth-diagnostic','auth-diagnostic'].includes(body.phase))return NextResponse.json({error:'Unauthorized'},{status:401});
  try{
+  if(body.phase==='openhands-auth-diagnostic'){
+   // The original signed PARIS workflows may inspect readiness without a
+   // repair ID, queue mutation, workflow-token override or provider start.
+   return NextResponse.json(await probeOpenHandsReadiness(),{headers:{'Cache-Control':'no-store'}});
+  }
   if(body.phase==='app-auth-diagnostic'){
    // Deliberately ignore X-Paris-GitHub-Token: this phase proves the runtime App.
    const token=await getGitHubAppToken();

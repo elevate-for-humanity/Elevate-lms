@@ -3,10 +3,12 @@ import {NextRequest} from 'next/server';
 const tick=vi.hoisted(()=>vi.fn());
 const authorized=vi.hoisted(()=>vi.fn(async()=>true));
 const deployDiagnostic=vi.hoisted(()=>vi.fn(async()=>false));
+const openhands=vi.hoisted(()=>vi.fn());
+vi.mock('@/lib/devstudio/paris-openhands-readiness',()=>({probeOpenHandsReadiness:openhands}));
 vi.mock('@/lib/paris-workflow-identity',()=>({authorizeParisWorkflow:authorized,authorizeParisDeploymentAppDiagnostic:deployDiagnostic}));
 vi.mock('@/lib/ai/runtime/code-repair',()=>({tickParisCodeRepairs:tick,prepareParisRepair:vi.fn(),publishParisRepair:vi.fn(),reportParisRepairFailure:vi.fn()}));
 import {POST} from '@/apps/admin/app/api/cron/paris-code-repair/route';
-afterEach(()=>{vi.unstubAllEnvs();vi.restoreAllMocks();tick.mockReset();authorized.mockReset();authorized.mockResolvedValue(true);deployDiagnostic.mockReset();deployDiagnostic.mockResolvedValue(false);});
+afterEach(()=>{vi.unstubAllEnvs();vi.restoreAllMocks();tick.mockReset();openhands.mockReset();authorized.mockReset();authorized.mockResolvedValue(true);deployDiagnostic.mockReset();deployDiagnostic.mockResolvedValue(false);});
 it('returns an actionable safe credential code to the trusted monitor',async()=>{
  vi.spyOn(console,'error').mockImplementation(()=>{});tick.mockRejectedValue(Error('PARIS_GITHUB_HTTP_401'));
  const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{method:'POST',headers:{authorization:'Bearer test-only'},body:JSON.stringify({phase:'tick'})}));expect(response.status).toBe(502);expect(await response.json()).toMatchObject({errorCode:'PARIS_GITHUB_HTTP_401'});
@@ -46,4 +48,22 @@ it('deploy-admin OIDC cannot call PARIS tick, prepare or publish operations',asy
  }));
  expect(response.status).toBe(401);
  expect(tick).not.toHaveBeenCalled();
+});
+
+it('returns a distinct read-only OpenHands receipt without ticking or starting a repair',async()=>{
+ openhands.mockResolvedValueOnce({verified:false,status:'not_configured',apiKeyResolved:false,repositoryMatches:true,agentStarted:false});
+ const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{
+  method:'POST',headers:{authorization:'Bearer signed-workflow','x-paris-github-token':'ignored-override'},body:JSON.stringify({phase:'openhands-auth-diagnostic'}),
+ }));
+ expect(response.status).toBe(200);expect(response.headers.get('Cache-Control')).toBe('no-store');
+ expect(await response.json()).toMatchObject({verified:false,apiKeyResolved:false,repositoryMatches:true,agentStarted:false});
+ expect(openhands).toHaveBeenCalledOnce();expect(tick).not.toHaveBeenCalled();
+});
+
+it.each(['anonymous','deployment-only'])('rejects %s OpenHands diagnostics before reading configuration',async identity=>{
+ authorized.mockResolvedValue(false);deployDiagnostic.mockResolvedValue(identity==='deployment-only');
+ const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{
+  method:'POST',body:JSON.stringify({phase:'openhands-auth-diagnostic'}),
+ }));
+ expect(response.status).toBe(401);expect(openhands).not.toHaveBeenCalled();expect(tick).not.toHaveBeenCalled();
 });

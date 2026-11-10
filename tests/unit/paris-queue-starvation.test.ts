@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false, stageLookups: [] as any[], releases: [] as any[], enqueues: [] as any[] }));
 vi.mock('server-only', () => ({}));
-vi.mock('@/lib/devstudio/openhands/client', () => ({ getHydratedOpenHandsConfig: async () => ({ configured: true, configuredRepository: 'elevate-for-humanity/Elevate-lms' }) }));
+vi.mock('@/lib/devstudio/paris-openhands-readiness', () => ({ probeOpenHandsReadiness: async () => ({ verified: true, status: 'read_authorization_verified' }) }));
 vi.mock('@/lib/ai/providers/owned-model-health.mjs', () => ({ probeOwnedModel: async () => ({ verified: true, status: 'reachable' }) }));
 vi.mock('@/lib/ai/runtime/repair-reconciliation', () => ({ reconcileRecoveredRepairs: vi.fn() }));
 vi.mock('@/lib/ai/runtime/repair-events', () => ({ readRecentRepairEvents: async () => [] }));

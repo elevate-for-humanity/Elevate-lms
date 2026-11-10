@@ -4,7 +4,7 @@ vi.mock('server-only',()=>({}));
 vi.mock('@/lib/devstudio/workflow-github-context',()=>({currentWorkflowGitHubToken:()=> 'signed-workflow-fixture'}));
 vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer fixture'})}));
 vi.mock('@/lib/ai/providers/owned-model-health.mjs',()=>({probeOwnedModel:h.probe}));
-vi.mock('@/lib/devstudio/openhands/client',()=>({getHydratedOpenHandsConfig:h.openhands}));
+vi.mock('@/lib/devstudio/paris-openhands-readiness',()=>({probeOpenHandsReadiness:h.openhands}));
 vi.mock('@/lib/ai/runtime/repair-events',()=>({readRecentRepairEvents:async()=>[]}));
 vi.mock('@/lib/ai/runtime/repair-reconciliation',()=>({reconcileRecoveredRepairs:async()=>({retired:0})}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:string)=>{
@@ -25,7 +25,7 @@ import {tickParisCodeRepairs} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
  h.verified=false;h.claimWon=true;h.candidate={kind:'planner-checkpoint'};h.updates=[];h.probe.mockReset();h.openhands.mockReset();
  h.probe.mockImplementation(async()=>({configured:true,verified:h.verified,status:h.verified?'reachable':'request_failed'}));
- h.openhands.mockResolvedValue({configured:true,configuredRepository:'elevate-for-humanity/Elevate-lms'});
+ h.openhands.mockResolvedValue({verified:true,status:'read_authorization_verified'});
  vi.stubEnv('AI_PROVIDER','elevate');
  vi.stubGlobal('fetch',vi.fn(async(input:any)=>String(input).includes('/git/ref/heads/main')
   ?Response.json({object:{sha:'a'.repeat(40)}}):Response.json({workflow_runs:[]})));
@@ -59,16 +59,16 @@ it('new OpenHands work admits one fenced claim while the local model is unavaila
 });
 it('missing or mismatched OpenHands configuration cannot consume an attempt',async()=>{
  h.candidate=null;
- for(const config of [{configured:false,configuredRepository:'elevate-for-humanity/Elevate-lms'},
-  {configured:true,configuredRepository:'another/repository'}]){
-  h.openhands.mockResolvedValue(config);
+ for(const config of [{apiKeyResolved:false,repositoryMatches:true},
+  {apiKeyResolved:true,repositoryMatches:false}]){
+  h.openhands.mockResolvedValue({...config,verified:false,status:'not_configured'});
   expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OPENHANDS_CONFIGURATION_REQUIRED'});
  }
  expect(h.updates).toEqual([]);expect(h.probe).not.toHaveBeenCalled();
 });
-it('OpenHands configuration failures preserve the queued repair and its attempt',async()=>{
- h.candidate=null;h.openhands.mockRejectedValueOnce(new Error('configuration unavailable'));
- await expect(tickParisCodeRepairs({workflowOwnedDispatch:true})).rejects.toThrow('configuration unavailable');
+it.each(['authorization_failed','provider_request_failed','configuration_unavailable','origin_not_verified','invalid_provider_response'])('OpenHands %s preserves the queued repair and its attempt',async status=>{
+ h.candidate=null;h.openhands.mockResolvedValueOnce({verified:false,status});
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OPENHANDS_READINESS_UNVERIFIED',providerStatus:status});
  expect(h.updates).toEqual([]);expect(h.probe).not.toHaveBeenCalled();
 });
 it('a lost OpenHands admission claim is never reported as a dispatch',async()=>{

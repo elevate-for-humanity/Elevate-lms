@@ -47,6 +47,7 @@ export type OpenHandsLifecycle = {
 export type StartOpenHandsTaskInput = {
   message: string;
   repository?: string | null;
+  branch?: string | null;
   traceId?: string | null;
   taskId?: string | null;
   tags?: string[];
@@ -190,6 +191,11 @@ export async function startOpenHandsTask(
   await hydrateProcessEnv();
   const message = normalizeMessage(input.message);
   const repository = validateRepository(input.repository);
+  const branch = input.branch?.trim() || null;
+  if (branch && (!/^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/.test(branch) ||
+      branch.includes('..') || branch.includes('//') || /(?:\/|\.|\.lock)$/.test(branch))) {
+    throw new Error('OpenHands branch is invalid');
+  }
   const { model } = getOpenHandsConfig();
   const metadata: Record<string, string | number | boolean | string[]> = {};
   if (input.traceId) metadata.trace_id = input.traceId;
@@ -204,6 +210,7 @@ export async function startOpenHandsTask(
         run: true,
       },
       selected_repository: repository,
+      ...(branch ? { selected_branch: branch } : {}),
       ...(model ? { llm_model: model } : {}),
       observability_span_name: 'elevate_openhands_engineering',
       observability_tags: ['elevate', 'dev-studio', ...(input.tags ?? [])].slice(0, 12),

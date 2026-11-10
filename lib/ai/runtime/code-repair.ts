@@ -1,9 +1,10 @@
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
+import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
 import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
 import {verifyParisRuntimeOrigins} from './paris-runtime-evidence.mjs';
-import {failedCurrentReleases} from './deployment-repair-events.mjs';
+import {failedCurrentReleases,queuedWorkflowRepairTarget,queuedWorkflowRepairDisposition} from './deployment-repair-events.mjs';
 import {recordFailedRepairWorkflow,repairDispatchValues} from './repair-workflow-reconciliation.mjs';
 import 'server-only';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
@@ -128,7 +129,27 @@ export async function prepareParisRepair(id:string,runId:number){
    if(!archived.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
    candidate=null;
   }
-  if(!candidate || candidate.kind==='planner-checkpoint') {
+  if(!candidate || candidate.kind==='openhands-checkpoint') {
+   const {stageParisOpenHandsRepair}=await import('@/lib/devstudio/paris-openhands-adapter');
+   candidate=await stageParisOpenHandsRepair({repairId:id,actorId:claimed.actor_id,
+    attempt:claimed.attempt_count,runId,goal:claimed.goal,
+    checkpoint:candidate?.kind==='openhands-checkpoint'?candidate.checkpoint:undefined,
+    save:async (checkpoint,expectedSequence)=>{
+     const save=db.from('paris_code_repairs').update({candidate:{kind:'openhands-checkpoint',checkpoint},updated_at:new Date().toISOString()})
+      .eq('id',id).eq('workflow_run_id',runId).eq('status','patching');
+     // Signed requests may overlap after transport ambiguity. Only one may
+     // advance this checkpoint or record intent to start the external task.
+     const saved=await (expectedSequence===null?save.is('candidate',null):
+      save.eq('candidate->checkpoint->>sequence',String(expectedSequence))).select('id').maybeSingle();
+     if(saved.error)throw saved.error;
+     if(!saved.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
+    },
+   });
+   if(candidate.pending===true)return candidate;
+  }
+  // Preserve in-flight internal checkpoints and their committed source. New
+  // repairs above use the existing tracked OpenHands engineering dispatcher.
+  if(candidate?.kind==='planner-checkpoint') {
    let sourceEvidence;
    if(claimed.source_job_id){
     const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,last_error,payload,monitor').eq('id',claimed.source_job_id).single();
@@ -223,7 +244,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  for(const repair of blocked.data??[]){
   // One post-fix replay for a source-free planner with an immutable zero-write
   // checkpoint. Do not reset attempts or override an existing source approval.
-  if(!recoveredProviderThisTick && canResumeZeroWritePlannerRepair(repair)){
+  if(!recoveredProviderThisTick && parisRepairEngine(repair.candidate)==='internal' && canResumeZeroWritePlannerRepair(repair)){
    const checkpoint=repair.candidate.checkpoint;
    const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
    if(providerRecoveryHealth===undefined){
@@ -325,7 +346,7 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   // Preserve the earlier attempt and do not reset any course job state.
   const legacyCpuEdit=canResumeLegacyCpuEdit(repair,events,ownedTier);
   const contextBudgetRecovery=canResumeContextBudgetRepair(repair);
-  if(!recoveredProviderThisTick && (legacyCpuEdit || contextBudgetRecovery || canRetryHealthyProviderRepair(repair))){
+  if(!recoveredProviderThisTick && parisRepairEngine(repair.candidate)==='internal' && (legacyCpuEdit || contextBudgetRecovery || canRetryHealthyProviderRepair(repair))){
    if(providerRecoveryHealth===undefined){
     const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
     const health=await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false}));
@@ -570,11 +591,13 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  // Inspect a bounded page; disposition decisions preserve source evidence.
  // An ineligible source is a state/eligibility decision, never missing owner authorization.
  // Do not replay completed, queued, paused, published or superseded jobs to clear the queue.
- const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history,workflow_run_id')
+ const queued=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id,attempt_history,workflow_run_id,candidate,goal,verification')
   .eq('status','queued').order('created_at',{ascending:true}).limit(1000);
  if(queued.data?.length===1000)throw Error('PARIS_QUEUED_REPAIR_SCAN_LIMIT');
  if(queued.error)throw queued.error;
- let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown;workflow_run_id:number|null}|null=null;
+ let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown;workflow_run_id:number|null;candidate:unknown}|null=null;
+ let awaitingCurrentWorkflowEvidence=0;
+ const sourceRunCache=new Map<number,any>();
  for(const candidate of queued.data??[]){
   // The production CHECK constraint was reconciled by the reviewed
   // paris_bounded_context_retry_contract migration. The policy below is the
@@ -591,7 +614,28 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
    if(limited.error)throw limited.error;
    continue;
   }
-  if(!candidate.source_job_id){pending=candidate;break;}
+  if(!candidate.source_job_id){
+   const target=queuedWorkflowRepairTarget(candidate.goal);
+   if(target){
+    if(!sourceRunCache.has(target.runId)){
+     try{sourceRunCache.set(target.runId,await gh(`/actions/runs/${target.runId}`));}
+     catch(error){if(error instanceof Error&&error.message==='PARIS_GITHUB_HTTP_404')sourceRunCache.set(target.runId,null);else throw error;}
+    }
+    const disposition=queuedWorkflowRepairDisposition(target,sourceRunCache.get(target.runId),releaseRuns,sha);
+    if(disposition.state==='awaiting-current-execution'){awaitingCurrentWorkflowEvidence++;continue;}
+    if(disposition.state!=='current-failure'){
+     // Historical evidence remains a blocked record, never a successful repair.
+     // A current failed execution already has its own canonical incident above.
+     const retained=await db.from('paris_code_repairs').update({status:'blocked',
+      error_code:disposition.state==='invalid-source'?'SOURCE_WORKFLOW_EVIDENCE_INVALID':'SOURCE_WORKFLOW_SUPERSEDED_NOT_REPAIR_VERIFIED',
+      verification:{...((candidate.verification??{}) as Record<string,unknown>),queuedWorkflowEvidence:disposition},updated_at:new Date().toISOString()})
+      .eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+     if(retained.error)throw retained.error;
+     continue;
+    }
+   }
+   pending=candidate;break;
+  }
   const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,status,last_error').eq('id',candidate.source_job_id).single();
   if(source.error)throw source.error;
   const latest=await db.from('ultimate_build_jobs').select('id,build_id,status').eq('build_id',source.data.build_id).eq('job_type',source.data.job_type).order('created_at',{ascending:false}).limit(1).maybeSingle();
@@ -609,11 +653,17 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
   if(blocked.error)throw blocked.error;
  }
- if(!pending)return {enabled:true,dispatched:0,reason:'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE'};
- // A provider outage or occupied single-instance CPU service must not spend
- // the repair's bounded attempt budget before planning can even start.
- // The prepare phase still probes again: readiness is not a reservation.
- if((process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
+ if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
+ // New repairs use OpenHands; the local inference service is not an admission
+ // dependency for that engine. Configuration permits an attempt, never proves
+ // provider acceptance or a completed repair. Old planner checkpoints retain
+ // their original engine and its readiness check.
+ if(parisRepairEngine(pending.candidate)==='openhands'){
+  const {getHydratedOpenHandsConfig}=await import('@/lib/devstudio/openhands/client');
+  const config=await getHydratedOpenHandsConfig();
+  if(!config.configured || config.configuredRepository!==REPAIR_REPOSITORY)return {
+   enabled:true,dispatched:0,awaitingProvider:true,reason:'OPENHANDS_CONFIGURATION_REQUIRED',providerStatus:'not_configured'};
+ }else if((process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
   const health=ownedProviderReadiness??await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false,status:'request_failed'}));
   if(!health.verified)return {enabled:true,dispatched:0,awaitingProvider:true,

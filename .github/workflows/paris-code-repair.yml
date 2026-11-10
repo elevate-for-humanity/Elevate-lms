@@ -6,6 +6,7 @@ on:
       - '.github/workflows/paris-code-repair.yml'
       - 'lib/ai/runtime/code-repair.ts'
       - 'lib/devstudio/paris-code-engineer.ts'
+      - 'lib/devstudio/paris-openhands-*'
       - 'lib/ai/runtime/supervision.ts'
       - 'lib/ai/runtime/code-repair-policy.mjs'
       - 'lib/ai/providers/**'
@@ -202,7 +203,7 @@ jobs:
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
-          import json,os,re,urllib.request,urllib.parse,urllib.error
+          import json,os,re,time,urllib.request,urllib.parse,urllib.error
           if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
           body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
           def fresh_identity():
@@ -215,9 +216,12 @@ jobs:
             if not isinstance(token,str) or len(token.split('.'))!=3: raise SystemExit('Invalid fresh workflow identity')
             print('::add-mask::'+token,flush=True)
             return token
-          # Each request advances one durable planner turn. Do not retry an
-          # ambiguous failed mutation; the failure report keeps it blocked.
-          for turn in range(15):
+          # OpenHands is asynchronous. Poll its SAME durable task, with a
+          # bounded wait; never start another conversation after ambiguity.
+          # Existing internal planner continuations retain their 15-turn cap.
+          deadline=time.monotonic()+35*60
+          internal_turns=0
+          while time.monotonic()<deadline:
             # A planner continuation can outlive the initial five-minute JWT.
             # Renew authority before every mutation; never replay an ambiguous POST.
             token=fresh_identity()
@@ -235,11 +239,17 @@ jobs:
               print('PARIS_PREPARE_REJECTED HTTP '+str(error.code)+' '+code,flush=True)
               raise
             if result.get('pending') is True:
-              print('Saved PARIS planner turn',result.get('turn'),flush=True)
+              if result.get('provider')=='openhands':
+                print('Waiting for tracked OpenHands task',result.get('taskId'),flush=True)
+                time.sleep(min(30,max(0,deadline-time.monotonic())))
+              else:
+                internal_turns+=1
+                if internal_turns>=15: raise SystemExit('PARIS planner exceeded its bounded continuation limit')
+                print('Saved PARIS planner turn',result.get('turn'),flush=True)
               continue
             break
           else:
-            raise SystemExit('PARIS planner exceeded its bounded continuation limit')
+            raise SystemExit('PARIS repair wait deadline reached; preserve the existing task receipt')
           if not all(re.fullmatch(r'[a-f0-9]{40}',result.get(k,'')) for k in ['sha','baseSha']): raise SystemExit('Missing candidate evidence')
           with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('sha='+result['sha']+'\nbase='+result['baseSha']+'\n')
           PY
@@ -276,7 +286,7 @@ jobs:
             status,path=line.split('\t',1)
             infrastructure = re.fullmatch(r'(?:\.github/workflows/[\w-]+\.ya?ml|Dockerfile\.(?:admin|lms|marketing)|scripts/gcp/[\w-]+\.(?:mjs|py))',path)
             if status not in ['A','M'] or not (re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path) or infrastructure): raise SystemExit('Repair outside authorized source scope')
-            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|infrastructure-repair|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
+            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|paris-openhands|infrastructure-repair|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
             if re.search(r'\.(test|spec)\.[cm]?[jt]sx?$',path) and status != 'A': raise SystemExit('Existing tests must remain unchanged')
             if path.startswith('tests/'):
               if status!='A': raise SystemExit('Existing tests must remain unchanged')

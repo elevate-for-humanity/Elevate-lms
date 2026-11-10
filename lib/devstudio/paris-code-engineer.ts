@@ -65,13 +65,13 @@ function normalizePath(value: unknown): string {
   return value.replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/{2,}/g, '/').trim();
 }
 
-function blockedPath(path: string): boolean {
+export function blockedPath(path: string): boolean {
   return (
     !path ||
     path.includes('..') ||
     /^\.env(?:\.|$)/.test(path) ||
     path.startsWith('.git/') ||
-    /code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|infrastructure-repair|main-release|api-auth|guards|role-matrix/i.test(path) ||
+    /code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|paris-openhands|infrastructure-repair|main-release|api-auth|guards|role-matrix/i.test(path) ||
     path.includes('/node_modules/') ||
     path.includes('/.next/') ||
     (!/^(lib|components|apps|remotion-src|workers|tests)\//.test(path) &&

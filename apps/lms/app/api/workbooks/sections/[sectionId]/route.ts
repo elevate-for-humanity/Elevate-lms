@@ -132,7 +132,19 @@ export async function POST(
       return reply({ error: 'Answers could not be saved. Please retry.' }, 503);
     }
     const saved = Array.isArray(data) ? data[0] : null;
-    if (!saved) return reply({ error: 'Save was not confirmed. Please retry.' }, 503);
+    // The RPC must return the actual stored row, not merely an accepted version.
+    // Never tell a learner their writing saved when the returned database copy
+    // differs from what they submitted (a common cause of missing practice work).
+    const submitted = body.answers;
+    const matches = Boolean(
+      saved &&
+      saved.section_id === sectionId &&
+      Number.isSafeInteger(saved.version) &&
+      saved.reviewed === body.reviewed &&
+      saved.answers &&
+      Object.entries(submitted).every(([key, value]) => saved.answers[key] === value),
+    );
+    if (!matches) return reply({ error: 'Saved answers could not be verified. Keep your browser copy and retry.' }, 503);
     return reply({
       section_id: saved.section_id,
       version: saved.version,

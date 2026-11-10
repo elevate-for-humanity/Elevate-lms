@@ -17,11 +17,18 @@ test.describe('Canonical application flow', () => {
     expect(await page.locator('main a[href*="/programs/"]:visible').count()).toBeGreaterThan(0);
   });
 
-  test('application chooser exposes Host Shop and the canonical student intake', async ({ page }) => {
+  test('application chooser separates unpaid intake, paid enrollment and Host Shop access', async ({ page }) => {
     await page.goto('/apply');
     await expect(page.getByRole('heading', { name: 'Choose your application' })).toBeVisible();
     await expect(page.getByRole('link', { name: /^Host Shop/ })).toHaveAttribute('href', '/partners/host-shop/apply');
-    await page.getByRole('link', { name: /^Student or apprentice/ }).click();
+    // The school now has two intentional paths: unpaid inquiry and paid
+    // enrollment. The retired "Student or apprentice" label must not keep
+    // breaking unrelated media release acceptance after that approved change.
+    const intake = page.getByRole('link', { name: /^Intake Application/ });
+    await expect(intake).toHaveAttribute('href', '/apply/student?intent=inquiry');
+    await expect(page.getByRole('link', { name: /^Full Enrollment Application/ }))
+      .toHaveAttribute('href', '/programs');
+    await intake.click();
     await expect(page).toHaveURL(/\/apply\/student\/interview/);
     await expect(page.getByRole('heading', { name: /Talk with PARIS/i })).toBeVisible();
     await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible({ timeout: 20_000 });

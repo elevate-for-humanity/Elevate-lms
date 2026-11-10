@@ -24,7 +24,10 @@ function harness(overrides = {}) {
   const h = {cp: null, task: null, dispatches: 0, refreshes: 0, now: 1000, lifecycle: {status: 'running'}, ...overrides};
   h.deps = {
     now: () => h.now, mainSha: async () => base, ensureBranch: async () => {},
-    save: async cp => {h.cp = structuredClone(cp);}, findTask: async () => h.task,
+    save: async (cp,expected) => {
+      if((expected===null&&h.cp!==null)||(expected!==null&&h.cp?.sequence!==expected))throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
+      h.cp = structuredClone(cp);
+    }, findTask: async () => h.task,
     dispatch: async request => {
       h.dispatches++;
       assert.equal(h.cp.dispatchRequested, true, 'intent must be durable before external start');
@@ -66,6 +69,12 @@ test('starts exactly one tracked task, persists before start, then polls that sa
 test('a failed checkpoint save prevents provider dispatch', async () => {
   const h = harness(); h.deps.save = async () => {throw Error('checkpoint unavailable');};
   await assert.rejects(h.run(), /checkpoint unavailable/); assert.equal(h.dispatches, 0);
+});
+test('overlapping signed prepares cannot start two provider conversations',async()=>{
+ const h=harness();const results=await Promise.allSettled([h.run(),h.run()]);
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+ assert.equal(results.filter(r=>r.status==='rejected').length,1);
+ assert.equal(h.dispatches,1);
 });
 test('an ambiguous start without a ledger receipt is not replayed', async () => {
   const h = harness(); h.deps.dispatch = async () => {h.dispatches++; throw Error('transport lost');};

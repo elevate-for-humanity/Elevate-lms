@@ -19,7 +19,7 @@ async function github(path: string, init: RequestInit = {}) {
 
 export async function stageParisOpenHandsRepair(input: {
   repairId: string; actorId: string; attempt: number; runId: number; goal: string;
-  checkpoint?: any; save: (checkpoint: any) => Promise<void>;
+  checkpoint?: any; save: (checkpoint: any, expectedSequence: number|null) => Promise<void>;
 }) {
   const db = await requireAdminClient();
   const {data: owner, error: ownerError} = await db.from('profiles').select('role').eq('id', input.actorId).maybeSingle();

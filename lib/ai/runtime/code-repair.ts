@@ -134,9 +134,13 @@ export async function prepareParisRepair(id:string,runId:number){
    candidate=await stageParisOpenHandsRepair({repairId:id,actorId:claimed.actor_id,
     attempt:claimed.attempt_count,runId,goal:claimed.goal,
     checkpoint:candidate?.kind==='openhands-checkpoint'?candidate.checkpoint:undefined,
-    save:async checkpoint=>{
-     const saved=await db.from('paris_code_repairs').update({candidate:{kind:'openhands-checkpoint',checkpoint},updated_at:new Date().toISOString()})
-      .eq('id',id).eq('workflow_run_id',runId).eq('status','patching').select('id').maybeSingle();
+    save:async (checkpoint,expectedSequence)=>{
+     const save=db.from('paris_code_repairs').update({candidate:{kind:'openhands-checkpoint',checkpoint},updated_at:new Date().toISOString()})
+      .eq('id',id).eq('workflow_run_id',runId).eq('status','patching');
+     // Signed requests may overlap after transport ambiguity. Only one may
+     // advance this checkpoint or record intent to start the external task.
+     const saved=await (expectedSequence===null?save.is('candidate',null):
+      save.eq('candidate->checkpoint->>sequence',String(expectedSequence))).select('id').maybeSingle();
      if(saved.error)throw saved.error;
      if(!saved.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
     },

@@ -1,5 +1,6 @@
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
+import {acceptedOpenHandsNeedsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
 import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
@@ -235,6 +236,49 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  const blocked=await db.from('paris_code_repairs').select('*').eq('status','blocked').order('updated_at',{ascending:false}).limit(2000);
  if(blocked.error)throw blocked.error;
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
+ // A timed-out prepare is not a provider-terminal result. Observe only one
+ // accepted task, under the same owner policy, without spending an attempt.
+ const accepted=(blocked.data??[]).find(repair=>repair.actor_id===policy.actor_id && acceptedOpenHandsNeedsObservation(repair));
+ if(accepted){
+  const busy=await db.from('paris_code_repairs').select('id').in('status',['dispatched','patching','validating','deploying','verifying']).limit(1);
+  if(busy.error)throw busy.error;
+  if(!busy.data?.length){
+   const {observeParisOpenHandsRepair}=await import('@/lib/devstudio/paris-openhands-adapter');
+   const owned=(values:any)=>db.from('paris_code_repairs').update(values)
+    .eq('id',accepted.id).eq('status','blocked').eq('actor_id',policy.actor_id)
+    .eq('workflow_run_id',accepted.workflow_run_id).eq('attempt_count',accepted.attempt_count)
+    .eq('updated_at',accepted.updated_at);
+   const result=await superviseAcceptedOpenHandsRepair(accepted,{
+    now:Date.now,workflow:(runId:number)=>gh(`/actions/runs/${runId}`),
+    observe:()=>observeParisOpenHandsRepair(accepted),
+    sourceEligible:async()=>{
+     if(!accepted.source_job_id)return true;
+     const source=await db.from('ultimate_build_jobs').select('*').eq('id',accepted.source_job_id).single();
+     if(source.error)throw source.error;
+     if(!isRepairableCourseFailure(source.data)||source.data.lease_owner&&Date.parse(source.data.lease_expires_at??'')>Date.now())return false;
+     const [latest,build]=await Promise.all([
+      db.from('ultimate_build_jobs').select('id,build_id,status').eq('build_id',source.data.build_id).eq('job_type',source.data.job_type).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+      db.from('ultimate_course_builds').select('id,status,profile,findings').eq('id',source.data.build_id).single(),
+     ]);
+     if(latest.error||build.error)throw latest.error??build.error;
+     return courseDefectDisposition({source:source.data,latest:latest.data,build:build.data})==='repair';
+    },
+    record:async(verification:any)=>{
+     const saved=await owned({verification,updated_at:new Date().toISOString()});
+     if(saved.error)throw saved.error;
+    },
+    claim:async(values:any)=>{
+     const saved=await owned(values).select('id').maybeSingle();
+     if(saved.error?.code==='23505')return false;
+     if(saved.error)throw saved.error;
+     return Boolean(saved.data);
+    },
+   });
+   if(result.dispatchRequired)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:result.repairId};
+   if(result.awaitingProvider)return {enabled:true,dispatched:0,awaitingProvider:true,reason:'ACCEPTED_OPENHANDS_EXECUTION_PENDING'};
+   if(result.handled)return {enabled:true,dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'};
+  }
+ }
  let recoveredProviderThisTick=false;
  let providerRecoveryHealth: boolean | undefined;
  let ownedProviderReadiness: {verified:boolean;status?:string} | undefined;

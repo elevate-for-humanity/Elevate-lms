@@ -30,9 +30,9 @@ export function getMinimumDepositCents({
   return Math.min(safeTuition, Math.max(10000, Math.round(safeTuition * 0.1)));
 }
 
-/** Initial invoice; nails use the owner's $600 deposit, with the balance billed separately. */
+/** Standard apprenticeship deposit is $600; only a validated deposit coupon can reduce it. */
 export function getInitialProgramInvoiceCents(slug: string, tuitionCents: number): number {
-  return slug === 'nail-technician-apprenticeship'
+  return /apprentice/i.test(slug)
     ? Math.min(Math.max(0, tuitionCents), 60000)
     : Math.ceil(tuitionCents / 4);
 }

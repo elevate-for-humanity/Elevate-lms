@@ -35,7 +35,7 @@ const request = (extra = {}) => new NextRequest('https://www.elevateforhumanity.
 describe('school invoice tuition checkout', () => {
   beforeEach(() => {
     state.assigned = true; state.nail = false; state.schedule.mockClear(); state.tables = [];
-    state.createInvoice.mockReset().mockResolvedValue({ providerInvoiceId: '42', paymentUrl: 'https://example.test/pay' });
+    state.createInvoice.mockReset().mockImplementation(async (input: { lines: Array<{ unitAmountCents: number }> }) => ({ providerInvoiceId: '42', paymentUrl: 'https://example.test/pay', totalCents: input.lines.reduce((sum, line) => sum + line.unitAmountCents, 0) }));
   });
   it('creates the $2,200 Elevate invoice without requiring a school checkout or PayPal payout account', async () => {
     const response = await POST(request());
@@ -60,6 +60,12 @@ describe('school invoice tuition checkout', () => {
     expect(input.lines[0].unitAmountCents).toBe(60000);
     expect(input.fulfillment.payload.amount_cents).toBe(60000);
     expect(state.schedule).toHaveBeenCalledWith(expect.objectContaining({ amount_cents: 180000, remaining_invoices: 3, fulfillment_payload: expect.objectContaining({ amount_cents: 180000 }) }));
+  });
+  it('rejects a reused QuickBooks invoice with mismatched payment terms', async () => {
+    state.createInvoice.mockResolvedValueOnce({ providerInvoiceId: 'old', paymentUrl: 'https://example.test/old', totalCents: 35000 });
+    const response = await POST(request({ program_id: 'nails', payment_plan: 'installments' }));
+    expect(response.status).toBe(409);
+    expect(state.schedule).not.toHaveBeenCalled();
   });
   it('rejects partial tuition before creating an invoice', async () => {
     expect((await POST(request({ payment_plan: 'installments' }))).status).toBe(400);

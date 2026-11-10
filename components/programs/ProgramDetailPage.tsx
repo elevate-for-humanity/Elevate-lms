@@ -395,16 +395,20 @@ export default function ProgramDetailPage({
                         {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
                       </p>
                       <Link
-                        href={primaryCTA.href}
+                        href={primaryCTA.external ? primaryCTA.href : `/enroll/${encodeURIComponent(p.slug)}`}
                         target={primaryCTA.external ? '_blank' : '_self'}
                         rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
                         className="block w-full text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 rounded-xl transition-colors text-sm mb-3"
                       >
-                        {primaryCTA.label}
+                        {primaryCTA.external ? primaryCTA.label : 'Full Enrollment Application'}
                       </Link>
                     </>
                   )}
 
+                  <Link href={`/apply/student?program=${encodeURIComponent(p.slug)}&intent=inquiry`} className="mb-3 block w-full rounded-xl border-2 border-blue-700 px-4 py-3 text-center text-sm font-bold text-blue-800">
+                    Intake Application — Request Information
+                  </Link>
+                  <p className="mb-4 text-xs leading-5 text-slate-600">Intake does not enroll you. Verified payment is required before the Full Enrollment Application. Submit the paid full application to activate enrollment and your dashboard.</p>
                   {p.cta.enrollHref && (
                     <>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
@@ -1412,7 +1416,7 @@ export default function ProgramDetailPage({
                     {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
                   </span>
                   <Link
-                    href={primaryCTA.href}
+                    href={primaryCTA.external ? primaryCTA.href : `/enroll/${encodeURIComponent(p.slug)}`}
                     target={primaryCTA.external ? '_blank' : '_self'}
                     rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
                     className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"

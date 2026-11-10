@@ -23,14 +23,14 @@ describe('program payment application handoff contract', () => {
     expect(redirectPage).toContain("query.set('payment'");
     expect(redirectPage).toContain("['self_pay', 'workone', 'wioa', 'grant', 'employer']");
     expect(redirectPage).toContain("query.set('funding'");
-    expect(redirectPage).toContain("query.set('session_id'");
+    expect(redirectPage).toContain("query.set('billing_invoice_id'");
   });
 
   it('shows the selected payment path in PARIS and preserves it in the fallback form', () => {
     const interviewPage = source('apps/marketing/app/apply/student/interview/page.tsx');
     const calculator = source('components/programs/PaymentPlanCalculator.tsx');
 
-    expect(interviewPage).toContain('initialPaymentMode={paymentPreference}');
+    expect(interviewPage).toContain('verifyPaidApplication(initialProgram, paymentSessionId)');
     expect(interviewPage).toContain("...(paymentPreference ? { payment: paymentPreference } : {})");
     expect(interviewPage).toContain("...(fundingPreference ? { funding: fundingPreference } : {})");
     expect(calculator).toContain('Your selected path:');

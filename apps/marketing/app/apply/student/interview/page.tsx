@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { verifyPaidApplication } from '@/lib/enrollment/paid-application';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
 import { ALL_PROGRAMS } from '@/lib/programs/static-registry';
 import { getAdminClient } from '@/lib/supabase/admin';
 import ParisApplicationWorkspace from './ParisApplicationWorkspace';
-import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,13 +57,17 @@ export default async function ParisStudentApplicationPage({
     intent?: string;
     payment?: string;
     funding?: string;
-    session_id?: string;
+    billing_invoice_id?: string; session_id?: string;
   }>;
 }) {
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
   const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
-  const paymentSessionId = params?.session_id || '';
+  const paymentSessionId = params?.billing_invoice_id || '';
+  if (applicationIntent === 'enrollment' &&
+      (!initialProgram || !await verifyPaidApplication(initialProgram, paymentSessionId))) {
+    redirect(initialProgram ? `/enroll/${encodeURIComponent(initialProgram)}` : '/apply');
+  }
   const paymentPreference = ['full', 'plan', 'bnpl'].includes(params?.payment || '')
     ? (params.payment as 'full' | 'plan' | 'bnpl')
     : undefined;
@@ -71,6 +76,10 @@ export default async function ParisStudentApplicationPage({
   )
     ? params.funding
     : undefined;
+  if (applicationIntent === 'enrollment') {
+    const query = new URLSearchParams({ program: initialProgram, intent: 'enrollment', billing_invoice_id: paymentSessionId });
+    redirect(`/apply/student/form?${query}`);
+  }
   const programs = await loadApplicationPrograms();
 
   return (
@@ -95,7 +104,7 @@ export default async function ParisStudentApplicationPage({
                 Guided admissions workspace
               </p>
               <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-                Talk with PARIS while your application builds beside you.
+                Intake Application — talk with PARIS
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-700 sm:text-base">
                 Choose PARIS for a guided conversation or use the standard application form. With
@@ -110,7 +119,7 @@ export default async function ParisStudentApplicationPage({
                 intent: applicationIntent,
                 ...(paymentPreference ? { payment: paymentPreference } : {}),
                 ...(fundingPreference ? { funding: fundingPreference } : {}),
-                ...(paymentSessionId ? { session_id: paymentSessionId } : {}),
+                ...(paymentSessionId ? { billing_invoice_id: paymentSessionId } : {}),
               }).toString()}`}
               className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 hover:border-slate-400 hover:bg-slate-50"
             >
@@ -118,32 +127,18 @@ export default async function ParisStudentApplicationPage({
             </Link>
           </div>
 
+          {applicationIntent === 'inquiry' && <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+            <h2 className="text-xl font-bold">Two application stages</h2>
+            <p className="mt-2"><strong>1. Intake Application:</strong> request information and discuss program options. No payment, enrollment, dashboard activation, or Host Shop placement is completed by intake.</p>
+            <p className="mt-2"><strong>2. Full Enrollment Application:</strong> pay the required deposit or tuition, complete the full application, and submit to activate your enrollment and dashboard. Required onboarding and placement still apply before training starts.</p>
+            {initialProgram && <Link href={`/enroll/${encodeURIComponent(initialProgram)}`} className="mt-4 inline-block rounded-xl bg-blue-700 px-5 py-3 font-bold text-white">Start Full Enrollment Application</Link>}
+          </div>}
           <ParisApplicationWorkspace
             programs={programs}
             initialProgram={initialProgram}
             applicationIntent={applicationIntent}
             paymentSessionId={paymentSessionId}
           />
-
-          {initialProgram && (
-            <section className="mt-8" aria-labelledby="application-payment-options">
-              <div className="mb-4">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-blue-700">
-                  Self-pay options
-                </p>
-                <h2 id="application-payment-options" className="mt-2 text-2xl font-black text-slate-950">
-                  Self-pay options and coupon code
-                </h2>
-                <p className="mt-2 text-sm text-slate-600">
-                  Applying is free. Use this calculator only if you plan to self-pay; workforce-funding eligibility is reviewed separately.
-                </p>
-              </div>
-              <PaymentPlanCalculator
-                programSlug={initialProgram}
-                initialPaymentMode={paymentPreference}
-              />
-            </section>
-          )}
 
           <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-xs leading-5 text-slate-600">
             PARIS assists with intake and completeness. Workforce agencies determine workforce-funding

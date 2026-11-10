@@ -31,7 +31,8 @@ export default async function ApplyPage({ searchParams }: {
       <p className="mt-3 text-lg text-slate-700">Select the service you want to join.</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {[
-          ['/apply/student', 'Student or apprentice', 'Apply for career training or an apprenticeship.'],
+          ['/apply/student?intent=inquiry', 'Intake Application', 'Request information about any career training or apprenticeship program. Intake does not activate enrollment.'],
+          ['/programs', 'Full Enrollment Application', 'Choose your program, pay the required deposit or tuition, then complete the full application to activate enrollment and your dashboard.'],
           ['/partners/host-shop/apply', 'Host Shop', 'Apply to host barber, cosmetology, esthetics, or nail apprentices.'],
           ['/apply/employer', 'Employer', 'Connect your business with training and hiring services.'],
           ['/apply/program-holder', 'Program Holder', 'Apply to provide training with Elevate.'],

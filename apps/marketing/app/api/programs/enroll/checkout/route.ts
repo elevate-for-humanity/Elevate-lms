@@ -37,6 +37,7 @@ type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
 
 interface CheckoutRequest {
   program_id: string;
+  require_full_application?: boolean;
   funding_source?: FundingSource;
   payment_plan?: 'full' | 'installments';
   coupon_code?: string;
@@ -60,7 +61,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CheckoutRequest = await request.json();
+    const requiresFullApplication = body.require_full_application !== false;
     const paymentMethod = body.payment_method ?? 'quickbooks';
+    if (body.payment_plan && !['full', 'installments'].includes(body.payment_plan))
+      return NextResponse.json({ error: 'Invalid payment plan.' }, { status: 400 });
     if (!['quickbooks', 'affirm'].includes(paymentMethod))
       return NextResponse.json({ error: 'Choose a supported payment method.' }, { status: 400 });
     const {
@@ -195,23 +199,24 @@ export async function POST(request: NextRequest) {
     let fullAmountCents = agencyFundingRequested
       ? 0
       : (partnerProgram?.retailPriceCents ?? Math.round(amountToCharge * 100));
-    let appliedCoupon: { code: string; discountAmountCents: number } | null = null;
+    let appliedCoupon: { code: string; discountAmountCents: number; scope: 'deposit' | 'tuition' } | null = null;
     if (coupon_code.trim() && funding_source === 'self_pay') {
       const result = await resolveQuickBooksProgramPromotion({
         admin,
         code: coupon_code,
         amountCents: fullAmountCents,
+        depositCents: payment_plan === 'installments' ? getInitialProgramInvoiceCents(program.slug, fullAmountCents) : undefined,
         maximumDiscountCents: partnerProgram
           ? partnerProgram.retailPriceCents - partnerProgram.providerShareCents
           : undefined,
       });
       if ('error' in result) return NextResponse.json({ error: result.error }, { status: 400 });
       appliedCoupon = result.promotion;
-      fullAmountCents -= appliedCoupon.discountAmountCents;
+      if (appliedCoupon.scope === 'tuition') fullAmountCents -= appliedCoupon.discountAmountCents;
     }
     const amountCents =
       funding_source === 'self_pay' && payment_plan === 'installments'
-        ? getInitialProgramInvoiceCents(program.slug, fullAmountCents)
+        ? getInitialProgramInvoiceCents(program.slug, fullAmountCents) - (appliedCoupon?.scope === 'deposit' ? appliedCoupon.discountAmountCents : 0)
         : fullAmountCents;
 
     // Get user profile for customer details
@@ -245,6 +250,7 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+    const fullApplicationRequired = !partnerProgram || requiresFullApplication;
     const pending =
       existingEnrollment?.status === 'checkout_pending'
         ? { data: { id: existingEnrollment.id }, error: null }
@@ -269,9 +275,9 @@ export async function POST(request: NextRequest) {
                   ? 'pending'
                   : 'paid',
               enrollment_state: agencyFundingRequested
-                ? 'funding_authorization_pending'
+                ? 'pending_funding_verification'
                 : amountCents > 0
-                  ? 'payment_pending'
+                  ? 'payment_required'
                   : 'active',
               next_required_action: agencyFundingRequested
                 ? 'FUNDING_AUTHORIZATION'
@@ -342,11 +348,14 @@ export async function POST(request: NextRequest) {
         },
       ],
       dueDate: new Date().toISOString().slice(0, 10),
-      memo: `Program enrollment ${pending.data.id}`,
+      memo: `Program enrollment ${pending.data.id}. Tuition $${(fullAmountCents / 100).toFixed(2)}; due today $${(amountCents / 100).toFixed(2)}; remaining $${((fullAmountCents - amountCents) / 100).toFixed(2)}${payment_plan === 'installments' ? ' in three monthly payments starting next month.' : '.'}`,
       fulfillment: {
         type: 'program_enrollment',
         payload: {
           enrollment_id: pending.data.id,
+          full_application_required: fullApplicationRequired,
+          required_amount_cents: amountCents,
+          total_tuition_cents: fullAmountCents,
           amount_cents: amountCents,
           program_id: program.id,
           program_slug: program.slug,
@@ -359,6 +368,11 @@ export async function POST(request: NextRequest) {
     });
     if (!invoice.paymentUrl && paymentMethod === 'quickbooks')
       throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
+    if (invoice.totalCents !== amountCents)
+      return NextResponse.json({ error: 'An existing payment request has different terms. Contact admissions before paying.' }, { status: 409 });
+    const trackedInvoice = await admin.from('billing_invoices').select('id')
+      .eq('idempotency_key', `program:${pending.data.id}`).single();
+    if (trackedInvoice.error) throw new Error('Payment request could not be tracked.');
     // School invoice liabilities are recorded by confirmed-payment fulfillment,
     // separately from the graduation/PayPal payout workflow.
     if (payment_plan === 'installments') {
@@ -372,17 +386,18 @@ export async function POST(request: NextRequest) {
           canonical_product_key: `program-installments-${program.id}`,
           product_name: `${program.title} installment`,
           provider: 'quickbooks',
-          amount_cents: program.slug === 'nail-technician-apprenticeship'
+          amount_cents: /apprentice/i.test(program.slug)
             ? Math.ceil((fullAmountCents - amountCents) / 3)
             : amountCents,
           cadence: 'monthly',
           next_invoice_date: next.toISOString().slice(0, 10),
           remaining_invoices: 3,
-          status: 'active',
-          fulfillment_type: 'program_enrollment',
+          status: fullApplicationRequired ? 'paused' : 'active',
+          fulfillment_type: 'tuition_payment',
           fulfillment_payload: {
             enrollment_id: pending.data.id,
-            amount_cents: program.slug === 'nail-technician-apprenticeship'
+            user_id: user.id,
+            amount_cents: /apprentice/i.test(program.slug)
               ? Math.ceil((fullAmountCents - amountCents) / 3)
               : amountCents,
             program_id: program.id,
@@ -414,6 +429,7 @@ export async function POST(request: NextRequest) {
           ? `https://app.${PLATFORM_DEFAULTS.canonicalDomain}/account/payment-methods`
           : invoice.paymentUrl,
       invoice_id: invoice.providerInvoiceId,
+      billing_invoice_id: trackedInvoice.data.id,
       coupon: appliedCoupon,
     });
   } catch (error) {

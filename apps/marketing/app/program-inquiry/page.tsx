@@ -22,7 +22,7 @@ export default async function ProgramInquiryPage({ searchParams }: { searchParam
     <main className="min-h-screen bg-slate-50">
       <section className="bg-slate-950 text-white py-16 sm:py-20 px-4">
         <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-400 text-sm font-extrabold uppercase tracking-widest mb-4">Program Inquiry</p>
+          <p className="text-brand-red-400 text-sm font-extrabold uppercase tracking-widest mb-4">Intake Application</p>
           <h1 className="text-4xl sm:text-6xl font-black leading-tight max-w-4xl">Ask questions first. Apply when you are ready.</h1>
           <p className="mt-5 text-lg sm:text-xl text-slate-300 max-w-3xl leading-relaxed">An inquiry is for information only. It does not start funding authorization, create an enrollment application, reserve a seat, or obligate you to enroll.</p>
         </div>
@@ -45,8 +45,8 @@ export default async function ProgramInquiryPage({ searchParams }: { searchParam
             <div className="rounded-2xl bg-brand-red-50 border border-brand-red-100 p-6">
               <ClipboardCheck className="h-7 w-7 text-brand-red-700 mb-4" />
               <h2 className="text-2xl font-extrabold text-slate-950">Ready to enroll?</h2>
-              <p className="mt-3 text-base text-slate-700">The enrollment application starts admissions. Funded programs may require WorkOne intake and authorization. Self-pay programs move into pricing, payment, onboarding, and enrollment steps.</p>
-              <Link href={`/apply${initialProgram ? `?program=${encodeURIComponent(initialProgram)}` : ''}`} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Start Enrollment Application <ArrowRight className="h-4 w-4" /></Link>
+              <p className="mt-3 text-base text-slate-700">The enrollment application starts admissions. Funded programs may require WorkOne intake and authorization. Verified payment is required before the Full Enrollment Application. Complete and submit that paid application to activate enrollment and your dashboard.</p>
+              <Link href={initialProgram ? `/enroll/${encodeURIComponent(initialProgram)}` : '/programs'} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Start Full Enrollment Application <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>
 

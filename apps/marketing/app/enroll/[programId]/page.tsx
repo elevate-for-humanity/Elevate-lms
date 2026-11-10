@@ -6,15 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight, Tag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
-
-// Apprenticeship programs require approval flow, not direct enrollment
-const APPRENTICESHIP_SLUGS = [
-  'barber',
-  'barber-apprenticeship',
-  'cosmetology-apprenticeship',
-  'esthetician-apprenticeship',
-  'nail-technician-apprenticeship',
-];
+import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 
 function getClientSearchParam(name: string) {
   if (typeof window === 'undefined') return null;
@@ -49,11 +41,12 @@ export default function EnrollPage() {
   const [enrolling, setEnrolling] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
   const [message, setMessage] = useState('');
+  const [paymentUrl, setPaymentUrl] = useState('');
   const [couponCode, setCouponCode] = useState(
     () => getClientSearchParam('coupon')?.toUpperCase() || '',
   );
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installments'>(() =>
-    getClientSearchParam('payment_plan') === 'installments' ? 'installments' : 'full',
+    getClientSearchParam('payment_plan') === 'full' ? 'full' : 'installments',
   );
   const [eligibility, setEligibility] = useState<any>(null);
   const supabase = createClient();
@@ -72,19 +65,6 @@ export default function EnrollPage() {
         throw new Error(result.error || 'Unable to load program.');
       const data = result.program;
 
-      // Apprenticeships require approval flow - redirect to application
-      const isApprenticeship =
-        data?.category?.toLowerCase().includes('apprenticeship') ||
-        (data?.slug && APPRENTICESHIP_SLUGS.includes(data.slug)) ||
-        data?.name?.toLowerCase().includes('apprenticeship');
-
-      if (isApprenticeship) {
-        // Use slug (not UUID) so /apply can resolve via program-registry
-        const identifier = data?.slug || programId;
-        router.replace(`/apply?program=${identifier}`);
-        return;
-      }
-
       setProgram(data);
 
       await checkEligibility(data.id);
@@ -95,6 +75,25 @@ export default function EnrollPage() {
       setLoading(false);
     }
   };
+
+  const verifyPayment = async () => {
+    if (!program?.slug || onlineSchoolProgram) return;
+    const response = await fetch(`/api/programs/enroll/payment-status?program=${encodeURIComponent(program.slug)}`, { cache: 'no-store' });
+    const result = await response.json();
+    if (!response.ok) {
+      if (response.status !== 401) setMessage(result.error || 'Unable to verify payment.');
+      return;
+    }
+    if (result.paid && result.application_url) window.location.assign(result.application_url);
+  };
+
+  useEffect(() => {
+    if (!program?.slug || onlineSchoolProgram) return;
+    void verifyPayment();
+    const timer = window.setInterval(() => { void verifyPayment(); }, 15000);
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [program?.slug, onlineSchoolProgram]);
 
   const checkEligibility = async (resolvedProgramId?: string) => {
     try {
@@ -127,7 +126,7 @@ export default function EnrollPage() {
       } = await supabase.auth.getUser();
       if (!user) {
         setMessage('Please sign in to enroll');
-        const destination = `/enroll/${programId}${onlineSchoolProgram ? '?partner=healthcare-training' : ''}`;
+        const destination = `/enroll/${programId}${window.location.search}`;
         router.push(`/login?redirect=${encodeURIComponent(destination)}`);
         return;
       }
@@ -139,7 +138,7 @@ export default function EnrollPage() {
       }
 
       // Programs are free if: is_free=true OR funding_eligible (WIOA/WRG covers cost)
-      const isFreeProgram = program && (program.is_free === true || program.funding_eligible);
+      const isFreeProgram = program?.is_free === true;
       const isPaid = !isFreeProgram && (program?.price || program?.total_cost);
 
       if (isPaid) {
@@ -154,6 +153,7 @@ export default function EnrollPage() {
             payment_plan: onlineSchoolProgram || paymentMethod === 'affirm' ? 'full' : paymentPlan,
             coupon_code: onlineSchoolProgram ? undefined : couponCode.trim() || undefined,
             partner_key: getClientSearchParam('partner') || undefined,
+            require_full_application: !onlineSchoolProgram,
           }),
         });
 
@@ -164,7 +164,11 @@ export default function EnrollPage() {
         }
 
         if (data.url) {
-          window.location.href = data.url;
+          if (onlineSchoolProgram) window.location.href = data.url;
+          else {
+            setPaymentUrl(data.url);
+            setMessage('Secure checkout is ready. Pay using the link below, then return here to verify payment and complete your full enrollment application.');
+          }
           return;
         }
       } else {
@@ -188,7 +192,11 @@ export default function EnrollPage() {
         }
 
         if (data.url) {
-          window.location.href = data.url;
+          if (onlineSchoolProgram) window.location.href = data.url;
+          else {
+            setPaymentUrl(data.url);
+            setMessage('Secure checkout is ready. Pay using the link below, then return here to verify payment and complete your full enrollment application.');
+          }
           return;
         }
 
@@ -254,7 +262,7 @@ export default function EnrollPage() {
                 <BookOpen className="w-10 h-10 sm:w-12 sm:h-12" />
                 <div>
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h1 className="text-2xl sm:text-3xl font-bold">{program.name}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold">Full Enrollment Application — {program.name}</h1>
                     {program.is_free === true ? (
                       <span className="px-3 py-1 bg-brand-green-500 text-white text-sm font-bold rounded-full">
                         FREE
@@ -283,6 +291,16 @@ export default function EnrollPage() {
             </div>
 
             <div className="p-4 sm:p-6 md:p-8">
+              {!onlineSchoolProgram && <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+                <h2 className="text-xl font-bold">Payment is required before the full application</h2>
+                <p className="mt-2">1. Pay the required deposit or tuition. 2. Complete and submit your full enrollment application. 3. Your enrollment and dashboard activate automatically after payment verification and submission. Orientation, documents, and any required Host Shop placement still apply before training starts.</p>
+                <a className="mt-3 inline-block font-bold underline" href={`/apply/student?program=${encodeURIComponent(program.slug || programId)}&intent=inquiry`}>Only requesting information? Use the Intake Application.</a>
+              </div>}
+              {paymentUrl && <div className="mb-6 rounded-xl border border-green-300 p-5">
+                <a href={paymentUrl} target="_blank" rel="noopener noreferrer" className="block font-bold underline">Open secure payment checkout</a>
+                <button type="button" onClick={() => void verifyPayment()} className="mt-4 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white">I have paid — verify and continue</button>
+                <p className="mt-2 text-sm">The full application opens only after the payment provider confirms payment. No separate invoice request is needed.</p>
+              </div>}
               {message && (
                 <div
                   className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg flex items-start gap-2 sm:gap-3 text-sm sm:text-base ${
@@ -424,7 +442,7 @@ export default function EnrollPage() {
                           />
                           <span className="font-bold text-slate-950">Pay in full</span>
                           <span className="mt-1 block text-xs text-slate-600">
-                            One QuickBooks invoice
+                            One secure payment
                           </span>
                         </label>
                         <label
@@ -442,9 +460,9 @@ export default function EnrollPage() {
                             onChange={() => setPaymentPlan('installments')}
                             className="mr-2"
                           />
-                          <span className="font-bold text-slate-950">Four installments</span>
+                          <span className="font-bold text-slate-950">Deposit + payment plan</span>
                           <span className="mt-1 block text-xs text-slate-600">
-                            Initial invoice, then three monthly invoices
+                            $ {(getInitialProgramInvoiceCents(program.slug || '', Math.round(Number(program.price || program.total_cost || 0) * 100)) / 100).toLocaleString()} down; remaining tuition billed separately
                           </span>
                         </label>
                       </div>
@@ -491,7 +509,7 @@ export default function EnrollPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button
                   onClick={handleEnroll}
-                  disabled={enrolling || (eligibility && !eligibility.can_enroll)}
+                  disabled={enrolling}
                   className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {enrolling ? (
@@ -504,7 +522,7 @@ export default function EnrollPage() {
                       {program?.is_free === true || program?.funding_eligible
                         ? 'Complete Enrollment'
                         : program?.price || program?.total_cost
-                          ? 'Enroll Now (Secure Checkout)'
+                          ? 'Continue to Secure Payment'
                           : 'Complete Enrollment'}
                       <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </>

@@ -76,9 +76,10 @@ async function cleanup() {
     }
   }
   if (state.hvacEnrollmentId) {
-    const { error } = await db.from('program_enrollments').delete().eq('id', state.hvacEnrollmentId)
-      .eq('user_id', state.learner.id).eq('source', 'qa-e2e');
-    if (error) throw new Error('QA HVAC enrollment cleanup failed: ' + error.message);
+    const { data, error } = await db.from('program_enrollments').delete()
+      .eq('id', state.hvacEnrollmentId).eq('user_id', state.learner.id).select('id');
+    if (error || data?.length !== 1)
+      throw new Error('QA HVAC enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
   }
   if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
   if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);

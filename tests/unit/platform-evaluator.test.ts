@@ -32,7 +32,7 @@ describe('platform execution evidence', () => {
     expect(result.reasons.join(' ')).toContain('Generic success flags are not verification');
   });
 
-  it('accepts independently verified repository evidence from OpenHands', () => {
+  it('blocks OpenHands branch-only evidence without a reviewable patch and CI', () => {
     const result = evaluateExecution({
       tool: 'openhands.execute',
       result: {
@@ -48,7 +48,34 @@ describe('platform execution evidence', () => {
       attempts: 1,
       maxAttempts: 1,
     });
+    expect(result.status).toBe('FAIL_BLOCKING');
+  });
 
+  it('accepts verified OpenHands changed-PR evidence with completed CI', () => {
+    const result = evaluateExecution({
+      tool: 'openhands.execute',
+      result: {
+        github_verification: {
+          verified: true,
+          repository: 'elevate-for-humanity/Elevate-lms',
+          branch: { name: 'fix/openhands-test', sha: '0123456789abcdef' },
+          pullRequests: [{
+            number: 2541,
+            state: 'open',
+            draft: false,
+            merged: false,
+            headSha: '0123456789abcdef',
+            headRef: 'fix/openhands-test',
+            baseRef: 'main',
+            changedFiles: ['lib/devstudio/openhands/runtime.ts'],
+            combinedStatus: 'success',
+            checkRuns: [{ name: 'CI', status: 'completed', conclusion: 'success' }],
+          }],
+        },
+      },
+      attempts: 1,
+      maxAttempts: 1,
+    });
     expect(result.status).toBe('PASS');
   });
 

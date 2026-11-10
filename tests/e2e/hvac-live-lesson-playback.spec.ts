@@ -20,30 +20,37 @@ async function signIn(page: Page) {
   await username.fill(email);
   await secret.fill(password);
   await page.locator('button[type="submit"]').first().click();
-  await expect.poll(() => new URL(page.url()).pathname, { timeout: 50_000 })
+  await expect
+    .poll(() => new URL(page.url()).pathname, { timeout: 50_000 })
     .not.toMatch(/\/login(?:\/|$)/);
 }
 
 test.describe('Authenticated live HVAC lesson media', () => {
   test.describe.configure({ timeout: 150_000 });
-  test('plays actual frames and uses the full screen without losing workbook controls', async ({ page }, info) => {
+  test('plays actual frames and uses the full screen without losing workbook controls', async ({
+    page,
+  }, info) => {
     // Fail rather than silently skipping when a disposable QA login is missing.
     expect(email, 'QA learner missing: do not skip this acceptance').toBeTruthy();
     expect(password, 'QA learner password missing: do not skip this acceptance').toBeTruthy();
-    expect(expectedLmsSha, 'A trusted exact deployed LMS SHA is required').toMatch(/^[a-f0-9]{40}$/);
-    const healthResponse = await page.request.get(`${BASE}/api/health`, { failOnStatusCode: false });
+    expect(expectedLmsSha, 'A trusted exact deployed LMS SHA is required').toMatch(
+      /^[a-f0-9]{40}$/,
+    );
+    const healthResponse = await page.request.get(`${BASE}/api/health`, {
+      failOnStatusCode: false,
+    });
     expect(healthResponse.status()).toBe(200);
     const health = await healthResponse.json();
     expect(health.ready, 'Serving LMS must report ready').toBe(true);
     expect(health.commit, 'Test must target the verified serving release').toBe(expectedLmsSha);
     const errors: string[] = [];
-    page.on('pageerror', error => errors.push(error.message));
+    page.on('pageerror', (error) => errors.push(error.message));
 
     await signIn(page);
-    const response = await page.goto(
-      `${BASE}/lms/courses/${COURSE_ID}/lessons/${LESSON_ID}`,
-      { waitUntil: 'domcontentloaded', timeout: 45_000 },
-    );
+    const response = await page.goto(`${BASE}/lms/courses/${COURSE_ID}/lessons/${LESSON_ID}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 45_000,
+    });
     expect(response?.status(), 'Actual enrolled lesson navigation must succeed').toBe(200);
     expect(page.url()).not.toMatch(/\/(login|unauthorized)(?:\?|$)/);
 
@@ -51,12 +58,16 @@ test.describe('Authenticated live HVAC lesson media', () => {
     await expect(workspace).toBeVisible({ timeout: 30_000 });
     const video = workspace.locator('video').first();
     await expect(video).toBeVisible({ timeout: 25_000 });
-    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.readyState),
-      { timeout: 35_000 }).toBeGreaterThanOrEqual(2);
+    await expect
+      .poll(() => video.evaluate((v: HTMLVideoElement) => v.readyState), { timeout: 35_000 })
+      .toBeGreaterThanOrEqual(2);
 
     const initial = await video.evaluate((v: HTMLVideoElement) => ({
-      videoWidth: v.videoWidth, videoHeight: v.videoHeight, duration: v.duration,
-      readyState: v.readyState, source: Boolean(v.currentSrc),
+      videoWidth: v.videoWidth,
+      videoHeight: v.videoHeight,
+      duration: v.duration,
+      readyState: v.readyState,
+      source: Boolean(v.currentSrc),
     }));
     expect(initial.videoWidth, 'Encoded video must decode real frames').toBeGreaterThan(0);
     expect(initial.videoHeight).toBeGreaterThan(0);
@@ -69,32 +80,104 @@ test.describe('Authenticated live HVAC lesson media', () => {
     await expect(video).toBeVisible();
     const frame = await workspace.boundingBox();
     const viewport = page.viewportSize();
-    expect(frame && viewport && Math.abs(frame.width - viewport.width) <= 2,
-      'Full screen course must span the entire device viewport').toBeTruthy();
+    expect(
+      frame && viewport && Math.abs(frame.width - viewport.width) <= 2,
+      'Full screen course must span the entire device viewport',
+    ).toBeTruthy();
     expect(frame && Math.abs(frame.x) <= 2).toBeTruthy();
 
     // Playback is genuine only when decoded media time advances without
     // seeking; a visible Play icon or HTTP 200 is insufficient acceptance.
-    await video.click();
-    await video.evaluate((v: HTMLVideoElement) => v.play());
+    await workspace.getByRole('button', { name: 'Play lesson video', exact: true }).click();
     const firstTime = await video.evaluate((v: HTMLVideoElement) => v.currentTime);
-    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => {
-      if (v.error) throw new Error('Native media error ' + v.error.code);
-      return v.currentTime;
-    }), { timeout: 20_000 }).toBeGreaterThan(firstTime + 1);
+    await expect
+      .poll(
+        () =>
+          video.evaluate((v: HTMLVideoElement) => {
+            if (v.error) throw new Error('Native media error ' + v.error.code);
+            return v.currentTime;
+          }),
+        { timeout: 20_000 },
+      )
+      .toBeGreaterThan(firstTime + 1);
+    const pauseResume = [];
+    for (let cycle = 0; cycle < 2; cycle++) {
+      const pause = workspace.getByRole('button', { name: 'Pause lesson video', exact: true });
+      // Touch devices have no hover: their Pause control must remain reachable
+      // even after the desktop auto-hide interval has elapsed.
+      if (await page.evaluate(() => matchMedia('(hover: none)').matches)) {
+        await page.waitForTimeout(3_500);
+        const control = await pause.evaluate((button) => {
+          const rect = button.getBoundingClientRect();
+          const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+          return {
+            width: rect.width,
+            height: rect.height,
+            reachable: hit === button || button.contains(hit),
+          };
+        });
+        expect(control.width).toBeGreaterThanOrEqual(44);
+        expect(control.height).toBeGreaterThanOrEqual(44);
+        expect(control.reachable, 'Touch Pause must not disappear or be covered').toBe(true);
+      } else {
+        await video.hover();
+      }
+      await pause.click();
+      await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+      const pausedAt = await video.evaluate((v: HTMLVideoElement) => v.currentTime);
+      await page.waitForTimeout(1_000);
+      const heldAt = await video.evaluate((v: HTMLVideoElement) => v.currentTime);
+      expect(
+        Math.abs(heldAt - pausedAt),
+        'Pause must stop playback, not just change its icon',
+      ).toBeLessThan(0.1);
+      await workspace.getByRole('button', { name: 'Play lesson video', exact: true }).click();
+      const resumedAt = await video.evaluate((v: HTMLVideoElement) => v.currentTime);
+      expect(resumedAt, 'Resume must retain the playback position').toBeGreaterThanOrEqual(
+        pausedAt - 0.1,
+      );
+      await expect
+        .poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime), { timeout: 20_000 })
+        .toBeGreaterThan(pausedAt + 0.5);
+      pauseResume.push({ pausedAt, heldAt, resumedAt });
+    }
+    const presentation = await video.evaluate((v: HTMLVideoElement) => ({
+      fit: getComputedStyle(v).objectFit,
+      inline: v.playsInline,
+      width: v.getBoundingClientRect().width,
+      viewportWidth: innerWidth,
+    }));
+    expect(presentation.fit, 'Phone and desktop must show the whole frame').toBe('contain');
+    expect(presentation.inline).toBe(true);
+    expect(presentation.width).toBeLessThanOrEqual(presentation.viewportWidth + 2);
     const media = await video.evaluate((v: HTMLVideoElement) => ({
-      currentTime: v.currentTime, duration: v.duration, paused: v.paused,
-      readyState: v.readyState, naturalWidth: v.videoWidth, error: v.error?.code ?? 0,
+      currentTime: v.currentTime,
+      duration: v.duration,
+      paused: v.paused,
+      readyState: v.readyState,
+      naturalWidth: v.videoWidth,
+      error: v.error?.code ?? 0,
     }));
     expect(media.error).toBe(0);
     expect(media.naturalWidth).toBeGreaterThan(0);
     await info.attach('live-hvac-course-playback', {
-      body: JSON.stringify({ exactTestSha: process.env.GITHUB_SHA || null, url: page.url(),
-        device: info.project.name, initial, media, viewport, frame, errors }),
+      body: JSON.stringify({
+        exactTestSha: process.env.GITHUB_SHA || null,
+        url: page.url(),
+        device: info.project.name,
+        initial,
+        media,
+        pauseResume,
+        presentation,
+        viewport,
+        frame,
+        errors,
+      }),
       contentType: 'application/json',
     });
     await info.attach('live-hvac-fullscreen', {
-      body: await page.screenshot(), contentType: 'image/png',
+      body: await page.screenshot(),
+      contentType: 'image/png',
     });
 
     await workspace.getByRole('button', { name: 'Exit full screen' }).click();

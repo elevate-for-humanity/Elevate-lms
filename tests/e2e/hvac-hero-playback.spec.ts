@@ -110,6 +110,10 @@ test('HVAC native media supports sound, pause, and resume', async ({ page }, tes
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime), { timeout: 15000 }).toBeGreaterThan(0.5);
   await video.evaluate((element: HTMLVideoElement) => element.pause());
   expect(await video.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
+  const pausedAt = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
+  await page.waitForTimeout(1_000);
+  const heldAt = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
+  expect(Math.abs(heldAt - pausedAt), 'Paused media time must stay still').toBeLessThan(0.1);
   // Native controls vary across mobile engines; exercise their real media API
   // without replacing browser methods or concealing autoplay rejection.
   await video.evaluate(async (element: HTMLVideoElement) => {
@@ -118,11 +122,13 @@ test('HVAC native media supports sound, pause, and resume', async ({ page }, tes
     await element.play();
   });
   const before = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
-  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBeGreaterThan(before + 0.5);
+  expect(before, 'Resume must not restart the film').toBeGreaterThanOrEqual(pausedAt - 0.1);
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime),
+    { timeout: 20_000 }).toBeGreaterThan(before + 0.5);
   const sound = await video.evaluate((element: HTMLVideoElement) => ({ muted: element.muted, volume: element.volume, paused: element.paused, error: element.error?.code ?? 0 }));
   expect(sound).toEqual({ muted: false, volume: 1, paused: false, error: 0 });
   expect(pageErrors).toEqual([]);
-  await testInfo.attach('hvac-native-sound', { body: JSON.stringify(sound), contentType: 'application/json' });
+  await testInfo.attach('hvac-native-sound', { body: JSON.stringify({ ...sound, pausedAt, heldAt, resumedAt: before }), contentType: 'application/json' });
 });
 
 test('HVAC poster remains available when the video request fails', async ({ page }, testInfo) => {

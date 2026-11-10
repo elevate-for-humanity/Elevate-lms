@@ -38,6 +38,11 @@ it('repeated Admin requests use the same owner-bound idempotency fingerprint and
  expect(h.enqueue.mock.calls[0][0].fingerprint).toBe('studio-openhands:owner:11111111-1111-4111-8111-111111111111');
  expect(result).toMatchObject({status:'validating',executed:false,engine:'openhands'});
 });
+it('does not relabel an earlier internal repair as an OpenHands execution',async()=>{
+ h.rows=[{id:'legacy-repair',status:'blocked',candidate:{provider:'elevate',branch:{name:'studio/legacy'}},verification:{},release_sha:null}];
+ const result=await(await GET(new NextRequest('https://admin.example/api/admin/dev-studio/engineering'))).json();
+ expect(result.repairs[0]).toMatchObject({engine:'internal',verifiedLive:false,taskId:null});
+});
 it('cannot reuse an accepted request key for another goal',async()=>{
  expect((await POST(post('Different task'))).status).toBe(409);
 });

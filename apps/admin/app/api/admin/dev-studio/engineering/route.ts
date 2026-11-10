@@ -53,7 +53,7 @@ export async function GET(request: NextRequest){
   const pr=verification?.pullRequest;
   const releaseSha=/^[a-f0-9]{40}$/.test(row.release_sha??'')?row.release_sha:null;
   return {repairId:row.id,status:row.status,area:row.source_job_id?'Course Builder':'Engineering',
-   engine:candidate?.kind==='planner-checkpoint'?'internal':'openhands',
+   engine:!candidate||candidate?.provider==='openhands'||candidate?.kind==='openhands-checkpoint'?'openhands':'internal',
    taskId:typeof taskId==='string'?taskId:null,
    branch:typeof branch==='string'&&/^studio\/[a-zA-Z0-9/_-]+$/.test(branch)?branch:null,
    pullRequest:typeof pr?.number==='number'?{number:pr.number,url:`https://github.com/elevate-for-humanity/Elevate-lms/pull/${pr.number}`}:null,

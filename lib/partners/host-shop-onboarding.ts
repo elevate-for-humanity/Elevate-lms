@@ -154,6 +154,9 @@ function normalizeLegacyRequirement(
 ): Record<string, unknown> | null {
   const rawType = String(raw.document_type ?? '').trim();
   if (!rawType || rawType === 'mou') return null;
+  // OSHA credentials are not an application prerequisite for any beauty Host
+  // Shop. Ignore legacy rows so they cannot reintroduce a required upload.
+  if (/osha/i.test([rawType, raw.document_name ?? ''].join(' '))) return null;
 
   let documentType = rawType;
   if (rawType === 'establishment_license') {

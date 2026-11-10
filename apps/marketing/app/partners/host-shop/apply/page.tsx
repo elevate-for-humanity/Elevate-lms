@@ -199,7 +199,8 @@ export default function UniversalHostSiteApplyPage() {
             One no-cost application covers Barber, Cosmetology, Esthetics, and Nail Technician host
             sites. Elevate verifies the business, licensed supervisor, insurance, workers&apos;
             compensation, worksite capacity, and compliance documents before approval. There is no
-            Host Site application or apprentice-placement fee.
+            Host Site application or apprentice-placement fee. An OSHA card or OSHA course
+            completion is not required to apply for any of these Host Site programs.
           </p>
         </div>
       </section>

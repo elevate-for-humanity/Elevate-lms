@@ -3,6 +3,15 @@ import { hostShopStateAliases, resolveHostShopDocuments } from '@/lib/partners/h
 
 const requirement = { document_type: 'extra_document', document_name: 'Extra', program_id: 'cosmetology', state: 'Indiana', is_required: true };
 describe('shared Host Shop document readiness', () => {
+  it.each(['barber', 'cosmetology', 'nail_technician', 'esthetician'] as const)('does not require a legacy OSHA credential for %s shops', (program) => {
+    const rows = resolveHostShopDocuments(program, 'Indiana', [
+      { ...requirement, program_id: program, document_type: 'osha_10', document_name: 'OSHA 10 Card' },
+      { ...requirement, program_id: program, document_type: 'safety_certification', document_name: 'OSHA certification' },
+    ], []);
+    expect(rows.some(row => /osha/i.test(row.document_type + row.document_name))).toBe(false);
+    expect(rows.find(row => row.document_type === 'liability_insurance')?.is_required).toBe(true);
+    expect(rows.find(row => row.document_type === 'supervisor_license')?.is_required).toBe(true);
+  });
   it('resolves IN and Indiana to the same requirements for existing and new shops', () => {
     expect(hostShopStateAliases('IN')).toEqual(expect.arrayContaining(['IN','Indiana','ALL']));
     expect(resolveHostShopDocuments('cosmetology','IN',[requirement],[])).toEqual(resolveHostShopDocuments('cosmetology','Indiana',[requirement],[]));

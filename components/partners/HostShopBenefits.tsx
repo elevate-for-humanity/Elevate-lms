@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 const benefits = [
@@ -15,7 +14,6 @@ export default function HostShopBenefits() {
       <h2 id="host-benefits-heading" className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Promote your shop. Build your team.</h2>
       <p className="mt-3 max-w-3xl leading-7 text-slate-700">We’re recruiting barbershops, salons, nail studios, and esthetics businesses across Indiana. Give your work a home in the Barber &amp; Beauty Network.</p>
       <div data-mobile-grid="2" className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">{benefits.map((benefit) => <article key={benefit.title} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        <div className="relative aspect-[4/3]"><Image src={benefit.image} alt={benefit.title} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" /></div>
         <div className="p-4"><h3 className="text-base sm:text-lg font-black text-slate-950">{benefit.title}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{benefit.text}</p></div>
       </article>)}</div>
       <div className="mt-6 rounded-2xl bg-slate-950 p-5 text-white sm:p-7">

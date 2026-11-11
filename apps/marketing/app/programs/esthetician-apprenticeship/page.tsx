@@ -10,7 +10,6 @@ import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
-import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
@@ -122,14 +121,13 @@ export default async function EstheticianApprenticeshipPage() {
             programLabel={program.title}
           />
         }
+        visualContent={<HostShopPlacementGuide programSlug="esthetician-apprenticeship" />}
         featuredContent={
           <>
             <ApprenticeshipExperienceGuide
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <FeaturedHostPartners programSlug="esthetician-apprenticeship" showDirectory={false} />
-            <HostShopPlacementGuide programSlug="esthetician-apprenticeship" />
           </>
         }
       >

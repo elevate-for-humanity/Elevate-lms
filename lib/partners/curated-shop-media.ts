@@ -16,10 +16,36 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
     // before deduplication so an absolute URL and its repository path form one slide.
     try {
       const parsed = new URL(item.url, 'https://www.elevateforhumanity.org');
+      // These verified Executivecutz imports are bundled locally. GitHub raw
+      // URLs bypassed responsive optimization and added a third-party request.
+      if (parsed.hostname === 'raw.githubusercontent.com' &&
+          /^\/elevate-for-humanity\/Elevate-lms\/[^/]+\/public\/images\/host-shops\/executivecutz\/interior-[1-5]\.webp$/.test(parsed.pathname)) {
+        item = { ...item, url: parsed.pathname.slice(parsed.pathname.indexOf('/public/') + 7) };
+      }
       if (parsed.hostname === 'www.elevateforhumanity.org' || parsed.hostname === 'elevateforhumanity.org') {
         item = { ...item, url: parsed.pathname + parsed.search };
       }
     } catch { return []; }
+    // The printed album sheets and contact card are source material, not
+    // portfolio photography. Publish the restored manicure, with clear labeling.
+    if (slug.startsWith('style-and-scissor')) {
+      if (/\/(?:logo|contact-card|melissas-nails|pink-nail-work)\.webp$/.test(item.url)) return [];
+      if (item.url === '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp') item = {
+        ...item,
+        url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp',
+        alt: 'AI-enhanced manicure photograph restored from Style and Scissor Salon’s published nail portfolio',
+        source: item.source || original.url,
+      };
+    }
+    const aliases: Record<string, string> = {
+      '/images/partners/salon-saloon/team-sign.webp': '/images/partners/salon-saloon/team-commercial-2026.webp',
+      '/images/partners/generations-hair/highlighted-curls-home.webp': '/images/partners/generations-hair/premium-curls.jpg',
+      '/images/partners/generations-hair/highlighted-curls-card.webp': '/images/partners/generations-hair/premium-curls.jpg',
+    };
+    if (aliases[item.url]) item = { ...item, url: aliases[item.url] };
+    if (slug.startsWith('top-shelf-barber-lounge')) {
+      item = { ...item, url: item.url.replace(/(top-shelf-(?:fade-profile|wave-and-beard|modern-fringe|textured-crop|precision-fade|fade-and-beard))(?:-enhanced-2026)?\.(?:jpg|webp)$/, '$1-enhanced-2026.webp') };
+    }
     if (item.url === '/images/partners/salon-saloon/team-interior.webp') return [{ ...item, url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp' }];
     if (kountry) {
       const filename = item.url.split('/').at(-1)?.split('?')[0];

@@ -40,14 +40,7 @@ function CourseCard({ course }: { course: PartnerCourse }) {
   const isFree = course.retailPrice === 0;
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col hover:shadow-md transition-shadow">
-      <PublicPageLead
-        image="/images/refresh-20261014/business.webp"
-        alt="Illustrative adults learning workplace and business skills"
-        actions={[
-          { href: '/microclasses#microcourse-catalog', label: 'Explore short courses' },
-          { href: '/contact', label: 'Ask about a course' },
-        ]}
-      />
+
 
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="text-sm font-bold text-slate-900 leading-snug">{course.title}</h3>
@@ -106,6 +99,14 @@ function CourseCard({ course }: { course: PartnerCourse }) {
 export default function MicroclassesPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative adults learning workplace and business skills"
+        actions={[
+          { href: '/microclasses#microcourse-catalog', label: 'Explore short courses' },
+          { href: '/contact', label: 'Ask about a course' },
+        ]}
+      />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[{ label: 'Programs', href: '/programs' }, { label: 'Microclasses' }]}

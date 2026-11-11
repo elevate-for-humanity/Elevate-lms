@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import { getStaticProgram } from '@/data/programs';
+import { getProgramHeroImage } from '@/lib/images/programImages';
 
 describe('visual-first program entry', () => {
   it('shows configured video and its photograph before program costs', () => {
@@ -19,7 +20,9 @@ describe('visual-first program entry', () => {
           primaryCta: { label: 'Apply', href: '/apply' },
         }}
         visualContent={
-          <section aria-label="See the training">Student training photographs</section>
+          <section aria-label="See the training">
+            <img src="/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp" alt="Host salon manicure portfolio" />
+          </section>
         }
         afterHero={<section aria-label="Enrollment promotion">Review enrollment costs</section>}
       />,
@@ -30,9 +33,16 @@ describe('visual-first program entry', () => {
       'src',
       '/videos/nail-training-mobile.mp4',
     );
-    expect(container.querySelector('img')).not.toBeNull();
+    // A native video poster is the hero photograph. Do not rely on an
+    // unrelated image later in the CTA to prove visual-first ordering.
+    expect(video).toHaveAttribute('poster', getProgramHeroImage(program.slug));
+    const photograph = screen.getByRole('img', { name: 'Host salon manicure portfolio' });
+    expect(photograph).toBeVisible();
+    expect(container.querySelectorAll('img')).toHaveLength(1);
     const visuals = screen.getByRole('region', { name: 'See the training' });
     const promotion = screen.getByRole('region', { name: 'Enrollment promotion' });
+    expect(visuals).toContainElement(photograph);
+    expect(photograph.compareDocumentPosition(promotion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(video.compareDocumentPosition(visuals) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
       visuals.compareDocumentPosition(promotion) & Node.DOCUMENT_POSITION_FOLLOWING,

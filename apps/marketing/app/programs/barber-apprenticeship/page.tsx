@@ -1,3 +1,4 @@
+import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import { ProgramIntroductionAudio } from '@/components/programs/NarratedProgramIntro';
 import Image from 'next/image';
 import { TUITION_CENTS } from '@/lib/barber/pricing';
@@ -225,6 +226,8 @@ export default async function BarberApprenticeshipPage() {
           </Link>
         </div>
       </section>
+
+      <HostShopPlacementGuide programSlug="barber-apprenticeship" />
 
       <ApprenticeshipExperienceGuide
         programTitle={program.title}

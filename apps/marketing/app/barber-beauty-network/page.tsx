@@ -5,9 +5,7 @@ import { getHostShopNetwork, type HostShopNetworkEntry } from '@/lib/programs/ho
 import { logger } from '@/lib/logger';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
-import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { ArrowRight, BriefcaseBusiness, MessageCircle, Scissors, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -67,7 +65,10 @@ export default async function BarberBeautyNetworkPage() {
   let shops: HostShopNetworkEntry[] = [];
   let directoryUnavailable = false;
   try {
-    shops = await getHostShopNetwork();
+    shops = (await getHostShopNetwork(true)).map((shop) => {
+      const gallery = shop.gallery?.filter((photo) => photo.url !== '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp');
+      return { ...shop, gallery, image: gallery?.[0]?.url };
+    });
   } catch (error) {
     logger.error('[BarberBeautyNetworkPage] Host Shop directory unavailable', error);
     directoryUnavailable = true;
@@ -119,7 +120,7 @@ export default async function BarberBeautyNetworkPage() {
           </div>
         </div>
       </section>
-      <DowntownTrainingGallery />
+      <DowntownTrainingGallery showPhotos={false} />
       <HostShopBenefits />
       <section id="shop-directory" className="bg-slate-950 px-5 py-10 text-white sm:py-14">
         <div className="mx-auto max-w-6xl">
@@ -151,24 +152,7 @@ export default async function BarberBeautyNetworkPage() {
         </div>
       </section>
       <section id="join" className="bg-red-50 px-5 py-10 sm:py-16">
-        <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-2 lg:items-center">
-          <HostShopMediaCarousel
-            shopName="Elevate Barber & Beauty Network"
-            items={[
-              {
-                url: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
-                alt: 'Top Shelf Barber Lounge haircut portfolio',
-              },
-              {
-                url: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
-                alt: 'Generations hair styling portfolio',
-              },
-              {
-                url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp',
-                alt: 'Salon Saloon team',
-              },
-            ]}
-          />
+        <div className="mx-auto max-w-6xl">
           <div>
             <p className="text-sm font-black uppercase text-red-700">Free network membership</p>
             <h2 className="mt-2 text-3xl font-black">Your talent deserves to be seen.</h2>
@@ -219,28 +203,11 @@ export default async function BarberBeautyNetworkPage() {
           listings and job opportunities are shown separately.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
-          {pathways.map(({ title, description, href, action, icon: Icon }, index) => (
+          {pathways.map(({ title, description, href, action, icon: Icon }) => (
             <article
               key={title}
               className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6"
             >
-              <div className="relative mb-5 aspect-[4/3] overflow-hidden rounded-xl">
-                <Image
-                  fill
-                  sizes="(min-width: 640px) 50vw, 100vw"
-                  src={
-                    [
-                      '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
-                      '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
-                      '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
-                      '/images/partners/salon-saloon/team-interior-enhanced-2026.webp',
-                    ][index]
-                  }
-                  alt={title}
-                  className="object-cover"
-                  loading="lazy"
-                />
-              </div>
               <Icon aria-hidden="true" className="h-8 w-8 text-blue-700" />
               <h3 className="mt-4 text-2xl font-bold">{title}</h3>
               <p className="mt-3 leading-7 text-slate-700">{description}</p>

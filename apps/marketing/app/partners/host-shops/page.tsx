@@ -1,12 +1,10 @@
-import { hostShopBusinessKey } from '@/lib/partners/dedupe-host-shops.mjs';
-import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
 import HostShopPageNavigation from '@/components/partners/HostShopPageNavigation';
 import DowntownTrainingGallery from '@/components/partners/DowntownTrainingGallery';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
-import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import { getProgramCardImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopBenefits from '@/components/partners/HostShopBenefits';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
@@ -73,8 +71,18 @@ const CALLER_CHECKLIST = [
 
 
 export default async function HostShopsPage() {
-  const networkShops = await getHostShopNetwork();
-  const onboardingShops = onboardingProfiles.filter(shop => !networkShops.some(active => hostShopBusinessKey(active.name) === hostShopBusinessKey(shop.name)));
+  const networkShops = await getHostShopNetwork(true);
+  const heroPhotos = new Set([
+    '/images/partners/salon-saloon/team-sign.webp',
+    '/images/partners/salon-saloon/team-commercial-2026.webp',
+    '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
+    '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
+    '/images/partners/generations-hair/salon-service.webp',
+  ]);
+  const directoryShops = networkShops.map((shop) => {
+    const gallery = shop.gallery?.filter((photo) => !heroPhotos.has(photo.url));
+    return { ...shop, gallery, image: gallery?.[0]?.url };
+  });
 
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
@@ -90,7 +98,7 @@ export default async function HostShopsPage() {
         }}
         mediaSequence={[
           { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
-          { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
+          { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-commercial-2026.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
           { shopSlug: 'kountry-kutz-barbershop', media: { src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz', kind: 'photo' } },
           { shopSlug: 'kountry-kutz-barbershop', media: { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop', kind: 'video', backdropSrc: '/images/partners/kountry-kutz-official.webp' } },
           { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp', alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop', kind: 'photo' } },
@@ -104,15 +112,27 @@ export default async function HostShopsPage() {
         narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, required documents, and the free Host Shop application."
       />
 
+      <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-9 text-white">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-red-400">Elevate Host Shop Network</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Find your next barber, salon, or beauty professional.</h2>
+            <p className="mt-3 leading-7 text-slate-300">Explore real shop portfolios, get directions, and contact or book directly with the business. Ask the shop about hours and walk-ins before visiting. Students can explore participating training locations; apprentice capacity is confirmed separately.</p>
+          </div>
+          <HostShopNetworkDirectory shops={directoryShops} />
+
+        </div>
+      </section>
+
       <section className="bg-white px-4 py-10 sm:py-9" aria-labelledby="host-trades-heading">
         <div className="mx-auto max-w-7xl">
           <h2 id="host-trades-heading" className="text-3xl font-black">Barbering. Cosmetology. Nails. Esthetics.</h2>
           <p className="mt-3 max-w-3xl leading-7 text-slate-700">Discover your training community or help the next generation grow. We're looking for new Host Shops in every pathway.</p>
           <div className="mt-6 grid items-stretch gap-6 md:grid-cols-2">
             {Object.entries(PROGRAM_LABELS).map(([slug, label]) => {
-              const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug)).length;
+              const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug) && shop.approval === 'approved').length;
               return <article key={slug} className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramHeroImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramCardImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
                 <div className="flex flex-1 flex-col p-4"><h3 className="text-lg font-black">{label.replace(' Apprenticeship', '')}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">{count ? `${count} participating ${count === 1 ? 'location' : 'locations'}. Explore the shops and start your journey.` : "We're looking for new Host Shops. Bring your licensed business into the network."}</p>
                   <Link href={`/programs/${slug}`} className="mt-4 inline-flex min-h-11 items-center font-bold text-red-700">Explore this pathway →</Link>
@@ -201,19 +221,8 @@ export default async function HostShopsPage() {
       </section>
 
       <HostShopPageNavigation />
-      <DowntownTrainingGallery />
+      <DowntownTrainingGallery showPhotos={false} />
       <HostShopBenefits />
-      <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-9 text-white">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.14em] text-red-400">Elevate Host Shop Network</p>
-            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Find your next barber, salon, or beauty professional.</h2>
-            <p className="mt-3 leading-7 text-slate-300">Explore real shop portfolios, get directions, and contact or book directly with the business. Ask the shop about hours and walk-ins before visiting. Students can explore participating training locations; apprentice capacity is confirmed separately.</p>
-          </div>
-          <HostShopNetworkDirectory shops={networkShops} />
-          <section className="mt-6 border-t border-slate-700 pt-5"><h3 className="text-xl font-bold">More local shops</h3><p className="mt-2 text-sm text-slate-300">These businesses are not yet confirmed for apprentice placement.</p><ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{onboardingShops.map(shop => <li key={shop.slug} className="rounded-xl border border-slate-700 p-4"><Link href={`/host-shops/${shop.slug}`} className="font-bold text-white underline">{shop.name}</Link><p className="mt-2 text-sm text-slate-300">{shop.address || `${shop.city}, IN — street address awaiting confirmation`}</p>{shop.phone && <p className="mt-1 text-sm text-slate-300">{shop.phone}</p>}</li>)}</ul></section>
-        </div>
-      </section>
 
       <section className="px-4 py-9">
         <div className="mx-auto max-w-7xl">

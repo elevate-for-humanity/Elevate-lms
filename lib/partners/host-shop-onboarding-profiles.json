@@ -26,12 +26,85 @@
         "alt": "DBO Hair Studios team portrait at the Indianapolis salon",
         "source": "https://www.dbohairstudios.com/team"
       }
+    ],
+    "programs": [
+      "cosmetology-apprenticeship"
     ]
   },
-  {"slug":"executivecutz","name":"Executivecutz","address":"2049 Veterans Memorial Pkwy S, Suite 8, Lafayette, IN 47909","city":"Lafayette","phone":"765-269-6243","website":"https://getsquire.com/discover/barbershop/executivecutz-lafayette","source":"https://getsquire.com/discover/barbershop/executivecutz-lafayette/barber/ivan-c-owner"},
-  {"slug":"studio-phresh","name":"Studio pHresh LLC","address":"1828 E Main St, Plainfield, IN 46168","city":"Plainfield","phone":"317-839-2954","website":"","source":"https://www.fresha.com/lvp/studio-phresh-east-main-street-plainfield-8J5BX2"},
-  {"slug":"barbershop-32","name":"Barbershop 32","address":"","city":"Indianapolis","phone":"317-378-2947","website":"","source":""},
-  {"slug":"hair-haven-extension-lounge","name":"Hair Haven Extension Lounge","address":"","city":"Bloomington","phone":"","website":"","source":""},
+  {
+    "slug": "executivecutz",
+    "name": "Executivecutz",
+    "address": "2049 Veterans Memorial Pkwy S, Suite 8, Lafayette, IN 47909",
+    "city": "Lafayette",
+    "phone": "765-269-6243",
+    "website": "https://getsquire.com/discover/barbershop/executivecutz-lafayette",
+    "source": "https://getsquire.com/discover/barbershop/executivecutz-lafayette/barber/ivan-c-owner"
+  },
+  {
+    "slug": "studio-phresh",
+    "name": "Studio pHresh LLC",
+    "address": "1828 E Main St, Plainfield, IN 46168",
+    "city": "Plainfield",
+    "phone": "317-839-2954",
+    "website": "",
+    "source": "https://www.fresha.com/lvp/studio-phresh-east-main-street-plainfield-8J5BX2",
+    "businessDescription": "Studio pHresh is a Plainfield beauty salon at 1828 East Main Street. Its published portfolio features braids, loc styling, and curled finishes. Call the salon to ask about hair and nail services, current hours, and walk-in availability.",
+    "gallery": [
+      {
+        "url": "/images/host-shops/studio-phresh/braids-enhanced-2026.webp",
+        "alt": "AI-enhanced from Studio pHresh portfolio — honey-blonde box braids",
+        "source": "https://www.bestprosintown.com/in/indianapolis/studio-phresh-beauty-spa-/"
+      }
+    ],
+    "programs": [
+      "cosmetology-apprenticeship",
+      "nail-technician-apprenticeship"
+    ]
+  },
+  {
+    "slug": "barbershop-32",
+    "name": "Barbershop 32",
+    "address": "330 East Main Street, Westfield, IN 46074",
+    "city": "Westfield",
+    "phone": "317-804-3623",
+    "website": "https://www.barbershop32.com/",
+    "source": "https://www.barbershop32.com/about",
+    "booking": "https://www.vagaro.com/barbershop32",
+    "businessDescription": "Barber Shop 32 is a downtown Westfield barbershop founded by Eli Resendez. The team offers traditional haircuts, beard and mustache grooming, children’s cuts, and straight-razor shaves. Book directly with the shop or ask about walk-ins.",
+    "programs": [
+      "barber-apprenticeship"
+    ],
+    "gallery": [
+      {
+        "url": "/images/host-shops/barbershop-32/official-barber-service-2026.webp",
+        "alt": "Barber Shop 32 barber providing a haircut in the Westfield shop",
+        "source": "https://www.barbershop32.com/"
+      },
+      {
+        "url": "/images/host-shops/barbershop-32/official-chair-2026.webp",
+        "alt": "Barber chair and workstation inside Barber Shop 32",
+        "source": "https://www.barbershop32.com/"
+      }
+    ]
+  },
+  {
+    "slug": "hair-haven-extension-lounge",
+    "name": "Hair Haven Extension Lounge",
+    "address": "811 North Walnut Street, Bloomington, IN 47404",
+    "city": "Bloomington",
+    "phone": "270-599-5053",
+    "website": "https://www.vagaro.com/hairhavenextensionlounge",
+    "source": "https://www.vagaro.com/hairhavenextensionlounge",
+    "booking": "https://www.vagaro.com/hairhavenextensionlounge",
+    "businessDescription": "Hair Haven Extension Lounge is a Bloomington salon offering hair extensions, haircuts, color, curly-hair services, facials, waxing, and lash services. Explore its booking page to choose a professional and confirm availability before visiting.",
+    "gallery": [
+      {
+        "url": "/images/host-shops/hair-haven/official-pink-color-2026.webp",
+        "alt": "Pink hair color and curled finish published by Hair Haven Extension Lounge",
+        "source": "https://www.vagaro.com/hairhavenextensionlounge"
+      }
+    ]
+  },
   {
     "slug": "b-52s-barber-shop",
     "name": "B-52’s Barber Shop LLC",
@@ -41,6 +114,22 @@
     "website": "",
     "source": "https://www.bestprosintown.com/in/new-castle/b-52s-barber-shop-/",
     "businessDescription": "Chris Newkirk owns B-52’s Barber Shop in New Castle. The shop offers classic haircuts, fades, beard trims, razor lineups, and straight-razor shaves.",
-    "portfolio": "/images/partners/b52s-official.webp"
+    "portfolio": "/images/partners/b52s-official.webp",
+    "programs": [
+      "barber-apprenticeship"
+    ]
+  },
+  {
+    "slug": "marvelouz-cutz",
+    "name": "MARVELOUZ CUTZ",
+    "address": "222 Douglas Street, Hammond, IN 46320",
+    "city": "Hammond",
+    "phone": "773-299-0050",
+    "website": "",
+    "source": "https://www.barbershopdirectories.com/indiana/hammond",
+    "businessDescription": "MARVELOUZ CUTZ is a Hammond barbering business listed at 222 Douglas Street. Contact the shop directly to confirm current services, hours, and walk-in availability before visiting.",
+    "programs": [
+      "barber-apprenticeship"
+    ]
   }
 ]

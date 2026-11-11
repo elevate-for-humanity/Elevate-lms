@@ -56,7 +56,6 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
-import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 interface Props {
@@ -140,8 +139,6 @@ export default function ProgramDetailPage({
         ? 'Competency-based'
         : 'Schedule varies';
   const hasIndianaFunding = isWorkforceFunded;
-  const heroPosterSrc = getProgramHeroImage(p.slug);
-  const heroAlt = getProgramImageAlt(p.slug, p.heroImageAlt || p.title);
   const requestInfoHref =
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
   const applicationHref = p.cta.applyHref || `/apply?program=${encodeURIComponent(p.slug)}`;
@@ -1381,17 +1378,7 @@ export default function ProgramDetailPage({
 
       {/* CTA */}
       <section className="py-16 bg-slate-900">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 lg:grid-cols-2">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-800">
-            <Image
-              src={heroPosterSrc}
-              alt={heroAlt}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              loading="lazy"
-              className="object-contain"
-            />
-          </div>
+        <div className="mx-auto max-w-6xl px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
               Ready to Start Your {p.title} Career?

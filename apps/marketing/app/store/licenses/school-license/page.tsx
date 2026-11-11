@@ -274,9 +274,6 @@ export default function SchoolLicensePage() {
               },
             ].map((item, i) => (
               <div key={i} className="bg-slate-50 rounded-xl overflow-hidden">
-                <div className="relative h-40">
-                  <Image sizes="100vw" src={item.img} alt={item.title} fill className="object-cover" placeholder="empty" />
-                </div>
                 <div className="p-6">
                   <h3 className="font-bold text-lg mb-2">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>

@@ -27,6 +27,7 @@ describe('Store visual previews', () => {
   it('loads the product-specific demo only after Play and releases it on Close', () => {
     const view = render(<InlineStoreDemo name="Solo plan" href="/store/demo/plan/solo" />);
     expect(view.container.querySelector('iframe')).toBeNull();
+    expect(view.container.querySelector('img')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Play Solo plan demo' }));
     expect(screen.getByTitle('Solo plan interactive demonstration')).toHaveAttribute(
       'src',
@@ -34,6 +35,10 @@ describe('Store visual previews', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Close demo' }));
     expect(view.container.querySelector('iframe')).toBeNull();
+  });
+  it('retains dedicated artwork when the product has its own preview', () => {
+    render(<InlineStoreDemo name="Website Builder" href="/store/demo/apps/website-builder" poster="/images/store-commercials/website-builder.webp" />);
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/images/store-commercials/website-builder.webp');
   });
   it('retains workbook preview notes when moving between activities', () => {
     render(<WorkbookPreview subject="Barbering" />);

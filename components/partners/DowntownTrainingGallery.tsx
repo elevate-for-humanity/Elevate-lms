@@ -6,7 +6,7 @@ import {
   DOWNTOWN_TRAINING_PROGRAMS,
 } from '@/lib/partners/downtown-training';
 
-export default function DowntownTrainingGallery() {
+export default function DowntownTrainingGallery({ showPhotos = true }: { showPhotos?: boolean }) {
   return (
     <section
       id="downtown-training"
@@ -34,7 +34,7 @@ export default function DowntownTrainingGallery() {
               key={item.program}
               className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-blue-100"
             >
-              <div className="relative aspect-[4/5]">
+              {showPhotos ? <div className="relative aspect-[4/5]">
                 <Image
                   src={item.image}
                   alt={item.alt}
@@ -42,7 +42,7 @@ export default function DowntownTrainingGallery() {
                   sizes="(min-width: 768px) 33vw, 100vw"
                   className="object-cover"
                 />
-              </div>
+              </div> : null}
               <div className="p-6">
                 <p className="text-sm font-bold text-blue-800">{item.name}</p>
                 <h3 className="mt-2 text-2xl font-black text-slate-950">{item.program}</h3>

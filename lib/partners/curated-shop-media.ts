@@ -30,7 +30,7 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
     // portfolio photography. Publish the restored manicure, with clear labeling.
     if (slug.startsWith('style-and-scissor')) {
       if (/\/(?:logo|contact-card|melissas-nails|pink-nail-work)\.webp$/.test(item.url)) return [];
-      if (item.url.endsWith('/portfolio-nail-work.webp')) item = {
+      if (item.url === '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp') item = {
         ...item,
         url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp',
         alt: 'AI-enhanced manicure photograph restored from Style and Scissor Salon’s published nail portfolio',

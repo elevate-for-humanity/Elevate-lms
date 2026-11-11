@@ -54,8 +54,9 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   };
   const replaceReadyValue = async (locator: Locator, value: string) => {
     await waitForClientReads();
-    await locator.fill('');
-    await expect(locator).toHaveValue('');
+    // WebKit can hydrate an existing draft between a separate clear and fill.
+    // Replace atomically and verify the final full field value, rather than
+    // requiring an intermediate empty form state that is not user-visible.
     await locator.fill(value);
     await expect(locator).toHaveValue(value);
   };

@@ -12,9 +12,9 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "619911265cbb9fa1d8965563dac0b3e3f9fb66e0f7d6f5ce5c8fd26e6d339188",
+      "sha256": "a0f864d36976b8c669885b5e861d5fc252cadb6e41ea093a3a7de4b50727e9ae",
       "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
-      "localRevisionReason": "Reviewed professional portal entry and responsive-menu breakpoint; preserve original Supersonic identity and immutable upstream source.",
+      "localRevisionReason": "Reviewed professional portal entry and responsive-menu breakpoint; preserve original Supersonic identity and immutable upstream source. Owner-requested Supersonic payroll and tax-service navigation; preserve the immutable upstream source digest.",
       "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
@@ -134,7 +134,7 @@
       "target": "apps/marketing/app/api/tax/returns/route.ts",
       "sha256": "d443b4a00b3cab6afad2c7561300978a25df4b4ec9b9964cefcf18efef8227b4",
       "sourceSha256": "d8c5413e56a596c6ab7a9c8e0742a02519d98bb00519ee3af16c51c370c7d755",
-      "localRevisionReason": "Reviewed inclusion of the authenticated user email in that user\u2019s private return-list response, enabling account verification and switching without changing authorization."
+      "localRevisionReason": "Reviewed inclusion of the authenticated user email in that user’s private return-list response, enabling account verification and switching without changing authorization."
     },
     {
       "source": "app/api/tax/w2/confirm/route.ts",

@@ -1,0 +1,370 @@
+{
+  "01": {
+    "name": "Adams",
+    "rate": 0.016
+  },
+  "02": {
+    "name": "Allen",
+    "rate": 0.0159
+  },
+  "03": {
+    "name": "Bartholomew",
+    "rate": 0.0175
+  },
+  "04": {
+    "name": "Benton",
+    "rate": 0.0179
+  },
+  "05": {
+    "name": "Blackford",
+    "rate": 0.025
+  },
+  "06": {
+    "name": "Boone",
+    "rate": 0.0171
+  },
+  "07": {
+    "name": "Brown",
+    "rate": 0.025234
+  },
+  "08": {
+    "name": "Carroll",
+    "rate": 0.024733
+  },
+  "09": {
+    "name": "Cass",
+    "rate": 0.0295
+  },
+  "10": {
+    "name": "Clark",
+    "rate": 0.02
+  },
+  "11": {
+    "name": "Clay",
+    "rate": 0.0235
+  },
+  "12": {
+    "name": "Clinton",
+    "rate": 0.0265
+  },
+  "13": {
+    "name": "Crawford",
+    "rate": 0.0165
+  },
+  "14": {
+    "name": "Daviess",
+    "rate": 0.015
+  },
+  "15": {
+    "name": "Dearborn",
+    "rate": 0.014
+  },
+  "16": {
+    "name": "Decatur",
+    "rate": 0.0245
+  },
+  "17": {
+    "name": "DeKalb",
+    "rate": 0.0213
+  },
+  "18": {
+    "name": "Delaware",
+    "rate": 0.015
+  },
+  "19": {
+    "name": "Dubois",
+    "rate": 0.012
+  },
+  "20": {
+    "name": "Elkhart",
+    "rate": 0.02
+  },
+  "21": {
+    "name": "Fayette",
+    "rate": 0.0282
+  },
+  "22": {
+    "name": "Floyd",
+    "rate": 0.0189
+  },
+  "23": {
+    "name": "Fountain",
+    "rate": 0.021
+  },
+  "24": {
+    "name": "Franklin",
+    "rate": 0.017
+  },
+  "25": {
+    "name": "Fulton",
+    "rate": 0.0288
+  },
+  "26": {
+    "name": "Gibson",
+    "rate": 0.013
+  },
+  "27": {
+    "name": "Grant",
+    "rate": 0.0275
+  },
+  "28": {
+    "name": "Greene",
+    "rate": 0.0235
+  },
+  "29": {
+    "name": "Hamilton",
+    "rate": 0.011
+  },
+  "30": {
+    "name": "Hancock",
+    "rate": 0.0194
+  },
+  "31": {
+    "name": "Harrison",
+    "rate": 0.01
+  },
+  "32": {
+    "name": "Hendricks",
+    "rate": 0.017
+  },
+  "33": {
+    "name": "Henry",
+    "rate": 0.0202
+  },
+  "34": {
+    "name": "Howard",
+    "rate": 0.0235
+  },
+  "35": {
+    "name": "Huntington",
+    "rate": 0.0195
+  },
+  "36": {
+    "name": "Jackson",
+    "rate": 0.021
+  },
+  "37": {
+    "name": "Jasper",
+    "rate": 0.02864
+  },
+  "38": {
+    "name": "Jay",
+    "rate": 0.025
+  },
+  "39": {
+    "name": "Jefferson",
+    "rate": 0.0103
+  },
+  "40": {
+    "name": "Jennings",
+    "rate": 0.025
+  },
+  "41": {
+    "name": "Johnson",
+    "rate": 0.014
+  },
+  "42": {
+    "name": "Knox",
+    "rate": 0.017
+  },
+  "43": {
+    "name": "Kosciusko",
+    "rate": 0.01
+  },
+  "44": {
+    "name": "LaGrange",
+    "rate": 0.0165
+  },
+  "45": {
+    "name": "Lake",
+    "rate": 0.015
+  },
+  "46": {
+    "name": "LaPorte",
+    "rate": 0.0145
+  },
+  "47": {
+    "name": "Lawrence",
+    "rate": 0.0175
+  },
+  "48": {
+    "name": "Madison",
+    "rate": 0.0225
+  },
+  "49": {
+    "name": "Marion",
+    "rate": 0.0202
+  },
+  "50": {
+    "name": "Marshall",
+    "rate": 0.0125
+  },
+  "51": {
+    "name": "Martin",
+    "rate": 0.025
+  },
+  "52": {
+    "name": "Miami",
+    "rate": 0.0254
+  },
+  "53": {
+    "name": "Monroe",
+    "rate": 0.0214
+  },
+  "54": {
+    "name": "Montgomery",
+    "rate": 0.0265
+  },
+  "55": {
+    "name": "Morgan",
+    "rate": 0.0272
+  },
+  "56": {
+    "name": "Newton",
+    "rate": 0.01
+  },
+  "57": {
+    "name": "Noble",
+    "rate": 0.0175
+  },
+  "58": {
+    "name": "Ohio",
+    "rate": 0.02
+  },
+  "59": {
+    "name": "Orange",
+    "rate": 0.0175
+  },
+  "60": {
+    "name": "Owen",
+    "rate": 0.025
+  },
+  "61": {
+    "name": "Parke",
+    "rate": 0.0265
+  },
+  "62": {
+    "name": "Perry",
+    "rate": 0.014
+  },
+  "63": {
+    "name": "Pike",
+    "rate": 0.012
+  },
+  "64": {
+    "name": "Porter",
+    "rate": 0.005
+  },
+  "65": {
+    "name": "Posey",
+    "rate": 0.0145
+  },
+  "66": {
+    "name": "Pulaski",
+    "rate": 0.0285
+  },
+  "67": {
+    "name": "Putnam",
+    "rate": 0.023
+  },
+  "68": {
+    "name": "Randolph",
+    "rate": 0.03
+  },
+  "69": {
+    "name": "Ripley",
+    "rate": 0.0238
+  },
+  "70": {
+    "name": "Rush",
+    "rate": 0.0215
+  },
+  "71": {
+    "name": "St. Joseph",
+    "rate": 0.0175
+  },
+  "72": {
+    "name": "Scott",
+    "rate": 0.0216
+  },
+  "73": {
+    "name": "Shelby",
+    "rate": 0.017
+  },
+  "74": {
+    "name": "Spencer",
+    "rate": 0.008
+  },
+  "75": {
+    "name": "Starke",
+    "rate": 0.0171
+  },
+  "76": {
+    "name": "Steuben",
+    "rate": 0.0199
+  },
+  "77": {
+    "name": "Sullivan",
+    "rate": 0.017
+  },
+  "78": {
+    "name": "Switzerland",
+    "rate": 0.0145
+  },
+  "79": {
+    "name": "Tippecanoe",
+    "rate": 0.0128
+  },
+  "80": {
+    "name": "Tipton",
+    "rate": 0.026
+  },
+  "81": {
+    "name": "Union",
+    "rate": 0.0275
+  },
+  "82": {
+    "name": "Vanderburgh",
+    "rate": 0.0125
+  },
+  "83": {
+    "name": "Vermillion",
+    "rate": 0.015
+  },
+  "84": {
+    "name": "Vigo",
+    "rate": 0.02
+  },
+  "85": {
+    "name": "Wabash",
+    "rate": 0.029
+  },
+  "86": {
+    "name": "Warren",
+    "rate": 0.0212
+  },
+  "87": {
+    "name": "Warrick",
+    "rate": 0.01
+  },
+  "88": {
+    "name": "Washington",
+    "rate": 0.02
+  },
+  "89": {
+    "name": "Wayne",
+    "rate": 0.0125
+  },
+  "90": {
+    "name": "Wells",
+    "rate": 0.021
+  },
+  "91": {
+    "name": "White",
+    "rate": 0.0232
+  },
+  "92": {
+    "name": "Whitley",
+    "rate": 0.016829
+  }
+}

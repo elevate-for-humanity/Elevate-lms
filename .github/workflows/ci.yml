@@ -42,6 +42,7 @@ jobs:
           node tests/integration/classroom-conflict-index-postgres.mjs
           node tests/integration/payment-integrity-evidence-postgres.mjs
           node tests/integration/native-epa-postgres.mjs
+          node tests/integration/supersonic-payroll-postgres.mjs
           node --experimental-strip-types --test lib/testing/native-exam-policy.test.mjs
       - name: Verify authenticated canonical SCORM tracking
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}

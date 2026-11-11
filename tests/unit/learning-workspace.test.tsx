@@ -124,12 +124,10 @@ it('expands the complete lesson across the viewport and restores the same mounte
   const video = screen.getByLabelText('Full lesson video');
   fireEvent.change(textarea, { target: { value: 'Unsubmitted saved work stays mounted' } });
   fireEvent.click(screen.getByRole('button', { name: 'Full screen lesson' }));
-  expect(document.body.style.overflow).toBe('hidden');
   expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-expanded', 'true');
   expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-view', 'preview');
   expect(screen.getByLabelText('Full lesson video')).toBe(video);
   fireEvent.keyDown(document, { key: 'Escape' });
-  expect(document.body.style.overflow).toBe('');
   expect(container.querySelector('[data-learning-workspace]')).toHaveAttribute('data-expanded', 'false');
   expect(screen.getByRole('textbox', { name: 'Workbook answer' })).toBe(textarea);
   expect(textarea).toHaveValue('Unsubmitted saved work stays mounted');

@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         .eq('provider', 'quickbooks').eq('provider_invoice_id', invoiceId).maybeSingle();
       if (tracked.error) throw new Error(tracked.error.message);
       if (!tracked.data) continue;
-      if (Number(tracked.data.total_cents) !== totalCents ||
+      if ((status !== 'void' && Number(tracked.data.total_cents) !== totalCents) ||
           !quickBooksRevisionMatches(invoice, tracked.data.fulfillment_payload) ||
           !invoice.CustomerRef?.value ||
           tracked.data.provider_payload?.CustomerRef?.value !== invoice.CustomerRef.value)
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         })
         .eq('provider', 'quickbooks')
         .eq('provider_invoice_id', invoiceId)
-        .eq('total_cents', totalCents)
+        .eq('total_cents', status === 'void' ? Number(tracked.data.total_cents) : totalCents)
         .select('id,fulfillment_type,fulfillment_payload')
         .maybeSingle();
       if (update.error) throw new Error(update.error.message);

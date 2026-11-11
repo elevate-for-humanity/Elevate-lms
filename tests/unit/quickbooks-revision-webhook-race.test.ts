@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   total: 498000,
   providerMarker: '',
   storedMarker: '',
+  voided: false,
   update: vi.fn(),
   queue: vi.fn(),
 }));
@@ -16,7 +17,8 @@ vi.mock('@/lib/integrations/quickbooks-client', () => ({
     Invoice: {
       Id: '799',
       Balance: 0,
-      TotalAmt: 600,
+      TotalAmt: state.voided ? 0 : 600,
+      TxnStatus: state.voided ? 'Voided' : undefined,
       CustomerRef: { value: '24' },
       PrivateNote: state.providerMarker,
     },
@@ -63,6 +65,7 @@ afterEach(() => {
   vi.clearAllMocks();
   state.providerMarker = '';
   state.storedMarker = '';
+  state.voided = false;
 });
 it('also waits for a same-amount coupon or schedule revision before delivering a paid invoice', async () => {
   state.total = 60000;
@@ -72,6 +75,15 @@ it('also waits for a same-amount coupon or schedule revision before delivering a
   state.storedMarker = state.providerMarker;
   expect((await POST(request())).status).toBe(200);
   expect(state.queue).toHaveBeenCalledOnce();
+});
+it('continues recording provider-confirmed voids without treating the zeroed total as paid tuition', async () => {
+  state.total = 60000;
+  state.voided = true;
+  expect((await POST(request())).status).toBe(200);
+  expect(state.update).toHaveBeenCalledWith(
+    expect.objectContaining({ status: 'void', paid_at: null }),
+  );
+  expect(state.queue).not.toHaveBeenCalled();
 });
 const request = () => {
   vi.stubEnv('QB_WEBHOOK_VERIFIER_TOKEN', 'test-verifier');

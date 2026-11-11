@@ -23,6 +23,7 @@ interface ProviderInvoice {
       ItemRef: { value: string; name?: string };
       Qty?: number;
       UnitPrice?: number;
+      TaxCodeRef?: { value: string };
     };
   }>;
 }
@@ -110,6 +111,7 @@ export async function reviseUnpaidProgramInvoice(
       lines.length !== 1 ||
       !line?.Id ||
       !line.SalesItemLineDetail?.ItemRef?.value ||
+      (line.SalesItemLineDetail.Qty ?? 1) !== 1 ||
       cents(line.Amount) !== cents(invoice.TotalAmt) ||
       invoice.Line?.some(
         (row) =>
@@ -143,6 +145,9 @@ export async function reviseUnpaidProgramInvoice(
                 Description: input.lines[0].description || input.lines[0].name,
                 SalesItemLineDetail: {
                   ItemRef: line.SalesItemLineDetail.ItemRef,
+                  ...(line.SalesItemLineDetail.TaxCodeRef
+                    ? { TaxCodeRef: line.SalesItemLineDetail.TaxCodeRef }
+                    : {}),
                   Qty: 1,
                   UnitPrice: amountCents / 100,
                 },

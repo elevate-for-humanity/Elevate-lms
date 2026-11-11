@@ -43,7 +43,7 @@ const invoice = () => ({
       Id: '1',
       Amount: 4980,
       DetailType: 'SalesItemLineDetail',
-      SalesItemLineDetail: { ItemRef: { value: '12' } },
+      SalesItemLineDetail: { ItemRef: { value: '12' }, TaxCodeRef: { value: 'NON' } },
     },
   ],
 });
@@ -98,6 +98,7 @@ describe('explicit unpaid checkout revision', () => {
       paymentUrl: 'https://example.test/invoice',
     });
     const body = JSON.parse(mocks.request.mock.calls[1][3].body);
+    expect(body.Line[0].SalesItemLineDetail.TaxCodeRef).toEqual({ value: 'NON' });
     expect(body).toMatchObject({
       Id: '799',
       SyncToken: '0',

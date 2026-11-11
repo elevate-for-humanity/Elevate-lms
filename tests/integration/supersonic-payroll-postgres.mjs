@@ -30,11 +30,13 @@ try{
  assert.equal((await save(owner,2,1)).rows[0].version,2,'draft can be recalculated against new profile');
  const approved=(await review(owner,2)).rows[0];
  assert.equal(approved.status,'approved_for_export');assert.equal(approved.calculation.paymentsSent,false);
+ await assert.rejects(db.query("update sfc_payroll_runs set calculation='{}'::jsonb where id=$1",[run]),/IMMUTABLE/);
  await assert.rejects(save(owner,2,3),/RUN_CHANGED/);
  await assert.rejects(review(owner,2),/RUN_CHANGED/);
  await assert.rejects(db.exec('delete from sfc_payroll_events'),/permission denied/);
  await assert.rejects(db.exec("update sfc_payroll_events set action='voided'"),/permission denied/);
  assert.equal((await review(owner,3,'void')).rows[0].status,'voided');
+ await assert.rejects(db.query("update sfc_payroll_runs set status='draft' where id=$1",[run]),/PERMANENT/);
  assert.equal((await db.query('select count(*)::int n from sfc_payroll_events')).rows[0].n,4);
  await db.exec('reset role; set role authenticated');
  await assert.rejects(db.exec('select * from sfc_payroll_runs'),/permission denied/);

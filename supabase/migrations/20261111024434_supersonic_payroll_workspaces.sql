@@ -45,6 +45,24 @@ revoke all on public.sfc_payroll_companies,public.sfc_payroll_runs,public.sfc_pa
 grant select,insert,update on public.sfc_payroll_companies,public.sfc_payroll_runs to service_role;
 grant select,insert on public.sfc_payroll_events to service_role;
 
+-- Retain reviewed snapshots even if a later server bug attempts a direct update.
+create function public.sfc_preserve_payroll_review() returns trigger
+language plpgsql security invoker set search_path=public,pg_temp as $$
+begin
+ if tg_op='DELETE' then raise exception 'PAYROLL_HISTORY_IS_PERMANENT'; end if;
+ if old.status='voided' then raise exception 'PAYROLL_HISTORY_IS_PERMANENT'; end if;
+ if old.status='approved_for_export' and (
+  new.status<>'voided' or new.version<>old.version+1 or
+  (to_jsonb(new)-array['status','version','updated_at']) is distinct from
+  (to_jsonb(old)-array['status','version','updated_at'])
+ ) then raise exception 'APPROVED_PAYROLL_IS_IMMUTABLE'; end if;
+ return new;
+end; $$;
+revoke all on function public.sfc_preserve_payroll_review() from public,anon,authenticated;
+grant execute on function public.sfc_preserve_payroll_review() to service_role;
+create trigger sfc_payroll_review_retention before update or delete on public.sfc_payroll_runs
+for each row execute function public.sfc_preserve_payroll_review();
+
 -- Company lock makes profile revision verification and draft/approval writes
 -- atomic. Parameters never authorize access: the saved office owner is checked.
 create function public.sfc_save_payroll_run(p_actor uuid,p_company uuid,p_source_version integer,p_run uuid,p_expected_version integer,p_input jsonb,p_calculation jsonb)

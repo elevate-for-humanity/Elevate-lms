@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import { getEmployerRecord } from '@/lib/employer/employer-context';
-import { saveHiringNeeds } from './actions';
+import { HiringNeedsForm } from './HiringNeedsForm';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Hiring and Training Needs' };
 export default async function HiringNeedsPage({
@@ -41,30 +41,13 @@ export default async function HiringNeedsPage({
         <p role="status" className="rounded-lg bg-green-50 p-4">
           Your hiring and training needs are saved.
         </p>
-      )}
-      <form action={saveHiringNeeds} className="space-y-5 rounded-xl border bg-white p-5">
-        {[
-          ['roles', 'Positions or staff training needed', needs.roles || needs.additionalInfo],
-          ['locations', 'Worksite locations', needs.locations],
-          ['timeline', 'Hiring or training timeline', needs.timeline],
-          ['additionalInfo', 'Additional information', needs.additionalInfo],
-        ].map(([name, label, value]) => (
-          <label key={name} className="block font-semibold">
-            {label}
-            <textarea
-              name={name}
-              required={name === 'roles' || name === 'locations'}
-              maxLength={4000}
-              defaultValue={typeof value === 'string' ? value : ''}
-              rows={3}
-              className="mt-2 block w-full rounded-lg border p-3 font-normal"
-            />
-          </label>
-        ))}
-        <button className="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white">
-          Save hiring and training needs
-        </button>
-      </form>
+       <HiringNeedsForm initial={{
+        roles: typeof needs.roles === 'string' ? needs.roles : typeof needs.additionalInfo === 'string' ? needs.additionalInfo : '',
+        locations: typeof needs.locations === 'string' ? needs.locations : '',
+        timeline: typeof needs.timeline === 'string' ? needs.timeline : '',
+        additionalInfo: typeof needs.additionalInfo === 'string' ? needs.additionalInfo : '',
+      }} />
+</form>
       <p>Submitting your needs does not activate a program or guarantee candidates or funding.</p>
     </main>
   );

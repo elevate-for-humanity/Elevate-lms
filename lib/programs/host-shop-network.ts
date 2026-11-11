@@ -65,7 +65,7 @@ function firstImage(shop: FeaturedHostPartner) {
  * during temporary database outages without creating duplicate businesses.
  */
 export async function getHostShopNetwork(includeOnboarding = false): Promise<HostShopNetworkEntry[]> {
-  const approved = await getApprovedShops();
+  const approved = (await getApprovedShops()).filter((shop) => !/marvelous\s+cuts/i.test(shop.name));
   const matchedFeatured = new Set<string>();
 
   const operational = approved.map((shop): HostShopNetworkEntry => {

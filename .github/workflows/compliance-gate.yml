@@ -54,6 +54,12 @@ jobs:
   e2e-enrollment:
     name: E2E Enrollment Flow
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -67,8 +73,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Install Playwright
-        run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Verify preinstalled Playwright browsers
+        run: node scripts/verify-playwright-runtime.mjs chromium webkit
       - name: Build application
         run: pnpm run ci:build
         env:
@@ -129,6 +135,12 @@ jobs:
   accessibility:
     name: Accessibility Tests
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -142,8 +154,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Install Playwright
-        run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Verify preinstalled Playwright browsers
+        run: node scripts/verify-playwright-runtime.mjs chromium webkit
       - name: Build application
         run: pnpm run ci:build
         env:

@@ -379,6 +379,12 @@ export function ProfessionalWorkspace() {
           <section className="rounded-xl border bg-white p-6">
             <h2 className="text-2xl font-bold">Calculate and review</h2>
             <div className="mt-5 flex flex-wrap gap-4">
+              <a
+                className={button}
+                href={`${endpoint}?returnId=${encodeURIComponent(active.id)}&download=review&revision=${encodeURIComponent(active.updated_at)}`}
+              >
+                Download saved preparation record
+              </a>
               <button
                 className={button}
                 disabled={busy}
@@ -398,6 +404,7 @@ export function ProfessionalWorkspace() {
                 Save to review queue
               </button>
             </div>
+            <p className="mt-4 text-sm leading-6">The download contains the last saved worksheet and calculation. Save changes first. It is a review record, not an IRS filing receipt.</p>
             {active.calculation && (
               <dl className="mt-6 grid gap-5 sm:grid-cols-3">
                 {[

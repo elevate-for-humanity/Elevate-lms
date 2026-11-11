@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 export const taxNav = [
+  ['Tax & payroll services', '/tax-software/office/services'],
   ['Prepare your taxes', '/tax-software/self-file'],
   ['Hire a professional', '/tax-software/contact'],
   ['Enroll to start your tax business', '/tax-software/professional#enroll'],
@@ -78,6 +79,9 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
             <Link href="/tax-software/office/preparation" className="py-4 hover:text-[#073ca2]">
               Tax Professional Portal
             </Link>
+            <Link href="/tax-software/office/services" className="py-4 hover:text-[#073ca2]">
+              Payroll
+            </Link>
             <Link href="/tax-software/login" className="py-4 hover:text-[#073ca2]">
               Sign in
             </Link>
@@ -128,6 +132,9 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
               </Link>
               <Link href="/tax-software/office/preparation" className="block py-3 font-semibold">
                 Tax Professional Portal
+              </Link>
+              <Link href="/tax-software/office/services" className="block py-3 font-semibold">
+                Tax & payroll services
               </Link>
             </nav>
           </details>

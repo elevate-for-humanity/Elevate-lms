@@ -1,5 +1,5 @@
 // pre-auth-registry: exempt - expertAccess requires verified identity, MFA and active office membership; every operation enforces office and preparer ownership.
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { expertAccess } from '@/lib/tax-software/server/expert-access';
 import { OfficeAccessError } from '@/lib/tax-software/server/office-access';
@@ -7,6 +7,7 @@ import { taxJson } from '@/lib/tax-software/server/response';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { federalInputSchema } from '@/lib/tax-software/calculation/input-schema';
 import { prepareStoredFederalReturn2026 } from '@/lib/tax-software/calculation/financial-inputs';
+import { taxReturnSourceDigest } from '@/lib/tax-software/security/return-digest';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const filing = z.enum([
@@ -108,6 +109,32 @@ export async function GET(req: NextRequest) {
         .eq('office_id', r.office_id)
         .maybeSingle();
       if (client.error) throw Error('CLIENT_READ_FAILED');
+      if (req.nextUrl.searchParams.get('download') === 'review') {
+        if (req.nextUrl.searchParams.get('revision') !== r.updated_at)
+          return taxJson({ error: 'RETURN_CHANGED_RELOAD' }, { status: 409 });
+        const record = {
+          purpose: 'supersonic-saved-preparation-review',
+          returnId: r.id,
+          taxYear: r.tax_year,
+          filingStatus: r.filing_status,
+          status: r.status,
+          savedAt: r.updated_at,
+          client: client.data,
+          worksheet: r.return_json?.officeWorksheet ?? { w2: [], extra: {} },
+          calculation: r.return_json?.officeCalculation ?? null,
+          thisExportTransmittedToIrs: false,
+          instruction: 'Saved preparation record only. Review original documents, unsupported forms and taxpayer authorizations before filing through the approved transmitter.',
+        };
+        return new NextResponse(JSON.stringify({ ...record, sha256: taxReturnSourceDigest(record) }, null, 2), {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Content-Disposition': `attachment; filename="tax-preparation-review-${r.id}.json"`,
+            'Cache-Control': 'private, no-store',
+            'Vary': 'Cookie',
+            'X-Content-Type-Options': 'nosniff',
+          },
+        });
+      }
       return taxJson({
         return: {
           id: r.id,

@@ -1,5 +1,33 @@
 [
-  {"slug":"dbo-hair-studios","name":"DBO Hair Studios","address":"2626 W Washington St, Indianapolis, IN 46222","city":"Indianapolis","phone":"317-822-4783","website":"https://www.dbohairstudios.com","source":"https://www.dbohairstudios.com/contact"},
+  {
+    "slug": "dbo-hair-studios",
+    "name": "DBO Hair Studios",
+    "address": "2626 W Washington St, Indianapolis, IN 46222",
+    "city": "Indianapolis",
+    "phone": "317-822-4783",
+    "website": "https://www.dbohairstudios.com",
+    "source": "https://www.dbohairstudios.com/contact",
+    "booking": "https://www.dbohairstudios.com/book",
+    "instagram": "https://www.instagram.com/evelynsindybeautysalon",
+    "logo": "/images/host-shops/dbo-hair-studios/logo.png",
+    "gallery": [
+      {
+        "url": "/images/host-shops/dbo-hair-studios/evelyn.webp",
+        "alt": "Evelyn Estevez, owner and master stylist, at DBO Hair Studios",
+        "source": "https://www.dbohairstudios.com/team"
+      },
+      {
+        "url": "/images/host-shops/dbo-hair-studios/team-portrait-2.webp",
+        "alt": "DBO Hair Studios stylist seated beside a styling station",
+        "source": "https://www.dbohairstudios.com/team"
+      },
+      {
+        "url": "/images/host-shops/dbo-hair-studios/team-portrait-3.webp",
+        "alt": "DBO Hair Studios team portrait at the Indianapolis salon",
+        "source": "https://www.dbohairstudios.com/team"
+      }
+    ]
+  },
   {"slug":"executivecutz","name":"Executivecutz","address":"2049 Veterans Memorial Pkwy S, Suite 8, Lafayette, IN 47909","city":"Lafayette","phone":"765-269-6243","website":"https://getsquire.com/discover/barbershop/executivecutz-lafayette","source":"https://getsquire.com/discover/barbershop/executivecutz-lafayette/barber/ivan-c-owner"},
   {"slug":"studio-phresh","name":"Studio pHresh LLC","address":"1828 E Main St, Plainfield, IN 46168","city":"Plainfield","phone":"317-839-2954","website":"","source":"https://www.fresha.com/lvp/studio-phresh-east-main-street-plainfield-8J5BX2"},
   {"slug":"barbershop-32","name":"Barbershop 32","address":"","city":"Indianapolis","phone":"317-378-2947","website":"","source":""},

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {verifyBilling, BILLING_READ_ATTEMPTS, BILLING_READ_RETRY_MS} from '../../scripts/gcp/preflight-billing.mjs';
+import {verifyBilling, BILLING_READ_ATTEMPTS, BILLING_READ_RETRY_MS, BILLING_READ_TIMEOUT_MS, BILLING_READ_BUDGET_MS} from '../../scripts/gcp/preflight-billing.mjs';
 
 const project = 'elegant-racer-299721';
 const describeArgs = ['billing', 'projects', 'describe', project, '--format=json'];
@@ -86,6 +86,46 @@ test('the retried preflight stays read-only', () => {
   const source = readFileSync(new URL('../../scripts/gcp/preflight-billing.mjs', import.meta.url), 'utf8');
   assert.match(source, /'billing', 'projects', 'describe'/);
   assert.doesNotMatch(source, /'billing',\s*'projects',\s*'(?:link|unlink|update|enable|disable)'/, 'billing must never be changed by a preflight');
+});
+
+test('the read timeout is never extended and never shortened below the remaining budget', () => {
+  // A healthy read keeps the full generous per-attempt timeout.
+  const healthy = countingRun([activePayload]);
+  verifyBilling(project, healthy.run, {sleep: () => {}});
+  assert.equal(healthy.calls[0].opts.timeout, BILLING_READ_TIMEOUT_MS);
+
+  // A virtual clock that consumes 30s on the first stalled read leaves only 5s
+  // of the 35s budget, so the retry must be clamped to what the budget covers.
+  let clock = 0;
+  const run = (cmd, args, opts) => {
+    clock += opts.timeout;
+    throw unanswered();
+  };
+  assert.throws(() => verifyBilling(project, run, {sleep: () => {}, now: () => clock}), /timed out/);
+});
+
+test('a spent wall-clock budget stops the loop instead of burning CI minutes', () => {
+  let clock = 0;
+  let calls = 0;
+  const run = () => { calls++; clock += 30000; throw unanswered(); };
+  const sleeps = [];
+  const error = (() => {
+    try { verifyBilling(project, run, {sleep: ms => sleeps.push(ms), now: () => clock}); } catch (thrown) { return thrown; }
+  })();
+  assert.ok(error);
+  // 35s budget / 30s reads: the second attempt cannot be covered, so it stops.
+  assert.equal(calls, 2, 'a budget that cannot cover another read must not start one');
+  assert.deepEqual(sleeps, [BILLING_READ_RETRY_MS]);
+  assert.match(error.message, /timed out/);
+});
+
+test('the whole stall path is bounded far below three full-length attempts', () => {
+  assert.ok(BILLING_READ_BUDGET_MS < BILLING_READ_ATTEMPTS * BILLING_READ_TIMEOUT_MS,
+    'the budget must be cheaper than three full-length attempts');
+  assert.ok(BILLING_READ_BUDGET_MS >= BILLING_READ_TIMEOUT_MS,
+    'the budget must still allow one complete read');
+  assert.ok(BILLING_READ_BUDGET_MS - BILLING_READ_TIMEOUT_MS >= BILLING_READ_RETRY_MS,
+    'the budget must leave room for at least one backoff');
 });
 
 test('the released gate keeps the billing guard and validates this retry contract', () => {

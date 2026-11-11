@@ -98,13 +98,13 @@ describe('host shop slideshow playback', () => {
     expect(screen.getByAltText('Second photo')).toHaveStyle({ opacity: '0' });
   });
 
-  it('provides compact shop cards with a single playback control and uncropped photos', () => {
+  it('provides compact full-frame shop cards with a single playback control', () => {
     const { container } = renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
     const first = screen.getByAltText('First photo');
     expect(screen.queryByAltText('Second photo')).not.toBeInTheDocument();
     fireEvent.load(first);
-    expect(first.className).toContain('object-contain');
-    expect(container.querySelector('.max-h-\\[160px\\]')).not.toBeNull();
+    expect(first.className).toContain('object-cover');
+    expect(container.querySelector('.aspect-\\[16\\/10\\]')).not.toBeNull();
     expect(screen.getAllByRole('button')).toHaveLength(3);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     const second = screen.getByAltText('Second photo');

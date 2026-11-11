@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import profiles from '@/lib/partners/host-shop-onboarding-profiles.json';
 export type OnboardingShop = (typeof profiles)[number];
 
@@ -13,12 +14,12 @@ export default function HostShopOnboardingProfile({ shop }: { shop: OnboardingSh
           </p>
           <h1 className="mt-4 max-w-3xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">
-            {isDbo
+            {shop.businessDescription || (isDbo
               ? 'Meet DBO Hair Studios, an Indianapolis beauty business joining the Elevate for Humanity Host Shop community. Explore the salon and connect directly with its team.'
-              : 'Discover a local beauty or barbering business participating in the Elevate Host Shop onboarding process.'}
+              : 'Discover a local beauty or barbering business participating in the Elevate Host Shop onboarding process.')}
           </p>
           <p className="mt-6 inline-flex rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold">
-            Host Shop onboarding in progress · Apprentice placement not yet confirmed
+            {shop.businessDescription ? 'Apprentice availability unconfirmed' : 'Host Shop onboarding in progress · Apprentice placement not yet confirmed'}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             {shop.website && <a className="inline-flex min-h-12 items-center rounded-xl bg-white px-5 py-3 font-bold text-slate-950 hover:bg-rose-100" href={shop.website} target="_blank" rel="noopener noreferrer">Explore the salon ↗</a>}
@@ -28,6 +29,17 @@ export default function HostShopOnboardingProfile({ shop }: { shop: OnboardingSh
       </section>
       <section className="mx-auto grid max-w-6xl gap-6 px-5 py-12 lg:grid-cols-5">
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm lg:col-span-3">
+          {shop.portfolio ? (
+            <figure>
+              <div className="relative aspect-[475/295] overflow-hidden rounded-xl">
+                {/* Show the interior panel of the archived 800 × 600 portfolio. */}
+                <Image src={shop.portfolio} width={800} height={600} alt={`Barber chairs and workstations inside ${shop.name}`} className="absolute bottom-0 right-0 h-auto w-[168.42%] max-w-none" />
+              </div>
+              <figcaption className="mt-3 text-sm text-slate-600">
+                Shop interior from the published portfolio. <a href={shop.source} className="font-semibold underline" target="_blank" rel="noopener noreferrer">View the shop’s photo listing</a>
+              </figcaption>
+            </figure>
+          ) : <>
           <h2 className="text-2xl font-black">About {shop.name}</h2>
           <p className="mt-4 leading-8 text-slate-700">
             {isDbo
@@ -35,6 +47,7 @@ export default function HostShopOnboardingProfile({ shop }: { shop: OnboardingSh
               : 'This shop is completing its Elevate Host Shop onboarding. Its business details and training-site eligibility are reviewed separately from public business promotion.'}
           </p>
           {isDbo && <p className="mt-4 text-sm leading-6 text-slate-600">Official salon photos and social portfolio will appear here once the selected assets and permissions have been verified. No substitute or stock portfolio is shown.</p>}
+          </>}
         </div>
         <aside className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm lg:col-span-2">
           <h2 className="text-xl font-black">Visit the shop</h2>

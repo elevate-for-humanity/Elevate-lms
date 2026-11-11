@@ -55,6 +55,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
   if (!approved) {
     const onboarding = onboardingProfiles.find(shop => shop.slug === slug);
+    if (onboarding?.businessDescription) {
+      return { title: `${onboarding.name} | ${onboarding.city}, Indiana`, description: onboarding.businessDescription };
+    }
     return onboarding ? { title: `${onboarding.name} | Host Shop Onboarding`, description: `Location and contact details for ${onboarding.name}. Host Shop onboarding is in progress.` } : {};
   }
   if (!profile || !approved) {

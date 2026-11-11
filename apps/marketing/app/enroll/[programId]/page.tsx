@@ -7,6 +7,8 @@ import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight, Tag } from 'lucide
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
+import ProgramDepositCalculator from '@/components/programs/ProgramDepositCalculator';
+import { downPaymentCents, programInstallmentTerms } from '@/lib/programs/installment-terms';
 
 function getClientSearchParam(name: string) {
   if (typeof window === 'undefined') return null;
@@ -42,6 +44,7 @@ export default function EnrollPage() {
   const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
   const [message, setMessage] = useState('');
   const [paymentUrl, setPaymentUrl] = useState('');
+  const [downPayment, setDownPayment] = useState(() => getClientSearchParam('down_payment') || '600');
   const [couponCode, setCouponCode] = useState(
     () => getClientSearchParam('coupon')?.toUpperCase() || '',
   );
@@ -66,6 +69,7 @@ export default function EnrollPage() {
       const data = result.program;
 
       setProgram(data);
+      if (!/apprentice/i.test(data.slug || '') && !getClientSearchParam('payment_plan')) setPaymentPlan('full');
 
       await checkEligibility(data.id);
     } catch (error: unknown) {
@@ -91,7 +95,9 @@ export default function EnrollPage() {
     if (!program?.slug || onlineSchoolProgram) return;
     void verifyPayment();
     const timer = window.setInterval(() => { void verifyPayment(); }, 15000);
-    return () => window.clearInterval(timer);
+    const onReturn = () => { void verifyPayment(); };
+    window.addEventListener('pageshow', onReturn);
+    return () => { window.clearInterval(timer); window.removeEventListener('pageshow', onReturn); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [program?.slug, onlineSchoolProgram]);
 
@@ -126,7 +132,11 @@ export default function EnrollPage() {
       } = await supabase.auth.getUser();
       if (!user) {
         setMessage('Please sign in to enroll');
-        const destination = `/enroll/${programId}${window.location.search}`;
+        const query = new URLSearchParams(window.location.search);
+        query.set('payment_plan', paymentPlan);
+        query.set('down_payment', downPayment);
+        if (couponCode.trim()) query.set('coupon', couponCode.trim());
+        const destination = `/enroll/${programId}?${query.toString()}`;
         router.push(`/login?redirect=${encodeURIComponent(destination)}`);
         return;
       }
@@ -142,6 +152,9 @@ export default function EnrollPage() {
       const isPaid = !isFreeProgram && (program?.price || program?.total_cost);
 
       if (isPaid) {
+        const customDownPayment = !onlineSchoolProgram && paymentMethod === 'quickbooks' && paymentPlan === 'installments' && /apprentice/i.test(program?.slug || '')
+          ? downPaymentCents(downPayment) : undefined;
+        if (customDownPayment !== undefined) programInstallmentTerms(program!.slug!, Math.round(Number(program!.price ?? program!.total_cost) * 100), customDownPayment);
         // Use canonical program enrollment checkout
         const response = await fetch('/api/programs/enroll/checkout', {
           method: 'POST',
@@ -151,6 +164,7 @@ export default function EnrollPage() {
             funding_source: 'self_pay',
             payment_method: paymentMethod,
             payment_plan: onlineSchoolProgram || paymentMethod === 'affirm' ? 'full' : paymentPlan,
+            down_payment_cents: customDownPayment,
             coupon_code: onlineSchoolProgram ? undefined : couponCode.trim() || undefined,
             partner_key: getClientSearchParam('partner') || undefined,
             require_full_application: !onlineSchoolProgram,
@@ -164,11 +178,9 @@ export default function EnrollPage() {
         }
 
         if (data.url) {
-          if (onlineSchoolProgram) window.location.href = data.url;
-          else {
-            setPaymentUrl(data.url);
-            setMessage('Secure checkout is ready. Pay using the link below, then return here to verify payment and complete your full enrollment application.');
-          }
+          setPaymentUrl(data.url);
+          setMessage('Opening secure checkout. After payment, return here to continue your full enrollment application.');
+          window.location.assign(data.url);
           return;
         }
       } else {
@@ -462,10 +474,13 @@ export default function EnrollPage() {
                           />
                           <span className="font-bold text-slate-950">Deposit + payment plan</span>
                           <span className="mt-1 block text-xs text-slate-600">
-                            $ {(getInitialProgramInvoiceCents(program.slug || '', Math.round(Number(program.price || program.total_cost || 0) * 100)) / 100).toLocaleString()} down; remaining tuition billed separately
+                            $ {((/apprentice/i.test(program.slug || '') && Number.isFinite(downPaymentCents(downPayment)) ? downPaymentCents(downPayment) : getInitialProgramInvoiceCents(program.slug || '', Math.round(Number(program.price ?? program.total_cost ?? 0) * 100))) / 100).toLocaleString()} down; remaining tuition billed separately
                           </span>
                         </label>
                       </div>
+                      {/apprentice/i.test(program.slug || '') && paymentPlan === 'installments' ? (
+                        <div className="mt-4"><ProgramDepositCalculator slug={program.slug!} tuitionCents={Math.round(Number(program.price ?? program.total_cost) * 100)} value={downPayment} onChange={setDownPayment} /></div>
+                      ) : null}
                       <p className="mt-3 text-xs leading-5 text-slate-600">
                         QuickBooks shows the online card or ACH methods enabled for your invoice.
                         This installment schedule is not third-party BNPL.

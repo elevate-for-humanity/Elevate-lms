@@ -32,14 +32,11 @@ export default function LearningWorkspace({
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     if (!expanded) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
     const close = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setExpanded(false);
     };
     document.addEventListener('keydown', close);
     return () => {
-      document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', close);
     };
   }, [expanded]);

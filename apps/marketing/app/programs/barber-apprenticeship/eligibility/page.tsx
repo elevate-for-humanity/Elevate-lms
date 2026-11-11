@@ -4,6 +4,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramFundingGate from '@/components/programs/ProgramFundingGate';
+import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 import heroBanners from '@/content/heroBanners';
 import { TransferHoursCalculator } from '../TransferHoursCalculator';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -44,8 +47,8 @@ export default function BarberEligibilityPage() {
             selfPayOnly
             programName="Barber Apprenticeship"
             applyHref="/programs/barber-apprenticeship/apply"
-            selfPayCost="$4,980"
-            depositAmount="$1,743"
+            selfPayCost={`$${BARBER_PRICING.fullPrice.toLocaleString('en-US')}`}
+            depositAmount={`$${getInitialProgramInvoiceCents('barber-apprenticeship', BARBER_PRICING.fullPrice * 100) / 100}`}
             depositHref="/programs/barber-apprenticeship/apply"
             fullPayHref="/programs/barber-apprenticeship/apply"
           />
@@ -57,8 +60,10 @@ export default function BarberEligibilityPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h2 className="text-xl font-bold text-slate-900 mb-2">Weekly Payment Calculator</h2>
           <p className="text-slate-600 mb-6">
-            Estimate your weekly payment based on transfer hours and deposit amount.
+            Choose your down payment to see the remaining balance and weekly payments. Transfer hours do not reduce tuition.
           </p>
+          <PaymentPlanCalculator programSlug="barber-apprenticeship" />
+          <h2 className="mt-10 mb-6 text-xl font-bold text-slate-900">Transfer Hours Credit</h2>
           <TransferHoursCalculator />
         </div>
       </section>

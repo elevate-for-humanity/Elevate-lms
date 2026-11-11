@@ -6,6 +6,7 @@ const row = { id: 'ledger', customer_external_key: 'user:u', provider: 'quickboo
   fulfillment_type: 'program_enrollment', fulfillment_payload: { student_id: 'u', enrollment_id: 'e' }, provider_payload: { CustomerRef: { value: 'customer' } } };
 const db = { from: (table: string) => {
   const q: any = { update: (value: any) => { state.writes.push({ table, value }); return q; }, eq: () => q, in: () => q,
+    select: () => q, maybeSingle: async () => ({ data: { id: 'ledger' }, error: null }),
     upsert: async (value: any) => { state.writes.push({ table, value }); return { error: null }; },
     then: (resolve: any) => Promise.resolve({ error: null }).then(resolve) };
   return q;
@@ -27,4 +28,11 @@ it('rejects another learner before contacting the provider', async () => {
 });
 it('does not replay a recorded paid invoice', async () => {
   await refreshOwnedProgramPayment(db, { ...row, status: 'paid' }, 'u'); expect(state.reads).not.toHaveBeenCalled(); expect(state.writes).toEqual([]);
+});
+it('waits for a same-amount checkout revision to reconcile before recording payment', async () => {
+  state.invoice.PrivateNote = `checkout-revision=${'b'.repeat(64)}`;
+  await expect(refreshOwnedProgramPayment(db, row, 'u')).rejects.toThrow('does not match');
+  expect(state.writes).toEqual([]);
+  await refreshOwnedProgramPayment(db, { ...row, fulfillment_payload: { ...row.fulfillment_payload, checkout_revision_marker: state.invoice.PrivateNote } }, 'u');
+  expect(state.writes[1]).toMatchObject({ table: 'billing_fulfillment_jobs' });
 });

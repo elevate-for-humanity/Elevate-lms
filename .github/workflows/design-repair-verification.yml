@@ -9,6 +9,8 @@ on:
       - 'styles/**'
       - 'scripts/visual/**'
       - 'scripts/audit-visual-layout.mjs'
+      - 'scripts/verify-playwright-runtime.mjs'
+      - 'tests/unit/playwright-ci-version-contract.test.ts'
       - 'scripts/audit-platform-media-duplicates.mjs'
       - 'tests/e2e/platform-design-repair.spec.ts'
       - 'tests/e2e/design-audit-public-pages.spec.ts'
@@ -25,6 +27,12 @@ jobs:
   responsive-marketing:
     # Playwright 1.57.0 cannot install Chromium dependencies on Ubuntu 26.04.
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 30
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
@@ -43,7 +51,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - run: node --test scripts/visual/*.test.mjs
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: node scripts/verify-playwright-runtime.mjs chromium
       - run: pnpm exec playwright test --config playwright.design-repair.config.ts
       - name: Render original audit public pages at 320px
         run: pnpm exec playwright test --config playwright.design-audit.config.ts --project=320px
@@ -64,6 +72,12 @@ jobs:
   learning-workspace:
     name: Learning workspace browser layout
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +89,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: node scripts/verify-playwright-runtime.mjs chromium
       - run: node tests/browser/learning-workspace-layout.mjs
       - uses: actions/upload-artifact@v4
         if: always()

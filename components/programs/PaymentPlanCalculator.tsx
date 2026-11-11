@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { AlertCircle, CreditCard, Loader2, Tag } from 'lucide-react';
+import ProgramDepositCalculator from './ProgramDepositCalculator';
+import { downPaymentCents, programInstallmentTerms } from '@/lib/programs/installment-terms';
 
 interface ProgramPricing {
   program_slug: string;
@@ -21,7 +23,7 @@ function fmt(cents: number) {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(cents / 100);
 }
 
@@ -33,6 +35,7 @@ export default function PaymentPlanCalculator({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [couponCode, setCouponCode] = useState('');
+  const [downPayment, setDownPayment] = useState('600');
   const [checkoutLoading, setCheckoutLoading] = useState<'full' | 'installments' | null>(null);
 
   useEffect(() => {
@@ -52,7 +55,10 @@ export default function PaymentPlanCalculator({
         }
         return data as ProgramPricing;
       })
-      .then(setPricing)
+      .then(data => {
+        setPricing(data);
+        setDownPayment(String((data.deposit_default_cents ?? Math.ceil(data.tuition_cents / 4)) / 100));
+      })
       .catch((cause) => {
         setError(
           cause instanceof DOMException && cause.name === 'AbortError'
@@ -74,8 +80,13 @@ export default function PaymentPlanCalculator({
   }, [programSlug]);
 
   function continueToEnrollment(paymentPlan: 'full' | 'installments') {
+    if (pricing && paymentPlan === 'installments' && /apprentice/i.test(programSlug)) {
+      try { programInstallmentTerms(programSlug, pricing.tuition_cents, downPaymentCents(downPayment)); }
+      catch (cause) { setError(cause instanceof Error ? cause.message : 'Invalid down payment.'); return; }
+    }
     setCheckoutLoading(paymentPlan);
     const query = new URLSearchParams({ payment_plan: paymentPlan });
+    if (paymentPlan === 'installments' && /apprentice/i.test(programSlug)) query.set('down_payment', downPayment);
     if (couponCode.trim()) query.set('coupon', couponCode.trim().toUpperCase());
     window.location.href = `/enroll/${encodeURIComponent(programSlug)}?${query.toString()}`;
   }
@@ -100,13 +111,9 @@ export default function PaymentPlanCalculator({
     );
   }
 
-  const installmentCents = pricing.deposit_default_cents ?? Math.ceil(pricing.tuition_cents / 4);
-  const selectedPlan =
-    initialPaymentMode === 'full'
-      ? 'full'
-      : initialPaymentMode === 'plan'
-        ? 'installments'
-        : null;
+  const installmentCents = /apprentice/i.test(programSlug) && Number.isFinite(downPaymentCents(downPayment))
+    ? downPaymentCents(downPayment) : pricing.deposit_default_cents ?? Math.ceil(pricing.tuition_cents / 4);
+  const selectedPlan = initialPaymentMode === 'full' ? 'full' : 'installments';
   const selectedPathLabel =
     initialPaymentMode === 'full'
       ? 'Pay in full'
@@ -125,6 +132,7 @@ export default function PaymentPlanCalculator({
       </div>
 
       <div className="space-y-5 p-5 sm:p-6">
+        {/apprentice/i.test(programSlug) ? <ProgramDepositCalculator slug={programSlug} tuitionCents={pricing.tuition_cents} value={downPayment} onChange={setDownPayment} /> : null}
         {selectedPathLabel ? (
           <p className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm font-bold text-blue-950">
             Your selected path: {selectedPathLabel}
@@ -141,7 +149,7 @@ export default function PaymentPlanCalculator({
                 : 'border-slate-200 hover:border-slate-400'
             }`}
           >
-            <span className="text-xs font-black uppercase tracking-wide text-slate-500">Pay in full</span>
+            <span className="text-xs font-black uppercase tracking-wide text-slate-700">Pay in full</span>
             <span className="mt-2 block text-2xl font-black text-slate-950">{fmt(pricing.tuition_cents)}</span>
             <span className="mt-1 block text-sm text-slate-600">One secure payment</span>
           </button>
@@ -156,7 +164,7 @@ export default function PaymentPlanCalculator({
                 : 'border-slate-200 hover:border-slate-400'
             }`}
           >
-            <span className="text-xs font-black uppercase tracking-wide text-slate-500">Deposit + payment plan</span>
+            <span className="text-xs font-black uppercase tracking-wide text-slate-700">Deposit + payment plan</span>
             <span className="mt-2 block text-2xl font-black text-slate-950">{fmt(installmentCents)}</span>
             <span className="mt-1 block text-sm text-slate-600">Required deposit; review the remaining balance and schedule before payment</span>
           </button>

@@ -4,14 +4,9 @@ import { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import {
   TUITION_DOLLARS,
-  MIN_SETUP_FEE_CENTS,
   TOTAL_HOURS_REQUIRED,
-  PAYMENT_TERM_WEEKS,
 } from '@/lib/barber/pricing';
 
-const SETUP_FEE = MIN_SETUP_FEE_CENTS / 100;
-const REMAINING_BALANCE = TUITION_DOLLARS - SETUP_FEE;
-const WEEKLY_PAYMENT = Math.round((REMAINING_BALANCE / PAYMENT_TERM_WEEKS) * 100) / 100;
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -82,14 +77,10 @@ export function TransferHoursCalculator() {
       </div>
 
       <div className="bg-white/10 rounded-xl p-4">
-        <div className="grid sm:grid-cols-3 gap-4 text-center">
+        <div className="grid sm:grid-cols-2 gap-4 text-center">
           <div>
             <div className="text-amber-200 text-xs uppercase tracking-wide mb-1">Remaining Hours</div>
             <div className="text-2xl font-black">{remainingHours.toLocaleString()}</div>
-          </div>
-          <div>
-            <div className="text-amber-200 text-xs uppercase tracking-wide mb-1">Weekly Payment</div>
-            <div className="text-2xl font-black">${WEEKLY_PAYMENT.toFixed(2)}</div>
           </div>
           <div>
             <div className="text-amber-200 text-xs uppercase tracking-wide mb-1">Est. Duration</div>
@@ -100,7 +91,7 @@ export function TransferHoursCalculator() {
         <div className="mt-4 pt-4 border-t border-white/20 flex items-start gap-2">
           <Info className="w-4 h-4 text-amber-200 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-100">
-            <strong>Weekly payment is fixed at ${WEEKLY_PAYMENT.toFixed(2)}</strong> for all students — transfer hours reduce your remaining OJL hours only, not tuition. Setup fee: {formatCurrency(SETUP_FEE)} minimum down payment.
+            Transfer hours reduce your remaining OJL hours only. Tuition remains {formatCurrency(TUITION_DOLLARS)}. Use the payment calculator to choose a deposit and see your weekly payments.
           </p>
         </div>
       </div>

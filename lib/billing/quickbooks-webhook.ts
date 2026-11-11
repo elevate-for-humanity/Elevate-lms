@@ -16,6 +16,12 @@ export function normalizeQuickBooksInvoiceStatus(invoice: { Balance?: number; Tx
   return invoice.Balance === 0 ? 'paid' : 'open';
 }
 
+/** Provider and ledger must describe the same explicit checkout revision. */
+export function quickBooksRevisionMatches(invoice: { PrivateNote?: unknown }, payload?: Record<string, unknown> | null): boolean {
+  const marker = typeof invoice.PrivateNote === 'string' ? invoice.PrivateNote.match(/checkout-revision=[a-f0-9]{64}/)?.[0] : undefined;
+  return marker === undefined || marker === payload?.checkout_revision_marker;
+}
+
 export function invoiceIdsFromWebhook(payload: any): string[] {
   const ids = new Set<string>();
   for (const notification of payload?.eventNotifications || []) {

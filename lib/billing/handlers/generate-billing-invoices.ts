@@ -26,6 +26,11 @@ export async function POST(request: NextRequest) {
   const results: Array<{ scheduleId: string; ok: boolean; error?: string }> = [];
   for (const schedule of schedules || []) {
     try {
+      const tuitionBalance = schedule.fulfillment_payload?.remaining_tuition_cents;
+      if (tuitionBalance !== undefined && (!Number.isSafeInteger(tuitionBalance) || tuitionBalance <= 0))
+        throw new Error('The remaining tuition balance must be reconciled before another invoice is issued.');
+      const capped = Number.isSafeInteger(tuitionBalance) && tuitionBalance > 0;
+      const amountCents = capped ? Math.min(schedule.amount_cents, tuitionBalance) : schedule.amount_cents;
       await provider.createManualInvoice({
         idempotencyKey: `schedule:${schedule.id}:${schedule.next_invoice_date}`,
         customer: {
@@ -39,7 +44,7 @@ export async function POST(request: NextRequest) {
             name: schedule.product_name,
             description: schedule.product_description || undefined,
             quantity: 1,
-            unitAmountCents: schedule.amount_cents,
+            unitAmountCents: amountCents,
           },
         ],
         dueDate: schedule.next_invoice_date,
@@ -47,17 +52,19 @@ export async function POST(request: NextRequest) {
         fulfillment: schedule.fulfillment_type
           ? {
               type: schedule.fulfillment_type,
-              payload: schedule.fulfillment_payload || {},
+              payload: { ...schedule.fulfillment_payload, amount_cents: amountCents },
             }
           : undefined,
       });
       const remaining =
         schedule.remaining_invoices == null ? null : Math.max(0, schedule.remaining_invoices - 1);
-      const completed = remaining === 0;
+      const balanceAfterInvoice = capped ? tuitionBalance - amountCents : null;
+      const completed = remaining === 0 || balanceAfterInvoice === 0;
       const update = await db
         .from('billing_schedules')
         .update({
           remaining_invoices: remaining,
+          ...(capped ? { fulfillment_payload: { ...schedule.fulfillment_payload, remaining_tuition_cents: balanceAfterInvoice } } : {}),
           status: completed ? 'completed' : 'active',
           next_invoice_date: completed
             ? schedule.next_invoice_date

@@ -1,6 +1,6 @@
 import 'server-only';
 import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
-import { normalizeQuickBooksInvoiceStatus } from './quickbooks-webhook';
+import { normalizeQuickBooksInvoiceStatus, quickBooksRevisionMatches } from './quickbooks-webhook';
 
 /** Recover a delayed callback through the authenticated provider API, never a browser paid flag. */
 export async function refreshOwnedProgramPayment(db: any, row: any, userId: string) {
@@ -16,13 +16,15 @@ export async function refreshOwnedProgramPayment(db: any, row: any, userId: stri
   if (!originalCustomer || String(invoice?.Id) !== String(row.provider_invoice_id) ||
       String(invoice?.CustomerRef?.value) !== String(originalCustomer) ||
       Math.round(Number(invoice?.TotalAmt) * 100) !== Number(row.total_cents) ||
+      !quickBooksRevisionMatches(invoice, row.fulfillment_payload) ||
       !(Number(row.total_cents) > 0)) throw new Error('The provider invoice does not match the checkout.');
   if (normalizeQuickBooksInvoiceStatus(invoice) !== 'paid') return;
   const paidAt = new Date().toISOString();
   const saved = await db.from('billing_invoices').update({ status: 'paid', paid_at: paidAt,
     provider_payload: invoice, updated_at: paidAt }).eq('id', row.id)
-    .eq('customer_external_key', `user:${userId}`).in('status', ['open', 'past_due']);
-  if (saved.error) throw new Error('Confirmed payment could not be saved.');
+    .eq('customer_external_key', `user:${userId}`).eq('total_cents', row.total_cents).in('status', ['open', 'past_due'])
+    .select('id').maybeSingle();
+  if (saved.error || !saved.data) throw new Error('Confirmed payment could not be saved. Refresh payment verification.');
   // The same durable fulfillment contract is used by the signed webhook.
   const queued = await db.from('billing_fulfillment_jobs').upsert({
     billing_invoice_id: row.id, fulfillment_type: row.fulfillment_type,

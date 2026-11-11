@@ -1,5 +1,6 @@
 // PUBLIC ROUTE: program pricing is public-facing (calculator on program pages)
 import { NextRequest, NextResponse } from 'next/server';
+import { installmentSchedule } from '@/lib/programs/installment-terms';
 import { createPublicClient } from '@/lib/supabase/public';
 import { safeError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -40,12 +41,12 @@ function buildStaticPricing(slug: string) {
     tuition_cents: tuitionCents,
     deposit_min_cents: slug.includes('apprenticeship') ? getInitialProgramInvoiceCents(slug, tuitionCents) : depositMinCents,
     deposit_default_cents: slug.includes('apprenticeship') ? getInitialProgramInvoiceCents(slug, tuitionCents) : depositDefaultCents,
-    payment_frequency: slug.includes('apprenticeship') ? 'monthly' as const : 'weekly' as const,
-    payment_weeks: slug.includes('apprenticeship') ? 16 : paymentWeeks,
+    payment_frequency: slug.includes('apprenticeship') ? installmentSchedule(slug, tuitionCents - getInitialProgramInvoiceCents(slug, tuitionCents)).cadence : 'weekly' as const,
+    payment_weeks: slug === 'barber-apprenticeship' ? installmentSchedule(slug, tuitionCents - getInitialProgramInvoiceCents(slug, tuitionCents)).installmentCount : slug.includes('apprenticeship') ? 16 : paymentWeeks,
     stripe_deposit_url: null,
     stripe_full_url: null,
     notes:
-      slug.includes('apprenticeship') ? 'Published self-pay tuition. Pay in full or four monthly invoices; review final terms before payment. BNPL requires separate provider approval when offered.' : 'Estimated self-pay schedule generated from the published program price. Final installment/BNPL terms are shown by the payment provider at checkout.',
+      slug === 'barber-apprenticeship' ? 'Start with $600 down and weekly manual invoices. A larger down payment reduces weekly payments. Final invoice is capped to the balance.' : slug.includes('apprenticeship') ? 'Published self-pay tuition. Pay in full or four monthly invoices; review final terms before payment. BNPL requires separate provider approval when offered.' : 'Estimated self-pay schedule generated from the published program price. Final installment/BNPL terms are shown by the payment provider at checkout.',
     source: 'static-program' as const,
   };
 }
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
       if (!programError && program) {
         const tuitionCents = Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100);
         if (Number.isFinite(tuitionCents) && tuitionCents > 0)
-          return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:getInitialProgramInvoiceCents(slug, tuitionCents),deposit_default_cents:getInitialProgramInvoiceCents(slug, tuitionCents),payment_frequency:'monthly',payment_weeks:16,source:'programs',notes:'Pay in full or four monthly invoices. Final payment terms are shown before payment; provider-approved BNPL is separate.'});
+          return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:getInitialProgramInvoiceCents(slug, tuitionCents),deposit_default_cents:getInitialProgramInvoiceCents(slug, tuitionCents),payment_frequency:installmentSchedule(slug,tuitionCents-getInitialProgramInvoiceCents(slug,tuitionCents)).cadence,payment_weeks:slug==='barber-apprenticeship'?installmentSchedule(slug,tuitionCents-getInitialProgramInvoiceCents(slug,tuitionCents)).installmentCount:16,source:'programs',notes:slug==='barber-apprenticeship'?'Start with $600 down and weekly manual invoices. A larger down payment reduces weekly payments. Final invoice is capped to the balance.':'Pay in full or a $600 deposit and three monthly invoices. Provider-approved BNPL is separate.'});
       }
       const fallback = buildStaticPricing(slug);
       return fallback ? NextResponse.json(fallback) : safeError('Pricing not found',404);

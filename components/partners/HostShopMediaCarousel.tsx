@@ -141,7 +141,7 @@ export default function HostShopMediaCarousel({
                     }
                     alt={item.alt || `${shopName} promotional image`}
                     aria-hidden={item.url !== active.url}
-                    className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-300"
+                    className={`absolute inset-0 h-full w-full ${compact ? 'object-contain' : 'object-cover'} object-center transition-opacity duration-300`}
                     style={{
                       opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0,
                     }}

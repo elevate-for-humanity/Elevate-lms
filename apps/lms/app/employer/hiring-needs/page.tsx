@@ -41,13 +41,13 @@ export default async function HiringNeedsPage({
         <p role="status" className="rounded-lg bg-green-50 p-4">
           Your hiring and training needs are saved.
         </p>
-       <HiringNeedsForm initial={{
+      )}
+      <HiringNeedsForm initial={{
         roles: typeof needs.roles === 'string' ? needs.roles : typeof needs.additionalInfo === 'string' ? needs.additionalInfo : '',
         locations: typeof needs.locations === 'string' ? needs.locations : '',
         timeline: typeof needs.timeline === 'string' ? needs.timeline : '',
         additionalInfo: typeof needs.additionalInfo === 'string' ? needs.additionalInfo : '',
       }} />
-</form>
       <p>Submitting your needs does not activate a program or guarantee candidates or funding.</p>
     </main>
   );

@@ -602,7 +602,7 @@ export default function InteractiveVideoPlayer({
   };
 
   const toggleFullscreen = async () => {
-    const surface = videoRef.current?.parentElement;
+    const surface = videoRef.current?.closest<HTMLElement>('[data-lesson-video-surface]');
     if (!surface) return;
     setFullscreenError(null);
     try {
@@ -824,7 +824,7 @@ export default function InteractiveVideoPlayer({
             </div>
           </div>
         ) : isAudioOnly ? (
-          <div className="w-full aspect-video flex flex-col items-center justify-center bg-slate-900">
+          <div data-lesson-audio-surface className="w-full aspect-video flex flex-col items-center justify-center bg-slate-900">
             <div className="w-24 h-24 rounded-full bg-brand-blue-600 flex items-center justify-center mb-4">
               <Volume2 className="w-12 h-12 text-white" />
             </div>

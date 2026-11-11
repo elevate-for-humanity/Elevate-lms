@@ -82,3 +82,14 @@ it('provides the lesson expansion option when native full screen is unavailable 
   fireEvent.click(button);
   await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Full-screen video could not open'));
 });
+
+it('keeps audio lesson controls inside the same full-screen surface', async () => {
+  const view = render(<InteractiveVideoPlayer videoUrl="/lesson.mp3" title="Audio lesson" readOnly />);
+  const audio = view.container.querySelector('audio')!;
+  const surface = view.container.querySelector('[data-lesson-video-surface]')!;
+  expect(surface).toContainElement(audio);
+  const requestFullscreen = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(surface, 'requestFullscreen', { configurable: true, value: requestFullscreen });
+  fireEvent.click(screen.getByRole('button', { name: 'Open lesson video fullscreen' }));
+  await waitFor(() => expect(requestFullscreen).toHaveBeenCalledOnce());
+});

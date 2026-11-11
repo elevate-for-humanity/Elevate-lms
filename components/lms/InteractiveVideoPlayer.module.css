@@ -27,6 +27,12 @@
   flex: none;
 }
 
+.surface:fullscreen > [data-lesson-audio-surface] {
+  flex: 1 1 0%;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
 /* Long questions must scroll from their first line to their submit button,
  * even when the inline video is only a few hundred pixels tall on a phone. */
 .checkpoint {

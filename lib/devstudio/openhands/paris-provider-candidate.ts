@@ -1,4 +1,5 @@
 import type { OpenHandsGitHubEvidence } from './github-verifier';
+import { isProviderConfirmationSnapshot } from './provider-confirmation.mjs';
 
 // PARIS is the sole owner of publication for its generated repair branches.
 // A provider-terminal branch is only a candidate for PARIS's independent
@@ -39,8 +40,8 @@ export function isParisProviderBranchCandidate(
     typeof task.user_id === 'string' &&
     task.user_id.length > 0 &&
     (task.tenant_id ?? null) === null &&
-    task.requires_approval === false &&
-    task.approval_status === 'not_required' &&
+    ((task.requires_approval === false && task.approval_status === 'not_required') ||
+      isProviderConfirmationSnapshot(task)) &&
     input.repository === REPOSITORY &&
     input.branch === branch &&
     prompt.startsWith(`PARIS owner-authorized engineering repair ${repairId}.\nRepository: ${REPOSITORY}. `) &&

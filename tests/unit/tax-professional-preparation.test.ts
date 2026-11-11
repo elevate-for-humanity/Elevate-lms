@@ -90,6 +90,7 @@ beforeEach(() => {
       tax_year: 2026,
       filing_status: 'single',
       return_json: {},
+      updated_at: save.expectedUpdatedAt,
     },
   };
   m.access.mockResolvedValue(context());
@@ -150,5 +151,41 @@ describe('professional client/return isolation', () => {
     (m.rows.tax_returns as any).status = 'filed';
     expect((await POST(req(save))).status).toBe(409);
     expect(m.write).not.toHaveBeenCalled();
+  });
+  it('downloads only the authorized saved revision without an IRS acceptance claim', async () => {
+    m.rows.tax_clients = { id: client, first_name: 'Fictional', last_name: 'Client' };
+    const r = await GET(
+      new NextRequest(
+        `https://example.com/api/tax/office/preparation?returnId=${id}&download=review&revision=${encodeURIComponent(save.expectedUpdatedAt)}`,
+      ),
+    );
+    expect(r.status).toBe(200);
+    expect(r.headers.get('cache-control')).toBe('private, no-store');
+    expect(r.headers.get('content-disposition')).toContain('attachment;');
+    const b = await r.json();
+    expect(b.purpose).toBe('supersonic-saved-preparation-review');
+    expect(b.thisExportTransmittedToIrs).toBe(false);
+    expect(b.sha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(b.providerReceipt).toBeUndefined();
+    expect(m.write).not.toHaveBeenCalled();
+  });
+  it('rejects an export if the saved return changed after the displayed revision', async () => {
+    const r = await GET(
+      new NextRequest(
+        `https://example.com/api/tax/office/preparation?returnId=${id}&download=review&revision=2026-10-01T00%3A00%3A00.000Z`,
+      ),
+    );
+    expect(r.status).toBe(409);
+    expect(m.write).not.toHaveBeenCalled();
+  });
+  it('denies an export belonging to another preparer', async () => {
+    m.access.mockResolvedValue(context(false));
+    (m.rows.tax_returns as any).preparer_user_id = 'different-actor';
+    const r = await GET(
+      new NextRequest(
+        `https://example.com/api/tax/office/preparation?returnId=${id}&download=review&revision=${encodeURIComponent(save.expectedUpdatedAt)}`,
+      ),
+    );
+    expect(r.status).toBe(404);
   });
 });

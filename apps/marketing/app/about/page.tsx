@@ -87,6 +87,7 @@ export default function AboutPage() {
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <div><h2 className="text-3xl font-bold">The people behind your next step.</h2><p className="mt-3 max-w-2xl leading-7 text-slate-700">Meet the leaders and staff who support our learners, programs, and community.</p></div>
           <Link href="/about/team" className="inline-flex min-h-11 items-center gap-2 font-bold text-brand-red-700 hover:underline">View the full team <ArrowRight className="h-4 w-4" /></Link>
+          <Link href="/about/faculty-network" className="inline-flex min-h-11 items-center gap-2 font-bold text-brand-red-700 hover:underline">Faculty, coordinators &amp; training partners <ArrowRight className="h-4 w-4" /></Link>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {TEAM_PREVIEW.map(member => <article key={member.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">

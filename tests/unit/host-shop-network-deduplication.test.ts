@@ -11,6 +11,6 @@ describe('public shop destination consolidation', () => {
     expect(shops).toHaveLength(1);
     expect(shops[0].programs).toEqual(['cosmetology-apprenticeship']);
     expect(shops[0].primaryProgram).toBe('cosmetology-apprenticeship');
-    expect(shops[0].description).toBe('Current cosmetology shop profile');
+    expect(shops[0].description).toContain('independent Martinsville hair business');
   });
 });

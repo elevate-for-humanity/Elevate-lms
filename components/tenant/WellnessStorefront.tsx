@@ -125,7 +125,7 @@ export function WellnessStorefront({ site, pathname, basePath, children }: { sit
   return <div className={styles.store} data-template={design?.template} data-layout={design?.layout} data-density={design?.density} style={design ? { '--ink': site.config.branding.primaryColor, backgroundColor: site.config.branding.backgroundColor } as CSSProperties : undefined}>
     <div className={styles.announcement}>CURVATURE BODY SCULPTING · THE MERI-GOLD-ROUND COLLECTION</div>
     <header className={styles.header}>
-      <a className={styles.brand} href={href('/')}><span>MERI-GOLD-ROUND</span><small>BOTANICAL BODY, SKIN & HAIR CARE</small></a>
+      <a className={styles.brand} href={href('/')} aria-label="MERI-GOLD-ROUND home">{site.config.branding.logoImage ? <img src={site.config.branding.logoImage} alt="MERI-GOLD-ROUND" style={{ width: 144, height: 76, maxWidth: '32vw', objectFit: 'contain' }} /> : <><span>MERI-GOLD-ROUND</span><small>BOTANICAL BODY, SKIN & HAIR CARE</small></>}</a>
       <nav aria-label="Store navigation"><a href={href('/shop')}>Shop collection</a><a href={href('/about')}>Our story</a><a href={href('/contact')}>Contact</a><StoreMusicSwitch /></nav>
       <button type="button" className={styles.bagButton} onClick={openBag} aria-label={`Shopping bag, ${totalCount} items`}><ShoppingBag size={19} /> Bag <span>{totalCount}</span></button>
     </header>

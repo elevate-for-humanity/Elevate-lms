@@ -12,6 +12,8 @@ on:
         'scripts/container-build-policy.mjs',
         '.github/workflows/deploy-google-store-runtime.yml',
         'scripts/gcp/smoke-marketing-container.mjs',
+        'scripts/gcp/smoke-fetch.mjs',
+        'tests/store-smoke-bounded-deadline.node.test.mjs',
         'scripts/gcp/store-page-contract.mjs',
         'scripts/gcp/test_store_preflight_admission.py',
         'scripts/gcp/store-rollout-diagnostics.test.mjs',
@@ -160,6 +162,7 @@ jobs:
       - name: Test actual Store container identity and health routing
         timeout-minutes: 5
         run: |
+          node --test tests/store-smoke-bounded-deadline.node.test.mjs
           node --test scripts/gcp/store-smoke-import-boundary.test.mjs
           node scripts/gcp/smoke-marketing-container.mjs
       - name: Refresh Google credentials after build

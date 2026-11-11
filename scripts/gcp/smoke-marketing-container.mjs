@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { assertStorePageChrome } from './store-page-contract.mjs';
+import { fetchSmoke } from './smoke-fetch.mjs';
 // The Store smoke is intentionally dependency-free on the host runner.
 // Only Marketing needs the homepage HTML parser (Cheerio).
 
@@ -37,9 +38,8 @@ try {
   while (Date.now() < deadline) {
     assert.equal(docker(['inspect', '--format={{.State.Running}}', name]), 'true', 'Container exited during startup');
     try {
-      const response = await fetch(root + '/api/ping', { redirect: 'manual', signal: AbortSignal.timeout(5000) });
-      const body = await response.json();
-      ready = response.status === 200 && body.ok === true && body.service === component && body.commit === sha;
+      const { status, body } = await fetchSmoke(root + '/api/ping', { redirect: 'manual' }, 5000);
+      ready = status === 200 && body.ok === true && body.service === component && body.commit === sha;
       if (ready) break;
     } catch { /* A bounded wait allows the real server to initialize. */ }
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -47,41 +47,36 @@ try {
   assert.ok(ready, 'Packaged server did not start within 120 seconds');
   for (const host of ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org']) {
     for (const path of ['/api/ping', '/api/ready', '/api/health']) {
-      const response = await fetch(root + path, { headers: { host }, redirect: 'manual', signal: AbortSignal.timeout(10000) });
-      if (path === '/api/health') assert.ok([200, 503].includes(response.status), 'Dependency health must return its real status');
-      else assert.equal(response.status, 200, `${host}${path} must reach the service endpoint`);
-      const body = await response.json();
+      const { status, body } = await fetchSmoke(root + path, { headers: { host }, redirect: 'manual' }, 10000);
+      if (path === '/api/health') assert.ok([200, 503].includes(status), 'Dependency health must return its real status');
+      else assert.equal(status, 200, `${host}${path} must reach the service endpoint`);
       assert.equal(body.service, component);
       assert.equal(body.commit, sha);
       assert.equal(path === '/api/ping' ? body.ok : body.ready, true);
     }
   }
-  const runtimeVersion = await fetch(root + '/api/version', { signal: AbortSignal.timeout(10000) });
+  const runtimeVersion = await fetchSmoke(root + '/api/version', {}, 10000);
   assert.equal(runtimeVersion.status, 200);
-  const identity = await runtimeVersion.json();
+  const identity = runtimeVersion.body;
   assert.equal(identity.service, component);
   assert.equal(identity.commitSha, sha);
-  const version = await fetch(root + '/version.json', { signal: AbortSignal.timeout(10000) });
+  const version = await fetchSmoke(root + '/version.json', {}, 10000);
   assert.equal(version.status, 200);
-  const packagedVersion = await version.json();
+  const packagedVersion = version.body;
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
   if (component === 'marketing') {
-    const home = await fetch(root + '/', { signal: AbortSignal.timeout(20000) });
+    const home = await fetchSmoke(root + '/', {}, 20000, 'text');
     assert.equal(home.status, 200, 'Packaged homepage must render');
     const { assertHomepageHostShopContract } = await import('./homepage-content.mjs');
-    assertHomepageHostShopContract(await home.text());
+    assertHomepageHostShopContract(home.body);
   }
   if (component === 'store') {
     // Exercise the packaged pages: source-level rendering tests cannot detect a
     // Store image that accidentally prerendered the shared Marketing chrome.
     for (const path of ['/store', '/login', '/privacy', '/terms-of-service', '/security-and-data-protection']) {
-      const response = await fetch(root + path, {
-        headers: { host: 'store.elevateforhumanity.org' },
-        redirect: 'manual', signal: AbortSignal.timeout(20000),
-      });
-      assert.equal(response.status, 200, `Store page ${path} must be served locally`);
-      const html = await response.text();
+      const { status, body: html } = await fetchSmoke(root + path, { headers: { host: 'store.elevateforhumanity.org' }, redirect: 'manual' }, 20000, 'text');
+      assert.equal(status, 200, `Store page ${path} must be served locally`);
       assertStorePageChrome(html, path);
     }
   }

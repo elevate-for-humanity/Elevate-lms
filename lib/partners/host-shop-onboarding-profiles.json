@@ -3,5 +3,16 @@
   {"slug":"executivecutz","name":"Executivecutz","address":"2049 Veterans Memorial Pkwy S, Suite 8, Lafayette, IN 47909","city":"Lafayette","phone":"765-269-6243","website":"https://getsquire.com/discover/barbershop/executivecutz-lafayette","source":"https://getsquire.com/discover/barbershop/executivecutz-lafayette/barber/ivan-c-owner"},
   {"slug":"studio-phresh","name":"Studio pHresh LLC","address":"1828 E Main St, Plainfield, IN 46168","city":"Plainfield","phone":"317-839-2954","website":"","source":"https://www.fresha.com/lvp/studio-phresh-east-main-street-plainfield-8J5BX2"},
   {"slug":"barbershop-32","name":"Barbershop 32","address":"","city":"Indianapolis","phone":"317-378-2947","website":"","source":""},
-  {"slug":"hair-haven-extension-lounge","name":"Hair Haven Extension Lounge","address":"","city":"Bloomington","phone":"","website":"","source":""}
+  {"slug":"hair-haven-extension-lounge","name":"Hair Haven Extension Lounge","address":"","city":"Bloomington","phone":"","website":"","source":""},
+  {
+    "slug": "b-52s-barber-shop",
+    "name": "B-52’s Barber Shop LLC",
+    "address": "314 Parkview Drive, Suite C, New Castle, IN 47362",
+    "city": "New Castle",
+    "phone": "765-374-9869",
+    "website": "",
+    "source": "https://www.bestprosintown.com/in/new-castle/b-52s-barber-shop-/",
+    "businessDescription": "Chris Newkirk owns B-52’s Barber Shop in New Castle. The shop offers classic haircuts, fades, beard trims, razor lineups, and straight-razor shaves.",
+    "portfolio": "/images/partners/b52s-official.webp"
+  }
 ]

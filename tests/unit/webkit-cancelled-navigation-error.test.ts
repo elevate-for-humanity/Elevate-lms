@@ -23,6 +23,23 @@ it('recognizes the production WebKit format (scheme-less URL in message, empty s
   // Still a failure when the same message has no paired cancellation.
   expect(isConfirmedWebKitCancellation(production, [], 'webkit')).toBe(false);
 });
+// Real authenticated iPhone WebKit trace in deployment run 42991123543:
+// requestfailed preceded the corresponding pageerror by 446, 494 and 448 ms.
+// An exact paired cancellation is a browser abort, not an authorization grant.
+it('pairs delayed WebKit pageerrors with exact cancellation receipts without waiving actual access denials', () => {
+  const endpoint = 'https://lms.elevateforhumanity.org/api/notifications/preferences';
+  const reported = { message: '/lms.elevateforhumanity.org/api/notifications/preferences due to access control checks.', stack: '', time: 5000 };
+  for (const delay of [446, 494, 448]) {
+    const cancelled = { url: endpoint, errorText: 'Load request cancelled', time: reported.time - delay };
+    expect(isConfirmedWebKitCancellation(reported, [cancelled], 'webkit')).toBe(true);
+  }
+  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 4000 }], 'webkit')).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Access control check failed', time: 4550 }], 'webkit')).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint + '/other', errorText: 'Load request cancelled', time: 4550 }], 'webkit')).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 5050 }], 'webkit')).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ url: endpoint, status: 403, time: 4550 }])).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 4550 }], 'chromium')).toBe(false);
+});
 it('keeps CORS failures without cancellation evidence as failures', () => {
   expect(isConfirmedWebKitCancellation(error, [], 'webkit')).toBe(false);
   expect(isConfirmedWebKitCancellation(error, [{ ...cancelled, errorText: 'Access control check failed' }], 'webkit')).toBe(false);

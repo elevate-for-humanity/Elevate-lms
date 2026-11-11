@@ -53,6 +53,8 @@ describe('host shop slideshow playback', () => {
   });
   it('rotates automatically, pauses, and resumes', () => {
     renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} />);
+    // Noncompact cards retain their original full-frame presentation.
+    expect(screen.getByAltText('First photo').className).toContain('object-cover');
     act(() => vi.advanceTimersByTime(5000));
     expect(screen.getByAltText('Second photo')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Pause slideshow' }));
@@ -104,7 +106,7 @@ describe('host shop slideshow playback', () => {
     expect(screen.queryByAltText('Second photo')).not.toBeInTheDocument();
     fireEvent.load(first);
     expect(first.className).toContain('object-contain');
-    expect(container.querySelector('.max-h-\\[160px\\]')).not.toBeNull();
+    expect(container.querySelector('[class*="aspect-[16/10]"]')).not.toBeNull();
     expect(screen.getAllByRole('button')).toHaveLength(3);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     const second = screen.getByAltText('Second photo');

@@ -53,3 +53,43 @@ it('keeps Play available when the browser rejects playback instead of claiming t
   );
   expect(screen.queryByRole('button', { name: 'Pause lesson video' })).toBeNull();
 });
+
+it('expands the video together with its controls without replacing media or its position', async () => {
+  const view = render(<InteractiveVideoPlayer videoUrl="/lesson.mp4" title="Full lesson" readOnly />);
+  const video = view.container.querySelector('video')!;
+  video.currentTime = 42;
+  const surface = view.container.querySelector('[data-lesson-video-surface]')!;
+  expect(surface).toContainElement(video);
+  expect(surface.querySelector('[data-lesson-playback-controls]')).toBeInTheDocument();
+  const requestFullscreen = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(surface, 'requestFullscreen', { configurable: true, value: requestFullscreen });
+  fireEvent.click(screen.getByRole('button', { name: 'Open lesson video fullscreen' }));
+  await waitFor(() => expect(requestFullscreen).toHaveBeenCalledOnce());
+  expect(view.container.querySelector('video')).toBe(video);
+  expect(video.currentTime).toBe(42);
+});
+
+it('provides the lesson expansion option when native full screen is unavailable or rejected', async () => {
+  const view = render(<InteractiveVideoPlayer videoUrl="/lesson.mp4" title="Phone lesson" readOnly />);
+  const button = screen.getByRole('button', { name: 'Open lesson video fullscreen' });
+  fireEvent.click(button);
+  expect(await screen.findByRole('alert')).toHaveTextContent('Full screen lesson');
+  const surface = view.container.querySelector('[data-lesson-video-surface]')!;
+  Object.defineProperty(surface, 'requestFullscreen', {
+    configurable: true,
+    value: vi.fn().mockRejectedValue(new DOMException('Denied', 'NotAllowedError')),
+  });
+  fireEvent.click(button);
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Full-screen video could not open'));
+});
+
+it('keeps audio lesson controls inside the same full-screen surface', async () => {
+  const view = render(<InteractiveVideoPlayer videoUrl="/lesson.mp3" title="Audio lesson" readOnly />);
+  const audio = view.container.querySelector('audio')!;
+  const surface = view.container.querySelector('[data-lesson-video-surface]')!;
+  expect(surface).toContainElement(audio);
+  const requestFullscreen = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(surface, 'requestFullscreen', { configurable: true, value: requestFullscreen });
+  fireEvent.click(screen.getByRole('button', { name: 'Open lesson video fullscreen' }));
+  await waitFor(() => expect(requestFullscreen).toHaveBeenCalledOnce());
+});

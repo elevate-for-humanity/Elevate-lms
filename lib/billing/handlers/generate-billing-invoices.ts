@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
         .from('billing_schedules')
         .update({
           remaining_invoices: remaining,
-          ...(capped ? { fulfillment_payload: { ...schedule.fulfillment_payload, remaining_tuition_cents: balanceAfterInvoice } } : {}),
+          fulfillment_payload: capped
+            ? { ...schedule.fulfillment_payload, remaining_tuition_cents: balanceAfterInvoice }
+            : undefined,
           status: completed ? 'completed' : 'active',
           next_invoice_date: completed
             ? schedule.next_invoice_date

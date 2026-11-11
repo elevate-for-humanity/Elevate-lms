@@ -97,11 +97,19 @@ test('ambiguous transport stays unverified and never admits a candidate',async()
  const h=fixture();h.observe=()=>{throw Error('PARIS_OPENHANDS_GITHUB_HTTP_503')};
  const result=await h.supervise();assert.equal(result.awaitingProvider,true);assert.equal(h.records[0].openhandsObservation.state,'unverified');assert.equal(h.claims.length,0);
 });
-test('internal, published, approval-blocked and exhausted-without-receipt repairs are excluded',()=>{
+test('internal, published and exhausted-without-receipt repairs are excluded',()=>{
  for(const mutate of [h=>h.repair.status='verified',h=>h.repair.release_sha='b'.repeat(40),h=>h.repair.candidate.kind='planner-checkpoint',
- h=>h.repair.error_code='PARIS_OPENHANDS_APPROVAL_REQUIRED',h=>delete h.cp.taskId,h=>h.repair.verification.openhandsObservation={state:'failed'}]){
+ h=>delete h.cp.taskId,h=>h.repair.verification.openhandsObservation={state:'failed'}]){
  const h=fixture();mutate(h);assert.equal(Boolean(acceptedOpenHandsNeedsObservation(h.repair)),false);
  }
+});
+
+test('an approval-blocked repair may be observed but a real approval gate prevents refresh and admission',async()=>{
+ const h=fixture();h.repair.error_code='PARIS_OPENHANDS_APPROVAL_REQUIRED';
+ h.task.requires_approval=true;h.task.approval_status='pending';
+ const result=await h.supervise();
+ assert.equal(result.awaitingProvider,true);assert.equal(h.refreshes,0);
+ assert.equal(h.reads,0);assert.equal(h.claims.length,0);
 });
 
 test('a source that pauses during terminal readback cannot be claimed',async()=>{

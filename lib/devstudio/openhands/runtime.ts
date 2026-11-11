@@ -4,6 +4,7 @@ import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconcile
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { evaluateExecution, type EvaluationResult } from '@/lib/platform/orchestration/evaluator';
 import { isParisProviderBranchCandidate } from '@/lib/devstudio/openhands/paris-provider-candidate';
+import { isProviderConfirmationSnapshot } from './provider-confirmation.mjs';
 import {
   getOpenHandsLifecycle,
   startOpenHandsTask,
@@ -620,6 +621,11 @@ export async function refreshOpenHandsTask(input: {
   // Keep the canonical task RUNNING and its verification step PENDING so the
   // same original provider receipt can progress without a fabricated approval.
   // All general Dev Studio OpenHands tasks retain strict PR+CI completion.
+  const staleProviderConfirmation = isProviderConfirmationSnapshot(task);
+  // Completion alone is insufficient: require the same owned receipt, exact
+  // branch and independent GitHub SHA readback before retiring a provider wait.
+  const resolvedProviderConfirmation = staleProviderConfirmation &&
+    isParisProviderBranchCandidate(task, lifecycle, githubEvidence);
   const parisProviderCandidatePendingValidation =
     evaluation.status === 'REQUIRES_HUMAN_REVIEW' &&
     isParisProviderBranchCandidate(task, lifecycle, githubEvidence);
@@ -653,7 +659,7 @@ export async function refreshOpenHandsTask(input: {
     github_verification: githubEvidence,
   };
 
-  await db
+  const taskUpdate = db
     .from('ai_tasks')
     .update({
       status: taskStatus,
@@ -671,13 +677,28 @@ export async function refreshOpenHandsTask(input: {
           ? { provider: 'openhands', lifecycle, githubEvidence, evaluation }
           : task.result,
       error_message: evaluation.status === 'FAIL_BLOCKING' ? evaluation.reasons.join(' ') : null,
-      requires_approval: needsHumanApproval,
-      approval_status: needsHumanApproval ? 'pending' : task.approval_status,
-      approval_reason: needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
+      requires_approval: resolvedProviderConfirmation ? false : staleProviderConfirmation ? true : needsHumanApproval,
+      approval_status: resolvedProviderConfirmation ? 'not_required' : needsHumanApproval ? 'pending' : task.approval_status,
+      approval_reason: resolvedProviderConfirmation ? null : needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
       completed_at: ['completed', 'failed'].includes(taskStatus) ? now : null,
       updated_at: now,
     })
     .eq('id', task.id);
+
+  // A human rejection/approval arriving during provider/GitHub reads wins.
+  // Never clear a newer decision using an older provider-wait snapshot.
+  const { data: updatedTask, error: taskUpdateError } = await (
+    resolvedProviderConfirmation
+      ? taskUpdate.eq('approval_status', 'pending')
+        .eq('requires_approval', task.requires_approval)
+        .eq('approval_reason', task.approval_reason)
+        .eq('updated_at', task.updated_at).select('id').maybeSingle()
+      : taskUpdate
+  );
+  if (taskUpdateError) throw taskUpdateError;
+  if (resolvedProviderConfirmation && !updatedTask) {
+    throw new Error('OPENHANDS_APPROVAL_STATE_CHANGED_DURING_REFRESH');
+  }
 
   const { data: steps } = await db
     .from('ai_task_steps')

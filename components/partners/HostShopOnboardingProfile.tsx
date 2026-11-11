@@ -31,7 +31,7 @@ export default function HostShopOnboardingProfile({ shop }: { shop: OnboardingSh
       </section>
       <section className="mx-auto grid max-w-6xl gap-6 px-5 py-12 lg:grid-cols-5">
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm lg:col-span-3">
-          {shop.portfolio ? (
+          {shop.portfolio && !shop.gallery?.length ? (
             <figure>
               <div className="relative aspect-[475/295] overflow-hidden rounded-xl">
                 {/* Show the interior panel of the archived 800 × 600 portfolio. */}

@@ -261,19 +261,18 @@ export default function HostShopShowcase({
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-red-700">
-              Indiana shops: we’re looking for you
+              {asHero ? 'Discover local businesses' : 'Indiana shops: we’re looking for you'}
             </p>
             <Heading
               id="host-shop-showcase-heading"
               className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
             >
-              Become a Host Shop for free. Grow your team through apprenticeship.
+              {asHero ? 'Find your next barber, salon, or beauty professional.' : 'Become a Host Shop for free. Grow your team through apprenticeship.'}
             </Heading>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
-              Elevate has apprentices ready to train, and we need licensed barbershops, beauty
-              salons, nail studios, spas, and esthetics businesses across Indiana. Join the Barber &
-              Beauty Host Shop Network at no cost, develop future professionals, and gain a
-              permanent business profile that helps apprentices and customers discover your shop.
+              {asHero
+                ? 'Explore the shops, meet their teams, see their work, and plan your next visit. Get directions, call or book directly with each business, and ask about walk-ins and supervised student services. Licensed business owners can also join the Host Shop network at no cost.'
+                : 'Elevate has apprentices ready to train, and we need licensed barbershops, beauty salons, nail studios, spas, and esthetics businesses across Indiana. Join the Barber & Beauty Host Shop Network at no cost, develop future professionals, and gain a permanent business profile that helps apprentices and customers discover your shop.'}
             </p>
           </div>
           {narrationBlocked ? (

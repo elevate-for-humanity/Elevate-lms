@@ -96,7 +96,14 @@
     "website": "https://www.vagaro.com/hairhavenextensionlounge",
     "source": "https://www.vagaro.com/hairhavenextensionlounge",
     "booking": "https://www.vagaro.com/hairhavenextensionlounge",
-    "businessDescription": "Hair Haven Extension Lounge is a Bloomington salon offering hair extensions, haircuts, color, curly-hair services, facials, waxing, and lash services. Explore its booking page to choose a professional and confirm availability before visiting."
+    "businessDescription": "Hair Haven Extension Lounge is a Bloomington salon offering hair extensions, haircuts, color, curly-hair services, facials, waxing, and lash services. Explore its booking page to choose a professional and confirm availability before visiting.",
+    "gallery": [
+      {
+        "url": "/images/host-shops/hair-haven/official-pink-color-2026.webp",
+        "alt": "Pink hair color and curled finish published by Hair Haven Extension Lounge",
+        "source": "https://www.vagaro.com/hairhavenextensionlounge"
+      }
+    ]
   },
   {
     "slug": "b-52s-barber-shop",

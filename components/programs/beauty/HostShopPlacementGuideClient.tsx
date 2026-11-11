@@ -44,18 +44,18 @@ export default function HostShopPlacementGuideClient({
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
-            Find your training location
+            Discover our Host Shops
           </p>
           <h2
             id="host-shop-placement-heading"
             className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
           >
-            Find an approved Host Shop near you.
+            Meet your local barber and beauty professionals.
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">
-            Search the current Host Shop network by city, ZIP code, or shop name. A public listing
-            confirms participation in the network, not a guaranteed opening. Placement is confirmed
-            during enrollment.
+            Explore each shop’s work, meet the team, and plan your visit. Search by city, ZIP code,
+            or shop name. A public listing confirms participation in the network, not a guaranteed
+            opening. Placement is confirmed during enrollment.
           </p>
         </div>
 
@@ -89,6 +89,7 @@ export default function HostShopPlacementGuideClient({
                 >
                   <HostShopMediaCarousel
                     shopName={shop.name}
+                    videoUrl={shop.videoUrl}
                     compact
                     spacious
                     items={
@@ -120,6 +121,36 @@ export default function HostShopPlacementGuideClient({
                       </span>
                     </div>
                     <p className="mt-4 text-base leading-7 text-slate-700">{shop.description}</p>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {shop.phone ? (
+                        <a
+                          href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`}
+                          className="inline-flex min-h-11 items-center font-bold text-brand-blue-800"
+                        >
+                          Call {shop.phone}
+                        </a>
+                      ) : null}
+                      {shop.booking ? (
+                        <a
+                          href={shop.booking}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-11 items-center font-bold text-brand-blue-800"
+                        >
+                          Book a service
+                        </a>
+                      ) : null}
+                      {shop.website ? (
+                        <a
+                          href={shop.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-11 items-center font-bold text-brand-blue-800"
+                        >
+                          Visit shop website
+                        </a>
+                      ) : null}
+                    </div>
                     <div className="mt-auto grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2">
                       <Link
                         href={`/host-shops/${shop.slug}`}

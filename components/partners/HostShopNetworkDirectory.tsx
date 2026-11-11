@@ -60,7 +60,10 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
       </p>
 
       {visible.length ? (
-        <div data-host-shop-directory className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div
+          data-host-shop-directory
+          className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+        >
           {visible.map((shop) => (
             <article
               key={shop.id}
@@ -68,8 +71,15 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
             >
               <HostShopMediaCarousel
                 shopName={shop.name}
+                videoUrl={shop.videoUrl}
                 compact
-                items={shop.gallery?.length ? shop.gallery : shop.image ? [{ url: shop.image, alt: `${shop.name} portfolio` }] : []}
+                items={
+                  shop.gallery?.length
+                    ? shop.gallery
+                    : shop.image
+                      ? [{ url: shop.image, alt: `${shop.name} portfolio` }]
+                      : []
+                }
               />
               <div className="flex flex-1 flex-col p-4">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">

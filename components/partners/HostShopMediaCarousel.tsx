@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import { ChevronLeft, ChevronRight, ExternalLink, PlayCircle } from 'lucide-react';
@@ -52,17 +52,26 @@ export default function HostShopMediaCarousel({
   const [loadedUrls, setLoadedUrls] = useState<Set<string>>(() => new Set());
   const [failedUrls, setFailedUrls] = useState<Set<string>>(() => new Set());
   const [lastLoadedUrl, setLastLoadedUrl] = useState<string>();
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(!compact);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
   const [videoPlaying, setVideoPlaying] = useState(false);
   useEffect(() => setVideoPlaying(false), [index]);
   useEffect(() => {
-    if (!playing || videoPlaying || media.length < 2) return;
+    if (!inView || !playing || videoPlaying || media.length < 2) return;
     const timer = window.setInterval(
       () => setIndex((current) => (current + 1) % media.length),
       5000,
     );
     return () => window.clearInterval(timer);
-  }, [playing, videoPlaying, media, index]);
+  }, [inView, playing, videoPlaying, media, index]);
 
   const requestedUrl = media[Math.min(index, media.length - 1)]?.url;
   useEffect(() => {
@@ -70,9 +79,9 @@ export default function HostShopMediaCarousel({
       setLastLoadedUrl(requestedUrl);
   }, [requestedUrl, loadedUrls, failedUrls]);
 
-  if (!media.length) return null;
+  if (!media.length && !videoUrl) return null;
   const safeIndex = Math.min(index, media.length - 1);
-  const requested = media[safeIndex]!;
+  const requested = media[safeIndex] ?? { url: '', alt: shopName };
   // Keep a decoded shop photo on screen while the next photo downloads.
   const active =
     loadedUrls.has(requested.url) && !failedUrls.has(requested.url)
@@ -86,84 +95,89 @@ export default function HostShopMediaCarousel({
 
   return (
     <div
+      ref={containerRef}
       className={
         compact
           ? 'w-full min-w-0 overflow-hidden bg-white'
           : 'mx-auto w-full max-w-[480px] min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl'
       }
     >
-      <div
-        className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${spacious ? 'aspect-[16/10]' : compact ? 'aspect-[16/10] max-h-[160px]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}
-      >
-        {active.type === 'video' ? (
-          <video
-            key={active.url}
-            src={active.url}
-            controls
-            playsInline
-            preload="metadata"
-            onPlay={() => setVideoPlaying(true)}
-            onPause={() => setVideoPlaying(false)}
-            onEnded={() => setVideoPlaying(false)}
-            onError={() => setVideoPlaying(false)}
-            className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]"
-            style={{ maxWidth: 'min(100%, 480px)' }}
-            aria-label={active.alt || `${shopName} video`}
-          />
-        ) : (
-          <>
-            {media.map((item, itemIndex) =>
-              itemIndex === safeIndex ||
-              itemIndex === (safeIndex + 1) % media.length ||
-              item.url === active.url ? (
-                <Image
-                  key={item.url}
-                  src={item.url}
-                  fill
-                  unoptimized={!item.url.startsWith('/')}
-                  sizes={
-                    spacious
-                      ? '(max-width: 767px) 100vw, 560px'
-                      : compact
-                        ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
-                        : '(max-width: 640px) 90vw, 480px'
-                  }
-                  alt={item.alt || `${shopName} promotional image`}
-                  aria-hidden={item.url !== active.url}
-                  className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
-                  style={{ opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0 }}
-                  loading={compact ? 'lazy' : 'eager'}
-                  decoding="async"
-                  fetchPriority={compact ? 'auto' : itemIndex === 0 ? 'high' : 'low'}
-                  onLoad={() => {
-                    setLoadedUrls((current) => new Set(current).add(item.url));
-                    if (item.url === requested.url || !lastLoadedUrl) setLastLoadedUrl(item.url);
-                  }}
-                  onError={() => setFailedUrls((current) => new Set(current).add(item.url))}
-                />
-              ) : null,
-            )}
-            {failedUrls.size === media.length ? (
-              <p className="relative px-6 text-center text-sm text-white" role="status">
-                The shop photos could not load. Please use the shop website link below to view its
-                portfolio.
-              </p>
-            ) : null}
-          </>
-        )}
-        {active.alt?.startsWith('AI-enhanced') ? (
-          <span className="absolute bottom-2 left-2 right-2 rounded bg-slate-950/85 px-2 py-1 text-center text-xs font-bold text-white">
-            AI-enhanced from shop portfolio
-          </span>
-        ) : null}
-        {active.type === 'video' ? (
-          <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white">
-            <span className="inline-flex items-center gap-1.5">
-              <PlayCircle className="h-4 w-4" /> Video
+      {media.length ? (
+        <div
+          className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${spacious ? 'aspect-[16/10]' : compact ? 'aspect-[16/10] max-h-[160px]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}
+        >
+          {active.type === 'video' ? (
+            <video
+              key={active.url}
+              src={active.url}
+              controls
+              playsInline
+              preload="none"
+              onPlay={() => setVideoPlaying(true)}
+              onPause={() => setVideoPlaying(false)}
+              onEnded={() => setVideoPlaying(false)}
+              onError={() => setVideoPlaying(false)}
+              className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]"
+              style={{ maxWidth: 'min(100%, 480px)' }}
+              aria-label={active.alt || `${shopName} video`}
+            />
+          ) : (
+            <>
+              {media.map((item, itemIndex) =>
+                itemIndex === safeIndex ||
+                (inView && playing && itemIndex === (safeIndex + 1) % media.length) ||
+                item.url === active.url ? (
+                  <Image
+                    key={item.url}
+                    src={item.url}
+                    fill
+                    unoptimized={!item.url.startsWith('/')}
+                    sizes={
+                      spacious
+                        ? '(max-width: 767px) 100vw, 560px'
+                        : compact
+                          ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
+                          : '(max-width: 640px) 90vw, 480px'
+                    }
+                    alt={item.alt || `${shopName} promotional image`}
+                    aria-hidden={item.url !== active.url}
+                    className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
+                    style={{
+                      opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0,
+                    }}
+                    loading={compact ? 'lazy' : 'eager'}
+                    decoding="async"
+                    fetchPriority={compact ? 'auto' : itemIndex === 0 ? 'high' : 'low'}
+                    onLoad={() => {
+                      setLoadedUrls((current) => new Set(current).add(item.url));
+                      if (item.url === requested.url || !lastLoadedUrl) setLastLoadedUrl(item.url);
+                    }}
+                    onError={() => setFailedUrls((current) => new Set(current).add(item.url))}
+                  />
+                ) : null,
+              )}
+              {failedUrls.size === media.length ? (
+                <p className="relative px-6 text-center text-sm text-white" role="status">
+                  The shop photos could not load. Please use the shop website link below to view its
+                  portfolio.
+                </p>
+              ) : null}
+            </>
+          )}
+          {active.alt?.startsWith('AI-enhanced') ? (
+            <span className="absolute bottom-2 left-2 right-2 rounded bg-slate-950/85 px-2 py-1 text-center text-xs font-bold text-white">
+              AI-enhanced from shop portfolio
             </span>
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+          {active.type === 'video' ? (
+            <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white">
+              <span className="inline-flex items-center gap-1.5">
+                <PlayCircle className="h-4 w-4" /> Video
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       {compact && media.length > 1 ? (
         <div className="grid grid-cols-3 border-t border-slate-200 text-xs font-bold">
           <button
@@ -229,7 +243,7 @@ export default function HostShopMediaCarousel({
               src={videoUrl}
               controls
               playsInline
-              preload="metadata"
+              preload="none"
               onPlay={() => setVideoPlaying(true)}
               onPause={() => setVideoPlaying(false)}
               onEnded={() => setVideoPlaying(false)}

@@ -1,3 +1,4 @@
+import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
 import { uniqueHostShops } from '@/lib/partners/dedupe-host-shops.mjs';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import 'server-only';
@@ -7,6 +8,7 @@ import {
   getFeaturedHostPartnerBySlug,
   type FeaturedHostPartner,
 } from '@/lib/apprenticeship-programs/host-partners';
+import { PROGRAM_LABELS } from '@/lib/programs/host-shop-programs';
 import { getApprovedShops, type HostShop } from '@/lib/programs/host-shops';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 export type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
@@ -71,19 +73,27 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       sameBusiness(shop, candidate),
     );
     if (featured) matchedFeatured.add(featured.slug);
+    const publicProfile = onboardingProfiles.find(
+      (profile) => identityKey(profile.name) === identityKey(shop.name),
+    );
     const gallery = curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [
       ...(shop.mediaGallery ?? []),
-      ...(featured?.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })) ?? []),
+      ...(publicProfile && 'gallery' in publicProfile ? (publicProfile.gallery ?? []) : []),
+      ...(featured?.media
+        ?.filter((item) => item.kind !== 'video')
+        .map((item) => ({ url: item.src, alt: item.alt })) ?? []),
       ...(shop.logoUrl ? [{ url: shop.logoUrl, alt: `${shop.name} official business image` }] : []),
       ...(shop.flyerUrl ? [{ url: shop.flyerUrl, alt: `${shop.name} official announcement` }] : []),
     ]);
     // Lead with the shop's current curated photography, retaining its full portfolio.
-    const preferredPhoto = featured?.slug === 'cals-kutz-studio'
-      ? '/images/partners/cals-kutz/storefront-enhanced-2026.webp'
-      : featured?.slug === 'top-shelf-barber-lounge'
-        ? '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp'
-        : undefined;
-    if (preferredPhoto) gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
+    const preferredPhoto =
+      featured?.slug === 'cals-kutz-studio'
+        ? '/images/partners/cals-kutz/storefront-enhanced-2026.webp'
+        : featured?.slug === 'top-shelf-barber-lounge'
+          ? '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp'
+          : undefined;
+    if (preferredPhoto)
+      gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {
       id: shop.id,
       slug: featured?.slug ?? shop.publicSlug!,
@@ -95,21 +105,30 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       programs: shop.programs,
       primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
-        shop.description ||
         featured?.marketingBlurb ||
-        `${shop.name} participates in Elevate's apprenticeship Host Site network.`,
+        (shop.description && !shop.description.includes('Approved Elevate Host Site record')
+          ? shop.description
+          : undefined) ||
+        (publicProfile?.slug === 'dbo-hair-studios'
+          ? 'DBO Hair Studios is an Indianapolis salon led by owner and master stylist Evelyn Estevez. Meet the team, explore their work, and book directly with the salon.'
+          : `${shop.name} is located in ${shop.city}, ${shop.state}. Explore ${shop.programs.map((program) => PROGRAM_LABELS[program] ?? program).join(' and ')} at this local business. Contact the shop for services, hours, and walk-in availability.`),
       image: gallery[0]?.url,
       videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
       gallery,
-      website: shop.website || featured?.websiteUrl,
-      social: featured?.socialUrl,
-      booking: featured?.bookingUrl,
+      website: shop.website || featured?.websiteUrl || publicProfile?.website || undefined,
+      social:
+        featured?.socialUrl ||
+        (publicProfile && 'instagram' in publicProfile ? publicProfile.instagram : undefined),
+      booking:
+        featured?.bookingUrl ||
+        (publicProfile && 'booking' in publicProfile ? publicProfile.booking : undefined),
       approval: 'approved',
     };
   });
 
   const publishedOnly = FEATURED_BEAUTY_HOST_PARTNERS.filter(
-    (shop) => !matchedFeatured.has(shop.slug) && approved.some((record) => sameBusiness(record, shop)),
+    (shop) =>
+      !matchedFeatured.has(shop.slug) && approved.some((record) => sameBusiness(record, shop)),
   ).map(
     (shop): HostShopNetworkEntry => ({
       id: `featured:${shop.slug}`,
@@ -127,7 +146,9 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
         `${shop.name} is listed in Elevate's Host Shop network.`,
       image: firstImage(shop),
       videoUrl: shop.media?.find((item) => item.kind === 'video')?.src,
-      gallery: shop.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })),
+      gallery: shop.media
+        ?.filter((item) => item.kind !== 'video')
+        .map((item) => ({ url: item.src, alt: item.alt })),
       website: shop.websiteUrl,
       social: shop.socialUrl,
       booking: shop.bookingUrl,
@@ -138,6 +159,7 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
   // Multiple historical approval records can refer to the same public shop.
   // Keep one destination and preserve its independently approved pathways.
   return uniqueHostShops([...operational, ...publishedOnly]).sort(
-    (left: HostShopNetworkEntry, right: HostShopNetworkEntry) => left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
+    (left: HostShopNetworkEntry, right: HostShopNetworkEntry) =>
+      left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );
 }

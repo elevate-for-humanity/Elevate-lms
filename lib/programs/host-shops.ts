@@ -1,3 +1,4 @@
+import { parseHostShopAddress } from '@/lib/partners/host-shop-address';
 /**
  * Canonical approved Host Shop loader.
  * Operational approval remains authoritative; public partner profiles only enrich
@@ -35,24 +36,6 @@ export type HostShop = {
 import { PROGRAM_SLUGS, PROGRAM_LABELS, matchesHostShopProgram, normalizeHostShopProgram, type ProgramKey } from '@/lib/programs/host-shop-programs';
 export { PROGRAM_SLUGS, PROGRAM_LABELS, normalizeHostShopProgram, type ProgramKey } from '@/lib/programs/host-shop-programs';
 
-function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
-  const parts = raw
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean);
-  if (parts.length < 2) return { address: raw.trim(), city: '', state: 'IN', zip: '' };
-  const stateZipPart = parts.at(-1) ?? '';
-  const stateZipMatch = stateZipPart.match(/^([A-Za-z]{2})(?:\s+(\d{5}(?:-\d{4})?))?$/);
-  if (stateZipMatch && parts.length >= 3) {
-    return {
-      address: parts.slice(0, -2).join(', '),
-      city: parts.at(-2) ?? '',
-      state: stateZipMatch[1].toUpperCase(),
-      zip: stateZipMatch[2] ?? '',
-    };
-  }
-  return { address: parts.slice(0, -1).join(', '), city: parts.at(-1) ?? '', state: 'IN', zip: '' };
-}
 
 function digits(value: string | null | undefined) {
   return (value ?? '').replace(/\D/g, '');
@@ -171,7 +154,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   }));
 
   const hostShops: HostShop[] = (hostRows ?? []).map((shop) => {
-    const parsed = parseAddress(shop.address ?? '');
+    const parsed = parseHostShopAddress(shop.address ?? '');
     const rawPrograms: unknown[] = Array.isArray(shop.intake?.programs) ? shop.intake.programs : [];
     const profile = (publicRows ?? []).find((row) => businessKey(row.display_name) === businessKey(shop.shop_name));
     const profilePrograms = Array.isArray(profile?.programs) ? profile.programs : [];

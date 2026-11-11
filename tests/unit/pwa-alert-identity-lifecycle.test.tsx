@@ -29,8 +29,26 @@ it('reuses the parent verified identity without another auth request and scopes 
   expect(h.on).toHaveBeenCalledWith('postgres_changes', expect.objectContaining({ filter: 'user_id=eq.parent-user' }), expect.any(Function));
   view.unmount();
   const request = vi.mocked(fetch).mock.calls[0][1];
-  expect(request?.signal?.aborted).toBe(true);
+  // Preferences are authenticated same-origin reads. Preserve them through
+  // client-side navigation so WebKit does not report an aborted request as
+  // an access-control page error. No credentials or security checks change.
+  expect(request).toMatchObject({ cache: 'no-store', keepalive: true });
+  expect(request?.signal).toBeUndefined();
   expect(h.removeChannel).toHaveBeenCalledOnce();
+});
+
+it('does not subscribe or surface stale preferences after unmount while keeping the read alive', async () => {
+  let finish!: (response: Response) => void;
+  vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(resolve => { finish = resolve; })));
+  const view = render(<PwaAlertListener authenticatedUserId="parent-user" />);
+  await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+  view.unmount();
+  const options = vi.mocked(fetch).mock.calls[0][1];
+  expect(options).toMatchObject({ cache: 'no-store', keepalive: true });
+  expect(options?.signal).toBeUndefined();
+  await act(async () => finish(new Response(JSON.stringify({ settings: { enabled: false } }), { status: 200 })));
+  expect(h.subscribe).not.toHaveBeenCalled();
+  expect(h.removeChannel).not.toHaveBeenCalled();
 });
 
 it('verifies identity when mounted without an authenticated parent', async () => {

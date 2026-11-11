@@ -8,7 +8,15 @@ try{
  insert into auth.users values('11111111-1111-4111-8111-111111111111'),('22222222-2222-4222-8222-222222222222');
  insert into tax_offices values('33333333-3333-4333-8333-333333333333','11111111-1111-4111-8111-111111111111','active');
  grant usage on schema public,auth to service_role; grant select on tax_offices to service_role;`);
- await db.exec(await readFile(new URL('../../supabase/migrations/20261111024434_supersonic_payroll_workspaces.sql',import.meta.url),'utf8'));
+ await db.exec(await readFile(new URL('../../supabase/migrations/20261111032104_supersonic_payroll_workspaces.sql',import.meta.url),'utf8'));
+ // Hosted Supabase defaults grant ALL to service_role on newly created tables.
+ // Reproduce that environment before applying the explicit narrowing migration.
+ await db.exec('grant all on sfc_payroll_companies,sfc_payroll_runs,sfc_payroll_events to service_role');
+ await db.exec(await readFile(new URL('../../supabase/migrations/20261111032208_supersonic_payroll_server_privileges.sql',import.meta.url),'utf8'));
+ for(const table of ['sfc_payroll_companies','sfc_payroll_runs','sfc_payroll_events']){
+  assert.equal((await db.query("select has_table_privilege('service_role',$1,'DELETE') allowed",[table])).rows[0].allowed,false);
+ }
+ assert.equal((await db.query("select has_table_privilege('service_role','sfc_payroll_events','UPDATE') allowed")).rows[0].allowed,false);
  const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222',company='44444444-4444-4444-8444-444444444444',run='55555555-5555-4555-8555-555555555555';
  await db.exec('set role service_role');
  await db.query("insert into sfc_payroll_companies(id,office_id,legal_name,frequency) values($1,'33333333-3333-4333-8333-333333333333','Isolated fictional company','weekly')",[company]);

@@ -149,7 +149,7 @@ export default function PaymentPlanCalculator({
                 : 'border-slate-200 hover:border-slate-400'
             }`}
           >
-            <span className="text-xs font-black uppercase tracking-wide text-slate-500">Pay in full</span>
+            <span className="text-xs font-black uppercase tracking-wide text-slate-700">Pay in full</span>
             <span className="mt-2 block text-2xl font-black text-slate-950">{fmt(pricing.tuition_cents)}</span>
             <span className="mt-1 block text-sm text-slate-600">One secure payment</span>
           </button>
@@ -164,7 +164,7 @@ export default function PaymentPlanCalculator({
                 : 'border-slate-200 hover:border-slate-400'
             }`}
           >
-            <span className="text-xs font-black uppercase tracking-wide text-slate-500">Deposit + payment plan</span>
+            <span className="text-xs font-black uppercase tracking-wide text-slate-700">Deposit + payment plan</span>
             <span className="mt-2 block text-2xl font-black text-slate-950">{fmt(installmentCents)}</span>
             <span className="mt-1 block text-sm text-slate-600">Required deposit; review the remaining balance and schedule before payment</span>
           </button>

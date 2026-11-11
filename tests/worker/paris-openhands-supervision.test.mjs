@@ -42,7 +42,7 @@ for(const [name,mutate] of [
  ['wrong owner',h=>h.task.user_id='other'],['wrong command',h=>h.task.command+=' changed'],
  ['wrong correlation',h=>h.task.correlation_id='other'],['wrong checkpoint run',h=>h.cp.runId=13],
  ['missing receipt',h=>h.task.tool_output={}],['approval required',h=>h.task.requires_approval=true],
- ['reused approval',h=>h.task.approval_status='approved'],['changed task id',h=>h.cp.taskId='other'],
+ ['pending approval',h=>h.task.approval_status='pending'],['changed task id',h=>h.cp.taskId='other'],
  ['wrong goal',h=>h.cp.goalHash='changed'],['wrong attempt',h=>h.cp.attempt=2],
  ])test(`${name} prevents even the provider refresh`,async()=>{
  const h=fixture();mutate(h);await assert.rejects(h.observe());assert.equal(h.refreshes,0);assert.equal(h.reads,0);
@@ -50,6 +50,16 @@ for(const [name,mutate] of [
 test('changed start receipt and wrong terminal branch cannot admit a candidate',async()=>{
  for(const mutate of [h=>h.lifecycle.startTaskId='new-start',h=>h.lifecycle.branch='main',h=>h.lifecycle.repository='other/repo']){
  const h=fixture();h.lifecycle.status='completed';mutate(h);await assert.rejects(h.observe());assert.equal(h.reads,0);
+ }
+});
+test('a previously approved canonical task does not request redundant approval',async()=>{
+ const h=fixture();h.task.approval_status='approved';
+ assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});
+ assert.equal(h.refreshes,1);assert.equal(h.reads,0);
+});
+test('an approval still pending or provider-required never advances',async()=>{
+ for(const mutate of [h=>h.task.approval_status='pending',h=>h.task.requires_approval=true,h=>h.task.status='awaiting_approval']){
+  const h=fixture();mutate(h);await assert.rejects(h.observe(),/APPROVAL_REQUIRED/);assert.equal(h.refreshes,0);
  }
 });
 test('approval requested by provider is retained',async()=>{

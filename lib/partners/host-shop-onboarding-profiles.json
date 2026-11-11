@@ -117,6 +117,13 @@
     "portfolio": "/images/partners/b52s-official.webp",
     "programs": [
       "barber-apprenticeship"
+    ],
+    "gallery": [
+      {
+        "url": "/images/partners/b52s-interior-enhanced-2026.webp",
+        "alt": "AI-enhanced interior photograph restored from B-52’s Barber Shop’s public portfolio",
+        "source": "https://www.bestprosintown.com/in/new-castle/b-52s-barber-shop-/"
+      }
     ]
   },
   {

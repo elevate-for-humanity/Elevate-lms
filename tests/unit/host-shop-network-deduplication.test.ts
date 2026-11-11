@@ -1,16 +1,30 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+const profile = vi.hoisted(() => ({ description: 'Current cosmetology shop profile' }));
 vi.mock('@/lib/programs/host-shops', () => ({ getApprovedShops: async () => [
   { id: 'historical', publicSlug: 'generations-hair-llc', name: 'Generations Hair LLC', address: '190 W Morgan St', city: 'Martinsville', state: 'IN', zip: '', phone: '', programs: [], description: 'Historical record without a pathway' },
-  { id: 'current', publicSlug: 'generations-hair-llc', name: 'Generations Hair / Cat Eye Collective', address: '190 W Morgan St', city: 'Martinsville', state: 'IN', zip: '', phone: '', programs: ['cosmetology-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship', description: 'Current cosmetology shop profile' },
+  { id: 'current', publicSlug: 'generations-hair-llc', name: 'Generations Hair / Cat Eye Collective', address: '190 W Morgan St', city: 'Martinsville', state: 'IN', zip: '', phone: '', programs: ['cosmetology-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship', description: profile.description },
 ] }));
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 
 describe('public shop destination consolidation', () => {
+  beforeEach(() => { profile.description = 'Current cosmetology shop profile'; });
   it('shows one shop per profile while retaining its approved occupation', async () => {
     const shops = (await getHostShopNetwork()).filter((shop) => shop.slug === 'generations-hair-llc');
     expect(shops).toHaveLength(1);
     expect(shops[0].programs).toEqual(['cosmetology-apprenticeship']);
     expect(shops[0].primaryProgram).toBe('cosmetology-apprenticeship');
+    expect(shops[0].description).toBe('Current cosmetology shop profile');
+  });
+  it.each([
+    'Approved Elevate Host Site record for Generations Hair',
+    'Approved Elevate Host Site for Generations Hair',
+  ])('replaces administrative copy with the curated biography: %s', async (description) => {
+    profile.description = description;
+    const shops = (await getHostShopNetwork()).filter((shop) => shop.slug === 'generations-hair-llc');
+    expect(shops).toHaveLength(1);
     expect(shops[0].description).toContain('independent Martinsville hair business');
+    expect(shops[0].programs).toEqual(['cosmetology-apprenticeship']);
+    expect(shops[0].primaryProgram).toBe('cosmetology-apprenticeship');
   });
 });
+

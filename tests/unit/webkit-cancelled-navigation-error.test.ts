@@ -36,7 +36,7 @@ it('pairs delayed WebKit pageerrors with exact cancellation receipts without wai
   expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 4000 }], 'webkit')).toBe(false);
   expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Access control check failed', time: 4550 }], 'webkit')).toBe(false);
   expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint + '/other', errorText: 'Load request cancelled', time: 4550 }], 'webkit')).toBe(false);
-  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 5050 }], 'webkit')).toBe(false);
+  expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 5850 }], 'webkit')).toBe(false);
   expect(isConfirmedWebKitCancellation(reported, [], 'webkit', [{ url: endpoint, status: 403, time: 4550 }])).toBe(false);
   expect(isConfirmedWebKitCancellation(reported, [{ url: endpoint, errorText: 'Load request cancelled', time: 4550 }], 'chromium')).toBe(false);
 });

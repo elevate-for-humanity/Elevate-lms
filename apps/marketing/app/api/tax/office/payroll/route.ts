@@ -139,6 +139,12 @@ export async function GET(req: NextRequest) {
   }
 }
 export async function POST(req: NextRequest) {
+  const origin = req.headers.get('origin');
+  if (
+    req.headers.get('sec-fetch-site') === 'cross-site' ||
+    (origin && origin !== req.nextUrl.origin)
+  )
+    return taxJson({ error: 'SAME_ORIGIN_REQUIRED' }, { status: 403 });
   const limited = await applyRateLimit(req, 'api');
   if (limited) return limited;
   try {

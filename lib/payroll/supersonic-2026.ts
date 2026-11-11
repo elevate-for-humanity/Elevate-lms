@@ -45,7 +45,15 @@ export const employeePayrollSchema = z
       })
       .strict(),
   })
-  .strict();
+  .strict()
+  .superRefine((employee, context) => {
+    if (employee.w4.exempt && employee.w4.year !== 2026)
+      context.addIssue({
+        code: 'custom',
+        path: ['w4', 'year'],
+        message: 'A federal exempt election must be renewed for the current payroll year',
+      });
+  });
 export type PayrollEmployee = z.infer<typeof employeePayrollSchema>;
 export const payrollLineSchema = z
   .object({

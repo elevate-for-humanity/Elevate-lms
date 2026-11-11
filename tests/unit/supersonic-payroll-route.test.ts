@@ -58,6 +58,18 @@ beforeEach(() => {
   });
 });
 describe('Supersonic payroll authorization and evidence boundaries', () => {
+  it('rejects cross-site writes before reaching account or database operations', async () => {
+    const r = await POST(
+      new NextRequest('https://example.test/api/tax/office/payroll', {
+        method: 'POST',
+        headers: { origin: 'https://other.test', 'sec-fetch-site': 'cross-site' },
+        body: '{}',
+      }),
+    );
+    expect(r.status).toBe(403);
+    expect(m.access).not.toHaveBeenCalled();
+    expect(m.write).not.toHaveBeenCalled();
+  });
   it('denies anonymous reads and writes before accessing payroll', async () => {
     m.access.mockRejectedValue(new OfficeAccessError(401, 'SIGN_IN_REQUIRED'));
     expect((await GET(new NextRequest('https://example.test/api/tax/office/payroll'))).status).toBe(

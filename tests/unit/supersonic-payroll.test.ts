@@ -100,6 +100,14 @@ describe('2026 Supersonic regular Indiana payroll', () => {
       socialSecurityCents: 6200,
     });
   });
+  it('rejects an expired federal exempt election', () => {
+    expect(
+      employeePayrollSchema.safeParse({
+        ...employee,
+        w4: { ...employee.w4, year: 2025, exempt: true },
+      }).success,
+    ).toBe(false);
+  });
   it('caps Social Security wages and starts additional Medicare at the employer threshold', () => {
     expect(
       calculatePayrollLine(employee, { ...line, priorSocialSecurityWagesCents: 18400000 }),

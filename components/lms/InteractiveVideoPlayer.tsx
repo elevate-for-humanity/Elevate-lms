@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessibility/lms-runtime-accessibility';
 
 import React from 'react';
+import styles from './InteractiveVideoPlayer.module.css';
 import { sendPlaybackEvent } from '@/lib/video/send-playback-event.mjs';
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
@@ -140,6 +141,7 @@ export default function InteractiveVideoPlayer({
   const [currentCaption, setCurrentCaption] = useState('');
   const [loadError, setLoadError] = useState(false);
   const [persistenceError, setPersistenceError] = useState<string | null>(null);
+  const [fullscreenError, setFullscreenError] = useState<string | null>(null);
   const [playbackEvidenceError, setPlaybackEvidenceError] = useState<string | null>(null);
   const [activeCheckpoint, setActiveCheckpoint] = useState<Checkpoint | null>(null);
   const [checkpointResponse, setCheckpointResponse] = useState('');
@@ -599,13 +601,20 @@ export default function InteractiveVideoPlayer({
     }
   };
 
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
+  const toggleFullscreen = async () => {
+    const surface = videoRef.current?.parentElement;
+    if (!surface) return;
+    setFullscreenError(null);
+    try {
       if (document.fullscreenElement) {
-        document.exitFullscreen();
+        await document.exitFullscreen();
+      } else if (surface.requestFullscreen) {
+        await surface.requestFullscreen();
       } else {
-        videoRef.current.parentElement?.requestFullscreen();
+        setFullscreenError('Use “Full screen lesson” above the player to expand this lesson on your device.');
       }
+    } catch {
+      setFullscreenError('Full-screen video could not open. Use “Full screen lesson” above the player instead.');
     }
   };
 
@@ -781,12 +790,17 @@ export default function InteractiveVideoPlayer({
           {playbackEvidenceError}
         </div>
       )}
+      {fullscreenError && (
+        <div className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-950" role="alert">
+          {fullscreenError}
+        </div>
+      )}
       {persistenceError && (
         <div className="border-b border-red-300 bg-red-50 p-3 text-sm text-red-900" role="alert">
           {persistenceError}
         </div>
       )}
-      <div className="relative">
+      <div className={styles.surface} data-lesson-video-surface>
         {/* Media Element — video or audio with graceful fallback */}
         {loadError ? (
           <div className="w-full aspect-video flex items-center justify-center bg-slate-900 text-white">
@@ -944,7 +958,7 @@ export default function InteractiveVideoPlayer({
         {/* Structured checkpoint overlay */}
         {activeCheckpoint && (
           <div
-            className="absolute inset-0 z-20 flex items-center justify-center bg-black/90 p-4"
+            className={`${styles.checkpoint} bg-black/90 p-4`}
             role="dialog"
             aria-modal="true"
             aria-label="Required video checkpoint"
@@ -1031,7 +1045,7 @@ export default function InteractiveVideoPlayer({
 
         {/* Quiz Overlay */}
         {showQuiz && currentQuiz && (
-          <div className="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center p-8">
+          <div className={`${styles.checkpoint} bg-black bg-opacity-90 p-4 sm:p-8`} role="dialog" aria-modal="true" aria-label="Video quiz">
             <div className="bg-white rounded-lg p-8 max-w-2xl w-full">
               <h3 className="text-2xl font-bold mb-4">Quick Quiz</h3>
               <p className="text-lg mb-6">{currentQuiz.question}</p>

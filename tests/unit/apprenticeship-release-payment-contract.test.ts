@@ -5,7 +5,7 @@ const valid = () => ({
   barberHtml: '<main>Have a code from admissions? Enter it at checkout.</main>',
   estheticsHtml: '<main>$6,000 tuition, $600 standard deposit, 25 hrs/week</main>',
   barberPricing: { program_slug: 'barber-apprenticeship', tuition_cents: 498000, deposit_min_cents: 60000, deposit_default_cents: 60000, payment_frequency: 'weekly', payment_weeks: 29 },
-  estheticsPricing: { program_slug: 'esthetician-apprenticeship', tuition_cents: 600000, deposit_min_cents: 60000, deposit_default_cents: 60000 },
+  estheticsPricing: { program_slug: 'esthetician-apprenticeship', tuition_cents: 600000, deposit_min_cents: 60000, deposit_default_cents: 60000, payment_frequency: 'monthly' },
 });
 
 it('accepts current public terms without requiring an expired code', () => {

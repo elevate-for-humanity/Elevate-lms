@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
-import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import { getProgramCardImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopBenefits from '@/components/partners/HostShopBenefits';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
@@ -98,7 +98,7 @@ export default async function HostShopsPage() {
         }}
         mediaSequence={[
           { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
-          { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
+          { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-commercial-2026.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
           { shopSlug: 'kountry-kutz-barbershop', media: { src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz', kind: 'photo' } },
           { shopSlug: 'kountry-kutz-barbershop', media: { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop', kind: 'video', backdropSrc: '/images/partners/kountry-kutz-official.webp' } },
           { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp', alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop', kind: 'photo' } },
@@ -132,7 +132,7 @@ export default async function HostShopsPage() {
             {Object.entries(PROGRAM_LABELS).map(([slug, label]) => {
               const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug) && shop.approval === 'approved').length;
               return <article key={slug} className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramHeroImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramCardImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
                 <div className="flex flex-1 flex-col p-4"><h3 className="text-lg font-black">{label.replace(' Apprenticeship', '')}</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">{count ? `${count} participating ${count === 1 ? 'location' : 'locations'}. Explore the shops and start your journey.` : "We're looking for new Host Shops. Bring your licensed business into the network."}</p>
                   <Link href={`/programs/${slug}`} className="mt-4 inline-flex min-h-11 items-center font-bold text-red-700">Explore this pathway →</Link>

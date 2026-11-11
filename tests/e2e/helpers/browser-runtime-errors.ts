@@ -96,7 +96,7 @@ export function isConfirmedWebKitCancellation(
       // 446–494 ms before its corresponding pageerror. The former 250 ms
       // window incorrectly rejected independently captured cancellations.
       // Match only the exact URL and WebKit's explicit cancellation reason.
-      error.time >= request.time && error.time - request.time <= 750,
+      request.time - error.time <= 250 && error.time - request.time <= 750,
   );
   if (cancelled) return true;
   return completedRequests.some(

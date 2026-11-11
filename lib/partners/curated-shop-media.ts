@@ -16,6 +16,12 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
     // before deduplication so an absolute URL and its repository path form one slide.
     try {
       const parsed = new URL(item.url, 'https://www.elevateforhumanity.org');
+      // These verified Executivecutz imports are bundled locally. GitHub raw
+      // URLs bypassed responsive optimization and added a third-party request.
+      if (parsed.hostname === 'raw.githubusercontent.com' &&
+          /^\/elevate-for-humanity\/Elevate-lms\/[^/]+\/public\/images\/host-shops\/executivecutz\/interior-[1-5]\.webp$/.test(parsed.pathname)) {
+        item = { ...item, url: parsed.pathname.slice(parsed.pathname.indexOf('/public/') + 7) };
+      }
       if (parsed.hostname === 'www.elevateforhumanity.org' || parsed.hostname === 'elevateforhumanity.org') {
         item = { ...item, url: parsed.pathname + parsed.search };
       }

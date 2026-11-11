@@ -92,7 +92,11 @@ export function isConfirmedWebKitCancellation(
     (request) =>
       normalize(request.url) === fragment &&
       request.errorText === 'Load request cancelled' &&
-      Math.abs(request.time - error.time) <= 250,
+      // Production iPhone WebKit trace 42991123543 delivered requestfailed
+      // 446–494 ms before its corresponding pageerror. The former 250 ms
+      // window incorrectly rejected independently captured cancellations.
+      // Match only the exact URL and WebKit's explicit cancellation reason.
+      error.time >= request.time && error.time - request.time <= 750,
   );
   if (cancelled) return true;
   return completedRequests.some(

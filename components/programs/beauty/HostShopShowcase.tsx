@@ -111,6 +111,10 @@ export default function HostShopShowcase({
   }, [mediaOverrides, mediaSequence, shops, videoTourShopSlug]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // SSR exposes the hero before its event handlers are attached. A disabled
+  // control prevents mobile visitors from losing their first pause tap.
+  const [interactive, setInteractive] = useState(false);
+  useEffect(() => setInteractive(true), []);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -294,6 +298,7 @@ export default function HostShopShowcase({
             type="button"
             onClick={() => setPaused((value) => !value)}
             className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl border-2 border-brand-blue-700 bg-white px-4 py-2 text-sm font-black text-brand-blue-900 hover:bg-sky-50 sm:self-auto"
+            disabled={!interactive}
             aria-label={paused ? 'Resume host shop slideshow' : 'Pause host shop slideshow'}
             aria-pressed={paused}
           >

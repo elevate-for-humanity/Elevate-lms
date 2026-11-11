@@ -130,7 +130,7 @@ jobs:
         run: node --test tests/worker/database-contract-version.test.mjs
       - name: Teaching panel layout and measured repair recovery
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test tests/worker/teaching-panel-recovery.test.mjs
+        run: node --test tests/worker/teaching-panel-recovery.test.mjs tests/worker/release-billing-preflight-retry.test.mjs
       - name: Environment audit repair regression tests
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: |

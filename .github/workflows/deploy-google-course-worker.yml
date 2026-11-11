@@ -159,7 +159,9 @@ jobs:
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Verify bounded teaching panels and measured scene recovery
-        run: node --test tests/worker/teaching-panel-recovery.test.mjs
+        run: |
+          node --test tests/worker/teaching-panel-recovery.test.mjs
+          node --test tests/worker/release-billing-preflight-retry.test.mjs
       - name: Build existing CPU Course Builder image
         shell: bash
         run: |

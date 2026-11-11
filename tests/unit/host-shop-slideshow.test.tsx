@@ -106,7 +106,7 @@ describe('host shop slideshow playback', () => {
     expect(screen.queryByAltText('Second photo')).not.toBeInTheDocument();
     fireEvent.load(first);
     expect(first.className).toContain('object-contain');
-    expect(container.querySelector('.max-h-\\[160px\\]')).not.toBeNull();
+    expect(container.querySelector('[class*="aspect-[16/10]"]')).not.toBeNull();
     expect(screen.getAllByRole('button')).toHaveLength(3);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     const second = screen.getByAltText('Second photo');

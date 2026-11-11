@@ -3,6 +3,7 @@ import {
   invoiceIdsFromWebhook,
   normalizeQuickBooksInvoiceStatus,
   verifyQuickBooksWebhook,
+  quickBooksRevisionMatches,
 } from '@/lib/billing/quickbooks-webhook';
 import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
 import { logger } from '@/lib/logger';
@@ -39,6 +40,21 @@ export async function POST(request: NextRequest) {
       );
       const invoice = result.Invoice;
       const status = normalizeQuickBooksInvoiceStatus(invoice);
+      const totalCents = Math.round(Number(invoice.TotalAmt) * 100);
+      if (!Number.isSafeInteger(totalCents) || totalCents < 0)
+        throw new Error('Verified invoice total is required.');
+      // A checkout revision updates the provider before the local ledger. Do
+      // not deliver the old full-tuition payload for a newly paid deposit.
+      // Retry this webhook after the revision reconciles the same invoice.
+      const tracked = await db.from('billing_invoices').select('total_cents,provider_payload,fulfillment_payload')
+        .eq('provider', 'quickbooks').eq('provider_invoice_id', invoiceId).maybeSingle();
+      if (tracked.error) throw new Error(tracked.error.message);
+      if (!tracked.data) continue;
+      if (Number(tracked.data.total_cents) !== totalCents ||
+          !quickBooksRevisionMatches(invoice, tracked.data.fulfillment_payload) ||
+          !invoice.CustomerRef?.value ||
+          tracked.data.provider_payload?.CustomerRef?.value !== invoice.CustomerRef.value)
+        throw new Error('Invoice terms are awaiting reconciliation.');
       const update = await db
         .from('billing_invoices')
         .update({
@@ -51,9 +67,11 @@ export async function POST(request: NextRequest) {
         })
         .eq('provider', 'quickbooks')
         .eq('provider_invoice_id', invoiceId)
+        .eq('total_cents', totalCents)
         .select('id,fulfillment_type,fulfillment_payload')
         .maybeSingle();
       if (update.error) throw new Error(update.error.message);
+      if (!update.data) throw new Error('Invoice changed during webhook synchronization.');
       if (status === 'paid' && update.data?.fulfillment_type) {
         const queued = await db.from('billing_fulfillment_jobs').upsert(
           {

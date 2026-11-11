@@ -1,4 +1,7 @@
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
+import { programInstallmentTerms, installmentSchedule, firstWeeklyInvoiceDate } from '@/lib/programs/installment-terms';
+import { InvoiceTermsConflict } from '@/lib/billing/revise-unpaid-program-invoice';
+import { activateProgramInstallments } from '@/lib/billing/activate-program-installments';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**
  * CANONICAL PROGRAM ENROLLMENT CHECKOUT
@@ -40,6 +43,7 @@ interface CheckoutRequest {
   require_full_application?: boolean;
   funding_source?: FundingSource;
   payment_plan?: 'full' | 'installments';
+  down_payment_cents?: number;
   coupon_code?: string;
   partner_key?: string;
   payment_method?: 'quickbooks' | 'affirm';
@@ -70,7 +74,6 @@ export async function POST(request: NextRequest) {
     const {
       program_id,
       funding_source = 'self_pay',
-      payment_plan = 'full',
       coupon_code = '',
       partner_key,
     } = body;
@@ -114,6 +117,10 @@ export async function POST(request: NextRequest) {
     if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
+    const payment_plan = body.payment_plan ?? (/apprentice/i.test(program.slug) ? 'installments' : 'full');
+    if (body.down_payment_cents !== undefined &&
+        (payment_plan !== 'installments' || funding_source !== 'self_pay' || !/apprentice/i.test(program.slug)))
+      return NextResponse.json({ error: 'A custom down payment requires the apprenticeship payment plan.' }, { status: 400 });
 
     if (program.status !== 'active') {
       return NextResponse.json(
@@ -199,13 +206,21 @@ export async function POST(request: NextRequest) {
     let fullAmountCents = agencyFundingRequested
       ? 0
       : (partnerProgram?.retailPriceCents ?? Math.round(amountToCharge * 100));
+    let requestedDownCents = getInitialProgramInvoiceCents(program.slug, fullAmountCents);
+    if (payment_plan === 'installments' && funding_source === 'self_pay') {
+      try {
+        requestedDownCents = programInstallmentTerms(program.slug, fullAmountCents, body.down_payment_cents).downPaymentCents;
+      } catch (error) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Invalid down payment.' }, { status: 400 });
+      }
+    }
     let appliedCoupon: { code: string; discountAmountCents: number; scope: 'deposit' | 'tuition' } | null = null;
     if (coupon_code.trim() && funding_source === 'self_pay') {
       const result = await resolveQuickBooksProgramPromotion({
         admin,
         code: coupon_code,
         amountCents: fullAmountCents,
-        depositCents: payment_plan === 'installments' ? getInitialProgramInvoiceCents(program.slug, fullAmountCents) : undefined,
+        depositCents: payment_plan === 'installments' ? requestedDownCents : undefined,
         maximumDiscountCents: partnerProgram
           ? partnerProgram.retailPriceCents - partnerProgram.providerShareCents
           : undefined,
@@ -216,8 +231,12 @@ export async function POST(request: NextRequest) {
     }
     const amountCents =
       funding_source === 'self_pay' && payment_plan === 'installments'
-        ? getInitialProgramInvoiceCents(program.slug, fullAmountCents) - (appliedCoupon?.scope === 'deposit' ? appliedCoupon.discountAmountCents : 0)
+        ? Math.min(requestedDownCents, fullAmountCents) - (appliedCoupon?.scope === 'deposit' ? appliedCoupon.discountAmountCents : 0)
         : fullAmountCents;
+    const billingTerms = installmentSchedule(program.slug, fullAmountCents - amountCents);
+    const scheduleDescription = billingTerms.installmentCount
+      ? `$${(amountCents / 100).toFixed(2)} down; remaining tuition $${(billingTerms.balanceCents / 100).toFixed(2)} in up to ${billingTerms.installmentCount} ${billingTerms.cadence} payments of $${(billingTerms.installmentCents / 100).toFixed(2)}; final payment $${(billingTerms.finalInstallmentCents / 100).toFixed(2)}.`
+      : 'Tuition payment in full.';
 
     // Get user profile for customer details
     const { data: profile } = await supabase
@@ -331,6 +350,7 @@ export async function POST(request: NextRequest) {
     }
     const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
       idempotencyKey: `program:${pending.data.id}`,
+      allowUnpaidProgramRevision: body.payment_plan !== undefined && paymentMethod === 'quickbooks',
       customer: {
         externalKey: `user:${user.id}`,
         displayName: profile?.full_name || customerEmail,
@@ -340,15 +360,13 @@ export async function POST(request: NextRequest) {
         {
           canonicalKey: `program-${program.slug}`,
           name: program.title,
-          description: appliedCoupon
-            ? `Enrollment in ${program.title} · coupon ${appliedCoupon.code}`
-            : `Enrollment in ${program.title}`,
+          description: `Enrollment in ${program.title}. ${scheduleDescription}${appliedCoupon ? ` Coupon ${appliedCoupon.code}.` : ''}`,
           quantity: 1,
           unitAmountCents: amountCents,
         },
       ],
       dueDate: new Date().toISOString().slice(0, 10),
-      memo: `Program enrollment ${pending.data.id}. Tuition $${(fullAmountCents / 100).toFixed(2)}; due today $${(amountCents / 100).toFixed(2)}; remaining $${((fullAmountCents - amountCents) / 100).toFixed(2)}${payment_plan === 'installments' ? ' in three monthly payments starting next month.' : '.'}`,
+      memo: `Program enrollment ${pending.data.id}. Tuition $${(fullAmountCents / 100).toFixed(2)}. ${scheduleDescription}`,
       fulfillment: {
         type: 'program_enrollment',
         payload: {
@@ -363,6 +381,7 @@ export async function POST(request: NextRequest) {
           program_holder_id: partnerHolderId,
           coupon_code: appliedCoupon?.code || null,
           discount_amount_cents: appliedCoupon?.discountAmountCents || 0,
+          payment_plan,
         },
       },
     });
@@ -375,7 +394,11 @@ export async function POST(request: NextRequest) {
     if (trackedInvoice.error) throw new Error('Payment request could not be tracked.');
     // School invoice liabilities are recorded by confirmed-payment fulfillment,
     // separately from the graduation/PayPal payout workflow.
-    if (payment_plan === 'installments') {
+    if (payment_plan === 'installments' && fullAmountCents > amountCents) {
+      const balanceCents = fullAmountCents - amountCents;
+      const terms = billingTerms;
+      const installmentCents = terms.installmentCents;
+      const weekly = terms.cadence === 'weekly';
       const next = new Date();
       next.setUTCMonth(next.getUTCMonth() + 1);
       const schedule = await admin.from('billing_schedules').upsert(
@@ -386,20 +409,21 @@ export async function POST(request: NextRequest) {
           canonical_product_key: `program-installments-${program.id}`,
           product_name: `${program.title} installment`,
           provider: 'quickbooks',
-          amount_cents: /apprentice/i.test(program.slug)
-            ? Math.ceil((fullAmountCents - amountCents) / 3)
-            : amountCents,
-          cadence: 'monthly',
-          next_invoice_date: next.toISOString().slice(0, 10),
-          remaining_invoices: 3,
+          amount_cents: installmentCents,
+          cadence: weekly ? 'weekly' : 'monthly',
+          next_invoice_date: weekly ? firstWeeklyInvoiceDate() : next.toISOString().slice(0, 10),
+          remaining_invoices: terms.installmentCount,
           status: fullApplicationRequired ? 'paused' : 'active',
+          updated_at: new Date().toISOString(),
           fulfillment_type: 'tuition_payment',
           fulfillment_payload: {
             enrollment_id: pending.data.id,
             user_id: user.id,
-            amount_cents: /apprentice/i.test(program.slug)
-              ? Math.ceil((fullAmountCents - amountCents) / 3)
-              : amountCents,
+            amount_cents: installmentCents,
+            remaining_tuition_cents: balanceCents,
+            initial_invoice_id: trackedInvoice.data.id,
+            initial_payment_amount_cents: amountCents,
+            total_tuition_cents: fullAmountCents,
             program_id: program.id,
             program_slug: program.slug,
             student_id: user.id,
@@ -411,6 +435,24 @@ export async function POST(request: NextRequest) {
         throw new Error(
           `Initial invoice created but installment schedule failed: ${schedule.error.message}`,
         );
+      if (fullApplicationRequired) {
+        // A learner can pay an already-open provider link while this retry is
+        // saving its schedule. Recheck after upsert so a concurrently completed
+        // application cannot leave the matching weekly schedule paused.
+        const current = await admin.from('program_enrollments')
+          .select('status,payment_status,payment_reference,amount_paid_cents')
+          .eq('id', pending.data.id).eq('student_id', user.id).maybeSingle();
+        if (current.error) throw new Error('Enrollment payment state could not be reconciled.');
+        if (current.data?.status === 'active' && current.data.payment_status === 'paid' &&
+            current.data.payment_reference === trackedInvoice.data.id && Number(current.data.amount_paid_cents) === amountCents)
+          await activateProgramInstallments(admin, { userId: user.id, programId: program.id,
+            invoiceId: trackedInvoice.data.id, paidCents: amountCents, tuitionCents: fullAmountCents });
+      }
+    } else if (/apprentice/i.test(program.slug)) {
+      const stopped = await admin.from('billing_schedules').update({ status: 'canceled', updated_at: new Date().toISOString() })
+        .eq('provider', 'quickbooks').eq('customer_external_key', `user:${user.id}`)
+        .eq('canonical_product_key', `program-installments-${program.id}`).in('status', ['paused', 'active']);
+      if (stopped.error) throw new Error('The previous installment schedule could not be stopped. Refresh checkout before paying.');
     }
 
     logger.info('Program enrollment checkout created', {
@@ -433,6 +475,8 @@ export async function POST(request: NextRequest) {
       coupon: appliedCoupon,
     });
   } catch (error) {
+    if (error instanceof InvoiceTermsConflict)
+      return NextResponse.json({ error: error.message }, { status: 409 });
     logger.error(
       'Program enrollment checkout error',
       error instanceof Error ? error : new Error(String(error)),

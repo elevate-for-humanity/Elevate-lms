@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const state = vi.hoisted(() => ({ assigned: true, nail: false, schedule: vi.fn(), tables: [] as string[], createInvoice: vi.fn() }));
+const state = vi.hoisted(() => ({ assigned: true, nail: false, barber: false, schedule: vi.fn(), tables: [] as string[], createInvoice: vi.fn() }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: vi.fn(async () => null) }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: async () => ({
   auth: { getUser: async () => ({ data: { user: { id: 'student', email: 'student@example.test' } } }) },
@@ -14,10 +14,10 @@ vi.mock('@/lib/supabase/server', () => ({ createClient: async () => ({
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({
   from(table: string) {
     state.tables.push(table);
-    const q: any = { select: () => q, eq: () => q, insert: () => q, upsert: (row: unknown) => { state.schedule(row); return { error: null }; },
+    const q: any = { select: () => q, eq: () => q, in: () => q, update: () => q, insert: () => q, upsert: (row: unknown) => { state.schedule(row); return { error: null }; },
       single: async () => ({ data: { id: 'enrollment' }, error: null }),
       maybeSingle: async () => ({ error: null, data: table === 'programs' ? {
-        id: state.nail ? 'nails' : 'fb36dbf1-db3c-4d34-adf9-3f98f397d371', title: state.nail ? 'Nails' : 'CNA', slug: state.nail ? 'nail-technician-apprenticeship' : 'cna', price: state.nail ? 6000 : 1100, status: 'active',
+        id: state.barber ? 'barber' : state.nail ? 'nails' : 'fb36dbf1-db3c-4d34-adf9-3f98f397d371', title: state.barber ? 'Barber' : state.nail ? 'Nails' : 'CNA', slug: state.barber ? 'barber-apprenticeship' : state.nail ? 'nail-technician-apprenticeship' : 'cna', price: state.barber ? 4980 : state.nail ? 6000 : 1100, status: 'active',
       } : state.assigned ? { id: 'assignment' } : null }) };
     return q;
   },
@@ -34,7 +34,7 @@ const request = (extra = {}) => new NextRequest('https://www.elevateforhumanity.
 
 describe('school invoice tuition checkout', () => {
   beforeEach(() => {
-    state.assigned = true; state.nail = false; state.schedule.mockClear(); state.tables = [];
+    state.assigned = true; state.nail = false; state.barber = false; state.schedule.mockClear(); state.tables = [];
     state.createInvoice.mockReset().mockImplementation(async (input: { lines: Array<{ unitAmountCents: number }> }) => ({ providerInvoiceId: '42', paymentUrl: 'https://example.test/pay', totalCents: input.lines.reduce((sum, line) => sum + line.unitAmountCents, 0) }));
   });
   it('creates the $2,200 Elevate invoice without requiring a school checkout or PayPal payout account', async () => {
@@ -68,6 +68,23 @@ describe('school invoice tuition checkout', () => {
     const response = await POST(request({ program_id: 'nails', payment_plan: 'installments' }));
     expect(response.status).toBe(409);
     expect(state.schedule).not.toHaveBeenCalled();
+  });
+  it('defaults barber checkout to the $600 deposit and 29 weekly invoices', async () => {
+    state.barber = true;
+    expect((await POST(request({ program_id: 'barber' }))).status).toBe(200);
+    expect(state.createInvoice.mock.calls[0][0].lines[0].unitAmountCents).toBe(60000);
+    expect(state.schedule).toHaveBeenCalledWith(expect.objectContaining({ amount_cents: 15104, remaining_invoices: 29, cadence: 'weekly', fulfillment_payload: expect.objectContaining({ remaining_tuition_cents: 438000 }) }));
+  });
+  it('honors a larger down payment and explicitly authorizes revising the same wholly unpaid invoice', async () => {
+    state.barber = true;
+    expect((await POST(request({ program_id: 'barber', payment_plan: 'installments', down_payment_cents: 200000 }))).status).toBe(200);
+    expect(state.createInvoice.mock.calls[0][0]).toMatchObject({ allowUnpaidProgramRevision: true, lines: [{ unitAmountCents: 200000 }] });
+    expect(state.schedule).toHaveBeenCalledWith(expect.objectContaining({ amount_cents: 10276, cadence: 'weekly' }));
+  });
+  it.each([59999, 498001, 60000.5])('rejects an invalid custom deposit before creating any invoice', async down => {
+    state.barber = true;
+    expect((await POST(request({ program_id: 'barber', payment_plan: 'installments', down_payment_cents: down }))).status).toBe(400);
+    expect(state.createInvoice).not.toHaveBeenCalled();
   });
   it('rejects partial tuition before creating an invoice', async () => {
     expect((await POST(request({ payment_plan: 'installments' }))).status).toBe(400);

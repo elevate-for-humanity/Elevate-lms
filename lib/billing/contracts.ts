@@ -17,6 +17,8 @@ export interface BillingLineInput {
 
 export interface ManualInvoiceInput {
   idempotencyKey: string;
+  /** Only the authenticated program checkout may revise its own wholly unpaid invoice. */
+  allowUnpaidProgramRevision?: boolean;
   customer: BillingCustomerInput;
   lines: BillingLineInput[];
   dueDate: string;

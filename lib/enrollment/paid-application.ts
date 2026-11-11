@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { paidInvoiceMatchesProgram } from '@/lib/programs/paid-intake-policy.mjs';
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 import { queuePaidProgramWelcome } from './apprenticeship-welcome';
+import { activateProgramInstallments } from '@/lib/billing/activate-program-installments';
 
 /** A URL parameter is a locator, never evidence of payment or ownership. */
 export async function verifyPaidApplication(programSlug: string, invoiceId?: string) {
@@ -58,10 +59,11 @@ export async function activatePaidApplication(evidence: NonNullable<Awaited<Retu
     enrollment_status: 'active', ...(apprentice ? { portal_type: 'apprentice' } : {}), updated_at: now,
   }).eq('id', user.id);
   if (profile.error) throw new Error('Dashboard activation could not be completed.');
-  const schedule = await db.from('billing_schedules').update({ status: 'active', updated_at: now })
-    .eq('customer_external_key', `user:${user.id}`).eq('canonical_product_key', `program-installments-${program.id}`)
-    .eq('provider', 'quickbooks').eq('status', 'paused');
-  if (schedule.error) throw new Error('The payment schedule could not be activated.');
+  await activateProgramInstallments(db, {
+    userId: user.id, programId: program.id, invoiceId: invoice.id,
+    paidCents: Number(invoice.total_cents),
+    tuitionCents: Number(invoice.fulfillment_payload?.total_tuition_cents ?? Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100)),
+  });
   await queuePaidProgramWelcome(db, enrollment.id);
   return `https://app.elevateforhumanity.org/${apprentice ? 'apprentice' : 'learner/dashboard'}`;
 }

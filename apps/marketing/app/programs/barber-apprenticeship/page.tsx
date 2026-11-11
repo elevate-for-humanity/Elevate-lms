@@ -139,9 +139,10 @@ export default async function BarberApprenticeshipPage() {
                 hours · Self-pay only
               </p>
               <p>
-                ${(TUITION_CENTS / 100).toLocaleString()} tuition: pay in full or four invoices of $
-                {(TUITION_CENTS / 400).toLocaleString()} (initial invoice, then three monthly
-                invoices). Third-party financing, when offered, requires provider approval.
+                ${(TUITION_CENTS / 100).toLocaleString()} tuition. Start with a $600 deposit credited
+                toward tuition, then pay the remaining balance through weekly invoices. Use the
+                calculator below to choose a larger down payment and see your weekly payments.
+                You may also choose to pay tuition in full.
               </p>
               <Link
                 href="/contact?program=barber-apprenticeship&topic=enrollment"

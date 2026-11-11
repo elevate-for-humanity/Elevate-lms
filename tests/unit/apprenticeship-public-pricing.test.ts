@@ -14,4 +14,9 @@ describe('apprenticeship public price authority',()=>{
    expect(data.payment_frequency).toBe('monthly');
    expect(fixture.tables).toEqual(['programs']);
  });
+ it('publishes the barber $600 deposit and 29-week schedule used by checkout',async()=>{
+   fixture.row={title:'Barber Apprenticeship',price:4980,tuition:4980,total_cost:4980};
+   const result=await GET(new NextRequest('https://www.elevateforhumanity.org/api/programs/pricing?slug=barber-apprenticeship'));
+   expect(await result.json()).toMatchObject({tuition_cents:498000,deposit_default_cents:60000,payment_frequency:'weekly',payment_weeks:29});
+ });
 });

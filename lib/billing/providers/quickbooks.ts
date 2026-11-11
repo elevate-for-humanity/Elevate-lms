@@ -1,4 +1,5 @@
 import 'server-only';
+import { reviseUnpaidProgramInvoice } from '../revise-unpaid-program-invoice';
 import { resolveQuickBooksInvoiceLink } from '../quickbooks-invoice-link';
 import { createHash } from 'node:crypto';
 
@@ -206,14 +207,21 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
     provider: 'quickbooks',
     async createManualInvoice(input: ManualInvoiceInput): Promise<BillingInvoiceResult> {
       assertProviderCanCreateCharges('quickbooks', await loadBillingProviderConfig(db));
+      const totalCents = input.lines.reduce((sum, line) => sum + line.quantity * line.unitAmountCents, 0);
       const existing = await db
         .from('billing_invoices')
-        .select('provider_invoice_id,invoice_number,payment_url,total_cents,status')
+        .select('id,provider_invoice_id,invoice_number,payment_url,total_cents,status,customer_external_key,customer_email,fulfillment_type,fulfillment_payload,provider_payload')
         .eq('idempotency_key', input.idempotencyKey)
         .maybeSingle();
       if (existing.error)
         throw new Error(`Could not check invoice idempotency: ${existing.error.message}`);
       if (existing.data?.provider_invoice_id) {
+        const changedTerms = Number(existing.data.total_cents) !== totalCents ||
+          ['total_tuition_cents', 'required_amount_cents', 'coupon_code', 'payment_plan', 'full_application_required'].some(
+            key => existing.data.fulfillment_payload?.[key] !== input.fulfillment?.payload?.[key],
+          );
+        if (changedTerms && input.allowUnpaidProgramRevision)
+          return reviseUnpaidProgramInvoice(db, existing.data, input, totalCents);
         let paymentUrl = existing.data.payment_url || undefined;
         if (!paymentUrl && ['open', 'past_due'].includes(existing.data.status)) {
           const config = await loadQuickBooksConfig(db);
@@ -238,10 +246,6 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
         };
       }
 
-      const totalCents = input.lines.reduce(
-        (sum, line) => sum + line.quantity * line.unitAmountCents,
-        0,
-      );
       if (existing.data && existing.data.status !== 'failed')
         throw new Error('An invoice with this idempotency key is already being created.');
       const reservation = existing.data

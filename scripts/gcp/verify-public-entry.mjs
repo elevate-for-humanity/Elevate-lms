@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { APPRENTICESHIP_RELEASE_TERMS, assertApprenticeshipPricingContract, assertApprenticeshipPublicCopy } from './apprenticeship-payment-contract.mjs';
 
 const canonical = 'https://www.elevateforhumanity.org';
 const results = [];
@@ -29,13 +30,7 @@ await check('live-version', async () => {
   assert.match(data.commitSha || '', /^[a-f0-9]{40}$/);
   return { status: response.status, commit: data.commitSha };
 });
-const programs = [
-  ['barber-apprenticeship', 498000, 60000],
-  ['cosmetology-apprenticeship', 600000, 60000],
-  ['esthetician-apprenticeship', 600000, 60000],
-  ['nail-technician-apprenticeship', 600000, 60000],
-];
-for (const [slug, tuition, installment] of programs) {
+for (const slug of Object.keys(APPRENTICESHIP_RELEASE_TERMS)) {
   await check('program:' + slug, async () => {
     const response = await fetch(canonical + '/programs/' + slug + '?entryAudit=' + Date.now(), { signal: AbortSignal.timeout(20000), cache: 'no-store' });
     assert.equal(response.status, 200);
@@ -46,13 +41,12 @@ for (const [slug, tuition, installment] of programs) {
     assert.ok(html.toLowerCase().includes('self-pay'), 'Program must explain self-pay tuition');
     assert.ok(!html.includes('lowers the startup deposit'), 'Retired deposit promise must remain removed');
     assert.ok(!html.includes('Estimated from $110 per week'), 'Retired weekly apprenticeship estimate must remain removed');
+    assertApprenticeshipPublicCopy(slug, html);
     const pricing = await fetch(canonical + '/api/programs/pricing?slug=' + slug, { signal: AbortSignal.timeout(15000), cache: 'no-store' });
     assert.equal(pricing.status, 200);
     const data = await pricing.json();
-    assert.equal(data.tuition_cents, tuition);
-    assert.equal(data.deposit_default_cents, installment);
-    assert.equal(data.payment_frequency, 'monthly');
-    return { status: response.status, tuitionCents: data.tuition_cents, firstInvoiceCents: data.deposit_default_cents };
+    assertApprenticeshipPricingContract(slug, data);
+    return { status: response.status, tuitionCents: data.tuition_cents, firstInvoiceCents: data.deposit_default_cents, paymentFrequency: data.payment_frequency, paymentWeeks: data.payment_weeks };
   });
 }
 await check('joelle-profile', async () => {

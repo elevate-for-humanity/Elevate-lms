@@ -10,6 +10,7 @@ on:
     paths:
       - 'scripts/gcp/production-acceptance.*'
       - 'scripts/gcp/verify-public-entry.*'
+      - 'scripts/gcp/apprenticeship-payment-contract.*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'

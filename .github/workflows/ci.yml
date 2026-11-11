@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         id: dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Public entry payment release regressions
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test scripts/gcp/verify-public-entry.test.mjs
       - name: Canonical dashboard PostgreSQL authorization regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: |

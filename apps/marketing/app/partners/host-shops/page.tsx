@@ -71,7 +71,7 @@ const CALLER_CHECKLIST = [
 
 
 export default async function HostShopsPage() {
-  const networkShops = await getHostShopNetwork(true);
+  const networkShops = await getHostShopNetwork();
   const heroPhotos = new Set([
     '/images/partners/salon-saloon/team-sign.webp',
     '/images/partners/salon-saloon/team-commercial-2026.webp',

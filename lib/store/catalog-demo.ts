@@ -14,8 +14,6 @@ const APP_POSTERS: Record<string, string> = {
 };
 
 export function catalogPoster(item: CommerceCatalogItem) {
-  if (APP_POSTERS[item.id]) return APP_POSTERS[item.id];
-  if (item.category === 'education') return '/images/programs/refresh-20261101/home.webp';
-  if (item.category === 'workforce') return '/images/programs/refresh-20261101/employers.webp';
-  return '/images/programs/refresh-20261101/business.webp';
+  // Only product-specific artwork belongs on a product preview.
+  return APP_POSTERS[item.id];
 }

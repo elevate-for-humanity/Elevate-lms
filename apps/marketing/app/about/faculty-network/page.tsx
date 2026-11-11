@@ -80,7 +80,7 @@ const hostShops: Card[] = [
   {
     name: 'Mesmerized by Beauty', role: 'Independent host-shop partner', area: 'Esthetics and nails',
     offerings: ['Supervised esthetics workplace experience', 'Supervised nail technology workplace experience'],
-    image: '/images/jozanna-george.jpg', imageAlt: 'Josanna George, associated with Mesmerized by Beauty', portrait: true,
+    image: '/images/partners/mesmerized-by-beauty/downtown-esthetician-program.webp', imageAlt: 'Mesmerized by Beauty esthetics training space',
   },
 ];
 

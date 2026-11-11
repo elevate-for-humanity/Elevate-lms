@@ -60,7 +60,7 @@ const SERVICES = [
     icon: Users,
     title: 'Career Coaching',
     desc: 'One-on-one guidance to help you navigate your career path, set goals, and overcome challenges.',
-    image: '/hero-images/career-services-hero.webp',
+    image: '/images/pages/career-counseling.webp',
   },
 ];
 

@@ -26,6 +26,17 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
         item = { ...item, url: parsed.pathname + parsed.search };
       }
     } catch { return []; }
+    // The printed album sheets and contact card are source material, not
+    // portfolio photography. Publish the restored manicure, with clear labeling.
+    if (slug.startsWith('style-and-scissor')) {
+      if (/\/(?:logo|contact-card|melissas-nails|pink-nail-work)\.webp$/.test(item.url)) return [];
+      if (item.url.endsWith('/portfolio-nail-work.webp')) item = {
+        ...item,
+        url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp',
+        alt: 'AI-enhanced manicure photograph restored from Style and Scissor Salon’s published nail portfolio',
+        source: item.source || original.url,
+      };
+    }
     const aliases: Record<string, string> = {
       '/images/partners/salon-saloon/team-sign.webp': '/images/partners/salon-saloon/team-commercial-2026.webp',
       '/images/partners/generations-hair/highlighted-curls-home.webp': '/images/partners/generations-hair/premium-curls.jpg',

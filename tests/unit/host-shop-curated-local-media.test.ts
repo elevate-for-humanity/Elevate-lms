@@ -12,3 +12,15 @@ describe('verified locally bundled shop photography', () => {
     expect(curateShopGallery('executivecutz', [{ url }])).toEqual([{ url }]);
   });
 });
+
+it('leads Style and Scissor with its restored manicure instead of a logo or album sheet', () => {
+  const photos = curateShopGallery('style-and-scissor-salon', [
+    { url: '/images/partners/style-and-scissor-salon/logo.webp' },
+    { url: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp' },
+    { url: '/images/partners/style-and-scissor-salon/contact-card.webp' },
+  ]);
+  expect(photos).toHaveLength(1);
+  expect(photos[0].url).toBe('/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp');
+  expect(photos[0].alt).toMatch(/^AI-enhanced/);
+  expect(photos[0].source).toContain('portfolio-nail-work.webp');
+});

@@ -144,16 +144,7 @@ export default function BarberBeautyProgramsPage() {
       </section>
 
       <section className="border-y border-slate-200 bg-slate-50 px-5 py-12 sm:py-16">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2 lg:items-center">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-            <Image
-              src="/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
-              alt="Salon Saloon styling team and host salon environment"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-          </div>
+        <div className="mx-auto max-w-6xl">
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">
               Real workplaces. Personal next steps.

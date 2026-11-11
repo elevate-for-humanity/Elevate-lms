@@ -60,7 +60,10 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
       </p>
 
       {visible.length ? (
-        <div data-host-shop-directory className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div
+          data-host-shop-directory
+          className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+        >
           {visible.map((shop) => (
             <article
               key={shop.id}
@@ -68,8 +71,15 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
             >
               <HostShopMediaCarousel
                 shopName={shop.name}
+                videoUrl={shop.videoUrl}
                 compact
-                items={shop.gallery?.length ? shop.gallery : shop.image ? [{ url: shop.image, alt: `${shop.name} portfolio` }] : []}
+                items={
+                  shop.gallery?.length
+                    ? shop.gallery
+                    : shop.image
+                      ? [{ url: shop.image, alt: `${shop.name} portfolio` }]
+                      : []
+                }
               />
               <div className="flex flex-1 flex-col p-4">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">
@@ -86,6 +96,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-slate-700">{shop.address}</p>
                 {shop.phone && <p className="mt-1 text-sm text-slate-700">{shop.phone}</p>}
+                {shop.approval === 'published-partner' ? <p className="mt-2 text-sm font-bold text-amber-800">Apprentice placement pending</p> : null}
                 <p className="mt-2 text-sm leading-6 text-slate-700">{shop.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {shop.programs.map((slug) => (

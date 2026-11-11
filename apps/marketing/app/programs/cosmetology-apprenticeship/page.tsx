@@ -8,8 +8,6 @@ import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
-import CosmetologyVisualExperience from '@/components/programs/beauty/CosmetologyVisualExperience';
-import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners from '@/content/heroBanners';
@@ -70,15 +68,13 @@ export default async function CosmetologyApprenticeshipPage() {
             programLabel={program.title}
           />
         }
-        visualContent={<CosmetologyVisualExperience />}
+        visualContent={<HostShopPlacementGuide programSlug="cosmetology-apprenticeship" />}
         featuredContent={
           <>
             <ApprenticeshipExperienceGuide
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" showDirectory={false} />
-            <HostShopPlacementGuide programSlug="cosmetology-apprenticeship" />
           </>
         }
       >

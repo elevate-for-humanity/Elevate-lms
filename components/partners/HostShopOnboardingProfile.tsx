@@ -31,7 +31,7 @@ export default function HostShopOnboardingProfile({ shop }: { shop: OnboardingSh
       </section>
       <section className="mx-auto grid max-w-6xl gap-6 px-5 py-12 lg:grid-cols-5">
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm lg:col-span-3">
-          {shop.portfolio ? (
+          {shop.portfolio && !shop.gallery?.length ? (
             <figure>
               <div className="relative aspect-[475/295] overflow-hidden rounded-xl">
                 {/* Show the interior panel of the archived 800 × 600 portfolio. */}
@@ -46,7 +46,7 @@ export default function HostShopOnboardingProfile({ shop }: { shop: OnboardingSh
           <p className="mt-4 leading-8 text-slate-700">
             {isDbo
               ? 'Founded in Indianapolis in 2001, Evelyn’s Beauty Salon now operates as DBO Hair Studios. Evelyn has owned the salon since 2012. Her team offers Dominican blowouts, cuts, color and styling for a range of hair textures.'
-              : 'This shop is completing its Elevate Host Shop onboarding. Its business details and training-site eligibility are reviewed separately from public business promotion.'}
+              : shop.businessDescription || 'This shop is completing its Elevate Host Shop onboarding. Its business details and training-site eligibility are reviewed separately from public business promotion.'}
           </p>
           {shop.gallery && (
             <section className="mt-6" aria-label={`${shop.name} photo gallery`}>

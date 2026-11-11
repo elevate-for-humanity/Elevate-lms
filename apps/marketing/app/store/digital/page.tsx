@@ -147,14 +147,14 @@ export default function StoreDigitalPage() {
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group border border-slate-100"
               >
                 <div className="relative h-48 overflow-hidden">
-          <Image
+          {product.image ? <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-                    src={product.image || '/images/pages/comp-universal-hero.webp'}
+                    src={product.image}
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" /> : null}
                   <div className="absolute bottom-4 left-4 right-4">
                     <span className="inline-block px-3 py-1 bg-indigo-600 text-slate-900 text-xs font-bold rounded-full">
                       {getProductDestination(product).available ? product.priceDisplay : 'Availability required'}
@@ -234,12 +234,12 @@ export default function StoreDigitalPage() {
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
               >
                 <div className="relative h-40 overflow-hidden">
-                  <Image
-                    src={product.image || '/images/pages/platform-page-4.webp'}
+                  {product.image ? <Image
+                    src={product.image}
                     alt={product.name}
                     fill
                     quality={85} className="object-cover"
-                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty" />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty" /> : null}
                   <div className="absolute bottom-4 left-4">
                     <span className="px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                       {getProductDestination(product).available ? product.priceDisplay : 'Availability required'}

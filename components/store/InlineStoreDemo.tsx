@@ -8,7 +8,7 @@ import Link from 'next/link';
 export default function InlineStoreDemo({
   name,
   href,
-  poster = '/images/programs/refresh-20261101/business.webp',
+  poster,
 }: {
   name: string;
   href: string;
@@ -51,13 +51,13 @@ export default function InlineStoreDemo({
           className="group relative block aspect-video w-full overflow-hidden text-left"
           aria-label={`Play ${name} demo`}
         >
-          <Image
+          {poster ? <Image
             src={poster}
             alt={`Illustrative ${name} product preview`}
             fill
             sizes="(max-width: 768px) 100vw, 400px"
             className="object-cover opacity-65 transition group-hover:opacity-80"
-          />
+          /> : null}
           <span className="absolute inset-0 flex items-center justify-center">
             <span className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-lg">
               ▶ Play demo

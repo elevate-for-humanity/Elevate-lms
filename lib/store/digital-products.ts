@@ -45,7 +45,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
       'The Elevate Model framework',
       'Lifetime updates',
     ],
-    image: '/images/pages/shop-hero.webp',
     featured: true,
   },
   {
@@ -166,7 +165,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     ],
     stripePriceId: 'price_1SqlurIRNf5vPH3A6j37XvWk',
     featured: true,
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'ai-studio-pro',
@@ -191,7 +189,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     ],
     stripePriceId: 'price_1SqlusIRNf5vPH3AqLbVXWn2',
     featured: true,
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'ai-instructor-pack',
@@ -216,7 +213,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     ],
     stripePriceId: 'price_1SqlusIRNf5vPH3AT11GLqso',
     featured: true,
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'community-hub-license',
@@ -240,7 +236,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
       'Source code access',
     ],
     stripePriceId: 'price_1SqlusIRNf5vPH3A4OVqbua3',
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'crm-hub-license',
@@ -264,7 +259,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
       'Custom reports',
     ],
     stripePriceId: 'price_1SqlutIRNf5vPH3AIb2JXemT',
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'ai-tutor-license',
@@ -289,7 +283,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     ],
     stripePriceId: 'price_1SqlutIRNf5vPH3A3dTfpAoH',
     featured: true,
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'sam-gov-assistant',
@@ -312,7 +305,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
       'Free forever',
     ],
     featured: true,
-    image: '/images/pages/shop-hero.webp',
   },
   {
     id: 'grants-gov-navigator',
@@ -336,7 +328,6 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     ],
     stripePriceId: 'price_grants_nav_49',
     featured: true,
-    image: '/images/pages/shop-hero.webp',
   },
 ];
 

@@ -22,19 +22,22 @@ export default function HealthcareTrainingPage() {
           </p>
         </div>
       </section>
+      <div className="mx-auto max-w-6xl px-4 pt-10">
+        <Image
+          src="/images/pages/cna-patient-care.jpg"
+          alt="Illustrative patient-care skills training"
+          width={1200}
+          height={500}
+          sizes="(max-width: 1200px) 100vw, 1200px"
+          className="h-64 w-full rounded-2xl object-cover"
+        />
+      </div>
       <section className="mx-auto grid max-w-6xl gap-6 px-4 py-12 md:grid-cols-2 lg:grid-cols-3">
         {ENCHANTED_HEARTS.programs.map((program) => (
           <article
             key={program.publicSlug}
             className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
           >
-            <Image
-              src="/images/pages/cna-patient-care.jpg"
-              alt="Healthcare skills training"
-              width={600}
-              height={300}
-              className="mb-5 h-40 w-full rounded-xl object-cover"
-            />
             <p className="text-sm font-bold text-fuchsia-700">{program.duration}</p>
             <h2 className="mt-3 text-xl font-black">{program.title}</h2>
             <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">{program.summary}</p>

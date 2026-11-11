@@ -54,8 +54,9 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   };
   const replaceReadyValue = async (locator: Locator, value: string) => {
     await waitForClientReads();
-    await locator.fill('');
-    await expect(locator).toHaveValue('');
+    await expect(locator).toBeEditable();
+    // Playwright's fill atomically replaces the existing value. A separate
+    // empty-value assertion can race WebKit hydration before the final edit.
     await locator.fill(value);
     await expect(locator).toHaveValue(value);
   };
@@ -96,6 +97,14 @@ test('Employer setup saves company and hiring needs, opens private files and ack
   await expect(page.getByLabel('Positions or staff training needed')).toHaveValue(
     'QA staff training only',
   );
+  // Regression: replacing a persisted textarea value must survive a mobile
+  // client rerender, server action, and a fresh server-rendered document.
+  await replaceReadyValue(page.getByLabel('Positions or staff training needed'), 'QA updated staff training');
+  await clickReady(page.getByRole('button', { name: 'Save hiring and training needs' }));
+  await expect(page.getByText('Your hiring and training needs are saved.', { exact: true })).toBeVisible();
+  await waitForClientReads();
+  await page.reload();
+  await expect(page.getByLabel('Positions or staff training needed')).toHaveValue('QA updated staff training');
   await clickReady(page.getByRole('link', { name: 'Back to employer setup' }));
   await clickReady(page.getByRole('link', { name: /Documents and agreements Review/ }));
   await expect(page.getByText('QA-employer-onboarding.pdf', { exact: true })).toBeVisible();

@@ -19,17 +19,31 @@ export function PwaAlertListener({ authenticatedUserId }: { authenticatedUserId?
       settings = DEFAULT_PWA_ALERTS,
       since = new Date().toISOString(),
       polling = false,
-      lastAudioAt = 0;
-    async function refresh() {
-      try {
-        const r = await fetch('/api/notifications/preferences', { cache: 'no-store', signal: reads.signal });
-        if (r.ok) {
-          const data = await r.json();
-          settings = normalizeAlertSettings(data.settings);
+      lastAudioAt = 0,
+      refreshing: Promise<void> | null = null;
+    function refresh(): Promise<void> {
+      if (stopped) return Promise.resolve();
+      if (refreshing) return refreshing;
+      // This read is also triggered on focus. Keep it alive through a client
+      // navigation instead of aborting it on unmount: WebKit otherwise emits
+      // access-control page errors for its interrupted same-origin request.
+      // Keepalive does not relax cookies, authentication, RLS, or API checks.
+      refreshing = (async () => {
+        try {
+          const response = await fetch('/api/notifications/preferences', {
+            cache: 'no-store',
+            keepalive: true,
+          });
+          if (!response.ok) return;
+          const data = await response.json();
+          // A response from an unmounted listener may never replace new-session
+          // settings, and no state updates are issued after navigation.
+          if (!stopped) settings = normalizeAlertSettings(data.settings);
+        } catch {
+          /* Network failures do not authorize changing saved alert preferences. */
         }
-      } catch {
-        /* Saved preferences are refreshed on the next focus. */
-      }
+      })().finally(() => { refreshing = null; });
+      return refreshing;
     }
     async function announce(row: any) {
       const kind = alertKind(row);

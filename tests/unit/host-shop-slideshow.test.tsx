@@ -1,10 +1,11 @@
+import type { ReactElement } from 'react';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 
 describe('host shop slideshow playback', () => {
   let enterViewport: () => void = () => {};
-  const renderVisible = (element: React.ReactElement) => {
+  const renderVisible = (element: ReactElement) => {
     const result = render(element);
     act(() => enterViewport());
     return result;

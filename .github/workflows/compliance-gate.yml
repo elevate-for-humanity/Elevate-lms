@@ -53,6 +53,9 @@ jobs:
 
   e2e-enrollment:
     name: E2E Enrollment Flow
+    env:
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      PLAYWRIGHT_HTML_OPEN: never
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -91,7 +94,9 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       - name: Start server
-        run: pnpm --filter @elevate/marketing run start &
+        run: |
+          mkdir -p artifacts/compliance
+          nohup pnpm --filter @elevate/marketing run start > artifacts/compliance/marketing-server.log 2>&1 &
         env:
           NODE_ENV: production
           PORT: 3000
@@ -118,22 +123,31 @@ jobs:
           echo '::error::Marketing server did not become ready within 120 seconds.'
           exit 1
       - name: Run canonical application-flow tests
-        run: pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts
+        run: pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts --reporter=line,html --max-failures=1
         env:
           # Match the production-mode server started above. Without this,
           # Playwright targets localhost and may start a second dev server,
           # so the compliance test does not exercise the built application.
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      - name: Print server diagnostics
+        if: always()
+        run: tail -n 120 artifacts/compliance/marketing-server.log || true
       - name: Upload test results
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-results
-          path: test-results/
+          path: |
+            test-results/
+            playwright-report/
+            artifacts/compliance/
           retention-days: 7
 
   accessibility:
     name: Accessibility Tests
+    env:
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      PLAYWRIGHT_HTML_OPEN: never
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -172,7 +186,9 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       - name: Start server
-        run: pnpm --filter @elevate/marketing run start &
+        run: |
+          mkdir -p artifacts/compliance
+          nohup pnpm --filter @elevate/marketing run start > artifacts/compliance/marketing-server.log 2>&1 &
         env:
           NODE_ENV: production
           PORT: 3000
@@ -206,16 +222,22 @@ jobs:
           for project in desktop-chrome laptop-chrome tablet-chrome android-chrome iphone-webkit; do
             pnpm exec playwright test tests/e2e/accessibility.spec.ts \
               --config playwright.config.ts \
-              --project="$project"
+              --project="$project" --reporter=line,html --max-failures=1
           done
       - name: Homepage config leak smoke
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
+      - name: Print server diagnostics
+        if: always()
+        run: tail -n 120 artifacts/compliance/marketing-server.log || true
       - name: Upload test results
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: a11y-results
-          path: test-results/
+          path: |
+            test-results/
+            playwright-report/
+            artifacts/compliance/
           retention-days: 7
 
   compliance-files:

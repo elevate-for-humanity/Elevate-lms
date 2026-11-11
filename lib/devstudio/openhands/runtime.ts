@@ -102,18 +102,7 @@ async function attachStartTask(
   );
 }
 
-export async function dispatchOpenHandsTask(
-  input: OpenHandsDispatchInput,
-): Promise<OpenHandsDispatchResult> {
-  const maxAttempts = input.maxAttempts ?? 3;
-  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 3) {
-    throw new Error('OPENHANDS_ATTEMPT_LIMIT_INVALID');
-  }
-  const db = await requireAdminClient();
-  const existing = await findExistingTask(input.correlationId);
-  // Never issue a second Cloud conversation for a previously recorded
-  // correlation. Ambiguous startup must be investigated, not blindly replayed.
-  if (existing) {
+function reuseCorrelatedOpenHandsTask(existing: Record<string, any>, input: OpenHandsDispatchInput): OpenHandsDispatchResult {
     if (existing.tool_name !== 'openhands.execute' ||
         existing.user_id !== input.actorId ||
         (existing.tenant_id ?? null) !== (input.tenantId ?? null) ||
@@ -139,6 +128,19 @@ export async function dispatchOpenHandsTask(
       status: existing.status === 'running' ? 'running' : 'queued',
     };
   }
+
+export async function dispatchOpenHandsTask(
+  input: OpenHandsDispatchInput,
+): Promise<OpenHandsDispatchResult> {
+  const maxAttempts = input.maxAttempts ?? 3;
+  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 3) {
+    throw new Error('OPENHANDS_ATTEMPT_LIMIT_INVALID');
+  }
+  const db = await requireAdminClient();
+  const existing = await findExistingTask(input.correlationId);
+  // Never issue a second Cloud conversation for a previously recorded
+  // correlation. Ambiguous startup must be investigated, not blindly replayed.
+  if (existing) return reuseCorrelatedOpenHandsTask(existing, input);
   let taskId: string | undefined;
 
   if (!taskId) {
@@ -187,6 +189,13 @@ export async function dispatchOpenHandsTask(
       })
       .select('id')
       .single();
+    if (error?.code === '23505' && input.correlationId) {
+      // Another dispatcher won the unique correlation claim. Never start a second
+      // provider conversation; the winning request may still be starting.
+      const winner = await findExistingTask(input.correlationId);
+      if (!winner) throw new Error('OPENHANDS_CORRELATION_CLAIM_UNCONFIRMED');
+      return reuseCorrelatedOpenHandsTask(winner, input);
+    }
     if (error || !created?.id)
       throw new Error(error?.message ?? 'Unable to create canonical OpenHands task');
     taskId = created.id;

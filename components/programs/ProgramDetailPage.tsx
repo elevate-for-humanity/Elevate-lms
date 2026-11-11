@@ -116,7 +116,6 @@ export default function ProgramDetailPage({
   const isApprenticeship = p.programType === 'apprenticeship';
   const registeredProgram = isApprenticeship ? getRegisteredProgramStandard(p.slug) : null;
   const instructionHours = registeredProgram?.completion.requiredRtiHours ?? totalHours;
-  const octoberCouponCode = 'OCT300';
   // The shared media hero renders no title; the program content owns its main heading.
   const ProgramTitle = 'h1';
   const weeklyHoursLabel =
@@ -148,7 +147,6 @@ export default function ProgramDetailPage({
       intent: 'enrollment',
       funding: 'self_pay',
       payment: mode,
-      ...(isApprenticeship ? { coupon: mode === 'full' ? 'PAYFULL600' : octoberCouponCode } : {}),
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';

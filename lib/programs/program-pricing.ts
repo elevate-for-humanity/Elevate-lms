@@ -9,6 +9,9 @@
  * not include NHA materials depending on the program structure.
  */
 
+import { BARBER_PRICING } from './pricing';
+import { getInitialProgramInvoiceCents } from './deposit-policy';
+
 export interface ProgramPricing {
   slug: string;
   name: string;
@@ -50,9 +53,9 @@ export const PROGRAM_PRICING: Record<string, ProgramPricing> = {
   'barber-apprenticeship': {
     slug: 'barber-apprenticeship',
     name: 'Barber Apprenticeship',
-    fullPrice: 4980,
+    fullPrice: BARBER_PRICING.fullPrice,
     fundingEligible: false,
-    depositAmount: 1743,
+    depositAmount: getInitialProgramInvoiceCents('barber-apprenticeship', BARBER_PRICING.fullPrice * 100) / 100,
     durationWeeks: 50,
     credentialCount: 1,
     fundingSources: [],

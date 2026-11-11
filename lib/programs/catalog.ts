@@ -1,4 +1,8 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { BARBER_PRICING } from './pricing';
+import { getInitialProgramInvoiceCents } from './deposit-policy';
+
+const barberDeposit = getInitialProgramInvoiceCents('barber-apprenticeship', BARBER_PRICING.fullPrice * 100) / 100;
 /**
  * PROGRAM CATALOG - Single Source of Truth
  *
@@ -91,10 +95,10 @@ export const BARBER_PROGRAM: ProgramCatalogEntry = {
   pricing: {
     program_id: 'BARBER',
     hours_total: 2000,
-    full_price: 4980,
-    setup_fee_rate: 0.35,
-    setup_fee_amount: 1743,
-    remaining_balance: 3237,
+    full_price: BARBER_PRICING.fullPrice,
+    setup_fee_rate: barberDeposit / BARBER_PRICING.fullPrice,
+    setup_fee_amount: barberDeposit,
+    remaining_balance: BARBER_PRICING.fullPrice - barberDeposit,
     billing_frequency: 'weekly',
     billing_day: 'Friday',
     first_charge_rule: 'first Friday AFTER enrollment',

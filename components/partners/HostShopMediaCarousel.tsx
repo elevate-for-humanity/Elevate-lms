@@ -104,7 +104,7 @@ export default function HostShopMediaCarousel({
     >
       {media.length ? (
         <div
-          className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${spacious ? 'aspect-[16/10]' : compact ? 'aspect-[16/10] max-h-[160px]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}
+          className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${spacious ? 'aspect-[16/10]' : compact ? 'aspect-[16/10]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}
         >
           {active.type === 'video' ? (
             <video
@@ -141,7 +141,7 @@ export default function HostShopMediaCarousel({
                     }
                     alt={item.alt || `${shopName} promotional image`}
                     aria-hidden={item.url !== active.url}
-                    className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
+                    className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-300"
                     style={{
                       opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0,
                     }}
@@ -164,11 +164,6 @@ export default function HostShopMediaCarousel({
               ) : null}
             </>
           )}
-          {active.alt?.startsWith('AI-enhanced') ? (
-            <span className="absolute bottom-2 left-2 right-2 rounded bg-slate-950/85 px-2 py-1 text-center text-xs font-bold text-white">
-              AI-enhanced from shop portfolio
-            </span>
-          ) : null}
           {active.type === 'video' ? (
             <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white">
               <span className="inline-flex items-center gap-1.5">

@@ -64,7 +64,7 @@ function firstImage(shop: FeaturedHostPartner) {
  * Curated profiles enrich those records and preserve published partner profiles
  * during temporary database outages without creating duplicate businesses.
  */
-export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
+export async function getHostShopNetwork(includeOnboarding = false): Promise<HostShopNetworkEntry[]> {
   const approved = await getApprovedShops();
   const matchedFeatured = new Set<string>();
 
@@ -105,10 +105,11 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       programs: shop.programs,
       primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
-        featured?.marketingBlurb ||
-        (shop.description && !shop.description.includes('Approved Elevate Host Site record')
+        (shop.description && !/Approved Elevate Host Site(?: record)? for/.test(shop.description)
           ? shop.description
           : undefined) ||
+        publicProfile?.businessDescription ||
+        featured?.marketingBlurb ||
         (publicProfile?.slug === 'dbo-hair-studios'
           ? 'DBO Hair Studios is an Indianapolis salon led by owner and master stylist Evelyn Estevez. Meet the team, explore their work, and book directly with the salon.'
           : `${shop.name} is located in ${shop.city}, ${shop.state}. Explore ${shop.programs.map((program) => PROGRAM_LABELS[program] ?? program).join(' and ')} at this local business. Contact the shop for services, hours, and walk-in availability.`),
@@ -156,9 +157,29 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
     }),
   );
 
+  const onboarding: HostShopNetworkEntry[] = includeOnboarding ? onboardingProfiles
+    .filter((profile) => !operational.some((shop) => identityKey(shop.name) === identityKey(profile.name)))
+    .map((profile): HostShopNetworkEntry => ({
+      id: `published:${profile.slug}`,
+      slug: profile.slug,
+      name: profile.name,
+      city: profile.city,
+      state: 'IN',
+      address: profile.address,
+      phone: profile.phone || undefined,
+      programs: profile.programs ?? [],
+      description: profile.businessDescription || `${profile.name} is a local business in ${profile.city}, Indiana. Contact the shop to ask about services and current availability.`,
+      image: profile.gallery?.[0]?.url || profile.portfolio,
+      gallery: profile.gallery || (profile.portfolio ? [{ url: profile.portfolio, alt: `${profile.name} published portfolio` }] : []),
+      website: profile.website || undefined,
+      booking: profile.booking,
+      social: profile.instagram,
+      approval: 'published-partner',
+    })) : [];
+
   // Multiple historical approval records can refer to the same public shop.
   // Keep one destination and preserve its independently approved pathways.
-  return uniqueHostShops([...operational, ...publishedOnly]).sort(
+  return uniqueHostShops([...operational, ...publishedOnly, ...onboarding]).sort(
     (left: HostShopNetworkEntry, right: HostShopNetworkEntry) =>
       left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );

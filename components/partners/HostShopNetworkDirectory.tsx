@@ -96,6 +96,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-slate-700">{shop.address}</p>
                 {shop.phone && <p className="mt-1 text-sm text-slate-700">{shop.phone}</p>}
+                {shop.approval === 'published-partner' ? <p className="mt-2 text-sm font-bold text-amber-800">Apprentice placement pending</p> : null}
                 <p className="mt-2 text-sm leading-6 text-slate-700">{shop.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {shop.programs.map((slug) => (

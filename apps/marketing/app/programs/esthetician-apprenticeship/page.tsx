@@ -121,13 +121,13 @@ export default async function EstheticianApprenticeshipPage() {
             programLabel={program.title}
           />
         }
+        visualContent={<HostShopPlacementGuide programSlug="esthetician-apprenticeship" />}
         featuredContent={
           <>
             <ApprenticeshipExperienceGuide
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <HostShopPlacementGuide programSlug="esthetician-apprenticeship" />
           </>
         }
       >

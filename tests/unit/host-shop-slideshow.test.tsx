@@ -3,10 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 
 describe('host shop slideshow playback', () => {
-  beforeEach(() => vi.useFakeTimers());
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.stubGlobal('IntersectionObserver', class {
+      constructor(private callback: (entries: { isIntersecting: boolean }[]) => void) {}
+      observe() { this.callback([{ isIntersecting: true }]); }
+      disconnect() {}
+    });
+  });
   afterEach(() => {
     cleanup();
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
   const items = [
     { url: '/one.jpg', alt: 'First photo' },
@@ -84,15 +92,16 @@ describe('host shop slideshow playback', () => {
   it('provides compact shop cards with a single playback control and uncropped photos', () => {
     const { container } = render(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
     const first = screen.getByAltText('First photo');
-    const second = screen.getByAltText('Second photo');
+    expect(screen.queryByAltText('Second photo')).not.toBeInTheDocument();
     fireEvent.load(first);
-    fireEvent.load(second);
     expect(first.className).toContain('object-contain');
     expect(container.querySelector('.max-h-\\[160px\\]')).not.toBeNull();
     expect(screen.getAllByRole('button')).toHaveLength(3);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
+    const second = screen.getByAltText('Second photo');
+    fireEvent.load(second);
     expect(second).toHaveStyle({ opacity: '1' });
-    fireEvent.click(screen.getByRole('button', { name: 'Pause slideshow' }));
+    expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
     act(() => vi.advanceTimersByTime(10000));
     expect(second).toHaveStyle({ opacity: '1' });
   });

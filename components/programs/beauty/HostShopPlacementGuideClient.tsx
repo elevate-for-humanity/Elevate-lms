@@ -117,7 +117,7 @@ export default function HostShopPlacementGuideClient({
                         </p>
                       </div>
                       <span className="self-start rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-emerald-800">
-                        Approved network
+                        {shop.approval === 'approved' ? 'Approved network' : 'Apprentice placement pending'}
                       </span>
                     </div>
                     <p className="mt-4 text-base leading-7 text-slate-700">{shop.description}</p>

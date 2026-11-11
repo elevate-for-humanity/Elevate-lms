@@ -7,7 +7,6 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
-import NailDesignShowcase from '@/components/programs/beauty/NailDesignShowcase';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners from '@/content/heroBanners';
@@ -58,14 +57,13 @@ export default async function NailTechnicianApprenticeshipPage() {
             programLabel={program.title}
           />
         }
-        visualContent={<NailDesignShowcase program="nail-technician" />}
+        visualContent={<HostShopPlacementGuide programSlug="nail-technician-apprenticeship" />}
         featuredContent={
           <>
             <ApprenticeshipExperienceGuide
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <HostShopPlacementGuide programSlug="nail-technician-apprenticeship" />
           </>
         }
       >

@@ -26,6 +26,15 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
         item = { ...item, url: parsed.pathname + parsed.search };
       }
     } catch { return []; }
+    const aliases: Record<string, string> = {
+      '/images/partners/salon-saloon/team-sign.webp': '/images/partners/salon-saloon/team-commercial-2026.webp',
+      '/images/partners/generations-hair/highlighted-curls-home.webp': '/images/partners/generations-hair/premium-curls.jpg',
+      '/images/partners/generations-hair/highlighted-curls-card.webp': '/images/partners/generations-hair/premium-curls.jpg',
+    };
+    if (aliases[item.url]) item = { ...item, url: aliases[item.url] };
+    if (slug.startsWith('top-shelf-barber-lounge')) {
+      item = { ...item, url: item.url.replace(/(top-shelf-(?:fade-profile|wave-and-beard|modern-fringe|textured-crop|precision-fade|fade-and-beard))(?:-enhanced-2026)?\.(?:jpg|webp)$/, '$1-enhanced-2026.webp') };
+    }
     if (item.url === '/images/partners/salon-saloon/team-interior.webp') return [{ ...item, url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp' }];
     if (kountry) {
       const filename = item.url.split('/').at(-1)?.split('?')[0];

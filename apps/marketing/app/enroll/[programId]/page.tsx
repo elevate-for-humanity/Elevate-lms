@@ -44,6 +44,7 @@ export default function EnrollPage() {
   const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
   const [message, setMessage] = useState('');
   const [paymentUrl, setPaymentUrl] = useState('');
+  const [apprenticeshipDisclosureAccepted, setApprenticeshipDisclosureAccepted] = useState(false);
   const [downPayment, setDownPayment] = useState(() => getClientSearchParam('down_payment') || '600');
   const [couponCode, setCouponCode] = useState(
     () => getClientSearchParam('coupon')?.toUpperCase() || '',
@@ -55,6 +56,7 @@ export default function EnrollPage() {
   const supabase = createClient();
 
   useEffect(() => {
+    setApprenticeshipDisclosureAccepted(false);
     loadProgram();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [programId]);
@@ -123,6 +125,10 @@ export default function EnrollPage() {
   };
 
   const handleEnroll = async () => {
+    if (/apprentice/i.test(program?.slug || '') && !apprenticeshipDisclosureAccepted) {
+      setMessage('Please review and acknowledge the apprenticeship training, licensing, materials and payment disclosures before continuing.');
+      return;
+    }
     setEnrolling(true);
     setMessage('');
 
@@ -520,6 +526,21 @@ export default function EnrollPage() {
                   ) : null}
                 </>
               ) : null}
+
+              {/apprentice/i.test(program.slug || '') && (
+                <section aria-labelledby="apprenticeship-disclosure-heading" className="mb-6 rounded-xl border-2 border-blue-800 bg-blue-50 p-5 text-slate-950">
+                  <h2 id="apprenticeship-disclosure-heading" className="text-xl font-black">Read before enrolling: apprenticeship terms and licensing</h2>
+                  <p className="mt-3 text-sm leading-6">This is a workplace-based apprenticeship, not a traditional full-time beauty school. You complete structured online related technical instruction and supervised on-the-job training at a confirmed approved host location. A host-shop placement and supervising professional must be approved before hands-on training begins.</p>
+                  <p className="mt-3 text-sm leading-6">Indiana beauty-school pathways differ: cosmetology school generally requires 1,500 school hours and covers broad beauty services; manicuring school generally requires 450 school hours and focuses on nails. A qualifying U.S. Department of Labor registered apprenticeship is a separate training pathway recognized in Indiana. Completing training does not automatically grant a state license. The Indiana licensing board determines eligibility and examination requirements. <a href="https://www.in.gov/pla/professions/cosmetology-and-barber-home/cosmetology-and-barber-licensing-information/" target="_blank" rel="noopener noreferrer" className="font-semibold underline">Review Indiana licensing requirements</a>.</p>
+                  <p className="mt-3 text-sm leading-6">Tuition covers program instruction and training administration; it is not a personal-expense allowance. Apprentices are responsible for their own required tools, supplies, transportation and personal expenses. {/nail/i.test(program.slug || '') && <strong>No starter kit is supplied with the Nail Technician Apprenticeship.</strong>} Your program-specific required materials and any examination or licensing fees must be reviewed separately.</p>
+                  <p className="mt-3 text-sm leading-6"><strong>Payment choices:</strong> Pay full tuition, or pay the displayed initial deposit and arrange the remaining balance under the school's installment schedule. For most apprenticeship programs this is three monthly remaining-balance payments; barbering may have different terms. QuickBooks installment payments are not Buy Now, Pay Later. Affirm, when offered, is separate third-party financing subject to the provider's decision and terms. Check the precise amount, balance, schedule and any fees before paying.</p>
+                  <p className="mt-3 text-sm leading-6">Paying is not itself completion of the full application. After payment verification, continue your full enrollment form using the same account. Dashboard activation follows verified payment and complete submission; orientation, documents and host placement remain separate prerequisites.</p>
+                  <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-blue-300 bg-white p-4 text-sm font-semibold">
+                    <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-blue-700" checked={apprenticeshipDisclosureAccepted} onChange={(event) => setApprenticeshipDisclosureAccepted(event.target.checked)} />
+                    <span>I have reviewed the differences between school and apprenticeship training, payment choices, licensing, and what materials I must provide.</span>
+                  </label>
+                </section>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button

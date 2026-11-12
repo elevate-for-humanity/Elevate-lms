@@ -13,8 +13,10 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
 
-const BASE = process.env.APP_URL || process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
+const BASE = process.env.APP_URL?.replace(/\/+$/, '') || peerOrigin('marketing');
+const LMS = peerOrigin('lms');
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -123,7 +125,9 @@ test.describe('Beauty apprenticeships — PARIS, calculator, and BNPL', () => {
     test(`${label} application uses PARIS and published payment options`, async ({ page, request }) => {
       const response = await page.goto(`${BASE}/programs/${slug}/apply`);
       expect(response?.status() ?? 200).toBeLessThan(500);
-      await page.waitForURL(new RegExp(`/apply/student/interview\\?program=${slug}$`));
+      // The apply route is a choice page (inquiry / enrollment / host site); enrollment goes to PARIS.
+      await page.getByRole('link', { name: /start enrollment application/i }).click();
+      await page.waitForURL(new RegExp(`/apply/student/interview\\?program=${slug}&intent=enrollment$`));
 
       await expect(
         page.getByRole('heading', { name: /payment calculator, bnpl, and coupon code/i }),
@@ -191,7 +195,7 @@ test.describe('Barbershop Partner Shop — apply + onboarding', () => {
   });
 
   test('apply API rejects missing required fields', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/partners/barber-host-shop/apply`, {
+    const res = await request.post(`${BASE}/api/host-shop/apply`, {
       data: { shopLegalName: 'Partial LLC' },
       failOnStatusCode: false,
     });
@@ -199,7 +203,7 @@ test.describe('Barbershop Partner Shop — apply + onboarding', () => {
   });
 
   test('apply API rejects unauthenticated request with full payload', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/partners/barber-host-shop/apply`, {
+    const res = await request.post(`${BASE}/api/host-shop/apply`, {
       data: {
         shopLegalName: 'Test Shop LLC',
         ownerName: 'Jane Owner',
@@ -229,7 +233,7 @@ test.describe('Barbershop Partner Shop — apply + onboarding', () => {
   });
 
   test('thank-you page renders', async ({ page }) => {
-    await expectPageOk(page, '/partners/barbershop-apprenticeship/thank-you');
+    await expectPageOk(page, '/partners/host-shop/confirmation');
     await expect(page.locator('body')).toContainText(/thank|submitted|received|review/i);
   });
 
@@ -256,13 +260,13 @@ test.describe('Barbershop Partner Shop — apply + onboarding', () => {
 
 test.describe('Cosmetology Partner Shop — apply + onboarding', () => {
   test('apply page renders shop application form', async ({ page }) => {
-    await expectPageOk(page, '/partners/cosmetology-partner-shop/apply');
+    await expectPageOk(page, '/partners/host-shop/apply');
     await expect(page.locator('input[type="email"]').first()).toBeVisible();
     await expect(page.locator('button[type="submit"]').first()).toBeVisible();
   });
 
   test('thank-you page renders', async ({ page }) => {
-    await expectPageOk(page, '/partners/cosmetology-partner-shop/thank-you');
+    await expectPageOk(page, '/partners/host-shop/confirmation');
     await expect(page.locator('body')).toContainText(/thank|submitted|received|review/i);
   });
 
@@ -287,13 +291,13 @@ test.describe('Cosmetology Partner Shop — apply + onboarding', () => {
 
 test.describe('Cosmetology Apprenticeship Partnership — apply + onboarding', () => {
   test('apply page renders shop/school application form', async ({ page }) => {
-    await expectPageOk(page, '/partners/cosmetology-apprenticeship/apply');
+    await expectPageOk(page, '/partners/host-shop/apply');
     await expect(page.locator('input[type="email"]').first()).toBeVisible();
     await expect(page.locator('button[type="submit"]').first()).toBeVisible();
   });
 
   test('apply API rejects missing required fields', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/partners/cosmetology-host-shop/apply`, {
+    const res = await request.post(`${BASE}/api/host-shop/apply`, {
       data: { salonLegalName: 'Partial Salon' },
       failOnStatusCode: false,
     });
@@ -301,7 +305,7 @@ test.describe('Cosmetology Apprenticeship Partnership — apply + onboarding', (
   });
 
   test('thank-you page renders', async ({ page }) => {
-    await expectPageOk(page, '/partners/cosmetology-apprenticeship/thank-you');
+    await expectPageOk(page, '/partners/host-shop/confirmation');
     await expect(page.locator('body')).toContainText(/thank|submitted|received|review/i);
   });
 
@@ -417,7 +421,7 @@ test.describe('Apprenticeship API — auth + validation', () => {
   });
 
   test('hours approve rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/apprenticeship/hours/approve`, {
+    const res = await request.post(`${LMS}/api/apprenticeship/hours/approve`, {
       data: { submissionId: 'fake-id' },
       failOnStatusCode: false,
     });
@@ -425,7 +429,7 @@ test.describe('Apprenticeship API — auth + validation', () => {
   });
 
   test('enroll checkout rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/apprenticeship/enroll/checkout`, {
+    const res = await request.post(`${BASE}/api/programs/enroll/checkout`, {
       data: { programSlug: 'barber-apprenticeship' },
       failOnStatusCode: false,
     });
@@ -433,7 +437,7 @@ test.describe('Apprenticeship API — auth + validation', () => {
   });
 
   test('apprentice program-slug returns data or auth error', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/apprentice/program-slug`, {
+    const res = await request.get(`${LMS}/api/apprentice/program-slug`, {
       failOnStatusCode: false,
     });
     expect([200, 401, 403]).toContain(res.status());

@@ -1,8 +1,9 @@
+import { appOrigin, peerOrigin } from './helpers/app-origins';
 import { test, expect, type Page } from '@playwright/test';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
-const ADMIN_BASE = 'https://admin.elevateforhumanity.org';
-const MARKETING_BASE = 'https://www.elevateforhumanity.org';
+const BASE = appOrigin('lms');
+const ADMIN_BASE = peerOrigin('admin');
+const MARKETING_BASE = peerOrigin('marketing');
 
 const creds = {
   apprentice: [process.env.E2E_APPRENTICE_EMAIL || '', process.env.E2E_APPRENTICE_PASSWORD || ''],

@@ -42,6 +42,7 @@ describe('durable admissions application submission processor contract', () => {
     expect(processor).toContain(".eq('related_id', applicationId)");
     expect(processor).toContain(".eq('title', item.title)");
     expect(processor).toContain("if (existingTask) continue");
+    expect(processor).toContain("process.env.PARIS_APPLICATION_ANALYSIS_ENABLED === 'true'");
   });
 
   it('does not expose unrelated applicant tasks in staff portal', () => {

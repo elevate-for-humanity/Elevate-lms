@@ -19,7 +19,6 @@ on:
           - missed-clockout
           - hours-pace-check
           - workflow-event-processor
-          - application-submissions
           - workflow-schedule-processor
           - funding-followup
           - inactivity-reminders
@@ -147,7 +146,6 @@ jobs:
       github.event_name == 'schedule' && github.event.schedule == '*/5 * * * *'
       || (github.event_name == 'workflow_dispatch' && (
             github.event.inputs.job == 'workflow-event-processor'
-         || github.event.inputs.job == 'application-submissions'
          || github.event.inputs.job == 'workflow-schedule-processor'
          || github.event.inputs.job == 'ai-operator'
          || github.event.inputs.job == 'video-render-queue'

@@ -17,7 +17,8 @@ describe('durable admissions application submission processor contract', () => {
   });
 
   it('has a scheduled route and reports HTTP failures as critical queue failures', () => {
-    expect(schedule).toContain("github.event.inputs.job == 'application-submissions'");
+    expect(schedule).toContain("github.event.schedule == '*/5 * * * *'");
+    expect(schedule).not.toContain("github.event.inputs.job == 'application-submissions'");
     expect(schedule).toContain('GET "$ADMIN_URL/api/cron/process-application-submissions"');
     expect(schedule).toContain('id: application_submissions');
     expect(schedule).toContain('APPLICATION_RESULT: ${{ steps.application_submissions.outcome }}');

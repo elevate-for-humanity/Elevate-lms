@@ -273,3 +273,8 @@ exports/northflank-env.production.json
 
 # Private files generated in the Studio runtime; preserved by its workspace checkpoint.
 studio-exports/
+
+# Personal data (applicant/student contact lists, credentials) must never be committed
+exports/*applicants*.json
+*_emails.txt
+user-credentials*.md

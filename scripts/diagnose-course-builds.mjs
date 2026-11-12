@@ -18,11 +18,11 @@ const RELEASE_PATH = 'OWNER_COURSE_REVIEW_REQUIRED';
 const SUCCESSOR_PATH = 'WAITING_FOR_CORRECTED_COMPLETE_LESSON_WORKER';
 
 export function parseArgs(argv) {
-  const args = { hours: 24, apply: false, json: false, requeueCodes: [] };
+  const args = { hours: 168, apply: false, json: false, requeueCodes: [] };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--hours') args.hours = Number(argv[++i]);
-    else if (arg === '--apply') args.apply = true;
+    else if (arg === '--apply' || arg === '--requeue-stuck') args.apply = true;
     else if (arg === '--json') args.json = true;
     else if (arg === '--requeue-codes') args.requeueCodes = String(argv[++i] ?? '').split(',').map(s => s.trim()).filter(Boolean);
   }

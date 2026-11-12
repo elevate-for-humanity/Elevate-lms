@@ -15,14 +15,6 @@ historical and must not be used as a work list.
 | Studio control plane | `lib/devstudio/course-builder-controller.ts` backed by `DevStudioUltimateCourseControl` (`lib/devstudio/ultimate-course-control.ts`) |
 | Build queue | `ultimate_course_builds` + `ultimate_build_jobs` (Ultimate worker) |
 | Release | `UltimateReleaseService.publish` (`lib/ultimate-course-builder/release/release-service.ts`); a row in `ultimate_release_versions` is publication authority |
-> **Status: migration complete.** The tables below the status table are the historical Phase 2 plan.
-
-| System | Status |
-|--------|--------|
-| Course Factory migration | ✅ Complete |
-| `lib/course-factory/index.ts` | ✅ Facade — exports `courseFactory` from the canonical `lib/course-builder/orchestrator` |
-| `lib/course-factory/factory.ts` | 🚫 Banned — `scripts/check-course-factory-authority.mjs` fails if it exists or is imported |
-| `lib/course-builder/` | ✅ Canonical Course Builder orchestration layer |
 
 ## Enforcement
 

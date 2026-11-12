@@ -607,10 +607,10 @@ Approval: Host shop supervisor sign-off
 ## Referenced Files
 | Document | Location | Purpose |
 |---------|----------|---------|
-| ARCHITECTURE_DOCUMENTATION.md | Root | System architecture |
-| TRUE-DASHBOARD-ARCHITECTURE.md | Root | Portal routing |
-| DATABASE-AUDIT.md | Root | Table status |
-| INTELLIGENT-AUTOMATION-ENGINE.md | Root | Lead-to-enrollment |
-| PRODUCTION-SETUP.md | Root | Deployment guide |
-| BLUEPRINT-SPECIFICATION.md | Root | Detailed specs |
-| SENIOR_DEV_PROMPT.md | Root | Developer guidance |
+| ARCHITECTURE_DOCUMENTATION.md | docs/archive/root | System architecture |
+| TRUE-DASHBOARD-ARCHITECTURE.md | docs/archive/root | Portal routing |
+| DATABASE-AUDIT.md | docs/archive/root | Table status |
+| INTELLIGENT-AUTOMATION-ENGINE.md | docs/archive/root | Lead-to-enrollment |
+| PRODUCTION-SETUP.md | docs/archive/root | Deployment guide |
+| BLUEPRINT-SPECIFICATION.md | docs/archive/root | Detailed specs |
+| SENIOR_DEV_PROMPT.md | docs/archive/root | Developer guidance |

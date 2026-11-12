@@ -12,6 +12,8 @@ it('routes each checkpoint to its own recovery path instead of a blanket reset',
  expect(classifyJob(job({attempts:3,last_error:'TEACHING_PHOTO_HASH: x'}),build,{now}).action).toBe('needs-code-change');
  expect(classifyJob(job({attempts:3,last_error:'TEACHING_PHOTO_HASH: x'}),build,{now,requeueCodes:['TEACHING_PHOTO_HASH']}).action).toBe('exhausted-requeue');
  expect(classifyJob(job({status:'running',lease_expires_at:ago(1),heartbeat_at:ago(40)}),build,{now}).action).toBe('dead-lease-requeue');
+ expect(classifyJob(job({status:'running',attempts:3,lease_expires_at:ago(1),last_error:'INFERENCE_TIMEOUT: x'}),build,{now}).reason).toBe('LEASE_EXPIRED_RETRY_EXHAUSTED');
+ expect(classifyJob(job({status:'running',attempts:3,lease_expires_at:ago(1),last_error:'INFERENCE_TIMEOUT: x'}),build,{now,requeueCodes:['INFERENCE_TIMEOUT']}).action).toBe('exhausted-requeue');
  expect(classifyJob(job({status:'running',lease_expires_at:ago(-5),heartbeat_at:ago(40)}),build,{now}).action).toBe('stuck-live-lease');
  expect(classifyJob(job({status:'running',lease_expires_at:ago(-5),heartbeat_at:ago(1)}),build,{now}).action).toBe('none');
  expect(classifyJob(job({}),build,{now,latestJobId:'other'}).action).toBe('superseded');

@@ -43,7 +43,11 @@ export function classifyJob(job, build, { now = Date.now(), latestJobId, requeue
   if (job.status === 'running') {
     const leaseExpired = !job.lease_expires_at || Date.parse(job.lease_expires_at) < now;
     const heartbeatStale = !job.heartbeat_at || now - Date.parse(job.heartbeat_at) > STALE_HEARTBEAT_MS;
-    if (leaseExpired) return { action: 'dead-lease-requeue', code, heartbeatStale };
+    if (leaseExpired && job.attempts < job.max_attempts) return { action: 'dead-lease-requeue', code, heartbeatStale };
+    if (leaseExpired) {
+      if (requeueCodes.includes(code)) return { action: 'exhausted-requeue', code };
+      return { action: 'needs-code-change', code, reason: 'LEASE_EXPIRED_RETRY_EXHAUSTED' };
+    }
     if (heartbeatStale) return { action: 'stuck-live-lease', code, reason: 'HEARTBEAT_STALE_LEASE_ACTIVE' };
     return { action: 'none', code, reason: 'RUNNING' };
   }

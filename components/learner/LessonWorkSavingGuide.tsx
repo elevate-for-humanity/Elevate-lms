@@ -19,7 +19,7 @@ const steps = [
   },
   {
     title: 'Mark the chapter as reviewed',
-    text: 'Write at least 10 characters for every writing activity, then check "I reviewed this lesson and my practice responses." Earlier chapters must be reviewed first. Your draft answers still save even if the review cannot be checked yet.',
+    text: 'Write at least 10 characters for every writing activity, then check "I reviewed this lesson and my practice responses." You can review chapters in any order, but every chapter in the workbook must be reviewed to finish the course.',
   },
   {
     title: 'Finish the lesson',

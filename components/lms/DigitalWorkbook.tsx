@@ -506,16 +506,17 @@ export default function DigitalWorkbook({
                         className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
                       >
                         {sections.map((section) => (
-                            <option key={section.id} value={section.id}>
-                              {section.section_number}. {section.title}
-                            </option>
-                          ))}
+                          <option key={section.id} value={section.id}>
+                            {section.section_number}. {section.title}
+                          </option>
+                        ))}
                       </select>
                       <p className="mb-6 leading-relaxed text-slate-600">
                         You can open and save writing in any available workbook chapter without
-                        repeating earlier lesson quizzes. Chapter review still requires completed
-                        writing and earlier reviews; saving answers alone does not mark a course
-                        lesson complete or award training hours.
+                        repeating earlier lesson quizzes. Check a chapter as reviewed once its
+                        writing is complete. Finishing the course requires all chapters reviewed;
+                        saving answers alone does not mark a course lesson complete or award
+                        training hours.
                       </p>
                     </>
                   ) : null

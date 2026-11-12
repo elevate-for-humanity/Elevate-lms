@@ -17,7 +17,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -220,7 +220,41 @@ export async function reportParisRepairFailure(id:string,runId:number){
  if(data?.workflow_run_id!==runId)return;
  if(['patching','validating'].includes(data.status))await updateOwnedRepair(id,runId,data.status,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'},true);
 }
-export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
+export async function tickParisCodeRepairs(options:{workflowOwnedDispatch?:boolean}={}){
+ const result=await runParisCodeRepairTick(options);
+ // Only a signed workflow tick that reached the repair queue proves the monitor is alive.
+ if(result.enabled&&!('awaitingWorkflow' in result&&result.awaitingWorkflow)){
+  const db=await requireAdminClient();
+  const {error}=await db.from('paris_autopilot_policy').update({last_tick_at:new Date().toISOString()}).eq('id',true);
+  if(error&&!['42703','PGRST204'].includes(String(error.code)))throw error;
+ }
+ return result;
+}
+/** Bounded requeue of an in-flight repair that stopped progressing and no
+ * longer has a live workflow run. Attempt count is intentionally preserved. */
+async function requeueTimedOutRepair(db:any,repair:any){
+ if(!inFlightRepairTimedOut(repair))return false;
+ const runOrNull=async(path:string)=>{
+  try{return await gh(path);}
+  catch(error){if(error instanceof Error&&error.message==='PARIS_GITHUB_HTTP_404')return null;throw error;}
+ };
+ const runs:any[]=repair.workflow_run_id?[await runOrNull(`/actions/runs/${repair.workflow_run_id}`)]:[];
+ if(repair.release_sha&&['deploying','verifying'].includes(repair.status)){
+  const deployments=await runOrNull(`/actions/runs?head_sha=${repair.release_sha}&per_page=100`);
+  runs.push(...(deployments?.workflow_runs??[]));
+ }
+ if(!repairRunsSettled(runs))return false;
+ const at=new Date().toISOString();
+ const requeued=await db.from('paris_code_repairs').update({
+  status:'queued',workflow_run_id:null,error_code:null,
+  attempt_history:[...(repair.attempt_history??[]),{error:'REPAIR_STATE_TIMEOUT:'+repair.status,at,runId:repair.workflow_run_id??null,stateSince:repair.updated_at}],
+  updated_at:at,
+ }).eq('id',repair.id).eq('status',repair.status).eq('attempt_count',repair.attempt_count)
+  .eq('updated_at',repair.updated_at).select('id').maybeSingle();
+ if(requeued.error)throw requeued.error;
+ return Boolean(requeued.data);
+}
+async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
  const db=await requireAdminClient();
  const {data:policy,error:policyError}=await db.from('paris_autopilot_policy').select('*').eq('id',true).maybeSingle();
  if(policyError)throw policyError;
@@ -472,9 +506,10 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
   const {reconcileWorkflowRepairActions}=await import('@/lib/control-plane/workflow-repairs');
   await reconcileWorkflowRepairActions(db,repair);
  }
- const active=await db.from('paris_code_repairs').select('id,status,release_sha,workflow_run_id,source_job_id,verification,updated_at').in('status',['dispatched','patching','validating','deploying','verifying']).limit(10);
+ const active=await db.from('paris_code_repairs').select('id,status,release_sha,workflow_run_id,source_job_id,verification,updated_at,attempt_count,attempt_history').in('status',['dispatched','patching','validating','deploying','verifying']).limit(10);
  if(active.error)throw active.error;
  for(const repair of active.data??[]){
+  if(await requeueTimedOutRepair(db,repair)){repair.status='queued';continue;}
   if(repair.status==='validating'&&repair.verification?.pullRequest){
    try{
     const pr=await gh('/pulls/'+repair.verification.pullRequest.number);

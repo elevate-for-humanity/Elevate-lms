@@ -1,7 +1,13 @@
 'use client';
 import { LearningPreview } from './LearningWorkspace';
 import {useState} from 'react';
+import dynamic from 'next/dynamic';
 import WorkbookNarration from './WorkbookNarration';
+
+const WorkbookStation3D = dynamic(() => import('./WorkbookStation3D'), {
+  ssr: false,
+  loading: () => <p className="my-4 rounded-xl bg-slate-100 p-4">Loading the 3D practice station…</p>,
+});
 
 const LABS = {
   'prestige-elevation-cosmetology': {
@@ -55,6 +61,7 @@ export default function BeautyWorkbookSimulator({slug}:{slug:string}) {
       <text x="45" y="202" fontSize="15" fill="#334155">Preparation</text>
       <text x="270" y="202" fontSize="15" fill={correct?'#065f46':'#334155'}>{correct?'Correct safe decision':'Choose your next action'}</text>
     </svg></LearningPreview>
+    <WorkbookStation3D variant={slug.includes('nail')?'nail':slug.includes('esthetics')?'esthetics':'cosmetology'} />
     <h4 className="font-bold">{lab.action}</h4>
     <p className="mt-2">{lab.question}</p>
     <WorkbookNarration text={`${lab.name}. ${lab.question} ${lab.choices.join('. ')}`} />

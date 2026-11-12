@@ -41,7 +41,7 @@ async function _GET(request: Request) {
     const db = await requireAdminClient();
     let query = db
       .from('program_enrollments')
-      .select('*, student:profiles!program_enrollments_user_id_fkey(id, full_name, email), program:programs(id, title, slug)')
+      .select('*')
       .order('enrolled_at', { ascending: false });
     if (courseId) query = query.eq('course_id', courseId) as typeof query;
     if (userId) query = query.eq('user_id', userId) as typeof query;
@@ -52,7 +52,29 @@ async function _GET(request: Request) {
       logger.error('[/api/admin/enrollments] DB error', error);
       return NextResponse.json({ error: 'Failed to fetch enrollments' }, { status: 500 });
     }
-    return NextResponse.json({ data: data ?? [] }, { status: 200 });
+    const rows = data ?? [];
+    const studentIds = [
+      ...new Set(rows.map((row) => row.user_id || row.student_id).filter(Boolean)),
+    ] as string[];
+    const programIds = [...new Set(rows.map((row) => row.program_id).filter(Boolean))] as string[];
+    const [students, programs] = await Promise.all([
+      studentIds.length
+        ? db.from('profiles').select('id, full_name, email').in('id', studentIds)
+        : null,
+      programIds.length ? db.from('programs').select('id, title, slug').in('id', programIds) : null,
+    ]);
+    const studentById = new Map((students?.data ?? []).map((row) => [row.id, row]));
+    const programById = new Map((programs?.data ?? []).map((row) => [row.id, row]));
+    return NextResponse.json(
+      {
+        data: rows.map((row) => ({
+          ...row,
+          student: studentById.get(row.user_id || row.student_id) ?? null,
+          program: programById.get(row.program_id) ?? null,
+        })),
+      },
+      { status: 200 },
+    );
   } catch (error) {
     logger.error('[/api/admin/enrollments] Unexpected error', error as Error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -369,10 +369,43 @@ export async function createEnrollment(input: EnrollmentCreate) {
       at_risk: input.at_risk ?? false,
       enrolled_at: new Date().toISOString(),
     })
-    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
+    .select('*')
     .maybeSingle();
   if (error) throw new Error('Database operation failed');
-  return data;
+  return data ? (await attachEnrollmentRelations(supabase, [data]))[0] : null;
+}
+
+type EnrollmentRow = Record<string, unknown> & {
+  user_id?: string | null;
+  student_id?: string | null;
+  course_id?: string | null;
+};
+
+// Separate lookups avoid ambiguous profile/course embeds on program_enrollments.
+async function attachEnrollmentRelations<T extends EnrollmentRow>(
+  supabase: Awaited<ReturnType<typeof getSupabase>>,
+  rows: T[],
+) {
+  const studentIds = [
+    ...new Set(rows.map((row) => row.user_id || row.student_id).filter(Boolean)),
+  ] as string[];
+  const courseIds = [...new Set(rows.map((row) => row.course_id).filter(Boolean))] as string[];
+  const [students, courses] = await Promise.all([
+    studentIds.length
+      ? supabase.from('profiles').select('id, full_name, email').in('id', studentIds)
+      : null,
+    courseIds.length ? supabase.from('courses').select('id, title').in('id', courseIds) : null,
+  ]);
+  const studentById = new Map((students?.data ?? []).map((row) => [row.id, row]));
+  const courseById = new Map((courses?.data ?? []).map((row) => [row.id, row]));
+  return rows.map((row) => {
+    const course = row.course_id ? courseById.get(row.course_id) : undefined;
+    return {
+      ...row,
+      student: studentById.get(row.user_id || row.student_id || '') ?? null,
+      course: course ? { id: course.id, course_name: course.title } : null,
+    };
+  });
 }
 
 export async function listEnrollments(filters?: {
@@ -383,7 +416,7 @@ export async function listEnrollments(filters?: {
   const supabase = await getSupabase();
   let query = supabase
     .from('program_enrollments')
-    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
+    .select('*')
     .order('enrolled_at', { ascending: false });
 
   if (filters?.courseId) query = query.eq('course_id', filters.courseId);
@@ -392,19 +425,19 @@ export async function listEnrollments(filters?: {
 
   const { data, error } = await query;
   if (error) throw new Error('Database operation failed');
-  return data || [];
+  return attachEnrollmentRelations(supabase, data || []);
 }
 
 export async function getEnrollment(id: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from('program_enrollments')
-    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
+    .select('*')
     .eq('id', id)
     .maybeSingle();
   if (error?.code === 'PGRST116') return null;
   if (error) throw new Error('Database operation failed');
-  return data;
+  return data ? (await attachEnrollmentRelations(supabase, [data]))[0] : null;
 }
 
 export async function updateEnrollment(id: string, patch: EnrollmentUpdate) {
@@ -416,11 +449,11 @@ export async function updateEnrollment(id: string, patch: EnrollmentUpdate) {
     .from('program_enrollments')
     .update(updateData)
     .eq('id', id)
-    .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
+    .select('*')
     .single();
   if (error?.code === 'PGRST116') return null;
   if (error) throw new Error('Database operation failed');
-  return data;
+  return data ? (await attachEnrollmentRelations(supabase, [data]))[0] : null;
 }
 
 export async function deleteEnrollment(id: string) {

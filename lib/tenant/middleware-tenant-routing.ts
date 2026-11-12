@@ -9,6 +9,10 @@ const RESERVED_SUBDOMAINS = new Set([
   'ns1', 'ns2', 'ns3', 'ftp', 'autodiscover',
 ]);
 
+export function isReservedTenantSubdomain(slug: string): boolean {
+  return RESERVED_SUBDOMAINS.has(slug.toLowerCase());
+}
+
 /** Extract workspace slug from `{slug}.elevateforhumanity.org` or legacy `{slug}.app.elevateforhumanity.org`. */
 export function tenantSlugFromAppHost(host: string): string | null {
   const normalized = host.split(':')[0]?.toLowerCase() ?? '';

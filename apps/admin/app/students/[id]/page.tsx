@@ -18,6 +18,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import EnrollmentVoucherPanel from '@/components/admin/EnrollmentVoucherPanel';
 import { logger } from '@/lib/logger';
 import { OpenLearnerPortalButton } from '@/components/admin/students/OpenLearnerPortalButton';
+import { LessonProgressManager, type ManagedCourse } from './LessonProgressManager';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false }, title: 'Student Profile | Admin' };
@@ -130,6 +131,46 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   if (programIds.length) {
     const { data: programs } = await db.from('programs').select('id,title').in('id', programIds);
     for (const program of programs ?? []) programNames[program.id] = program.title;
+  }
+
+  const managedCourses: ManagedCourse[] = [];
+  if (programIds.length) {
+    const [directCourses, linkedCourses] = await Promise.all([
+      db.from('courses').select('id').in('program_id', programIds),
+      db.from('program_courses').select('course_id').in('program_id', programIds),
+    ]);
+    const courseIds = [
+      ...new Set(
+        [
+          ...(directCourses.data ?? []).map((row) => row.id),
+          ...(linkedCourses.data ?? []).map((row) => row.course_id),
+        ].filter((value): value is string => Boolean(value)),
+      ),
+    ];
+    if (courseIds.length) {
+      const [coursesRes, lessonsRes, completedRes] = await Promise.all([
+        db.from('courses').select('id,title').in('id', courseIds),
+        db
+          .from('course_lessons')
+          .select('id,course_id,title,order_index')
+          .in('course_id', courseIds)
+          .order('order_index', { ascending: true }),
+        db.from('lesson_progress').select('lesson_id').eq('user_id', id).eq('completed', true),
+      ]);
+      const completedLessons = new Set(
+        (completedRes.data ?? []).map((row) => String(row.lesson_id)),
+      );
+      for (const course of coursesRes.data ?? []) {
+        const lessons = (lessonsRes.data ?? [])
+          .filter((lesson) => lesson.course_id === course.id)
+          .map((lesson) => ({
+            id: lesson.id,
+            title: lesson.title || 'Untitled lesson',
+            completed: completedLessons.has(lesson.id),
+          }));
+        if (lessons.length) managedCourses.push({ id: course.id, title: course.title, lessons });
+      }
+    }
   }
 
   const holderIds = [
@@ -339,6 +380,10 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               <p className="p-6 text-sm text-slate-500">No enrollments.</p>
             )}
           </section>
+
+          {managedCourses.length > 0 && (
+            <LessonProgressManager studentId={student.id} courses={managedCourses} />
+          )}
 
           {voucherPanels.map(({ enrollment, auditLog }) => (
             <EnrollmentVoucherPanel

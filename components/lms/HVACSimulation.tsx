@@ -170,7 +170,7 @@ export default function HVACSimulation({
         <div className="border-b bg-slate-50 px-5 py-3">
           <h3 className="text-lg font-bold text-slate-900">{title}</h3>
           <p className="text-sm text-slate-600 mt-0.5">
-            Click each highlighted component to identify it. Rotate the model by dragging.
+            Select each marker or component name to identify it. Drag to rotate the model.
           </p>
         </div>
       )}
@@ -230,9 +230,12 @@ export default function HVACSimulation({
 
         <div className="grid grid-cols-2 gap-2">
           {hotspots.map((h) => (
-            <div
+            <button
+              type="button"
               key={h.id}
-              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
+              aria-pressed={selectedHotspot?.id === h.id}
+              onClick={() => handleClick(h)}
+              className={`flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-left text-sm ${
                 clickedIds.has(h.id) ? 'bg-brand-green-50 text-brand-green-800' : 'bg-slate-50 text-slate-500'
               }`}
             >
@@ -254,7 +257,7 @@ export default function HVACSimulation({
                 <div className="w-4 h-4 rounded-full border-2 border-slate-300 flex-shrink-0" />
               )}
               {h.label}
-            </div>
+            </button>
           ))}
         </div>
       </div>

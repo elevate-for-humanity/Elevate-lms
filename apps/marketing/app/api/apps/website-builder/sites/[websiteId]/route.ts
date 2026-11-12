@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import { bridgeLegacyPatchIntoComposition } from '@/lib/tenant/legacy-composition-bridge';
 import { validateSiteConfig } from '@/lib/tenant/site-validation';
+import { isReservedTenantSubdomain } from '@/lib/tenant/middleware-tenant-routing';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { loadVerifiedWebsiteClaims } from '@/lib/tenant/website-claims';
@@ -88,6 +89,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const parsed = parseSubdomain(body.subdomain);
     if (!parsed.valid) return NextResponse.json({ error: 'Subdomain can contain only letters, numbers, and hyphens' }, { status: 400 });
     requestedSubdomain = parsed.value;
+    if (requestedSubdomain && isReservedTenantSubdomain(requestedSubdomain)) {
+      return NextResponse.json({ error: 'That subdomain is reserved' }, { status: 400 });
+    }
     if (requestedSubdomain) {
       const { data: taken } = await admin.from('user_websites').select('id').eq('subdomain', requestedSubdomain).neq('id', websiteId).maybeSingle();
       if (taken) return NextResponse.json({ error: 'That subdomain is already in use' }, { status: 409 });

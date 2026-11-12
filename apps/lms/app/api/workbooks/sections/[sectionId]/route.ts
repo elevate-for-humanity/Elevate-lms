@@ -67,7 +67,7 @@ export async function POST(
     // position, or a purchased workbook entitlement.
     const { data: targetSection, error: targetError } = await db
       .from('digital_workbook_sections')
-      .select('workbook_id,section_number,prompts')
+      .select('prompts')
       .eq('id', sectionId)
       .maybeSingle();
     if (targetError || !targetSection)
@@ -80,37 +80,6 @@ export async function POST(
       )
     )
       return reply({ error: 'Finish the writing activities before reviewing this section.' }, 400);
-    // Preserve writing from an accessible lesson even when an earlier chapter
-    // still needs review. Only the reviewed flag advances workbook progression;
-    // draft saves retain the RPC's account, enrollment and section-access checks.
-    if (body.reviewed) {
-      const { data: prerequisites, error: prerequisiteError } = await db
-        .from('digital_workbook_sections')
-        .select('id')
-        .eq('workbook_id', targetSection.workbook_id)
-        .lt('section_number', targetSection.section_number);
-      if (prerequisiteError)
-        return reply({ error: 'Workbook progression could not be checked.' }, 503);
-      const requiredIds = (prerequisites || []).map((row) => row.id);
-      if (requiredIds.length) {
-        const { data: savedReviews, error: reviewError } = await db
-          .from('digital_workbook_responses')
-          .select('section_id')
-          .eq('user_id', user.id)
-          .eq('reviewed', true)
-          .in('section_id', requiredIds);
-        if (reviewError) return reply({ error: 'Workbook progression could not be checked.' }, 503);
-        if ((savedReviews || []).length !== requiredIds.length)
-          return reply(
-            {
-              error:
-                'Your chapter review cannot advance until earlier sections are reviewed. Your draft answers can still be saved.',
-              code: 'WORKBOOK_REVIEW_PREREQUISITE',
-            },
-            409,
-          );
-      }
-    }
     const { data, error } = await db.rpc('save_digital_workbook_section', {
       p_section_id: sectionId,
       p_answers: body.answers,
@@ -144,7 +113,11 @@ export async function POST(
       saved.answers &&
       Object.entries(submitted).every(([key, value]) => saved.answers[key] === value),
     );
-    if (!matches) return reply({ error: 'Saved answers could not be verified. Keep your browser copy and retry.' }, 503);
+    if (!matches)
+      return reply(
+        { error: 'Saved answers could not be verified. Keep your browser copy and retry.' },
+        503,
+      );
     return reply({
       section_id: saved.section_id,
       version: saved.version,

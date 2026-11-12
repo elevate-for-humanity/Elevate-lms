@@ -75,8 +75,13 @@ export async function POST(request: NextRequest) {
         })
         .eq('id', schedule.id)
         .eq('next_invoice_date', schedule.next_invoice_date)
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .select('id')
+        .maybeSingle();
       if (update.error) throw new Error(update.error.message);
+      if (!update.data?.id) {
+        throw new Error('Invoice exists, but the billing schedule was not advanced; reconciliation is required.');
+      }
       results.push({ scheduleId: schedule.id, ok: true });
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : 'Unknown billing error';

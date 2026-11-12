@@ -781,13 +781,17 @@ async function _POST(req: Request) {
 
       // Link provisioned userId back to the application row
       if (userId && data?.id) {
-        await supabase
+        const { error: linkError } = await supabase
           .from('applications')
           .update({ user_id: userId })
-          .eq('id', data.id)
-          .then(undefined, (err) =>
-            logger.warn('[Applications] Failed to link user_id', { err: String(err) }),
-          );
+          .eq('id', data.id);
+        if (linkError) {
+          // PostgREST resolves with { error } on failed writes; a rejected
+          // Promise handler alone silently lost this critical binder linkage.
+          logger.warn('[Applications] Failed to link user_id', {
+            applicationId: data.id, code: linkError.code,
+          });
+        }
       }
     } catch (provisionError) {
       // The application is already committed. Ancillary account failures must

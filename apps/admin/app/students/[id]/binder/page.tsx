@@ -72,9 +72,22 @@ export default async function StudentBinderPage({ params }: PageProps) {
     return acc;
   }, {}) || {};
 
-  const requirementQuery = enrollment?.program_slug
+  // Applications can precede enrollment. Build the same requirements view
+  // from the saved intake record instead of creating a disconnected binder
+  // table, and never treat an unverified upload as a completed requirement.
+  const { data: intakeApplication } = !enrollment?.program_slug
+    ? await db.from('applications')
+        .select('program_slug,program_interest')
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+  const binderProgram = enrollment?.program_slug ||
+    intakeApplication?.program_slug || intakeApplication?.program_interest || null;
+  const requirementQuery = binderProgram
     ? await db.from('apprentice_document_types').select('document_type,name,is_required')
-        .eq('program_slug', enrollment.program_slug).eq('is_required', true)
+        .eq('program_slug', binderProgram).eq('is_required', true)
     : { data: null, error: null };
   if (requirementQuery.error) throw new Error('Document requirements could not load.');
   const requirements = requirementQuery.data ?? [];

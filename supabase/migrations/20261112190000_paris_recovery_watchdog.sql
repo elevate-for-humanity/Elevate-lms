@@ -4,21 +4,17 @@ set statement_timeout='90s';
 -- PARIS monitor heartbeat: written by each signed repair tick.
 alter table public.paris_autopilot_policy add column if not exists last_tick_at timestamptz;
 
--- Covering indexes for studio run foreign keys. paris_code_repairs.actor_id and
--- paris_autopilot_policy.actor_id are already covered by orch_fk_31 / orch_fk_30.
-create index if not exists studio_runs_conversation_id_idx on public.studio_runs (conversation_id);
-create index if not exists studio_runs_active_step_id_idx on public.studio_runs (active_step_id);
-create index if not exists studio_run_events_step_id_idx on public.studio_run_events (step_id);
-create index if not exists studio_run_artifacts_step_id_idx on public.studio_run_artifacts (step_id);
-create index if not exists studio_run_step_dependencies_depends_on_step_id_idx
-  on public.studio_run_step_dependencies (depends_on_step_id);
+-- Studio FK covering indexes ship in 20261112130000_paris_studio_fk_indexes.sql.
 
 -- Requeue blocked repairs whose root cause is fixed, selected by exact error
 -- code. attempt_count is preserved: the attempt bound is deliberate and the
 -- dispatch preflight still enforces it. Diagnose first:
 --   select error_code, count(*) from public.paris_code_repairs
 --   where status = 'blocked' group by error_code order by 2 desc;
-create or replace function public.requeue_fixed_paris_repairs(p_error_codes text[])
+-- Replaces the integer-returning version from 20261112130000 (return types
+-- cannot change in place) and keeps its in-progress guard.
+drop function if exists public.requeue_fixed_paris_repairs(text[]);
+create function public.requeue_fixed_paris_repairs(p_error_codes text[])
 returns table (repair_id uuid, error_code text)
 language plpgsql
 security definer
@@ -26,7 +22,12 @@ set search_path = ''
 as $$
 begin
   if p_error_codes is null or cardinality(p_error_codes) = 0 then
-    raise exception 'PARIS_REQUEUE_ERROR_CODES_REQUIRED';
+    raise exception 'PARIS_REQUEUE_ERROR_CODES_REQUIRED' using errcode = '22023';
+  end if;
+  lock table public.paris_code_repairs in share row exclusive mode;
+  if exists (select 1 from public.paris_code_repairs
+             where status in ('dispatched','patching','validating','deploying','verifying')) then
+    raise exception 'PARIS_REPAIR_IN_PROGRESS' using errcode = '55000';
   end if;
   return query
   update public.paris_code_repairs r

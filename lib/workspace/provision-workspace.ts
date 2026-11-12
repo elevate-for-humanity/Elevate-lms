@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { fetchPlatformOwnerTenantId } from '@/lib/platform/platform-owner';
 import { enqueueJob } from '@/lib/jobs/queue';
 import { normalizeWorkspaceTier, type WorkspaceSubscriptionTier } from '@/lib/workspace/tier-limits';
+import { tenantPublicHost, tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
 
 export type ProvisionWorkspaceParams = {
   displayName: string;
@@ -35,7 +36,7 @@ export function workspacePublicUrl(slug: string): string {
   if (devCloudHost) {
     return `https://${slug}.${devCloudHost}`;
   }
-  return `https://${slug}.app.elevateforhumanity.org`;
+  return tenantPublicSiteUrl(slug);
 }
 
 /**
@@ -99,7 +100,7 @@ export async function provisionWorkspace(
     status: 'active',
     tenant_id: tenant.id,
     contact_email: params.contactEmail ?? null,
-    domain: `${slug}.app.elevateforhumanity.org`,
+    domain: tenantPublicHost(slug),
   };
 
   const { data: org, error: orgError } = await db

@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
 
 export type ProvisionTrialWebsiteParams = {
   organizationId: string;
@@ -81,7 +82,7 @@ export async function provisionTrialWebsite(
       return {
         ok: true,
         websiteId: existing.id,
-        publicUrl: `https://${slug}.app.elevateforhumanity.org`,
+        publicUrl: tenantPublicSiteUrl(slug),
       };
     }
 
@@ -98,7 +99,7 @@ export async function provisionTrialWebsite(
     return {
       ok: true,
       websiteId: inserted.id,
-      publicUrl: `https://${slug}.app.elevateforhumanity.org`,
+      publicUrl: tenantPublicSiteUrl(slug),
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

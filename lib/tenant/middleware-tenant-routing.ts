@@ -1,14 +1,25 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const TENANT_APP_SUFFIX = '.app.elevateforhumanity.org';
+const ROOT_DOMAIN = '.elevateforhumanity.org';
+const LEGACY_TENANT_APP_SUFFIX = '.app.elevateforhumanity.org';
+const RESERVED_SUBDOMAINS = new Set([
+  'www', 'app', 'admin', 'lms', 'portal', 'store', 'testing', 'phone', 'mail', 'email', 'webmail',
+  'smtp', 'api', 'cdn', 'assets', 'static', 'docs', 'status', 'staging', 'dev', 'preview',
+  'ns1', 'ns2', 'ns3', 'ftp', 'autodiscover',
+]);
 
-/** Extract workspace slug from `{slug}.app.elevateforhumanity.org`. */
+/** Extract workspace slug from `{slug}.elevateforhumanity.org` or legacy `{slug}.app.elevateforhumanity.org`. */
 export function tenantSlugFromAppHost(host: string): string | null {
   const normalized = host.split(':')[0]?.toLowerCase() ?? '';
-  if (!normalized.endsWith(TENANT_APP_SUFFIX)) return null;
-  const slug = normalized.slice(0, -TENANT_APP_SUFFIX.length);
-  if (!slug || slug.includes('.')) return null;
+  const suffix = normalized.endsWith(LEGACY_TENANT_APP_SUFFIX)
+    ? LEGACY_TENANT_APP_SUFFIX
+    : normalized.endsWith(ROOT_DOMAIN)
+      ? ROOT_DOMAIN
+      : null;
+  if (!suffix) return null;
+  const slug = normalized.slice(0, -suffix.length);
+  if (!slug || slug.includes('.') || RESERVED_SUBDOMAINS.has(slug)) return null;
   return slug;
 }
 

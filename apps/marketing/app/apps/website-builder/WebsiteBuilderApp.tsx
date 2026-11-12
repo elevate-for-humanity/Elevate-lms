@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Plus, ExternalLink, Pencil, Globe2, Upload, Sparkles, X } from 'lucide-react';
 import { PromptWebsiteCreator } from '@/components/website-builder/PromptWebsiteCreator';
 import { ParisWebsiteInterview } from '@/components/store/ParisWebsiteInterview';
+import { tenantPublicHost, tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
 
 type WebsiteRow = {
   id: string;
@@ -121,7 +122,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
           <section className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {websites.map((site) => {
               const liveUrl = site.subdomain && site.is_published ? `/sites/${encodeURIComponent(site.subdomain)}` : null;
-              const tenantUrl = site.subdomain && site.is_published ? `https://${site.subdomain}.app.elevateforhumanity.org` : null;
+              const tenantUrl = site.subdomain && site.is_published ? tenantPublicSiteUrl(site.subdomain) : null;
               const isLegacy83 = site.site_name?.toLowerCase().includes('legacy 83');
               return (
                 <article key={site.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -133,7 +134,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
                     <Globe2 className="h-6 w-6 text-brand-red-700" />
                   </div>
                   <div className="mt-4 space-y-1 text-sm text-slate-600">
-                    <p>{site.subdomain ? `${site.subdomain}.app.elevateforhumanity.org` : 'Subdomain not selected'}</p>
+                    <p>{site.subdomain ? tenantPublicHost(site.subdomain) : 'Subdomain not selected'}</p>
                     <p>{site.is_published ? 'Public tenant site is enabled' : 'Private draft — not visible publicly'}</p>
                     {site.updated_at ? <p className="text-xs text-slate-400">Updated {new Date(site.updated_at).toLocaleString()}</p> : null}
                   </div>

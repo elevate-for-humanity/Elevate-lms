@@ -18,6 +18,19 @@ describe('middleware tenant routing', () => {
     expect(tenantSlugFromAppHost('foo.bar.app.elevateforhumanity.org')).toBeNull();
   });
 
+  it('extracts slug from single-level subdomain covered by the root certificate', () => {
+    expect(tenantSlugFromAppHost('acme.elevateforhumanity.org')).toBe('acme');
+    expect(tenantSlugFromAppHost('ACME.elevateforhumanity.org:443')).toBe('acme');
+  });
+
+  it('never treats reserved Elevate hosts as tenants', () => {
+    for (const host of ['www', 'app', 'admin', 'lms', 'store', 'testing', 'portal', 'phone']) {
+      expect(tenantSlugFromAppHost(`${host}.elevateforhumanity.org`)).toBeNull();
+    }
+    expect(tenantSlugFromAppHost('elevateforhumanity.org')).toBeNull();
+    expect(tenantSlugFromAppHost('acme.example.com')).toBeNull();
+  });
+
   it('strips port from host', () => {
     expect(tenantSlugFromAppHost('demo.app.elevateforhumanity.org:3000')).toBe('demo');
   });

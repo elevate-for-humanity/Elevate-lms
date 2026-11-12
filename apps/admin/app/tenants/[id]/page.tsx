@@ -7,6 +7,7 @@ import {
   Building2, Zap, Clock, AlertTriangle, CheckCircle,
   XCircle, Users, ArrowLeft, ExternalLink, Copy,
 } from 'lucide-react';
+import { tenantAdminUrl, tenantPublicHost } from '@/lib/tenant/public-site-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,7 +62,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
   const enrollCount = enrollments.status === 'fulfilled' ? (enrollments.value.count ?? 0) : 0;
   const riskCount   = riskStudents.status === 'fulfilled' ? (riskStudents.value.count ?? 0) : 0;
 
-  const dashboardUrl = `https://${tenant.subdomain}.app.elevateforhumanity.org/admin`;
+  const dashboardUrl = tenantAdminUrl(tenant.subdomain, '/admin');
 
   const STATUS_BADGE: Record<string, string> = {
     success: 'bg-emerald-100 text-emerald-700',
@@ -91,7 +92,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
               </span>
             </div>
             <div className="flex items-center gap-4 mt-2">
-              <span className="text-sm text-slate-500 font-mono">{tenant.subdomain}.app.elevateforhumanity.org</span>
+              <span className="text-sm text-slate-500 font-mono">{tenantPublicHost(tenant.subdomain)}</span>
               <a href={dashboardUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-1 text-xs text-brand-blue-600 hover:text-brand-blue-800">
                 Open Dashboard <ExternalLink className="w-3 h-3" />

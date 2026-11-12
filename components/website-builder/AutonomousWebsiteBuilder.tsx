@@ -10,6 +10,7 @@ import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComp
 import { TenantDraftViewport } from '@/components/website-builder/TenantDraftViewport';
 import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import { TENANT_HOST_SUFFIX } from '@/lib/tenant/public-site-url';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 type Device = 'desktop' | 'tablet' | 'mobile';
@@ -200,7 +201,7 @@ export function AutonomousWebsiteBuilder({
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-end gap-3">
             <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Site name</span><input value={siteName} onChange={(event) => setSiteName(event.target.value)} className="w-56 rounded-lg border border-slate-300 px-3 py-2 font-semibold" /></label>
-            <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Subdomain</span><div className="flex items-center rounded-lg border border-slate-300 bg-white"><input value={subdomain} onChange={(event) => setSubdomain(event.target.value)} className="w-44 rounded-l-lg px-3 py-2 outline-none" /><span className="pr-3 text-xs text-slate-400">.app.elevateforhumanity.org</span></div></label>
+            <label className="block"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Subdomain</span><div className="flex items-center rounded-lg border border-slate-300 bg-white"><input value={subdomain} onChange={(event) => setSubdomain(event.target.value)} className="w-44 rounded-l-lg px-3 py-2 outline-none" /><span className="pr-3 text-xs text-slate-400">{TENANT_HOST_SUFFIX}</span></div></label>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={saving || busy} onClick={() => void saveIdentity(false)} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 font-bold text-slate-800 disabled:opacity-50"><Save className="h-4 w-4" /> Save</button>

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import type { MouseEvent, ReactNode } from 'react';
+import { Component, type ErrorInfo, type MouseEvent, type ReactNode } from 'react';
 import './legacy83-premium.css';
 import './website-designs.css';
 import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
@@ -87,6 +87,35 @@ function ActionLink({
       {children}
     </TenantTrackedLink>
   );
+}
+
+/**
+ * An individual tenant section must not crash the rest of a published site.
+ * Render errors remain scoped to the section; navigation, other sections and
+ * commerce remain available. Keys include website/page/section so a failed
+ * preview section does not carry its error state into another page.
+ */
+class TenantSectionBoundary extends Component<
+  { children: ReactNode; sectionId: string },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError(): { failed: boolean } {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error, _info: ErrorInfo) {
+    // Log the exception server-side/client-side without leaking it to visitors.
+    console.error('[tenant-section] Rendering failed', { sectionId: this.props.sectionId, error });
+  }
+
+  render() {
+    if (this.state.failed) {
+      return <section data-section-id={this.props.sectionId} role="status" className="mx-auto max-w-4xl px-5 py-10 text-slate-600">This section is temporarily unavailable.</section>;
+    }
+    return this.props.children;
+  }
 }
 
 function Section({ section, primary, secondary, basePath, websiteId, businessName, isPageHeading = false }: { section: TenantSiteSection; primary: string; secondary: string; basePath: string; websiteId: string; businessName: string; isPageHeading?: boolean }) {
@@ -236,7 +265,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   // Keep the imported Curvature collection visual and shoppable without changing other tenants.
   if (site.subdomain === 'meri-gold-round') {
     return <div onClickCapture={onNavigate ? navigateDraft : undefined}><WellnessStorefront site={{ ...site, config }} pathname={path} basePath={basePath}>
-      {page.sections.map((section, index) => <Section key={section.id} section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex(item => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}
+      {page.sections.map((section, index) => <TenantSectionBoundary key={`${site.id}:${page.slug}:${section.id}`} sectionId={section.id}><Section section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex(item => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} /></TenantSectionBoundary>)}
     </WellnessStorefront>{site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}</div>;
   }
 
@@ -252,7 +281,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
         </div>
       </header>
       {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
-      <main>{page.sections.map((section, index) => <Section key={section.id} section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
+      <main>{page.sections.map((section, index) => <TenantSectionBoundary key={`${site.id}:${page.slug}:${section.id}`} sectionId={section.id}><Section section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} /></TenantSectionBoundary>)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
     </div></TenantCommerce>

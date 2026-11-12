@@ -34,24 +34,51 @@ async function processApplicationSubmitted(db: Awaited<ReturnType<typeof require
   logger.info('[process-application-submissions] Processing application', { applicationId });
 
   try {
-    // 1. Update CRM lead if exists
-    const { data: existingLead } = await db
-      .from('crm_leads')
-      .select('id')
-      .eq('email', email.toLowerCase())
+    // Use the saved canonical application as evidence, never trust the queue
+    // payload alone for attribution, identity or staff access decisions.
+    const { data: application, error: applicationError } = await db
+      .from('applications')
+      .select('id, email, phone, first_name, last_name, source, program_interest, program_slug, advisor_assigned, user_id')
+      .eq('id', applicationId)
       .maybeSingle();
+    if (applicationError || !application) throw new Error('Canonical application could not be loaded');
+    if (application.email?.trim().toLowerCase() !== email.trim().toLowerCase()) {
+      throw new Error('Queue identity does not match canonical application');
+    }
+
+    // 1. Create or reconcile the existing CRM lead, respecting the unique
+    // email contract and never downgrading an already advanced lead stage.
+    const normalizedEmail = application.email.trim().toLowerCase();
+    const { data: existingLead, error: leadLookupError } = await db
+      .from('crm_leads')
+      .select('id, stage, status')
+      .ilike('email', normalizedEmail)
+      .limit(1)
+      .maybeSingle();
+    if (leadLookupError) throw leadLookupError;
 
     if (existingLead) {
-      await db
-        .from('crm_leads')
-        .update({
-          stage: 'application_received',
-          status: 'in_progress',
-          last_contact_at: new Date().toISOString(),
-          notes: `Application submitted for ${programSlug || 'unknown program'}`,
-        })
-        .eq('id', existingLead.id);
-      logger.info('[process-application-submissions] CRM lead updated', { leadId: existingLead.id });
+      const { error: leadUpdateError } = await db.from('crm_leads').update({
+        application_id: applicationId,
+        last_contact_at: new Date().toISOString(),
+      }).eq('id', existingLead.id);
+      if (leadUpdateError) throw leadUpdateError;
+    } else {
+      const { error: leadInsertError } = await db.from('crm_leads').insert({
+        full_name: [application.first_name, application.last_name].filter(Boolean).join(' '),
+        email: normalizedEmail,
+        phone: application.phone,
+        source: application.source || 'website',
+        program_slug: application.program_slug || application.program_interest || programSlug,
+        stage: 'application_received',
+        status: 'in_progress',
+        application_id: applicationId,
+        owner_user_id: application.advisor_assigned || null,
+        profile_id: application.user_id || null,
+      });
+      if (leadInsertError && leadInsertError.code !== '23505') throw leadInsertError;
+      // Concurrent submissions may race on crm_leads.email; the unique key
+      // allows one canonical lead. A later job can reconcile its application.
     }
 
     // 2. Create admission checklist tasks
@@ -64,34 +91,64 @@ async function processApplicationSubmitted(db: Awaited<ReturnType<typeof require
     ];
 
     for (const item of checklistItems) {
-      await db.from('tasks').insert({
+      // A prior worker may have completed some tasks before failing. Replays
+      // must not create another checklist for the same application.
+      const { data: existingTask, error: taskLookupError } = await db.from('tasks')
+        .select('id')
+        .eq('related_type', 'application')
+        .eq('related_id', applicationId)
+        .eq('title', item.title)
+        .limit(1)
+        .maybeSingle();
+      if (taskLookupError) throw taskLookupError;
+      if (existingTask) continue;
+      const { error: taskError } = await db.from('tasks').insert({
         title: item.title,
         description: item.description,
         priority: item.priority,
         status: 'pending',
         related_type: 'application',
         related_id: applicationId,
-        assigned_to: null,
+        assigned_to: application.advisor_assigned || null,
+        due_days: item.priority === 'high' ? 2 : 7,
       });
+      if (taskError) throw taskError;
     }
     logger.info('[process-application-submissions] Checklist created', { applicationId, itemCount: checklistItems.length });
 
     // 3. Create timeline event
-    await db.from('timeline_events').insert({
-      entity_type: 'application',
-      entity_id: applicationId,
-      event_type: 'application_submitted',
-      title: 'Application Submitted',
-      description: `Application submitted for ${programSlug || 'program'}`,
-      metadata: { programSlug, fundingType, firstName, lastName },
-    });
+    const { data: priorEvent, error: eventLookupError } = await db
+      .from('timeline_events').select('id')
+      .eq('entity_type', 'application').eq('entity_id', applicationId)
+      .eq('event_type', 'application_submitted').limit(1).maybeSingle();
+    if (eventLookupError) throw eventLookupError;
+    if (!priorEvent) {
+      const { error: timelineError } = await db.from('timeline_events').insert({
+        entity_type: 'application',
+        entity_id: applicationId,
+        event_type: 'application_submitted',
+        title: 'Application Submitted',
+        description: `Application submitted for ${programSlug || 'program'}`,
+        metadata: { programSlug, fundingType, firstName, lastName },
+      });
+      if (timelineError) throw timelineError;
+    }
 
     // 4. Queue PARIS analysis (if PARIS is configured)
-    await db.from('job_queue').insert({
-      type: 'paris_analyze_application',
-      payload: { applicationId, programSlug },
-      run_after: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-    });
+    // Queue one PARIS analysis per application only if one is not already
+    // recorded. This is a request, not evidence that PARIS accepted a repair.
+    const { data: priorParisJob, error: parisLookupError } = await db.from('job_queue')
+      .select('id').eq('type', 'paris_analyze_application')
+      .contains('payload', { applicationId }).limit(1).maybeSingle();
+    if (parisLookupError) throw parisLookupError;
+    if (!priorParisJob) {
+      const { error: parisQueueError } = await db.from('job_queue').insert({
+        type: 'paris_analyze_application',
+        payload: { applicationId, programSlug },
+        run_after: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+      });
+      if (parisQueueError) throw parisQueueError;
+    }
 
     logger.info('[process-application-submissions] Application processed successfully', { applicationId });
     return { success: true };

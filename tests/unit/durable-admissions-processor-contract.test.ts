@@ -7,6 +7,7 @@ const processor = readFileSync(join(root, 'apps/admin/app/api/cron/process-appli
 const schedule = readFileSync(join(root, '.github/workflows/cron-scheduler.yml'), 'utf8');
 const staffTasks = readFileSync(join(root, 'apps/admin/app/staff-portal/tasks/page.tsx'), 'utf8');
 const binder = readFileSync(join(root, 'apps/admin/app/students/[id]/binder/page.tsx'), 'utf8');
+const intake = readFileSync(join(root, 'apps/marketing/app/api/applications/route.ts'), 'utf8');
 
 describe('durable admissions application submission processor contract', () => {
   it('requires the cron bearer token before opening the Admin database', () => {
@@ -52,6 +53,12 @@ describe('durable admissions application submission processor contract', () => {
     expect(binder).toContain("intakeApplication?.program_slug");
     expect(binder).toContain(".from('apprentice_document_types')");
     expect(binder).toContain("['approved','verified','accepted']");
+  });
+
+  it('detects PostgREST application-to-profile link errors without exposing identity data', () => {
+    expect(intake).toContain("const { error: linkError } = await supabase");
+    expect(intake).toContain("if (linkError)");
+    expect(intake).toContain("applicationId: data.id, code: linkError.code");
   });
 
   it('does not expose unrelated applicant tasks in staff portal', () => {

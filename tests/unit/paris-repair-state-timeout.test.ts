@@ -13,6 +13,7 @@ it('applies per-state in-flight timeouts and leaves dispatched to REPAIR_DISPATC
  expect(inFlightRepairTimedOut({status:'verifying',updated_at:ago(31)},now)).toBe(true);
  expect(inFlightRepairTimedOut({status:'dispatched',updated_at:ago(600)},now)).toBe(false);
  expect(inFlightRepairTimedOut({status:'patching',updated_at:'not-a-date'},now)).toBe(false);
+ expect(inFlightRepairTimedOut({status:'validating',updated_at:ago(600),verification:{pullRequest:{number:1}}},now)).toBe(false);
 });
 
 it('requeues only when every owning workflow run is gone or completed',()=>{

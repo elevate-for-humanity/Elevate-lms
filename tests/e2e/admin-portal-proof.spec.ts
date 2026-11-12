@@ -32,7 +32,7 @@ async function loginAsAdmin(page: Page) {
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
-  await page.waitForURL(/\/admin/, { timeout: 20000 });
+  await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 20000 });
 }
 
 // ── Wait for real content (not networkidle — dev server keeps connections open)
@@ -83,7 +83,7 @@ test.describe('Admin Portal — Production Proof', () => {
 
   // ── 1. Dashboard: live data, no crash ─────────────────────────────────────
   test('dashboard renders live data without ERR_DASHBOARD_LOAD', async ({ page }) => {
-    await page.goto('/admin/dashboard');
+    await page.goto('/dashboard');
     // Wait for sidebar nav (always present) then give client component time to hydrate
     await page.waitForSelector('nav, aside', { timeout: 30000 });
     await page.waitForTimeout(6000);
@@ -119,7 +119,7 @@ test.describe('Admin Portal — Production Proof', () => {
 
   // ── 2. Applications: page loads, no missing component crash ───────────────
   test('applications page loads without FollowUpBlastButton crash', async ({ page }) => {
-    await page.goto('/admin/applications');
+    await page.goto('/applications');
     // Wait for h1 — server component renders it immediately once compiled
     await page.waitForSelector('h1', { timeout: 40000 });
     await page.waitForTimeout(2000);
@@ -133,7 +133,7 @@ test.describe('Admin Portal — Production Proof', () => {
   test('application approve changes status in DB and survives reload', async ({ page }) => {
     const appId = await createTestApplication();
     try {
-      await page.goto(`/admin/applications/review/${appId}`);
+      await page.goto(`/applications/review/${appId}`);
       await waitForContent(page, 'h1, h2, [class*="rounded"]');
 
       const approveBtn = page.locator('button', { hasText: /approve/i }).first();
@@ -162,7 +162,7 @@ test.describe('Admin Portal — Production Proof', () => {
   test('application reject changes status in DB and survives reload', async ({ page }) => {
     const appId = await createTestApplication();
     try {
-      await page.goto(`/admin/applications/review/${appId}`);
+      await page.goto(`/applications/review/${appId}`);
       await waitForContent(page, 'h1, h2, [class*="rounded"]');
 
       const rejectBtn = page.locator('button', { hasText: /reject/i }).first();
@@ -191,7 +191,7 @@ test.describe('Admin Portal — Production Proof', () => {
       .select('*', { count: 'exact', head: true });
     expect(dbCount).toBeGreaterThan(0);
 
-    await page.goto('/admin/programs');
+    await page.goto('/programs');
     await waitForContent(page, 'h1');
 
     const bodyText = await page.locator('body').innerText();
@@ -220,7 +220,7 @@ test.describe('Admin Portal — Production Proof', () => {
 
   // ── 4. Analytics: live data, no hardcoded sentinels ───────────────────────
   test('analytics page shows live data without hardcoded values', async ({ page }) => {
-    await page.goto('/admin/analytics');
+    await page.goto('/analytics');
     await waitForContent(page, 'h1');
 
     const bodyText = await page.locator('body').innerText();
@@ -234,7 +234,7 @@ test.describe('Admin Portal — Production Proof', () => {
 
   // ── 5. Users: search input present and functional ─────────────────────────
   test('users page shows live count and search filters rows', async ({ page }) => {
-    await page.goto('/admin/users');
+    await page.goto('/users');
     await waitForContent(page, 'h1');
 
     await expect(page.locator('h1').first()).toContainText('User');
@@ -259,7 +259,7 @@ test.describe('Admin Portal — Production Proof', () => {
 
   // ── 6. Settings: real page, no fake spinner ───────────────────────────────
   test('settings page loads and is not a fake spinner', async ({ page }) => {
-    await page.goto('/admin/settings');
+    await page.goto('/settings');
     await waitForContent(page, 'h1');
 
     await expect(page.locator('h1').first()).toContainText('Settings');
@@ -276,7 +276,7 @@ test.describe('Admin Portal — Production Proof', () => {
 
   // ── 7. Programs View/Manage links resolve without 404 ─────────────────────
   test('programs View links resolve to correct records without 404', async ({ page }) => {
-    await page.goto('/admin/programs');
+    await page.goto('/programs');
     await waitForContent(page, 'h1');
 
     const viewLinks = page.locator('a', { hasText: /^(view|manage|edit)$/i });

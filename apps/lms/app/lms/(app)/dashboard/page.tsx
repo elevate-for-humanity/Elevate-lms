@@ -8,6 +8,7 @@ import { StudentCompletionTasks } from '@/components/learner/StudentCompletionTa
 import { DashboardOrientationPanel } from '@/components/learner/DashboardOrientation';
 import HvacHandsOnClock from '@/components/learner/HvacHandsOnClock';
 import HvacStartHere from '@/components/learner/HvacStartHere';
+import LessonWorkSavingGuide from '@/components/learner/LessonWorkSavingGuide';
 import { loadQwikStudyCode } from '@/lib/learner/qwik-study-access';
 import type { Metadata } from 'next';
 import Image from 'next/image';
@@ -674,6 +675,7 @@ export default async function StudentDashboard() {
         )}
 
         {hasHvacEnrollment ? <HvacStartHere studyCode={qwikStudyCode} /> : null}
+        <LessonWorkSavingGuide />
         <section
           className="rounded-2xl border border-slate-200 bg-white p-5"
           aria-label="Documents and agreements"

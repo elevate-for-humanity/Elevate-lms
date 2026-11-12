@@ -69,6 +69,6 @@ export default async function ParentStudentPage({ params }: { params: Promise<{ 
   );
 }
 
-function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: React.ElementType }) {
+function Metric({ label, value, icon: Icon }: { label: string; value: string; icon: React.ComponentType<{ className?: string }> }) {
   return <div className="rounded-xl bg-slate-50 p-4"><Icon className="h-5 w-5 text-blue-700" /><p className="mt-3 text-2xl font-black text-slate-950">{value}</p><p className="text-xs font-semibold text-slate-600">{label}</p></div>;
 }

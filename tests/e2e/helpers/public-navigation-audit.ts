@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { NAV_ITEMS } from '../../lib/navigation';
+import { NAV_ITEMS } from '../../../lib/navigation';
 
 const origin = 'https://www.elevateforhumanity.org';
 const destinations = [...new Set(NAV_ITEMS.flatMap(item => [item.href, ...(item.subItems ?? []).map(sub => sub.href)]).filter((href): href is string => Boolean(href?.startsWith('/'))))];

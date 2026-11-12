@@ -51,3 +51,15 @@ test('quality gate retains hard-fail behavior when URL cannot be renewed',async(
  assert.match(source,/getSignedElevateMediaUrl\(key, 300\)/);
  assert.match(source,/if \(!response\.ok\) throw new Error/);
 });
+
+test('Supabase caption renewal is limited to this project course-videos bucket and owned keys',async()=>{
+ const {ownedSupabaseAncillaryCourseObject}=await import('../../lib/video/owned-ancillary-course-key.mjs');
+ const project='https://cuxzzpsyufcewtmicszk.supabase.co';
+ assert.deepEqual(ownedSupabaseAncillaryCourseObject(`${project}/storage/v1/object/sign/course-videos/${file}?token=expired`,project),{bucket:'course-videos',key:file});
+ assert.deepEqual(ownedSupabaseAncillaryCourseObject(`${project}/storage/v1/object/public/course_videos/${file}`,project),{bucket:'course_videos',key:file});
+ assert.equal(ownedSupabaseAncillaryCourseObject(`https://evil.supabase.co/storage/v1/object/sign/course-videos/${file}`,project),null);
+ assert.equal(ownedSupabaseAncillaryCourseObject(`${project}/storage/v1/object/sign/private-docs/${file}`,project),null);
+ assert.equal(ownedSupabaseAncillaryCourseObject(`${project}/storage/v1/object/sign/course-videos/generated-lessons/../secrets.vtt`,project),null);
+ assert.equal(ownedSupabaseAncillaryCourseObject(`${project}/storage/v1/object/sign/course-videos/${file.replace('.vtt','.mp4')}`,project),null);
+ assert.equal(ownedSupabaseAncillaryCourseObject(`${project}/storage/v1/object/sign/course-videos/${file}`,undefined),null);
+});

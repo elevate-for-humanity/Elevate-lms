@@ -1,3 +1,15 @@
+const SIGNATURE_PARAM = /^(?:x-amz-|x-goog-)|^(?:token|expires|signature|key-pair-id|policy|authorization)$/i;
+
+/** Compare media identity, not the short-lived delivery signature on it. */
+export function canonicalMediaUrl(value) {
+  if (typeof value !== 'string' || !value) return value;
+  let url;
+  try { url = new URL(value); } catch { return value; }
+  for (const name of [...url.searchParams.keys()]) if (SIGNATURE_PARAM.test(name)) url.searchParams.delete(name);
+  url.hash = '';
+  return url.toString();
+}
+
 export function reconcileCanonicalReleases(releases, lessons) {
   const byCourse = new Map();
   for (const lesson of lessons) {
@@ -32,7 +44,7 @@ export function reconcileCanonicalReleases(releases, lessons) {
       }
       if (lesson.status !== 'published' || lesson.is_published !== true || lesson.video_status !== 'complete' || !lesson.video_url)
         findings.push({code:'RELEASE_CANONICAL_NOT_READY',courseId,releaseId:release.id,lessonId});
-      if (!entry.videoUrl || entry.videoUrl !== lesson.video_url)
+      if (!entry.videoUrl || canonicalMediaUrl(entry.videoUrl) !== canonicalMediaUrl(lesson.video_url))
         findings.push({code:'RELEASE_CANONICAL_VIDEO_DRIFT',courseId,releaseId:release.id,lessonId});
     }
   }

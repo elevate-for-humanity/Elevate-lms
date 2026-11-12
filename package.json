@@ -412,8 +412,6 @@
     "verify:all": "pnpm run lockfile:check && pnpm run verify:repo && pnpm run typecheck:all && pnpm run build:all",
     "audit:marketing-images": "node scripts/audit-marketing-images.mjs",
     "verify:ultimate": "node scripts/verify-ultimate-clean-room.mjs && node scripts/verify-ultimate-section-1.mjs",
-    "verify:paris-app": "node scripts/verify-paris-github-app.mjs",
-    "diagnose:course-builds": "node scripts/diagnose-course-builds.mjs",
     "integrity:route-auth": "node scripts/check-unprotected-routes.mjs"
   },
   "overrides": {

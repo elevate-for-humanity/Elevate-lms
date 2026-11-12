@@ -20,3 +20,12 @@ test('rejects missing canonical IDs, duplicates and incomplete media',()=>{
 test('does not mutate source objects or historical releases',()=>{
  const input=structuredClone(release);reconcileCanonicalReleases([release],[lesson]);assert.deepEqual(release,input);
 });
+test('ignores rotated delivery signatures but still detects a different media object',async()=>{
+ const {canonicalMediaUrl}=await import('../../scripts/gcp/canonical-release-reconciliation.mjs');
+ const signed=(sig)=>`https://media.example/course-videos/lesson-1-v2.mp4?X-Amz-Signature=${sig}&X-Amz-Expires=300&v=2`;
+ const ok=reconcileCanonicalReleases([{...release,package:{lessons:[{canonicalLessonId:'lesson-1',videoUrl:signed('a')}]}}],[{...lesson,video_url:signed('b')}]);
+ assert.equal(ok.ok,true);
+ assert.equal(canonicalMediaUrl(signed('a')),'https://media.example/course-videos/lesson-1-v2.mp4?v=2');
+ const drift=reconcileCanonicalReleases([{...release,package:{lessons:[{canonicalLessonId:'lesson-1',videoUrl:signed('a')}]}}],[{...lesson,video_url:signed('a').replace('-v2','-v3')}]);
+ assert.deepEqual(drift.findings.map(x=>x.code),['RELEASE_CANONICAL_VIDEO_DRIFT']);
+});

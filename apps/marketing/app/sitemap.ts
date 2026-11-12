@@ -22,10 +22,19 @@ import {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Legacy static copy for entrepreneurship still exists, but its public detail
   // route renders Program Not Found. Only advertise the published programs.
-  const excludedPaths = new Set(['/programs/technology', '/programs/business', '/programs/entrepreneurship']);
+  const excludedPaths = new Set([
+    '/programs/technology',
+    '/programs/business',
+    '/programs/entrepreneurship',
+    // Permanently redirects to the canonical trades catalog.
+    '/programs/skilled-trades',
+  ]);
+  // Storefront pages are served and indexed on store.elevateforhumanity.org;
+  // www only redirects them, so they belong to the Store sitemap.
+  const isStoreHostPath = (path: string) => path === '/store' || path.startsWith('/store/');
 
   const staticRoutes: MetadataRoute.Sitemap = PUBLIC_ROUTE_REGISTRY
-    .filter((route) => !excludedPaths.has(route.path))
+    .filter((route) => !excludedPaths.has(route.path) && !isStoreHostPath(route.path))
     .map((route) => ({
     url: `${PUBLIC_SITE_ORIGIN}${route.path === '/' ? '' : route.path}`,
     lastModified: new Date(route.lastModified),

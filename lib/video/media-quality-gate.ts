@@ -8,7 +8,7 @@ import {quoteStartSeconds} from '../ultimate-course-builder/instructional/pictur
 import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { createHash } from 'node:crypto';
 import {getElevateMediaStorageConfig,getSignedElevateMediaUrl} from '@/lib/storage/elevate-media-storage';
-import {ownedAncillaryCourseKey} from './owned-ancillary-course-key.mjs';
+import {ownedAncillaryCourseKey, ownedSupabaseAncillaryCourseObject } from './owned-ancillary-course-key.mjs';
 
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
@@ -348,6 +348,13 @@ async function requireTextAsset(url: string, label: string): Promise<string> {
       const freshUrl = await getSignedElevateMediaUrl(key, 300);
       if (!freshUrl) throw new Error(`${label} signed read renewal unavailable`);
       response = await fetch(freshUrl, { signal: AbortSignal.timeout(15_000) });
+    } else {
+      const object = ownedSupabaseAncillaryCourseObject(url, process.env.NEXT_PUBLIC_SUPABASE_URL);
+      if (object) {
+        const { data } = await createAdminClient().storage.from(object.bucket).createSignedUrl(object.key, 300);
+        if (!data?.signedUrl) throw new Error(`${label} signed read renewal unavailable`);
+        response = await fetch(data.signedUrl, { signal: AbortSignal.timeout(15_000) });
+      }
     }
   }
   if (!response.ok) throw new Error(`${label} returned HTTP ${response.status}`);

@@ -64,9 +64,11 @@ export type VideoFailureClass =
 
 export function classifyVideoFailure(message: string): VideoFailureClass {
   const text = message.toLowerCase();
-  if (/413|request entity too large|upload|storage|bucket|tus/.test(text)) return 'storage';
-  if (/unauthorized|authorization(?:_| )required|forbidden|invalid api key|401|403/.test(text))
+  // Credential failures are terminal even when raised by storage uploads;
+  // retrying a 401/403 cannot succeed and only burns render attempts.
+  if (/unauthorized|authorization(?:_| )required|forbidden|access ?denied|invalid api key|401|403/.test(text))
     return 'authorization';
+  if (/413|request entity too large|upload|storage|bucket|tus/.test(text)) return 'storage';
   if (/not configured|missing .*key|missing .*url|configuration/.test(text)) return 'configuration';
   if (/lesson not found|course not found|not found/.test(text)) return 'not_found';
   if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text))

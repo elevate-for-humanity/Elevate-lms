@@ -6,6 +6,7 @@ const root = process.cwd();
 const processor = readFileSync(join(root, 'apps/admin/app/api/cron/process-application-submissions/route.ts'), 'utf8');
 const schedule = readFileSync(join(root, '.github/workflows/cron-scheduler.yml'), 'utf8');
 const staffTasks = readFileSync(join(root, 'apps/admin/app/staff-portal/tasks/page.tsx'), 'utf8');
+const binder = readFileSync(join(root, 'apps/admin/app/students/[id]/binder/page.tsx'), 'utf8');
 
 describe('durable admissions application submission processor contract', () => {
   it('requires the cron bearer token before opening the Admin database', () => {
@@ -43,6 +44,14 @@ describe('durable admissions application submission processor contract', () => {
     expect(processor).toContain(".eq('title', item.title)");
     expect(processor).toContain("if (existingTask) continue");
     expect(processor).toContain("process.env.PARIS_APPLICATION_ANALYSIS_ENABLED === 'true'");
+  });
+
+  it('uses policy-backed document requirements for unenrolled applicants without shadow binder tables', () => {
+    expect(binder).toContain(".from('applications')");
+    expect(binder).toContain(".eq('user_id', id)");
+    expect(binder).toContain("intakeApplication?.program_slug");
+    expect(binder).toContain(".from('apprentice_document_types')");
+    expect(binder).toContain("['approved','verified','accepted']");
   });
 
   it('does not expose unrelated applicant tasks in staff portal', () => {

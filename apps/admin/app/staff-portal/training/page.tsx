@@ -39,7 +39,10 @@ export default async function StaffTrainingPage() {
   const modules = moduleRows?.map((module) => ({
     ...module,
     duration: module.duration_minutes,
-    required: Boolean(module.required_for_roles),
+    required:
+      Array.isArray(module.required_for_roles) &&
+      !!profile?.role &&
+      module.required_for_roles.includes(profile.role),
   }));
 
   const { data: progress, error: progressError } = await supabase

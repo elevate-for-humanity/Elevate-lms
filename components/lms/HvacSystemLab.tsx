@@ -1,11 +1,18 @@
 'use client';
 import { LearningPreview } from './LearningWorkspace';
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { hvacLessonSimulations } from '@/lib/lms/hvac-simulations';
 import WorkbookNarration from '@/components/lms/WorkbookNarration';
 import { refrigerationStages, superheat, subcooling } from '@/lib/lms/hvac-system-model';
 
+const HVACSimulation = lazy(() => import('./HVACSimulation'));
+const condenser = hvacLessonSimulations['hvac-module-1'];
+
 /** SVG uses explicit labels and states; color is never the only teaching cue. */
 export default function HvacSystemLab() {
+  const [show3D, setShow3D] = useState(false);
+  useEffect(() => setShow3D(true), []);
   const [stage, setStage] = useState(0);
   const [running, setRunning] = useState(false);
   const [answer, setAnswer] = useState<number | null>(null);
@@ -41,6 +48,8 @@ export default function HvacSystemLab() {
     ].map(([label,value,setter])=><label className="block font-semibold" key={String(label)}>{String(label)}<input type="number" min="-100" max="250" value={Number(value)} onChange={event=>{const value=event.currentTarget.valueAsNumber;if(Number.isFinite(value))(setter as (n:number)=>void)(value);}} className="mt-2 min-h-12 w-full rounded-lg border p-3"/></label>)}</div>
     <output className="my-4 block rounded-xl bg-stone-100 p-4">Superheat = {suction} − {evaporating} = <strong>{superheat(suction,evaporating)}°F</strong>. Subcooling = {condensing} − {liquid} = <strong>{subcooling(condensing,liquid)}°F</strong>.</output>
     {(superheat(suction,evaporating)<0||subcooling(condensing,liquid)<0)&&<p role="status">These readings do not match the assumed superheated-vapor/subcooled-liquid outlet model. Recheck the phase assumption, measurement location, units, and saturation reference.</p>}
+    <h4 className="mt-6 text-xl font-bold">3D condenser unit</h4><p className="my-3">Drag to rotate the outdoor unit, then select each red marker or component name to identify it. Explain each component's job in your workbook answers.</p>
+    {show3D && <ErrorBoundary fallback={<p className="rounded-xl bg-stone-100 p-4">The 3D view could not load on this device. Continue with the activity on this page.</p>}><Suspense fallback={<p className="rounded-xl bg-stone-100 p-4">Loading the 3D model…</p>}><HVACSimulation modelPath={condenser.modelPath} title={condenser.title} hotspots={[...condenser.hotspots]} requiredHotspotIds={[...condenser.requiredHotspotIds]} /></Suspense></ErrorBoundary>}
     <p className="text-sm leading-relaxed">Record your explanation in the workbook. This practice does not award hours, establish exam readiness, or verify an observed hands-on skill. Do not use its hypothetical values as service targets.</p>
   </section>;
 }

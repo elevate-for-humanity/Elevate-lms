@@ -33,7 +33,9 @@ export async function register(): Promise<void> {
   }
 
   const serviceRole = process.env.ELEVATE_SERVICE || process.env.SERVICE_ROLE;
-  if (serviceRole === 'admin') {
+  // Repeat the literal runtime check: webpack only drops this import from the
+  // Edge bundle when the condition is a compile-time constant at the import.
+  if (process.env.NEXT_RUNTIME === 'nodejs' && serviceRole === 'admin') {
     try {
       // Keep Node-only executor imports in the dedicated Node instrumentation
       // module so the Edge instrumentation bundle never traces Node built-ins.

@@ -1,6 +1,7 @@
+import { appOrigin } from './helpers/app-origins';
 import { test, expect } from '@playwright/test';
 
-const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
+const base = appOrigin('lms');
 
 test('unauthenticated Program Holder dashboard redirects to login without dropping return target', async ({ browser }) => {
   // A fresh context guarantees no inherited authenticated session or cached worker.

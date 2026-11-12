@@ -53,19 +53,35 @@ describe('non-delivering voicemail acceptance',()=>{
  it('reports a stable speech permission error without exposing provider bodies',async()=>{
   database();
   vi.mocked(fetch).mockImplementation(async(url:any)=>String(url).includes('169.254')?Response.json({access_token:'fixture-token'}):new Response('private provider details',{status:403}));
-  const response=await POST(request());expect(response.status).toBe(503);
+  const probe=new Request('https://example.invalid/api/internal/phone/voicemail',{method:'POST',headers:{Authorization:'Bearer '+secret},body:JSON.stringify({...body,validateOnly:true})});
+  const response=await POST(probe);expect(response.status).toBe(503);
   expect(await response.json()).toMatchObject({code:'speech_http_403'});
   expect(mock.notice).not.toHaveBeenCalled();
  });
- it('logs a bounded identity failure without recording provider details or PBX credentials',async()=>{
+ it('persists the voicemail without a transcript when Speech is unavailable',async()=>{
+  const {writes,upload}=database();
+  const log=vi.spyOn(console,'error').mockImplementation(()=>{});
+  vi.mocked(fetch).mockImplementation(async(url:any)=>String(url).includes('169.254')?Response.json({access_token:'fixture-token'}):new Response('private provider details',{status:403}));
+  try{
+   const response=await POST(request());
+   expect(response.status).toBe(200);
+   expect(await response.json()).toMatchObject({saved:true,transcriptAvailable:false});
+   expect(log).toHaveBeenCalledWith('phone_voicemail_transcription_deferred',{reason:'speech_http_403'});
+   expect(upload).toHaveBeenCalled();
+   expect(writes.find((write:any)=>write.table==='voicemails')?.value).toMatchObject({transcription:null});
+   expect(mock.notice).toHaveBeenCalled();
+   expect(JSON.stringify(log.mock.calls)).not.toContain('private provider details');
+  }finally{log.mockRestore();}
+ });
+ it('defers transcription on a bounded identity failure without recording provider details or PBX credentials',async()=>{
   database();
   const log=vi.spyOn(console,'error').mockImplementation(()=>{});
   vi.mocked(fetch).mockResolvedValueOnce(new Response('private provider details',{status:403}));
   try{
    const response=await POST(request());
-   expect(response.status).toBe(503);
-   expect(await response.json()).toMatchObject({code:'voicemail_processing_unavailable'});
-   expect(log).toHaveBeenCalledWith('phone_voicemail_processing_failed',{reason:'voice_identity_unavailable'});
+   expect(response.status).toBe(200);
+   expect(await response.json()).toMatchObject({saved:true,transcriptAvailable:false});
+   expect(log).toHaveBeenCalledWith('phone_voicemail_transcription_deferred',{reason:'voice_identity_unavailable'});
    expect(JSON.stringify(log.mock.calls)).not.toContain('private provider details');
    expect(JSON.stringify(log.mock.calls)).not.toContain(secret);
   }finally{log.mockRestore();}

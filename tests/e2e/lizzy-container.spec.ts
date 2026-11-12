@@ -6,12 +6,12 @@ import { test, expect } from '@playwright/test';
  */
 test.describe('Lizzy container', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/admin/dashboard');
+    await page.goto('/dashboard');
   });
 
   test('loads Lizzy with deploy strip and command panel', async ({ page }) => {
     await expect(page.getByText('Lizzy', { exact: false }).first()).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByText('GitHub → Northflank')).toBeVisible();
+    await expect(page.getByText('GitHub → Google Cloud Run')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Command' })).toBeVisible();
   });
 

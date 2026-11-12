@@ -1,6 +1,7 @@
+import { appOrigin } from './helpers/app-origins';
 import { test, expect } from '@playwright/test';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
+const BASE = appOrigin('lms');
 const EMAIL = process.env.E2E_LEARNER_EMAIL || '';
 const PASSWORD = process.env.E2E_LEARNER_PASSWORD || '';
 

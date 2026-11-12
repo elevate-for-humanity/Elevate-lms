@@ -1,6 +1,7 @@
+import { appOrigin } from './helpers/app-origins';
 import { expect, test, type Page } from '@playwright/test';
 
-const website = 'https://www.elevateforhumanity.org/programs/hvac-technician';
+const website = `${appOrigin('marketing')}/programs/hvac-technician`;
 const selector = 'video[data-hvac-program-video="20261029"]';
 type PlaybackEvidence = {
   startedAt: number; firstTime: number; maxTime: number;

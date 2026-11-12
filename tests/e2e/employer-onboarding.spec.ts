@@ -1,6 +1,7 @@
+import { appOrigin as e2eAppOrigin } from './helpers/app-origins';
 import { test, expect, type Locator, type Request as BrowserRequest } from '@playwright/test';
 import { isConfirmedWebKitCancellation, isTrackedClientRead, isSettlingClientRead, type CapturedBrowserError, type CancelledBrowserRequest, type CompletedBrowserRequest } from './helpers/browser-runtime-errors';
-const base = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
+const base = e2eAppOrigin('lms');
 const email = process.env.E2E_EMPLOYER_EMAIL || '';
 const password = process.env.E2E_EMPLOYER_PASSWORD || '';
 test('Employer setup saves company and hiring needs, opens private files and acknowledges orientation', async ({

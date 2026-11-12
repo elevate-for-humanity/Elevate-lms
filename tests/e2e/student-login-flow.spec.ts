@@ -1,3 +1,4 @@
+import { appOrigin } from './helpers/app-origins';
 /**
  * Student login → dashboard → LMS smoke test.
  *
@@ -16,7 +17,7 @@
 
 import { test, expect } from '@playwright/test';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
+const BASE = appOrigin('lms');
 const STUDENT_EMAIL = process.env.TEST_STUDENT_EMAIL || '';
 const STUDENT_PASSWORD = process.env.TEST_STUDENT_PASSWORD || '';
 const HAS_CREDENTIALS = !!STUDENT_EMAIL && !!STUDENT_PASSWORD;

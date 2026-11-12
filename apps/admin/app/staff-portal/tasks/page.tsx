@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
+import { hasAnyRole } from '@/lib/rbac/role-matrix';
 import { 
   CheckSquare,
   Clock,
@@ -38,7 +39,7 @@ interface Task {
 }
 
 export default async function StaffTasksPage() {
-  const { user, profile } = await requireRole(['staff', 'admin', 'super_admin']);
+  const { user, profile, effectiveRoles } = await requireRole(['staff', 'admin', 'super_admin']);
   const supabase = await createClient();
 
   const { data: onboardingTasks } = await supabase
@@ -84,7 +85,7 @@ export default async function StaffTasksPage() {
   })));
 
   // Admins triage the unowned admissions queue; staff never see it.
-  if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+  if (hasAnyRole(effectiveRoles, ['admin', 'super_admin'])) {
     const { data: unassignedTasks, error: unassignedError } = await supabase
       .from('tasks')
       .select('id,title,description,status,priority')

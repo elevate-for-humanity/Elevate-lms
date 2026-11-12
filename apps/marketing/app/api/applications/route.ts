@@ -557,6 +557,8 @@ async function _POST(req: Request) {
       normalized_email: body.email.toLowerCase().trim(),
       normalized_phone: body.phone.replace(/\D/g, ''),
       city: body.city || 'Not provided',
+      state: body.state || null,
+      address: body.address || null,
       zip: body.zip || '00000',
       program_interest: program,
       program_slug: body.programSlug || body.program_slug || null,

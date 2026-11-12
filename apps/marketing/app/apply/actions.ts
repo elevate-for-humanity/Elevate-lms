@@ -8,6 +8,10 @@ export async function submitStudentApplication(data: {
   lastName: string;
   email: string;
   phone: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
   zipCode?: string;
   programInterest?: string;
   requestedFundingSource?: string;
@@ -49,6 +53,10 @@ export async function submitStudentApplication(data: {
       lastName,
       email,
       phone,
+      dateOfBirth: data.dateOfBirth?.trim() || '',
+      address: data.address?.trim() || '',
+      city: data.city?.trim() || '',
+      state: data.state?.trim() || '',
       zip: data.zipCode?.trim() || '',
       program,
       programSlug: program,

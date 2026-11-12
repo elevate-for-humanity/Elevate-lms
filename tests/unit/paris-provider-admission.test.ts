@@ -10,6 +10,7 @@ vi.mock('@/lib/ai/runtime/repair-reconciliation',()=>({reconcileRecoveredRepairs
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:string)=>{
  let values:any;const filters:any[]=[];
  const result=()=>{
+  if(values&&table==='paris_autopilot_policy')return {data:null,error:null};
   if(values){h.updates.push({table,values,filters});return {data:h.claimWon?{id:'pending'}:null,error:null};}
   if(table==='paris_autopilot_policy')return {data:{enabled:true,actor_id:'owner'},error:null};
   if(table==='profiles')return {data:{role:'admin'},error:null};

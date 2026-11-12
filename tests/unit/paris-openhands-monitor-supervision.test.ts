@@ -1,5 +1,5 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const h=vi.hoisted(()=>({repair:null as any,updates:[] as any[],observations:0,mode:'pending',lose:false,enabled:true,role:'super_admin',source:null as any,latest:null as any,build:null as any}));
+const h=vi.hoisted(()=>({repair:null as any,updates:[] as any[],heartbeats:[] as any[],observations:0,mode:'pending',lose:false,enabled:true,role:'super_admin',source:null as any,latest:null as any,build:null as any}));
 vi.mock('@/lib/ai/runtime/repair-events',()=>({readRecentRepairEvents:async()=>[]}));
 vi.mock('@/lib/ai/runtime/repair-reconciliation',()=>({reconcileRecoveredRepairs:async()=>{}}));
 vi.mock('@/lib/devstudio/workflow-github-context',()=>({currentWorkflowGitHubToken:()=> 'temporary-test-only'}));
@@ -10,6 +10,7 @@ vi.mock('@/lib/devstudio/paris-openhands-adapter',()=>({observeParisOpenHandsRep
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:string)=>{
  let values:any;const eqs:any[]=[];let statuses:any;
  const result=()=>{
+  if(values&&table==='paris_autopilot_policy'){h.heartbeats.push(values);return {data:null,error:null};}
   if(values){h.updates.push({values,eqs});return {data:h.lose?null:{id:h.repair.id},error:null};}
   if(table==='paris_autopilot_policy')return {data:{enabled:h.enabled,actor_id:'owner'},error:null};
   if(table==='profiles')return {data:{role:h.role},error:null};
@@ -25,7 +26,7 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:s
 }})}));
 import {tickParisCodeRepairs} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
- h.updates=[];h.observations=0;h.mode='pending';h.lose=false;h.enabled=true;h.role='super_admin';
+ h.updates=[];h.heartbeats=[];h.observations=0;h.mode='pending';h.lose=false;h.enabled=true;h.role='super_admin';
  h.repair={id:'11111111-1111-4111-8111-111111111111',actor_id:'owner',status:'blocked',
   error_code:'PARIS_OPENHANDS_WAIT_DEADLINE',attempt_count:1,attempt_history:[],workflow_run_id:12,
   updated_at:'2026-11-10T11:00:00Z',candidate:{kind:'openhands-checkpoint',checkpoint:{taskId:'same-task',runId:12,
@@ -36,6 +37,7 @@ beforeEach(()=>{
 it('actual signed monitor records pending provider evidence without dispatching another execution',async()=>{
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true});
  expect(h.observations).toBe(1);expect(h.updates).toHaveLength(1);
+ expect(h.heartbeats).toEqual([{last_tick_at:expect.any(String)}]);
  expect(h.updates[0].values.verification.openhandsObservation.state).toBe('pending');
  expect(h.updates[0].values.attempt_count).toBeUndefined();
  expect(vi.mocked(fetch).mock.calls.every(([,init])=>!init?.method||init.method==='GET')).toBe(true);

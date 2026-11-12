@@ -282,6 +282,8 @@
     "audit:placeholder-images": "node scripts/audit-forbidden-placeholder-images.mjs",
     "audit:app-routes": "node scripts/audit-program-application-routes.mjs",
     "verify:system": "tsx scripts/verify-system.ts",
+    "diagnose:course-builds": "node scripts/diagnose-course-builds.mjs",
+    "verify:paris-app": "node scripts/verify-paris-app.mjs",
     "link:hvac-videos": "tsx scripts/link-hvac-videos.ts",
     "build:retail-course": "tsx scripts/course-factory/build-retail-industry-fundamentals.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm build && pnpm smoke",

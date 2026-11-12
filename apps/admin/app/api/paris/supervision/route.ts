@@ -6,6 +6,8 @@ import { PARIS_IDENTITY } from '@/lib/ai/paris-identity';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+const MONITOR_STALL_MS = 30 * 60 * 1000;
+
 /** Real durable observations, never synthetic registry heartbeats. */
 export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
@@ -20,7 +22,7 @@ export async function GET(req: NextRequest) {
     db.from('paris_runtime_events').select('id,kind,operation,status,provider,duration_ms,failure_category,recovery,next_action,correlation_id,created_at')
       .gte('created_at', since).order('created_at', {ascending:false}).limit(100),
     courseQuery,
-    db.from('paris_autopilot_policy').select('enabled,max_daily_repairs,authorized_at').eq('id',true).maybeSingle(),
+    db.from('paris_autopilot_policy').select('*').eq('id',true).maybeSingle(),
   ]);
   let repairQuery=db.from('paris_code_repairs').select('id,status,source_job_id,workflow_run_id,release_sha,error_code,verification,created_at,updated_at').order('created_at',{ascending:false}).limit(20);
   if(buildId)repairQuery=repairQuery.in('source_job_id',(jobs.data??[]).map(job=>job.id));
@@ -49,12 +51,20 @@ export async function GET(req: NextRequest) {
     // Never report healthy while work waits and nothing is completing.
     stalled: summary.queued > 0 && inFlight === 0 && summary.verified === 0,
   };
+  // A dead cron is silent: GitHub disables schedules after 60 days of repo
+  // inactivity. Each signed tick records last_tick_at; surface its absence.
+  const lastTickAt:string|null=repairPolicy.data?.last_tick_at ?? null;
+  const monitorStalled=Boolean(repairPolicy.data?.enabled) &&
+    (!lastTickAt || Date.now()-Date.parse(lastTickAt)>MONITOR_STALL_MS);
+  const policy=repairPolicy.data?{enabled:repairPolicy.data.enabled,max_daily_repairs:repairPolicy.data.max_daily_repairs,
+    authorized_at:repairPolicy.data.authorized_at,last_tick_at:lastTickAt}:repairPolicy.data;
   return NextResponse.json({identity:PARIS_IDENTITY,observedAt:new Date().toISOString(),
     status:events.data.length ? 'observed' : 'no_observations',
     coverage:{inference:'shared aiChat gateway',commands:'shared governed command executor',
       workflows:'API handlers using withApiAudit',courses:'canonical course queue monitor'},
     events:events.data,courses:jobs.data,
-    codeRepair:{available:!repairs.error&&!repairPolicy.error,policy:repairPolicy.data,summary:repairSummary,repairs:repairs.data??[]},
+    monitor_stalled:monitorStalled,
+    codeRepair:{available:!repairs.error&&!repairPolicy.error,policy,monitor_stalled:monitorStalled,summary:repairSummary,repairs:repairs.data??[]},
     limits:['Recent failures are historical observations, not proof a service is still failing.',
       'Uninstrumented endpoints and external services are not covered.',
       'Code repair uses independent tests, bounded dispatch and exact deployment verification; protected failures remain blocked.']},

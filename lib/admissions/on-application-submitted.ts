@@ -79,6 +79,13 @@ async function upsertLead(db: SupabaseClient, app: SubmittedApplication, email: 
 }
 
 async function upsertBinderChecklist(db: SupabaseClient, programSlug: string) {
+  const { data: configured, error: lookupError } = await db.from('apprentice_document_types')
+    .select('document_type').eq('program_slug', programSlug);
+  if (lookupError) throw lookupError;
+  // A program with a configured checklist keeps it: adding default keys
+  // alongside existing aliases (e.g. social_security_card) would reopen
+  // binders whose approved uploads match the configured key.
+  if (configured && configured.length > 0) return configured.map((row) => row.document_type as string);
   const checklist = binderChecklistFor(programSlug);
   const { error } = await db.from('apprentice_document_types').upsert(
     checklist.map((doc, index) => ({

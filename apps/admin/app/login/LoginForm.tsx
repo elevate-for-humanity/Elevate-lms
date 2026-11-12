@@ -169,10 +169,11 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
             )}
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">
+              <label htmlFor="admin-login-email" className="block text-sm font-medium text-slate-300 mb-1.5">
                 Email
               </label>
               <input
+                id="admin-login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -186,7 +187,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-slate-300">
+                <label htmlFor="admin-login-password" className="block text-sm font-medium text-slate-300">
                   Password
                 </label>
                 <button
@@ -198,6 +199,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
                 </button>
               </div>
               <input
+                id="admin-login-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -253,10 +255,11 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                  <label htmlFor="admin-forgot-email" className="block text-sm font-medium text-slate-300 mb-1.5">
                     Email
                   </label>
                   <input
+                    id="admin-forgot-email"
                     type="email"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}

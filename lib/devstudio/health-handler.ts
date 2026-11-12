@@ -34,8 +34,8 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
   const hasCloudflare = cloudflareProbe.reachable;
   let githubAuthError: string | null = null;
-  const githubToken = await getGitHubToken().catch(() => {
-    githubAuthError = 'github_authentication_unavailable';
+  const githubToken = await getGitHubToken().catch((err: unknown) => {
+    githubAuthError = err instanceof Error ? err.message : 'github_authentication_unavailable';
     return null;
   });
   const hasGitHub = Boolean(githubToken);

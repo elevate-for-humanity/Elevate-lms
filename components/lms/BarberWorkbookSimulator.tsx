@@ -2,6 +2,7 @@
 
 import { LearningPreview } from './LearningWorkspace';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import WorkbookNarration from './WorkbookNarration';
 
 const WorkbookStation3D = lazy(() => import('./WorkbookStation3D'));
@@ -63,7 +64,7 @@ export default function BarberWorkbookSimulator({sectionNumber}:{sectionNumber:n
       <text x="18" y="260" fontSize="15" fill="#334155">{stage===0?'Guard selection':stage===1?'Fade placement':'Blend correction'}</text>
       <text x="230" y="260" fontSize="16" fontWeight="bold" fill="#334155">{stage===0?guard:'Virtual guide'}</text>
     </svg></LearningPreview>
-    {show3D && <Suspense fallback={<p className="rounded-xl bg-stone-100 p-4">Loading the 3D model…</p>}><WorkbookStation3D variant={'barber'} /></Suspense>}
+    {show3D && <ErrorBoundary fallback={<p className="rounded-xl bg-stone-100 p-4">The 3D view could not load on this device. Continue with the activity on this page.</p>}><Suspense fallback={<p className="rounded-xl bg-stone-100 p-4">Loading the 3D model…</p>}><WorkbookStation3D variant={'barber'} /></Suspense></ErrorBoundary>}
     <div className="my-4"><p className="font-bold">Step {stage+1} of {exercises.length}: {task.title}</p><p className="mt-2">{task.prompt}</p><WorkbookNarration text={`Virtual practice. ${task.title}. ${task.prompt} ${task.choices.join('. ')}`} /></div>
     <fieldset className="space-y-2"><legend className="sr-only">{task.prompt}</legend>{task.choices.map((option,index)=><label key={option} className="flex min-h-12 items-center gap-3 rounded-lg border border-stone-300 p-3"><input type="radio" name={`barber-practice-${stage}`} checked={choice===index} onChange={()=>{setChoice(index);setChecked(false);}} />{option}</label>)}</fieldset>
     {checked&&<p role="status" aria-live="polite" className={`my-4 rounded-lg p-4 font-semibold ${correct?'bg-emerald-50 text-emerald-900':'bg-amber-50 text-amber-950'}`}>{correct?'Correct. ':'Not quite—try again. '}{task.explanation}</p>}

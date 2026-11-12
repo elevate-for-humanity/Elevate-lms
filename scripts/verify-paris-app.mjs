@@ -26,7 +26,7 @@ export function permissionChecks(permissions = {}) {
   return Object.entries(REQUIRED_PERMISSIONS).map(([name, level]) => ({
     name: `permission ${name}:${level}`,
     passed: permissions[name] === level || (level === 'read' && permissions[name] === 'write'),
-    detail: `granted=${permissions[name] ?? 'none'}`,
+    detail: `${permissions[name] === level ? '' : 'GITHUB_APP_WRITE_PERMISSIONS_REQUIRED '}granted=${permissions[name] ?? 'none'}`,
   }));
 }
 
@@ -48,17 +48,17 @@ export async function verifyParisApp({ env = process.env, request = fetch } = {}
   try { jwt = appJwt(appId, pem); record('app JWT minted', true); }
   catch { record('app JWT minted', false, 'GITHUB_APP_PRIVATE_KEY_INVALID'); return checks; }
   const app = await call('/app', jwt);
-  if (!record('app identity', app.ok && String(app.body.id) === appId, `HTTP ${app.status}${app.body.slug ? ' slug=' + app.body.slug : ''}`)) return checks;
+  if (!record('app identity', app.ok && String(app.body.id) === appId, `${app.ok ? 'GITHUB_APP_INSTALLATION_MISMATCH' : 'GITHUB_APP_REQUEST_HTTP_' + app.status}${app.body.slug ? ' slug=' + app.body.slug : ''}`)) return checks;
   const installation = await call(`/repos/${repository}/installation`, jwt);
   const expected = env.GITHUB_APP_INSTALLATION_ID?.trim();
   const resolved = installation.ok ? String(installation.body.id) : null;
   if (!record(`installation on ${repository}`, installation.ok && !installation.body.suspended_at && (!expected || expected === resolved),
-    installation.ok ? `id=${resolved}${expected && expected !== resolved ? ' (configured ' + expected + ')' : ''}${installation.body.suspended_at ? ' SUSPENDED' : ''}` : `HTTP ${installation.status} — App not installed on repository`)) return checks;
+    installation.ok ? `id=${resolved}${expected && expected !== resolved ? ' GITHUB_APP_INSTALLATION_MISMATCH (configured ' + expected + ')' : ''}${installation.body.suspended_at ? ' SUSPENDED' : ''}` : `GITHUB_APP_REQUEST_HTTP_${installation.status} — App not installed on repository`)) return checks;
   for (const check of permissionChecks(installation.body.permissions)) record(check.name, check.passed, check.detail);
   const minted = await call(`/app/installations/${resolved}/access_tokens`, jwt, { method: 'POST', body: JSON.stringify({ repositories: [repository.split('/')[1]] }) });
-  if (!record('installation token minted', minted.ok && typeof minted.body.token === 'string', `HTTP ${minted.status}`)) return checks;
+  if (!record('installation token minted', minted.ok && typeof minted.body.token === 'string', `GITHUB_APP_REQUEST_HTTP_${minted.status}`)) return checks;
   const ref = await call(`/repos/${repository}/git/ref/heads/main`, minted.body.token);
-  record('main ref readable', ref.ok && /^[a-f0-9]{40}$/.test(ref.body.object?.sha ?? ''), ref.ok ? `sha=${ref.body.object.sha.slice(0, 12)}` : `HTTP ${ref.status}`);
+  record('main ref readable', ref.ok && /^[a-f0-9]{40}$/.test(ref.body.object?.sha ?? ''), ref.ok ? `sha=${ref.body.object.sha.slice(0, 12)}` : `GITHUB_APP_REQUEST_HTTP_${ref.status}`);
   await call('/installation/token', minted.body.token, { method: 'DELETE' }).catch(() => null);
   return checks;
 }

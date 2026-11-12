@@ -42,6 +42,13 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
   if (error || !lead) notFound();
 
+  const { data: communications } = await db
+    .from('communication_log')
+    .select('id, template_key, subject, status, error, created_at')
+    .or(lead.email ? `lead_id.eq.${lead.id},recipient_email.eq."${lead.email.toLowerCase()}"` : `lead_id.eq.${lead.id}`)
+    .order('created_at', { ascending: false })
+    .limit(25);
+
   const name = lead.full_name || [lead.first_name, lead.last_name].filter(Boolean).join(' ') || lead.email || 'Unknown Lead';
 
   return (
@@ -121,6 +128,28 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
               <h2 className="text-sm font-bold text-slate-900 mb-3">Notes</h2>
               <p className="text-sm text-slate-700 whitespace-pre-wrap">{lead.notes}</p>
             </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 p-6 mt-6">
+          <h2 className="text-sm font-bold text-slate-900 mb-3">Communications</h2>
+          {communications && communications.length > 0 ? (
+            <ul className="divide-y divide-slate-100">
+              {communications.map((entry) => (
+                <li key={entry.id} className="py-2 flex items-start justify-between gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-slate-900">{entry.subject || entry.template_key}</p>
+                    <p className="text-xs text-slate-500">{entry.template_key}{entry.error ? ` — ${entry.error}` : ''}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className={`text-xs font-semibold ${entry.status === 'sent' ? 'text-green-700' : 'text-red-700'}`}>{entry.status}</span>
+                    <p className="text-xs text-slate-500">{new Date(entry.created_at).toLocaleString()}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-slate-500">No logged communications.</p>
           )}
         </div>
 

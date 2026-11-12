@@ -8,6 +8,7 @@ import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { barberOnboardingEmail } from '@/lib/email/templates/barber-onboarding';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { APPLICATION_STATUS_EMAIL_STAGE, sendAdmissionsStatusEmail } from '@/lib/admissions/status-emails';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -205,21 +206,17 @@ export async function POST(req: NextRequest) {
 <p>If you have questions, please contact us at <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a>.</p>
 <br/><p>Warm regards,<br/>Elevate for Humanity Team</p>`,
         });
-      } else if (next_status === 'approved') {
-        // Generic approval email for non-barber programs
-        if (!isBarber) {
-          await sendEmail({
-            to: [application.email],
-            from: `${PLATFORM_DEFAULTS.orgName} <info@${PLATFORM_DEFAULTS.canonicalDomain}>`,
-            subject: `Your Application Has Been Approved — ${PLATFORM_DEFAULTS.orgName}`,
-            html: `<p>Hi ${firstName},</p>
-<p>Congratulations! Your application for <strong>${application.program_slug || application.program_interest || 'the program'}</strong> has been <strong>approved</strong>.</p>
-<p>Please log in to your portal to complete enrollment:</p>
-<p><a href="${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard">Access Your Portal →</a></p>
-<p>Questions? Contact us at <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}">info@elevateforhumanity.org</a>.</p>
-<br/><p>Warm regards,<br/>Elevate for Humanity Team</p>`,
-          });
-        }
+      }
+
+      const stage = APPLICATION_STATUS_EMAIL_STAGE[next_status];
+      if (stage && !(stage === 'accepted' && isBarber)) {
+        await sendAdmissionsStatusEmail(db, {
+          stage: stage as Exclude<typeof stage, 'submitted'>,
+          email: application.email,
+          firstName,
+          programName: application.program_slug || application.program_interest || 'the program',
+          applicationId: application_id,
+        });
       }
     } catch (emailErr) {
       // Email failure must not roll back the status change

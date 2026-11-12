@@ -17,6 +17,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getRedisClient } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/sendgrid';
+import { logCommunication } from '@/lib/admissions/status-emails';
+import { onApplicationSubmitted } from '@/lib/admissions/on-application-submitted';
 import { provisionAccount } from '@/lib/enrollment/provision-account';
 
 import { auditMutation } from '@/lib/api/withAudit';
@@ -953,6 +955,15 @@ async function _POST(req: Request) {
           ? `🔵 Admin Review Required [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${fundingName}`
           : `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`;
 
+      await logCommunication(supabase, {
+        recipientEmail: body.email,
+        templateKey: 'admissions_submitted',
+        subject: emailSubject,
+        applicationId: data.id,
+        success: studentEmailResult.success,
+        error: studentEmailResult.error,
+      });
+
       const staffEmailResult = await sendEmail({
         to: 'elevate4humanityedu@gmail.com',
         subject: staffSubject,
@@ -999,6 +1010,24 @@ async function _POST(req: Request) {
         emailError instanceof Error ? emailError : undefined,
       );
       emailStatus = { student: 'exception', staff: 'exception' };
+    }
+
+    try {
+      const automationDb = await getAdminClient();
+      if (automationDb) {
+        const automation = await onApplicationSubmitted(automationDb, {
+          applicationId: data.id,
+          firstName: body.firstName,
+          lastName: body.lastName,
+          email: body.email,
+          phone: body.phone || null,
+          programSlug: data.program_interest || program || null,
+          source: body.source || 'website',
+        });
+        logger.info('[Applications] Admissions automation complete', { applicationId: data.id, ...automation });
+      }
+    } catch (automationError) {
+      logger.error('[Applications] Admissions automation failed', automationError instanceof Error ? automationError : undefined, { applicationId: data.id });
     }
 
     // Queue automation jobs for post-submission processing (non-blocking)

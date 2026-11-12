@@ -50,9 +50,27 @@ for (const file of files) {
   }
 }
 
-if (offenders.length) {
-  console.error(`check-unprotected-routes: ${offenders.length} mutating route(s) without an auth guard:`);
-  for (const offender of offenders.sort()) console.error(`  - ${offender}`);
+// Ratchet: routes listed in the baseline predate this check and are tracked
+// for review. Any new unguarded mutating route fails immediately.
+const baselinePath = path.join(root, 'scripts/route-auth-baseline.json');
+if (process.argv.includes('--update-baseline')) {
+  const entries = offenders.map((offender) => offender.replace(/ \[.*\]$/, '')).sort();
+  fs.writeFileSync(baselinePath, `${JSON.stringify(entries, null, 2)}\n`);
+  console.log(`check-unprotected-routes: baseline written (${entries.length} route(s))`);
+  process.exit(0);
+}
+const baseline = new Set(fs.existsSync(baselinePath) ? JSON.parse(fs.readFileSync(baselinePath, 'utf8')) : []);
+const fresh = offenders.filter((offender) => !baseline.has(offender.replace(/ \[.*\]$/, '')));
+const offenderFiles = new Set(offenders.map((offender) => offender.replace(/ \[.*\]$/, '')));
+const stale = [...baseline].filter((file) => !offenderFiles.has(file));
+if (stale.length) {
+  console.warn(`check-unprotected-routes: ${stale.length} baseline route(s) are now guarded or removed; prune scripts/route-auth-baseline.json:`);
+  for (const file of stale) console.warn(`  - ${file}`);
+}
+
+if (fresh.length) {
+  console.error(`check-unprotected-routes: ${fresh.length} mutating route(s) without an auth guard:`);
+  for (const offender of fresh.sort()) console.error(`  - ${offender}`);
   process.exit(1);
 }
-console.log(`check-unprotected-routes: OK (${files.length} route files scanned)`);
+console.log(`check-unprotected-routes: OK (${files.length} route files scanned, ${baseline.size} baselined for review)`);

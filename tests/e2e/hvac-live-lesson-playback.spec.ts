@@ -1,8 +1,9 @@
+import { appOrigin } from './helpers/app-origins';
 import { expect, test, type Page } from '@playwright/test';
 
 // A real LMS lesson with a published, encoded video. Only the disposable QA
 // learner can log in; no existing student's work is opened or changed.
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
+const BASE = appOrigin('lms');
 const COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 const LESSON_ID = 'f1d32b7f-7cd4-44c4-9858-6b756ef21b89';
 const email = process.env.E2E_LEARNER_EMAIL || '';

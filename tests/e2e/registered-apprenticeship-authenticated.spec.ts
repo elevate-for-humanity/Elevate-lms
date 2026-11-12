@@ -1,12 +1,13 @@
+import { appOrigin, peerOrigin } from './helpers/app-origins';
 import { test, expect, type Page } from '@playwright/test';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
+const BASE = appOrigin('lms');
 const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || process.env.TEST_STUDENT_EMAIL || '';
 const APPRENTICE_PASSWORD =
   process.env.E2E_APPRENTICE_PASSWORD || process.env.TEST_STUDENT_PASSWORD || '';
 const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
-const ADMIN_BASE = process.env.PLAYWRIGHT_ADMIN_URL || 'https://admin.elevateforhumanity.org';
+const ADMIN_BASE = peerOrigin('admin');
 const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL || '';
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD || '';
 

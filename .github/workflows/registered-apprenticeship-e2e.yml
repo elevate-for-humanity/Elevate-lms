@@ -12,7 +12,7 @@ on:
       - 'tests/browser/lesson-player-pause-resume.mjs'
       - 'components/lms/LessonPlayer.tsx'
       - 'components/lms/InteractiveVideoPlayer.tsx'
-      - 'tests/e2e/public-navigation-audit.ts'
+      - 'tests/e2e/helpers/public-navigation-audit.ts'
   workflow_dispatch:
     inputs:
       employer_only:

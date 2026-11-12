@@ -1,4 +1,4 @@
-import { registerPublicNavigationAudit } from './public-navigation-audit';
+import { registerPublicNavigationAudit } from './helpers/public-navigation-audit';
 import { expect, test } from '@playwright/test';
 import { observeDocumentStability } from './helpers/document-stability';
 

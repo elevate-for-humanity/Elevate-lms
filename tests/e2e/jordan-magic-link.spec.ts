@@ -1,3 +1,4 @@
+import { appOrigin } from './helpers/app-origins';
 /**
  * Jordan White — authenticated student flow via magic link.
  *
@@ -12,7 +13,7 @@
 
 import { test, expect } from '@playwright/test';
 
-const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://www.elevateforhumanity.org';
+const BASE = appOrigin('lms');
 const MAGIC_LINK = process.env.MAGIC_LINK_URL || '';
 
 test.describe('Jordan White — student portal access', () => {

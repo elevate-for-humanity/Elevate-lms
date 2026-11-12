@@ -8,6 +8,7 @@ import { indexRepository, searchRepoIndex } from '@/lib/devstudio/os/repo-indexe
 import { jsonOk } from '@/lib/devstudio/os/api-helpers';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import { approveWorkflowRepair, WorkflowRepairError } from '@/lib/control-plane/workflow-repairs';
+import { dispatchWorkflow, getRun, GitHubWorkflowError, listRecentRuns, listWorkflows } from '@/lib/devstudio/github-workflows';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -18,6 +19,22 @@ export async function GET(request: NextRequest) {
 
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
+
+  const action = request.nextUrl.searchParams.get('action');
+  const runId = request.nextUrl.searchParams.get('run_id');
+  if (action === 'list' || action === 'recent_runs' || runId) {
+    try {
+      if (action === 'list') return jsonOk({ workflows: await listWorkflows() }, { headers: { 'cache-control': 'no-store' } });
+      if (action === 'recent_runs') {
+        const runs = await listRecentRuns(Number(request.nextUrl.searchParams.get('per_page') ?? '10'));
+        return jsonOk({ runs }, { headers: { 'cache-control': 'no-store' } });
+      }
+      return jsonOk({ run: await getRun(runId!) }, { headers: { 'cache-control': 'no-store' } });
+    } catch (err) {
+      if (err instanceof GitHubWorkflowError) return safeError(err.message, err.status);
+      return safeInternalError(err, 'Failed to load GitHub workflows');
+    }
+  }
 
   const view = request.nextUrl.searchParams.get('view');
 
@@ -97,6 +114,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json().catch(() => ({}));
+    if (typeof body.workflow === 'string') {
+      if (!auth.effectiveRoles.includes('super_admin')) return safeError('Workflow dispatch requires super_admin.', 403);
+      const dispatched = await dispatchWorkflow(body.workflow, body.inputs);
+      return jsonOk({ dispatched: true, ...dispatched }, { status: 202, headers: { 'cache-control': 'no-store' } });
+    }
     if (body.action === 'approve-workflow-repair') {
       if (typeof body.actionId !== 'string' ||
           !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(body.actionId)) {
@@ -123,6 +145,7 @@ export async function POST(request: NextRequest) {
     return safeError('Unknown action', 400);
   } catch (err) {
     if (err instanceof WorkflowRepairError) return safeError(err.message, err.status);
+    if (err instanceof GitHubWorkflowError) return safeError(err.message, err.status);
     return safeInternalError(err, 'Workflow action failed');
   }
 }

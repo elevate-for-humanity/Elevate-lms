@@ -4,12 +4,14 @@
 
 ### Runtime Reference Counts
 
-| System | References | Status |
-|--------|------------|--------|
-| `lib/course-builder/` | 70 | ⚠️ ACTIVE |
-| `lib/curriculum/builders/` | 5 | ⚠️ ACTIVE |
-| `lib/ai/course-*` | 11 | ⚠️ ACTIVE |
-| `lib/course-factory/` | 0 | 🆕 NEW |
+> **Status: migration complete.** The tables below the status table are the historical Phase 2 plan.
+
+| System | Status |
+|--------|--------|
+| Course Factory migration | ✅ Complete |
+| `lib/course-factory/index.ts` | ✅ Facade — exports `courseFactory` from the canonical `lib/course-builder/orchestrator` |
+| `lib/course-factory/factory.ts` | 🚫 Banned — `scripts/check-course-factory-authority.mjs` fails if it exists or is imported |
+| `lib/course-builder/` | ✅ Canonical Course Builder orchestration layer |
 
 ---
 

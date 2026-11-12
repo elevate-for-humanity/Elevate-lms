@@ -21,7 +21,7 @@ async function speech(audio:Buffer){
  const identity=await fetch('http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token',{headers:{'Metadata-Flavor':'Google'},redirect:'error',signal:AbortSignal.timeout(5000)});
  if(!identity.ok)throw Error('voice_identity_unavailable');
  const token=(await identity.json()).access_token;if(typeof token!=='string')throw Error('voice_identity_unavailable');
- const response=await fetch('https://speech.googleapis.com/v1/speech:recognize',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({config:{languageCode:'en-US',model:'phone_call',enableAutomaticPunctuation:true},audio:{content:audio.toString('base64')}}),redirect:'error',signal:AbortSignal.timeout(45000)});
+ const response=await fetch('https://speech.googleapis.com/v1/speech:recognize',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({config:{encoding:'LINEAR16',sampleRateHertz:8000,languageCode:'en-US',model:'phone_call',enableAutomaticPunctuation:true},audio:{content:audio.toString('base64')}}),redirect:'error',signal:AbortSignal.timeout(45000)});
  if(!response.ok)throw Error('speech_http_'+response.status);
  const result=await response.json();return (result.results||[]).map((part:any)=>part.alternatives?.[0]?.transcript||'').join(' ').trim().slice(0,20000);
 }
@@ -51,7 +51,18 @@ export async function POST(request:Request){
   if(!/^(unknown|[0-9]{1,3}|[+][1-9][0-9]{7,14})$/.test(caller))return NextResponse.json({error:'Invalid caller identifier.'},{status:400});
   const {data:previous,error:previousError}=await db.from('voicemails').select('transcription').eq('id',body.id).maybeSingle();
   if(previousError)throw Error('voicemail_lookup_unavailable');
-  const transcript=previous?.transcription||await speech(audio);
+  let transcript:string=previous?.transcription||'';
+  if(!transcript){
+   try{transcript=await speech(audio);}
+   catch(error){
+    // A validation probe exists to surface Speech failures; ingestion must not depend on Speech.
+    if(body.validateOnly===true)throw error;
+    // Persist the voicemail anyway; the inbox transcript panel retries transcription later.
+    const reason=error instanceof Error && /^(speech_http_[0-9]{3}|voice_identity_unavailable)$/.test(error.message)?error.message:error instanceof Error && error.name==='TimeoutError'?'speech_timeout':'speech_unavailable';
+    console.error('phone_voicemail_transcription_deferred',{reason});
+    transcript='';
+   }
+  }
   if(body.validateOnly===true)return NextResponse.json({validated:true,transcriptAvailable:Boolean(transcript)});
   const {data:bucket,error:bucketLookupError}=await db.storage.getBucket('phone-voicemails');
   if(bucketLookupError && !bucket){

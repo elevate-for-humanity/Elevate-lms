@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import savedConfig from '../fixtures/legacy83-saved-config.json';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 
@@ -39,6 +39,6 @@ it('contains an interactive section failure without taking down the tenant site'
   expect(screen.getByRole('heading', { name: 'Healthy sibling section' })).toBeInTheDocument();
   expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
   expect(screen.getByRole('navigation', { name: 'Footer navigation' })).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Contact', exact: true })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
+  expect(within(screen.getByRole('navigation', { name: 'Footer navigation' })).getByRole('link', { name: 'Contact', exact: true })).toHaveAttribute('href', '/sites/legacy83-preview/contact');
   expect(report).toHaveBeenCalled();
 });

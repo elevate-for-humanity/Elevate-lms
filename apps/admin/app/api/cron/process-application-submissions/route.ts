@@ -61,6 +61,8 @@ async function processApplicationSubmitted(db: Awaited<ReturnType<typeof require
       const { error: leadUpdateError } = await db.from('crm_leads').update({
         application_id: applicationId,
         last_contact_at: new Date().toISOString(),
+        ...(existingLead.stage === 'new' ? { stage: 'application_received' } : {}),
+        ...(existingLead.status === 'new' ? { status: 'in_progress' } : {}),
       }).eq('id', existingLead.id);
       if (leadUpdateError) throw leadUpdateError;
     } else {
@@ -76,9 +78,19 @@ async function processApplicationSubmitted(db: Awaited<ReturnType<typeof require
         owner_user_id: application.advisor_assigned || null,
         profile_id: application.user_id || null,
       });
-      if (leadInsertError && leadInsertError.code !== '23505') throw leadInsertError;
-      // Concurrent submissions may race on crm_leads.email; the unique key
-      // allows one canonical lead. A later job can reconcile its application.
+      if (leadInsertError) {
+        if (leadInsertError.code !== '23505') throw leadInsertError;
+        // On concurrent email-unique insertion, recover the winning row and
+        // link this canonical application instead of falsely reporting success.
+        const { data: winningLead, error: recoveryError } = await db
+          .from('crm_leads').select('id')
+          .ilike('email', normalizedEmail).limit(1).maybeSingle();
+        if (recoveryError || !winningLead) throw new Error('CRM lead conflict could not be reconciled');
+        const { error: linkError } = await db.from('crm_leads')
+          .update({ application_id: applicationId })
+          .eq('id', winningLead.id);
+        if (linkError) throw linkError;
+      }
     }
 
     // 2. Create admission checklist tasks
@@ -137,17 +149,19 @@ async function processApplicationSubmitted(db: Awaited<ReturnType<typeof require
     // 4. Queue PARIS analysis (if PARIS is configured)
     // Queue one PARIS analysis per application only if one is not already
     // recorded. This is a request, not evidence that PARIS accepted a repair.
-    const { data: priorParisJob, error: parisLookupError } = await db.from('job_queue')
-      .select('id').eq('type', 'paris_analyze_application')
-      .contains('payload', { applicationId }).limit(1).maybeSingle();
-    if (parisLookupError) throw parisLookupError;
-    if (!priorParisJob) {
-      const { error: parisQueueError } = await db.from('job_queue').insert({
-        type: 'paris_analyze_application',
-        payload: { applicationId, programSlug },
-        run_after: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-      });
-      if (parisQueueError) throw parisQueueError;
+    if (process.env.PARIS_APPLICATION_ANALYSIS_ENABLED === 'true') {
+      const { data: priorParisJob, error: parisLookupError } = await db.from('job_queue')
+        .select('id').eq('type', 'paris_analyze_application')
+        .contains('payload', { applicationId }).limit(1).maybeSingle();
+      if (parisLookupError) throw parisLookupError;
+      if (!priorParisJob) {
+        const { error: parisQueueError } = await db.from('job_queue').insert({
+          type: 'paris_analyze_application',
+          payload: { applicationId, programSlug },
+          run_after: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        });
+        if (parisQueueError) throw parisQueueError;
+      }
     }
 
     logger.info('[process-application-submissions] Application processed successfully', { applicationId });

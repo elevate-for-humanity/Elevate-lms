@@ -63,6 +63,26 @@ export default async function StaffTasksPage() {
     assigned_to: profile?.full_name || 'Staff',
     created_at: task.created_at,
   }));
+  // Canonical admissions follow-up tasks are assigned to a named staff account.
+  // Never fetch unassigned or other employees' applicant records here.
+  const { data: applicationTasks, error: applicationTaskError } = await supabase
+    .from('tasks')
+    .select('id,title,description,status,priority')
+    .eq('assigned_to', user.id)
+    .eq('related_type', 'application')
+    .limit(100);
+  if (applicationTaskError) throw new Error('Assigned application tasks could not load');
+  tasks.push(...(applicationTasks || []).map((task) => ({
+    id: task.id,
+    title: task.title,
+    description: task.description || 'Review the assigned applicant in your staff workspace.',
+    status: (task.status === 'completed' ? 'completed' : task.status === 'in_progress' ? 'in_progress' : 'pending') as Task['status'],
+    priority: (['low', 'medium', 'high', 'urgent'].includes(task.priority || '') ? task.priority : 'medium') as Task['priority'],
+    due_date: null, // The canonical tasks table uses due_days, not an absolute due date.
+    assigned_to: profile?.full_name || 'Staff',
+    created_at: '',
+  })));
+
   if ((queueCount || 0) > 0) tasks.unshift({
     id: 'assigned-applicant-queue',
     title: 'Work assigned applicant queue',

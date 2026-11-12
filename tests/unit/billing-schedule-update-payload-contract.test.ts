@@ -188,7 +188,7 @@ it('sends only real billing_schedules columns in the scheduled-invoice update', 
   expect(keys).toContain('fulfillment_payload');
 });
 
-const state = vi.hoisted(() => ({ row: {} as Record<string, any>, invoice: vi.fn() }));
+const state = vi.hoisted(() => ({ row: {} as Record<string, any>, invoice: vi.fn(), updated: false }));
 
 vi.mock('@/lib/billing/providers/quickbooks', () => ({
   createQuickBooksBillingProvider: () => ({ createManualInvoice: state.invoice }),
@@ -206,10 +206,11 @@ vi.mock('@/lib/supabase/admin', () => ({
           data: state.row.status === 'active' ? [state.row] : [],
           error: null,
         }),
-        maybeSingle: async () => ({ data: state.row.status === 'active' ? { id: state.row.id } : null, error: null }),
+        maybeSingle: async () => ({ data: state.updated ? { id: state.row.id } : null, error: null }),
         update: (values: Record<string, unknown>) => {
           // postgrest-js sends `JSON.stringify(body)`, so undefined properties
           // never reach PostgREST and the stored column keeps its value.
+          state.updated = true;
           state.row = { ...state.row, ...(JSON.parse(JSON.stringify(values)) as Record<string, unknown>) };
           return q;
         },
@@ -251,6 +252,7 @@ async function runOnce() {
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.clearAllMocks();
+  state.updated = false;
 });
 
 it('reduces the remaining tuition balance after a capped invoice', async () => {
@@ -278,4 +280,14 @@ it('leaves the stored payload untouched when no tuition balance is tracked', asy
   // the stored value instead of overwriting it with an empty object.
   expect(state.row.fulfillment_payload).toEqual({ enrollment_id: 'enrollment' });
   expect(state.row.remaining_invoices).toBe(28);
+});
+
+it('marks a schedule completed when the final invoice exhausts tuition', async () => {
+  vi.stubEnv('CRON_SECRET', 'test-cron');
+  state.updated = false;
+  state.row = activeSchedule({ remaining_invoices: 1, fulfillment_payload: { remaining_tuition_cents: 10000 } });
+  expect((await runOnce()).status).toBe(200);
+  expect(state.row.status).toBe('completed');
+  expect(state.row.remaining_invoices).toBe(0);
+  expect(state.row.fulfillment_payload.remaining_tuition_cents).toBe(0);
 });

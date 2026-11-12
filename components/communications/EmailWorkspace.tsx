@@ -539,13 +539,13 @@ export function EmailWorkspace({
             <p className="px-2 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
               Mailboxes
             </p>
-            <div className="space-y-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
               {data.mailboxes.map((mailbox) => (
                 <button
                   key={mailbox.id}
                   type="button"
                   onClick={() => chooseView('inbox', mailbox.id)}
-                  className={`w-full rounded-xl px-3 py-3 text-left ${mailbox.id === data.selectedMailboxId ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-white'}`}
+                  className={`w-60 shrink-0 rounded-xl px-3 py-3 text-left lg:w-full ${mailbox.id === data.selectedMailboxId ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-white'}`}
                 >
                   <span className="block truncate text-sm font-black">{mailbox.displayName}</span>
                   <span
@@ -563,7 +563,7 @@ export function EmailWorkspace({
             </div>
             <nav
               aria-label="Mail folders"
-              className="mt-5 space-y-1 border-t border-slate-200 pt-3"
+              className="mt-3 flex gap-1 overflow-x-auto border-t border-slate-200 pt-3 lg:mt-5 lg:block lg:space-y-1 lg:overflow-visible"
             >
               {Object.entries({
                 inbox: 'Inbox',
@@ -579,7 +579,7 @@ export function EmailWorkspace({
                   key={key}
                   type="button"
                   onClick={() => chooseView(key)}
-                  className={`block w-full rounded-lg px-3 py-2 text-left text-sm font-bold ${view === key ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-white'}`}
+                  className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold lg:block lg:w-full ${view === key ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-white'}`}
                 >
                   {label}
                 </button>
@@ -588,14 +588,14 @@ export function EmailWorkspace({
                 <button
                   type="button"
                   onClick={() => setFilterEditor(true)}
-                  className="w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-blue-800"
+                  className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold text-blue-800 lg:w-full"
                 >
                   Filters & copy rules
                 </button>
               )}
-              <p className="px-3 pt-3 text-xs font-bold uppercase text-slate-500">Folders</p>
+              <p className="hidden px-3 pt-3 text-xs font-bold uppercase text-slate-500 lg:block">Folders</p>
               {(data.folders || []).map((folder) => (
-                <div className="flex items-center" key={folder.id}>
+                <div className="flex shrink-0 items-center" key={folder.id}>
                   <button
                     type="button"
                     className="min-w-0 flex-1 truncate rounded-lg px-3 py-2 text-left text-sm font-bold text-slate-800"
@@ -629,7 +629,7 @@ export function EmailWorkspace({
                 <button
                   type="button"
                   onClick={() => setFolderEditor({ name: '' })}
-                  className="flex items-center gap-2 px-3 py-3 text-sm font-bold text-blue-800"
+                  className="flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-3 text-sm font-bold text-blue-800"
                 >
                   <Plus className="h-4 w-4" />
                   New folder

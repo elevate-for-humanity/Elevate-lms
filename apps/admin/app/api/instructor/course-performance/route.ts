@@ -21,12 +21,23 @@ async function _GET(request: Request) {
     }
 
     // Get courses and enrollment counts from canonical table
-    const { data: enrollments, error: enrollmentError } = await supabase
+    const { data: enrollmentRows, error: enrollmentError } = await supabase
       .from('program_enrollments')
-      .select('program_id, status, programs!program_enrollments_program_id_fkey(title)')
+      .select('program_id, status')
       .limit(200);
 
     if (enrollmentError) throw enrollmentError;
+
+    const programIds = [...new Set((enrollmentRows || []).map((e) => e.program_id).filter(Boolean))];
+    const { data: programRows, error: programError } = programIds.length
+      ? await supabase.from('programs').select('id, title').in('id', programIds)
+      : { data: [], error: null };
+    if (programError) throw programError;
+    const programTitles = new Map((programRows || []).map((p: any) => [p.id, p.title]));
+    const enrollments = (enrollmentRows || []).map((e) => ({
+      ...e,
+      programs: { title: programTitles.get(e.program_id) },
+    }));
 
     // Aggregate by program
     const programStats: Record<string, { name: string; students: number; completed: number }> = {};

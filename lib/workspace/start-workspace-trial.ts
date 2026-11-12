@@ -4,7 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { provisionWorkspace } from '@/lib/workspace/provision-workspace';
 import { provisionTrialWebsite } from '@/lib/tenant/provision-trial-website';
-import { tenantAdminUrl } from '@/lib/tenant/public-site-url';
+import { tenantAdminUrl, tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
 import { slugifyWorkspaceName, ensureUniqueSlugCandidate } from '@/lib/workspace/slug';
 import { TRIAL_DURATION_DAYS } from '@/lib/workspace/tier-limits';
 
@@ -174,7 +174,7 @@ export async function startWorkspaceTrial(
     const publicPreviewUrl =
       (typeof metadata.public_preview_url === 'string' && metadata.public_preview_url) ||
       existingWorkspace.workspace_url ||
-      `https://${existingWorkspace.slug}.app.elevateforhumanity.org`;
+      tenantPublicSiteUrl(existingWorkspace.slug);
     const trialStartedAt = existingWorkspace.created_at || new Date().toISOString();
     const trialEndsAt = existingWorkspace.trial_ends_at || trialEndFromStart(trialStartedAt);
     const license = await ensureManagedTrialLicense({

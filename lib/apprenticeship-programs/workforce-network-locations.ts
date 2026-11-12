@@ -25,7 +25,7 @@ export const BARBER_WORKFORCE_NETWORK_PINS: NetworkMapPin[] = [
     city: 'Indianapolis',
     state: 'IN',
     zip: '46240',
-    phone: '(317) 760-7908',
+    phone: PLATFORM_DEFAULTS.mainPhone,
     lat: 39.9142,
     lng: -86.065,
     programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],

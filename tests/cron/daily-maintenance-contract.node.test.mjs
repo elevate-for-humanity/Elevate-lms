@@ -15,11 +15,16 @@ test('guardrail cron uses the exported GET route and bearer authorization', () =
   assert.match(daily, /"Authorization: Bearer \$CRON_SECRET"/);
 });
 
-test('testing no-show uses the required x-cron-secret header', () => {
+test('testing no-show uses bearer authorization admitted by Admin middleware', () => {
   assert.match(noShowRoute, /export async function GET\(/);
-  assert.match(noShowRoute, /headers\.get\('x-cron-secret'\)/);
-  assert.match(daily, /-X GET "\$ADMIN_URL\/api\/cron\/testing-no-show"/);
-  assert.match(daily, /"x-cron-secret: \$CRON_SECRET"/);
+  assert.match(noShowRoute, /headers\.get\('authorization'\) === `Bearer \$\{cronSecret\}`/);
+  assert.match(daily, /-X GET "\$ADMIN_URL\/api\/cron\/testing-no-show" \\\n\s+-H "Authorization: Bearer \$CRON_SECRET"/);
+  assert.doesNotMatch(daily, /"x-cron-secret: \$CRON_SECRET"/);
+});
+
+test('testing no-show verifies the scheduler secret before loading runtime secrets', () => {
+  assert.ok(noShowRoute.indexOf('if (!authorized)') < noShowRoute.indexOf('await hydrateProcessEnv()'));
+  assert.match(noShowRoute, /Boolean\(cronSecret\) &&/);
 });
 
 test('memory cleanup remains POST with bearer authorization', () => {

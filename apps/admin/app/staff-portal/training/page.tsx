@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { PlayCircle, Clock, Award, BookOpen } from 'lucide-react';
@@ -28,21 +28,25 @@ export default async function StaffTrainingPage() {
   // Require staff or admin role
   const { user, profile } = await requireRole(['staff', 'admin', 'advisor']);
 
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
-  // Get all training modules
-  const { data: modules, error: modulesError } = await supabase
-    .from('training_modules')
-    .select('*')
+  const { data: moduleRows, error: modulesError } = await supabase
+    .from('staff_training_modules')
+    .select('id, title, description, video_url, duration_minutes, required_for_roles, order_index, created_at')
+    .eq('is_active', true)
+    .order('order_index', { ascending: true, nullsFirst: false })
     .order('created_at', { ascending: true });
+  const modules = moduleRows?.map((module) => ({
+    ...module,
+    duration: module.duration_minutes,
+    required: Boolean(module.required_for_roles),
+  }));
 
-  // Get user's progress
   const { data: progress, error: progressError } = await supabase
     .from('staff_training_progress')
     .select('*')
     .eq('user_id', user.id);
 
-  // Combine modules with progress
   const modulesWithProgress = modules?.map((module) => {
     const userProgress = progress?.find((p) => p.module_id === module.id);
     return {
@@ -196,9 +200,9 @@ export default async function StaffTrainingPage() {
                         <span className="text-black">
                           Completed: {new Date(module.progress.completed_at).toLocaleDateString()}
                         </span>
-                        {module.progress.quiz_score && (
+                        {module.progress.score && (
                           <span className="font-medium text-black">
-                            Score: {module.progress.quiz_score}%
+                            Score: {module.progress.score}%
                           </span>
                         )}
                       </div>

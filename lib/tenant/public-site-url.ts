@@ -1,7 +1,11 @@
-const TENANT_HOST_SUFFIX = '.app.elevateforhumanity.org';
+export const TENANT_HOST_SUFFIX = '.elevateforhumanity.org';
+
+export function tenantPublicHost(subdomain: string): string {
+  return `${subdomain}${TENANT_HOST_SUFFIX}`;
+}
 
 export function tenantPublicSiteUrl(subdomain: string, path = '/'): string {
-  const base = `https://${subdomain}${TENANT_HOST_SUFFIX}`;
+  const base = `https://${tenantPublicHost(subdomain)}`;
   if (!path || path === '/') return base;
   return `${base}${path.startsWith('/') ? path : `/${path}`}`;
 }

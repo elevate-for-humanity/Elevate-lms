@@ -27,11 +27,15 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
 const NO_SHOW_FEE_CENTS = 5000; // $50
 
 export async function GET(req: NextRequest) {
-  await hydrateProcessEnv();
-  const secret = req.headers.get('x-cron-secret');
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authorized =
+    Boolean(cronSecret) &&
+    (req.headers.get('authorization') === `Bearer ${cronSecret}` ||
+      req.headers.get('x-cron-secret') === cronSecret);
+  if (!authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  await hydrateProcessEnv();
 
   const db = await requireAdminClient();
   if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 });

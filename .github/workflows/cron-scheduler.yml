@@ -552,7 +552,7 @@ jobs:
           status="$(curl --silent --show-error --max-time 60 \
             --output /dev/null --write-out '%{http_code}' \
             -X GET "$ADMIN_URL/api/cron/testing-no-show" \
-            -H "x-cron-secret: $CRON_SECRET")" || {
+            -H "Authorization: Bearer $CRON_SECRET")" || {
             echo "::error::testing-no-show transport failed"
             exit 1
           }

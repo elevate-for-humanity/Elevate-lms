@@ -45,11 +45,15 @@ function examLabel(examType: string) {
 }
 
 export async function GET(req: NextRequest) {
-  await hydrateProcessEnv();
-  const secret = req.headers.get('x-cron-secret');
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authorized =
+    Boolean(cronSecret) &&
+    (req.headers.get('authorization') === `Bearer ${cronSecret}` ||
+      req.headers.get('x-cron-secret') === cronSecret);
+  if (!authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  await hydrateProcessEnv();
 
   const db = await requireAdminClient();
   if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 });

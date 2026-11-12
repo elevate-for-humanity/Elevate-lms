@@ -218,7 +218,6 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 
-import { POST } from '@/lib/billing/handlers/generate-billing-invoices';
 
 function activeSchedule(overrides: Record<string, unknown> = {}) {
   return {

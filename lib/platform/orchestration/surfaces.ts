@@ -128,19 +128,19 @@ export const PLATFORM_SURFACES: Record<string, PlatformSurfaceContract> = {
   },
   ai_paris: {
     key: 'ai_paris', label: 'PARIS', runtime: 'admin',
-    entryPath: '/ai/paris', scope: 'organization', requiredFeature: PlatformFeature.AI_PARIS,
+    entryPath: '/ai-team', scope: 'organization', requiredFeature: PlatformFeature.AI_PARIS,
   },
   ai_ellie: {
     key: 'ai_ellie', label: 'ELLIE', runtime: 'admin',
-    entryPath: '/ai/ellie', scope: 'organization', requiredFeature: PlatformFeature.AI_ELLIE,
+    entryPath: '/ai-team', scope: 'organization', requiredFeature: PlatformFeature.AI_ELLIE,
   },
   ai_lizzy: {
     key: 'ai_lizzy', label: 'LIZZY', runtime: 'admin',
-    entryPath: '/ai/lizzy', scope: 'organization', requiredFeature: PlatformFeature.AI_LIZZY,
+    entryPath: '/ai-team', scope: 'organization', requiredFeature: PlatformFeature.AI_LIZZY,
   },
   ai_zora: {
     key: 'ai_zora', label: 'ZORA', runtime: 'admin',
-    entryPath: '/ai/zora', scope: 'organization', requiredFeature: PlatformFeature.AI_ZORA,
+    entryPath: '/ai-team', scope: 'organization', requiredFeature: PlatformFeature.AI_ZORA,
   },
   dev_studio: {
     key: 'dev_studio', label: 'Dev Studio', runtime: 'admin',

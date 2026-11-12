@@ -29,3 +29,20 @@ test('credential resolver failure remains an explicit unhealthy capability witho
  assert.equal(result.githubAuthError,'github_authentication_unavailable');
  assert.equal(h.requests.length,0);assert.equal(JSON.stringify(result).includes('fixture-private-credential'),false);
 });
+
+test('known GitHub App failure codes are surfaced without exposing credentials',async()=>{
+ for (const code of ['GITHUB_APP_NOT_CONFIGURED','GITHUB_APP_INSTALLATION_MISMATCH','GITHUB_APP_WRITE_PERMISSIONS_REQUIRED','GITHUB_APP_REQUEST_HTTP_404']) {
+  const h=health({tokenError:Error(code)}),result=await h.handler({});
+  assert.equal(result.githubAuthError,code);
+  assert.equal(result.githubTokenValid,false);
+  assert.equal(result.execution.ready,false);
+  assert.equal(h.requests.length,0);
+ }
+});
+test('untrusted exception details are never included in health response',async()=>{
+ for (const message of ['GITHUB_APP_NOT_CONFIGURED secret=private-key','GITHUB_TOKEN_REJECTED: private-token','fixture-private-credential']) {
+  const h=health({tokenError:Error(message)}),result=await h.handler({});
+  assert.equal(result.githubAuthError,'github_authentication_unavailable');
+  assert.equal(JSON.stringify(result).includes(message),false);
+ }
+});

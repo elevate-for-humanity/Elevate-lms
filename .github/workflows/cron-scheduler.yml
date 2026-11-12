@@ -19,6 +19,7 @@ on:
           - missed-clockout
           - hours-pace-check
           - workflow-event-processor
+          - application-submissions
           - workflow-schedule-processor
           - funding-followup
           - inactivity-reminders
@@ -146,6 +147,7 @@ jobs:
       github.event_name == 'schedule' && github.event.schedule == '*/5 * * * *'
       || (github.event_name == 'workflow_dispatch' && (
             github.event.inputs.job == 'workflow-event-processor'
+         || github.event.inputs.job == 'application-submissions'
          || github.event.inputs.job == 'workflow-schedule-processor'
          || github.event.inputs.job == 'ai-operator'
          || github.event.inputs.job == 'video-render-queue'
@@ -175,6 +177,22 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 30 || echo "::warning::process-provisioning-jobs failed"
+
+      - name: Process durable application submission jobs
+        id: application_submissions
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET missing"; exit 1; }
+          status="$(curl --silent --show-error --max-time 65 \
+            --output /dev/null --write-out '%{http_code}' \
+            -X GET "$ADMIN_URL/api/cron/process-application-submissions" \
+            -H "Authorization: Bearer $CRON_SECRET")" || {
+            echo "::error::application-submissions transport failed"
+            exit 1
+          }
+          echo "application-submissions HTTP $status"
+          if [ "$status" != 200 ]; then echo "::error::application-submissions HTTP $status"; exit 1; fi
 
       - name: Drain canonical durable Course Builder jobs
         run: |
@@ -239,9 +257,10 @@ jobs:
           EVENT_RESULT: ${{ steps.workflow_events.outcome }}
           SCHEDULE_RESULT: ${{ steps.workflow_schedules.outcome }}
           AI_RESULT: ${{ steps.ai_operator.outcome }}
+          APPLICATION_RESULT: ${{ steps.application_submissions.outcome }}
         run: |
           set -euo pipefail
-          for outcome in "$EVENT_RESULT" "$SCHEDULE_RESULT" "$AI_RESULT"; do
+          for outcome in "$EVENT_RESULT" "$SCHEDULE_RESULT" "$AI_RESULT" "$APPLICATION_RESULT"; do
             if [ "$outcome" != success ]; then
               echo "::error::Critical queue processor failed; see individual step results"
               exit 1

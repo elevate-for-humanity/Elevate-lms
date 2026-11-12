@@ -83,6 +83,28 @@ export default async function StaffTasksPage() {
     created_at: '',
   })));
 
+  // Admins triage the unowned admissions queue; staff never see it.
+  if (profile?.role === 'admin' || profile?.role === 'super_admin') {
+    const { data: unassignedTasks, error: unassignedError } = await supabase
+      .from('tasks')
+      .select('id,title,description,status,priority')
+      .is('assigned_to', null)
+      .eq('related_type', 'application')
+      .neq('status', 'completed')
+      .limit(100);
+    if (unassignedError) throw new Error('Unassigned application tasks could not load');
+    tasks.push(...(unassignedTasks || []).map((task) => ({
+      id: task.id,
+      title: task.title,
+      description: task.description || 'Assign an admissions owner for this applicant.',
+      status: (task.status === 'in_progress' ? 'in_progress' : 'pending') as Task['status'],
+      priority: (['low', 'medium', 'high', 'urgent'].includes(task.priority || '') ? task.priority : 'medium') as Task['priority'],
+      due_date: null,
+      assigned_to: 'Unassigned',
+      created_at: '',
+    })));
+  }
+
   if ((queueCount || 0) > 0) tasks.unshift({
     id: 'assigned-applicant-queue',
     title: 'Work assigned applicant queue',

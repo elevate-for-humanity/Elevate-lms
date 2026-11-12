@@ -1023,6 +1023,7 @@ async function _POST(req: Request) {
           phone: body.phone || null,
           programSlug: data.program_interest || program || null,
           source: body.source || 'website',
+          assignedTo: data.advisor_assigned || null,
         });
         logger.info('[Applications] Admissions automation complete', { applicationId: data.id, ...automation });
       }

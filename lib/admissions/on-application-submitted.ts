@@ -36,6 +36,7 @@ export type SubmittedApplication = {
 export type ApplicationAutomationResult = {
   leadId: string | null;
   leadCreated: boolean;
+  ownerId: string | null;
   binderDocuments: string[];
   taskCreated: boolean;
 };
@@ -56,7 +57,7 @@ export function binderChecklistFor(programSlug: string | null | undefined): Bind
 
 async function upsertLead(db: SupabaseClient, app: SubmittedApplication, email: string) {
   const { data: existing, error: lookupError } = await db
-    .from('leads').select('id,status').ilike('email', escapeLikePattern(email)).limit(1).maybeSingle();
+    .from('leads').select('id,status,assigned_to').ilike('email', escapeLikePattern(email)).limit(1).maybeSingle();
   if (lookupError) throw lookupError;
   if (existing) {
     if (existing.status === 'new') {
@@ -65,7 +66,11 @@ async function upsertLead(db: SupabaseClient, app: SubmittedApplication, email: 
         .eq('id', existing.id);
       if (error) throw error;
     }
-    return { leadId: existing.id as string, leadCreated: false };
+    return {
+      leadId: existing.id as string,
+      leadCreated: false,
+      ownerId: (existing.assigned_to as string | null) || app.assignedTo || null,
+    };
   }
   const { data: inserted, error: insertError } = await db.from('leads').insert({
     first_name: app.firstName,
@@ -79,7 +84,7 @@ async function upsertLead(db: SupabaseClient, app: SubmittedApplication, email: 
     assigned_at: app.assignedTo ? new Date().toISOString() : null,
   }).select('id').maybeSingle();
   if (insertError) throw insertError;
-  return { leadId: (inserted?.id as string | undefined) ?? null, leadCreated: true };
+  return { leadId: (inserted?.id as string | undefined) ?? null, leadCreated: true, ownerId: app.assignedTo || null };
 }
 
 async function upsertBinderChecklist(db: SupabaseClient, programSlug: string) {
@@ -105,7 +110,12 @@ async function upsertBinderChecklist(db: SupabaseClient, programSlug: string) {
   return checklist.map((doc) => doc.documentType);
 }
 
-async function insertReviewTask(db: SupabaseClient, app: SubmittedApplication, name: string) {
+async function insertReviewTask(
+  db: SupabaseClient,
+  app: SubmittedApplication,
+  name: string,
+  ownerId: string | null,
+) {
   const title = `Review application from ${name}`;
   const { data: existing, error: lookupError } = await db.from('tasks').select('id')
     .eq('related_type', 'application').eq('related_id', app.applicationId).eq('title', title)
@@ -119,7 +129,7 @@ async function insertReviewTask(db: SupabaseClient, app: SubmittedApplication, n
     status: 'pending',
     related_type: 'application',
     related_id: app.applicationId,
-    assigned_to: app.assignedTo || null,
+    assigned_to: ownerId,
     due_days: 2,
   });
   if (error) throw error;
@@ -138,8 +148,8 @@ export async function onApplicationSubmitted(
 ): Promise<ApplicationAutomationResult> {
   const email = app.email.trim().toLowerCase();
   const name = [app.firstName, app.lastName].map((part) => part?.trim()).filter(Boolean).join(' ') || email;
-  const lead = await upsertLead(db, app, email);
+  const { ownerId, ...lead } = await upsertLead(db, app, email);
   const binderDocuments = app.programSlug ? await upsertBinderChecklist(db, app.programSlug) : [];
-  const taskCreated = await insertReviewTask(db, app, name);
-  return { ...lead, binderDocuments, taskCreated };
+  const taskCreated = await insertReviewTask(db, app, name, ownerId);
+  return { ...lead, ownerId, binderDocuments, taskCreated };
 }

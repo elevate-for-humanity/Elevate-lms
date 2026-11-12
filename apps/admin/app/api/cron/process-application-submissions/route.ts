@@ -102,6 +102,11 @@ async function processApplicationSubmitted(db: Awaited<ReturnType<typeof require
 }
 
 async function _GET(req: NextRequest) {
+  // Scheduler-only endpoint: no anonymous applicant/CRM processing.
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const db = await requireAdminClient();
     if (!db) {

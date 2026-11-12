@@ -1,19 +1,17 @@
 'use client';
 import { LearningPreview } from './LearningWorkspace';
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { hvacLessonSimulations } from '@/lib/lms/hvac-simulations';
 import WorkbookNarration from '@/components/lms/WorkbookNarration';
 import { refrigerationStages, superheat, subcooling } from '@/lib/lms/hvac-system-model';
 
-const HVACSimulation = dynamic(() => import('./HVACSimulation'), {
-  ssr: false,
-  loading: () => <p className="rounded-xl bg-stone-100 p-4">Loading the 3D condenser model…</p>,
-});
+const HVACSimulation = lazy(() => import('./HVACSimulation'));
 const condenser = hvacLessonSimulations['hvac-module-1'];
 
 /** SVG uses explicit labels and states; color is never the only teaching cue. */
 export default function HvacSystemLab() {
+  const [show3D, setShow3D] = useState(false);
+  useEffect(() => setShow3D(true), []);
   const [stage, setStage] = useState(0);
   const [running, setRunning] = useState(false);
   const [answer, setAnswer] = useState<number | null>(null);
@@ -50,7 +48,7 @@ export default function HvacSystemLab() {
     <output className="my-4 block rounded-xl bg-stone-100 p-4">Superheat = {suction} − {evaporating} = <strong>{superheat(suction,evaporating)}°F</strong>. Subcooling = {condensing} − {liquid} = <strong>{subcooling(condensing,liquid)}°F</strong>.</output>
     {(superheat(suction,evaporating)<0||subcooling(condensing,liquid)<0)&&<p role="status">These readings do not match the assumed superheated-vapor/subcooled-liquid outlet model. Recheck the phase assumption, measurement location, units, and saturation reference.</p>}
     <h4 className="mt-6 text-xl font-bold">3D condenser unit</h4><p className="my-3">Drag to rotate the outdoor unit, then select each red marker or component name to identify it. Explain each component's job in your workbook answers.</p>
-    <HVACSimulation modelPath={condenser.modelPath} title={condenser.title} hotspots={[...condenser.hotspots]} requiredHotspotIds={[...condenser.requiredHotspotIds]} />
+    {show3D && <Suspense fallback={<p className="rounded-xl bg-stone-100 p-4">Loading the 3D model…</p>}><HVACSimulation modelPath={condenser.modelPath} title={condenser.title} hotspots={[...condenser.hotspots]} requiredHotspotIds={[...condenser.requiredHotspotIds]} /></Suspense>}
     <p className="text-sm leading-relaxed">Record your explanation in the workbook. This practice does not award hours, establish exam readiness, or verify an observed hands-on skill. Do not use its hypothetical values as service targets.</p>
   </section>;
 }

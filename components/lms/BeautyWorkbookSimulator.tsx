@@ -1,13 +1,9 @@
 'use client';
 import { LearningPreview } from './LearningWorkspace';
-import {useState} from 'react';
-import dynamic from 'next/dynamic';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import WorkbookNarration from './WorkbookNarration';
 
-const WorkbookStation3D = dynamic(() => import('./WorkbookStation3D'), {
-  ssr: false,
-  loading: () => <p className="my-4 rounded-xl bg-slate-100 p-4">Loading the 3D practice station…</p>,
-});
+const WorkbookStation3D = lazy(() => import('./WorkbookStation3D'));
 
 const LABS = {
   'prestige-elevation-cosmetology': {
@@ -42,6 +38,8 @@ type Slug = keyof typeof LABS;
 
 /** Self-check only. No practical hours, assessment grade or skills signoff. */
 export default function BeautyWorkbookSimulator({slug}:{slug:string}) {
+  const [show3D, setShow3D] = useState(false);
+  useEffect(() => setShow3D(true), []);
   const lab=LABS[slug as Slug];
   const [selected,setSelected]=useState<number|null>(null);
   const [checked,setChecked]=useState(false);
@@ -61,7 +59,7 @@ export default function BeautyWorkbookSimulator({slug}:{slug:string}) {
       <text x="45" y="202" fontSize="15" fill="#334155">Preparation</text>
       <text x="270" y="202" fontSize="15" fill={correct?'#065f46':'#334155'}>{correct?'Correct safe decision':'Choose your next action'}</text>
     </svg></LearningPreview>
-    <WorkbookStation3D variant={slug.includes('nail')?'nail':slug.includes('esthetics')?'esthetics':'cosmetology'} />
+    {show3D && <Suspense fallback={<p className="rounded-xl bg-stone-100 p-4">Loading the 3D model…</p>}><WorkbookStation3D variant={slug.includes('nail')?'nail':slug.includes('esthetics')?'esthetics':'cosmetology'} /></Suspense>}
     <h4 className="font-bold">{lab.action}</h4>
     <p className="mt-2">{lab.question}</p>
     <WorkbookNarration text={`${lab.name}. ${lab.question} ${lab.choices.join('. ')}`} />

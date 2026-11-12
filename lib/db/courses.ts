@@ -79,7 +79,7 @@ export async function listCourses() {
 export async function getCourse(id: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('lms_courses')
+    .from('courses')
     .select('*')
     .eq('id', id)
     .maybeSingle();

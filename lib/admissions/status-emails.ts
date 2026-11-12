@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { escapeLikePattern } from '@/lib/admissions/on-application-submitted';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -32,7 +33,7 @@ function escapeHtml(value: string): string {
 export async function logCommunication(db: SupabaseClient, entry: CommunicationLogEntry): Promise<void> {
   try {
     const email = entry.recipientEmail.trim().toLowerCase();
-    const { data: lead } = await db.from('leads').select('id').ilike('email', email)
+    const { data: lead } = await db.from('leads').select('id').ilike('email', escapeLikePattern(email))
       .order('created_at', { ascending: false }).limit(1).maybeSingle();
     const { error } = await db.from('communication_log').insert({
       lead_id: lead?.id ?? null,

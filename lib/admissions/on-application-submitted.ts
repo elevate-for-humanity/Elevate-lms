@@ -40,6 +40,10 @@ export type ApplicationAutomationResult = {
   taskCreated: boolean;
 };
 
+export function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (c) => `\\${c}`);
+}
+
 export function requiresClinicalDocuments(programSlug: string | null | undefined): boolean {
   return Boolean(programSlug && CLINICAL_PROGRAM_PATTERN.test(programSlug.toLowerCase()));
 }
@@ -52,7 +56,7 @@ export function binderChecklistFor(programSlug: string | null | undefined): Bind
 
 async function upsertLead(db: SupabaseClient, app: SubmittedApplication, email: string) {
   const { data: existing, error: lookupError } = await db
-    .from('leads').select('id,status').ilike('email', email).limit(1).maybeSingle();
+    .from('leads').select('id,status').ilike('email', escapeLikePattern(email)).limit(1).maybeSingle();
   if (lookupError) throw lookupError;
   if (existing) {
     if (existing.status === 'new') {

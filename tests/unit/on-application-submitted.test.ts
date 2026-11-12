@@ -17,3 +17,10 @@ describe('admissions binder checklist', () => {
     ]));
   });
 });
+
+describe('escapeLikePattern', () => {
+  it('escapes ilike wildcards in email addresses', async () => {
+    const { escapeLikePattern } = await import('@/lib/admissions/on-application-submitted');
+    expect(escapeLikePattern('a_b%c\\d@example.com')).toBe('a\\_b\\%c\\\\d@example.com');
+  });
+});

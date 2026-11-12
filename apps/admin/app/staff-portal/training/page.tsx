@@ -203,9 +203,9 @@ export default async function StaffTrainingPage() {
                         <span className="text-black">
                           Completed: {new Date(module.progress.completed_at).toLocaleDateString()}
                         </span>
-                        {module.progress.score && (
+                        {(module.progress.quiz_score ?? module.progress.score) != null && (
                           <span className="font-medium text-black">
-                            Score: {module.progress.score}%
+                            Score: {module.progress.quiz_score ?? module.progress.score}%
                           </span>
                         )}
                       </div>

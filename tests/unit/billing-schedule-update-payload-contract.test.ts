@@ -206,6 +206,7 @@ vi.mock('@/lib/supabase/admin', () => ({
           data: state.row.status === 'active' ? [state.row] : [],
           error: null,
         }),
+        maybeSingle: async () => ({ data: state.row.status === 'active' ? { id: state.row.id } : null, error: null }),
         update: (values: Record<string, unknown>) => {
           // postgrest-js sends `JSON.stringify(body)`, so undefined properties
           // never reach PostgREST and the stored column keeps its value.

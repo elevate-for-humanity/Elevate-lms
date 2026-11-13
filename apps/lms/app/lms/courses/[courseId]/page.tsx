@@ -19,6 +19,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { canonicalBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -67,6 +69,15 @@ export default async function CourseLandingPage({
   const { data: course, error: courseError } = await courseQuery.maybeSingle();
   if (courseError) throw new Error('COURSE_LOOKUP_UNAVAILABLE');
   if (!course) notFound();
+
+  // Do not disclose unpublished training modules to unpaid beauty applicants
+  // who have an intake-created login. Admin previews retain their own guard.
+  const beautySlug = canonicalBeautyApprenticeshipSlug(course.slug);
+  if (!preview.active && beautySlug && user) {
+    const adminDb = await requireAdminClient();
+    const paymentGate = await loadBeautyPaymentGate(adminDb, user.id, user.email, beautySlug);
+    if (paymentGate?.locked) redirect('/lms/enrollment-pending');
+  }
 
   const [moduleResult, lessonResult, heroResult, readinessResult] = await Promise.all([
     db

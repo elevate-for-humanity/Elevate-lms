@@ -45,6 +45,8 @@ import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-req
 import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 import { TrainingReadyNotice } from '@/components/apprenticeship/TrainingReadyNotice';
+import { loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
+import { BeautyPaymentLock } from '@/components/apprenticeship/BeautyPaymentLock';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -166,6 +168,12 @@ export default async function ApprenticePortalPage({
         </section>
       </main>
     );
+  }
+  // A profile created during intake is not proof of tuition payment.
+  // Preserve existing enrolled students and approved workforce funding.
+  if (!subject.previewing && user) {
+    const paymentGate = await loadBeautyPaymentGate(db, subject.userId, user.email);
+    if (paymentGate?.locked) return <BeautyPaymentLock programSlug={paymentGate.programSlug} />;
   }
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');

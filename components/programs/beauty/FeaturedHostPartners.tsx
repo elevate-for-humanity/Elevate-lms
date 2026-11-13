@@ -1,6 +1,7 @@
 import Image from 'next/image';
+import { shopGalleryForProgram } from '@/lib/partners/curated-shop-media';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
-import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
@@ -33,7 +34,7 @@ export default async function FeaturedHostPartners({
   // Every public pathway uses the same live directory and exact occupation filter.
   const network = await getHostShopNetwork();
   const shops: FeaturedHostPartner[] = network
-    .filter((shop) => !programSlug || matchesHostShopProgram(shop, programSlug))
+    .filter((shop) => !programSlug || matchesHostShopPresentationProgram(shop, programSlug))
     .map((shop) => ({
       slug: shop.slug,
       name: shop.name,
@@ -47,20 +48,27 @@ export default async function FeaturedHostPartners({
       websiteUrl: shop.website,
       bookingUrl: shop.booking,
       socialUrl: shop.social,
-      media: (programSlug === 'nail-technician-apprenticeship'
-        ? [...(shop.gallery ?? [])].sort(
-            (a, b) => Number(/nail/i.test(b.url)) - Number(/nail/i.test(a.url)),
-          )
-        : (shop.gallery ?? [])
-      ).map((item) => ({
-        src: item.url,
-        alt: item.alt || `${shop.name} portfolio`,
-        kind: 'photo' as const,
-      })),
+      media: [
+        ...(programSlug
+          ? shopGalleryForProgram(shop.slug, shop.gallery ?? [], programSlug)
+          : (shop.gallery ?? [])
+        ).map((item) => ({
+          src: item.url,
+          alt: item.alt || `${shop.name} portfolio`,
+          kind: 'photo' as const,
+        })),
+        ...(shop.videoUrl
+          ? [{ src: shop.videoUrl, alt: `${shop.name} shop video`, kind: 'video' as const }]
+          : []),
+      ],
     }));
 
   // Program-specific, image-first cards: every approved shop gets equal space.
-  const compactShowcase = ['barber-apprenticeship', 'cosmetology-apprenticeship', 'nail-technician-apprenticeship'].includes(programSlug ?? '');
+  const compactShowcase = [
+    'barber-apprenticeship',
+    'cosmetology-apprenticeship',
+    'nail-technician-apprenticeship',
+  ].includes(programSlug ?? '');
 
   // Show every verified barber host in one directory, including Kountry Kutz.
   // The prior exclusion made the featured shop disappear from the network list.
@@ -166,6 +174,7 @@ export default async function FeaturedHostPartners({
                     <HostShopMediaCarousel
                       shopName={shop.dba ?? shop.name}
                       compact
+                      videoUrl={shop.media?.find((item) => item.kind === 'video')?.src}
                       items={stillMedia.map((item) => ({ url: item.src, alt: item.alt }))}
                     />
 
@@ -195,7 +204,7 @@ export default async function FeaturedHostPartners({
                         {shop.marketingBlurb ?? shop.note}
                       </p>
 
-                      <div className="mt-2 hidden space-y-2 border-y border-slate-100 py-3 sm:block">
+                      <div className="mt-2 space-y-2 border-y border-slate-100 py-3">
                         <p className="flex items-start gap-2 text-sm font-bold text-slate-800">
                           <MapPin
                             className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700"

@@ -72,17 +72,9 @@ const CALLER_CHECKLIST = [
 
 export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
-  const heroPhotos = new Set([
-    '/images/partners/salon-saloon/team-sign.webp',
-    '/images/partners/salon-saloon/team-commercial-2026.webp',
-    '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
-    '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
-    '/images/partners/generations-hair/salon-service.webp',
-  ]);
-  const directoryShops = networkShops.map((shop) => {
-    const gallery = shop.gallery?.filter((photo) => !heroPhotos.has(photo.url));
-    return { ...shop, gallery, image: gallery?.[0]?.url };
-  });
+  // Preserve team/client photos in each shop's own card, even when the hero
+  // features one of them. Removing hero images left some cards with empty rooms.
+  const directoryShops = networkShops;
 
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">

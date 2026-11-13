@@ -10,6 +10,8 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
   const kountry = slug.startsWith('kountry-kutz');
   const seen = new Set<string>();
   return items.flatMap((original) => {
+    // Retired purple room mockup must not return through an older database gallery.
+    if (slug.startsWith('prestige-elevation') && original.url.includes('downtown-cosmetology-program.webp')) return [];
     const localUrl = LOCAL_SHOP_MEDIA[original.url];
     let item = localUrl ? { ...original, url: localUrl, source: original.source || original.url } : original;
     // First-party imports should use repository asset paths. Normalize them
@@ -70,6 +72,27 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
+  });
+}
+
+/** Keep a dual-program shop's nail/salon portfolio off an unrelated program page. */
+export function shopGalleryForProgram(
+  slug: string,
+  items: ShopMedia[],
+  program: string,
+): ShopMedia[] {
+  return curateShopGallery(slug, items).filter((item) => {
+    const path = item.url.toLowerCase();
+    if (program === 'barber-apprenticeship') {
+      return !/nail|manicure|esthetic|cosmetology|prestige-elevation\/official-portfolio/.test(
+        path,
+      );
+    }
+    if (program === 'cosmetology-apprenticeship')
+      return !/nail|manicure|esthetic|program-barber-training/.test(path);
+    if (program === 'nail-technician-apprenticeship') return /nail|manicure/.test(path);
+    if (program === 'esthetician-apprenticeship') return /esthetic|skincare|facial/.test(path);
+    return false;
   });
 }
 

@@ -1,5 +1,3 @@
-'use client';
-
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
@@ -12,7 +10,7 @@ export default function BarberApprenticeshipExtras() {
   return (
     <>
       <BeautyTheoryDailyPolicy programTitle="Barber Apprenticeship" />
-      <FeaturedHostPartners />
+      <FeaturedHostPartners programSlug="barber-apprenticeship" />
       <BarberWorkforceNetworkMap />
     </>
   );

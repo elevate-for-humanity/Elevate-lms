@@ -22,8 +22,8 @@ export const DOWNTOWN_TRAINING_PROGRAMS = [
     name: 'Prestige Elevation',
     program: 'Barber & Beauty • Cosmetology',
     lead: 'Downtown barber and beauty programs',
-    image: '/images/partners/prestige-elevation/downtown-cosmetology-program.webp',
-    alt: 'Prestige Elevation cosmetology training room with salon chairs, mirrors and shampoo station',
+    image: '/images/beauty/program-barber-training.webp',
+    alt: 'Representative barber service image from Elevate’s earlier program collection',
     href: '/barber-and-beauty-apprenticeships',
   },
 ] as const;

@@ -88,10 +88,12 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
     // Lead with the shop's current curated photography, retaining its full portfolio.
     const preferredPhoto =
       featured?.slug === 'cals-kutz-studio'
-        ? '/images/partners/cals-kutz/storefront-enhanced-2026.webp'
+        ? '/images/partners/cals-kutz/client-cut-enhanced-2026.webp'
         : featured?.slug === 'top-shelf-barber-lounge'
           ? '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp'
-          : undefined;
+          : featured?.slug === 'kountry-kutz-barbershop'
+            ? '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp'
+            : undefined;
     if (preferredPhoto)
       gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {

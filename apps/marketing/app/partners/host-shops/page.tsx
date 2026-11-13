@@ -10,7 +10,7 @@ import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirec
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description: 'Licensed barbershops, salons, nail studios, spas, and esthetics businesses can apply free to train apprentices and grow their teams across Indiana.',
     url: 'https://www.elevateforhumanity.org/partners/host-shops',
     type: 'website',
-    images: [{ url: '/images/partners/kountry-kutz-interior.webp', alt: 'Elevate apprenticeship Host Shop network' }],
+    images: [{ url: '/images/pages/apprenticeships-hero.webp', alt: 'Elevate apprenticeship Host Shop network' }],
   },
 };
 
@@ -38,11 +38,6 @@ const HOST_SHOP_HERO_ORDER = [
   'cals-kutz-studio',
   'generations-hair-llc',
 ] as const;
-
-const HOST_SHOP_HERO_SHOPS = HOST_SHOP_HERO_ORDER.flatMap((slug) => {
-  const shop = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) => candidate.slug === slug);
-  return shop ? [shop] : [];
-});
 
 const REQUIREMENTS = [
   'Current business or establishment license appropriate to the occupation.',
@@ -72,7 +67,19 @@ const CALLER_CHECKLIST = [
 
 export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
-  const approvedHeroShops = HOST_SHOP_HERO_SHOPS.filter((profile) => networkShops.some((shop) => shop.slug === profile.slug));
+  const approvedHeroShops: FeaturedHostPartner[] = networkShops.map(shop => ({
+    slug: shop.slug, name: shop.name, address: shop.address, city: shop.city,
+    state: shop.state, zip: '', programs: shop.programs, phone: shop.phone,
+    marketingBlurb: shop.description, websiteUrl: shop.website,
+    bookingUrl: shop.booking, socialUrl: shop.social,
+    media: [
+      ...(shop.gallery ?? []).map(photo => ({ src: photo.url, alt: photo.alt || `${shop.name} portfolio`, kind: 'photo' as const })),
+      ...(shop.videoUrl ? [{ src: shop.videoUrl, alt: `${shop.name} shop video`, kind: 'video' as const }] : []),
+    ],
+  })).sort((a, b) => {
+    const rank = (slug: string) => { const index = HOST_SHOP_HERO_ORDER.findIndex(value => value === slug); return index < 0 ? HOST_SHOP_HERO_ORDER.length : index; };
+    return rank(a.slug) - rank(b.slug);
+  });
   // Preserve team/client photos in each shop's own card, even when the hero
   // features one of them. Removing hero images left some cards with empty rooms.
   const directoryShops = networkShops;
@@ -102,7 +109,7 @@ export default async function HostShopsPage() {
           '/images/partners/salon-saloon/team-sign.webp': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
           '/videos/partners/kountry-kutz-tour.mp4': 'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
         }}
-        narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, required documents, and the free Host Shop application."
+        narration="Explore Elevate's approved Host Shop network. Licensed salons, spas, nail studios, esthetics businesses, and barbershops can apply to become a Host Shop at no cost. Host Shops employ, pay, and supervise apprentices; Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. Continue down the page to review requirements, required documents, and the free Host Shop application."
       />
 
       <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-9 text-white">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
 import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
@@ -51,7 +51,30 @@ function embedUrl(pin: DisplayPin) {
 }
 
 export default function BarberWorkforceNetworkMap({ shops }: { shops?: HostShopNetworkEntry[] } = {}) {
-  const MAP_PINS: DisplayPin[] = useMemo(() => [...(shops ?? []).filter((shop) => matchesHostShopProgram(shop, 'barber-apprenticeship')).map((shop): DisplayPin => ({ id: `host-${shop.id}`, kind: 'host_shop', name: shop.name, address: shop.address, city: shop.city, state: shop.state, zip: '', phone: shop.phone, href: `/host-shops/${shop.slug}` })), ...SUPPORT_PINS], [shops]);
+  type MapShop = Pick<HostShopNetworkEntry, 'id' | 'slug' | 'name' | 'address' | 'city' | 'state' | 'phone' | 'programs'>;
+  const [loadedShops, setLoadedShops] = useState<MapShop[]>([]);
+  const [loadError, setLoadError] = useState(false);
+  useEffect(() => {
+    if (shops !== undefined) return;
+    const controller = new AbortController();
+    // Legacy client callers use the same approved operational source as the
+    // server directory, never the static promotional partner inventory.
+    void fetch('/api/programs/host-shops?program=barber', { signal: controller.signal })
+      .then(async response => {
+        if (!response.ok) throw new Error('HOST_SHOP_MAP_UNAVAILABLE');
+        const data = await response.json();
+        if (!Array.isArray(data.shops)) throw new Error('HOST_SHOP_MAP_INVALID_RESPONSE');
+        if (!controller.signal.aborted) setLoadedShops(data.shops.map((shop: MapShop & { publicSlug?: string }) => ({
+          id: shop.id, slug: shop.publicSlug ?? shop.slug, name: shop.name,
+          address: shop.address, city: shop.city, state: shop.state,
+          phone: shop.phone, programs: shop.programs,
+        })));
+      })
+      .catch(() => { if (!controller.signal.aborted) setLoadError(true); });
+    return () => controller.abort();
+  }, [shops]);
+  const displayShops = shops ?? loadedShops;
+  const MAP_PINS: DisplayPin[] = useMemo(() => [...displayShops.filter((shop) => matchesHostShopProgram(shop, 'barber-apprenticeship')).map((shop): DisplayPin => ({ id: `host-${shop.id}`, kind: 'host_shop', name: shop.name, address: shop.address, city: shop.city, state: shop.state, zip: '', phone: shop.phone, href: `/host-shops/${shop.slug}` })), ...SUPPORT_PINS], [displayShops]);
   const [selectedId, setSelectedId] = useState(MAP_PINS[0]?.id ?? '');
   const selected = useMemo(
     () => MAP_PINS.find((pin) => pin.id === selectedId) ?? MAP_PINS[0],
@@ -71,6 +94,7 @@ export default function BarberWorkforceNetworkMap({ shops }: { shops?: HostShopN
           Select a participating barber host shop to see its exact public address, phone number when verified,
           map, and directions. WorkOne and Elevate support locations remain available in the same map.
         </p>
+        {loadError ? <p role="status">Host Shop locations are temporarily unavailable. Community support locations remain below.</p> : null}
 
         <div className="grid gap-6 lg:grid-cols-5">
           <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1 lg:col-span-2">

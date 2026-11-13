@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {autopilotRpcVerdict, transientAutopilotTransportError, AUTOPILOT_RPC_ATTEMPTS, AUTOPILOT_RPC_RETRY_MS, AUTOPILOT_RPC_TIMEOUT_MS} from '../../scripts/gcp/deploy-lesson-autopilots.mjs';
+import {autopilotRpcVerdict, autopilotRpcWriteOnce, transientAutopilotTransportError, AUTOPILOT_RPC_ATTEMPTS, AUTOPILOT_RPC_RETRY_MS, AUTOPILOT_RPC_TIMEOUT_MS} from '../../scripts/gcp/deploy-lesson-autopilots.mjs';
 
 const URL_READY = 'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready';
 
@@ -106,11 +106,26 @@ test('cancellation and non-transport failures are never retried', async () => {
   }
 });
 
-test('the deploy entrypoint retries both RPC reads and keeps its fail-closed codes', () => {
+test('ambiguous runtime registration transport failure is never retried', async () => {
+  const error = dnsUnavailable();
+  let calls = 0;
+  await assert.rejects(
+    autopilotRpcWriteOnce('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/register_ultimate_autopilot_runtime',
+      () => ({method: 'POST', body: JSON.stringify({p_image_sha: 'test'})}), {
+        request: async () => { calls++; throw error; },
+      }),
+    thrown => thrown === error,
+  );
+  assert.equal(calls, 1, 'a write must not be replayed after an ambiguous transport failure');
+});
+
+test('the deploy entrypoint retries only stable readiness reads and preserves single-shot registration', () => {
   const source = readFileSync(new URL('../../scripts/gcp/deploy-lesson-autopilots.mjs', import.meta.url), 'utf8');
   assert.match(source, /rest\/v1\/rpc\/ultimate_autopilot_ready/);
   assert.match(source, /rest\/v1\/rpc\/register_ultimate_autopilot_runtime/);
-  assert.ok(!/await fetch\(/.test(source), 'both readiness reads must go through the retrying verdict helper');
+  assert.ok(!/await fetch\(/.test(source), 'RPCs must use the bounded helpers');
+  assert.match(source, /const ready=await autopilotRpcVerdict\(/, 'only the stable readiness RPC can retry');
+  assert.match(source, /const recorded=await autopilotRpcWriteOnce\(/, 'the runtime-registration UPSERT must not retry');
   assert.match(source, /ULTIMATE_AUTOPILOT_DATABASE_MIGRATION_REQUIRED/);
   assert.match(source, /ULTIMATE_AUTOPILOT_RUNTIME_NOT_RECORDED/);
   assert.match(source, /ULTIMATE_AUTOPILOT_RUNTIME_IMAGE_MISMATCH/);

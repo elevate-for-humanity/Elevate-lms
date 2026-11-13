@@ -14,7 +14,7 @@ export default function WorkforceTrainingIndianapolisPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <section className="relative isolate overflow-hidden bg-slate-950 px-6 py-20 text-white">
-        <Image src="/images/pages/workforce-training.webp" alt="Career training at Elevate for Humanity" fill priority className="-z-20 object-cover" />
+        <Image src="/images/pages/workforce-training.webp" alt="Career training at Elevate for Humanity" fill priority sizes="100vw" className="-z-20 object-cover" />
         <div className="absolute inset-0 -z-10 bg-slate-950/80" />
         <div className="mx-auto max-w-6xl">
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest">Indianapolis · Indiana</p>

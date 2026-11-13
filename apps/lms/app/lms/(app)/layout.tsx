@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { redirect } from 'next/navigation';
+import { loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
+import { BeautyPaymentLock } from '@/components/apprenticeship/BeautyPaymentLock';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +33,13 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
     const hasReadOnlyModule =
       subject.previewing &&
       ['/lms/calendar', '/lms/assignments', '/lms/grades', '/lms/quizzes'].includes(pathname);
+    // Server-side restriction: a pending, unpaid beauty apprenticeship application
+    // may authenticate for checkout, but cannot render student modules.
+    // Existing activated enrollments and verified workforce-funded paths are retained.
+    if (user && !isAdmin && !pathname.startsWith('/lms/payments') && !pathname.startsWith('/lms/enroll')) {
+      const paymentGate = await loadBeautyPaymentGate(db, user.id, user.email);
+      if (paymentGate?.locked) return <BeautyPaymentLock programSlug={paymentGate.programSlug} />;
+    }
     if (hasReadOnlyModule) {
       return (
         <CanonicalLearnerWorkspaceLayout showLearnerNotices={false}>

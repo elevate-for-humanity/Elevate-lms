@@ -10,6 +10,25 @@ import 'server-only';
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { canonicalBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
+
+/**
+ * Check the same prepayment barrier at the canonical module/lesson API boundary,
+ * not just in React pages. The verified enrollment exception preserves existing
+ * active apprentices and their payment plans.
+ */
+async function assertBeautyPaymentAccess(db: NonNullable<Awaited<ReturnType<typeof requireAdminClient>>>, userId: string, courseId: string) {
+  const { data: course, error: courseError } = await db.from('courses')
+    .select('slug').eq('id', courseId).maybeSingle();
+  if (courseError) throw courseError;
+  const slug = canonicalBeautyApprenticeshipSlug(course?.slug);
+  if (!slug) return;
+  const { data: profile, error: profileError } = await db.from('profiles')
+    .select('email').eq('id', userId).maybeSingle();
+  if (profileError) throw profileError;
+  const paymentGate = await loadBeautyPaymentGate(db, userId, profile?.email, slug);
+  if (paymentGate?.locked) throw new Error('ACCESS_DENIED');
+}
 
 /**
  * Asserts the user can access a lesson.
@@ -22,6 +41,12 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 export async function assertLessonAccess(userId: string, lessonId: string): Promise<void> {
   const db = await requireAdminClient();
   if (!db) throw new Error('DB_UNAVAILABLE');
+
+  const { data: lesson, error: lookupError } = await db.from('course_lessons')
+    .select('course_id').eq('id', lessonId).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (!lesson?.course_id) throw new Error('LESSON_NOT_FOUND');
+  await assertBeautyPaymentAccess(db, userId, lesson.course_id);
 
   const { data, error } = await db.rpc('can_access_lesson', {
     p_user_id: userId,
@@ -47,6 +72,7 @@ export async function assertModuleAccess(
   const db = await requireAdminClient();
   if (!db) throw new Error('DB_UNAVAILABLE');
 
+  await assertBeautyPaymentAccess(db, userId, courseId);
   const { data, error } = await db.rpc('check_module_unlock', {
     p_user_id: userId,
     p_course_id: courseId,

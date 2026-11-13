@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { state, route } = vi.hoisted(() => ({
-  state: { messages: [] as any[], threads: [] as any[], mailboxes: [] as any[] },
+  state: { messages: [] as any[], threads: [] as any[], mailboxes: [] as any[], notifications: [] as any[] },
   route: vi.fn(),
 }));
 vi.mock('@/lib/email/program-conversation-routing', async (original) => ({
@@ -25,6 +25,7 @@ vi.mock('@/lib/supabase/admin', () => ({
           else state.threads.push(row);
           return query;
         },
+        upsert: (rows: any[]) => { state.notifications.push(...rows); return query; },
         update: () => query,
         maybeSingle: async () => ({ data: table === 'communication_email_mailboxes' ? state.mailboxes.find(row => row.address === address) || null : null }),
         single: async () => ({
@@ -36,7 +37,7 @@ vi.mock('@/lib/supabase/admin', () => ({
             data:
               table === 'communication_email_mailboxes'
                 ? state.mailboxes.filter(row => !requested || requested.includes(row.address))
-                : null,
+                : table === 'communication_email_mailbox_members' ? [{ user_id: 'owner' }] : null,
             error: null,
           }).then(resolve),
       };
@@ -59,6 +60,7 @@ const parsed = {
 describe('interoffice copies preserve conversations', () => {
   beforeEach(() => {
     route.mockClear();
+    state.notifications = [];
     state.messages = [];
     state.threads = [];
     state.mailboxes = [{id:'admin',address:'admissions@elevateforhumanity.org'},{id:'holder',address:'the.cdl.academy@elevateforhumanity.org'}];
@@ -81,6 +83,16 @@ describe('interoffice copies preserve conversations', () => {
         thread.normalized_subject.endsWith(' :: student@example.com'),
       ),
     ).toBe(true);
+  });
+  it('links each alert to the stored conversation in its own mailbox', async () => {
+    await storeInboundCommunicationEmail(parsed);
+    expect(state.notifications).toHaveLength(2);
+    for (const notice of state.notifications) {
+      const url = new URL(notice.action_url);
+      const box = url.searchParams.get('mailboxId');
+      expect(url.searchParams.get('threadId')).toBe(`thread-${box}`);
+      expect(notice.metadata).toMatchObject({mailbox_id: box, thread_id: `thread-${box}`});
+    }
   });
   it('keeps admin identity on a response copy while Reply targets the applicant', async () => {
     await storeInboundCommunicationEmail(

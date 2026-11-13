@@ -225,6 +225,17 @@ export function HomeFeaturedHostShop() {
             </article>
           ))}
         </div>
+        <aside aria-labelledby="downtown-beauty-preview" className="mt-8 grid overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 sm:grid-cols-2">
+          <div className="relative aspect-[16/10] sm:aspect-auto">
+            <Image src="/images/partners/mesmerized-by-beauty/downtown-nail-program.webp" alt="Preview of the planned Mesmerized by Beauty downtown nail space" fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+          </div>
+          <div className="p-6 sm:p-8">
+            <p className="text-sm font-bold text-blue-800">Coming soon · Downtown Indianapolis</p>
+            <h3 id="downtown-beauty-preview" className="mt-2 text-2xl font-black text-slate-950">Meet Mesmerized by Beauty.</h3>
+            <p className="mt-3 leading-7 text-slate-700">Interested in nail or esthetic services downtown? Explore the planned location and send a client inquiry. Opening date, service menu, prices, and appointments are not yet confirmed.</p>
+            <Link href="/schools/mesmerized-by-beauty#downtown-client-inquiry" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-blue-800 px-5 py-3 font-bold text-white">Ask about downtown beauty services</Link>
+          </div>
+        </aside>
       </div>
     </section>
   );

@@ -138,9 +138,16 @@ async function _POST(req: Request) {
       const lastName = nameParts.slice(1).join(' ') || '';
 
       const { error: dbError } = await supabase.from('marketing_contacts').insert({
+        name: data.name,
         first_name: firstName,
         last_name: lastName,
         email: data.email,
+        phone: data.phone || null,
+        message: data.message,
+        program_interest: data.program || data.interest || null,
+        contact_type: data.role || 'general',
+        // A service inquiry is not permission to add someone to a mailing list.
+        ...(data.interest === 'mesmerized-downtown-client' ? { subscribed: false } : {}),
         tags: [
           'contact_form',
           data.role || 'general',
@@ -160,16 +167,21 @@ async function _POST(req: Request) {
       );
     }
 
-    // Send email notification (non-blocking but important fallback when DB unavailable)
-    sendEmailNotification(data).catch((err) => {
+    // Await the provider result: serverless execution can end after the response.
+    // Never claim receipt unless a durable record or provider acceptance exists.
+    const emailAccepted = await sendEmailNotification(data).then(() => true).catch((err) => {
       logger.error('Error sending email notification:', err);
+      return false;
     });
+    if (!dbSaved && !emailAccepted) {
+      return isNativeForm
+        ? redirectToContact('error')
+        : NextResponse.json({ ok: false, error: 'Your inquiry could not be received. Please try again or call our team.' }, { status: 503 });
+    }
 
-    // Return success - form submission is valid even if DB save failed
-    // Email notification serves as backup
     return isNativeForm
       ? redirectToContact('submitted')
-      : NextResponse.json({ ok: true, dbSaved });
+      : NextResponse.json({ ok: true, dbSaved, emailAccepted });
   } catch (err) {
     logger.error('Contact API error:', err);
     if (isNativeForm) return redirectToContact('error');
@@ -180,26 +192,32 @@ async function _POST(req: Request) {
   }
 }
 
-// Send email notification (async, non-blocking)
+// Request-scoped provider acceptance check; delivery is recorded by the transport.
 async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
   const { sendEmail } = await import('@/lib/email/sendgrid');
+  const escape = (value: string) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!);
 
   try {
-    await sendEmail({
+    const result = await sendEmail({
       to: 'elevate4humanityedu@gmail.com',
-      subject: `New Inquiry from ${data.name}`,
+      replyTo: data.email,
+      subject: data.interest === 'mesmerized-downtown-client'
+        ? `Mesmerized by Beauty — Downtown client inquiry from ${data.name}`
+        : `New Inquiry from ${data.name}`,
       html: `
         <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${data.name}</p>
-        <p><strong>Email:</strong> ${data.email}</p>
-        ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ''}
-        ${data.program ? `<p><strong>Program Interest:</strong> ${data.program}</p>` : ''}
-        ${data.role ? `<p><strong>Role:</strong> ${data.role}</p>` : ''}
-        <p><strong>Message:</strong><br>${data.message}</p>
+        <p><strong>Name:</strong> ${escape(data.name)}</p>
+        <p><strong>Email:</strong> ${escape(data.email)}</p>
+        ${data.phone ? `<p><strong>Phone:</strong> ${escape(data.phone)}</p>` : ''}
+        ${data.program ? `<p><strong>Program Interest:</strong> ${escape(data.program)}</p>` : ''}
+        ${data.interest ? `<p><strong>Interest:</strong> ${escape(data.interest)}</p>` : ''}
+        ${data.role ? `<p><strong>Role:</strong> ${escape(data.role)}</p>` : ''}
+        <p><strong>Message:</strong><br>${escape(data.message)}</p>
         <hr>
         <p><em>Submitted from ${PLATFORM_DEFAULTS.canonicalDomain}</em></p>
       `,
     });
+    if (!result.success) throw new Error(result.error || 'Email provider did not accept the notification');
 
     // SMS alert via AT&T email-to-SMS gateway (only if configured)
     if (process.env.ADMIN_SMS_GATEWAY) {

@@ -230,7 +230,7 @@ export default function HostShopMediaCarousel({
       ) : null}
       {videoUrl ? (
         <div className="border-t border-slate-200 bg-slate-950 p-4">
-          <p className="mb-3 text-sm font-bold text-white">Watch the {shopName} shop video</p>
+          <p className="mb-3 flex items-center gap-2 text-base font-black text-white"><PlayCircle aria-hidden="true" className="h-6 w-6 shrink-0" />Watch the {shopName} shop tour</p>
           {videoScript ? (
             <NarratedShopTour
               src={videoUrl}

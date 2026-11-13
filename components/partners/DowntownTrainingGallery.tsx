@@ -15,14 +15,20 @@ export default function DowntownTrainingGallery({ showPhotos = true }: { showPho
     >
       <div className="mx-auto max-w-7xl">
         <p className="text-sm font-bold uppercase tracking-widest text-blue-800">
-          Downtown Indianapolis
+          Coming soon · Downtown Indianapolis
         </p>
         <h2
           id="downtown-training-heading"
           className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
         >
-          Beauty training. A downtown destination.
+          Mesmerized by Beauty. A new downtown destination.
         </h2>
+        <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">
+          Mesmerized by Beauty is preparing its downtown Indianapolis location with a focus on
+          nails and esthetics. Discover the planned space and connect with Elevate for opening
+          updates, program information, and future training opportunities.
+        </p>
+        <p className="mt-3 font-bold text-blue-900">Planned location · Opening date to be announced</p>
         <address className="mt-4 text-lg not-italic leading-7 text-slate-700">
           {DOWNTOWN_TRAINING_ADDRESS}
           <br />
@@ -58,15 +64,16 @@ export default function DowntownTrainingGallery({ showPhotos = true }: { showPho
           ))}
         </div>
         <p className="mt-6 max-w-3xl leading-7 text-slate-700">
-          Contact Elevate to confirm downtown schedules, enrollment requirements, and training
-          availability.
+          The downtown location is coming soon. Opening dates, schedules, services, and training
+          availability will be announced after confirmation. Contact Elevate for current information.
         </p>
         <Link
-          href="/contact"
+          href="/schools/mesmerized-by-beauty#downtown-client-inquiry"
           className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-800 px-6 py-3 font-bold text-white hover:bg-blue-700"
         >
-          Ask about downtown training
+          Ask about downtown beauty services
         </Link>
+        <Link href="/schools/mesmerized-by-beauty#beauty-training" className="ml-0 mt-5 inline-flex min-h-12 items-center px-6 py-3 font-bold text-blue-800 underline sm:ml-4">Explore training opportunities</Link>
       </div>
     </section>
   );

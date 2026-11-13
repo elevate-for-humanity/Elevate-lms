@@ -2,6 +2,7 @@ import { hostShopPreviewMemberId } from '@/lib/partners/host-shop-preview-member
 import { HOST_SHOP_PREVIEW_MARKER } from '@/lib/partners/host-shop-preview-marker';
 import { hostShopPortfolioPhotos } from '@/lib/partners/curated-shop-media';
 import HostShopStudentInvitation from '@/components/host-shop/HostShopStudentInvitation';
+import { hostShopStudentPrograms } from '@/lib/partners/host-shop-student-links';
 import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
 import HostShopWelcome from '@/components/host-shop/HostShopWelcome';
 import { cookies } from 'next/headers';
@@ -310,7 +311,7 @@ export default async function HostShopDashboardView() {
           </p>
         </section>
       </HostShopWelcome>
-      <HostShopStudentInvitation />
+      <HostShopStudentInvitation partnerId={board.partner.id} shopName={board.partner.name} programs={hostShopStudentPrograms(board.partner)} />
     </div>
   );
 }

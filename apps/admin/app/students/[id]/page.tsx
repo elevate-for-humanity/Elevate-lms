@@ -77,11 +77,22 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   const { data: student } = await db
     .from('profiles')
     .select(
-      'id,full_name,first_name,last_name,email,phone,address,city,state,zip,created_at,enrollment_status,funding_source,student_number,date_of_birth,emergency_contact_name,emergency_contact_phone,last_login_at,onboarding_completed',
+      'id,full_name,first_name,last_name,email,phone,address,city,state,zip,created_at,enrollment_status,funding_source,student_number,date_of_birth,emergency_contact_name,emergency_contact_phone,last_login_at,last_sign_in_at,role,onboarding_completed',
     )
     .eq('id', id)
     .maybeSingle();
   if (!student) notFound();
+
+  const [{ data: apprentice }, authRecord] = await Promise.all([
+    db.from('apprentices').select('shop_id,host_shop_id,status').eq('user_id', id).maybeSingle(),
+    db.auth.admin.getUserById(id),
+  ]);
+  const assignedShopId = apprentice?.host_shop_id || apprentice?.shop_id;
+  const { data: assignedShop } = assignedShopId
+    ? await db.from('host_shops').select('id,name').eq('id', assignedShopId).maybeSingle()
+    : { data: null };
+  const lastSignIn =
+    authRecord.data?.user?.last_sign_in_at || student.last_login_at || student.last_sign_in_at;
 
   const [enrollmentsRes, applicationsRes, progressRes, billingRes] = await Promise.all([
     db
@@ -119,7 +130,8 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     logger.error('[student-detail] applications query failed', applicationsRes.error);
 
   const enrollments = enrollmentsRes.data ?? [];
-  const onlineStudySessions = await loadHolderOnlineStudy(db, enrollments);
+  const hvacEnrollments = enrollments.filter((row) => row.program_slug === 'hvac-technician');
+  const onlineStudySessions = await loadHolderOnlineStudy(db, hvacEnrollments);
   const applications = applicationsRes.data ?? [];
   const billingInvoices = (billingRes.data ?? []).filter(isIssuedStudentInvoice);
   const programIds = [
@@ -268,7 +280,10 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
         <div className="flex flex-wrap items-start gap-2">
-          <OpenLearnerPortalButton studentId={student.id} />
+          <OpenLearnerPortalButton
+            studentId={student.id}
+            label={apprentice ? 'Preview apprentice dashboard' : 'Preview learner dashboard'}
+          />
           {student.email && (
             <a
               href={`mailto:${student.email}`}
@@ -281,10 +296,12 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
         </div>
       </section>
 
-      <ProgramHolderOnlineStudy
-        sessions={onlineStudySessions}
-        enrollments={enrollments.map((row) => ({ ...row, full_name: name }))}
-      />
+      {hvacEnrollments.length > 0 && (
+        <ProgramHolderOnlineStudy
+          sessions={onlineStudySessions}
+          enrollments={enrollments.map((row) => ({ ...row, full_name: name }))}
+        />
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[.75fr_1.25fr]">
         <aside className="min-w-0 space-y-4">
@@ -294,6 +311,10 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               Profile
             </h2>
             <InfoRow label="Email" value={student.email} />
+            <InfoRow label="Account type" value={apprentice ? 'Apprentice' : student.role} />
+            {apprentice && (
+              <InfoRow label="Host Shop" value={assignedShop?.name || 'Not assigned'} />
+            )}
             <InfoRow label="Phone" value={student.phone} />
             <InfoRow
               label="Location"
@@ -315,7 +336,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               label="Onboarding"
               value={student.onboarding_completed ? 'Complete' : 'Incomplete'}
             />
-            <InfoRow label="Last Login" value={fmtDate(student.last_login_at)} />
+            <InfoRow label="Last Sign-in" value={fmtDate(lastSignIn)} />
           </section>
           {(student.emergency_contact_name || student.emergency_contact_phone) && (
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

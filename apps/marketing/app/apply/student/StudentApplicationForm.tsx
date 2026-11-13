@@ -14,6 +14,8 @@ const WORKONE_INTAKE_URL = WORKONE_INDY_BOOKING_URL;
 
 interface StudentApplicationFormProps {
   initialProgram?: string;
+  lockedProgram?: boolean;
+  initialHostShopName?: string;
   applicationIntent?: 'inquiry' | 'enrollment';
   paymentSessionId?: string;
 }
@@ -165,9 +167,14 @@ export default function StudentApplicationForm({
   initialProgram = '',
   applicationIntent = 'inquiry',
   paymentSessionId = '',
+  lockedProgram = false,
+  initialHostShopName = '',
 }: StudentApplicationFormProps) {
   const router = useRouter();
-  const [form, setForm] = useState<StudentForm>(() => createEmptyForm(initialProgram));
+  const [form, setForm] = useState<StudentForm>(() => ({
+    ...createEmptyForm(initialProgram),
+    ...(initialHostShopName ? { hasHostShop: 'yes', hostShopName: initialHostShopName } : {}),
+  }));
   const [submissionKey] = useState(createSubmissionKey);
   const [step, setStep] = useState(1);
   const [showResume, setShowResume] = useState(false);
@@ -199,6 +206,7 @@ export default function StudentApplicationForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = e.target;
+    if (lockedProgram && name === 'program') return;
     setResult(null);
     if (name === 'program' && value.includes('apprenticeship')) {
       setForm((prev) => ({ ...prev, program: value, fundingSource: 'self_pay' }));
@@ -226,7 +234,10 @@ export default function StudentApplicationForm({
 
   function resumeDraft() {
     if (!savedData) return;
-    setForm(savedData.form.program.includes('apprenticeship') ? { ...savedData.form, fundingSource: 'self_pay' } : savedData.form);
+    const resumed = lockedProgram
+      ? { ...savedData.form, program: initialProgram, ...(initialHostShopName ? { hasHostShop: 'yes', hostShopName: initialHostShopName } : {}) }
+      : savedData.form;
+    setForm(resumed.program.includes('apprenticeship') ? { ...resumed, fundingSource: 'self_pay' } : resumed);
     setWorkOneAcknowledged(savedData.workOneAcknowledged);
     setApprenticeshipFundingConfirmed(Boolean(savedData.apprenticeshipFundingConfirmed));
     setTransferHoursDocument(null);
@@ -524,7 +535,7 @@ export default function StudentApplicationForm({
             <h3 className="text-xl font-black text-slate-950">Program and training preferences</h3>
             <p className="mt-1 text-sm text-slate-700">Tell us what you want to study and how you prefer to train.</p>
           </div>
-          <div><label htmlFor="program" className={labelClass}>Program of Interest *</label><select id="program" name="program" required value={form.program} onChange={handleChange} className={fieldClass}><option value="">Select a program</option>{PROGRAMS.map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}</select></div>
+          <div><label htmlFor="program" className={labelClass}>Program of Interest *</label><select id="program" name="program" required disabled={lockedProgram} value={form.program} onChange={handleChange} className={fieldClass}>{!lockedProgram && <option value="">Select a program</option>}{PROGRAMS.filter(program => !lockedProgram || program.value === initialProgram).map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}</select></div>
           <div><label htmlFor="modalityPreference" className={labelClass}>Training Preference</label><select id="modalityPreference" name="modalityPreference" value={form.modalityPreference} onChange={handleChange} className={fieldClass}><option value="">No preference</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online where available</option></select></div>
           {isApprenticeship && (
             <div className="rounded-xl border border-blue-200 bg-blue-50 p-5">

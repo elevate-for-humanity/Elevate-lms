@@ -3,6 +3,7 @@ import { submitHostShopForReview } from './actions';
 import { hostShopReadyForReview } from '@/lib/partners/host-shop-review';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import StudentOnboardingLinks from '@/components/host-shop/StudentOnboardingLinks';
+import { hostShopStudentPrograms } from '@/lib/partners/host-shop-student-links';
 import Link from 'next/link';
 import { HostShopHandbook } from '@/components/partners/HostShopHandbook';
 import { redirect } from 'next/navigation';
@@ -210,7 +211,7 @@ export default async function HostShopOnboardingPage({ searchParams }: {
           <summary className="min-h-11 cursor-pointer font-bold">Read your Host Shop handbook</summary>
           <HostShopHandbook />
         </details>
-        <StudentOnboardingLinks shopName={board.partner?.name || 'Host Shop'} />
+        <StudentOnboardingLinks partnerId={board.partner.id} shopName={board.partner.name || 'Host Shop'} programs={hostShopStudentPrograms(board.partner)} />
       </div>
     </main>
   );

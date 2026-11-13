@@ -126,7 +126,7 @@ test('operator marker must be heard from the greeting channel, not the caller or
 test('operator and voicemail scenarios stay bounded to the business DID and do not accept mixed scenarios',async()=>{
  const f=fixture();await exerciseSelfCall(bindings,{...options(f),operatorTest:true});
  const create=f.requests.find(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');const params=new URLSearchParams(create.options.body);
- assert.equal(params.get('TimeLimit'),'60');assert.ok(params.get('Twiml').includes('connect me to the operator'));assert.equal(params.get('To'),number);
+ assert.equal(params.get('TimeLimit'),'60');assert.ok(params.get('Twiml').includes('<Play digits="w0"/>'));assert.equal(params.get('To'),number);
  const vm=fixture();const result=await exerciseSelfCall(bindings,{...options(vm),voicemailTest:true});
  const voicemailCreate=vm.requests.find(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');const voicemailParams=new URLSearchParams(voicemailCreate.options.body);
  assert.equal(voicemailParams.get('TimeLimit'),'75');assert.equal(voicemailParams.get('Record'),'false');assert.equal(result.voicemailDeliveryAcceptance,'PENDING');

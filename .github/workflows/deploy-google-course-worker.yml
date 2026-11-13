@@ -238,13 +238,14 @@ jobs:
         run: node scripts/gcp/deploy-course-job.mjs
       - name: Synchronize approved regional worker image and verify readback
         run: node scripts/gcp/sync-course-worker-regions.mjs
+      - name: Verify lesson autopilot RPC read retry contract
+        run: node --test tests/worker/lesson-autopilot-deploy-network-retry.test.mjs
       - name: Deploy three lesson autopilot roles and verify immutable configurations
         env:
           IMAGE_SHA: ${{ github.sha }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           node --test scripts/gcp/deploy-lesson-autopilots.test.mjs scripts/gcp/dispatch-lesson-autopilots.test.mjs
-          node --test tests/worker/lesson-autopilot-deploy-network-retry.test.mjs
           node scripts/gcp/deploy-lesson-autopilots.mjs
       - name: Verify all five deployed worker image digests and runtime identities
         env:

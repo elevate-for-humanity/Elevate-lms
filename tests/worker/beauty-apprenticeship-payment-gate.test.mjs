@@ -54,3 +54,10 @@ test('LMS layout, apprentice dashboard, course overview and direct lesson URL en
     assert.match(content, /loadBeautyPaymentGate\(/, path);
   }
 });
+
+test('canonical lesson and module API access checks enforce prepayment policy server-side', () => {
+  const content = readFileSync(new URL('../../lib/lms/access-control.ts', import.meta.url), 'utf8');
+  assert.match(content, /assertBeautyPaymentAccess\(db, userId, lesson.course_id\)/);
+  assert.match(content, /assertBeautyPaymentAccess\(db, userId, courseId\)/);
+  assert.match(content, /if \(paymentGate\?\.locked\) throw new Error\('ACCESS_DENIED'\)/);
+});

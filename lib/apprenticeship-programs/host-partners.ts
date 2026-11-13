@@ -313,7 +313,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     programs: ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
     primaryProgram: 'esthetician-apprenticeship',
     note: 'Published downtown Indianapolis Host Shop profile for esthetics and nail apprenticeship pathways.',
-    marketingBlurb: 'Mesmerized by Beauty supports Elevate esthetics and nail apprenticeship pathways at 120 East Market Street, Suite 560 in downtown Indianapolis. Contact Elevate to confirm schedules, requirements, and training availability.',
+    marketingBlurb: 'Mesmerized by Beauty is preparing a downtown Indianapolis location with a focus on nails and esthetics. The location is coming soon; the opening date, schedules, services and training availability will be announced after confirmation. Contact Elevate for updates and program information.',
     media: [
       {
         src: '/images/partners/mesmerized-by-beauty/downtown-nail-program.webp',

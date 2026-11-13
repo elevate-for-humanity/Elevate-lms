@@ -77,6 +77,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
               <HostShopMediaCarousel
                 shopName={shop.name}
                 videoUrl={shop.videoUrl}
+                videoScript={shop.videoScript}
                 compact
                 items={
                   shop.gallery?.length
@@ -177,6 +178,12 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                     className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-red-700"
                   >
                     Visit shop website ↗
+                  </a>
+                ) : null}
+                {shop.social ? (
+                  <a href={shop.social} target="_blank" rel="noopener noreferrer"
+                    className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-red-700">
+                    Photos &amp; social ↗
                   </a>
                 ) : null}
                 <Link

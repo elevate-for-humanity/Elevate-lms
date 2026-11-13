@@ -4,6 +4,10 @@ import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirec
 import HostShopPlacementGuideClient from '@/components/programs/beauty/HostShopPlacementGuideClient';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 
+vi.mock('@/components/partners/NarratedShopTour', () => ({
+  default: ({ script, src }: { script: string; src: string }) => <div data-testid="shop-tour" data-src={src}>{script}</div>,
+}));
+
 vi.mock('next/image', () => ({
   default: ({
     fill,
@@ -33,6 +37,13 @@ const shop: HostShopNetworkEntry = {
 };
 
 describe('actual shop navigation', () => {
+  it('shows the shop social link and passes its own walkthrough script to its video', () => {
+    render(<HostShopNetworkDirectory shops={[{ ...shop, social: 'https://example.com/social', videoUrl: '/shop-tour.mp4', videoScript: 'Welcome to Actual Shop in Indianapolis.' }]} />);
+    expect(screen.getByRole('link', { name: 'Photos & social ↗' })).toHaveAttribute('href', 'https://example.com/social');
+    expect(screen.getByText('Watch the Actual Shop shop tour')).toBeInTheDocument();
+    expect(screen.getByTestId('shop-tour')).toHaveAttribute('data-src', '/shop-tour.mp4');
+    expect(screen.getByTestId('shop-tour')).toHaveTextContent('Welcome to Actual Shop in Indianapolis.');
+  });
   it('links the shop name and profile button to the same shop beside its slideshow', () => {
     render(<HostShopNetworkDirectory shops={[shop]} />);
     for (const name of ['Actual Shop', 'View shop profile']) {

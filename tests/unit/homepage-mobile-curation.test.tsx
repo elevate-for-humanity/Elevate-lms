@@ -76,6 +76,11 @@ describe('homepage curation', () => {
     expect(grid?.className).toContain('grid-cols-1');
     expect(grid?.className).toContain('sm:grid-cols-2');
     expect(grid?.className).toContain('lg:grid-cols-3');
+    const downtown = root.querySelector('aside[aria-labelledby="downtown-beauty-preview"]')!;
+    expect(downtown.textContent).toContain('Coming soon');
+    expect(downtown.textContent).toContain('appointments are not yet confirmed');
+    expect(downtown.querySelector('a')?.getAttribute('href')).toBe('/schools/mesmerized-by-beauty#downtown-client-inquiry');
+    expect(grid?.contains(downtown)).toBe(false);
   });
 
   it('keeps visual career sections and the program-specific funding notice', () => {

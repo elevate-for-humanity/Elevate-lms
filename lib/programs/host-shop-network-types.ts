@@ -12,6 +12,7 @@ export type HostShopNetworkEntry = {
   image?: string;
   logo?: string;
   videoUrl?: string;
+  videoScript?: string;
   gallery?: Array<{ url: string; alt?: string }>;
   website?: string;
   social?: string;

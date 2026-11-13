@@ -100,7 +100,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
       city: shop.city || featured?.city || '',
       state: shop.state || featured?.state || 'IN',
       address: approvedAddress(shop) || (featured ? featuredAddress(featured) : ''),
-      phone: featured?.phone || shop.phone || undefined,
+      phone: featured?.phone || shop.phone || publicProfile?.phone || undefined,
       programs: shop.programs,
       primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
@@ -115,6 +115,8 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
       image: gallery[0]?.url,
       logo: shop.logoUrl || (publicProfile && 'logo' in publicProfile ? publicProfile.logo : undefined) || featured?.media?.find((item) => /\/logo\./.test(item.src))?.src,
       videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
+      // Only intentionally scripted assets replace their recorded audio with narration.
+      videoScript: featured?.media?.find((item) => item.kind === 'video' && item.src === (shop.videoUrl || featured?.media?.find((media) => media.kind === 'video')?.src))?.script,
       gallery,
       website: shop.website || featured?.websiteUrl || publicProfile?.website || undefined,
       social:

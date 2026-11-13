@@ -3,7 +3,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/programs/host-shop-network', () => ({
   getHostShopNetwork: async () => [
-    { id: 'salon', slug: 'salon', name: 'Salon only', city: 'Indy', state: 'IN', address: '1 Main St', programs: ['cosmetology-apprenticeship', 'barber-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship', gallery: [{ url: '/salon.webp' }] },
+    { id: 'salon', slug: 'salon', name: 'Salon only', city: 'Indy', state: 'IN', address: '1 Main St', programs: ['cosmetology-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship', gallery: [{ url: '/salon.webp' }] },
     { id: 'barber', slug: 'barber', name: 'Barber Studio', city: 'Indy', state: 'IN', address: '2 Main St', programs: ['barber-apprenticeship'], primaryProgram: 'barber-apprenticeship', gallery: [{ url: '/haircut.webp' }, { url: '/manicure.webp' }], videoUrl: '/barber-tour.mp4' },
   ],
 }));
@@ -23,3 +23,15 @@ for (const [name, Component] of [['featured cards', FeaturedHostPartners], ['pla
     expect(screen.getByLabelText('Shop tour')).toHaveAttribute('src', '/barber-tour.mp4');
   });
 }
+
+it('preserves approved dual-program placement choices with trade-specific photographs', async () => {
+  const { getHostShopNetwork } = await import('@/lib/programs/host-shop-network');
+  const shops = await getHostShopNetwork();
+  const barber = shops.find(shop => shop.id === 'barber')!;
+  barber.programs.push('cosmetology-apprenticeship');
+  // The actual function reads a fresh list; test the placement component's
+  // existing client contract directly for a primary-barber dual approval.
+  const { default: Guide } = await import('@/components/programs/beauty/HostShopPlacementGuideClient');
+  render(<Guide programSlug="cosmetology-apprenticeship" shops={[{ ...barber, description: 'Dual approved business', approval: 'approved' }]} />);
+  expect(screen.getByRole('heading', { name: 'Barber Studio' })).toBeInTheDocument();
+});

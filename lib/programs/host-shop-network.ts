@@ -116,6 +116,7 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
           ? 'DBO Hair Studios is an Indianapolis salon led by owner and master stylist Evelyn Estevez. Meet the team, explore their work, and book directly with the salon.'
           : `${shop.name} is located in ${shop.city}, ${shop.state}. Explore ${shop.programs.map((program) => PROGRAM_LABELS[program] ?? program).join(' and ')} at this local business. Contact the shop for services, hours, and walk-in availability.`),
       image: gallery[0]?.url,
+      logo: shop.logoUrl || (publicProfile && 'logo' in publicProfile ? publicProfile.logo : undefined) || featured?.media?.find((item) => /\/logo\./.test(item.src))?.src,
       videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
       gallery,
       website: shop.website || featured?.websiteUrl || publicProfile?.website || undefined,

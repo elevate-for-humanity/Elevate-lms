@@ -50,7 +50,7 @@ export default async function FeaturedHostPartners({
       socialUrl: shop.social,
       media: [
         ...(programSlug
-          ? shopGalleryForProgram(shop.slug, shop.gallery ?? [], programSlug)
+          ? shopGalleryForProgram(shop.slug, shop.gallery ?? [], programSlug, shop.logo)
           : (shop.gallery ?? [])
         ).map((item) => ({
           src: item.url,

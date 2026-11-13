@@ -25,7 +25,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
       return matchesProgram && (!needle || haystack.includes(needle));
     }).map((shop) => {
       if (program === 'all') return shop;
-      const gallery = shopGalleryForProgram(shop.slug, shop.gallery ?? [], program);
+      const gallery = shopGalleryForProgram(shop.slug, shop.gallery ?? [], program, shop.logo);
       return { ...shop, gallery, image: gallery[0]?.url };
     });
   }, [program, query, shops]);

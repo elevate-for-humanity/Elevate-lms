@@ -80,8 +80,9 @@ export function shopGalleryForProgram(
   slug: string,
   items: ShopMedia[],
   program: string,
+  businessLogo?: string,
 ): ShopMedia[] {
-  return curateShopGallery(slug, items).filter((item) => {
+  const photos = curateShopGallery(slug, items).filter((item) => {
     const path = item.url.toLowerCase();
     if (program === 'barber-apprenticeship') {
       return !/nail|manicure|esthetic|cosmetology|prestige-elevation\/official-portfolio/.test(
@@ -94,6 +95,9 @@ export function shopGalleryForProgram(
     if (program === 'esthetician-apprenticeship') return /esthetic|skincare|facial/.test(path);
     return false;
   });
+  // An official identity image is explicit branding, never a claim about a
+  // service or training environment when the shop has no photo for this trade.
+  return photos.length || !businessLogo ? photos : [{ url: businessLogo, alt: 'Official business logo' }];
 }
 
 /** Portfolio media comes from the selected partner's public gallery, never from compliance uploads. */

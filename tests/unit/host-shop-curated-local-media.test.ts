@@ -40,3 +40,10 @@ it('shows only occupation-appropriate media on each program page', () => {
   expect(shopGalleryForProgram('prestige-elevation', photos, 'nail-technician-apprenticeship').map(p => p.url)).toEqual([photos[2].url]);
   expect(shopGalleryForProgram('prestige-elevation', photos, 'esthetician-apprenticeship').map(p => p.url)).toEqual([photos[3].url]);
 });
+
+it('uses official business branding when no trade-specific photograph is supplied', () => {
+  const manicure = { url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp' };
+  expect(shopGalleryForProgram('style-and-scissor-salon', [manicure], 'cosmetology-apprenticeship', '/images/partners/style-and-scissor-salon/logo.webp')).toEqual([
+    { url: '/images/partners/style-and-scissor-salon/logo.webp', alt: 'Official business logo' },
+  ]);
+});

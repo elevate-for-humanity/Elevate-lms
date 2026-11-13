@@ -27,6 +27,13 @@ test('unrelated active enrolled courses are never greyed out by a new beauty inq
   assert.equal(evaluateBeautyPaymentGate([{ program_slug: beauty[0] }],
     [{ program_slug: 'hvac-technician', status: 'active', enrollment_state: 'active' }]), null);
 });
+test('existing active cosmetology learner keeps dashboard despite new unpaid nail inquiry', () => {
+  assert.equal(evaluateBeautyPaymentGate([{ program_slug: 'nail-technician-apprenticeship' }],
+    [{ program_slug: 'cosmetology-apprenticeship', status: 'active', enrollment_state: 'active' }]), null);
+  assert.ok(evaluateBeautyPaymentGate([{ program_slug: 'nail-technician-apprenticeship' }],
+    [{ program_slug: 'cosmetology-apprenticeship', status: 'active', enrollment_state: 'active' }],
+    'nail-technician-apprenticeship'));
+});
 test('other course routes are not intercepted by a beauty application', () => {
   assert.equal(evaluateBeautyPaymentGate([{ program_slug: beauty[0] }], [], 'bookkeeping'), null);
 });

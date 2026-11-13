@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { MapPin, Navigation, Phone } from 'lucide-react';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import {
@@ -52,7 +51,7 @@ function embedUrl(pin: DisplayPin) {
 }
 
 export default function BarberWorkforceNetworkMap({ shops }: { shops?: HostShopNetworkEntry[] } = {}) {
-  const MAP_PINS: DisplayPin[] = useMemo(() => [...(shops ?? FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => ({ ...shop, id: shop.slug }))).filter((shop) => matchesHostShopProgram(shop, 'barber-apprenticeship')).map((shop): DisplayPin => ({ id: `host-${shop.id}`, kind: 'host_shop', name: shop.name, address: shop.address, city: shop.city, state: shop.state, zip: '', phone: shop.phone, href: `/host-shops/${shop.slug}` })), ...SUPPORT_PINS], [shops]);
+  const MAP_PINS: DisplayPin[] = useMemo(() => [...(shops ?? []).filter((shop) => matchesHostShopProgram(shop, 'barber-apprenticeship')).map((shop): DisplayPin => ({ id: `host-${shop.id}`, kind: 'host_shop', name: shop.name, address: shop.address, city: shop.city, state: shop.state, zip: '', phone: shop.phone, href: `/host-shops/${shop.slug}` })), ...SUPPORT_PINS], [shops]);
   const [selectedId, setSelectedId] = useState(MAP_PINS[0]?.id ?? '');
   const selected = useMemo(
     () => MAP_PINS.find((pin) => pin.id === selectedId) ?? MAP_PINS[0],

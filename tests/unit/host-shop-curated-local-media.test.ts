@@ -20,8 +20,8 @@ it('leads Style and Scissor with its restored manicure instead of a logo or albu
     { url: '/images/partners/style-and-scissor-salon/contact-card.webp' },
   ]);
   expect(photos).toHaveLength(1);
-  expect(photos[0].url).toBe('/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp');
-  expect(photos[0].alt).toMatch(/^AI-enhanced/);
+  expect(photos[0].url).toBe('/images/partners/style-and-scissor-salon/portfolio-nail-work-restored-2026.webp');
+  expect(photos[0].alt).toContain('restored from Style and Scissor');
   expect(photos[0].source).toContain('portfolio-nail-work.webp');
 });
 
@@ -41,10 +41,10 @@ it('shows only occupation-appropriate media on each program page', () => {
   expect(shopGalleryForProgram('prestige-elevation', photos, 'esthetician-apprenticeship').map(p => p.url)).toEqual([photos[3].url]);
 });
 
-it('uses official business branding when no trade-specific photograph is supplied', () => {
+it('uses the salon’s real labeled portfolio before considering a logo fallback', () => {
   const manicure = { url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp' };
   expect(shopGalleryForProgram('style-and-scissor-salon', [manicure], 'cosmetology-apprenticeship', '/images/partners/style-and-scissor-salon/logo.webp')).toEqual([
-    { url: '/images/partners/style-and-scissor-salon/logo.webp', alt: 'Official business logo' },
+    { url: '/images/partners/style-and-scissor-salon/portfolio-nail-work-restored-2026.webp', alt: 'Patriotic and mixed nail-art portfolio — restored from Style and Scissor Salon’s own photographs', source: manicure.url },
   ]);
 });
 

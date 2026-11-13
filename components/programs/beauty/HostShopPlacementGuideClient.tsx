@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { Building2, MapPin, Search, UserPlus, Users } from 'lucide-react';
-import { matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
+import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 
 function normalized(value: string) {
@@ -24,7 +24,7 @@ export default function HostShopPlacementGuideClient({
   const [query, setQuery] = useState('');
   const filtered = useMemo(() => {
     const q = normalized(query);
-    const programShops = shops.filter((shop) => matchesHostShopPresentationProgram(shop, programSlug));
+    const programShops = shops.filter((shop) => matchesHostShopProgram(shop, programSlug));
     if (!q) return programShops;
     return programShops.filter((shop) =>
       normalized(

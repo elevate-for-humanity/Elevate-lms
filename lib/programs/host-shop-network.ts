@@ -55,24 +55,21 @@ function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
   return sameName || samePhone;
 }
 
-function firstImage(shop: FeaturedHostPartner) {
-  return shop.media?.find((item) => item.kind !== 'video')?.src;
-}
-
 /**
  * Canonical public network: approved operational records are authoritative.
- * Curated profiles enrich those records and preserve published partner profiles
- * during temporary database outages without creating duplicate businesses.
+ * Curated profiles enrich approved records; saved media and onboarding alone
+ * never establish approval or publish an additional business.
  */
 export async function getHostShopNetwork(includeOnboarding = false): Promise<HostShopNetworkEntry[]> {
-  const approved = (await getApprovedShops()).filter((shop) => !/marvelous\s+cuts/i.test(shop.name));
-  const matchedFeatured = new Set<string>();
+  // Compatibility parameter must never publish incomplete onboarding records.
+  void includeOnboarding;
+  const approved = await getApprovedShops();
 
   const operational = approved.map((shop): HostShopNetworkEntry => {
     const featured = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) =>
       sameBusiness(shop, candidate),
     );
-    if (featured) matchedFeatured.add(featured.slug);
+
     const publicProfile = onboardingProfiles.find(
       (profile) => identityKey(profile.name) === identityKey(shop.name),
     );
@@ -130,59 +127,9 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
     };
   });
 
-  const publishedOnly = FEATURED_BEAUTY_HOST_PARTNERS.filter(
-    (shop) =>
-      !matchedFeatured.has(shop.slug) && approved.some((record) => sameBusiness(record, shop)),
-  ).map(
-    (shop): HostShopNetworkEntry => ({
-      id: `featured:${shop.slug}`,
-      slug: shop.slug,
-      name: shop.dba ?? shop.name,
-      city: shop.city,
-      state: shop.state,
-      address: featuredAddress(shop),
-      phone: shop.phone,
-      programs: shop.programs,
-      primaryProgram: shop.primaryProgram ?? shop.programs[0],
-      description:
-        shop.marketingBlurb ||
-        shop.note ||
-        `${shop.name} is listed in Elevate's Host Shop network.`,
-      image: firstImage(shop),
-      videoUrl: shop.media?.find((item) => item.kind === 'video')?.src,
-      gallery: shop.media
-        ?.filter((item) => item.kind !== 'video')
-        .map((item) => ({ url: item.src, alt: item.alt })),
-      website: shop.websiteUrl,
-      social: shop.socialUrl,
-      booking: shop.bookingUrl,
-      approval: 'published-partner',
-    }),
-  );
-
-  const onboarding: HostShopNetworkEntry[] = includeOnboarding ? onboardingProfiles
-    .filter((profile) => !operational.some((shop) => identityKey(shop.name) === identityKey(profile.name)))
-    .map((profile): HostShopNetworkEntry => ({
-      id: `published:${profile.slug}`,
-      slug: profile.slug,
-      name: profile.name,
-      city: profile.city,
-      state: 'IN',
-      address: profile.address,
-      phone: profile.phone || undefined,
-      programs: profile.programs ?? [],
-      description: profile.businessDescription || `${profile.name} is a local business in ${profile.city}, Indiana. Contact the shop to ask about services and current availability.`,
-      image: profile.gallery?.[0]?.url || profile.portfolio,
-      gallery: profile.gallery || (profile.portfolio ? [{ url: profile.portfolio, alt: `${profile.name} published portfolio` }] : []),
-      website: profile.website || undefined,
-      booking: profile.booking,
-      social: profile.instagram,
-      approval: 'published-partner',
-    })) : [];
-
   // Multiple historical approval records can refer to the same public shop.
   // Keep one destination and preserve its independently approved pathways.
-  return uniqueHostShops([...operational, ...publishedOnly, ...onboarding]).sort(
+  return uniqueHostShops(operational).sort(
     (left: HostShopNetworkEntry, right: HostShopNetworkEntry) =>
       left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );

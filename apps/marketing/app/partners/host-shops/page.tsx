@@ -72,6 +72,7 @@ const CALLER_CHECKLIST = [
 
 export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
+  const approvedHeroShops = HOST_SHOP_HERO_SHOPS.filter((profile) => networkShops.some((shop) => shop.slug === profile.slug));
   // Preserve team/client photos in each shop's own card, even when the hero
   // features one of them. Removing hero images left some cards with empty rooms.
   const directoryShops = networkShops;
@@ -79,7 +80,7 @@ export default async function HostShopsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
       <HostShopShowcase
-        shops={HOST_SHOP_HERO_SHOPS}
+        shops={approvedHeroShops}
         asHero
         portraitTour
         videoTourShopSlug="salon-saloon"

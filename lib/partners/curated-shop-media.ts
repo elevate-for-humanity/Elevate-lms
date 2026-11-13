@@ -30,14 +30,21 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
         item = { ...item, url: parsed.pathname + parsed.search };
       }
     } catch { return []; }
-    // The printed album sheets and contact card are source material, not
-    // portfolio photography. Publish the restored manicure, with clear labeling.
+    // Restore every supplied portfolio sheet; keep logos and contact cards
+    // outside the photographic gallery and label the actual nail work.
     if (slug.startsWith('style-and-scissor')) {
-      if (/\/(?:logo|contact-card|melissas-nails|pink-nail-work)\.webp$/.test(item.url)) return [];
-      if (item.url === '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp') item = {
+      if (/\/(?:logo|contact-card)\.webp$/.test(item.url)) return [];
+      const restored: Record<string, { file: string; label: string }> = {
+        'portfolio-nail-work.webp': { file: 'portfolio-nail-work-restored-2026.webp', label: 'Patriotic and mixed nail-art portfolio' },
+        'manicure-enhanced-2026.webp': { file: 'portfolio-nail-work-restored-2026.webp', label: 'Patriotic and mixed nail-art portfolio' },
+        'melissas-nails.webp': { file: 'melissas-nails-restored-2026.webp', label: 'Three nail-service portfolio examples' },
+        'pink-nail-work.webp': { file: 'pink-nail-work-restored-2026.webp', label: 'Pink French-tip and polished manicure portfolio' },
+      };
+      const replacement = restored[item.url.split('/').at(-1) ?? ''];
+      if (replacement) item = {
         ...item,
-        url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp',
-        alt: 'AI-enhanced manicure photograph restored from Style and Scissor Salon’s published nail portfolio',
+        url: `/images/partners/style-and-scissor-salon/${replacement.file}`,
+        alt: `${replacement.label} — restored from Style and Scissor Salon’s own photographs`,
         source: item.source || original.url,
       };
     }
@@ -92,6 +99,10 @@ export function shopGalleryForProgram(
         path,
       );
     }
+    // This salon supplied nail-service portfolios. Keep its real photographs
+    // on its cosmetology shop card, labeled as nail work, never as hair work.
+    if (program === 'cosmetology-apprenticeship' && slug.startsWith('style-and-scissor'))
+      return !/program-barber-training/.test(path);
     if (program === 'cosmetology-apprenticeship')
       return !/nail|manicure|esthetic|program-barber-training/.test(path);
     if (program === 'nail-technician-apprenticeship') return /nail|manicure/.test(path);

@@ -22,16 +22,11 @@ describe('complete public shop promotion', () => {
     expect(shop?.gallery?.[0].url).toBe('/images/partners/b52s-interior-enhanced-2026.webp');
     expect(shop?.gallery?.[0].alt).toMatch(/^AI-enhanced/);
   });
-  it('includes published businesses only when requested, without claiming placement approval', async () => {
-    const approved = await getHostShopNetwork();
-    expect(approved.every((shop) => shop.approval === 'approved')).toBe(true);
+  it('never promotes pending businesses even through the historical includeOnboarding option', async () => {
     const directory = await getHostShopNetwork(true);
-    const barber = directory.find((shop) => shop.slug === 'barbershop-32');
-    expect(barber?.approval).toBe('published-partner');
-    expect(barber?.address).toContain('330 East Main Street');
-    expect(barber?.programs).toEqual(['barber-apprenticeship']);
-    expect(barber?.booking).toBe('https://www.vagaro.com/barbershop32');
+    expect(directory.every((shop) => shop.approval === 'approved')).toBe(true);
+    expect(directory.find((shop) => shop.slug === 'barbershop-32')).toBeUndefined();
+    expect(directory.find((shop) => shop.slug === 'marvelouz-cutz')).toBeUndefined();
     expect(directory.filter((shop) => shop.name === 'DBO Hair Studios')).toHaveLength(1);
-    expect(directory.find((shop) => shop.slug === 'marvelouz-cutz')?.approval).toBe('published-partner');
   });
 });

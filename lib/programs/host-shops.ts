@@ -1,4 +1,4 @@
-import { parseHostShopAddress } from '@/lib/partners/host-shop-address';
+import { parseHostShopAddress, normalizeHostShopAddress, formatHostShopAddress } from '@/lib/partners/host-shop-address';
 /**
  * Canonical approved Host Shop loader.
  * Operational approval remains authoritative; public partner profiles only enrich
@@ -87,7 +87,7 @@ function isPubliclyListedHostShop(shop: HostShop): boolean {
 }
 
 function approvedAddress(shop: HostShop) {
-  return [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
+  return formatHostShopAddress(shop);
 }
 
 function approvedMapsUrl(shop: HostShop) {
@@ -233,7 +233,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       return { id: row.id, name: row.name, address: row.address ?? '', city: row.city ?? '', state: row.state === 'Indiana' ? 'IN' : row.state || 'IN', zip: row.zip_code ?? '', phone: row.phone ?? '', email: '', supervisor: '', programs, primaryProgram: programs[0], badge: 'partner', publicSlug: featured?.slug ?? slug, website: row.website || featured?.websiteUrl, description: row.description || featured?.marketingBlurb || `${row.name} participates in Elevate’s approved Host Shop network. Occupation and placement availability are confirmed by Elevate.`, mediaGallery: row.image_url ? [{url: row.image_url, alt: `${row.name} shop photo`}] : undefined };
     });
   const archivedNames = new Set((archivedPartnerResult.data ?? []).flatMap((row) => [row.name, row.shop_name, row.dba]).filter(Boolean).map(businessKey));
-  const all = [...existing, ...activeShopBacked].filter((shop) =>
+  const all = [...existing, ...activeShopBacked].map(shop => ({ ...shop, ...normalizeHostShopAddress(shop) })).filter((shop) =>
     isPubliclyListedHostShop(shop) && !archivedNames.has(businessKey(shop.name)),
   );
 

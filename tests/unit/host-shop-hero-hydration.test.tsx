@@ -11,8 +11,8 @@ afterEach(cleanup);
 describe('Host Shop hero interaction readiness', () => {
   it.each([
     ['56 W Main St, New Palestine, IN, 46163', '', '56 W Main St, New Palestine, IN, 46163'],
-    ['56 W Main St', '46163', '56 W Main St, New Palestine, IN 46163'],
-    ['56 W Main St, Suite 2', '46163', '56 W Main St, Suite 2, New Palestine, IN 46163'],
+    ['56 W Main St', '46163', '56 W Main St, New Palestine, IN, 46163'],
+    ['56 W Main St, Suite 2', '46163', '56 W Main St, Suite 2, New Palestine, IN, 46163'],
   ])('shows one complete location for address %s', (address, zip, expected) => {
     render(<HostShopShowcase shops={[{ slug: 'address-test', name: 'Address Test', city: 'New Palestine', state: 'IN', zip, address, programs: ['barber-apprenticeship'], media: [{ src: '/shop.webp', alt: 'Shop portfolio', kind: 'photo' }] }]} asHero />);
     expect(screen.getByText(expected, { exact: true })).toBeInTheDocument();

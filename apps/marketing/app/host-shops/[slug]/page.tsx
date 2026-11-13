@@ -5,8 +5,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
 import { ExternalLink, MapPin, Navigation, Phone, ShieldCheck } from 'lucide-react';
-import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { getFeaturedHostPartnerBySlug, type FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 import { getPublicHostShopBySlug } from '@/lib/partners/public-host-shops';
@@ -101,7 +101,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
   const description = approved.description || `${approved.name} is an approved Elevate apprenticeship Host Site${approved.city ? ` in ${approved.city}, ${approved.state}` : ''}.`;
-  const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
+  const gallery = curateShopGallery(slug, [...(approved.mediaGallery ?? []), ...(Array.isArray(profile.media_gallery) ? profile.media_gallery : [])]);
   const image = gallery[0]?.url || profile.logo_url || profile.flyer_url;
   return {
     title: `${approved.name}${approved.city ? ` in ${approved.city}, ${approved.state}` : ''} | Host Site`,
@@ -131,9 +131,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     const featured = getFeaturedHostPartnerBySlug(slug);
     if (!featured && approved) return <ApprovedHostShopProfile shop={approved} />;
     if (!featured) return notFound();
-    const currentMedia = approved?.mediaGallery?.length
-      ? curateShopGallery(featured.slug, [...approved.mediaGallery, ...(featured.media ?? []).filter((media) => media.kind !== 'video').map((media) => ({ url: media.src, alt: media.alt }))])
-      : null;
+    const currentMedia = curateShopGallery(featured.slug, [...(approved.mediaGallery ?? []), ...(featured.media ?? []).filter((media) => media.kind !== 'video').map((media) => ({ url: media.src, alt: media.alt }))]);
     const shop: FeaturedHostPartner = approved ? {
       ...featured,
       programs: approved.programs,
@@ -143,25 +141,27 @@ export default async function HostShopProfilePage({ params }: PageProps) {
       zip: approved.zip || featured.zip,
       phone: approved.phone || featured.phone,
       websiteUrl: approved.website || featured.websiteUrl,
-      media: currentMedia ? [
-        ...currentMedia.map((media) => ({ src: media.url, alt: media.alt || `${featured.name} portfolio`, kind: 'photo' as const })),
-        ...(featured.media ?? []).filter((media) => media.kind === 'video'),
-      ] : featured.media,
+      media: [
+        ...(currentMedia ?? []).map((media) => ({ src: media.url, alt: media.alt || `${featured.name} portfolio`, kind: 'photo' as const })),
+        ...(approved.videoUrl ? [{ src: approved.videoUrl, alt: `${approved.name} shop video`, kind: 'video' as const, script: featured.media?.find(media => media.src === approved.videoUrl)?.script }] : (featured.media ?? []).filter((media) => media.kind === 'video')),
+      ],
     } : featured;
     return <FeaturedHostShopProfile shop={shop} />;
   }
 
-  const address = [approved.address, approved.city, approved.state, approved.zip].filter(Boolean).join(', ');
+  const address = formatHostShopAddress(approved);
   const externalUrl = profile.website_url || profile.website || getFeaturedHostPartnerBySlug(slug)?.websiteUrl;
   const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
-  const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
+  const gallery = curateShopGallery(slug, [...(approved.mediaGallery ?? []), ...(Array.isArray(profile.media_gallery) ? profile.media_gallery : [])]);
   const featuredFallback = getFeaturedHostPartnerBySlug(slug);
   const featuredFallbackImages = (featuredFallback?.media ?? [])
     .filter((media) => media.kind !== 'video')
     .map((media) => ({ url: media.src, alt: media.alt }));
   const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
   const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
-  const videoScript = featuredFallbackVideoMedia?.script || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
+  const videoUrl = approved.videoUrl || profile.video_url || featuredFallbackVideo || undefined;
+  const authoredVideoScript = featuredFallbackVideoMedia?.src === videoUrl ? featuredFallbackVideoMedia?.script : undefined;
+  const videoScript = authoredVideoScript || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
   const items = curateShopGallery(slug, dedupeMedia([
     ...gallery,
     ...featuredFallbackImages,
@@ -193,7 +193,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
 
       <section
         className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50"
-        data-scroll-narration={!profile.video_url && !featuredFallbackVideo ? '' : undefined}
+        data-scroll-narration={!videoUrl ? '' : undefined}
         data-narration={videoScript}
         data-narration-rate={videoScript ? '0.82' : undefined}
         data-narration-style={videoScript ? 'instructor' : undefined}
@@ -214,7 +214,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             </div>
           </div>
           <div className="min-w-0">
-            {items.length || profile.video_url || featuredFallbackVideo ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} videoScript={videoScript} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+            {items.length || videoUrl ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={videoUrl} videoScript={authoredVideoScript} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
           </div>
         </div>
       </section>
@@ -249,7 +249,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
 }
 
 function ApprovedHostShopProfile({ shop }: { shop: HostShop & { booking?: string } }) {
-  const address = [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
+  const address = formatHostShopAddress(shop);
   const canonical = `${SITE_URL}/host-shops/${shop.publicSlug}`;
   const mapUrl = address ? directionsUrl(address) : undefined;
   const jsonLd = {
@@ -314,7 +314,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
     shop.programs.some((program) => program.toLowerCase().includes('barber'));
   const hostLabel = isBarberShop ? 'Elevate Host Shop' : 'Elevate Host Salon';
   const trainingSetting = isBarberShop ? 'barbershop' : 'salon';
-  const address = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
+  const address = formatHostShopAddress(shop);
   const imageItems = curateShopGallery(shop.slug, (shop.media ?? [])
     .filter((media) => media.kind !== 'video')
     .map((media) => ({ url: media.src, alt: media.alt })));
@@ -373,10 +373,10 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
               <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{shop.dba ?? shop.name}</h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
-              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Play the tour to hear the introduction to this shop. Read the script beside the video or use fullscreen for a larger view.</p>
+              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Play the shop tour or use fullscreen for a larger view.</p>
             </div>
             <div className="min-w-0">
-              <NarratedShopTour src={videoUrl} script={videoScript} shopName={shop.dba ?? shop.name} />
+              <HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={[]} videoUrl={videoUrl} videoScript={videoMedia?.script} spacious />
             </div>
           </div>
         </section>

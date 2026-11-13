@@ -1,3 +1,4 @@
+import { isReviewedShopProgramMedia } from '@/lib/partners/reviewed-shop-program-media';
 import { PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
 
 // Optimized copies of the shop’s published portfolio; source URLs remain credited.
@@ -92,23 +93,9 @@ export function shopGalleryForProgram(
   businessLogo?: string,
 ): ShopMedia[] {
   if (!Object.values(PROGRAM_SLUGS).some((slug) => slug === program)) return [];
-  const photos = curateShopGallery(slug, items).filter((item) => {
-    const path = item.url.toLowerCase();
-    if (program === 'barber-apprenticeship') {
-      return !/nail|manicure|esthetic|cosmetology|prestige-elevation\/official-portfolio/.test(
-        path,
-      );
-    }
-    // This salon supplied nail-service portfolios. Keep its real photographs
-    // on its cosmetology shop card, labeled as nail work, never as hair work.
-    if (program === 'cosmetology-apprenticeship' && slug.startsWith('style-and-scissor'))
-      return !/program-barber-training/.test(path);
-    if (program === 'cosmetology-apprenticeship')
-      return !/nail|manicure|esthetic|program-barber-training/.test(path);
-    if (program === 'nail-technician-apprenticeship') return /nail|manicure/.test(path);
-    if (program === 'esthetician-apprenticeship') return /esthetic|skincare|facial/.test(path);
-    return false;
-  });
+  const photos = curateShopGallery(slug, items).filter(item =>
+    isReviewedShopProgramMedia(slug, item.url, program),
+  );
   // An official identity image is explicit branding, never a claim about a
   // service or training environment when the shop has no photo for this trade.
   return photos.length || !businessLogo ? photos : [{ url: businessLogo, alt: 'Official business logo' }];
@@ -122,4 +109,9 @@ export function hostShopPortfolioPhotos(slug: string, gallery: unknown): ShopMed
     return (/^\/(?!\/)/.test(item.url) || /^https:\/\//.test(item.url)) && !/\.(?:mp4|webm|mov)(?:$|\?)/i.test(item.url);
   });
   return curateShopGallery(slug, photos);
+}
+
+/** Keep tours on their reviewed pathway; the general shop page retains every tour. */
+export function shopVideoForProgram(slug: string, videoUrl: string | undefined, program: string): string | undefined {
+  return videoUrl && isReviewedShopProgramMedia(slug, videoUrl, program) ? videoUrl : undefined;
 }

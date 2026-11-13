@@ -1,12 +1,14 @@
 'use client';
 
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
+
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { MapPin, Search } from 'lucide-react';
-import { shopGalleryForProgram } from '@/lib/partners/curated-shop-media';
+import { shopGalleryForProgram, shopVideoForProgram } from '@/lib/partners/curated-shop-media';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import { PROGRAM_LABELS, matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
 
@@ -21,12 +23,12 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
     return shops.filter((shop) => {
       const matchesProgram = program === 'all' || matchesHostShopPresentationProgram(shop, program);
       const haystack =
-        `${shop.name} ${shop.city} ${shop.state} ${shop.address} ${shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug).join(' ')}`.toLowerCase();
+        `${shop.name} ${shop.city} ${shop.state} ${formatHostShopAddress(shop)} ${shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug).join(' ')}`.toLowerCase();
       return matchesProgram && (!needle || haystack.includes(needle));
     }).map((shop) => {
       if (program === 'all') return shop;
       const gallery = shopGalleryForProgram(shop.slug, shop.gallery ?? [], program, shop.logo);
-      return { ...shop, gallery, image: gallery[0]?.url };
+      return { ...shop, gallery, image: gallery[0]?.url, videoUrl: shopVideoForProgram(shop.slug, shop.videoUrl, program) };
     });
   }, [program, query, shops]);
 
@@ -124,7 +126,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                     {shop.name}
                   </Link>
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-slate-700">{shop.address}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{formatHostShopAddress(shop)}</p>
                 {shop.phone && <p className="mt-1 text-sm text-slate-700">{shop.phone}</p>}
                 {shop.approval === 'published-partner' ? (
                   <p className="mt-2 text-sm font-bold text-amber-800">
@@ -144,7 +146,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${shop.name} ${shop.address}`)}`}
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${shop.name} ${formatHostShopAddress(shop)}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-3 text-sm font-bold"

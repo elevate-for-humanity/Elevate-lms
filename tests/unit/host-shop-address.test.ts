@@ -24,3 +24,19 @@ describe('host shop public addresses', () => {
     });
   });
 });
+
+import { formatHostShopAddress, normalizeHostShopAddress } from '@/lib/partners/host-shop-address';
+it.each([
+  '1600 E Bristol St',
+  '1600 E Bristol St, Elkhart, IN 46514',
+  '1600 E Bristol St, Elkhart, IN, 46514',
+  '1600 E Bristol St, Elkhart, Indiana, 46514, Elkhart, IN, 46514',
+])('normalizes duplicated location suffixes without altering records: %s', address => {
+  const record = { address, city: 'Elkhart', state: 'IN', zip: '46514' };
+  expect(normalizeHostShopAddress(record)).toEqual({ ...record, address: '1600 E Bristol St' });
+  expect(formatHostShopAddress(record)).toBe('1600 E Bristol St, Elkhart, IN, 46514');
+  expect(record.address).toBe(address);
+});
+it('keeps suite details and does not mistake a street name for the city suffix', () => {
+  expect(formatHostShopAddress({ address: '12 Indianapolis Ave, Suite 4', city: 'Indianapolis', state: 'Indiana', zip: '46204' })).toBe('12 Indianapolis Ave, Suite 4, Indianapolis, IN, 46204');
+});

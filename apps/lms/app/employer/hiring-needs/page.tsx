@@ -37,12 +37,7 @@ export default async function HiringNeedsPage({
       </Link>
       <h1 className="text-3xl font-bold">Hiring and training needs</h1>
       <p>{employer.company_name || employer.business_name}</p>
-      {saved === '1' && (
-        <p role="status" className="rounded-lg bg-green-50 p-4">
-          Your hiring and training needs are saved.
-        </p>
-      )}
-      <HiringNeedsForm initial={{
+      <HiringNeedsForm saved={saved === '1'} initial={{
         roles: typeof needs.roles === 'string' ? needs.roles : typeof needs.additionalInfo === 'string' ? needs.additionalInfo : '',
         locations: typeof needs.locations === 'string' ? needs.locations : '',
         timeline: typeof needs.timeline === 'string' ? needs.timeline : '',

@@ -51,6 +51,15 @@ export function classifyJob(job, build, { now = Date.now(), latestJobId, requeue
     if (heartbeatStale) return { action: 'stuck-live-lease', code, reason: 'HEARTBEAT_STALE_LEASE_ACTIVE' };
     return { action: 'none', code, reason: 'RUNNING' };
   }
+  // A queued row is claimable only while attempts < max_attempts. Keep
+  // exhausted queue entries visible even though no worker can claim them.
+  // Reporting these rows must not silently authorize resetting their budget.
+  if (job.status === 'queued') {
+    if (job.attempts < job.max_attempts) return { action: 'none', code, reason: 'QUEUED' };
+    if (code === RELEASE_PATH) return { action: 'release-path', code };
+    if (code === SUCCESSOR_PATH) return { action: 'successor-path', code };
+    return { action: 'needs-code-change', code, reason: 'QUEUED_RETRY_EXHAUSTED' };
+  }
   if (job.status !== 'failed' && job.status !== 'blocked') return { action: 'none', code, reason: job.status.toUpperCase() };
   if (code === RELEASE_PATH) return { action: 'release-path', code };
   if (code === SUCCESSOR_PATH) return { action: 'successor-path', code };
@@ -78,35 +87,67 @@ async function requeue(db, job, { fromStatus, clearAttempts }) {
   return true;
 }
 
+// PostgREST caps responses at a server-configured row count. Page every scan,
+// including latest-job lookups, so old queued blockers and newer successors
+// cannot disappear behind a single capped response.
+async function readAllRows(queryFor) {
+  const rows = [];
+  const seen = new Set();
+  const pageSize = 1000;
+  let expectedCount;
+  for (let page = 0; page < 200; page++) {
+    const start = rows.length;
+    const { data, error, count } = await queryFor().range(start, start + pageSize - 1);
+    if (error) throw error;
+    if (!Array.isArray(data) || !Number.isInteger(count) || count < 0) throw Error('COURSE_DIAGNOSTICS_ROWS_UNAVAILABLE');
+    if (expectedCount !== undefined && expectedCount !== count) throw Error('COURSE_DIAGNOSTICS_SCAN_CHANGED');
+    expectedCount = count;
+    if (data.length === 0 && start < count) throw Error('COURSE_DIAGNOSTICS_SCAN_INCOMPLETE');
+    for (const row of data) {
+      if (!row.id || seen.has(row.id)) throw Error('COURSE_DIAGNOSTICS_SCAN_INCOMPLETE');
+      seen.add(row.id);
+    }
+    rows.push(...data);
+    if (rows.length > count) throw Error('COURSE_DIAGNOSTICS_SCAN_CHANGED');
+    if (rows.length === count) return rows;
+  }
+  throw Error('COURSE_DIAGNOSTICS_SCAN_LIMIT');
+}
+
 export async function diagnoseCourseBuilds(db, { hours = 24, apply = false, requeueCodes = [], now = Date.now() } = {}) {
   const since = new Date(now - hours * 3600_000).toISOString();
-  const [recent, running] = await Promise.all([
-    db.from('ultimate_build_jobs').select('id,build_id,job_type,status,attempts,max_attempts,lease_owner,lease_expires_at,heartbeat_at,last_error,execution_generation,updated_at,created_at')
-      .gte('updated_at', since).order('updated_at', { ascending: false }).limit(5000),
-    db.from('ultimate_build_jobs').select('id,build_id,job_type,status,attempts,max_attempts,lease_owner,lease_expires_at,heartbeat_at,last_error,execution_generation,updated_at,created_at')
-      .eq('status', 'running').limit(1000),
+  const columns = 'id,build_id,job_type,status,attempts,max_attempts,lease_owner,lease_expires_at,heartbeat_at,last_error,execution_generation,updated_at,created_at';
+  const [recent, running, queued] = await Promise.all([
+    readAllRows(() => db.from('ultimate_build_jobs').select(columns, { count: 'exact' })
+      .gte('updated_at', since).order('updated_at', { ascending: false }).order('id')),
+    readAllRows(() => db.from('ultimate_build_jobs').select(columns, { count: 'exact' })
+      .eq('status', 'running').order('id')),
+    // Active queued work remains relevant regardless of the failure window.
+    readAllRows(() => db.from('ultimate_build_jobs').select(columns, { count: 'exact' })
+      .eq('status', 'queued').order('id')),
   ]);
-  if (recent.error || running.error) throw recent.error ?? running.error;
-  const jobs = new Map([...(recent.data ?? []), ...(running.data ?? [])].map(job => [job.id, job]));
+  const jobs = new Map([...recent, ...running, ...queued].map(job => [job.id, job]));
   const buildIds = [...new Set([...jobs.values()].map(job => job.build_id))];
   const builds = new Map();
   const latest = new Map();
   for (let i = 0; i < buildIds.length; i += 200) {
     const ids = buildIds.slice(i, i + 200);
     const [b, all] = await Promise.all([
-      db.from('ultimate_course_builds').select('id,course_id,status,profile,updated_at').in('id', ids),
-      db.from('ultimate_build_jobs').select('id,build_id,job_type,created_at').in('build_id', ids).order('created_at', { ascending: false }),
+      readAllRows(() => db.from('ultimate_course_builds').select('id,course_id,status,profile,updated_at', { count: 'exact' }).in('id', ids).order('id')),
+      readAllRows(() => db.from('ultimate_build_jobs').select('id,build_id,job_type,created_at', { count: 'exact' }).in('build_id', ids)
+        .order('created_at', { ascending: false }).order('id', { ascending: false })),
     ]);
-    if (b.error || all.error) throw b.error ?? all.error;
-    for (const build of b.data ?? []) builds.set(build.id, build);
-    for (const job of all.data ?? []) { const key = job.build_id + ':' + job.job_type; if (!latest.has(key)) latest.set(key, job.id); }
+    for (const build of b) builds.set(build.id, build);
+    for (const job of all) { const key = job.build_id + ':' + job.job_type; if (!latest.has(key)) latest.set(key, job.id); }
   }
   const statusCounts = {}, errorCounts = {}, rows = [];
   for (const job of jobs.values()) {
     statusCounts[job.status] = (statusCounts[job.status] ?? 0) + 1;
     const build = builds.get(job.build_id);
     const decision = classifyJob(job, build, { now, latestJobId: latest.get(job.build_id + ':' + job.job_type), requeueCodes });
-    if (decision.code && ['failed', 'blocked'].includes(job.status)) errorCounts[decision.code] = (errorCounts[decision.code] ?? 0) + 1;
+    if (decision.code && (['failed', 'blocked'].includes(job.status) || (job.status === 'queued' && job.attempts >= job.max_attempts))) {
+      errorCounts[decision.code] = (errorCounts[decision.code] ?? 0) + 1;
+    }
     if (decision.action === 'none' || decision.action === 'superseded') continue;
     let applied = null;
     if (apply && decision.action === 'dead-lease-requeue') applied = await requeue(db, job, { fromStatus: 'running', clearAttempts: false });
@@ -128,11 +169,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://cuxzzpsyufcewtmicszk.supabase.co';
   const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   diagnoseCourseBuilds(db, args).then(report => {
-    if (args.json) return console.log(JSON.stringify(report, null, 2));
-    console.log(`Course builds since ${report.since} (${report.hours}h)${report.apply ? ' [APPLY]' : ' [read-only]'}`);
-    console.log('Job status:', JSON.stringify(report.statusCounts));
-    console.log('Failure codes:', JSON.stringify(report.errorCounts));
-    console.log('Actions:', JSON.stringify(report.actions));
-    for (const row of report.jobs) console.log([row.action, row.jobStatus, row.code ?? '-', `${row.attempts}/${row.maxAttempts}`, row.title ?? row.courseId ?? '-', row.jobId, row.applied === undefined ? '' : 'applied=' + row.applied].join(' | '));
+    if (args.json) return console.info(JSON.stringify(report, null, 2));
+    console.info(`Course builds since ${report.since} (${report.hours}h)${report.apply ? ' [APPLY]' : ' [read-only]'}`);
+    console.info('Job status:', JSON.stringify(report.statusCounts));
+    console.info('Failure codes:', JSON.stringify(report.errorCounts));
+    console.info('Actions:', JSON.stringify(report.actions));
+    for (const row of report.jobs) console.info([row.action, row.jobStatus, row.code ?? '-', `${row.attempts}/${row.maxAttempts}`, row.title ?? row.courseId ?? '-', row.jobId, row.applied === undefined ? '' : 'applied=' + row.applied].join(' | '));
   }).catch(error => { console.error(error?.message ?? 'COURSE_DIAGNOSTICS_FAILED'); process.exitCode = 1; });
 }

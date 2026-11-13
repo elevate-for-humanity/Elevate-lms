@@ -23,6 +23,7 @@ class FixtureDatabase {
   writes: { table: string; operation: string; payload: any }[] = [];
   failures: { table: string; operation: string; skip?: number; code?: string; message?: string }[] = [];
   patterns: string[] = [];
+  beforeExecute?: (table: string, operation: string, payload: any) => void;
   asClient() { return this as unknown as SupabaseClient; }
   from(table: string) {
     if (!(table in this.rows)) throw new Error(`Unexpected table ${table}`);
@@ -53,6 +54,7 @@ class FixtureDatabase {
           return { data: null, error: { code: failure.code || '42501', message: failure.message || 'fixture write denied' } };
         }
         if (failure?.skip) failure.skip--;
+        this.beforeExecute?.(table, operation, payload);
         let result = this.rows[table].filter(row => filters.every(filter => filter(row))).slice(0, maximum);
         if (operation !== 'select') {
           this.writes.push({ table, operation, payload: structuredClone(payload) });
@@ -206,5 +208,96 @@ describe('canonical admissions recovery', () => {
     const response = await GET(new NextRequest('https://admin.example.invalid/api/cron/process-application-submissions'));
     expect(response.status).toBe(401);
     expect(db.writes).toHaveLength(0);
+  });
+
+  const dueJob = (id: string, extra: Row = {}) => ({
+    id, type: 'application_submitted', payload, status: 'pending', attempts: 0, max_attempts: 3,
+    run_after: new Date(Date.now() - 1000).toISOString(), ...extra,
+  });
+  const cronRequest = () => new NextRequest('https://admin.example.invalid/api/cron/process-application-submissions', {
+    headers: { authorization: 'Bearer fixture-cron-secret' },
+  });
+
+  it('terminalizes an exhausted prefix without replaying it and processes the later eligible submission', async () => {
+    const old = Array.from({ length: 10 }, (_, i) => dueJob(`exhausted-${i}`, {
+      attempts: 3, last_error: 'retained-original-evidence', error: 'retained-original-error',
+    }));
+    const failed = dueJob('already-failed', { status: 'failed', attempts: 3, last_error: 'do-not-change' });
+    db.rows.job_queue.push(...old, failed, dueJob('eligible'));
+    const response = await GET(cronRequest());
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ processed: 1, failed: 10, terminalized: 10, claims: 1 });
+    for (const row of old) expect(row).toMatchObject({ status: 'failed', attempts: 3, max_attempts: 3,
+      last_error: 'retained-original-evidence', error: 'retained-original-error' });
+    expect(failed).toMatchObject({ status: 'failed', attempts: 3, last_error: 'do-not-change' });
+    expect(db.rows.job_queue.find(row => row.id === 'eligible')).toMatchObject({ status: 'completed', attempts: 1 });
+    expect(db.rows.crm_leads).toHaveLength(1);
+    expect(db.rows.tasks).toHaveLength(5);
+    expect((await GET(cronRequest())).status).toBe(200);
+    expect(old.every(row => row.attempts === 3)).toBe(true);
+  });
+
+  it.each(['attempts', 'max_attempts', 'run_after', 'status'])('retains an owner update to %s instead of terminalizing a stale snapshot', async key => {
+    const row = dueJob('changed-owner', { attempts: 3 });
+    db.rows.job_queue.push(row);
+    db.beforeExecute = (table, operation, change) => {
+      if (table === 'job_queue' && operation === 'update' && change?.status === 'failed') {
+        db.beforeExecute = undefined;
+        Object.assign(row, { [key]: key === 'status' ? 'completed' : key === 'run_after'
+          ? new Date(Date.now() + 60000).toISOString() : 4 });
+      }
+    };
+    const response = await GET(cronRequest());
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ processed: 0, failed: 0, skipped: 1, terminalized: 0, claims: 0 });
+    expect(row.status).not.toBe('failed');
+    expect(db.rows.tasks).toHaveLength(0);
+  });
+
+  it('keeps live exhausted leases untouched and bounds a scan to 50 rows and 10 successful claims', async () => {
+    const live = dueJob('live', { status: 'processing', attempts: 3, run_after: new Date(Date.now() + 60000).toISOString() });
+    db.rows.job_queue.push(live, ...Array.from({ length: 61 }, (_, i) => dueJob(`queued-${i}`)));
+    const response = await GET(cronRequest());
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ processed: 10, claims: 10, total: 50 });
+    expect(db.rows.job_queue.filter(row => row.status === 'completed')).toHaveLength(10);
+    expect(live).toMatchObject({ status: 'processing', attempts: 3 });
+    expect(db.rows.job_queue.filter(row => row.id.startsWith('queued-') && row.attempts === 0)).toHaveLength(51);
+  });
+
+  it('retains a completion-stage SQLSTATE without persisting its private error message', async () => {
+    db.rows.job_queue.push(dueJob('completion-error'));
+    db.failures.push({ table: 'job_queue', operation: 'update', skip: 1, code: '23502', message: 'private-completion@example.invalid details' });
+    const response = await GET(cronRequest());
+    expect(response.status).toBe(503);
+    expect(db.rows.job_queue[0]).toMatchObject({ status: 'failed', attempts: 1,
+      last_error: 'ADMISSIONS_QUEUE_COMPLETE_23502', error: 'ADMISSIONS_QUEUE_COMPLETE_23502' });
+    expect(JSON.stringify(mocks.error.mock.calls)).not.toContain('private-completion');
+  });
+
+  it('does not overwrite an extended lease when completion and failure receipts lose ownership', async () => {
+    const row = dueJob('renewed-lease');
+    db.rows.job_queue.push(row);
+    const renewed = new Date(Date.now() + 10 * 60000).toISOString();
+    db.beforeExecute = (table, operation, change) => {
+      if (table === 'job_queue' && operation === 'update' && change?.status === 'completed') {
+        db.beforeExecute = undefined;
+        row.run_after = renewed;
+      }
+    };
+    const response = await GET(cronRequest());
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ processed: 0, failed: 1, skipped: 1 });
+    expect(row).toMatchObject({ status: 'processing', attempts: 1, run_after: renewed });
+    expect(row).not.toHaveProperty('last_error');
+  });
+
+  it.each(['select', 'update'])('sanitizes %s failures at the batch boundary while returning failure status', async operation => {
+    db.rows.job_queue.push(dueJob('batch-error'));
+    db.failures.push({ table: 'job_queue', operation, code: '42501', message: 'private-batch@example.invalid details' });
+    const response = await GET(cronRequest());
+    expect(response.status).toBe(500);
+    expect(JSON.stringify(mocks.error.mock.calls)).not.toContain('private-batch');
+    expect(JSON.stringify(mocks.error.mock.calls)).toContain(`ADMISSIONS_QUEUE_${operation === 'select' ? 'FETCH' : 'CLAIM'}_42501`);
   });
 });

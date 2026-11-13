@@ -34,7 +34,7 @@ async function context() {
     db,
     previewPartnerId: preview?.partnerId || null,
     members: members || [],
-    admin: ['admin', 'super_admin', 'org_admin'].includes(profile?.role || ''),
+    admin: ['admin', 'super_admin'].includes(profile?.role || ''),
   };
 }
 async function authorize(

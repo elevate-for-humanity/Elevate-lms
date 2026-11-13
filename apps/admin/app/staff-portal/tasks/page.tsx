@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import { hasAnyRole } from '@/lib/rbac/role-matrix';
 import { 
@@ -64,9 +65,10 @@ export default async function StaffTasksPage() {
     assigned_to: profile?.full_name || 'Staff',
     created_at: task.created_at,
   }));
-  // Canonical admissions follow-up tasks are assigned to a named staff account.
-  // Never fetch unassigned or other employees' applicant records here.
-  const { data: applicationTasks, error: applicationTaskError } = await supabase
+  // tasks is server-only. Authorize above, then scope every service-role query
+  // to this employee; only administrators may read the unassigned queue.
+  const taskDb = await requireAdminClient();
+  const { data: applicationTasks, error: applicationTaskError } = await taskDb
     .from('tasks')
     .select('id,title,description,status,priority')
     .eq('assigned_to', user.id)
@@ -86,7 +88,7 @@ export default async function StaffTasksPage() {
 
   // Admins triage the unowned admissions queue; staff never see it.
   if (hasAnyRole(effectiveRoles, ['admin', 'super_admin'])) {
-    const { data: unassignedTasks, error: unassignedError } = await supabase
+    const { data: unassignedTasks, error: unassignedError } = await taskDb
       .from('tasks')
       .select('id,title,description,status,priority')
       .is('assigned_to', null)

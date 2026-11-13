@@ -3,7 +3,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { verifyPortalPreviewHandoff } from './portal-preview-handoff';
 
 export const HOST_SHOP_PREVIEW_SESSION_COOKIE = 'elevate_host_shop_preview_session';
-const ADMIN_ROLES = new Set(['admin', 'super_admin', 'org_admin']);
+const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 
 export async function resolveHostShopAdminPreview() {
   const cookieStore = await cookies();

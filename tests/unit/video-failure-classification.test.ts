@@ -9,6 +9,10 @@ describe('video failure classification', () => {
   it('keeps provider throttling retryable', () => {
     expect(classifyVideoFailure('Provider returned 429 rate limit')).toBe('transient');
   });
+  it.each([401, 403])('treats private checkpoint HTTP %s as terminal authorization', (status) => {
+    expect(classifyVideoFailure(`PRIVATE_CHECKPOINT_READ_HTTP_${status}`)).toBe('authorization');
+    expect(classifyVideoFailure(`PRIVATE_CHECKPOINT_WRITE_HTTP_${status}`)).toBe('authorization');
+  });
   it('treats storage credential rejections as terminal authorization errors', () => {
     expect(classifyVideoFailure('Storage upload failed: 403 Forbidden')).toBe('authorization');
     expect(classifyVideoFailure('B2 bucket AccessDenied')).toBe('authorization');

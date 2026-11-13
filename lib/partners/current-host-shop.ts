@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { normalizeRoles } from '@/lib/rbac/role-matrix';
 import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
+import { enforceArchivedHostShopScope } from '@/lib/auth/require-role';
 
 export type CurrentHostShopPartner = {
   id: string;
@@ -70,18 +71,22 @@ export async function requireCurrentHostShopPartner(
   if ((!preview && authError) || !user) throw new Error('HOST_SHOP_UNAUTHENTICATED');
 
   const db = await requireAdminClient();
-  const [{ data: profile }, { data: roleRows }] = await Promise.all([
-    db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+  const [{ data: profile, error: profileError }, { data: roleRows, error: roleError }] = await Promise.all([
+    db.from('profiles').select('role,is_active,suspended').eq('id', user.id).maybeSingle(),
     db.from('user_roles').select('roles(name)').eq('user_id', user.id),
   ]);
+  if (profileError || roleError || !profile || profile.is_active === false || profile.suspended === true)
+    throw new Error('HOST_SHOP_UNAUTHENTICATED');
 
   const secondaryRoles = (roleRows ?? [])
     .map((row: any) => row?.roles?.name)
     .filter((value: unknown): value is string => typeof value === 'string');
-  const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
+  const effectiveRoles = await enforceArchivedHostShopScope(
+    user.id, profile.role, normalizeRoles([profile.role, ...secondaryRoles]),
+  );
 
   const isPlatformAdmin = effectiveRoles.some((role) =>
-    ['super_admin', 'admin', 'org_admin'].includes(role),
+    ['super_admin', 'admin'].includes(role),
   );
 
   if (isPlatformAdmin) {

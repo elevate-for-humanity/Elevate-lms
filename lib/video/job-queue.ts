@@ -66,7 +66,7 @@ export function classifyVideoFailure(message: string): VideoFailureClass {
   const text = message.toLowerCase();
   // Credential failures are terminal even when raised by storage uploads;
   // retrying a 401/403 cannot succeed and only burns render attempts.
-  if (/unauthorized|authorization(?:_| )required|forbidden|access ?denied|invalid api key|(?<![\w-])40[13](?![\w-])/.test(text))
+  if (/unauthorized|authorization(?:_| )required|forbidden|access ?denied|invalid api key|\bprivate_checkpoint_(?:read|write)_http_40[13]\b|(?<![\w-])40[13](?![\w-])/.test(text))
     return 'authorization';
   if (/413|request entity too large|upload|storage|bucket|tus/.test(text)) return 'storage';
   if (/not configured|missing .*key|missing .*url|configuration/.test(text)) return 'configuration';

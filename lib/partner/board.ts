@@ -160,7 +160,7 @@ export async function resolvePartnerForBoard(db: any, userId: string): Promise<P
   // membership cannot capture the request and send the session into onboarding.
   const { data: profile } = await db.from('profiles').select('role').eq('id', userId).maybeSingle();
   const role = normalizeRole(profile?.role);
-  if (role && ['admin', 'super_admin', 'org_admin'].includes(role)) {
+  if (role && ['admin', 'super_admin'].includes(role)) {
     const cookieStore = await cookies();
     const preview = await resolveHostShopAdminPreview();
     const selectedPartnerId =

@@ -15,7 +15,7 @@ export const metadata = {
 };
 
 function isPlatformAdmin(effectiveRoles: readonly string[]) {
-  return effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin') || effectiveRoles.includes('org_admin');
+  return effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin');
 }
 
 async function getAuthorizedHour(hourId: string) {

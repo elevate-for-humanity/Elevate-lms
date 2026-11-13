@@ -7,6 +7,7 @@ import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { enforceArchivedHostShopScope } from '@/lib/auth/require-role';
 import { unauthorized, forbidden, serverError } from '@/lib/api/responses';
 import {
   PRIVILEGED_MFA_ROLES,
@@ -157,7 +158,7 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
       );
     }
 
-    if (profileResult.data?.is_active === false || profileResult.data?.suspended === true) {
+    if (!profileResult.data || profileResult.data.is_active === false || profileResult.data.suspended === true) {
       return guardedIdentity('', null, null, [], unauthorized());
     }
 
@@ -165,7 +166,9 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
       .map((row: any) => row?.roles?.name)
       .filter((value: unknown): value is string => typeof value === 'string');
     const role = (profileResult.data?.role as UserRole) ?? null;
-    const effectiveRoles = normalizeRoles([role, ...secondaryRoles]);
+    const effectiveRoles = await enforceArchivedHostShopScope(
+      user.id, role, normalizeRoles([role, ...secondaryRoles]),
+    );
 
     return guardedIdentity(user.id, user.email ?? null, role, effectiveRoles);
   } catch (error) {

@@ -15,7 +15,7 @@ export const metadata = { title: 'Shop Profile | Host Shop Portal', description:
 async function reviewShopAddress(formData: FormData) {
   'use server';
   const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
-  if (effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role))) throw new Error('HOST_SHOP_REVIEW_REQUIRES_OWNER');
+  if (effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role))) throw new Error('HOST_SHOP_REVIEW_REQUIRES_OWNER');
   const board = await getHostShopBoard(user.id);
   const shopId = String(formData.get('shopId') || '');
   if (!board.shops.some((shop) => shop.id === shopId)) throw new Error('SHOP_NOT_AUTHORIZED');
@@ -37,7 +37,7 @@ async function reviewShopAddress(formData: FormData) {
 export default async function HostShopProfilePage() {
   const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
-  const isPlatformAdmin = effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+  const isPlatformAdmin = effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role));
   const db = await requireAdminClient();
   const partnerId = board.partner?.id;
   const { data: locations } = board.shops.length

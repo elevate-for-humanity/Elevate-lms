@@ -5,6 +5,8 @@ const state = vi.hoisted(() => ({
   preview: null as any,
   selected: [] as string[],
   role: 'admin',
+  secondary: [] as string[],
+  archived: false,
   sessionUser: { id: 'actor' } as { id: string } | null,
 }));
 vi.mock('next/headers', () => ({
@@ -24,16 +26,20 @@ vi.mock('@/lib/supabase/admin', () => ({
       let id = '';
       const q: any = {};
       q.select = () => q;
+      q.limit = () => q;
       q.eq = (key: string, value: string) => {
         if (key === 'id') id = value;
         return q;
       };
       q.maybeSingle = async () => {
         if (table === 'profiles') return { data: { role: state.role }, error: null };
+        if (table === 'partner_users') return { data: { partner_id: 'owner-partner', status: 'active' }, error: null };
         state.selected.push(id);
-        return { data: { id }, error: null };
+        return { data: { id, status: 'active', approval_status: 'approved', is_active: true }, error: null };
       };
-      q.then = (resolve: any) => Promise.resolve({ data: [], error: null }).then(resolve);
+      q.then = (resolve: any) => Promise.resolve({ data: table === 'user_roles'
+        ? state.secondary.map(name => ({ roles: { name } }))
+        : table === 'program_holders' && state.archived ? [{ features: { portal_access_archived: true } }] : [], error: null }).then(resolve);
       return q;
     },
   }),
@@ -44,6 +50,8 @@ beforeEach(() => {
   state.preview = null;
   state.selected = [];
   state.role = 'admin';
+  state.secondary = [];
+  state.archived = false;
   state.sessionUser = { id: 'actor' };
 });
 it('uses the signed selected shop even without the companion cookie', async () => {
@@ -76,4 +84,22 @@ it('allows document APIs through the verified Admin handoff without a cross-doma
 it('rejects a missing session when no valid handoff exists', async () => {
   state.sessionUser = null;
   await expect(requireCurrentHostShopPartner()).rejects.toThrow('HOST_SHOP_UNAUTHENTICATED');
+});
+it('resolves organization administrators through their own membership, ignoring foreign selector cookies', async () => {
+  state.role = 'org_admin';
+  state.cookie = 'foreign-partner';
+  const context = await requireCurrentHostShopPartner();
+  expect(context.partner.id).toBe('owner-partner');
+  expect(context.isPlatformAdmin).toBe(false);
+  expect(state.selected).not.toContain('foreign-partner');
+});
+it('does not restore global preview from an archived Host Shop owners legacy admin grant', async () => {
+  state.role = 'host_shop';
+  state.secondary = ['admin'];
+  state.archived = true;
+  state.cookie = 'foreign-partner';
+  const context = await requireCurrentHostShopPartner();
+  expect(context.partner.id).toBe('owner-partner');
+  expect(context.effectiveRoles).toEqual(['host_shop']);
+  expect(context.isPlatformAdmin).toBe(false);
 });

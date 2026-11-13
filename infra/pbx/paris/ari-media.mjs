@@ -31,6 +31,8 @@ const config = {
   maxFrames: 600, // 12 seconds maximum per turn.
   silenceFrames: 45, // 900 ms end-of-turn silence.
   threshold: 450,
+  interruptFrames: 15, // 300 ms of caller speech, allowing short phoneme gaps.
+  interruptQuietFrames: 5, // Discard unconfirmed noise after 100 ms of silence.
 };
 const UUIDISH=/^[a-zA-Z0-9._:-]{1,128}$/;
 const sessions=new Map();
@@ -195,7 +197,7 @@ export async function handleDtmf(event,active=sessions,{route=routeOperator,rout
   if(!requested)return;
   // Only route this owned caller to a destination resolved from the saved menu.
   session.transferring=true;
-  session.frames=[];session.quiet=0;session.heard=false;
+  session.frames=[];session.quiet=0;session.heard=false;session.inputReady=false;
   try{
     if(requested.type==='operator')await route(session.callId,requested);
     else await routeExtension(session.callId,requested);
@@ -254,10 +256,10 @@ export async function speak(session,encoded,{clock=()=>performance.now(),wait=sl
   const bytes=Buffer.from(encoded,'base64');
   if(bytes.length<FRAME || bytes.length>640000 || bytes.length%FRAME!==0)throw Error('INVALID_ULAW_AUDIO');
   if(!session.remote)throw Error('NO_RTP_PEER');
-  session.playing=true;
+  session.playing=true;session.playbackInterrupted=false;session.interruptSpeechFrames=0;session.interruptQuietFrames=0;session.interruptCandidate=false;
   const startedAt=clock();
   try{
-    for(let i=0;i<bytes.length&&!session.closed&&!session.transferring;i+=FRAME){
+    for(let i=0;i<bytes.length&&!session.closed&&!session.transferring&&!session.playbackInterrupted;i+=FRAME){
       const payload=bytes.subarray(i,i+FRAME);
       if(session.writeAudio)await session.writeAudio(payload);
       else { // Retained UDP codec harness; production sessions use authenticated TCP.
@@ -271,7 +273,38 @@ export async function speak(session,encoded,{clock=()=>performance.now(),wait=sl
     }
   }finally{session.playing=false;}
 }
-export async function greet(session,{request=privateTurn,play=speak,finish=end}={}){
+// Keep the caller's first words while PARIS is speaking. A bounded utterance
+// waits for the current request/playback to unwind, so turns cannot overlap.
+export function receiveCallerAudio(session,payload,{processTurn=turn}={}){
+  if(session.closed || session.transferring || !session.bridgeReady || session.inputReady)return;
+  if(session.busy && !session.playing && !session.playbackInterrupted)return;
+  const speech=isSpeech(payload);
+  if((session.playing && !session.playbackInterrupted) || session.interruptCandidate){
+    session.interruptCandidate=true;
+    session.interruptSpeechFrames=(session.interruptSpeechFrames||0)+(speech?1:0);
+    session.interruptQuietFrames=speech?0:(session.interruptQuietFrames||0)+1;
+    if(session.interruptSpeechFrames>=config.interruptFrames){
+      session.playbackInterrupted=true;session.interruptCandidate=false;
+    }else if(session.interruptQuietFrames>=config.interruptQuietFrames){
+      // Keep brief phoneme gaps, but never dispatch an unconfirmed tail click
+      // as a delayed command after playback has completed.
+      session.frames=[];session.heard=false;session.quiet=0;
+      session.interruptCandidate=false;session.interruptSpeechFrames=0;session.interruptQuietFrames=0;return;
+    }
+  }
+  if(speech)session.heard=true;
+  if(!session.heard)return;
+  session.frames.push(Buffer.from(payload));
+  session.quiet=speech?0:session.quiet+1;
+  if(session.frames.length>=config.maxFrames || (session.frames.length>=config.minFrames && session.quiet>=config.silenceFrames)){
+    session.inputReady=true;
+    if(!session.busy && !session.playing)void processTurn(session);
+  }
+}
+async function drainCallerAudio(session,processTurn){
+  if(session.inputReady && !session.closed && !session.transferring)await processTurn(session);
+}
+export async function greet(session,{request=privateTurn,play=speak,finish=end,processTurn=turn}={}){
   if(session.closed || session.transferring || session.greetingStarted || !session.bridgeReady || !session.remote)return;
   session.greetingStarted=true;session.busy=true;
   process.stderr.write('PARIS_GREETING_REQUESTED\n');
@@ -282,15 +315,15 @@ export async function greet(session,{request=privateTurn,play=speak,finish=end}=
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_GREETING_AUDIO_MISSING');
     process.stderr.write('PARIS_GREETING_AUDIO_READY\n');
     await play(session,body.replyAudioUlawBase64);
-    if(!session.closed)process.stderr.write('PARIS_GREETING_SENT\n');
+    if(!session.closed)process.stderr.write(session.playbackInterrupted?'PARIS_GREETING_INTERRUPTED\n':'PARIS_GREETING_SENT\n');
   }catch{
     process.stderr.write('PARIS_GREETING_FAILED\n');
     if(!session.closed && !session.transferring)await finish(session,'continue');
-  }finally{session.busy=false;}
+  }finally{session.busy=false;await drainCallerAudio(session,processTurn);}
 }
 export async function turn(session,{request=privateTurn,play=speak,finish=end}={}){
   if(session.closed || session.transferring || session.busy || session.playing)return;
-  const voice=Buffer.concat(session.frames);session.frames=[];session.quiet=0;session.heard=false;
+  const voice=Buffer.concat(session.frames);session.frames=[];session.quiet=0;session.heard=false;session.inputReady=false;session.playbackInterrupted=false;
   if(voice.length<config.minFrames*FRAME)return;
   session.busy=true;
   process.stderr.write('PARIS_TURN_REQUESTED\n');
@@ -300,8 +333,11 @@ export async function turn(session,{request=privateTurn,play=speak,finish=end}={
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
     process.stderr.write('PARIS_TURN_AUDIO_READY\n');
     await play(session,body.replyAudioUlawBase64);
-    if(!session.closed)process.stderr.write('PARIS_TURN_SENT\n');
+    if(!session.closed)process.stderr.write(session.playbackInterrupted?'PARIS_TURN_INTERRUPTED\n':'PARIS_TURN_SENT\n');
     if(session.closed || session.transferring)return;
+    // A caller who interrupts a goodbye or transfer announcement gets another
+    // turn before that voice-generated action. Explicit keypad handoff wins.
+    if(session.playbackInterrupted)return;
     if(body.requestedRoute?.type==='operator' || body.requestedRoute?.type==='extension') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
       // Resume the allowlisted dialplan route without changing channel technology.
@@ -320,7 +356,7 @@ export async function turn(session,{request=privateTurn,play=speak,finish=end}={
     // Fail closed: do not claim the caller was served when the AI is unavailable.
     process.stderr.write('PARIS_TURN_FAILED\n');
     await finish(session,'continue');
-  }finally{session.busy=false;}
+  }finally{session.busy=false;await drainCallerAudio(session,s=>turn(s,{request,play,finish}));}
 }
 async function cleanupMedia(s){
   for(const id of [s.externalId,s.bridgeId]) {
@@ -356,15 +392,7 @@ async function begin(call){
   try{
     if(call.state!=='Up')await ari('/channels/'+encode(callId)+'/answer','POST');
     if(session.closed)return;
-    const media=await listenAudioSocket(session,payload=>{
-      if(session.closed || session.transferring || session.playing || session.busy || !session.bridgeReady)return;
-      const speech=isSpeech(payload);
-      if(speech)session.heard=true;
-      if(!session.heard)return;
-      session.frames.push(payload);
-      session.quiet=speech?0:session.quiet+1;
-      if(session.frames.length>=config.maxFrames || (session.frames.length>=config.minFrames && session.quiet>=config.silenceFrames))void turn(session);
-    });
+    const media=await listenAudioSocket(session,payload=>receiveCallerAudio(session,payload));
     const bridge=await ari('/bridges','POST',{type:'mixing,proxy_media',name:'paris-'+session.id});
     session.bridgeId=bridge.id;
     if(session.closed){await cleanupMedia(session);return;}

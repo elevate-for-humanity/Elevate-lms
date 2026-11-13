@@ -5,6 +5,7 @@ export async function notifyParisMailResult(
   db: SupabaseClient,
   result: {
     messageId: string;
+    threadId?: string;
     mailboxId: string;
     mailboxAddress: string;
     recipient: string;
@@ -25,7 +26,7 @@ export async function notifyParisMailResult(
       type: 'message',
       title: sent ? 'PARIS replied to an email' : 'PARIS email reply failed',
       message: `${sent ? 'Sent to' : 'Could not send to'} ${result.recipient} · ${result.subject}`,
-      action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(result.mailboxId)}`,
+      action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(result.mailboxId)}${result.threadId ? `&threadId=${encodeURIComponent(result.threadId)}` : ''}`,
       action_label: 'Review conversation',
       read: false,
       idempotency_key: `email:paris-reply:${result.messageId}:${userId}`,
@@ -36,6 +37,8 @@ export async function notifyParisMailResult(
         subject: result.subject,
         mailbox_address: result.mailboxAddress,
         message_id: result.messageId,
+        mailbox_id: result.mailboxId,
+        ...(result.threadId ? { thread_id: result.threadId } : {}),
       },
     })),
     { onConflict: 'idempotency_key', ignoreDuplicates: true },

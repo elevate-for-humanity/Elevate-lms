@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { evaluateBeautyPaymentGate, isBeautyApprenticeshipSlug } from '../../lib/apprenticeship/beauty-payment-gate.mjs';
 
 const beauty = ['barber-apprenticeship','cosmetology-apprenticeship','esthetician-apprenticeship','nail-technician-apprenticeship'];
@@ -40,4 +41,16 @@ test('do not accept a revoked enrollment as proof of authorization', () => {
 test('nail technician application also gates legacy nail-tech course alias', () => {
   assert.equal(isBeautyApprenticeshipSlug('nail-tech-apprenticeship'), true);
   assert.ok(evaluateBeautyPaymentGate([{ program_slug: 'nail-technician-apprenticeship' }], [], 'nail-tech-apprenticeship'));
+});
+
+test('LMS layout, apprentice dashboard, course overview and direct lesson URL enforce the gate', () => {
+  for (const path of [
+    '../../apps/lms/app/lms/(app)/layout.tsx',
+    '../../apps/lms/app/apprentice/page.tsx',
+    '../../apps/lms/app/lms/courses/[courseId]/page.tsx',
+    '../../apps/lms/app/lms/courses/[courseId]/lessons/[lessonId]/page.tsx',
+  ]) {
+    const content = readFileSync(new URL(path, import.meta.url), 'utf8');
+    assert.match(content, /loadBeautyPaymentGate\(/, path);
+  }
 });

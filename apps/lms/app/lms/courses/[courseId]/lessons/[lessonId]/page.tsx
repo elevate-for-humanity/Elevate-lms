@@ -13,6 +13,8 @@ import LessonPicker from '@/components/lms/LessonPicker';
 import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { assertLessonAccess } from '@/lib/lms/access-control';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { canonicalBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
 import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 import { measuredLessonCues } from '@/lib/video/measured-lesson-assets';
 import { TheoryWindowNotice } from '@/components/apprenticeship/TheoryWindowNotice';
@@ -188,6 +190,14 @@ export default async function LessonPage({
     : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
+  // A direct lesson URL must not bypass the unpaid beauty-apprenticeship gate.
+  // This precedes all lesson content and media reads.
+  const beautySlug = canonicalBeautyApprenticeshipSlug(course.slug);
+  if (!preview.active && beautySlug && user) {
+    const adminDb = await requireAdminClient();
+    const paymentGate = await loadBeautyPaymentGate(adminDb, user.id, user.email, beautySlug);
+    if (paymentGate?.locked) redirect('/lms/enrollment-pending');
+  }
   const { data: program } = course.program_id
     ? await db.from('programs').select('slug').eq('id', course.program_id).maybeSingle()
     : { data: null };

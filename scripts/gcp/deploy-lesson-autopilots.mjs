@@ -49,21 +49,47 @@ export function deployLessonAutopilots({run=google}={}){
   return {verified:true,region:LESSON_ROLE_REGION,jobs:verified};
  }finally{rmSync(directory,{recursive:true,force:true});}
 }
+export const AUTOPILOT_RPC_ATTEMPTS=3;
+export const AUTOPILOT_RPC_RETRY_MS=2000;
+export const AUTOPILOT_RPC_TIMEOUT_MS=15000;
+const TRANSIENT_TRANSPORT_CODES=new Set(['ENOTFOUND','EAI_AGAIN','ECONNRESET','ECONNREFUSED','ETIMEDOUT','EPIPE','ENETUNREACH','EHOSTUNREACH','UND_ERR_SOCKET','UND_ERR_CONNECT_TIMEOUT','UND_ERR_HEADERS_TIMEOUT','UND_ERR_BODY_TIMEOUT']);
+// An unanswered read is a connectivity fault, not a database verdict. Only
+// transport faults are retried; an HTTP status or a parsed body is a real
+// answer and must never be retried.
+export function transientAutopilotTransportError(error){
+ if(error?.name==='AbortError')return false;
+ for(let current=error,depth=0;current&&depth<4;depth++,current=current.cause)
+  if(TRANSIENT_TRANSPORT_CODES.has(current.code)||current.name==='TimeoutError'||current.name==='ConnectTimeoutError')return true;
+ return false;
+}
+/** Read-only verdict, retried only while the read is unanswered. A fresh
+ * request is built per attempt so a spent timeout deadline is never reused. */
+export async function autopilotRpcVerdict(url,optionsFor,{request=fetch,attempts=AUTOPILOT_RPC_ATTEMPTS,
+ wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
+ for(let attempt=1;;attempt++){
+  try{
+   const response=await request(url,optionsFor());
+   // A status answered the read: report it without spending another attempt.
+   if(!response.ok)return {answered:true,value:null,status:response.status};
+   return {answered:true,value:await response.json(),status:response.status};
+  }catch(error){
+   if(attempt>=attempts||!transientAutopilotTransportError(error))throw error;
+   await wait(AUTOPILOT_RPC_RETRY_MS*attempt);
+  }
+ }
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  const token=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('DATABASE_AUTH_REQUIRED');
- const ready=await fetch('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready',{
-  method:'POST',headers:{apikey:token,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000),
- });
- if(!ready.ok || await ready.json()!==true)throw Error('ULTIMATE_AUTOPILOT_DATABASE_MIGRATION_REQUIRED');
+ const rpc=(url,body)=>autopilotRpcVerdict(url,()=>({method:'POST',
+  headers:{apikey:token,Authorization:'Bearer '+token,'Content-Type':'application/json'},body,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)}));
+ const ready=await rpc('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready','{}');
+ if(!ready.answered||ready.value!==true)throw Error('ULTIMATE_AUTOPILOT_DATABASE_MIGRATION_REQUIRED');
  const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('VERIFIED_REPAIR_IMAGE_REQUIRED');
  const registry='us-central1-docker.pkg.dev/'+PROJECT+'/elevate/ultimate-worker';
  const digest=google(['artifacts','docker','images','describe',registry+':'+sha,'--project='+PROJECT,'--format=value(image_summary.digest)']).trim();
  const verified=deployLessonAutopilots();
  if(verified.jobs.some(job=>job.image!==registry+'@'+digest))throw Error('ULTIMATE_AUTOPILOT_RUNTIME_IMAGE_MISMATCH');
- const recorded=await fetch('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/register_ultimate_autopilot_runtime',{
-  method:'POST',headers:{apikey:token,Authorization:'Bearer '+token,'Content-Type':'application/json'},
-  body:JSON.stringify({p_image_sha:sha,p_image_digest:digest,p_roles:verified.jobs}),signal:AbortSignal.timeout(15000),
- });
- if(!recorded.ok || await recorded.json()!==true)throw Error('ULTIMATE_AUTOPILOT_RUNTIME_NOT_RECORDED');
+ const recorded=await rpc('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/register_ultimate_autopilot_runtime',JSON.stringify({p_image_sha:sha,p_image_digest:digest,p_roles:verified.jobs}));
+ if(!recorded.answered||recorded.value!==true)throw Error('ULTIMATE_AUTOPILOT_RUNTIME_NOT_RECORDED');
  console.log(JSON.stringify(verified));
 }

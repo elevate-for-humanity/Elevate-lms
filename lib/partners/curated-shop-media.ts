@@ -1,3 +1,5 @@
+import { PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
+
 // Optimized copies of the shop’s published portfolio; source URLs remain credited.
 const LOCAL_SHOP_MEDIA: Record<string, string> = {
   "https://bucket.setmore.com/files/img/fRYGyv7MVdze/f942496e-3d23-4bc1-8368-e8347feef0c0.jpeg": "/images/partners/paola-petit/official-portfolio-1-2026.webp",
@@ -82,6 +84,7 @@ export function shopGalleryForProgram(
   program: string,
   businessLogo?: string,
 ): ShopMedia[] {
+  if (!Object.values(PROGRAM_SLUGS).some((slug) => slug === program)) return [];
   const photos = curateShopGallery(slug, items).filter((item) => {
     const path = item.url.toLowerCase();
     if (program === 'barber-apprenticeship') {

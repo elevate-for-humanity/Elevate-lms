@@ -47,3 +47,8 @@ it('uses official business branding when no trade-specific photograph is supplie
     { url: '/images/partners/style-and-scissor-salon/logo.webp', alt: 'Official business logo' },
   ]);
 });
+
+it('never supplies photography or branding for an unsupported occupation', () => {
+  expect(shopGalleryForProgram('salon', [], 'massage-apprenticeship', '/salon/logo.webp')).toEqual([]);
+  expect(shopGalleryForProgram('salon', [{ url: '/salon/haircut.webp' }], '', '/salon/logo.webp')).toEqual([]);
+});

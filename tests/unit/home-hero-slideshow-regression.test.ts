@@ -56,11 +56,15 @@ describe('homepage hero slideshow rendering', () => {
     expect(narratedTour).toContain('tour script');
     expect(narratedTour).toContain('{script}');
     expect(featuredHosts).toContain('Welcome to Salon Saloon in South Bend, Indiana.');
-    expect(hostProfiles).toContain('script={videoScript}');
+    // Only the narration authored for this exact video is passed to its player.
+    // Uploaded tours retain their recorded audio and must not inherit a generic shop script.
+    expect(hostProfiles).toContain('const authoredVideoScript = featuredFallbackVideoMedia?.src === videoUrl ? featuredFallbackVideoMedia?.script : undefined;');
+    expect(hostProfiles).toContain('videoScript={authoredVideoScript}');
+    expect(hostProfiles).toContain("data-scroll-narration={!videoUrl ? '' : undefined}");
     expect(barberPage).toContain('href="/programs/barber-apprenticeship/host-shops"');
     expect(featuredHosts).toContain("slug: 'kountry-kutz-barbershop'");
     expect(featuredHosts).toContain('/videos/partners/kountry-kutz-tour.mp4');
-    expect(hostProfiles).toContain('videoScript={videoScript}');
+    expect(hostProfiles).toContain('videoScript={videoMedia?.script}');
   });
 
   it('keeps every slide mounted so transitions never expose the placeholder', () => {

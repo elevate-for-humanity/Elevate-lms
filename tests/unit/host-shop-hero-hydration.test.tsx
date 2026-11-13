@@ -9,6 +9,15 @@ const shops = FEATURED_BEAUTY_HOST_PARTNERS.slice(0, 2);
 afterEach(cleanup);
 
 describe('Host Shop hero interaction readiness', () => {
+  it.each([
+    ['56 W Main St, New Palestine, IN, 46163', '', '56 W Main St, New Palestine, IN, 46163'],
+    ['56 W Main St', '46163', '56 W Main St, New Palestine, IN 46163'],
+    ['56 W Main St, Suite 2', '46163', '56 W Main St, Suite 2, New Palestine, IN 46163'],
+  ])('shows one complete location for address %s', (address, zip, expected) => {
+    render(<HostShopShowcase shops={[{ slug: 'address-test', name: 'Address Test', city: 'New Palestine', state: 'IN', zip, address, programs: ['barber-apprenticeship'], media: [{ src: '/shop.webp', alt: 'Shop portfolio', kind: 'photo' }] }]} asHero />);
+    expect(screen.getByText(expected, { exact: true })).toBeInTheDocument();
+    expect(screen.queryByText(/New Palestine, IN, 46163, New Palestine/)).not.toBeInTheDocument();
+  });
   it('retains an approved shop hero when the fixed tour sequence has no approved matches', () => {
     const approved = [{ slug: 'approved-barber', name: 'Approved Barber', city: 'Indy', state: 'IN', zip: '', address: '1 Main Street', programs: ['barber-apprenticeship'], media: [{ src: '/approved-barber.webp', alt: 'Approved shop portfolio', kind: 'photo' as const }] }];
     render(<HostShopShowcase shops={approved} asHero mediaSequence={[{ shopSlug: 'pending-salon', media: { src: '/pending.webp', alt: 'Pending shop', kind: 'photo' } }]} />);

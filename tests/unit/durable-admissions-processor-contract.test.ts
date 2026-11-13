@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const root = process.cwd();
-const processor = readFileSync(join(root, 'apps/admin/app/api/cron/process-application-submissions/route.ts'), 'utf8');
+const route = readFileSync(join(root, 'apps/admin/app/api/cron/process-application-submissions/route.ts'), 'utf8');
+const processor = route + readFileSync(join(root, 'lib/admissions/process-application-submitted.ts'), 'utf8');
 const schedule = readFileSync(join(root, '.github/workflows/cron-scheduler.yml'), 'utf8');
 const staffTasks = readFileSync(join(root, 'apps/admin/app/staff-portal/tasks/page.tsx'), 'utf8');
 const binder = readFileSync(join(root, 'apps/admin/app/students/[id]/binder/page.tsx'), 'utf8');
@@ -38,7 +39,7 @@ describe('durable admissions application submission processor contract', () => {
 
   it('uses canonical identity, unique CRM email, and reads prior tasks before writing', () => {
     expect(processor).toContain(".from('applications')");
-    expect(processor).toContain("Queue identity does not match canonical application");
+    expect(processor).toContain("APPLICATION_IDENTITY_MISMATCH");
     expect(processor).toContain(".from('crm_leads')");
     expect(processor).toContain("application.advisor_assigned || null");
     expect(processor).toContain(".eq('related_id', applicationId)");

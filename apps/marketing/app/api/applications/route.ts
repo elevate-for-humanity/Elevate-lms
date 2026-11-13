@@ -16,9 +16,9 @@ import { getProgramEnrollmentState } from '@/lib/programs/program-state';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getRedisClient } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
+import { enqueueApplicationSubmission } from '@/lib/admissions/queue-application-submission';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logCommunication } from '@/lib/admissions/status-emails';
-import { onApplicationSubmitted } from '@/lib/admissions/on-application-submitted';
 import { provisionAccount } from '@/lib/enrollment/provision-account';
 
 import { auditMutation } from '@/lib/api/withAudit';
@@ -1012,42 +1012,21 @@ async function _POST(req: Request) {
       emailStatus = { student: 'exception', staff: 'exception' };
     }
 
-    try {
-      const automationDb = await getAdminClient();
-      if (automationDb) {
-        const automation = await onApplicationSubmitted(automationDb, {
-          applicationId: data.id,
-          firstName: body.firstName,
-          lastName: body.lastName,
-          email: body.email,
-          phone: body.phone || null,
-          programSlug: data.program_interest || program || null,
-          source: body.source || 'website',
-          assignedTo: data.advisor_assigned || null,
-        });
-        logger.info('[Applications] Admissions automation complete', { applicationId: data.id, ...automation });
-      }
-    } catch (automationError) {
-      logger.error('[Applications] Admissions automation failed', automationError instanceof Error ? automationError : undefined, { applicationId: data.id });
-    }
-
     // Queue automation jobs for post-submission processing (non-blocking)
     try {
       const adminDb = await getAdminClient();
       if (adminDb) {
-        await adminDb.from('job_queue').insert({
-          type: 'application_submitted',
-          payload: {
-            applicationId: data.id,
-            programSlug: body.programSlug || body.preferredProgramId || null,
-            email: body.email,
-            firstName: body.firstName,
-            lastName: body.lastName,
-            fundingType: body.fundingType || null,
-          },
-          run_after: new Date().toISOString(),
+        await enqueueApplicationSubmission(adminDb, {
+          applicationId: data.id,
+          programSlug: data.program_slug || data.program_interest || program || null,
+          email: body.email,
+          firstName: body.firstName,
+          lastName: body.lastName,
+          fundingType: body.fundingType || null,
         });
         logger.info('[Applications] Automation job queued', { applicationId: data.id });
+      } else {
+        throw new Error('APPLICATION_AUTOMATION_DATABASE_UNAVAILABLE');
       }
     } catch (queueError) {
       logger.warn(

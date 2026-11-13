@@ -29,7 +29,7 @@ export async function ensureDevStudioSecrets(): Promise<void> {
 }
 
 /** A present token can be expired or lack access to the requested repository. */
-async function acceptedByGitHub(token: string): Promise<boolean> {
+async function acceptedByGitHub(token: string, signal?: AbortSignal): Promise<boolean> {
   const response = await fetch(
     'https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main',
     {
@@ -40,7 +40,7 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
       },
       redirect: 'error',
       cache: 'no-store',
-      signal: AbortSignal.timeout(8000),
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000),
     },
   );
   if (response.ok) return true;
@@ -48,10 +48,11 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
   throw new Error(`GITHUB_CREDENTIAL_CHECK_UNAVAILABLE_HTTP_${response.status}`);
 }
 
-export async function getGitHubToken(): Promise<string | null> {
+export async function getGitHubToken(options: { signal?: AbortSignal } = {}): Promise<string | null> {
+  options.signal?.throwIfAborted();
   const workflowToken=currentWorkflowGitHubToken();
   if(workflowToken)return workflowToken;
-  const appToken = await getGitHubAppToken();
+  const appToken = await getGitHubAppToken(options);
   if (appToken) return appToken;
   // Explicit App-only deployments must not fall back to a legacy access
   // token if the encrypted dashboard App settings are missing or incomplete.
@@ -60,9 +61,9 @@ export async function getGitHubToken(): Promise<string | null> {
   }
   // One saved runtime source. Never retry a rejected credential through an
   // expired duplicate or silently change identities after a failed check.
-  const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN', options));
   const selected = stored ?? normalizeToken(process.env.GITHUB_TOKEN);
-  if (selected && await acceptedByGitHub(selected)) return selected;
+  if (selected && await acceptedByGitHub(selected, options.signal)) return selected;
   if (selected) {
     throw new Error('GITHUB_TOKEN_REJECTED: The configured runtime credential was rejected for Elevate-lms. Update GITHUB_TOKEN in Admin Secrets.');
   }

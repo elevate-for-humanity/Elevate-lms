@@ -80,7 +80,8 @@ function getBootstrapClient(): SupabaseClient | null {
       fetch: (input, init) => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), SECRETS_FETCH_TIMEOUT_MS);
-        return fetch(input, { ...init, signal: controller.signal }).finally(() =>
+        const signal = init?.signal ? AbortSignal.any([controller.signal, init.signal]) : controller.signal;
+        return fetch(input, { ...init, signal }).finally(() =>
           clearTimeout(timer),
         );
       },
@@ -180,6 +181,37 @@ export async function getSecrets<K extends string>(
   return result;
 }
 
+/** Read only the requested runtime keys for bounded diagnostics. Reuse the
+ * canonical cache when warm; never mark a partial read as a full cache fill. */
+export async function getSelectedRuntimeSecrets<K extends string>(
+  keys: K[], { signal }: { signal?: AbortSignal } = {},
+): Promise<Record<K, string | undefined>> {
+  signal?.throwIfAborted();
+  if (cache && Date.now() - cacheTimestamp < CACHE_TTL_MS) return getSecrets(keys);
+  const requested = [...new Set(keys.filter(key => !usesGoogleRuntimeBindings(key)))];
+  const values: Record<string, string> = {};
+  const client = requested.length ? getBootstrapClient() : null;
+  if (client) {
+    const bounded = <T extends { abortSignal(signal: AbortSignal): T }>(query: T) => signal ? query.abortSignal(signal) : query;
+    const [legacy, canonical] = await Promise.all([
+      bounded(client.from('app_secrets').select('key,value').eq('scope', 'runtime').in('key', requested)),
+      bounded(client.from('platform_secrets').select('key,scope').eq('scope', 'runtime').in('key', requested)),
+    ]);
+    signal?.throwIfAborted();
+    if ((legacy.error && legacy.error.code !== '42P01') || canonical.error)
+      throw new Error('RUNTIME_SECRET_READ_UNAVAILABLE');
+    for (const row of legacy.data ?? []) if (requested.includes(row.key)) acceptSecret(values, row.key, row.value);
+    await Promise.all((canonical.data ?? []).filter(row => requested.includes(row.key)).map(async row => {
+      const result = await bounded(client.rpc('get_platform_secret', { p_key: row.key }));
+      signal?.throwIfAborted();
+      if (result.error) throw new Error('RUNTIME_SECRET_READ_UNAVAILABLE');
+      acceptSecret(values, row.key, result.data);
+    }));
+  }
+  signal?.throwIfAborted();
+  return Object.fromEntries(keys.map(key => [key, usesGoogleRuntimeBindings(key) ? process.env[key] : values[key] ?? process.env[key]])) as Record<K, string | undefined>;
+}
+
 /** Synchronous read after hydration; process.env remains the final fallback. */
 export function getCachedSecret(key: string): string | undefined {
   if (usesGoogleRuntimeBindings(key)) return process.env[key];
@@ -201,12 +233,15 @@ export async function refreshSecrets(): Promise<void> {
  * table into process.env. The restricted database function is the only place
  * that can decrypt value_enc.
  */
-export async function getDecryptedPlatformSecret(key: string): Promise<string | undefined> {
+export async function getDecryptedPlatformSecret(key: string, { signal }: { signal?: AbortSignal } = {}): Promise<string | undefined> {
+  signal?.throwIfAborted();
   if (usesGoogleRuntimeBindings(key)) return process.env[key];
   const client = getBootstrapClient();
   if (!client) return process.env[key];
 
-  const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
+  const query = client.rpc('get_platform_secret', { p_key: key });
+  const { data, error } = await (signal ? query.abortSignal(signal) : query);
+  signal?.throwIfAborted();
   if (error || typeof data !== 'string' || !data.trim()) return process.env[key];
   return data.trim();
 }
@@ -218,10 +253,14 @@ export async function getDecryptedPlatformSecret(key: string): Promise<string | 
  */
 export async function getAdminGitHubAppSecret(
   key: 'GITHUB_APP_ID' | 'GITHUB_APP_INSTALLATION_ID' | 'GITHUB_APP_PRIVATE_KEY',
+  { signal }: { signal?: AbortSignal } = {},
 ): Promise<string | undefined> {
+  signal?.throwIfAborted();
   const client = getBootstrapClient();
   if (!client) throw new Error('GITHUB_APP_DASHBOARD_STORE_UNAVAILABLE');
-  const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
+  const query = client.rpc('get_platform_secret', { p_key: key });
+  const { data, error } = await (signal ? query.abortSignal(signal) : query);
+  signal?.throwIfAborted();
   if (error) throw new Error('GITHUB_APP_DASHBOARD_STORE_UNAVAILABLE');
   return typeof data === 'string' && data.trim() ? data.trim() : undefined;
 }

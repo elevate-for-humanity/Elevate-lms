@@ -2,14 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
+import {runHealthProbe,waitForHealthSignal,STUDIO_HEALTH_BUDGET_MS,STUDIO_HEALTH_SECRET_MS} from '../lib/devstudio/health-probes.mjs';
 const source=stripTypeScriptTypes(await readFile(new URL('../lib/devstudio/health-handler.ts',import.meta.url),'utf8')).replace(/^import[\s\S]*?;\n/gm,'').replaceAll('export ','');
 function health({status=200,tokenError}={}){
  const requests=[];
- const handler=new Function('apiRequireDevStudio','getGoogleServices','isGoogleRuntimeReady','googleProjectId','getGitHubToken','probeCloudflareWorkersAI','resolveAIRuntimeState','fetch','NextResponse','process','require',source+'\nreturn handleDevStudioHealth;')(
+ const handler=new Function('apiRequireDevStudio','getGoogleServices','isGoogleRuntimeReady','googleProjectId','getGitHubToken','probeCloudflareWorkersAI','resolveAIRuntimeState','fetch','NextResponse','process','require','readAIHealthSecrets','runHealthProbe','waitForHealthSignal','STUDIO_HEALTH_BUDGET_MS','STUDIO_HEALTH_SECRET_MS',source+'\nreturn handleDevStudioHealth;')(
   async()=>({}),()=>[],()=>true,()=> 'fixture-project',async()=>{if(tokenError)throw tokenError;return 'installation-fixture-token';},
   async()=>({reachable:false}),async()=>({providers:{},activeProvider:'elevate',elevate:true,anyConfigured:true}),
   async(url,init)=>{requests.push({url,init});return new Response(null,{status:url.endsWith('/user')?403:status});},
-  {json:value=>value},{env:{NEXT_PUBLIC_SUPABASE_URL:'https://fixture.invalid',SUPABASE_SERVICE_ROLE_KEY:'fixture'},version:'v22'},()=>({version:'fixture'}));
+  {json:value=>value},{env:{NEXT_PUBLIC_SUPABASE_URL:'https://fixture.invalid',SUPABASE_SERVICE_ROLE_KEY:'fixture'},version:'v22'},()=>({version:'fixture'}),async()=>({}),runHealthProbe,waitForHealthSignal,STUDIO_HEALTH_BUDGET_MS,STUDIO_HEALTH_SECRET_MS);
  return {handler,requests};
 }
 test('canonical Studio health accepts installation repository access without requiring a GitHub user identity',async()=>{

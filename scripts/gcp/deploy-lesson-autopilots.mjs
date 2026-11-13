@@ -78,18 +78,23 @@ export async function autopilotRpcVerdict(url,optionsFor,{request=fetch,attempts
   }
  }
 }
+// Runtime registration UPSERTs data; ambiguous network errors must not retry.
+export function autopilotRpcWriteOnce(url,optionsFor,{request=fetch}={}){
+ return autopilotRpcVerdict(url,optionsFor,{request,attempts:1});
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  const token=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('DATABASE_AUTH_REQUIRED');
- const rpc=(url,body)=>autopilotRpcVerdict(url,()=>({method:'POST',
-  headers:{apikey:token,Authorization:'Bearer '+token,'Content-Type':'application/json'},body,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)}));
- const ready=await rpc('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready','{}');
+ const optionsFor=body=>()=>({method:'POST',
+  headers:{apikey:token,Authorization:'Bearer '+token,'Content-Type':'application/json'},body,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)});
+ const ready=await autopilotRpcVerdict('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready',optionsFor('{}'));
  if(!ready.answered||ready.value!==true)throw Error('ULTIMATE_AUTOPILOT_DATABASE_MIGRATION_REQUIRED');
  const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('VERIFIED_REPAIR_IMAGE_REQUIRED');
  const registry='us-central1-docker.pkg.dev/'+PROJECT+'/elevate/ultimate-worker';
  const digest=google(['artifacts','docker','images','describe',registry+':'+sha,'--project='+PROJECT,'--format=value(image_summary.digest)']).trim();
  const verified=deployLessonAutopilots();
  if(verified.jobs.some(job=>job.image!==registry+'@'+digest))throw Error('ULTIMATE_AUTOPILOT_RUNTIME_IMAGE_MISMATCH');
- const recorded=await rpc('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/register_ultimate_autopilot_runtime',JSON.stringify({p_image_sha:sha,p_image_digest:digest,p_roles:verified.jobs}));
+ // The ledger RPC is a write: never replay after an ambiguous transport failure.
+ const recorded=await autopilotRpcWriteOnce('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/register_ultimate_autopilot_runtime',optionsFor(JSON.stringify({p_image_sha:sha,p_image_digest:digest,p_roles:verified.jobs})));
  if(!recorded.answered||recorded.value!==true)throw Error('ULTIMATE_AUTOPILOT_RUNTIME_NOT_RECORDED');
  console.log(JSON.stringify(verified));
 }

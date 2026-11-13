@@ -24,6 +24,15 @@ const ROTATION_MS = 6000;
 type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
 type ShowcaseSequenceItem = { shopSlug: string; media: ShowcaseMedia };
 
+function displayAddress(shop: FeaturedHostPartner) {
+  const address = shop.address.trim();
+  // Network entries already include city/state/ZIP; curated profiles can
+  // contain only a street. Preserve a formatted location without appending it twice.
+  if (shop.city && address.split(',').some(part => part.trim().toLowerCase() === shop.city.trim().toLowerCase())) return address;
+  return [address, shop.city, [shop.state, shop.zip].filter(Boolean).join(' ')]
+    .filter(Boolean).join(', ');
+}
+
 const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
   'kountry-kutz-barbershop': {
     src: '/images/partners/kountry-kutz-interior.webp',
@@ -92,10 +101,11 @@ export default function HostShopShowcase({
   const slides = useMemo(() => {
     if (mediaSequence?.length) {
       const shopsBySlug = new Map(shops.map((shop) => [shop.slug, shop]));
-      return mediaSequence.flatMap(({ shopSlug, media }) => {
+      const sequenced = mediaSequence.flatMap(({ shopSlug, media }) => {
         const shop = shopsBySlug.get(shopSlug);
         return shop ? [{ shop, media }] : [];
       });
+      if (sequenced.length) return sequenced;
     }
 
     return shops.flatMap((shop) => {
@@ -199,7 +209,16 @@ export default function HostShopShowcase({
     preload.src = nextSlide.media.src;
   }, [activeIndex, slides]);
 
-  if (!slides.length) return null;
+  if (!slides.length) return asHero ? (
+    <section className="relative isolate overflow-hidden bg-slate-950 px-6 py-24 text-white">
+      <Image src="/images/pages/apprenticeships-hero.webp" alt="Apprenticeship training" fill priority className="object-cover opacity-30" sizes="100vw" />
+      <div className="relative mx-auto max-w-5xl">
+        <h1 className="max-w-3xl text-4xl font-black sm:text-5xl">Join the Elevate Host Shop network</h1>
+        <p className="mt-5 max-w-2xl text-lg">Licensed barbershops, salons, nail studios, and esthetics businesses can apply free to train and mentor apprentices.</p>
+        <Link href="/partners/host-shop/apply" className="mt-7 inline-flex min-h-11 items-center rounded-xl bg-red-600 px-6 py-3 font-bold text-white">Apply free to become a Host Shop</Link>
+      </div>
+    </section>
+  ) : null;
 
   const { shop, media: image } = slides[activeIndex];
   const Heading = asHero ? 'h1' : 'h2';
@@ -443,7 +462,7 @@ export default function HostShopShowcase({
               <p className="mt-5 flex items-start gap-2 text-sm font-semibold text-slate-800">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
                 <span>
-                  {shop.address}, {shop.city}, {shop.state} {shop.zip}
+                  {displayAddress(shop)}
                 </span>
               </p>
               {shop.phone ? (

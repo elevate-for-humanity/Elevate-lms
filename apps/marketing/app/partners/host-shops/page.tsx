@@ -3,14 +3,14 @@ import DowntownTrainingGallery from '@/components/partners/DowntownTrainingGalle
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { PROGRAM_LABELS, matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
 import { getProgramCardImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopBenefits from '@/components/partners/HostShopBenefits';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description: 'Licensed barbershops, salons, nail studios, spas, and esthetics businesses can apply free to train apprentices and grow their teams across Indiana.',
     url: 'https://www.elevateforhumanity.org/partners/host-shops',
     type: 'website',
-    images: [{ url: '/images/partners/kountry-kutz-interior.webp', alt: 'Elevate apprenticeship Host Shop network' }],
+    images: [{ url: '/images/pages/apprenticeships-hero.webp', alt: 'Elevate apprenticeship Host Shop network' }],
   },
 };
 
@@ -38,11 +38,6 @@ const HOST_SHOP_HERO_ORDER = [
   'cals-kutz-studio',
   'generations-hair-llc',
 ] as const;
-
-const HOST_SHOP_HERO_SHOPS = HOST_SHOP_HERO_ORDER.flatMap((slug) => {
-  const shop = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) => candidate.slug === slug);
-  return shop ? [shop] : [];
-});
 
 const REQUIREMENTS = [
   'Current business or establishment license appropriate to the occupation.',
@@ -72,22 +67,27 @@ const CALLER_CHECKLIST = [
 
 export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
-  const heroPhotos = new Set([
-    '/images/partners/salon-saloon/team-sign.webp',
-    '/images/partners/salon-saloon/team-commercial-2026.webp',
-    '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
-    '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
-    '/images/partners/generations-hair/salon-service.webp',
-  ]);
-  const directoryShops = networkShops.map((shop) => {
-    const gallery = shop.gallery?.filter((photo) => !heroPhotos.has(photo.url));
-    return { ...shop, gallery, image: gallery?.[0]?.url };
+  const approvedHeroShops: FeaturedHostPartner[] = networkShops.map(shop => ({
+    slug: shop.slug, name: shop.name, address: shop.address, city: shop.city,
+    state: shop.state, zip: '', programs: shop.programs, phone: shop.phone,
+    marketingBlurb: shop.description, websiteUrl: shop.website,
+    bookingUrl: shop.booking, socialUrl: shop.social,
+    media: [
+      ...(shop.gallery ?? []).map(photo => ({ src: photo.url, alt: photo.alt || `${shop.name} portfolio`, kind: 'photo' as const })),
+      ...(shop.videoUrl ? [{ src: shop.videoUrl, alt: `${shop.name} shop video`, kind: 'video' as const }] : []),
+    ],
+  })).sort((a, b) => {
+    const rank = (slug: string) => { const index = HOST_SHOP_HERO_ORDER.findIndex(value => value === slug); return index < 0 ? HOST_SHOP_HERO_ORDER.length : index; };
+    return rank(a.slug) - rank(b.slug);
   });
+  // Preserve team/client photos in each shop's own card, even when the hero
+  // features one of them. Removing hero images left some cards with empty rooms.
+  const directoryShops = networkShops;
 
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
       <HostShopShowcase
-        shops={HOST_SHOP_HERO_SHOPS}
+        shops={approvedHeroShops}
         asHero
         portraitTour
         videoTourShopSlug="salon-saloon"
@@ -109,7 +109,7 @@ export default async function HostShopsPage() {
           '/images/partners/salon-saloon/team-sign.webp': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
           '/videos/partners/kountry-kutz-tour.mp4': 'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
         }}
-        narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, required documents, and the free Host Shop application."
+        narration="Explore Elevate's approved Host Shop network. Licensed salons, spas, nail studios, esthetics businesses, and barbershops can apply to become a Host Shop at no cost. Host Shops employ, pay, and supervise apprentices; Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. Continue down the page to review requirements, required documents, and the free Host Shop application."
       />
 
       <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-9 text-white">
@@ -130,7 +130,7 @@ export default async function HostShopsPage() {
           <p className="mt-3 max-w-3xl leading-7 text-slate-700">Discover your training community or help the next generation grow. We're looking for new Host Shops in every pathway.</p>
           <div className="mt-6 grid items-stretch gap-6 md:grid-cols-2">
             {Object.entries(PROGRAM_LABELS).map(([slug, label]) => {
-              const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug) && shop.approval === 'approved').length;
+              const count = networkShops.filter((shop) => matchesHostShopPresentationProgram(shop, slug) && shop.approval === 'approved').length;
               return <article key={slug} className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramCardImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
                 <div className="flex flex-1 flex-col p-4"><h3 className="text-lg font-black">{label.replace(' Apprenticeship', '')}</h3>

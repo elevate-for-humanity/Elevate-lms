@@ -60,3 +60,22 @@ describe('approved host directory data', () => {
   });
 
 });
+
+it('does not treat a saved public media profile as formal approval', async () => {
+  fixture.rows = {
+    host_shops: { data: [], error: null }, partners: { data: [], error: null },
+    barbershop_partner_applications: { data: [], error: null },
+    host_shop_applications: { data: [], error: null },
+    public_host_shops: { data: [{ id: 'pending', display_name: 'Pending Salon', public_slug: 'pending-salon', programs: ['cosmetology'] }], error: null },
+  };
+  expect(await getApprovedShops()).toEqual([]);
+});
+
+it.each(['Marvelous Cuts', 'Marvelouz Cutz', 'Marvelous-Cuts'])('excludes the owner-removed business %s even if an old approval remains', async (name) => {
+  fixture.rows = {
+    host_shops: { data: [], error: null }, partners: { data: [], error: null },
+    barbershop_partner_applications: { data: [{ id: 'old', shop_legal_name: name }], error: null },
+    host_shop_applications: { data: [], error: null }, public_host_shops: { data: [], error: null },
+  };
+  expect(await getApprovedShops()).toEqual([]);
+});

@@ -31,6 +31,7 @@ describe('downtown businesses sharing a training address', () => {
     expect(mesmerized?.programs).toEqual(['nail-technician-apprenticeship', 'esthetician-apprenticeship']);
     expect(mesmerized?.gallery?.every((image) => image.url.includes('mesmerized-by-beauty'))).toBe(true);
     expect(prestige?.programs).toEqual(['barber-apprenticeship', 'cosmetology-apprenticeship']);
-    expect(prestige?.gallery?.some((image) => image.url.includes('downtown-cosmetology-program'))).toBe(true);
+    expect(prestige?.gallery?.some((image) => image.url.includes('downtown-cosmetology-program'))).toBe(false);
+    expect(prestige?.gallery?.some((image) => image.url.includes('program-barber-training'))).toBe(true);
   });
 });

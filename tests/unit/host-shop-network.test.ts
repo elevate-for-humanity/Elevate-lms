@@ -6,7 +6,7 @@ describe('host shop network architecture', () => {
     const source = readFileSync('lib/programs/host-shop-network.ts', 'utf8');
     const page = readFileSync('apps/marketing/app/partners/host-shops/page.tsx', 'utf8');
     expect(source).toContain('getApprovedShops()');
-    expect(source).toContain('matchedFeatured');
+    expect(source).toContain('uniqueHostShops(operational)');
     expect(page).toContain('HostShopNetworkDirectory');
   });
 

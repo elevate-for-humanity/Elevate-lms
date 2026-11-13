@@ -1,6 +1,4 @@
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
-import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.json';
-import HostShopOnboardingProfile from '@/components/partners/HostShopOnboardingProfile';
 import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
@@ -62,13 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     website: entry.website,
     booking: entry.booking,
   } : approvedRecord;
-  if (!approved) {
-    const onboarding = onboardingProfiles.find(shop => shop.slug === slug);
-    if (onboarding?.businessDescription) {
-      return { title: `${onboarding.name} | ${onboarding.city}, Indiana`, description: onboarding.businessDescription };
-    }
-    return onboarding ? { title: `${onboarding.name} | Host Shop Onboarding`, description: `Location and contact details for ${onboarding.name}. Host Shop onboarding is in progress.` } : {};
-  }
+  if (!approved) return { robots: { index: false, follow: false } };
   if (!profile || !approved) {
     const featured = getFeaturedHostPartnerBySlug(slug);
     if (!featured && approved) {
@@ -134,10 +126,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     website: entry.website,
     booking: entry.booking,
   } : approvedRecord;
-  if (!approved) {
-    const onboarding = onboardingProfiles.find(shop => shop.slug === slug);
-    return onboarding ? <HostShopOnboardingProfile shop={onboarding} /> : notFound();
-  }
+  if (!approved) return notFound();
   if (!profile || !approved) {
     const featured = getFeaturedHostPartnerBySlug(slug);
     if (!featured && approved) return <ApprovedHostShopProfile shop={approved} />;

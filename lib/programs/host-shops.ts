@@ -82,7 +82,7 @@ function isPubliclyListedHostShop(shop: HostShop): boolean {
   const identity = [shop.name, shop.email, shop.publicSlug, shop.address].filter(Boolean).join(' ').toLowerCase();
   if (!shop.name.trim()) return false;
   if (/\[qa(?:\s+e2e)?\]|qa[ -]?e2e|qa test|test only|100 qa test way|@qa\.invalid|@example\.(?:com|org|net)|@test\.|\.invalid\b/.test(identity)) return false;
-  if (/razor[’'\s-]*s?\s+image|razorsimage/.test(identity)) return false;
+  if (/razor[’'\s-]*s?\s+image|razorsimage|marvel(?:ous|ouz)?[\s-]*(?:cuts|cutz)/.test(identity)) return false;
   return true;
 }
 
@@ -219,58 +219,10 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       return enriched;
     });
 
-  // The approved partner directory is also an operational approval source.
-  // Include approved public profiles that predate the newer application tables
-  // instead of returning a 404 for an otherwise active Host Shop.
-  const matchedProfileIds = new Set(
-    applicationBacked
-      .map((shop) => (publicRows ?? []).find((row) => row.public_slug === shop.publicSlug)?.id)
-      .filter(Boolean),
-  );
-  const directoryBacked: HostShop[] = (publicRows ?? [])
-    .filter((row) => !matchedProfileIds.has(row.id))
-    .map((row) => {
-      const programs = (Array.isArray(row.programs) ? row.programs : [])
-        .map(normalizeHostShopProgram)
-        .filter((value): value is string => typeof value === 'string');
-      return {
-        id: row.id,
-        name: row.display_name,
-        address: [row.address_line1, row.address_line2].filter(Boolean).join(', '),
-        city: row.city ?? '',
-        state: row.state ?? 'IN',
-        zip: row.zip ?? '',
-        phone: row.phone ?? '',
-        email: '',
-        supervisor: '',
-        programs: [...new Set(programs)],
-        primaryProgram: programs[0],
-        badge: 'partner',
-        publicSlug: row.public_slug,
-        description: row.description ?? undefined,
-        website: row.website_url || row.website || undefined,
-        googleMapsUrl: approvedMapsUrl({
-          id: row.id,
-          name: row.display_name,
-          address: [row.address_line1, row.address_line2].filter(Boolean).join(', '),
-          city: row.city ?? '',
-          state: row.state ?? 'IN',
-          zip: row.zip ?? '',
-          phone: row.phone ?? '',
-          email: '',
-          supervisor: '',
-          programs,
-          badge: 'partner',
-        }),
-        logoUrl: row.logo_url ?? undefined,
-        flyerUrl: row.flyer_url ?? undefined,
-        videoUrl: row.video_url ?? undefined,
-        mediaGallery: parseMedia(row.media_gallery),
-      };
-    })
-    .filter(isPubliclyListedHostShop);
-
-  const existing = [...applicationBacked, ...directoryBacked];
+  // Public profiles are media records, not evidence of formal approval.
+  // Only approved applications or explicitly approved active operational shops
+  // can enter the network. Keep historical public profiles private from discovery.
+  const existing = applicationBacked;
   const activeShopBacked: HostShop[] = (activeShopResult.data ?? [])
     .filter((row) => !existing.some((shop) => businessKey(shop.name) === businessKey(row.name)))
     .map((row) => {

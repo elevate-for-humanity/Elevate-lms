@@ -173,6 +173,11 @@ export default function HostShopMediaCarousel({
           ) : null}
         </div>
       ) : null}
+      {active.alt?.startsWith('Representative') ? (
+        <p className="border-t border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+          Representative training image
+        </p>
+      ) : null}
       {compact && media.length > 1 ? (
         <div className="grid grid-cols-3 border-t border-slate-200 text-xs font-bold">
           <button

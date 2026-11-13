@@ -6,8 +6,9 @@ import Image from 'next/image';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { MapPin, Search } from 'lucide-react';
+import { shopGalleryForProgram } from '@/lib/partners/curated-shop-media';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
-import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { PROGRAM_LABELS, matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
 
 type Props = { shops: HostShopNetworkEntry[]; programSlug?: string };
 
@@ -18,10 +19,14 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return shops.filter((shop) => {
-      const matchesProgram = program === 'all' || matchesHostShopProgram(shop, program);
+      const matchesProgram = program === 'all' || matchesHostShopPresentationProgram(shop, program);
       const haystack =
         `${shop.name} ${shop.city} ${shop.state} ${shop.address} ${shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug).join(' ')}`.toLowerCase();
       return matchesProgram && (!needle || haystack.includes(needle));
+    }).map((shop) => {
+      if (program === 'all') return shop;
+      const gallery = shopGalleryForProgram(shop.slug, shop.gallery ?? [], program, shop.logo);
+      return { ...shop, gallery, image: gallery[0]?.url };
     });
   }, [program, query, shops]);
 
@@ -81,6 +86,30 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                       : []
                 }
               />
+              {(shop.gallery?.length ?? 0) > 1 ? (
+                <div
+                  className="grid grid-cols-3 gap-1 border-t border-slate-200 bg-slate-100 p-1"
+                  aria-label={`${shop.name} portfolio preview`}
+                >
+                  {shop.gallery?.slice(1, 4).map((photo) => (
+                    <Link
+                      key={photo.url}
+                      href={`/host-shops/${shop.slug}`}
+                      className="relative aspect-square overflow-hidden rounded-lg bg-white"
+                    >
+                      <Image
+                        src={photo.url}
+                        alt={photo.alt || `${shop.name} portfolio photograph`}
+                        fill
+                        sizes="(max-width: 767px) 30vw, 140px"
+                        loading="lazy"
+                        unoptimized={!photo.url.startsWith('/')}
+                        className="object-contain"
+                      />
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <div className="flex flex-1 flex-col p-4">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
@@ -96,7 +125,11 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-slate-700">{shop.address}</p>
                 {shop.phone && <p className="mt-1 text-sm text-slate-700">{shop.phone}</p>}
-                {shop.approval === 'published-partner' ? <p className="mt-2 text-sm font-bold text-amber-800">Apprentice placement pending</p> : null}
+                {shop.approval === 'published-partner' ? (
+                  <p className="mt-2 text-sm font-bold text-amber-800">
+                    Apprentice placement pending
+                  </p>
+                ) : null}
                 <p className="mt-2 text-sm leading-6 text-slate-700">{shop.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {shop.programs.map((slug) => (
@@ -186,7 +219,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
               type="button"
               onClick={() => {
                 setQuery('');
-                setProgram('all');
+                setProgram(programSlug ?? 'all');
               }}
               className="mt-3 min-h-11 font-bold text-blue-800"
             >

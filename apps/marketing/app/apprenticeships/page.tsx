@@ -5,6 +5,7 @@ import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, ShieldCheck } fro
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export const metadata: Metadata = {
@@ -62,7 +63,11 @@ const EXPERIENCE = [
   { icon: MapPin, title: 'Work with a host site', body: 'Host-site availability is confirmed during enrollment and depends on current participating capacity.' },
 ] as const;
 
-export default function ApprenticeshipsPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function ApprenticeshipsPage() {
+  const approved = await getHostShopNetwork();
+  const approvedProfiles = FEATURED_BEAUTY_HOST_PARTNERS.filter((profile) => approved.some((shop) => shop.slug === profile.slug));
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
       <section
@@ -154,7 +159,7 @@ export default function ApprenticeshipsPage() {
         </div>
       </section>
 
-      <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
+      <HostShopShowcase shops={approvedProfiles} />
 
       <section className="bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl">

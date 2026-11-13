@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   normalizeHostShopProgram,
   matchesHostShopProgram,
+  matchesHostShopPresentationProgram,
   PROGRAM_SLUGS,
 } from '@/lib/programs/host-shop-programs';
 
@@ -33,4 +34,11 @@ describe('public Host Shop trade categories', () => {
     for (const program of Object.values(PROGRAM_SLUGS))
       expect(matchesHostShopProgram(unclassified, program)).toBe(false);
   });
+});
+
+it('separates primary salon and barber marketing without changing dual approvals', () => {
+  const salon = { programs: [PROGRAM_SLUGS.barber, PROGRAM_SLUGS.cosmetology], primaryProgram: PROGRAM_SLUGS.cosmetology };
+  expect(matchesHostShopProgram(salon, PROGRAM_SLUGS.barber)).toBe(true);
+  expect(matchesHostShopPresentationProgram(salon, PROGRAM_SLUGS.barber)).toBe(false);
+  expect(matchesHostShopPresentationProgram(salon, PROGRAM_SLUGS.cosmetology)).toBe(true);
 });

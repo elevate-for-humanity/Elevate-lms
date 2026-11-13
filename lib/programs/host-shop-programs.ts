@@ -28,3 +28,14 @@ export function matchesHostShopProgram(
 ) {
   return shop.programs.includes(programSlug);
 }
+
+/** Marketing categories follow the business's primary trade; approvals stay intact. */
+export function matchesHostShopPresentationProgram(
+  shop: { programs: string[]; primaryProgram?: string },
+  programSlug: string,
+) {
+  if (!matchesHostShopProgram(shop, programSlug)) return false;
+  if (programSlug === PROGRAM_SLUGS.barber && shop.primaryProgram === PROGRAM_SLUGS.cosmetology) return false;
+  if (programSlug === PROGRAM_SLUGS.cosmetology && shop.primaryProgram === PROGRAM_SLUGS.barber) return false;
+  return true;
+}

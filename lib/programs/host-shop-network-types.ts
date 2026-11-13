@@ -10,6 +10,7 @@ export type HostShopNetworkEntry = {
   primaryProgram?: string;
   description: string;
   image?: string;
+  logo?: string;
   videoUrl?: string;
   gallery?: Array<{ url: string; alt?: string }>;
   website?: string;

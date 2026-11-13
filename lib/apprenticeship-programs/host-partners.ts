@@ -60,8 +60,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     primaryProgram: 'barber-apprenticeship',
     marketingBlurb: 'An Indianapolis barber and beauty business offering haircuts, beard grooming, styling and client care. Explore the shop portfolio and contact Elevate about supervised apprenticeship placement.',
     media: [
-      { src: '/images/partners/prestige-elevation/downtown-cosmetology-program.webp', alt: 'Prestige Elevation downtown cosmetology lab with salon chairs at 120 East Market Street, Suite 560', kind: 'photo' },
-      { src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Haircut portfolio published by Prestige Elevation Barber and Beauty Institute', kind: 'photo' },
+      { src: '/images/beauty/program-barber-training.webp', alt: 'Representative barber service image from Elevate’s earlier program collection', kind: 'photo' },
+      { src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Natural iron-out bob styling artwork from Prestige Elevation’s published portfolio', kind: 'photo' },
     ],
     websiteUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
     websiteLabel: 'Explore services and book with Prestige Elevation',
@@ -201,31 +201,10 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
-      {
-        src: '/images/partners/style-and-scissor-salon/logo.webp',
-        alt: 'Style and Scissor Salon business logo',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
-        alt: 'Professional nail art portfolio from Style and Scissor Salon',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/style-and-scissor-salon/logo.webp',
-        alt: 'Style and Scissor Salon scissors and comb logo',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/style-and-scissor-salon/contact-card.webp',
-        alt: 'Style and Scissor Salon contact card for owner Cori Meid',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/style-and-scissor-salon/melissas-nails.webp',
-        alt: 'Melissa nail designs from Style and Scissor Salon',
-        kind: 'photo',
-      },
+      { src: '/images/partners/style-and-scissor-salon/portfolio-nail-work-restored-2026.webp', alt: 'Patriotic and mixed nail-art portfolio — restored from Style and Scissor Salon photographs', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/melissas-nails-restored-2026.webp', alt: 'Three nail-service examples — restored from Style and Scissor Salon photographs', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/pink-nail-work-restored-2026.webp', alt: 'Pink French-tip and polished manicures — restored from Style and Scissor Salon photographs', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/logo.webp', alt: 'Style and Scissor Salon business logo', kind: 'photo' },
     ],
     onlineListingUrl:
       'https://www.fresha.com/pl/lvp/style-and-scissor-salon-west-hopewell-street-farmersburg-l1E0B7',

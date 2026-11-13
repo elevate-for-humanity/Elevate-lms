@@ -1,3 +1,5 @@
+import { PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
+
 // Optimized copies of the shop’s published portfolio; source URLs remain credited.
 const LOCAL_SHOP_MEDIA: Record<string, string> = {
   "https://bucket.setmore.com/files/img/fRYGyv7MVdze/f942496e-3d23-4bc1-8368-e8347feef0c0.jpeg": "/images/partners/paola-petit/official-portfolio-1-2026.webp",
@@ -10,6 +12,8 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
   const kountry = slug.startsWith('kountry-kutz');
   const seen = new Set<string>();
   return items.flatMap((original) => {
+    // Retired purple room mockup must not return through an older database gallery.
+    if (slug.startsWith('prestige-elevation') && original.url.includes('downtown-cosmetology-program.webp')) return [];
     const localUrl = LOCAL_SHOP_MEDIA[original.url];
     let item = localUrl ? { ...original, url: localUrl, source: original.source || original.url } : original;
     // First-party imports should use repository asset paths. Normalize them
@@ -26,14 +30,21 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
         item = { ...item, url: parsed.pathname + parsed.search };
       }
     } catch { return []; }
-    // The printed album sheets and contact card are source material, not
-    // portfolio photography. Publish the restored manicure, with clear labeling.
+    // Restore every supplied portfolio sheet; keep logos and contact cards
+    // outside the photographic gallery and label the actual nail work.
     if (slug.startsWith('style-and-scissor')) {
-      if (/\/(?:logo|contact-card|melissas-nails|pink-nail-work)\.webp$/.test(item.url)) return [];
-      if (item.url === '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp') item = {
+      if (/\/(?:logo|contact-card)\.webp$/.test(item.url)) return [];
+      const restored: Record<string, { file: string; label: string }> = {
+        'portfolio-nail-work.webp': { file: 'portfolio-nail-work-restored-2026.webp', label: 'Patriotic and mixed nail-art portfolio' },
+        'manicure-enhanced-2026.webp': { file: 'portfolio-nail-work-restored-2026.webp', label: 'Patriotic and mixed nail-art portfolio' },
+        'melissas-nails.webp': { file: 'melissas-nails-restored-2026.webp', label: 'Three nail-service portfolio examples' },
+        'pink-nail-work.webp': { file: 'pink-nail-work-restored-2026.webp', label: 'Pink French-tip and polished manicure portfolio' },
+      };
+      const replacement = restored[item.url.split('/').at(-1) ?? ''];
+      if (replacement) item = {
         ...item,
-        url: '/images/partners/style-and-scissor-salon/manicure-enhanced-2026.webp',
-        alt: 'AI-enhanced manicure photograph restored from Style and Scissor Salon’s published nail portfolio',
+        url: `/images/partners/style-and-scissor-salon/${replacement.file}`,
+        alt: `${replacement.label} — restored from Style and Scissor Salon’s own photographs`,
         source: item.source || original.url,
       };
     }
@@ -71,6 +82,36 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
     seen.add(key);
     return true;
   });
+}
+
+/** Keep a dual-program shop's nail/salon portfolio off an unrelated program page. */
+export function shopGalleryForProgram(
+  slug: string,
+  items: ShopMedia[],
+  program: string,
+  businessLogo?: string,
+): ShopMedia[] {
+  if (!Object.values(PROGRAM_SLUGS).some((slug) => slug === program)) return [];
+  const photos = curateShopGallery(slug, items).filter((item) => {
+    const path = item.url.toLowerCase();
+    if (program === 'barber-apprenticeship') {
+      return !/nail|manicure|esthetic|cosmetology|prestige-elevation\/official-portfolio/.test(
+        path,
+      );
+    }
+    // This salon supplied nail-service portfolios. Keep its real photographs
+    // on its cosmetology shop card, labeled as nail work, never as hair work.
+    if (program === 'cosmetology-apprenticeship' && slug.startsWith('style-and-scissor'))
+      return !/program-barber-training/.test(path);
+    if (program === 'cosmetology-apprenticeship')
+      return !/nail|manicure|esthetic|program-barber-training/.test(path);
+    if (program === 'nail-technician-apprenticeship') return /nail|manicure/.test(path);
+    if (program === 'esthetician-apprenticeship') return /esthetic|skincare|facial/.test(path);
+    return false;
+  });
+  // An official identity image is explicit branding, never a claim about a
+  // service or training environment when the shop has no photo for this trade.
+  return photos.length || !businessLogo ? photos : [{ url: businessLogo, alt: 'Official business logo' }];
 }
 
 /** Portfolio media comes from the selected partner's public gallery, never from compliance uploads. */

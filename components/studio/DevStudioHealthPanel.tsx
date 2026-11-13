@@ -11,7 +11,10 @@ const ServicesPanel = dynamic(
 );
 
 type HealthPayload = Record<string, unknown> & {
+  probes?: Partial<Record<'ai' | 'cloudflare' | 'github', { status: 'completed' | 'timed_out' | 'unavailable'; checkedAt?: string }>>;
+  githubAuthError?: string | null;
   hasElevate?: boolean;
+  hasCloudflare?: boolean;
   hasGroq?: boolean;
   hasXAI?: boolean;
   hasGemini?: boolean;
@@ -26,6 +29,7 @@ type HealthPayload = Record<string, unknown> & {
     ready?: boolean;
     repositoryWritesReady?: boolean | null;
     legacyShellRemoved?: boolean;
+    status?: string;
   };
   google?: { ready?: boolean; project?: string; deploymentDispatchReady?: boolean | null };
 };
@@ -38,6 +42,12 @@ function operationStatus(ready?: boolean | null) {
   if (ready === true) return 'verified';
   if (ready === false) return 'repository access unavailable';
   return 'not tested by this check';
+}
+
+function incompleteProbe(status?: string) {
+  if (status === 'timed_out') return 'not verified — check timed out';
+  if (status === 'unavailable') return 'not verified — check unavailable';
+  return null;
 }
 
 export default function DevStudioHealthPanel() {
@@ -68,11 +78,14 @@ export default function DevStudioHealthPanel() {
     void load();
   }, [load]);
 
+  const aiUnknown = incompleteProbe(health?.probes?.ai?.status);
+  const githubUnknown = incompleteProbe(health?.probes?.github?.status);
+  const incomplete = health?.probes && Object.entries(health.probes).filter(([, probe]) => probe?.status !== 'completed');
   const rows = health
     ? [
         [
           'Container GitHub token',
-          health.hasGitHub === undefined
+          githubUnknown ?? (health.githubAuthError ? `not verified (${health.githubAuthError})` : health.hasGitHub === undefined
             ? 'not reported'
             : !health.hasGitHub
               ? 'missing'
@@ -80,20 +93,21 @@ export default function DevStudioHealthPanel() {
                 ? 'not verified'
                 : health.githubTokenValid
                   ? 'valid'
-                  : 'invalid',
+                  : 'invalid'),
         ],
-        ['Groq', flag(health.hasGroq)],
-        ['Grok / xAI', flag(health.hasXAI)],
-        ['OpenAI', flag(health.hasOpenAI)],
-        ['Anthropic', flag(health.hasAnthropic)],
-        ['Gemini', flag(health.hasGemini)],
+        ['Groq', aiUnknown ?? flag(health.hasGroq)],
+        ['Grok / xAI', aiUnknown ?? flag(health.hasXAI)],
+        ['OpenAI', aiUnknown ?? flag(health.hasOpenAI)],
+        ['Anthropic', aiUnknown ?? flag(health.hasAnthropic)],
+        ['Gemini', aiUnknown ?? flag(health.hasGemini)],
+        ['Cloudflare Workers AI', incompleteProbe(health.probes?.cloudflare?.status) ?? (health.hasCloudflare ? 'verified reachable' : 'not verified')],
         ['Supabase URL', flag(health.supabaseUrlPresent)],
         ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
-        ['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable'],
-        ['Paris owned inference', health.hasElevate ? 'verified reachable' : 'unavailable'],
-        ['Repository writes', operationStatus(health.execution?.repositoryWritesReady)],
-        ['Deployment dispatch', operationStatus(health.google?.deploymentDispatchReady)],
+        ['Dev Studio core', health.execution?.ready ? 'ready' : health.execution?.status === 'verification-incomplete' ? 'verification incomplete' : 'prerequisites incomplete'],
+        ['Paris owned inference', aiUnknown ?? (health.hasElevate ? 'verified reachable' : 'not verified')],
+        ['Repository writes', githubUnknown ?? operationStatus(health.execution?.repositoryWritesReady)],
+        ['Deployment dispatch', githubUnknown ?? operationStatus(health.google?.deploymentDispatchReady)],
         ['Google runtime', flag(health.google?.ready)],
         ['Google project', health.google?.project ?? 'unavailable'],
       ]
@@ -123,6 +137,12 @@ export default function DevStudioHealthPanel() {
             {error}
           </div>
         )}
+        {incomplete && incomplete.length > 0 && (
+          <div role="status" className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            Some checks did not complete: {incomplete.map(([name, probe]) => `${name}: ${probe?.status === 'timed_out' ? 'timed out' : 'unavailable'}`).join('; ')}.
+            {' '}This does not establish a service outage. Completed checks remain visible below.
+          </div>
+        )}
         {loading && !health && (
           <div className="flex items-center justify-center gap-2 py-8 text-sm text-slate-500">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -141,7 +161,7 @@ export default function DevStudioHealthPanel() {
                 className="flex items-center justify-between border-b border-slate-100 px-3 py-2 text-xs last:border-0"
               >
                 <span className="text-slate-600">{label}</span>
-                <span className="font-mono text-slate-900">{value}</span>
+                <span className="min-w-0 max-w-[60%] break-words text-right font-mono text-slate-900">{value}</span>
               </div>
             ))}
           </div>

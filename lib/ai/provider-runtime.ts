@@ -2,7 +2,7 @@ import 'server-only';
 import { probeOwnedModel } from '@/lib/ai/providers/owned-model-health.mjs';
 
 import { getActiveProviderName } from '@/lib/ai/ai-service';
-import { getSecrets, hydrateProcessEnv } from '@/lib/secrets';
+import { getSecrets, getSelectedRuntimeSecrets, hydrateProcessEnv } from '@/lib/secrets';
 
 const PROVIDER_SECRET_KEYS = [
   'GROQ_API_KEY',
@@ -21,6 +21,18 @@ const PROVIDER_SECRET_KEYS = [
   'CLOUDFLARE_AI_MODEL',
 ] as const;
 
+const HEALTH_SECRET_KEYS = [...PROVIDER_SECRET_KEYS, 'AI_PROVIDER', 'AI_PROVIDER_ORDER',
+  'ELEVATE_LLM_URL', 'ELEVATE_LLM_SECRET', 'ELEVATE_LLM_CPU_URL', 'ELEVATE_LLM_CPU_SECRET',
+  'ELEVATE_LLM_GPU_URL', 'ELEVATE_LLM_GPU_SECRET', 'ELEVATE_LLM_GOOGLE_IAM', 'ELEVATE_LLM_GPU_GOOGLE_IAM',
+  'PARIS_GPU_ENABLED', 'PARIS_INFERENCE_TIER'] as const;
+type HealthSecrets = Partial<Record<(typeof HEALTH_SECRET_KEYS)[number], string | undefined>>;
+type HealthProbeOptions = { signal?: AbortSignal; secrets?: HealthSecrets | Promise<HealthSecrets> };
+
+/** One scoped read supplies both independent AI probes without broad hydration. */
+export function readAIHealthSecrets(signal?: AbortSignal) {
+  return getSelectedRuntimeSecrets([...HEALTH_SECRET_KEYS], { signal });
+}
+
 export type CloudflareAIProbe = {
   configured: boolean;
   reachable: boolean;
@@ -34,9 +46,10 @@ export type CloudflareAIProbe = {
  * spending inference tokens. The model catalogue endpoint proves account scope
  * and authentication; checking strings alone produced false-green Studio UI.
  */
-export async function probeCloudflareWorkersAI(): Promise<CloudflareAIProbe> {
-  await hydrateProcessEnv();
-  const secrets = await getSecrets([...PROVIDER_SECRET_KEYS]);
+export async function probeCloudflareWorkersAI(options: HealthProbeOptions = {}): Promise<CloudflareAIProbe> {
+  if (!options.secrets) await hydrateProcessEnv();
+  const secrets = options.secrets ? await options.secrets : await getSecrets([...PROVIDER_SECRET_KEYS]);
+  options.signal?.throwIfAborted();
   const accountId = secrets.CLOUDFLARE_ACCOUNT_ID?.trim();
   const token = (
     secrets.CLOUDFLARE_AI_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN
@@ -63,7 +76,7 @@ export async function probeCloudflareWorkersAI(): Promise<CloudflareAIProbe> {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         cache: 'no-store',
         redirect: 'error',
-        signal: AbortSignal.timeout(10_000),
+        signal: options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(10_000)]) : AbortSignal.timeout(10_000),
       },
     );
     if (response.ok) {
@@ -111,9 +124,10 @@ export type AIRuntimeState = Awaited<ReturnType<typeof resolveAIRuntimeState>>;
  * variables last. Browser-exposed NEXT_PUBLIC variables are intentionally never
  * accepted as credentials.
  */
-export async function resolveAIRuntimeState() {
-  await hydrateProcessEnv();
-  const secrets = await getSecrets([...PROVIDER_SECRET_KEYS]);
+export async function resolveAIRuntimeState(options: HealthProbeOptions = {}) {
+  if (!options.secrets) await hydrateProcessEnv();
+  const secrets = options.secrets ? await options.secrets : await getSecrets([...PROVIDER_SECRET_KEYS]);
+  options.signal?.throwIfAborted();
   const present = (...keys: (typeof PROVIDER_SECRET_KEYS)[number][]) =>
     keys.some((key) => Boolean(secrets[key]?.trim()));
 
@@ -128,14 +142,23 @@ export async function resolveAIRuntimeState() {
       present('CLOUDFLARE_AI_API_TOKEN', 'CLOUDFLARE_API_TOKEN') &&
       present('CLOUDFLARE_AI_MODEL'),
   };
-  const activeProvider = getActiveProviderName();
-  const ownedModel = await probeOwnedModel();
+  // getActiveProviderName may populate the inference discovery cache. A scoped
+  // diagnostic must not select a provider or mutate that cache before hydration.
+  const activeProvider = options.secrets ? 'not_tested' : getActiveProviderName();
+  const snapshot = secrets as HealthSecrets;
+  const selected = snapshot.AI_PROVIDER?.trim().toLowerCase() || snapshot.AI_PROVIDER_ORDER?.split(',')
+    .map(name => name.trim().toLowerCase()).find(name => name && name !== 'none') || 'elevate';
+  const configuredProvider = options.secrets
+    ? ['elevate', 'gemini', 'google', 'groq', 'xai', 'cloudflare', 'openai', 'anthropic', 'azure', 'none'].includes(selected) ? selected : 'invalid'
+    : activeProvider;
+  const ownedModel = await probeOwnedModel({ env: { ...process.env, ...secrets }, signal: options.signal });
 
   return {
     providers,
     activeProvider,
+    configuredProvider,
     ownedModel,
     elevate: ownedModel.verified,
-    anyConfigured: Object.values(providers).some(Boolean) || activeProvider === 'elevate',
+    anyConfigured: Object.values(providers).some(Boolean) || (options.secrets ? ownedModel.configured === true : activeProvider === 'elevate'),
   };
 }

@@ -8,19 +8,38 @@ const API = 'https://api.github.com';
 let cached: { identity: string; token: string; expires: number; workflowWrite: boolean } | undefined;
 let pending: { identity: string; promise: Promise<string> } | undefined;
 
+/** A diagnostic waiter may stop without cancelling issuance needed by another
+ * runtime consumer. The shared issuance itself remains bounded by two 8s calls. */
+function waitForToken(promise: Promise<string>, signal?: AbortSignal): Promise<string> {
+  if (!signal) return promise;
+  if (signal.aborted) return Promise.reject(signal.reason);
+  return new Promise((resolve, reject) => {
+    const cleanup = () => signal.removeEventListener('abort', aborted);
+    const aborted = () => { cleanup(); reject(signal.reason); };
+    signal.addEventListener('abort', aborted, { once: true });
+    promise.then(value => { cleanup(); resolve(value); }, error => { cleanup(); reject(error); });
+  });
+}
+
 /** Server-only, opt-in App authentication. Never persist installation tokens. */
-export async function getGitHubAppToken(options: { requireWorkflowWrite?: boolean } = {}): Promise<string | null> {
+export async function getGitHubAppToken(options: { requireWorkflowWrite?: boolean; signal?: AbortSignal } = {}): Promise<string | null> {
+  options.signal?.throwIfAborted();
   // Dashboard-managed App credentials are encrypted at rest and resolved by
   // exact key. Never confuse a saved GITHUB_TOKEN/PAT with an RSA App key.
   // A mounted Google secret takes precedence over the Admin dashboard source.
   const dashboardOnly = process.env.PARIS_GITHUB_APP_SOURCE === 'dashboard';
-  const appId = (dashboardOnly ? await getAdminGitHubAppSecret('GITHUB_APP_ID')
-    : process.env.GITHUB_APP_ID || await getDecryptedPlatformSecret('GITHUB_APP_ID'))?.trim();
-  const installationId = (dashboardOnly ? await getAdminGitHubAppSecret('GITHUB_APP_INSTALLATION_ID')
-    : process.env.GITHUB_APP_INSTALLATION_ID || await getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID'))?.trim();
   const path = dashboardOnly ? undefined : process.env.GITHUB_APP_PRIVATE_KEY_FILE?.trim();
-  const pem = dashboardOnly ? await getAdminGitHubAppSecret('GITHUB_APP_PRIVATE_KEY')
-    : process.env.GITHUB_APP_PRIVATE_KEY || (path ? undefined : await getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY'));
+  const [idValue, installationValue, pem] = await Promise.all([
+    dashboardOnly ? getAdminGitHubAppSecret('GITHUB_APP_ID', options)
+      : process.env.GITHUB_APP_ID || getDecryptedPlatformSecret('GITHUB_APP_ID', options),
+    dashboardOnly ? getAdminGitHubAppSecret('GITHUB_APP_INSTALLATION_ID', options)
+      : process.env.GITHUB_APP_INSTALLATION_ID || getDecryptedPlatformSecret('GITHUB_APP_INSTALLATION_ID', options),
+    dashboardOnly ? getAdminGitHubAppSecret('GITHUB_APP_PRIVATE_KEY', options)
+      : process.env.GITHUB_APP_PRIVATE_KEY || (path ? undefined : getDecryptedPlatformSecret('GITHUB_APP_PRIVATE_KEY', options)),
+  ]);
+  options.signal?.throwIfAborted();
+  const appId = idValue?.trim();
+  const installationId = installationValue?.trim();
   if (!appId && !installationId && !pem && !path) return null;
   if (!appId || !installationId || !/^\d+$/.test(appId) || !/^\d+$/.test(installationId) || Boolean(pem) === Boolean(path)) {
     throw new Error('GITHUB_APP_CONFIGURATION_INVALID');
@@ -41,7 +60,7 @@ export async function getGitHubAppToken(options: { requireWorkflowWrite?: boolea
     return cached.token;
   }
   if (pending?.identity === identity) {
-    const token = await pending.promise;
+    const token = await waitForToken(pending.promise, options.signal);
     if (options.requireWorkflowWrite && !cached?.workflowWrite) throw new Error('GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED');
     return token;
   }
@@ -98,9 +117,9 @@ export async function getGitHubAppToken(options: { requireWorkflowWrite?: boolea
     return result.token as string;
   })();
   pending = { identity, promise };
-  try {
-    const token=await promise;
-    if (options.requireWorkflowWrite && !cached?.workflowWrite) throw new Error('GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED');
-    return token;
-  } finally { if (pending?.promise === promise) pending = undefined; }
+  const clearPending = () => { if (pending?.promise === promise) pending = undefined; };
+  void promise.then(clearPending, clearPending);
+  const token = await waitForToken(promise, options.signal);
+  if (options.requireWorkflowWrite && !cached?.workflowWrite) throw new Error('GITHUB_APP_WORKFLOWS_PERMISSION_REQUIRED');
+  return token;
 }

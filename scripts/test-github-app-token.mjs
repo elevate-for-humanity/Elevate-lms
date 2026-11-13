@@ -8,7 +8,7 @@ const pair = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const pem = pair.privateKey.export({ type: 'pkcs8', format: 'pem' });
 const source = stripTypeScriptTypes(await readFile(new URL('../lib/devstudio/github-app-token.ts', import.meta.url), 'utf8'))
   .replace(/^import .*;\n/gm, '').replaceAll('export ', '');
-function fixture({ env = {}, stored = {}, status = 200, mismatch = false, invalidToken = false, network = false, mounted = false, permissions = { contents: 'write', actions: 'write', pull_requests: 'write' } } = {}) {
+function fixture({ env = {}, stored = {}, status = 200, mismatch = false, invalidToken = false, network = false, mounted = false, pause, permissions = { contents: 'write', actions: 'write', pull_requests: 'write' } } = {}) {
   let now = Date.now();
   const calls = [];
   const environment = { GITHUB_APP_ID: '5477907', GITHUB_APP_INSTALLATION_ID: '42',
@@ -17,6 +17,7 @@ function fixture({ env = {}, stored = {}, status = 200, mismatch = false, invali
     source + '\nreturn getGitHubAppToken;');
   const get = factory(createHash, createPrivateKey, sign, () => pem, { env: environment }, async (url, init) => {
     calls.push({ url, init });
+    if (pause) await pause(url);
     if (network) throw new Error('network error containing sensitive upstream details');
     return new Response(JSON.stringify(url.endsWith('/installation')
       ? { id: mismatch ? 99 : 42, app_id: 5477907, suspended_at: null }
@@ -37,6 +38,27 @@ test('signs verifiable RSA JWT and scopes token to only Elevate-lms', async () =
   assert.equal(f.calls[1].url, 'https://api.github.com/app/installations/42/access_tokens');
   assert.deepEqual(JSON.parse(f.calls[1].init.body), { repositories: ['Elevate-lms'] });
   assert.ok(f.calls.every(c => c.init.redirect === 'error' && c.init.cache === 'no-store'));
+});
+test('a cancelled diagnostic waiter cannot cancel or duplicate shared installation issuance', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const f = fixture({ pause: url => url.endsWith('/installation') ? gate : undefined });
+  const controller = new AbortController();
+  const cancelled = f.get({ signal: controller.signal });
+  const rejected = assert.rejects(cancelled, { name: 'AbortError' });
+  await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
+  const other = f.get();
+  controller.abort();
+  await rejected;
+  const third = f.get();
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(f.calls.length, 1, 'cancelled waiter must not clear the shared pending token');
+  release();
+  assert.equal(await other, 'ghs_fixture_installation_token');
+  assert.equal(await third, 'ghs_fixture_installation_token');
+  assert.equal(f.calls.length, 2);
+  assert.equal(await f.get(), 'ghs_fixture_installation_token');
+  assert.equal(f.calls.length, 2, 'the completed token is reused');
 });
 test('coalesces requests and renews before token expiration', async () => {
   const f = fixture();

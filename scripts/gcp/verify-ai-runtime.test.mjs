@@ -59,6 +59,22 @@ test('uses the private Google invocation adapter for model health', async () => 
   assert.equal(result.verified,true); assert.equal(calls,1);
   assert.ok(!JSON.stringify(result).includes('private-identity'));
 });
+test('owned health cancellation covers identity acquisition and prevents a later model request', async () => {
+  const {probeOwnedModel} = await import('../../lib/ai/providers/owned-model-health.mjs');
+  const controller = new AbortController();
+  let modelRequests = 0, identitySignal;
+  const pending = probeOwnedModel({env,signal:controller.signal,
+    headersFor: async (_base,_token,{signal}) => {
+      identitySignal=signal;
+      return new Promise((_,reject)=>signal.addEventListener('abort',()=>reject(signal.reason),{once:true}));
+    },
+    request: async()=>{modelRequests++;return Response.json({data:[{id:'elevate-local'}]});},
+  });
+  controller.abort();
+  assert.equal(identitySignal.aborted,true);
+  assert.deepEqual(await pending,{configured:true,verified:false,status:'request_failed',reason:'timeout'});
+  assert.equal(modelRequests,0);
+});
 
 test('model startup diagnostics retain categories without printing model keys or arbitrary logs',()=>{
  const entries=['MODEL_BOUNDED_EIGHT_GIB_MEMORY_REQUIRED','MODEL_CHECKSUM_FAILED','MODEL_AUTHENTICATION_CONFIGURATION_REQUIRED'].map(code=>({textPayload:code+' private-value'}));

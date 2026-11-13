@@ -16,7 +16,7 @@ import { refreshSecrets } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 const verifiedFundingList = VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map(
   (program) => `${program.title}: ${program.description}`,
@@ -215,7 +215,7 @@ async function _POST(req: NextRequest) {
         providerPolicy: 'owned-only',
         temperature: 0.25,
         maxTokens: 700,
-        signal: AbortSignal.timeout(45_000),
+        signal: AbortSignal.timeout(110_000),
       });
       if (!result.content.trim()) throw new Error('PARIS_EMPTY_REPLY');
       return NextResponse.json({ reply: result.content, provider: result.provider });

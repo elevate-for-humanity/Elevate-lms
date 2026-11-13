@@ -31,7 +31,9 @@ const nextConfig = {
   images: {
     unoptimized: false,
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 86400,
+    // Optimized variants are cached for 30 days so repeat visitors and new
+    // Cloud Run instances avoid re-encoding (1-2s cold MISS per image).
+    minimumCacheTTL: 2592000,
     // Next defaults deviceSizes up to 3840px, so a full-width hero shipped a
     // ~200KB 3840px variant to every visitor. Cap at 1920px (covers standard
     // desktop) so the responsive srcset never requests the oversized variant.
@@ -45,6 +47,20 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.pexels.com' },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=604800, stale-while-revalidate=2592000',
+          },
+        ],
+      },
+    ];
+  },
+
   experimental: { staticGenerationRetryCount: 3 },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,

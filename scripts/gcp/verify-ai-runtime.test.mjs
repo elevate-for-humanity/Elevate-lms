@@ -85,3 +85,20 @@ test('off-Google verification sends the workflow invoker identity instead of cal
   }});
   assert.equal(result.verified,true);
 });
+test('retries a cold-starting model before reporting it unreachable', async () => {
+  let calls=0;
+  const result=await verifyOwnedModel(env,{attempts:3,request:async()=>{
+    calls++;
+    if(calls===1) throw Object.assign(new Error('slow'),{name:'TimeoutError'});
+    if(calls===2) return new Response('starting',{status:503});
+    return Response.json({data:[{id:'elevate-local'}]});
+  }});
+  assert.equal(calls,3);assert.equal(result.verified,true);assert.equal(result.attempts,3);
+});
+test('reports why the probe failed and stops retrying authentication failures', async () => {
+  const timedOut=await verifyOwnedModel(env,{request:async()=>{throw Object.assign(new Error('slow'),{name:'TimeoutError'})}});
+  assert.equal(timedOut.status,'request_failed');assert.equal(timedOut.reason,'timeout');
+  let calls=0;
+  const denied=await verifyOwnedModel(env,{attempts:3,request:async()=>{calls++;return new Response('',{status:403})}});
+  assert.equal(calls,1);assert.equal(denied.status,'authentication_failed');
+});

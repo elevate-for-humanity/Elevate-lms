@@ -11,8 +11,18 @@ export function invokerHeaders(invokerToken) {
   return async (_base, token) => ({Authorization:'Bearer '+token, 'Content-Type':'application/json', 'X-Serverless-Authorization':'Bearer '+invokerToken});
 }
 
-export async function verifyOwnedModel(env, {invokerToken, ...options}={}) {
-  return probeOwnedModel({env, ...(invokerToken ? {headersFor:invokerHeaders(invokerToken)} : {}), ...options});
+/** The scale-to-zero model can exceed one probe window while it cold-starts;
+ * retry only transport failures and Cloud Run "no instance yet" responses. */
+export async function verifyOwnedModel(env, {invokerToken, attempts=1, ...options}={}) {
+  const probe={env, ...(invokerToken ? {headersFor:invokerHeaders(invokerToken)} : {}), ...options};
+  let result, attempt=0;
+  while (attempt<attempts) {
+    attempt++;
+    result=await probeOwnedModel(probe);
+    const coldStart=result.status==='request_failed' || [429,502,503,504].includes(result.httpStatus);
+    if (result.verified || !coldStart) break;
+  }
+  return attempts>1 ? {...result, attempts:attempt} : result;
 }
 
 /** Report binding presence only; never serialize endpoint or credential values. */
@@ -68,7 +78,7 @@ async function main() {
   const services=JSON.parse(google(['run','services','list','--project',PROJECT,'--region',region,'--format=json']));
   const admin=loadGoogleConfig('admin');
   const browser=loadGoogleConfig('studio-browser');
-  const ownedModel=await verifyOwnedModel(admin.runtimeEnvironment,{invokerToken:process.env.MODEL_INVOKER_TOKEN,timeoutMs:90000});
+  const ownedModel=await verifyOwnedModel(admin.runtimeEnvironment,{invokerToken:process.env.MODEL_INVOKER_TOKEN,timeoutMs:100000,attempts:3});
   const report={ observedAt:new Date().toISOString(), project:PROJECT, region,
     services:services.map(service=>({name:service.metadata?.name, revision:service.status?.latestReadyRevisionName})),
     ownedModel,

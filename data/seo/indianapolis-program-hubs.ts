@@ -54,7 +54,7 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
   metadata: {
     title: 'CNA Training Indianapolis | State-Supervised Nurse Aide Program',
     description:
-      'CNA training in Indianapolis. ISDH-aligned nurse aide instruction, clinical hours, and WIOA funding pathways for eligible Indiana residents.',
+      'Compare CNA training requirements, clinical instruction, costs, and current enrollment availability in Indianapolis.',
     ogTitle: 'CNA Training Indianapolis | Certified Nursing Assistant',
   },
   breadcrumbLabel: 'CNA Training Indianapolis',
@@ -68,14 +68,14 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
   hero: {
     tag: 'CNA · Indianapolis · Indiana',
     heading: 'CNA Training in Indianapolis',
-    subtitle: `${org} delivers state-supervised Certified Nursing Assistant training for adults entering long-term care, hospital, and home health roles. WIOA and Workforce Ready Grant funding may be available for eligible residents.`,
+    subtitle: `Explore Certified Nursing Assistant training for patient-care careers. Confirm the approved training provider, clinical arrangements, start date, and self-pay costs with ${org} before enrollment.`,
     primaryCta: { label: 'Apply for CNA Training', href: '/apply?program=cna' },
     secondaryCta: { label: 'CNA Program Details', href: '/programs/cna' },
   },
   trustBadges: [
     { label: 'ISDH-Aligned Curriculum', detail: 'Indiana nurse aide training standards' },
-    { label: 'ETPL Approved Provider', detail: 'Workforce funding eligible' },
-    { label: 'Clinical Hours Included', detail: 'Approved facility rotations' },
+    { label: 'Self-Pay Pathway', detail: 'Confirm tuition before enrollment' },
+    { label: 'Clinical Training Required', detail: 'Confirm approved facility arrangements' },
     { label: 'Employer Placement Support', detail: 'Indianapolis healthcare network' },
   ],
   whoHeading: 'Who CNA Training Is For',
@@ -99,18 +99,15 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
   funding: {
     heading: 'Funding CNA Training in Indianapolis',
     paragraphs: [
-      `CNA programs at ${org} are listed on Indiana's ETPL, which allows eligible participants to use WIOA Individual Training Accounts and other workforce funding when approved by WorkOne.`,
-      'Healthcare support roles remain a priority sector in Indiana workforce plans. Your local WorkOne office determines final eligibility — not the training provider.',
+      'CNA is currently presented as self-pay in the verified program funding registry. Provider-level approval does not establish funding eligibility for this specific program.',
+      'Confirm tuition, clinical costs, examination fees, and the approved training arrangement before paying.',
     ],
     bullets: [
-      'WIOA Title I — adults and dislocated workers',
-      'Workforce Ready Grant — when CNA is on the eligible credential list',
-      'FSSA Gov Portal — qualifying public-assistance referrals',
-      'Job Ready Indy — Marion County residents',
-      'Self-pay and payment plans when funding is not available',
+      'Self-pay tuition and any available payment schedule',
+      'Program-specific written approval required before any agency funding is represented as available',
     ],
     eligibilityNote:
-      'Funding approval is issued by WorkOne or the referring agency. Contact WorkOne Indianapolis or our admissions team to start eligibility screening.',
+      'WIOA and Workforce Ready Grant eligibility for this CNA program is not established by the current verified registry.',
   },
   pathwaysHeading: 'Related Healthcare Pathways',
   pathways: [
@@ -157,7 +154,7 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
     {
       question: 'Can WIOA pay for CNA classes?',
       answer:
-        'Many eligible participants use WIOA funding for ETPL-approved CNA training. WorkOne determines eligibility and issues the training authorization.',
+        'Elevate’s current verified funding registry does not establish WIOA eligibility for this CNA program. Plan for self-pay unless program-specific approval and written participant authorization are confirmed.',
     },
   ],
   relatedLinks: [
@@ -295,7 +292,7 @@ export const CDL_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
   hero: {
     tag: 'CDL Class A · Indianapolis',
     heading: 'CDL Training in Indianapolis',
-    subtitle: `Prepare for a Class A commercial driver career with structured instruction and placement support. ${org} helps eligible participants navigate WIOA and state workforce funding.`,
+    subtitle: `Prepare for a Class A commercial driver career. ${org} helps eligible participants review the verified Workforce Ready Grant pathway and confirm road-training arrangements.`,
     primaryCta: { label: 'Apply for CDL Training', href: '/apply?program=cdl-training' },
     secondaryCta: { label: 'CDL Program Details', href: '/programs/cdl-training' },
   },
@@ -303,7 +300,7 @@ export const CDL_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
     { label: 'Class A CDL Pathway', detail: 'Long-haul and regional freight' },
     { label: 'ETPL Approved', detail: 'Workforce referrals' },
     { label: 'Employer Pipeline', detail: 'Logistics partners' },
-    { label: 'Funding Guidance', detail: 'WIOA & WRG support' },
+    { label: 'Funding Guidance', detail: 'Verified WRG pathway; individual approval required' },
   ],
   whoHeading: 'Who CDL Training Is For',
   whoItems: [
@@ -323,10 +320,10 @@ export const CDL_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
   funding: {
     heading: 'Funding CDL Training',
     paragraphs: [
-      'Transportation and logistics roles are frequently listed among Indiana in-demand occupations, which may support WIOA funding when WorkOne approves the training plan.',
+      'The verified program registry records Workforce Ready Grant approval for CDL training. It does not establish WIOA eligibility for this program.',
     ],
-    bullets: ['WIOA ITA', 'Workforce Ready Grant', 'Employer-sponsored training', 'Self-pay options'],
-    eligibilityNote: 'CDL licensing is issued by the Indiana BMV after meeting state requirements.',
+    bullets: ['Workforce Ready Grant with written participant authorization', 'Self-pay options; confirm current costs'],
+    eligibilityNote: 'Funding depends on participant eligibility, available funds, and written agency authorization. CDL licensing is issued by the Indiana BMV.',
   },
   pathwaysHeading: 'Related Pathways',
   pathways: [
@@ -405,11 +402,12 @@ export const BARBER_APPRENTICESHIP_INDIANAPOLIS: IndianapolisProgramHubConfig = 
   funding: {
     heading: 'Apprenticeship Funding & Costs',
     paragraphs: [
-      'Apprentices earn wages from the host shop during on-the-job training. Related technical instruction fees may be covered through workforce funding, scholarships, or self-pay depending on eligibility.',
+      'The barber apprenticeship is self-pay under the current verified funding registry. Review the published tuition, $600 deposit, and payment schedule on the exact program page.',
+      'Workplace hours and wages depend on an approved host-shop placement and employment arrangements.',
     ],
     bullets: [
-      'Paid OJT from day one at the shop',
-      'WIOA may support RTI for eligible participants',
+      'Confirm the approved placement and employment terms',
+      'No program-level WIOA or Workforce Ready Grant eligibility is established in the current registry',
       'Payment plans for self-pay learners',
     ],
     eligibilityNote: 'Barber licenses are issued by the Indiana State Board of Cosmetology and Barber Examiners.',

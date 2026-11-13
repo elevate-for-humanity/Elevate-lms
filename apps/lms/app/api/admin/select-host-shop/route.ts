@@ -31,7 +31,7 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
   const handoff = verifyPortalPreviewHandoff(handoffToken);
   const actor = handoff
     ? null
-    : await apiRequireRoles(request, ['admin', 'super_admin', 'org_admin'], {
+    : await apiRequireRoles(request, ['admin', 'super_admin'], {
         adminOverride: true,
       });
   if (actor?.error) return actor.error;
@@ -59,7 +59,7 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
       .maybeSingle();
     if (
       !handoffActor?.id ||
-      !['admin', 'super_admin', 'org_admin'].includes(String(handoffActor.role || ''))
+      !['admin', 'super_admin'].includes(String(handoffActor.role || ''))
     ) {
       return NextResponse.json({ error: 'Invalid Host Shop handoff' }, { status: 403 });
     }

@@ -69,7 +69,7 @@ export async function getMyPartnerContext() {
   let partnerRole = (partnerUser?.role || 'owner') as PartnerRole;
 
   // Platform admins may inspect a tenant selected from the Host Shop board.
-  if (!partnerId && ['admin', 'super_admin', 'org_admin'].includes(profileRole || '')) {
+  if (!partnerId && ['admin', 'super_admin'].includes(profileRole || '')) {
     const cookieStore = await cookies();
     partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
     partnerRole = 'admin';

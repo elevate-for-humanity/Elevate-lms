@@ -30,3 +30,9 @@ it('ordinary shop owners still resolve only their active approved management mem
  state.role='host_shop';state.cookie='country';state.preview={actorId:'admin',partnerId:'styles'};
  expect((await resolvePartnerForBoard(db,'owner')).id).toBe('owner-partner');
 });
+it('organization administrators cannot select another shop using the platform preview cookie',async()=>{
+ state.role='org_admin';state.cookie='foreign-partner';state.preview={actorId:'owner',partnerId:'foreign-partner'};
+ expect((await resolvePartnerForBoard(db,'owner')).id).toBe('owner-partner');
+ expect(state.filters).not.toContainEqual(['partners','id','foreign-partner']);
+ expect(state.filters).toContainEqual(['partner_users','user_id','owner']);
+});

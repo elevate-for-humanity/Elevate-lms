@@ -11,7 +11,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 const HOST_SHOP_ADMIN_COOKIE = '__efh_host_shop_partner';
-const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'org_admin']);
+const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin']);
 const HOST_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin', 'program_holder']);
 const APPRENTICE_ROLES = new Set([
   'student',

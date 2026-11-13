@@ -39,8 +39,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
     .maybeSingle();
   const actorRole = normalizeRole(actorProfile?.role);
   const isPlatformAdmin =
-    (actorRole !== null && ['super_admin', 'admin', 'org_admin'].includes(actorRole)) ||
-    auth.effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+    (actorRole !== null && ['super_admin', 'admin'].includes(actorRole)) ||
+    auth.effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role));
   const pathname = (await headers()).get('x-pathname') || '/host-shop/dashboard';
 
   // The dashboard page owns the administrator's audited-shop selection. Do not

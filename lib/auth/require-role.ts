@@ -66,7 +66,7 @@ export function scopeArchivedHostShopRoles(
     : effectiveRoles;
 }
 
-async function enforceArchivedHostShopScope(
+export async function enforceArchivedHostShopScope(
   userId: string,
   profileRole: unknown,
   effectiveRoles: UserRole[],

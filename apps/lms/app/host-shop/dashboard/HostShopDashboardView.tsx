@@ -25,7 +25,7 @@ import {
 
 async function clearAdminPartner() {
   'use server';
-  await requireRole(['super_admin', 'admin', 'org_admin']);
+  await requireRole(['super_admin', 'admin']);
   const cookieStore = await cookies();
   for (const name of [
     HOST_SHOP_ADMIN_COOKIE,
@@ -97,8 +97,8 @@ export default async function HostShopDashboardView() {
   const authoritativeActorRole = normalizeRole(actorProfile?.role);
   const isPlatformAdmin =
     (authoritativeActorRole !== null &&
-      ['super_admin', 'admin', 'org_admin'].includes(authoritativeActorRole)) ||
-    effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+      ['super_admin', 'admin'].includes(authoritativeActorRole)) ||
+    effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role));
   if (!isPlatformAdmin) await ensureCanonicalPartner(user);
 
   let board: Awaited<ReturnType<typeof getHostShopBoard>> | null = null;

@@ -13,7 +13,7 @@ export async function POST(req:Request) {
   const kind=String(body?.kind||'');
   const placement=board.apprentices.find((item:any)=>item.id===placementId);
   if(!placement || !board.shops.some((shop:any)=>shop.id===placement.shop_id)) return NextResponse.json({error:'Choose an assigned apprentice.'},{status:403});
-  const isAdmin=effectiveRoles.some((role:string)=>['admin','super_admin','org_admin'].includes(role));
+  const isAdmin=effectiveRoles.some((role:string)=>['admin','super_admin'].includes(role));
   if(!isAdmin && placement.program_slug==='barber-apprenticeship' && placement.supervisor_user_id!==user.id)
     return NextResponse.json({error:'Assigned supervisor required.'},{status:403});
   const db=await requireAdminClient();

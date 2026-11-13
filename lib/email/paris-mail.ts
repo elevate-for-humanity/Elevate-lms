@@ -77,6 +77,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     if (['sent', 'failed'].includes(existing.data.status))
       await notifyParisMailResult(db, {
         messageId: existing.data.id,
+        threadId: inbound.thread_id,
         mailboxId: mailbox.id,
         mailboxAddress: mailbox.address,
         recipient: sender,
@@ -182,6 +183,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
   if (savedError) throw new Error('PARIS delivery receipt could not be saved');
   await notifyParisMailResult(db, {
     messageId: record.id,
+    threadId: inbound.thread_id,
     mailboxId: mailbox.id,
     mailboxAddress: mailbox.address,
     recipient: sender,

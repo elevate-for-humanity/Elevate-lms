@@ -6,8 +6,13 @@ import { diagnoseAccess } from './diagnose-access.mjs';
 
 import { probeOwnedModel } from '../../lib/ai/providers/owned-model-health.mjs';
 
-export async function verifyOwnedModel(env, options={}) {
-  return probeOwnedModel({env, ...options});
+/** GitHub runners have no Google metadata server; send the workflow-minted invoker identity instead. */
+export function invokerHeaders(invokerToken) {
+  return async (_base, token) => ({Authorization:'Bearer '+token, 'Content-Type':'application/json', 'X-Serverless-Authorization':'Bearer '+invokerToken});
+}
+
+export async function verifyOwnedModel(env, {invokerToken, ...options}={}) {
+  return probeOwnedModel({env, ...(invokerToken ? {headersFor:invokerHeaders(invokerToken)} : {}), ...options});
 }
 
 /** Report binding presence only; never serialize endpoint or credential values. */
@@ -63,7 +68,7 @@ async function main() {
   const services=JSON.parse(google(['run','services','list','--project',PROJECT,'--region',region,'--format=json']));
   const admin=loadGoogleConfig('admin');
   const browser=loadGoogleConfig('studio-browser');
-  const ownedModel=await verifyOwnedModel(admin.runtimeEnvironment);
+  const ownedModel=await verifyOwnedModel(admin.runtimeEnvironment,{invokerToken:process.env.MODEL_INVOKER_TOKEN,timeoutMs:90000});
   const report={ observedAt:new Date().toISOString(), project:PROJECT, region,
     services:services.map(service=>({name:service.metadata?.name, revision:service.status?.latestReadyRevisionName})),
     ownedModel,

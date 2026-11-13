@@ -76,3 +76,12 @@ test('checks only service-scoped permissions and never includes the access crede
  assert.deepEqual(result,{verified:true,canManageInvocation:false,canInvoke:false,httpStatus:200});
  assert.ok(!JSON.stringify(result).includes('fixture-access'));
 });
+test('off-Google verification sends the workflow invoker identity instead of calling metadata',async()=>{
+  const result=await verifyOwnedModel({...env,ELEVATE_LLM_GOOGLE_IAM:'true'},{invokerToken:'invoker-fixture',request:async(url,opts)=>{
+    assert.notEqual(new URL(url).hostname,'metadata.google.internal');
+    assert.equal(opts.headers['X-Serverless-Authorization'],'Bearer invoker-fixture');
+    assert.equal(opts.headers.Authorization,'Bearer private-fixture');
+    return new Response(JSON.stringify({data:[{id:'elevate-local'}]}));
+  }});
+  assert.equal(result.verified,true);
+});

@@ -59,3 +59,22 @@ it('keeps native contact forms on the failure path when all delivery options fai
   expect(result.status).toBe(303);
   expect(result.headers.get('location')).toBe('https://www.example.test/contact?error=error');
 });
+it('preserves the same selected service in native and JSON inquiries', async () => {
+  const selected = { ...body, service: 'Esthetic services', message: 'Please contact me about availability.' };
+  await submit(selected);
+  const jsonRecord = state.insert.mock.calls[0][0];
+  state.insert.mockClear();
+  state.send.mockClear();
+  const native = await POST(new Request('https://www.example.test/api/contact', { method: 'POST', body: new URLSearchParams(selected) }));
+  expect(native.status).toBe(303);
+  expect(native.headers.get('location')).toContain('submitted=1');
+  expect(state.insert.mock.calls[0][0]).toEqual(jsonRecord);
+  expect(jsonRecord.message).toContain('Service interest: Esthetic services.');
+  expect(state.send.mock.calls[0][0].html).toContain('Service interest: Esthetic services.');
+});
+it('rejects a service outside the supported choices before storage or notification', async () => {
+  const response = await submit({ ...body, service: 'unsupported service' } as typeof body);
+  expect(response.status).toBe(400);
+  expect(state.insert).not.toHaveBeenCalled();
+  expect(state.send).not.toHaveBeenCalled();
+});

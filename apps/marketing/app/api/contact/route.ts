@@ -22,6 +22,7 @@ const ContactSchema = z.object({
   program: z.string().max(120).optional().or(z.literal('')),
   role: z.string().max(120).optional().or(z.literal('')),
   interest: z.string().max(120).optional().or(z.literal('')),
+  service: z.enum(['Nail services', 'Esthetic services', 'Opening information']).optional(),
 });
 
 // Validation schema for demo schedule form (optional fields)
@@ -125,7 +126,13 @@ async function _POST(req: Request) {
       );
     }
 
-    const data = parsed.data;
+    const data = {
+      ...parsed.data,
+      // Format both native and JSON submissions here so neither loses the selection.
+      message: parsed.data.interest === 'mesmerized-downtown-client' && parsed.data.service
+        ? `Mesmerized by Beauty downtown client inquiry. Service interest: ${parsed.data.service}. ${parsed.data.message}`
+        : parsed.data.message,
+    };
 
     // Try to save to database (non-blocking - form should work even without DB)
     let dbSaved = false;

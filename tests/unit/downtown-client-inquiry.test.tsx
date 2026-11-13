@@ -17,7 +17,7 @@ it('sends a service inquiry to contact intake rather than student applications',
   await screen.findByRole('status');
   const [url, request] = fetcher.mock.calls[0];
   expect(url).toBe('/api/contact');
-  expect(JSON.parse(request.body)).toMatchObject({ role: 'beauty-service-client', interest: 'mesmerized-downtown-client' });
+  expect(JSON.parse(request.body)).toMatchObject({ role: 'beauty-service-client', interest: 'mesmerized-downtown-client', service: 'Nail services', message: 'I am interested in downtown nail services.' });
   expect(screen.getByRole('status')).toHaveTextContent('This is not an appointment booking');
 });
 it('preserves entered details and avoids success claims when receipt fails', async () => {

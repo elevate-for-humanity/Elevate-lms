@@ -39,6 +39,7 @@ describe('Host Shop mobile media loading', () => {
     const video = screen.getByLabelText('Tour shop shop video');
     expect(video.getAttribute('src')).toBe('/tour.mp4');
     expect(video.getAttribute('preload')).toBe('none');
+    expect((video as HTMLVideoElement).muted).toBe(false);
     expect(document.querySelectorAll('img')).toHaveLength(0);
   });
 });

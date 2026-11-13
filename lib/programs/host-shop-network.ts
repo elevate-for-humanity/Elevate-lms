@@ -115,8 +115,8 @@ export async function getHostShopNetwork(includeOnboarding = false): Promise<Hos
       image: gallery[0]?.url,
       logo: shop.logoUrl || (publicProfile && 'logo' in publicProfile ? publicProfile.logo : undefined) || featured?.media?.find((item) => /\/logo\./.test(item.src))?.src,
       videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
-      videoScript: featured?.media?.find((item) => item.kind === 'video' && item.src === (shop.videoUrl || featured?.media?.find((media) => media.kind === 'video')?.src))?.script ||
-        `Welcome to ${featured?.dba ?? shop.name} in ${shop.city || featured?.city || 'Indiana'}. ${featured?.marketingBlurb || publicProfile?.businessDescription || shop.description || ''} Explore the shop in this video, then view its portfolio and business links. Contact the shop directly for services, appointments, hours and availability. Contact Elevate separately about apprenticeship placement and enrollment.`,
+      // Only intentionally scripted assets replace their recorded audio with narration.
+      videoScript: featured?.media?.find((item) => item.kind === 'video' && item.src === (shop.videoUrl || featured?.media?.find((media) => media.kind === 'video')?.src))?.script,
       gallery,
       website: shop.website || featured?.websiteUrl || publicProfile?.website || undefined,
       social:

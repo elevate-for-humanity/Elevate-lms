@@ -17,7 +17,7 @@ export default function DowntownClientInquiry() {
         body: JSON.stringify({
           name: data.get('name'), email: data.get('email'), phone: data.get('phone'),
           role: 'beauty-service-client', interest: 'mesmerized-downtown-client',
-          message: `Mesmerized by Beauty downtown client inquiry. Service interest: ${data.get('service')}. ${data.get('message') || ''}`,
+          service: data.get('service'), message: data.get('message'),
         }),
       });
       const result = await response.json();

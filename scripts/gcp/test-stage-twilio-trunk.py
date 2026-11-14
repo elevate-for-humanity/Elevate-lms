@@ -63,7 +63,7 @@ class CarrierInstallation(unittest.TestCase):
         (root / 'extensions.conf').write_text('; Preserve user routing\n')
         return root, Path(directory) / 'rollback'
 
-    def command(self, calls, endpoint='media_encryption : sdes', transport='protocol : tls\nverify_server : true'):
+    def command(self, calls, endpoint='media_encryption : sdes\ntrust_id_inbound : true', transport='protocol : tls\nverify_server : true'):
         def execute(args):
             calls.append(args[-1])
             outputs = {'core show channels count': '0 active calls\n0 active channels',
@@ -84,6 +84,15 @@ class CarrierInstallation(unittest.TestCase):
             self.assertEqual((backup / 'pjsip.conf').read_bytes(), original)
             self.assertEqual((backup / 'pjsip.conf').stat().st_mode & 0o777, 0o600)
             self.assertEqual(calls.count('pjsip reload'), 2)
+
+    def test_identity_readback_failure_rolls_back_legacy_fragment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, backup = self.fixture(directory)
+            fragment = root / 'elevate-twilio.conf'
+            fragment.write_text(trunk.LEGACY_CONFIG)
+            with self.assertRaisesRegex(ValueError, 'live_inbound_caller_identity_not_confirmed'):
+                trunk.install_endpoint(root, backup, self.command([], endpoint='media_encryption : sdes\ntrust_id_inbound : false'))
+            self.assertEqual(fragment.read_text(), trunk.LEGACY_CONFIG)
 
     def test_active_calls_prevent_configuration_writes(self):
         with tempfile.TemporaryDirectory() as directory:

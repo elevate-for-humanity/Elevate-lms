@@ -32,7 +32,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Dev Studio container configuration regressions
-        run: node --test tests/devstudio-jsonc.test.mjs
+        run: node --test tests/devstudio-jsonc.test.mjs tests/studio-model-health-budget.test.mjs
       - name: Install dependencies
         id: dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false

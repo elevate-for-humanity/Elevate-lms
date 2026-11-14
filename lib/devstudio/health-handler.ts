@@ -6,7 +6,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { getGoogleServices, isGoogleRuntimeReady, googleProjectId } from '@/lib/google/runtime';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState, readAIHealthSecrets } from '@/lib/ai/provider-runtime';
-import { runHealthProbe, waitForHealthSignal, STUDIO_HEALTH_BUDGET_MS, STUDIO_HEALTH_SECRET_MS } from './health-probes.mjs';
+import { runHealthProbe, waitForHealthSignal, STUDIO_HEALTH_BUDGET_MS, STUDIO_HEALTH_SECRET_MS, STUDIO_HEALTH_MODEL_MS } from './health-probes.mjs';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
@@ -48,7 +48,7 @@ async function collectHealthSnapshot(): Promise<Record<string, unknown>> {
     // nor serializes the independent GitHub check behind a sleeping model.
     const secrets = readAIHealthSecrets(AbortSignal.any([overall.signal, secretRead.signal]));
     const [aiProbe, cloudflareResult, githubProbe] = await Promise.all([
-      runHealthProbe(async signal => resolveAIRuntimeState({ signal, secrets: await waitForHealthSignal(secrets, signal) }), { signal: overall.signal }),
+      runHealthProbe(async signal => resolveAIRuntimeState({ signal, secrets: await waitForHealthSignal(secrets, signal), ownedModelTimeoutMs: STUDIO_HEALTH_MODEL_MS }), { signal: overall.signal }),
       runHealthProbe(async signal => probeCloudflareWorkersAI({ signal, secrets: await waitForHealthSignal(secrets, signal) }), { signal: overall.signal }),
       runHealthProbe(probeGitHub, { signal: overall.signal }),
     ]);

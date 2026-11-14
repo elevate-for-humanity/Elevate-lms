@@ -26,7 +26,7 @@ const HEALTH_SECRET_KEYS = [...PROVIDER_SECRET_KEYS, 'AI_PROVIDER', 'AI_PROVIDER
   'ELEVATE_LLM_GPU_URL', 'ELEVATE_LLM_GPU_SECRET', 'ELEVATE_LLM_GOOGLE_IAM', 'ELEVATE_LLM_GPU_GOOGLE_IAM',
   'PARIS_GPU_ENABLED', 'PARIS_INFERENCE_TIER'] as const;
 type HealthSecrets = Partial<Record<(typeof HEALTH_SECRET_KEYS)[number], string | undefined>>;
-type HealthProbeOptions = { signal?: AbortSignal; secrets?: HealthSecrets | Promise<HealthSecrets> };
+type HealthProbeOptions = { signal?: AbortSignal; secrets?: HealthSecrets | Promise<HealthSecrets>; ownedModelTimeoutMs?: number };
 
 /** One scoped read supplies both independent AI probes without broad hydration. */
 export function readAIHealthSecrets(signal?: AbortSignal) {
@@ -151,7 +151,7 @@ export async function resolveAIRuntimeState(options: HealthProbeOptions = {}) {
   const configuredProvider = options.secrets
     ? ['elevate', 'gemini', 'google', 'groq', 'xai', 'cloudflare', 'openai', 'anthropic', 'azure', 'none'].includes(selected) ? selected : 'invalid'
     : activeProvider;
-  const ownedModel = await probeOwnedModel({ env: { ...process.env, ...secrets }, signal: options.signal });
+  const ownedModel = await probeOwnedModel({ env: { ...process.env, ...secrets }, signal: options.signal, timeoutMs: options.ownedModelTimeoutMs });
 
   return {
     providers,

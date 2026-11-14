@@ -166,5 +166,14 @@ describe('Host Shop E2E identity isolation', () => {
     expect(desktop).toContain('E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL || secrets.TEST_HOST_SHOP_EMAIL }}');
     expect(desktop).toContain('E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD || secrets.TEST_HOST_SHOP_PASSWORD }}');
     expect(desktop).not.toMatch(/E2E_HOST_SHOP_(?:EMAIL|PASSWORD):[^\r\n]*(?:ADMIN|PROGRAM_HOLDER|STUDENT)/);
+    expect(desktop).toContain('Authenticated Host Shop desktop, tablet and mobile geometry');
+    expect(desktop).toContain('env.E2E_HOST_SHOP_EMAIL !=');
+    expect(desktop).toContain('env.E2E_HOST_SHOP_PASSWORD !=');
+    expect(desktop).toContain('tests/e2e/portal-responsive-design.spec.ts');
+    for (const device of ['desktop-chrome', 'tablet-chrome', 'android-chrome', 'iphone-webkit']) {
+      expect(desktop).toContain('--project=' + device);
+    }
+    expect(desktop.indexOf('Authenticated Host Shop desktop, tablet and mobile geometry'))
+      .toBeLessThan(desktop.indexOf('Run desktop-chrome E2E (marketing, admin, lms)'));
   });
 });

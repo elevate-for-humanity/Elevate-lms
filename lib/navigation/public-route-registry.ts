@@ -27,6 +27,10 @@ export type PublicRouteDefinition = {
 const changed = '2026-08-29T00:00:00-04:00';
 
 export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
+  { path: '/partners/host-shops/barber', label: 'Barber Host Shops', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.83, lastModified: '2026-11-14T00:00:00-06:00', index: true },
+  { path: '/partners/host-shops/cosmetology', label: 'Cosmetology Host Salons', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.83, lastModified: '2026-11-14T00:00:00-06:00', index: true },
+  { path: '/partners/host-shops/esthetician', label: 'Esthetics Host Spas', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.83, lastModified: '2026-11-14T00:00:00-06:00', index: true },
+  { path: '/partners/host-shops/nail-technician', label: 'Nail Technician Host Studios', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.83, lastModified: '2026-11-14T00:00:00-06:00', index: true },
   { path: ROUTES.curvatureBodySculpting, label: 'Curvature Body Sculpting / Meri-Gold-Round', category: 'Store', changeFrequency: 'weekly', priority: 0.7, lastModified: '2026-11-06T00:00:00-05:00', index: true },
   { path: '/employers/directory', label: 'Employer Directory', category: 'Employers', changeFrequency: 'weekly', priority: 0.7, lastModified: '2026-11-02T00:00:00-05:00', index: true },
   { path: '/about/elizabeth-greene', label: 'Elizabeth Greene — Founder', category: 'About', changeFrequency: 'monthly', priority: 0.8, lastModified: '2026-11-02T00:00:00-05:00', index: true },

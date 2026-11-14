@@ -24,7 +24,11 @@ describe('NAV_ITEMS structure', () => {
     const programs = NAV_ITEMS.find(i => i.id === 'programs');
     expect(programs?.subItems?.some(item => item.name === 'Healthcare')).toBe(true);
     expect(programs?.subItems?.some(item => item.isHeader)).toBe(false);
-    expect(programs?.subItems?.length).toBeLessThanOrEqual(7);
+    // Four independent beauty trades are intentionally visible alongside existing program hubs.
+    expect(programs?.subItems?.length).toBeLessThanOrEqual(10);
+    for (const href of ['/programs/barber-apprenticeship', '/programs/cosmetology-apprenticeship', '/programs/esthetician-apprenticeship', '/programs/nail-technician-apprenticeship']) {
+      expect(programs?.subItems?.some(item => item.href === href)).toBe(true);
+    }
   });
 
   it('includes core main menu sections', () => {

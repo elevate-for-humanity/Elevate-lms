@@ -65,7 +65,7 @@ test('a workflow file is actually written with App authority and cannot fall bac
 });
 
 const candidate = { branch: { name: 'studio/repair-abc', sha: 'b'.repeat(40) }, summary: 'Correct Store disk capacity.' };
-test('independently validated infrastructure edits create a PR and enable protected auto-merge', async () => {
+test('independently validated infrastructure edits create a PR without arming automatic merge', async () => {
   const calls = [];
   const github = async (path, init) => {
     calls.push([path, init]);
@@ -79,7 +79,7 @@ test('independently validated infrastructure edits create a PR and enable protec
   assert.equal(result.headSha, candidate.branch.sha);
   assert.ok(calls.some(([path, init]) => path === '/pulls' && JSON.parse(init.body).base === 'main'));
   assert.equal(calls.some(([path]) => path === '/git/refs/heads/main'), false);
-  assert.match(mutations[0].query, /enablePullRequestAutoMerge/);
+  assert.deepEqual(mutations, [], 'publication must wait for independent review and required checks');
 });
 
 test('a changed candidate cannot be published and a pending PR cannot be reported as merged', async () => {
@@ -90,13 +90,25 @@ test('a changed candidate cannot be published and a pending PR cannot be reporte
   assert.throws(() => infrastructureMergeEvidence({ ...pr, head: { sha: 'd'.repeat(40) } }, candidate.branch.sha), /PULL_REQUEST_CHANGED/);
 });
 
-test('publication reuses the same PR and propagates a protected auto-merge rejection', async () => {
+test('publication reuses the same PR without requesting automatic merge', async () => {
   const existing = { number: 7, node_id: 'PR_7', state: 'open', base: { ref: 'main' }, head: { sha: candidate.branch.sha }, html_url: 'https://github.com/example/pull/7' };
   const github = async (path, init) => {
     assert.equal(init, undefined, 'existing PR must not be duplicated');
     return path.startsWith('/git/ref/') ? { object: { sha: candidate.branch.sha } } : [existing];
   };
-  await assert.rejects(openInfrastructureRepair({ candidate, repairId: 'id', github, graphql: async () => { throw Error('Protected merge rejected'); } }), /Protected merge rejected/);
+  const result = await openInfrastructureRepair({ candidate, repairId: 'id', github, graphql: async () => { assert.fail('publication must not request automatic merge'); } });
+  assert.deepEqual(result, { number: 7, url: existing.html_url, headSha: candidate.branch.sha });
+});
+
+test('a rejected PR creation cannot produce a publication receipt', async () => {
+  const github = async (path, init) => {
+    if (path.startsWith('/git/ref/')) return { object: { sha: candidate.branch.sha } };
+    if (path.startsWith('/pulls?')) return [];
+    assert.equal(path, '/pulls');
+    assert.equal(init.method, 'POST');
+    throw Error('Protected publication rejected');
+  };
+  await assert.rejects(openInfrastructureRepair({ candidate, repairId: 'id', github }), /Protected publication rejected/);
 });
 
 test('infrastructure completion also requires the Store release workflow', () => {

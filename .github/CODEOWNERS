@@ -23,6 +23,17 @@
 /app/admin/ @elevateforhumanity
 /app/api/admin/ @elevateforhumanity
 
+# Current Next.js applications use /apps/, not the legacy /app/ paths.
+# Keep existing owners until a distinct authorized reviewer is granted write access.
+# CODEOWNERS does not independently enforce approval; protect main with required reviews.
+/apps/admin/ @elevateforhumanity
+/apps/admin/app/api/ @elevateforhumanity
+/apps/lms/ @elevateforhumanity
+/apps/marketing/ @elevateforhumanity
+/lib/devstudio/openhands/ @elevateforhumanity
+/tests/unit/openhands-* @elevateforhumanity
+/tests/worker/openhands-* @elevateforhumanity
+
 # Serverless functions
 /netlify/functions/ @elevateforhumanity
 /supabase/functions/ @elevateforhumanity

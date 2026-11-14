@@ -41,7 +41,7 @@ jobs:
         with: {skip_install: true}
       - name: Assert synthetic audio, video, screen share and data receipt in an isolated temporary room
         run: node scripts/gcp/verify-live-meeting-delivery.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: live-meeting-delivery-${{ github.sha }}

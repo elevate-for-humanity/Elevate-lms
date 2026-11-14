@@ -131,7 +131,7 @@ jobs:
         run: |
           git fetch --unshallow origin || git fetch --depth=10000 origin main
           node scripts/audits/october-course-builder-diff-inventory.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: october-course-builder-full-diff-evidence
           path: |

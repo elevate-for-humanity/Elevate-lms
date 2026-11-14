@@ -72,7 +72,7 @@ jobs:
         run: |
           set -o pipefail
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py | tee audit-reports/phone-work.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: paid-workload-functional-evidence-${{ github.run_id }}

@@ -93,7 +93,7 @@ jobs:
             --command='sudo python3 -' < scripts/gcp/audit-pbx-runtime.py | tee pbx-runtime-evidence.json
       - name: Preserve sanitized installation and runtime evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pbx-runtime-stage-evidence
           path: pbx-*-evidence.json

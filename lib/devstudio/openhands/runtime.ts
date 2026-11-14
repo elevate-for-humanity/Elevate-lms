@@ -91,6 +91,9 @@ async function attachStartTask(
       tool_output: external,
       result_json: { ok: true, status: 'running', external_run: external },
       error_message: null,
+      // A new external execution needs its own timeout origin; otherwise a
+      // retry inherits the first attempt's age and can fail immediately.
+      started_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
     .eq('id', taskId);

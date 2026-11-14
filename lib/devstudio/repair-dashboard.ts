@@ -20,7 +20,7 @@ export function repairDashboardReceipt(row: any, task: any, actorId: string) {
   const workflow = Number.isSafeInteger(row.workflow_run_id) && row.workflow_run_id > 0 ? row.workflow_run_id : null;
   const branch = candidate?.branch?.name ?? candidate?.checkpoint?.branch;
   const changedFiles = Array.isArray(candidate?.changed_files) ? candidate.changed_files.filter((path: unknown) =>
-    typeof path === 'string' && path.length <= 300 && /^(?:lib|components|apps|tests|workers|scripts|remotion-src|\.github)\/[A-Za-z0-9_./()[\]@-]+$/.test(path) &&
+    typeof path === 'string' && path.length <= 300 && /^(?:(?:lib|components|apps|tests|workers|scripts|remotion-src|\.github)\/[A-Za-z0-9_./()[\]@-]+|Dockerfile\.(?:admin|lms|marketing))$/.test(path) &&
     !path.split('/').includes('..')).slice(0, 100) : [];
   const approvalStatus = owned && ['pending','approved','rejected','not_required'].includes(task.approval_status)
     ? task.approval_status : 'unverified';

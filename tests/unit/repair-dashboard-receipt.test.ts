@@ -43,6 +43,14 @@ it('does not turn arbitrary diagnostics or malformed links into browser evidence
  const row={...repair(),error_code:'error token=SECRET',workflow_run_id:-1,candidate:{changed_files:['lib/safe.ts','lib/../../secret','https://evil.test/key','lib/private?token=SECRET']},verification:{pullRequest:{number:-1,url:'https://evil.test'}}};
  expect(repairDashboardReceipt(row,null,'owner')).toMatchObject({blockerCode:null,workflowUrl:null,pullRequest:null,changedFiles:['lib/safe.ts']});
 });
+it('shows permitted root Dockerfiles alongside regression tests without widening root path access',()=>{
+ const changed_files=['Dockerfile.admin','Dockerfile.lms','Dockerfile.marketing','tests/admin-container.test.ts',
+  'Dockerfile','Dockerfile.admin.bak','Dockerfile.other','Dockerfile.admin/../secret',
+  '../Dockerfile.admin','/Dockerfile.admin','Dockerfile.admin?token=SECRET','package.json','.env'];
+ expect(repairDashboardReceipt({...repair(),candidate:{changed_files}},null,'owner').changedFiles).toEqual([
+  'Dockerfile.admin','Dockerfile.lms','Dockerfile.marketing','tests/admin-container.test.ts',
+ ]);
+});
 it('actual route scopes both repair and canonical task reads to the authenticated owner',async()=>{
  const response=await GET(new NextRequest('https://admin.test/api/admin/dev-studio/engineering'));
  expect(response.status).toBe(200);

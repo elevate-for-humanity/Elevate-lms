@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BEAUTY_TRADES } from '@/lib/programs/beauty-trade-navigation';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
@@ -26,6 +27,9 @@ export default async function HostShopsPage() {
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-red-300">Elevate for Humanity · Host Shop Network</p>
           <h1 className="mt-4 max-w-4xl text-4xl font-black leading-tight tracking-tight sm:text-6xl">Find the right training environment for your craft.</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">Choose your trade below to see businesses approved for that occupation. Every shop has its own profile, photos and contact information. Placement availability is confirmed separately.</p>
+          <div className="relative mt-8 aspect-[16/7] max-w-3xl overflow-hidden rounded-2xl border border-white/20 bg-slate-800">
+            <Image src="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" alt="Professional barbers at an approved Elevate apprenticeship Host Shop" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
+          </div>
           <Link href="/partners/host-shop/apply" className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-white px-6 font-bold text-slate-950 hover:bg-slate-100">
             Own a shop? Apply to host apprentices — Free
           </Link>

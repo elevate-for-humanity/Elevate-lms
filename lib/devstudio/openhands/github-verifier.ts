@@ -170,8 +170,28 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         );
         ancestryVerified = ['ahead', 'identical'].includes(ancestry.status ?? '');
       }
+      // Verify the *effective* protected-main rules. A PR being merged does
+      // not itself prove a required independent review was enforced.
+      let protectionVerified = false;
+      try {
+        const rules = await gh<Array<{
+          type?: string;
+          parameters?: {
+            required_approving_review_count?: number;
+            required_status_checks?: Array<unknown>;
+          };
+        }>>(`/repos/${repository}/rules/branches/main`, token);
+        const enforcedReviews = rules.some(rule => rule.type === 'pull_request' &&
+          Number(rule.parameters?.required_approving_review_count ?? 0) >= 1);
+        const enforcedChecks = rules.some(rule => rule.type === 'required_status_checks' &&
+          (rule.parameters?.required_status_checks?.length ?? 0) > 0);
+        protectionVerified = enforcedReviews && enforcedChecks;
+      } catch {
+        // Missing permissions to inspect branch protections are not PASS.
+        reasons.push(`PR #${number} main branch protection readback unavailable.`);
+      }
       const protectedAcceptance = evaluateProtectedPullRequest({
-        pr, reviews, checks: checkRuns, ancestryVerified,
+        pr, reviews, checks: checkRuns, ancestryVerified, protectionVerified,
       });
       if (!protectedAcceptance.accepted) {
         reasons.push(`PR #${number} lacks protected acceptance: ${protectedAcceptance.reasons.join('; ')}.`);

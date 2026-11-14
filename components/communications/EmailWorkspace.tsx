@@ -307,6 +307,16 @@ export function EmailWorkspace({
       }
       setCompose(null);
       setFiles([]);
+      // Keep a newly sent conversation selected after refresh and PWA resume.
+      // Clear a stale thread when a bulk send has no individual thread ID.
+      const url = new URL(window.location.href);
+      url.searchParams.set('mailboxId', data.selectedMailboxId);
+      if (typeof payload.threadId === 'string' && payload.threadId) {
+        url.searchParams.set('threadId', payload.threadId);
+      } else {
+        url.searchParams.delete('threadId');
+      }
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
       await load(data.selectedMailboxId, payload.threadId);
       if (payload.warning) setError(payload.warning);
       else

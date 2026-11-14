@@ -12,6 +12,8 @@ test('CI does not skip independent preflight tests after an earlier failure',()=
   if(!section.includes('\n        run:')&&!section.includes('\n        uses:'))continue;
   assert.match(section,/if: \$\{\{ !cancelled\(\) && steps\.dependencies\.outcome == 'success'/,
     'Missing independent execution condition: '+section.split('\n')[0]);
+  assert.ok(preflight.indexOf(section)>preflight.indexOf('      - name: Install dependencies'),
+    'Dependency outcome checked before installation: '+section.split('\n')[0]);
   checked++;
  }
  assert.ok(checked>=40,'Expected comprehensive preflight coverage');

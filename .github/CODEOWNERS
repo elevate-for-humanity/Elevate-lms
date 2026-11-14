@@ -31,8 +31,8 @@
 /apps/lms/ @elevateforhumanity
 /apps/marketing/ @elevateforhumanity
 /lib/devstudio/openhands/ @elevateforhumanity
-/tests/unit/openhands- @elevateforhumanity
-/tests/worker/openhands- @elevateforhumanity
+/tests/unit/openhands-* @elevateforhumanity
+/tests/worker/openhands-* @elevateforhumanity
 
 # Serverless functions
 /netlify/functions/ @elevateforhumanity

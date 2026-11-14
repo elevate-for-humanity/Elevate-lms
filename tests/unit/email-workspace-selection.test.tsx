@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
 
 const mailbox = {
@@ -82,16 +82,69 @@ it('does not let an older mailbox response replace the current mailbox or its de
   await waitFor(() =>
     expect(new URL(window.location.href).searchParams.get('mailboxId')).toBe('admissions'),
   );
-  resolveOld({
-    ok: true,
-    json: async () => ({
-      ...base,
-      selectedMailboxId: 'stale-private-box',
-      selectedThread: { ...thread, messages: [] },
-    }),
+  await act(async () => {
+    resolveOld({
+      ok: true,
+      json: async () => ({
+        ...base,
+        selectedMailboxId: 'stale-private-box',
+        selectedThread: { ...thread, messages: [] },
+      }),
+    });
   });
   await waitFor(() =>
     expect(screen.queryByRole('heading', { name: thread.subject })).not.toBeInTheDocument(),
   );
   expect(new URL(window.location.href).searchParams.get('mailboxId')).toBe('admissions');
+});
+
+it('restores the saved folder and search when the PWA reloads', async () => {
+  window.history.replaceState({}, '', '/email?view=sent&q=class&mailboxId=admissions');
+  const fetchMock = vi.fn(async (_input: string) => ({
+    ok: true,
+    json: async () => ({ ...base, selectedThread: null }),
+  }));
+  vi.stubGlobal('fetch', fetchMock);
+  render(<EmailWorkspace initialMailboxId="admissions" />);
+  await screen.findByRole('heading', { name: 'Sent' });
+  expect(screen.getByRole('textbox', { name: 'Search mail' })).toHaveValue('class');
+  const request = new URL(String(fetchMock.mock.calls[0][0]), window.location.origin);
+  expect(request.searchParams.get('view')).toBe('sent');
+  expect(request.searchParams.get('q')).toBe('class');
+});
+
+it('reports a read-status failure instead of silently ignoring it', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (input: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH')
+        return { ok: false, json: async () => ({ error: 'Unavailable' }) };
+      const url = new URL(input, window.location.origin);
+      return {
+        ok: true,
+        json: async () => ({
+          ...base,
+          selectedThread: url.searchParams.has('threadId') ? { ...thread, messages: [] } : null,
+        }),
+      };
+    }),
+  );
+  render(<EmailWorkspace />);
+  fireEvent.click(await screen.findByRole('button', { name: /Applicant.*Enrollment question/ }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('read status could not be saved');
+});
+
+it('does not mark a conversation read when opening it fails', async () => {
+  const fetchMock = vi.fn(async (input: string) => {
+    const url = new URL(input, window.location.origin);
+    return url.searchParams.has('threadId')
+      ? { ok: false, json: async () => ({ error: 'Conversation unavailable' }) }
+      : { ok: true, json: async () => ({ ...base, selectedThread: null }) };
+  });
+  vi.stubGlobal('fetch', fetchMock);
+  render(<EmailWorkspace />);
+  fireEvent.click(await screen.findByRole('button', { name: /Applicant.*Enrollment question/ }));
+  await screen.findByText('Conversation unavailable');
+  expect(new URL(window.location.href).searchParams.get('threadId')).toBeNull();
+  expect(fetchMock).toHaveBeenCalledTimes(2);
 });

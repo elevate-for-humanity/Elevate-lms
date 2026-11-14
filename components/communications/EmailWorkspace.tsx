@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { createBrowserSpeechRecognition, type BrowserSpeechRecognition } from '@/lib/browser/speech-recognition';
+import { MAIL_VIEWS } from '@/lib/email/mail-management';
 
 type Mailbox = {
   id: string;
@@ -215,7 +216,7 @@ export function EmailWorkspace({
       try {
         const response = await fetch(`${apiPath}?${params.toString()}`, { cache: 'no-store' });
         const payload = await response.json().catch(() => ({}));
-        if (requestId !== requestSequence.current) return;
+        if (requestId !== requestSequence.current) return false;
         if (!response.ok) setError(payload.error || 'Email could not be loaded.');
         else {
           setData(payload);
@@ -228,22 +229,39 @@ export function EmailWorkspace({
           if (payload.selectedThread?.id)
             url.searchParams.set('threadId', payload.selectedThread.id);
           else url.searchParams.delete('threadId');
+          const acceptedView = params.get('view') || 'inbox';
+          if (acceptedView === 'inbox') url.searchParams.delete('view');
+          else url.searchParams.set('view', acceptedView);
+          if (params.get('q')) url.searchParams.set('q', params.get('q')!);
+          else url.searchParams.delete('q');
           window.history.replaceState(
             window.history.state,
             '',
             url.pathname + url.search + url.hash,
           );
         }
+        setLoading(false);
+        return response.ok;
       } catch {
-        if (requestId !== requestSequence.current) return;
+        if (requestId !== requestSequence.current) return false;
         setError('Email could not be loaded. Try Refresh.');
       }
       setLoading(false);
+      return false;
     },
     [apiPath],
   );
 
   useEffect(() => {
+    const params = new URL(window.location.href).searchParams;
+    const savedView = params.get('view') || 'inbox';
+    const validView =
+      (MAIL_VIEWS as readonly string[]).includes(savedView) ||
+      /^folder:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(savedView);
+    viewRef.current = validView ? savedView : 'inbox';
+    searchRef.current = (params.get('q') || '').slice(0, 160);
+    setView(viewRef.current);
+    setSearch(searchRef.current);
     void load(initialMailboxId, initialThreadId);
   }, [initialMailboxId, initialThreadId, load]);
 
@@ -254,18 +272,29 @@ export function EmailWorkspace({
 
   async function openThread(threadId: string) {
     if (!data?.selectedMailboxId) return;
-    // Keep the exact message selectable when the PWA resumes or is refreshed.
-    const url = new URL(window.location.href);
-    url.searchParams.set('mailboxId', data.selectedMailboxId);
-    url.searchParams.set('threadId', threadId);
-    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
-    await load(data.selectedMailboxId, threadId);
-    if (!data.readOnly) {
-      void fetch(apiPath, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ threadId }),
-      });
+    const opened = await load(data.selectedMailboxId, threadId);
+    if (opened && !data.readOnly) {
+      const readRequest = requestSequence.current;
+      try {
+        const response = await fetch(apiPath, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ threadId }),
+        });
+        if (!response.ok) throw new Error('Read status update failed');
+        setData((current) => current?.selectedMailboxId === data.selectedMailboxId ? {
+          ...current,
+          threads: current.threads.map((thread) =>
+            thread.id === threadId ? { ...thread, unread: false } : thread),
+          selectedThread: current.selectedThread?.id === threadId
+            ? { ...current.selectedThread, unread: false } : current.selectedThread,
+        } : current);
+      } catch {
+        if (readRequest === requestSequence.current)
+          setError(
+            'The email opened, but its read status could not be saved. Open the conversation again to retry.',
+          );
+      }
     }
   }
 
@@ -383,10 +412,6 @@ export function EmailWorkspace({
     viewRef.current = next;
     setView(next);
     setSelected([]);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('threadId');
-    if (mailboxId) url.searchParams.set('mailboxId', mailboxId);
-    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
     void load(mailboxId);
   }
   async function saveDraft() {
@@ -940,12 +965,7 @@ export function EmailWorkspace({
                 <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 p-3 sm:gap-3 sm:p-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      const url = new URL(window.location.href);
-                      url.searchParams.delete('threadId');
-                      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
-                      void load(data.selectedMailboxId);
-                    }}
+                    onClick={() => void load(data.selectedMailboxId)}
                     className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-300 md:hidden"
                     aria-label="Back to inbox"
                   >

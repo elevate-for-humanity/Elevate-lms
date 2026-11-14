@@ -163,11 +163,13 @@ export async function processInterofficeOutbox(limit = 20) {
             text: row.body,
             html: textToEmailHtml(row.body),
             envelopeRecipients: addresses,
-            eventId: `outbox-copy:${row.campaign_key}`,
+            // Each recipient delivery owns its copy. A campaign can contain
+            // several recipients whose memberships reach the same mailbox.
+            eventId: `outbox-copy:${row.id}`,
             attachments: [],
             headers: '',
           },
-          { internalCopy: true },
+          { internalCopy: true, applicantEmail: row.recipient_email },
         );
     }
     if (result.success) sent++;

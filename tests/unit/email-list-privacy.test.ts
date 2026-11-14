@@ -74,3 +74,24 @@ it('returns a bounded text preview and scopes the latest-message embed to the au
     args: [1, { referencedTable: 'latest_mail' }],
   });
 });
+
+it('rejects excess attachments before creating a partial message or sending it', async () => {
+  const { handleCommunicationEmailPost } = await import('@/lib/email/communication-email-api');
+  const { sendEmail } = await import('@/lib/email/sendgrid');
+  vi.mocked(sendEmail).mockClear();
+  const form = new FormData();
+  form.set('mailboxId', 'authorized-box');
+  form.set('to', 'recipient@example.org');
+  form.set('subject', 'All documents');
+  form.set('body', 'Please review every attachment.');
+  for (let i = 0; i < 11; i++)
+    form.append('attachments', new File(['document'], `document-${i}.txt`, { type: 'text/plain' }));
+  const request = new Request('https://app.example.org/api/communications/email', {
+    method: 'POST',
+  });
+  vi.spyOn(request, 'formData').mockResolvedValue(form);
+  const response = await handleCommunicationEmailPost(request);
+  expect(response.status).toBe(400);
+  expect(await response.json()).toEqual({ error: 'Attach no more than 10 files per email.' });
+  expect(sendEmail).not.toHaveBeenCalled();
+});

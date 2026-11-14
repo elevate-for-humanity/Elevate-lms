@@ -336,11 +336,11 @@ export async function handleCommunicationEmailGet(
 function formFiles(form: FormData): File[] {
   return form
     .getAll('attachments')
-    .filter((value): value is File => value instanceof File && value.size > 0)
-    .slice(0, 10);
+    .filter((value): value is File => value instanceof File && value.size > 0);
 }
 
 async function validateFiles(files: File[]): Promise<string | null> {
+  if (files.length > 10) return 'Attach no more than 10 files per email.';
   const total = files.reduce((sum, file) => sum + file.size, 0);
   if (total > MAX_TOTAL_ATTACHMENT_BYTES) return 'Attachments may not exceed 20 MB total.';
   for (const file of files) {

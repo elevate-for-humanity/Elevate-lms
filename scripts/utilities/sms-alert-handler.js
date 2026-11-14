@@ -16,13 +16,14 @@
   See LICENSE file for details.
 */
 
+const { getAlertPhone, requireAlertPhone } = require('./phone-config.cjs');
 const fs = require('fs');
 const path = require('path');
 
 // SMS Alert System for EFH Marketplace
 class SMSAlertHandler {
   constructor() {
-    this.phoneNumber = '3177607908';
+    this.phoneNumber = getAlertPhone();
     this.twilio = null;
     this.initialized = false;
     this.init();
@@ -47,6 +48,7 @@ class SMSAlertHandler {
     const fullMessage = `🚀 EFH Alert [${type.toUpperCase()}]: ${message} - ${timestamp}`;
 
     try {
+      const recipient = requireAlertPhone(this.phoneNumber);
       if (this.mockMode || !this.initialized) {
         // Mock mode - log to console and file
         this.logAlert(fullMessage);
@@ -57,7 +59,7 @@ class SMSAlertHandler {
       const result = await this.client.messages.create({
         body: fullMessage,
         from: process.env.TWILIO_PHONE_NUMBER || '+15551234567',
-        to: `+1${this.phoneNumber}`,
+        to: recipient,
       });
 
       this.logAlert(`SMS SENT: ${fullMessage} (SID: ${result.sid})`);

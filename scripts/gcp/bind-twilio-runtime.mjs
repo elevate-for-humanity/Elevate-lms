@@ -7,6 +7,10 @@ const PHONE_SID = 'PN98930da7084d809ab410e1ece0115632';
 
 export function mergeTwilioBindings(config, bindings) {
   const next = structuredClone(config);
+  // Retired carrier settings must not survive a verified Twilio runtime update.
+  for (const key of Object.keys(next.runtimeEnvironment)) {
+    if (/^TELNYX_/i.test(key)) delete next.runtimeEnvironment[key];
+  }
   for (const [key, value] of Object.entries(bindings)) {
     if (key !== 'TWILIO_PHONE_NUMBER' && next.runtimeEnvironment[key] && next.runtimeEnvironment[key] !== value)
       throw Error('Existing Twilio credential binding requires review');

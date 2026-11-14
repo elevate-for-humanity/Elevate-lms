@@ -25,7 +25,6 @@ SECRETS=(
   elevate-source-elevate-platform-elevate-cron-runtime
   elevate-source-elevate-platform-elevate-llm-client-env
   elevate-source-elevate-platform-elevate-admin-github-token
-  elevate-source-elevate-platform-telnyx-api-key
   elevate-source-elevate-platform-elevate-media-runtime-secrets
   elevate-source-elevate-platform-elevate-media-worker-secrets
   elevate-source-elevate-media-gpu-elevate-gpu-worker-env
@@ -40,4 +39,4 @@ for SECRET in "${SECRETS[@]}"; do
       --member="$IMPORTER" --role="$ROLE" --condition=None --quiet >/dev/null
   done
 done
-printf '23 empty secret-group destinations and confined importer permissions are ready. No source resources changed.\n'
+printf '%s empty secret-group destinations and confined importer permissions are ready. No source resources changed.\n' "${#SECRETS[@]}"

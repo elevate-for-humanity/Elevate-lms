@@ -5,7 +5,7 @@ type Database = Awaited<ReturnType<typeof requireAdminClient>>;
 const ADMIN_ADDRESS = 'admissions@elevateforhumanity.org';
 const INTAKE_ADDRESSES = new Set([ADMIN_ADDRESS, 'enrollment@elevateforhumanity.org']);
 
-/** Only canonical, unambiguous primary assignments may receive applicant copies. */
+/** Only unique, explicit, active applicant assignments may receive protected copies. */
 export async function programConversationRoute(
   db: Database,
   applicantAddresses: string[],
@@ -39,10 +39,12 @@ export async function programConversationRoute(
   if (linkedHolderIds.length !== 1) return null;
   // An applicant's unique explicit holder assignment is authoritative even if
   // the holder is not the primary program-wide instructor (e.g. Jozanna).
-  const assignments = await db
+  let assignmentQuery = db
     .from('program_holder_programs')
     .select('program_holder_id,program_id,program_slug')
     .eq('status', 'active');
+  if (ids.length) assignmentQuery = assignmentQuery.in('program_id', ids);
+  const assignments = await assignmentQuery;
   if (assignments.error) throw assignments.error;
   const holderIds = [
     ...new Set(

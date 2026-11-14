@@ -65,3 +65,39 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
+
+  email-device-browsers:
+    name: Email device browsers
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify all three browser engines
+        run: node scripts/verify-playwright-runtime.mjs chromium firefox webkit
+      - name: Test real email component across desktop, tablet, and phone browsers
+        run: pnpm exec playwright test --config playwright.email.config.ts
+      - name: Upload email device evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: email-device-browsers
+          path: |
+            playwright-email-report/
+            test-results/
+          retention-days: 14

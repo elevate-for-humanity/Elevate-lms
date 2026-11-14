@@ -278,3 +278,9 @@ studio-exports/
 exports/*applicants*.json
 *_emails.txt
 user-credentials*.md
+
+# Isolated email device-test reports
+playwright-email-report/
+
+# Ephemeral QA identity checkpoints contain passwords
+.qa-*-e2e-state.json

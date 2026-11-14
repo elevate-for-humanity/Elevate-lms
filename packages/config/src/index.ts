@@ -1,1 +1,0 @@
-export { validateEnvironment } from './env';

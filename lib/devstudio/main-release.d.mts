@@ -1,1 +1,0 @@
-export function publishTaskToMain(input: {baseSha:string;branchSha:string;githubJson:(path:string,init?:RequestInit)=>Promise<any>}):Promise<{branch:string;sha:string;status:string;verifiedLive:boolean}>;

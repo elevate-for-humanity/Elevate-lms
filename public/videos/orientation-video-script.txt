@@ -1,1 +1,0 @@
-{"id":"/videos/orientation-video-script.txt","path":"/videos/orientation-video-script.txt","sha":"be5d48e00221574e78cc8fca695e5128eb295c94","mime_type":"text/plain","size":12907,"site_id":"0a9378d2-a1d1-4062-9e9a-7be3105044df","deploy_id":"69df0487a1f5810008a809b3"}

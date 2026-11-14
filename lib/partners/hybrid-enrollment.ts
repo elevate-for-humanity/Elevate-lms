@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 // Unified enrollment handler that supports both API and link-based modes
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getPartnerClient, PartnerType } from './index';
+import { getPartnerClient, PartnerIntegrationUnavailableError, PartnerType } from './index';
 import { setAuditContext } from '@/lib/audit-context';
 
 async function getSupabaseAdmin() {
@@ -90,8 +90,8 @@ export async function enrollInExternalModule(
     // Error: $1
     return {
       success: false,
-      mode: 'link',
-      error: 'Operation failed',
+      mode: error instanceof PartnerIntegrationUnavailableError ? 'api' : 'link',
+      error: error instanceof PartnerIntegrationUnavailableError ? error.code : 'Operation failed',
     };
   }
 }

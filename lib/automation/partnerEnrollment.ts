@@ -3,7 +3,7 @@ import 'server-only';
 // lib/automation/partnerEnrollment.ts
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
-import { getPartnerClient, PartnerType, StudentData } from '../partners';
+import { getPartnerClient, PartnerIntegrationUnavailableError, PartnerType, StudentData } from '../partners';
 
 type UUID = string;
 
@@ -136,19 +136,19 @@ export async function autoEnrollPartnerCourse(
       launchUrl,
     };
   } catch (err: any) {
-    // Error: $1
+    const errorMessage = err instanceof PartnerIntegrationUnavailableError ? err.code : 'Operation failed';
 
     await supabase.from('partner_lms_enrollment_failures').insert({
       student_id: payload.studentId,
       provider_id: payload.partnerId,
       course_id: payload.courseId,
       program_id: payload.programId ?? null,
-      error_message: 'Operation failed',
+      error_message: errorMessage,
     });
 
     return {
       success: false,
-      error: 'Operation failed',
+      error: errorMessage,
     };
   }
 }

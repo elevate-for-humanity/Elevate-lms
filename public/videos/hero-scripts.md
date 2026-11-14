@@ -1,1 +1,0 @@
-{"id":"/videos/hero-scripts.md","path":"/videos/hero-scripts.md","sha":"66190824dcda3e444564b55fcbec36d8d0ead345","mime_type":"text/markdown","size":5910,"site_id":"0a9378d2-a1d1-4062-9e9a-7be3105044df","deploy_id":"69df0487a1f5810008a809b3"}

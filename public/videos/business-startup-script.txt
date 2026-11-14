@@ -1,1 +1,0 @@
-{"id":"/videos/business-startup-script.txt","path":"/videos/business-startup-script.txt","sha":"1af77be1de676a1fa8d91807bacc28c21e0cc430","mime_type":"text/plain","size":7893,"site_id":"0a9378d2-a1d1-4062-9e9a-7be3105044df","deploy_id":"69df0487a1f5810008a809b3"}

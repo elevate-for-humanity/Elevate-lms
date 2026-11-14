@@ -1,4 +1,0 @@
-import Link from 'next/link';
-export function EnrollmentWorkspaceNavigation() {
- return <nav aria-label="Enrollment workspace" className="mx-auto flex max-w-5xl flex-wrap gap-3 px-4 py-4"><Link href="/learner/dashboard" className="inline-flex min-h-11 items-center rounded-xl border bg-white px-4 font-bold text-blue-900">My dashboard</Link><Link href="/enrollment/orientation" className="inline-flex min-h-11 items-center rounded-xl border bg-white px-4 font-bold text-blue-900">Orientation</Link><Link href="/enrollment/documents" className="inline-flex min-h-11 items-center rounded-xl border bg-white px-4 font-bold text-blue-900">Documents & signatures</Link><Link href="/lms/support" className="inline-flex min-h-11 items-center rounded-xl border bg-white px-4 font-bold text-blue-900">Support</Link></nav>;
-}

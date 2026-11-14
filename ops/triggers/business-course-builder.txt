@@ -1,4 +1,0 @@
-Run Indiana INTraining Program #10005173 through the canonical Course Factory after lesson-contract normalization repair.
-Triggered: 2026-08-22
-Target: business-administration
-Expected: 5 modules, 35 lessons, 35 lesson videos, 70 microclips, strict publish gate.

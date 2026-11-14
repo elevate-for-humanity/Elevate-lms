@@ -1,1 +1,0 @@
-{"id":"/videos/homepage-voiceover-script.txt","path":"/videos/homepage-voiceover-script.txt","sha":"a61aae9c190f6468b3d79cd5d7343dd7b2941ddc","mime_type":"text/plain","size":720,"site_id":"0a9378d2-a1d1-4062-9e9a-7be3105044df","deploy_id":"69df0487a1f5810008a809b3"}

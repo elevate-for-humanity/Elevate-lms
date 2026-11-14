@@ -1,7 +1,0 @@
-Configuring production container: Sunday, Jun 28, 2026, 11:15:00
-Service: elevate-lms-build
-Configuration:
-- Dockerfile: Dockerfile.northflank-lms
-- Memory: 8GB
-- Plan: nf-compute-400
-- Engine: Buildkit

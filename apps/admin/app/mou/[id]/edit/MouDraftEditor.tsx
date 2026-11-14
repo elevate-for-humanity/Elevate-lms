@@ -1,8 +1,0 @@
-'use client';
-import { useState,type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-export default function MouDraftEditor({id,title:initialTitle,content:initialContent,updatedAt}:{id:string;title:string;content:string;updatedAt:string}) {
- const [title,setTitle]=useState(initialTitle),[content,setContent]=useState(initialContent),[busy,setBusy]=useState(false),[error,setError]=useState('');const router=useRouter();
- async function save(e:FormEvent){e.preventDefault();setBusy(true);setError('');try{const r=await fetch('/api/admin/mou',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({id,title,content,updated_at:updatedAt})});const data=await r.json();if(!r.ok)throw new Error(data.error||'Unable to save.');router.push(`/mou/${id}`);router.refresh();}catch(cause){setError(cause instanceof Error?cause.message:'Unable to save.');}finally{setBusy(false);}}
- return <form onSubmit={save} className="mt-6 space-y-5"><label className="block font-bold">Agreement title<input className="mt-2 min-h-12 w-full rounded-xl border p-3" value={title} onChange={e=>setTitle(e.target.value)} required maxLength={250}/></label><label className="block font-bold">Complete agreement text<textarea className="mt-2 w-full rounded-xl border p-3 font-normal leading-7" rows={20} value={content} onChange={e=>setContent(e.target.value)} required minLength={200} maxLength={100000}/></label>{error&&<p role="alert" className="text-red-800">{error}</p>}<button className="min-h-12 rounded-xl bg-blue-800 px-5 font-bold text-white" disabled={busy}>{busy?'Saving…':'Save draft'}</button></form>;
-}

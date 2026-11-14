@@ -1,8 +1,0 @@
-# Keep ALL app directories - DO NOT ignore any of these
-# app/**
-
-# But ignore specific build artifacts and cache
-.next
-.cache
-node_modules
-.env*.local

@@ -1,6 +1,0 @@
-{
-  "billing": {
-    "deploymentPlan": "nf-compute-400",
-    "buildPlan": "nf-compute-200-4"
-  }
-}

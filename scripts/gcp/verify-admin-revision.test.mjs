@@ -24,3 +24,16 @@ test('no credentials are sent to a non-Google URL', async () => {
   await assert.rejects(verifyAdminRevision('https://old-runtime.code.run',commit,{request:async()=>{calls++}}),/Invalid Google/);
   assert.equal(calls,0);
 });
+
+
+test('Admin revision verification reports sanitized root-cause categories', async () => {
+  await assert.rejects(verifyAdminRevision(url, commit, {
+    attempts:1, request:async()=>{throw Object.assign(new Error('private-provider-message'), {cause:{code:'ENOTFOUND'}});},
+  }), error => error.message.includes('dns_unavailable') && !error.message.includes('private-provider-message'));
+  await assert.rejects(verifyAdminRevision(url, commit, {
+    attempts:1, request:async()=>healthy({commit:'b'.repeat(40)}),
+  }), /revision_mismatch/);
+  await assert.rejects(verifyAdminRevision(url, commit, {
+    attempts:1, request:async()=>healthy({dependencies:{supabase:{ok:false}}}),
+  }), /supabase_unready/);
+});

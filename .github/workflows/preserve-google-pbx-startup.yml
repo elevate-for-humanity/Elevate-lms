@@ -85,7 +85,7 @@ jobs:
           echo 'Existing PBX and gateway container IDs, running state and start times unchanged.'
       - name: Preserve sanitized metadata evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pbx-startup-preservation-evidence
           path: pbx-startup-preservation-evidence.json

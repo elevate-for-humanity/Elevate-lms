@@ -1,6 +1,41 @@
 import { pathToFileURL } from 'node:url';
+import { readFile } from 'node:fs/promises';
 const repository = 'elevate-for-humanity/Elevate-lms';
 const workflows = ['deploy-admin.yml', 'deploy-google-lms-trigger.yml', 'deploy-google-marketing-trigger.yml', 'deploy-google-store-runtime.yml'];
+
+// CI completion closes path-filter gaps without becoming a second deployer.
+// Never consume a PR artifact or clear a release hold from workflow_run.
+export async function dispatchCompletedMainCI({ env, event, request = fetch }) {
+  const run = event?.workflow_run;
+  if (env.GITHUB_REPOSITORY !== repository || env.GITHUB_REF !== 'refs/heads/main' ||
+      env.GITHUB_EVENT_NAME !== 'workflow_run' || run?.name !== 'CI' ||
+      run.path !== '.github/workflows/ci.yml' || run.event !== 'push' ||
+      run.conclusion !== 'success' || run.head_branch !== 'main' ||
+      run.head_repository?.full_name !== repository || !/^[a-f0-9]{40}$/.test(run.head_sha || '')) {
+    return { status: 'ignored_untrusted_or_unsuccessful_ci', deploymentVerified: false };
+  }
+  if (env.GOOGLE_RELEASE_HOLD !== 'false') return { status: 'held', deploymentVerified: false };
+  if (!env.GH_TOKEN?.trim()) throw Error('RELEASE_WORKFLOW_TOKEN_REQUIRED');
+  async function api(path, method = 'GET', body) {
+    const response = await request(`https://api.github.com/repos/${repository}/${path}`, {
+      method, headers: { Authorization: `Bearer ${env.GH_TOKEN}`, Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' },
+      ...(body ? { body: JSON.stringify(body) } : {}), redirect: 'error', signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) throw Error(`RELEASE_GITHUB_HTTP_${response.status}`);
+    return response.status === 204 ? null : response.json();
+  }
+  const head = await api('git/ref/heads/main');
+  if (head.object?.sha !== run.head_sha) return { status: 'superseded', deploymentVerified: false };
+  const previous = await api(`actions/workflows/release-approved-google-web.yml/runs?head_sha=${run.head_sha}&event=workflow_dispatch&per_page=30`);
+  if (previous.workflow_runs?.some(r => r.head_sha === run.head_sha &&
+      (['queued', 'in_progress', 'waiting', 'requested', 'pending'].includes(r.status) ||
+       (r.status === 'completed' && r.conclusion === 'success')))) {
+    return { status: 'already_requested', commit: run.head_sha, deploymentVerified: false };
+  }
+  await api('actions/workflows/release-approved-google-web.yml/dispatches', 'POST', { ref: 'main' });
+  return { status: 'requested', commit: run.head_sha, deploymentVerified: false };
+}
 
 export async function releaseApprovedWeb({ sha, token, releaseHold, request = fetch }) {
   if (!/^[a-f0-9]{40}$/.test(sha || '') || typeof token !== 'string' || !token.trim()) throw Error('RELEASE_IDENTITY_REQUIRED');
@@ -84,7 +119,10 @@ export async function releaseCurrentWorkflow(env = process.env, request = fetch)
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    console.log(JSON.stringify(await releaseCurrentWorkflow()));
+    const result = process.argv.includes('--completed-ci')
+      ? await dispatchCompletedMainCI({ env: process.env, event: JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH, 'utf8')) })
+      : await releaseCurrentWorkflow();
+    console.log(JSON.stringify(result));
   }
   catch (error) { console.error(JSON.stringify({ error: /^RELEASE_[A-Z0-9_]+$/.test(error?.message || '') ? error.message : 'RELEASE_CONTROLLER_FAILED' })); process.exitCode = 1; }
 }

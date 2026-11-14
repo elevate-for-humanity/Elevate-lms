@@ -9,6 +9,7 @@ on:
       - 'lib/apprenticeship/registered-program-contract.ts'
       - 'lib/compliance/appendix-a-standards.ts'
       - 'lib/curriculum/blueprints/**'
+      - 'lib/curriculum/registered-beauty/**'
       - 'lib/supabase/admin.ts'
       - 'lib/supabase/timed-fetch.ts'
       - 'lib/media/licensed-course-media.ts'
@@ -25,6 +26,7 @@ on:
       - 'scripts/gcp/resume-repaired-course-jobs.test.mjs'
       - 'scripts/gcp/execute-course-job.mjs'
       - 'tests/integration/google-lesson-author.test.ts'
+      - 'tests/integration/approved-teaching-recaps.test.ts'
       - 'tests/unit/ultimate-registered-profile.test.ts'
       - 'tests/unit/ultimate-renderer-assignments.test.mjs'
       - 'tests/worker/**'
@@ -131,7 +133,7 @@ jobs:
         run: |
           git fetch --unshallow origin || git fetch --depth=10000 origin main
           node scripts/audits/october-course-builder-diff-inventory.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: october-course-builder-full-diff-evidence
           path: |

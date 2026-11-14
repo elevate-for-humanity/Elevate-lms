@@ -2,6 +2,10 @@ name: Release approved Google web repairs
 # Deploy only after exact-commit CI and an explicitly cleared release hold.
 # Service workflows independently retain their hold, capacity and health gates.
 on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
     paths:
@@ -15,6 +19,22 @@ concurrency:
   group: google-approved-web-release-controller
   cancel-in-progress: false
 jobs:
+  ci-complete:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # workflow_run is privileged: use trusted main only, never PR artifacts.
+      - uses: actions/checkout@v4
+        with: { ref: main, persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: node --test scripts/gcp/release-approved-web.test.mjs
+      - name: Hand successful current-main CI to the existing release controller
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GOOGLE_RELEASE_HOLD: ${{ vars.GOOGLE_RELEASE_HOLD }}
+        run: node scripts/gcp/release-approved-web.mjs --completed-ci
   dispatch:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04

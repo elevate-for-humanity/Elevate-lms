@@ -1,7 +1,93 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { releaseApprovedWeb, releaseCurrentWorkflow, resolveReleaseCredential } from './release-approved-web.mjs';
+import { releaseApprovedWeb, releaseCurrentWorkflow, resolveReleaseCredential, dispatchCompletedMainCI } from './release-approved-web.mjs';
+import { readFileSync } from 'node:fs';
 const sha = 'a'.repeat(40);
+const ciEnv = { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GITHUB_REF: 'refs/heads/main', GITHUB_EVENT_NAME: 'workflow_run', GH_TOKEN: 'scoped-ci-token', GOOGLE_RELEASE_HOLD: 'false' };
+const completedCI = { name: 'CI', path: '.github/workflows/ci.yml', event: 'push', conclusion: 'success', head_branch: 'main', head_sha: sha, head_repository: { full_name: ciEnv.GITHUB_REPOSITORY } };
+test('every explicit course-image COPY input has an automatic source-change trigger', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/deploy-google-course-worker.yml', import.meta.url), 'utf8');
+  const dockerfile = readFileSync(new URL('../../Dockerfile.ultimate-worker', import.meta.url), 'utf8');
+  const push = workflow.split('  workflow_dispatch:')[0];
+  const patterns = [...push.matchAll(/^\s+- '([^']+)'/gm)].map(m => m[1]);
+  const matches = (pattern, path) => {
+    const expression = pattern.split('**').map(part => part.split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('[^/]*')).join('.*');
+    return new RegExp('^' + expression + '$').test(path);
+  };
+  const inputs = [...dockerfile.matchAll(/^COPY (.+)$/gm)].flatMap(m => m[1].trim().split(/\s+/).slice(0, -1));
+  assert.ok(inputs.length > 10, 'inspect the actual worker source COPY instructions');
+  const missing = inputs.filter(path => {
+    // Directory inputs represent every file below that directory.
+    const probe = path.split('/').at(-1).includes('.') ? path : path + '/__runtime_source__';
+    return !patterns.some(pattern => matches(pattern, probe));
+  });
+  assert.deepEqual(missing, [], 'copied runtime inputs must not be silently excluded from deployment triggers');
+});
+function completionSetup({ current = sha, prior = [], deny = false } = {}) {
+  const calls = [];
+  const request = async (url, init) => {
+    const path = new URL(url).pathname;
+    calls.push({ path, method: init.method, body: init.body && JSON.parse(init.body) });
+    assert.equal(init.headers.Authorization, 'Bearer scoped-ci-token');
+    if (deny) return new Response('{}', { status: 403 });
+    if (path.endsWith('git/ref/heads/main')) return Response.json({ object: { sha: current } });
+    if (path.endsWith('/runs')) return Response.json({ workflow_runs: prior });
+    if (path.endsWith('/dispatches')) return new Response(null, { status: 204 });
+    throw Error('Unexpected completion request');
+  };
+  return { calls, request };
+}
+test('every successful current-main CI can release changes outside service path filters', async () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/release-approved-google-web.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /workflow_run:\n\s+workflows: \[CI\]\n\s+types: \[completed\]\n\s+branches: \[main\]/);
+  assert.match(workflow, /run: node scripts\/gcp\/release-approved-web.mjs --completed-ci/);
+  assert.match(workflow, /with: \{ ref: main, persist-credentials: false \}/);
+  const s = completionSetup();
+  const result = await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: s.request });
+  assert.equal(result.status, 'requested');
+  assert.equal(result.deploymentVerified, false);
+  assert.deepEqual(s.calls.filter(c => c.method === 'POST').map(c => c.body), [{ ref: 'main' }]);
+  assert.ok(s.calls.every(c => !c.path.includes('/variables/')));
+});
+test('PR, fork, failed, wrong-workflow and non-main completions cannot make API calls', async () => {
+  const changes = [{ event: 'pull_request' }, { conclusion: 'failure' }, { conclusion: 'skipped' }, { head_branch: 'repair' }, { head_sha: 'bad' }, { name: 'Other' }, { path: '.github/workflows/other.yml' }, { head_repository: { full_name: 'attacker/fork' } }];
+  for (const change of changes) {
+    const s = completionSetup();
+    assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: { ...completedCI, ...change } }, request: s.request })).status, 'ignored_untrusted_or_unsuccessful_ci');
+    assert.equal(s.calls.length, 0);
+  }
+  for (const change of [{ GITHUB_REPOSITORY: 'other/repo' }, { GITHUB_REF: 'refs/heads/repair' }, { GITHUB_EVENT_NAME: 'pull_request' }]) {
+    const s = completionSetup();
+    await dispatchCompletedMainCI({ env: { ...ciEnv, ...change }, event: { workflow_run: completedCI }, request: s.request });
+    assert.equal(s.calls.length, 0);
+  }
+});
+test('a set or missing release hold prevents completion dispatch without editing it', async () => {
+  for (const hold of ['true', '', undefined]) {
+    const s = completionSetup();
+    assert.equal((await dispatchCompletedMainCI({ env: { ...ciEnv, GOOGLE_RELEASE_HOLD: hold }, event: { workflow_run: completedCI }, request: s.request })).status, 'held');
+    assert.equal(s.calls.length, 0);
+  }
+});
+test('a superseded CI completion does not dispatch a newer untested main', async () => {
+  const s = completionSetup({ current: 'b'.repeat(40) });
+  assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: s.request })).status, 'superseded');
+  assert.equal(s.calls.length, 1);
+});
+test('active or successfully handed-off controller runs deduplicate CI reruns', async () => {
+  for (const prior of [{ head_sha: sha, status: 'pending' }, { head_sha: sha, status: 'in_progress' }, { head_sha: sha, status: 'completed', conclusion: 'success' }]) {
+    const s = completionSetup({ prior: [prior] });
+    assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: s.request })).status, 'already_requested');
+    assert.ok(s.calls.every(c => c.method === 'GET'));
+  }
+});
+test('a failed handoff can retry, but authorization denial cannot seek another identity', async () => {
+  const s = completionSetup({ prior: [{ head_sha: sha, status: 'completed', conclusion: 'failure' }] });
+  assert.equal((await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: s.request })).status, 'requested');
+  const denied = completionSetup({ deny: true });
+  await assert.rejects(dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: completedCI }, request: denied.request }), /HTTP_403/);
+  assert.equal(denied.calls.length, 1);
+});
 function setup({ green = true, current = sha, active = false, readback = 'false' } = {}) {
   const calls = []; let holdReads = 0;
   const request = async (url, init) => {

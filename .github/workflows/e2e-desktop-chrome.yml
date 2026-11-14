@@ -58,6 +58,8 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Verify published marketing artwork through Next image loader
+        run: node --test scripts/marketing-image-config.test.mjs
       - name: Verify Course Builder chat controls in short and landscape panels
         run: node scripts/test-course-chat-layout.mjs
       # The broad test:e2e command runs desktop-chrome only. Certify the same
@@ -74,7 +76,7 @@ jobs:
         run: pnpm test:e2e
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-desktop-chrome
           path: |
@@ -114,7 +116,7 @@ jobs:
         run: pnpm exec playwright test --config playwright.email.config.ts
       - name: Upload email device evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: email-device-browsers
           path: |

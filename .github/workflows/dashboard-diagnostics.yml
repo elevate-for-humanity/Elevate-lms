@@ -29,7 +29,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Cache pnpm store
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -114,7 +114,7 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Upload diagnostic artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dashboard-diagnostics-${{ github.run_number }}
           path: |

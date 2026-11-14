@@ -174,7 +174,7 @@ jobs:
         run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --grep 'navigation destination /partners/host-shops:' --config playwright.config.ts --reporter=line,html --output=test-results/host-shop-navigation --project=${{ matrix.device }}
       - name: Preserve playback samples, screenshots and browser report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hvac-hero-playback-${{ github.run_id }}-${{ matrix.device }}
           path: |
@@ -287,7 +287,7 @@ jobs:
         run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Preserve authenticated LMS playback and full-screen acceptance evidence
         if: ${{ always() && !inputs.employer_only && ((github.event_name == 'workflow_dispatch' && inputs.component == 'lms') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy LMS automatically on Google')) }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hvac-authenticated-lms-playback-evidence
           path: |
@@ -303,7 +303,7 @@ jobs:
         run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
       - name: Upload employer onboarding evidence immediately
         if: ${{ always() && (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: employer-onboarding-e2e-results
           path: |
@@ -354,7 +354,7 @@ jobs:
         run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Upload QA evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: full-portal-responsive-e2e-results
           path: |

@@ -38,7 +38,7 @@ jobs:
           gcloud dns managed-zones list --project=elegant-racer-299721 --format='json(name,dnsName)' || true
           gcloud iam service-accounts describe curvature-runtime@elegant-racer-299721.iam.gserviceaccount.com --project=elegant-racer-299721 --format='json(email,disabled)' || true
           gcloud secrets versions describe latest --secret=curvature-supabase-service-role-key --project=elegant-racer-299721 --format='json(name,state)' || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: platform-runtime-bindings
           path: services.json

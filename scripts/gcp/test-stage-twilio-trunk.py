@@ -18,6 +18,44 @@ class CarrierInstallation(unittest.TestCase):
                                     ('0 active calls\n0 active channels', 'Endpoint inventory unavailable')]:
             with self.assertRaises(ValueError):
                 trunk.require_idle_endpoint_restart(channels, endpoints)
+    def test_inbound_identity_is_not_replaced_for_any_extension(self):
+        self.assertIn('trust_id_inbound=yes', trunk.CONFIG)
+        self.assertNotIn('\ncallerid=', trunk.CONFIG)
+        # Outbound carrier identity remains explicit and separate from inbound identity.
+        self.assertIn('from_user=+14632401404', trunk.CONFIG)
+        self.assertIn('send_pai=yes', trunk.CONFIG)
+        self.assertIn('identify_by=ip', trunk.CONFIG)
+        self.assertIn('verify_server=yes', trunk.CONFIG)
+
+    def test_exact_legacy_configuration_can_be_upgraded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, backup = self.fixture(directory)
+            fragment = root / 'elevate-twilio.conf'
+            fragment.write_text(trunk.LEGACY_CONFIG)
+            trunk.install_endpoint(root, backup, self.command([]))
+            self.assertEqual(fragment.read_text(), trunk.CONFIG)
+
+    def test_failed_upgrade_restores_existing_carrier_fragment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, backup = self.fixture(directory)
+            fragment = root / 'elevate-twilio.conf'
+            fragment.write_text(trunk.LEGACY_CONFIG)
+            with self.assertRaisesRegex(ValueError, 'live_tls_endpoint_reload_not_confirmed'):
+                trunk.install_endpoint(root, backup, self.command([], endpoint='Unable to find object'))
+            self.assertEqual(fragment.read_text(), trunk.LEGACY_CONFIG)
+
+    def test_unknown_existing_carrier_configuration_is_preserved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, backup = self.fixture(directory)
+            fragment = root / 'elevate-twilio.conf'
+            original = trunk.LEGACY_CONFIG + '; operator-managed change\n'
+            fragment.write_text(original)
+            calls = []
+            with self.assertRaisesRegex(ValueError, 'existing_carrier_configuration_requires_review'):
+                trunk.install_endpoint(root, backup, self.command(calls))
+            self.assertEqual(fragment.read_text(), original)
+            self.assertEqual(calls, [])
+
     def fixture(self, directory):
         root = Path(directory) / 'asterisk'
         root.mkdir()
@@ -71,3 +109,4 @@ class CarrierInstallation(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

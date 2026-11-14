@@ -61,3 +61,33 @@ test('not-required canonical execution remains eligible without a second approva
   assert.equal(result.state, 'ready');
   assert.equal(started, 0);
 });
+
+test('provider candidate classification agrees with terminal authorization for explicit approvals', async () => {
+  const {readFileSync} = await import('node:fs');
+  const {stripTypeScriptTypes} = await import('node:module');
+  const {isProviderConfirmationSnapshot} = await import('../../lib/devstudio/openhands/provider-confirmation.mjs');
+  const source = readFileSync(new URL('../../lib/devstudio/openhands/paris-provider-candidate.ts', import.meta.url), 'utf8');
+  const compiled = stripTypeScriptTypes(source).replace(/^import .*;\\n/gm, '').replaceAll('export ', '');
+  const classify = new Function('isProviderConfirmationSnapshot', compiled + ';return isParisProviderBranchCandidate;')(isProviderConfirmationSnapshot);
+  const baseTask = {
+    id: 'task', user_id: 'owner', tenant_id: null, tool_name: 'openhands.execute',
+    correlation_id: cp.correlationId, command: openHandsRepairPrompt({...cp, goal}),
+    tool_input: {repository: lifecycle.repository, branch: cp.branch},
+    tool_output: {start_task_id: lifecycle.startTaskId}, status: 'running'
+  };
+  const github = {
+    verified: false, repository: lifecycle.repository,
+    branch: {name: cp.branch, sha: 'b'.repeat(40)}, pullRequests: []
+  };
+  assert.equal(classify({...baseTask, requires_approval: true, approval_status: 'approved'}, {...lifecycle, prNumbers: []}, github), true);
+  assert.equal(classify({...baseTask, requires_approval: false, approval_status: 'not_required'}, {...lifecycle, prNumbers: []}, github), true);
+  for (const changes of [
+    {requires_approval: true, approval_status: 'pending'},
+    {requires_approval: true, approval_status: 'rejected'},
+    {requires_approval: true, approval_status: 'not_required'},
+    {requires_approval: true, approval_status: 'approved', status: 'awaiting_approval'}
+  ]) {
+    assert.equal(classify({...baseTask, ...changes}, {...lifecycle, prNumbers: []}, github), false);
+  }
+  assert.equal(classify({...baseTask, requires_approval: true, approval_status: 'approved'}, {...lifecycle, startTaskId: 'changed', prNumbers: []}, github), false);
+});

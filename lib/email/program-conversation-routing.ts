@@ -17,7 +17,7 @@ export async function programConversationRoute(
   const { data: applications, error } = await db
     .from('applications')
     .select('program_id,program_slug,program_interest,pathway_slug')
-    .eq('email', applicantEmail);
+    .ilike('email', applicantEmail);
   if (error || !applications?.length) return null;
   const slugs = [
     ...new Set(applications.map((row) => row.program_slug || row.program_interest).filter(Boolean)),
@@ -32,7 +32,7 @@ export async function programConversationRoute(
   const linked = await db
     .from('program_holder_students')
     .select('program_holder_id,program_id')
-    .eq('applicant_email', applicantEmail)
+    .ilike('applicant_email', applicantEmail)
     .in('status', ['applied', 'pending', 'active', 'enrolled', 'completed']);
   if (linked.error) throw linked.error;
   const linkedHolderIds = [...new Set((linked.data || []).map((row) => row.program_holder_id))];

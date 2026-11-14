@@ -23,7 +23,8 @@ const fixtures = {
 function github(overrides = {}, unreachable = []) {
   const data = { ...fixtures, ...overrides };
   return async path => {
-    if (unreachable.includes(path) || !(path in data)) throw Error('unavailable');
+    if (unreachable.includes(path)) throw Object.assign(Error('GitHub API 404: Not Found'), { status: 404 });
+    if (!(path in data)) throw Error('unavailable');
     return data[path];
   };
 }
@@ -148,4 +149,43 @@ test('PARIS requires all independent protected approvals, not merely one', async
     }),
   });
   assert.equal(result.accepted, false);
+});
+
+test('read errors other than confirmed policy absence cannot weaken protection', async () => {
+  const policyRead403 = async path => {
+    if (path === '/rules/branches/main') {
+      throw Object.assign(Error('GitHub API 403: Forbidden'), { status: 403 });
+    }
+    return github()(path);
+  };
+  const result = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github(), policyGh: policyRead403,
+  });
+  assert.equal(result.accepted, false);
+  assert.match(result.reasons.join(' '), /PARIS_PROTECTED_PR_VERIFICATION_UNAVAILABLE/);
+});
+
+test('required App ID cannot be satisfied by an unrelated green check context', async () => {
+  const checkPath = `/commits/${HEAD}/check-runs?per_page=100`;
+  const policy = [
+    { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
+    { type: 'required_status_checks', parameters: {
+      required_status_checks: [{ context: 'CI Required Gate', app_id: 17 }],
+    } },
+  ];
+  const input = { pr, expectedHeadSha: HEAD };
+  const oldApp = await verifyProtectedParisMerge({
+    ...input, gh: github({
+      '/rules/branches/main': policy,
+      [checkPath]: { check_runs: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success', app: { id: 18 } }] },
+    }),
+  });
+  assert.equal(oldApp.accepted, false);
+  const correctApp = await verifyProtectedParisMerge({
+    ...input, gh: github({
+      '/rules/branches/main': policy,
+      [checkPath]: { check_runs: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success', app: { id: 17 } }] },
+    }),
+  });
+  assert.equal(correctApp.accepted, true, JSON.stringify(correctApp.reasons));
 });

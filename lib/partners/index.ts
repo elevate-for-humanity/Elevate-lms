@@ -1,93 +1,23 @@
-// lib/partners/index.ts
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  BasePartnerAPI,
-  PartnerAPIConfig,
-  PartnerType,
-  StudentData,
-  PartnerAccount,
-  CourseEnrollment,
-  ProgressData,
-  CertificateData,
-} from './base';
+import type {BasePartnerAPI,PartnerType} from './base';
 
 /**
- * Partner API Integration Layer
- *
- * STATUS: Pending vendor integration — returns default data.
- *
- * Each partner (NDS, CareerSafe, etc.) will need a concrete
- * implementation that calls their vendor API. This allows
- * the enrollment/automation pipeline to function without
- * blocking on vendor integration timelines.
- *
- * To connect a real partner:
- *   1. Create a class extending BasePartnerAPI
- *   2. Implement createAccount, enrollInCourse, getProgress, getCertificate, getSSOLink
- *   3. Add the partner type to getPartnerAPI()
+ * API enrollment is unavailable until a vendor adapter has a verified contract.
+ * Do not manufacture vendor accounts, enrollments, launch URLs or progress.
+ * Existing manual/link enrollment uses the separate link-based integration.
  */
-
-class PendingPartnerAPI extends BasePartnerAPI {
-  async createAccount(student: StudentData): Promise<PartnerAccount> {
-    // In production: call real partner API here
-    const generatedId = `${this.partner}_${student.id}`;
-    return {
-      externalId: generatedId,
-      username: student.email,
-      loginUrl: `https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/login`,
-      passwordPlaintext: undefined,
-    };
-  }
-
-  async enrollInCourse(
-    accountExternalId: string,
-    courseExternalCode: string,
-  ): Promise<CourseEnrollment> {
-    // In production: call real partner API here
-    return {
-      externalEnrollmentId: `${this.partner}_${accountExternalId}_${courseExternalCode}`,
-      courseId: courseExternalCode,
-      courseName: `Course ${courseExternalCode}`,
-      accessUrl: `https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/course/launch`,
-    };
-  }
-
-  async getProgress(externalEnrollmentId: string): Promise<ProgressData | null> {
-    // In production: call real partner API here
-    // Default: mark as in progress until vendor API connected
-    return {
-      percentage: 50,
-      completed: false,
-      lastAccessed: new Date(),
-      lessonsCompleted: 3,
-      totalLessons: 6,
-    };
-  }
-
-  async getCertificate(externalEnrollmentId: string): Promise<CertificateData | null> {
-    // In production: call real partner API here
-    // Default: no certificate until vendor API connected
-    return null;
-  }
-
-  async getSsoLaunchUrl(params: {
-    accountExternalId: string;
-    externalEnrollmentId: string;
-    returnTo?: string;
-  }): Promise<string> {
-    // In production: generate real SSO link
-    return `https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/sso/launch?enrollment=${encodeURIComponent(
-      params.externalEnrollmentId,
-    )}`;
+export class PartnerIntegrationUnavailableError extends Error {
+  readonly code = 'PARTNER_API_NOT_CONNECTED';
+  constructor() {
+    super('PARTNER_API_NOT_CONNECTED: Vendor API enrollment and progress are not connected. Use the existing manual/link enrollment workflow.');
+    this.name = 'PartnerIntegrationUnavailableError';
   }
 }
 
-export function getPartnerClient(partner: PartnerType): BasePartnerAPI {
-  // Later: you can switch specific partners to real client classes
-  const config: PartnerAPIConfig = {
-    baseUrl: process.env.PARTNER_API_BASE_URL,
-  };
-  return new PendingPartnerAPI(partner, config);
+export function getPartnerClient(_partner: PartnerType): BasePartnerAPI {
+  // The former pending client returned synthetic success for every vendor,
+  // even with no configured API. Keep the existing callers' failure paths and
+  // student records intact until an independently verified adapter is wired.
+  throw new PartnerIntegrationUnavailableError();
 }
 
 export * from './base';

@@ -163,6 +163,6 @@ describe('Host Shop E2E identity isolation', () => {
     const desktop = workflow.split('  desktop-chrome:')[1]?.split('  email-device-browsers:')[0] || '';
     expect(desktop).toContain('E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL || secrets.TEST_HOST_SHOP_EMAIL }}');
     expect(desktop).toContain('E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD || secrets.TEST_HOST_SHOP_PASSWORD }}');
-    expect(desktop).not.toMatch(/E2E_HOST_SHOP_(?:EMAIL|PASSWORD):[^\\n]*(?:ADMIN|PROGRAM_HOLDER|STUDENT)/);
+    expect(desktop).not.toMatch(/E2E_HOST_SHOP_(?:EMAIL|PASSWORD):[^\r\n]*(?:ADMIN|PROGRAM_HOLDER|STUDENT)/);
   });
 });

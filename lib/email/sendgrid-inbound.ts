@@ -21,7 +21,8 @@ export interface ParsedInboundEmail {
   html: string;
   text: string;
   replyTo: string;
-  eventId: string; // SHA-256 of from+to+subject+timestamp for dedup
+  eventId: string; // Stable message identity for per-mailbox deduplication
+  deliveryId?: string; // Includes the normalized SMTP envelope for delivery claims
   envelopeRecipients: string[];
   attachments: File[];
   headers?: string;
@@ -95,7 +96,12 @@ export async function parseInboundEmail(request: Request): Promise<ParsedInbound
       .digest('hex')
       .slice(0, 32);
 
+    const deliveryId = createHash('sha256')
+      .update(JSON.stringify([eventId, [...inboundDeliveryRecipients({ envelopeRecipients, to })].sort()]))
+      .digest('hex').slice(0, 32);
+
     return {
+      deliveryId,
       from,
       to,
       subject,

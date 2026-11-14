@@ -87,7 +87,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
   }
   const { data: app, error: appError } = await db
     .from('applications')
-    .select('id,first_name,program_interest,status,interview_responses,interview_completed')
+    .select('id,first_name,program_interest,status,interview_responses,interview_completed,updated_at')
     .ilike('email', emailLikeLiteral(sender))
     .order('created_at', { ascending: false })
     .limit(1)
@@ -99,46 +99,78 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     .slice(0, 10000);
   let reply =
     'I am PARIS, Elevate’s virtual assistant. Your message is saved in the admin inbox for the team to review. You can reply here to keep the conversation together.';
-  if (app && !app.interview_completed && app.status !== 'enrolled') {
+  if (app) {
     const prior = app.interview_responses || {};
     const interview = prior.email_interview || { started: false, current: 0, answers: [] };
     if (interview.closed) return { responded: false, reason: 'opted_out' };
-    const outcome = interviewReply(text, Number(interview.current || 0), !!interview.started);
-    const answers =
-      interview.started && text
-        ? [
-            ...(interview.answers || []),
-            {
-              question: EMAIL_INTERVIEW_QUESTIONS[interview.current],
-              answer: text,
-              event_id: parsed.eventId,
-              received_at: new Date().toISOString(),
+    // Retain every event's outcome, including interview-start events which have
+    // no answer entry. A later email must not erase an earlier retry receipt.
+    const outcomes = {
+      ...(interview.event_outcomes || {}),
+      ...(interview.last_event_id && typeof interview.last_reply === 'string'
+        ? { [interview.last_event_id]: { reply: interview.last_reply } } : {}),
+    };
+    const savedOutcome = Object.hasOwn(outcomes, parsed.eventId) ? outcomes[parsed.eventId] : null;
+    const alreadyAnswered = (interview.answers || []).some(
+      (answer: { event_id?: string }) => answer.event_id === parsed.eventId,
+    );
+    if (savedOutcome && typeof savedOutcome.reply === 'string') {
+      reply = savedOutcome.reply;
+    } else if (alreadyAnswered) {
+      // Historical answers predate per-event outcomes. Never append or advance
+      // them again merely because their original reply receipt is unavailable.
+      reply = 'Thank you. Your answer was already saved. The admissions team can continue this conversation with you.';
+    } else if (!app.interview_completed && app.status !== 'enrolled') {
+      const outcome = interviewReply(text, Number(interview.current || 0), !!interview.started);
+      const answers =
+        interview.started && text
+          ? [
+              ...(interview.answers || []),
+              {
+                question: EMAIL_INTERVIEW_QUESTIONS[interview.current],
+                answer: text,
+                event_id: parsed.eventId,
+                received_at: new Date().toISOString(),
+              },
+            ]
+          : interview.answers || [];
+      reply = outcome.reply;
+      if (!interview.started && !outcome.closed)
+        reply += `\n\nContinue your program signup: https://www.elevateforhumanity.org/apply?program=${encodeURIComponent(app.program_interest || '')}`;
+      const previousUpdatedAt = Date.parse(app.updated_at || '');
+      const updatedAt = new Date(Math.max(Date.now(), Number.isFinite(previousUpdatedAt) ? previousUpdatedAt + 1 : 0)).toISOString();
+      const update = db
+        .from('applications')
+        .update({
+          updated_at: updatedAt,
+          interview_responses: {
+            ...prior,
+            email_interview: {
+              started: true,
+              current: outcome.next,
+              answers,
+              closed: outcome.closed,
+              event_outcomes: {
+                ...outcomes,
+                [parsed.eventId]: { reply, recorded_at: new Date().toISOString() },
+              },
             },
-          ]
-        : interview.answers || [];
-    const { error } = await db
-      .from('applications')
-      .update({
-        interview_responses: {
-          ...prior,
-          email_interview: {
-            started: true,
-            current: outcome.next,
-            answers,
-            closed: outcome.closed,
           },
-        },
-        next_step: outcome.closed
-          ? 'Staff review: applicant declined email interview'
-          : outcome.next === EMAIL_INTERVIEW_QUESTIONS.length
-            ? 'Staff review: email interview complete'
-            : `PARIS email interview: awaiting question ${outcome.next + 1}`,
-      })
-      .eq('id', app.id);
-    if (error) throw new Error('Interview answer could not be saved');
-    reply = outcome.reply;
-    if (!interview.started && !outcome.closed)
-      reply += `\n\nContinue your program signup: https://www.elevateforhumanity.org/apply?program=${encodeURIComponent(app.program_interest || '')}`;
+          next_step: outcome.closed
+            ? 'Staff review: applicant declined email interview'
+            : outcome.next === EMAIL_INTERVIEW_QUESTIONS.length
+              ? 'Staff review: email interview complete'
+              : `PARIS email interview: awaiting question ${outcome.next + 1}`,
+        })
+        .eq('id', app.id);
+      // Compare-and-set prevents concurrent deliveries from discarding another
+      // event's answer/outcome. A lost race retries from the new persisted state.
+      const guarded = app.updated_at == null
+        ? update.is('updated_at', null)
+        : update.eq('updated_at', app.updated_at);
+      const { data: saved, error } = await guarded.select('id').maybeSingle();
+      if (error || !saved) throw new Error('Interview answer could not be saved');
+    }
   }
   const subject = /^re:/i.test(parsed.subject) ? parsed.subject : `Re: ${parsed.subject}`;
   const { data: record, error: recordError } = await db
@@ -159,7 +191,8 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     })
     .select('id')
     .single();
-  if (recordError || !record) return { responded: false, reason: 'already_claimed_or_failed' };
+  if (recordError?.code === '23505') return { responded: false, reason: 'already_claimed' };
+  if (recordError || !record) throw new Error('PARIS reply claim could not be saved');
   const sent = await sendEmail({
     singleAttempt: true,
     to: sender,

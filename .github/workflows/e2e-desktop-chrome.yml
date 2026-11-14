@@ -54,6 +54,8 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Verify Course Builder chat controls in short and landscape panels
+        run: node scripts/test-course-chat-layout.mjs
       - name: Run desktop-chrome E2E (marketing, admin, lms)
         run: pnpm test:e2e
       - name: Upload Playwright report
@@ -91,6 +93,10 @@ jobs:
       - name: Verify all three browser engines
         run: node scripts/verify-playwright-runtime.mjs chromium firefox webkit
       - name: Test real email component across desktop, tablet, and phone browsers
+        # Firefox refuses to launch as root when HOME belongs to the container's pwuser.
+        # Scope this to browser execution; do not relax test coverage or checks.
+        env:
+          HOME: /root
         run: pnpm exec playwright test --config playwright.email.config.ts
       - name: Upload email device evidence
         if: always()

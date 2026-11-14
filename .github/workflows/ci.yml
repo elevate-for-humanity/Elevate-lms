@@ -31,13 +31,15 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Dev Studio container configuration regressions
-        run: node --test tests/devstudio-jsonc.test.mjs tests/studio-model-health-budget.test.mjs
-      - name: Protected OpenHands release evidence regressions
-        run: node --test tests/worker/openhands-protected-acceptance.test.mjs tests/worker/openhands-paris-protected-merge.test.mjs tests/worker/openhands-policy-readback.test.mjs
       - name: Install dependencies
         id: dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Protected OpenHands release evidence regressions
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test tests/worker/openhands-protected-acceptance.test.mjs tests/worker/openhands-paris-protected-merge.test.mjs tests/worker/openhands-policy-readback.test.mjs
+      - name: Dev Studio container configuration regressions
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test tests/devstudio-jsonc.test.mjs tests/studio-model-health-budget.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs scripts/gcp/verify-admin-revision.test.mjs
       - name: Public entry payment release regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test scripts/gcp/verify-public-entry.test.mjs

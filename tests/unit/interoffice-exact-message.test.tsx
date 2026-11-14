@@ -69,7 +69,7 @@ it('persists the new sent conversation ID so a refresh cannot reopen the previou
   const view = render(<EmailWorkspace initialMailboxId={mailboxId} initialThreadId={threadId} />);
   await screen.findByText('Information');
   fireEvent.click(screen.getByRole('button', { name: /Compose/ }));
-  fireEvent.change(screen.getByRole('textbox', { name: 'To' }), { target: { value: 'student@example.com' } });
+  fireEvent.change(screen.getByRole('combobox', { name: 'To' }), { target: { value: 'student@example.com' } });
   fireEvent.change(screen.getByRole('textbox', { name: 'Subject' }), { target: { value: 'New conversation' } });
   fireEvent.change(screen.getByRole('textbox', { name: 'Message' }), { target: { value: 'Requested information' } });
   fireEvent.click(screen.getByRole('button', { name: 'Send email' }));

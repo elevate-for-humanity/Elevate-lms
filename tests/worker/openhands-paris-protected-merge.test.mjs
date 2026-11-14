@@ -9,6 +9,7 @@ const fixtures = {
   '/pulls/2613/reviews?per_page=100': [{ user: { login: 'human', type: 'User' }, state: 'APPROVED',
     commit_id: HEAD, submitted_at: '2026-11-14T01:00:00Z' }],
   [`/commits/${HEAD}/check-runs?per_page=100`]: { check_runs: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success' }] },
+  [`/commits/${HEAD}/statuses?per_page=100`]: [],
   '/git/ref/heads/main': { object: { sha: MAIN } },
   [`/compare/${MERGE}...${MAIN}`]: { status: 'ahead' },
   '/rules/branches/main': [
@@ -78,6 +79,32 @@ test('skipped operational jobs do not override approved required PR validation c
       '/branches/main/protection': { required_pull_request_reviews: { required_approving_review_count: 1 } },
     }),
   })).accepted, false);
+});
+
+test('required commit status contexts are accepted only when latest state succeeded', async () => {
+  const path = `/commits/${HEAD}/statuses?per_page=100`;
+  const policy = [
+    { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
+    { type: 'required_status_checks', parameters: { required_status_checks: [{ context: 'external-ci' }] } },
+  ];
+  const classic = { required_pull_request_reviews: { required_approving_review_count: 1 } };
+  const base = {
+    '/rules/branches/main': policy,
+    '/branches/main/protection': classic,
+  };
+  const pass = github({
+    ...base, [path]: [{ context: 'external-ci', state: 'success' }],
+  });
+  assert.equal((await verifyProtectedParisMerge({ pr, expectedHeadSha: HEAD, gh: pass })).accepted, true);
+  for (const statuses of [
+    [{ context: 'external-ci', state: 'failure' }],
+    [{ context: 'external-ci', state: 'pending' }],
+    [],
+    Array.from({ length: 100 }, () => ({ context: 'external-ci', state: 'success' })),
+  ]) {
+    const fail = github({ ...base, [path]: statuses });
+    assert.equal((await verifyProtectedParisMerge({ pr, expectedHeadSha: HEAD, gh: fail })).accepted, false);
+  }
 });
 
 test('exact candidate, protected merge and main ancestry are mandatory', async () => {

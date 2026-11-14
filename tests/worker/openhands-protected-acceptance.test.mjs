@@ -60,6 +60,35 @@ test('skipped nonrequired operational checks do not override successful required
   }).accepted, false);
 });
 
+test('neutral optional check is not sufficient validation', () => {
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews, checks: [...checks, { name: 'Security', status: 'completed', conclusion: 'neutral' }],
+    requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true,
+  }).accepted, false);
+});
+
+test('required shared context needs BOTH successful check run and commit status', () => {
+  for (const conclusion of ['skipped', 'failure', 'neutral']) {
+    assert.equal(evaluateProtectedPullRequest({
+      pr, reviews,
+      checks: [{ name: 'external-ci', status: 'completed', conclusion }],
+      statuses: [{ context: 'external-ci', state: 'success' }],
+      requiredChecks: ['external-ci'], ancestryVerified: true, protectionVerified: true,
+    }).accepted, false);
+  }
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews,
+    checks: [{ name: 'external-ci', status: 'completed', conclusion: 'success' }],
+    statuses: [{ context: 'external-ci', state: 'failure' }],
+    requiredChecks: ['external-ci'], ancestryVerified: true, protectionVerified: true,
+  }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews, checks: [],
+    statuses: [{ context: 'external-ci', state: 'success' }],
+    requiredChecks: ['external-ci'], ancestryVerified: true, protectionVerified: true,
+  }).accepted, true);
+});
+
 test('classic-only, ruleset-only and mixed protection are recognized without assuming enforcement', () => {
   const classic = { required_pull_request_reviews: { required_approving_review_count: 1 },
     required_status_checks: { checks: [{ context: 'CI Required Gate' }] } };

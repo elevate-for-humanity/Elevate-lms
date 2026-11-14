@@ -5,6 +5,24 @@ import { readFileSync } from 'node:fs';
 const sha = 'a'.repeat(40);
 const ciEnv = { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GITHUB_REF: 'refs/heads/main', GITHUB_EVENT_NAME: 'workflow_run', GH_TOKEN: 'scoped-ci-token', GOOGLE_RELEASE_HOLD: 'false' };
 const completedCI = { name: 'CI', path: '.github/workflows/ci.yml', event: 'push', conclusion: 'success', head_branch: 'main', head_sha: sha, head_repository: { full_name: ciEnv.GITHUB_REPOSITORY } };
+test('every explicit course-image COPY input has an automatic source-change trigger', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/deploy-google-course-worker.yml', import.meta.url), 'utf8');
+  const dockerfile = readFileSync(new URL('../../Dockerfile.ultimate-worker', import.meta.url), 'utf8');
+  const push = workflow.split('  workflow_dispatch:')[0];
+  const patterns = [...push.matchAll(/^\s+- '([^']+)'/gm)].map(m => m[1]);
+  const matches = (pattern, path) => {
+    const expression = pattern.split('**').map(part => part.split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('[^/]*')).join('.*');
+    return new RegExp('^' + expression + '$').test(path);
+  };
+  const inputs = [...dockerfile.matchAll(/^COPY (.+)$/gm)].flatMap(m => m[1].trim().split(/\s+/).slice(0, -1));
+  assert.ok(inputs.length > 10, 'inspect the actual worker source COPY instructions');
+  const missing = inputs.filter(path => {
+    // Directory inputs represent every file below that directory.
+    const probe = path.split('/').at(-1).includes('.') ? path : path + '/__runtime_source__';
+    return !patterns.some(pattern => matches(pattern, probe));
+  });
+  assert.deepEqual(missing, [], 'copied runtime inputs must not be silently excluded from deployment triggers');
+});
 function completionSetup({ current = sha, prior = [], deny = false } = {}) {
   const calls = [];
   const request = async (url, init) => {

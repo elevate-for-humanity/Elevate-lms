@@ -1,5 +1,6 @@
 -- Run after the migration, in a disposable DB or an explicit ROLLBACK transaction.
--- Every fixture and all resulting warnings must be rolled back; never send pushes.
+-- Every fixture and all resulting warnings are rolled back; never send pushes.
+begin;
 do $$
 declare
   actor uuid; revision text; candidate jsonb; notice uuid; returned integer; resolved text;
@@ -45,3 +46,5 @@ begin
     or has_function_privilege('anon','public.record_service_billing_push_receipt(uuid,uuid,text,integer,timestamp with time zone)','execute') then
     raise exception 'untrusted role can mutate billing alerts'; end if;
 end $$;
+
+rollback;

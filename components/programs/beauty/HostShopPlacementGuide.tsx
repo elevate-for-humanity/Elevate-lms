@@ -1,6 +1,6 @@
 import { getProgramHeroImage } from '@/lib/images/programImages';
 import { shopGalleryForProgram, shopVideoForProgram } from '@/lib/partners/curated-shop-media';
-import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import HostShopPlacementGuideClient from './HostShopPlacementGuideClient';
 
@@ -8,7 +8,7 @@ export default async function HostShopPlacementGuide({ programSlug }: { programS
   const network = await getHostShopNetwork(true);
   const heroImage = getProgramHeroImage(programSlug);
   const shops = network
-    .filter((shop) => matchesHostShopProgram(shop, programSlug))
+    .filter((shop) => matchesHostShopPresentationProgram(shop, programSlug))
     .map((shop) => {
       const gallery = shopGalleryForProgram(shop.slug, shop.gallery ?? [], programSlug, shop.logo).filter(
         (photo) => photo.url !== heroImage,

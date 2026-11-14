@@ -93,7 +93,7 @@ jobs:
           tests/unit/portal-preview-subject.test.ts
       - name: Required CI completion policy
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test scripts/test-ci-required-gate.mjs scripts/test-github-branch-policy.mjs lib/phone/microphone.test.mjs scripts/audits/ci-independent-steps.test.mjs scripts/audits/github-actions-history-audit.test.mjs scripts/audits/cron-schedule-routing.test.mjs
+        run: node --test scripts/test-ci-required-gate.mjs tests/ci-required-gate-cancellation.node.test.mjs scripts/test-github-branch-policy.mjs lib/phone/microphone.test.mjs scripts/audits/ci-independent-steps.test.mjs scripts/audits/github-actions-history-audit.test.mjs scripts/audits/cron-schedule-routing.test.mjs
       - name: Studio GitHub credential fallback regression tests
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test scripts/test-devstudio-github-token.mjs scripts/test-github-app-token.mjs scripts/gcp/paris-github-app-binding.test.mjs scripts/gcp/github-runtime-binding.test.mjs scripts/test-github-authorization-contract.mjs scripts/test-paris-release-wakeup.mjs scripts/test-paris-planner-identity.mjs scripts/test-paris-workflow-target.mjs scripts/test-paris-app-diagnostic.mjs scripts/test-paris-rejected-read-recovery.mjs scripts/test-paris-completion-audit.mjs scripts/test-studio-health-app-access.mjs scripts/test-paris-tool-outcomes.mjs tests/worker/course-workspace-controls.test.mjs

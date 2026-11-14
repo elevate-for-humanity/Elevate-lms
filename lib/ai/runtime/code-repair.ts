@@ -197,7 +197,7 @@ export async function publishParisRepair(id:string,runId:number){
  const comparison=await gh(`/compare/${candidate.base_sha}...${candidate.branch.sha}`);
  if(!Array.isArray(comparison.files)||comparison.files.length>=300)throw Error('COMPLETE_REPAIR_FILE_INVENTORY_REQUIRED');
  const infrastructureRepair=comparison.files.some((file:any)=>infrastructureRepairPath(file.filename));
- const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub,graphql:(body:any)=>infrastructureGitHub('/graphql',{method:'POST',body:JSON.stringify(body)})});
+ const pullRequest=await openInfrastructureRepair({candidate,repairId:id,github:infrastructureGitHub});
  await updateOwnedRepair(id,runId,'validating',{verification:{...row.verification,protectedMerge:true,infrastructureRepair,pullRequest}});
  return {status:'awaiting-protected-merge',pullRequest,verifiedLive:false};
 }

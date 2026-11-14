@@ -55,6 +55,7 @@ function database(initial: ServiceBillingRecord[] = []) {
         if (
           !row ||
           current.revision !== args.p_expected_revision ||
+          row.metadata.billing_revision !== args.p_expected_revision ||
           row.metadata.push_status !== 'pending' ||
           row.metadata.resolved_at
         )
@@ -96,7 +97,11 @@ function database(initial: ServiceBillingRecord[] = []) {
               ? n.idempotency_key + ':after:' + prior.id
               : prior.idempotency_key
             : n.idempotency_key,
-          metadata: { ...n.metadata, base_key: n.idempotency_key },
+          metadata: {
+            ...n.metadata,
+            base_key: n.idempotency_key,
+            billing_revision: args.p_expected_revision,
+          },
         };
       });
       for (const row of notices.values())
@@ -113,6 +118,17 @@ function database(initial: ServiceBillingRecord[] = []) {
           const row = { ...n, id: 'notice' + notices.size };
           notices.set(n.idempotency_key, row);
           inserted.push(row);
+        } else {
+          const old = notices.get(n.idempotency_key);
+          if (old.metadata.push_status === 'pending' && !old.metadata.resolved_at) {
+            old.title = n.title;
+            old.message = n.message;
+            old.metadata = {
+              ...old.metadata,
+              billing_revision: args.p_expected_revision,
+              observed_at: n.metadata.observed_at,
+            };
+          }
         }
       return {
         data: [
@@ -365,6 +381,33 @@ describe('service billing evidence and alerts', () => {
     await Promise.all([refreshServiceBillingAlerts(db, now), refreshServiceBillingAlerts(db, now)]);
     expect(notices.size).toBe(1);
     expect(push).toHaveBeenCalledTimes(1);
+  });
+  it('refreshes an unattempted warning amount before recovering its push', async () => {
+    const { db, settings, notices } = database([record({ balance: 2 })]);
+    db.beforeReconcile = async () => {
+      db.beforeReconcile = undefined;
+      db.failNextRead = true;
+    };
+    await expect(refreshServiceBillingAlerts(db, now)).rejects.toThrow(
+      'SERVICE_BILLING_ALERTS_UNAVAILABLE',
+    );
+    settings.set(
+      'service_billing:twilio',
+      JSON.stringify(record({ balance: 1, revision: 'lower-balance' })),
+    );
+    await refreshServiceBillingAlerts(db, now);
+    expect(notices.size).toBe(1);
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(push.mock.calls[0][2].body).toContain('$1.00');
+    expect(push.mock.calls[0][2].body).not.toContain('$2.00');
+    const sent = [...notices.values()][0];
+    settings.set(
+      'service_billing:twilio',
+      JSON.stringify(record({ balance: 0, revision: 'lower-again' })),
+    );
+    await refreshServiceBillingAlerts(db, now);
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(sent.message).toContain('$1.00');
   });
   it('preserves resolution when push finishes after a recovery poll', async () => {
     const { db, settings, notices } = database([record({ balance: 2 })]);

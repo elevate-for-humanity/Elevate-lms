@@ -19,14 +19,26 @@ begin
   select n.id into notice from public.notifications n where n.idempotency_key=candidate->0->>'idempotency_key';
   select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now()) where not newly_created and id=notice;
   if returned<>1 then raise exception 'definitely unattempted notice was not recoverable'; end if;
+  update public.app_settings set value='{"revision":"updated-amount"}' where key='service_billing:transaction-test';
+  if public.claim_service_billing_push(notice,actor,'transaction-test','updated-amount',now()) then
+    raise exception 'unreconciled financial contents were claimed'; end if;
+  candidate:=jsonb_set(candidate,'{0,message}','"Updated amount regression fixture"');
+  perform public.reconcile_service_billing_alerts('transaction-test','updated-amount',candidate,now());
+  if (select n.message from public.notifications n where n.id=notice) is distinct from 'Updated amount regression fixture' then
+    raise exception 'pending financial contents were not refreshed'; end if;
+  update public.app_settings set value='{"revision":"test-revision"}' where key='service_billing:transaction-test';
+  perform public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now());
   if public.claim_service_billing_push(notice,actor,'transaction-test','stale-revision',now()) then
     raise exception 'stale push claim accepted'; end if;
   if not public.claim_service_billing_push(notice,actor,'transaction-test','test-revision',now()) then
     raise exception 'pending push was not claimed'; end if;
   if public.claim_service_billing_push(notice,actor,'transaction-test','test-revision',now()) then
     raise exception 'push claimed twice'; end if;
+  candidate:=jsonb_set(candidate,'{0,message}','"Do not rewrite attempted push"');
   select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now()) where newly_created;
   if returned<>0 then raise exception 'identical poll duplicated warning'; end if;
+  if (select n.message from public.notifications n where n.id=notice) is distinct from 'Updated amount regression fixture' then
+    raise exception 'attempted push evidence was rewritten'; end if;
   begin
     perform public.reconcile_service_billing_alerts('transaction-test','stale-revision','[]',now());
     raise exception 'stale revision unexpectedly accepted';

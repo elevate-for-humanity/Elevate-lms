@@ -71,6 +71,13 @@ begin
     on conflict(idempotency_key) do nothing returning n.* into inserted;
     newly_created:=found;
     if not newly_created then
+      -- Refresh only definitely unattempted notices while holding the billing
+      -- row lock. Already attempted pushes retain their original evidence.
+      update public.notifications n set title=candidate->>'title',message=candidate->>'message',
+        metadata=coalesce(n.metadata,'{}'::jsonb)||jsonb_build_object(
+          'billing_revision',p_expected_revision,'observed_at',candidate->'metadata'->>'observed_at')
+        where n.idempotency_key=candidate->>'idempotency_key'
+          and n.metadata->>'push_status'='pending' and n.metadata->>'resolved_at' is null;
       select n.* into inserted from public.notifications n where n.idempotency_key=candidate->>'idempotency_key'
         and n.metadata->>'push_status'='pending' and n.metadata->>'resolved_at' is null;
     end if;
@@ -116,6 +123,7 @@ begin
     jsonb_build_object('push_status','attempting','push_claimed_at',p_now)
     where n.id=p_id and n.user_id=p_user_id and n.metadata->>'source'='service-billing'
       and n.metadata->>'service_id'=p_service_id and n.metadata->>'push_status'='pending'
+      and n.metadata->>'billing_revision'=p_expected_revision
       and n.metadata->>'resolved_at' is null
       and exists(select 1 from public.service_billing_admin_recipients() r where r.id=p_user_id)
       returning n.id into claimed;

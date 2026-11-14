@@ -165,6 +165,9 @@ export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date
       await receipt(notice, 'superseded', 0);
       continue;
     }
+    // A same-band amount update still changes the notice's financial contents.
+    // Leave it unattempted until reconciliation refreshes those contents under lock.
+    if (notice.metadata.billing_revision !== latest!.revision) continue;
     const claim = await db.rpc('claim_service_billing_push', {
       p_id: notice.id,
       p_user_id: notice.user_id,

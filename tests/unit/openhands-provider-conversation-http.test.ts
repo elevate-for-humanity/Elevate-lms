@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ hydrate: vi.fn() }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: mocks.hydrate }));
-import { sendOpenHandsMessage, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
+import { sendOpenHandsMessage } from '@/lib/devstudio/openhands/client';
 
 const previousKey = process.env.OPENHANDS_API_KEY;
 const previousOrigin = process.env.OPENHANDS_API_URL;

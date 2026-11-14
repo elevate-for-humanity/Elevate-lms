@@ -53,13 +53,19 @@ media_encryption=sdes
 direct_media=no
 dtmf_mode=rfc4733
 from_user=+14632401404
-callerid=Elevate <+14632401404>
+; Preserve carrier-provided caller identity for every inbound extension.
+trust_id_inbound=yes
 send_pai=yes
 rtp_symmetric=yes
 force_rport=yes
 rewrite_contact=yes
 '''
 
+
+# Only the exact previous managed configuration is eligible for an in-place upgrade.
+LEGACY_CONFIG = CONFIG.replace(
+    "; Preserve carrier-provided caller identity for every inbound extension.\ntrust_id_inbound=yes",
+    "callerid=Elevate <+14632401404>")
 
 def run(args, required=True):
     result = subprocess.run(args, capture_output=True, text=True, timeout=30)
@@ -198,7 +204,8 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
     if main.is_symlink() or fragment.is_symlink():
         raise ValueError('carrier_configuration_symlink_requires_review')
     previous = main.read_text()
-    if fragment.exists() and fragment.read_text() != CONFIG:
+    previous_fragment = fragment.read_text() if fragment.exists() else None
+    if previous_fragment is not None and previous_fragment not in (CONFIG, LEGACY_CONFIG):
         raise ValueError('existing_carrier_configuration_requires_review')
     cli = lambda text: execute(['docker', 'exec', CONTAINER, 'asterisk', '-rx', text]).stdout
     channels = cli('core show channels count')
@@ -248,7 +255,9 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
             raise ValueError('live_server_certificate_verification_not_confirmed')
     except Exception:
         main.write_text(previous)
-        if not existed:
+        if existed:
+            fragment.write_text(previous_fragment)
+        else:
             fragment.unlink(missing_ok=True)
         try:
             if restarted:
@@ -278,3 +287,4 @@ if __name__ == '__main__':
         result = {'result': 'BLOCKED', 'code': str(error) if isinstance(error, ValueError) and re.fullmatch('[a-z_]+', str(error)) else 'isolated_trunk_validation_unavailable'}
     print(json.dumps(result))
     raise SystemExit(0 if result['result'] == 'PASS' else 1)
+

@@ -236,6 +236,11 @@ export function EmailWorkspace({
 
   async function openThread(threadId: string) {
     if (!data?.selectedMailboxId) return;
+    // Keep the exact message selectable when the PWA resumes or is refreshed.
+    const url = new URL(window.location.href);
+    url.searchParams.set('mailboxId', data.selectedMailboxId);
+    url.searchParams.set('threadId', threadId);
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
     await load(data.selectedMailboxId, threadId);
     if (!data.readOnly) {
       void fetch(apiPath, {
@@ -350,6 +355,10 @@ export function EmailWorkspace({
     viewRef.current = next;
     setView(next);
     setSelected([]);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('threadId');
+    if (mailboxId) url.searchParams.set('mailboxId', mailboxId);
+    window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
     void load(mailboxId);
   }
   async function saveDraft() {
@@ -887,16 +896,21 @@ export function EmailWorkspace({
           <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white md:static md:z-auto md:block md:max-h-[75dvh] md:overflow-y-auto' : 'hidden md:block'} min-w-0`} aria-label="Email reading pane">
             {data.selectedThread ? (
               <>
-                <div className="flex items-center gap-3 border-b border-slate-200 p-4">
+                <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 p-3 sm:gap-3 sm:p-4">
                   <button
                     type="button"
-                    onClick={() => void load(data.selectedMailboxId)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 md:hidden"
+                    onClick={() => {
+                      const url = new URL(window.location.href);
+                      url.searchParams.delete('threadId');
+                      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+                      void load(data.selectedMailboxId);
+                    }}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-300 md:hidden"
                     aria-label="Back to inbox"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
-                  <h2 className="min-w-0 flex-1 truncate font-black text-slate-950">
+                  <h2 className="order-last w-full min-w-0 break-words text-base font-black leading-6 text-slate-950 sm:order-none sm:w-auto sm:flex-1">
                     {data.selectedThread.subject}
                   </h2>
                   {!data.readOnly ? (
@@ -904,7 +918,7 @@ export function EmailWorkspace({
                       <button
                         type="button"
                         onClick={forward}
-                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-800"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 sm:text-sm"
                       >
                         Forward
                       </button>
@@ -918,11 +932,11 @@ export function EmailWorkspace({
                     </>
                   ) : null}
                 </div>
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6 md:max-h-[555px] md:flex-none">
+                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-slate-50 p-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:space-y-4 sm:p-6 md:max-h-[555px] md:flex-none">
                   {data.selectedThread.messages.map((message) => (
                     <article
                       key={message.id}
-                      className={`max-w-3xl rounded-2xl border p-4 shadow-sm ${message.direction === 'outbound' ? 'ml-auto border-blue-200 bg-blue-50' : 'border-slate-200 bg-white'}`}
+                      className={`max-w-full min-w-0 rounded-2xl border p-3 shadow-sm sm:max-w-3xl sm:p-4 ${message.direction === 'outbound' ? 'ml-auto border-blue-200 bg-blue-50' : 'border-slate-200 bg-white'}`}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
@@ -935,7 +949,7 @@ export function EmailWorkspace({
                           {formatDate(message.sent_at || message.received_at || message.created_at)}
                         </p>
                       </div>
-                      <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-6 text-slate-800">
+                      <p className="mt-4 whitespace-pre-wrap break-words text-[15px] leading-7 text-slate-900">
                         {message.text_body || '(No text content)'}
                       </p>
                       {message.attachments?.length ? (

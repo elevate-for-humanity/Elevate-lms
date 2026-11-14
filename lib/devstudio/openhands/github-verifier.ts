@@ -2,7 +2,8 @@ import 'server-only';
 
 import { getSecret } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
-import { evaluateProtectedPullRequest, protectedMainPolicyVerified } from './acceptance-contract.mjs';
+import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
+import { evaluateProtectedPullRequest, protectedMainPolicyVerified, requiredMainChecks } from './acceptance-contract.mjs';
 
 const GH_API = 'https://api.github.com';
 const DEFAULT_REPOSITORY = 'elevate-for-humanity/Elevate-lms';
@@ -170,6 +171,9 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         );
         ancestryVerified = ['ahead', 'identical'].includes(ancestry.status ?? '');
       }
+      // Use the dedicated GitHub App identity to read branch policy.
+      // A workflow job token may lack Administration read permission.
+      const policyToken = await getGitHubAppToken();
       // Both classic protection and rulesets may enforce main. A missing
       // or forbidden read is UNKNOWN, never evidence of enforcement.
       let rules: Array<{
@@ -181,18 +185,19 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         required_status_checks?: { checks?: unknown[]; contexts?: string[] };
       } | null = null;
       try {
-        rules = await gh<typeof rules>(`/repos/${repository}/rules/branches/main`, token);
+        rules = await gh<typeof rules>(`/repos/${repository}/rules/branches/main`, policyToken ?? undefined);
       } catch {
         reasons.push(`PR #${number}: ruleset readback unavailable; checking classic protection.`);
       }
       try {
-        classic = await gh<typeof classic>(`/repos/${repository}/branches/main/protection`, token);
+        classic = await gh<typeof classic>(`/repos/${repository}/branches/main/protection`, policyToken ?? undefined);
       } catch {
         reasons.push(`PR #${number}: classic protection readback unavailable.`);
       }
-      const protectionVerified = protectedMainPolicyVerified({ rules, classic });
+      const protectionVerified = Boolean(policyToken) && protectedMainPolicyVerified({ rules, classic });
+      const requiredChecks = requiredMainChecks({ rules, classic });
       const protectedAcceptance = evaluateProtectedPullRequest({
-        pr, reviews, checks: checkRuns, ancestryVerified, protectionVerified,
+        pr, reviews, checks: checkRuns, requiredChecks, ancestryVerified, protectionVerified,
       });
       if (!protectedAcceptance.accepted) {
         reasons.push(`PR #${number} lacks protected acceptance: ${protectedAcceptance.reasons.join('; ')}.`);

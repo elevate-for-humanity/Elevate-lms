@@ -289,7 +289,7 @@ jobs:
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Restore incremental TypeScript cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             apps/${{ matrix.app }}/.next/cache/tsbuildinfo.json
@@ -319,7 +319,7 @@ jobs:
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Restore content-based ESLint cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .eslintcache
           key: lint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.*', 'eslint-rules/**') }}-${{ github.sha }}

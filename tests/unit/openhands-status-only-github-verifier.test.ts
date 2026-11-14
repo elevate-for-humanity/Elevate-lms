@@ -25,6 +25,7 @@ const fixtures: Record<string, unknown> = {
     user: { login: 'independent', type: 'User' }, state: 'APPROVED',
     commit_id: HEAD, submitted_at: '2026-11-14T01:00:00Z',
   }],
+  [`${prefix}/collaborators/independent/permission`]: { permission: 'write' },
   [`${prefix}/compare/${MERGE}...main`]: { status: 'ahead' },
   [`${prefix}/rules/branches/main`]: [
     { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
@@ -73,6 +74,14 @@ describe('OpenHands independent GitHub verification — status-only CI', () => {
     expect(result.verified).toBe(true);
     expect(result.pullRequests[0].headSha).toBe(HEAD);
     expect(keys.app).toHaveBeenCalled();
+  });
+  it('rejects a read-only reviewer approval even with green PR checks', async () => {
+    mockGitHub({ [`${prefix}/collaborators/independent/permission`]: { permission: 'read' } });
+    expect((await verifyOpenHandsGitHubOutcome(request)).verified).toBe(false);
+  });
+  it('rejects a reviewer permission lookup failure rather than guessing authority', async () => {
+    mockGitHub({ [`${prefix}/collaborators/independent/permission`]: null });
+    expect((await verifyOpenHandsGitHubOutcome(request)).verified).toBe(false);
   });
   it('rejects failed legacy commit status even when PR exists', async () => {
     mockGitHub({ [`${prefix}/commits/${HEAD}/statuses?per_page=100`]: [{

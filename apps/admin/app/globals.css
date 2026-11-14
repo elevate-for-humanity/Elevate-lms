@@ -1067,11 +1067,7 @@ html {
     font-size: 16px !important;
   }
 
-  /* The iOS zoom floor must not cap Studio's explicit larger typing size. */
-  .admin-studio-viewport input.text-xl,
-  .admin-studio-viewport textarea.text-xl {
-    font-size: 1.25rem !important;
-  }
+  /* Keep Studio inputs at the same 16px mobile zoom-safe size. */
 }
 
 /* Mobile video player optimizations */

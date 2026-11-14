@@ -36,6 +36,7 @@ on:
       - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-google-lms-trigger.yml'
       - 'scripts/gcp/resolve-main-release*'
+      - 'scripts/gcp/require-exact-lms-ci.*'
   workflow_dispatch:
     inputs:
       requested_sha:
@@ -86,8 +87,24 @@ jobs:
         run: |
           node --test scripts/gcp/resolve-main-release.test.mjs
           node scripts/gcp/resolve-main-release.mjs
-  build:
+  ci-required:
     needs: validate
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 66
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Regression-test exact-main CI release denial
+        run: node --test scripts/gcp/require-exact-lms-ci.test.mjs
+      - name: Require green exact-main push CI before build and traffic activation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/gcp/require-exact-lms-ci.mjs
+  build:
+    needs: [validate, ci-required]
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
     uses: ./.github/workflows/build-google-migration-images.yml
     with:
@@ -124,7 +141,7 @@ jobs:
 
   release-result:
     name: Confirm LMS release jobs completed
-    needs: [validate, build, deploy, acceptance]
+    needs: [validate, ci-required, build, deploy, acceptance]
     if: ${{ always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (needs.validate.result != 'success' || needs.validate.outputs.ready == 'true') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2

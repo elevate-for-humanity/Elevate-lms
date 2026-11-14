@@ -100,4 +100,16 @@ test('original repair acceptance requires durable repair receipt, exact serving 
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, correlatedTask: { ...correlatedTask, correlation_id: 'paris-repair:other:attempt:1' } }).accepted, false);
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, services: [{ ready: true, servingSha: HEAD }] }).accepted, false);
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, originalDefectRegressionPassed: false }).accepted, false);
+  const newerSha = 'c'.repeat(40);
+  assert.equal(evaluateOriginalRepairAcceptance({
+    ...accepted, deployedSha: newerSha,
+    releaseAncestryVerified: true,
+    services: [{ ready: true, servingSha: newerSha }],
+  }).accepted, true);
+  assert.equal(evaluateOriginalRepairAcceptance({
+    ...accepted, deployedSha: newerSha,
+    releaseAncestryVerified: false,
+    services: [{ ready: true, servingSha: newerSha }],
+  }).accepted, false);
+
 });

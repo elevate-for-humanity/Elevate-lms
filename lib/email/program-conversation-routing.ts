@@ -1,5 +1,6 @@
 import type { requireAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmailSubject, parseEmailList } from './communication-email';
+import { canonicalHostShopProgram, permittedHostShopProgramScopes } from '@/lib/partners/host-shop-match-access';
 
 type Database = Awaited<ReturnType<typeof requireAdminClient>>;
 const ADMIN_ADDRESS = 'admissions@elevateforhumanity.org';
@@ -79,6 +80,25 @@ export async function programConversationRoute(
       .eq('id', holder.data.user_id)
       .maybeSingle();
     if (profile.error || profile.data?.role !== 'host_shop') return null;
+    // The historic Program Holder association is not an approved Host Shop
+    // placement. Copies into an active Host Shop mailbox require exactly one
+    // currently approved partner and the partner's exact program permissions.
+    let scopes: Awaited<ReturnType<typeof permittedHostShopProgramScopes>>;
+    try {
+      scopes = await permittedHostShopProgramScopes(db, holder.data.user_id);
+    } catch {
+      return null; // Fail closed when approved membership cannot be verified.
+    }
+    if (new Set(scopes.map(scope => scope.partnerId)).size !== 1) return null;
+    const permittedPrograms = new Set(scopes.flatMap(scope => scope.programSlugs));
+    const applicationPrograms = slugs.map(canonicalHostShopProgram);
+    const assignmentPrograms = (assignments.data || [])
+      .filter(row => row.program_holder_id === holderIds[0] &&
+        (linked.data || []).some(link => link.program_id === row.program_id))
+      .map(row => canonicalHostShopProgram(row.program_slug));
+    if (!applicationPrograms.length || !assignmentPrograms.length ||
+      [...applicationPrograms, ...assignmentPrograms].some(program =>
+        !program || !permittedPrograms.has(program))) return null;
     const memberships = await db.from('communication_email_mailbox_members')
       .select('access_level,mailbox:communication_email_mailboxes!inner(address,mailbox_kind,active)')
       .eq('user_id', holder.data.user_id)

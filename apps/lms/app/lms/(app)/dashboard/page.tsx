@@ -869,7 +869,7 @@ export default async function StudentDashboard() {
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   {careerMatches.map(
                     ({ job, eligibility, reasons, missingCredentials, applyUrl, source }) => (
-                      <div key={job.id} className="min-w-0 space-y-2">
+                      <div key={JSON.stringify([source, job.id])} className="min-w-0 space-y-2">
                         <JobCard job={job} sourceLabel={source || 'Job opportunity'} showApply href={applyUrl ?? '/lms/placement'} />
                         <p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
                           {eligibility === 'credential_match'

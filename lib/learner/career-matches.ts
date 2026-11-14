@@ -172,14 +172,10 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
       applyUrl: row.application_url ?? undefined,
       source: row.source || 'USAJOBS',
     }));
+  // Rank eligible copies before deduplicating each provider's job identity.
+  // Distinct jobs may share a general application link.
   const seen = new Set<string>();
   return candidates
-    .filter(({ job, applyUrl }) => {
-      const key = applyUrl || job.id;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
     .map(({ job, applyUrl, source }) => {
       const required = terms(job.required_certifications).map(norm).filter(Boolean);
       const missingCredentials = required.filter(
@@ -217,5 +213,11 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
     })
     .filter((match) => !interests.length || match.score > 0 || match.reasons.length > 0)
     .sort((a, b) => b.score - a.score || a.job.id.localeCompare(b.job.id))
+    .filter(({ job, source }) => {
+      const key = JSON.stringify([norm(source), job.id]);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
     .slice(0, limit);
 }

@@ -51,7 +51,9 @@ it('keeps the composer in the visible viewport and preserves a draft when the ke
     flush();
   });
   expect(screen.getByTestId('workspace').style.height).toBe('420px');
-  expect(screen.getByTestId('workspace').style.top).toBe('12px');
+  expect(screen.getByTestId('workspace').style.position).toBe('');
+  expect(screen.getByTestId('workspace').style.top).toBe('');
+  expect(screen.getByTestId('workspace').style.maxHeight).toBe('420px');
   expect((screen.getByLabelText('Draft') as HTMLTextAreaElement).value).toBe(
     'Keep my course request',
   );

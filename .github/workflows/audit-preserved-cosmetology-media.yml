@@ -58,7 +58,7 @@ jobs:
         run: |
           node --test scripts/gcp/repair-preserved-cosmetology-motion.test.mjs
           node scripts/gcp/repair-preserved-cosmetology-motion.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: preserved-cosmetology-media-evidence

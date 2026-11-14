@@ -85,7 +85,7 @@ jobs:
           systemctl enable elevate-pbx-provisioner elevate-paris-turn elevate-paris-gateway >/dev/null
           echo '{"result":"PASS","scope":"verified_private_service_boot_persistence","carrierRoutingChanged":false}'
           SH
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: private-phone-connection

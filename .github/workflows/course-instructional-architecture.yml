@@ -63,7 +63,7 @@ jobs:
         run: |
           mkdir -p layout-acceptance
           docker run --rm --entrypoint node -v "$PWD/layout-acceptance:/tmp/render-acceptance" -v "$PWD/scripts/gcp/render-course-layout-acceptance.mjs:/app/render-course-layout-acceptance.mjs:ro" elevate-course-architecture:${{ github.sha }} /app/render-course-layout-acceptance.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: course-layout-regression

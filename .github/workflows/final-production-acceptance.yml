@@ -42,7 +42,7 @@ jobs:
           IMAGE_SHA: ${{ github.sha }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/gcp/final-production-acceptance.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: production-acceptance-${{ github.sha }}

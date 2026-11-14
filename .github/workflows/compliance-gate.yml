@@ -134,7 +134,7 @@ jobs:
         run: tail -n 120 artifacts/compliance/marketing-server.log || true
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-results
           path: |
@@ -231,7 +231,7 @@ jobs:
         run: tail -n 120 artifacts/compliance/marketing-server.log || true
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: a11y-results
           path: |

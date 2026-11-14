@@ -76,7 +76,7 @@ jobs:
             for (const c of courses.filter(c=>c.reconciliation_finding!=="RELEASE_CONSISTENT"))
               console.log(`  ${c.reconciliation_finding}\t${c.title}\tstatus=${c.lms_status} active=${c.is_active} total=${c.total_lessons} published=${c.published_lessons} actual=${c.actual_lessons} builds=${c.build_count} release=${c.release_version??"-"}`);
           }'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: course-release-recovery-${{ github.run_id }}

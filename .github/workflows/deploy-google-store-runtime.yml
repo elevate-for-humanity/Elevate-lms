@@ -287,7 +287,7 @@ jobs:
           FAILED_SERVICE: elevate-store-migration
           FAILED_REVISION: ${{ steps.deploy.outputs.revision }}
         run: node scripts/gcp/collect-marketing-revision-diagnostics.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ failure() && steps.deploy.outputs.revision != '' }}
         with:
           name: store-revision-${{ github.run_id }}

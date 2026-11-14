@@ -337,7 +337,7 @@ jobs:
           import json,os
           open('/tmp/paris-validation.json','w').write(json.dumps({'sha':os.environ['PATCH_SHA'],'repairId':os.environ['REPAIR_ID'],'runId':os.environ['GITHUB_RUN_ID']}))
           PYCODE
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: paris-validated-${{ inputs.repair_id }}-${{ needs.prepare.outputs.sha }}
           path: /tmp/paris-validation.json

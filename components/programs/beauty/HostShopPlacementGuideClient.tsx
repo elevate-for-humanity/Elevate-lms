@@ -7,6 +7,7 @@ import Link from 'next/link';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { Building2, MapPin, Search, UserPlus, Users } from 'lucide-react';
 import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { BEAUTY_TRADES } from '@/lib/programs/beauty-trade-navigation';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 
 function normalized(value: string) {
@@ -35,6 +36,7 @@ export default function HostShopPlacementGuideClient({
     );
   }, [query, shops, programSlug]);
 
+  const selectedTrade = BEAUTY_TRADES.find(trade => trade.programSlug === programSlug);
   const suggestionHref = `/contact?topic=host-shop-suggestion&program=${encodeURIComponent(programSlug)}`;
   const waitlistHref = `/apply/student?program=${encodeURIComponent(programSlug)}&placement=waitlist`;
 
@@ -52,7 +54,7 @@ export default function HostShopPlacementGuideClient({
             id="host-shop-placement-heading"
             className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
           >
-            Meet your local barber and beauty professionals.
+            Meet your local {selectedTrade?.label.toLowerCase() ?? 'beauty'} professionals.
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">
             Explore each shop’s work, meet the team, and plan your visit. Search by city, ZIP code,
@@ -60,6 +62,12 @@ export default function HostShopPlacementGuideClient({
             opening. Placement is confirmed during enrollment.
           </p>
         </div>
+
+        {selectedTrade ? (
+          <Link href={selectedTrade.hostHref} className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-5 font-bold text-white">
+            Browse all {selectedTrade.label} Host Shops →
+          </Link>
+        ) : null}
 
         <div className="mt-7 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
           <label htmlFor="host-shop-search" className="text-sm font-black text-slate-950">

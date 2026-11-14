@@ -24,7 +24,7 @@ for (const [name, Component] of [['featured cards', FeaturedHostPartners], ['pla
   });
 }
 
-it('preserves approved dual-program placement choices with trade-specific photographs', async () => {
+it('keeps dual-approved barber-primary businesses on the barber page, not the cosmetology gallery', async () => {
   const { getHostShopNetwork } = await import('@/lib/programs/host-shop-network');
   const shops = await getHostShopNetwork();
   const barber = shops.find(shop => shop.id === 'barber')!;
@@ -33,5 +33,5 @@ it('preserves approved dual-program placement choices with trade-specific photog
   // existing client contract directly for a primary-barber dual approval.
   const { default: Guide } = await import('@/components/programs/beauty/HostShopPlacementGuideClient');
   render(<Guide programSlug="cosmetology-apprenticeship" shops={[{ ...barber, description: 'Dual approved business', approval: 'approved' }]} />);
-  expect(screen.getByRole('heading', { name: 'Barber Studio' })).toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'Barber Studio' })).not.toBeInTheDocument();
 });

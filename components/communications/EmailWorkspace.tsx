@@ -544,18 +544,18 @@ export function EmailWorkspace({
             Text messages
           </a>
         </nav>
-        <div className="grid min-h-[620px] lg:grid-cols-[240px_330px_minmax(0,1fr)]">
-          <aside className={`border-b border-slate-200 bg-slate-50 p-3 lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}>
+        <div className="grid min-h-[620px] min-w-0 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,1.6fr)] xl:grid-cols-[220px_minmax(280px,0.9fr)_minmax(0,1.6fr)]">
+          <aside className={`border-b border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-1 xl:border-b-0 xl:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}>
             <p className="px-2 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
               Mailboxes
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
+            <div className="flex gap-2 overflow-x-auto pb-1 xl:block xl:space-y-1 xl:overflow-visible xl:pb-0">
               {data.mailboxes.map((mailbox) => (
                 <button
                   key={mailbox.id}
                   type="button"
                   onClick={() => chooseView('inbox', mailbox.id)}
-                  className={`w-60 shrink-0 rounded-xl px-3 py-3 text-left lg:w-full ${mailbox.id === data.selectedMailboxId ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-white'}`}
+                  className={`w-60 shrink-0 rounded-xl px-3 py-3 text-left xl:w-full ${mailbox.id === data.selectedMailboxId ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-white'}`}
                 >
                   <span className="block truncate text-sm font-black">{mailbox.displayName}</span>
                   <span
@@ -573,7 +573,7 @@ export function EmailWorkspace({
             </div>
             <nav
               aria-label="Mail folders"
-              className="mt-3 flex gap-1 overflow-x-auto border-t border-slate-200 pt-3 lg:mt-5 lg:block lg:space-y-1 lg:overflow-visible"
+              className="mt-3 flex gap-1 overflow-x-auto border-t border-slate-200 pt-3 xl:mt-5 xl:block xl:space-y-1 xl:overflow-visible"
             >
               {Object.entries({
                 inbox: 'Inbox',
@@ -589,7 +589,7 @@ export function EmailWorkspace({
                   key={key}
                   type="button"
                   onClick={() => chooseView(key)}
-                  className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold lg:block lg:w-full ${view === key ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-white'}`}
+                  className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold xl:block xl:w-full ${view === key ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-white'}`}
                 >
                   {label}
                 </button>
@@ -598,7 +598,7 @@ export function EmailWorkspace({
                 <button
                   type="button"
                   onClick={() => setFilterEditor(true)}
-                  className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold text-blue-800 lg:w-full"
+                  className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold text-blue-800 xl:w-full"
                 >
                   Filters & copy rules
                 </button>
@@ -649,7 +649,7 @@ export function EmailWorkspace({
           </aside>
 
           <section
-            className={`border-b border-slate-200 lg:max-h-[75dvh] lg:overflow-y-auto lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}
+            className={`min-w-0 border-b border-slate-200 md:max-h-[75dvh] md:overflow-y-auto md:border-b-0 md:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}
           >
             <div className="flex items-center gap-2 border-b border-slate-200 p-4">
               <Inbox className="h-4 w-4 text-slate-500" />
@@ -884,14 +884,14 @@ export function EmailWorkspace({
             )}
           </section>
 
-          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white lg:static lg:z-auto lg:block lg:max-h-[75dvh] lg:overflow-y-auto' : 'hidden lg:block'} min-w-0`} aria-label="Email reading pane">
+          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white md:static md:z-auto md:block md:max-h-[75dvh] md:overflow-y-auto' : 'hidden md:block'} min-w-0`} aria-label="Email reading pane">
             {data.selectedThread ? (
               <>
                 <div className="flex items-center gap-3 border-b border-slate-200 p-4">
                   <button
                     type="button"
                     onClick={() => void load(data.selectedMailboxId)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 lg:hidden"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 md:hidden"
                     aria-label="Back to inbox"
                   >
                     <ArrowLeft className="h-4 w-4" />
@@ -918,7 +918,7 @@ export function EmailWorkspace({
                     </>
                   ) : null}
                 </div>
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:max-h-[555px] lg:flex-none">
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6 md:max-h-[555px] md:flex-none">
                   {data.selectedThread.messages.map((message) => (
                     <article
                       key={message.id}

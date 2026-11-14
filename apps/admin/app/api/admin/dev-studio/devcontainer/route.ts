@@ -1,3 +1,4 @@
+import { parseJsonc } from '@/lib/devstudio/jsonc.mjs';
 import { studioRepository } from '@/lib/devstudio/repository';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
@@ -29,64 +30,6 @@ function getBranch() {
 
 function encodePath(path: string) {
   return encodeURIComponent(path).replace(/%2F/g, '/');
-}
-
-function stripJsonCommentsAndTrailingCommas(input: string): string {
-  let out = '';
-  let inString = false;
-  let quote = '';
-  let i = 0;
-
-  while (i < input.length) {
-    const ch = input[i];
-    const next = input[i + 1];
-
-    if (inString) {
-      out += ch;
-      if (ch === '\\') {
-        if (i + 1 < input.length) {
-          out += input[i + 1];
-          i += 2;
-          continue;
-        }
-      } else if (ch === quote) {
-        inString = false;
-        quote = '';
-      }
-      i += 1;
-      continue;
-    }
-
-    if (ch === '"' || ch === "'") {
-      inString = true;
-      quote = ch;
-      out += ch;
-      i += 1;
-      continue;
-    }
-
-    if (ch === '/' && next === '/') {
-      i += 2;
-      while (i < input.length && input[i] !== '\n') i += 1;
-      continue;
-    }
-
-    if (ch === '/' && next === '*') {
-      i += 2;
-      while (i + 1 < input.length && !(input[i] === '*' && input[i + 1] === '/')) i += 1;
-      i += 2;
-      continue;
-    }
-
-    out += ch;
-    i += 1;
-  }
-
-  return out.replace(/,\s*([}\]])/g, '$1');
-}
-
-function parseJsonc(content: string) {
-  return JSON.parse(stripJsonCommentsAndTrailingCommas(content));
 }
 
 export async function GET(req: NextRequest) {

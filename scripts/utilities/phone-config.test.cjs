@@ -55,10 +55,12 @@ test('SMS transport receives normalized configured recipient and refuses retired
   }
 });
 test('retired carrier entry point fails without network requests', () => {
-  const entry = path.resolve(__dirname, '../northflank/reconcile-telnyx.ts');
+  for (const name of ['reconcile-telnyx.ts', 'audit-telnyx.ts', 'audit-telnyx-account-level.ts', 'register-telnyx-failover.ts']) {
+  const entry = path.resolve(__dirname, '../northflank/' + name);
   const script = 'global.fetch = () => { throw new Error("NETWORK_REQUEST"); }; require(' + JSON.stringify(entry) + ');';
   const result = spawnSync(process.execPath, ['-e', script], { encoding:'utf8' });
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /reconciliation is retired/);
+  assert.match(result.stderr, /retired/i);
   assert.doesNotMatch(result.stderr, /NETWORK_REQUEST/);
+  }
 });

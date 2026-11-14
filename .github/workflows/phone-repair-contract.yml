@@ -50,7 +50,7 @@ jobs:
         with:
           version: 10.28.2
       - run: pnpm install --frozen-lockfile
-      - run: node --test scripts/utilities/phone-config.test.cjs
+      - run: node --test scripts/utilities/phone-config.test.cjs scripts/gcp/bind-twilio-runtime.test.mjs scripts/gcp/retired-phone-runtime.test.mjs
       - run: python3 scripts/gcp/test-stage-twilio-trunk.py
       - run: node --test lib/communications/meeting-calendar.test.mjs
       - run: pnpm exec vitest run tests/unit/google-runtime-secret-scope.test.ts tests/unit/asterisk-device.test.ts

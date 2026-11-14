@@ -148,3 +148,22 @@ it('does not mark a conversation read when opening it fails', async () => {
   expect(new URL(window.location.href).searchParams.get('threadId')).toBeNull();
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
+
+it('does not overwrite refreshed unread status with a delayed automatic read result', async () => {
+  let finishRead!: (value: unknown) => void;
+  const fetchMock = vi.fn((input: string, init?: RequestInit) => {
+    if (init?.method === 'PATCH') return new Promise(resolve => { finishRead = resolve; });
+    const url = new URL(input, window.location.origin);
+    return Promise.resolve({ ok: true, json: async () => ({
+      ...base, selectedThread: url.searchParams.has('threadId') ? { ...thread, messages: [] } : null,
+    }) });
+  });
+  vi.stubGlobal('fetch', fetchMock);
+  render(<EmailWorkspace />);
+  fireEvent.click(await screen.findByRole('button', { name: /Applicant.*Enrollment question/ }));
+  await waitFor(() => expect(finishRead).toBeTypeOf('function'));
+  await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Refresh' })); });
+  await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
+  await act(async () => { finishRead({ ok: true }); });
+  expect(screen.getAllByText(thread.subject).find(node => node.tagName === 'P')).toHaveClass('font-black');
+});

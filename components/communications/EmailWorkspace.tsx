@@ -282,7 +282,7 @@ export function EmailWorkspace({
           body: JSON.stringify({ threadId }),
         });
         if (!response.ok) throw new Error('Read status update failed');
-        setData((current) => current?.selectedMailboxId === data.selectedMailboxId ? {
+        setData((current) => readRequest === requestSequence.current && current?.selectedMailboxId === data.selectedMailboxId ? {
           ...current,
           threads: current.threads.map((thread) =>
             thread.id === threadId ? { ...thread, unread: false } : thread),

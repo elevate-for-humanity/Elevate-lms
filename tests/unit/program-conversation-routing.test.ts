@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   applicantConversationSubject,
+  exactCaseInsensitiveEmailPattern,
   programConversationRoute,
 } from '@/lib/email/program-conversation-routing';
 
@@ -16,7 +17,7 @@ function database(
     const query: any = {
       select: () => query,
       eq: () => query,
-      ilike: vi.fn(() => query),
+      filter: vi.fn(() => query),
       in: () => query,
       neq: () => query,
       maybeSingle: async () => ({
@@ -58,7 +59,7 @@ function database(
   return { from } as any;
 }
 describe('assigned program interoffice conversations', () => {
-  it('escapes SQL wildcard metacharacters in both applicant identity filters', async () => {
+  it('uses exact case-insensitive literal identity patterns in both applicant identity filters', async () => {
     const db = database();
     await programConversationRoute(
       db,
@@ -67,14 +68,24 @@ describe('assigned program interoffice conversations', () => {
     );
     const filters = db.from.mock.calls.map((args: string[], index: number) => ({
       table: args[0],
-      ilike: db.from.mock.results[index].value.ilike.mock.calls,
+      filter: db.from.mock.results[index].value.filter.mock.calls,
     }));
-    expect(filters.find((item: any) => item.table === 'applications')?.ilike).toContainEqual([
-      'email', String.raw`student\_10\%off@example.com`,
+    expect(filters.find((item: any) => item.table === 'applications')?.filter).toContainEqual([
+      'email', 'imatch', String.raw`^student_10%off@example\.com$`,
     ]);
-    expect(filters.find((item: any) => item.table === 'program_holder_students')?.ilike).toContainEqual([
-      'applicant_email', String.raw`student\_10\%off@example.com`,
+    expect(filters.find((item: any) => item.table === 'program_holder_students')?.filter).toContainEqual([
+      'applicant_email', 'imatch', String.raw`^student_10%off@example\.com$`,
     ]);
+  });
+  it('treats PostgREST asterisks and regex punctuation as literal email characters', () => {
+    for (const address of ['ann*@example.com', 'ann+tag@example.com', 'a_b%off@example.com']) {
+      const pattern = exactCaseInsensitiveEmailPattern(address);
+      const exact = new RegExp(pattern, 'i');
+      expect(exact.test(address.toUpperCase())).toBe(true);
+      expect(exact.test('annsmith@example.com')).toBe(false);
+      expect(exact.test('prefix' + address)).toBe(false);
+      expect(exact.test(address + '.unrelated')).toBe(false);
+    }
   });
   it('routes non-CDL programs through their canonical holder assignment', async () => {
     expect(await programConversationRoute(database([{program_slug:'barber-apprenticeship',program_id:'cdl'}]),['student@example.com'],['admissions@elevateforhumanity.org'])).not.toBeNull();

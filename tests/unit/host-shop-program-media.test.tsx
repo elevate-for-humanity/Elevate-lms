@@ -4,7 +4,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 vi.mock('@/lib/programs/host-shop-network', () => ({
   getHostShopNetwork: async () => [
     { id: 'salon', slug: 'salon', name: 'Salon only', city: 'Indy', state: 'IN', address: '1 Main St', programs: ['cosmetology-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship', gallery: [{ url: '/salon.webp' }] },
-    { id: 'barber', slug: 'barber', name: 'Barber Studio', city: 'Indy', state: 'IN', address: '2 Main St', programs: ['barber-apprenticeship'], primaryProgram: 'barber-apprenticeship', gallery: [{ url: '/haircut.webp' }, { url: '/manicure.webp' }], videoUrl: '/barber-tour.mp4' },
+    { id: 'barber', slug: 'kountry-kutz-barbershop', name: 'Barber Studio', city: 'Indy', state: 'IN', address: '2 Main St', programs: ['barber-apprenticeship'], primaryProgram: 'barber-apprenticeship', gallery: [{ url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp' }, { url: '/manicure.webp' }], videoUrl: '/videos/partners/kountry-kutz-tour.mp4' },
   ],
 }));
 vi.mock('@/components/partners/HostShopMediaCarousel', () => ({
@@ -18,9 +18,9 @@ for (const [name, Component] of [['featured cards', FeaturedHostPartners], ['pla
   it(`${name} keep salons and manicures off the barber page and retain shop videos`, async () => {
     render(await Component({ programSlug: 'barber-apprenticeship' }));
     expect(screen.queryByText('Salon only')).not.toBeInTheDocument();
-    expect(screen.getByAltText('/haircut.webp')).toBeInTheDocument();
+    expect(screen.getByAltText('/images/partners/kountry-kutz/interior-active-enhanced-2026.webp')).toBeInTheDocument();
     expect(screen.queryByAltText('/manicure.webp')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Shop tour')).toHaveAttribute('src', '/barber-tour.mp4');
+    expect(screen.getByLabelText('Shop tour')).toHaveAttribute('src', '/videos/partners/kountry-kutz-tour.mp4');
   });
 }
 

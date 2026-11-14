@@ -2,6 +2,7 @@ import onboardingProfiles from '@/lib/partners/host-shop-onboarding-profiles.jso
 import { uniqueHostShops } from '@/lib/partners/dedupe-host-shops.mjs';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import 'server-only';
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
 
 import {
   FEATURED_BEAUTY_HOST_PARTNERS,
@@ -34,11 +35,11 @@ function phoneKey(value?: string) {
 }
 
 function featuredAddress(shop: FeaturedHostPartner) {
-  return [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
+  return formatHostShopAddress(shop);
 }
 
 function approvedAddress(shop: HostShop) {
-  return [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
+  return formatHostShopAddress(shop);
 }
 
 function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {

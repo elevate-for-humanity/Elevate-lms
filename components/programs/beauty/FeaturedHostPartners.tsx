@@ -1,5 +1,6 @@
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
 import Image from 'next/image';
-import { shopGalleryForProgram } from '@/lib/partners/curated-shop-media';
+import { shopGalleryForProgram, shopVideoForProgram } from '@/lib/partners/curated-shop-media';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { matchesHostShopPresentationProgram } from '@/lib/programs/host-shop-programs';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
@@ -57,8 +58,8 @@ export default async function FeaturedHostPartners({
           alt: item.alt || `${shop.name} portfolio`,
           kind: 'photo' as const,
         })),
-        ...(shop.videoUrl
-          ? [{ src: shop.videoUrl, alt: `${shop.name} shop video`, kind: 'video' as const }]
+        ...((!programSlug ? shop.videoUrl : shopVideoForProgram(shop.slug, shop.videoUrl, programSlug))
+          ? [{ src: shop.videoUrl!, alt: `${shop.name} shop video`, kind: 'video' as const }]
           : []),
       ],
     }));
@@ -165,7 +166,7 @@ export default async function FeaturedHostPartners({
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
 
-                const fullAddress = shop.address;
+                const fullAddress = formatHostShopAddress(shop);
                 return (
                   <article
                     key={shop.slug}

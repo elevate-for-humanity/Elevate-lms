@@ -36,14 +36,16 @@ describe('shop portfolio curation', () => {
 });
 
 import { shopGalleryForProgram } from '@/lib/partners/curated-shop-media';
-it('keeps all three restored Style and Scissor portfolios on its salon and nail cards', () => {
+it('keeps all three restored Style and Scissor portfolios on nail cards and its general profile', () => {
   const items = ['portfolio-nail-work', 'melissas-nails', 'pink-nail-work'].map(name => ({ url: `/images/partners/style-and-scissor-salon/${name}.webp` }));
-  for (const program of ['cosmetology-apprenticeship', 'nail-technician-apprenticeship']) {
+  for (const program of ['nail-technician-apprenticeship']) {
     const gallery = shopGalleryForProgram('style-and-scissor-salon', items, program);
     expect(gallery).toHaveLength(3);
     expect(gallery.every(photo => photo.url.endsWith('-restored-2026.webp'))).toBe(true);
     expect(gallery.every(photo => photo.alt?.includes('own photographs'))).toBe(true);
   }
+  expect(curateShopGallery('style-and-scissor-salon', items)).toHaveLength(3);
+  expect(shopGalleryForProgram('style-and-scissor-salon', items, 'cosmetology-apprenticeship')).toEqual([]);
   expect(shopGalleryForProgram('style-and-scissor-salon', items, 'barber-apprenticeship')).toEqual([]);
   expect(shopGalleryForProgram('style-and-scissor-salon', items, 'unknown', '/logo.webp')).toEqual([]);
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
 import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import Link from 'next/link';
 import {
@@ -23,15 +24,6 @@ import type {
 const ROTATION_MS = 6000;
 type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
 type ShowcaseSequenceItem = { shopSlug: string; media: ShowcaseMedia };
-
-function displayAddress(shop: FeaturedHostPartner) {
-  const address = shop.address.trim();
-  // Network entries already include city/state/ZIP; curated profiles can
-  // contain only a street. Preserve a formatted location without appending it twice.
-  if (shop.city && address.split(',').some(part => part.trim().toLowerCase() === shop.city.trim().toLowerCase())) return address;
-  return [address, shop.city, [shop.state, shop.zip].filter(Boolean).join(' ')]
-    .filter(Boolean).join(', ');
-}
 
 const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
   'kountry-kutz-barbershop': {
@@ -462,7 +454,7 @@ export default function HostShopShowcase({
               <p className="mt-5 flex items-start gap-2 text-sm font-semibold text-slate-800">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
                 <span>
-                  {displayAddress(shop)}
+                  {formatHostShopAddress(shop)}
                 </span>
               </p>
               {shop.phone ? (

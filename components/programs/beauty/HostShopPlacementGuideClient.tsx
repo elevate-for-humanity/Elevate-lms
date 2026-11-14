@@ -1,5 +1,7 @@
 'use client';
 
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
+
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
@@ -78,7 +80,7 @@ export default function HostShopPlacementGuideClient({
         {filtered.length ? (
           <div data-host-shop-directory className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
             {filtered.map((shop) => {
-              const address = shop.address || [shop.city, shop.state].filter(Boolean).join(', ');
+              const address = formatHostShopAddress(shop);
               const directions = address
                 ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
                 : undefined;

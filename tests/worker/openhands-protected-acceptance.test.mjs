@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateProtectedPullRequest, evaluateOriginalRepairAcceptance } from '../../lib/devstudio/openhands/acceptance-contract.mjs';
+import { evaluateProtectedPullRequest, evaluateOriginalRepairAcceptance, protectedMainPolicyVerified } from '../../lib/devstudio/openhands/acceptance-contract.mjs';
 
 const HEAD = 'a'.repeat(40);
 const MERGE = 'b'.repeat(40);
@@ -41,6 +41,39 @@ test('missing, failing, pending and truncated CI all fail closed', () => {
   ]) {
     assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: invalid, ancestryVerified: true, protectionVerified: true }).accepted, false);
   }
+});
+
+
+test('classic-only, ruleset-only and mixed protection are recognized without assuming enforcement', () => {
+  const classic = { required_pull_request_reviews: { required_approving_review_count: 1 },
+    required_status_checks: { checks: [{ context: 'CI Required Gate' }] } };
+  const rules = [
+    { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
+    { type: 'required_status_checks', parameters: { required_status_checks: [{ context: 'CI Required Gate' }] } },
+  ];
+  assert.equal(protectedMainPolicyVerified({ classic }), true);
+  assert.equal(protectedMainPolicyVerified({ rules }), true);
+  assert.equal(protectedMainPolicyVerified({
+    classic: { required_pull_request_reviews: { required_approving_review_count: 1 } },
+    rules: [rules[1]],
+  }), true);
+  assert.equal(protectedMainPolicyVerified({ rules: [], classic: {} }), false);
+  assert.equal(protectedMainPolicyVerified({}), false);
+});
+
+test('comments do not erase an independent approval or reinstate changes requested', () => {
+  const comment = { ...reviews[0], state: 'COMMENTED', submitted_at: '2026-11-14T02:00:00Z' };
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews: [reviews[0], comment], checks, ancestryVerified: true, protectionVerified: true,
+  }).accepted, true);
+  const changes = { ...reviews[0], state: 'CHANGES_REQUESTED', submitted_at: '2026-11-14T01:30:00Z' };
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews: [reviews[0], changes, comment], checks, ancestryVerified: true, protectionVerified: true,
+  }).accepted, false);
+  const dismissed = { ...reviews[0], state: 'DISMISSED', submitted_at: '2026-11-14T01:30:00Z' };
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews: [reviews[0], dismissed, comment], checks, ancestryVerified: true, protectionVerified: true,
+  }).accepted, false);
 });
 
 const repairId = 'd1507c12-93f7-459e-9aaf-b73286e2bd5c';

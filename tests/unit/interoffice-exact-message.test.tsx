@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, act } from '@testing-library/react';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
-import { emailAlertUrl } from '@/lib/notifications/pwa-alert-settings';
+import { emailAlertUrl, alertPresentation } from '@/lib/notifications/pwa-alert-settings';
 const mailboxId='25235365-1df4-4bee-b904-f615196c517b';
 const threadId='4ce8b846-2ffd-48ae-81af-6869a27ca57b';
 afterEach(()=>{ cleanup(); vi.unstubAllGlobals(); });
@@ -33,4 +33,18 @@ it('preserves mailbox and thread on admin push links without trusting arbitrary 
  expect(url.searchParams.get('threadId')).toBe(threadId);
  expect(url.searchParams.get('mailboxId')).toBe(mailboxId);
  expect(emailAlertUrl({action_url:'https://evil.example/communications/email?mailboxId='+mailboxId},false)).toBe('https://app.elevateforhumanity.org/communications/email');
+});
+
+it('shows a readable authorized email preview and retains the exact secure deep link',()=>{
+ const notice={
+   metadata:{alert_kind:'email',sender_email:'student@example.com',subject:'Nail technician reply',preview:'I need a training location.',mailbox_id:mailboxId,thread_id:threadId},
+   action_url:'https://app.elevateforhumanity.org/communications/email',
+ };
+ const presentation=alertPresentation(notice,'email');
+ expect(presentation.title).toContain('student@example.com');
+ expect(presentation.body).toContain('I need a training location.');
+ const destination=new URL(emailAlertUrl(notice,true));
+ expect(destination.pathname).toBe('/phone/email');
+ expect(destination.searchParams.get('mailboxId')).toBe(mailboxId);
+ expect(destination.searchParams.get('threadId')).toBe(threadId);
 });

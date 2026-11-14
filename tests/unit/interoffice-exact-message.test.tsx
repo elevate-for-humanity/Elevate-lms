@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, act } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, act, waitFor } from '@testing-library/react';
 import { EmailWorkspace } from '@/components/communications/EmailWorkspace';
 import { emailAlertUrl, alertPresentation } from '@/lib/notifications/pwa-alert-settings';
 const mailboxId='25235365-1df4-4bee-b904-f615196c517b';
@@ -47,4 +47,41 @@ it('shows a readable authorized email preview and retains the exact secure deep 
  expect(destination.pathname).toBe('/phone/email');
  expect(destination.searchParams.get('mailboxId')).toBe(mailboxId);
  expect(destination.searchParams.get('threadId')).toBe(threadId);
+});
+
+it('persists the new sent conversation ID so a refresh cannot reopen the previous email', async () => {
+  const sentThread = 'e6f0b16d-374e-4712-8627-25a09bc08012';
+  window.history.replaceState(null, '', `/communications/email?mailboxId=${mailboxId}&threadId=${threadId}`);
+  const fetch = vi.fn(async (url: string, options?: { method?: string }) => {
+    if (options?.method === 'POST') {
+      return { ok: true, json: async () => ({ threadId: sentThread }) };
+    }
+    const requestedThread = new URL(String(url), 'https://app.elevateforhumanity.org').searchParams.get('threadId');
+    return { ok: true, json: async () => ({
+      ...data(),
+      readOnly: false,
+      selectedThread: requestedThread
+        ? { id: requestedThread, subject: 'Conversation', messages: [] }
+        : null,
+    }) };
+  });
+  vi.stubGlobal('fetch', fetch);
+  const view = render(<EmailWorkspace initialMailboxId={mailboxId} initialThreadId={threadId} />);
+  await screen.findByText('Information');
+  fireEvent.click(screen.getByRole('button', { name: /Compose/ }));
+  fireEvent.change(screen.getByRole('textbox', { name: 'To' }), { target: { value: 'student@example.com' } });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Subject' }), { target: { value: 'New conversation' } });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Message' }), { target: { value: 'Requested information' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Send email' }));
+  await waitFor(() => expect(new URL(window.location.href).searchParams.get('threadId')).toBe(sentThread));
+  expect(new URL(window.location.href).searchParams.get('mailboxId')).toBe(mailboxId);
+  view.unmount();
+  const resumed = new URL(window.location.href);
+  render(<EmailWorkspace
+    initialMailboxId={resumed.searchParams.get('mailboxId') || undefined}
+    initialThreadId={resumed.searchParams.get('threadId') || undefined}
+  />);
+  await waitFor(() => expect(fetch.mock.calls.some(([url]) =>
+    String(url).includes(`threadId=${sentThread}`)
+  )).toBe(true));
 });

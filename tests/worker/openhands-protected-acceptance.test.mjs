@@ -13,11 +13,12 @@ const reviews = [{ user: { login: 'independent-reviewer', type: 'User' }, state:
 const checks = [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success' }];
 
 test('protected GitHub acceptance requires merge ancestry, current-head checks and independent review', () => {
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: true }).accepted, true);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: false }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr: { ...pr, merged: false }, reviews, checks, ancestryVerified: true }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews: [], checks, ancestryVerified: true }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: [], ancestryVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: true, protectionVerified: true }).accepted, true);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: true, protectionVerified: false }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: false, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr: { ...pr, merged: false }, reviews, checks, ancestryVerified: true, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews: [], checks, ancestryVerified: true, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: [], ancestryVerified: true, protectionVerified: true }).accepted, false);
 });
 
 test('reviewer cannot be author, bot, stale approval or superseded by changes requested', () => {
@@ -28,7 +29,7 @@ test('reviewer cannot be author, bot, stale approval or superseded by changes re
     [{ ...reviews[0], state: 'COMMENTED' }],
     [reviews[0], { ...reviews[0], state: 'CHANGES_REQUESTED', submitted_at: '2026-11-14T02:00:00Z' }],
   ]) {
-    assert.equal(evaluateProtectedPullRequest({ pr, reviews: bad, checks, ancestryVerified: true }).accepted, false);
+    assert.equal(evaluateProtectedPullRequest({ pr, reviews: bad, checks, ancestryVerified: true, protectionVerified: true }).accepted, false);
   }
 });
 
@@ -38,7 +39,7 @@ test('missing, failing, pending and truncated CI all fail closed', () => {
     [{ name: 'CI', status: 'completed', conclusion: 'failure' }],
     Array.from({ length: 100 }, () => checks[0]),
   ]) {
-    assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: invalid, ancestryVerified: true }).accepted, false);
+    assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: invalid, ancestryVerified: true, protectionVerified: true }).accepted, false);
   }
 });
 

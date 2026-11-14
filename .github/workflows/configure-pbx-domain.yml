@@ -31,7 +31,7 @@ jobs:
       # This is transport-only verification; never report actual calls as PASS.
       - name: Verify authoritative DNS, TLS, HTTPS and SIP WebSocket transport
         run: node scripts/gcp/verify-pbx-transport.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pbx-transport-evidence

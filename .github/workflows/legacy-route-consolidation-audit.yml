@@ -16,7 +16,7 @@ jobs:
           node-version: 22
       - name: Dry-run collision-safe consolidation
         run: node scripts/consolidate-legacy-routes.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: legacy-route-consolidation-audit
           path: artifacts/legacy-route-consolidation.json

@@ -183,7 +183,7 @@ jobs:
           node scripts/gcp/repair-studio-browser-cloud-run.mjs
       - name: Preserve exact failed browser revision diagnostics
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: studio-browser-startup-${{ github.run_id }}
           path: reports/studio-browser

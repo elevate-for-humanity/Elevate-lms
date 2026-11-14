@@ -32,7 +32,7 @@ jobs:
         env:
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
         run: node scripts/gcp/retire-northflank-domain.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: retired-domain-inventory

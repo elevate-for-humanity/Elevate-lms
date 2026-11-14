@@ -54,7 +54,7 @@ jobs:
             cat "audit-reports/$vm-health.json"
           done
           exit "$result"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: google-cost-readiness-${{ github.run_id }}
@@ -87,7 +87,7 @@ jobs:
         run: |
           set -o pipefail
           node scripts/gcp/reduce-idle-capacity.mjs | tee audit-reports/idle-apps.jsonl
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: google-idle-apps-${{ github.run_id }}
@@ -117,7 +117,7 @@ jobs:
       - run: node --test scripts/gcp/cleanup-old-images.test.mjs scripts/gcp/audit-cost-resources.test.mjs
       - name: Clean old images after complete reference and manifest verification
         run: node scripts/gcp/cleanup-old-images.mjs --apply
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: google-image-cleanup-${{ github.run_id }}
@@ -154,7 +154,7 @@ jobs:
         run: |
           set -o pipefail
           node scripts/gcp/reduce-model-idle.mjs | tee audit-reports/model-idle.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: google-idle-model-${{ github.run_id }}
@@ -191,7 +191,7 @@ jobs:
         run: |
           set -o pipefail
           node scripts/gcp/park-browser-trial.mjs | tee audit-reports/browser-trial-parking.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: google-browser-idle-${{ github.run_id }}

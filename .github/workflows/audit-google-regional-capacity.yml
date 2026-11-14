@@ -134,7 +134,7 @@ jobs:
           NODE
       - name: Preserve regional and cost inventory evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: google-resource-audit-${{ github.run_id }}-${{ github.run_attempt }}
           path: audit-reports/*.json

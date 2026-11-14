@@ -54,7 +54,7 @@ jobs:
         with:
           skip_install: true
       - run: node scripts/gcp/preflight-isolated-workloads.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: isolated-google-workload-preflight

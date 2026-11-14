@@ -75,7 +75,7 @@ jobs:
         run: node scripts/gcp/collect-marketing-revision-diagnostics.mjs
       - name: Preserve diagnostic verification evidence
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: marketing-diagnostic-verification-${{ github.run_id }}
           path: deployment-diagnostics/marketing-revision.json

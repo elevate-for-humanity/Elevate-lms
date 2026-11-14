@@ -61,7 +61,7 @@ jobs:
       - name: Clean only this run's disposable portal identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: studio-iphone-diagnostic

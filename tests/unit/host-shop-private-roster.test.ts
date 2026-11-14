@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { hasAnyRole } from '@/lib/rbac/role-matrix';
 import { hostShopMatchSummary } from '@/lib/partners/host-shop-match-projection';
@@ -159,8 +160,9 @@ describe('independent exact approved shop + program privacy regressions', () => 
 
 describe('Host Shop E2E identity isolation', () => {
   it('passes only dedicated Host Shop test credentials to the desktop runner', () => {
-    const workflow = readFileSync(new URL('../../.github/workflows/e2e-desktop-chrome.yml', import.meta.url), 'utf8');
+    const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/e2e-desktop-chrome.yml'), 'utf8');
     const desktop = workflow.split('  desktop-chrome:')[1]?.split('  email-device-browsers:')[0] || '';
+    expect(desktop).not.toBe(''); // Reject a renamed or missing browser job before asserting its identity.
     expect(desktop).toContain('E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL || secrets.TEST_HOST_SHOP_EMAIL }}');
     expect(desktop).toContain('E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD || secrets.TEST_HOST_SHOP_PASSWORD }}');
     expect(desktop).not.toMatch(/E2E_HOST_SHOP_(?:EMAIL|PASSWORD):[^\r\n]*(?:ADMIN|PROGRAM_HOLDER|STUDENT)/);

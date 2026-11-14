@@ -37,11 +37,12 @@ export async function programConversationRoute(
   if (linked.error) throw linked.error;
   const linkedHolderIds = [...new Set((linked.data || []).map((row) => row.program_holder_id))];
   if (linkedHolderIds.length !== 1) return null;
+  // An applicant's unique explicit holder assignment is authoritative even if
+  // the holder is not the primary program-wide instructor (e.g. Jozanna).
   const assignments = await db
     .from('program_holder_programs')
     .select('program_holder_id,program_id,program_slug')
-    .eq('status', 'active')
-    .eq('is_primary', true);
+    .eq('status', 'active');
   if (assignments.error) throw assignments.error;
   const holderIds = [
     ...new Set(

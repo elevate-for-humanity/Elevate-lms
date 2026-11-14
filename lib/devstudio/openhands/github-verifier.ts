@@ -2,6 +2,7 @@ import 'server-only';
 
 import { getSecret } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { evaluateProtectedPullRequest } from './acceptance-contract.mjs';
 
 const GH_API = 'https://api.github.com';
 const DEFAULT_REPOSITORY = 'elevate-for-humanity/Elevate-lms';
@@ -108,6 +109,9 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         state: string;
         draft?: boolean;
         merged?: boolean;
+        merged_at?: string | null;
+        merge_commit_sha?: string | null;
+        user?: { login?: string | null };
         created_at?: string;
         head?: { sha?: string; ref?: string };
         base?: { ref?: string };
@@ -153,6 +157,26 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         reasons.push(`PR #${number} has no changed files, successful completed checks, or valid commit status.`);
         continue;
       }
+      // GitHub CI success is not enough. Review the exact head, prove the
+      // protected merge is reachable from main, and fail closed on uncertainty.
+      const reviews = await gh<Array<{
+        user?: { login?: string; type?: string };
+        state?: string; commit_id?: string; submitted_at?: string;
+      }>>(`/repos/${repository}/pulls/${number}/reviews?per_page=100`, token);
+      let ancestryVerified = false;
+      if (pr.merged && /^[a-f0-9]{40}$/i.test(pr.merge_commit_sha ?? '')) {
+        const ancestry = await gh<{ status?: string }>(
+          `/repos/${repository}/compare/${encodeURIComponent(pr.merge_commit_sha!)}...main`, token,
+        );
+        ancestryVerified = ['ahead', 'identical'].includes(ancestry.status ?? '');
+      }
+      const protectedAcceptance = evaluateProtectedPullRequest({
+        pr, reviews, checks: checkRuns, ancestryVerified,
+      });
+      if (!protectedAcceptance.accepted) {
+        reasons.push(`PR #${number} lacks protected acceptance: ${protectedAcceptance.reasons.join('; ')}.`);
+        continue;
+      }
       pullRequests.push({
         number: pr.number,
         state: pr.state,
@@ -175,6 +199,8 @@ export async function verifyOpenHandsGitHubOutcome(input: {
     }
   }
 
+  // 'verified' means protected GitHub PR acceptance, NOT production recovery.
+  // The original repair must independently match a durable release SHA and serving endpoints.
   // Branch existence alone is never an engineering completion gate.
   const verified = pullRequests.length > 0;
   if (!verified) {

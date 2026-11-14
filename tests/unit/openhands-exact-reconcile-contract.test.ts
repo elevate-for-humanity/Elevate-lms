@@ -63,7 +63,8 @@ describe('exact OpenHands reconciliation contract', () => {
     const response = await GET(request(`?task_id=${taskId}`));
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ success: true, task_id: taskId });
-    expect(reconcileOpenHandsTasks).toHaveBeenCalledExactlyOnceWith(1, taskId);
+    expect(reconcileOpenHandsTasks).toHaveBeenCalledTimes(1);
+    expect(reconcileOpenHandsTasks).toHaveBeenCalledWith(1, taskId);
   });
 
   it.each(['', '?task_id=%20%20'])(
@@ -71,7 +72,8 @@ describe('exact OpenHands reconciliation contract', () => {
       const response = await GET(request(query));
       expect(response.status).toBe(200);
       expect(await response.json()).toMatchObject({ success: true, task_id: null });
-      expect(reconcileOpenHandsTasks).toHaveBeenCalledExactlyOnceWith(10, undefined);
+      expect(reconcileOpenHandsTasks).toHaveBeenCalledTimes(1);
+      expect(reconcileOpenHandsTasks).toHaveBeenCalledWith(10, undefined);
     },
   );
 
@@ -80,6 +82,7 @@ describe('exact OpenHands reconciliation contract', () => {
     const response = await GET(request(`?task_id=${taskId}`));
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ success: false, task_id: taskId });
-    expect(reconcileOpenHandsTasks).toHaveBeenCalledExactlyOnceWith(1, taskId);
+    expect(reconcileOpenHandsTasks).toHaveBeenCalledTimes(1);
+    expect(reconcileOpenHandsTasks).toHaveBeenCalledWith(1, taskId);
   });
 });

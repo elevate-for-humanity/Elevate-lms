@@ -52,7 +52,7 @@ it('submits only the validated SHA through a protected PR and keeps deployment p
  expect(h.updates).toContainEqual(expect.objectContaining({verification:expect.objectContaining({protectedMerge:true,infrastructureRepair:false})}));
  expect(vi.mocked(fetch).mock.calls.filter(([u])=>String(u).endsWith('/dispatches'))).toEqual([]);
 });
-it('publishes workflow corrections through App-authenticated protected auto-merge before deployment',async()=>{
+it('submits workflow corrections through an App-authenticated PR and waits for protected review',async()=>{
  h.infrastructure=true;
  expect(await publishParisRepair('repair',7)).toMatchObject({status:'awaiting-protected-merge',verifiedLive:false,pullRequest:{number:12}});
  expect(h.updates).toContainEqual(expect.objectContaining({verification:expect.objectContaining({infrastructureRepair:true,pullRequest:expect.objectContaining({headSha:'b'.repeat(40)})})}));
@@ -60,7 +60,7 @@ it('publishes workflow corrections through App-authenticated protected auto-merg
  expect(calls.some(([,init])=>init?.method==='PATCH')).toBe(false);
  expect(calls.some(([url])=>String(url).endsWith('/dispatches'))).toBe(false);
  expect(calls.find(([url])=>String(url).endsWith('/pulls'))?.[1]?.headers).toMatchObject({Authorization:'Bearer app-only-fixture'});
- expect(JSON.parse(String(calls.find(([url])=>String(url).endsWith('/graphql'))?.[1]?.body)).query).toContain('enablePullRequestAutoMerge');
+ expect(calls.filter(([url])=>String(url).endsWith('/graphql'))).toEqual([]);
 });
 it('a stale repair state or another workflow run cannot publish',async()=>{
  await expect(publishParisRepair('repair',8)).rejects.toThrow('STATE_MISMATCH');
@@ -73,11 +73,13 @@ it('binds the protected PR to the independently validated immutable source',asyn
  expect(JSON.parse(String(publication?.[1]?.body))).toMatchObject({base:'main',head:'studio/task'});
  expect(h.updates).toContainEqual(expect.objectContaining({verification:expect.objectContaining({pullRequest:expect.objectContaining({number:12,headSha:'b'.repeat(40)})})}));
 });
-it('a rejected protected merge cannot be reported as a published or deployed repair',async()=>{
+it('a rejected PR creation cannot be reported as a published or deployed repair',async()=>{
  const original=vi.mocked(fetch).getMockImplementation()!;
- vi.mocked(fetch).mockImplementation(async(input:any,init:any)=>String(input).endsWith('/graphql')?new Response(null,{status:403}):original(input,init));
+ vi.mocked(fetch).mockImplementation(async(input:any,init:any)=>String(input).endsWith('/pulls')&&init?.method==='POST'?new Response(null,{status:403}):original(input,init));
  await expect(publishParisRepair('repair',7)).rejects.toThrow('PARIS_INFRASTRUCTURE_GITHUB_HTTP_403');
  expect(h.updates.some(value=>value.release_sha||value.status==='verified')).toBe(false);
+ expect(h.updates).toHaveLength(0);
+ expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).endsWith('/dispatches'))).toBe(false);
 });
 
 it('does not persist a publication receipt when a concurrent repair supersedes its workflow',async()=>{

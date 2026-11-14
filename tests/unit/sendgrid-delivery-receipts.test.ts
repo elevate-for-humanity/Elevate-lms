@@ -37,3 +37,16 @@ it('accepts the DER verification-key representation without exposing key materia
  m.rpc.mockResolvedValue({data:true,error:null});
  expect((await POST(request([event]))).status).toBe(200);
 });
+
+it('correlates grouped conversation receipts to the actual recipient only', async () => {
+ vi.stubEnv('SENDGRID_EVENT_WEBHOOK_PUBLIC_KEY',publicKey);
+ m.rpc.mockResolvedValue({data:true,error:null});
+ const one='00000000-0000-4000-8000-000000000001';
+ const two='00000000-0000-4000-8000-000000000002';
+ const group={...event,elevate_email_log_id:undefined,elevate_email_log_ids:JSON.stringify({'one@example.org':one,'two@example.org':two})};
+ expect((await POST(request([{...group,email:'TWO@example.org'}]))).status).toBe(200);
+ expect(m.rpc).toHaveBeenCalledWith('record_sendgrid_delivery_event',expect.objectContaining({p_log_id:two}));
+ m.rpc.mockClear();
+ expect((await POST(request([{...group,email:'untracked-copy@example.org',event:'bounce'}]))).status).toBe(200);
+ expect(m.rpc).not.toHaveBeenCalled();
+});

@@ -1,29 +1,56 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   applicantConversationSubject,
+  exactCaseInsensitiveEmailPattern,
   programConversationRoute,
 } from '@/lib/email/program-conversation-routing';
 
 function database(
   applications: any[] = [{ program_slug: 'cdl-training', program_id: 'cdl' }],
   holders = ['academy'],
+  archived = false,
+  hostMailboxes = ['mesmerized.by.beauty.cosmetology.academy-2@elevateforhumanity.org'],
+  partnerPrograms = ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
+  activeMember = true,
 ) {
   const from = vi.fn((table: string) => {
     const query: any = {
       select: () => query,
       eq: () => query,
-      ilike: () => query,
+      filter: vi.fn(() => query),
       in: () => query,
+      neq: () => query,
+      maybeSingle: async () => ({
+        data: table === 'program_holders'
+          ? { user_id: 'holder-owner', features: { portal_access_archived: archived } }
+          : table === 'profiles' ? { role: 'host_shop' } : null,
+        error: null,
+      }),
       then: (resolve: any) =>
         Promise.resolve({
           data:
             table === 'applications'
               ? applications
               : table === 'program_holder_students'
-                ? holders.map((id) => ({ program_holder_id: id, program_id: 'cdl' }))
+                ? holders.map((id) => ({
+                    program_holder_id: id, program_id: applications[0]?.program_id || 'cdl',
+                  }))
                 : table === 'program_holder_programs'
-                  ? holders.map((id) => ({ program_holder_id: id, program_id: 'cdl' }))
-                  : [{ address: 'the.cdl.academy@elevateforhumanity.org' }],
+                  ? holders.map((id) => ({
+                    program_holder_id: id,
+                    program_id: applications[0]?.program_id || 'cdl',
+                    program_slug: applications[0]?.program_slug || 'cdl-training',
+                  }))
+                  : table === 'partner_users'
+                    ? activeMember ? [{ partner_id: 'mesmerized-partner', role: 'owner' }] : []
+                    : table === 'partners'
+                      ? [{ id: 'mesmerized-partner', status: 'active', approval_status: 'approved',
+                        is_active: true, programs: partnerPrograms }]
+                      : table === 'shops'
+                        ? [{ id: 'mesmerized-shop', partner_id: 'mesmerized-partner', active: true }]
+                  : table === 'communication_email_mailbox_members'
+                    ? hostMailboxes.map((address) => ({ access_level: 'manager', mailbox: { address, mailbox_kind: 'host_shop', active: true } }))
+                    : [{ address: 'the.cdl.academy@elevateforhumanity.org' }],
           error: null,
         }).then(resolve),
     };
@@ -32,6 +59,34 @@ function database(
   return { from } as any;
 }
 describe('assigned program interoffice conversations', () => {
+  it('uses exact case-insensitive literal identity patterns in both applicant identity filters', async () => {
+    const db = database();
+    await programConversationRoute(
+      db,
+      ['STUDENT_10%OFF@example.com'],
+      ['admissions@elevateforhumanity.org'],
+    );
+    const filters = db.from.mock.calls.map((args: string[], index: number) => ({
+      table: args[0],
+      filter: db.from.mock.results[index].value.filter.mock.calls,
+    }));
+    expect(filters.find((item: any) => item.table === 'applications')?.filter).toContainEqual([
+      'email', 'imatch', String.raw`^student_10%off@example\.com$`,
+    ]);
+    expect(filters.find((item: any) => item.table === 'program_holder_students')?.filter).toContainEqual([
+      'applicant_email', 'imatch', String.raw`^student_10%off@example\.com$`,
+    ]);
+  });
+  it('treats PostgREST asterisks and regex punctuation as literal email characters', () => {
+    for (const address of ['ann*@example.com', 'ann+tag@example.com', 'a_b%off@example.com']) {
+      const pattern = exactCaseInsensitiveEmailPattern(address);
+      const exact = new RegExp(pattern, 'i');
+      expect(exact.test(address.toUpperCase())).toBe(true);
+      expect(exact.test('annsmith@example.com')).toBe(false);
+      expect(exact.test('prefix' + address)).toBe(false);
+      expect(exact.test(address + '.unrelated')).toBe(false);
+    }
+  });
   it('routes non-CDL programs through their canonical holder assignment', async () => {
     expect(await programConversationRoute(database([{program_slug:'barber-apprenticeship',program_id:'cdl'}]),['student@example.com'],['admissions@elevateforhumanity.org'])).not.toBeNull();
   });
@@ -97,6 +152,67 @@ describe('assigned program interoffice conversations', () => {
         ),
       ).toBeNull();
     }
+  });
+  it('does not convert archived Program Holder applicant history into Host Shop mail', async () => {
+    // Even a same-program application and an active Host Shop mailbox do not
+    // establish an approved placement or authorize copying applicant content.
+    for (const slug of ['esthetician-apprenticeship', 'nail-technician-apprenticeship']) {
+      const db = database([{ program_slug: slug, program_id: slug }], ['academy'], true);
+      expect(await programConversationRoute(
+        db, ['student@example.com'], ['admissions@elevateforhumanity.org'],
+      )).toBeNull();
+      // Never query Host Shop partners or mailboxes to route archived-holder mail.
+      expect(db.from.mock.calls.map((call: string[]) => call[0])).not.toContain('partner_users');
+      expect(db.from.mock.calls.map((call: string[]) => call[0])).not.toContain('communication_email_mailbox_members');
+    }
+  });
+  it('fails closed rather than sharing applicant mail across multiple Host Shops', async () => {
+    expect(await programConversationRoute(
+      database([{ program_slug: 'nail-technician-apprenticeship', program_id: 'nails' }], ['academy'], true, ['shop-one@example.org', 'shop-two@example.org']),
+      ['student@example.com'],
+      ['admissions@elevateforhumanity.org'],
+    )).toBeNull();
+  });
+  it('denies archived holder barber, cosmetology, and CDL copies at a beauty-only shop', async () => {
+    for (const slug of ['barber-apprenticeship', 'cosmetology-apprenticeship', 'cdl-training']) {
+      expect(await programConversationRoute(
+        database([{ program_slug: slug, program_id: 'legacy' }], ['academy'], true),
+        ['student@example.com'], ['admissions@elevateforhumanity.org'],
+      )).toBeNull();
+    }
+  });
+  it('denies historic copies when approved Host Shop membership is absent', async () => {
+    expect(await programConversationRoute(
+      database([{ program_slug: 'esthetician-apprenticeship', program_id: 'esthetician' }],
+        ['academy'], true, undefined, undefined, false),
+      ['student@example.com'], ['admissions@elevateforhumanity.org'],
+    )).toBeNull();
+  });
+  it('fails closed for multiple partners rather than combining their program permissions', async () => {
+    const db = database([{ program_slug: 'esthetician-apprenticeship', program_id: 'esthetician' }],
+      ['academy'], true);
+    const from = db.from;
+    db.from = (table: string) => {
+      const q = from(table);
+      if (table === 'partner_users') q.then = (resolve: any) => Promise.resolve({ data: [
+        { partner_id: 'mesmerized-partner', role: 'owner' },
+        { partner_id: 'other-partner', role: 'owner' },
+      ], error: null }).then(resolve);
+      if (table === 'partners') q.then = (resolve: any) => Promise.resolve({ data: [
+        { id: 'mesmerized-partner', programs: ['esthetician-apprenticeship'],
+          status: 'active', approval_status: 'approved', is_active: true },
+        { id: 'other-partner', programs: ['barber-apprenticeship'],
+          status: 'active', approval_status: 'approved', is_active: true },
+      ], error: null }).then(resolve);
+      if (table === 'shops') q.then = (resolve: any) => Promise.resolve({ data: [
+        { id: 'mesmerized-shop', partner_id: 'mesmerized-partner', active: true },
+        { id: 'other-shop', partner_id: 'other-partner', active: true },
+      ], error: null }).then(resolve);
+      return q;
+    };
+    expect(await programConversationRoute(
+      db, ['student@example.com'], ['admissions@elevateforhumanity.org'],
+    )).toBeNull();
   });
   it('keeps different applicants separate even with identical outreach subjects', () => {
     expect(applicantConversationSubject('Re: WorkOne status', 'a@example.com')).toBe(

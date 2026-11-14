@@ -31,7 +31,17 @@ export async function POST(request: Request) {
   let recorded = 0;
   for (const event of events) {
     if (!event || typeof event !== 'object') return NextResponse.json({ error: 'Invalid event' }, { status: 400 });
-    const logId = String(event.elevate_email_log_id || '');
+    let logId = String(event.elevate_email_log_id || '');
+    // Conversation sends share one personalization. Resolve its signed receipt
+    // by recipient so a CC/BCC bounce cannot change a different person's log.
+    if (!logId && typeof event.elevate_email_log_ids === 'string') {
+      try {
+        const ids = JSON.parse(event.elevate_email_log_ids);
+        const email = typeof event.email === 'string' ? event.email.toLowerCase() : '';
+        if (ids && typeof ids === 'object' && Object.hasOwn(ids, email))
+          logId = String(ids[email] || '');
+      } catch { return NextResponse.json({ error: 'Invalid tracking map' }, { status: 400 }); }
+    }
     // Other SendGrid senders may share this account; only mutate our tracked sends.
     if (!logId) continue;
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(logId)) return NextResponse.json({ error: 'Invalid tracking ID' }, { status: 400 });

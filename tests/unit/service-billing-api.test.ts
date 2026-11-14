@@ -55,7 +55,27 @@ describe('Admin service-billing authorization and writes', () => {
     mocks.alerts.mockRejectedValue(new Error('push unavailable'));
     const response = await POST(request());
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ record: { revision: 'new' }, alertsAvailable: false });
+    expect(await response.json()).toEqual({
+      record: { revision: 'new' },
+      alertsAvailable: false,
+      refreshRequired: false,
+    });
+  });
+  it('returns the persisted revision after automatic balance refresh', async () => {
+    mocks.save.mockResolvedValue({ serviceId: 'twilio', revision: 'saved' });
+    mocks.read.mockResolvedValue([{ serviceId: 'twilio', revision: 'refreshed', balance: 42 }]);
+    const response = await POST(request());
+    expect((await response.json()).record).toEqual({
+      serviceId: 'twilio',
+      revision: 'refreshed',
+      balance: 42,
+    });
+  });
+  it('keeps a durable save successful when the final read fails', async () => {
+    mocks.read.mockRejectedValue(new Error('storage unavailable after save'));
+    const response = await POST(request());
+    expect(response.status).toBe(200);
+    expect((await response.json()).refreshRequired).toBe(true);
   });
   it('never exposes an unavailable ledger as an empty successful response', async () => {
     mocks.read.mockRejectedValue(new Error('database unavailable'));

@@ -89,6 +89,12 @@ export function ServiceBillingPanel() {
       if (!response.ok) throw Error(result.error || 'Billing record could not be saved.');
       setRecords((rows) => [...rows.filter((r) => r.serviceId !== editing), result.record]);
       setEditing(null);
+      window.dispatchEvent(new Event('service-billing-updated'));
+      if (result.refreshRequired) {
+        setError(
+          'Record saved, but its current revision could not be reloaded. Refresh billing before another edit.',
+        );
+      }
       setNotice(
         result.alertsAvailable
           ? 'Verified record saved. Any new billing warnings were checked.'
@@ -224,7 +230,7 @@ export function ServiceBillingPanel() {
                 </a>
                 <button
                   type="button"
-                  disabled={loading || !!error}
+                  disabled={loading || !!error || saving}
                   className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold disabled:opacity-50"
                   onClick={() => {
                     setEditingRecord(record ? { ...record } : undefined);
@@ -241,7 +247,7 @@ export function ServiceBillingPanel() {
       </div>
       {editing && (
         <form
-          key={editing}
+          key={`${editing}:${editingRecord?.revision ?? 'new'}`}
           onSubmit={save}
           className="m-5 space-y-4 rounded-xl border-2 border-blue-300 bg-blue-50 p-5"
         >

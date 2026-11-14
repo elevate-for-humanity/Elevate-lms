@@ -45,6 +45,61 @@ function database(initial: ServiceBillingRecord[] = []) {
   );
   const notices = new Map<string, any>();
   const db: any = {
+    async rpc(name: string, args: any) {
+      if (name === 'record_service_billing_push_receipt') {
+        const row = [...notices.values()].find(
+          (n) => n.id === args.p_id && n.user_id === args.p_user_id,
+        );
+        if (row) {
+          row.metadata = {
+            ...row.metadata,
+            push_status: args.p_status,
+            accepted_devices: args.p_devices,
+            push_attempted_at: args.p_now,
+            ...(args.p_status === 'superseded'
+              ? { resolved_at: row.metadata.resolved_at || args.p_now }
+              : {}),
+          };
+          if (args.p_status === 'superseded') row.read = true;
+        }
+        return {};
+      }
+      await db.beforeReconcile?.();
+      const current = JSON.parse(settings.get('service_billing:' + args.p_service_id)!);
+      if (current.revision !== args.p_expected_revision)
+        return { error: { message: 'SERVICE_BILLING_CONFLICT' } };
+      const inserted: any[] = [];
+      const prepared = args.p_notices.map((n: any) => {
+        const prior = [...notices.values()]
+          .reverse()
+          .find((old) => (old.metadata.base_key || old.idempotency_key) === n.idempotency_key);
+        return {
+          ...n,
+          idempotency_key: prior
+            ? prior.metadata.resolved_at
+              ? n.idempotency_key + ':after:' + prior.id
+              : prior.idempotency_key
+            : n.idempotency_key,
+          metadata: { ...n.metadata, base_key: n.idempotency_key },
+        };
+      });
+      for (const row of notices.values())
+        if (
+          row.metadata.service_id === args.p_service_id &&
+          !row.metadata.resolved_at &&
+          !prepared.some((n: any) => n.idempotency_key === row.idempotency_key)
+        ) {
+          row.read = true;
+          row.metadata = { ...row.metadata, resolved_at: args.p_now };
+        }
+      for (const n of prepared)
+        if (!notices.has(n.idempotency_key)) {
+          const row = { ...n, id: 'notice' + notices.size };
+          notices.set(n.idempotency_key, row);
+          inserted.push(row);
+        }
+      return { data: inserted };
+    },
     from(table: string) {
       const filters: Record<string, any> = {};
       let operation = 'read';
@@ -251,6 +306,55 @@ describe('service billing evidence and alerts', () => {
     await refreshServiceBillingAlerts(db, now);
     expect([...notices.values()][0].read).toBe(true);
     expect([...notices.values()][0].metadata.resolved_at).toBeDefined();
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+  it('preserves resolution when push finishes after a recovery poll', async () => {
+    const { db, settings, notices } = database([record({ balance: 2 })]);
+    push.mockImplementationOnce(async () => {
+      settings.set(
+        'service_billing:twilio',
+        JSON.stringify(record({ balance: 50, revision: 'recovered' })),
+      );
+      await refreshServiceBillingAlerts(db, now);
+      return 1;
+    });
+    await refreshServiceBillingAlerts(db, now);
+    expect([...notices.values()][0].metadata.resolved_at).toBeDefined();
+    settings.set(
+      'service_billing:twilio',
+      JSON.stringify(record({ balance: 2, revision: 'low-again' })),
+    );
+    await refreshServiceBillingAlerts(db, now);
+    expect(notices.size).toBe(2);
+    expect(push).toHaveBeenCalledTimes(2);
+  });
+  it('does not let a stale poll resolve a newer critical warning', async () => {
+    const { db, settings, notices } = database([record({ balance: 50 })]);
+    db.beforeReconcile = async () => {
+      db.beforeReconcile = undefined;
+      settings.set(
+        'service_billing:twilio',
+        JSON.stringify(record({ balance: 0, revision: 'new-low' })),
+      );
+      await refreshServiceBillingAlerts(db, now);
+    };
+    await expect(refreshServiceBillingAlerts(db, now)).rejects.toThrow(
+      'SERVICE_BILLING_ALERTS_UNAVAILABLE',
+    );
+    expect([...notices.values()][0].metadata.resolved_at).toBeUndefined();
+    expect([...notices.values()][0].read).not.toBe(true);
+  });
+  it('creates a new warning with more than 1000 retained historical notices', async () => {
+    const { db, notices } = database([record({ balance: 0 })]);
+    for (let i = 0; i < 1100; i++)
+      notices.set('old-' + i, {
+        id: 'old-' + i,
+        idempotency_key: 'old-' + i,
+        metadata: { service_id: 'twilio', resolved_at: new Date(now).toISOString() },
+        read: true,
+      });
+    await refreshServiceBillingAlerts(db, now);
+    expect(notices.size).toBe(1101);
     expect(push).toHaveBeenCalledTimes(1);
   });
   it('refreshes only the exact Twilio account without changing invoice evidence or paying', async () => {

@@ -26,11 +26,13 @@ export async function GET(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const supabase = await createClient();
-  const db = (await getAdminClient()) ?? (supabase as ReturnType<typeof getAdminClient> extends Promise<infer T> ? T : never);
+  const db =
+    (await getAdminClient()) ??
+    (supabase as ReturnType<typeof getAdminClient> extends Promise<infer T> ? T : never);
   const effectiveDb = db ?? supabase;
 
   try {
-    const [profileRes, appsRes, docsRes, alertsRes, wioaDocsRes, staleLeadsRes] =
+    const [profileRes, appsRes, docsRes, alertsRes, wioaDocsRes, staleLeadsRes, billingRes] =
       await Promise.all([
         effectiveDb
           .from('profiles')
@@ -58,15 +60,46 @@ export async function GET(req: NextRequest) {
           .select('id', { count: 'exact', head: true })
           .lt('updated_at', new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString())
           .not('status', 'in', '("closed_won","closed_lost","Closed Won","Closed Lost")'),
+        effectiveDb
+          .from('notifications')
+          .select('id,title,created_at', { count: 'exact' })
+          .eq('user_id', auth.user.id)
+          .eq('read', false)
+          .eq('metadata->>source', 'service-billing')
+          .order('created_at', { ascending: false })
+          .limit(20),
       ]);
 
-    const unavailableSources = ([['applications', appsRes], ['documents', docsRes], ['compliance', alertsRes], ['wioa', wioaDocsRes], ['leads', staleLeadsRes]] as const).filter(([, result]) => Boolean(result.error)).map(([name]) => name);
+    const unavailableSources = (
+      [
+        ['applications', appsRes],
+        ['documents', docsRes],
+        ['compliance', alertsRes],
+        ['wioa', wioaDocsRes],
+        ['leads', staleLeadsRes],
+        ['service-billing', billingRes],
+      ] as const
+    )
+      .filter(([, result]) => Boolean(result.error))
+      .map(([name]) => name);
     const name =
-      profileRes.data?.first_name ||
-      profileRes.data?.full_name?.split(' ')[0] ||
-      'Admin';
+      profileRes.data?.first_name || profileRes.data?.full_name?.split(' ')[0] || 'Admin';
 
-    const notifs: AdminNavNotif[] = [];
+    const notifs: AdminNavNotif[] = (billingRes.data || []).map((row) => ({
+      id: `service-billing:${row.id}`,
+      unread: true,
+      href: '/operations/infrastructure-costs#service-billing',
+      title: row.title,
+      time: 'Service billing · needs attention',
+    }));
+    if ((billingRes.count || 0) > 20)
+      notifs.push({
+        id: 'service-billing:remaining',
+        unread: true,
+        href: '/operations/infrastructure-costs#service-billing',
+        title: `${billingRes.count - 20} more billing warnings`,
+        time: 'Review service billing',
+      });
 
     if ((appsRes.count ?? 0) > 0) {
       notifs.push({
@@ -115,11 +148,19 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { userName: name, notifs, status: unavailableSources.length ? 'degraded' : 'ok', unavailableSources },
+      {
+        userName: name,
+        notifs,
+        status: unavailableSources.length ? 'degraded' : 'ok',
+        unavailableSources,
+      },
       { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' } },
     );
   } catch (err) {
     logger.warn('[header-data] fetch failed', err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: 'HEADER_DATA_UNAVAILABLE', status: 'unavailable', userName: 'Admin', notifs: [] }, { status: 503 });
+    return NextResponse.json(
+      { error: 'HEADER_DATA_UNAVAILABLE', status: 'unavailable', userName: 'Admin', notifs: [] },
+      { status: 503 },
+    );
   }
 }

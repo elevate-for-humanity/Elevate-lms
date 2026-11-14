@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
+import { writePrivateQaState } from './write-private-state.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_E2E_STATE_PATH || '.qa-apprenticeship-e2e-state.json';
@@ -238,7 +239,7 @@ async function provision() {
     );
     state.placementId = placement.id;
 
-    await writeFile(statePath, JSON.stringify(state, null, 2));
+    await writePrivateQaState(statePath, state);
 
     if (process.env.GITHUB_ENV) {
       const lines = [
@@ -264,7 +265,7 @@ async function provision() {
       standardKey: standard.standard_key,
     }));
   } catch (error) {
-    await writeFile(statePath, JSON.stringify(state, null, 2)).catch(() => {});
+    await writePrivateQaState(statePath, state).catch(() => {});
     await cleanup().catch((cleanupError) => console.error('cleanup after provision failure:', cleanupError));
     throw error;
   }

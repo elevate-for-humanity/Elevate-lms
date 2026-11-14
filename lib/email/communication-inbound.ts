@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { applyMailFilters, isGmailCopy, isRelevantCopy, isAutomatedMail } from './mail-filters';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmailSubject, parseEmailList } from '@/lib/email/communication-email';
-import { safeAttachmentName, type ParsedInboundEmail } from '@/lib/email/sendgrid-inbound';
+import { inboundDeliveryRecipients, safeAttachmentName, type ParsedInboundEmail } from '@/lib/email/sendgrid-inbound';
 import {
   applicantConversationSubject,
   programConversationRoute,
@@ -50,9 +50,7 @@ export async function storeInboundCommunicationEmail(
   parsed: ParsedInboundEmail,
   options: { applicantEmail?: string; internalCopy?: boolean } = {},
 ): Promise<{ stored: boolean; mailboxCount: number; filtered?: boolean }> {
-  let recipients = Array.from(
-    new Set([...parsed.envelopeRecipients, ...parseEmailList(parsed.to)]),
-  );
+  let recipients = inboundDeliveryRecipients(parsed);
   if (!recipients.length) return { stored: false, mailboxCount: 0 };
 
   const db = await requireAdminClient();
@@ -63,12 +61,30 @@ export async function storeInboundCommunicationEmail(
   if (route) recipients = [...new Set([...recipients, ...route.addresses])];
   // Deliver known addresses to their designated mailbox. Admissions is a fallback
   // for unknown business addresses, never a copy of every department's mail.
-  const matched = await db.from('communication_email_mailboxes').select('id,address').in('address', recipients).eq('active', true);
+  const matched = await db.from('communication_email_mailboxes')
+    .select('id,address,mailbox_kind,program_holder_id')
+    .in('address', recipients).eq('active', true);
   if (matched.error) throw new Error('Mail routing unavailable');
-  const unknownBusiness = recipients.some(address => address.endsWith('@elevateforhumanity.org') && !(matched.data || []).some(mailbox => mailbox.address === address));
-  let mailboxes = matched.data || [];
+  const holderIds = [...new Set((matched.data || [])
+    .filter((mailbox) => mailbox.mailbox_kind === 'program_holder' && mailbox.program_holder_id)
+    .map((mailbox) => mailbox.program_holder_id))];
+  let archivedHolderIds = new Set<string>();
+  if (holderIds.length) {
+    const holders = await db.from('program_holders').select('id,features').in('id', holderIds);
+    if (holders.error) throw new Error('Archived mailbox routing check unavailable');
+    archivedHolderIds = new Set((holders.data || [])
+      .filter((holder: any) => holder.features?.portal_access_archived === true)
+      .map((holder: any) => holder.id));
+  }
+  // Preserve archived history but never deliver new mail to the archived box.
+  // A direct email to an archived legacy address remains in the admin fallback.
+  let mailboxes = (matched.data || []).filter((mailbox) =>
+    !(mailbox.mailbox_kind === 'program_holder' &&
+      mailbox.program_holder_id && archivedHolderIds.has(mailbox.program_holder_id)));
+  const unknownBusiness = recipients.some(address =>
+    address.endsWith('@elevateforhumanity.org') && !mailboxes.some(mailbox => mailbox.address === address));
   if (!options.internalCopy && unknownBusiness) {
-    const fallback = await db.from('communication_email_mailboxes').select('id,address').eq('address', 'admissions@elevateforhumanity.org').eq('active', true).maybeSingle();
+    const fallback = await db.from('communication_email_mailboxes').select('id,address,mailbox_kind,program_holder_id').eq('address', 'admissions@elevateforhumanity.org').eq('active', true).maybeSingle();
     if (fallback.error) throw new Error('Admissions fallback unavailable');
     if (fallback.data && !mailboxes.some(mailbox => mailbox.id === fallback.data.id)) mailboxes = [...mailboxes, fallback.data];
   }
@@ -143,11 +159,11 @@ export async function storeInboundCommunicationEmail(
             user_id: member.user_id,
             type: 'message',
             title: `New interoffice email · ${mailbox.address}`,
-            message: `From ${senderEmail} · To ${mailbox.address} · ${subject}`,
+            message: `From ${senderEmail} · ${subject} · ${textBody.replace(/\s+/g, ' ').slice(0, 160)}`,
             action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(mailbox.id)}&threadId=${encodeURIComponent(threadId)}`,
             action_label: 'Read and reply',
             idempotency_key: `email:${inboundEventId}:${member.user_id}`,
-            metadata: { alert_kind: 'email', sender_name: senderName(parsed.from), sender_email: senderEmail, subject, mailbox_address: mailbox.address, mailbox_id: mailbox.id, thread_id: threadId },
+            metadata: { alert_kind: 'email', sender_name: senderName(parsed.from), sender_email: senderEmail, subject, preview: textBody.replace(/\s+/g, ' ').slice(0, 180), mailbox_address: mailbox.address, mailbox_id: mailbox.id, thread_id: threadId },
             read: false,
           })),
           { onConflict: 'idempotency_key', ignoreDuplicates: true },
@@ -244,7 +260,7 @@ export async function storeInboundCommunicationEmail(
     storedCount += 1;
   }
 
-  if ((route || options.internalCopy) && storedCount + filteredCount !== mailboxes.length) {
+  if (storedCount + filteredCount !== mailboxes.length) {
     throw new Error('An assigned interoffice conversation copy could not be stored.');
   }
   return {

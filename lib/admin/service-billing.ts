@@ -113,83 +113,60 @@ export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date
       })),
     ),
   );
-  // Read completed episodes too: a recovered wallet may later become low again.
-  // User-reading an alert is not resolution of its underlying condition.
-  const { data: previousNotices, error: previousNoticeError } = await db
-    .from('notifications')
-    .select('id,user_id,idempotency_key,metadata,read,created_at')
-    .eq('metadata->>source', 'service-billing')
-    .order('created_at', { ascending: false })
-    .order('id', { ascending: false })
-    .limit(1000);
-  if (previousNoticeError || previousNotices?.length === 1000)
-    throw Error('SERVICE_BILLING_ALERTS_UNAVAILABLE');
-  const latestByBase = new Map<string, (typeof previousNotices)[number]>();
-  for (const notice of previousNotices || []) {
-    const base = notice.metadata?.base_key || notice.idempotency_key;
-    if (!latestByBase.has(base)) latestByBase.set(base, notice);
-  }
-  const notices = candidates.map((notice) => {
-    const base = notice.idempotency_key;
-    const previous = latestByBase.get(base);
-    return {
-      ...notice,
-      idempotency_key: previous
-        ? previous.metadata?.resolved_at
-          ? `${base}:after:${previous.id}`
-          : previous.idempotency_key
-        : base,
-      metadata: { ...notice.metadata, base_key: base },
-    };
-  });
-  // Preserve history while clearing warnings whose condition has recovered.
-  const activeKeys = new Set(notices.map((n) => n.idempotency_key));
-  for (const notice of previousNotices || [])
-    if (!notice.metadata?.resolved_at && !activeKeys.has(notice.idempotency_key)) {
-      const { error: resolveError } = await db
-        .from('notifications')
-        .update({
-          read: true,
-          read_at: new Date(now).toISOString(),
-          metadata: { ...notice.metadata, resolved_at: new Date(now).toISOString() },
-        })
-        .eq('id', notice.id)
-        .eq('metadata->>source', 'service-billing');
-      if (resolveError) throw Error('SERVICE_BILLING_ALERT_RESOLUTION_UNAVAILABLE');
+  // Each service reconciles under its billing-row lock. The database verifies the
+  // exact revision, selects the latest episode and merges resolution atomically.
+  // Retained history has no API page-size limit and never disables future alerts.
+  const inserted: Array<{
+    id: string;
+    user_id: string;
+    title: string;
+    message: string;
+    metadata: any;
+  }> = [];
+  let reconciliationUnavailable = false;
+  for (const record of records) {
+    const result = await db.rpc('reconcile_service_billing_alerts', {
+      p_service_id: record.serviceId,
+      p_expected_revision: record.revision,
+      p_notices: candidates.filter((n) => n.metadata.service_id === record.serviceId),
+      p_now: new Date(now).toISOString(),
+    });
+    if (result.error) {
+      reconciliationUnavailable = true;
+      continue;
     }
-  if (!notices.length) return { created: 0, pushAcceptedDevices: 0 };
-  const { data: inserted, error: insertError } = await db
-    .from('notifications')
-    .upsert(notices, { onConflict: 'idempotency_key', ignoreDuplicates: true })
-    .select('id,user_id,title,message,metadata');
-  if (insertError) throw Error('SERVICE_BILLING_ALERT_SAVE_FAILED');
+    inserted.push(...(result.data || []));
+  }
+  const receipt = async (notice: (typeof inserted)[number], status: string, devices: number) => {
+    const { error } = await db.rpc('record_service_billing_push_receipt', {
+      p_id: notice.id,
+      p_user_id: notice.user_id,
+      p_status: status,
+      p_devices: devices,
+      p_now: new Date(now).toISOString(),
+    });
+    if (error) reconciliationUnavailable = true;
+  };
   let pushAcceptedDevices = 0;
   for (const notice of inserted || []) {
     // A payment or balance update may have arrived while this poll was running.
     // Re-read before external push so a superseded warning is retained only as history.
-    const latest = (await readServiceBilling(db)).find(
-      (r) => r.serviceId === notice.metadata.service_id,
-    );
+    let latest: ServiceBillingRecord | undefined;
+    try {
+      latest = (await readServiceBilling(db)).find(
+        (r) => r.serviceId === notice.metadata.service_id,
+      );
+    } catch {
+      reconciliationUnavailable = true;
+      continue;
+    }
     const stillCurrent =
       latest &&
       billingSignals(latest, now).some(
         (s) => s.kind === notice.metadata.signal && s.episode === notice.metadata.episode,
       );
     if (!stillCurrent) {
-      const { error: resolveError } = await db
-        .from('notifications')
-        .update({
-          read: true,
-          read_at: new Date(now).toISOString(),
-          metadata: {
-            ...notice.metadata,
-            resolved_at: new Date(now).toISOString(),
-            push_status: 'superseded',
-          },
-        })
-        .eq('id', notice.id)
-        .eq('user_id', notice.user_id);
-      if (resolveError) throw Error('SERVICE_BILLING_ALERT_RESOLUTION_UNAVAILABLE');
+      await receipt(notice, 'superseded', 0);
       continue;
     }
     let devices = 0;
@@ -205,20 +182,9 @@ export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date
       /* A durable bell alert remains available; never auto-repeat an ambiguous push. */
     }
     pushAcceptedDevices += devices;
-    const { error: receiptError } = await db
-      .from('notifications')
-      .update({
-        metadata: {
-          ...notice.metadata,
-          push_status: devices ? 'accepted' : 'unconfirmed',
-          accepted_devices: devices,
-          push_attempted_at: new Date(now).toISOString(),
-        },
-      })
-      .eq('id', notice.id)
-      .eq('user_id', notice.user_id);
-    if (receiptError) throw Error('SERVICE_BILLING_ALERT_RECEIPT_UNAVAILABLE');
+    await receipt(notice, devices ? 'accepted' : 'unconfirmed', devices);
   }
+  if (reconciliationUnavailable) throw Error('SERVICE_BILLING_ALERTS_UNAVAILABLE');
   return { created: inserted?.length || 0, pushAcceptedDevices };
 }
 

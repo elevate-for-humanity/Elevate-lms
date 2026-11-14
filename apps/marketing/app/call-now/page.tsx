@@ -83,8 +83,8 @@ export default function GetStartedPage() {
       </div>
 
       <HeroPicture
-        src="/images/pages/workforce-training.webp"
-        alt="Career training and workforce support at Elevate for Humanity"
+        src="/images/pages/phone-support-coordinator-v2.webp"
+        alt="Support coordinator helping someone get started"
         microLabel="Get Started"
         belowHeroHeadline="How Can We Help?"
         belowHeroSubheadline="Choose the application, information, funding-review, employer, or support path you need."

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Record too large' }, { status: 413, headers });
     const body = JSON.parse(raw);
     const db = await requireAdminClient();
-    const record = await saveServiceBilling(db, body.record, body.expectedRevision);
+    let record = await saveServiceBilling(db, body.record, body.expectedRevision);
     // Save is durable even if a notification provider is unavailable.
     let alertsAvailable = true;
     try {
@@ -46,7 +46,14 @@ export async function POST(req: NextRequest) {
     } catch {
       alertsAvailable = false;
     }
-    return NextResponse.json({ record, alertsAvailable }, { headers });
+    let refreshRequired = false;
+    try {
+      record =
+        (await readServiceBilling(db)).find((r) => r.serviceId === record.serviceId) || record;
+    } catch {
+      refreshRequired = true;
+    }
+    return NextResponse.json({ record, alertsAvailable, refreshRequired }, { headers });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     const status =

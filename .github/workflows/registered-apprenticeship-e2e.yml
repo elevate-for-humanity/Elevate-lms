@@ -269,7 +269,7 @@ jobs:
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Require all nine roles so authenticated tests cannot silently skip
         run: |
-          node --test scripts/qa/require-portal-e2e-identities.test.mjs
+          node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
           node scripts/qa/require-portal-e2e-identities.mjs
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install chromium webkit --with-deps

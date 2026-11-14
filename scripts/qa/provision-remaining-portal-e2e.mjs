@@ -3,6 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { PDFDocument } from 'pdf-lib';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
+import { writePrivateQaState } from './write-private-state.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath =
@@ -128,7 +129,7 @@ async function provision() {
           throw new Error(`employer document record fixture: ${document.error.message}`);
       }
     }
-    await writeFile(statePath, JSON.stringify(state, null, 2));
+    await writePrivateQaState(statePath, state);
     if (process.env.GITHUB_ENV) {
       const envNames = {
         employer: 'EMPLOYER',
@@ -148,7 +149,7 @@ async function provision() {
     }
     console.log(JSON.stringify({ ok: true, roles: state.users.map(({ role }) => role) }));
   } catch (error) {
-    await writeFile(statePath, JSON.stringify(state, null, 2)).catch(() => {});
+    await writePrivateQaState(statePath, state).catch(() => {});
     await cleanup().catch(() => {});
     throw error;
   }

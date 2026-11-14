@@ -74,6 +74,9 @@ export function alertPresentation(notification: any, kind: keyof typeof ALERT_PH
   const who = clean(status ? meta.recipient : meta.sender_name || meta.sender_email, 100);
   const subject = clean(meta.subject, 180);
   const mailbox = clean(meta.mailbox_address, 100);
+  // Only the already-authorized mailbox member receives this short preview.
+  // The push opens the exact secured conversation for the complete message.
+  const preview = clean(meta.preview, 180);
   const title =
     status === 'sent'
       ? `PARIS replied${who ? ' to ' + who : ''}`
@@ -83,7 +86,7 @@ export function alertPresentation(notification: any, kind: keyof typeof ALERT_PH
   return {
     title,
     body:
-      [mailbox, subject].filter(Boolean).join(' · ') ||
+      [subject, preview || mailbox].filter(Boolean).join(' · ') ||
       clean(notification?.message, 300) ||
       ALERT_PHRASES.email,
   };

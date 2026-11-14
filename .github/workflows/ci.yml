@@ -386,7 +386,9 @@ jobs:
     name: CI Required Gate
     runs-on: ubuntu-24.04
     needs: [preflight, typecheck, lint, enrollment-database, diagnostics]
-    if: always()
+    # Failed diagnostics must still fail this gate, but cancelled/superseded
+    # runs must release their concurrency slot instead of queuing more work.
+    if: ${{ !cancelled() }}
     steps:
       - name: Require every CI diagnostic to pass
         shell: bash

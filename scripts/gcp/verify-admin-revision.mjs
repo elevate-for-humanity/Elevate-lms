@@ -14,11 +14,15 @@ export async function verifyAdminRevision(base, commit, {
         redirect: 'manual', signal: AbortSignal.timeout(15000), headers: { 'Cache-Control': 'no-cache' },
       });
       const body = await response.json().catch(() => ({}));
-      lastReason = response.status !== 200 ? 'http_' + response.status
+      lastReason = response.status !== 200 ? (
+          response.status === 503 && body?.service === 'admin' && body.commit === commit
+            ? body.dependencies?.supabase?.ok === false ? 'supabase_unready'
+              : body.healthy === false ? 'health_contract_unmet' : 'http_503'
+            : 'http_' + response.status)
         : body.service !== 'admin' ? 'service_mismatch'
         : body.commit !== commit ? 'revision_mismatch'
-        : body.healthy !== true ? 'health_contract_unmet'
         : body.dependencies?.supabase?.ok !== true ? 'supabase_unready'
+        : body.healthy !== true ? 'health_contract_unmet'
         : 'verified';
       if (response.status === 200 && body.service === 'admin' && body.commit === commit && body.healthy === true && body.dependencies?.supabase?.ok === true) {
         return { verified: true, commit, attempts: attempt };

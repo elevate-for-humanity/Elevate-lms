@@ -1,0 +1,43 @@
+name: Inbound email delivery recovery
+on:
+  pull_request:
+    paths:
+      - 'lib/email/sendgrid-inbound.ts'
+      - 'lib/webhooks/event-tracker.ts'
+      - 'apps/lms/app/api/webhooks/sendgrid-inbound/**'
+      - 'apps/marketing/app/api/webhooks/sendgrid-inbound/**'
+      - 'supabase/migrations/*recover_inbound_delivery_leases.sql'
+      - 'tests/integration/inbound-recovery/**'
+      - '.github/workflows/inbound-delivery-recovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: efh_inbound_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d efh_inbound_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: '5432'
+      PGDATABASE: efh_inbound_test
+      PGUSER: postgres
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Exercise actual migration, handlers, split envelopes and retry fencing
+        run: node --test tests/integration/inbound-recovery/acceptance.mjs

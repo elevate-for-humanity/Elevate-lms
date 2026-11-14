@@ -327,8 +327,8 @@ export default function UnifiedCourseBuilder({
         <div id="course-paris-instructions" hidden={!assistantOpen}>
         <p className="text-sm text-slate-300">Speak or type your instructions here. Select courses and lessons below; previews stay on the right.</p>
         <p className="text-xs text-slate-300">Deploy updates the platform. Publish course releases accepted lessons to learners.</p>
-        <div className="h-[min(24rem,45dvh)] min-h-[12rem] min-w-0 overflow-hidden rounded-xl border border-slate-700">
-          <UnifiedEllieChat embedded restoreLatest={false}
+        <div className="min-w-0 overflow-hidden rounded-xl border border-slate-700">
+          <UnifiedEllieChat embedded contentSized restoreLatest={false}
             fileContext={JSON.stringify({workspace:'course',courseId:selectedCourse?.id,title:selectedCourse?.title,
               programSlug:selectedProgram?.slug||selectedCourse?.slug,
               lessonId:lessonSelection?.canonicalLessonId||requestedLessonId,lessonTitle:lessonSelection?.title,buildId:currentBuildId})}
@@ -1679,4 +1679,3 @@ export function UltimateBuildPanel({
     </section>
   );
 }
-

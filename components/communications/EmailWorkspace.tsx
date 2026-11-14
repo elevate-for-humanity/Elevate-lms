@@ -262,7 +262,7 @@ export function EmailWorkspace({
     searchRef.current = (params.get('q') || '').slice(0, 160);
     setView(viewRef.current);
     setSearch(searchRef.current);
-    void load(initialMailboxId, initialThreadId);
+    void load(initialMailboxId ?? params.get('mailboxId'), initialThreadId ?? params.get('threadId'));
   }, [initialMailboxId, initialThreadId, load]);
 
   const selectedMailbox = useMemo(

@@ -8,3 +8,17 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+/* Page-flow embeds must grow around toolbars, status banners and the composer.
+   A viewport-height cap on their parent can otherwise clip Send in landscape.
+   Fixed-height Studio workspaces keep the original flex layout. */
+.root.contentSized {
+  height: auto;
+  overflow: visible;
+}
+
+.root.contentSized .messagesViewport {
+  flex: none;
+  height: clamp(8rem, 32dvh, 20rem);
+  min-height: 8rem;
+}

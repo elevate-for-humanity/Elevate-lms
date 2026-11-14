@@ -54,3 +54,43 @@ test('Admin executor failure and wrong backend identity are distinct', async () 
     attempts:1, request:async()=>({status:200,json:async()=>good}),
   }), /service_mismatch/);
 });
+
+test('actual 503 health payloads identify Supabase failures without changing the retry budget', async () => {
+  for (const service of ['admin', 'marketing', 'lms']) {
+    let calls = 0, pauses = 0;
+    await assert.rejects(verifyRuntimeReadiness(service, base, 'private-token', {
+      attempts: 2, pause: async ms => { assert.equal(ms, 5000); pauses++; },
+      request: async () => {
+        calls++;
+        return new Response(JSON.stringify({ service, status: 'degraded', healthy: false, ready: true,
+          configuration: { ok: true, missing: [] }, dependencies: { supabase: { ok: false } },
+          privateDetail: 'do-not-emit' }), { status: 503 });
+      },
+    }), error => error.message.includes(service + ' /api/health supabase_unready') && !error.message.includes('do-not-emit'));
+    assert.equal(calls, 2); assert.equal(pauses, 1);
+  }
+});
+
+test('actual Admin 503 readiness payload identifies the stopped executor', async () => {
+  let healthCalls = 0, readyCalls = 0;
+  await assert.rejects(verifyRuntimeReadiness('admin', base, 'token', {
+    attempts: 2, pause: async () => {}, request: async url => {
+      if (url.pathname === '/api/health') {
+        healthCalls++;
+        return new Response(JSON.stringify({ ...good, service: 'admin' }));
+      }
+      readyCalls++;
+      return new Response(JSON.stringify({ service: 'admin', ready: false, status: 'not_ready',
+        missing: ['AGENTIC_EXECUTOR'], agenticExecutorReady: false }), { status: 503 });
+    },
+  }), /admin \/api\/ready agentic_executor_unready/);
+  assert.equal(healthCalls, 1); assert.equal(readyCalls, 2);
+});
+
+test('malformed, unknown and wrong-service 503 bodies retain the HTTP fallback', async () => {
+  for (const payload of ['not-json', 'null', '{}', JSON.stringify({ service: 'admin', dependencies: { supabase: { ok: false } } }), JSON.stringify(good)]) {
+    await assert.rejects(verifyRuntimeReadiness('marketing', base, 'token', {
+      attempts: 1, request: async () => new Response(payload, { status: 503 }),
+    }), /marketing \/api\/health http_503/);
+  }
+});

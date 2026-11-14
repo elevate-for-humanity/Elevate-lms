@@ -37,3 +37,31 @@ test('Admin revision verification reports sanitized root-cause categories', asyn
     attempts:1, request:async()=>healthy({dependencies:{supabase:{ok:false}}}),
   }), /supabase_unready/);
 });
+
+test('actual 503 Admin health payload gives Supabase failure precedence over unhealthy', async () => {
+  let calls = 0, pauses = 0;
+  await assert.rejects(verifyAdminRevision(url, commit, {
+    attempts: 2, pause: async ms => { assert.equal(ms, 5000); pauses++; }, request: async () => {
+      calls++;
+      return new Response(JSON.stringify({ service: 'admin', commit, status: 'degraded', healthy: false, ready: true,
+        configuration: { ok: true, missing: [] }, dependencies: { supabase: { ok: false } },
+        privateDetail: 'do-not-emit' }), { status: 503 });
+    },
+  }), error => error.message.includes('supabase_unready') && !error.message.includes('do-not-emit'));
+  assert.equal(calls, 2); assert.equal(pauses, 1);
+});
+
+test('HTTP 200 dependency failure also takes precedence over generic unhealthy status', async () => {
+  await assert.rejects(verifyAdminRevision(url, commit, {
+    attempts: 1, request: async () => healthy({ healthy: false, dependencies: { supabase: { ok: false } } }),
+  }), /supabase_unready/);
+});
+
+test('unrecognized or malformed 503 Admin responses retain HTTP failure and never verify', async () => {
+  for (const payload of ['not-json', 'null', '{}', JSON.stringify({ service: 'admin', commit, healthy: true, dependencies: { supabase: { ok: true } } }),
+    JSON.stringify({ service: 'marketing', commit, healthy: false, dependencies: { supabase: { ok: false } } })]) {
+    await assert.rejects(verifyAdminRevision(url, commit, {
+      attempts: 1, request: async () => new Response(payload, { status: 503 }),
+    }), /http_503/);
+  }
+});

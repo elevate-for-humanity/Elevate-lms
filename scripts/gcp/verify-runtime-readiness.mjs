@@ -30,14 +30,21 @@ export async function verifyRuntimeReadiness(component, base, token, { request =
           throw new Error('Google readiness rejected request (' + component + ' ' + path + ' http_' + status + ')');
         }
         lastReason = 'http_' + status;
-        if (status === 200) {
-          const body = await response.json();
+        if (status === 200 || status === 503) {
+          // The application returns dependency details with HTTP 503. Only
+          // recognized failures override the HTTP category; malformed or proxy
+          // responses must keep their status fallback and can never pass.
+          const body = status === 503 ? await response.json().catch(() => null) : await response.json();
           passed = healthPassed(processService, path, status, body);
-          if (!passed) {
+          if (!passed && status === 200) {
             lastReason = body?.service !== processService ? 'service_mismatch'
               : path === '/api/health' && body?.dependencies?.supabase?.ok !== true ? 'supabase_unready'
               : path === '/api/ready' && component === 'admin' && body?.agenticExecutorReady !== true ? 'agentic_executor_unready'
               : 'health_contract_unmet';
+          } else if (!passed && body?.service === processService) {
+            if (path === '/api/health' && body?.dependencies?.supabase?.ok === false) lastReason = 'supabase_unready';
+            else if (path === '/api/ready' && component === 'admin' && body?.agenticExecutorReady === false) lastReason = 'agentic_executor_unready';
+            else if ((path === '/api/health' && body?.healthy === false) || (path === '/api/ready' && body?.ready === false)) lastReason = 'health_contract_unmet';
           }
         }
       } catch (error) {

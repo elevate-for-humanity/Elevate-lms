@@ -8,6 +8,11 @@ const m = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/supabase/admin', () => ({
   requireAdminClient: async () => ({
+    rpc: async (_name: string, args: any) => ({
+      data: m.readError ? null : ['processed', 'skipped'].includes(m.status) ? { state: 'duplicate' } :
+        (m.status === 'errored' || !m.duplicate) ? { state: 'claimed', leaseToken: args.p_token } : { state: 'busy' },
+      error: m.readError ? { message: 'Unavailable' } : null,
+    }),
     from: () => {
       const query: any = {
         insert: async () => ({ error: m.duplicate ? { code: '23505' } : null }),
@@ -38,7 +43,7 @@ beforeEach(() => {
     missingUpdate: false,
   });
 });
-it.each(['processing', 'errored', 'failed', 'received', 'validated'])(
+it.each(['processing', 'failed', 'received', 'validated'])(
   'does not acknowledge a duplicate in %s state',
   async (status) => {
     m.status = status;
@@ -99,4 +104,10 @@ it('strict finalization requires exactly one durable event row', async () => {
   await expect(
     finalizeWebhookEvent('sendgrid-inbound', 'missing', 'processed', undefined, { strict: true }),
   ).rejects.toThrow('finalization');
+});
+
+it('returns a new token when the database atomically reclaims an errored event', async () => {
+  m.status = 'errored';
+  expect(await claimWebhookEvent('sendgrid-inbound','event','email.received',{}, {requireFinalizedDuplicate:true}))
+    .toMatchObject({confident:true,shouldProcess:true,leaseToken:expect.any(String)});
 });

@@ -103,42 +103,49 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     const prior = app.interview_responses || {};
     const interview = prior.email_interview || { started: false, current: 0, answers: [] };
     if (interview.closed) return { responded: false, reason: 'opted_out' };
-    const outcome = interviewReply(text, Number(interview.current || 0), !!interview.started);
-    const answers =
-      interview.started && text
-        ? [
-            ...(interview.answers || []),
-            {
-              question: EMAIL_INTERVIEW_QUESTIONS[interview.current],
-              answer: text,
-              event_id: parsed.eventId,
-              received_at: new Date().toISOString(),
+    if (interview.last_event_id === parsed.eventId && typeof interview.last_reply === 'string') {
+      // Storage/PARIS failures can retry the delivery without advancing an answer twice.
+      reply = interview.last_reply;
+    } else {
+      const outcome = interviewReply(text, Number(interview.current || 0), !!interview.started);
+      const answers =
+        interview.started && text
+          ? [
+              ...(interview.answers || []),
+              {
+                question: EMAIL_INTERVIEW_QUESTIONS[interview.current],
+                answer: text,
+                event_id: parsed.eventId,
+                received_at: new Date().toISOString(),
+              },
+            ]
+          : interview.answers || [];
+      reply = outcome.reply;
+      if (!interview.started && !outcome.closed)
+        reply += `\n\nContinue your program signup: https://www.elevateforhumanity.org/apply?program=${encodeURIComponent(app.program_interest || '')}`;
+      const { error } = await db
+        .from('applications')
+        .update({
+          interview_responses: {
+            ...prior,
+            email_interview: {
+              started: true,
+              current: outcome.next,
+              answers,
+              closed: outcome.closed,
+              last_event_id: parsed.eventId,
+              last_reply: reply,
             },
-          ]
-        : interview.answers || [];
-    const { error } = await db
-      .from('applications')
-      .update({
-        interview_responses: {
-          ...prior,
-          email_interview: {
-            started: true,
-            current: outcome.next,
-            answers,
-            closed: outcome.closed,
           },
-        },
-        next_step: outcome.closed
-          ? 'Staff review: applicant declined email interview'
-          : outcome.next === EMAIL_INTERVIEW_QUESTIONS.length
-            ? 'Staff review: email interview complete'
-            : `PARIS email interview: awaiting question ${outcome.next + 1}`,
-      })
-      .eq('id', app.id);
-    if (error) throw new Error('Interview answer could not be saved');
-    reply = outcome.reply;
-    if (!interview.started && !outcome.closed)
-      reply += `\n\nContinue your program signup: https://www.elevateforhumanity.org/apply?program=${encodeURIComponent(app.program_interest || '')}`;
+          next_step: outcome.closed
+            ? 'Staff review: applicant declined email interview'
+            : outcome.next === EMAIL_INTERVIEW_QUESTIONS.length
+              ? 'Staff review: email interview complete'
+              : `PARIS email interview: awaiting question ${outcome.next + 1}`,
+        })
+        .eq('id', app.id);
+      if (error) throw new Error('Interview answer could not be saved');
+    }
   }
   const subject = /^re:/i.test(parsed.subject) ? parsed.subject : `Re: ${parsed.subject}`;
   const { data: record, error: recordError } = await db
@@ -159,7 +166,8 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     })
     .select('id')
     .single();
-  if (recordError || !record) return { responded: false, reason: 'already_claimed_or_failed' };
+  if (recordError?.code === '23505') return { responded: false, reason: 'already_claimed' };
+  if (recordError || !record) throw new Error('PARIS reply claim could not be saved');
   const sent = await sendEmail({
     singleAttempt: true,
     to: sender,

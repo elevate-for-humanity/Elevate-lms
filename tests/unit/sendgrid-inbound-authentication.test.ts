@@ -16,6 +16,7 @@ vi.mock('@/lib/audit/withApiAudit', () => ({
 vi.mock('@/lib/webhooks/event-tracker', () => ({
   claimWebhookEvent: m.claim,
   finalizeWebhookEvent: m.finish,
+  claimInboundForward: vi.fn(),
 }));
 vi.mock('@/lib/email/communication-inbound', () => ({ storeInboundCommunicationEmail: m.store }));
 vi.mock('@/lib/email/paris-mail', () => ({ respondToParisMail: m.paris }));
@@ -57,7 +58,7 @@ async function signedRequest(tamper = false) {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv('SENDGRID_INBOUND_WEBHOOK_PUBLIC_KEY', pem);
-  m.claim.mockResolvedValue({ shouldProcess: true, confident: true });
+  m.claim.mockResolvedValue({ shouldProcess: true, confident: true, leaseToken: 'test-lease' });
   m.store.mockResolvedValue({ stored: true, mailboxCount: 1 });
   m.finish.mockResolvedValue(undefined);
 });
@@ -83,7 +84,7 @@ for (const [name, post] of [
       expect.any(String),
       'processed',
       undefined,
-      { strict: true },
+      { strict: true, leaseToken: 'test-lease' },
     );
   });
   it(`${name} rejects a modified signed body before database or forwarding work`, async () => {

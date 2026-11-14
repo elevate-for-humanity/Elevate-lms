@@ -112,6 +112,8 @@ interface UnifiedEllieChatProps {
   onOpenDeploy?: () => void;
   onOpenPreview?: () => void;
   embedded?: boolean;
+  /** Let an embedded page-flow panel grow around its controls; messages remain bounded. */
+  contentSized?: boolean;
   fileContext?: string;
   onPreviewTarget?: (url: string) => void;
   onTaskCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint | null) => void;
@@ -657,6 +659,7 @@ export default function UnifiedEllieChat({
   onOpenDeploy,
   onOpenPreview,
   embedded = false,
+  contentSized = false,
   fileContext,
   onPreviewTarget,
   onTaskCheckpoint,
@@ -1205,7 +1208,7 @@ export default function UnifiedEllieChat({
     : 'border-gray-700 bg-gray-950 text-white placeholder:text-gray-500 focus:border-blue-500';
 
   return (
-    <div className={`${styles.root} flex h-full min-h-0 min-w-0 flex-col overflow-hidden ${shellClass}`}>
+    <div className={`${styles.root} ${embedded && contentSized ? styles.contentSized : ''} flex h-full min-h-0 min-w-0 flex-col overflow-hidden ${shellClass}`}>
       {!embedded && (
         <div
           className={`flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 ${headerClass}`}
@@ -1375,7 +1378,7 @@ export default function UnifiedEllieChat({
 
       <div
         ref={messagesViewportRef}
-        className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 px-3 py-5 sm:px-8 sm:py-8"
+        className={`${styles.messagesViewport} min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 px-3 py-5 sm:px-8 sm:py-8`}
       >
         {messages.length === 0 ? (
           <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-4 text-center sm:py-6">

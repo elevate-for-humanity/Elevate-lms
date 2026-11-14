@@ -54,6 +54,8 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Verify Course Builder chat controls in short and landscape panels
+        run: node scripts/test-course-chat-layout.mjs
       - name: Run desktop-chrome E2E (marketing, admin, lms)
         run: pnpm test:e2e
       - name: Upload Playwright report

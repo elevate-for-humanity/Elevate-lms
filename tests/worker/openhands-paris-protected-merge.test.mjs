@@ -23,7 +23,7 @@ const fixtures = {
 function github(overrides = {}, unreachable = []) {
   const data = { ...fixtures, ...overrides };
   return async path => {
-    if (unreachable.includes(path)) throw Object.assign(Error('GitHub API 404: Not Found'), { status: 404 });
+    if (unreachable.includes(path)) throw Object.assign(Error('GitHub API 404: Not Found'), { status: 404, policyAbsent: path === '/branches/main/protection' });
     if (!(path in data)) throw Error('unavailable');
     return data[path];
   };
@@ -35,10 +35,14 @@ test('actual PARIS release verifier accepts a protected merged exact PR with ind
 });
 
 test('a classic-only and ruleset-only protected main are recognized', async () => {
-  for (const missing of ['/rules/branches/main', '/branches/main/protection']) {
-    const outcome = await verifyProtectedParisMerge({ pr, expectedHeadSha: HEAD, gh: github({}, [missing]) });
-    assert.equal(outcome.accepted, true, missing);
-  }
+  const classicOnly = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({ '/rules/branches/main': [] }),
+  });
+  assert.equal(classicOnly.accepted, true, JSON.stringify(classicOnly.reasons));
+  const rulesOnly = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({}, ['/branches/main/protection']),
+  });
+  assert.equal(rulesOnly.accepted, true, JSON.stringify(rulesOnly.reasons));
 });
 
 test('no readable protection, no independent review, or failed checks block deployment', async () => {
@@ -188,4 +192,31 @@ test('required App ID cannot be satisfied by an unrelated green check context', 
     }),
   });
   assert.equal(correctApp.accepted, true, JSON.stringify(correctApp.reasons));
+});
+
+test('ambiguous policy 404 remains blocking instead of being treated as absence', async () => {
+  for (const path of ['/rules/branches/main', '/branches/main/protection']) {
+    const result = await verifyProtectedParisMerge({
+      pr, expectedHeadSha: HEAD, gh: github(), policyGh: async requested => {
+        if (requested === path) throw Object.assign(Error('Not Found'), { status: 404 });
+        return github()(requested);
+      },
+    });
+    assert.equal(result.accepted, false);
+    assert.match(result.reasons.join(' '), /VERIFICATION_UNAVAILABLE/);
+  }
+});
+
+test('PARIS keeps authorized approvals when a known reader requests changes', async () => {
+  const requested = { user: { login: 'reader', type: 'User' }, state: 'CHANGES_REQUESTED',
+    commit_id: HEAD, submitted_at: '2026-11-14T02:00:00Z' };
+  for (const permission of ['read', 'triage', 'none']) {
+    const result = await verifyProtectedParisMerge({
+      pr, expectedHeadSha: HEAD, gh: github({
+        '/pulls/2613/reviews?per_page=100': [...fixtures['/pulls/2613/reviews?per_page=100'], requested],
+        '/collaborators/reader/permission': { permission },
+      }),
+    });
+    assert.equal(result.accepted, true, JSON.stringify(result.reasons));
+  }
 });

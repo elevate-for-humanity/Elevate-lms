@@ -72,7 +72,14 @@ async function infrastructureGitHub(path:string,init:RequestInit={}) {
  if(!token)throw Error('PARIS_INFRASTRUCTURE_APP_AUTHORITY_REQUIRED');
  const endpoint=path==='/graphql'?'https://api.github.com/graphql':`https://api.github.com/repos/${REPAIR_REPOSITORY}${path}`;
  const response=await fetch(endpoint,{...init,headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},cache:'no-store',signal:AbortSignal.timeout(20000)});
- if(!response.ok)throw Error('PARIS_INFRASTRUCTURE_GITHUB_HTTP_'+response.status);
+ if(!response.ok){
+  let policyAbsent=false;
+  if(response.status===404&&path==='/branches/main/protection'){
+   const body=await response.json().catch(()=>null);
+   policyAbsent=body?.message==='Branch not protected';
+  }
+  throw Object.assign(Error('PARIS_INFRASTRUCTURE_GITHUB_HTTP_'+response.status),{status:response.status,policyAbsent});
+ }
  const result=await response.json();
  if(result.errors?.length)throw Error('PARIS_INFRASTRUCTURE_PULL_REQUEST_AUTOMERGE_REJECTED');
  return result;

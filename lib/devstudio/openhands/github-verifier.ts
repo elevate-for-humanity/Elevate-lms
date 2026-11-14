@@ -71,13 +71,20 @@ async function gh<T>(path: string, token?: string): Promise<T> {
   });
   if (!response.ok) {
     const detail = (await response.text().catch(() => '')).slice(0, 300);
-    throw new Error(`GitHub verification API ${response.status}${detail ? `: ${detail}` : ''}`);
+    let policyAbsent = false;
+    if (response.status === 404 && path.endsWith('/branches/main/protection')) {
+      try { policyAbsent = JSON.parse(detail)?.message === 'Branch not protected'; } catch { /* Unknown 404 remains blocking. */ }
+    }
+    throw Object.assign(new Error(`GitHub verification API ${response.status}${detail ? `: ${detail}` : ''}`), {
+      status: response.status, policyAbsent,
+    });
   }
   return response.json() as Promise<T>;
 }
 
 function confirmedPolicyAbsent(error: unknown): boolean {
-  return error instanceof Error && /^GitHub verification API 404(?:\b|:)/.test(error.message);
+  return error instanceof Error && 'status' in error && error.status === 404 &&
+    'policyAbsent' in error && error.policyAbsent === true;
 }
 
 export async function verifyOpenHandsGitHubOutcome(input: {

@@ -7,7 +7,8 @@ describe('host shop network architecture', () => {
     const page = readFileSync('apps/marketing/app/partners/host-shops/page.tsx', 'utf8');
     expect(source).toContain('getApprovedShops()');
     expect(source).toContain('uniqueHostShops(operational)');
-    expect(page).toContain('HostShopNetworkDirectory');
+    expect(page).toContain('BEAUTY_TRADES.map');
+    expect(page).toContain('matchesHostShopPresentationProgram');
   });
 
   it('gives approved shops a profile before optional media exists', () => {
@@ -17,13 +18,16 @@ describe('host shop network architecture', () => {
     expect(profile).toContain('ApprovedHostShopProfile');
   });
 
-  it('keeps the narrated Host Shop showcase on its dedicated page instead of the homepage', () => {
+  it('keeps the Host Shop hub concise and routes photography into approved trade-specific pages', () => {
     const home = readFileSync('apps/marketing/app/page.tsx', 'utf8');
-    const hostShops = readFileSync('apps/marketing/app/partners/host-shops/page.tsx', 'utf8');
+    const hub = readFileSync('apps/marketing/app/partners/host-shops/page.tsx', 'utf8');
+    const directory = readFileSync('apps/marketing/app/partners/host-shops/[trade]/page.tsx', 'utf8');
     expect(home).not.toContain('<HostShopShowcase');
-    expect(hostShops).toContain('<HostShopShowcase');
-    expect(hostShops).toContain('salon-saloon-tour.mp4');
-    expect(hostShops).toContain('tourScripts=');
+    expect(hub).not.toContain('<HostShopShowcase');
+    expect(hub).not.toContain('<HostShopNetworkDirectory');
+    expect(hub).toContain('BEAUTY_TRADES.map');
+    expect(directory).toContain('<HostShopNetworkDirectory shops={shops} programSlug={trade.programSlug} />');
+    expect(directory).toContain('matchesHostShopPresentationProgram');
   });
 
   it('moves the narrated program showcase from the homepage to the All Programs hero', () => {

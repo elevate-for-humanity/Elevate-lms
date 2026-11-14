@@ -41,6 +41,8 @@ type Thread = {
   starred: boolean;
   folder: string;
   custom_folder_id?: string | null;
+  sender?: string;
+  preview?: string;
 };
 type Attachment = { id: string; file_name: string; mime_type: string; size_bytes: number };
 type Message = {
@@ -215,7 +217,23 @@ export function EmailWorkspace({
         const payload = await response.json().catch(() => ({}));
         if (requestId !== requestSequence.current) return;
         if (!response.ok) setError(payload.error || 'Email could not be loaded.');
-        else setData(payload);
+        else {
+          setData(payload);
+          // Persist the accepted selection for every path (search, move, refresh,
+          // and folder changes), not just conversation clicks and sends.
+          const url = new URL(window.location.href);
+          if (payload.selectedMailboxId)
+            url.searchParams.set('mailboxId', payload.selectedMailboxId);
+          else url.searchParams.delete('mailboxId');
+          if (payload.selectedThread?.id)
+            url.searchParams.set('threadId', payload.selectedThread.id);
+          else url.searchParams.delete('threadId');
+          window.history.replaceState(
+            window.history.state,
+            '',
+            url.pathname + url.search + url.hash,
+          );
+        }
       } catch {
         if (requestId !== requestSequence.current) return;
         setError('Email could not be loaded. Try Refresh.');
@@ -564,11 +582,16 @@ export function EmailWorkspace({
           </a>
         </nav>
         <div className="grid min-h-[620px] min-w-0 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,1.6fr)] xl:grid-cols-[220px_minmax(280px,0.9fr)_minmax(0,1.6fr)]">
-          <aside className={`border-b border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-1 xl:border-b-0 xl:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}>
+          <aside
+            className={`border-b border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-1 xl:border-b-0 xl:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}
+          >
             <p className="px-2 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
               Mailboxes
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 xl:block xl:space-y-1 xl:overflow-visible xl:pb-0">
+            <div
+              aria-label="Available mailboxes"
+              className="flex gap-2 overflow-x-auto pb-1 xl:block xl:max-h-64 xl:space-y-1 xl:overflow-y-auto xl:pb-0"
+            >
               {data.mailboxes.map((mailbox) => (
                 <button
                   key={mailbox.id}
@@ -874,18 +897,26 @@ export function EmailWorkspace({
                     <button
                       type="button"
                       onClick={() => void openThread(thread.id)}
-                      className={`w-full px-4 py-4 text-left hover:bg-blue-50 ${data.selectedThread?.id === thread.id ? 'bg-blue-50' : ''}`}
+                      className={`min-w-0 flex-1 px-3 py-3 text-left hover:bg-blue-50 ${data.selectedThread?.id === thread.id ? 'bg-blue-50' : ''}`}
                     >
                       <div className="flex items-start gap-2">
                         <span
                           className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${thread.unread ? 'bg-blue-600' : 'bg-slate-300'}`}
                         />
                         <div className="min-w-0 flex-1">
+                          {thread.sender ? (
+                            <p className="truncate text-xs font-semibold text-slate-700">
+                              {thread.sender}
+                            </p>
+                          ) : null}
                           <p
                             className={`truncate text-sm ${thread.unread ? 'font-black text-slate-950' : 'font-bold text-slate-700'}`}
                           >
                             {thread.subject}
                           </p>
+                          {thread.preview ? (
+                            <p className="mt-1 truncate text-xs text-slate-600">{thread.preview}</p>
+                          ) : null}
                           <p className="mt-1 text-xs text-slate-500">
                             {thread.message_count} message{thread.message_count === 1 ? '' : 's'} ·{' '}
                             {formatDate(thread.last_message_at)}

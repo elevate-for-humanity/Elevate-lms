@@ -161,13 +161,16 @@ export async function handleCommunicationEmailGet(
   const search = (url.searchParams.get('q') || '').trim().slice(0, 160);
   const directionView = view === 'sent' || view === 'inbox';
   const projection =
-    'id,subject,last_message_at,message_count,created_at,folder,custom_folder_id,starred' +
+    'id,subject,last_message_at,message_count,created_at,folder,custom_folder_id,starred,latest_mail:communication_email_messages(sender_email,sender_name,text_body)' +
     (directionView ? ',scope_mail:communication_email_messages!inner(id)' : '') +
     (search ? ',search_mail:communication_email_messages!inner(id)' : '');
   let threadQuery = context.db
     .from('communication_email_threads')
     .select(projection)
     .eq('mailbox_id', selectedMailbox.id)
+    .eq('latest_mail.mailbox_id', selectedMailbox.id)
+    .order('created_at', { referencedTable: 'latest_mail', ascending: false })
+    .limit(1, { referencedTable: 'latest_mail' })
     .order('last_message_at', { ascending: false })
     .limit(500);
   threadQuery = mailViewQuery(threadQuery, view);
@@ -271,13 +274,23 @@ export async function handleCommunicationEmailGet(
     drafts: drafts || [],
     view,
     selectedMailboxId: selectedMailbox.id,
-    threads: (threadRows ?? []).map((thread: any) => ({
-      ...thread,
-      unread:
-        !readAtByThread.get(thread.id) ||
-        new Date(readAtByThread.get(thread.id)).getTime() <
-          new Date(thread.last_message_at).getTime(),
-    })),
+    threads: (threadRows ?? []).map((row: any) => {
+      // Never return embedded bodies or helper joins in the conversation list.
+      const { latest_mail, scope_mail, search_mail, ...thread } = row;
+      const latest = latest_mail?.[0];
+      return {
+        ...thread,
+        sender: latest?.sender_name || latest?.sender_email || '',
+        preview: String(latest?.text_body || '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 160),
+        unread:
+          !readAtByThread.get(thread.id) ||
+          new Date(readAtByThread.get(thread.id)).getTime() <
+            new Date(thread.last_message_at).getTime(),
+      };
+    }),
     selectedThread: selectedThread ? { ...selectedThread, messages } : null,
     readOnly: context.previewing,
     isAdmin: context.isAdmin,

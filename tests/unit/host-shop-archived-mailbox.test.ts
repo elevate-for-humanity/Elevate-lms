@@ -13,9 +13,10 @@ const mailboxMembers = [
 ];
 
 function mailboxReadOnlyDb(
-  profileRole: string,
+  profileRole: string | null,
   holderRecords: Array<{ features: { portal_access_archived: boolean } }>,
   holderLookupError: Error | null = null,
+  profileLookupError: Error | null = null,
 ) {
   const queried: string[] = [];
   const db = {
@@ -28,7 +29,10 @@ function mailboxReadOnlyDb(
           if (table !== 'profiles') {
             throw new Error('Archived-holder lookup must not select an arbitrary first row');
           }
-          return { data: { role: profileRole, full_name: 'Test Partner' }, error: null };
+          return {
+            data: profileRole ? { role: profileRole, full_name: 'Test Partner' } : null,
+            error: profileLookupError,
+          };
         },
         then: (resolve: (value: unknown) => void) =>
           Promise.resolve(
@@ -71,6 +75,23 @@ describe('archived Program Holder interoffice visibility', () => {
     ]);
     const mailboxes = await ensureActorMailboxes(db as any, 'test-user');
     expect(mailboxes.map(m => m.mailboxKind)).toEqual(['program_holder', 'host_shop']);
+  });
+
+
+  it('fails closed if profile lookup errors instead of falling back to historical mailboxes', async () => {
+    const { db } = mailboxReadOnlyDb('host_shop', [
+      { features: { portal_access_archived: true } },
+    ], null, new Error('canonical actor profile unavailable'));
+    await expect(ensureActorMailboxes(db as any, 'test-user'))
+      .rejects.toThrow('canonical actor profile unavailable');
+  });
+
+  it('fails closed if the actor profile is absent despite existing mailbox memberships', async () => {
+    const { db } = mailboxReadOnlyDb(null, [
+      { features: { portal_access_archived: true } },
+    ]);
+    await expect(ensureActorMailboxes(db as any, 'test-user'))
+      .rejects.toThrow('MAILBOX_PROFILE_UNAVAILABLE');
   });
 
   it('fails closed when archived-holder lookup fails', async () => {

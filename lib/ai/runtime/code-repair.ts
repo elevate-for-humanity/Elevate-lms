@@ -519,6 +519,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     if(!sha)continue;
     const protectedEvidence=await verifyProtectedParisMerge({
      pr,expectedHeadSha:repair.verification.pullRequest.headSha,gh,
+     policyGh:infrastructureGitHub, // scoped GitHub App, not the workflow job token
     });
     if(!protectedEvidence.accepted){
      await update(repair.id,{

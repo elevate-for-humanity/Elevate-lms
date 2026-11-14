@@ -1,6 +1,5 @@
 import type { requireAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmailSubject, parseEmailList } from './communication-email';
-import { canonicalHostShopProgram, permittedHostShopProgramScopes } from '@/lib/partners/host-shop-match-access';
 
 type Database = Awaited<ReturnType<typeof requireAdminClient>>;
 const ADMIN_ADDRESS = 'admissions@elevateforhumanity.org';
@@ -63,61 +62,18 @@ export async function programConversationRoute(
     ),
   ];
   if (holderIds.length !== 1) return null;
-  // An archived Program Holder portal must never receive automatic copies.
-  // For a holder currently operating as a Host Shop, only an explicitly
-  // assigned, active Host Shop mailbox may receive the holder's own applicant
-  // conversations. Fail closed for ambiguous or missing membership.
+  // Program Holder application history is not a Host Shop placement. An archived
+  // holder retains historical records and its role-specific mailbox, but
+  // automatic application/conversation copies must not enter an active Host
+  // Shop mailbox merely because the programs overlap. Direct mail is handled
+  // by the mailbox routing layer, which preserves the Admin fallback.
   const holder = await db
     .from('program_holders')
-    .select('user_id,features')
+    .select('features')
     .eq('id', holderIds[0])
     .maybeSingle();
   if (holder.error || !holder.data) return null;
-  if (holder.data.features?.portal_access_archived === true) {
-    if (!holder.data.user_id) return null;
-    const profile = await db.from('profiles')
-      .select('role')
-      .eq('id', holder.data.user_id)
-      .maybeSingle();
-    if (profile.error || profile.data?.role !== 'host_shop') return null;
-    // The historic Program Holder association is not an approved Host Shop
-    // placement. Copies into an active Host Shop mailbox require exactly one
-    // currently approved partner and the partner's exact program permissions.
-    let scopes: Awaited<ReturnType<typeof permittedHostShopProgramScopes>>;
-    try {
-      scopes = await permittedHostShopProgramScopes(db, holder.data.user_id);
-    } catch {
-      return null; // Fail closed when approved membership cannot be verified.
-    }
-    if (new Set(scopes.map(scope => scope.partnerId)).size !== 1) return null;
-    const permittedPrograms = new Set(scopes.flatMap(scope => scope.programSlugs));
-    const applicationPrograms = slugs.map(canonicalHostShopProgram);
-    const assignmentPrograms = (assignments.data || [])
-      .filter(row => row.program_holder_id === holderIds[0] &&
-        (linked.data || []).some(link => link.program_id === row.program_id))
-      .map(row => canonicalHostShopProgram(row.program_slug));
-    if (!applicationPrograms.length || !assignmentPrograms.length ||
-      [...applicationPrograms, ...assignmentPrograms].some(program =>
-        !program || !permittedPrograms.has(program))) return null;
-    const memberships = await db.from('communication_email_mailbox_members')
-      .select('access_level,mailbox:communication_email_mailboxes!inner(address,mailbox_kind,active)')
-      .eq('user_id', holder.data.user_id)
-      .eq('mailbox.mailbox_kind', 'host_shop')
-      .eq('mailbox.active', true);
-    if (memberships.error) return null;
-    const permitted = (memberships.data || [])
-      .filter((row: any) => ['owner', 'manager'].includes(row.access_level))
-      .flatMap((row: any) => {
-        const mailbox = Array.isArray(row.mailbox) ? row.mailbox[0] : row.mailbox;
-        return mailbox?.address && mailbox.mailbox_kind === 'host_shop' && mailbox.active
-          ? [mailbox.address] : [];
-      });
-    if (permitted.length !== 1) return null;
-    const internal = internalAddresses.flatMap(parseEmailList);
-    if (!internal.some((address) => INTAKE_ADDRESSES.has(address) || permitted.includes(address)))
-      return null;
-    return { addresses: [ADMIN_ADDRESS, permitted[0]], applicantEmail, replyTo: ADMIN_ADDRESS };
-  }
+  if (holder.data.features?.portal_access_archived === true) return null;
   const result = await db
     .from('communication_email_mailboxes')
     .select('address,program_holder_id')

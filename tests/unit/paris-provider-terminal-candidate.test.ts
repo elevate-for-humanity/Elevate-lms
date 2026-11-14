@@ -55,7 +55,8 @@ describe('PARIS provider stage is distinct from final OpenHands/PR/CI acceptance
       { ...f.task, tool_name: 'openhands.status' },
       { ...f.task, user_id: null },
       { ...f.task, tenant_id: 'other-tenant' },
-      { ...f.task, approval_status: 'approved' },
+      { ...f.task, approval_status: 'pending', requires_approval: true },
+      { ...f.task, approval_status: 'rejected', requires_approval: true },
       { ...f.task, requires_approval: true },
       { ...f.task, correlation_id: 'random-unrelated-task' },
       { ...f.task, command: 'Spoofed repair' },
@@ -68,6 +69,22 @@ describe('PARIS provider stage is distinct from final OpenHands/PR/CI acceptance
     expect(isParisProviderBranchCandidate(f.task, { ...f.lifecycle, startTaskId: 'different' }, f.github)).toBe(false);
     expect(isParisProviderBranchCandidate(f.task, { ...f.lifecycle, branch: 'main' }, f.github)).toBe(false);
     expect(isParisProviderBranchCandidate(f.task, f.lifecycle, { ...f.github, repository: 'other/repo' })).toBe(false);
+  });
+
+  it('accepts recorded owner approval for terminal inspection but never a still-gated task', () => {
+    const f = fixture();
+    expect(isParisProviderBranchCandidate(
+      { ...f.task, approval_status: 'approved', requires_approval: true, status: 'running' },
+      f.lifecycle, f.github,
+    )).toBe(true);
+    expect(isParisProviderBranchCandidate(
+      { ...f.task, approval_status: 'approved', requires_approval: true, status: 'awaiting_approval' },
+      f.lifecycle, f.github,
+    )).toBe(false);
+    expect(isParisProviderBranchCandidate(
+      { ...f.task, approval_status: 'pending', requires_approval: true, status: 'running' },
+      f.lifecycle, f.github,
+    )).toBe(false);
   });
 
   it('wires candidate to running/pending rather than completed or fabricated human approval', () => {

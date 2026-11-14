@@ -44,8 +44,8 @@ export default async function CareerPage() {
       </Link>
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         {matches.map(({ job, reasons, missingCredentials, eligibility, applyUrl, source }) => (
-          <div key={job.id} className="min-w-0 space-y-2">
-            <JobCard job={job} showApply href={applyUrl ?? '/lms/placement'} />
+          <div key={JSON.stringify([source, job.id])} className="min-w-0 space-y-2">
+            <JobCard job={job} sourceLabel={source || 'Job opportunity'} showApply href={applyUrl ?? '/lms/placement'} />
             <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700">
               {eligibility === 'credential_match'
                 ? 'Verified credential match'

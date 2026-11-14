@@ -28,3 +28,14 @@ it('saves training, skills, and earned credentials together and includes them in
   expect(screen.getByRole('region', { name: 'Resume preview' })).toHaveTextContent('HVAC training');
   expect(screen.getByRole('region', { name: 'Resume preview' })).toHaveTextContent('Safety procedures');
 });
+
+it('shows a failed save and lets the learner retry without losing their changes', async () => {
+  const save = vi.fn().mockRejectedValueOnce(new Error('Connection lost. Please retry.')).mockResolvedValueOnce(undefined);
+  render(<ResumeBuilder initialData={{summary:'Keep my draft'}} onSave={save} />);
+  fireEvent.click(screen.getByRole('button', {name:'Save Resume'}));
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Connection lost'));
+  fireEvent.click(screen.getByRole('button', {name:'Save Resume'}));
+  await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
+  expect(save.mock.calls[1][0].summary).toBe('Keep my draft');
+  expect(screen.queryByRole('alert')).toBeNull();
+});

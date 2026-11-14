@@ -42,6 +42,33 @@ it('actual signed monitor records pending provider evidence without dispatching 
  expect(h.updates[0].values.attempt_count).toBeUndefined();
  expect(vi.mocked(fetch).mock.calls.every(([,init])=>!init?.method||init.method==='GET')).toBe(true);
 });
+it.each(['failure','timed_out'])('signed monitor observes the same task after a verified %s prepare',async conclusion=>{
+ h.repair.error_code=`REPAIR_WORKFLOW_${conclusion}`;
+ vi.stubGlobal('fetch',vi.fn(async input=>new Response(JSON.stringify(String(input).includes('/jobs?')?{
+  total_count:3,jobs:[{name:'prepare',status:'completed',conclusion},
+   {name:'validate',status:'completed',conclusion:'skipped'},
+   {name:'publish',status:'completed',conclusion:'skipped'}],
+ }:{id:12,path:'.github/workflows/paris-code-repair.yml',event:'workflow_dispatch',
+  head_branch:'main',status:'completed',conclusion}),{status:200})));
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true});
+ expect(h.observations).toBe(1);
+ expect(h.updates[0].values.verification.openhandsObservation.taskId).toBe('same-task');
+ expect(h.updates[0].values.attempt_count).toBeUndefined();
+ expect(vi.mocked(fetch).mock.calls.every(([,init])=>!init?.method||init.method==='GET')).toBe(true);
+});
+it('signed monitor preserves failed validation after a generic workflow failure',async()=>{
+ h.repair.error_code='REPAIR_WORKFLOW_failure';
+ vi.stubGlobal('fetch',vi.fn(async input=>new Response(JSON.stringify(String(input).includes('/jobs?')?{
+  total_count:3,jobs:[{name:'prepare',status:'completed',conclusion:'success'},
+   {name:'validate',status:'completed',conclusion:'failure'},
+   {name:'publish',status:'completed',conclusion:'skipped'}],
+ }:{id:12,path:'.github/workflows/paris-code-repair.yml',event:'workflow_dispatch',
+  head_branch:'main',status:'completed',conclusion:'failure'}),{status:200})));
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'});
+ expect(h.observations).toBe(0);
+ expect(h.updates[0].values.verification.openhandsObservation.reason).toBe('FAILED_PREPARE_EVIDENCE_REQUIRED');
+ expect(h.updates[0].values.status).toBeUndefined();
+});
 it('refuses to report a provider observation when the guarded database write loses its CAS',async()=>{
  h.lose=true;
  await expect(tickParisCodeRepairs({workflowOwnedDispatch:true})).rejects.toThrow('PARIS_OPENHANDS_OBSERVATION_LOST_CAS');

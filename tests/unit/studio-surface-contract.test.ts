@@ -187,11 +187,11 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('keeps core Studio available when only GitHub repository writes are unavailable', () => {
     const health = source('lib/devstudio/health-handler.ts');
     const panel = source('components/studio/DevStudioHealthPanel.tsx');
-    expect(health).toContain('const githubToken = await getGitHubToken()');
+    expect(health).toContain('const githubToken = await getGitHubToken({ signal })');
     expect(health).toContain('repositoryWritesReady: githubTokenValid ? null : false');
     expect(health).toContain('ready: executionPrerequisitesReady');
     expect(panel).toContain(
-      "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
+      "health.execution?.status === 'verification-incomplete' ? 'verification incomplete'",
     );
     expect(panel).toContain("'Repository writes'");
     expect(panel).toContain('not tested by this check');

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { saveHiringNeeds } from './actions';
 
 export type HiringNeedsFields = {
@@ -19,8 +20,9 @@ const fields: { name: keyof HiringNeedsFields; label: string; required: boolean 
 /** Controlled inputs preserve an employer's edits through client hydration
  * and mobile rerenders. The existing server action remains the only writer:
  * it enforces employer identity and validates persisted values. */
-export function HiringNeedsForm({ initial }: { initial: HiringNeedsFields }) {
+export function HiringNeedsForm({ initial, saved = false }: { initial: HiringNeedsFields; saved?: boolean }) {
   const [values, setValues] = useState(initial);
+  const dirty = fields.some(({ name }) => values[name] !== initial[name]);
   return (
     <form action={saveHiringNeeds} className="space-y-5 rounded-xl border bg-white p-5">
       {fields.map(({ name, label, required }) => (
@@ -40,9 +42,24 @@ export function HiringNeedsForm({ initial }: { initial: HiringNeedsFields }) {
           />
         </label>
       ))}
-      <button className="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white">
-        Save hiring and training needs
-      </button>
+      <SaveStatus saved={saved && !dirty} />
     </form>
+  );
+}
+
+function SaveStatus({ saved }: { saved: boolean }) {
+  const { pending } = useFormStatus();
+  return (
+    <>
+      {saved && !pending && (
+        <p role="status" className="rounded-lg bg-green-50 p-4">
+          Your hiring and training needs are saved.
+        </p>
+      )}
+      <button type="submit" disabled={pending} aria-busy={pending}
+        className="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white disabled:opacity-60">
+        {pending ? 'Saving hiring and training needs…' : 'Save hiring and training needs'}
+      </button>
+    </>
   );
 }

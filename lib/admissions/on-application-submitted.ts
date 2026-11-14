@@ -22,25 +22,6 @@ export const CLINICAL_BINDER_DOCUMENTS: readonly BinderDocumentRequirement[] = [
 const CLINICAL_PROGRAM_PATTERN =
   /apprentice|barber|cosmetolog|esthetic|manicur|nail|health|medical|nurs|cna|phleb|ekg|pharm|patient|dental|clinical|caregiver|home-health|peer-recovery/;
 
-export type SubmittedApplication = {
-  applicationId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string | null;
-  programSlug?: string | null;
-  source?: string | null;
-  assignedTo?: string | null;
-};
-
-export type ApplicationAutomationResult = {
-  leadId: string | null;
-  leadCreated: boolean;
-  ownerId: string | null;
-  binderDocuments: string[];
-  taskCreated: boolean;
-};
-
 export function escapeLikePattern(value: string): string {
   return value.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
@@ -55,39 +36,8 @@ export function binderChecklistFor(programSlug: string | null | undefined): Bind
     : [...BASE_BINDER_DOCUMENTS];
 }
 
-async function upsertLead(db: SupabaseClient, app: SubmittedApplication, email: string) {
-  const { data: existing, error: lookupError } = await db
-    .from('leads').select('id,status,assigned_to').ilike('email', escapeLikePattern(email)).limit(1).maybeSingle();
-  if (lookupError) throw lookupError;
-  if (existing) {
-    if (existing.status === 'new') {
-      const { error } = await db.from('leads')
-        .update({ status: 'application_started', updated_at: new Date().toISOString() })
-        .eq('id', existing.id);
-      if (error) throw error;
-    }
-    return {
-      leadId: existing.id as string,
-      leadCreated: false,
-      ownerId: (existing.assigned_to as string | null) || app.assignedTo || null,
-    };
-  }
-  const { data: inserted, error: insertError } = await db.from('leads').insert({
-    first_name: app.firstName,
-    last_name: app.lastName,
-    email,
-    phone: app.phone || null,
-    program_interest: app.programSlug || null,
-    source: app.source || 'website_application',
-    status: 'application_started',
-    assigned_to: app.assignedTo || null,
-    assigned_at: app.assignedTo ? new Date().toISOString() : null,
-  }).select('id').maybeSingle();
-  if (insertError) throw insertError;
-  return { leadId: (inserted?.id as string | undefined) ?? null, leadCreated: true, ownerId: app.assignedTo || null };
-}
-
-async function upsertBinderChecklist(db: SupabaseClient, programSlug: string) {
+export async function ensureApplicationBinderChecklist(db: SupabaseClient, programSlug: string | null | undefined) {
+  if (!programSlug) return [];
   const { data: configured, error: lookupError } = await db.from('apprentice_document_types')
     .select('document_type').eq('program_slug', programSlug);
   if (lookupError) throw lookupError;
@@ -108,48 +58,4 @@ async function upsertBinderChecklist(db: SupabaseClient, programSlug: string) {
   );
   if (error) throw error;
   return checklist.map((doc) => doc.documentType);
-}
-
-async function insertReviewTask(
-  db: SupabaseClient,
-  app: SubmittedApplication,
-  name: string,
-  ownerId: string | null,
-) {
-  const title = `Review application from ${name}`;
-  const { data: existing, error: lookupError } = await db.from('tasks').select('id')
-    .eq('related_type', 'application').eq('related_id', app.applicationId).eq('title', title)
-    .limit(1).maybeSingle();
-  if (lookupError) throw lookupError;
-  if (existing) return false;
-  const { error } = await db.from('tasks').insert({
-    title,
-    description: `New ${app.programSlug || 'program'} application from ${app.email}. Verify documents and funding.`,
-    priority: 'high',
-    status: 'pending',
-    related_type: 'application',
-    related_id: app.applicationId,
-    assigned_to: ownerId,
-    due_days: 2,
-  });
-  if (error) throw error;
-  return true;
-}
-
-/**
- * Wires a newly inserted application into the CRM (`leads`), the student
- * binder requirements (`apprentice_document_types`, read by
- * /students/[id]/binder) and the staff task queue (`tasks`, read by
- * /staff-portal/tasks). Every step is idempotent so replays are safe.
- */
-export async function onApplicationSubmitted(
-  db: SupabaseClient,
-  app: SubmittedApplication,
-): Promise<ApplicationAutomationResult> {
-  const email = app.email.trim().toLowerCase();
-  const name = [app.firstName, app.lastName].map((part) => part?.trim()).filter(Boolean).join(' ') || email;
-  const { ownerId, ...lead } = await upsertLead(db, app, email);
-  const binderDocuments = app.programSlug ? await upsertBinderChecklist(db, app.programSlug) : [];
-  const taskCreated = await insertReviewTask(db, app, name, ownerId);
-  return { ...lead, ownerId, binderDocuments, taskCreated };
 }

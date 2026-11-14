@@ -64,6 +64,7 @@ on:
           - low-hours-pace
           - ops-scan
           - qa-scan
+          - process-application-submissions
           - video-render-queue
           - course-builder-queue
           - portal-completion-reminders
@@ -94,6 +95,7 @@ jobs:
         || github.event.inputs.job == 'missed-checkins'
         || github.event.inputs.job == 'expire-credentials'
         || github.event.inputs.job == 'qa-scan'
+        || github.event.inputs.job == 'process-application-submissions'
       )
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -105,7 +107,7 @@ jobs:
         run: |
           set -euo pipefail
           case "$SELECTED_JOB" in
-            morning-reminders|missed-checkins|expire-credentials|qa-scan) ;;
+            morning-reminders|missed-checkins|expire-credentials|qa-scan|process-application-submissions) ;;
             *) echo "::error::Unsupported stabilization cron"; exit 1 ;;
           esac
           test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET is missing"; exit 1; }

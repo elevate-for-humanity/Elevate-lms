@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 export async function saveHiringNeeds(form: FormData) {
   const { user } = await requireRole(['employer', 'sponsor']);
   const session = await createClient();
@@ -52,5 +53,7 @@ export async function saveHiringNeeds(form: FormData) {
         .single();
   if (result.error || !result.data)
     throw new Error('Hiring needs could not be saved. Please retry.');
+  revalidatePath('/employer/hiring-needs');
+  revalidatePath('/employer/setup');
   redirect('/employer/hiring-needs?saved=1');
 }

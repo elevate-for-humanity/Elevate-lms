@@ -39,7 +39,9 @@ const nextConfig = {
     // desktop) so the responsive srcset never requests the oversized variant.
     deviceSizes: [360, 420, 640, 750, 828, 1080, 1200, 1440, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    qualities: [70, 75, 85, 90, 95, 100],
     remotePatterns: [
+      { protocol: 'https', hostname: 'cdn.durable.co' },
       { protocol: 'https', hostname: 'www.elevateforhumanity.org' },
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: '*.r2.dev' },

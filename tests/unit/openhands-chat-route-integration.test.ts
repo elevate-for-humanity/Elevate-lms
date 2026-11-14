@@ -95,6 +95,32 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     expect(state.send).not.toHaveBeenCalled();
   });
 
+  it('reconciles status for an owned task without creating a new agent', async () => {
+    const response = await GET(new Request('https://admin.example.test/api/admin/dev-studio/openhands/chat?taskId=original-task') as never);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      taskId: 'original-task', lifecycle: { conversationId: 'existing-conversation' },
+    });
+    expect(state.refresh).toHaveBeenCalledWith({
+      taskId: 'original-task', actorId: 'original-owner',
+    });
+    expect(state.dispatch).not.toHaveBeenCalled();
+    expect(state.send).not.toHaveBeenCalled();
+  });
+
+  it('passes caller idempotency to the existing tracked dispatcher for a new approved task', async () => {
+    const response = await POST(new Request('https://admin.example.test/api/admin/dev-studio/openhands/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': 'same-approved-work' },
+      body: JSON.stringify({ message: 'Check the existing approved engineering request' }),
+    }) as never);
+    expect(response.status).toBe(202);
+    expect(state.dispatch).toHaveBeenCalledTimes(1);
+    expect(state.dispatch).toHaveBeenCalledWith(expect.objectContaining({
+      actorId: 'original-owner', correlationId: 'same-approved-work',
+    }));
+    expect(state.send).not.toHaveBeenCalled();
+  });
+
   it('owner-scopes reconciliation GET and does not refresh an unowned task', async () => {
     state.owned.mockResolvedValue(null);
     const response = await GET(new Request('https://admin.example.test/api/admin/dev-studio/openhands/chat?taskId=unowned') as never);

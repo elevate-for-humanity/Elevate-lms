@@ -550,8 +550,8 @@ export async function handleCommunicationEmailPost(
     return NextResponse.json({ ok: true, queued: rows.length });
   }
   const to = parseEmailList(form.get('to'));
-  const cc = parseEmailList(form.get('cc'));
-  const bcc = parseEmailList(form.get('bcc'));
+  const cc = parseEmailList(form.get('cc')).filter(address => !to.includes(address));
+  const bcc = parseEmailList(form.get('bcc')).filter(address => !to.includes(address) && !cc.includes(address));
   const bodyText = String(form.get('body') || '')
     .trim()
     .slice(0, 100_000);
@@ -666,8 +666,10 @@ export async function handleCommunicationEmailPost(
   }
 
   const sendResult = await sendEmail({
-    to: [...to, ...cc],
+    to,
+    cc,
     bcc,
+    groupRecipients: true,
     from: `${safeMailboxDisplayName(mailbox.displayName)} <${mailbox.address}>`,
     replyTo,
     subject,

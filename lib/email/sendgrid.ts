@@ -19,7 +19,10 @@ export interface EmailOptions {
   text?: string;
   from?: string;
   replyTo?: string;
+  cc?: string | string[];
   bcc?: string | string[];
+  /** One shared conversation; automated mail keeps individual delivery by default. */
+  groupRecipients?: boolean;
   attachments?: EmailAttachment[];
   /** Durable outbox owns retry policy; ambiguous sends must never auto-retry. */
   singleAttempt?: boolean;
@@ -112,6 +115,7 @@ export async function sendEmail(options: EmailOptions): Promise<EmailSendResult>
   const from = options.from || FROM_EMAIL;
   const replyTo = options.replyTo ?? REPLY_TO_EMAIL;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
+  const ccArr = options.cc ? (Array.isArray(options.cc) ? options.cc : [options.cc]) : undefined;
   const bccArr = options.bcc
     ? Array.isArray(options.bcc)
       ? options.bcc
@@ -136,6 +140,8 @@ export async function sendEmail(options: EmailOptions): Promise<EmailSendResult>
     replyTo,
     to: toArr,
     trackingIds,
+    groupRecipients: options.groupRecipients,
+    ...(ccArr ? { cc: ccArr } : {}),
     subject: options.subject,
     html: options.html,
     ...(options.text ? { text: options.text } : {}),
@@ -156,15 +162,25 @@ async function sendViaSendGrid(
     html: string;
     text?: string;
     replyTo: string;
+    cc?: string[];
     bcc?: string[];
+    groupRecipients?: boolean;
     attachments?: EmailAttachment[];
     singleAttempt?: boolean;
   },
 ): Promise<EmailSendResult> {
   try {
-    const personalizations = opts.to.map((email, index) => ({
+    const personalizations = opts.groupRecipients ? [{
+      to: opts.to.map(email => ({ email })),
+      custom_args: { elevate_email_log_ids: JSON.stringify(Object.fromEntries(
+        opts.to.map((email, index) => [email.toLowerCase(), opts.trackingIds[index]]),
+      )) },
+      ...(opts.cc?.length ? { cc: opts.cc.map(email => ({ email })) } : {}),
+      ...(opts.bcc?.length ? { bcc: opts.bcc.map(email => ({ email })) } : {}),
+    }] : opts.to.map((email, index) => ({
       to: [{ email }],
       custom_args: { elevate_email_log_id: opts.trackingIds[index] },
+      ...(opts.cc?.length ? { cc: opts.cc.map(email => ({ email })) } : {}),
       ...(opts.bcc?.length ? { bcc: opts.bcc.map((bcc) => ({ email: bcc })) } : {}),
     }));
 

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, type ComponentProps } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ResumeUploads } from '@/components/career/ResumeUploads';
 import { ResumeBuilder } from '@/components/career/ResumeBuilder';
 import { createClient } from '@/lib/supabase/client';
@@ -11,6 +13,7 @@ export function ResumeBuilderPage({
   initialData?: ComponentProps<typeof ResumeBuilder>['initialData'];
 }) {
   const [message, setMessage] = useState('');
+  const router = useRouter();
   return (
     <div className="space-y-4">
       <div>
@@ -27,17 +30,25 @@ export function ResumeBuilderPage({
           {message}
         </p>
       ) : null}
+      <div className="flex flex-wrap gap-4">
+        <Link href="/lms/career" className="font-bold underline">
+          See jobs matching my skills
+        </Link>
+        <Link href="/lms/dashboard" className="font-bold underline">
+          Back to dashboard
+        </Link>
+      </div>
       <ResumeUploads />
       <ResumeBuilder
         initialData={initialData}
         onSave={async (resumeData) => {
+          setMessage('');
           const supabase = createClient();
           const {
             data: { user },
           } = await supabase.auth.getUser();
           if (!user) {
-            setMessage('Sign in again to save your resume.');
-            return;
+            throw new Error('Sign in again to save your resume.');
           }
           const { data: existing, error: readError } = await supabase
             .from('resumes')
@@ -47,7 +58,6 @@ export function ResumeBuilderPage({
             .limit(1)
             .maybeSingle();
           if (readError) {
-            setMessage(`Resume could not be loaded: ${readError.message}`);
             throw readError;
           }
           const payload = {
@@ -62,8 +72,9 @@ export function ResumeBuilderPage({
                 .eq('id', existing.id)
                 .eq('user_id', user.id)
             : await supabase.from('resumes').insert(payload);
-          setMessage(error ? `Resume could not be saved: ${error.message}` : 'Resume saved.');
           if (error) throw error;
+          setMessage('Resume saved. Your skills and credentials will inform your career feed.');
+          router.refresh();
         }}
       />
     </div>

@@ -61,6 +61,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
 
   const [skillDraft, setSkillDraft] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const downloadPdf = async () => {
@@ -162,8 +163,15 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
 
   const handleSave = async () => {
     setIsSaving(true);
+    setSaveError('');
     try {
       await onSave(resumeData);
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Your résumé could not be saved. Please try again.',
+      );
     } finally {
       setIsSaving(false);
     }
@@ -690,6 +698,11 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
         ))}
       </section>
 
+      {saveError ? (
+        <p role="alert" className="rounded-xl bg-red-50 p-3 text-red-900">
+          {saveError}
+        </p>
+      ) : null}
       {/* Save Button */}
       <div className="flex justify-start pb-40">
         <button

@@ -8,9 +8,10 @@ interface JobCardProps {
   href?: string;
   /** Show apply button instead of view details */
   showApply?: boolean;
+  sourceLabel?: string;
 }
 
-export default function JobCard({ job, href, showApply = false }: JobCardProps) {
+export default function JobCard({ job, href, showApply = false, sourceLabel = 'Elevate Employer Partner' }: JobCardProps) {
   const dest = href ?? `/careers/jobs/${job.id}`;
   const isExpired = job.application_deadline
     ? new Date(job.application_deadline) < new Date()
@@ -34,7 +35,7 @@ export default function JobCard({ job, href, showApply = false }: JobCardProps) 
             >
               {job.title}
             </Link>
-            <p className="text-sm text-slate-500 mt-0.5">Elevate Employer Partner</p>
+            <p className="text-sm text-slate-500 mt-0.5">{sourceLabel}</p>
           </div>
           <span
             className={`flex-shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full ${jobTypeBadge(job.job_type ?? job.employment_type)}`}
@@ -48,7 +49,7 @@ export default function JobCard({ job, href, showApply = false }: JobCardProps) 
           {(job.location || !job.remote_allowed) && (
             <span className="flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5" />
-              {job.location ?? 'Indianapolis, IN'}
+              {job.location ?? 'Location not listed'}
             </span>
           )}
           {job.remote_allowed && (

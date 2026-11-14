@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type ProgramOption = { id: string; label: string };
 const CREDENTIAL_TYPES = [
@@ -68,7 +69,28 @@ export function CredentialUploadForm({ programs, credentials }: { programs: Prog
       </div>
       <button type="submit" disabled={busy || programs.length === 0} className="min-h-12 w-full rounded-xl bg-blue-700 px-5 font-black text-white disabled:opacity-60">{busy ? 'Uploading…' : 'Upload credential'}</button>
       {programs.length === 0 ? <p role="alert" className="text-sm text-amber-800">No eligible program enrollment was found. Contact learner support to correct your enrollment before uploading.</p> : null}
-      {message ? <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-900">{message}</p> : null}
+      {message ? (
+        <div className="space-y-3 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900">
+          <p role="status" className="font-bold">
+            {message}
+          </p>
+          <p>
+            Your selected credential helps suggest jobs now. Verification is required before it
+            counts as a verified credential match.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/lms/career" className="font-bold underline">
+              See matching jobs
+            </Link>
+            <Link href="/lms/resume-builder" className="font-bold underline">
+              Update my résumé
+            </Link>
+            <Link href="/lms/dashboard" className="font-bold underline">
+              Back to dashboard
+            </Link>
+          </div>
+        </div>
+      ) : null}
       {error ? <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-900">{error}</p> : null}
     </form>
   );

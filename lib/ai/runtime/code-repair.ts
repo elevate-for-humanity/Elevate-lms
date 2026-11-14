@@ -1,6 +1,6 @@
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
-import {acceptedOpenHandsNeedsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
+import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
 import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
@@ -272,7 +272,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  if(blocked.data?.length===2000)throw Error('PARIS_BLOCKED_REPAIR_SCAN_LIMIT');
  // A timed-out prepare is not a provider-terminal result. Observe only one
  // accepted task, under the same owner policy, without spending an attempt.
- const accepted=(blocked.data??[]).find(repair=>repair.actor_id===policy.actor_id && acceptedOpenHandsNeedsObservation(repair));
+ const accepted=nextAcceptedOpenHandsObservation(blocked.data??[],policy.actor_id);
  if(accepted){
   const busy=await db.from('paris_code_repairs').select('id').in('status',['dispatched','patching','validating','deploying','verifying']).limit(1);
   if(busy.error)throw busy.error;
@@ -284,6 +284,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     .eq('updated_at',accepted.updated_at);
    const result=await superviseAcceptedOpenHandsRepair(accepted,{
     now:Date.now,workflow:(runId:number)=>gh(`/actions/runs/${runId}`),
+    jobs:(runId:number)=>gh(`/actions/runs/${runId}/jobs?per_page=100`),
     observe:()=>observeParisOpenHandsRepair(accepted),
     sourceEligible:async()=>{
      if(!accepted.source_job_id)return true;

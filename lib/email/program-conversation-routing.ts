@@ -53,6 +53,42 @@ export async function programConversationRoute(
     ),
   ];
   if (holderIds.length !== 1) return null;
+  // An archived Program Holder portal must never receive automatic copies.
+  // For a holder currently operating as a Host Shop, only an explicitly
+  // assigned, active Host Shop mailbox may receive the holder's own applicant
+  // conversations. Fail closed for ambiguous or missing membership.
+  const holder = await db
+    .from('program_holders')
+    .select('user_id,features')
+    .eq('id', holderIds[0])
+    .maybeSingle();
+  if (holder.error || !holder.data) return null;
+  if (holder.data.features?.portal_access_archived === true) {
+    if (!holder.data.user_id) return null;
+    const profile = await db.from('profiles')
+      .select('role')
+      .eq('id', holder.data.user_id)
+      .maybeSingle();
+    if (profile.error || profile.data?.role !== 'host_shop') return null;
+    const memberships = await db.from('communication_email_mailbox_members')
+      .select('access_level,mailbox:communication_email_mailboxes!inner(address,mailbox_kind,active)')
+      .eq('user_id', holder.data.user_id)
+      .eq('mailbox.mailbox_kind', 'host_shop')
+      .eq('mailbox.active', true);
+    if (memberships.error) return null;
+    const permitted = (memberships.data || [])
+      .filter((row: any) => ['owner', 'manager'].includes(row.access_level))
+      .flatMap((row: any) => {
+        const mailbox = Array.isArray(row.mailbox) ? row.mailbox[0] : row.mailbox;
+        return mailbox?.address && mailbox.mailbox_kind === 'host_shop' && mailbox.active
+          ? [mailbox.address] : [];
+      });
+    if (permitted.length !== 1) return null;
+    const internal = internalAddresses.flatMap(parseEmailList);
+    if (!internal.some((address) => INTAKE_ADDRESSES.has(address) || permitted.includes(address)))
+      return null;
+    return { addresses: [ADMIN_ADDRESS, permitted[0]], applicantEmail, replyTo: ADMIN_ADDRESS };
+  }
   const result = await db
     .from('communication_email_mailboxes')
     .select('address,program_holder_id')

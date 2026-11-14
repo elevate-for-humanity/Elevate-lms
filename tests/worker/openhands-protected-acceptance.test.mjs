@@ -43,7 +43,7 @@ test('missing, failing, pending and truncated CI all fail closed', () => {
 });
 
 const repairId = 'd1507c12-93f7-459e-9aaf-b73286e2bd5c';
-const repair = { id: repairId, status: 'completed', release_sha: MERGE };
+const repair = { id: repairId, status: 'verified', release_sha: MERGE };
 const correlatedTask = { tool_name: 'openhands.execute', correlation_id: 'original:repair' };
 const services = [{ service: 'admin', ready: true, servingSha: MERGE },
   { service: 'lms', ready: true, servingSha: MERGE },

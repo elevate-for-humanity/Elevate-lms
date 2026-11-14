@@ -35,6 +35,7 @@ jobs:
         id: dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Protected OpenHands release evidence regressions
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tests/worker/openhands-protected-acceptance.test.mjs tests/worker/openhands-paris-protected-merge.test.mjs tests/worker/openhands-policy-readback.test.mjs
       - name: Dev Studio container configuration regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}

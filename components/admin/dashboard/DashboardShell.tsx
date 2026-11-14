@@ -153,8 +153,8 @@ function OperationalShortcuts() {
       href: '/system-health',
     },
     {
-      title: 'Cost Intelligence',
-      description: 'Review Google Cloud, GPU, failed jobs, and media storage costs.',
+      title: 'Spend & Service Bills',
+      description: 'Open payment links, monitor low balances and due dates, and review infrastructure costs.',
       href: '/operations/infrastructure-costs',
     },
   ] as const;

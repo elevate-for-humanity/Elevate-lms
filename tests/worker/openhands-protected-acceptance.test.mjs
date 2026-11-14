@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateProtectedPullRequest, evaluateOriginalRepairAcceptance, protectedMainPolicyVerified, requiredMainReviewCount } from '../../lib/devstudio/openhands/acceptance-contract.mjs';
+import { evaluateProtectedPullRequest, evaluateOriginalRepairAcceptance, protectedMainPolicyVerified, requiredMainReviewCount, requiredMainChecks } from '../../lib/devstudio/openhands/acceptance-contract.mjs';
 
 const HEAD = 'a'.repeat(40);
 const MERGE = 'b'.repeat(40);
@@ -207,4 +207,55 @@ test('required approval count is enforced from both classic and ruleset policy',
     reviewerPermissions: { 'independent-reviewer': 'write', 'second-reviewer': 'maintain' },
   }).accepted, true);
   assert.equal(requiredMainReviewCount({}), 0);
+});
+
+test('required GitHub App ID must match the independently reported check issuer', () => {
+  const rules = [
+    { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
+    { type: 'required_status_checks', parameters: {
+      required_status_checks: [{ context: 'CI Required Gate', app_id: 99 }],
+    } },
+  ];
+  const requiredChecks = requiredMainChecks({ rules });
+  assert.deepEqual(requiredChecks, [{ context: 'CI Required Gate', app_id: 99 }]);
+  const base = { pr, reviews, requiredChecks, ancestryVerified: true, protectionVerified: true };
+  const wrong = evaluate({ ...base, checks: [{ ...checks[0], app: { id: 98 } }] });
+  assert.equal(wrong.accepted, false);
+  const right = evaluate({ ...base, checks: [{ ...checks[0], app: { id: 99 } }] });
+  assert.equal(right.accepted, true, JSON.stringify(right.reasons));
+  const statusOnly = evaluate({ ...base, checks: [],
+    statuses: [{ context: 'CI Required Gate', state: 'success' }] });
+  assert.equal(statusOnly.accepted, false);
+});
+
+test('ruleset integration_id pins the check issuer independently of classic policy', () => {
+  const requiredChecks = requiredMainChecks({ rules: [{
+    type: 'required_status_checks', parameters: { required_status_checks: [
+      { context: 'CI Required Gate', integration_id: 99 },
+    ] },
+  }] });
+  assert.deepEqual(requiredChecks, [{ context: 'CI Required Gate', app_id: 99 }]);
+  const base = { pr, reviews, requiredChecks, ancestryVerified: true, protectionVerified: true };
+  assert.equal(evaluate({ ...base, checks: [{ ...checks[0], app: { id: 98 } }] }).accepted, false);
+  assert.equal(evaluate({ ...base, checks: [{ ...checks[0], app: { id: 99 } }] }).accepted, true);
+});
+
+test('known read-only change requests do not veto sufficient authorized approvals', () => {
+  const requested = { user: { login: 'reader', type: 'User' }, state: 'CHANGES_REQUESTED',
+    commit_id: HEAD, submitted_at: '2026-11-14T02:00:00Z' };
+  for (const permission of ['read', 'triage', 'none']) {
+    const result = evaluate({
+      pr, reviews: [...reviews, requested], checks, requiredChecks: ['CI Required Gate'],
+      reviewerPermissions: { 'independent-reviewer': 'write', reader: permission },
+      ancestryVerified: true, protectionVerified: true,
+    });
+    assert.equal(result.accepted, true, JSON.stringify(result.reasons));
+  }
+  const unknown = evaluate({
+    pr, reviews: [...reviews, requested], checks, requiredChecks: ['CI Required Gate'],
+    reviewerPermissions: { 'independent-reviewer': 'write' },
+    ancestryVerified: true, protectionVerified: true,
+  });
+  assert.equal(unknown.accepted, false);
+  assert.match(unknown.reasons.join(' '), /reviewer authority could not be verified/);
 });

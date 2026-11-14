@@ -23,7 +23,8 @@ const fixtures = {
 function github(overrides = {}, unreachable = []) {
   const data = { ...fixtures, ...overrides };
   return async path => {
-    if (unreachable.includes(path) || !(path in data)) throw Error('unavailable');
+    if (unreachable.includes(path)) throw Object.assign(Error('GitHub API 404: Not Found'), { status: 404, policyAbsent: path === '/branches/main/protection' });
+    if (!(path in data)) throw Error('unavailable');
     return data[path];
   };
 }
@@ -34,10 +35,14 @@ test('actual PARIS release verifier accepts a protected merged exact PR with ind
 });
 
 test('a classic-only and ruleset-only protected main are recognized', async () => {
-  for (const missing of ['/rules/branches/main', '/branches/main/protection']) {
-    const outcome = await verifyProtectedParisMerge({ pr, expectedHeadSha: HEAD, gh: github({}, [missing]) });
-    assert.equal(outcome.accepted, true, missing);
-  }
+  const classicOnly = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({ '/rules/branches/main': [] }),
+  });
+  assert.equal(classicOnly.accepted, true, JSON.stringify(classicOnly.reasons));
+  const rulesOnly = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({}, ['/branches/main/protection']),
+  });
+  assert.equal(rulesOnly.accepted, true, JSON.stringify(rulesOnly.reasons));
 });
 
 test('no readable protection, no independent review, or failed checks block deployment', async () => {
@@ -148,4 +153,70 @@ test('PARIS requires all independent protected approvals, not merely one', async
     }),
   });
   assert.equal(result.accepted, false);
+});
+
+test('read errors other than confirmed policy absence cannot weaken protection', async () => {
+  const policyRead403 = async path => {
+    if (path === '/rules/branches/main') {
+      throw Object.assign(Error('GitHub API 403: Forbidden'), { status: 403 });
+    }
+    return github()(path);
+  };
+  const result = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github(), policyGh: policyRead403,
+  });
+  assert.equal(result.accepted, false);
+  assert.match(result.reasons.join(' '), /PARIS_PROTECTED_PR_VERIFICATION_UNAVAILABLE/);
+});
+
+test('required App ID cannot be satisfied by an unrelated green check context', async () => {
+  const checkPath = `/commits/${HEAD}/check-runs?per_page=100`;
+  const policy = [
+    { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
+    { type: 'required_status_checks', parameters: {
+      required_status_checks: [{ context: 'CI Required Gate', app_id: 17 }],
+    } },
+  ];
+  const input = { pr, expectedHeadSha: HEAD };
+  const oldApp = await verifyProtectedParisMerge({
+    ...input, gh: github({
+      '/rules/branches/main': policy,
+      [checkPath]: { check_runs: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success', app: { id: 18 } }] },
+    }),
+  });
+  assert.equal(oldApp.accepted, false);
+  const correctApp = await verifyProtectedParisMerge({
+    ...input, gh: github({
+      '/rules/branches/main': policy,
+      [checkPath]: { check_runs: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success', app: { id: 17 } }] },
+    }),
+  });
+  assert.equal(correctApp.accepted, true, JSON.stringify(correctApp.reasons));
+});
+
+test('ambiguous policy 404 remains blocking instead of being treated as absence', async () => {
+  for (const path of ['/rules/branches/main', '/branches/main/protection']) {
+    const result = await verifyProtectedParisMerge({
+      pr, expectedHeadSha: HEAD, gh: github(), policyGh: async requested => {
+        if (requested === path) throw Object.assign(Error('Not Found'), { status: 404 });
+        return github()(requested);
+      },
+    });
+    assert.equal(result.accepted, false);
+    assert.match(result.reasons.join(' '), /VERIFICATION_UNAVAILABLE/);
+  }
+});
+
+test('PARIS keeps authorized approvals when a known reader requests changes', async () => {
+  const requested = { user: { login: 'reader', type: 'User' }, state: 'CHANGES_REQUESTED',
+    commit_id: HEAD, submitted_at: '2026-11-14T02:00:00Z' };
+  for (const permission of ['read', 'triage', 'none']) {
+    const result = await verifyProtectedParisMerge({
+      pr, expectedHeadSha: HEAD, gh: github({
+        '/pulls/2613/reviews?per_page=100': [...fixtures['/pulls/2613/reviews?per_page=100'], requested],
+        '/collaborators/reader/permission': { permission },
+      }),
+    });
+    assert.equal(result.accepted, true, JSON.stringify(result.reasons));
+  }
 });

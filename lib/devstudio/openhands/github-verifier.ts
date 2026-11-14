@@ -71,9 +71,20 @@ async function gh<T>(path: string, token?: string): Promise<T> {
   });
   if (!response.ok) {
     const detail = (await response.text().catch(() => '')).slice(0, 300);
-    throw new Error(`GitHub verification API ${response.status}${detail ? `: ${detail}` : ''}`);
+    let policyAbsent = false;
+    if (response.status === 404 && path.endsWith('/branches/main/protection')) {
+      try { policyAbsent = JSON.parse(detail)?.message === 'Branch not protected'; } catch { /* Unknown 404 remains blocking. */ }
+    }
+    throw Object.assign(new Error(`GitHub verification API ${response.status}${detail ? `: ${detail}` : ''}`), {
+      status: response.status, policyAbsent,
+    });
   }
   return response.json() as Promise<T>;
+}
+
+function confirmedPolicyAbsent(error: unknown): boolean {
+  return error instanceof Error && 'status' in error && error.status === 404 &&
+    'policyAbsent' in error && error.policyAbsent === true;
 }
 
 export async function verifyOpenHandsGitHubOutcome(input: {
@@ -189,17 +200,23 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         required_pull_request_reviews?: { required_approving_review_count?: number };
         required_status_checks?: { checks?: unknown[]; contexts?: string[] };
       } | null = null;
+      let policyReadFailed = false;
       try {
         rules = await gh<typeof rules>(`/repos/${repository}/rules/branches/main`, policyToken ?? undefined);
-      } catch {
-        reasons.push(`PR #${number}: ruleset readback unavailable; checking classic protection.`);
+      } catch (error) {
+        if (!confirmedPolicyAbsent(error)) policyReadFailed = true;
+        reasons.push(`PR #${number}: ruleset readback unavailable.`);
       }
       try {
         classic = await gh<typeof classic>(`/repos/${repository}/branches/main/protection`, policyToken ?? undefined);
-      } catch {
+      } catch (error) {
+        if (!confirmedPolicyAbsent(error)) policyReadFailed = true;
         reasons.push(`PR #${number}: classic protection readback unavailable.`);
       }
-      const protectionVerified = Boolean(policyToken) && protectedMainPolicyVerified({ rules, classic });
+      // A 403 or transport error cannot be silently replaced by another
+      // less restrictive policy source.
+      const protectionVerified = Boolean(policyToken) && !policyReadFailed &&
+        protectedMainPolicyVerified({ rules, classic });
       const requiredChecks = requiredMainChecks({ rules, classic });
       const requiredApprovalCount = requiredMainReviewCount({ rules, classic });
       const reviewerPermissions: Record<string, string> = {};

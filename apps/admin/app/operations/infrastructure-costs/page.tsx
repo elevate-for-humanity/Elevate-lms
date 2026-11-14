@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import {
   AlertTriangle,
@@ -15,6 +16,7 @@ import {
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireRole } from '@/lib/auth/require-role';
 import { getInfrastructureCostIntelligence } from '@/lib/admin/infrastructure-cost-intelligence';
+import { ServiceBillingPanel } from '@/components/admin/ServiceBillingPanel';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Infrastructure Cost Intelligence | Admin' };
@@ -40,7 +42,36 @@ function money(value: number | null) {
 
 export default async function InfrastructureCostPage() {
   await requireRole(['super_admin', 'admin']);
-  const intelligence = await getInfrastructureCostIntelligence(30);
+  return (
+    <>
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        <ServiceBillingPanel />
+      </div>
+      <Suspense
+        fallback={
+          <p className="p-5" role="status">
+            Loading infrastructure telemetry… Billing links remain available above.
+          </p>
+        }
+      >
+        <InfrastructureTelemetry />
+      </Suspense>
+    </>
+  );
+}
+
+async function InfrastructureTelemetry() {
+  const intelligence = await getInfrastructureCostIntelligence(30).catch(() => null);
+  if (!intelligence)
+    return (
+      <p
+        role="alert"
+        className="mx-auto max-w-7xl rounded-xl border border-amber-300 bg-amber-50 p-5"
+      >
+        Infrastructure telemetry is unavailable. Service payment links and billing records remain
+        available above; usage totals cannot be verified.
+      </p>
+    );
   const { gpu } = intelligence;
   const cards = [
     {

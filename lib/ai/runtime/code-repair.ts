@@ -15,6 +15,7 @@ import {requireAdminClient} from '@/lib/supabase/admin';
 import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvidence,STORE_REPAIR_DEPLOYMENT} from '@/lib/devstudio/infrastructure-repair.mjs';
+import {verifyProtectedParisMerge} from '@/lib/devstudio/openhands/paris-protected-merge.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled} from './code-repair-policy.mjs';
@@ -516,7 +517,18 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     const pr=await gh('/pulls/'+repair.verification.pullRequest.number);
     const sha=infrastructureMergeEvidence(pr,repair.verification.pullRequest.headSha);
     if(!sha)continue;
-    await update(repair.id,{status:'deploying',release_sha:sha,verification:{...repair.verification,requestedDeployments:[]}});
+    const protectedEvidence=await verifyProtectedParisMerge({
+     pr,expectedHeadSha:repair.verification.pullRequest.headSha,gh,
+    });
+    if(!protectedEvidence.accepted){
+     await update(repair.id,{
+      status:'blocked',
+      error_code:'PROTECTED_PR_ACCEPTANCE_EVIDENCE_REQUIRED',
+      verification:{...repair.verification,protectedReviewAcceptance:protectedEvidence},
+     });
+     continue;
+    }
+    await update(repair.id,{status:'deploying',release_sha:sha,verification:{...repair.verification,protectedReviewAcceptance:protectedEvidence,requestedDeployments:[]}});
    }catch(error){await update(repair.id,{status:'blocked',error_code:String(error instanceof Error?error.message:error).slice(0,500)});}
    continue;
   }

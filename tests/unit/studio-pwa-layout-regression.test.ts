@@ -28,7 +28,11 @@ describe('Studio, Course Builder and PWA layout regression', () => {
     const css = source('apps/admin/styles/studio-workspace.css');
     expect(studio).toContain('sideBySide={splitView && !compact}');
     expect(studio).toContain("activePane={compact ? (surface === 'commands' ? 'primary' : 'panel') : undefined}");
-    expect(course).toContain('h-[min(24rem,45dvh)]');
+    const chatStyles = source('components/studio/UnifiedEllieChat.module.css');
+    expect(course).toMatch(/<UnifiedEllieChat\s+embedded\s+contentSized\b/);
+    expect(course).not.toContain('h-[min(24rem,45dvh)]');
+    expect(chatStyles).toMatch(/\.contentSized\s*\{[^}]*height:\s*auto/);
+    expect(chatStyles).toMatch(/\.root\.contentSized\s+\.messagesViewport\s*\{[^}]*height:\s*clamp\(8rem,\s*32dvh,\s*20rem\)/);
     expect(course).not.toContain('h-[32rem]');
     expect(css).not.toContain('.studio-workspace :is(.text-xs, .text-sm');
     expect(css).toContain('font-size: 16px');

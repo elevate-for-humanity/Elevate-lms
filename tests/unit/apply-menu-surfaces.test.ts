@@ -38,7 +38,7 @@ describe('Apply menu surfaces', () => {
     const apprenticeships = NAV_ITEMS.find((item) => item.id === 'apprenticeships');
     const employers = NAV_ITEMS.find((item) => item.id === 'employers');
 
-    expect(apprenticeships?.subItems?.some((item) => item.name === 'All Host Sites')).toBe(true);
+    expect(apprenticeships?.subItems?.some((item) => item.name === 'Host Shop Directory' && item.href === '/partners/host-shops')).toBe(true);
     expect(apprenticeships?.subItems?.some((item) => item.name === 'Become a Host Site')).toBe(true);
     expect(employers?.subItems?.some((item) => /Host Site/.test(item.name))).toBe(false);
   });

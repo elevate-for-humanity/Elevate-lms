@@ -16,6 +16,7 @@
   See LICENSE file for details.
 */
 
+import phoneConfig from './phone-config.cjs';
 import fs from 'fs';
 import nodemailer from 'nodemailer';
 import path from 'path';
@@ -24,7 +25,7 @@ class EFHNotificationSystem {
   constructor() {
     this.notificationSettings = {
       email: process.env.NOTIFICATION_EMAIL || '',
-      phone: '3177607908',
+      phone: phoneConfig.getAlertPhone(),
       enabledNotifications: {
         newSale: true,
         dailySummary: true,
@@ -493,7 +494,7 @@ class EFHNotificationSystem {
       await this.twilioClient.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
-        to: `+1${this.notificationSettings.phone}`,
+        to: phoneConfig.requireAlertPhone(this.notificationSettings.phone),
       });
         `📱 SMS sent to ${this.notificationSettings.phone}: ${message.substring(0, 50)}...`
       );

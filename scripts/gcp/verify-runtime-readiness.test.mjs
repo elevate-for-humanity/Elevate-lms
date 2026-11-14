@@ -29,3 +29,28 @@ test('Store accepts its own identity and rejects Marketing', async () => {
  assert.equal((await verifyRuntimeReadiness('store',base,'test',{attempts:1,request:request('store')})).passed,true);
  await assert.rejects(verifyRuntimeReadiness('store',base,'test',{attempts:1,request:request('marketing')}),/budget exhausted/);
 });
+
+
+test('DNS, timeout and dependency failures report safe, actionable classes', async () => {
+  const failure = (code, message = 'private-token-must-not-appear') => Object.assign(new Error(message), {cause: {code}});
+  for (const [code, reason] of [['ENOTFOUND', 'dns_unavailable'], ['EAI_AGAIN', 'dns_unavailable'], ['ECONNREFUSED', 'connection_unavailable'], ['ETIMEDOUT', 'timeout']]) {
+    await assert.rejects(verifyRuntimeReadiness('marketing', base, 'secret-token', {
+      attempts: 1, request: async () => { throw failure(code); },
+    }), error => error.message.includes(reason) && !error.message.includes('private-token') && !error.message.includes('secret-token'));
+  }
+  await assert.rejects(verifyRuntimeReadiness('marketing', base, 'secret-token', {
+    attempts: 1, request: async () => ({status:503, json:async()=>({})}),
+  }), /marketing \/api\/health http_503/);
+  await assert.rejects(verifyRuntimeReadiness('marketing', base, 'secret-token', {
+    attempts: 1, request: async () => ({status:200, json:async()=>({...good, dependencies:{supabase:{ok:false}}})}),
+  }), /supabase_unready/);
+});
+
+test('Admin executor failure and wrong backend identity are distinct', async () => {
+  await assert.rejects(verifyRuntimeReadiness('admin', base, 'token', {
+    attempts:1, request:async()=>({status:200,json:async()=>({...good,service:'admin'})}),
+  }), /agentic_executor_unready|supabase_unready|health_contract_unmet/);
+  await assert.rejects(verifyRuntimeReadiness('admin', base, 'token', {
+    attempts:1, request:async()=>({status:200,json:async()=>good}),
+  }), /service_mismatch/);
+});

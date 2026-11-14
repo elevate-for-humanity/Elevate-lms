@@ -260,7 +260,7 @@ export default function UnifiedCourseBuilder({
 
   const workspace = (
     <div
-      className="min-h-full min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100"
+      className="min-h-0 min-w-0 w-full overflow-x-hidden bg-slate-950 text-slate-100"
     >
       <div className="border-b border-slate-800 bg-slate-900 px-3 py-2 sm:px-5 sm:py-4">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -327,7 +327,7 @@ export default function UnifiedCourseBuilder({
         <div id="course-paris-instructions" hidden={!assistantOpen}>
         <p className="text-sm text-slate-300">Speak or type your instructions here. Select courses and lessons below; previews stay on the right.</p>
         <p className="text-xs text-slate-300">Deploy updates the platform. Publish course releases accepted lessons to learners.</p>
-        <div className="h-[32rem] min-w-0 overflow-hidden rounded-xl border border-slate-700">
+        <div className="h-[min(24rem,45dvh)] min-h-[12rem] min-w-0 overflow-hidden rounded-xl border border-slate-700">
           <UnifiedEllieChat embedded restoreLatest={false}
             fileContext={JSON.stringify({workspace:'course',courseId:selectedCourse?.id,title:selectedCourse?.title,
               programSlug:selectedProgram?.slug||selectedCourse?.slug,

@@ -53,12 +53,102 @@ media_encryption=sdes
 direct_media=no
 dtmf_mode=rfc4733
 from_user=+14632401404
-callerid=Elevate <+14632401404>
+; Preserve carrier-provided caller identity for every inbound extension.
+trust_id_inbound=yes
 send_pai=yes
 rtp_symmetric=yes
 force_rport=yes
 rewrite_contact=yes
 '''
+
+
+# Only the exact previous managed configuration is eligible for an in-place upgrade.
+LEGACY_CONFIG = CONFIG.replace(
+    "; Preserve carrier-provided caller identity for every inbound extension.\ntrust_id_inbound=yes",
+    "callerid=Elevate <+14632401404>")
+
+def identity_upgrade(previous):
+    """Validate managed carrier settings, then alter inbound identity only."""
+    if previous is None:
+        return CONFIG
+    if previous in (CONFIG, LEGACY_CONFIG):
+        return CONFIG
+    allowed_comments = {
+        '; Managed Elevate Twilio carrier endpoint',
+        '; Preserve carrier-provided caller identity for every inbound extension.',
+    }
+    def parse(text):
+        sections = {}
+        current = None
+        for line in text.splitlines():
+            if not line.strip():
+                continue
+            if line.startswith(';'):
+                if line not in allowed_comments:
+                    raise ValueError('existing_carrier_configuration_requires_review')
+                continue
+            if re.fullmatch(r'\[[a-zA-Z0-9_-]+\]', line):
+                current = line[1:-1]
+                if current in sections:
+                    raise ValueError('existing_carrier_configuration_requires_review')
+                sections[current] = {}
+                continue
+            if current is None or '=' not in line:
+                raise ValueError('existing_carrier_configuration_requires_review')
+            key, value = line.split('=', 1)
+            values = sections[current].setdefault(key, [])
+            if values and not (current == 'elevate-twilio-tls' and key == 'local_net'):
+                raise ValueError('existing_carrier_configuration_requires_review')
+            values.append(value)
+        return sections
+    expected = parse(CONFIG)
+    actual = parse(previous)
+    if set(actual) != set(expected):
+        raise ValueError('existing_carrier_configuration_requires_review')
+    endpoint = actual['twilio']
+    if endpoint.get('context') != ['elevate-paris-inbound']:
+        raise ValueError('existing_carrier_configuration_requires_review')
+    endpoint['context'] = expected['twilio']['context']
+    if endpoint.pop('callerid', None) not in (None, ['Elevate <+14632401404>']):
+        raise ValueError('existing_carrier_configuration_requires_review')
+    if endpoint.get('trust_id_inbound') not in (None, ['yes']):
+        raise ValueError('existing_carrier_configuration_requires_review')
+    endpoint['trust_id_inbound'] = ['yes']
+    transport = actual['elevate-twilio-tls']
+    certificate_keys = {'cert_file': ['/etc/asterisk/tls/phone.crt'],
+                        'priv_key_file': ['/etc/asterisk/tls/phone.key'],
+                        'allow_reload': ['yes']}
+    present = set(transport).intersection(certificate_keys)
+    if present and present != set(certificate_keys):
+        raise ValueError('existing_carrier_configuration_requires_review')
+    for key in present:
+        if transport.pop(key) != certificate_keys[key]:
+            raise ValueError('existing_carrier_configuration_requires_review')
+    local = transport.get('local_net', [])
+    if not local or local[0] != '127.0.0.0/8' or len(local) > 2:
+        raise ValueError('existing_carrier_configuration_requires_review')
+    if len(local) == 2:
+        import ipaddress
+        try:
+            network = ipaddress.ip_network(local[1], strict=True)
+        except ValueError:
+            raise ValueError('existing_carrier_configuration_requires_review')
+        if network.version != 4 or network.prefixlen != 32 or not network.network_address.is_private or network.network_address.is_loopback or network.network_address.is_link_local:
+            raise ValueError('existing_carrier_configuration_requires_review')
+    transport['local_net'] = ['127.0.0.0/8']
+    if actual != expected:
+        raise ValueError('existing_carrier_configuration_requires_review')
+    # Keep routing, AOR, transport, certificate paths and NAT byte-for-byte.
+    match = re.search(r'(?ms)(^\[twilio\]\s*\n)(.*?)(?=^\[|\Z)', previous)
+    body = match[2]
+    replacement = '; Preserve carrier-provided caller identity for every inbound extension.\ntrust_id_inbound=yes'
+    if re.search(r'^trust_id_inbound=yes$', body, re.M):
+        body = re.sub(r'^callerid=.*\n?', '', body, flags=re.M)
+    else:
+        body = re.sub(r'^callerid=.*$', lambda _: replacement, body, flags=re.M)
+        if not re.search(r'^trust_id_inbound=yes$', body, re.M):
+            body = body.rstrip() + '\n' + replacement + '\n'
+    return previous[:match.start(2)] + body + previous[match.end(2):]
 
 
 def run(args, required=True):
@@ -119,7 +209,8 @@ def validate():
         original = pjsip.read_text()
         if re.search(r'^\[(twilio|twilio-aor|elevate-twilio-tls)\]', original, re.M):
             raise ValueError('existing_twilio_objects_require_review')
-        (staging / 'elevate-twilio.conf').write_text(CONFIG)
+        staged_fragment = staging / 'elevate-twilio.conf'
+        staged_fragment.write_text(identity_upgrade(staged_fragment.read_text() if staged_fragment.exists() else None))
         os.chmod(staging / 'elevate-twilio.conf', pjsip.stat().st_mode & 0o777)
         os.chown(staging / 'elevate-twilio.conf', pjsip.stat().st_uid, pjsip.stat().st_gid)
         if '#include elevate-twilio.conf' not in original.splitlines():
@@ -198,8 +289,8 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
     if main.is_symlink() or fragment.is_symlink():
         raise ValueError('carrier_configuration_symlink_requires_review')
     previous = main.read_text()
-    if fragment.exists() and fragment.read_text() != CONFIG:
-        raise ValueError('existing_carrier_configuration_requires_review')
+    previous_fragment = fragment.read_text() if fragment.exists() else None
+    candidate_fragment = identity_upgrade(previous_fragment)
     cli = lambda text: execute(['docker', 'exec', CONTAINER, 'asterisk', '-rx', text]).stdout
     channels = cli('core show channels count')
     if not all(re.search(r'^0 active ' + kind + r's?$', channels, re.M) for kind in ['call', 'channel']):
@@ -212,7 +303,7 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
     restarted = False
     identity = json.loads(execute(['docker', 'inspect', CONTAINER]).stdout)[0] if execute is run else None
     try:
-        fragment.write_text(CONFIG)
+        fragment.write_text(candidate_fragment)
         os.chmod(fragment, main.stat().st_mode & 0o777)
         os.chown(fragment, main.stat().st_uid, main.stat().st_gid)
         include = '#include elevate-twilio.conf'
@@ -246,9 +337,13 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
             raise ValueError('live_tls_endpoint_reload_not_confirmed')
         if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport, re.I):
             raise ValueError('live_server_certificate_verification_not_confirmed')
+        if not re.search(r'trust_id_inbound\s*:\s*(?:true|yes)\b', endpoint, re.I):
+            raise ValueError('live_inbound_caller_identity_not_confirmed')
     except Exception:
         main.write_text(previous)
-        if not existed:
+        if existed:
+            fragment.write_text(previous_fragment)
+        else:
             fragment.unlink(missing_ok=True)
         try:
             if restarted:
@@ -278,3 +373,4 @@ if __name__ == '__main__':
         result = {'result': 'BLOCKED', 'code': str(error) if isinstance(error, ValueError) and re.fullmatch('[a-z_]+', str(error)) else 'isolated_trunk_validation_unavailable'}
     print(json.dumps(result))
     raise SystemExit(0 if result['result'] == 'PASS' else 1)
+

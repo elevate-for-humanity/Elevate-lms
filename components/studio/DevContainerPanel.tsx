@@ -1,5 +1,6 @@
 'use client';
 
+import { parseJsonc } from '@/lib/devstudio/jsonc.mjs';
 import { useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
@@ -125,12 +126,7 @@ export default function DevContainerPanel() {
     if (!config?.sha || !editedRaw.trim() || saving) return;
 
     try {
-      JSON.parse(
-        editedRaw
-          .replace(/\/\*[\s\S]*?\*\//g, '')
-          .replace(/^\s*\/\/.*$/gm, '')
-          .replace(/,\s*([}\]])/g, '$1'),
-      );
+      parseJsonc(editedRaw);
     } catch {
       setStatus({ type: 'error', message: 'devcontainer.json is not valid JSON/JSONC.' });
       return;

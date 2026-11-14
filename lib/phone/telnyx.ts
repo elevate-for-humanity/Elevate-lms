@@ -1,6 +1,5 @@
 import 'server-only';
 
-import type Telnyx from 'telnyx';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { resolveSendingNumber } from './sending-number';
 
@@ -32,24 +31,14 @@ export type TelnyxCallEvent = {
   };
 };
 
-export async function telnyxClient(): Promise<Telnyx> {
+export async function telnyxClient(): Promise<never> {
   // Retain types and historical evidence, but never instantiate the retired SDK,
   // even if legacy credentials are still present in the secret store.
   throw new Error('Telnyx is retired. Use Twilio and Elevate PBX.');
 }
 
-export async function verifyTelnyxWebhook(body: string, headers: Headers) {
-  await hydrateProcessEnv();
-  const publicKey = process.env.TELNYX_PUBLIC_KEY;
-  if (!publicKey) throw new Error('TELNYX_PUBLIC_KEY is not configured.');
-
-  // The SDK reads the public key from the client configuration. The exact raw
-  // request body and Telnyx signature/timestamp headers must be passed through
-  // unchanged or ED25519 verification will fail.
-  const client = await telnyxClient();
-  return client.webhooks.unwrap(body, {
-    headers: Object.fromEntries(headers.entries()),
-  }) as unknown as TelnyxCallEvent;
+export async function verifyTelnyxWebhook(_body: string, _headers: Headers): Promise<TelnyxCallEvent> {
+  throw new Error('Retired carrier webhooks are disabled. Use Twilio and Elevate PBX.');
 }
 
 export function encodeCallState(value: Record<string, string>) {
@@ -69,7 +58,7 @@ export async function publicPhoneNumber() {
   await hydrateProcessEnv();
   const { requireAdminClient } = await import('@/lib/supabase/admin');
   const number = await resolveSendingNumber(await requireAdminClient());
-  if (!number) throw new Error('An active primary Telnyx number is not configured');
+  if (!number) throw new Error('An active primary Twilio number is not configured');
   return number;
 }
 

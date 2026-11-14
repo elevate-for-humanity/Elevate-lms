@@ -174,9 +174,8 @@ export default function StudioCommandWorkspace({
     return () => controller.abort();
   }, [activeConversationId]);
 
-  useEffect(() => {
-    if (surface === 'course') setFocusMode(true);
-  }, [surface]);
+  // Course Builder stays inside the Studio workspace unless expanded explicitly.
+  // Automatically fixing it over the viewport hides the underlying navigation and composer.
 
   const courseBuilderUrl = useMemo(
     () =>
@@ -372,7 +371,9 @@ export default function StudioCommandWorkspace({
           </button>
           <button
             type="button"
-            aria-pressed={splitView}
+            aria-pressed={splitView && !compact}
+            disabled={compact}
+            title={compact ? 'Split screen requires a wider viewport' : 'Show conversation and tools side by side'}
             onClick={() => {
               setSplitView((value) => !value);
               if (surface === 'commands') setSurface(lastSurface);
@@ -505,8 +506,8 @@ export default function StudioCommandWorkspace({
         </div>
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
           <ResizableWorkspace
-            sideBySide={splitView}
-            activePane={compact && !splitView ? (surface === 'commands' ? 'primary' : 'panel') : undefined}
+            sideBySide={splitView && !compact}
+            activePane={compact ? (surface === 'commands' ? 'primary' : 'panel') : undefined}
             hideClosedToolbar
             initialPanelSize={50}
             className="h-full"

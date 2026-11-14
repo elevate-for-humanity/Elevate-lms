@@ -33,6 +33,10 @@ const SECRETS_READ_ATTEMPTS = Math.max(
   Number.parseInt(process.env.SUPABASE_READ_MAX_ATTEMPTS || '3', 10) || 3,
 );
 
+function isRetiredPhoneSecret(key: unknown): boolean {
+  return typeof key === 'string' && /^TELNYX_/i.test(key);
+}
+
 function usesGoogleRuntimeBindings(key?: string): boolean {
   return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager' ||
     key === 'PBX_RUNTIME_CONFIG_PROVIDER' ||
@@ -91,7 +95,7 @@ function getBootstrapClient(): SupabaseClient | null {
 
 function acceptSecret(target: Record<string, string>, key: unknown, value: unknown) {
   if (typeof key !== 'string' || typeof value !== 'string') return;
-  if (usesGoogleRuntimeBindings(key)) return;
+  if (isRetiredPhoneSecret(key) || usesGoogleRuntimeBindings(key)) return;
   const trimmed = value.trim();
   if (trimmed) target[key] = value;
 }
@@ -126,7 +130,7 @@ async function loadSecrets(): Promise<Record<string, string>> {
     if (!result.error) {
       let allDecryptionsSucceeded = true;
       const decryptedRows = await Promise.all(
-        (result.data ?? []).filter(row => !usesGoogleRuntimeBindings(row.key)).map(async (row) => {
+        (result.data ?? []).filter(row => !isRetiredPhoneSecret(row.key) && !usesGoogleRuntimeBindings(row.key)).map(async (row) => {
           const decrypted = await client.rpc('get_platform_secret', { p_key: row.key });
           if (decrypted.error) {
             allDecryptionsSucceeded = false;
@@ -154,6 +158,7 @@ async function loadSecrets(): Promise<Record<string, string>> {
 
 /** Merge canonical runtime secrets into process.env. */
 export async function hydrateProcessEnv(): Promise<void> {
+  for (const key of Object.keys(process.env)) if (isRetiredPhoneSecret(key)) delete process.env[key];
   if (usesGoogleRuntimeBindings()) return;
   if (hydrated && Date.now() - cacheTimestamp < CACHE_TTL_MS) return;
 
@@ -166,6 +171,7 @@ export async function hydrateProcessEnv(): Promise<void> {
 
 /** Get a single runtime secret, falling back to process.env. */
 export async function getSecret(key: string): Promise<string | undefined> {
+  if (isRetiredPhoneSecret(key)) return undefined;
   if (usesGoogleRuntimeBindings(key)) return process.env[key];
   const secrets = await loadSecrets();
   return secrets[key] ?? process.env[key];
@@ -175,9 +181,9 @@ export async function getSecret(key: string): Promise<string | undefined> {
 export async function getSecrets<K extends string>(
   keys: K[],
 ): Promise<Record<K, string | undefined>> {
-  const secrets = keys.some(key => !usesGoogleRuntimeBindings(key)) ? await loadSecrets() : {};
+  const secrets = keys.some(key => !isRetiredPhoneSecret(key) && !usesGoogleRuntimeBindings(key)) ? await loadSecrets() : {};
   const result = {} as Record<K, string | undefined>;
-  for (const key of keys) result[key] = usesGoogleRuntimeBindings(key) ? process.env[key] : secrets[key] ?? process.env[key];
+  for (const key of keys) result[key] = isRetiredPhoneSecret(key) ? undefined : usesGoogleRuntimeBindings(key) ? process.env[key] : secrets[key] ?? process.env[key];
   return result;
 }
 
@@ -188,7 +194,7 @@ export async function getSelectedRuntimeSecrets<K extends string>(
 ): Promise<Record<K, string | undefined>> {
   signal?.throwIfAborted();
   if (cache && Date.now() - cacheTimestamp < CACHE_TTL_MS) return getSecrets(keys);
-  const requested = [...new Set(keys.filter(key => !usesGoogleRuntimeBindings(key)))];
+  const requested = [...new Set(keys.filter(key => !isRetiredPhoneSecret(key) && !usesGoogleRuntimeBindings(key)))];
   const values: Record<string, string> = {};
   const client = requested.length ? getBootstrapClient() : null;
   if (client) {
@@ -209,11 +215,12 @@ export async function getSelectedRuntimeSecrets<K extends string>(
     }));
   }
   signal?.throwIfAborted();
-  return Object.fromEntries(keys.map(key => [key, usesGoogleRuntimeBindings(key) ? process.env[key] : values[key] ?? process.env[key]])) as Record<K, string | undefined>;
+  return Object.fromEntries(keys.map(key => [key, isRetiredPhoneSecret(key) ? undefined : usesGoogleRuntimeBindings(key) ? process.env[key] : values[key] ?? process.env[key]])) as Record<K, string | undefined>;
 }
 
 /** Synchronous read after hydration; process.env remains the final fallback. */
 export function getCachedSecret(key: string): string | undefined {
+  if (isRetiredPhoneSecret(key)) return undefined;
   if (usesGoogleRuntimeBindings(key)) return process.env[key];
   return cache?.[key] ?? process.env[key];
 }
@@ -234,6 +241,7 @@ export async function refreshSecrets(): Promise<void> {
  * that can decrypt value_enc.
  */
 export async function getDecryptedPlatformSecret(key: string, { signal }: { signal?: AbortSignal } = {}): Promise<string | undefined> {
+  if (isRetiredPhoneSecret(key)) return undefined;
   signal?.throwIfAborted();
   if (usesGoogleRuntimeBindings(key)) return process.env[key];
   const client = getBootstrapClient();

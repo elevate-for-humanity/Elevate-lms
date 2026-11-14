@@ -5,6 +5,12 @@ type Database = Awaited<ReturnType<typeof requireAdminClient>>;
 const ADMIN_ADDRESS = 'admissions@elevateforhumanity.org';
 const INTAKE_ADDRESSES = new Set([ADMIN_ADDRESS, 'enrollment@elevateforhumanity.org']);
 
+// Email local parts may legally contain % and _. Both are SQL ILIKE wildcards;
+// escape them so one applicant cannot route another applicant's correspondence.
+function exactCaseInsensitiveEmailPattern(email: string): string {
+  return email.replace(/[\\%_]/g, '\\const INTAKE_ADDRESSES = new Set([ADMIN_ADDRESS, 'enrollment@elevateforhumanity.org']);');
+}
+
 /** Only unique, explicit, active applicant assignments may receive protected copies. */
 export async function programConversationRoute(
   db: Database,
@@ -17,7 +23,7 @@ export async function programConversationRoute(
   const { data: applications, error } = await db
     .from('applications')
     .select('program_id,program_slug,program_interest,pathway_slug')
-    .ilike('email', applicantEmail);
+    .ilike('email', exactCaseInsensitiveEmailPattern(applicantEmail));
   if (error || !applications?.length) return null;
   const slugs = [
     ...new Set(applications.map((row) => row.program_slug || row.program_interest).filter(Boolean)),
@@ -32,7 +38,7 @@ export async function programConversationRoute(
   const linked = await db
     .from('program_holder_students')
     .select('program_holder_id,program_id')
-    .ilike('applicant_email', applicantEmail)
+    .ilike('applicant_email', exactCaseInsensitiveEmailPattern(applicantEmail))
     .in('status', ['applied', 'pending', 'active', 'enrolled', 'completed']);
   if (linked.error) throw linked.error;
   const linkedHolderIds = [...new Set((linked.data || []).map((row) => row.program_holder_id))];

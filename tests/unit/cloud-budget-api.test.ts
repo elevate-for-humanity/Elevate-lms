@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ auth: vi.fn(), db: vi.fn(), read: vi.fn(), refresh: vi.fn(), cron: vi.fn() }));
+const service = vi.hoisted(() => ({ refresh: vi.fn().mockResolvedValue({ created: 0, pushAcceptedDevices: 0 }) }));
+vi.mock('@/lib/admin/service-billing', () => ({ refreshServiceBillingAlerts: service.refresh }));
 vi.mock('@/lib/devstudio/api-auth', () => ({ apiRequireDevStudio: mocks.auth }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.db }));
 vi.mock('@/lib/gcp/cloud-budget', () => ({ readCloudBudget: mocks.read, refreshCloudBudget: mocks.refresh }));
@@ -30,5 +32,6 @@ describe('cloud spending status boundaries', () => {
     const response = await poll({} as any);
     expect(response.status).toBe(503);
     expect(await response.text()).toBe('{"error":"CLOUD_BUDGET_UNAVAILABLE"}');
+    expect(service.refresh).toHaveBeenCalled();
   });
 });

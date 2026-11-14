@@ -48,6 +48,38 @@ test('no readable protection, no independent review, or failed checks block depl
   }
 });
 
+test('policy checks use separate App-authenticated reader, not workflow-scoped token', async () => {
+  const workflowGh = github({}, ['/rules/branches/main', '/branches/main/protection']);
+  const appPolicyGh = github();
+  const result = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: workflowGh, policyGh: appPolicyGh,
+  });
+  assert.equal(result.accepted, true, JSON.stringify(result.reasons));
+});
+
+test('skipped operational jobs do not override approved required PR validation checks', async () => {
+  const checkPath = `/commits/${HEAD}/check-runs?per_page=100`;
+  const data = { check_runs: [
+    { name: 'CI Required Gate', status: 'completed', conclusion: 'success' },
+    { name: 'PBX preserve operation', status: 'completed', conclusion: 'skipped' },
+  ] };
+  assert.equal((await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({ [checkPath]: data }),
+  })).accepted, true);
+  assert.equal((await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD,
+    gh: github({ [checkPath]: data,
+      '/rules/branches/main': [
+        { type: 'pull_request', parameters: { required_approving_review_count: 1 } },
+        { type: 'required_status_checks', parameters: {
+          required_status_checks: [{ context: 'PBX preserve operation' }],
+        } },
+      ],
+      '/branches/main/protection': { required_pull_request_reviews: { required_approving_review_count: 1 } },
+    }),
+  })).accepted, false);
+});
+
 test('exact candidate, protected merge and main ancestry are mandatory', async () => {
   assert.equal((await verifyProtectedParisMerge({ pr, expectedHeadSha: MAIN, gh: github() })).accepted, false);
   assert.equal((await verifyProtectedParisMerge({

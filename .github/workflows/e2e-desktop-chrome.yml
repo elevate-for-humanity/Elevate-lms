@@ -93,6 +93,10 @@ jobs:
       - name: Verify all three browser engines
         run: node scripts/verify-playwright-runtime.mjs chromium firefox webkit
       - name: Test real email component across desktop, tablet, and phone browsers
+        # Firefox refuses to launch as root when HOME belongs to the container's pwuser.
+        # Scope this to browser execution; do not relax test coverage or checks.
+        env:
+          HOME: /root
         run: pnpm exec playwright test --config playwright.email.config.ts
       - name: Upload email device evidence
         if: always()

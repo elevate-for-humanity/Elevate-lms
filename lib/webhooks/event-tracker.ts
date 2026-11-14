@@ -39,6 +39,7 @@ export async function claimWebhookEvent(
   eventId: string,
   eventType: string,
   metadata?: Record<string, unknown>,
+  options: { requireFinalizedDuplicate?: boolean } = {},
 ): Promise<TrackEventResult> {
   try {
     const supabase = await requireAdminClient();
@@ -59,6 +60,14 @@ export async function claimWebhookEvent(
     if (error) {
       // Unique constraint violation = duplicate
       if (error.code === '23505') {
+        if (options.requireFinalizedDuplicate) {
+          const existing = await supabase.from('webhook_events_processed')
+            .select('status').eq('provider', provider).eq('event_id', eventId).maybeSingle();
+          // An in-flight or failed attempt is not a successful delivery. Keep
+          // provider retry available without replaying work concurrently.
+          if (existing.error || !['processed', 'skipped'].includes(existing.data?.status))
+            return { shouldProcess: true, isDuplicate: true, confident: false };
+        }
         logger.info('Webhook event already processed (idempotent skip)', {
           provider,
           eventId,
@@ -86,12 +95,16 @@ export async function finalizeWebhookEvent(
   eventId: string,
   status: Exclude<EventStatus, 'processing'>,
   errorMessage?: string,
+  options: { strict?: boolean } = {},
 ): Promise<void> {
   try {
     const supabase = await requireAdminClient();
-    if (!supabase) return;
+    if (!supabase) {
+      if (options.strict) throw new Error('Webhook finalization unavailable');
+      return;
+    }
 
-    const { error } = await supabase
+    const update = supabase
       .from('webhook_events_processed')
       .update({
         status,
@@ -100,16 +113,19 @@ export async function finalizeWebhookEvent(
       })
       .eq('provider', provider)
       .eq('event_id', eventId);
+    const { data, error } = options.strict ? await update.select('id') : await update;
 
-    if (error) {
+    if (error || (options.strict && data?.length !== 1)) {
       logger.error('Webhook event tracker finalize error', undefined, {
         provider,
         eventId,
         status,
         error,
       });
+      if (options.strict) throw new Error('Webhook finalization could not be saved');
     }
   } catch (err) {
     logger.error('Webhook event tracker finalize exception', err);
+    if (options.strict) throw new Error('Webhook finalization could not be saved', { cause: err });
   }
 }

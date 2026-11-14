@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { createBrowserSpeechRecognition, type BrowserSpeechRecognition } from '@/lib/browser/speech-recognition';
+import { MAIL_VIEWS } from '@/lib/email/mail-management';
 
 type Mailbox = {
   id: string;
@@ -41,6 +42,8 @@ type Thread = {
   starred: boolean;
   folder: string;
   custom_folder_id?: string | null;
+  sender?: string;
+  preview?: string;
 };
 type Attachment = { id: string; file_name: string; mime_type: string; size_bytes: number };
 type Message = {
@@ -213,19 +216,52 @@ export function EmailWorkspace({
       try {
         const response = await fetch(`${apiPath}?${params.toString()}`, { cache: 'no-store' });
         const payload = await response.json().catch(() => ({}));
-        if (requestId !== requestSequence.current) return;
+        if (requestId !== requestSequence.current) return false;
         if (!response.ok) setError(payload.error || 'Email could not be loaded.');
-        else setData(payload);
+        else {
+          setData(payload);
+          // Persist the accepted selection for every path (search, move, refresh,
+          // and folder changes), not just conversation clicks and sends.
+          const url = new URL(window.location.href);
+          if (payload.selectedMailboxId)
+            url.searchParams.set('mailboxId', payload.selectedMailboxId);
+          else url.searchParams.delete('mailboxId');
+          if (payload.selectedThread?.id)
+            url.searchParams.set('threadId', payload.selectedThread.id);
+          else url.searchParams.delete('threadId');
+          const acceptedView = params.get('view') || 'inbox';
+          if (acceptedView === 'inbox') url.searchParams.delete('view');
+          else url.searchParams.set('view', acceptedView);
+          if (params.get('q')) url.searchParams.set('q', params.get('q')!);
+          else url.searchParams.delete('q');
+          window.history.replaceState(
+            window.history.state,
+            '',
+            url.pathname + url.search + url.hash,
+          );
+        }
+        setLoading(false);
+        return response.ok;
       } catch {
-        if (requestId !== requestSequence.current) return;
+        if (requestId !== requestSequence.current) return false;
         setError('Email could not be loaded. Try Refresh.');
       }
       setLoading(false);
+      return false;
     },
     [apiPath],
   );
 
   useEffect(() => {
+    const params = new URL(window.location.href).searchParams;
+    const savedView = params.get('view') || 'inbox';
+    const validView =
+      (MAIL_VIEWS as readonly string[]).includes(savedView) ||
+      /^folder:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(savedView);
+    viewRef.current = validView ? savedView : 'inbox';
+    searchRef.current = (params.get('q') || '').slice(0, 160);
+    setView(viewRef.current);
+    setSearch(searchRef.current);
     void load(initialMailboxId, initialThreadId);
   }, [initialMailboxId, initialThreadId, load]);
 
@@ -236,13 +272,29 @@ export function EmailWorkspace({
 
   async function openThread(threadId: string) {
     if (!data?.selectedMailboxId) return;
-    await load(data.selectedMailboxId, threadId);
-    if (!data.readOnly) {
-      void fetch(apiPath, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ threadId }),
-      });
+    const opened = await load(data.selectedMailboxId, threadId);
+    if (opened && !data.readOnly) {
+      const readRequest = requestSequence.current;
+      try {
+        const response = await fetch(apiPath, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ threadId }),
+        });
+        if (!response.ok) throw new Error('Read status update failed');
+        setData((current) => readRequest === requestSequence.current && current?.selectedMailboxId === data.selectedMailboxId ? {
+          ...current,
+          threads: current.threads.map((thread) =>
+            thread.id === threadId ? { ...thread, unread: false } : thread),
+          selectedThread: current.selectedThread?.id === threadId
+            ? { ...current.selectedThread, unread: false } : current.selectedThread,
+        } : current);
+      } catch {
+        if (readRequest === requestSequence.current)
+          setError(
+            'The email opened, but its read status could not be saved. Open the conversation again to retry.',
+          );
+      }
     }
   }
 
@@ -302,6 +354,16 @@ export function EmailWorkspace({
       }
       setCompose(null);
       setFiles([]);
+      // Keep a newly sent conversation selected after refresh and PWA resume.
+      // Clear a stale thread when a bulk send has no individual thread ID.
+      const url = new URL(window.location.href);
+      url.searchParams.set('mailboxId', data.selectedMailboxId);
+      if (typeof payload.threadId === 'string' && payload.threadId) {
+        url.searchParams.set('threadId', payload.threadId);
+      } else {
+        url.searchParams.delete('threadId');
+      }
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
       await load(data.selectedMailboxId, payload.threadId);
       if (payload.warning) setError(payload.warning);
       else
@@ -544,18 +606,23 @@ export function EmailWorkspace({
             Text messages
           </a>
         </nav>
-        <div className="grid min-h-[620px] lg:grid-cols-[240px_330px_minmax(0,1fr)]">
-          <aside className={`border-b border-slate-200 bg-slate-50 p-3 lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}>
+        <div className="grid min-h-[620px] min-w-0 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,1.6fr)] xl:grid-cols-[220px_minmax(280px,0.9fr)_minmax(0,1.6fr)]">
+          <aside
+            className={`border-b border-slate-200 bg-slate-50 p-3 md:col-span-2 xl:col-span-1 xl:border-b-0 xl:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}
+          >
             <p className="px-2 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
               Mailboxes
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
+            <div
+              aria-label="Available mailboxes"
+              className="flex gap-2 overflow-x-auto pb-1 xl:block xl:max-h-64 xl:space-y-1 xl:overflow-y-auto xl:pb-0"
+            >
               {data.mailboxes.map((mailbox) => (
                 <button
                   key={mailbox.id}
                   type="button"
                   onClick={() => chooseView('inbox', mailbox.id)}
-                  className={`w-60 shrink-0 rounded-xl px-3 py-3 text-left lg:w-full ${mailbox.id === data.selectedMailboxId ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-white'}`}
+                  className={`w-60 shrink-0 rounded-xl px-3 py-3 text-left xl:w-full ${mailbox.id === data.selectedMailboxId ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-white'}`}
                 >
                   <span className="block truncate text-sm font-black">{mailbox.displayName}</span>
                   <span
@@ -573,7 +640,7 @@ export function EmailWorkspace({
             </div>
             <nav
               aria-label="Mail folders"
-              className="mt-3 flex gap-1 overflow-x-auto border-t border-slate-200 pt-3 lg:mt-5 lg:block lg:space-y-1 lg:overflow-visible"
+              className="mt-3 flex gap-1 overflow-x-auto border-t border-slate-200 pt-3 xl:mt-5 xl:block xl:space-y-1 xl:overflow-visible"
             >
               {Object.entries({
                 inbox: 'Inbox',
@@ -589,7 +656,7 @@ export function EmailWorkspace({
                   key={key}
                   type="button"
                   onClick={() => chooseView(key)}
-                  className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold lg:block lg:w-full ${view === key ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-white'}`}
+                  className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold xl:block xl:w-full ${view === key ? 'bg-blue-100 text-blue-900' : 'text-slate-700 hover:bg-white'}`}
                 >
                   {label}
                 </button>
@@ -598,7 +665,7 @@ export function EmailWorkspace({
                 <button
                   type="button"
                   onClick={() => setFilterEditor(true)}
-                  className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold text-blue-800 lg:w-full"
+                  className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-bold text-blue-800 xl:w-full"
                 >
                   Filters & copy rules
                 </button>
@@ -649,7 +716,7 @@ export function EmailWorkspace({
           </aside>
 
           <section
-            className={`border-b border-slate-200 lg:max-h-[75dvh] lg:overflow-y-auto lg:border-b-0 lg:border-r ${data.selectedThread ? 'hidden lg:block' : 'block'}`}
+            className={`min-w-0 border-b border-slate-200 md:max-h-[75dvh] md:overflow-y-auto md:border-b-0 md:border-r ${data.selectedThread ? 'hidden md:block' : 'block'}`}
           >
             <div className="flex items-center gap-2 border-b border-slate-200 p-4">
               <Inbox className="h-4 w-4 text-slate-500" />
@@ -855,18 +922,26 @@ export function EmailWorkspace({
                     <button
                       type="button"
                       onClick={() => void openThread(thread.id)}
-                      className={`w-full px-4 py-4 text-left hover:bg-blue-50 ${data.selectedThread?.id === thread.id ? 'bg-blue-50' : ''}`}
+                      className={`min-w-0 flex-1 px-3 py-3 text-left hover:bg-blue-50 ${data.selectedThread?.id === thread.id ? 'bg-blue-50' : ''}`}
                     >
                       <div className="flex items-start gap-2">
                         <span
                           className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${thread.unread ? 'bg-blue-600' : 'bg-slate-300'}`}
                         />
                         <div className="min-w-0 flex-1">
+                          {thread.sender ? (
+                            <p className="truncate text-xs font-semibold text-slate-700">
+                              {thread.sender}
+                            </p>
+                          ) : null}
                           <p
                             className={`truncate text-sm ${thread.unread ? 'font-black text-slate-950' : 'font-bold text-slate-700'}`}
                           >
                             {thread.subject}
                           </p>
+                          {thread.preview ? (
+                            <p className="mt-1 truncate text-xs text-slate-600">{thread.preview}</p>
+                          ) : null}
                           <p className="mt-1 text-xs text-slate-500">
                             {thread.message_count} message{thread.message_count === 1 ? '' : 's'} ·{' '}
                             {formatDate(thread.last_message_at)}
@@ -884,19 +959,19 @@ export function EmailWorkspace({
             )}
           </section>
 
-          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white lg:static lg:z-auto lg:block lg:max-h-[75dvh] lg:overflow-y-auto' : 'hidden lg:block'} min-w-0`} aria-label="Email reading pane">
+          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:static md:pt-0 md:pl-0 md:pr-0 md:z-auto md:block md:max-h-[75dvh] md:overflow-y-auto' : 'hidden md:block'} min-w-0`} aria-label="Email reading pane">
             {data.selectedThread ? (
               <>
-                <div className="flex items-center gap-3 border-b border-slate-200 p-4">
+                <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 p-3 sm:gap-3 sm:p-4">
                   <button
                     type="button"
                     onClick={() => void load(data.selectedMailboxId)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 lg:hidden"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-300 md:hidden"
                     aria-label="Back to inbox"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
-                  <h2 className="min-w-0 flex-1 truncate font-black text-slate-950">
+                  <h2 className="order-last w-full min-w-0 break-words text-base font-black leading-6 text-slate-950 sm:order-none sm:w-auto sm:flex-1">
                     {data.selectedThread.subject}
                   </h2>
                   {!data.readOnly ? (
@@ -904,7 +979,7 @@ export function EmailWorkspace({
                       <button
                         type="button"
                         onClick={forward}
-                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-800"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 sm:text-sm"
                       >
                         Forward
                       </button>
@@ -918,14 +993,14 @@ export function EmailWorkspace({
                     </>
                   ) : null}
                 </div>
-                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:max-h-[555px] lg:flex-none">
+                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-slate-50 p-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:space-y-4 sm:p-6 md:max-h-[555px] md:flex-none">
                   {data.selectedThread.messages.map((message) => (
                     <article
                       key={message.id}
-                      className={`max-w-3xl rounded-2xl border p-4 shadow-sm ${message.direction === 'outbound' ? 'ml-auto border-blue-200 bg-blue-50' : 'border-slate-200 bg-white'}`}
+                      className={`max-w-full min-w-0 rounded-2xl border p-3 shadow-sm sm:max-w-3xl sm:p-4 ${message.direction === 'outbound' ? 'ml-auto border-blue-200 bg-blue-50' : 'border-slate-200 bg-white'}`}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div>
+                        <div className="min-w-0 max-w-full [overflow-wrap:anywhere]">
                           <p className="text-sm font-black text-slate-950">
                             {message.sender_name || message.sender_email}
                           </p>
@@ -935,7 +1010,7 @@ export function EmailWorkspace({
                           {formatDate(message.sent_at || message.received_at || message.created_at)}
                         </p>
                       </div>
-                      <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-6 text-slate-800">
+                      <p className="mt-4 whitespace-pre-wrap [overflow-wrap:anywhere] text-[15px] leading-7 text-slate-900">
                         {message.text_body || '(No text content)'}
                       </p>
                       {message.attachments?.length ? (
@@ -944,9 +1019,9 @@ export function EmailWorkspace({
                             <a
                               key={attachment.id}
                               href={`${apiPath}?attachmentId=${encodeURIComponent(attachment.id)}`}
-                              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-blue-800"
+                              className="inline-flex max-w-full items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-blue-800 [overflow-wrap:anywhere]"
                             >
-                              <FileText className="h-4 w-4" /> {attachment.file_name}
+                              <FileText className="h-4 w-4 shrink-0" /> <span className="min-w-0">{attachment.file_name}</span>
                             </a>
                           ))}
                         </div>
@@ -980,7 +1055,7 @@ export function EmailWorkspace({
           aria-modal="true"
           className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/50 p-4"
         >
-          <div className="max-h-[90vh] w-full max-w-xl overflow-auto rounded-2xl bg-white p-6">
+          <div className="max-h-[90vh] supports-[height:100dvh]:max-h-[90dvh] w-full max-w-xl overflow-auto rounded-2xl bg-white p-6">
             <h2 className="text-xl font-bold">Filters & copy rules</h2>
             <p className="mt-2 text-sm text-slate-700">
               New incoming messages use these rules in order. Skip prevents a copy from being stored
@@ -1169,14 +1244,14 @@ export function EmailWorkspace({
       )}
       {compose ? (
         <div
-          className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/50 p-3 sm:items-center"
+          className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/50 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center"
           role="dialog"
           aria-modal="true"
           aria-label="Compose email"
         >
           <form
             onSubmit={sendMessage}
-            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
+            className="max-h-[92vh] supports-[height:100dvh]:max-h-[92dvh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-slate-200 p-5">
               <div>

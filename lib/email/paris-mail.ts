@@ -3,7 +3,7 @@ import { notifyParisMailResult } from './paris-mail-notification';
 import { sendEmail } from './sendgrid';
 import { parseEmailList, textToEmailHtml } from './communication-email';
 import { canParisRespond, emailLikeLiteral } from './mail-filters';
-import type { ParsedInboundEmail } from './sendgrid-inbound';
+import { inboundDeliveryRecipients, type ParsedInboundEmail } from './sendgrid-inbound';
 
 export const EMAIL_INTERVIEW_QUESTIONS = [
   'Which program would you like to start, and what interests you about that career?',
@@ -45,8 +45,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     .eq('active', true)
     .eq('paris_enabled', true)
     .in('address', [
-      ...parsed.envelopeRecipients,
-      ...parseEmailList(parsed.to),
+      ...inboundDeliveryRecipients(parsed),
       'admissions@elevateforhumanity.org',
     ]);
   if (inboxError) throw new Error('PARIS mailbox settings unavailable');

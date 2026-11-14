@@ -76,7 +76,7 @@ it('sends sender and subject previews and honors silent mode without claiming th
   expect(payload).toMatchObject({
     silent: true,
     title: 'New email from Andrew',
-    body: 'info@elevateforhumanity.org · EPA application',
+    body: 'EPA application · info@elevateforhumanity.org',
   });
   expect(payload.body).not.toContain('subject');
   expect(mocks.patch).toHaveBeenCalledWith(

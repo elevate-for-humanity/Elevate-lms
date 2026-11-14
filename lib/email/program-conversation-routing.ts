@@ -5,7 +5,13 @@ type Database = Awaited<ReturnType<typeof requireAdminClient>>;
 const ADMIN_ADDRESS = 'admissions@elevateforhumanity.org';
 const INTAKE_ADDRESSES = new Set([ADMIN_ADDRESS, 'enrollment@elevateforhumanity.org']);
 
-/** Only canonical, unambiguous primary assignments may receive applicant copies. */
+// ILIKE treats %/_ as wildcards, and PostgREST also aliases * to %.
+// An anchored literal regex avoids both layers while preserving case folding.
+export function exactCaseInsensitiveEmailPattern(email: string): string {
+  return '^' + email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$';
+}
+
+/** Only unique, explicit, active applicant assignments may receive protected copies. */
 export async function programConversationRoute(
   db: Database,
   applicantAddresses: string[],
@@ -17,7 +23,7 @@ export async function programConversationRoute(
   const { data: applications, error } = await db
     .from('applications')
     .select('program_id,program_slug,program_interest,pathway_slug')
-    .eq('email', applicantEmail);
+    .filter('email', 'imatch', exactCaseInsensitiveEmailPattern(applicantEmail));
   if (error || !applications?.length) return null;
   const slugs = [
     ...new Set(applications.map((row) => row.program_slug || row.program_interest).filter(Boolean)),
@@ -32,16 +38,19 @@ export async function programConversationRoute(
   const linked = await db
     .from('program_holder_students')
     .select('program_holder_id,program_id')
-    .eq('applicant_email', applicantEmail)
+    .filter('applicant_email', 'imatch', exactCaseInsensitiveEmailPattern(applicantEmail))
     .in('status', ['applied', 'pending', 'active', 'enrolled', 'completed']);
   if (linked.error) throw linked.error;
   const linkedHolderIds = [...new Set((linked.data || []).map((row) => row.program_holder_id))];
   if (linkedHolderIds.length !== 1) return null;
-  const assignments = await db
+  // An applicant's unique explicit holder assignment is authoritative even if
+  // the holder is not the primary program-wide instructor (e.g. Jozanna).
+  let assignmentQuery = db
     .from('program_holder_programs')
     .select('program_holder_id,program_id,program_slug')
-    .eq('status', 'active')
-    .eq('is_primary', true);
+    .eq('status', 'active');
+  if (ids.length) assignmentQuery = assignmentQuery.in('program_id', ids);
+  const assignments = await assignmentQuery;
   if (assignments.error) throw assignments.error;
   const holderIds = [
     ...new Set(
@@ -53,6 +62,18 @@ export async function programConversationRoute(
     ),
   ];
   if (holderIds.length !== 1) return null;
+  // Program Holder application history is not a Host Shop placement. An archived
+  // holder retains historical records and its role-specific mailbox, but
+  // automatic application/conversation copies must not enter an active Host
+  // Shop mailbox merely because the programs overlap. Direct mail is handled
+  // by the mailbox routing layer, which preserves the Admin fallback.
+  const holder = await db
+    .from('program_holders')
+    .select('features')
+    .eq('id', holderIds[0])
+    .maybeSingle();
+  if (holder.error || !holder.data) return null;
+  if (holder.data.features?.portal_access_archived === true) return null;
   const result = await db
     .from('communication_email_mailboxes')
     .select('address,program_holder_id')

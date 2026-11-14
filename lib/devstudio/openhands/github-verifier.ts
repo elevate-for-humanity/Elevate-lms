@@ -77,7 +77,7 @@ async function gh<T>(path: string, token?: string): Promise<T> {
 }
 
 function confirmedPolicyAbsent(error: unknown): boolean {
-  return error instanceof Error && /^GitHub verification API 404(?:\\b|:)/.test(error.message);
+  return error instanceof Error && /^GitHub verification API 404(?:\b|:)/.test(error.message);
 }
 
 export async function verifyOpenHandsGitHubOutcome(input: {

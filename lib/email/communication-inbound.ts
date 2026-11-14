@@ -129,10 +129,10 @@ export async function storeInboundCommunicationEmail(
     const inboundEventId = `${parsed.eventId}:${mailbox.id}`;
     const { data: duplicate } = await db
       .from('communication_email_messages')
-      .select('id')
+      .select('id,thread_id')
       .eq('inbound_event_id', inboundEventId)
       .maybeSingle();
-    async function notifyMembers() {
+    async function notifyMembers(threadId: string) {
       const { data: members } = await db
         .from('communication_email_mailbox_members')
         .select('user_id')
@@ -144,17 +144,17 @@ export async function storeInboundCommunicationEmail(
             type: 'message',
             title: `New interoffice email · ${mailbox.address}`,
             message: `From ${senderEmail} · To ${mailbox.address} · ${subject}`,
-            action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(mailbox.id)}`,
+            action_url: `https://app.elevateforhumanity.org/communications/email?mailboxId=${encodeURIComponent(mailbox.id)}&threadId=${encodeURIComponent(threadId)}`,
             action_label: 'Read and reply',
             idempotency_key: `email:${inboundEventId}:${member.user_id}`,
-            metadata: { alert_kind: 'email', sender_name: senderName(parsed.from), sender_email: senderEmail, subject, mailbox_address: mailbox.address },
+            metadata: { alert_kind: 'email', sender_name: senderName(parsed.from), sender_email: senderEmail, subject, mailbox_address: mailbox.address, mailbox_id: mailbox.id, thread_id: threadId },
             read: false,
           })),
           { onConflict: 'idempotency_key', ignoreDuplicates: true },
         );
     }
     if (duplicate) {
-      await notifyMembers();
+      await notifyMembers(duplicate.thread_id);
       storedCount += 1;
       continue;
     }
@@ -240,7 +240,7 @@ export async function storeInboundCommunicationEmail(
         custom_folder_id: folderId,
       })
       .eq('id', thread.id);
-    await notifyMembers();
+    await notifyMembers(thread.id);
     storedCount += 1;
   }
 

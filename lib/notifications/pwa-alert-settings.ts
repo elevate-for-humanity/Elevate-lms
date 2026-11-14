@@ -106,3 +106,21 @@ export function isPushEndpoint(endpoint: unknown): boolean {
     return false;
   }
 }
+
+/** Keep email identity when switching between Admin and LMS origins. */
+export function emailAlertUrl(notification: any, admin: boolean): string {
+  const base = admin ? 'https://admin.elevateforhumanity.org/phone/email'
+    : 'https://app.elevateforhumanity.org/communications/email';
+  const url = new URL(base);
+  let original: URL | null = null;
+  try {
+    const candidate = new URL(notification.action_url);
+    if (['https://app.elevateforhumanity.org', 'https://admin.elevateforhumanity.org'].includes(candidate.origin)
+      && ['/communications/email', '/phone/email'].includes(candidate.pathname)) original = candidate;
+  } catch { /* Legacy notifications may have no URL. */ }
+  for (const [key, field] of [['mailboxId', 'mailbox_id'], ['threadId', 'thread_id']] as const) {
+    const value = notification.metadata?.[field] || original?.searchParams.get(key);
+    if (typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) url.searchParams.set(key, value);
+  }
+  return url.toString();
+}

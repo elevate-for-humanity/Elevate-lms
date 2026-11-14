@@ -121,6 +121,7 @@ function mailboxLabel(kind: Mailbox['mailboxKind']) {
 export function EmailWorkspace({
   apiPath = '/api/communications/email',
   initialMailboxId,
+  initialThreadId,
   roleLabel = 'Program Holder',
   initialRecipient,
   initialSubject = '',
@@ -128,6 +129,7 @@ export function EmailWorkspace({
 }: {
   apiPath?: string;
   initialMailboxId?: string;
+  initialThreadId?: string;
   roleLabel?: string;
   initialRecipient?: string;
   initialSubject?: string;
@@ -197,8 +199,10 @@ export function EmailWorkspace({
   const [confirmFolder, setConfirmFolder] = useState<{ id: string; name: string } | null>(null);
   const [notice, setNotice] = useState('');
 
+  const requestSequence = useRef(0);
   const load = useCallback(
     async (mailboxId?: string | null, threadId?: string | null) => {
+      const requestId = ++requestSequence.current;
       setLoading(true);
       setError('');
       const params = new URLSearchParams();
@@ -209,9 +213,11 @@ export function EmailWorkspace({
       try {
         const response = await fetch(`${apiPath}?${params.toString()}`, { cache: 'no-store' });
         const payload = await response.json().catch(() => ({}));
+        if (requestId !== requestSequence.current) return;
         if (!response.ok) setError(payload.error || 'Email could not be loaded.');
         else setData(payload);
       } catch {
+        if (requestId !== requestSequence.current) return;
         setError('Email could not be loaded. Try Refresh.');
       }
       setLoading(false);
@@ -220,8 +226,8 @@ export function EmailWorkspace({
   );
 
   useEffect(() => {
-    void load(initialMailboxId);
-  }, [initialMailboxId, load]);
+    void load(initialMailboxId, initialThreadId);
+  }, [initialMailboxId, initialThreadId, load]);
 
   const selectedMailbox = useMemo(
     () => data?.mailboxes.find((mailbox) => mailbox.id === data.selectedMailboxId) ?? null,
@@ -337,6 +343,10 @@ export function EmailWorkspace({
     }
   }
   function chooseView(next: string, mailboxId = data?.selectedMailboxId) {
+    if (mailboxId !== data?.selectedMailboxId) {
+      searchRef.current = '';
+      setSearch('');
+    }
     viewRef.current = next;
     setView(next);
     setSelected([]);

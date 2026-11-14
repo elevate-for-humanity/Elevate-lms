@@ -235,9 +235,19 @@ export async function handleCommunicationEmailGet(
   if (folderError || draftError || filterError)
     return NextResponse.json({ error: 'Mail folders could not be loaded.' }, { status: 500 });
   const selectedThreadId = url.searchParams.get('threadId');
-  const selectedThread = selectedThreadId
-    ? (threadRows ?? []).find((thread: any) => thread.id === selectedThreadId)
-    : null;
+  // A notification can reference archived mail or a conversation older than the
+  // list window. Resolve it independently, always scoped to the authorized box.
+  let selectedThread: any = null;
+  if (selectedThreadId) {
+    const result = await context.db.from('communication_email_threads')
+      .select('id,subject,last_message_at,message_count,created_at,folder,custom_folder_id,starred')
+      .eq('id', selectedThreadId)
+      .eq('mailbox_id', selectedMailbox.id)
+      .maybeSingle();
+    if (result.error) return NextResponse.json({ error: 'Conversation could not be loaded.' }, { status: 500 });
+    if (!result.data) return NextResponse.json({ error: 'Conversation not found in this mailbox.' }, { status: 404 });
+    selectedThread = result.data;
+  }
   let messages: any[] = [];
   if (selectedThread) {
     const { data: messageRows, error: messageError } = await context.db

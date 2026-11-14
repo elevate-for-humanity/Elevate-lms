@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: 'Elevate Email' };
 export default async function AdminEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mailboxId?: string }>;
+  searchParams: Promise<{ threadId?: string; mailboxId?: string }>;
 }) {
   const params = await searchParams;
   const { effectiveRoles } = await requireRole(COMMUNICATION_MEMBER_ROLES);
@@ -41,7 +41,7 @@ export default async function AdminEmailPage({
           ) : null}
         </div>
       </div>
-      <EmailWorkspace initialMailboxId={params.mailboxId} />
+      <EmailWorkspace initialMailboxId={params.mailboxId} initialThreadId={params.threadId} />
     </main>
   );
 }

@@ -2,7 +2,7 @@ import 'server-only';
 import webpush from 'web-push';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getSecrets } from '@/lib/secrets';
-import { alertPresentation, isPushEndpoint } from './pwa-alert-settings';
+import { alertPresentation, isPushEndpoint, emailAlertUrl } from './pwa-alert-settings';
 export async function processPwaAlerts() {
   const db = await requireAdminClient();
   const { error: emitError } = await db.rpc('emit_recorded_student_alerts');
@@ -22,7 +22,7 @@ export async function processPwaAlerts() {
       try {
         const { data: notification, error: noticeError } = await db
           .from('notifications')
-          .select('title,message,metadata')
+          .select('title,message,metadata,action_url')
           .eq('id', row.notification_id)
           .eq('user_id', row.user_id)
           .maybeSingle();
@@ -63,9 +63,7 @@ export async function processPwaAlerts() {
                     ...(important ? { vibrate: [400, 200, 400, 200, 400] } : {}),
                     url:
                       row.kind === 'email'
-                        ? ['admin', 'super_admin'].includes(profile?.role)
-                          ? 'https://admin.elevateforhumanity.org/phone/email'
-                          : 'https://app.elevateforhumanity.org/communications/email'
+                        ? emailAlertUrl(notification, ['admin', 'super_admin'].includes(profile?.role))
                         : row.kind === 'inactive'
                           ? 'https://admin.elevateforhumanity.org/at-risk'
                           : 'https://admin.elevateforhumanity.org/students',

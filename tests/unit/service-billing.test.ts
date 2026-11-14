@@ -46,6 +46,22 @@ function database(initial: ServiceBillingRecord[] = []) {
   const notices = new Map<string, any>();
   const db: any = {
     async rpc(name: string, args: any) {
+      if (name === 'service_billing_admin_recipients') return { data: [{ id: 'admin1' }] };
+      if (name === 'claim_service_billing_push') {
+        const row = [...notices.values()].find(
+          (n) => n.id === args.p_id && n.user_id === args.p_user_id,
+        );
+        const current = JSON.parse(settings.get('service_billing:' + args.p_service_id)!);
+        if (
+          !row ||
+          current.revision !== args.p_expected_revision ||
+          row.metadata.push_status !== 'pending' ||
+          row.metadata.resolved_at
+        )
+          return { data: false };
+        row.metadata.push_status = 'attempting';
+        return { data: true };
+      }
       if (name === 'record_service_billing_push_receipt') {
         const row = [...notices.values()].find(
           (n) => n.id === args.p_id && n.user_id === args.p_user_id,
@@ -98,7 +114,19 @@ function database(initial: ServiceBillingRecord[] = []) {
           notices.set(n.idempotency_key, row);
           inserted.push(row);
         }
-      return { data: inserted };
+      return {
+        data: [
+          ...inserted.map((n) => ({ ...n, newly_created: true })),
+          ...prepared.flatMap((n: any) => {
+            const old = notices.get(n.idempotency_key);
+            return !inserted.includes(old) &&
+              old?.metadata.push_status === 'pending' &&
+              !old.metadata.resolved_at
+              ? [{ ...old, newly_created: false }]
+              : [];
+          }),
+        ],
+      };
     },
     from(table: string) {
       const filters: Record<string, any> = {};
@@ -147,6 +175,10 @@ function database(initial: ServiceBillingRecord[] = []) {
             .then(() => {
               if (table === 'profiles') return { data: [{ id: 'admin1' }] };
               if (table === 'app_settings') {
+                if (operation === 'read' && db.failNextRead) {
+                  db.failNextRead = false;
+                  throw Error('temporary read failure');
+                }
                 if (operation === 'read')
                   return { data: [...settings].map(([key, value]) => ({ key, value })) };
                 const key = filters.key || payload.key;
@@ -257,6 +289,17 @@ describe('service billing evidence and alerts', () => {
     expect(value).not.toHaveProperty('billingUrl');
     expect(value).not.toHaveProperty('apiKey');
   });
+  it('accepts normal multiline notes but still rejects other control characters', () => {
+    expect(
+      validateServiceBilling(
+        record({ notes: 'Invoice received\nCheck account\r\nNo card data' }),
+        now,
+      ).notes,
+    ).toBe('Invoice received Check account No card data');
+    expect(() => validateServiceBilling(record({ notes: 'bad\0data' }), now)).toThrow(
+      'SERVICE_BILLING_INVALID',
+    );
+  });
   it('rejects a stale open form and preserves the newer payment record', async () => {
     const { db, settings } = database([record()]);
     await expect(saveServiceBilling(db, record({ balance: 0 }), 'old')).rejects.toThrow(
@@ -306,6 +349,21 @@ describe('service billing evidence and alerts', () => {
     await refreshServiceBillingAlerts(db, now);
     expect([...notices.values()][0].read).toBe(true);
     expect([...notices.values()][0].metadata.resolved_at).toBeDefined();
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+  it('recovers a definitely unattempted warning after a transient pre-push read failure', async () => {
+    const { db, notices } = database([record({ balance: 0 })]);
+    db.beforeReconcile = async () => {
+      db.beforeReconcile = undefined;
+      db.failNextRead = true;
+    };
+    await expect(refreshServiceBillingAlerts(db, now)).rejects.toThrow(
+      'SERVICE_BILLING_ALERTS_UNAVAILABLE',
+    );
+    expect(push).not.toHaveBeenCalled();
+    expect([...notices.values()][0].metadata.push_status).toBe('pending');
+    await Promise.all([refreshServiceBillingAlerts(db, now), refreshServiceBillingAlerts(db, now)]);
+    expect(notices.size).toBe(1);
     expect(push).toHaveBeenCalledTimes(1);
   });
   it('preserves resolution when push finishes after a recovery poll', async () => {

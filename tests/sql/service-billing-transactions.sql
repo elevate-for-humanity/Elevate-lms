@@ -13,11 +13,19 @@ begin
   candidate := jsonb_build_array(jsonb_build_object('user_id',actor,'type','warning',
     'title','ROLLBACK ONLY billing test','message','Transaction regression fixture',
     'idempotency_key','service-billing:transaction-test:critical:5:'||actor,
-    'metadata',jsonb_build_object('source','service-billing','service_id','transaction-test','signal','critical','episode','5')));
+    'metadata',jsonb_build_object('source','service-billing','service_id','transaction-test','signal','critical','episode','5','push_status','pending')));
   select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now());
   if returned<>1 then raise exception 'initial warning was not inserted'; end if;
   select n.id into notice from public.notifications n where n.idempotency_key=candidate->0->>'idempotency_key';
-  select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now());
+  select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now()) where not newly_created and id=notice;
+  if returned<>1 then raise exception 'definitely unattempted notice was not recoverable'; end if;
+  if public.claim_service_billing_push(notice,actor,'transaction-test','stale-revision',now()) then
+    raise exception 'stale push claim accepted'; end if;
+  if not public.claim_service_billing_push(notice,actor,'transaction-test','test-revision',now()) then
+    raise exception 'pending push was not claimed'; end if;
+  if public.claim_service_billing_push(notice,actor,'transaction-test','test-revision',now()) then
+    raise exception 'push claimed twice'; end if;
+  select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now()) where newly_created;
   if returned<>0 then raise exception 'identical poll duplicated warning'; end if;
   begin
     perform public.reconcile_service_billing_alerts('transaction-test','stale-revision','[]',now());
@@ -40,11 +48,22 @@ begin
   from generate_series(1,1100) i;
   select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now());
   if returned<>1 then raise exception 'retained history blocked recurrence'; end if;
-  select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now());
+  select count(*) into returned from public.reconcile_service_billing_alerts('transaction-test','test-revision',candidate,now()) where newly_created;
   if returned<>0 then raise exception 'recurrence did not deduplicate with identical transaction timestamps'; end if;
   if has_function_privilege('authenticated','public.reconcile_service_billing_alerts(text,text,jsonb,timestamp with time zone)','execute')
     or has_function_privilege('anon','public.record_service_billing_push_receipt(uuid,uuid,text,integer,timestamp with time zone)','execute') then
     raise exception 'untrusted role can mutate billing alerts'; end if;
+end $$;
+
+do $$ declare actor uuid; original text; admin_role uuid; begin
+select p.id,p.role into actor,original from public.profiles p where p.role in ('admin','super_admin') and p.is_active is not false and p.suspended is not true order by p.id limit 1;
+select r.id into admin_role from public.roles r where r.name='admin' limit 1;
+if actor is null or admin_role is null then raise exception 'role test prerequisites missing'; end if;
+update public.profiles set role='student' where id=actor;
+insert into public.user_roles(user_id,role_id) select actor,admin_role where not exists(select 1 from public.user_roles ur where ur.user_id=actor and ur.role_id=admin_role);
+if not exists(select 1 from public.service_billing_admin_recipients() r where r.id=actor) then raise exception 'secondary administrator omitted'; end if;
+update public.profiles set role=original where id=actor;
+if exists(select 1 from public.service_billing_admin_recipients() r join public.profiles p on p.id=r.id where p.role='host_shop' and exists(select 1 from public.program_holders ph where ph.user_id=p.id and ph.features->>'portal_access_archived'='true')) then raise exception 'archived host shop regained billing alerts'; end if;
 end $$;
 
 rollback;

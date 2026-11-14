@@ -172,6 +172,7 @@ export function validateServiceBilling(
   now = Date.now(),
 ): Omit<ServiceBillingRecord, 'revision' | 'source'> {
   const x = input as ServiceBillingRecord;
+  const notes = typeof x?.notes === 'string' ? x.notes.replace(/[\r\n]+/g, ' ') : x?.notes;
   const amount = (n: unknown, negative = false) =>
     n === null ||
     (typeof n === 'number' && Number.isFinite(n) && Math.abs(n) <= 1e9 && (negative || n >= 0));
@@ -198,10 +199,10 @@ export function validateServiceBilling(
     Date.parse(x.observedAt) > now + 300000 ||
     typeof x.reference !== 'string' ||
     !/^[\w .:#/-]{0,120}$/.test(x.reference) ||
-    typeof x.notes !== 'string' ||
-    x.notes.length > 500 ||
-    /https?:\/\//i.test(x.notes) ||
-    [...x.notes].some((char) => char.charCodeAt(0) < 32)
+    typeof notes !== 'string' ||
+    notes.length > 500 ||
+    /https?:\/\//i.test(notes) ||
+    [...notes].some((char) => char.charCodeAt(0) < 32)
   )
     throw new Error('SERVICE_BILLING_INVALID');
   // Pick fields explicitly. Ignore supplied URLs, credentials, actor and revision.
@@ -218,7 +219,7 @@ export function validateServiceBilling(
     warningDays: x.warningDays,
     observedAt: new Date(x.observedAt).toISOString(),
     reference: x.reference,
-    notes: x.notes,
+    notes,
     autoRefresh: x.serviceId === 'twilio' && x.autoRefresh === true,
   };
 }

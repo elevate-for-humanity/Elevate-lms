@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { ServiceBillingPanel } from '@/components/admin/ServiceBillingPanel';
 
 afterEach(() => {
@@ -124,4 +124,36 @@ it('prevents switching editors while a save is in flight', async () => {
   await waitFor(() =>
     expect(screen.queryByRole('button', { name: 'Saving…' })).not.toBeInTheDocument(),
   );
+});
+
+it('ignores an older GET that completes after a successful save', async () => {
+  let finishGet!: (value: Response) => void;
+  const request = vi
+    .fn()
+    .mockResolvedValueOnce(Response.json({ records: [record] }))
+    .mockImplementationOnce(
+      () =>
+        new Promise<Response>((resolve) => {
+          finishGet = resolve;
+        }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({
+        record: { ...record, revision: 'saved', balance: 80 },
+        alertsAvailable: true,
+      }),
+    );
+  vi.stubGlobal('fetch', request);
+  render(<ServiceBillingPanel />);
+  await waitFor(() => expect(screen.queryByText('Loading records…')).not.toBeInTheDocument());
+  const card = screen.getByRole('heading', { name: 'Twilio', exact: true }).closest('article')!;
+  fireEvent.click(within(card).getByRole('button', { name: 'Update verified billing' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh billing' }));
+  fireEvent.change(screen.getByLabelText('Available balance (USD)'), { target: { value: '80' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Save verified record' }));
+  await waitFor(() => expect(within(card).getByText('$80.00')).toBeInTheDocument());
+  await act(async () => finishGet(Response.json({ records: [record] })));
+  expect(within(card).getByText('$80.00')).toBeInTheDocument();
+  fireEvent.click(within(card).getByRole('button', { name: 'Update verified billing' }));
+  expect(screen.getByLabelText('Available balance (USD)')).toHaveValue(80);
 });

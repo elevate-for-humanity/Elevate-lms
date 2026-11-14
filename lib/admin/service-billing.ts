@@ -81,16 +81,11 @@ export async function saveServiceBilling(
   return record;
 }
 
-/** Only newly inserted durable notices may attempt a push, including concurrent polls. */
+/** Durable pending notices need an exclusive claim before any external push attempt. */
 export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date.now()) {
   await refreshConnectedBalances(db, now);
   const records = await readServiceBilling(db);
-  const { data: admins, error } = await db
-    .from('profiles')
-    .select('id')
-    .in('role', ['admin', 'super_admin'])
-    .or('is_active.is.null,is_active.eq.true')
-    .or('suspended.is.null,suspended.eq.false');
+  const { data: admins, error } = await db.rpc('service_billing_admin_recipients');
   if (error) throw Error('SERVICE_BILLING_RECIPIENTS_UNAVAILABLE');
   const candidates = records.flatMap((record) =>
     billingSignals(record, now).flatMap((signal) =>
@@ -122,6 +117,7 @@ export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date
     title: string;
     message: string;
     metadata: any;
+    newly_created: boolean;
   }> = [];
   let reconciliationUnavailable = false;
   for (const record of records) {
@@ -169,6 +165,18 @@ export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date
       await receipt(notice, 'superseded', 0);
       continue;
     }
+    const claim = await db.rpc('claim_service_billing_push', {
+      p_id: notice.id,
+      p_user_id: notice.user_id,
+      p_service_id: latest!.serviceId,
+      p_expected_revision: latest!.revision,
+      p_now: new Date(now).toISOString(),
+    });
+    if (claim.error) {
+      reconciliationUnavailable = true;
+      continue;
+    }
+    if (!claim.data) continue;
     let devices = 0;
     try {
       devices = await getPushNotificationService().sendToUserWithDatabase(db, notice.user_id, {
@@ -185,7 +193,7 @@ export async function refreshServiceBillingAlerts(db: SupabaseClient, now = Date
     await receipt(notice, devices ? 'accepted' : 'unconfirmed', devices);
   }
   if (reconciliationUnavailable) throw Error('SERVICE_BILLING_ALERTS_UNAVAILABLE');
-  return { created: inserted?.length || 0, pushAcceptedDevices };
+  return { created: inserted.filter((n) => n.newly_created).length, pushAcceptedDevices };
 }
 
 /** Read-only provider balance; never tops up or changes auto-recharge. */

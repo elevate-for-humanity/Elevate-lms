@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   BILLING_SERVICES,
   billingSignals,
@@ -23,22 +23,26 @@ export function ServiceBillingPanel() {
   const [saving, setSaving] = useState(false);
   // Keep the form's revision with its values even if background polling refreshes cards.
   const [editingRecord, setEditingRecord] = useState<ServiceBillingRecord | undefined>();
+  const loadSequence = useRef(0);
+  const savingRef = useRef(false);
   async function load(signal?: AbortSignal) {
+    if (savingRef.current) return;
+    const sequence = ++loadSequence.current;
     try {
       const response = await fetch('/api/admin/service-billing', { cache: 'no-store', signal });
       if (!response.ok) throw Error();
       const body = await response.json();
-      if (!signal?.aborted) {
+      if (!signal?.aborted && sequence === loadSequence.current) {
         setRecords(body.records);
         setError('');
       }
     } catch {
-      if (!signal?.aborted)
+      if (!signal?.aborted && sequence === loadSequence.current)
         setError(
           'Current billing records could not be loaded. Open the provider links below to verify payments directly.',
         );
     } finally {
-      if (!signal?.aborted) setLoading(false);
+      if (!signal?.aborted && sequence === loadSequence.current) setLoading(false);
     }
   }
   useEffect(() => {
@@ -74,9 +78,11 @@ export function ServiceBillingPanel() {
       warningDays: number('warningDays'),
       observedAt: verifiedAt.toISOString(),
       reference: String(form.get('reference') || ''),
-      notes: String(form.get('notes') || ''),
+      notes: String(form.get('notes') || '').replace(/[\r\n]+/g, ' '),
       autoRefresh: form.get('autoRefresh') === 'on',
     };
+    savingRef.current = true;
+    loadSequence.current++;
     setSaving(true);
     setNotice('');
     try {
@@ -105,6 +111,7 @@ export function ServiceBillingPanel() {
         failure instanceof Error ? failure.message : 'Save failed. Refresh before retrying.',
       );
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }

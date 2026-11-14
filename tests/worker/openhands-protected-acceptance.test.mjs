@@ -13,12 +13,12 @@ const reviews = [{ user: { login: 'independent-reviewer', type: 'User' }, state:
 const checks = [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success' }];
 
 test('protected GitHub acceptance requires merge ancestry, current-head checks and independent review', () => {
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: true, protectionVerified: true }).accepted, true);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: true, protectionVerified: false }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, ancestryVerified: false, protectionVerified: true }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr: { ...pr, merged: false }, reviews, checks, ancestryVerified: true, protectionVerified: true }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews: [], checks, ancestryVerified: true, protectionVerified: true }).accepted, false);
-  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: [], ancestryVerified: true, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true }).accepted, true);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: false }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks, requiredChecks: ['CI Required Gate'], ancestryVerified: false, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr: { ...pr, merged: false }, reviews, checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews: [], checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: [], requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true }).accepted, false);
 });
 
 test('reviewer cannot be author, bot, stale approval or superseded by changes requested', () => {
@@ -29,7 +29,7 @@ test('reviewer cannot be author, bot, stale approval or superseded by changes re
     [{ ...reviews[0], state: 'COMMENTED' }],
     [reviews[0], { ...reviews[0], state: 'CHANGES_REQUESTED', submitted_at: '2026-11-14T02:00:00Z' }],
   ]) {
-    assert.equal(evaluateProtectedPullRequest({ pr, reviews: bad, checks, ancestryVerified: true, protectionVerified: true }).accepted, false);
+    assert.equal(evaluateProtectedPullRequest({ pr, reviews: bad, checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true }).accepted, false);
   }
 });
 
@@ -39,10 +39,26 @@ test('missing, failing, pending and truncated CI all fail closed', () => {
     [{ name: 'CI', status: 'completed', conclusion: 'failure' }],
     Array.from({ length: 100 }, () => checks[0]),
   ]) {
-    assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: invalid, ancestryVerified: true, protectionVerified: true }).accepted, false);
+    assert.equal(evaluateProtectedPullRequest({ pr, reviews, checks: invalid, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true }).accepted, false);
   }
 });
 
+
+test('skipped nonrequired operational checks do not override successful required gates', () => {
+  const optional = [...checks, { name: 'PBX preserve (push only)', status: 'completed', conclusion: 'skipped' }];
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews, checks: optional, requiredChecks: ['CI Required Gate'],
+    ancestryVerified: true, protectionVerified: true,
+  }).accepted, true);
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews, checks: optional, requiredChecks: ['PBX preserve (push only)'],
+    ancestryVerified: true, protectionVerified: true,
+  }).accepted, false);
+  assert.equal(evaluateProtectedPullRequest({
+    pr, reviews, checks: [...optional, { name: 'Security', status: 'completed', conclusion: 'failure' }],
+    requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true,
+  }).accepted, false);
+});
 
 test('classic-only, ruleset-only and mixed protection are recognized without assuming enforcement', () => {
   const classic = { required_pull_request_reviews: { required_approving_review_count: 1 },
@@ -64,15 +80,15 @@ test('classic-only, ruleset-only and mixed protection are recognized without ass
 test('comments do not erase an independent approval or reinstate changes requested', () => {
   const comment = { ...reviews[0], state: 'COMMENTED', submitted_at: '2026-11-14T02:00:00Z' };
   assert.equal(evaluateProtectedPullRequest({
-    pr, reviews: [reviews[0], comment], checks, ancestryVerified: true, protectionVerified: true,
+    pr, reviews: [reviews[0], comment], checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true,
   }).accepted, true);
   const changes = { ...reviews[0], state: 'CHANGES_REQUESTED', submitted_at: '2026-11-14T01:30:00Z' };
   assert.equal(evaluateProtectedPullRequest({
-    pr, reviews: [reviews[0], changes, comment], checks, ancestryVerified: true, protectionVerified: true,
+    pr, reviews: [reviews[0], changes, comment], checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true,
   }).accepted, false);
   const dismissed = { ...reviews[0], state: 'DISMISSED', submitted_at: '2026-11-14T01:30:00Z' };
   assert.equal(evaluateProtectedPullRequest({
-    pr, reviews: [reviews[0], dismissed, comment], checks, ancestryVerified: true, protectionVerified: true,
+    pr, reviews: [reviews[0], dismissed, comment], checks, requiredChecks: ['CI Required Gate'], ancestryVerified: true, protectionVerified: true,
   }).accepted, false);
 });
 

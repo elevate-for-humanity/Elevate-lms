@@ -152,11 +152,15 @@ test('PARIS retries a failed reply claim without advancing the applicant intervi
  const fakeDb={from:table=>{
   let selection='',updates,filters={};let inserting;
   const q={
-   select:(value)=>{selection=value;return q;},eq:(key,value)=>{filters[key]=value;return q;},
+   select:(value)=>{selection=value;return q;},eq:(key,value)=>{filters[key]=value;return q;},is:(key,value)=>{filters[key]=value;return q;},
    ilike:()=>q,in:()=>q,order:()=>q,limit:()=>q,
    update:value=>{updates=value;return q;},insert:value=>{inserting=value;return q;},
    maybeSingle:async()=>{
-    if(table==='applications')return {data:app,error:null};
+    if(table==='applications' && updates){
+     if(filters.updated_at!==(app.updated_at??null))return {data:null,error:null};
+     app={...app,...updates};return {data:{id:app.id},error:null};
+    }
+    if(table==='applications')return {data:structuredClone(app),error:null};
     if(filters.inbound_event_id?.endsWith(':paris-mail'))return {data:null,error:null};
     return {data:{id:'inbound',thread_id:'thread'},error:null};
    },
@@ -186,6 +190,115 @@ test('PARIS retries a failed reply claim without advancing the applicant intervi
  assert.equal(records[0].text_body,records[1].text_body);assert.equal(sends,1);
 });
 
+
+function interviewHarness(started=true) {
+ let app={id:'interview-app',program_interest:'barber',interview_completed:false,status:'pending',
+  interview_responses:{email_interview:{started,current:0,answers:[]}}};
+ const failedClaims=new Set();const records=[];const messages=new Map();const sends=[];
+ let gate=null;
+ const fakeDb={from:table=>{
+  let updates,inserting;const filters={};
+  const q={
+   select:()=>q,eq:(key,value)=>{filters[key]=value;return q;},is:(key,value)=>{filters[key]=value;return q;},
+   ilike:()=>q,in:()=>q,order:()=>q,limit:()=>q,update:value=>{updates=value;return q;},insert:value=>{inserting=value;return q;},
+   maybeSingle:async()=>{
+    if(table==='applications' && updates){
+     const expected=app.updated_at??null;
+     if(filters.updated_at!==expected)return {data:null,error:null};
+     app={...app,...updates};return {data:{id:app.id},error:null};
+    }
+    if(table==='applications'){
+     const snapshot=structuredClone(app);
+     if(gate){const waiting=gate;waiting.count++;if(waiting.count===2){gate=null;waiting.release();}await waiting.promise;}
+     return {data:snapshot,error:null};
+    }
+    if(filters.inbound_event_id?.endsWith(':paris-mail'))return {data:messages.get(filters.inbound_event_id)||null,error:null};
+    return {data:{id:'inbound',thread_id:'thread'},error:null};
+   },
+   single:async()=>{
+    records.push(inserting);
+    if(failedClaims.delete(inserting.inbound_event_id))return {data:null,error:{code:'57014'}};
+    const record={id:'reply-'+records.length,status:'pending'};
+    messages.set(inserting.inbound_event_id,record);return {data:record,error:null};
+   },
+   then:resolve=>{
+    if(table==='communication_email_messages'&&updates){
+     for(const record of messages.values())if(record.id===filters.id)Object.assign(record,updates);
+    }
+    return Promise.resolve(table==='communication_email_mailboxes'?{data:[{id:'box',address:'admissions@elevateforhumanity.org'}],error:null}:{data:null,count:messages.size+1,error:null}).then(resolve);
+   }
+  };return q;
+ }};
+ const ctx=moduleContext('lib/email/paris-mail.ts',{
+  requireAdminClient:async()=>fakeDb,notifyParisMailResult:async()=>{},sendEmail:async options=>{sends.push(options);return {success:true};},
+  parseEmailList:value=>[value],textToEmailHtml:value=>value,canParisRespond:()=>true,emailLikeLiteral:value=>value,
+  inboundDeliveryRecipients:()=>['admissions@elevateforhumanity.org']
+ });
+ return {get app(){return app;},records,sends,
+  failClaim:eventId=>failedClaims.add(eventId+':paris-mail'),
+  setInterview:value=>{app.interview_responses.email_interview=value;},
+  synchronizeReads:()=>{let release;const promise=new Promise(resolve=>{release=resolve;});gate={count:0,promise,release};},
+  reply:eventId=>ctx.respondToParisMail({eventId,from:'applicant@example.org',text:'Answer '+eventId,subject:'Application'})
+ };
+}
+test('answer A claim fails, B advances, then A retries its durable reply without advancing',async()=>{
+ const h=interviewHarness();h.failClaim('answer-A');
+ await assert.rejects(h.reply('answer-A'),/reply claim/);
+ const originalReply=h.records[0].text_body;
+ await h.reply('answer-B');
+ assert.equal(h.app.interview_responses.email_interview.current,2);
+ await h.reply('answer-A');
+ const interview=h.app.interview_responses.email_interview;
+ assert.equal(interview.current,2);assert.equal(interview.answers.length,2);
+ assert.deepEqual(Array.from(interview.answers,answer=>answer.event_id),['answer-A','answer-B']);
+ assert.equal(h.records[2].text_body,originalReply);
+ assert.equal(interview.event_outcomes['answer-A'].reply,originalReply);
+ assert.equal(h.sends.length,2);
+});
+test('start claim fails, newer answer advances, then start retries without becoming an answer',async()=>{
+ const h=interviewHarness(false);h.failClaim('start-A');
+ await assert.rejects(h.reply('start-A'),/reply claim/);
+ const originalReply=h.records[0].text_body;
+ assert.equal(h.app.interview_responses.email_interview.answers.length,0);
+ await h.reply('answer-B');
+ await h.reply('start-A');
+ const interview=h.app.interview_responses.email_interview;
+ assert.equal(interview.current,1);assert.equal(interview.answers.length,1);
+ assert.equal(interview.answers[0].event_id,'answer-B');
+ assert.equal(h.records[2].text_body,originalReply);
+ assert.equal(interview.event_outcomes['start-A'].reply,originalReply);
+ assert.equal(h.sends.length,2);
+});
+test('historical answers with no retained reply are never appended or advanced again',async()=>{
+ const h=interviewHarness();
+ h.setInterview({started:true,current:2,answers:[{event_id:'legacy-A',question:'First question',answer:'Saved'}]});
+ await h.reply('legacy-A');
+ assert.equal(h.app.interview_responses.email_interview.current,2);
+ assert.equal(h.app.interview_responses.email_interview.answers.length,1);
+ assert.match(h.records[0].text_body,/answer was already saved/);
+});
+
+test('the prior latest-only start receipt is retained when a newer answer upgrades its state',async()=>{
+ const h=interviewHarness();
+ h.setInterview({started:true,current:0,answers:[],last_event_id:'old-start',last_reply:'Original retained start reply'});
+ await h.reply('new-answer');
+ await h.reply('old-start');
+ const interview=h.app.interview_responses.email_interview;
+ assert.equal(interview.current,1);assert.equal(interview.answers.length,1);
+ assert.equal(h.records[1].text_body,'Original retained start reply');
+ assert.equal(interview.event_outcomes['old-start'].reply,'Original retained start reply');
+});
+test('concurrent answers use compare-and-set then retry without losing either event outcome',async()=>{
+ const h=interviewHarness();h.synchronizeReads();
+ const replies=await Promise.allSettled([h.reply('concurrent-A'),h.reply('concurrent-B')]);
+ assert.equal(replies.filter(result=>result.status==='fulfilled').length,1);
+ const failed=replies[0].status==='rejected'?'concurrent-A':'concurrent-B';
+ await h.reply(failed);
+ const interview=h.app.interview_responses.email_interview;
+ assert.equal(interview.current,2);assert.equal(interview.answers.length,2);
+ assert.equal(Object.keys(interview.event_outcomes).length,2);
+ assert.equal(h.sends.length,2);
+});
 test('legacy errored and abandoned forwarding remains fenced while mailbox storage can recover',async()=>{
  for(const app of ['lms','marketing']){
   for(const legacyStatus of ['errored','processing']){

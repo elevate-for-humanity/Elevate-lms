@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { state, route } = vi.hoisted(() => ({
-  state: { messages: [] as any[], threads: [] as any[], mailboxes: [] as any[], notifications: [] as any[] },
+  state: { messages: [] as any[], threads: [] as any[], mailboxes: [] as any[], notifications: [] as any[], failMailboxIds: [] as string[] },
   route: vi.fn(),
 }));
 vi.mock('@/lib/email/program-conversation-routing', async (original) => ({
@@ -38,7 +38,7 @@ vi.mock('@/lib/supabase/admin', () => ({
               table === 'communication_email_mailboxes'
                 ? state.mailboxes.filter(row => !requested || requested.includes(row.address))
                 : table === 'communication_email_mailbox_members' ? [{ user_id: 'owner' }] : null,
-            error: null,
+            error: table === 'communication_email_messages' && inserted && state.failMailboxIds.includes(inserted.mailbox_id) ? { message: 'Unavailable' } : null,
           }).then(resolve),
       };
       return query;
@@ -60,6 +60,7 @@ const parsed = {
 describe('interoffice copies preserve conversations', () => {
   beforeEach(() => {
     route.mockClear();
+    state.failMailboxIds = [];
     state.notifications = [];
     state.messages = [];
     state.threads = [];
@@ -123,4 +124,56 @@ describe('interoffice copies preserve conversations', () => {
     expect(result.mailboxCount).toBe(1);
     expect(state.messages.map(message => message.mailbox_id)).toEqual(['admin']);
   });
+});
+
+it('does not deliver a visible To header to a mailbox outside the SMTP envelope', async () => {
+  route.mockResolvedValue(null);
+  state.messages = [];
+  state.threads = [];
+  state.notifications = [];
+  state.failMailboxIds = [];
+  state.mailboxes = [
+    { id: 'admin', address: 'admissions@elevateforhumanity.org' },
+    { id: 'billing', address: 'billing@elevateforhumanity.org' },
+  ];
+  await storeInboundCommunicationEmail({
+    ...parsed,
+    to: 'billing@elevateforhumanity.org',
+    envelopeRecipients: ['admissions@elevateforhumanity.org'],
+  });
+  expect(state.messages.map((message) => message.mailbox_id)).toEqual(['admin']);
+  expect(route).toHaveBeenLastCalledWith(
+    expect.anything(),
+    ['student@example.com'],
+    ['admissions@elevateforhumanity.org'],
+  );
+});
+it('keeps visible-header fallback when a legacy delivery has no SMTP envelope', async () => {
+  route.mockResolvedValue(null);
+  state.messages = [];
+  state.threads = [];
+  state.notifications = [];
+  state.failMailboxIds = [];
+  state.mailboxes = [{ id: 'admin', address: 'admissions@elevateforhumanity.org' }];
+  expect(await storeInboundCommunicationEmail({ ...parsed, envelopeRecipients: [] })).toMatchObject(
+    { stored: true, mailboxCount: 1 },
+  );
+});
+it('does not claim full inbound delivery when one directly addressed mailbox fails', async () => {
+  route.mockResolvedValue(null);
+  state.messages = [];
+  state.threads = [];
+  state.notifications = [];
+  state.failMailboxIds = ['billing'];
+  state.mailboxes = [
+    { id: 'admin', address: 'admissions@elevateforhumanity.org' },
+    { id: 'billing', address: 'billing@elevateforhumanity.org' },
+  ];
+  await expect(
+    storeInboundCommunicationEmail({
+      ...parsed,
+      to: 'admissions@elevateforhumanity.org,billing@elevateforhumanity.org',
+      envelopeRecipients: ['admissions@elevateforhumanity.org', 'billing@elevateforhumanity.org'],
+    }),
+  ).rejects.toThrow('could not be stored');
 });

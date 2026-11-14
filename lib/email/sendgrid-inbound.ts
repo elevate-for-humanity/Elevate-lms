@@ -27,6 +27,13 @@ export interface ParsedInboundEmail {
   headers?: string;
 }
 
+/** SMTP envelope is authoritative; display headers must not add deliveries. */
+export function inboundDeliveryRecipients(parsed: Pick<ParsedInboundEmail, 'envelopeRecipients' | 'to'>): string[] {
+  return parsed.envelopeRecipients.length
+    ? parseEnvelopeAddresses(JSON.stringify({ to: parsed.envelopeRecipients }))
+    : parseEnvelopeAddresses(parsed.to);
+}
+
 export function parseEnvelopeAddresses(value: unknown): string[] {
   let source = String(value || '');
   try {

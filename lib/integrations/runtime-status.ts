@@ -30,7 +30,7 @@ export const RUNTIME_INTEGRATIONS: readonly RuntimeIntegration[] = [
   { id: 'jotform', required: ['JOTFORM_API_KEY', 'JOTFORM_WEBHOOK_SECRET'], webhook: true },
   { id: 'calendly', required: ['CALENDLY_API_TOKEN', 'CALENDLY_WEBHOOK_SECRET'], webhook: true },
   { id: 'resend', required: ['RESEND_API_KEY', 'RESEND_WEBHOOK_SECRET'], webhook: true },
-  { id: 'sendgrid-inbound', required: ['SENDGRID_API_KEY'], webhook: true },
+  { id: 'sendgrid-inbound', required: ['SENDGRID_API_KEY', 'SENDGRID_INBOUND_WEBHOOK_PUBLIC_KEY'], webhook: true },
   { id: 'supabase', required: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] },
   { id: 'quickbooks', required: ['QB_CLIENT_ID', 'QB_CLIENT_SECRET'], webhook: true },
   { id: 'google', required: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'] },

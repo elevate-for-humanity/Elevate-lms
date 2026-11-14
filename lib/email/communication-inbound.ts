@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { applyMailFilters, isGmailCopy, isRelevantCopy, isAutomatedMail } from './mail-filters';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmailSubject, parseEmailList } from '@/lib/email/communication-email';
-import { safeAttachmentName, type ParsedInboundEmail } from '@/lib/email/sendgrid-inbound';
+import { inboundDeliveryRecipients, safeAttachmentName, type ParsedInboundEmail } from '@/lib/email/sendgrid-inbound';
 import {
   applicantConversationSubject,
   programConversationRoute,
@@ -50,9 +50,7 @@ export async function storeInboundCommunicationEmail(
   parsed: ParsedInboundEmail,
   options: { applicantEmail?: string; internalCopy?: boolean } = {},
 ): Promise<{ stored: boolean; mailboxCount: number; filtered?: boolean }> {
-  let recipients = Array.from(
-    new Set([...parsed.envelopeRecipients, ...parseEmailList(parsed.to)]),
-  );
+  let recipients = inboundDeliveryRecipients(parsed);
   if (!recipients.length) return { stored: false, mailboxCount: 0 };
 
   const db = await requireAdminClient();
@@ -262,7 +260,7 @@ export async function storeInboundCommunicationEmail(
     storedCount += 1;
   }
 
-  if ((route || options.internalCopy) && storedCount + filteredCount !== mailboxes.length) {
+  if (storedCount + filteredCount !== mailboxes.length) {
     throw new Error('An assigned interoffice conversation copy could not be stored.');
   }
   return {

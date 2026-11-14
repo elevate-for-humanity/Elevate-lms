@@ -1,3 +1,5 @@
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { verifySendGridInboundRequest } from '@/lib/email/verify-sendgrid-inbound';
 import { respondToParisMail } from '@/lib/email/paris-mail';
 // PUBLIC ROUTE: SendGrid inbound webhook
 import { NextRequest, NextResponse } from 'next/server';
@@ -24,12 +26,19 @@ export const dynamic = 'force-dynamic';
  *    - Check "POST the raw, full MIME message" OFF (use default form-encoded)
  *    - Check "Send Raw" OFF
  *
+ * Enable an Inbound Parse signing policy and bind its public key to
+ * SENDGRID_INBOUND_WEBHOOK_PUBLIC_KEY before releasing this handler.
+ *
  * 2. DNS — add MX record at your domain registrar:
  *    Type: MX  |  Host: @  |  Value: mx.sendgrid.net  |  Priority: 10
  *    (Remove or lower-priority any existing MX records for the root domain)
  */
 async function _POST(request: NextRequest) {
   try {
+    await hydrateProcessEnv();
+    const verification = await verifySendGridInboundRequest(request, process.env.SENDGRID_INBOUND_WEBHOOK_PUBLIC_KEY);
+    if (verification.verified === false)
+      return NextResponse.json({ error: verification.status === 503 ? 'Inbound verification unavailable' : 'Invalid webhook signature' }, { status: verification.status });
     const parsed = await parseInboundEmail(request);
 
     if (!parsed) {
@@ -46,6 +55,7 @@ async function _POST(request: NextRequest) {
       eventId,
       'email.received',
       { from, to, subject },
+      { requireFinalizedDuplicate: true },
     );
 
     if (!shouldProcess) {
@@ -60,10 +70,10 @@ async function _POST(request: NextRequest) {
     }
 
     const workspaceDelivery = await storeInboundCommunicationEmail(parsed);
-    if(workspaceDelivery.filtered){await finalizeWebhookEvent('sendgrid-inbound',eventId,'processed');return NextResponse.json({ok:true,filtered:true});}
+    if(workspaceDelivery.filtered){await finalizeWebhookEvent('sendgrid-inbound',eventId,'processed', undefined, { strict: true });return NextResponse.json({ok:true,filtered:true});}
     if (workspaceDelivery.stored) {
       await respondToParisMail(parsed);
-      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed', undefined, { strict: true });
       logger.info('[SendGrid Inbound] Stored in Elevate Email', {
         eventId,
         mailboxCount: workspaceDelivery.mailboxCount,
@@ -86,11 +96,11 @@ async function _POST(request: NextRequest) {
 
     if (!result.success) {
       logger.error('[SendGrid Inbound] Forward failed:', result.error);
-      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'errored', String(result.error));
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'errored', String(result.error), { strict: true });
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
-    await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
+    await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed', undefined, { strict: true });
     logger.info('[SendGrid Inbound] Forwarded successfully', { forwardTo, subject });
     return NextResponse.json({ ok: true });
   } catch (err) {

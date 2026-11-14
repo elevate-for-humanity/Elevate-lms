@@ -58,6 +58,7 @@ function mockGitHub(overrides: Record<string, unknown> = {}) {
   globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
     const path = String(input).replace(origin, '');
     if (!(path in map)) return new Response('not found', { status: 404 });
+    if (map[path] instanceof Response) return map[path] as Response;
     return new Response(JSON.stringify(map[path]), {
       status: 200, headers: { 'Content-Type': 'application/json' },
     });
@@ -81,6 +82,12 @@ describe('OpenHands independent GitHub verification — status-only CI', () => {
   });
   it('rejects a reviewer permission lookup failure rather than guessing authority', async () => {
     mockGitHub({ [`${prefix}/collaborators/independent/permission`]: null });
+    expect((await verifyOpenHandsGitHubOutcome(request)).verified).toBe(false);
+  });
+  it('does not accept ruleset permission denial as absent policy', async () => {
+    mockGitHub({
+      [`${prefix}/rules/branches/main`]: new Response('Forbidden', { status: 403 }),
+    });
     expect((await verifyOpenHandsGitHubOutcome(request)).verified).toBe(false);
   });
   it('rejects failed legacy commit status even when PR exists', async () => {

@@ -2,7 +2,7 @@ import 'server-only';
 
 import { getSecret } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
-import { evaluateProtectedPullRequest } from './acceptance-contract.mjs';
+import { evaluateProtectedPullRequest, protectedMainPolicyVerified } from './acceptance-contract.mjs';
 
 const GH_API = 'https://api.github.com';
 const DEFAULT_REPOSITORY = 'elevate-for-humanity/Elevate-lms';
@@ -170,26 +170,27 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         );
         ancestryVerified = ['ahead', 'identical'].includes(ancestry.status ?? '');
       }
-      // Verify the *effective* protected-main rules. A PR being merged does
-      // not itself prove a required independent review was enforced.
-      let protectionVerified = false;
+      // Both classic protection and rulesets may enforce main. A missing
+      // or forbidden read is UNKNOWN, never evidence of enforcement.
+      let rules: Array<{
+        type?: string;
+        parameters?: { required_approving_review_count?: number; required_status_checks?: unknown[] };
+      }> | null = null;
+      let classic: {
+        required_pull_request_reviews?: { required_approving_review_count?: number };
+        required_status_checks?: { checks?: unknown[]; contexts?: string[] };
+      } | null = null;
       try {
-        const rules = await gh<Array<{
-          type?: string;
-          parameters?: {
-            required_approving_review_count?: number;
-            required_status_checks?: Array<unknown>;
-          };
-        }>>(`/repos/${repository}/rules/branches/main`, token);
-        const enforcedReviews = rules.some(rule => rule.type === 'pull_request' &&
-          Number(rule.parameters?.required_approving_review_count ?? 0) >= 1);
-        const enforcedChecks = rules.some(rule => rule.type === 'required_status_checks' &&
-          (rule.parameters?.required_status_checks?.length ?? 0) > 0);
-        protectionVerified = enforcedReviews && enforcedChecks;
+        rules = await gh<typeof rules>(`/repos/${repository}/rules/branches/main`, token);
       } catch {
-        // Missing permissions to inspect branch protections are not PASS.
-        reasons.push(`PR #${number} main branch protection readback unavailable.`);
+        reasons.push(`PR #${number}: ruleset readback unavailable; checking classic protection.`);
       }
+      try {
+        classic = await gh<typeof classic>(`/repos/${repository}/branches/main/protection`, token);
+      } catch {
+        reasons.push(`PR #${number}: classic protection readback unavailable.`);
+      }
+      const protectionVerified = protectedMainPolicyVerified({ rules, classic });
       const protectedAcceptance = evaluateProtectedPullRequest({
         pr, reviews, checks: checkRuns, ancestryVerified, protectionVerified,
       });

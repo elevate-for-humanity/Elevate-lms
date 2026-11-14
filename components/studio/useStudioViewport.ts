@@ -17,13 +17,12 @@ export function useStudioViewport(): CSSProperties | undefined {
       }
       // Let the browser handle pinch zoom; don't resize around magnified content.
       if (viewport && viewport.scale !== 1) return;
+      // AdminApplicationChrome already owns the fixed Studio viewport.
+      // A second fixed-position child escapes its grid and covers adjacent
+      // controls when the keyboard opens. Resize in place instead.
       setStyle({
-        position: 'fixed',
-        top: viewport?.offsetTop ?? 0,
-        left: 0,
-        right: 0,
         height: viewport?.height ?? window.innerHeight,
-        zIndex: 80,
+        maxHeight: viewport?.height ?? window.innerHeight,
       });
     };
     const schedule = () => {

@@ -106,7 +106,7 @@ export default function RepositoryStudioWorkspace() {
         <div hidden={mode !== 'preview'} className="h-full min-h-0">
           {visitedModes.has('preview') ? (
             <div className="grid h-full min-h-0 gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(420px,0.8fr)]">
-              <div className="min-h-[640px] min-w-0 overflow-hidden rounded-xl border border-slate-200 xl:min-h-0">
+              <div className="min-h-[min(65dvh,480px)] min-w-0 overflow-hidden rounded-xl border border-slate-200 xl:min-h-0">
                 <DevStudioEditorWorkspace
                   onFileContextChange={(path, content) => {
                     setActivePath(path);
@@ -114,7 +114,7 @@ export default function RepositoryStudioWorkspace() {
                   }}
                 />
               </div>
-              <div className="min-h-[640px] min-w-0 xl:min-h-0">
+              <div className="min-h-[min(65dvh,480px)] min-w-0 xl:min-h-0">
                 <RepositoryLivePreview filePath={activePath} content={activeContent} />
               </div>
             </div>

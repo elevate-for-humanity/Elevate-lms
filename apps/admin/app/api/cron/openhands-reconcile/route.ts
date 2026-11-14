@@ -15,14 +15,15 @@ async function _GET(request: Request) {
   }
 
   const taskId = new URL(request.url).searchParams.get('task_id')?.trim() ?? '';
-  // Scheduled reconciliation has no individual task ID. Preserve the
-  // authenticated single-task path for targeted operator diagnostics.
-  if (taskId && !UUID_RE.test(taskId)) {
-    return NextResponse.json({ error: 'Invalid task_id' }, { status: 400 });
+  // Scheduled reconciliation runs through the autopilot tick. This endpoint must
+  // stay scoped to exactly one requested task so a targeted retry can never
+  // widen into unrelated work.
+  if (!UUID_RE.test(taskId)) {
+    return NextResponse.json({ error: 'A valid task_id is required' }, { status: 400 });
   }
 
-  const result = await reconcileOpenHandsTasks(taskId ? 1 : 10, taskId || undefined);
-  return NextResponse.json({ success: result.errors.length === 0, task_id: taskId || null, ...result });
+  const result = await reconcileOpenHandsTasks(1, taskId);
+  return NextResponse.json({ success: result.errors.length === 0, task_id: taskId, ...result });
 }
 
 export const GET = withRuntime(_GET);

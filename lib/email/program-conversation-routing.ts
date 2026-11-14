@@ -8,7 +8,7 @@ const INTAKE_ADDRESSES = new Set([ADMIN_ADDRESS, 'enrollment@elevateforhumanity.
 // Email local parts may legally contain % and _. Both are SQL ILIKE wildcards;
 // escape them so one applicant cannot route another applicant's correspondence.
 function exactCaseInsensitiveEmailPattern(email: string): string {
-  return email.replace(/[\\%_]/g, '\\const INTAKE_ADDRESSES = new Set([ADMIN_ADDRESS, 'enrollment@elevateforhumanity.org']);');
+  return email.replace(/[\\%_]/g, '\\$&');
 }
 
 /** Only unique, explicit, active applicant assignments may receive protected copies. */

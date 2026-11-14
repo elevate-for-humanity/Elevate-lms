@@ -61,7 +61,8 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     expect(state.owned).toHaveBeenCalledWith({
       actorId: 'original-owner', taskId: 'original-task', conversationId: 'existing-conversation',
     });
-    expect(state.send).toHaveBeenCalledExactlyOnceWith('existing-conversation', 'Follow up');
+    expect(state.send).toHaveBeenCalledTimes(1);
+    expect(state.send).toHaveBeenCalledWith('existing-conversation', 'Follow up');
     expect(state.dispatch).not.toHaveBeenCalled();
   });
 

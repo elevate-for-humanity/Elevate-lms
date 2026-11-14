@@ -3,7 +3,7 @@ import 'server-only';
 import { getSecret } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
 import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
-import { evaluateProtectedPullRequest, protectedMainPolicyVerified, requiredMainChecks } from './acceptance-contract.mjs';
+import { evaluateProtectedPullRequest, protectedMainPolicyVerified, requiredMainChecks, requiredMainReviewCount } from './acceptance-contract.mjs';
 
 const GH_API = 'https://api.github.com';
 const DEFAULT_REPOSITORY = 'elevate-for-humanity/Elevate-lms';
@@ -201,8 +201,28 @@ export async function verifyOpenHandsGitHubOutcome(input: {
       }
       const protectionVerified = Boolean(policyToken) && protectedMainPolicyVerified({ rules, classic });
       const requiredChecks = requiredMainChecks({ rules, classic });
+      const requiredApprovalCount = requiredMainReviewCount({ rules, classic });
+      const reviewerPermissions: Record<string, string> = {};
+      const decisionLogins = new Set(reviews.filter(review =>
+        ['APPROVED', 'CHANGES_REQUESTED'].includes(review.state ?? ''))
+        .map(review => review.user?.login?.toLowerCase()).filter((login): login is string => Boolean(login)));
+      for (const login of decisionLogins) {
+        if (!/^[a-z0-9](?:[a-z0-9-]{0,38})$/.test(login)) continue;
+        try {
+          // Repo review submission is not evidence of permission to approve.
+          // The App policy identity must independently verify collaborator rights.
+          if (!policyToken) throw new Error('GitHub policy identity unavailable');
+          const collaborator = await gh<{ permission?: string }>(
+            `/repos/${repository}/collaborators/${encodeURIComponent(login)}/permission`, policyToken,
+          );
+          reviewerPermissions[login] = collaborator.permission ?? 'unknown';
+        } catch {
+          reviewerPermissions[login] = 'unknown';
+        }
+      }
       const protectedAcceptance = evaluateProtectedPullRequest({
         pr, reviews, checks: checkRuns, statuses, requiredChecks, ancestryVerified, protectionVerified,
+        reviewerPermissions, requiredApprovalCount,
       });
       if (!protectedAcceptance.accepted) {
         reasons.push(`PR #${number} lacks protected acceptance: ${protectedAcceptance.reasons.join('; ')}.`);

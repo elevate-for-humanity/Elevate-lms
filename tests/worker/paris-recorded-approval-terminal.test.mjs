@@ -67,7 +67,7 @@ test('provider candidate classification agrees with terminal authorization for e
   const {stripTypeScriptTypes} = await import('node:module');
   const {isProviderConfirmationSnapshot} = await import('../../lib/devstudio/openhands/provider-confirmation.mjs');
   const source = readFileSync(new URL('../../lib/devstudio/openhands/paris-provider-candidate.ts', import.meta.url), 'utf8');
-  const compiled = stripTypeScriptTypes(source).replace(/^import .*;\\n/gm, '').replaceAll('export ', '');
+  const compiled = stripTypeScriptTypes(source).replace(/^import .*;.*$/gm, '').replaceAll('export ', '');
   const classify = new Function('isProviderConfirmationSnapshot', compiled + ';return isParisProviderBranchCandidate;')(isProviderConfirmationSnapshot);
   const baseTask = {
     id: 'task', user_id: 'owner', tenant_id: null, tool_name: 'openhands.execute',

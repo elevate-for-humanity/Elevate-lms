@@ -1,0 +1,6 @@
+.root { min-width: 0; }
+.mobileTabs { display: flex; flex-wrap: wrap; gap: .5rem; padding: .5rem; }
+.mobileTabs[hidden] { display: none; }
+/* Follow the actual pane width, including when nested in the desktop Studio. */
+.root[data-compact=true] .operations,
+.root[data-compact=true] .outline { height: auto !important; min-height: 0 !important; }

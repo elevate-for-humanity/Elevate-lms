@@ -1,0 +1,502 @@
+{
+  "observed_at": "2026-11-06T12:17:41Z",
+  "scope": "full-production-recovery",
+  "source_sha": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+  "production_admin_sha": "83ab4e87df0d9cb5217031fbab445a5b0ddc57ad",
+  "production_admin_revision": "elevate-admin-migration-00485-2pb",
+  "production_migration_records": 1474,
+  "repository_migration_files": 1432,
+  "pr_2407": {
+    "status": "merged",
+    "merge_sha": "652e85cac08daae06bbcaefa6b0f12d08c97730b"
+  },
+  "queues": {
+    "paris": {
+      "queued": 31,
+      "blocked": 26
+    },
+    "studio": {
+      "planning": 224,
+      "failed": 48,
+      "blocked": 6,
+      "completed": 10
+    },
+    "course_builder": {
+      "completed": 244,
+      "failed": 74,
+      "queued": 70,
+      "running": 2
+    }
+  },
+  "findings": [
+    {
+      "id": "w9-mobile-target",
+      "status": "deployed-verified-desktop-control-size-mobile-certification-pending",
+      "cause": "24px native checkbox targets below mobile minimum",
+      "change": "44px controls; preserve certification and saved data contracts"
+    },
+    {
+      "id": "employer-webkit",
+      "status": "investigating",
+      "evidence": "textarea fill and orientation checkbox fail in existing production WebKit suite; root cause not yet proved"
+    },
+    {
+      "id": "main-ci-readiness-fixture",
+      "status": "verified-full-ci",
+      "cause": "test routes /api/ready request to comparison fixture and supplies obsolete healthy flag",
+      "tests": "production readiness guard unchanged; three isolated guard cases passed; negative executor readiness cases added"
+    },
+    {
+      "id": "paris-runtime-drift",
+      "status": "runtime-sha-aligned-autonomous-task-not-yet-verified",
+      "evidence": "monitor job 127886852714 deferred because compatible Admin control-plane source is not serving",
+      "action": "release through existing required CI; no bypass"
+    },
+    {
+      "id": "postgrest-timeout-events",
+      "status": "investigating",
+      "evidence": "2026-11-06 11:00-12:24Z logs contain repeated Warp timeout-manager events; no connection exhaustion established"
+    },
+    {
+      "id": "cdl-assigned-applicants-hidden",
+      "status": "verified-admin-preview",
+      "cause": "56 existing assigned applicant rows hidden because explicit recruiting_enabled flag absent on active verified Program Holder",
+      "change": "restored explicit recruiting assignment for that organization; existing program and holder filters retained",
+      "database_verification": {
+        "assigned_rows": 56,
+        "audit_record_required_in_same_transaction": true
+      },
+      "runtime_verification": {
+        "path": "/program-holder/students/pending",
+        "observed": "56 applicant records; CDL Training (56)",
+        "method": "signed-in administrator Program Holder preview"
+      },
+      "limitations": [
+        "individual Kirtan account/device not tested",
+        "applicant follow-up actions not performed"
+      ],
+      "rollback": "remove only newly added recruiting_enabled and recruiting_assignment keys if the saved assignment marker still matches this recovery directive; preserve all other features"
+    },
+    {
+      "id": "chunk-recovery-transition-destination",
+      "status": "validated-awaiting-ci-and-production",
+      "cause": "recovery uses location.href while App Router still displays previous route during failed navigation",
+      "evidence": "current production WebKit trace: orientation click, chunk 39189 cancellation/error, recovery to employer/setup?__elevate_reload",
+      "change": "retain recent same-origin navigation intent for recovery; ignore external links, modified clicks, downloads and new tabs",
+      "tests": "8 bootstrap tests and 4 strict WebKit cancellation tests passed; full LMS production compilation and generated-route typecheck passed"
+    },
+    {
+      "id": "employer-reports-schema-drift",
+      "status": "confirmed-open",
+      "cause": "reports query applications.employer_id, which does not exist in production; errors become zero counts",
+      "action": "repair canonical job-posting/application query and scope after current recovery validation"
+    },
+    {
+      "id": "employer-report-schema-failure",
+      "status": "deployed-verified-scoped-QA-report-rendering-on-five-device-profiles",
+      "cause": "reports queried applications.employer_id and referred_by absent in production; errors collapsed to zero",
+      "change": "canonical job_postings/job_applications/job_placements/referrals through signed-in RLS and canonical owner employer; query errors explicit",
+      "tests": "4 report contract tests plus 85 employer authorization tests passed; reports rendered heading added to portal acceptance"
+    },
+    {
+      "id": "paris-invented-deep-path-feedback",
+      "status": "deployed-narrow-tests-passed-autonomous-outcome-not-verified",
+      "cause": "fresh repair 08c1ab64 repeated nonexistent nested paths after parent-only feedback exhausted",
+      "change": "bounded credential-filtered root listing fallback; inspection and retry guards unchanged",
+      "tests": "19 targeted tests passed; full Admin compile and generated route typecheck passed"
+    },
+    {
+      "id": "paypal-mobile-target",
+      "status": "deployed-verified-scoped-QA-payout-geometry-on-five-device-profiles",
+      "cause": "payout PayPal confirmation checkbox used native 13px target",
+      "change": "44px target; no approval, verification or saved submission changes"
+    }
+  ],
+  "acceptance": "incomplete; no production-ready claim",
+  "phases": [
+    {
+      "phase": 1,
+      "status": "in_progress"
+    },
+    {
+      "phase": 2,
+      "status": "in_progress"
+    },
+    {
+      "phase": 3,
+      "status": "in_progress"
+    },
+    {
+      "phase": 4,
+      "status": "in_progress"
+    },
+    {
+      "phase": 5,
+      "status": "pending"
+    },
+    {
+      "phase": 6,
+      "status": "pending"
+    },
+    {
+      "phase": 7,
+      "status": "pending"
+    },
+    {
+      "phase": 8,
+      "status": "in_progress"
+    },
+    {
+      "phase": 9,
+      "status": "pending"
+    },
+    {
+      "phase": 10,
+      "status": "pending"
+    },
+    {
+      "phase": 11,
+      "status": "pending"
+    },
+    {
+      "phase": 12,
+      "status": "in_progress"
+    },
+    {
+      "phase": 13,
+      "status": "pending"
+    },
+    {
+      "phase": 14,
+      "status": "pending"
+    },
+    {
+      "phase": 15,
+      "status": "in_progress"
+    },
+    {
+      "phase": 16,
+      "status": "pending"
+    },
+    {
+      "phase": 17,
+      "status": "pending"
+    }
+  ],
+  "checks": [
+    {
+      "name": "release safety node regressions",
+      "passed": 38,
+      "failed": 0
+    },
+    {
+      "name": "readiness guard Python fixture cases",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "name": "targeted Vitest W9 authorization, schema and UI plus PARIS readiness",
+      "files": 4,
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "name": "LMS typecheck",
+      "status": "passed"
+    },
+    {
+      "name": "changed-file ESLint",
+      "status": "passed"
+    },
+    {
+      "name": "changed-file formatting",
+      "status": "passed"
+    },
+    {
+      "name": "LMS production build",
+      "status": "passed",
+      "build_identity": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+      "initial_setup_failure": "missing GIT_SHA; rerun with actual baseline SHA"
+    },
+    {
+      "name": "public route and redirect invariants",
+      "status": "passed"
+    },
+    {
+      "name": "PR 2409 initial required CI gate",
+      "source_sha": "7ba47f83406722feeeef4df02d3d03bcb575a128",
+      "status": "passed",
+      "next_step": "rerun required CI after adding the verified chunk-transition correction"
+    }
+  ],
+  "migration_inventory": {
+    "top_level_sql_files": 1432,
+    "pending_subdirectory_sql_files": 3,
+    "exact_matches": 904,
+    "same_version_different_name": 42,
+    "files_with_absent_version": 486,
+    "distinct_absent_versions": 469,
+    "production_only_versions": 569,
+    "names_present_under_other_version": 366,
+    "repository_names_absent": 159,
+    "production_names_absent": 200,
+    "object_reconciliation": "pending"
+  },
+  "security_baseline": {
+    "public_and_storage_tables": 1814,
+    "rls_disabled_tables": 0,
+    "policies": 7809,
+    "health_advisories": 0,
+    "meaning": "inventory only; no tenant-authorization acceptance inferred"
+  },
+  "pooling_baseline": {
+    "max_connections": 160,
+    "idle_transactions_followup": 0,
+    "ungranted_locks": 0,
+    "deadlocks": 0,
+    "database_timeout_ms": 120000,
+    "authenticated_role_statement_timeout": "8s",
+    "anon_role_statement_timeout": "3s",
+    "leak_confirmed": false
+  },
+  "learner_acceptance_baseline": {
+    "signed_evidence_records": 112,
+    "distinct_lesson_builds": 56,
+    "temporary_run_records": 0,
+    "acceptance": "evidence records do not alone prove current learner playback"
+  },
+  "repository_inventory_counts": {
+    "api_routes": 1223,
+    "page_sources": 1655,
+    "worker_named_files": 216,
+    "workflows": 278,
+    "environment_variable_references": 4232,
+    "todo_fixme_placeholder_stub_matches": 2178,
+    "interpretation": "candidate inventory; matches do not automatically establish defects"
+  },
+  "runtime_snapshot": {
+    "marketing": "652e85cac08daae06bbcaefa6b0f12d08c97730b",
+    "admin": "83ab4e87df0d9cb5217031fbab445a5b0ddc57ad",
+    "lms": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+    "store": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+    "meaning": "health endpoint identities; authenticated rendering not inferred"
+  },
+  "active_admin_release": {
+    "run_id": 42214167873,
+    "source_sha": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f",
+    "image_build": "passed",
+    "deployment": "verified",
+    "duplicate_release_started": false,
+    "observed_live_ready_sha": "ba156f4fdce0c103a4722c4d4b835ac4c9b06f1f"
+  },
+  "scheduler_evidence": {
+    "guarded_recovery": {
+      "status": "succeeded",
+      "observed_start": "2026-11-06T12:30:00Z"
+    },
+    "application_router": {
+      "status": "succeeded",
+      "observed_start": "2026-11-06T12:31:00Z"
+    },
+    "note": "scheduler receipt is not proof of course completion or applicant processing"
+  },
+  "local_webkit": {
+    "browser_download": "succeeded",
+    "host_dependencies": "unavailable",
+    "error": "install-deps requires root; su failed",
+    "fallback": "existing isolated Google/GitHub WebKit acceptance environment"
+  },
+  "live_schema_audit": {
+    "relations": 1870,
+    "select_calls": 5670,
+    "current_signatures": 27,
+    "new_signatures": 6,
+    "host_shop_legacy_guards": "no callers found; not proven Jamie runtime defect; no migration replayed"
+  },
+  "validation_latest": {
+    "targeted_tests_passed": 109,
+    "files": 6,
+    "admin_build_and_generated_typecheck": "passed",
+    "lms_build_and_generated_typecheck": "passed",
+    "required_ci_0375c21": "all required checks passed",
+    "production_verification_of_source_repairs": "pending",
+    "full_paris_preflight_tests_passed": 94,
+    "read_discovery_bound": "original three listing calls preserved; regression adds actual root recovery"
+  },
+  "dashboard_runtime_check_20261106": {
+    "checked_at": "2026-11-06T13:15:00Z",
+    "method": "authenticated desktop Chrome administrator/authorized read-only preview; no submissions",
+    "rendered": [
+      "host-shop dashboard J Noelle & Co.",
+      "host-shop onboarding documents",
+      "host-shop signed MOU status",
+      "host-shop onboarding profile",
+      "learner read-only Jamie preview",
+      "apprentice neutral admin preview",
+      "parent admin oversight",
+      "workforce overview",
+      "instructor dashboard",
+      "staff dashboard",
+      "testing center",
+      "workforce board oversight",
+      "case manager dashboard",
+      "provider oversight",
+      "admin dashboard",
+      "program-holder CDL assigned applications (earlier verified)"
+    ],
+    "access_limits": {
+      "employer": "Admin session routes to employer registry; individual employer reports require isolated employer acceptance",
+      "creator": "Admin session redirected with creator-access-required; creator account workflow unverified"
+    },
+    "not_verified": [
+      "Jamie own login/session",
+      "mobile Safari",
+      "real account write/save/upload behavior",
+      "every individual account/device"
+    ],
+    "participant_data_mutated": false,
+    "external_messages_sent": false
+  },
+  "release_verification_20261106": {
+    "observed_at": "2026-11-06T14:07:00Z",
+    "pr": 2409,
+    "validated_head": "369762c182a1ba92eef68422e01c0cdc8bc7c77e",
+    "merge_sha": "6ce0c9b664d44ed79bf256d6e9a805c0e731d93f",
+    "all_premerge_checks_passed": true,
+    "vitest": {
+      "files_passed": 1096,
+      "tests_passed": 6626,
+      "existing_skips": 8
+    },
+    "post_merge_ci": {
+      "run": 42225951378,
+      "status": "success"
+    },
+    "services": {
+      "lms": {
+        "revision": "elevate-lms-migration-00505-mrd",
+        "release_run": 42226003305,
+        "deployment": "success"
+      },
+      "admin": {
+        "revision": "elevate-admin-migration-00488-pn2",
+        "release_run": 42225983963,
+        "deployment": "success"
+      },
+      "marketing": {
+        "revision": "elevate-marketing-migration-r6ce0c9b6-42226009647-1",
+        "release_run": 42226009647,
+        "deployment": "success"
+      }
+    },
+    "authenticated_desktop_rendering": {
+      "method": "existing signed-in administrator session and authorized preview; rendered content inspected after activation",
+      "types": [
+        "host-shop",
+        "learner read-only preview",
+        "apprentice neutral administrator preview",
+        "program-holder",
+        "admin",
+        "instructor",
+        "staff",
+        "testing-center",
+        "parent oversight",
+        "workforce",
+        "workforce-board oversight",
+        "case-manager",
+        "provider oversight"
+      ],
+      "jamie_j_noelle": [
+        "dashboard rendered",
+        "document upload form and required records rendered",
+        "existing signed MOU status rendered",
+        "onboarding profile fields rendered"
+      ],
+      "program_holder": [
+        "CDL assigned applicants: 56; existing scope retained",
+        "W-9 visible checkbox measured 44 by 44 pixels",
+        "banking preview correctly read only"
+      ],
+      "studio": "heading and private model verified-reachable state rendered after Admin activation",
+      "chunk_recovery": "navigation-aware inline bootstrap observed in rendered page; forced production chunk failure not induced"
+    },
+    "acceptance": {
+      "lms_run": "42227376279",
+      "public_runtime": "passed",
+      "authenticated_functional": "passed",
+      "responsive_cross_device": "passed: 48 clean tests and 2 successful retries; 50 total",
+      "studio_device_step": "iPhone Course Builder link remained at dashboard; separate tablet click intercepted by mobile dock; iPhone recovery later interrupted dashboard navigation",
+      "coherent_release_employer_run": 42229571050,
+      "coherent_release_employer_source": "6ce0c9b664d44ed79bf256d6e9a805c0e731d93f",
+      "employer_desktop": "passed",
+      "employer_iphone": "failed: unhandled browser auth/notification access-control errors; cancellation evidence observed; not declared repaired",
+      "handoff_success_is_not_acceptance_success": true,
+      "qa_cleanup": "all three cleanup steps succeeded",
+      "live_revision_remained_attested": true
+    },
+    "not_verified": [
+      "Jamie individual login and Mobile Safari",
+      "every individual account or device",
+      "approved Creator account workflow",
+      "real customer saves/uploads/submissions",
+      "forced chunk recovery against authenticated production account",
+      "autonomous PARIS task completion"
+    ],
+    "protections": {
+      "customer_forms_submitted_during_manual_checks": false,
+      "participant_records_altered_merely_to_test": false,
+      "emails_sent": false,
+      "rls_or_authorization_weakened": false,
+      "financial_verification_or_approvals_changed": false,
+      "existing_isolated_ci_qa_framework": "standard deployment acceptance ran; active QA and cleanup were not interrupted"
+    },
+    "other_active_repair": {
+      "pr": 2410,
+      "status": "merged independently",
+      "merge_sha": "bca58282b83a53191b545831cdc78807c01d9a94",
+      "preserved_in_followup": true
+    },
+    "paris_latest_observation": {
+      "queued": 30,
+      "blocked": 28,
+      "latest_blocked_at": "2026-11-06T14:01:40Z",
+      "error": "PARIS_PLANNER_REPEATED_INSPECTION",
+      "conclusion": "narrow source discovery repair is deployed; autonomous recovery remains unverified"
+    },
+    "platform_production_ready": false
+  },
+  "admin_navigation_followup": {
+    "observed_at": "2026-11-06T14:21:32.606386+00:00",
+    "status": "implemented-narrow-validation-passed-not-deployed",
+    "source_evidence": {
+      "run": 42227376279,
+      "job": 127924193704,
+      "iphone": "/studio/courses remained at /dashboard; later __recover navigation interrupted dashboard goto",
+      "tablet": "Mobile admin navigation Courses span intercepted Open Course Builder click"
+    },
+    "root_causes": [
+      "AdminErrorBoundary owned an independent per-asset automatic reload in parallel with the head bootstrap",
+      "fixed mobile dock was not accounted for by native scroll-into-view clearance"
+    ],
+    "change": [
+      "React-caught chunks delegate to the canonical bounded bootstrap handler",
+      "global-error can install the same handler only when the head owner is absent",
+      "non-chunk server/authentication failures never trigger chunk recovery",
+      "mobile document actions get dock-aware scroll margins and padding; dock remains visible and interactive",
+      "Late recovery yields to full-document navigation; restored back/forward-cache pages can recover."
+    ],
+    "validation": {
+      "targeted_tests_before_leave_fence": 29,
+      "source_lint_before_leave_fence": "passed",
+      "added_leave_fence_regressions": 2,
+      "final_validation": "GitHub CI required; local exec-server transport disconnected during builds",
+      "local_executor": "unavailable",
+      "signed_in_browser": "unavailable after execution environment disconnected"
+    },
+    "branch": "fix/production-recovery-20261106",
+    "duplicate_of_pr_2410": false,
+    "auth_rls_participant_records_changed": false,
+    "pr": 2411,
+    "base_main": "bca58282b83a53191b545831cdc78807c01d9a94"
+  }
+}

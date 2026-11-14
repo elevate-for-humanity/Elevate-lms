@@ -1,0 +1,251 @@
+import type { ProgramSchema } from '@/lib/programs/program-schema';
+export const GRAPHIC_DESIGN: ProgramSchema = {
+  slug: 'graphic-design',
+  title: 'Graphic Design',
+  videoSrc: '/videos/it-technology.mp4',
+  subtitle:
+    'Learn Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional credentials in 10 weeks.',
+  sector: 'technology',
+  category: 'Graphic Design',
+  programType: 'workforce',
+  heroImage: '/images/pexels/webdev.webp',
+  heroImageAlt: 'Graphic design student working in Adobe Creative Suite',
+  deliveryMode: 'hybrid',
+  deliveredBy: 'Elevate',
+  durationWeeks: 10,
+  hoursPerWeekMin: 20,
+  hoursPerWeekMax: 25,
+  hoursBreakdown: { onlineInstruction: 50, handsOnLab: 130, examPrep: 20, careerPlacement: 20 },
+  schedule: 'Mon–Fri, 9:00 AM–1:00 PM',
+  cohortSize: '10–14 participants per cohort',
+  fundingStatement:
+    'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
+  selfPayCost: '$4,000',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  badge: 'Funding Available',
+  badgeColor: 'green',
+  credentials: [
+    {
+      name: 'Adobe Certified Professional — Photoshop',
+      issuer: 'Adobe / Certiport',
+      description: 'Certification in Adobe Photoshop for image editing and compositing.',
+      validity: 'Lifetime (version-specific)',
+    },
+    {
+      name: 'Adobe Certified Professional — Illustrator',
+      issuer: 'Adobe / Certiport',
+      description: 'Certification in Adobe Illustrator for vector graphics.',
+      validity: 'Lifetime (version-specific)',
+    },
+    {
+      name: 'Adobe Certified Professional — InDesign',
+      issuer: 'Adobe / Certiport',
+      description: 'Certification in Adobe InDesign for print and digital layout.',
+      validity: 'Lifetime (version-specific)',
+    },
+  ],
+  outcomes: [
+    {
+      statement: 'Edit and composite images in Photoshop using layers, masks, and adjustment tools',
+      assessedAt: 'Week 3',
+    },
+    { statement: 'Create vector logos and illustrations in Illustrator', assessedAt: 'Week 5' },
+    {
+      statement: 'Design multi-page layouts in InDesign with proper typography',
+      assessedAt: 'Week 7',
+    },
+    {
+      statement: 'Apply color theory and design principles to client projects',
+      assessedAt: 'Week 4',
+    },
+    { statement: 'Build a professional design portfolio with 5+ projects', assessedAt: 'Week 9' },
+  ],
+  careerPathway: [
+    {
+      title: 'Junior Graphic Designer',
+      timeframe: '0–6 months',
+      requirements: 'Adobe certifications + portfolio',
+      salaryRange: '$32,000–$42,000',
+    },
+    {
+      title: 'Graphic Designer',
+      timeframe: '1–3 years',
+      requirements: 'Certifications + experience',
+      salaryRange: '$42,000–$58,000',
+    },
+    {
+      title: 'Senior Designer',
+      timeframe: '3–5 years',
+      requirements: 'Portfolio + specialization',
+      salaryRange: '$55,000–$75,000',
+    },
+    {
+      title: 'Art Director',
+      timeframe: '5+ years',
+      requirements: 'Leadership + creative direction',
+      salaryRange: '$70,000–$100,000',
+    },
+  ],
+  weeklySchedule: [
+    {
+      week: 'Week 1',
+      title: 'Design Principles & Color Theory',
+      competencyMilestone: 'Apply design principles to layout compositions',
+    },
+    {
+      week: 'Weeks 2–3',
+      title: 'Adobe Photoshop',
+      competencyMilestone: 'Edit and composite images using layers and masks',
+    },
+    {
+      week: 'Weeks 4–5',
+      title: 'Adobe Illustrator',
+      competencyMilestone: 'Create vector logos and illustrations',
+    },
+    {
+      week: 'Weeks 6–7',
+      title: 'Adobe InDesign',
+      competencyMilestone: 'Design multi-page layouts with typography',
+    },
+    {
+      week: 'Weeks 8–9',
+      title: 'Portfolio Development',
+      competencyMilestone: 'Complete 5+ portfolio projects',
+    },
+    {
+      week: 'Week 10',
+      title: 'Certification & Career Placement',
+      competencyMilestone: 'Pass Adobe certification exams',
+    },
+  ],
+  curriculum: [
+    {
+      title: 'Photoshop',
+      topics: [
+        'Image editing and retouching',
+        'Layers and masks',
+        'Color correction',
+        'Compositing',
+        'Export for web and print',
+      ],
+    },
+    {
+      title: 'Illustrator',
+      topics: [
+        'Vector drawing tools',
+        'Logo design',
+        'Typography',
+        'Pattern and icon design',
+        'Print preparation',
+      ],
+    },
+    {
+      title: 'InDesign',
+      topics: [
+        'Page layout',
+        'Master pages and styles',
+        'Typography and grids',
+        'Interactive PDFs',
+        'Print production',
+      ],
+    },
+    {
+      title: 'Design Fundamentals',
+      topics: [
+        'Color theory',
+        'Composition and layout',
+        'Typography principles',
+        'Brand identity',
+        'Client communication',
+      ],
+    },
+  ],
+  complianceAlignment: [
+    {
+      standard: 'Adobe Certified Professional Standards',
+      description: 'Curriculum aligned to Adobe certification exam objectives.',
+    },
+    {
+      standard: 'WIOA Title I',
+      description: 'Program meets WIOA eligibility for Individual Training Accounts.',
+    },
+  ],
+  credentialPipeline: [
+    {
+      training: 'Graphic Design (10 weeks)',
+      certification: 'Adobe Certified Professional (3 apps)',
+      certBody: 'Adobe / Certiport',
+      jobRole: 'Graphic Designer',
+    },
+  ],
+  laborMarket: {
+    medianSalary: 57990,
+    salaryRange: '$32,000–$100,000',
+    growthRate: '3% (as fast as average)',
+    source: 'U.S. Bureau of Labor Statistics',
+    sourceYear: 2024,
+    region: 'Indianapolis-Carmel-Anderson MSA',
+  },
+  careers: [
+    { title: 'Graphic Designer', salary: '$42,000–$58,000' },
+    { title: 'Senior Designer', salary: '$55,000–$75,000' },
+    { title: 'Art Director', salary: '$70,000–$100,000' },
+  ],
+  cta: {
+    applyHref: '/apply?program=graphic-design',
+    requestInfoHref: '/programs/graphic-design/request-info',
+    careerConnectHref:
+      'https://www.indianacareerconnect.com/jobs/search?q=graphic+designer&location=Indiana',
+    advisorHref: '/contact',
+    courseHref: '/programs/graphic-design',
+  },
+  admissionRequirements: [
+    '18 years or older',
+    'High school diploma or GED',
+    'Basic computer skills',
+    'No prior design experience required',
+  ],
+  equipmentIncluded:
+    'Workstation provided during training. Adobe Creative Cloud licenses and certification exam fees included.',
+  modality: 'Hybrid — In-person computer labs, LMS-supported coursework',
+  facilityInfo: 'Elevate training center, Indianapolis',
+  employerPartners: ['Indianapolis-area marketing agencies and design studios'],
+  pricingIncludes: [
+    '220 instructional hours',
+    '3 Adobe certification exams',
+    'Adobe Creative Cloud license',
+    'Portfolio hosting',
+    'Career placement support',
+  ],
+  paymentTerms:
+    'WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $4,000 with payment plans.',
+  faqs: [
+    {
+      question: 'Do I need art experience?',
+      answer:
+        'No. The program teaches design principles and software skills from scratch. Creativity helps, but technical skills are learned.',
+    },
+    {
+      question: 'Will I have a portfolio?',
+      answer:
+        'Yes. You will complete 5+ projects that form a professional portfolio for job applications.',
+    },
+  ],
+  breadcrumbs: [
+    { label: 'Home', href: '/' },
+    { label: 'Programs', href: '/programs' },
+    { label: 'Graphic Design' },
+  ],
+  metaTitle: 'Graphic Design | Adobe Certified Professional | Indianapolis',
+  metaDescription:
+    'Learn Photoshop, Illustrator, and InDesign in 10 weeks. Prepare for 3 Adobe certifications. Designers earn $57,990/year. Indianapolis. WIOA funding available for eligible Indiana residents.',
+
+
+  funding: {
+    wioa_eligible: true,
+    fssa_eligible: true,
+    wrg_eligible: true,
+    jobReadyIndyEligible: true,
+    fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',
+  },
+};

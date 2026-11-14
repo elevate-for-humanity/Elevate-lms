@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-07-07T08:39:58.275Z",
+  "totalImages": 852,
+  "totalSizeMB": 83.04,
+  "byCategory": {
+    "icons": {
+      "count": 29,
+      "totalSizeKB": 1062
+    },
+    "other": {
+      "count": 347,
+      "totalSizeKB": 37365
+    },
+    "program": {
+      "count": 37,
+      "totalSizeKB": 4527
+    },
+    "hero": {
+      "count": 217,
+      "totalSizeKB": 25189
+    },
+    "beauty": {
+      "count": 26,
+      "totalSizeKB": 1698
+    },
+    "trades": {
+      "count": 22,
+      "totalSizeKB": 3097
+    },
+    "healthcare": {
+      "count": 21,
+      "totalSizeKB": 1782
+    },
+    "partners": {
+      "count": 64,
+      "totalSizeKB": 3747
+    },
+    "people": {
+      "count": 77,
+      "totalSizeKB": 5298
+    },
+    "misc": {
+      "count": 3,
+      "totalSizeKB": 127
+    },
+    "facilities": {
+      "count": 5,
+      "totalSizeKB": 765
+    },
+    "testimonials": {
+      "count": 4,
+      "totalSizeKB": 380
+    }
+  },
+  "lowQualityFlags": [],
+  "genericNames": [],
+  "needsSEO": []
+}

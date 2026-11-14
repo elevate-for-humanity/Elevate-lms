@@ -1,0 +1,35 @@
+name: Dev Studio Infrastructure Audit Worker
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: devstudio-infrastructure-audit-worker
+  cancel-in-progress: false
+
+jobs:
+  read-only-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Audit queued Dev Studio infrastructure jobs
+        env:
+          SUPABASE_URL: https://cuxzzpsyufcewtmicszk.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/gcp/devstudio-infrastructure-audit.mjs
+
+      - name: Verify safe scale-down prerequisites (read-only)
+        run: node scripts/gcp/cloud-run-scaling-preflight.mjs

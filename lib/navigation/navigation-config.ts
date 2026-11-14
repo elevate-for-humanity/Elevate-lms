@@ -1,0 +1,844 @@
+// lib/navigation/navigation-config.ts
+// Canonical portal-level navigation. Database role aliases map into these
+// portal menus; they do not maintain separate route trees.
+
+import type React from 'react';
+import {
+  Activity,
+  Award,
+  BarChart3,
+  BookOpen,
+  Briefcase,
+  Building2,
+  Calendar,
+  ClipboardCheck,
+  ClipboardList,
+  Clock,
+  DollarSign,
+  FileText,
+  GraduationCap,
+  LayoutDashboard,
+  Palette,
+  Plus,
+  Phone,
+  Mail,
+  Settings,
+  Shield,
+  Target,
+  Users,
+} from 'lucide-react';
+import { PortalRouter } from '@/lib/routing/portal-router';
+import { LMS_HOST } from '@/lib/routing/portal-map';
+
+export type UserRole =
+  | 'student'
+  | 'learner'
+  | 'user'
+  | 'delegate'
+  | 'grant_client'
+  | 'apprentice'
+  | 'barber_apprentice'
+  | 'cosmetology_apprentice'
+  | 'instructor'
+  | 'employer'
+  | 'sponsor'
+  | 'recruiter'
+  | 'partner'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'host_shop_admin'
+  | 'mentor'
+  | 'staff'
+  | 'case_manager'
+  | 'workforce'
+  | 'workforce_partner'
+  | 'workforce_board'
+  | 'workforce_board_admin'
+  | 'government'
+  | 'program_holder'
+  | 'site_coordinator'
+  | 'provider'
+  | 'provider_admin'
+  | 'creator'
+  | 'parent'
+  | 'admin'
+  | 'org_admin'
+  | 'super_admin'
+  | 'advisor'
+  | 'test_admin'
+  | 'proctor'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
+
+export type NavigationRole =
+  | 'student'
+  | 'apprentice'
+  | 'instructor'
+  | 'employer'
+  | 'host_shop'
+  | 'staff'
+  | 'case_manager'
+  | 'workforce'
+  | 'workforce_board'
+  | 'program_holder'
+  | 'provider'
+  | 'creator'
+  | 'parent'
+  | 'admin'
+  | 'testing';
+
+export interface NavItem {
+  id: string;
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number | string;
+  children?: NavItem[];
+  dividerBefore?: boolean;
+}
+export interface ActionItem {
+  id: string;
+  label: string;
+  href?: string;
+  onClick?: () => void;
+  icon?: React.ComponentType<{ className?: string }>;
+  variant?: 'primary' | 'secondary' | 'ghost';
+}
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+export interface NavSection {
+  id: string;
+  label?: string;
+  items: NavItem[];
+}
+
+const p = (key: Parameters<typeof PortalRouter.get>[0], path?: string) =>
+  path ? PortalRouter.getPath(key, path) : PortalRouter.get(key);
+
+export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
+  student: [
+    {
+      id: 'learning',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('lms'), icon: LayoutDashboard },
+        {
+          id: 'dashboard-orientation',
+          label: 'Dashboard & Class Guide',
+          href: `${p('lms', 'dashboard')}#orientation`,
+          icon: BookOpen,
+        },
+        {
+          id: 'interoffice-email',
+          label: 'Interoffice Email',
+          href: '/communications/email',
+          icon: Mail,
+        },
+        { id: 'learner-messages', label: 'Messages', href: p('lms', 'messages'), icon: Mail },
+        { id: 'learner-support', label: 'Get Help', href: p('lms', 'support'), icon: Phone },
+        {
+          id: 'upload-credential',
+          label: 'Upload Credentials',
+          href: p('lms', 'certification/upload'),
+          icon: Award,
+        },
+        {
+          id: 'onboarding',
+          label: 'Onboarding',
+          href: p('lms', 'onboarding'),
+          icon: ClipboardList,
+        },
+        {
+          id: 'documents',
+          label: 'Documents & Records',
+          href: p('lms', 'documents'),
+          icon: FileText,
+        },
+        { id: 'agreements', label: 'Agreements', href: p('lms', 'agreements'), icon: Shield },
+        { id: 'handbook', label: 'Student Handbook', href: p('lms', 'handbook'), icon: BookOpen },
+        { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), icon: BookOpen },
+        { id: 'workbooks', label: 'My Workbooks', href: `${LMS_HOST}/workbooks`, icon: BookOpen },
+        { id: 'community', label: 'Student Community', href: p('lms', 'community'), icon: Users },
+        { id: 'progress', label: 'Progress', href: p('lms', 'progress'), icon: BarChart3 },
+        {
+          id: 'assignments',
+          label: 'Assignments',
+          href: p('lms', 'assignments'),
+          icon: ClipboardCheck,
+        },
+        {
+          id: 'calendar',
+          label: 'Calendar & Appointments',
+          href: p('lms', 'calendar'),
+          icon: Calendar,
+        },
+        { id: 'certificates', label: 'Certificates', href: p('lms', 'certificates'), icon: Award },
+        { id: 'career', label: 'Career Services', href: p('lms', 'career'), icon: Briefcase },
+        { id: 'resume', label: 'Resume Builder', href: p('lms', 'resume-builder'), icon: FileText },
+        { id: 'profile', label: 'My Profile & Photo', href: p('lms', 'profile'), icon: Users },
+      ],
+    },
+  ],
+  apprentice: [
+    {
+      id: 'apprenticeship',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
+        { id: 'theory', label: 'My Lessons', href: p('apprentice', 'theory'), icon: BookOpen },
+        { id: 'class-assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: FileText },
+        { id: 'class-quizzes', label: 'My Quizzes & Exams', href: p('lms', 'quizzes'), icon: ClipboardCheck },
+        { id: 'class-grades', label: 'My Grades & Feedback', href: p('lms', 'grades'), icon: Award },
+        { id: 'theory-schedule', label: 'My Study Times', href: p('apprentice', 'theory-schedule'), icon: Calendar },
+        { id: 'syllabus', label: 'Course Syllabus', href: p('apprentice', 'syllabus'), icon: FileText },
+        { id: 'class-calendar', label: 'Class Calendar', href: p('lms', 'calendar'), icon: Calendar },
+        { id: 'workbook', label: 'My Workbook', href: p('apprentice', 'workbook'), icon: BookOpen },
+        { id: 'training-records', label: 'Progress & Setup', href: `${p('apprentice')}?view=records`, icon: BarChart3 },
+        { id: 'profile', label: 'My Profile', href: p('apprentice', 'profile'), icon: Users },
+        {
+          id: 'orientation',
+          label: 'Orientation',
+          href: p('apprentice', 'orientation'),
+          icon: ClipboardList,
+        },
+        { id: 'hours', label: 'Work Hours', href: p('apprentice', 'hours'), icon: Clock },
+        { id: 'timeclock', label: 'Timeclock', href: p('apprentice', 'timeclock'), icon: Clock },
+        {
+          id: 'timeclock-policy',
+          label: 'Clock & Geofence Rules',
+          href: p('apprentice', 'policies/timeclock'),
+          icon: Shield,
+        },
+        {
+          id: 'competencies',
+          label: 'Competencies',
+          href: p('apprentice', 'competencies'),
+          icon: Target,
+        },
+        { id: 'documents', label: 'Documents', href: p('apprentice', 'documents'), icon: FileText },
+        { id: 'career', label: 'Career Services', href: '/lms/career', icon: Briefcase },
+        { id: 'resume', label: 'Resume Builder', href: '/lms/resume-builder', icon: FileText },
+        {
+          id: 'credentials',
+          label: 'Upload Credentials',
+          href: '/lms/certification/upload',
+          icon: Award,
+        },
+        { id: 'community', label: 'Community', href: '/lms/community', icon: Users },
+        { id: 'email', label: 'Inter-office Email', href: '/communications/email', icon: Mail },
+        {
+          id: 'billing',
+          label: 'Billing & Payments',
+          href: p('apprentice', 'billing'),
+          icon: ClipboardCheck,
+        },
+        {
+          id: 'payment-policy',
+          label: 'Payment Rules',
+          href: p('apprentice', 'policies/payments'),
+          icon: Shield,
+        },
+        { id: 'rti', label: 'RTI Hours & Evidence', href: p('apprentice', 'rti'), icon: BookOpen },
+        {
+          id: 'handbook',
+          label: 'Handbook',
+          href: p('apprentice', 'handbook'),
+          icon: ClipboardList,
+        },
+        {
+          id: 'state-board',
+          label: 'State Board',
+          href: p('apprentice', 'state-board'),
+          icon: Shield,
+        },
+      ],
+    },
+  ],
+  employer: [
+    {
+      id: 'operations',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('employer'), icon: LayoutDashboard },
+        { id: 'setup', label: 'Complete Setup', href: p('employer', 'setup'), icon: ClipboardCheck },
+        { id: 'documents', label: 'Documents & Agreements', href: p('employer', 'documents'), icon: FileText },
+        { id: 'settings', label: 'Company Settings', href: p('employer', 'settings'), icon: Settings },
+        { id: 'jobs', label: 'Job Postings', href: p('employer', 'jobs'), icon: Briefcase },
+        {
+          id: 'applications',
+          label: 'Applications',
+          href: p('employer', 'applications'),
+          icon: Users,
+        },
+        {
+          id: 'apprenticeships',
+          label: 'Apprenticeships',
+          href: p('employer', 'apprenticeships'),
+          icon: GraduationCap,
+        },
+        {
+          id: 'company',
+          label: 'Company Profile',
+          href: p('employer', 'company'),
+          icon: Building2,
+        },
+        { id: 'reports', label: 'Reports', href: p('employer', 'reports'), icon: BarChart3 },
+      ],
+    },
+  ],
+  host_shop: [
+    {
+      id: 'host-shop',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('hostshop'), icon: LayoutDashboard },
+        {
+          id: 'apprentices',
+          label: 'Apprentices',
+          href: p('hostshop', 'dashboard/apprentices'),
+          icon: GraduationCap,
+        },
+        {
+          id: 'attendance',
+          label: 'Attendance',
+          href: p('hostshop', 'dashboard/attendance'),
+          icon: Calendar,
+        },
+        { id: 'hours', label: 'Work Hours', href: p('hostshop', 'dashboard/hours'), icon: Clock },
+        {
+          id: 'practical-log',
+          label: 'Record Student Progress',
+          href: p('hostshop', 'dashboard/practical-log'),
+          icon: ClipboardList,
+        },
+        {
+          id: 'match-requests',
+          label: 'Match Requests',
+          href: p('hostshop', 'dashboard/match-requests'),
+          icon: Users,
+        },
+        { id: 'email', label: 'Email', href: p('hostshop', 'email'), icon: Mail },
+        { id: 'orientation', label: 'Orientation', href: p('hostshop', 'orientation'), icon: BookOpen },
+        {
+          id: 'community',
+          label: 'Barber & Beauty Network',
+          href: p('hostshop', 'dashboard/community'),
+          icon: Users,
+        },
+        {
+          id: 'competencies',
+          label: 'Competencies',
+          href: p('hostshop', 'dashboard/competencies'),
+          icon: ClipboardCheck,
+        },
+        { id: 'wages', label: 'Wage Compliance', href: p('hostshop', 'dashboard/wages'), icon: BarChart3 },
+        { id: 'documents', label: 'Documents', href: p('hostshop', 'dashboard/documents'), icon: FileText },
+        { id: 'student-certificates', label: 'Student Certificates', href: p('hostshop', 'dashboard/certificates'), icon: Award },
+        {
+          id: 'resources',
+          label: 'Guides & Agreements',
+          href: p('hostshop', 'dashboard/resources'),
+          icon: ClipboardList,
+        },
+        { id: 'schedule', label: 'Schedule', href: p('hostshop', 'dashboard/schedule'), icon: Calendar },
+        { id: 'messages', label: 'Messages', href: p('hostshop', 'dashboard/messages'), icon: Users },
+        {
+          id: 'communications',
+          label: 'Communications',
+          href: p('hostshop', 'dashboard/communications'),
+          icon: Mail,
+        },
+        { id: 'phone', label: 'Phone & Extension', href: p('hostshop', 'dashboard/phone'), icon: Phone },
+        { id: 'reports', label: 'Reports', href: p('hostshop', 'dashboard/reports'), icon: BarChart3 },
+        { id: 'programs', label: 'Programs', href: p('hostshop', 'dashboard/programs'), icon: BookOpen },
+        { id: 'profile', label: 'Shop Profile', href: p('hostshop', 'dashboard/profile'), icon: Building2 },
+        { id: 'store', label: 'Store', href: p('hostshop', 'dashboard/store'), icon: Palette },
+        { id: 'settings', label: 'Settings', href: p('hostshop', 'dashboard/settings'), icon: Settings },
+        { id: 'mou', label: 'MOU', href: p('hostshop', 'onboarding/mou'), icon: ClipboardList },
+      ],
+    },
+  ],
+  instructor: [
+    {
+      id: 'instruction',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('instructor'), icon: LayoutDashboard },
+        { id: 'students', label: 'Students', href: p('instructor', 'students'), icon: Users },
+        { id: 'courses', label: 'Courses', href: p('instructor', 'courses'), icon: BookOpen },
+        {
+          id: 'attendance',
+          label: 'Attendance',
+          href: p('instructor', 'attendance'),
+          icon: Calendar,
+        },
+      ],
+    },
+  ],
+  staff: [
+    {
+      id: 'staff',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('staff'), icon: LayoutDashboard },
+        { id: 'students', label: 'Students', href: p('staff', 'students'), icon: Users },
+        { id: 'courses', label: 'Courses', href: p('staff', 'courses'), icon: BookOpen },
+        { id: 'reports', label: 'Reports', href: p('staff', 'reports'), icon: BarChart3 },
+        { id: 'training', label: 'Staff Training', href: p('staff', 'training'), icon: GraduationCap },
+      ],
+    },
+  ],
+  testing: [
+    {
+      id: 'testing',
+      items: [
+        { id: 'dashboard', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck },
+      ],
+    },
+  ],
+  admin: [
+    {
+      id: 'main',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('admin'), icon: LayoutDashboard },
+        {
+          id: 'applications',
+          label: 'Applications',
+          href: p('admin', 'applications'),
+          icon: FileText,
+        },
+        { id: 'students', label: 'Students', href: p('admin', 'students'), icon: Users },
+        { id: 'programs', label: 'Programs', href: p('admin', 'programs'), icon: BookOpen },
+        { id: 'crm', label: 'CRM', href: p('admin', 'crm'), icon: Activity },
+        { id: 'compliance', label: 'Compliance', href: p('admin', 'compliance'), icon: Shield },
+        { id: 'studio', label: 'Studio', href: p('admin', 'studio'), icon: Settings },
+        { id: 'testing', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck },
+        { id: 'health', label: 'System Health', href: p('admin', 'system-health'), icon: Activity },
+      ],
+    },
+  ],
+  workforce: [
+    {
+      id: 'workforce',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('workforce'), icon: LayoutDashboard },
+        {
+          id: 'participants',
+          label: 'Participants',
+          href: p('workforce', 'participants'),
+          icon: Users,
+        },
+        {
+          id: 'placements',
+          label: 'Placements',
+          href: p('workforce', 'placements'),
+          icon: Briefcase,
+        },
+        {
+          id: 'wioa-export',
+          label: 'WIOA Export',
+          href: p('workforce', 'wioa-export'),
+          icon: FileText,
+        },
+        {
+          id: 'follow-ups',
+          label: 'Follow-Ups',
+          href: p('workforce', 'follow-ups'),
+          icon: ClipboardCheck,
+        },
+        {
+          id: 'eligibility',
+          label: 'Eligibility',
+          href: p('workforce', 'eligibility'),
+          icon: Shield,
+        },
+        {
+          id: 'supportive-services',
+          label: 'Supportive Services',
+          href: p('workforce', 'supportive-services'),
+          icon: Users,
+        },
+      ],
+    },
+  ],
+  parent: [
+    {
+      id: 'parent',
+      items: [{ id: 'dashboard', label: 'Dashboard', href: p('parent'), icon: LayoutDashboard }],
+    },
+  ],
+  case_manager: [
+    {
+      id: 'case-manager',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('casemanager'), icon: LayoutDashboard },
+        {
+          id: 'participants',
+          label: 'Participants',
+          href: p('casemanager', 'participants'),
+          icon: Users,
+        },
+        {
+          id: 'placements',
+          label: 'Placements',
+          href: p('casemanager', 'placements'),
+          icon: Briefcase,
+        },
+        {
+          id: 'analytics',
+          label: 'Analytics',
+          href: p('casemanager', 'analytics'),
+          icon: BarChart3,
+        },
+        {
+          id: 'wioa-report',
+          label: 'WIOA Reporting',
+          href: p('casemanager', 'reports/wioa'),
+          icon: FileText,
+        },
+      ],
+    },
+  ],
+  workforce_board: [
+    {
+      id: 'workforce-board',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('workforceboard'), icon: LayoutDashboard },
+        {
+          id: 'employment',
+          label: 'Employment Outcomes',
+          href: p('workforceboard', 'employment'),
+          icon: Briefcase,
+        },
+      ],
+    },
+  ],
+  program_holder: [
+    {
+      id: 'holder-home',
+      label: 'Start',
+      items: [
+        {
+          id: 'dashboard',
+          label: 'To-dos & Alerts',
+          href: p('programholder'),
+          icon: LayoutDashboard,
+        },
+        {
+          id: 'start-here',
+          label: 'Start Here · PARIS',
+          href: '/program-holder/how-to-use',
+          icon: BookOpen,
+        },
+      ],
+    },
+    {
+      id: 'holder-students',
+      label: 'People',
+      items: [
+        { id: 'recruiting', label: 'Recruiting', href: '/program-holder/recruiting', icon: Users },
+        {
+          id: 'pending',
+          label: 'Assigned Applications',
+          href: '/program-holder/students/pending',
+          icon: Users,
+        },
+        {
+          id: 'students',
+          label: 'Students',
+          href: '/program-holder/students',
+          icon: GraduationCap,
+        },
+        {
+          id: 'at-risk',
+          label: 'Student Follow-up',
+          href: '/program-holder/students/at-risk',
+          icon: Target,
+        },
+      ],
+    },
+    {
+      id: 'holder-training',
+      label: 'Training',
+      items: [
+        {
+          id: 'programs',
+          label: 'Programs & Courses',
+          href: '/program-holder/programs',
+          icon: BookOpen,
+        },
+        { id: 'hours', label: 'Training Hours', href: '/program-holder/hours', icon: Clock },
+        {
+          id: 'ready-to-test',
+          label: 'Ready to Test',
+          href: '/program-holder/ready-to-test',
+          icon: FileText,
+        },
+        {
+          id: 'reports',
+          label: 'Progress Reports',
+          href: '/program-holder/reports',
+          icon: BarChart3,
+        },
+        { id: 'career', label: 'Career Services', href: '/program-holder/career', icon: Briefcase },
+      ],
+    },
+    {
+      id: 'holder-office',
+      label: 'Office',
+      items: [
+        {
+          id: 'meetings',
+          label: 'Calendar & Video',
+          href: '/program-holder/meetings',
+          icon: Calendar,
+        },
+        { id: 'phone', label: 'Phone', href: '/program-holder/phone', icon: Phone },
+        {
+          id: 'airscript',
+          label: 'AirScript',
+          href: '/program-holder/airscript',
+          icon: ClipboardList,
+        },
+        { id: 'email', label: 'Email', href: '/program-holder/email', icon: Mail },
+        { id: 'office-mail', label: 'Office Messages', href: '/program-holder/inbox', icon: Mail },
+        { id: 'community', label: 'Community', href: '/program-holder/community', icon: Users },
+      ],
+    },
+    {
+      id: 'holder-records',
+      label: 'Records & Setup',
+      items: [
+        { id: 'documents', label: 'Documents', href: '/program-holder/documents', icon: FileText },
+        { id: 'handbook', label: 'Handbook', href: '/program-holder/handbook', icon: BookOpen },
+        {
+          id: 'sign-mou',
+          label: 'Sign Agreement',
+          href: '/program-holder/sign-mou',
+          icon: FileText,
+        },
+        { id: 'compliance', label: 'Compliance', href: '/program-holder/compliance', icon: Shield },
+        {
+          id: 'agreement',
+          label: 'Agreement & Duties',
+          href: '/program-holder/rights-responsibilities',
+          icon: ClipboardCheck,
+        },
+        {
+          id: 'payouts',
+          label: 'Payments & Invoices',
+          href: '/program-holder/payouts',
+          icon: DollarSign,
+        },
+        {
+          id: 'onboarding',
+          label: 'Onboarding',
+          href: '/program-holder/onboarding',
+          icon: ClipboardList,
+        },
+        { id: 'settings', label: 'Office Setup', href: '/program-holder/settings', icon: Settings },
+      ],
+    },
+  ],
+  provider: [
+    {
+      id: 'provider',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', href: p('provider'), icon: LayoutDashboard },
+        { id: 'programs', label: 'Programs', href: p('provider', 'programs'), icon: BookOpen },
+        { id: 'compliance', label: 'Compliance', href: p('provider', 'compliance'), icon: Shield },
+        { id: 'settings', label: 'Settings', href: p('provider', 'settings'), icon: Settings },
+      ],
+    },
+  ],
+  creator: [
+    {
+      id: 'creator',
+      items: [{ id: 'products', label: 'Creator Studio', href: p('creator'), icon: Palette }],
+    },
+  ],
+};
+
+const ROLE_TO_NAVIGATION: Readonly<Record<UserRole, NavigationRole>> = {
+  student: 'student',
+  learner: 'student',
+  user: 'student',
+  delegate: 'student',
+  grant_client: 'student',
+  apprentice: 'apprentice',
+  barber_apprentice: 'apprentice',
+  cosmetology_apprentice: 'apprentice',
+  instructor: 'instructor',
+  employer: 'employer',
+  sponsor: 'employer',
+  recruiter: 'employer',
+  partner: 'host_shop',
+  partner_admin: 'host_shop',
+  host_shop: 'host_shop',
+  host_shop_admin: 'host_shop',
+  mentor: 'host_shop',
+  staff: 'staff',
+  case_manager: 'case_manager',
+  workforce: 'workforce',
+  workforce_partner: 'workforce',
+  workforce_board: 'workforce_board',
+  workforce_board_admin: 'workforce_board',
+  government: 'workforce_board',
+  program_holder: 'program_holder',
+  site_coordinator: 'program_holder',
+  provider: 'provider',
+  provider_admin: 'provider',
+  creator: 'creator',
+  parent: 'parent',
+  admin: 'admin',
+  org_admin: 'admin',
+  super_admin: 'admin',
+  advisor: 'admin',
+  financial_aid: 'admin',
+  compliance: 'admin',
+  dev_studio: 'admin',
+  test_admin: 'testing',
+  proctor: 'testing',
+  testing_center: 'testing',
+};
+
+export function getNavigationRole(role: UserRole): NavigationRole {
+  return ROLE_TO_NAVIGATION[role] ?? 'student';
+}
+export function getNavigationForRole(role: UserRole): NavSection[] {
+  const navigationRole = getNavigationRole(role);
+  const sections = ROLE_NAVIGATION[navigationRole];
+  const groups = WORKSPACE_GROUPS[navigationRole];
+  if (!groups) return sections;
+  const items = sections.flatMap((section) => section.items);
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const used = new Set<string>();
+  const grouped = groups.map(([id, label, ids]) => ({
+    id,
+    label,
+    items: ids.flatMap((itemId) => {
+      const item = byId.get(itemId);
+      if (!item || used.has(itemId)) return [];
+      used.add(itemId);
+      return [item];
+    }),
+  })).filter((section) => section.items.length > 0);
+  const remaining = items.filter((item) => !used.has(item.id));
+  return remaining.length
+    ? [...grouped, { id: 'more-tools', label: 'More tools', items: remaining }]
+    : grouped;
+}
+export function getFlatNavItems(role: UserRole): NavItem[] {
+  return getNavigationForRole(role).flatMap((section) => section.items);
+}
+
+
+/** Group existing tools without maintaining a second set of URLs or hiding tools. */
+const WORKSPACE_GROUPS: Partial<Record<NavigationRole, Array<[string, string, string[]]>>> = {
+  student: [
+    ['today', 'Start here', ['dashboard', 'courses', 'assignments', 'calendar', 'learner-support']],
+    ['learning', 'Learning & progress', ['workbooks', 'progress', 'certificates', 'upload-credential']],
+    ['records', 'Documents & setup', ['onboarding', 'documents', 'agreements', 'handbook', 'profile', 'dashboard-orientation']],
+    ['connect', 'Messages & career', ['learner-messages', 'interoffice-email', 'community', 'career', 'resume']],
+  ],
+  apprentice: [
+    ['today', 'Daily training', ['dashboard', 'theory', 'workbook', 'timeclock', 'hours']],
+    ['learning', 'Theory & progress', ['class-assignments', 'class-quizzes', 'class-grades', 'class-calendar', 'theory-schedule', 'syllabus', 'rti', 'competencies', 'training-records']],
+    ['setup', 'Documents & requirements', ['profile', 'orientation', 'documents', 'handbook', 'timeclock-policy', 'state-board']],
+    ['billing', 'Payments', ['billing', 'payment-policy']],
+    ['connect', 'Messages & career', ['email', 'community', 'credentials', 'career', 'resume']],
+  ],
+  host_shop: [
+    ['today', 'Daily training', ['dashboard', 'apprentices', 'hours', 'attendance', 'practical-log', 'schedule']],
+    ['training', 'Training & compliance', ['competencies', 'wages', 'programs', 'reports', 'match-requests']],
+    ['connect', 'Communication', ['email', 'messages', 'communications', 'phone', 'community']],
+    ['setup', 'Documents & setup', ['documents', 'student-certificates', 'resources', 'orientation', 'mou', 'profile', 'settings', 'store']],
+  ],
+};
+
+/** Header and sidebar share the same host-qualified portal destination. */
+export function getDashboardHref(role: UserRole): string {
+  const items = getFlatNavItems(role);
+  const home = items.find((item) => item.id === 'dashboard') || items[0];
+  if (!home) throw new Error(`No portal home configured for ${role}`);
+  return home.href;
+}
+
+export function isApprenticeWorkspaceRole(role: string | null | undefined): boolean {
+  return Boolean(role && getNavigationRole(role as UserRole) === 'apprentice');
+}
+
+export function isActiveNavItem(href: string, pathname: string): boolean {
+  try {
+    const url = new URL(href, 'https://local.invalid');
+    return pathname === url.pathname || pathname.startsWith(`${url.pathname}/`);
+  } catch {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+}
+
+export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
+  if (!pathname) return [];
+  const segments = pathname.split('/').filter(Boolean);
+  let currentPath = '';
+  return segments.map((segment, index) => {
+    currentPath += `/${segment}`;
+    const label = segment.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    return { label, href: index < segments.length - 1 ? currentPath : undefined };
+  });
+}
+
+const NAVIGATION_DISPLAY_NAMES: Record<NavigationRole, string> = {
+  student: 'Student Portal',
+  apprentice: 'Apprentice Portal',
+  instructor: 'Instructor Portal',
+  employer: 'Employer Portal',
+  host_shop: 'Host Shop Portal',
+  staff: 'Staff Portal',
+  case_manager: 'Case Manager',
+  workforce: 'Workforce Portal',
+  workforce_board: 'Workforce Board',
+  program_holder: 'Program Holder',
+  provider: 'Provider Portal',
+  creator: 'Creator Studio',
+  parent: 'Parent Portal',
+  admin: 'Admin',
+  testing: 'Testing Center',
+};
+
+export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = Object.fromEntries(
+  (Object.keys(ROLE_TO_NAVIGATION) as UserRole[]).map((role) => [
+    role,
+    NAVIGATION_DISPLAY_NAMES[ROLE_TO_NAVIGATION[role]],
+  ]),
+) as Record<UserRole, string>;
+
+export const ROLE_DEFAULT_ACTIONS: Partial<Record<UserRole, ActionItem[]>> = {
+  admin: [
+    {
+      id: 'applications',
+      label: 'Applications',
+      href: p('admin', 'applications'),
+      variant: 'secondary',
+    },
+  ],
+  student: [
+    { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), variant: 'secondary' },
+  ],
+  apprentice: [
+    {
+      id: 'clock-in',
+      label: 'Clock In',
+      href: p('apprentice', 'timeclock'),
+      icon: Clock,
+      variant: 'primary',
+    },
+  ],
+  employer: [
+    {
+      id: 'post-job',
+      label: 'Post Job',
+      href: p('employer', 'post-job'),
+      icon: Plus,
+      variant: 'primary',
+    },
+  ],
+};

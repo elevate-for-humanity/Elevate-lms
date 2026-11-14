@@ -1,0 +1,42 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "submit": "Submit",
+    "next": "Next",
+    "back": "Back",
+    "close": "Close",
+    "search": "Search",
+    "viewAll": "View All",
+    "learnMore": "Learn More",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "free": "Free",
+    "freeWithWIOA": "Free with WIOA"
+  },
+  "nav": {
+    "home": "Home",
+    "programs": "Programs",
+    "courses": "Courses",
+    "about": "About",
+    "contact": "Contact",
+    "apply": "Apply Now",
+    "dashboard": "Dashboard"
+  },
+  "offline": {
+    "youAreOffline": "You're offline",
+    "downloadForOffline": "Download for Offline",
+    "downloading": "Downloading...",
+    "availableOffline": "Available Offline",
+    "removeOffline": "Remove Offline Data"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all"
+  }
+}

@@ -1,0 +1,229 @@
+'use server';
+
+import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { IMAGE_RELEASE_TEXT, IMAGE_RELEASE_VERSION } from '@/lib/profile/image-release-constants';
+
+const MAX_AVATAR_SOURCE_BYTES = 10 * 1024 * 1024;
+const MAX_AVATAR_PIXELS = 40_000_000;
+
+function revalidateProfilePaths() {
+  revalidatePath('/account/profile');
+  revalidatePath('/lms/profile');
+  revalidatePath('/lms/settings/profile');
+  revalidatePath('/program-holder/dashboard');
+  revalidatePath('/program-holder/settings');
+  revalidatePath('/employer/dashboard');
+  revalidatePath('/host-shop/dashboard');
+  revalidatePath('/staff/dashboard');
+  revalidatePath('/apprentice');
+}
+
+export async function uploadProfileAvatar(file: File) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'Sign in again before uploading your profile photo.' };
+
+  if (!(file instanceof File) || file.size <= 0 || file.size > MAX_AVATAR_SOURCE_BYTES) {
+    return { error: 'Choose an image no larger than 10 MB.' };
+  }
+
+  let normalized: Buffer;
+  try {
+    const sharp = (await import('sharp')).default;
+    const input = Buffer.from(await file.arrayBuffer());
+    const metadata = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS }).metadata();
+    if (!metadata.width || !metadata.height || !metadata.format) {
+      return { error: 'Image was not approved: that file is not a readable image.' };
+    }
+    if (metadata.width < 300 || metadata.height < 300) {
+      return {
+        error:
+          'Image was not approved: profile photos must be at least 300×300 pixels so authorized staff can identify you clearly.',
+      };
+    }
+    normalized = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS })
+      .rotate()
+      .resize(1200, 1200, { fit: 'cover', position: 'attention', withoutEnlargement: true })
+      .flatten({ background: '#ffffff' })
+      .jpeg({ quality: 88, mozjpeg: true })
+      .toBuffer();
+  } catch {
+    return {
+      error:
+        'Image was not approved: that format could not be decoded. Export it as JPG, PNG, WebP, GIF, AVIF, TIFF, or HEIC and try again.',
+    };
+  }
+
+  // The session determines the only account that may be updated. Storage and
+  // profile writes use the server-side service client to avoid inconsistent
+  // client RLS policies leaving an uploaded image disconnected from its owner.
+  const db = await requireAdminClient();
+  const objectPath = `${user.id}/profile-${crypto.randomUUID()}.jpg`;
+  const { error: uploadError } = await db.storage
+    .from('avatars')
+    .upload(objectPath, normalized, { contentType: 'image/jpeg', upsert: false });
+  if (uploadError) return { error: `Photo upload failed: ${uploadError.message}` };
+
+  const {
+    data: { publicUrl },
+  } = db.storage.from('avatars').getPublicUrl(objectPath);
+  const { data: profile, error: profileError } = await db
+    .from('profiles')
+    .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
+    .eq('id', user.id)
+    .select('id')
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    await db.storage.from('avatars').remove([objectPath]);
+    return { error: 'The photo uploaded, but the profile record could not be updated.' };
+  }
+
+  revalidateProfilePaths();
+  return { success: true, url: publicUrl };
+}
+
+export async function getImageReleaseStatus() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'Sign in again to review the image release.' };
+
+  const { data, error } = await (supabase as any)
+    .from('image_release_consents')
+    .select(
+      'id,participant_name,signed_name,signer_capacity,guardian_relationship,consent_scope,document_version,signed_at,granted,revoked_at',
+    )
+    .eq('user_id', user.id)
+    .eq('granted', true)
+    .is('revoked_at', null)
+    .order('signed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) return { error: 'The image-release status could not be loaded.' };
+  return { consent: data ?? null };
+}
+
+export async function signImageRelease(input: {
+  participantName: string;
+  signedName: string;
+  signerCapacity: 'self' | 'parent_guardian';
+  guardianRelationship?: string;
+  consentScope: 'internal_only' | 'internal_and_public';
+}) {
+  const participantName = input.participantName.trim();
+  const signedName = input.signedName.trim();
+  const guardianRelationship = input.guardianRelationship?.trim() || null;
+
+  if (participantName.length < 2 || signedName.length < 2) {
+    return { error: 'Enter the participant name and the signer’s full legal name.' };
+  }
+  if (input.signerCapacity === 'parent_guardian' && !guardianRelationship) {
+    return { error: 'Enter the parent or guardian relationship.' };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'Sign in again before signing the image release.' };
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const allowedRoles = new Set([
+    'program_holder',
+    'staff',
+    'employee',
+    'instructor',
+    'apprentice',
+    'student',
+    'learner',
+    'host_shop',
+    'employer',
+    'admin',
+    'super_admin',
+  ]);
+  const role = String(profile?.role || 'learner');
+  if (!allowedRoles.has(role)) return { error: 'This account role cannot sign this release.' };
+
+  const { data: active } = await (supabase as any)
+    .from('image_release_consents')
+    .select('id,document_version')
+    .eq('user_id', user.id)
+    .eq('granted', true)
+    .is('revoked_at', null)
+    .maybeSingle();
+
+  if (active?.id && active.document_version === IMAGE_RELEASE_VERSION) {
+    return { success: true, alreadySigned: true };
+  }
+  if (active?.id) {
+    await (supabase as any)
+      .from('image_release_consents')
+      .update({
+        granted: false,
+        revoked_at: new Date().toISOString(),
+        revoked_reason: 'Superseded by a newer document version',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', active.id)
+      .eq('user_id', user.id);
+  }
+
+  const requestHeaders = await headers();
+  const forwardedFor = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
+  const { error } = await (supabase as any).from('image_release_consents').insert({
+    user_id: user.id,
+    role,
+    participant_name: participantName,
+    signed_name: signedName,
+    signer_capacity: input.signerCapacity,
+    guardian_relationship: input.signerCapacity === 'parent_guardian' ? guardianRelationship : null,
+    consent_scope: input.consentScope,
+    document_version: IMAGE_RELEASE_VERSION,
+    release_text: IMAGE_RELEASE_TEXT,
+    granted: true,
+    signed_at: new Date().toISOString(),
+    ip_address: forwardedFor,
+    user_agent: requestHeaders.get('user-agent'),
+  });
+
+  if (error) return { error: `Image release could not be saved: ${error.message}` };
+  revalidateProfilePaths();
+  return { success: true };
+}
+
+export async function revokeImageRelease(reason?: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'Sign in again before changing the image release.' };
+
+  const { error } = await (supabase as any)
+    .from('image_release_consents')
+    .update({
+      granted: false,
+      revoked_at: new Date().toISOString(),
+      revoked_reason: reason?.trim() || 'Revoked by signer from dashboard',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', user.id)
+    .eq('granted', true)
+    .is('revoked_at', null);
+
+  if (error) return { error: 'The image release could not be revoked.' };
+  revalidateProfilePaths();
+  return { success: true };
+}

@@ -1,0 +1,43 @@
+
+> efh-autopilot@2.0.0 prebuild /workspaces/Elevate-lms
+> echo 'Migrations already run in Supabase - skipping' && node scripts/write-build-marker.mjs
+
+Migrations already run in Supabase - skipping
+Wrote /workspaces/Elevate-lms/public/build.json {
+  builtAt: '2026-05-11T10:26:50.384Z',
+  nodeEnv: null,
+  gitCommit: 'cd8c23eb596d1152cf978c5c1fc85cb38038a2fa',
+  gitCommitShort: 'cd8c23eb'
+}
+
+> efh-autopilot@2.0.0 build /workspaces/Elevate-lms
+> pnpm run build:lms:phased
+
+
+> efh-autopilot@2.0.0 build:lms:phased /workspaces/Elevate-lms
+> pnpm run build:lms:checks && pnpm run build:lms:stamp && pnpm run build:lms:compile
+
+
+> efh-autopilot@2.0.0 build:lms:checks /workspaces/Elevate-lms
+> BUILD_SCOPE=1 node scripts/check-redirect-conflicts.mjs && node scripts/guard-public-routes.mjs
+
+✅  check-redirect-conflicts: no conflicts detected (213 sources scanned)
+✅ guard-public-routes: no violations
+
+> efh-autopilot@2.0.0 build:lms:stamp /workspaces/Elevate-lms
+> BUILD_SCOPE=1 node scripts/stamp-sw.mjs
+
+[stamp-sw] Cache version set to: v1778495214102
+
+> efh-autopilot@2.0.0 build:lms:compile /workspaces/Elevate-lms
+> BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=6144' next build
+
+   ▲ Next.js 15.5.15
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ELIFECYCLE  Command failed with exit code 143.
+ ELIFECYCLE  Command failed with exit code 143.
+ ELIFECYCLE  Command failed with exit code 143.

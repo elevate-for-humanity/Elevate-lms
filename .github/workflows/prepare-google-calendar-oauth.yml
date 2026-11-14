@@ -1,0 +1,53 @@
+name: Prepare Google Calendar OAuth API
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/prepare-google-calendar-oauth.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: prepare-google-calendar-oauth
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST repos/$GITHUB_REPOSITORY/actions/workflows/prepare-google-calendar-oauth.yml/dispatches -f ref=main
+  prepare:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Enable and verify only the Calendar API for the existing portal project
+        run: |
+          node --input-type=module <<'NODE'
+          import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const service='calendar-json.googleapis.com';
+          const list=()=>google(['services','list','--enabled','--project',PROJECT,'--filter=config.name='+service,'--format=value(config.name)']);
+          try {
+            const previouslyEnabled=list()===service;
+            if(!previouslyEnabled)google(['services','enable',service,'--project',PROJECT,'--quiet']);
+            if(list()!==service)throw Error('verification_failed');
+            console.log(JSON.stringify({project:PROJECT,calendarApiEnabled:true,previouslyEnabled,oauthClientCreated:false,userConsentGranted:false}));
+          }catch(error){
+            console.error(JSON.stringify({project:PROJECT,calendarApiEnabled:false,error:['permission_denied','api_disabled','authentication_failed'].includes(error.code)?error.code:'preparation_failed'}));
+            process.exitCode=1;
+          }
+          NODE

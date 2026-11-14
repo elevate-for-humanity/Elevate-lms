@@ -1,0 +1,45 @@
+name: Full Platform Duplicate Sweep
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'apps/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'scripts/**'
+      - '.github/workflows/full-platform-duplicate-sweep.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: duplicate-sweep-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sweep:
+    name: Route and surface duplicate sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Sweep all production and legacy App Router roots
+        run: node scripts/full-platform-duplicate-sweep.mjs
+
+      - name: Upload duplicate sweep report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-platform-duplicate-sweep
+          path: artifacts/full-platform-duplicate-sweep.json
+          retention-days: 14

@@ -1,0 +1,58 @@
+source_path,line_count,target_path,category,priority,confidence,notes
+app/apply/fssa/page.tsx,10,/apply,marketing_alias,medium,medium,campaign or outreach path alias
+app/apply/fssa/success/page.tsx,9,/apply,marketing_alias,medium,medium,campaign or outreach path alias
+app/apply/impact/page.tsx,9,/apply,marketing_alias,medium,medium,campaign or outreach path alias
+app/apply/intake/page.tsx,22,/apply,marketing_alias,medium,medium,campaign or outreach path alias
+app/apply/quick/page.tsx,10,/apply,marketing_alias,medium,medium,campaign or outreach path alias
+app/auth/forgot-password/page.tsx,6,/reset-password,required_legacy_url,high,high,legacy access or role-area entry alias
+app/cert/verify/[certificateId]/page.tsx,16,(dynamic-or-unknown),required_legacy_url,high,medium,critical transactional/support alias
+app/client-portal/demo/page.tsx,12,/start,temporary_compat_path,low,medium,flow bridge or migration-era route
+app/cm/learners/[id]/schedule/page.tsx,14,(dynamic-or-unknown),temporary_compat_path,medium,medium,
+app/courses/[courseId]/learn/page.tsx,17,(dynamic-or-unknown),temporary_compat_path,medium,medium,
+app/ebook/barber-theory/page.tsx,12,/lms/courses,temporary_compat_path,low,medium,flow bridge or migration-era route
+app/fssa-impact/page.tsx,9,/snap/snap-et,marketing_alias,medium,medium,campaign or outreach path alias
+app/fssa-partnership-request/page.tsx,9,/snap/snap-et,marketing_alias,medium,medium,campaign or outreach path alias
+app/help/tutorials/accessing-courses/page.tsx,12,/help,marketing_alias,medium,medium,campaign or outreach path alias
+app/help/tutorials/how-to-apply/page.tsx,12,/help,marketing_alias,medium,medium,campaign or outreach path alias
+app/help/tutorials/submitting-assignments/page.tsx,12,/help,marketing_alias,medium,medium,campaign or outreach path alias
+app/help/tutorials/troubleshooting/page.tsx,12,/help,marketing_alias,medium,medium,campaign or outreach path alias
+app/instructor/dashboard/page.tsx,10,https://admin.elevateforhumanity.org/instructor,required_legacy_url,high,high,legacy access or role-area entry alias
+app/intake/page.tsx,14,/apply,required_legacy_url,high,medium,critical transactional/support alias
+app/lms/page.tsx,22,/login?redirect=/lms,required_legacy_url,high,high,legacy access or role-area entry alias
+app/mentor/page.tsx,7,/mentor/dashboard,temporary_compat_path,medium,medium,
+app/onboarding/barber-apprenticeship/page.tsx,7,/programs/barber-apprenticeship/orientation,temporary_compat_path,medium,medium,
+app/partner/page.tsx,18,/partner/dashboard,temporary_compat_path,medium,medium,
+app/(partner)/partners/attendance/page.tsx,10,/partner/attendance,required_legacy_url,high,high,legacy access or role-area entry alias
+app/(partner)/partners/dashboard/page.tsx,10,/partner/dashboard,required_legacy_url,high,high,legacy access or role-area entry alias
+app/(partner)/partners/documents/page.tsx,10,/partner/documents,required_legacy_url,high,high,legacy access or role-area entry alias
+app/(partner)/partners/hours/page.tsx,10,/partner/hours,required_legacy_url,high,high,legacy access or role-area entry alias
+app/(partner)/partners/login/page.tsx,10,/partner/login,required_legacy_url,high,high,legacy access or role-area entry alias
+app/(partner)/partners/students/page.tsx,10,/partner/students,required_legacy_url,high,high,legacy access or role-area entry alias
+app/partner-portal/page.tsx,6,/partner/dashboard,required_legacy_url,high,high,legacy access or role-area entry alias
+app/programs/building-services-technician/apply/page.tsx,10,/apply?program=building-services-technician,temporary_compat_path,low,medium,flow bridge or migration-era route
+app/programs/[program]/enroll/page.tsx,14,(dynamic-or-unknown),temporary_compat_path,low,medium,flow bridge or migration-era route
+app/programs/[program]/inquiry/page.tsx,15,(dynamic-or-unknown),temporary_compat_path,low,medium,flow bridge or migration-era route
+app/(public)/admin-portal/page.tsx,14,/admin-login,required_legacy_url,high,medium,critical transactional/support alias
+app/pwa/barber/page.tsx,12,/pwa/barber/onboarding,temporary_compat_path,medium,medium,
+app/pwa/barber/profile/page.tsx,12,/student-portal/profile,temporary_compat_path,medium,medium,
+app/pwa/barber/training/page.tsx,12,/programs/barber-apprenticeship/orientation,temporary_compat_path,medium,medium,
+app/rise/page.tsx,14,/tax,marketing_alias,medium,medium,campaign or outreach path alias
+apps/admin/app/admin/certifications/page.tsx,6,/admin/certificates,duplicate_deadweight,high,high,explicit duplicate-to-canonical comment
+apps/admin/app/admin/compliance-dashboard/page.tsx,6,/admin/compliance,duplicate_deadweight,high,high,explicit duplicate-to-canonical comment
+apps/admin/app/admin/dashboard-enhanced/page.tsx,9,/admin/dashboard,temporary_compat_path,medium,medium,
+apps/admin/app/admin/funding/allocations/page.tsx,15,/login,temporary_compat_path,medium,medium,
+apps/admin/app/admin/lms-dashboard/page.tsx,9,/admin/dashboard,temporary_compat_path,medium,medium,
+apps/admin/app/admin/page.tsx,10,/admin/dashboard,temporary_compat_path,medium,medium,
+apps/admin/app/admin/reporting/page.tsx,6,/admin/reports,duplicate_deadweight,high,high,explicit duplicate-to-canonical comment
+apps/admin/app/page.tsx,5,/admin/dashboard,temporary_compat_path,medium,medium,
+app/snap/page.tsx,12,/snap/snap-et,marketing_alias,medium,medium,campaign or outreach path alias
+app/store/licenses/managed/page.tsx,21,(dynamic-or-unknown),required_legacy_url,high,medium,critical transactional/support alias
+app/store/licensing/enterprise/page.tsx,6,/store/licenses/enterprise-license,required_legacy_url,high,medium,critical transactional/support alias
+app/store/licensing/managed/page.tsx,6,/store/licenses/managed,required_legacy_url,high,medium,critical transactional/support alias
+app/store/licensing/page.tsx,6,/store/licenses,required_legacy_url,high,medium,critical transactional/support alias
+app/store/licensing/partnerships/page.tsx,6,/store/licenses,required_legacy_url,high,medium,critical transactional/support alias
+app/store/licensing/success/page.tsx,6,/store/licenses/success,required_legacy_url,high,medium,critical transactional/support alias
+app/store/request-license/page.tsx,19,(dynamic-or-unknown),required_legacy_url,high,medium,critical transactional/support alias
+app/support/documentation/page.tsx,16,/help,required_legacy_url,high,medium,critical transactional/support alias
+app/tax/rise-up-foundation/faq/page.tsx,12,/help,marketing_alias,medium,medium,campaign or outreach path alias
+app/tax/rise-up-foundation/free-tax-help/page.tsx,12,/contact,marketing_alias,medium,medium,campaign or outreach path alias

@@ -1,0 +1,58 @@
+source_path,target_path,category,priority,recommended_code,recommended_layer,phase,action,reason
+app/apply/fssa/page.tsx,/apply,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/apply/fssa/success/page.tsx,/apply,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/apply/impact/page.tsx,/apply,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/apply/intake/page.tsx,/apply,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/apply/quick/page.tsx,/apply,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/auth/forgot-password/page.tsx,/reset-password,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/cert/verify/[certificateId]/page.tsx,(dynamic-or-unknown),required_legacy_url,high,307,keep_shell_until_manual_map,phase2,manual_resolution_required,legacy auth/critical flow entry; dynamic target unresolved
+app/client-portal/demo/page.tsx,/start,temporary_compat_path,low,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/cm/learners/[id]/schedule/page.tsx,(dynamic-or-unknown),temporary_compat_path,medium,307,keep_shell_until_manual_map,phase2,manual_resolution_required,compatibility bridge; dynamic target unresolved
+app/courses/[courseId]/learn/page.tsx,(dynamic-or-unknown),temporary_compat_path,medium,307,keep_shell_until_manual_map,phase2,manual_resolution_required,compatibility bridge; dynamic target unresolved
+app/ebook/barber-theory/page.tsx,/lms/courses,temporary_compat_path,low,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/fssa-impact/page.tsx,/snap/snap-et,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/fssa-partnership-request/page.tsx,/snap/snap-et,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/help/tutorials/accessing-courses/page.tsx,/help,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/help/tutorials/how-to-apply/page.tsx,/help,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/help/tutorials/submitting-assignments/page.tsx,/help,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/help/tutorials/troubleshooting/page.tsx,/help,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/instructor/dashboard/page.tsx,https://admin.elevateforhumanity.org/instructor,required_legacy_url,high,307,edge_or_next,phase2,preserve_legacy_entry,legacy auth/critical flow entry; external target
+app/intake/page.tsx,/apply,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/lms/page.tsx,/login?redirect=/lms,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/mentor/page.tsx,/mentor/dashboard,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/onboarding/barber-apprenticeship/page.tsx,/programs/barber-apprenticeship/orientation,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/partner/page.tsx,/partner/dashboard,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/(partner)/partners/attendance/page.tsx,/partner/attendance,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/(partner)/partners/dashboard/page.tsx,/partner/dashboard,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/(partner)/partners/documents/page.tsx,/partner/documents,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/(partner)/partners/hours/page.tsx,/partner/hours,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/(partner)/partners/login/page.tsx,/partner/login,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/(partner)/partners/students/page.tsx,/partner/students,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/partner-portal/page.tsx,/partner/dashboard,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/programs/building-services-technician/apply/page.tsx,/apply?program=building-services-technician,temporary_compat_path,low,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/programs/[program]/enroll/page.tsx,(dynamic-or-unknown),temporary_compat_path,low,307,keep_shell_until_manual_map,phase2,manual_resolution_required,compatibility bridge; dynamic target unresolved
+app/programs/[program]/inquiry/page.tsx,(dynamic-or-unknown),temporary_compat_path,low,307,keep_shell_until_manual_map,phase2,manual_resolution_required,compatibility bridge; dynamic target unresolved
+app/(public)/admin-portal/page.tsx,/admin-login,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/pwa/barber/page.tsx,/pwa/barber/onboarding,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/pwa/barber/profile/page.tsx,/student-portal/profile,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/pwa/barber/training/page.tsx,/programs/barber-apprenticeship/orientation,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/rise/page.tsx,/tax,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+apps/admin/app/admin/certifications/page.tsx,/admin/certificates,duplicate_deadweight,high,308,nextjs_redirects,phase2,remove_shell_keep_rule,explicit duplicate path
+apps/admin/app/admin/compliance-dashboard/page.tsx,/admin/compliance,duplicate_deadweight,high,308,nextjs_redirects,phase2,remove_shell_keep_rule,explicit duplicate path
+apps/admin/app/admin/dashboard-enhanced/page.tsx,/admin/dashboard,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+apps/admin/app/admin/funding/allocations/page.tsx,/login,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+apps/admin/app/admin/lms-dashboard/page.tsx,/admin/dashboard,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+apps/admin/app/admin/page.tsx,/admin/dashboard,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+apps/admin/app/admin/reporting/page.tsx,/admin/reports,duplicate_deadweight,high,308,nextjs_redirects,phase2,remove_shell_keep_rule,explicit duplicate path
+apps/admin/app/page.tsx,/admin/dashboard,temporary_compat_path,medium,307,nextjs_redirects,phase2,review_for_deprecation,compatibility bridge
+app/snap/page.tsx,/snap/snap-et,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/store/licenses/managed/page.tsx,(dynamic-or-unknown),required_legacy_url,high,307,keep_shell_until_manual_map,phase2,manual_resolution_required,legacy auth/critical flow entry; dynamic target unresolved
+app/store/licensing/enterprise/page.tsx,/store/licenses/enterprise-license,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/store/licensing/managed/page.tsx,/store/licenses/managed,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/store/licensing/page.tsx,/store/licenses,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/store/licensing/partnerships/page.tsx,/store/licenses,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/store/licensing/success/page.tsx,/store/licenses/success,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/store/request-license/page.tsx,(dynamic-or-unknown),required_legacy_url,high,307,keep_shell_until_manual_map,phase2,manual_resolution_required,legacy auth/critical flow entry; dynamic target unresolved
+app/support/documentation/page.tsx,/help,required_legacy_url,high,307,nextjs_redirects,phase2,preserve_legacy_entry,legacy auth/critical flow entry
+app/tax/rise-up-foundation/faq/page.tsx,/help,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity
+app/tax/rise-up-foundation/free-tax-help/page.tsx,/contact,marketing_alias,medium,307,nextjs_redirects,phase2,keep_campaign_alias,campaign URL continuity

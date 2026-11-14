@@ -1,0 +1,29 @@
+name: Apply Pending Migrations (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type APPLY to confirm you will run SQL in Supabase Dashboard'
+        required: true
+
+jobs:
+  instructions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "APPLY" ]; then
+            echo "Input must be APPLY"
+            exit 1
+          fi
+      - name: Print migration bundle path
+        run: |
+          echo "Run this file in Supabase Dashboard → SQL Editor (idempotent):"
+          echo "  supabase/migrations/20260703000002_pending_migrations_bundle.sql"
+          echo ""
+          echo "Individual files (if bundle already applied):"
+          ls -1 supabase/migrations/20260702000009*.sql supabase/migrations/20260702000010*.sql supabase/migrations/20260702000011*.sql supabase/migrations/20260702000012*.sql 2>/dev/null || true
+          echo ""
+          echo "Verify: SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;"

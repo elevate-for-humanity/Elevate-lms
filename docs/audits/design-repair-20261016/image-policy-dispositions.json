@@ -1,0 +1,945 @@
+{
+  "baselineHead": "8c5f47cbe2e19e314271c9ecf5a9f55313dc0f61",
+  "originalStrictCount": 104,
+  "currentStrictCount": 0,
+  "currentCriticalCount": 0,
+  "scope": "Source and audit verification. Public responsive render suite is separate; authenticated interfaces not rendered.",
+  "findings": [
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/compliance/exports/page.tsx",
+      "line": 37,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/docs/page.tsx",
+      "line": 42,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/email-marketing/EmailMarketingClient.tsx",
+      "line": 43,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/email-marketing/analytics/EmailAnalyticsClient.tsx",
+      "line": 115,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/email-marketing/automation/new/NewAutomationClient.tsx",
+      "line": 101,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/email-marketing/campaigns/new/NewCampaignClient.tsx",
+      "line": 107,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/external-progress/page.tsx",
+      "line": 41,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/grants/submissions/page.tsx",
+      "line": 112,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/grants/workflow/page.tsx",
+      "line": 69,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "apps/admin/app/home/page.tsx",
+      "line": 100,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/home/page.tsx",
+      "line": 100,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/analytics/page.tsx",
+      "line": 58,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/campaigns/page.tsx",
+      "line": 101,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/courses/[courseId]/announcements/page.tsx",
+      "line": 108,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/courses/[courseId]/assignments/[assignmentId]/grade/page.tsx",
+      "line": 121,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/courses/[courseId]/assignments/page.tsx",
+      "line": 71,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/programs/page.tsx",
+      "line": 58,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/settings/page.tsx",
+      "line": 41,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/instructor/students/page.tsx",
+      "line": 67,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/live-chat/LiveChatClient.tsx",
+      "line": 20,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/payroll-cards/page.tsx",
+      "line": 42,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/signatures/page.tsx",
+      "line": 57,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/store/clones/PageClient.tsx",
+      "line": 108,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
+      "line": 64,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
+      "line": 216,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
+      "line": 350,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/lms/app/apprentice/page.tsx",
+      "line": 477,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/lms/app/programs/[program]/courses/page.tsx",
+      "line": 94,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "apps/lms/app/verify-credentials/page.tsx",
+      "line": 221,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/lms/app/verify-credentials/page.tsx",
+      "line": 221,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/academic-calendar/page.tsx",
+      "line": 67,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/academic-integrity/page.tsx",
+      "line": 29,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/calendar/page.tsx",
+      "line": 73,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/career-counseling/page.tsx",
+      "line": 44,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/educatorhub/page.tsx",
+      "line": 55,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/employment-support/page.tsx",
+      "line": 25,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/founder/page.tsx",
+      "line": 25,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/founder/page.tsx",
+      "line": 53,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/grievance/page.tsx",
+      "line": 46,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/host-shops/[slug]/page.tsx",
+      "line": 272,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/licenses/page.tsx",
+      "line": 19,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/platform/employer-portal/page.tsx",
+      "line": 107,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/platform/student-portal/page.tsx",
+      "line": 109,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/programs/[program]/page.tsx",
+      "line": 165,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "apps/marketing/app/programs/barber-apprenticeship/sections/BarberHero.tsx",
+      "line": 11,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "apps/marketing/app/programs/barber-apprenticeship/sections/BarberHero.tsx",
+      "line": 114,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/programs/barber-apprenticeship/sections/BarberHero.tsx",
+      "line": 114,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/programs/healthcare/page.tsx",
+      "line": 89,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/services/page.tsx",
+      "line": 85,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/store/digital/page.tsx",
+      "line": 68,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/tax-software/_components/TaxHero.tsx",
+      "line": 33,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/transparency/page.tsx",
+      "line": 61,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/tutoring/page.tsx",
+      "line": 126,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/volunteer/page.tsx",
+      "line": 54,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "apps/marketing/app/writing-center/page.tsx",
+      "line": 101,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/ProgramPageLayout.tsx",
+      "line": 74,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/ProgramPageLayout.tsx",
+      "line": 74,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/ProgramPageTemplate.tsx",
+      "line": 66,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/ProgramPageTemplate.tsx",
+      "line": 66,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/archetypes/ArchetypeBase.tsx",
+      "line": 33,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/barber/BarberApprenticeshipDashboard.tsx",
+      "line": 143,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/blocks/Hero.tsx",
+      "line": 68,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/blocks/Hero.tsx",
+      "line": 82,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "RAW_IMG_UNREVIEWED",
+      "file": "components/hero/SafeHeroVideo.tsx",
+      "line": 101,
+      "message": "Raw <img> found without IMAGE-CONTRACT rationale; use Next Image or document the remote/generated-image exception",
+      "disposition": "Documented native-image exception",
+      "evidence": "Existing native video poster or intrinsic-size optional brand bug retained with explicit implementation rationale."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/home/PlatformHubHero.tsx",
+      "line": 21,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/landing/ModernLandingHero.tsx",
+      "line": 89,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/landing/ModernLandingHero.tsx",
+      "line": 89,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/layouts/AutoPolishedPage.tsx",
+      "line": 472,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/lms/LmsHeroBanner.tsx",
+      "line": 29,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/lms/LmsHeroBanner.tsx",
+      "line": 29,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "RAW_IMG_UNREVIEWED",
+      "file": "components/marketing/HeroPicture.tsx",
+      "line": 103,
+      "message": "Raw <img> found without IMAGE-CONTRACT rationale; use Next Image or document the remote/generated-image exception",
+      "disposition": "Documented native-image exception",
+      "evidence": "Existing native video poster or intrinsic-size optional brand bug retained with explicit implementation rationale."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/HeroPicture.tsx",
+      "line": 77,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/HeroPicture.tsx",
+      "line": 88,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/MarketingPageContent.tsx",
+      "line": 21,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/marketing/MarketingPageContent.tsx",
+      "line": 21,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/ProgramTemplate.tsx",
+      "line": 77,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/ProgramVideoCards.tsx",
+      "line": 28,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/PublicLandingPage.tsx",
+      "line": 56,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/marketing/PublicPage.tsx",
+      "line": 51,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/portal/ApprenticePortalShell.tsx",
+      "line": 302,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/CprPageBlocks.tsx",
+      "line": 53,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/CprPageBlocks.tsx",
+      "line": 53,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramDetailPage.tsx",
+      "line": 273,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/ProgramDetailPage.tsx",
+      "line": 273,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramPageContract.tsx",
+      "line": 164,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/ProgramPageContract.tsx",
+      "line": 164,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramPageLayout.tsx",
+      "line": 202,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/ProgramPageLayout.tsx",
+      "line": 202,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramPageLocked.tsx",
+      "line": 64,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/ProgramPageLocked.tsx",
+      "line": 64,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramPageShell.tsx",
+      "line": 92,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/ProgramPageShell.tsx",
+      "line": 92,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramPageTemplate.tsx",
+      "line": 56,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/ProgramPageVisual.tsx",
+      "line": 59,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/PublicProgramPage.tsx",
+      "line": 227,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/TradesProgramPage.tsx",
+      "line": 77,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/TradesProgramPage.tsx",
+      "line": 77,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/programs/WorkforceProgramPage.tsx",
+      "line": 188,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/WorkforceProgramPage.tsx",
+      "line": 188,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/programs/beauty/CosmetologyVisualExperience.tsx",
+      "line": 120,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/templates/ProgramPageTemplate.tsx",
+      "line": 108,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/templates/ProgramPageTemplate.tsx",
+      "line": 108,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "IMAGE_EMPTY_PLACEHOLDER",
+      "file": "components/templates/StateCommunityServicesPage.tsx",
+      "line": 67,
+      "message": "Critical/hero image uses placeholder=\"empty\"; provide blurDataURL, poster/fallback, or an intentional painted background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    },
+    {
+      "severity": "STRICT",
+      "code": "CRITICAL_IMAGE_FALLBACK_MISSING",
+      "file": "components/templates/StateCommunityServicesPage.tsx",
+      "line": 67,
+      "message": "Critical marketing/program/hero image needs a real blur, poster/fallback, or painted container background",
+      "disposition": "Corrected with inlined loading backdrop",
+      "evidence": "Next Image now receives placeholder=\"blur\" and a valid inlined 8\u00d78 PNG loading backdrop; photographs, src, crop, sizes and loading priority preserved."
+    }
+  ]
+}

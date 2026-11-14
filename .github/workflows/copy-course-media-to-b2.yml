@@ -1,0 +1,61 @@
+name: Copy Supabase course media to B2 (verified batch)
+on:
+  workflow_dispatch:
+    inputs:
+      skip:
+        description: Number of source objects already visited by verified previous batches
+        required: true
+        default: '0'
+        type: string
+      limit:
+        description: Maximum objects to verify (1-25 for initial batches)
+        required: true
+        default: '1'
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: verified-course-media-b2-migration
+  cancel-in-progress: false
+jobs:
+  copy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate bounded copy request
+        env:
+          MIGRATION_LIMIT: ${{ inputs.limit }}
+          MIGRATION_SKIP: ${{ inputs.skip }}
+        run: |
+          node --input-type=module -e "const n=Number(process.env.MIGRATION_LIMIT),s=Number(process.env.MIGRATION_SKIP);if(!Number.isSafeInteger(n)||n<1||n>25||!Number.isSafeInteger(s)||s<0) process.exit(1)"
+      - name: Install storage client without running project build scripts
+        run: npm install --no-save --ignore-scripts --package-lock=false @aws-sdk/client-s3@3.910.0
+      - name: Verify source and destination credentials are available
+        env:
+          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
+          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
+          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
+          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
+          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
+          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
+        run: |
+          node --input-type=module -e "for(const k of ['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_REGION','ELEVATE_MEDIA_BUCKET','ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY']) if(!process.env[k]) throw Error('MIGRATION_CREDENTIALS_NOT_CONFIGURED: '+k)"
+      - name: Copy and verify batch (no source deletions)
+        env:
+          MIGRATION_SKIP: ${{ inputs.skip }}
+          MIGRATION_LIMIT: ${{ inputs.limit }}
+          SUPABASE_URL: ${{ secrets.COURSE_MIGRATION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.COURSE_MIGRATION_SUPABASE_SERVICE_ROLE_KEY }}
+          ELEVATE_MEDIA_ENDPOINT: ${{ secrets.COURSE_MIGRATION_B2_ENDPOINT }}
+          ELEVATE_MEDIA_REGION: ${{ secrets.COURSE_MIGRATION_B2_REGION }}
+          ELEVATE_MEDIA_BUCKET: ${{ secrets.COURSE_MIGRATION_B2_BUCKET }}
+          ELEVATE_MEDIA_ACCESS_KEY_ID: ${{ secrets.COURSE_MIGRATION_B2_KEY_ID }}
+          ELEVATE_MEDIA_SECRET_ACCESS_KEY: ${{ secrets.COURSE_MIGRATION_B2_APP_KEY }}
+        run: node scripts/gcp/migrate-course-media-to-b2.mjs

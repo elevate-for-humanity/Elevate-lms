@@ -1,0 +1,45 @@
+#!/usr/bin/env tsx
+import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+
+const serviceId = process.env.NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID || 'elevate-ultimate-worker';
+const secretGroupIds = [process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env'];
+
+async function main() {
+  const projectId = resolveProjectId();
+  if (!projectId) throw new Error('NORTHFLANK_PROJECT_ID_REQUIRED');
+  for (const groupId of new Set(secretGroupIds)) {
+    const current: any = await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`));
+    const restrictions = current.restrictions ?? {};
+    const objects = restrictions.nfObjects ?? [];
+    if (objects.some((item: any) => item.type === 'service' && item.id === serviceId)) {
+      console.log(`${groupId} already grants ${serviceId} access`);
+      continue;
+    }
+    await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`), {
+      method: 'PATCH',
+      body: JSON.stringify({
+        restrictions: {
+          restricted: true,
+          nfObjects: [...objects, { id: serviceId, type: 'service' }],
+          tags: restrictions.tags ?? [],
+          tagMatchCondition: restrictions.tagMatchCondition ?? 'or',
+        },
+      }),
+    });
+    console.log(`Attached ${groupId} to ${serviceId} without reading secret values`);
+  }
+  // The GPU/LLM service is archived. Remove only this worker's old LLM grant.
+  const llmGroup: any = await nfFetch(projectApiPath(projectId, '/secrets/elevate-llm-client-env'));
+  const restrictions = llmGroup.restrictions ?? {};
+  const existing = restrictions.nfObjects ?? [];
+  const remaining = existing.filter((item: any) => !(item.type === 'service' && item.id === serviceId));
+  if (remaining.length !== existing.length) {
+    await nfFetch(projectApiPath(projectId, '/secrets/elevate-llm-client-env'), {
+      method: 'PATCH',
+      body: JSON.stringify({restrictions: {...restrictions, nfObjects: remaining}}),
+    });
+    console.log(`Removed archived LLM secret access from ${serviceId}`);
+  }
+}
+
+main().catch(error => { console.error(error); process.exit(1); });

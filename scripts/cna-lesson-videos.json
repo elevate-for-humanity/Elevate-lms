@@ -1,0 +1,41 @@
+{
+  "generated": "2025-12-02T18:16:47.769Z",
+  "course": "CNA Module 1",
+  "lessons": [
+    {
+      "lessonId": "cna-lesson-1",
+      "lessonTitle": "Program Orientation & Introduction",
+      "videoFile": "cna-training-video.mp4",
+      "duration": 600,
+      "videoUrl": "/videos/about-section-video-with-narration.mp4"
+    },
+    {
+      "lessonId": "cna-lesson-2",
+      "lessonTitle": "Healthcare Basics & Medical Terminology",
+      "videoFile": "healthcare-overview.mp4",
+      "duration": 720,
+      "videoUrl": "/videos/about-section-video-with-narration.mp4"
+    },
+    {
+      "lessonId": "cna-lesson-3",
+      "lessonTitle": "Patient Safety & Infection Control",
+      "videoFile": "patient-care-video.mp4",
+      "duration": 900,
+      "videoUrl": "/videos/about-section-video-with-narration.mp4"
+    },
+    {
+      "lessonId": "cna-lesson-4",
+      "lessonTitle": "Infection Control Procedures",
+      "videoFile": "healthcare-training.mp4",
+      "duration": 720,
+      "videoUrl": "/videos/about-section-video-with-narration.mp4"
+    },
+    {
+      "lessonId": "cna-lesson-5",
+      "lessonTitle": "Communication Skills in Healthcare",
+      "videoFile": "professional-development.mp4",
+      "duration": 600,
+      "videoUrl": "/videos/about-section-video-with-narration.mp4"
+    }
+  ]
+}

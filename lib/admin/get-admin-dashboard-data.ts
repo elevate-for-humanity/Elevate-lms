@@ -1,0 +1,917 @@
+import { isTestRecord, isUnpublishedOperationalProgram } from './dashboard/record-evidence';
+import 'server-only';
+import {decodePaidInvoiceTotals} from './dashboard/paid-invoice-totals.mjs';
+import { hasUnavailableInvoiceTotals } from './dashboard/data-availability.mjs';
+import { APPLICATION_REVIEW_STATUSES } from './application-filters';
+
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import type {
+  AdminDashboardData,
+  DegradedSection,
+  RecentApplication,
+  RecentPayment,
+} from '@/components/admin/dashboard/types';
+import {
+  calculatePriorityScore,
+  scoreSeverity,
+  sortPriorityItems,
+  type PriorityItem,
+} from '@/lib/admin/priority-score';
+import { getSystemHealth, type DashboardSystemHealth } from './dashboard/get-system-health';
+import { isTestOrSuspiciousPayment } from './dashboard/format-metrics';
+import { requireRole } from '@/lib/auth/require-role';
+
+const DASHBOARD_SOURCE_TIMEOUT_MS = 8_000;
+
+async function loadDashboardApplications(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db
+      .from('applications')
+      .select(
+        'id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at',
+      )
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardEnrollments(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db
+      .from('program_enrollments')
+      .select('id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardLeads(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('crm_leads')
+      .select('id,full_name,email,status,created_at,updated_at,last_contact_at')
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardSubmissions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('step_submissions')
+      .select('id,user_id,course_lesson_id,step_type,status,created_at')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardPrograms(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('programs')
+      .select('id,title,slug,status,published,is_active,archived_at,updated_at')
+      .order('title', { ascending: true })
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardStripeSessions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('stripe_sessions_staging')
+      .select('session_id,email,amount,program_slug,kind,payment_status,created_at')
+      .in('payment_status', ['paid', 'completed'])
+      .order('created_at', { ascending: false })
+      .order('session_id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardBarberSubscriptions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('barber_subscriptions')
+      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
+      .gt('amount_paid_at_checkout', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardCosmetologySubscriptions(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('cosmetology_subscriptions')
+      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
+      .gt('amount_paid_at_checkout', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardBarberPayments(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('barber_payments')
+      .select('id,amount_paid,payment_date,created_at')
+      .gt('amount_paid', 0)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardCompliance(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('admin_alerts')
+      .select('id,alert_type,severity,message,created_at,resolved')
+      .eq('resolved', false)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardPaidInvoices(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const {data, error} = await db.rpc('get_admin_paid_invoice_totals');
+  if (error) return {data:null,error};
+  try { return {data:decodePaidInvoiceTotals(data),error:null}; }
+  catch (error) { return {data:null,error}; }
+}
+
+async function loadDashboardLearningActivity(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('lesson_progress')
+      .select('id,user_id,enrollment_id,last_watched,updated_at')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+async function loadDashboardOutcomes(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db.from('employment_outcomes')
+      .select('id,user_id,user_uuid,program_slug,outcome_type')
+      .order('id', { ascending: true })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
+function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(
+      () =>
+        resolve({
+          data: null,
+          error: new Error(`Dashboard source timed out: ${label}`),
+        } as T),
+      DASHBOARD_SOURCE_TIMEOUT_MS,
+    );
+  });
+
+  return Promise.race([
+    Promise.resolve(source).catch((error) => ({ data: null, error }) as T),
+    timeout,
+  ]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
+function timeboxDashboardHealth(
+  source: Promise<DashboardSystemHealth>,
+): Promise<DashboardSystemHealth> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const fallback: DashboardSystemHealth = {
+    quickBooksWebhookOk: false,
+    quickBooksBillingOk: false,
+    buildEnvOk: false,
+    staleJobs: 0,
+    degraded: true,
+    missingDocuments: 0,
+    missingCertifications: 0,
+    unresolvedFlags: 0,
+    alerts: [
+      {
+        code: 'dashboard_health_timeout',
+        severity: 'warning',
+        message: 'System health checks timed out; the rest of the dashboard remains available.',
+      },
+    ],
+  };
+  const timeout = new Promise<DashboardSystemHealth>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), DASHBOARD_SOURCE_TIMEOUT_MS);
+  });
+  return Promise.race([source.catch(() => fallback), timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
+function n(value: unknown): number {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+function dollarsToCents(value: unknown): number {
+  return Math.round(n(value) * 100);
+}
+function monthKey(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+function safeRows<T>(
+  result: { data: T[] | null; error: unknown },
+  degraded: DegradedSection[],
+  section?: DegradedSection,
+): T[] {
+  if (result.error) {
+    if (section && !degraded.includes(section)) degraded.push(section);
+    return [];
+  }
+  return result.data ?? [];
+}
+
+export async function getAdminDashboardData(): Promise<AdminDashboardData> {
+  await requireRole(['admin', 'super_admin']);
+  const supabase = await createClient();
+  const db = await requireAdminClient();
+  const degradedSections: DegradedSection[] = [];
+  const now = Date.now();
+  const todayIso = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+
+  const auth = await supabase.auth.getUser();
+  const userId = auth.data.user?.id ?? null;
+
+  const [
+    profileRes,
+    applicationsRes,
+    enrollmentsRes,
+    learningActivityRes,
+    outcomesRes,
+    studentsRes,
+    certificatesRes,
+    holdersRes,
+    holderDocsRes,
+    recentEnrollmentsRes,
+    complianceRes,
+    leadsRes,
+    wioaDocsRes,
+    submissionsRes,
+    programsRes,
+    stripeSessionsRes,
+    barberSubsRes,
+    cosmetologySubsRes,
+    barberPaymentsRes,
+    paidInvoicesRes,
+    systemHealth,
+  ] = await Promise.all([
+    timeboxDashboardQuery(
+      userId
+        ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
+      'profile',
+    ),
+    timeboxDashboardQuery(loadDashboardApplications(db), 'applications'),
+    timeboxDashboardQuery(loadDashboardEnrollments(db), 'enrollments'),
+    timeboxDashboardQuery(loadDashboardLearningActivity(db), 'learning activity'),
+    timeboxDashboardQuery(loadDashboardOutcomes(db), 'employment outcomes'),
+    timeboxDashboardQuery(
+      db
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'student')
+        .like('email', '%@%')
+        .not('email', 'ilike', '%@qa.invalid')
+        // A missing name is incomplete profile data, not evidence of a test account.
+        .or('full_name.is.null,full_name.not.ilike."[QA%"'),
+      'student count',
+    ),
+    timeboxDashboardQuery(
+      db.from('certificates').select('id', { count: 'exact', head: true }),
+      'certificate count',
+    ),
+    timeboxDashboardQuery(
+      db
+        .from('program_holder_applications')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+      'program-holder applications',
+    ),
+    timeboxDashboardQuery(
+      db
+        .from('program_holder_documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+      'program-holder documents',
+    ),
+    timeboxDashboardQuery(
+      db
+        .from('program_enrollments')
+        .select(
+          'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at',
+        )
+        .order('created_at', { ascending: false })
+        .limit(25),
+      'recent enrollments',
+    ),
+    timeboxDashboardQuery(loadDashboardCompliance(db), 'compliance alerts'),
+    timeboxDashboardQuery(loadDashboardLeads(db), 'CRM leads'),
+    timeboxDashboardQuery(
+      db
+        .from('documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .ilike('document_type', '%wioa%'),
+      'WIOA documents',
+    ),
+    timeboxDashboardQuery(loadDashboardSubmissions(db), 'step submissions'),
+    timeboxDashboardQuery(loadDashboardPrograms(db), 'programs'),
+    timeboxDashboardQuery(loadDashboardStripeSessions(db), 'historical payment sessions'),
+    timeboxDashboardQuery(loadDashboardBarberSubscriptions(db), 'barber subscriptions'),
+    timeboxDashboardQuery(loadDashboardCosmetologySubscriptions(db), 'cosmetology subscriptions'),
+    timeboxDashboardQuery(loadDashboardBarberPayments(db), 'barber payments'),
+    timeboxDashboardQuery(loadDashboardPaidInvoices(db), 'paid invoices'),
+    timeboxDashboardHealth(getSystemHealth(db)),
+  ]);
+
+  const applications = safeRows(applicationsRes, degradedSections, 'dashboard_data').filter(
+    (row: any) => !isTestRecord(row.full_name, row.first_name, row.last_name, row.email),
+  );
+  const enrollments = safeRows(enrollmentsRes, degradedSections, 'dashboard_data')
+    .filter((row: any) => !isTestRecord(row.full_name, row.email));
+  const recentEnrollmentRows = safeRows(recentEnrollmentsRes, degradedSections, 'recent_students')
+    .filter((row: any) => !isTestRecord(row.full_name, row.email));
+  const programRows = safeRows(programsRes, degradedSections, 'unpublished_programs');
+  const complianceRows = safeRows(complianceRes, degradedSections, 'dashboard_data');
+  const leadRows = safeRows(leadsRes, degradedSections, 'dashboard_data');
+  const submissionRows = safeRows(submissionsRes, degradedSections, 'dashboard_data');
+
+  const pendingStatuses = new Set<string>(APPLICATION_REVIEW_STATUSES);
+  const pendingApplications: RecentApplication[] = applications
+    .filter((row: any) => pendingStatuses.has(String(row.status ?? 'submitted')))
+    .map((row: any) => {
+      const createdAt = row.submitted_at || row.created_at || '';
+      const ageDays = Number.isFinite(Date.parse(createdAt)) ? Math.max(0, Math.floor((now - Date.parse(createdAt)) / 86_400_000)) : 0;
+      return {
+        id: row.id,
+        first_name: row.first_name ?? null,
+        last_name: row.last_name ?? null,
+        full_name: row.full_name ?? null,
+        email: row.email ?? null,
+        program_interest: row.program_interest ?? row.program_slug ?? null,
+        status: row.status ?? 'submitted',
+        created_at: createdAt,
+        submitted_at: row.submitted_at ?? null,
+        age_days: ageDays,
+        urgent: ageDays >= 3,
+        href: `/applications/review/${row.id}`,
+      };
+    })
+    .sort((a, b) => b.age_days - a.age_days);
+
+  const recentApplications: RecentApplication[] = applications.slice(0, 15).map((row: any) => {
+    const createdAt = row.submitted_at || row.created_at || '';
+    const ageDays = Number.isFinite(Date.parse(createdAt)) ? Math.max(0, Math.floor((now - Date.parse(createdAt)) / 86_400_000)) : 0;
+    return {
+      id: row.id,
+      first_name: row.first_name ?? null,
+      last_name: row.last_name ?? null,
+      full_name: row.full_name ?? null,
+      email: row.email ?? null,
+      program_interest: row.program_interest ?? row.program_slug ?? null,
+      status: row.status ?? 'submitted',
+      created_at: createdAt,
+      submitted_at: row.submitted_at ?? null,
+      age_days: ageDays,
+      urgent: ageDays >= 3,
+      href: `/applications/review/${row.id}`,
+    };
+  });
+
+  const recordedOutcomes = new Set(safeRows(outcomesRes, degradedSections, 'dashboard_data')
+    .filter((row: any) => row.outcome_type && (row.user_id || row.user_uuid) && row.program_slug)
+    .map((row: any) => `${row.user_id || row.user_uuid}:${row.program_slug}`));
+  const programSlugById = new Map(programRows.map((row: any) => [row.id, row.slug]));
+  const noOutcomeEnrollments = outcomesRes.error ? [] : enrollments.filter((row: any) =>
+    !row.revoked_at && String(row.enrollment_state ?? row.status) === 'completed' &&
+    !recordedOutcomes.has(`${row.user_id}:${row.program_slug || programSlugById.get(row.program_id)}`));
+
+  const activeEnrollments = enrollments.filter(
+    (row: any) =>
+      !row.revoked_at &&
+      ['active', 'enrolled', 'in_progress'].includes(
+        String(row.enrollment_state ?? row.status ?? ''),
+      ),
+  );
+
+  const programTitleById = new Map(
+    programRows.map((row: any) => [row.id, row.title || row.slug || 'Program']),
+  );
+  const recentStudents = recentEnrollmentRows.slice(0, 15).map((row: any) => ({
+    id: row.user_id || row.id,
+    full_name: row.full_name ?? null,
+    email: row.email ?? null,
+    enrollment_status: row.enrollment_state ?? row.status ?? null,
+    created_at: row.enrolled_at ?? row.created_at ?? null,
+    program_name: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
+    href: `/students/${row.user_id || row.id}`,
+  }));
+
+  const statusCounts = enrollments.filter((row: any) => !row.revoked_at).reduce<Record<string, number>>((acc, row: any) => {
+    const key = String(row.enrollment_state ?? row.status ?? 'unknown');
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
+  const studentStatuses = Object.entries(statusCounts)
+    .map(([name, value]) => ({ name: name.replaceAll('_', ' '), value }))
+    .sort((a, b) => b.value - a.value);
+
+  const programCounts = enrollments.filter((row: any) => !row.revoked_at).reduce<
+    Record<string, { learners: number; completed: number; slug: string }>
+  >((acc, row: any) => {
+    const id = row.program_id || row.program_slug || 'unassigned';
+    const existing = acc[id] ?? { learners: 0, completed: 0, slug: row.program_slug || '' };
+    existing.learners += 1;
+    if (String(row.enrollment_state ?? row.status) === 'completed') existing.completed += 1;
+    acc[id] = existing;
+    return acc;
+  }, {});
+  const topPrograms = Object.entries(programCounts)
+    .map(([id, value]) => ({
+      id,
+      title: programTitleById.get(id) || value.slug || `Unassigned program (${id})`,
+      slug: value.slug || undefined,
+      learners: value.learners,
+      completed: value.completed,
+      completionRate: value.learners ? Math.round((value.completed / value.learners) * 100) : 0,
+    }))
+    .sort((a, b) => b.learners - a.learners)
+    .slice(0, 8);
+
+  const trendCounts = enrollments.reduce<Record<string, number>>((acc, row: any) => {
+    const key = monthKey(row.enrolled_at ?? row.created_at);
+    if (key) acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
+  const enrollmentTrend = Array.from({ length: 12 }, (_, index) => {
+    const date = new Date();
+    date.setDate(1);
+    date.setMonth(date.getMonth() - (11 - index));
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    return {
+      month: date.toLocaleDateString('en-US', { month: 'short' }),
+      enrollments: trendCounts[key] ?? 0,
+    };
+  });
+
+  const recentPayments: RecentPayment[] = [];
+  for (const row of stripeSessionsRes.error ? [] : (stripeSessionsRes.data ?? [])) {
+    recentPayments.push({
+      id: row.session_id,
+      email: row.email ?? null,
+      amountCents: n(row.amount),
+      label: row.program_slug ?? row.kind ?? null,
+      source: 'stripe',
+      paidAt: row.created_at,
+    });
+  }
+  for (const row of barberSubsRes.error ? [] : (barberSubsRes.data ?? [])) {
+    recentPayments.push({
+      id: row.id,
+      email: row.customer_email ?? null,
+      amountCents: dollarsToCents(row.amount_paid_at_checkout),
+      label: row.customer_name ?? 'Barber apprenticeship',
+      source: 'barber',
+      paidAt: row.created_at,
+    });
+  }
+  for (const row of cosmetologySubsRes.error ? [] : (cosmetologySubsRes.data ?? [])) {
+    recentPayments.push({
+      id: row.id,
+      email: row.customer_email ?? null,
+      amountCents: dollarsToCents(row.amount_paid_at_checkout),
+      label: row.customer_name ?? 'Cosmetology apprenticeship',
+      source: 'cosmetology',
+      paidAt: row.created_at,
+    });
+  }
+  for (const row of barberPaymentsRes.error ? [] : (barberPaymentsRes.data ?? [])) {
+    recentPayments.push({
+      id: row.id,
+      email: null,
+      amountCents: dollarsToCents(row.amount_paid),
+      label: 'Barber recurring',
+      source: 'barber_recurring',
+      paidAt: row.payment_date ?? row.created_at,
+    });
+  }
+  recentPayments.sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime());
+  const verifiedRecentPayments = recentPayments.filter(
+    (payment) => !isTestOrSuspiciousPayment(payment),
+  );
+
+  const invoiceTotals = paidInvoicesRes.error
+    ? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false}
+    : paidInvoicesRes.data ?? {allTimeCents:0,thisMonthCents:0,paidCount:0,allTimeAvailable:false,monthAvailable:false};
+  if (hasUnavailableInvoiceTotals(invoiceTotals)) degradedSections.push('paid_invoices');
+  if ([stripeSessionsRes,barberSubsRes,cosmetologySubsRes,barberPaymentsRes].some(result => result.error)) {
+    if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
+  }
+  // Paid invoices have an explicit cents contract and one canonical identity.
+  // Enrollment balances and historical receipt snapshots overlap; never add
+  // them together or choose their maximum as an invented revenue total.
+  const revenueAllTimeCents = invoiceTotals.allTimeCents;
+  const revenueThisMonthCents = invoiceTotals.thisMonthCents;
+
+  const complianceAlerts = complianceRows.map((row: any) => ({
+    id: row.id,
+    alert_type: row.alert_type ?? null,
+    severity: row.severity ?? null,
+    title: row.alert_type ? String(row.alert_type).replaceAll('_', ' ') : null,
+    description: row.message ?? null,
+    created_at: row.created_at ?? null,
+  }));
+
+  const staleLeads = leadRows
+    .filter((row: any) => !isTestRecord(row.full_name, row.email))
+    .map((row: any) => ({
+      id: row.id,
+      name: row.full_name || row.email || null,
+      status: row.status ?? null,
+      updated_at: row.last_contact_at ?? row.created_at ?? null,
+      days_stale: (row.last_contact_at ?? row.created_at)
+        ? Math.max(0, Math.floor((now - new Date(row.last_contact_at ?? row.created_at).getTime()) / 86_400_000))
+        : 0,
+      href: `/crm/leads/${row.id}`,
+    }))
+    .filter((row) => row.days_stale >= 7);
+
+  const activityByEnrollment = new Map<string, number>();
+  const activityByUser = new Map<string, number>();
+  for (const progress of safeRows(learningActivityRes, degradedSections, 'dashboard_data')) {
+    const timestamp = Date.parse(progress.last_watched ?? progress.updated_at ?? '');
+    if (!Number.isFinite(timestamp) || timestamp > now) continue;
+    const activity = progress.enrollment_id ? activityByEnrollment : activityByUser;
+    const key = progress.enrollment_id || progress.user_id;
+    if (key) activity.set(key, Math.max(activity.get(key) ?? 0, timestamp));
+  }
+  const lastLearningAt = (row: any) => Math.max(
+    Date.parse(row.enrolled_at ?? row.created_at ?? '') || 0,
+    activityByEnrollment.get(row.id) ?? 0,
+    activityByUser.get(row.user_id) ?? 0,
+  );
+  const inactiveLearners = activeEnrollments
+    .filter((row: any) => !learningActivityRes.error && lastLearningAt(row) > 0 &&
+      now - lastLearningAt(row) >= 7 * 86_400_000)
+    .map((row: any) => ({
+      enrollmentId: row.id,
+      userId: row.user_id,
+      enrolledAt: row.enrolled_at ?? row.created_at ?? '',
+      fullName: row.full_name ?? null,
+      email: row.email ?? null,
+      daysInactive: Math.floor((now - lastLearningAt(row)) / 86_400_000),
+      programTitle: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
+      href: `/students/${row.user_id}`,
+    }));
+
+  const blockedPrograms = programRows
+    .filter(isUnpublishedOperationalProgram)
+    .map((row: any) => ({
+      id: row.id,
+      title: row.title ?? 'Untitled',
+      slug: row.slug ?? '',
+      status: row.status ?? 'draft',
+      updatedAt: row.updated_at ?? '',
+      href: `/programs/${row.id}`,
+    }));
+
+  const pendingSubmissions = submissionRows.map((row: any) => ({
+    id: row.id,
+    user_id: row.user_id ?? null,
+    course_lesson_id: row.course_lesson_id ?? null,
+    step_type: row.step_type ?? null,
+    submitted_at: row.created_at ?? null,
+    status: row.status ?? 'pending',
+  }));
+
+  const pendingWioaDocs = wioaDocsRes.error ? 0 : (wioaDocsRes.count ?? 0);
+  const priorities: PriorityItem[] = [];
+  if (pendingApplications.length) {
+    const score = calculatePriorityScore({
+      type: 'enrollment',
+      days: Math.max(0, pendingApplications[0].age_days - 3),
+      money: 2,
+      blocked: true,
+    });
+    priorities.push({
+      id: 'pending-applications',
+      type: 'enrollment',
+      label: `${pendingApplications.length} applications awaiting review`,
+      href: '/applications',
+      score,
+      severity: scoreSeverity(score),
+      context: `${pendingApplications.filter((row) => row.urgent).length} are 3+ days old`,
+    });
+  }
+  if (complianceAlerts.length) {
+    const score = calculatePriorityScore({ type: 'compliance', risk: 4, blocked: true });
+    priorities.push({
+      id: 'compliance-alerts',
+      type: 'compliance',
+      label: `${complianceAlerts.length} unresolved compliance alerts`,
+      href: '/compliance',
+      score,
+      severity: scoreSeverity(score),
+      context: 'Review current compliance alerts',
+    });
+  }
+  if (staleLeads.length) {
+    const score = calculatePriorityScore({
+      type: 'lead',
+      days: staleLeads[0]?.days_stale ?? 0,
+      money: 2,
+    });
+    priorities.push({
+      id: 'stale-leads',
+      type: 'lead',
+      label: `${staleLeads.length} stale CRM leads`,
+      href: '/crm/leads',
+      score,
+      severity: scoreSeverity(score),
+      context: 'No activity for 7+ days',
+    });
+  }
+  if (pendingWioaDocs) {
+    const score = calculatePriorityScore({ type: 'wioa', risk: 3, blocked: true });
+    priorities.push({
+      id: 'wioa-docs',
+      type: 'wioa',
+      label: `${pendingWioaDocs} WIOA documents awaiting review`,
+      href: '/wioa/documents',
+      score,
+      severity: scoreSeverity(score),
+      context: 'Funding eligibility may be blocked',
+    });
+  }
+
+  const recentActivity = [
+    ...recentApplications.map((row) => ({
+      id: `app-${row.id}`,
+      title: `Application: ${row.full_name || row.email || row.id}`,
+      timestamp: row.created_at,
+    })),
+    ...recentStudents.map((row) => ({
+      id: `enr-${row.id}`,
+      title: `Enrollment: ${row.full_name || row.email || row.id}`,
+      timestamp: row.created_at || '',
+    })),
+  ]
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, 15);
+
+  const newAppsToday = applications.filter((row: any) => (row.created_at ?? '') >= todayIso).length;
+  const newEnrollmentsToday = enrollments.filter(
+    (row: any) => (row.created_at ?? '') >= todayIso,
+  ).length;
+  const newLeadsToday = leadRows.filter((row: any) => (row.created_at ?? '') >= todayIso).length;
+  if ([studentsRes, certificatesRes, holdersRes, holderDocsRes, wioaDocsRes].some(result => result.error)) {
+    if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
+  }
+  const counts = {
+    pendingApplications: pendingApplications.length,
+    activeEnrollments: activeEnrollments.length,
+    revenueThisMonthCents,
+    certificatesIssued: certificatesRes.error ? 0 : (certificatesRes.count ?? 0),
+    pendingProgramHolders: holdersRes.error ? 0 : (holdersRes.count ?? 0),
+    pendingDocuments: holderDocsRes.error ? 0 : (holderDocsRes.count ?? 0),
+  };
+
+  const kpis = [
+    {
+      label: 'Pending Applications',
+      unavailable: Boolean(applicationsRes.error),
+      value: counts.pendingApplications,
+      delta: 0,
+      deltaLabel: 'Live pending count',
+      href: '/applications',
+      urgent: counts.pendingApplications > 0,
+      sub: `${pendingApplications.filter((row) => row.urgent).length} aged 3+ days`,
+    },
+    {
+      label: 'Active Enrollments',
+      unavailable: Boolean(enrollmentsRes.error),
+      value: counts.activeEnrollments,
+      delta: 0,
+      deltaLabel: 'Live active count',
+      href: '/students?status=active',
+      urgent: inactiveLearners.length > 0,
+      sub: `${inactiveLearners.length} inactive 7+ days`,
+    },
+    {
+      label: 'Paid Invoices This Month',
+      unavailable: !invoiceTotals.monthAvailable,
+      value: revenueThisMonthCents,
+      delta: 0,
+      deltaLabel: 'Paid invoice value (USD)',
+      href: '/integrations/quickbooks',
+      urgent: false,
+      sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} paid invoices all time`,
+    },
+    {
+      label: 'Certificates Issued',
+      unavailable: Boolean(certificatesRes.error) || typeof certificatesRes.count !== 'number',
+      value: counts.certificatesIssued,
+      delta: 0,
+      deltaLabel: 'Live certificate count',
+      href: '/certificates',
+      urgent: false,
+    },
+    {
+      label: 'Pending Program Holders',
+      unavailable: Boolean(holdersRes.error) || typeof holdersRes.count !== 'number',
+      value: counts.pendingProgramHolders,
+      delta: 0,
+      deltaLabel: 'Awaiting approval',
+      href: '/program-holders',
+      urgent: counts.pendingProgramHolders > 0,
+    },
+    {
+      label: 'Pending Documents',
+      unavailable: Boolean(holderDocsRes.error) || typeof holderDocsRes.count !== 'number',
+      value: counts.pendingDocuments,
+      delta: 0,
+      deltaLabel: 'Awaiting review',
+      href: '/program-holder-documents',
+      urgent: counts.pendingDocuments > 0,
+    },
+  ];
+
+  const profile = profileRes.data
+    ? { full_name: profileRes.data.full_name ?? null, role: profileRes.data.role ?? undefined }
+    : null;
+  const isSuperAdmin = profileRes.data?.role === 'super_admin';
+
+  return {
+    sourceAvailability: {
+      applications: !applicationsRes.error,
+      wioaDocuments: !wioaDocsRes.error && typeof wioaDocsRes.count === 'number',
+      submissions: !submissionsRes.error,
+      programHolders: !holdersRes.error && typeof holdersRes.count === 'number',
+      holderDocuments: !holderDocsRes.error && typeof holderDocsRes.count === 'number',
+      operationalAlerts: !applicationsRes.error && !enrollmentsRes.error && !outcomesRes.error && !complianceRes.error,
+    },
+    enrollmentSummary: {totalRecords: enrollments.filter((row: any) => !row.revoked_at).length, available: !enrollmentsRes.error},
+    counts,
+    revenueAllTimeCents,
+    paidInvoiceSummary: {allTimeAvailable:invoiceTotals.allTimeAvailable,monthAvailable:invoiceTotals.monthAvailable,paidCount:invoiceTotals.paidCount},
+    totalStudentsAvailable: !studentsRes.error && typeof studentsRes.count === 'number',
+    newTodayAvailable: !applicationsRes.error && !enrollmentsRes.error && !leadsRes.error,
+    totalStudents: studentsRes.error ? 0 : (studentsRes.count ?? 0),
+    recentPayments: verifiedRecentPayments.slice(0, 10),
+    operational: {
+      needsReview: pendingApplications.length,
+      needsReviewDetail: `${pendingApplications.length} applications awaiting review`,
+      atRisk: inactiveLearners.length,
+      complianceAlerts: complianceAlerts.length,
+      complianceAlertsSeverity: complianceAlerts[0]?.severity ?? null,
+      newToday: newAppsToday + newEnrollmentsToday + newLeadsToday,
+      newTodayDetail: `${newAppsToday} applications · ${newEnrollmentsToday} enrollments · ${newLeadsToday} leads`,
+      newAppsToday,
+      newLeadsToday,
+      newEnrollmentsToday,
+      revenueThisMonthCents,
+    },
+    priorities: sortPriorityItems(priorities),
+    kpis,
+    enrollmentTrend,
+    studentStatuses,
+    topPrograms,
+    recentActivity,
+    recentStudents,
+    recentApplications,
+    pendingApplications,
+    blockedPrograms,
+    inactiveLearners,
+    pendingSubmissions,
+    complianceAlerts,
+    staleLeads,
+    pendingWioaDocs,
+    stalledApplications: pendingApplications.filter(
+      (row) => row.age_days >= 7,
+    ) as unknown as Record<string, unknown>[],
+    noOutcomeEnrollments: noOutcomeEnrollments.map((row: any) => ({
+      ...row,
+      program_title: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
+    })),
+    missingFundingEnrollments: activeEnrollments.filter(
+      (row: any) => !row.funding_source && n(row.amount_paid_cents) === 0,
+    ) as Record<string, unknown>[],
+    profile,
+    generatedAt: new Date().toISOString(),
+    sitePreviewTargets: [
+      {
+        label: 'Public Site',
+        url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+      },
+      {
+        label: 'Admin',
+        url: process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
+      },
+      {
+        label: 'LMS',
+        url: process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
+      },
+    ],
+    degradedSections,
+    systemHealth,
+    isSuperAdmin,
+  };
+}
+

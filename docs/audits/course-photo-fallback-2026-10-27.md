@@ -1,0 +1,7 @@
+# Course photo fallback — 2026-10-27
+
+The stopped cosmetology lesson contains 250 inspected licensed media entries, but none is marked lesson_match_verified and only one is a photograph. Existing reviewed-photo selection therefore cannot choose them. The selected-video still path additionally required an exact teachingCueSelections binding, recreating the exact-photo blocker despite the operator authorizing a next-best course image.
+
+Premium illustrative delivery now first preserves exact approved reference/selected cue choices, then selects the closest contextual frame from this course's ready source_broll. Candidates require an entitlement, license evidence, a dated sampled-frame inspection, visible-action observations, and a valid inspected sample fraction. The worker hashes the downloaded video against the inspection before extracting a frame, verifies saved bytes, and signs the private result. Frames remain distinct across cues. This is a contextual illustration, not evidence of a learner's skill or an exact performed procedure. No approval, licensing, access, owner-pause, queue lease, or publication gate is fabricated or bypassed.
+
+Validation: focused selection regressions exercise contextual relevance, frame exhaustion, course scope, inactive sources, rights, inspected hashes, invalid dates and fractions. Existing strict selected-cue consumers keep their original default. Combined application checks and protected CI are reported on PR #2178.

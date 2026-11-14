@@ -1,0 +1,47 @@
+tasks:
+  setup:
+    name: Setup
+    description: Prepare local environment files and install pnpm dependencies.
+    command: bash .devcontainer/setup-env.sh && sudo corepack enable && sudo corepack prepare pnpm@10.28.2 --activate && pnpm install --frozen-lockfile
+    triggeredBy:
+      - postDevcontainerStart
+
+  build:
+    name: Build
+    description: Build the LMS application for production.
+    command: pnpm next build
+    dependsOn:
+      - setup
+
+  lint:
+    name: Lint
+    description: Run ESLint across the workspace.
+    command: pnpm lint
+    dependsOn:
+      - setup
+
+  test:
+    name: Test
+    description: Run the Vitest test suite once.
+    command: pnpm test
+    dependsOn:
+      - setup
+
+services:
+  lms-dev:
+    name: LMS Dev Server
+    description: Next.js LMS application on port 3000.
+    commands:
+      start: bash .devcontainer/setup-env.sh && pnpm dev
+      ready: curl -sf http://localhost:3000 > /dev/null
+    triggeredBy:
+      - manual
+
+  admin-dev:
+    name: Admin Dev Server
+    description: Next.js admin application on port 3001.
+    commands:
+      start: bash .devcontainer/setup-env.sh && pnpm dev:admin
+      ready: curl -sf http://localhost:3001 > /dev/null
+    triggeredBy:
+      - manual

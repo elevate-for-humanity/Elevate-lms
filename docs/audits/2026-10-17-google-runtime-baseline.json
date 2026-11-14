@@ -1,0 +1,493 @@
+{
+  "observedAt": "2026-10-17T11:44:10.511Z",
+  "project": "elegant-racer-299721",
+  "cloudRunScope": "us-central1; later evidence identified an additional course worker in us-east1",
+  "failures": [],
+  "cloudRunServices": [
+    {
+      "name": "elevate-admin-migration",
+      "uri": "https://elevate-admin-migration-aabnh2y32a-uc.a.run.app",
+      "latestReadyRevision": "elevate-admin-migration-00189-p6g",
+      "latestCreatedRevision": "elevate-admin-migration-00189-p6g",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        },
+        {
+          "type": "ConfigurationsReady",
+          "status": "True"
+        },
+        {
+          "type": "RoutesReady",
+          "status": "True"
+        }
+      ],
+      "traffic": [
+        {
+          "revision": "elevate-admin-migration-00189-p6g",
+          "percent": 100,
+          "tag": "c-aa10c18af951"
+        }
+      ],
+      "limits": [
+        {
+          "cpu": "4",
+          "memory": "8Gi"
+        }
+      ]
+    },
+    {
+      "name": "elevate-lms-migration",
+      "uri": "https://elevate-lms-migration-aabnh2y32a-uc.a.run.app",
+      "latestReadyRevision": "elevate-lms-migration-00167-xj2",
+      "latestCreatedRevision": "elevate-lms-migration-00167-xj2",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        },
+        {
+          "type": "ConfigurationsReady",
+          "status": "True"
+        },
+        {
+          "type": "RoutesReady",
+          "status": "True"
+        }
+      ],
+      "traffic": [
+        {
+          "revision": "elevate-lms-migration-00167-xj2",
+          "percent": 100,
+          "tag": "c-8ef29879f3d9"
+        }
+      ],
+      "limits": [
+        {
+          "cpu": "4",
+          "memory": "8Gi"
+        }
+      ]
+    },
+    {
+      "name": "elevate-marketing-migration",
+      "uri": "https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app",
+      "latestReadyRevision": "elevate-marketing-migration-r43e37c9d-39016126670-1",
+      "latestCreatedRevision": "elevate-marketing-migration-r43e37c9d-39016126670-1",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        },
+        {
+          "type": "ConfigurationsReady",
+          "status": "True"
+        },
+        {
+          "type": "RoutesReady",
+          "status": "True"
+        }
+      ],
+      "traffic": [
+        {
+          "revision": "elevate-marketing-migration-r43e37c9d-39016126670-1",
+          "percent": 100,
+          "tag": "c-43e37c9d9b55"
+        }
+      ],
+      "limits": [
+        {
+          "cpu": "1",
+          "memory": "4Gi"
+        }
+      ]
+    },
+    {
+      "name": "elevate-store-migration",
+      "uri": "https://elevate-store-migration-aabnh2y32a-uc.a.run.app",
+      "latestReadyRevision": "elevate-store-migration-r43e37c9d-39016165723-1",
+      "latestCreatedRevision": "elevate-store-migration-r43e37c9d-39016165723-1",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        },
+        {
+          "type": "ConfigurationsReady",
+          "status": "True"
+        },
+        {
+          "type": "RoutesReady",
+          "status": "True"
+        }
+      ],
+      "traffic": [
+        {
+          "revision": "elevate-store-migration-r43e37c9d-39016165723-1",
+          "percent": 100,
+          "tag": "c-43e37c9d9b55"
+        }
+      ],
+      "limits": [
+        {
+          "cpu": "4",
+          "memory": "8Gi"
+        }
+      ]
+    },
+    {
+      "name": "elevate-studio-browser",
+      "uri": "https://elevate-studio-browser-aabnh2y32a-uc.a.run.app",
+      "latestReadyRevision": "elevate-studio-browser-runtime-mv670pu3",
+      "latestCreatedRevision": "elevate-studio-browser-00024-7gf",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        },
+        {
+          "type": "ConfigurationsReady",
+          "status": "True",
+          "reason": "Retired"
+        },
+        {
+          "type": "RoutesReady",
+          "status": "True"
+        }
+      ],
+      "traffic": [
+        {
+          "revision": "elevate-studio-browser-00009-rf2",
+          "percent": 100
+        }
+      ],
+      "limits": [
+        {
+          "cpu": "2",
+          "memory": "4Gi"
+        }
+      ]
+    }
+  ],
+  "cloudRunJobs": [
+    {
+      "name": "elevate-course-builder",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        }
+      ],
+      "latestCreatedExecution": {
+        "completionStatus": "EXECUTION_CANCELLED",
+        "completionTimestamp": "2026-10-13T06:30:12.384732Z",
+        "creationTimestamp": "2026-10-13T05:15:51.963822Z",
+        "name": "elevate-course-builder-9w92l"
+      },
+      "limits": [
+        {
+          "cpu": "4",
+          "memory": "8Gi"
+        }
+      ]
+    },
+    {
+      "name": "elevate-video-render",
+      "conditions": [
+        {
+          "type": "Ready",
+          "status": "True"
+        }
+      ],
+      "latestCreatedExecution": {
+        "completionStatus": "EXECUTION_CANCELLED",
+        "completionTimestamp": "2026-10-10T15:38:33.216452Z",
+        "creationTimestamp": "2026-10-10T15:31:08.006217Z",
+        "name": "elevate-video-render-ggtsk"
+      },
+      "limits": [
+        {
+          "cpu": "8000m",
+          "memory": "32Gi"
+        }
+      ]
+    }
+  ],
+  "computeInstances": [
+    {
+      "name": "elevate-pbx",
+      "status": "RUNNING",
+      "machineType": "https://www.googleapis.com/compute/v1/projects/elegant-racer-299721/zones/us-central1-a/machineTypes/e2-standard-2"
+    },
+    {
+      "name": "elevate-studio-browser-trial",
+      "status": "RUNNING",
+      "machineType": "https://www.googleapis.com/compute/v1/projects/elegant-racer-299721/zones/us-central1-a/machineTypes/e2-standard-2"
+    }
+  ],
+  "scheduler": [],
+  "buckets": [
+    {
+      "name": "elegant-racer-299721-studio-browser-auth",
+      "location": "US-CENTRAL1"
+    },
+    {
+      "name": "elevate-render-tests-484736877039-us-central1",
+      "location": "US-CENTRAL1"
+    }
+  ],
+  "courseExecutions": [
+    {
+      "name": "elevate-course-builder-9w92l",
+      "startedAt": "2026-10-13T05:16:51.813500Z",
+      "completedAt": "2026-10-13T06:30:12.384732Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "Cancelled"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-course-builder-xv6lf",
+      "startedAt": "2026-10-13T04:33:39.776686Z",
+      "completedAt": "2026-10-13T04:38:50.092766Z",
+      "failed": 2,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-course-builder-xdkn5",
+      "startedAt": "2026-10-13T03:08:19.735571Z",
+      "completedAt": "2026-10-13T04:30:58.712809Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-course-builder-jqxjq",
+      "startedAt": "2026-10-13T03:04:09.731853Z",
+      "completedAt": "2026-10-13T03:07:04.414480Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-course-builder-5fcx7",
+      "startedAt": "2026-10-13T01:24:51.892109Z",
+      "completedAt": "2026-10-13T03:00:49.841718Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    }
+  ],
+  "videoExecutions": [
+    {
+      "name": "elevate-video-render-ggtsk",
+      "startedAt": "2026-10-10T15:31:17.213081Z",
+      "completedAt": "2026-10-10T15:38:33.216452Z",
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "Cancelled"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-video-render-6gzfg",
+      "startedAt": "2026-10-10T14:21:49.146718Z",
+      "completedAt": "2026-10-10T14:51:52.702320Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-video-render-lp9bw",
+      "startedAt": "2026-10-08T19:10:18.430438Z",
+      "completedAt": "2026-10-08T20:07:35.550597Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-video-render-j8bps",
+      "startedAt": "2026-10-08T19:01:18.437022Z",
+      "completedAt": "2026-10-08T19:04:33.518028Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    },
+    {
+      "name": "elevate-video-render-rcbvp",
+      "startedAt": "2026-10-08T18:55:02.405683Z",
+      "completedAt": "2026-10-08T18:57:26.995699Z",
+      "failed": 1,
+      "conditions": [
+        {
+          "type": "Completed",
+          "status": "False",
+          "reason": "NonZeroExitCode"
+        },
+        {
+          "type": "ResourcesAvailable",
+          "status": "True"
+        },
+        {
+          "type": "Started",
+          "status": "True"
+        },
+        {
+          "type": "ContainerReady",
+          "status": "True"
+        }
+      ]
+    }
+  ],
+  "limits": "Resource readiness does not prove application operation. This snapshot precedes activation of release 6b51ed294."
+}

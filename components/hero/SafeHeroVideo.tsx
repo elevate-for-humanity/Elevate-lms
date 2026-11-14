@@ -1,0 +1,140 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+interface SafeHeroVideoProps {
+  src: string;
+  poster: string;
+  className?: string;
+  ariaLabel?: string;
+  /** Keep false when a poster would create a visible image-to-video flash. */
+  showPosterBeforePlayback?: boolean;
+  /** Repeat the visual continuously. Audio/narration is controlled separately. */
+  loop?: boolean;
+  /** Prioritize the visible poster and video metadata for above-the-fold heroes. */
+  priority?: boolean;
+}
+
+type NetworkInformationLike = {
+  saveData?: boolean;
+  effectiveType?: string;
+  addEventListener?: (type: 'change', listener: () => void) => void;
+  removeEventListener?: (type: 'change', listener: () => void) => void;
+};
+
+function shouldAvoidAutoplay(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+
+  const connection = (navigator as Navigator & { connection?: NetworkInformationLike }).connection;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const constrainedNetwork =
+    connection?.saveData === true ||
+    connection?.effectiveType === 'slow-2g' ||
+    connection?.effectiveType === '2g';
+
+  return reducedMotion || constrainedNetwork;
+}
+
+/**
+ * Shared hero-video surface.
+ *
+ * The poster is physically mounted behind the video layer, remains visible
+ * until playback actually starts, and stays available as the fallback if the
+ * video cannot load or autoplay. Videos play once unless loop is requested.
+ *
+ * On Save-Data, 2G/slow-2G, or reduced-motion devices, the poster is used
+ * instead of downloading/playing the hero video.
+ */
+export function SafeHeroVideo({
+  src,
+  poster,
+  className = '',
+  ariaLabel = 'Hero video',
+  showPosterBeforePlayback = true,
+  loop = false,
+  priority = false,
+}: SafeHeroVideoProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasFailed, setHasFailed] = useState(false);
+  const [avoidAutoplay, setAvoidAutoplay] = useState(false);
+
+  useEffect(() => {
+    const updateNetworkPolicy = () => setAvoidAutoplay(shouldAvoidAutoplay());
+    updateNetworkPolicy();
+
+    const connection = (navigator as Navigator & { connection?: NetworkInformationLike })
+      .connection;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    connection?.addEventListener?.('change', updateNetworkPolicy);
+    motion.addEventListener('change', updateNetworkPolicy);
+
+    return () => {
+      connection?.removeEventListener?.('change', updateNetworkPolicy);
+      motion.removeEventListener('change', updateNetworkPolicy);
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsPlaying(false);
+    setHasFailed(false);
+
+    const video = videoRef.current;
+    if (!video || avoidAutoplay) {
+      video?.pause();
+      return;
+    }
+
+    video.muted = true;
+    video.loop = loop;
+    video.currentTime = 0;
+    void video.play().catch(() => {
+      // Autoplay can be blocked. Keep the mounted poster visible underneath.
+    });
+
+    return () => video.pause();
+  }, [src, avoidAutoplay, loop]);
+
+  return (
+    <>
+      {showPosterBeforePlayback || hasFailed || avoidAutoplay ? (
+        /* IMAGE-CONTRACT: allow raw img because the native poster must share the video source and remain available without image optimization during playback failure. */
+        <img
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full object-cover ${className} z-0`}
+          decoding="async"
+          fetchPriority={priority || showPosterBeforePlayback ? 'high' : 'auto'}
+        />
+      ) : null}
+      {!hasFailed && !avoidAutoplay ? (
+        <video
+          ref={videoRef}
+          autoPlay
+          loop={loop}
+          muted
+          playsInline
+          preload="metadata"
+          poster={showPosterBeforePlayback ? poster : undefined}
+          aria-label={ariaLabel}
+          onCanPlay={() => {
+            void videoRef.current?.play().catch(() => {
+              // Keep the poster visible when browser policy blocks playback.
+            });
+          }}
+          onPlaying={() => setIsPlaying(true)}
+          onError={() => {
+            setIsPlaying(false);
+            setHasFailed(true);
+          }}
+          className={`absolute inset-0 h-full w-full object-cover ${className} z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      ) : null}
+    </>
+  );
+}
+
+export default SafeHeroVideo;

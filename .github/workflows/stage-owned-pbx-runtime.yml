@@ -1,0 +1,101 @@
+name: Stage independent PBX runtime prerequisites
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/stage-owned-pbx-runtime.yml'
+      - 'scripts/gcp/*stage-pbx-runtime.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stage-owned-pbx-runtime.yml'
+      - 'scripts/gcp/stage-pbx-runtime.py'
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('google-pbx-checks-{0}-{1}', github.workflow, github.ref) }}
+  cancel-in-progress: false
+  queue: max
+jobs:
+  contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python3 scripts/gcp/test-stage-pbx-runtime.py
+      - name: Build only the reviewed runtime files and tested Node binary
+        run: python3 scripts/gcp/stage-pbx-runtime.py bundle --node-binary "$(command -v node)" --revision "$GITHUB_SHA" --output /tmp/pbx-runtime.tgz
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Stage through the protected Google deployment identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/stage-owned-pbx-runtime.yml/dispatches" -f ref=main
+  stage:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify the existing target VM
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(status)')" = RUNNING
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Stage verified executable files and inactive units; never activate calls
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE="/tmp/elevate-pbx-runtime-$GITHUB_SHA.tgz"
+          python3 scripts/gcp/stage-pbx-runtime.py bundle --node-binary "$(command -v node)" --revision "$GITHUB_SHA" --output "$BUNDLE"
+          BUNDLE_SHA=$(sha256sum "$BUNDLE" | cut -d ' ' -f 1)
+          gcloud compute scp "$BUNDLE" "elevate-pbx:$BUNDLE" --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          set +e
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo python3 - install --archive $BUNDLE --sha256 $BUNDLE_SHA --revision $GITHUB_SHA" \
+            < scripts/gcp/stage-pbx-runtime.py > /tmp/pbx-stage-output 2> /tmp/pbx-stage-error
+          SSH_STATUS=$?
+          set -e
+          python3 scripts/gcp/stage-pbx-runtime.py report --input /tmp/pbx-stage-output --status "$SSH_STATUS"
+      - name: Verify authoritative DNS, trusted TLS and SIP transport
+        if: always()
+        run: node scripts/gcp/verify-pbx-transport.mjs
+      - name: Inspect actual runtime and retain blocked activation requirements
+        if: always()
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command='sudo python3 -' < scripts/gcp/audit-pbx-runtime.py | tee pbx-runtime-evidence.json
+      - name: Preserve sanitized installation and runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbx-runtime-stage-evidence
+          path: pbx-*-evidence.json
+          if-no-files-found: error
+          retention-days: 14

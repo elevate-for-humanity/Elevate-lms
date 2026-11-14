@@ -1,0 +1,34 @@
+{
+  "name": "Elevate Platform",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker": {}
+  },
+  "mounts": [
+    "source=elevate-lms-next-cache,target=${containerWorkspaceFolder}/.next/cache,type=volume"
+  ],
+  "containerEnv": {
+    "ELEVATE_DEVINT_CONTAINER": "true",
+    "ELEVATE_MARKETING_URL": "http://localhost:3002",
+    "ELEVATE_ADMIN_URL": "http://localhost:3001",
+    "ELEVATE_LMS_URL": "http://localhost:3000",
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "forwardPorts": [3000, 3001, 3002],
+  "portsAttributes": {
+    "3000": { "label": "Elevate LMS" },
+    "3001": { "label": "Elevate Admin" },
+    "3002": { "label": "Elevate Marketing" }
+  },
+  "postCreateCommand": "bash .devcontainer/setup-env.sh && corepack enable && pnpm install --frozen-lockfile --strict-peer-dependencies=false && node scripts/sync-pwa-public.mjs marketing && node scripts/sync-pwa-public.mjs lms && node scripts/sync-pwa-public.mjs admin && pnpm --filter @elevate/marketing build && pnpm --filter @elevate/lms build && pnpm --filter @elevate/admin build",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "redhat.vscode-yaml"
+      ]
+    }
+  }
+}

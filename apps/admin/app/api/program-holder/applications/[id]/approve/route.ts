@@ -1,0 +1,430 @@
+import { ensureProgramHolderQuickBooksContractor } from '@/lib/integrations/quickbooks-program-holder-contractor';
+import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireRoles } from '@/lib/admin/guards';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { logger } from '@/lib/logger';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+// Program Holder pages are served by the LMS app, not the public marketing site.
+// Keeping auth callback and destination on the same app domain is especially
+// important on mobile browsers, where cross-domain cookies are often blocked.
+const PORTAL_BASE = 'https://app.elevateforhumanity.org';
+
+type AuthUserSummary = { id: string; email?: string | null };
+
+function splitName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts.shift() || fullName,
+    lastName: parts.join(' ') || null,
+  };
+}
+
+function escapeHtml(value: unknown) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function accountRoleForApprovedRole(value: unknown): 'program_holder' | 'site_coordinator' {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
+  return normalized.includes('site coordinator') ? 'site_coordinator' : 'program_holder';
+}
+
+async function requireAdminActor(request: Request) {
+  const actor = await apiRequireRoles(request, ['admin', 'super_admin', 'staff', 'org_admin']);
+  if (actor.error) return { error: actor.error } as const;
+  const db = await requireAdminClient();
+  return { db, user: { id: actor.id, email: actor.email } } as const;
+}
+
+async function findOrCreateUser(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  email: string,
+  fullName: string,
+  accountRole: 'program_holder' | 'site_coordinator',
+) {
+  const normalizedEmail = email.toLowerCase().trim();
+  const { data: existingProfile } = await db
+    .from('profiles')
+    .select('id, role, program_holder_id')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+  if (existingProfile?.id) {
+    return {
+      userId: String(existingProfile.id),
+      isNewUser: false,
+      existingRole: String(existingProfile.role || ''),
+    };
+  }
+
+  const { data: listed } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  const users = (listed?.users ?? []) as AuthUserSummary[];
+  const existingAuthUser = users.find(
+    (candidate) => candidate.email?.toLowerCase() === normalizedEmail,
+  );
+  if (existingAuthUser?.id) {
+    return { userId: existingAuthUser.id, isNewUser: false, existingRole: '' };
+  }
+
+  const tempPassword = `${crypto.randomUUID().replace(/-/g, '')}Aa1!`;
+  const { data, error } = await db.auth.admin.createUser({
+    email: normalizedEmail,
+    password: tempPassword,
+    email_confirm: true,
+    app_metadata: { role: accountRole },
+    user_metadata: { full_name: fullName, role: accountRole },
+  });
+  if (error || !data.user?.id) {
+    throw new Error(error?.message || 'Unable to create Program Holder account.');
+  }
+  return { userId: data.user.id, isNewUser: true, existingRole: '' };
+}
+
+async function secureAccessLink(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  email: string,
+  isNewUser: boolean,
+) {
+  const destination = isNewUser
+    ? '/reset-password?portal=program-holder&mode=recovery&next=/program-holder/sign-mou'
+    : '/program-holder/sign-mou';
+  const redirectTo = `${PORTAL_BASE}/auth/callback?redirect=${encodeURIComponent(destination)}`;
+  const { data, error } = await db.auth.admin.generateLink({
+    type: isNewUser ? 'recovery' : 'magiclink',
+    email: email.toLowerCase().trim(),
+    options: { redirectTo },
+  });
+  if (error) {
+    logger.warn('[program-holder/approve] secure access link failed', {
+      email,
+      error: error.message,
+    });
+    return null;
+  }
+  return data?.properties?.action_link || null;
+}
+
+async function auditEmail(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  params: {
+    recipient: string;
+    subject: string;
+    applicationId: string;
+    success: boolean;
+    error?: string;
+  },
+) {
+  await db
+    .from('email_logs')
+    .insert({
+      action: 'program_holder_approval_notification',
+      recipient_email: params.recipient,
+      recipient: params.recipient,
+      to: params.recipient,
+      subject: params.subject,
+      provider: 'sendgrid',
+      status: params.success ? 'sent' : 'failed',
+      error_message: params.error || null,
+      error: params.error || null,
+      sent_at: params.success ? new Date().toISOString() : null,
+      details: {
+        application_id: params.applicationId,
+        application_type: 'program_holder',
+        event: 'approved',
+      },
+      metadata: {
+        application_id: params.applicationId,
+        application_type: 'program_holder',
+        event: 'approved',
+      },
+    })
+    .then(({ error }) => {
+      if (error)
+        logger.warn('[program-holder/approve] email audit failed', { error: error.message });
+    });
+}
+
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const actor = await requireAdminActor(_request);
+    if ('error' in actor) return actor.error;
+    const { db, user: adminUser } = actor;
+    const { id } = await params;
+
+    const { data: application, error: applicationError } = await db
+      .from('program_holder_applications')
+      .select('id, tenant_id, user_id, organization_name, contact_name, email, phone, status, data')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (applicationError) throw applicationError;
+    if (!application)
+      return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
+    if (application.status === 'rejected') {
+      return NextResponse.json(
+        { error: 'Rejected applications must be reopened before approval.' },
+        { status: 409 },
+      );
+    }
+
+    const email = String(application.email || '')
+      .toLowerCase()
+      .trim();
+    const contactName = String(
+      application.contact_name || application.organization_name || 'Program Holder',
+    ).trim();
+    if (!email)
+      return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
+
+    const existingData =
+      application.data && typeof application.data === 'object' && !Array.isArray(application.data)
+        ? (application.data as Record<string, unknown>)
+        : {};
+    const accountRole = accountRoleForApprovedRole(existingData.approved_role);
+    const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
+      ? [
+          ...new Set(
+            existingData.requested_program_slugs
+              .map((value) => String(value || '').trim())
+              .filter(Boolean),
+          ),
+        ]
+      : [];
+
+    let activePrograms: Array<{ id: string; slug: string }> = [];
+    if (requestedProgramSlugs.length > 0) {
+      const { data: requestedPrograms, error: programsError } = await db
+        .from('programs')
+        .select('id,slug,title,name,is_active,status')
+        .in('slug', requestedProgramSlugs);
+      if (programsError) throw programsError;
+
+      activePrograms = (requestedPrograms ?? []).filter(
+        (program) =>
+          program.is_active !== false &&
+          !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
+      );
+      const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
+      const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));
+      if (missingSlugs.length > 0) {
+        return NextResponse.json(
+          {
+            error: `Cannot approve: requested program is unavailable (${missingSlugs.join(', ')}).`,
+          },
+          { status: 409 },
+        );
+      }
+    }
+
+    const identity = await findOrCreateUser(db, email, contactName, accountRole);
+    const { data: priorMou } = await db
+      .from('license_agreement_acceptances')
+      .select('accepted_at,document_version')
+      .eq('user_id', identity.userId)
+      .eq('agreement_type', 'program_holder_mou')
+      .order('accepted_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    const { data: existingHolder } = await db
+      .from('program_holders')
+      .select('id, user_id, status, approved_at, mou_signed, mou_signed_at, mou_type, features')
+      .or(`user_id.eq.${identity.userId},contact_email.eq.${email}`)
+      .limit(1)
+      .maybeSingle();
+
+    const now = new Date().toISOString();
+    const alreadySigned = Boolean(
+      existingHolder?.mou_signed ||
+      (existingHolder?.id && priorMou?.document_version === `3.0-${existingHolder.id}`),
+    );
+    const holderPayload = {
+      user_id: identity.userId,
+      organization_name: application.organization_name,
+      name: application.organization_name,
+      contact_name: contactName,
+      contact_email: email,
+      contact_phone: application.phone || null,
+      status: alreadySigned ? 'active' : 'approved_pending_mou',
+      approved_at: existingHolder?.approved_at || now,
+      approved_by: adminUser.id,
+      mou_signed: alreadySigned,
+      mou_signed_at: existingHolder?.mou_signed_at || priorMou?.accepted_at || null,
+      mou_status: alreadySigned ? 'signed' : 'pending_signature',
+      mou_type: existingHolder?.mou_type || 'universal',
+      features: {
+        ...(existingHolder?.features && typeof existingHolder.features === 'object'
+          ? existingHolder.features
+          : {}),
+        approved_role: existingData.approved_role || 'Program Holder',
+        regional_assignment: existingData.regional_assignment || null,
+        custom_mou: existingData.custom_mou || null,
+        training_required: existingData.training_required === true,
+        training_topics: Array.isArray(existingData.training_topics)
+          ? existingData.training_topics
+          : [],
+        payout_provider: 'quickbooks',
+        onboarding_contract_version: '2026-09-role-scoped-program-holder',
+      },
+    };
+
+    let holderId: string;
+    if (existingHolder?.id) {
+      holderId = String(existingHolder.id);
+      const { error } = await db.from('program_holders').update(holderPayload).eq('id', holderId);
+      if (error) throw error;
+    } else {
+      const { data, error } = await db
+        .from('program_holders')
+        .insert(holderPayload)
+        .select('id')
+        .single();
+      if (error || !data?.id) throw error || new Error('Program Holder record was not created.');
+      holderId = String(data.id);
+    }
+
+    const { firstName, lastName } = splitName(contactName);
+    const privilegedRole = ['admin', 'super_admin', 'staff', 'org_admin'].includes(
+      identity.existingRole,
+    );
+    const { data: profile } = await db
+      .from('profiles')
+      .select('id')
+      .eq('id', identity.userId)
+      .maybeSingle();
+    if (profile?.id) {
+      const { error } = await db
+        .from('profiles')
+        .update({
+          program_holder_id: holderId,
+          ...(privilegedRole ? {} : { role: accountRole }),
+        })
+        .eq('id', identity.userId);
+      if (error) throw error;
+    } else {
+      const { error } = await db.from('profiles').insert({
+        id: identity.userId,
+        email,
+        full_name: contactName,
+        first_name: firstName,
+        last_name: lastName,
+        phone: application.phone || null,
+        role: accountRole,
+        program_holder_id: holderId,
+        tenant_id: application.tenant_id || null,
+      });
+      if (error) throw error;
+    }
+
+    if (requestedProgramSlugs.length > 0) {
+      const primaryProgram = activePrograms[0];
+      const assignments = activePrograms.map((program, index) => ({
+        program_holder_id: holderId,
+        program_id: program.id,
+        program_slug: program.slug,
+        role_in_program: 'owner',
+        is_primary: index === 0,
+        status: 'active',
+      }));
+      const { error: assignmentError } = await db
+        .from('program_holder_programs')
+        .upsert(assignments, { onConflict: 'program_holder_id,program_id' });
+      if (assignmentError) throw assignmentError;
+
+      const { error: holderProgramError } = await db
+        .from('program_holders')
+        .update({
+          primary_program_id: primaryProgram.id,
+          status: alreadySigned ? 'active' : 'approved_pending_mou',
+        })
+        .eq('id', holderId);
+      if (holderProgramError) throw holderProgramError;
+    }
+
+    const { error: appUpdateError } = await db
+      .from('program_holder_applications')
+      .update({
+        status: 'approved',
+        user_id: identity.userId,
+        data: {
+          ...existingData,
+          approved_at: now,
+          approved_by: adminUser.id,
+          program_holder_id: holderId,
+          provisioned_program_slugs: requestedProgramSlugs,
+        },
+        updated_at: now,
+      })
+      .eq('id', id);
+    if (appUpdateError) throw appUpdateError;
+
+    const contractorSync = await ensureProgramHolderQuickBooksContractor(db, holderId).catch(
+      () => ({ linked: false, reason: 'QuickBooks contractor setup is pending reconciliation.' }),
+    );
+
+    const accessLink = await secureAccessLink(db, email, identity.isNewUser);
+    const portalUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent('/program-holder/dashboard')}`;
+    const fallbackPath = alreadySigned ? '/program-holder/dashboard' : '/program-holder/sign-mou';
+    const nextUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent(fallbackPath)}`;
+    const subject =
+      'Approved: Gary Regional Site Coordinator — Dashboard Access & Required Onboarding | Elevate for Humanity';
+    const result = await sendEmail({
+      to: email,
+      subject,
+      html: `<div style="font-family:Arial,sans-serif;max-width:720px;margin:auto;color:#0f172a;line-height:1.55"><h2>Your Gary Regional Site Coordinator application is approved</h2><p>Hello ${escapeHtml(contactName)},</p><p><strong>${escapeHtml(application.organization_name)}</strong> has been approved for the <strong>Gary Regional Site Coordinator</strong> role covering Gary, Indiana and surrounding communities within 30 miles.</p><p>You and the other Gary coordinator will have separate linked dashboards. You are responsible for regional intake, WorkOne coordination, program-holder recruitment and supervision, student monitoring, documentation, communications, reporting, and closeout. For any offered program without an assigned qualified Program Holder, the Site Coordinators remain responsible for coordinating that program until a qualified holder is approved and assigned.</p><p><strong>Username:</strong> ${escapeHtml(email)}</p><p>For security, Elevate does not email a plaintext password.</p><p><a href="${accessLink || nextUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">${identity.isNewUser ? 'Set Password & Continue Onboarding' : 'Secure Sign In & Continue Onboarding'}</a></p><h3>Required onboarding — complete every dashboard item</h3><ol>${alreadySigned ? '' : '<li>Review and sign your custom Site Coordinator MOU.</li>'}<li>Complete the W-9 and upload all required organization documents.</li><li>Enter banking information only through the secure payout workflow and complete QuickBooks payment-record setup.</li><li>Go to WorkOne, complete setup, establish the local working relationship, and document applicant eligibility and funding steps. Funding is never guaranteed.</li><li>Review PARIS and the interactive office. Use dashboard calls, messages, notes, tasks, documents, reports, and applicant/student status tools to contact and manage people through the system.</li><li>Recruit qualified Program Holders for every program offered in your region; vet, onboard, assign, support, and monitor them.</li><li>Track each applicant from intake through WorkOne, approved enrollment, attendance, course progress, completion, credential, and closeout.</li></ol><h3>Compensation</h3><p>The approved compensation is <strong>$1,000 per eligible, verified enrollment</strong>: <strong>$500</strong> after verified enrollment, required documentation, and funding authorization; and <strong>$500</strong> after verified course completion and required closeout documentation. A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p><p><strong>Contact requirement:</strong> No compensation is earned or payable for an applicant unless you make a documented call/contact through the system and record the outcome on that applicant. If Elevate staff performs the intake and you do not contact the applicant, you are not entitled to payout credit. Applicants without a documented contact outcome for five days are escalated to the Elevate admin dashboard.</p><h3>PARIS and your interactive office</h3><p>PARIS helps explain the dashboard, open the right workspace, identify missing requirements, and prepare actions. Use the interactive office to call or message applicants, record notes and outcomes, assign tasks, review documents, monitor students, submit reports, and view payout readiness. You remain responsible for reviewing records and completing official submissions.</p><p>Portal: <a href="${portalUrl}">${portalUrl}</a></p><p>Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+    });
+    await auditEmail(db, {
+      recipient: email,
+      subject,
+      applicationId: id,
+      success: result.success === true,
+      error: result.success ? undefined : result.error,
+    });
+
+    if (result.success) {
+      await db.from('program_holders').update({ welcome_email_sent: true }).eq('id', holderId);
+    } else {
+      await db.from('staff_notifications').insert({
+        type: 'program_holder_approval_email_failed',
+        title: `Program Holder approved but onboarding email failed: ${application.organization_name}`,
+        message: `Application ${id} was approved and account provisioned, but the onboarding email to ${email} failed: ${result.error || 'unknown error'}`,
+        severity: 'error',
+        metadata: {
+          application_id: id,
+          program_holder_id: holderId,
+          email,
+          error: result.error || null,
+        },
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      applicationId: id,
+      programHolderId: holderId,
+      quickbooksContractor: contractorSync,
+      userId: identity.userId,
+      mouSigned: alreadySigned,
+      emailStatus: result.success ? 'sent' : 'failed',
+    });
+  } catch (error) {
+    logger.error(
+      '[admin/program-holder/approve] failed',
+      error instanceof Error ? error : undefined,
+    );
+    return NextResponse.json(
+      {
+        error: 'Unable to approve Program Holder application.',
+        code: 'PROGRAM_HOLDER_APPROVAL_FAILED',
+      },
+      { status: 500 },
+    );
+  }
+}

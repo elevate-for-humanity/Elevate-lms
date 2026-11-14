@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevate for Humanity - Demo Video Slides</title>
+    <style>
+        @media print {
+            .slide { page-break-after: always; height: 100vh; }
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .slide {
+            width: 1920px;
+            height: 1080px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 20px auto;
+            padding: 60px 80px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,120,212,0.1) 0%, transparent 70%);
+        }
+        .logo {
+            position: absolute;
+            top: 40px;
+            left: 80px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 16px;
+            color: rgba(255,255,255,0.5);
+        }
+        h1 {
+            font-size: 72px;
+            margin: 0 0 30px 0;
+            background: linear-gradient(135deg, #fff, #0078D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        h2 {
+            font-size: 48px;
+            margin: 0 0 40px 0;
+            color: #0078D4;
+        }
+        p {
+            font-size: 28px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.9);
+        }
+        .highlight {
+            color: #0078D4;
+            font-weight: bold;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .metric-box {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(0,120,212,0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 80px;
+            font-weight: bold;
+            color: #0078D4;
+        }
+        .metric-label {
+            font-size: 24px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 10px;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 25px 30px;
+            border-radius: 15px;
+            border-left: 4px solid #0078D4;
+        }
+        .feature-icon {
+            font-size: 40px;
+            flex-shrink: 0;
+        }
+        .feature-text {
+            font-size: 24px;
+        }
+        .feature-text strong {
+            color: #0078D4;
+            display: block;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0,120,212,0.3);
+        }
+        .timeline-item {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .timeline-circle {
+            width: 60px;
+            height: 60px;
+            background: #0078D4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 20px;
+            font-weight: bold;
+        }
+        .timeline-label {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            max-width: 150px;
+        }
+        .program-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .program-icon {
+            font-size: 50px;
+        }
+        .program-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0078D4;
+        }
+        .program-code {
+            font-family: monospace;
+            background: rgba(0,120,212,0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 20px;
+        }
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-top: 40px;
+        }
+        .score-box {
+            background: linear-gradient(135deg, #0078D4, #005A9E);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+        }
+        .score-number {
+            font-size: 56px;
+            font-weight: bold;
+        }
+        .score-label {
+            font-size: 20px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        .competitor-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        .competitor-table th,
+        .competitor-table td {
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .competitor-table th {
+            background: #0078D4;
+            font-size: 22px;
+        }
+        .competitor-table td:first-child {
+            text-align: left;
+            font-weight: bold;
+        }
+        .check { color: #4CAF50; font-size: 28px; }
+        .x { color: #f44336; font-size: 28px; }
+        .partial { color: #FFC107; font-size: 28px; }
+        .elevate-check { 
+            background: linear-gradient(135deg, #0078D4, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .pitch-box {
+            background: linear-gradient(135deg, rgba(0,120,212,0.2), rgba(0,212,170,0.1));
+            border: 3px solid #0078D4;
+            border-radius: 25px;
+            padding: 50px;
+            font-size: 26px;
+            line-height: 1.8;
+            font-style: italic;
+        }
+        .cta-section {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 25px 60px;
+            border-radius: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            text-decoration: none;
+            margin: 10px;
+        }
+        .contact-info {
+            margin-top: 40px;
+            font-size: 24px;
+        }
+        .contact-info div {
+            margin: 15px 0;
+        }
+        .tagline {
+            font-size: 36px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 40px;
+        }
+        .section-label {
+            font-size: 18px;
+            color: #0078D4;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <div style="text-align: center;">
+        <p class="section-label">Microsoft Build 2026 Conference Submission</p>
+        <h1>Enterprise AI Workforce Operating System</h1>
+        <p class="tagline">DOL-Registered Apprenticeships • AI Course Generation • Geofenced Timeclock</p>
+        <div style="margin-top: 60px; font-size: 24px; color: rgba(255,255,255,0.6);">
+            Presented by: Elevate for Humanity<br>
+            March 2026
+        </div>
+    </div>
+    <div class="slide-number">1 / 12</div>
+</div>
+
+<!-- SLIDE 2: Impact Metrics -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>Impact Metrics</h2>
+    <div class="metric-grid">
+        <div class="metric-box">
+            <div class="metric-number">200+</div>
+            <div class="metric-label">Apprentices Enrolled</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-number">3</div>
+            <div class="metric-label">DOL Programs</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-number">100%</div>
+            <div class="metric-label">WIOA Compliance</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-number">80%</div>
+            <div class="metric-label">Time Saved on Courses</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-number">$0</div>
+            <div class="metric-label">Billing Overhead</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-number">2,000</div>
+            <div class="metric-label">Hours Per Program</div>
+        </div>
+    </div>
+    <div class="slide-number">2 / 12</div>
+</div>
+
+<!-- SLIDE 3: The Problem -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>The Problem We Solve</h2>
+    <p style="font-size: 32px; margin-bottom: 40px;">Workforce development agencies spend millions on fragmented systems:</p>
+    <div class="feature-list">
+        <div class="feature-item">
+            <div class="feature-icon">❌</div>
+            <div class="feature-text">
+                <strong>No Digital Hour Tracking</strong>
+                Apprentices still use paper logbooks
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">❌</div>
+            <div class="feature-text">
+                <strong>No Training Verification</strong>
+                Employers can't verify on-site hours
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">❌</div>
+            <div class="feature-text">
+                <strong>Manual Billing</strong>
+                Payment collection is error-prone
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">❌</div>
+            <div class="feature-text">
+                <strong>Compliance Burden</strong>
+                Governments can't get accurate data
+            </div>
+        </div>
+    </div>
+    <div class="slide-number">3 / 12</div>
+</div>
+
+<!-- SLIDE 4: Our Solution -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>Our Solution</h2>
+    <p style="font-size: 32px; margin-bottom: 40px;">One platform that manages the entire apprenticeship lifecycle:</p>
+    <div class="feature-list">
+        <div class="feature-item" style="border-left-color: #4CAF50;">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-text">
+                <strong>AI Course Generation</strong>
+                GPT-4 creates courses in minutes, not months
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #4CAF50;">
+            <div class="feature-icon">📍</div>
+            <div class="feature-text">
+                <strong>Geofenced Clock-in</strong>
+                GPS verifies apprentices at host shop
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #4CAF50;">
+            <div class="feature-icon">💳</div>
+            <div class="feature-text">
+                <strong>Auto Payment Collection</strong>
+                Stripe integration with lockout enforcement
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #4CAF50;">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text">
+                <strong>Real-time Dashboards</strong>
+                Government reporting at the click of a button
+            </div>
+        </div>
+    </div>
+    <div class="slide-number">4 / 12</div>
+</div>
+
+<!-- SLIDE 5: Elevator Pitch -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>30-Second Elevator Pitch</h2>
+    <div class="pitch-box">
+        <p>"Imagine if Workday Learning, ServiceNow, and a DOL-registered apprenticeship program had a baby — that's Elevate for Humanity.</p>
+        <p style="margin-top: 20px;">We help workforce development agencies, employers, and job seekers go from enrollment to employment with AI-generated courses, automatic payment collection, geofenced time tracking, and verifiable credentials.</p>
+        <p style="margin-top: 20px;">We're the only platform where an apprentice can clock in at their barbershop, complete their RTI coursework, and receive their license — all on one platform."</p>
+    </div>
+    <div class="slide-number">5 / 12</div>
+</div>
+
+<!-- SLIDE 6: Tech Stack -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>Built on Microsoft Stack</h2>
+    <div class="feature-list">
+        <div class="feature-item">
+            <div class="feature-icon">⚛️</div>
+            <div class="feature-text">
+                <strong>Frontend</strong>
+                Next.js 15, React 19, TypeScript
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🗄️</div>
+            <div class="feature-text">
+                <strong>Database</strong>
+                Supabase (Azure PostgreSQL)
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🤖</div>
+            <div class="feature-text">
+                <strong>AI</strong>
+                OpenAI GPT-4
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">💳</div>
+            <div class="feature-text">
+                <strong>Payments</strong>
+                Stripe with auto-lockout
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🔐</div>
+            <div class="feature-text">
+                <strong>Auth</strong>
+                Supabase Auth with MFA
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">☁️</div>
+            <div class="feature-text">
+                <strong>Hosting</strong>
+                Northflank (Azure)
+            </div>
+        </div>
+    </div>
+    <div class="slide-number">6 / 12</div>
+</div>
+
+<!-- SLIDE 7: DOL Programs -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>DOL-Registered Programs</h2>
+    <div class="program-card">
+        <div class="program-icon">💇</div>
+        <div>
+            <div class="program-name">Barber Apprenticeship</div>
+            <div>RAPIDS Code: <span class="program-code">0030CB</span> • 2,000 hours • ✅ Live</div>
+        </div>
+    </div>
+    <div class="program-card">
+        <div class="program-icon">💆</div>
+        <div>
+            <div class="program-name">Esthetician Apprenticeship</div>
+            <div>RAPIDS Code: <span class="program-code">2089CB</span> • 2,000 hours • ✅ Live</div>
+        </div>
+    </div>
+    <div class="program-card">
+        <div class="program-icon">💅</div>
+        <div>
+            <div class="program-name">Nail Technician Apprenticeship</div>
+            <div>RAPIDS Code: <span class="program-code">2090CB</span> • 2,000 hours • ✅ Live</div>
+        </div>
+    </div>
+    <p style="margin-top: 30px; text-align: center; color: #0078D4; font-size: 24px;">
+        DOL Registration: 2025-IN-132301
+    </p>
+    <div class="slide-number">7 / 12</div>
+</div>
+
+<!-- SLIDE 8: Demo Flow -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>5-Minute Demo Flow</h2>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-circle">1</div>
+            <div class="timeline-label">Introduction<br>(0:00-0:30)</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-circle">2</div>
+            <div class="timeline-label">Enrollment<br>(0:30-1:30)</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-circle">3</div>
+            <div class="timeline-label">Clock-in<br>(1:30-2:30)</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-circle">4</div>
+            <div class="timeline-label">AI Coursework<br>(2:30-3:30)</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-circle">5</div>
+            <div class="timeline-label">Payment<br>(3:30-4:30)</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-circle">6</div>
+            <div class="timeline-label">Credentials<br>(4:30-5:00)</div>
+        </div>
+    </div>
+    <div class="slide-number">8 / 12</div>
+</div>
+
+<!-- SLIDE 9: Evaluation Scores -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>Conference Evaluation Scores</h2>
+    <div class="score-grid">
+        <div class="score-box">
+            <div class="score-number">10/10</div>
+            <div class="score-label">Innovation</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">10/10</div>
+            <div class="score-label">Social Impact</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">10/10</div>
+            <div class="score-label">Government Use Cases</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">9/10</div>
+            <div class="score-label">Technical Excellence</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">9/10</div>
+            <div class="score-label">AI Integration</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">9/10</div>
+            <div class="score-label">Architecture</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">9/10</div>
+            <div class="score-label">Scalability</div>
+        </div>
+        <div class="score-box">
+            <div class="score-number">9/10</div>
+            <div class="score-label">Developer Experience</div>
+        </div>
+    </div>
+    <p style="text-align: center; margin-top: 40px; font-size: 36px; color: #00d4aa;">
+        <strong>Overall Conference Readiness: 9.5/10</strong>
+    </p>
+    <div class="slide-number">9 / 12</div>
+</div>
+
+<!-- SLIDE 10: Competitor Comparison -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>Competitor Comparison</h2>
+    <table class="competitor-table">
+        <tr>
+            <th>Feature</th>
+            <th>Workday</th>
+            <th>ServiceNow</th>
+            <th>Canvas</th>
+            <th style="background: linear-gradient(135deg, #0078D4, #00d4aa);">Elevate</th>
+        </tr>
+        <tr>
+            <td>LMS Core</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+            <td>AI Course Generation</td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+            <td>DOL Apprenticeships</td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+            <td>Geofenced Clock-in</td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+            <td>Payment Enforcement</td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+            <td>Government Reporting</td>
+            <td><span class="partial">◐</span></td>
+            <td><span class="partial">◐</span></td>
+            <td><span class="x">✗</span></td>
+            <td><span class="check">✓</span></td>
+        </tr>
+    </table>
+    <div class="slide-number">10 / 12</div>
+</div>
+
+<!-- SLIDE 11: What Makes Us Stand Out -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <h2>What Makes Us Stand Out</h2>
+    <div class="feature-list" style="grid-template-columns: 1fr;">
+        <div class="feature-item" style="border-left-color: #00d4aa;">
+            <div class="feature-icon">🏆</div>
+            <div class="feature-text">
+                <strong>First-to-Market</strong>
+                Only platform with DOL + AI + geofencing + payments in one system
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #00d4aa;">
+            <div class="feature-icon">📈</div>
+            <div class="feature-text">
+                <strong>Real Impact</strong>
+                200+ apprentices already using the system in production
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #00d4aa;">
+            <div class="feature-icon">✅</div>
+            <div class="feature-text">
+                <strong>Compliance Built-In</strong>
+                WIOA, DOL, state board reporting automated
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #00d4aa;">
+            <div class="feature-icon">☁️</div>
+            <div class="feature-text">
+                <strong>Microsoft Stack</strong>
+                Azure-native, TypeScript, Supabase
+            </div>
+        </div>
+        <div class="feature-item" style="border-left-color: #00d4aa;">
+            <div class="feature-icon">❤️</div>
+            <div class="feature-text">
+                <strong>Social Mission</strong>
+                Workforce development for underserved communities
+            </div>
+        </div>
+    </div>
+    <div class="slide-number">11 / 12</div>
+</div>
+
+<!-- SLIDE 12: Contact / CTA -->
+<div class="slide">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">Elevate for Humanity</div>
+    </div>
+    <div style="text-align: center;">
+        <h1>Let's Connect!</h1>
+        <p class="tagline">Enterprise AI Workforce Operating System</p>
+        <div class="contact-info">
+            <div>🌐 <strong>Website:</strong> www.elevateforhumanity.org</div>
+            <div>📧 <strong>Email:</strong> info@elevateforhumanity.org</div>
+            <div>📋 <strong>DOL Registration:</strong> 2025-IN-132301</div>
+            <div>💻 <strong>GitHub:</strong> github.com/elevate-for-humanity</div>
+        </div>
+        <div class="cta-section">
+            <div style="margin-top: 60px; font-size: 28px; color: #0078D4;">
+                Thank you for your consideration!<br>
+                <span style="color: rgba(255,255,255,0.6);">We're ready to showcase at Microsoft Build 2026</span>
+            </div>
+        </div>
+    </div>
+    <div class="slide-number">12 / 12</div>
+</div>
+
+</body>
+</html>

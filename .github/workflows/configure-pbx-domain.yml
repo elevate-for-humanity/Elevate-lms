@@ -1,0 +1,40 @@
+name: Verify Elevate PBX domain (Durable DNS)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/configure-pbx-domain.yml'
+      - 'scripts/gcp/verify-pbx-transport.mjs'
+      - 'scripts/gcp/verify-production-dns.mjs'
+  schedule:
+    - cron: '23 * * * *'
+permissions:
+  contents: read
+jobs:
+  verify-domain:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # The previous grep check succeeded whenever the expected A record was
+      # present, even alongside an unexpected A/AAAA record. Use the existing
+      # fail-closed verifier to compare all authoritative answers and check
+      # trusted hostname TLS, /healthz and strict SIP WebSocket negotiation.
+      # This is transport-only verification; never report actual calls as PASS.
+      - name: Verify authoritative DNS, TLS, HTTPS and SIP WebSocket transport
+        run: node scripts/gcp/verify-pbx-transport.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pbx-transport-evidence
+          path: pbx-transport-evidence.json
+          if-no-files-found: warn
+          retention-days: 14

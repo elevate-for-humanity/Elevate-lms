@@ -1,0 +1,3 @@
+Deploy current main to Marketing production for the merged bookkeeping/accounting hero.
+Requested 2026-09-13.
+No course-builder, GPU, narration, or video render.

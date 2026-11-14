@@ -1,0 +1,226 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
+const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
+const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',attempts:1,max_attempts:5,execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
+ monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false,canonicalLessonIds:{lesson:'11111111-1111-4111-8111-111111111111'}}}};
+async function run(job,conflict=false,mediaAvailable=true,runEnv=env,activeJobs=[],repairStatus='blocked'){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env:runEnv,request:async(url,options)=>{
+ if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
+ if(String(url).includes('/paris_code_repairs'))return {ok:true,json:async()=>[{
+  id:new URL(url).searchParams.get('id').slice(3),status:repairStatus,source_job_id:job.id
+ }]};
+ if(String(url).includes('/course_lesson_media_matches'))return {ok:true,json:async()=>[{
+  entitlement_id:'22222222-2222-4222-8222-222222222222',match_score:1,status:'attached'
+ }]};
+ if(String(url).includes('/course_videos'))return {ok:true,json:async()=>mediaAvailable?[{id:'entitled-source'}]:[]};
+ return {ok:true,json:async()=>String(url).includes('status=in.')?activeJobs:[job]};
+ }});return {writes,result};}
+test('new verified repair queues an exhausted internal failure, retaining checkpoints and previous error',async()=>{
+ const {writes,result}=await run(base);assert.deepEqual(result.jobIds,['job']);
+ const b=writes[0].body;assert.equal(b.attempts,undefined);assert.equal(b.max_attempts,5);assert.equal(b.execution_generation,9);assert.equal(b.payload,undefined);assert.equal(b.artifacts,undefined);
+ assert.equal(b.monitor.lastRepairDeployment.previousError,base.last_error);
+ assert.match(writes[0].url,/execution_generation=eq.8/);
+});
+test('exhausted attempt budgets gain at most one claimed execution without zeroing the counter',async()=>{
+ const exhausted={...base,attempts:5,max_attempts:5};
+ const {writes}=await run(exhausted);
+ assert.equal(writes.length,1);
+ assert.equal(writes[0].body.attempts,undefined);
+ assert.equal(writes[0].body.max_attempts,6);
+ assert.match(writes[0].url,/attempts=eq.5/);
+ assert.match(writes[0].url,/max_attempts=eq.5/);
+ assert.equal(writes[0].body.monitor.lastRepairDeployment.previousError,base.last_error);
+});
+test('malformed or excessive retry budgets remain blocked',async()=>{
+ for(const job of [
+  {...base,attempts:11,max_attempts:11},
+  {...base,attempts:-1},
+  {...base,attempts:7,max_attempts:5},
+  {...base,max_attempts:null},
+ ])assert.equal((await run(job)).writes.length,0);
+});
+test('same image cannot continuously retry the same unresolved defect',async()=>{
+ const {writes}=await run({...base,monitor:{...base.monitor,lastRepairDeployment:{imageSha}}});assert.equal(writes.length,0);
+});
+test('pause, live lease, publication, unrelated course and external blockers never restart',async()=>{
+ for(const job of [{...base,status:'running'},{...base,lease_expires_at:'2999-01-01'},
+ {...base,build:{...base.build,profile:{ownerPaused:true}}},{...base,build:{...base.build,status:'published'}},
+ {...base,build:{...base.build,course_id:'other'}},{...base,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:MEDIA_LICENSE_REQUIRED'},
+ {...base,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED'},
+ {...base,monitor:{enabled:false}}])assert.equal((await run(job)).writes.length,0);
+});
+test('verified private-media renewal resumes an expired finished-media QA URL only',async()=>{
+ const renewable='ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"step":"finished_media_qa","code":"MP4 returned HTTP 401"}]';
+ assert.equal((await run({...base,last_error:renewable})).writes.length,1);
+ for(const last_error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"step":"media","code":"HTTP 401"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"step":"finished_media_qa","code":"MP4 returned HTTP 403"}]',
+ ]) assert.equal((await run({...base,last_error})).writes.length,0);
+});
+test('concurrent claim or monitor change produces no false restart proof',async()=>{
+ assert.deepEqual((await run(base,true)).result.jobIds,[]);
+});
+
+test('approved-source contract deployment resumes old per-scene metadata and saved-render findings',async()=>{
+ for(const last_error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"message":"licensed third-party scenes are missing entitlement/license evidence"}]',
+ ]) assert.equal((await run({...base,last_error})).writes.length,1);
+});
+
+
+test('missing course-scoped licensed media prevents futile scene repair retries',async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:esthetician-a:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]';
+ const job={...base,last_error:error};
+ assert.equal((await run(job,false,false)).writes.length,0);
+ // Admission is only a precondition, not a substitute for scene QA.
+ assert.equal((await run(job,false,true)).writes.length,1);
+});
+
+test('an active continuation prevents a historical failed attempt being reopened',async()=>{
+ let writes=0;
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options.method==='PATCH'){writes++;throw Error('must not duplicate active work');}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[{build_id:'build'}]:[base]};
+ }});
+ assert.equal(writes,0);assert.deepEqual(result.jobIds,[]);
+});
+test('only the furthest historical cursor is recovered and an admission race is harmless',async()=>{
+ const writes=[];
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options.method==='PATCH'){writes.push(String(url));return {ok:false,status:409};}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[{...base,id:'older',payload:{nextCompetencyIndex:2}},base]};
+ }});
+ assert.equal(writes.length,1);assert.match(writes[0],/id=eq.job/);assert.deepEqual(result.jobIds,[]);
+});
+
+
+test('business saved-render repair resumes once after a verified image without reopening superseded HVAC', async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED"}]';
+ const business={...base,last_error:error,build:{...base.build,course_id:'e9a2547c-ae03-418e-97fc-51377d438f8c'}};
+ assert.equal((await run(business)).writes.length,1);
+ assert.equal((await run({...business,monitor:{...business.monitor,lastRepairDeployment:{imageSha}}})).writes.length,0);
+ for(const course_id of ['0ba9a61c-1f1b-4019-be6f-90e92eba2bc0','511aefe6-15fe-47b2-8eca-d55da4f31c51'])
+  assert.equal((await run({...business,build:{...business.build,course_id}})).writes.length,0);
+});
+
+test('ineligible furthest cursor does not suppress an eligible saved repair',async()=>{
+ const stale={...base,id:'stale',payload:{nextCompetencyIndex:30},last_error:'OWNER_PAUSED_REFERENCE_BUILD'};
+ const eligible={...base,id:'eligible',payload:{nextCompetencyIndex:18}};
+ const writes=[];
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options?.method==='PATCH'){
+   writes.push(String(url));
+   return {ok:true,json:async()=>[{id:'eligible',status:'queued',execution_generation:9}]};
+  }
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[stale,eligible]};
+ }});
+ assert.equal(writes.length,1);
+ assert.match(writes[0],/id=eq.eligible/);
+ assert.deepEqual(result.jobIds,['eligible']);
+});
+
+test('missing authored instructional source cannot be fixed by repeating an exhausted worker',async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:esthetician-a:FINDINGS=[{"code":"ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED"}]';
+ assert.equal((await run({...base,last_error:error})).writes.length,0);
+});
+test('skipped historical candidate does not prevent a later eligible repair',async()=>{
+ const stale={...base,id:'stale',payload:{nextCompetencyIndex:30},last_error:'OWNER_PAUSED_REFERENCE_BUILD'};
+ const eligible={...base,id:'eligible',payload:{nextCompetencyIndex:18}};
+ const writes=[];
+ const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options?.method==='PATCH'){writes.push(String(url));return {ok:true,json:async()=>[{id:'eligible',status:'queued',execution_generation:9}]};}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[stale,eligible]};
+ }});
+ assert.equal(writes.length,1);
+ assert.match(writes[0],/id=eq.eligible/);
+ assert.deepEqual(result.jobIds,['eligible']);
+});
+
+test('verified deadline repair resumes only the exhausted quality playback checkpoint',async()=>{
+ const job={...base,payload:{autopilot:{version:'three-role-v1',competencyId:'icbp-orientation',role:'quality'}},last_error:'ULTIMATE_PROGRESS_STALLED:'+JSON.stringify({phase:'autopilot:quality:learner_runthrough',idleMs:603179}),build:{...base.build,course_id:'5a72b6d1-6a05-4294-832b-0a836ac4a74d'}};
+ assert.equal((await run(job)).writes.length,1);
+ assert.equal((await run({...job,monitor:{enabled:true,lastRepairDeployment:{imageSha}}})).writes.length,0);
+ for(const last_error of ['ULTIMATE_PROGRESS_STALLED:invalid','ULTIMATE_PROGRESS_STALLED:'+JSON.stringify({phase:'autopilot:media:lesson_film_render'})])assert.equal((await run({...job,last_error})).writes.length,0);
+});
+
+test('ready b-roll for another course lesson cannot trigger a media retry',async()=>{
+ const unrelated={...base,build:{...base.build,profile:{ownerPaused:false,
+  canonicalLessonIds:{another:'11111111-1111-4111-8111-111111111111'}}},
+  last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:FINDINGS=[{"code":"ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED"}]'};
+ assert.equal((await run(unrelated)).writes.length,0);
+});
+
+test('only a verified new worker may retry expired private caption or transcript at quality stage',async()=>{
+ const quality={...base,payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-d',role:'quality'}},
+  build:{...base.build,course_id:'377cd34a-b402-40ab-8ff9-2fcfd394b96d'}};
+ for(const asset of ['captions','transcript']){
+  const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"finished_media_qa","code":"'+asset+' returned HTTP 401"}]';
+  const job={...quality,last_error:error};
+  assert.equal((await run(job)).writes.length,1);
+  assert.equal((await run({...job,monitor:{enabled:true,lastRepairDeployment:{imageSha}}})).writes.length,0);
+  assert.equal((await run({...job,payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-d',role:'media'}}})).writes.length,0);
+ }
+ for(const error of [
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"finished_media_qa","code":"captions returned HTTP 403"}]',
+  'ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-d:FINDINGS=[{"step":"media","code":"captions returned HTTP 401"}]',
+ ])
+  assert.equal((await run({...quality,last_error:error})).writes.length,0);
+});
+
+test('retries isolated B2 internal incident only after exact release preflight and without PARIS-owned repair',async()=>{
+ const error='ULTIMATE_INTERNAL_REPAIR_REQUIRED:manicurist-n:FINDINGS=[{"step":"lesson_film_render","severity":"error","code":"ULTIMATE_VIDEO_RENDER_FAILED","message":"ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:internal incident"}]';
+ const media={...base,
+  payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-n',role:'media'}},
+  build:{...base.build,status:'running',profile:{ownerPaused:false}},
+  last_error:error};
+ const verified={...env,COURSE_B2_VERIFIED_FOR_THIS_RELEASE:'true'};
+ assert.equal((await run(media)).writes.length,0);
+ assert.equal((await run(media,false,true,verified)).writes.length,1);
+ assert.equal((await run({...media,monitor:{...media.monitor,repairId:'owned'}},false,true,verified)).writes.length,0);
+ assert.equal((await run({...media,payload:{autopilot:{version:'three-role-v1',competencyId:'manicurist-n',role:'quality'}}},false,true,verified)).writes.length,0);
+ for(const unsafe of [
+  error.replace('internal incident','HTTP 403'),
+  error+';OWNER_PAUSED',
+  error.replace('COURSE_OBJECT_STORAGE_UPLOAD_FAILED','COURSE_OBJECT_STORAGE_READBACK_MISMATCH')
+ ]) assert.equal((await run({...media,last_error:unsafe},false,true,verified)).writes.length,0);
+});
+
+function pooled(role='media') {return {...base,payload:{nextCompetencyIndex:18,autopilot:{version:'three-role-v1',competencyId:'lesson',role}}};}
+function waiter(id,prerequisite,role='quality') {return {id,build_id:'build',status:'queued',lease_owner:null,lease_expires_at:null,
+ payload:{autopilot:{version:'three-role-v1',competencyId:'lesson',role,prerequisiteJobId:prerequisite}}};}
+test('a queued quality waiter cannot deadlock recovery of its exact failed media prerequisite',async()=>{
+ const {writes,result}=await run(pooled(),false,true,env,[waiter('quality','job')]);
+ assert.deepEqual(result.jobIds,['job']);assert.equal(writes.length,1);
+ assert.equal(writes[0].body.attempts,undefined);assert.equal(writes[0].body.max_attempts,5);
+});
+test('queued transitive role waiters allow their failed upstream producer to recover once',async()=>{
+ const {writes}=await run(pooled('instruction'),false,true,env,[waiter('media','job','media'),waiter('quality','media')]);
+ assert.equal(writes.length,1);
+});
+test('running, leased, unrelated, cyclic or superseding work still fences the failed producer',async()=>{
+ for(const active of [
+  [{...waiter('quality','job'),status:'running'}],
+  [{...waiter('quality','job'),lease_owner:'live-worker'}],
+  [{...waiter('quality','job'),lease_expires_at:'2999-01-01'}],
+  [waiter('quality','newer-media')],
+  [waiter('a','b'),waiter('b','a')],
+  [waiter('quality','job'),waiter('newer-media','newer-plan','media')],
+ ])assert.equal((await run(pooled(),false,true,env,active)).writes.length,0);
+});
+test('a lost admission CAS never opens an older failed cursor in the same lesson',async()=>{
+ const first={...pooled(),id:'current'},older={...pooled(),id:'older'};let writes=0;
+ await resumeRepairedCourseJobs({imageSha,imageDigest,env,request:async(url,options)=>{
+  if(options?.method==='PATCH'){writes++;return {ok:true,json:async()=>[]};}
+  return {ok:true,json:async()=>String(url).includes('status=in.')?[]:[first,older]};
+ }});
+ assert.equal(writes,1);
+});
+
+test('a PARIS-owned source cannot resume while its code repair is queued or executing',async()=>{
+ const job={...pooled(),monitor:{enabled:true,repairId:'11111111-1111-4111-8111-111111111111'}};
+ for(const state of ['queued','dispatched','patching','validating','deploying','verifying'])
+  assert.equal((await run(job,false,true,env,[waiter('quality','job')],state)).writes.length,0);
+ assert.equal((await run(job,false,true,env,[waiter('quality','job')],'blocked')).writes.length,1);
+ assert.equal((await run({...job,monitor:{enabled:true,repairId:'invalid-owner'}},false,true,env,[waiter('quality','job')])).writes.length,0);
+});

@@ -1,0 +1,3 @@
+# Canonical production deployment trigger
+# Batch deployment requested after Master Studio consolidation.
+release=master-studio-consolidation-2026-09-21

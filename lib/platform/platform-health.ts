@@ -1,0 +1,492 @@
+/**
+ * Centralized platform health aggregation layer.
+ * Operational checks run in parallel with bounded timeouts.
+ */
+
+import { getElevateMediaStorageConfig, isElevateMediaStorageConfigured } from '@/lib/storage/elevate-media-storage';
+import { checkLessonMediaStorage } from '@/lib/storage/lesson-media-health';
+import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { createAdminClient } from '@/lib/supabase/admin';
+
+export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
+
+export type ServiceCheck = {
+  name: string;
+  status: HealthStatus;
+  latencyMs?: number;
+  message?: string;
+  configured: boolean;
+};
+
+export type AIProviderCheck = {
+  name: string;
+  configured: boolean;
+  active: boolean;
+};
+
+export type PlatformAlert = {
+  severity: 'critical' | 'warning' | 'info';
+  service: string;
+  message: string;
+};
+
+export type PlatformHealthSnapshot = {
+  overall: HealthStatus;
+  timestamp: string;
+  responseTimeMs: number;
+  services: {
+    database: ServiceCheck;
+    redis: ServiceCheck;
+    billing: ServiceCheck;
+    email: ServiceCheck;
+    storage: ServiceCheck;
+    studioBrowser: ServiceCheck;
+  };
+  ai: {
+    activeProvider: string | null;
+    providers: AIProviderCheck[];
+    anyConfigured: boolean;
+  };
+  alerts: PlatformAlert[];
+};
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
+async function checkDatabase(): Promise<ServiceCheck> {
+  const start = Date.now();
+  try {
+    const db = createAdminClient();
+    const { error } = await db
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .limit(1);
+    const latencyMs = Date.now() - start;
+    if (error) throw error;
+    return {
+      name: 'Database',
+      status: latencyMs > 3000 ? 'degraded' : 'healthy',
+      latencyMs,
+      configured: true,
+    };
+  } catch (err) {
+    return {
+      name: 'Database',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      message: err instanceof Error ? err.message : 'Connection failed',
+      configured: true,
+    };
+  }
+}
+
+async function checkRedis(): Promise<ServiceCheck> {
+  const url = process.env.REDIS_URL?.trim();
+  const restUrl = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const restToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url && !(restUrl && restToken)) {
+    return {
+      name: 'Redis',
+      status: 'unknown',
+      configured: false,
+      message: 'Redis connection is not configured',
+    };
+  }
+
+  const start = Date.now();
+  let redis: import('ioredis').Redis | null = null;
+  try {
+    if (restUrl && restToken) {
+      const response = await fetch(`${restUrl.replace(/\/$/, '')}/ping`, {
+        headers: { Authorization: `Bearer ${restToken}` },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (!response.ok) throw new Error(`Redis REST ping returned HTTP ${response.status}`);
+      return {
+        name: 'Redis',
+        status: 'healthy',
+        latencyMs: Date.now() - start,
+        configured: true,
+      };
+    }
+
+    // ioredis is CommonJS-compatible and Next/Node may expose the constructor as
+    // default or named depending on bundling. Resolve both forms explicitly.
+    const module = await import('ioredis');
+    const RedisCtor = module.default ?? module.Redis;
+    if (typeof RedisCtor !== 'function') {
+      throw new Error('ioredis constructor unavailable');
+    }
+
+    redis = new RedisCtor(url!, {
+      maxRetriesPerRequest: 1,
+      connectTimeout: 5_000,
+      enableReadyCheck: true,
+      lazyConnect: true,
+    });
+    await redis.connect();
+    const pong = await redis.ping();
+    if (pong !== 'PONG') {
+      throw new Error(`Unexpected Redis ping response: ${String(pong)}`);
+    }
+
+    return {
+      name: 'Redis',
+      status: 'healthy',
+      latencyMs: Date.now() - start,
+      configured: true,
+    };
+  } catch (err) {
+    return {
+      name: 'Redis',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      message: err instanceof Error ? err.message : 'Ping failed',
+      configured: true,
+    };
+  } finally {
+    if (redis) {
+      try {
+        redis.disconnect();
+      } catch {
+        // A probe cleanup failure must not replace the probe result.
+      }
+    }
+  }
+}
+
+async function checkBilling(): Promise<ServiceCheck> {
+  const start = Date.now();
+  try {
+    const { data: rows, error } = await createAdminClient()
+      .from('app_settings')
+      .select('key,value')
+      .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']);
+    if (error) throw new Error('Billing configuration could not be read');
+    const stored = Object.fromEntries((rows ?? []).map((row: any) => [row.key, row.value]));
+    const has = (key: string) => Boolean(process.env[key] || stored[key]);
+    const quickBooksConfigured =
+      has('QB_CLIENT_ID') &&
+      has('QB_CLIENT_SECRET') &&
+      has('QB_REFRESH_TOKEN') &&
+      has('QB_REALM_ID');
+    const payPalConfigured = Boolean(
+      process.env.PAYPAL_CLIENT_ID &&
+        process.env.PAYPAL_CLIENT_SECRET &&
+        process.env.PAYPAL_BILLING_WEBHOOK_ID,
+    );
+    const configured = quickBooksConfigured && payPalConfigured;
+    return {
+      name: 'Billing (QuickBooks + PayPal)',
+      // Presence cannot prove that OAuth is valid or payment collection works.
+      status: configured ? 'unknown' : quickBooksConfigured || payPalConfigured ? 'degraded' : 'unknown',
+      latencyMs: Date.now() - start,
+      configured,
+      message: configured
+        ? 'Configuration present. QuickBooks authorization, PayPal connectivity, and payment collection are not verified by this check.'
+        : `Missing ${[
+            !payPalConfigured ? 'PayPal billing' : null,
+            !quickBooksConfigured ? 'QuickBooks configuration' : null,
+          ]
+            .filter(Boolean)
+            .join(' and ')}`,
+    };
+  } catch (err) {
+    return {
+      name: 'Billing (QuickBooks + PayPal)',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: false,
+      message: err instanceof Error ? err.message : 'Billing configuration check failed',
+    };
+  }
+}
+
+async function checkEmail(): Promise<ServiceCheck> {
+  const key = process.env.SENDGRID_API_KEY?.trim();
+  const configured = Boolean(key && key.startsWith('SG.'));
+  if (!configured) {
+    return {
+      name: 'Email (SendGrid)',
+      status: 'unknown',
+      configured: false,
+      message: 'SENDGRID_API_KEY not set',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const response = await fetch('https://api.sendgrid.com/v3/scopes', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(`SendGrid API returned HTTP ${response.status}`);
+    const latencyMs = Date.now() - start;
+    return {
+      name: 'Email (SendGrid)',
+      status: latencyMs > 3000 ? 'degraded' : 'healthy',
+      latencyMs,
+      configured: true,
+    };
+  } catch (err) {
+    return {
+      name: 'Email (SendGrid)',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'SendGrid API probe failed',
+    };
+  }
+}
+
+async function checkStudioBrowser(): Promise<ServiceCheck> {
+  const url = process.env.STUDIO_BROWSER_URL?.trim().replace(/\/$/, '');
+  const publicUrl = (
+    process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL
+  )?.trim();
+  const secret = process.env.STUDIO_BROWSER_SECRET?.trim();
+  const configured = Boolean(url && publicUrl && secret);
+  if (!configured) {
+    return {
+      name: 'Studio Browser',
+      status: 'unknown',
+      configured: false,
+      message: 'Studio Browser URL, public URL, or shared secret is not configured',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const response = await fetch(`${url}/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5_000),
+    });
+    const payload = (await response.json().catch(() => null)) as {
+      browserState?: string;
+      browserConnected?: boolean;
+      commit?: string;
+    } | null;
+    const runtimeReady =
+      response.ok && payload?.browserState === 'ready' && payload.browserConnected === true;
+    return {
+      name: 'Studio Browser',
+      status: runtimeReady ? 'healthy' : 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: runtimeReady
+        ? `Chromium ready${payload?.commit ? ` · ${payload.commit.slice(0, 7)}` : ''}`
+        : response.ok
+          ? `Runtime reported ${payload?.browserState || 'not ready'}`
+          : `Health endpoint returned HTTP ${response.status}`,
+    };
+  } catch (err) {
+    return {
+      name: 'Studio Browser',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'Studio Browser health check failed',
+    };
+  }
+}
+
+function checkAIProviders(): PlatformHealthSnapshot['ai'] {
+  const providers: AIProviderCheck[] = [
+    { name: 'openai', configured: Boolean(process.env.OPENAI_API_KEY), active: false },
+    { name: 'groq', configured: Boolean(process.env.GROQ_API_KEY), active: false },
+    { name: 'gemini', configured: Boolean(process.env.GEMINI_API_KEY), active: false },
+    { name: 'anthropic', configured: Boolean(process.env.ANTHROPIC_API_KEY), active: false },
+  ];
+  const active = providers.find((provider) => provider.configured);
+  if (active) active.active = true;
+  return {
+    activeProvider: active?.name ?? null,
+    providers,
+    anyConfigured: providers.some((provider) => provider.configured),
+  };
+}
+
+function generateAlerts(
+  services: PlatformHealthSnapshot['services'],
+  ai: PlatformHealthSnapshot['ai'],
+): PlatformAlert[] {
+  const alerts: PlatformAlert[] = [];
+
+  if (services.database.status === 'down') {
+    alerts.push({ severity: 'critical', service: 'Database', message: services.database.message ?? 'Database is unreachable' });
+  } else if (services.database.status === 'degraded') {
+    alerts.push({ severity: 'warning', service: 'Database', message: `High latency: ${services.database.latencyMs}ms` });
+  }
+
+  if (services.redis.status === 'down') {
+    alerts.push({ severity: 'warning', service: 'Redis', message: services.redis.message ?? 'Rate limiting unavailable — Redis is down' });
+  } else if (!services.redis.configured) {
+    alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — Redis is not configured' });
+  }
+
+  for (const service of [
+    services.billing,
+    services.email,
+    services.storage,
+    services.studioBrowser,
+  ]) {
+    if (!service.configured && !/disabled for new transactions/i.test(service.message ?? '')) {
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is not configured` });
+    } else if (service.status === 'down') {
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is unreachable` });
+    } else if (service.status === 'degraded') {
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `High latency: ${service.latencyMs}ms` });
+    } else if (service.status === 'unknown') {
+      alerts.push({ severity: 'info', service: service.name, message: service.message ?? 'Operational status has not been verified' });
+    }
+  }
+
+  if (!ai.anyConfigured) {
+    alerts.push({ severity: 'critical', service: 'AI', message: 'No AI provider configured — all AI features offline' });
+  }
+
+  return alerts;
+}
+
+function determineOverall(
+  services: PlatformHealthSnapshot['services'],
+  alerts: PlatformAlert[],
+): HealthStatus {
+  if (services.database.status === 'down') return 'down';
+  if (alerts.some((alert) => alert.severity === 'critical')) return 'degraded';
+  if (alerts.some((alert) => alert.severity === 'warning')) return 'degraded';
+  if (Object.values(services).some((service) => service.status === 'unknown')) return 'unknown';
+  return 'healthy';
+}
+
+const TIMEOUT_MS = 5000;
+const DOWN_DB: ServiceCheck = { name: 'Database', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_BILLING: ServiceCheck = { name: 'Billing (QuickBooks + PayPal)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_EMAIL: ServiceCheck = { name: 'Email (SendGrid)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STORAGE: ServiceCheck = { name: 'Lesson media (Backblaze B2)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STUDIO_BROWSER: ServiceCheck = { name: 'Studio Browser', status: 'down', configured: true, message: 'Timed out' };
+
+export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
+  const start = Date.now();
+
+  try {
+    // Canonical runtime secrets override stale container values. This is
+    // especially important after credential rotation (Stripe, Redis, AI, etc.).
+    await hydrateProcessEnv().catch(() => undefined);
+
+    const [database, redis, billing, email, storage, studioBrowser] = await Promise.all([
+      withTimeout(checkDatabase(), TIMEOUT_MS, DOWN_DB),
+      withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
+      withTimeout(checkBilling(), TIMEOUT_MS, DOWN_BILLING),
+      withTimeout(checkEmail(), TIMEOUT_MS, DOWN_EMAIL),
+      withTimeout(checkLessonMediaStorage(), TIMEOUT_MS, DOWN_STORAGE),
+      withTimeout(checkStudioBrowser(), TIMEOUT_MS, DOWN_STUDIO_BROWSER),
+    ]);
+
+    const ai = checkAIProviders();
+    const services = { database, redis, billing, email, storage, studioBrowser };
+    const alerts = generateAlerts(services, ai);
+    const overall = determineOverall(services, alerts);
+
+    return {
+      overall,
+      timestamp: new Date().toISOString(),
+      responseTimeMs: Date.now() - start,
+      services,
+      ai,
+      alerts,
+    };
+  } catch (err) {
+    logger.error('[platform-health] Health check failed', err);
+    return {
+      overall: 'down',
+      timestamp: new Date().toISOString(),
+      responseTimeMs: Date.now() - start,
+      services: {
+        database: DOWN_DB,
+        redis: DOWN_REDIS,
+        billing: DOWN_BILLING,
+        email: DOWN_EMAIL,
+        storage: DOWN_STORAGE,
+        studioBrowser: DOWN_STUDIO_BROWSER,
+      },
+      ai: { activeProvider: null, providers: [], anyConfigured: false },
+      alerts: [{ severity: 'critical', service: 'Platform', message: 'Health check failed entirely' }],
+    };
+  }
+}
+
+/** Configuration-only snapshot. Never present this as operational health. */
+export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'services'> {
+  const payPalConfigured = Boolean(
+    process.env.PAYPAL_CLIENT_ID &&
+      process.env.PAYPAL_CLIENT_SECRET &&
+      process.env.PAYPAL_BILLING_WEBHOOK_ID,
+  );
+  const quickBooksConfigured = Boolean(
+    process.env.QB_CLIENT_ID &&
+      process.env.QB_CLIENT_SECRET &&
+      process.env.QB_REFRESH_TOKEN &&
+      process.env.QB_REALM_ID,
+  );
+  const emailConfigured = Boolean(process.env.SENDGRID_API_KEY?.startsWith('SG.'));
+  const storageConfigured = isElevateMediaStorageConfigured() && getElevateMediaStorageConfig().provider === 'backblaze-b2';
+  const ai = checkAIProviders();
+  const redisConfigured = Boolean(
+    process.env.REDIS_URL ||
+      (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
+  );
+
+  return {
+    services: {
+      database: { name: 'Database', status: 'unknown', configured: true, message: 'Not probed' },
+      redis: {
+        name: 'Redis',
+        status: 'unknown',
+        configured: redisConfigured,
+        message: redisConfigured ? 'Not probed' : 'Redis connection is not configured',
+      },
+      billing: {
+        name: 'Billing (QuickBooks + PayPal)',
+        status: 'unknown',
+        configured: payPalConfigured && quickBooksConfigured,
+        message:
+          payPalConfigured && quickBooksConfigured
+            ? 'Configured; runtime not probed'
+            : 'PayPal billing or QuickBooks connection is not configured',
+      },
+      email: {
+        name: 'Email (SendGrid)',
+        status: 'unknown',
+        configured: emailConfigured,
+        message: emailConfigured ? 'Not probed' : 'SENDGRID_API_KEY not set',
+      },
+      storage: {
+        name: 'Lesson media (Backblaze B2)',
+        status: 'unknown',
+        configured: storageConfigured,
+        message: storageConfigured ? 'Backblaze bucket privacy not probed' : 'Backblaze lesson-media connection not configured',
+      },
+      studioBrowser: {
+        name: 'Studio Browser',
+        status: 'unknown',
+        configured: Boolean(
+          process.env.STUDIO_BROWSER_URL &&
+            (process.env.STUDIO_BROWSER_PUBLIC_URL ||
+              process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
+            process.env.STUDIO_BROWSER_SECRET,
+        ),
+        message: 'Not probed',
+      },
+    },
+    ai,
+  };
+}

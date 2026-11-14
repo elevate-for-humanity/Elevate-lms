@@ -1,0 +1,72 @@
+{
+  "version": "partner-onboarding-20261103",
+  "durationSeconds": 259.944,
+  "video": "/videos/partner-onboarding-20261103.mp4",
+  "audio": "/audio/partner-onboarding-20261103.mp3",
+  "captions": "/captions/partner-onboarding-20261103.vtt",
+  "chapters": [
+    {
+      "title": "Your business. Our shared standard.",
+      "points": [
+        "Professional appearance",
+        "Prepared instruction",
+        "Respectful student service"
+      ],
+      "script": "Welcome to Elevate for Humanity. I'm PARIS, your onboarding guide. Elevate expects premium education and professional service. Present yourself and your business professionally. Keep training spaces clean, safe and ready. Under your independent contractor agreement, you operate your own business and deliver your assigned program services. Elevate provides the curriculum, platform, sponsor coordination, referrals and funding coordination stated in your agreement. Funding and student numbers are not guaranteed. Your signed agreement and applicable law control your responsibilities."
+    },
+    {
+      "title": "Read your own agreement",
+      "points": [
+        "Open assigned MOU",
+        "Review scope and payment terms",
+        "Sign your own documents"
+      ],
+      "script": "Start with your own MOU in the dashboard. Check the organization, assigned programs, duties and payment terms. Read the full agreement and any individual addendum. Never use someone else's rates. If a field or original document is missing, ask Elevate to correct it. Each person signs their own agreement. Viewing a page or watching this video does not sign a contract. Existing signatures remain on record; a new addendum needs its own review."
+    },
+    {
+      "title": "Handbook, privacy and conduct",
+      "points": [
+        "Read the full handbook",
+        "Protect student information",
+        "Ask before you accept unclear terms"
+      ],
+      "script": "Read the handbook, confidentiality obligations, and the full non-compete and non-solicitation terms linked in Forms. These describe how to protect student information and Elevate relationships. Ask questions before accepting anything you do not understand. Communicate respectfully, meet deadlines, and record actual attendance, progress and skills. Do not invent hours or promise funding, credentials, jobs or payments. Site coordinators can download team handouts, but each worker's own applicable agreement still controls their role."
+    },
+    {
+      "title": "Complete your W-9",
+      "points": [
+        "Name and tax classification",
+        "Address and nine-digit TIN",
+        "Review, sign and save"
+      ],
+      "script": "Open Complete and save my W-9. Enter the name shown on your tax return. For a sole proprietor or disregarded LLC, line one generally identifies the owner; the business name belongs on line two. Select the federal tax classification from your tax records. Follow the official IRS instructions if unsure. Enter your mailing address and the matching nine-digit taxpayer number. This is not a bank account number. Read the certification, indicate backup withholding if applicable, then type your signature as the final entry. Save the protected PDF and check your dashboard document register. Format checks do not confirm an IRS name and number match."
+    },
+    {
+      "title": "Prepare the correct invoice",
+      "points": [
+        "Choose assigned student",
+        "Review stage and suggested amount",
+        "Edit, certify and submit"
+      ],
+      "script": "Open Payouts and select Fill out an invoice. Choose a student from your assigned dashboard roster. The form fills the student information, recorded training dates and the available agreed installment amount. Select training start or completion and review the source. An individual student schedule takes priority. Prior payments and holds may require review before another amount is suggested. You can edit the request, dates and description. Add your unique invoice reference and certify the facts. Submit for Elevate review. An invoice does not change your MOU and does not release a payment."
+    },
+    {
+      "title": "Set up your banking securely",
+      "points": [
+        "Request your Intuit invitation",
+        "Enter bank details with Intuit",
+        "Check verification status"
+      ],
+      "script": "Use the secure banking guide in Payouts. Request your personal QuickBooks contractor invitation if needed. Check your legal and tax information, then enter the account type, routing number and bank account number on the verified Intuit setup page. Use your bank's direct deposit instructions. A debit card number is not a bank account number. Never send bank or taxpayer numbers in Office Mail. Complete the provider's verification and return to your dashboard to check status. PayPal is a separate available method where your agreement allows it. A saved destination is not proof of payment."
+    },
+    {
+      "title": "Review, ask questions, sign off",
+      "points": [
+        "Complete required forms",
+        "Check saved records",
+        "Confirm understanding after playback"
+      ],
+      "script": "Your Forms library contains the handbook, full agreements, W-9 flow, invoice form and team templates. Fill Elevate-created forms in the dashboard. Existing identity documents, licenses and insurance still need original evidence from the issuer. Complete your program plan and required acknowledgements. Use Office Mail for help with a specific missing item. After this video ends, review any questions and sign the watched-and-understood acknowledgement. It records your statement and playback progress, not a guarantee of understanding. Your MOU and other agreements still require their own signatures. Thank you for bringing excellence to your program."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+name: Record production integration and service checks
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: platform-integration-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Record actual production checks
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$CRON_SECRET"
+          curl --silent --show-error --fail --max-time 90 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            https://admin.elevateforhumanity.org/api/cron/health > /tmp/platform-monitor.json
+          node -e "const r=JSON.parse(require('fs').readFileSync('/tmp/platform-monitor.json','utf8'));if(r.monitoring?.recorded!==20||r.monitoring?.serviceChecks<10)process.exit(1);console.log('Production monitoring receipts saved; provider readiness is reported separately.')"

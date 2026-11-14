@@ -1,0 +1,5 @@
+[
+  { "source": "/programs/barber", "destination": "/programs/barber-apprenticeship" },
+  { "source": "/programs/hvac", "destination": "/programs/hvac-technician" },
+  { "source": "/programs/finance-bookkeeping-accounting", "destination": "/programs/bookkeeping" }
+]

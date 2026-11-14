@@ -1,0 +1,58 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+const source = fs.readFileSync(path.resolve('components/home/ScrollNarrator.tsx'), 'utf8');
+
+describe('homepage scroll narration lifecycle', () => {
+  it('enables the guided narration by default and remembers an explicit opt-out', () => {
+    expect(source).toContain("const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration'");
+    expect(source).toContain('const [enabled, setEnabled] = useState(true)');
+    expect(source).toContain("if (preference === 'off') setEnabled(false)");
+    expect(source).toContain("window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off')");
+    expect(source).toContain("window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on')");
+  });
+
+  it('keeps narration playing through small mobile scroll movement', () => {
+    const scrollHandler = source.slice(
+      source.indexOf('const synchronizeNarrationToScroll'),
+      source.indexOf("window.addEventListener('scroll'"),
+    );
+    expect(scrollHandler).toContain('if (visible === current) return');
+    expect(scrollHandler).toContain('if (!visible) return');
+    expect(scrollHandler).not.toContain('lastNarrationRef.current = null');
+    expect(scrollHandler).not.toContain('stop()');
+    expect(scrollHandler).toContain('void narrateVisibleSection()');
+    expect(source).toContain("window.addEventListener('scroll', synchronizeNarrationToScroll");
+    expect(source).not.toContain("window.addEventListener('wheel'");
+  });
+
+  it('does not cut off narration in the gap between page sections', () => {
+    const noSection = source.slice(
+      source.indexOf('if (!section)'),
+      source.indexOf('const text = narrationFor(section)'),
+    );
+    expect(noSection).not.toContain('stop()');
+    expect(noSection).not.toContain('lastNarrationRef.current = null');
+  });
+
+  it('warms opening narration and attempts the visible section on entry', () => {
+    expect(source).toContain('sections.slice(0, 3).forEach(preload)');
+    expect(source).toContain('void narrateVisibleSection();');
+  });
+
+  it('uses the next ordinary page interaction when mobile autoplay is blocked', () => {
+    expect(source).toContain('Narration could not start. Turn narration off and on to retry.');
+    expect(source).toContain("window.addEventListener('pointerdown', beginFromNaturalInteraction");
+    expect(source).toContain("window.addEventListener('keydown', beginFromNaturalInteraction");
+  });
+
+  it('does not rebuild scroll listeners for transient playback state', () => {
+    const scrollEffect = source.slice(
+      source.indexOf('const synchronizeNarrationToScroll'),
+      source.indexOf('const toggle ='),
+    );
+    expect(scrollEffect).not.toContain('isPlaying');
+    expect(scrollEffect).not.toContain('isLoading');
+  });
+});

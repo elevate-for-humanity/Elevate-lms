@@ -1,0 +1,42 @@
+# Canonical production continuation for all owner-authorized courses
+name: Course Builder Production Kick
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/course-builder-production-kick.yml'
+      - 'Dockerfile.ultimate-worker'
+      - 'lib/video/edge-tts.ts'
+      - 'workers/local-speech-smoke.mjs'
+      - 'workers/admin-speech-cache.mjs'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: course-builder-production-kick
+  # A workflow-file repair must replace the older continuation loop immediately.
+  # The actual render stays owned by the Admin worker/database lease, so cancelling
+  # this HTTP-kick loop does not terminate an in-flight canonical render.
+  cancel-in-progress: true
+
+jobs:
+  kick-canonical-runs:
+    name: Keep authorized canonical course workers active
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The canonical Google coordinator owns build selection, pool profiles,
+      # generation fences and leases. Never restart legacy video_jobs by slug.
+      - name: Continue approved checkpointed Google course work
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main

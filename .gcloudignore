@@ -1,0 +1,42 @@
+# Cloud Build source rules are separate from development Git and Docker rules.
+# Bare Docker directory patterns have different semantics here and can remove
+# tracked modules such as lib/supabase, core, and artifacts. Keep application
+# source and acceptance tests; Docker applies its own image exclusions later.
+.git/
+node_modules/
+.next/
+.turbo/
+.cache/
+.pnpm-store/
+/dist/
+/out/
+/coverage/
+/playwright-report/
+/test-results/
+/tmp/
+/temp/
+/logs/
+*.log
+*.tsbuildinfo
+
+# Credentials and local runtime configuration never enter source uploads.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.asc
+*.gpg
+*.keystore
+id_rsa*
+id_dsa*
+service-account*.json
+*-credentials.json
+*_credentials.json
+firebase-adminsdk*.json
+google-credentials*.json
+gha-creds-*.json

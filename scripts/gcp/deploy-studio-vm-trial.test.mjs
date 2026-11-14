@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {runtimeEnvironment,mountScript,unitFile} from './deploy-studio-vm-trial.mjs';
+const secret='existing-encryption-key-unchanged';
+const config={runtimeEnvironment:{STUDIO_BROWSER_SECRET:secret,STUDIO_REPOSITORY_BRANCH:'main',UNRELATED_TOKEN:'must-not-copy'},runtimeFiles:{}};
+test('keep the encryption key and only the browser configuration',()=>{const env=runtimeEnvironment(config,secret);assert.ok(env.includes('STUDIO_BROWSER_SECRET='+secret+'\n'));assert.ok(!env.includes('must-not-copy'));assert.ok(env.includes('STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth'));});
+test('reject key rotation, injected environment lines and unhandled files',()=>{assert.throws(()=>runtimeEnvironment(config,'a-different-secret-key'),/mismatch/);assert.throws(()=>runtimeEnvironment({...config,runtimeEnvironment:{STUDIO_BROWSER_SECRET:secret,STUDIO_X:'x\nEVIL=value'}},secret),/Unsupported/);assert.throws(()=>runtimeEnvironment({...config,runtimeFiles:{credential:'do-not-drop'}},secret),/explicit migration/);});
+test('only a disk created by this trial may be formatted',()=>{assert.ok(!mountScript(false).includes('mkfs.'));assert.ok(mountScript(false).includes('Refusing to format'));assert.ok(mountScript(true).includes('wipefs -n'));for(const fresh of [false,true])execFileSync('bash',['-n'],{input:mountScript(fresh)});});
+test('container is private, bounded and requires its persistent mount',()=>{const unit=unitFile('us-central1-docker.pkg.dev/elegant-racer-299721/elevate/studio-browser@sha256:'+'a'.repeat(64));for(const requirement of ['127.0.0.1:3100:3100','--memory=4g','--cpus=2','--cap-drop=ALL','RequiresMountsFor=/var/lib/elevate-studio','--env-file=/etc/elevate-studio/runtime.env'])assert.ok(unit.includes(requirement));assert.ok(!unit.includes(secret));assert.throws(()=>unitFile('image:latest'),/Immutable/);});

@@ -1,0 +1,59 @@
+name: Request Google Cloud Run deployment quota
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/gcp/request-run-headroom.mjs
+      - scripts/gcp/request-run-headroom.test.mjs
+      - .github/workflows/request-google-run-headroom.yml
+  workflow_dispatch:
+    inputs:
+      request_maximum:
+        description: Request unlimited CPU/memory preferences; Google decides the approved limits
+        type: boolean
+        required: false
+        default: false
+permissions:
+  contents: read
+  id-token: write
+  actions: write
+concurrency:
+  group: google-run-quota-request
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch quota request using authorized workflow_dispatch identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if [ "$latest" != "$GITHUB_SHA" ]; then
+            echo "Superseded quota request: current main $latest"
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/request-google-run-headroom.yml/dispatches" -f ref=main -F 'inputs[request_maximum]=false'
+  request:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: node --test scripts/gcp/request-run-headroom.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - run: node scripts/gcp/request-run-headroom.mjs
+        env:
+          REQUEST_MAXIMUM: ${{ inputs.request_maximum }}

@@ -1,0 +1,32 @@
+name: Provision Amir Texas Site Coordinator
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ops/provision-amir-texas-site-coordinator.mjs'
+      - '.github/workflows/provision-amir-texas-site-coordinator.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: provision-amir-texas-site-coordinator
+  cancel-in-progress: false
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Provision Amir Texas Site Coordinator
+        run: node scripts/ops/provision-amir-texas-site-coordinator.mjs

@@ -1,0 +1,7 @@
+# Verified lesson repair
+Failures are diagnosed before another expensive render. The runner persists the failed requirements, responsible stage, previous producer artifact, attempt, and correction status in __repairState. Generation receives that directive and bypasses its cached failed producer.
+A corrected producer must validate and differ from its previous output. Content preflight runs before rendering; final encoded media and learner checks still apply. A failed prerequisite does not fabricate inspection failures for work not performed.
+Inspection failures route to finished_media_qa and preserve the certified movie. Authoring failures return to learning_objectives and invalidate dependent script, narration, visual assignment and movie artifacts. Unchanged repairs and external permissions or license evidence block instead of looping. Existing bounded retry and lease fencing remain enforced.
+Checkpoint restore carries the repair directive across executions. Valid upstream stages are retained; an explicitly targeted failed producer cannot be skipped due to an old certificate. The course cursor cannot advance before a complete accepted lesson.
+Semantic recap and knowledge-check roles are derived from the authored teaching stage; content and actual media evidence remain subject to validation.
+This handles failures covered by the system's repair routes, not arbitrary code edits, authorization changes, purchase approvals or invented evidence.

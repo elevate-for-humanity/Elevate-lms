@@ -1,0 +1,23 @@
+name: Dispatch queued Google Course Builder work
+on:
+  schedule:
+    - cron: '11 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: google-course-queue-dispatch-request
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # The existing recovery workflow owns Google authentication, capacity
+      # checks, durable claims, and the shared runtime concurrency lane.
+      - name: Request existing Google-trusted Course Builder dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main

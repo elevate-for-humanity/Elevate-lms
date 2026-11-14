@@ -1,0 +1,92 @@
+name: Configure Google web health probes
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-runtime-operations
+  cancel-in-progress: false
+jobs:
+  capacity:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Require idle course executor and bounded existing web topology
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
+          const cloud=args=>JSON.parse(execFileSync('gcloud',[...args,'--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          assertNoActiveExecutions(cloud(['run','jobs','executions','list','--job=elevate-course-builder']));
+          for(const component of ['marketing','admin','lms']) {
+            const s=cloud(['run','services','describe','elevate-'+component+'-migration']);
+            const t=s.spec.template;
+            const limits=t.spec.containers[0].resources.limits;
+            if(limits.cpu!=='4' || limits.memory!=='8Gi' || t.metadata.annotations?.['autoscaling.knative.dev/maxScale']!=='1')
+              throw new Error('Unexpected web capacity; refusing to modify probes');
+          }
+          NODE
+  configure:
+    needs: capacity
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    strategy:
+      max-parallel: 1
+      fail-fast: true
+      matrix:
+        component: [marketing, admin, lms]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Change only dependency-free startup and liveness probes
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          gcloud run services update "elevate-$COMPONENT-migration" --project=elegant-racer-299721 --region=us-central1 --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
+      - uses: google-github-actions/auth@v3
+        id: health_auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - name: Read back probes and verify live readiness and database access
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TOKEN: ${{ steps.health_auth.outputs.id_token }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { verifyRuntimeReadiness } from './scripts/gcp/verify-runtime-readiness.mjs';
+          const component=process.env.COMPONENT;
+          const s=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-'+component+'-migration','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          const c=s.spec.template.spec.containers[0];
+          if(c.startupProbe?.httpGet?.path!=='/api/ping' || c.livenessProbe?.httpGet?.path!=='/api/ping') throw new Error('Probe readback mismatch');
+          console.log(JSON.stringify(await verifyRuntimeReadiness(component,s.status.url,process.env.TOKEN)));
+          NODE

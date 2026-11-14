@@ -1,0 +1,1 @@
+import fs from 'node:fs';for(const p of ['lib/ultimate-course-builder/release/lms-publisher.ts','apps/admin/app/api/admin/ultimate-course-builder/publish/route.ts','apps/lms/app/api/ultimate/courses/[courseId]/mastery/route.ts'])if(!fs.existsSync(p)){console.error('missing '+p);process.exit(1);}console.log('Ultimate LMS publication/runtime structure: PASS');

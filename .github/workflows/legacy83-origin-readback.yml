@@ -1,0 +1,49 @@
+name: Legacy 83 origin connection readback
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/legacy83-origin-readback.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Read current DNS and public customer application configuration
+        run: |
+          node --input-type=module <<'NODE'
+          import {resolveNs,resolve4} from 'node:dns/promises';
+          import {randomBytes,createCipheriv,publicEncrypt,constants} from 'node:crypto';
+          const origin='https://www.legacy83business.com';
+          console.log(JSON.stringify({nameservers:await resolveNs('legacy83business.com'),addresses:await resolve4('legacy83business.com')}));
+          const html=await fetch(origin+'/schedule-a-call').then(r=>r.text());
+          const paths=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(x=>x[1].replaceAll('&amp;','&'));
+          let found;
+          for(const path of paths){
+           const url=new URL(path,origin);
+           if(url.origin!==origin||!url.pathname.startsWith('/_next/')||!url.pathname.endsWith('.js'))continue;
+           const js=await fetch(url).then(r=>r.text());
+           for(const match of js.matchAll(/apiKey:\s*["'](AIza[A-Za-z0-9_-]+)["']/g)){
+            const context=js.slice(Math.max(0,match.index-100),match.index+1400);
+            const config={apiKey:match[1]};
+            for(const key of ['authDomain','projectId','storageBucket','messagingSenderId','appId','measurementId']){
+             const value=new RegExp(key+':\\s*["\\x27]([^"\\x27]+)["\\x27]').exec(context)?.[1];
+             if(value)config[key]=value;
+            }
+            if(config.projectId&&config.authDomain?.endsWith('.firebaseapp.com')){found=config;break;}
+           }
+           if(found)break;
+          }
+          if(found){
+           const key=randomBytes(32),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);
+           const ciphertext=Buffer.concat([cipher.update(JSON.stringify(found)),cipher.final()]);
+           const publicKey="-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxnPkT5z8tiKpqOcFgeWB\nmoWtdQnm43iAHizqnjv/WO+HoWZ9leybeTK32PoBqkLrYYgnf5harBpMFqYpIlvl\n0ROhcPEViwJr/oTbjV+JrdconyjEa9PZs5b7I6G3/h9+AWASvpXiiiZ32eyH/c3y\nop+mWRMAVTiOZpLFFEVJWU6h6gGpGxZaDhsgK5bbthfPtt1Gd0yLRMnePuY4ZeGB\nHKV4FxU3TKBUF7qf1vlEMVNCcxP/qVAFhNLfNRRjAP2pqrLOoOauJWudOBZER8ko\nGWn6vzimlYRlpFkaqCjuzVkg2bQfBejXHz9Syzq1iss4m3LoaUTL1L8ZhoCMm5Yq\nXq6m4I8XQiHdn8sv/yZwsIaGAdDrlV5ZvMSx188TnIXWov5/XK2CisCoyCRgYN+B\ncwsfSXOHJk7jrRw2B6hDqSzmzDM6K3rRaz4Tzl4QXWk/zWYhG3SDiA99g1foM2yO\nu1achJrsfOiiZWfnbuKORyqonJSHz5IFFEk2FMRD9zBpAgMBAAE=\n-----END PUBLIC KEY-----\n";
+           const envelope={version:1,encryptedKey:publicEncrypt({key:publicKey,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},key).toString('base64'),iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),ciphertext:ciphertext.toString('base64')};
+           console.log('CLIENT_CONFIG_ENVELOPE='+Buffer.from(JSON.stringify(envelope)).toString('base64'));
+           console.log(JSON.stringify({existingCustomerFirebaseProject:found.projectId,authDomain:found.authDomain,publicClientConfigRecovered:true}));
+          }else console.log(JSON.stringify({publicClientConfigRecovered:false,bundles:paths.length}));
+          
+          NODE

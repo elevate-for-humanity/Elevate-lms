@@ -1,0 +1,7 @@
+Triggering production build on the new container: Sunday, Jun 28, 2026, 11:30:00
+Target Service: elevate-lms-production
+Configuration:
+- Docker Engine: Buildkit
+- Memory: 8GB
+- Health Check: /api/health/northflank
+- Status: PENDING

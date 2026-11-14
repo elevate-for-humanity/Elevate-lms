@@ -1,0 +1,58 @@
+name: Course Builder isolation acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/course-builder-isolation-acceptance.yml'
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  isolate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify isolated production worker without changing resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, subprocess, sys
+          project='elegant-racer-299721'
+          def read(args):
+              result=subprocess.run(['gcloud',*args,'--project='+project,'--format=json'],text=True,capture_output=True,timeout=75)
+              if result.returncode: raise RuntimeError('GCP_READ_FAILED: '+str(args[:4]))
+              return json.loads(result.stdout)
+          job=read(['run','jobs','describe','elevate-course-builder-parallel','--region=us-east1'])
+          admin=read(['run','services','describe','elevate-admin-migration','--region=us-central1'])
+          execution=job.get('spec',{}).get('template',{}).get('spec',{})
+          spec=execution.get('template',{}).get('spec',{})
+          task=spec.get('containers',[{}])[0]
+          resources=task.get('resources',{}).get('limits',{})
+          image=task.get('image','')
+          execution_count=execution.get('parallelism')
+          task_count=execution.get('taskCount')
+          admin_spec=admin.get('spec',{}).get('template',{}).get('spec',{})
+          acontainer=(admin_spec.get('containers') or [{}])[0]
+          aenv={v.get('name'):v.get('value') for v in acontainer.get('env',[]) if 'value' in v}
+          flags={'workerRegionIsolated':job.get('metadata',{}).get('name')=='elevate-course-builder-parallel',
+                 'immutableWorkerImage':'@sha256:' in image,
+                 'finiteParallelism':execution_count==1 and task_count==1,
+                 'adminWorkerDisabled':aenv.get('DISABLE_ADMIN_VIDEO_WORKER')=='true'}
+          report={'project':project,'workerRegion':'us-east1','publicRegion':'us-central1','workerJob':'elevate-course-builder-parallel','cpu':resources.get('cpu'),'memory':resources.get('memory'),'parallelism':execution_count,'taskCount':task_count,'checks':flags}
+          print(json.dumps(report))
+          with open(__import__('os').environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write('### Course Builder isolation checks\n\n```json\n'+json.dumps(report,indent=2)+'\n```\n')
+          if not all(flags.values()):sys.exit('COURSE_BUILDER_ISOLATION_INCOMPLETE')
+          PY

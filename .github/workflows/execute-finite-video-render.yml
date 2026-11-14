@@ -1,0 +1,71 @@
+name: Execute finite Google video rendering
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/execute-finite-video-render.yml']
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: Use saved settings or refresh the serving Admin image and startup health check
+        type: choice
+        options: [saved, redeploy]
+        default: saved
+        required: true
+      validate_only:
+        description: Verify the configured startup probe, packaged narration and exact video state without rendering
+        type: boolean
+        default: false
+        required: true
+      region:
+        description: Google region for the renderer
+        type: choice
+        options: [us-east1, us-central1]
+        default: us-east1
+        required: true
+      source_region:
+        description: Existing region to copy only when creating a validation job in an empty target region
+        type: string
+        default: ''
+        required: false
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: finite-video-render-${{ inputs.region || 'us-central1' }}
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/execute-finite-video-render.yml/dispatches" -f ref=main -f 'inputs[configuration]=redeploy' -F 'inputs[validate_only]=true' -f 'inputs[region]=us-east1' -f 'inputs[source_region]=us-central1'
+  render:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Test bounded execution and terminal render evidence
+        run: node --test scripts/gcp/execute-finite-video-render.test.mjs scripts/gcp/finite-video-render.test.mjs
+      - name: Execute and verify the bounded Google render job
+        env:
+          RENDER_REGION: ${{ inputs.region }}
+          RENDER_SOURCE_REGION: ${{ inputs.source_region }}
+          RENDER_CONFIGURATION: ${{ inputs.configuration }}
+          VALIDATE_ONLY: ${{ inputs.validate_only }}
+        run: node scripts/gcp/execute-finite-video-render.mjs

@@ -1,0 +1,34 @@
+name: Publish approved validated courses
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/approved-course-publication*', 'scripts/gcp/publish-approved-courses.ts', '.github/workflows/publish-approved-courses.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+permissions:
+  contents: read
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    concurrency:
+      group: approved-course-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/gcp/approved-course-publication.test.mjs workers/ultimate-release-media.test.mjs
+      - name: Install isolated publication dependencies
+        run: |
+          npm install --prefix "$RUNNER_TEMP/course-publication" --no-audit --no-fund --ignore-scripts @supabase/supabase-js@2.89.0 tsx@4.21.0 server-only@0.0.1
+          ln -s "$RUNNER_TEMP/course-publication/node_modules" node_modules
+      - name: Publish owner-approved courses through full contract validation
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NODE_OPTIONS: --conditions=react-server
+        run: node --import tsx scripts/gcp/publish-approved-courses.ts

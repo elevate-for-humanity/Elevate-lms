@@ -1,0 +1,86 @@
+name: Audit existing course worker storage connection
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Existing job to inspect; no execution is started
+        required: true
+        type: choice
+        default: elevate-course-builder-parallel
+        options: [elevate-course-builder, elevate-course-builder-overflow, elevate-course-builder-parallel, elevate-course-builder-repair]
+      approved_source:
+        description: Previously approved exact worker source commit
+        required: true
+        type: string
+        default: 6b51ed2940c081d81e1d01e00f7355caa81dd367
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: { skip_install: true }
+      - name: Verify the existing job image against the approved source digest
+        env:
+          JOB: ${{ inputs.job }}
+          APPROVED_SOURCE: ${{ inputs.approved_source }}
+        run: |
+          set -euo pipefail
+          [[ "$APPROVED_SOURCE" =~ ^[a-f0-9]{40}$ ]] || exit 1
+          case "$JOB" in
+            elevate-course-builder) REGION=us-central1 ;;
+            elevate-course-builder-overflow|elevate-course-builder-parallel|elevate-course-builder-repair) REGION=us-east1 ;;
+            *) exit 1 ;;
+          esac
+          REGISTRY=us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker
+          DIGEST="$(gcloud artifacts docker images describe "$REGISTRY:$APPROVED_SOURCE" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
+          IMAGE="$(gcloud run jobs describe "$JOB" --project=elegant-racer-299721 --region="$REGION" --format='value(spec.template.spec.template.spec.containers[0].image)')"
+          case "$IMAGE" in
+            "$REGISTRY"@sha256:*) ACTUAL_DIGEST="${IMAGE#*@}" ;;
+            "$REGISTRY":*) ACTUAL_DIGEST="$(gcloud artifacts docker images describe "$IMAGE" --project=elegant-racer-299721 --format='value(image_summary.digest)')" ;;
+            *) echo 'COURSE_AUDIT_UNEXPECTED_IMAGE_REPOSITORY'; exit 1 ;;
+          esac
+          echo "Configured image: $IMAGE; resolved digest: $ACTUAL_DIGEST; approved digest: $DIGEST"
+          test "$ACTUAL_DIGEST" = "$DIGEST" || { echo 'COURSE_AUDIT_APPROVED_IMAGE_MISMATCH'; exit 1; }
+          echo "REGION=$REGION" >> "$GITHUB_ENV"
+          echo "CONFIGURED_IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          echo "IMAGE=$REGISTRY@$DIGEST" >> "$GITHUB_ENV"
+          echo "Approved immutable image resolved; no job execution or template change."
+      - name: Read only the actual job's inline storage connection and canonical lesson references
+        env:
+          JOB: ${{ inputs.job }}
+        run: |
+          set -euo pipefail
+          umask 077
+          CONFIG="$RUNNER_TEMP/course-storage-audit-config.json"
+          trap 'rm -f "$CONFIG" "$RUNNER_TEMP/extract-course-audit.mjs"' EXIT
+          cat > "$RUNNER_TEMP/extract-course-audit.mjs" <<'NODE'
+          let input='';for await(const part of process.stdin)input+=part;
+          const job=JSON.parse(input),containers=job.spec?.template?.spec?.template?.spec?.containers;
+          if(containers?.length!==1||containers[0].image!==process.env.CONFIGURED_IMAGE)throw Error('COURSE_AUDIT_RUNTIME_CHANGED');
+          const names=/^(ELEVATE_MEDIA_|S3_|R2_|CLOUDFLARE_R2_|AWS_|CLOUDFLARE_ACCOUNT_ID$|NEXT_PUBLIC_SUPABASE_URL$|SUPABASE_SERVICE_ROLE_KEY$)/;
+          const selected=(containers[0].env||[]).filter(item=>names.test(item.name));
+          if(selected.some(item=>item.valueFrom))throw Error('COURSE_AUDIT_INLINE_CONNECTION_UNAVAILABLE');
+          console.log(JSON.stringify({runtimeEnvironment:Object.fromEntries(selected.filter(item=>typeof item.value==='string').map(item=>[item.name,item.value]))}));
+          NODE
+          gcloud run jobs describe "$JOB" --project=elegant-racer-299721 --region="$REGION" --format=json | node "$RUNNER_TEMP/extract-course-audit.mjs" > "$CONFIG"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker pull "$IMAGE"
+          docker run --rm -i --entrypoint node \
+            -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" \
+            --import=tsx /app/scripts/gcp/audit-course-storage.ts < "$CONFIG"

@@ -1,0 +1,148 @@
+name: Diagnose Google runtime and capacity
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose-google-runtime.yml']
+  workflow_dispatch:
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted read-only Google diagnostics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-google-runtime.yml/dispatches" -f ref=main
+  diagnose:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        component: [admin, lms, marketing, store]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        id: auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Read capacity, configuration parity and dependency diagnostics
+        env:
+          TOKEN: ${{ steps.auth.outputs.id_token }}
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          const component = process.env.COMPONENT;
+          const project = 'elegant-racer-299721';
+          function gcloud(args) {
+            return execFileSync('gcloud', args, {encoding: 'utf8', stdio: ['ignore','pipe','pipe']}).trim();
+          }
+          function report(value) { console.log(JSON.stringify(value)); }
+          const service = JSON.parse(gcloud(['run','services','describe','elevate-'+component+'-migration','--project='+project,'--region=us-central1','--format=json']));
+          const spec = service.spec.template.spec;
+          const container = spec.containers[0];
+          const env = Object.fromEntries((container.env || []).filter(x => typeof x.value === 'string').map(x => [x.name, x.value]));
+          report({component, resources:container.resources, concurrency:spec.containerConcurrency,
+            scaling: Object.fromEntries(Object.entries(service.spec.template.metadata.annotations || {}).filter(([k]) => /Scale|cpu-throttling/.test(k))),
+            latestReadyRevision:service.status.latestReadyRevisionName, latestCreatedRevision:service.status.latestCreatedRevisionName,
+            traffic:service.status.traffic, conditions:(service.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason}))});
+          if (['admin', 'lms', 'marketing'].includes(component)) {
+            const revision = service.status.latestCreatedRevisionName;
+            const details = JSON.parse(gcloud(['run','revisions','describe',revision,'--project='+project,'--region=us-central1','--format=json']));
+            report({component, revision, startupProbe:details.spec.containers[0].startupProbe,
+              command:details.spec.containers[0].command,args:details.spec.containers[0].args,
+              ports:details.spec.containers[0].ports,runtimeIdentity:details.spec.serviceAccountName,
+              bindEnvironment:(details.spec.containers[0].env || []).filter(x=>['HOSTNAME','PORT'].includes(x.name)),
+              conditions:(details.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason,message:x.message}))});
+            try {
+              const exclusions = JSON.parse(gcloud(['logging','exclusions','list','--project='+project,'--format=json']));
+              report({component,loggingExclusions:exclusions.map(x=>({name:x.name,disabled:x.disabled,filter:x.filter}))});
+            } catch {report({component,loggingExclusionMetadataUnavailable:true});}
+            const logs = JSON.parse(gcloud(['logging','read',
+              'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-'+component+'-migration" AND resource.labels.revision_name="'+revision+'"',
+              '--project='+project,'--freshness=2h','--limit=200','--format=json']));
+            report({revision,logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]});
+            for (const row of logs) {
+              const message = String(row.textPayload || row.jsonPayload?.message || row.jsonPayload?.text || row.protoPayload?.status?.message || '');
+              const safe = message.replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]')
+                .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]')
+                .replace(/((?:api[_-]?key|token|password|secret)\s*[:=]\s*)\S+/gi,'$1[REDACTED]');
+              if (safe) {
+                report({revision,timestamp:row.timestamp,severity:row.severity,payloadKeys:Object.keys(row),message:safe.slice(0,2000)});
+              }
+            }
+          }
+          report({component, expectedSupabase:env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/,'') === 'https://cuxzzpsyufcewtmicszk.supabase.co',
+            anonPresent:Boolean(env.NEXT_PUBLIC_SUPABASE_ANON_KEY), serviceRolePresent:Boolean(env.SUPABASE_SERVICE_ROLE_KEY)});
+          if (component === 'marketing') {
+            try {
+              const billing = JSON.parse(gcloud(['billing','projects','describe',project,'--format=json']));
+              report({billingEnabled:billing.billingEnabled,billingAccountLinked:Boolean(billing.billingAccountName)});
+            } catch { report({billingRead:'unavailable'}); }
+            for (const [label,args] of [
+              ['services',['run','services','list','--region=us-central1','--format=json']],
+              ['executions',['run','jobs','executions','list','--region=us-central1','--format=json']]
+            ]) {
+              try {
+                const items=JSON.parse(gcloud(args));
+                report({capacityInventory:label,items:items.map(x=>({name:x.metadata?.name,
+                  resources:x.spec?.template?.spec?.containers?.[0]?.resources,
+                  scaling:x.spec?.template?.metadata?.annotations,
+                  conditions:x.status?.conditions,
+                  runningCount:x.status?.runningCount,completionTime:x.status?.completionTime}))});
+              } catch {report({capacityInventory:label,read:'unavailable'});}
+            }
+            const access = gcloud(['auth','print-access-token']);
+            let pageToken = '';
+            do {
+              const endpoint = new URL('https://serviceusage.googleapis.com/v1beta1/projects/484736877039/services/run.googleapis.com/consumerQuotaMetrics');
+              endpoint.searchParams.set('view','FULL');
+              endpoint.searchParams.set('pageSize','200');
+              if (pageToken) endpoint.searchParams.set('pageToken',pageToken);
+              const r = await fetch(endpoint,{headers:{Authorization:'Bearer '+access},signal:AbortSignal.timeout(30000)});
+              const body = await r.json();
+              report({quotaHttpStatus:r.status,errorStatus:body.error?.status});
+              if (!r.ok) break;
+              for (const metric of body.metrics || []) {
+                if (!/memory|cpu/i.test(metric.metric+' '+metric.displayName)) continue;
+                report({metric:metric.metric,displayName:metric.displayName,limits:metric.consumerQuotaLimits});
+              }
+              pageToken = body.nextPageToken || '';
+            } while (pageToken);
+          }
+          const allowedErrors = new Set(['TimeoutError','AbortError','TypeError','Error','request_failed','non_success_status','missing_configuration']);
+          for (let sample=1; sample<=3; sample++) {
+            const start=Date.now();
+            try {
+              const r = await fetch('https://elevate-'+component+'-migration-aabnh2y32a-uc.a.run.app/api/health',
+                {headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},redirect:'manual',signal:AbortSignal.timeout(90000)});
+              const b=await r.json();
+              const d=b.dependencies?.supabase;
+              report({component,sample,httpStatus:r.status,totalMs:Date.now()-start,service:b.service,ready:b.ready,healthy:b.healthy,
+                commit:b.commit,uptime:b.uptime,supabase:d ? {ok:d.ok,status:d.status,latencyMs:d.latencyMs,error:allowedErrors.has(d.error)?d.error:undefined}:null});
+            } catch(e) {report({component,sample,probeError:allowedErrors.has(e.name)?e.name:'probe_failed'});}
+          }
+          NODE
+
+      - name: Read serving probes and payment-provider diagnostics without mutation
+        if: matrix.component == 'marketing'
+        run: |
+          node --test scripts/gcp/audit-stabilization.test.mjs
+          node scripts/gcp/audit-stabilization.mjs

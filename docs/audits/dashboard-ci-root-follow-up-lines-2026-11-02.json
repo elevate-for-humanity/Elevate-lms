@@ -1,0 +1,621 @@
+[
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 10,
+        "text": "function resetTarget(value: string | null) {"
+      },
+      {
+        "line": 11,
+        "text": "  const destination = new URL('/reset-password?mode=recovery', siteUrls.app);"
+      }
+    ],
+    "after": [
+      {
+        "line": 10,
+        "text": "function recoveryOrigin(request: NextRequest) {"
+      },
+      {
+        "line": 11,
+        "text": "  const origin = request.nextUrl.origin;"
+      },
+      {
+        "line": 12,
+        "text": "  const allowed = new Set([new URL(siteUrls.app).origin, 'https://app.elevateforhumanity.org', 'https://lms.elevateforhumanity.org']);"
+      },
+      {
+        "line": 13,
+        "text": "  return allowed.has(origin) ? origin : new URL(siteUrls.app).origin;"
+      },
+      {
+        "line": 14,
+        "text": "}"
+      },
+      {
+        "line": 15,
+        "text": "function resetTarget(value: string | null, origin: string) {"
+      },
+      {
+        "line": 16,
+        "text": "  const destination = new URL('/reset-password?mode=recovery', origin);"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 13,
+        "text": "    const candidate = new URL(value || '', siteUrls.app);"
+      }
+    ],
+    "after": [
+      {
+        "line": 18,
+        "text": "    const candidate = new URL(value || '', origin);"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 21,
+        "text": "function failed(value: string | null, reason: string) {"
+      },
+      {
+        "line": 22,
+        "text": "  const destination = resetTarget(value);"
+      }
+    ],
+    "after": [
+      {
+        "line": 26,
+        "text": "function failed(value: string | null, reason: string, origin: string) {"
+      },
+      {
+        "line": 27,
+        "text": "  const destination = resetTarget(value, origin);"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "insert",
+    "before": [],
+    "after": [
+      {
+        "line": 40,
+        "text": "  const origin = recoveryOrigin(request);"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 38,
+        "text": "  if (!token && !code) return failed(params.get('next'), 'missing_recovery_token');"
+      },
+      {
+        "line": 39,
+        "text": "  const next = resetTarget(params.get('next')).pathname + resetTarget(params.get('next')).search;"
+      }
+    ],
+    "after": [
+      {
+        "line": 44,
+        "text": "  if (!token && !code) return failed(params.get('next'), 'missing_recovery_token', origin);"
+      },
+      {
+        "line": 45,
+        "text": "  const next = resetTarget(params.get('next'), origin).pathname + resetTarget(params.get('next'), origin).search;"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 53,
+        "text": "  if (request.headers.get('origin') !== new URL(siteUrls.app).origin) return new NextResponse('Invalid origin', { status: 403 });"
+      }
+    ],
+    "after": [
+      {
+        "line": 59,
+        "text": "  const origin = recoveryOrigin(request);"
+      },
+      {
+        "line": 60,
+        "text": "  if (request.nextUrl.origin !== origin || request.headers.get('origin') !== origin) return new NextResponse('Invalid origin', { status: 403 });"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 58,
+        "text": "  if (!token && !code) return failed(next, 'missing_recovery_token');"
+      }
+    ],
+    "after": [
+      {
+        "line": 65,
+        "text": "  if (!token && !code) return failed(next, 'missing_recovery_token', origin);"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 60,
+        "text": "  if (!config) return failed(next, 'recovery_unavailable');"
+      }
+    ],
+    "after": [
+      {
+        "line": 67,
+        "text": "  if (!config) return failed(next, 'recovery_unavailable', origin);"
+      }
+    ]
+  },
+  {
+    "path": "apps/lms/app/api/auth/recovery-callback/route.ts",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 69,
+        "text": "  if (result.error || !result.data?.session) return failed(next, 'recovery_failed');"
+      },
+      {
+        "line": 70,
+        "text": "  const response = NextResponse.redirect(resetTarget(next), 303);"
+      },
+      {
+        "line": 71,
+        "text": "  const hostname = new URL(siteUrls.app).hostname;"
+      }
+    ],
+    "after": [
+      {
+        "line": 76,
+        "text": "  if (result.error || !result.data?.session) return failed(next, 'recovery_failed', origin);"
+      },
+      {
+        "line": 77,
+        "text": "  const response = NextResponse.redirect(resetTarget(next, origin), 303);"
+      },
+      {
+        "line": 78,
+        "text": "  const hostname = new URL(origin).hostname;"
+      }
+    ]
+  },
+  {
+    "path": "apps/marketing/app/partners/host-shop/apply/page.tsx",
+    "kind": "insert",
+    "before": [],
+    "after": [
+      {
+        "line": 3,
+        "text": "import { siteUrls } from '@/lib/utils/site-urls';"
+      }
+    ]
+  },
+  {
+    "path": "apps/marketing/app/partners/host-shop/apply/page.tsx",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 207,
+        "text": "        <p className=\"rounded-xl border border-slate-300 bg-white p-4 text-slate-800\">Already started? <a className=\"font-bold underline\" href=\"https://app.elevateforhumanity.org/host-shop/login\">Sign in to finish your Host Shop onboarding</a>. No password yet? Use the password setup link on the sign-in page.</p>"
+      }
+    ],
+    "after": [
+      {
+        "line": 208,
+        "text": "        <p className=\"rounded-xl border border-slate-300 bg-white p-4 text-slate-800\">Already started? <a className=\"font-bold underline\" href={`${siteUrls.app}/host-shop/login`}>Sign in to finish your Host Shop onboarding</a>. No password yet? Use the password setup link on the sign-in page.</p>"
+      }
+    ]
+  },
+  {
+    "path": "components/program-holder/ProgramHolderDocumentUpload.tsx",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 180,
+        "text": "            <label className=\"flex gap-2 text-sm sm:col-span-2\"><input name=\"invoiceAttested\" type=\"checkbox\" value=\"yes\" required />I certify that these services and the requested amount are accurate.</label>"
+      }
+    ],
+    "after": [
+      {
+        "line": 180,
+        "text": "            <label className=\"flex min-h-11 cursor-pointer items-center gap-3 text-sm sm:col-span-2\"><input name=\"invoiceAttested\" type=\"checkbox\" value=\"yes\" required className=\"h-11 w-11 shrink-0 cursor-pointer\" />I certify that these services and the requested amount are accurate.</label>"
+      }
+    ]
+  },
+  {
+    "path": "scripts/gcp/resolve-main-release.mjs",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 30,
+        "text": "export function run(env = process.env) {"
+      }
+    ],
+    "after": [
+      {
+        "line": 30,
+        "text": "export function run(env = process.env, execute = execFileSync) {"
+      }
+    ]
+  },
+  {
+    "path": "scripts/gcp/resolve-main-release.mjs",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 40,
+        "text": "    execFileSync('gh', ['api', ...args], { encoding: 'utf8', timeout: 20000 }).trim();"
+      }
+    ],
+    "after": [
+      {
+        "line": 40,
+        "text": "    execute('gh', ['api', ...args], { encoding: 'utf8', timeout: 20000 }).trim();"
+      }
+    ]
+  },
+  {
+    "path": "scripts/gcp/resolve-main-release.mjs",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 51,
+        "text": "        `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&per_page=100`,"
+      }
+    ],
+    "after": [
+      {
+        "line": 51,
+        "text": "        `repos/${repository}/actions/workflows/${workflow}/runs?event=workflow_dispatch&branch=main&head_sha=${result.successor}&per_page=100`,"
+      },
+      {
+        "line": 52,
+        "text": "        // Project in gh before buffering stdout: full run metadata exceeds"
+      },
+      {
+        "line": 53,
+        "text": "        // execFileSync's buffer in repositories with a large workflow history."
+      },
+      {
+        "line": 54,
+        "text": "        '--jq',"
+      },
+      {
+        "line": 55,
+        "text": "        '{workflow_runs: [.workflow_runs[] | {head_branch, event, head_sha, status}]}',"
+      }
+    ]
+  },
+  {
+    "path": "scripts/gcp/resolve-main-release.test.mjs",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 3,
+        "text": "import { resolveMainRelease, hasPendingSuccessor } from './resolve-main-release.mjs';"
+      }
+    ],
+    "after": [
+      {
+        "line": 3,
+        "text": "import { resolveMainRelease, hasPendingSuccessor, run } from './resolve-main-release.mjs';"
+      }
+    ]
+  },
+  {
+    "path": "scripts/gcp/resolve-main-release.test.mjs",
+    "kind": "insert",
+    "before": [],
+    "after": [
+      {
+        "line": 63,
+        "text": ""
+      },
+      {
+        "line": 64,
+        "text": "test('large workflow inventories are projected by gh before stdout buffering', async () => {"
+      },
+      {
+        "line": 65,
+        "text": "  const { mkdtempSync, readFileSync, rmSync } = await import('node:fs');"
+      },
+      {
+        "line": 66,
+        "text": "  const { tmpdir } = await import('node:os');"
+      },
+      {
+        "line": 67,
+        "text": "  const { join } = await import('node:path');"
+      },
+      {
+        "line": 68,
+        "text": "  const dir = mkdtempSync(join(tmpdir(), 'release-inventory-'));"
+      },
+      {
+        "line": 69,
+        "text": "  const calls = [];"
+      },
+      {
+        "line": 70,
+        "text": "  try {"
+      },
+      {
+        "line": 71,
+        "text": "    const result = run({ GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', RELEASE_WORKFLOW: 'deploy-google-lms-trigger.yml', GITHUB_REF: 'refs/heads/main', GITHUB_SHA: current, REQUESTED_SHA: current, GITHUB_OUTPUT: join(dir, 'output') }, (_command, args) => {"
+      },
+      {
+        "line": 72,
+        "text": "      calls.push(args);"
+      },
+      {
+        "line": 73,
+        "text": "      if (args.includes('.object.sha')) return latest;"
+      },
+      {
+        "line": 74,
+        "text": "      if (args.some(value => value.includes('/runs?'))) {"
+      },
+      {
+        "line": 75,
+        "text": "        assert.ok(args.some(value => value.includes('head_sha=' + latest)));"
+      },
+      {
+        "line": 76,
+        "text": "        assert.equal(args.at(-2), '--jq');"
+      },
+      {
+        "line": 77,
+        "text": "        assert.ok(args.at(-1).includes('{head_branch, event, head_sha, status}'));"
+      },
+      {
+        "line": 78,
+        "text": "        return JSON.stringify({workflow_runs:[{head_branch:'main',event:'workflow_dispatch',head_sha:latest,status:'queued'}]});"
+      },
+      {
+        "line": 79,
+        "text": "      }"
+      },
+      {
+        "line": 80,
+        "text": "      throw new Error('An existing exact-main successor must prevent duplicate dispatch');"
+      },
+      {
+        "line": 81,
+        "text": "    });"
+      },
+      {
+        "line": 82,
+        "text": "    assert.equal(result.ready, false);"
+      },
+      {
+        "line": 83,
+        "text": "    assert.equal(calls.length, 2);"
+      },
+      {
+        "line": 84,
+        "text": "    assert.equal(readFileSync(join(dir, 'output'), 'utf8'), 'ready=false\\n');"
+      },
+      {
+        "line": 85,
+        "text": "  } finally { rmSync(dir, {recursive:true,force:true}); }"
+      },
+      {
+        "line": 86,
+        "text": "});"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 2,
+        "text": " * Surface defaults belong in a low-priority layer. Component utilities win; a light"
+      }
+    ],
+    "after": [
+      {
+        "line": 2,
+        "text": " * Surface defaults use zero-specificity selectors. Component utilities win; a light"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "insert",
+    "before": [],
+    "after": [
+      {
+        "line": 4,
+        "text": " * Do not introduce a named layer after utility layers or use Tailwind base"
+      },
+      {
+        "line": 5,
+        "text": " * in this standalone stylesheet; explicit component colors must always win."
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 5,
+        "text": "@layer efh-surface-defaults {"
+      },
+      {
+        "line": 6,
+        "text": "  .efh-contrast {"
+      }
+    ],
+    "after": [
+      {
+        "line": 7,
+        "text": "  :where(.efh-contrast) {"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 13,
+        "text": "  .efh-contrast :where(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800,"
+      }
+    ],
+    "after": [
+      {
+        "line": 14,
+        "text": "  :where(.efh-contrast) :where(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800,"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 20,
+        "text": "  .efh-contrast :where(.bg-white, .bg-slate-50, .bg-gray-50) {"
+      }
+    ],
+    "after": [
+      {
+        "line": 21,
+        "text": "  :where(.efh-contrast) :where(.bg-white, .bg-slate-50, .bg-gray-50) {"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 24,
+        "text": "  .efh-contrast :where(p, li, label, td, th, dd, dt, blockquote, figcaption) {"
+      }
+    ],
+    "after": [
+      {
+        "line": 25,
+        "text": "  :where(.efh-contrast) :where(p, li, label, td, th, dd, dt, blockquote, figcaption) {"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 28,
+        "text": "  .efh-contrast :where(input, textarea, select)::placeholder {"
+      }
+    ],
+    "after": [
+      {
+        "line": 29,
+        "text": "  :where(.efh-contrast) :where(input, textarea, select)::placeholder {"
+      }
+    ]
+  },
+  {
+    "path": "styles/contrast-guardrails.css",
+    "kind": "replace",
+    "before": [
+      {
+        "line": 32,
+        "text": "}"
+      }
+    ],
+    "after": [
+      {
+        "line": 33,
+        "text": ""
+      }
+    ]
+  },
+  {
+    "path": "tests/unit/lms-password-recovery-handoff.test.ts",
+    "kind": "insert",
+    "before": [],
+    "after": [
+      {
+        "line": 86,
+        "text": ""
+      },
+      {
+        "line": 87,
+        "text": "it('preserves the approved LMS alias while rejecting cross-alias POSTs', async () => {"
+      },
+      {
+        "line": 88,
+        "text": "  const url = 'https://lms.elevateforhumanity.org/api/auth/recovery-callback';"
+      },
+      {
+        "line": 89,
+        "text": "  const body = new URLSearchParams({ token_hash: 'expired', next: '/reset-password?portal=host-shop' });"
+      },
+      {
+        "line": 90,
+        "text": "  mocks.verify.mockResolvedValue({ data: { session: null }, error: new Error('expired') });"
+      },
+      {
+        "line": 91,
+        "text": "  const response = await POST(new NextRequest(url, { method: 'POST', headers: { origin: 'https://lms.elevateforhumanity.org' }, body }));"
+      },
+      {
+        "line": 92,
+        "text": "  expect(response.status).toBe(303);"
+      },
+      {
+        "line": 93,
+        "text": "  expect(response.headers.get('location')).toBe('https://lms.elevateforhumanity.org/reset-password?mode=recovery&portal=host-shop&error=recovery_failed');"
+      },
+      {
+        "line": 94,
+        "text": "  mocks.verify.mockClear();"
+      },
+      {
+        "line": 95,
+        "text": "  const rejected = await POST(new NextRequest(url, { method: 'POST', headers: { origin: 'https://app.elevateforhumanity.org' }, body }));"
+      },
+      {
+        "line": 96,
+        "text": "  expect(rejected.status).toBe(403);"
+      },
+      {
+        "line": 97,
+        "text": "  expect(mocks.verify).not.toHaveBeenCalled();"
+      },
+      {
+        "line": 98,
+        "text": "});"
+      }
+    ]
+  }
+]

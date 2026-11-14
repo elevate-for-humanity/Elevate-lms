@@ -1,0 +1,503 @@
+import 'server-only';
+
+import { getAITool } from './registry';
+import { isReadOnlyRequest, isRepositoryRevisionInspection } from '../command-intent';
+
+export type PlannedAITool = {
+  name: string;
+  input: Record<string, unknown>;
+};
+
+export function asAIRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function extractUuid(text: string): string | null {
+  // Database identities include newer UUID versions; routing must not discard
+  // a valid persisted UUID merely because its version nibble is above v5.
+  return (
+    text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i)?.[0] ?? null
+  );
+}
+
+function extractNamedFilter(command: string, label: string): string | null {
+  const match = command.match(new RegExp(`\\b${label}\\s+([a-z0-9_-]+)`, 'i'));
+  return match?.[1]?.trim() || null;
+}
+
+function wioaFollowupInput(
+  command: string,
+  context: Record<string, unknown>,
+): Record<string, unknown> {
+  const input = { ...asAIRecord(context.toolInput) };
+  const lower = command.toLowerCase();
+  if (/30\s*[- ]?day/.test(lower)) input.type = '30-day';
+  if (/\b(overdue|past due|missing|missed)\b/.test(lower)) input.overdue = true;
+  const sector = extractNamedFilter(command, 'sector');
+  const program = extractNamedFilter(command, 'program');
+  if (sector) input.sector = sector;
+  if (program) input.program = program;
+  return input;
+}
+
+function isOpenHandsStatusCommand(lower: string): boolean {
+  if (!/\bopenhands\b/.test(lower)) return false;
+
+  // Status routing must describe the OpenHands run itself. A compound
+  // engineering request often contains incidental words such as "check",
+  // "result", or "running" while asking OpenHands to change the repository.
+  // Treating any one of those words anywhere in the prompt as a status query
+  // silently converts mutation-capable work into a no-op status lookup.
+  if (
+    /\b(implement|modify|change|update|edit|refactor|write|add|remove|fix|repair|correct|commit|deploy)\b/.test(
+      lower,
+    )
+  ) {
+    return false;
+  }
+
+  return (
+    /\bopenhands(?:\s+(?:task|run|job))?(?:\s+\w+){0,2}\s+(?:status|progress|state|result|finished|running)\b/.test(
+      lower,
+    ) ||
+    /\b(?:check|show|get|refresh|monitor)\s+(?:the\s+)?openhands(?:\s+(?:task|run|job))?(?:\s+(?:status|progress|state|result))?\b/.test(
+      lower,
+    )
+  );
+}
+
+function isEngineeringCommand(lower: string): boolean {
+  if (/\bopenhands\b/.test(lower)) return true;
+  // Operators frequently refer to the product by its visible name (and by
+  // voice-to-text variants) instead of saying "repository" or "component".
+  // A repair request for these engineering surfaces must never fall through
+  // to advisory chat, because advisory chat cannot change or verify code.
+  const studioSurface =
+    /\b(?:dev(?:iant|int|in)?|div(?:iant|int)|elevate)\s+studio\b|\badmin\s+ai\b|\bcourse\s+builder\b/.test(
+      lower,
+    );
+  const engineeringNoun =
+    /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow|workflow file|source file|container|devcontainer|studio workspace)\b/.test(
+      lower,
+    );
+  const engineeringVerb =
+    /\b(fix|repair|correct|debug|refactor|implement|modify|change|update|edit|review|write|add|remove|clean up|cleanup|test)\b/.test(
+      lower,
+    );
+  return (engineeringNoun || studioSurface) && engineeringVerb;
+}
+
+function isEngineeringExecutionCommand(lower: string): boolean {
+  return (
+    isEngineeringCommand(lower) &&
+    /\b(implement|modify|change|update|edit|refactor|write|add|remove|fix|repair|correct)\b/.test(
+      lower,
+    ) &&
+    /\b(commit|files? changed|regression tests?|typecheck|build|deploy|repository|codebase|source)\b/.test(
+      lower,
+    )
+  );
+}
+
+function isLiveBrowserWork(lower: string): boolean {
+  const browserTarget =
+    /\b(live (site|website|page|homepage|dashboard)|cloud browser|browser|production (site|website|page|homepage|dashboard)|host shop dashboard)\b/.test(
+      lower,
+    );
+  const action =
+    /\b(open|audit|check|inspect|test|verify|fix|repair|click through|walk through)\b/.test(lower);
+  return browserTarget && action;
+}
+
+/**
+ * Deterministic planner for operational commands.
+ *
+ * This is intentionally rules-first. A model may explain a command, but a
+ * write action is only executable when it maps to a registered tool here (or
+ * an explicit registered tool name is supplied by a trusted caller).
+ */
+export function planAIToolFromCommand(
+  command: string,
+  context: Record<string, unknown> = {},
+): PlannedAITool | null {
+  const tool = matchAITool(command, context);
+  if (tool && isReadOnlyRequest(command) && getAITool(tool.name)?.classification === 'write') return null;
+  return tool;
+}
+
+function matchAITool(command: string, context: Record<string, unknown>): PlannedAITool | null {
+  const explicitTool = typeof context.toolName === 'string' ? context.toolName : null;
+  if (explicitTool && getAITool(explicitTool)) {
+    return { name: explicitTool, input: asAIRecord(context.toolInput) };
+  }
+
+  const workspace = command.split('\n').map(line=>{
+    try{return JSON.parse(line);}catch{return null;}
+  }).find(value=>value?.workspace==='course');
+  if(workspace){
+    const validId=(value:unknown)=>typeof value==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value)?value:undefined;
+    context={...context,courseId:context.courseId??validId(workspace.courseId),
+      lessonId:context.lessonId??validId(workspace.lessonId),buildId:context.buildId??validId(workspace.buildId)};
+  }
+  const instruction = command.split('\n').filter(line => {
+    try { return JSON.parse(line)?.workspace !== 'course'; } catch { return true; }
+  }).join('\n');
+  const lower = instruction.toLowerCase();
+  if (lower.trim() === 'inspect course builder health checks') {
+    return { name: 'courses.health', input: {} };
+  }
+  if (!isEngineeringCommand(lower) && /\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
+      /\b(status|health|monitor|failures?|errors?|working|helping)\b/.test(lower))
+    return {name:'paris.supervision', input:{}};
+
+  // The plan's platform snapshot command must resolve to a read-only tool.
+  if (
+    /^(?:get|show|inspect|check)\s+(?:(?:the|live|current)\s+)*(?:platform|system)\s+(?:state|health|status)\b/.test(lower)
+  ) {
+    return { name: 'system.health', input: {} };
+  }
+  const contextId = typeof context.id === 'string' ? context.id : null;
+  const id = contextId ?? extractUuid(instruction);
+
+  if (isRepositoryRevisionInspection(instruction)) {
+    return { name: 'studio.repository.status', input: {} };
+  }
+  if (isOpenHandsStatusCommand(lower)) {
+    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+  }
+  // Read-only workflow inspection outranks generic engineering keywords.
+  // Negated phrases such as "do not modify" describe a safety boundary, not
+  // authorization to dispatch a mutation-capable coding provider.
+  if (
+    /\b(workflow|pipeline|job)\b/.test(lower) &&
+    /\b(inspect|check|status|progress|current step|failures?)\b/.test(lower) &&
+    (isReadOnlyRequest(command) || /\bdo not (?:deploy|restart|cancel|modify|create)\b/.test(lower))
+  ) {
+    return { name: 'workflows.inspect', input: {} };
+  }
+  // A read-only Course Builder investigation must never enqueue production work,
+  // even when a quoted error or historical action contains repair verbs.
+  // Preserve the explicit tool override above for trusted internal callers.
+  if (
+    (isReadOnlyRequest(command) || /\b(do not (?:start|resume|create|generate|publish|modify|change|repair)|without (?:starting|resuming|modifying))\b/.test(lower)) &&
+    /\b(course|lesson|course builder|build|worker|checkpoint)\b/.test(lower) &&
+    /\b(audit|inspect|check|status|health|review|report|verify)\b/.test(lower)
+  ) {
+    return {
+      name: 'courses.status',
+      input: {
+        ...(typeof context.courseId === 'string' ? { courseId: context.courseId } : {}),
+        ...(typeof context.buildId === 'string' ? { buildId: context.buildId } : {}),
+      },
+    };
+  }
+
+  // The workspace provides explicit selected identities in its context line.
+  // Course text edits belong to the course service, not the coding runtime.
+  const selectedCourseId = typeof context.courseId==='string' ? context.courseId : workspace?.courseId;
+  const selectedLessonId = typeof context.lessonId==='string' ? context.lessonId : workspace?.lessonId;
+  const selectedBuildId = typeof context.buildId==='string' ? context.buildId : workspace?.buildId;
+  if(selectedCourseId && !isReadOnlyRequest(instruction) &&
+    /\b(change|update|edit|rewrite|revise|improve)\b/i.test(instruction) &&
+    !/\b(code|repository|github|component|typescript|route|layout|api endpoint)\b/i.test(instruction)) {
+    return {name:'courses.edit',input:{courseId:selectedCourseId,
+      ...(selectedLessonId?{lessonId:selectedLessonId}:{}),goal:instruction}};
+  }
+  if(selectedBuildId && /\bpublish\b.*\bcourse\b/i.test(instruction) && !isReadOnlyRequest(instruction))
+    return {name:'courses.publish',input:{buildId:selectedBuildId}};
+
+  // A compound repair request may require live-browser evidence, but the
+  // browser runtime cannot edit, test, commit, or deploy repository changes.
+  // Route explicit engineering execution to the coding runtime; that worker
+  // can use the requested browser verification as an acceptance criterion.
+  if (!isReadOnlyRequest(command) && isEngineeringExecutionCommand(lower)) {
+    return {
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  // Provider readiness can be an acceptance check inside a repository repair.
+  // Only use the standalone health tool after preserving the engineering goal.
+  if (
+    /\b(?:provider|credential|integration)\s+(?:health|status|availability|configuration)\b/.test(lower) ||
+    /\b(?:health|status)\b.*\b(?:provider|credential|integration)s?\b/.test(lower)
+  ) {
+    return { name: 'devstudio.health', input: {} };
+  }
+  // Browser-only work stays in the isolated browser runtime. Compound repair
+  // requests were already routed to engineering above.
+  if (isLiveBrowserWork(lower)) {
+    return {
+      name: 'browser.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  if (isEngineeringCommand(lower)) {
+    return {
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  if (/\bquickbooks\b/.test(lower)) {
+    if (/\b(sync|import|refresh)\b/.test(lower) && /\b(payroll|employees?)\b/.test(lower)) {
+      return {
+        name: 'quickbooks.syncPayroll',
+        input: { ...asAIRecord(context.toolInput), action: 'sync_payroll' },
+      };
+    }
+    if (
+      /\b(sync|import|refresh)\b/.test(lower) &&
+      /\b(expenses?|purchases?|transactions?)\b/.test(lower)
+    ) {
+      return {
+        name: 'quickbooks.syncExpenses',
+        input: { ...asAIRecord(context.toolInput), action: 'sync_expenses' },
+      };
+    }
+    if (
+      /\b(connect|reconnect|authorize|authorization|oauth|auth url|authorization link)\b/.test(
+        lower,
+      )
+    ) {
+      return { name: 'quickbooks.authorization', input: {} };
+    }
+    return { name: 'quickbooks.status', input: {} };
+  }
+
+  const personAtElevate = command.match(
+    /\bwho is\s+(.+?)\s+(?:at|with)\s+elevate(?:\s+for\s+humanity)?\b/i,
+  );
+  if (personAtElevate?.[1]) {
+    return { name: 'organization.directory', input: { query: personAtElevate[1].trim() } };
+  }
+
+  if (
+    /\bwioa\b/.test(lower) &&
+    /\b(follow[- ]?ups?|30\s*[- ]?day|overdue|past due|missing|missed)\b/.test(lower)
+  ) {
+    return { name: 'wioa.followups', input: wioaFollowupInput(command, context) };
+  }
+  if (
+    /\bwioa\b/.test(lower) &&
+    /\b(performance|outcomes?|metrics?|narrative|report|earnings|credential|skill gain)\b/.test(
+      lower,
+    )
+  ) {
+    return { name: 'wioa.performance', input: asAIRecord(context.toolInput) };
+  }
+  if (/\bwioa\b/.test(lower) && /\b(list|show|find|search|participants?)\b/.test(lower)) {
+    return { name: 'wioa.list', input: asAIRecord(context.toolInput) };
+  }
+  if (
+    /\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower) ||
+    /\bpending applications?\b/.test(lower)
+  ) {
+    return { name: 'applications.search', input: asAIRecord(context.toolInput) };
+  }
+  if (/\bapprove\b.*\bapplication\b/.test(lower)) {
+    return {
+      name: 'applications.approve',
+      input: { ...asAIRecord(context.toolInput), ...(id ? { id } : {}) },
+    };
+  }
+  if (/\b(list|show|find|search)\b.*\bstudents?\b/.test(lower)) {
+    return { name: 'students.search', input: asAIRecord(context.toolInput) };
+  }
+  if (
+    /\b(assign|start|create)\b.*\b(ai[- ]?(counselor|coach|coaching)|student[- ]?success intervention)\b/.test(
+      lower,
+    )
+  ) {
+    return {
+      name: 'risk.assignCounselor',
+      input: { ...asAIRecord(context.toolInput), ...(id ? { userId: id } : {}) },
+    };
+  }
+  if (/\b(list|show|find|search)\b.*\benrollments?\b/.test(lower)) {
+    return { name: 'enrollments.search', input: asAIRecord(context.toolInput) };
+  }
+  if (/\b(create|enroll)\b.*\benrollment\b|\benroll\b.*\bstudent\b/.test(lower)) {
+    return { name: 'enrollments.create', input: asAIRecord(context.toolInput) };
+  }
+  if (/\b(list|show|find)\b.*\bprograms?\b/.test(lower)) {
+    return { name: 'programs.list', input: asAIRecord(context.toolInput) };
+  }
+  if (/\b(system|platform)\b.*\b(health|status)\b|\bhealth check\b/.test(lower)) {
+    return { name: 'system.health', input: {} };
+  }
+  if (
+    /\b(container|devcontainer|studio workspace)\b/.test(lower) &&
+    /\b(scan|audit|inspect|check|diagnose|find|health|status|errors?|failures?|configuration)\b/.test(
+      lower,
+    )
+  ) {
+    return { name: 'devstudio.health', input: {} };
+  }
+  if (
+    /\b(create|make|generate|render)\b.*\b(commercial|promo|promotional)\b.*\bvideo\b|\bcommercial video\b/.test(
+      lower,
+    )
+  ) {
+    const duration = Number(lower.match(/\b(15|30|45|60|90)\s*[- ]?second/)?.[1] ?? 30);
+    const aspectRatio = lower.includes('9:16') ? '9:16' : lower.includes('1:1') ? '1:1' : '16:9';
+    return {
+      name: 'video.generate',
+      input: {
+        action: 'render',
+        projectName: 'Admin AI Commercial',
+        title: 'Elevate for Humanity Commercial',
+        prompt: command,
+        audience: 'prospective learners, employers, training providers, and community partners',
+        objective: 'demonstrate verified Elevate platform workflows',
+        cta: 'Explore the Elevate demos',
+        durationSeconds: duration,
+        aspectRatio,
+        sourceMode: 'hybrid',
+        tone: 'professional',
+        voice: 'coral',
+        includeCaptions: true,
+      },
+    };
+  }
+  if (
+    /\b(store demos?|demo routes?)\b/.test(lower) &&
+    /\b(scan|audit|inspect|test|verify|fix|repair)\b/.test(lower)
+  ) {
+    return {
+      name: 'browser.execute',
+      input: {
+        ...asAIRecord(context.toolInput),
+        task: command,
+      },
+    };
+  }
+  // Workflow inspection is only for requests whose subject is workflow/build
+  // execution state. Do not let an incidental phrase such as "claims that do
+  // not match the real workflow" hijack a browser or engineering audit.
+  if (
+    /\b(workflows?|course build|course generation)\b/.test(lower) &&
+    /\b(status|progress|state|current|running|failed|failure|completion|queue|task)\b/.test(
+      lower,
+    ) &&
+    !/\b(store demos?|demo routes?|live browser|public store|broken links?|mobile layout|console errors?|api errors?)\b/.test(
+      lower,
+    ) &&
+    !/\b(fix|repair|correct|change|update|edit|rerun|re-run|retry|resume|cancel)\b/.test(lower)
+  ) {
+    return { name: 'workflows.inspect', input: asAIRecord(context.toolInput) };
+  }
+  if (/\b(analytics|metrics|dashboard numbers)\b/.test(lower)) {
+    return { name: 'analytics.read', input: asAIRecord(context.toolInput) };
+  }
+  if (
+    /\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)
+  ) {
+    return { name: 'payouts.list', input: asAIRecord(context.toolInput) };
+  }
+  if (/\bmark\b.*\bpayout\b.*\bpaid\b/.test(lower)) {
+    return {
+      name: 'payouts.markPaid',
+      input: { ...asAIRecord(context.toolInput), ...(id ? { enrollmentId: id } : {}) },
+    };
+  }
+  if (/\b(issue|generate)\b.*\bcertificate/.test(lower)) {
+    return { name: 'certificates.issue', input: asAIRecord(context.toolInput) };
+  }
+  if (/\b(course|lesson|builder)\b/.test(lower) && /\b(status|monitor|progress|stalled|health|autopilot)\b/.test(lower) &&
+      !/\b(enable|disable|start|repair|fix|resume|build|create)\b/.test(lower)) {
+    return {name:'courses.status',input:{...(typeof context.courseId === 'string'?{courseId:context.courseId}:{}),
+      ...(typeof context.buildId === 'string'?{buildId:context.buildId}:{})}};
+  }
+
+  // Existing course media repair is Course Builder work. Route it before the
+  // generic engineering/browser rules so words such as "repair", "endpoint",
+  // or "dashboard" cannot accidentally dispatch an unauthorized OpenHands job.
+  if (
+    /\b(course|lesson)\b/.test(lower) &&
+    /\b(videos?|media|mp4s?|captions?|transcripts?|assets?)\b/.test(lower) &&
+    /\b(repair|fix|replace|restore|recover|rerender|re-render|audit|publish|finish|resume)\b/.test(
+      lower,
+    )
+  ) {
+    return {
+      name: 'courses.generate',
+      input: {
+        ...asAIRecord(context.toolInput),
+        action: 'start',
+        goal: instruction,
+        ...((selectedCourseId ?? id) ? { courseId: selectedCourseId ?? id } : {}),
+      },
+    };
+  }
+  if (/\b(send|email)\b.*\breminder/.test(lower)) {
+    return { name: 'communications.remind', input: asAIRecord(context.toolInput) };
+  }
+  // Domain generation stays inside Elevate's canonical Course Builder, never OpenHands.
+  if (/\b(generate|build|create|finish|complete|resume|make)\b.*\bcourse\b/.test(lower)) {
+    return {
+      name: 'courses.generate',
+      input: {
+        ...asAIRecord(context.toolInput),
+        action: 'start',
+        goal: instruction,
+        ...(instruction.match(/\bTarget programSlug=([a-z0-9-]+)\b/)?.[1]
+          ? {programSlug: instruction.match(/\bTarget programSlug=([a-z0-9-]+)\b/)![1]} : {}),
+        ...((id ?? (/\b(?:this|selected|current|open|same)\s+course\b/i.test(instruction) ? selectedCourseId : null))
+          ? { courseId: id ?? selectedCourseId } : {}),
+      },
+    };
+  }
+  // OpenHands is an engineering worker, not a general platform action router.
+  if (isOpenHandsStatusCommand(lower)) {
+    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+  }
+  if (isLiveBrowserWork(lower)) {
+    return {
+      name: 'browser.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  if (isEngineeringCommand(lower)) {
+    return {
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
+      input: {
+        ...asAIRecord(context.toolInput),
+        task: command,
+      },
+    };
+  }
+
+  if (/\brun\b.*\btests?\b/.test(lower)) {
+    return { name: 'workflows.runTests', input: asAIRecord(context.toolInput) };
+  }
+  if (
+    /\bdeploy\b/.test(lower) &&
+    !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,2}deploy\b/.test(lower)
+  ) {
+    return { name: 'deployments.autopilot', input: {workflow:'deploy-admin',confirmation:'CONFIRM DEPLOY',...asAIRecord(context.toolInput)} };
+  }
+  if (/\bapply\b.*\bmigrations?\b|\brun\b.*\bmigrations?\b/.test(lower)) {
+    return { name: 'migrations.applyAll', input: asAIRecord(context.toolInput) };
+  }
+  if (/\brollback\b.*\bmigrations?\b/.test(lower)) {
+    return { name: 'migrations.rollback', input: asAIRecord(context.toolInput) };
+  }
+  if (/\b(push|git push)\b/.test(lower)) {
+    return { name: 'devstudio.gitPush', input: asAIRecord(context.toolInput) };
+  }
+
+  return null;
+}
+
+export function commandApprovalConfirmation(
+  command: string,
+  body: Record<string, unknown>,
+  toolName: string,
+): unknown {
+  if (typeof body.confirmationText === 'string') return body.confirmationText;
+  const required = getAITool(toolName)?.confirmationPhrase;
+  if (required && command.includes(required)) return required;
+  return undefined;
+}

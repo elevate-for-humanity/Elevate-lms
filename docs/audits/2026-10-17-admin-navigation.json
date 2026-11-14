@@ -1,0 +1,1329 @@
+{
+  "observedAt": "2026-10-17T11:18:51.509Z",
+  "scope": "Authenticated browser navigation sweep; page loading is not proof of all read/write operations.",
+  "results": [
+    {
+      "requested": "/dashboard",
+      "url": "https://admin.elevateforhumanity.org/dashboard",
+      "heading": "Good morning, Elizabeth.",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/students",
+      "url": "https://admin.elevateforhumanity.org/students",
+      "heading": "Students",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/applications",
+      "url": "https://admin.elevateforhumanity.org/applications",
+      "heading": "Applications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/enrollments",
+      "url": "https://admin.elevateforhumanity.org/enrollments",
+      "heading": "Enrollments",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/notifications",
+      "url": "https://admin.elevateforhumanity.org/notifications",
+      "heading": "Notifications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/analytics/traffic",
+      "url": "https://admin.elevateforhumanity.org/analytics/traffic",
+      "heading": "Website Traffic",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/at-risk",
+      "url": "https://admin.elevateforhumanity.org/at-risk",
+      "heading": "Student Success & RTI",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/analytics",
+      "url": "https://admin.elevateforhumanity.org/analytics",
+      "heading": "Analytics",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/analytics/engagement",
+      "url": "https://admin.elevateforhumanity.org/analytics/engagement",
+      "heading": "Engagement Analytics",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/analytics/learning",
+      "url": "https://admin.elevateforhumanity.org/analytics/learning",
+      "heading": "Learning Analytics",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/analytics/programs",
+      "url": "https://admin.elevateforhumanity.org/analytics/programs",
+      "heading": "Program Analytics",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/analytics/revenue",
+      "url": "https://admin.elevateforhumanity.org/analytics/revenue",
+      "heading": "Revenue Analytics",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/reports",
+      "url": "https://admin.elevateforhumanity.org/reports",
+      "heading": "Admin Resource Unavailable",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/reports/enrollment",
+      "url": "https://admin.elevateforhumanity.org/reports/enrollment",
+      "heading": "Admin Resource Unavailable",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/reports/financial",
+      "url": "https://admin.elevateforhumanity.org/reports/financial",
+      "heading": "Admin Resource Unavailable",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/reports/caseload",
+      "url": "https://admin.elevateforhumanity.org/reports/caseload",
+      "heading": "Admin Resource Unavailable",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/reports/wioa",
+      "url": "https://admin.elevateforhumanity.org/reports/wioa",
+      "heading": "Admin Resource Unavailable",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/phone",
+      "url": "https://admin.elevateforhumanity.org/phone",
+      "heading": "Elevate Communications Hub",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Test call"
+      ]
+    },
+    {
+      "requested": "/phone/email",
+      "url": "https://admin.elevateforhumanity.org/phone/email",
+      "heading": "Elevate Email",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/phone/email/accounts",
+      "url": "https://admin.elevateforhumanity.org/phone/email/accounts",
+      "heading": "Email accounts",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/phone/texts",
+      "url": "https://admin.elevateforhumanity.org/phone/texts",
+      "heading": "Text messages",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Send text"
+      ]
+    },
+    {
+      "requested": "/phone/meetings",
+      "url": "https://admin.elevateforhumanity.org/phone/meetings",
+      "heading": "Team Meetings",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/operations/sms-logs",
+      "url": "https://admin.elevateforhumanity.org/operations/sms-logs",
+      "heading": "SMS Delivery",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Send SMS"
+      ]
+    },
+    {
+      "requested": "/inbox",
+      "url": "https://admin.elevateforhumanity.org/inbox",
+      "heading": "Admin Inbox",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/crm",
+      "url": "https://admin.elevateforhumanity.org/crm",
+      "heading": "CRM Hub",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/crm/leads",
+      "url": "https://admin.elevateforhumanity.org/crm/leads",
+      "heading": "Leads",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/crm/contacts",
+      "url": "https://admin.elevateforhumanity.org/crm/contacts",
+      "heading": "Contacts",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/crm/deals",
+      "url": "https://admin.elevateforhumanity.org/crm/deals",
+      "heading": "Deals",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/crm/campaigns",
+      "url": "https://admin.elevateforhumanity.org/crm/campaigns",
+      "heading": "Email Campaigns",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/crm/follow-ups",
+      "url": "https://admin.elevateforhumanity.org/crm/follow-ups",
+      "heading": "Follow-ups",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/email-marketing",
+      "url": "https://admin.elevateforhumanity.org/email-marketing",
+      "heading": "Email Marketing",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/social-media",
+      "url": "https://admin.elevateforhumanity.org/social-media",
+      "heading": "One newsroom for Elevate blogs, social posts, Reels and local visibility.",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/settings/social-media",
+      "url": "https://admin.elevateforhumanity.org/settings/social-media",
+      "heading": "Social Media Accounts",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/blog",
+      "url": "https://admin.elevateforhumanity.org/blog",
+      "heading": "Blog Posts",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/content",
+      "url": "https://admin.elevateforhumanity.org/content",
+      "heading": "Website Directory Content",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/studio",
+      "url": "https://admin.elevateforhumanity.org/studio",
+      "heading": "All Workflows \u2014 newest first",
+      "alerts": [
+        "ULTIMATE_INTERNAL_REPAIR_REQUIRED:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8:FINDINGS=[{\"step\":\"finished_media_qa\",\"code\":\"Media quality gate failed\",\"message\":\"Media quality gate failed: frozen interval 4.40s exceeds 4s; rendered video repeats 1 earlier moving sequence(s), indicating a backward timeline jump or replay\"}]",
+        "Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but automatic execution is not verified."
+      ],
+      "error": null,
+      "disabled": [
+        "Send",
+        "Start source-grounded acceptance build",
+        "@",
+        "Type securely",
+        "Enter"
+      ]
+    },
+    {
+      "requested": "/store",
+      "url": "https://admin.elevateforhumanity.org/store",
+      "heading": "Store Management",
+      "alerts": [
+        "Some store records could not be loaded. Counts and revenue are incomplete; refresh after resolving the data connection."
+      ],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/live-chat",
+      "url": "https://admin.elevateforhumanity.org/live-chat",
+      "heading": "Live Chat",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/community",
+      "url": "https://admin.elevateforhumanity.org/community",
+      "heading": "One community, one moderation workspace.",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/announcements",
+      "url": "https://admin.elevateforhumanity.org/instructor/announcements",
+      "heading": "Announcements",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/courses",
+      "url": "https://admin.elevateforhumanity.org/courses",
+      "heading": "Courses",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/programs",
+      "url": "https://admin.elevateforhumanity.org/programs",
+      "heading": "Programs Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/studio/courses",
+      "url": "https://admin.elevateforhumanity.org/studio/courses",
+      "heading": "Course Production Studio",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructors",
+      "url": "https://admin.elevateforhumanity.org/instructors",
+      "heading": "Admin Resource Unavailable",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/certificates",
+      "url": "https://admin.elevateforhumanity.org/certificates",
+      "heading": "Certificates",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/credentials",
+      "url": "https://admin.elevateforhumanity.org/credentials",
+      "heading": "Credential Registry",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/website-editor",
+      "url": "https://admin.elevateforhumanity.org/website-editor",
+      "heading": "Website Editor",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Publish"
+      ]
+    },
+    {
+      "requested": "/studio/workflows",
+      "url": "https://admin.elevateforhumanity.org/studio?workspace=workflows",
+      "heading": "What are we building today?",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Send",
+        "Refresh",
+        "Loading build status\u2026",
+        "Run browser check",
+        "Start Chromium"
+      ]
+    },
+    {
+      "requested": "/system/jobs",
+      "url": "https://admin.elevateforhumanity.org/system/jobs",
+      "heading": "Background Jobs",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/system/webhooks",
+      "url": "https://admin.elevateforhumanity.org/system/webhooks",
+      "heading": "Webhook Health",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Refresh"
+      ]
+    },
+    {
+      "requested": "/integrations",
+      "url": "https://admin.elevateforhumanity.org/integrations",
+      "heading": "Communication",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/ai-team",
+      "url": "https://admin.elevateforhumanity.org/ai-team",
+      "heading": "PARIS",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Send"
+      ]
+    },
+    {
+      "requested": "/intelligence",
+      "url": "https://admin.elevateforhumanity.org/intelligence",
+      "heading": "Institutional Intelligence",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/intelligence/forecast",
+      "url": "https://admin.elevateforhumanity.org/intelligence/forecast",
+      "heading": "Completion Forecast",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/system-health",
+      "url": "https://admin.elevateforhumanity.org/system-health",
+      "heading": "System Health",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/wioa",
+      "url": "https://admin.elevateforhumanity.org/wioa",
+      "heading": "WIOA Participants",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/funding",
+      "url": "https://admin.elevateforhumanity.org/funding",
+      "heading": "Funding",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/apprenticeships",
+      "url": "https://admin.elevateforhumanity.org/apprenticeships",
+      "heading": "Apprenticeships",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Approve all eligible (0)"
+      ]
+    },
+    {
+      "requested": "/testing-center",
+      "url": "https://admin.elevateforhumanity.org/testing-center",
+      "heading": "Testing Center",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/compliance",
+      "url": "https://admin.elevateforhumanity.org/compliance",
+      "heading": "WIOA / INTraining ETPL forms",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Validate COI"
+      ]
+    },
+    {
+      "requested": "/employers",
+      "url": "https://admin.elevateforhumanity.org/employers",
+      "heading": "Employers",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/program-holders",
+      "url": "https://admin.elevateforhumanity.org/program-holders",
+      "heading": "Program Holders",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/settings",
+      "url": "https://admin.elevateforhumanity.org/settings",
+      "heading": "Settings",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/wioa/eligibility",
+      "url": "https://admin.elevateforhumanity.org/wioa/eligibility",
+      "heading": "WIOA Eligibility Determinations",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/wioa/documents",
+      "url": "https://admin.elevateforhumanity.org/wioa/documents",
+      "heading": "WIOA Documents",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/wioa/verify",
+      "url": "https://admin.elevateforhumanity.org/wioa/verify",
+      "heading": "Pending WIOA Verifications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/grants",
+      "url": "https://admin.elevateforhumanity.org/grants",
+      "heading": "Grants",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/grants/applications",
+      "url": "https://admin.elevateforhumanity.org/grants/applications",
+      "heading": "Grant Applications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/grants/opportunities",
+      "url": "https://admin.elevateforhumanity.org/grants/opportunities",
+      "heading": "Grant Opportunities",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/grants/revenue",
+      "url": "https://admin.elevateforhumanity.org/grants/revenue",
+      "heading": "Grant Revenue",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/grants/workflow",
+      "url": "https://admin.elevateforhumanity.org/grants/workflow",
+      "heading": "Grant Autopilot Workflow",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/contracts",
+      "url": "https://admin.elevateforhumanity.org/contracts",
+      "heading": "Contract Automation",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/jri",
+      "url": "https://admin.elevateforhumanity.org/jri",
+      "heading": "Job Ready Indy",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/jri/participants",
+      "url": "https://admin.elevateforhumanity.org/jri/participants",
+      "heading": "Job Ready Indy Participants",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/payout-queue",
+      "url": "https://admin.elevateforhumanity.org/payout-queue",
+      "heading": "Partner Payout Queue",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/payroll-cards",
+      "url": "https://admin.elevateforhumanity.org/payroll-cards",
+      "heading": "Items",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/incentives",
+      "url": "https://admin.elevateforhumanity.org/incentives",
+      "heading": "Incentives",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/wotc",
+      "url": "https://admin.elevateforhumanity.org/wotc",
+      "heading": "Form 8850 is no longer in use",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/funding-verification",
+      "url": "https://admin.elevateforhumanity.org/funding-verification",
+      "heading": "Funding Verification Queue",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/studio?workspace=intelligence",
+      "url": "https://admin.elevateforhumanity.org/studio?workspace=intelligence",
+      "heading": "All Workflows \u2014 newest first",
+      "alerts": [
+        "ULTIMATE_INTERNAL_REPAIR_REQUIRED:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8:FINDINGS=[{\"step\":\"finished_media_qa\",\"code\":\"Media quality gate failed\",\"message\":\"Media quality gate failed: frozen interval 4.40s exceeds 4s; rendered video repeats 1 earlier moving sequence(s), indicating a backward timeline jump or replay\"}]",
+        "Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but automatic execution is not verified."
+      ],
+      "error": null,
+      "disabled": [
+        "Send",
+        "Start source-grounded acceptance build",
+        "@",
+        "Type securely",
+        "Enter"
+      ]
+    },
+    {
+      "requested": "/studio?workspace=workflows",
+      "url": "https://admin.elevateforhumanity.org/studio?workspace=workflows",
+      "heading": "All Workflows \u2014 newest first",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Send",
+        "Refresh",
+        "Loading build status\u2026",
+        "@",
+        "Type securely"
+      ]
+    },
+    {
+      "requested": "/snapshots",
+      "url": "https://admin.elevateforhumanity.org/snapshots",
+      "heading": "Platform Snapshots",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Refresh"
+      ]
+    },
+    {
+      "requested": "/instructor/dashboard",
+      "url": "https://admin.elevateforhumanity.org/instructor/dashboard",
+      "heading": "Instructor Dashboard",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/courses",
+      "url": "https://admin.elevateforhumanity.org/instructor/courses",
+      "heading": "My Courses",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/students",
+      "url": "https://admin.elevateforhumanity.org/instructor/students",
+      "heading": "My Students",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/gradebook",
+      "url": "https://admin.elevateforhumanity.org/instructor/gradebook",
+      "heading": "Gradebook",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/submissions",
+      "url": "https://admin.elevateforhumanity.org/instructor/submissions",
+      "heading": "Hands-on practical reviews",
+      "alerts": [
+        "Failed to load assignment submissions. Please try again."
+      ],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/attendance",
+      "url": "https://admin.elevateforhumanity.org/instructor/attendance",
+      "heading": "Attendance",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/analytics",
+      "url": "https://admin.elevateforhumanity.org/instructor/analytics",
+      "heading": "Teaching Analytics",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/programs",
+      "url": "https://admin.elevateforhumanity.org/instructor/programs",
+      "heading": "My Programs",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructor/settings",
+      "url": "https://admin.elevateforhumanity.org/instructor/settings",
+      "heading": "Account Settings",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/dashboard",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/dashboard",
+      "heading": "Staff Dashboard",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/students",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/students",
+      "heading": "Student Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/cases",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/cases",
+      "heading": "Participant Case Files",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/attendance",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/attendance",
+      "heading": "Attendance Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/courses",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/courses",
+      "heading": "Course Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/campaigns",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/campaigns",
+      "heading": null,
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/booth-renters",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/booth-renters",
+      "heading": "Booth Renters",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/training",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/training",
+      "heading": "Staff Training",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/skills",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/skills",
+      "heading": "Staff Skills Checklist",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/qa-checklist",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/qa-checklist",
+      "heading": "QA Checklist",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff-portal/customer-service",
+      "url": "https://admin.elevateforhumanity.org/staff-portal/customer-service",
+      "heading": "Customer Service",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/enrollment-jobs",
+      "url": "https://admin.elevateforhumanity.org/enrollment-jobs",
+      "heading": "Enrollment Jobs Monitor",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/gradebook",
+      "url": "https://admin.elevateforhumanity.org/gradebook",
+      "heading": "Gradebook",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/submissions",
+      "url": "https://admin.elevateforhumanity.org/submissions",
+      "heading": "External Submissions OS",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/verifications",
+      "url": "https://admin.elevateforhumanity.org/verifications",
+      "heading": "ID Verifications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/exam-authorizations",
+      "url": "https://admin.elevateforhumanity.org/exam-authorizations",
+      "heading": "Exam Authorization Queue",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/barriers",
+      "url": "https://admin.elevateforhumanity.org/barriers",
+      "heading": "Barriers Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/waitlist",
+      "url": "https://admin.elevateforhumanity.org/waitlist",
+      "heading": "Program Waitlist",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/transfer-hours",
+      "url": "https://admin.elevateforhumanity.org/transfer-hours",
+      "heading": "Transfer Hours Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/workone-queue",
+      "url": "https://admin.elevateforhumanity.org/workone-queue",
+      "heading": "WorkOne / Funding Queue",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/referrals",
+      "url": "https://admin.elevateforhumanity.org/referrals",
+      "heading": "Agency Referrals",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/programs/new",
+      "url": "https://admin.elevateforhumanity.org/programs/new",
+      "heading": "Create New Program",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/programs/catalog",
+      "url": "https://admin.elevateforhumanity.org/programs/catalog",
+      "heading": "Program Catalog Generator",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/career-courses",
+      "url": "https://admin.elevateforhumanity.org/career-courses",
+      "heading": "Career Courses",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/modules",
+      "url": "https://admin.elevateforhumanity.org/modules",
+      "heading": "Failed to load",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/videos",
+      "url": "https://admin.elevateforhumanity.org/videos",
+      "heading": "Training Videos",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/learning-paths",
+      "url": "https://admin.elevateforhumanity.org/learning-paths",
+      "heading": "Learning Paths",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/staff",
+      "url": "https://admin.elevateforhumanity.org/staff",
+      "heading": "Staff",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/instructors/performance",
+      "url": "https://admin.elevateforhumanity.org/instructors/performance",
+      "heading": "Instructor Performance",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/dashboard/etpl",
+      "url": "https://admin.elevateforhumanity.org/dashboard/etpl",
+      "heading": "ETPL Performance Dashboard",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/external-course-completions",
+      "url": "https://admin.elevateforhumanity.org/external-course-completions",
+      "heading": "Pending Credential Review",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/employers/onboarding",
+      "url": "https://admin.elevateforhumanity.org/employers/onboarding",
+      "heading": "Employer Onboarding Review",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/partners",
+      "url": "https://admin.elevateforhumanity.org/partners",
+      "heading": "Approved Host Shop readiness",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/partner-enrollments",
+      "url": "https://admin.elevateforhumanity.org/partner-enrollments",
+      "heading": "Partner Course Enrollments",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/program-holders/verification",
+      "url": "https://admin.elevateforhumanity.org/program-holders/verification",
+      "heading": "Program Holder Verification",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/providers",
+      "url": "https://admin.elevateforhumanity.org/providers",
+      "heading": "Providers",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/provider-applications",
+      "url": "https://admin.elevateforhumanity.org/provider-applications",
+      "heading": "Provider Applications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/tenants",
+      "url": "https://admin.elevateforhumanity.org/tenants",
+      "heading": "Tenant Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/jobs",
+      "url": "https://admin.elevateforhumanity.org/jobs",
+      "heading": "Job Postings",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/affiliates",
+      "url": "https://admin.elevateforhumanity.org/affiliates",
+      "heading": "Affiliate Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/marketplace",
+      "url": "https://admin.elevateforhumanity.org/marketplace",
+      "heading": "Marketplace & Platform Capabilities",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/delegates",
+      "url": "https://admin.elevateforhumanity.org/delegates",
+      "heading": "Delegates",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/audit-logs",
+      "url": "https://admin.elevateforhumanity.org/audit-logs",
+      "heading": "Audit Logs",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/accreditation",
+      "url": "https://admin.elevateforhumanity.org/accreditation",
+      "heading": "Accreditation Readiness",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/governance",
+      "url": "https://admin.elevateforhumanity.org/governance",
+      "heading": "Governance",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/ferpa",
+      "url": "https://admin.elevateforhumanity.org/ferpa",
+      "heading": "FERPA Compliance",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/ferpa/training",
+      "url": "https://admin.elevateforhumanity.org/ferpa/training",
+      "heading": "FERPA Training Compliance",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/documents",
+      "url": "https://admin.elevateforhumanity.org/documents/review",
+      "heading": "Document Review",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/documents/review",
+      "url": "https://admin.elevateforhumanity.org/documents/review",
+      "heading": "Document Review",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/signatures",
+      "url": "https://admin.elevateforhumanity.org/signatures",
+      "heading": "Signature Documents",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/mou",
+      "url": "https://admin.elevateforhumanity.org/mou",
+      "heading": "MOU Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/review-queue",
+      "url": "https://admin.elevateforhumanity.org/review-queue",
+      "heading": "Review Queue",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/hr",
+      "url": "https://admin.elevateforhumanity.org/hr",
+      "heading": "HR Dashboard",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/hr/employees",
+      "url": "https://admin.elevateforhumanity.org/hr/employees",
+      "heading": "Employee Directory",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/hr/payroll",
+      "url": "https://admin.elevateforhumanity.org/hr/payroll",
+      "heading": "Payroll Management",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/barber-shop-applications",
+      "url": "https://admin.elevateforhumanity.org/barber-shop-applications",
+      "heading": "Partner Barbershop Applications",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/licenses",
+      "url": "https://admin.elevateforhumanity.org/licenses",
+      "heading": "Platform Licenses",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/api-keys",
+      "url": "https://admin.elevateforhumanity.org/api-keys",
+      "heading": "API Keys",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/billing/subscriptions",
+      "url": "https://admin.elevateforhumanity.org/billing/subscriptions",
+      "heading": "SaaS billing",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/settings/payments",
+      "url": "https://admin.elevateforhumanity.org/settings/payments",
+      "heading": "Payment Settings",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Save Changes"
+      ]
+    },
+    {
+      "requested": "/settings/integrations",
+      "url": "https://admin.elevateforhumanity.org/settings/integrations",
+      "heading": "Integrations & Webhooks",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/settings/grok",
+      "url": "https://admin.elevateforhumanity.org/settings/grok",
+      "heading": "AI provider keys",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Save & activate",
+        "Save & activate"
+      ]
+    },
+    {
+      "requested": "/integrations/google-classroom",
+      "url": "https://admin.elevateforhumanity.org/integrations/google-classroom",
+      "heading": "Google Classroom",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/migrations",
+      "url": "https://admin.elevateforhumanity.org/migrations",
+      "heading": "Data Migrations",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/files",
+      "url": "https://admin.elevateforhumanity.org/files",
+      "heading": "File Manager",
+      "alerts": [],
+      "error": null,
+      "disabled": [
+        "Process Video"
+      ]
+    },
+    {
+      "requested": "/settings/nav",
+      "url": "https://admin.elevateforhumanity.org/settings/nav",
+      "heading": "Navigation Editor",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    },
+    {
+      "requested": "/impersonate",
+      "url": "https://admin.elevateforhumanity.org/impersonate",
+      "heading": "User Impersonation",
+      "alerts": [],
+      "error": null,
+      "disabled": []
+    }
+  ]
+}

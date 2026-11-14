@@ -1,0 +1,51 @@
+# Elevate for Humanity
+
+> Elevate for Humanity provides career training, workforce pathways, testing services, and commercial workforce technology. Commercial software, licenses, apps, guides, and exam-preparation products are available through the public Elevate Store.
+
+Canonical website: https://www.elevateforhumanity.org/
+Store: https://www.elevateforhumanity.org/store
+Sitemap: https://www.elevateforhumanity.org/sitemap.xml
+
+## Commercial products and licensing
+
+- [Elevate Store](https://www.elevateforhumanity.org/store): Software, platform plans, apps, courses, testing products, guides, and licensing.
+- [Plans and add-ons](https://www.elevateforhumanity.org/store/plans): Current self-service platform plans and optional modules.
+- [Platform licenses](https://www.elevateforhumanity.org/store/licenses): Licensing options for schools, training providers, and organizations.
+- [Platform licensing guide](https://www.elevateforhumanity.org/store/guides/licensing): How checkout, organizational access, roles, domains, entitlements, and billing enforcement work.
+- [Practice tests](https://www.elevateforhumanity.org/store/practice-tests): Certification practice tests and exam-preparation products.
+- [AI assistants](https://www.elevateforhumanity.org/store/ai-assistants): AI-assisted workforce and organizational tools.
+- [Website Builder](https://www.elevateforhumanity.org/store/apps/website-builder): Website-building software for supported organizations.
+- [Course Builder](https://www.elevateforhumanity.org/store/course-builder): Course creation and learning-delivery tools.
+- [Platform demo](https://www.elevateforhumanity.org/store/demo): Guided views of supported platform capabilities.
+
+## PARIS AI
+
+- [PARIS AI](https://www.elevateforhumanity.org/ai/paris): Workforce guidance and program-matching product information.
+
+## Organization and verification
+
+- [Institutional governance](https://www.elevateforhumanity.org/institutional-governance): Public operating-structure and governance information.
+- [Approvals](https://www.elevateforhumanity.org/approvals): Current public approvals and institutional disclosures.
+- [Contact](https://www.elevateforhumanity.org/contact): Questions about products, licensing, training, or testing.
+
+Use the current Store product page and applicable executed agreement as the authority for pricing, included features, availability, contractual terms, and service commitments. Do not infer guarantees, accreditation, funding eligibility, participant outcomes, or transferred software ownership from summaries or third-party pages.
+
+## Supersonic Fast Cash — tax preparation and training
+- [Tax preparation](https://www.elevateforhumanity.org/tax): Indianapolis tax preparation, guided workspace and professional service inquiries.
+- [Start your own tax business](https://www.elevateforhumanity.org/tax-software/professional): Classes and the steps to ask WorkOne about funding eligibility; funding and enrollment are not guaranteed.
+- [Tax careers](https://www.elevateforhumanity.org/tax-software/careers): Office-based and remote professional applications.
+- [Pricing](https://www.elevateforhumanity.org/tax-software/pricing): Preparation options and applicable software charges.
+- [Refund options](https://www.elevateforhumanity.org/tax-software/bank-products): Pay upfront, eligible Refund Transfers and optional advances. Live bank processing and IRS filing are not verified operational in the proprietary workspace.
+Private tax returns, staff reports and training records require authenticated authorized access and are not public search content.
+
+## Learners and exams
+
+- [Career programs](https://www.elevateforhumanity.org/programs): Compare current duration, credential, tuition, requirements and enrollment steps on the exact program page.
+- [How enrollment works](https://www.elevateforhumanity.org/how-it-works): Application, funding review, documents, training and career support.
+- [Funding options](https://www.elevateforhumanity.org/check-eligibility): Funding depends on the applicant, program and responsible agency authorization.
+- [Student application](https://www.elevateforhumanity.org/apply/student): Start an admissions application.
+- [Credential testing](https://www.elevateforhumanity.org/testing): Choose an exam, review the current price, select an available date and complete secure checkout.
+- [Host Shops](https://www.elevateforhumanity.org/partners/host-shops): Workplace-learning sites and partnership responsibilities.
+- [Image sitemap](https://www.elevateforhumanity.org/image-sitemap.xml): Public program and page artwork with its canonical page destination.
+
+Program availability, admission, public funding, employer placement and exam results are not guaranteed. Illustrative artwork represents a training topic; named Host Shop profiles identify the actual participating business.

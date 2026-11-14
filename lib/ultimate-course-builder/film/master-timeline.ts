@@ -1,0 +1,3 @@
+export interface NarrationCue{id:string;objectiveId:string;text:string;start:number;end:number}
+export interface VisualEvent{id:string;cueId:string;src:string;start:number;end:number;kind:'video'|'image'|'diagram'|'overlay';transition:'cut'|'crossfade'|'fade';loop:false}
+export function validateMasterTimeline(cues:NarrationCue[],visuals:VisualEvent[]){const failures:string[]=[];for(const cue of cues){const covered=visuals.some(v=>v.cueId===cue.id&&v.start<cue.end&&v.end>cue.start);if(!covered)failures.push(`NO_VISUAL_FOR:${cue.id}`);}for(const v of visuals){if(v.loop!==false)failures.push(`LOOP_NOT_ALLOWED:${v.id}`);if(v.end<=v.start)failures.push(`INVALID_DURATION:${v.id}`);}return {pass:failures.length===0,failures};}

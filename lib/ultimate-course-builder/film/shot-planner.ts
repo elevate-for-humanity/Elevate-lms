@@ -1,0 +1,2 @@
+import type {NarrationCue,VisualEvent} from './master-timeline';
+export function planShotCoverage(cues:NarrationCue[],assets:Array<{cueId:string;src:string;kind:VisualEvent['kind']}>):VisualEvent[]{return cues.flatMap((cue)=>assets.filter(a=>a.cueId===cue.id).map((a,i,arr)=>{const span=(cue.end-cue.start)/Math.max(1,arr.length);return {id:`${cue.id}:shot:${i+1}`,cueId:cue.id,src:a.src,start:cue.start+(i*span),end:i===arr.length-1?cue.end:cue.start+((i+1)*span),kind:a.kind,transition:i===0?'cut':'crossfade',loop:false as const};}));}

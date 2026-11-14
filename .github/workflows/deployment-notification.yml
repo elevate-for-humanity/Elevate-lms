@@ -1,0 +1,170 @@
+name: Deployment Notifications
+
+on:
+  workflow_dispatch:
+  deployment_status:
+
+jobs:
+  # Skip non-terminal deployment states gracefully
+  check-state:
+    runs-on: ubuntu-latest
+    outputs:
+      should_notify: ${{ steps.check.outputs.should_notify }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check deployment state
+        id: check
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          import { classifyDeploymentEvent } from './scripts/deployment-notification-event.mjs';
+          const result = classifyDeploymentEvent(JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')));
+          appendFileSync(process.env.GITHUB_OUTPUT, `should_notify=${result.notify}\n`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, result.reason + '\n');
+          NODE
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: check-state
+    if: ${{ needs.check-state.outputs.should_notify == 'true' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get deployment info
+        id: deployment
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          import { classifyDeploymentEvent } from './scripts/deployment-notification-event.mjs';
+          const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+          const result = classifyDeploymentEvent(event);
+          for (const [key, value] of Object.entries({environment: event.deployment.environment,
+            url: result.origin, state: event.deployment_status.state, commit: event.deployment.sha})) {
+            if (/[\r\n]/.test(String(value))) throw new Error('Invalid deployment metadata');
+            appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
+          }
+          NODE
+
+      - name: Run health check
+        if: github.event.deployment_status.state == 'success'
+        id: health
+        run: |
+          HEALTH_URL="${{ steps.deployment.outputs.url }}/api/health"
+          echo "Checking: $HEALTH_URL"
+
+          status_code=$(curl --fail-with-body --silent --show-error --max-time 20 \
+            --output /tmp/deployment-health.json --write-out "%{http_code}" "$HEALTH_URL" || true)
+          echo "status=${status_code:-000}" >> $GITHUB_OUTPUT
+
+          if [ "$status_code" = "200" ] && grep -Eq '"(healthy|ready|ok)"[[:space:]]*:[[:space:]]*true' /tmp/deployment-health.json; then
+            echo "result=✅ HEALTHY" >> $GITHUB_OUTPUT
+          else
+            echo "result=❌ UNHEALTHY" >> $GITHUB_OUTPUT
+            cat /tmp/deployment-health.json 2>/dev/null || true
+            exit 1
+          fi
+
+      - name: Create deployment summary
+        run: |
+          cat << EOF > $GITHUB_STEP_SUMMARY
+          # Deployment ${{ steps.deployment.outputs.state == 'success' && '✅ Successful' || '❌ Failed' }}
+
+          **Environment:** ${{ steps.deployment.outputs.environment }}
+          **URL:** ${{ steps.deployment.outputs.url }}
+          **Commit:** \`${{ steps.deployment.outputs.commit }}\`
+          **Time:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ## Health Check
+          ${{ steps.health.outputs.result || 'Skipped' }}
+
+          ## Quick Links
+          - [View Deployment](${{ steps.deployment.outputs.url }})
+          - [View Commit](https://github.com/${{ github.repository }}/commit/${{ steps.deployment.outputs.commit }})
+          - [View Workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+
+      - name: Comment on PR (if applicable)
+        if: github.event.deployment_status.state == 'success' && github.event.pull_request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Deployment Status')
+            );
+
+            const body = `## 🚀 Deployment Status: ${{ steps.deployment.outputs.state == 'success' && '✅ Success' || '❌ Failed' }}
+
+            **Environment:** ${{ steps.deployment.outputs.environment }}
+            **URL:** ${{ steps.deployment.outputs.url }}
+            **Health Check:** ${{ steps.health.outputs.result || 'N/A' }}
+
+            [View Deployment](${{ steps.deployment.outputs.url }}) | [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: body
+              });
+            }
+
+      - name: Send Slack notification (optional)
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          STATUS_EMOJI="${{ steps.deployment.outputs.state == 'success' && '✅' || '❌' }}"
+          STATUS_TEXT="${{ steps.deployment.outputs.state == 'success' && 'Success' || 'Failed' }}"
+
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "{
+              \"text\": \"${STATUS_EMOJI} Deployment ${STATUS_TEXT}\",
+              \"blocks\": [
+                {
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Deployment ${STATUS_TEXT}*\n\n*Environment:* ${{ steps.deployment.outputs.environment }}\n*URL:* ${{ steps.deployment.outputs.url }}\n*Health:* ${{ steps.health.outputs.result || 'N/A' }}\"
+                  }
+                },
+                {
+                  \"type\": \"actions\",
+                  \"elements\": [
+                    {
+                      \"type\": \"button\",
+                      \"text\": {
+                        \"type\": \"plain_text\",
+                        \"text\": \"View Deployment\"
+                      },
+                      \"url\": \"${{ steps.deployment.outputs.url }}\"
+                    },
+                    {
+                      \"type\": \"button\",
+                      \"text\": {
+                        \"type\": \"plain_text\",
+                        \"text\": \"View Logs\"
+                      },
+                      \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+                    }
+                  ]
+                }
+              ]
+            }"

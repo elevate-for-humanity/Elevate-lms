@@ -1,0 +1,7 @@
+{
+  "repository": "elevateforhumanity/elevate-store-platform",
+  "sourceCommit": "6f5d298a2a619c43741493278bf613a2c92cff31",
+  "supabaseProject": "ebnbeqdsuxygopetptlv",
+  "paymentReceiptUrl": "https://ebnbeqdsuxygopetptlv.supabase.co/functions/v1/quickbooks-payment-receipt",
+  "billingProvider": "quickbooks"
+}

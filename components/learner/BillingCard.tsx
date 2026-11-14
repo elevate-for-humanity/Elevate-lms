@@ -1,0 +1,264 @@
+'use client';
+
+import Link from 'next/link';
+import { CreditCard, AlertCircle, Clock, DollarSign, CalendarDays } from 'lucide-react';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export interface BillingSummary {
+  program: 'barber' | 'cosmetology';
+  paymentStatus: string;
+  weeklyPaymentCents: number | null;
+  remainingBalance: number | null;
+  fullTuitionAmount: number | null;
+  amountPaidAtCheckout: number | null;
+  nextPaymentDate: string | null;
+  fullyPaid: boolean;
+  setupFeePaid: boolean;
+  hasSubscription: boolean;
+}
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  active: {
+    label: 'Active',
+    color: 'bg-brand-green-100 text-brand-green-800',
+    icon: (
+      <span
+        className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+        aria-hidden="true"
+      />
+    ),
+  },
+  past_due: {
+    label: 'Payment Due',
+    color: 'bg-red-100 text-red-800',
+    icon: <AlertCircle className="w-3.5 h-3.5" />,
+  },
+  suspended: {
+    label: 'Suspended',
+    color: 'bg-red-100 text-red-800',
+    icon: <AlertCircle className="w-3.5 h-3.5" />,
+  },
+  cancelled: {
+    label: 'Cancelled',
+    color: 'bg-slate-100 text-slate-700',
+    icon: <AlertCircle className="w-3.5 h-3.5" />,
+  },
+  paid_in_full: {
+    label: 'Paid in Full',
+    color: 'bg-brand-green-100 text-brand-green-800',
+    icon: (
+      <span
+        className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+        aria-hidden="true"
+      />
+    ),
+  },
+  pending_payment_method: {
+    label: 'Setup Pending',
+    color: 'bg-amber-100 text-amber-800',
+    icon: <Clock className="w-3.5 h-3.5" />,
+  },
+};
+
+function fmt(cents: number | null): string {
+  if (cents === null) return '—';
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+function fmtDollars(amount: number | null): string {
+  if (amount === null) return '—';
+  return `$${Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+export default function BillingCard({
+  billing,
+  readOnly = false,
+}: {
+  billing: BillingSummary;
+  readOnly?: boolean;
+}) {
+  const statusCfg = STATUS_CONFIG[billing.paymentStatus] ?? {
+    label: billing.paymentStatus,
+    color: 'bg-slate-100 text-slate-700',
+    icon: <Clock className="w-3.5 h-3.5" />,
+  };
+
+  // Estimate total paid = full_tuition - remaining_balance
+  const totalPaid =
+    billing.fullTuitionAmount !== null && billing.remainingBalance !== null
+      ? billing.fullTuitionAmount - billing.remainingBalance
+      : null;
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+      {/* Header */}
+      <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-brand-blue-600" />
+          <h2 className="text-base font-semibold text-slate-900">Tuition &amp; Payments</h2>
+        </div>
+        <span
+          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${statusCfg.color}`}
+        >
+          {statusCfg.icon}
+          {statusCfg.label}
+        </span>
+      </div>
+
+      <div className="p-5 space-y-3">
+        {/* Rows */}
+        <div className="flex items-center justify-between text-sm">
+          <span className="flex items-center gap-1.5 text-slate-600">
+            <DollarSign className="w-4 h-4 text-slate-400" />
+            Weekly Tuition Payment
+          </span>
+          <span className="font-semibold text-slate-900">
+            {billing.fullyPaid ? 'Paid in full' : fmt(billing.weeklyPaymentCents)}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Total Tuition</span>
+          <span className="font-semibold text-slate-900">
+            {fmtDollars(billing.fullTuitionAmount)}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Amount Paid</span>
+          <span className="font-semibold text-brand-green-700">{fmtDollars(totalPaid)}</span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Enrollment Deposit Paid</span>
+          <span className="font-semibold text-brand-green-700">
+            {billing.setupFeePaid ? fmtDollars(billing.amountPaidAtCheckout) : 'Not paid'}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Automatic Drafts</span>
+          <span
+            className={`font-semibold ${billing.hasSubscription ? 'text-brand-green-700' : 'text-red-700'}`}
+          >
+            {billing.hasSubscription
+              ? 'PayPal agreement active'
+              : 'Release and PayPal approval required'}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Remaining Balance</span>
+          <span
+            className={`font-semibold ${
+              billing.fullyPaid ? 'text-brand-green-700' : 'text-slate-900'
+            }`}
+          >
+            {billing.fullyPaid ? '$0.00' : fmtDollars(billing.remainingBalance)}
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        {billing.fullTuitionAmount && billing.fullTuitionAmount > 0 && (
+          <div>
+            <div className="flex justify-between text-xs text-slate-500 mb-1">
+              <span>Tuition progress</span>
+              <span>
+                {Math.round(((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100)}%
+              </span>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-2">
+              <div
+                className="bg-brand-orange-500 h-2 rounded-full transition-all"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.round(((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100),
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Next payment */}
+        {!billing.fullyPaid && billing.nextPaymentDate && (
+          <div className="flex items-center justify-between text-sm pt-1">
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <CalendarDays className="w-4 h-4 text-slate-400" />
+              Next Payment
+            </span>
+            <span className="font-semibold text-slate-900">{fmtDate(billing.nextPaymentDate)}</span>
+          </div>
+        )}
+
+        {/* Past due alert */}
+        {billing.paymentStatus === 'past_due' && (
+          <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              Your payment is past due. Review the billing agreement below or contact support.
+            </span>
+          </div>
+        )}
+
+        {billing.paymentStatus === 'suspended' && (
+          <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              Your account is suspended due to non-payment. Call{' '}
+              <a
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                className="font-semibold underline"
+              >
+                {PLATFORM_DEFAULTS.supportPhone}
+              </a>{' '}
+              to restore access.
+            </span>
+          </div>
+        )}
+
+        {/* PayPal owns recurring collection; QuickBooks records the accounting entry. */}
+        {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && !readOnly && (
+          <div className="space-y-3 pt-2">
+            {!billing.hasSubscription && !billing.setupFeePaid && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
+                Complete the enrollment deposit first. The recurring-payment release and PayPal
+                approval become available after the deposit is recorded.
+              </div>
+            )}
+            {!billing.hasSubscription && billing.setupFeePaid && (
+              <p className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
+                Upload the signed recurring-payment release, then approve the PayPal billing
+                agreement. PayPal collects the scheduled amount automatically and QuickBooks records
+                the payment; you do not pay a separate invoice each week.
+              </p>
+            )}
+            <Link
+              href="/lms/documents"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
+            >
+              <CreditCard className="w-4 h-4" />
+              {billing.hasSubscription ? 'Review Billing Documents' : 'Complete PayPal Authorization'}
+            </Link>
+          </div>
+        )}
+        {readOnly && !billing.fullyPaid && !billing.hasSubscription && billing.setupFeePaid && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
+            Admin preview is read-only. The learner will see the recurring-payment release and
+            PayPal approval steps after the enrollment deposit is paid.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

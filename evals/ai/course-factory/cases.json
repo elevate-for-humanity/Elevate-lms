@@ -1,0 +1,39 @@
+[
+  {
+    "id": "course-factory.lesson-contract.v1",
+    "suite": "course-factory",
+    "category": "lesson-generation",
+    "description": "lesson generation preserves the canonical structured contract",
+    "prompt": "Create a workforce-training lesson titled Barber Infection Control for a barber apprenticeship course.",
+    "expected_criteria": {
+      "priority": ["P0", "P3"],
+      "contract": "strict lesson JSON with objective, learning_points, scenario, content, and quiz_questions",
+      "quality": "job-ready, topic-specific, no unrelated invented regulatory claims"
+    },
+    "version": 1
+  },
+  {
+    "id": "course-factory.assessment-contract.v1",
+    "suite": "course-factory",
+    "category": "assessment-generation",
+    "description": "assessment generation returns bounded answer choices and indexes",
+    "prompt": "Generate exactly four job-relevant knowledge-check questions for barber infection control.",
+    "expected_criteria": {
+      "priority": ["P0"],
+      "contract": "exactly four questions with four answer choices and a valid zero-based correct-answer index"
+    },
+    "version": 1
+  },
+  {
+    "id": "course-factory.blueprint-contract.v1",
+    "suite": "course-factory",
+    "category": "blueprint-generation",
+    "description": "blueprint generation preserves canonical module lesson shape",
+    "prompt": "Create a short workforce-training blueprint titled Barber Safety Fundamentals.",
+    "expected_criteria": {
+      "priority": ["P0"],
+      "contract": "strict blueprint JSON with two modules, two lessons per module, kebab-case slugs, and supported step types"
+    },
+    "version": 1
+  }
+]

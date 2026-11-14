@@ -1,0 +1,2 @@
+import type {UltimateCredentialProfile} from '../core/types';
+export function validateCredentialProfile(p:UltimateCredentialProfile){const errors:string[]=[];if(!p.authority)errors.push('authority');if(!p.standardVersion)errors.push('standardVersion');if(!p.sourceDocuments.length)errors.push('sourceDocuments');if(!p.competencies.length)errors.push('competencies');return {pass:errors.length===0,errors};}

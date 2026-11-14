@@ -1,0 +1,51 @@
+name: Start fresh complete lesson courses
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/start-fresh-complete-lessons.yml', 'scripts/gcp/audit-course-control-errors.mjs']
+  workflow_run:
+    workflows: ['Deploy Google Course Builder on source changes']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      worker_sha:
+        description: Exact deployed worker source commit
+        required: false
+        type: string
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          WORKER_SHA: ${{ github.event.workflow_run.head_sha || '2132a5e10866950ef8b8fa2264f47c887929f971' }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/start-fresh-complete-lessons.yml/dispatches" -f ref=main -f "inputs[worker_sha]=$WORKER_SHA"
+  start:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: google-course-regional-repair
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --test tests/worker/complete-lesson-before-advance.test.mjs scripts/gcp/regional-capacity.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Read course control failure categories
+        run: node scripts/gcp/audit-course-control-errors.mjs
+      - env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          COMPLETE_LESSON_IMAGE_SHA: ${{ inputs.worker_sha || '2132a5e10866950ef8b8fa2264f47c887929f971' }}
+        run: node scripts/gcp/start-fresh-complete-lessons.mjs

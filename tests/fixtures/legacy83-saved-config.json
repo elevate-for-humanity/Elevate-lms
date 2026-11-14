@@ -1,0 +1,1211 @@
+{
+  "pages": [
+    {
+      "id": "home",
+      "seo": {
+        "title": "Legacy 83 Business | Build a Business That Thrives Beyond You",
+        "keywords": [],
+        "description": "Business strategy, leadership coaching, operational excellence and legacy transition with Legacy 83 Business."
+      },
+      "slug": "/",
+      "title": "Home",
+      "navLabel": "Home",
+      "sections": [
+        {
+          "id": "hero",
+          "type": "hero",
+          "content": {
+            "text": "Strategic guidance for business owners ready to grow with purpose, lead with confidence, and create something that lasts.",
+            "image": "https://www.legacy83business.com/images/IcyWilliams.jpg",
+            "title": "Build Today. Leave a Legacy Tomorrow.",
+            "eyebrow": "Business strategy · Leadership · Legacy",
+            "imageAlt": "Icy Williams, founder of Legacy 83 Business",
+            "buttonHref": "/contact",
+            "buttonText": "Schedule a Conversation →",
+            "imageCaption": "Icy Williams · Founder, Legacy 83 Business",
+            "titleHighlight": "Leave a Legacy",
+            "secondaryButtonHref": "/services",
+            "secondaryButtonText": "Explore Our Services"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "services",
+          "type": "services",
+          "content": {
+            "text": "Your business is unique. Your path to sustainable success should be too.",
+            "items": [
+              {
+                "href": "/services",
+                "title": "Strategic Planning",
+                "buttonText": "Learn more →",
+                "description": "Connect your vision to actionable priorities and measurable business goals."
+              },
+              {
+                "href": "/services",
+                "title": "Leadership Coaching",
+                "buttonText": "Learn more →",
+                "description": "Develop confident leaders, accountable teams, and a culture of execution."
+              },
+              {
+                "href": "/services",
+                "title": "Operational Excellence",
+                "buttonText": "Learn more →",
+                "description": "Strengthen the processes and systems that support sustainable growth."
+              },
+              {
+                "href": "/services",
+                "title": "Legacy Transition",
+                "buttonText": "Learn more →",
+                "description": "Prepare your business for continuity, succession, and long-term value."
+              }
+            ],
+            "title": "Business Solutions Built Around Your Future",
+            "eyebrow": "What we do"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "pathways",
+            "numbered": true
+          }
+        },
+        {
+          "id": "framework",
+          "type": "features",
+          "content": {
+            "text": "The G.R.O.W.S. framework helps business owners focus on the essentials of resilient growth and long-term continuity.",
+            "items": [
+              {
+                "title": "Goals",
+                "marker": "G",
+                "description": "Clear priorities and measurable direction"
+              },
+              {
+                "title": "Revenue",
+                "marker": "R",
+                "description": "Sustainable growth and stronger decisions"
+              },
+              {
+                "title": "Operations",
+                "marker": "O",
+                "description": "Systems that support consistency"
+              },
+              {
+                "title": "Workforce",
+                "marker": "W",
+                "description": "Leadership and team readiness"
+              },
+              {
+                "title": "Succession",
+                "marker": "S",
+                "description": "Continuity beyond the founder"
+              }
+            ],
+            "title": "Five Foundations for a Business That Lasts.",
+            "eyebrow": "The Legacy 83 approach",
+            "buttonHref": "/growth-iq",
+            "buttonText": "Explore Growth IQ →"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "framework"
+          }
+        },
+        {
+          "id": "process",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "01 — Assess",
+                "description": "Understand your business today with the Legacy Growth IQ assessment."
+              },
+              {
+                "title": "02 — Plan",
+                "description": "Identify priorities and build a roadmap that fits your goals."
+              },
+              {
+                "title": "03 — Execute",
+                "description": "Put leadership and operational improvements into practice."
+              },
+              {
+                "title": "04 — Sustain",
+                "description": "Measure progress and prepare your business for what comes next."
+              }
+            ],
+            "title": "From Insight to Implementation",
+            "eyebrow": "YOUR PATH FORWARD"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "pathways"
+          }
+        },
+        {
+          "id": "assessment",
+          "type": "cta",
+          "content": {
+            "text": "Start with the Legacy Growth IQ assessment and discover where to focus next.",
+            "title": "Where Is Your Next Growth Opportunity?",
+            "buttonHref": "/growth-iq",
+            "buttonText": "Take the Growth IQ Assessment"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "faq",
+          "type": "faq",
+          "content": {
+            "items": [
+              {
+                "answer": "Entrepreneurs, business owners, and leaders who want stronger strategy, teams, operations, and succession readiness.",
+                "question": "Who does Legacy 83 work with?"
+              },
+              {
+                "answer": "Begin with the Legacy Growth IQ assessment or contact Legacy 83 to discuss your priorities.",
+                "question": "Where should I start?"
+              },
+              {
+                "answer": "No. The approach is tailored to the business, its leadership, and its goals.",
+                "question": "Is every engagement the same?"
+              }
+            ],
+            "title": "Questions Before You Begin"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "academy",
+          "type": "cta",
+          "content": {
+            "text": "Explore leadership, strategy, operational excellence, and succession readiness through the Legacy 83 Academy.",
+            "title": "Build Your Legacy Through Learning.",
+            "eyebrow": "Learning and development",
+            "buttonHref": "/academy",
+            "buttonText": "Explore the Academy →"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "academy"
+          }
+        },
+        {
+          "id": "final-cta",
+          "type": "cta",
+          "content": {
+            "text": "Start with a conversation about your vision and what your business needs next.",
+            "title": "Let's Build Your Legacy Together.",
+            "eyebrow": "Your next chapter",
+            "buttonHref": "/contact",
+            "buttonText": "Start a Conversation →"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "final"
+          }
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "contact",
+      "seo": {
+        "title": "Contact Legacy 83 Business | Start a Conversation",
+        "keywords": [],
+        "description": "Connect with Legacy 83 Business to explore strategic planning, leadership, operational excellence and legacy transition support."
+      },
+      "slug": "/contact",
+      "title": "Contact",
+      "navLabel": "Contact",
+      "sections": [
+        {
+          "id": "contact-hero",
+          "type": "hero",
+          "content": {
+            "text": "Tell us about your business and the future you're working toward.",
+            "title": "Let's Build Your Legacy Together.",
+            "eyebrow": "Legacy 83 Business"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "contact-info",
+          "type": "rich_text",
+          "content": {
+            "text": "info@legacy83business.com\n(513) 335-1978\n4724 Vine Street, Cincinnati, OH 45217",
+            "hours": [],
+            "title": "Contact Information"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "contact-form",
+          "type": "contact_form",
+          "content": {
+            "title": "Send a Message"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "contact-steps",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Share Your Goals",
+                "description": "Tell us about your business and what you want to improve."
+              },
+              {
+                "title": "Discuss Priorities",
+                "description": "Explore the most pressing opportunities and challenges."
+              },
+              {
+                "title": "Plan Your Next Step",
+                "description": "Identify a practical path forward with Legacy 83."
+              }
+            ],
+            "title": "What Happens Next",
+            "eyebrow": "START HERE"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "about",
+      "seo": {
+        "title": "About Icy Williams | Legacy 83 Business",
+        "keywords": [],
+        "description": "Meet the founder and lead coach of Legacy 83 Business."
+      },
+      "slug": "/about",
+      "title": "About",
+      "navLabel": "About",
+      "sections": [
+        {
+          "id": "about-hero",
+          "type": "hero",
+          "content": {
+            "text": "Legacy 83 Business works alongside entrepreneurs and business leaders to connect purpose with practical strategy, stronger teams, operational discipline, and long-term continuity.",
+            "image": "https://www.legacy83business.com/images/IcyWilliams.jpg",
+            "title": "Build something that outlasts you.",
+            "eyebrow": "Meet the founder",
+            "imageAlt": "Icy Williams, founder of Legacy 83 Business",
+            "buttonHref": "/contact",
+            "buttonText": "Contact Legacy 83"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "about-copy",
+          "type": "rich_text",
+          "content": {
+            "text": "Legacy 83 partners with small business owners and solo entrepreneurs to create sustainable growth strategies that honor profit, purpose, people, and the future.",
+            "title": "Build Something That Outlasts You"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "about-story",
+          "type": "rich_text",
+          "content": {
+            "text": "Legacy 83 Business works with entrepreneurs and business owners to connect business strategy with strong leadership, operational discipline, and long-term continuity. The goal is a business that performs today and can thrive beyond its founder.",
+            "title": "Purpose. People. A Legacy That Lasts."
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "about-pillars",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "People",
+                "description": "Develop leadership, accountability, and capable teams."
+              },
+              {
+                "title": "Strategy",
+                "description": "Make priorities clear and turn vision into measurable action."
+              },
+              {
+                "title": "Profits",
+                "description": "Improve systems and decisions that support sustainable growth."
+              },
+              {
+                "title": "Legacy",
+                "description": "Build continuity, succession readiness, and long-term value."
+              }
+            ],
+            "title": "Built Around What Matters",
+            "eyebrow": "WHAT GUIDES OUR WORK"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "pathways",
+            "numbered": true
+          }
+        },
+        {
+          "id": "about-cta",
+          "type": "cta",
+          "content": {
+            "text": "Start a conversation about your company's goals and next stage.",
+            "title": "Let's Build What Comes Next",
+            "buttonHref": "/contact",
+            "buttonText": "Contact Legacy 83"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "final"
+          }
+        },
+        {
+          "id": "home-founder-story",
+          "type": "rich_text",
+          "content": {
+            "text": "Meet Icy Williams. Legacy 83 helps entrepreneurs turn purpose into practical strategy, stronger leadership, and long-term business continuity.",
+            "title": "A Vision for Business That Outlasts Its Founder"
+          },
+          "visible": true,
+          "settings": {}
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "services-page",
+      "seo": {
+        "title": "Services | Legacy 83 Business",
+        "keywords": [],
+        "description": "Strategic planning, leadership coaching, operational excellence, and legacy transition."
+      },
+      "slug": "/services",
+      "title": "Services",
+      "navLabel": "Services",
+      "sections": [
+        {
+          "id": "services-hero",
+          "type": "hero",
+          "content": {
+            "text": "Four interconnected pathways support entrepreneurs as they clarify priorities, build accountable teams, improve operations, and plan for what comes next.",
+            "title": "Your business. Your vision. A stronger future.",
+            "eyebrow": "Strategy · Leadership · Legacy",
+            "buttonHref": "/contact",
+            "buttonText": "Start a Conversation"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "services-grid",
+          "type": "services",
+          "content": {
+            "items": [
+              {
+                "href": "/contact",
+                "title": "Strategic Planning",
+                "buttonText": "Discuss this pathway →",
+                "description": "Connect your vision to actionable priorities and measurable business goals."
+              },
+              {
+                "href": "/contact",
+                "title": "Leadership Coaching",
+                "buttonText": "Discuss this pathway →",
+                "description": "Develop confident leaders, accountable teams, and a culture of execution."
+              },
+              {
+                "href": "/contact",
+                "title": "Operational Excellence",
+                "buttonText": "Discuss this pathway →",
+                "description": "Strengthen the processes and systems that support sustainable growth."
+              },
+              {
+                "href": "/contact",
+                "title": "Legacy Transition",
+                "buttonText": "Discuss this pathway →",
+                "description": "Prepare your business for continuity, succession, and long-term value."
+              }
+            ],
+            "title": "Four Advisory Pathways"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "pathways",
+            "numbered": true
+          }
+        },
+        {
+          "id": "service-detail",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Strategic Planning",
+                "description": "Clarify priorities, build actionable roadmaps, and align day-to-day decisions with long-term goals."
+              },
+              {
+                "title": "Leadership Coaching",
+                "description": "Strengthen executive decision-making, accountability, and team development."
+              },
+              {
+                "title": "Operational Excellence",
+                "description": "Improve workflows, documentation, execution, and business resilience."
+              },
+              {
+                "title": "Business Growth",
+                "description": "Identify revenue opportunities and build repeatable systems for sustainable expansion."
+              },
+              {
+                "title": "Succession & Legacy",
+                "description": "Prepare leadership continuity, ownership transitions, and enduring business value."
+              }
+            ],
+            "title": "Focused on Your Business's Next Chapter",
+            "eyebrow": "TAILORED BUSINESS SUPPORT"
+          },
+          "visible": false,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "service-process",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Discover",
+                "description": "Understand your goals, challenges, and existing operations."
+              },
+              {
+                "title": "Prioritize",
+                "description": "Identify the highest-impact opportunities."
+              },
+              {
+                "title": "Execute",
+                "description": "Translate strategy into practical steps and measurable progress."
+              }
+            ],
+            "title": "How an Engagement Works"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "service-cta",
+          "type": "cta",
+          "content": {
+            "text": "Explore the right combination of services for your goals.",
+            "title": "Your Next Chapter Starts With a Conversation",
+            "buttonHref": "/contact",
+            "buttonText": "Request a Consultation"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "final"
+          }
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "resources",
+      "seo": {
+        "title": "Resources | Legacy 83 Business",
+        "keywords": [],
+        "description": "Assessments and resources for stronger leadership and sustainable growth."
+      },
+      "slug": "/resources",
+      "title": "Resources",
+      "navLabel": "Resources",
+      "sections": [
+        {
+          "id": "resources-hero",
+          "type": "hero",
+          "content": {
+            "text": "Assessments, insights, and learning resources for stronger leadership and sustainable growth.",
+            "title": "Tools to Build Your Legacy",
+            "eyebrow": "Practical Tools",
+            "buttonHref": "/contact",
+            "buttonText": "Contact Legacy 83"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "resources-grid",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Legacy Growth IQ™",
+                "description": "Identify business gaps and the next area to strengthen."
+              },
+              {
+                "title": "Leadership & Operations",
+                "description": "Strengthen the people and systems that allow the company to grow."
+              },
+              {
+                "title": "Succession Readiness",
+                "description": "Prepare the business, leadership, and owner for transition."
+              }
+            ],
+            "title": "Start Here"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "resources-tools",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "href": "/growth-iq",
+                "title": "Legacy Growth IQ",
+                "buttonText": "Explore Assessment",
+                "description": "Reflect on goals, revenue, operations, workforce, and succession readiness."
+              },
+              {
+                "href": "/journal",
+                "title": "Business Strategy Insights",
+                "buttonText": "Read the Journal",
+                "description": "Explore practical thinking on planning and execution."
+              },
+              {
+                "href": "/academy",
+                "title": "Learning Opportunities",
+                "buttonText": "Explore Academy",
+                "description": "Discover topics designed to strengthen business leadership and operations."
+              }
+            ],
+            "title": "Resources for Every Stage of Growth",
+            "eyebrow": "YOUR BUSINESS TOOLKIT"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "resources-cta",
+          "type": "cta",
+          "content": {
+            "text": "Discuss what your business needs to strengthen next.",
+            "title": "Turn Insight Into Action",
+            "buttonHref": "/contact",
+            "buttonText": "Contact Legacy 83"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "final"
+          }
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "academy",
+      "seo": {
+        "title": "Legacy 83 Academy",
+        "keywords": [],
+        "description": "Courses and workshops for business owners and leaders."
+      },
+      "slug": "/academy",
+      "title": "Academy",
+      "navLabel": "Academy",
+      "sections": [
+        {
+          "id": "academy-hero",
+          "type": "hero",
+          "content": {
+            "text": "Practical learning for business owners and leaders focused on strategy, operational excellence, and long-term continuity.",
+            "title": "Legacy 83 Academy",
+            "eyebrow": "Learn · Lead · Leave a legacy",
+            "buttonHref": "/contact",
+            "buttonText": "Ask About Current Programs"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "academy-grid",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Goals & Vision",
+                "description": "Clarify direction, priorities, and measurable outcomes."
+              },
+              {
+                "title": "Revenue & Growth",
+                "description": "Build disciplined strategies for sustainable growth."
+              },
+              {
+                "title": "Workforce & Leadership",
+                "description": "Develop leaders and teams that execute with confidence."
+              },
+              {
+                "title": "Succession & Legacy",
+                "description": "Prepare the company, people, and owner for transition."
+              }
+            ],
+            "title": "Learning Areas"
+          },
+          "visible": false,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "academy-programs",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Vision & Goal Setting",
+                "description": "Turn business vision into clear priorities and measurable outcomes."
+              },
+              {
+                "title": "Revenue & Sustainable Growth",
+                "description": "Explore the fundamentals of disciplined business growth."
+              },
+              {
+                "title": "Leadership & Workforce",
+                "description": "Build communication, accountability, and leadership readiness."
+              },
+              {
+                "title": "Operations & Execution",
+                "description": "Develop practical systems that support consistent delivery."
+              },
+              {
+                "title": "Succession & Legacy",
+                "description": "Learn how to prepare for continuity and business transitions."
+              }
+            ],
+            "title": "Build the Skills Behind a Lasting Business.",
+            "eyebrow": "PRACTICAL BUSINESS EDUCATION"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "academy-how",
+          "type": "rich_text",
+          "content": {
+            "text": "Legacy 83's academy brings business concepts into practical focus. Ask about current programs, workshops, and enrollment availability.",
+            "title": "Learning That Supports Real Decisions"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "academy-published-courses",
+          "type": "services",
+          "content": {
+            "items": [],
+            "title": "Available Courses",
+            "emptyText": "Contact Legacy 83 for current learning opportunities and enrollment availability."
+          },
+          "visible": true,
+          "settings": {
+            "source": "published-courses",
+            "numbered": true
+          }
+        },
+        {
+          "id": "academy-cta",
+          "type": "cta",
+          "content": {
+            "text": "Connect with Legacy 83 to discuss current learning opportunities.",
+            "title": "Ready to Grow Your Capabilities?",
+            "buttonHref": "/contact",
+            "buttonText": "Ask About the Academy"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "final"
+          }
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "growth-iq",
+      "seo": {
+        "title": "Legacy Growth IQ | Legacy 83 Business",
+        "keywords": [],
+        "description": "A guided business assessment covering goals, revenue, operations, workforce, and succession readiness."
+      },
+      "slug": "/growth-iq",
+      "title": "Legacy Growth IQ",
+      "navLabel": "Growth IQ",
+      "sections": [
+        {
+          "id": "growth-hero",
+          "type": "hero",
+          "content": {
+            "text": "Use the Legacy Growth IQ assessment to reflect on goals, revenue, operations, workforce, and succession readiness.",
+            "title": "Find the Next Area Your Business Needs to Strengthen",
+            "eyebrow": "Legacy Growth IQ",
+            "buttonHref": "/contact",
+            "buttonText": "Start with Legacy 83"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "growth-framework",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Goals",
+                "description": "Clarify vision, priorities, milestones, and measurable outcomes."
+              },
+              {
+                "title": "Revenue",
+                "description": "Review the systems and decisions supporting sustainable growth."
+              },
+              {
+                "title": "Operations",
+                "description": "Identify process, efficiency, and execution gaps."
+              },
+              {
+                "title": "Workforce",
+                "description": "Assess leadership, accountability, communication, and team readiness."
+              },
+              {
+                "title": "Succession",
+                "description": "Consider continuity, ownership transition, and long-term legacy readiness."
+              }
+            ],
+            "title": "The G.R.O.W.S. Areas"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "growth-cta",
+          "type": "cta",
+          "content": {
+            "text": "Discuss your priorities with Legacy 83 and identify practical next steps.",
+            "title": "Turn Your Assessment Into a Plan",
+            "buttonHref": "/contact",
+            "buttonText": "Contact Legacy 83"
+          },
+          "visible": true,
+          "settings": {
+            "variant": "final"
+          }
+        },
+        {
+          "id": "growth-assessment",
+          "type": "assessment",
+          "content": {
+            "text": "Answer each question based on where your business is today. Your result identifies a practical next area to strengthen.",
+            "title": "Legacy Growth IQ Assessment",
+            "results": [
+              {
+                "max": 49,
+                "min": 0,
+                "href": "/contact",
+                "text": "Your next opportunity is strengthening the fundamentals before scaling. Legacy 83 can help identify the highest-priority gaps.",
+                "title": "Build the foundation",
+                "buttonText": "Discuss My Results"
+              },
+              {
+                "max": 79,
+                "min": 50,
+                "href": "/contact",
+                "text": "You have important pieces in place. The next step is making leadership and operations more consistent and less owner-dependent.",
+                "title": "Strengthen the systems",
+                "buttonText": "Build My Action Plan"
+              },
+              {
+                "max": 100,
+                "min": 80,
+                "href": "/contact",
+                "text": "Your business shows strong foundations. Focus on resilience, succession readiness, and long-term value creation.",
+                "title": "Prepare for sustainable legacy",
+                "buttonText": "Plan the Next Stage"
+              }
+            ],
+            "questions": [
+              {
+                "options": [
+                  {
+                    "label": "Not yet clear",
+                    "score": 1
+                  },
+                  {
+                    "label": "Partly defined",
+                    "score": 2
+                  },
+                  {
+                    "label": "Clear and measurable",
+                    "score": 3
+                  }
+                ],
+                "question": "How clearly are your business goals translated into measurable priorities?"
+              },
+              {
+                "options": [
+                  {
+                    "label": "Mostly reactive",
+                    "score": 1
+                  },
+                  {
+                    "label": "Some repeatable practices",
+                    "score": 2
+                  },
+                  {
+                    "label": "Consistent and measured",
+                    "score": 3
+                  }
+                ],
+                "question": "How predictable and disciplined is your revenue growth process?"
+              },
+              {
+                "options": [
+                  {
+                    "label": "Mostly in people's heads",
+                    "score": 1
+                  },
+                  {
+                    "label": "Some systems documented",
+                    "score": 2
+                  },
+                  {
+                    "label": "Documented and consistently used",
+                    "score": 3
+                  }
+                ],
+                "question": "How well documented and repeatable are your core operations?"
+              },
+              {
+                "options": [
+                  {
+                    "label": "Not prepared",
+                    "score": 1
+                  },
+                  {
+                    "label": "Developing",
+                    "score": 2
+                  },
+                  {
+                    "label": "Prepared and accountable",
+                    "score": 3
+                  }
+                ],
+                "question": "How prepared is your leadership team to operate without the owner handling every decision?"
+              },
+              {
+                "options": [
+                  {
+                    "label": "Not started",
+                    "score": 1
+                  },
+                  {
+                    "label": "Some planning",
+                    "score": 2
+                  },
+                  {
+                    "label": "Documented transition plan",
+                    "score": 3
+                  }
+                ],
+                "question": "How prepared is the business for succession, sale, or an ownership transition?"
+              }
+            ]
+          },
+          "visible": true,
+          "settings": {}
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "journal",
+      "seo": {
+        "title": "Legacy Journal | Legacy 83 Business",
+        "keywords": [],
+        "description": "Business leadership, operations, growth, and succession insights from Legacy 83 Business."
+      },
+      "slug": "/journal",
+      "title": "Journal",
+      "navLabel": "Journal",
+      "sections": [
+        {
+          "id": "journal-hero",
+          "type": "hero",
+          "content": {
+            "text": "Leadership, operations, growth, and succession perspectives for business owners.",
+            "title": "Practical Insight for Building a Business That Lasts",
+            "eyebrow": "Legacy Journal"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "journal-topics",
+          "type": "features",
+          "content": {
+            "items": [
+              {
+                "title": "Strategy & Goals",
+                "description": "Turn long-term vision into focused priorities and measurable action."
+              },
+              {
+                "title": "Leadership & Workforce",
+                "description": "Build accountable teams and stronger leadership systems."
+              },
+              {
+                "title": "Operations & Growth",
+                "description": "Strengthen the processes that support sustainable growth."
+              },
+              {
+                "title": "Succession & Legacy",
+                "description": "Prepare the business and its leaders for continuity and transition."
+              }
+            ],
+            "title": "Explore the Journal"
+          },
+          "visible": true,
+          "settings": {
+            "numbered": true
+          }
+        },
+        {
+          "id": "journal-feed",
+          "type": "journal",
+          "content": {
+            "items": [
+              {
+                "href": "/contact",
+                "title": "Turn Vision Into Priorities Your Team Can Execute",
+                "excerpt": "A strong vision becomes useful when it is translated into a small set of measurable priorities, clear ownership, and a consistent review rhythm.",
+                "category": "Strategy & Goals"
+              },
+              {
+                "href": "/contact",
+                "title": "Build Leadership Capacity Beyond the Owner",
+                "excerpt": "A business becomes more resilient when decisions, accountability, and leadership do not depend on one person. Start by clarifying decision rights and developing leaders who can own outcomes.",
+                "category": "Leadership & Workforce"
+              },
+              {
+                "href": "/contact",
+                "title": "Document the Systems That Make Growth Repeatable",
+                "excerpt": "Growth becomes harder to sustain when core processes live only in people’s heads. Identify the workflows that affect customers, cash, quality, and team performance, then make the best way of working visible.",
+                "category": "Operations & Growth"
+              },
+              {
+                "href": "/contact",
+                "title": "Succession Planning Starts Before You Are Ready to Leave",
+                "excerpt": "Succession is not only an exit event. It is the work of building continuity, leadership depth, documented systems, and transferable value long before ownership changes.",
+                "category": "Succession & Legacy"
+              }
+            ],
+            "title": "Legacy Journal"
+          },
+          "visible": true,
+          "settings": {}
+        }
+      ],
+      "showInNavigation": true
+    },
+    {
+      "id": "events",
+      "seo": {
+        "title": "Events | Legacy 83 Business",
+        "keywords": [],
+        "description": "Workshops, webinars, and business-owner learning opportunities from Legacy 83 Business."
+      },
+      "slug": "/events",
+      "title": "Events",
+      "navLabel": "Events",
+      "sections": [
+        {
+          "id": "events-hero",
+          "type": "hero",
+          "content": {
+            "text": "Legacy 83 workshops, webinars, and community sessions are designed to help business owners learn together and put strategy into action.",
+            "title": "Learn, Connect, and Grow Together",
+            "eyebrow": "Events & Community",
+            "buttonHref": "/contact",
+            "buttonText": "Ask About Upcoming Events"
+          },
+          "visible": true,
+          "settings": {}
+        },
+        {
+          "id": "events-note",
+          "type": "rich_text",
+          "content": {
+            "text": "Current event dates and registration details will be posted here as they are confirmed. Contact Legacy 83 for the latest schedule.",
+            "title": "Upcoming Events"
+          },
+          "visible": false,
+          "settings": {}
+        },
+        {
+          "id": "events-registration-ready",
+          "type": "events",
+          "content": {
+            "items": [],
+            "title": "Upcoming Events",
+            "emptyText": "No events are currently scheduled. Contact Legacy 83 for updates."
+          },
+          "visible": true,
+          "settings": {
+            "source": "published-events"
+          }
+        },
+        {
+          "id": "events-interest",
+          "type": "contact_form",
+          "content": {
+            "title": "Get Event Updates",
+            "fields": [
+              {
+                "name": "name",
+                "type": "text",
+                "label": "Name",
+                "required": true
+              },
+              {
+                "name": "email",
+                "type": "email",
+                "label": "Email",
+                "required": true
+              },
+              {
+                "name": "event_interest",
+                "type": "select",
+                "label": "What are you interested in?",
+                "options": [
+                  "Business strategy workshops",
+                  "Leadership development",
+                  "Operations and growth",
+                  "Succession and legacy planning"
+                ],
+                "required": true
+              }
+            ]
+          },
+          "visible": true,
+          "settings": {}
+        }
+      ],
+      "showInNavigation": true
+    }
+  ],
+  "footer": {
+    "description": "Empowering business owners to build wealth, inspire teams, and leave lasting legacies.",
+    "contactEmail": "info@legacy83business.com"
+  },
+  "branding": {
+    "tagline": "Build Wealth. Inspire Teams. Leave a Legacy.",
+    "logoText": "Legacy 83 Business",
+    "logoImage": "https://www.legacy83business.com/legacy83Logo.webp",
+    "textColor": "#19372b",
+    "accentColor": "#d7b46a",
+    "primaryColor": "#123327",
+    "secondaryColor": "#9a743d",
+    "backgroundColor": "#faf7f0"
+  },
+  "homepage": {
+    "features": [
+      {
+        "title": "Business Strategy & Growth",
+        "description": "Turn your vision into a focused plan for revenue, operations, and sustainable growth."
+      },
+      {
+        "title": "Leadership & Team Development",
+        "description": "Build capable leaders, accountable teams, and systems that do not depend on one person."
+      },
+      {
+        "title": "Succession & Legacy Planning",
+        "description": "Prepare your company for continuity, ownership transition, and long-term value."
+      }
+    ],
+    "heroImage": "https://www.legacy83business.com/images/IcyWilliams.jpg",
+    "heroTitle": "Build Today. Leave a Legacy Tomorrow.",
+    "heroCtaHref": "/contact",
+    "heroCtaText": "Schedule a Conversation →",
+    "announcement": "Temporary preview — current domain remains unchanged.",
+    "heroImageAlt": "Icy Williams, founder of Legacy 83 Business",
+    "heroSubtitle": "Strategic guidance for business owners ready to grow with purpose, lead with confidence, and create something that lasts."
+  },
+  "programs": [],
+  "template": {
+    "id": "legacy83-premium",
+    "name": "Legacy 83 Premium",
+    "colors": {
+      "text": "#17201b",
+      "accent": "#d7b46a",
+      "primary": "#263a30",
+      "secondary": "#9a743d",
+      "background": "#fffdf8"
+    }
+  },
+  "navigation": [
+    {
+      "href": "/",
+      "label": "Home"
+    },
+    {
+      "href": "/contact",
+      "label": "Contact"
+    },
+    {
+      "href": "/about",
+      "label": "About"
+    },
+    {
+      "href": "/services",
+      "label": "Services"
+    },
+    {
+      "href": "/resources",
+      "label": "Resources"
+    },
+    {
+      "href": "/academy",
+      "label": "Academy"
+    },
+    {
+      "href": "/growth-iq",
+      "label": "Growth IQ"
+    },
+    {
+      "href": "/journal",
+      "label": "Journal"
+    },
+    {
+      "href": "/events",
+      "label": "Events"
+    }
+  ]
+}

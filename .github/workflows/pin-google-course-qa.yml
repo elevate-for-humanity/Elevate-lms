@@ -1,0 +1,65 @@
+name: Pin verified Google browser for course QA
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/pin-course-qa-revision*', '.github/workflows/pin-google-course-qa.yml']
+  workflow_dispatch:
+    inputs:
+      browser_revision:
+        description: Existing verified isolated browser revision
+        required: true
+        type: string
+      browser_image_sha:
+        description: Exact tested immutable browser image commit
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/pin-course-qa-revision.test.mjs
+  pin:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: test
+    permissions: {contents: read, actions: read, id-token: write}
+    environment: production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    concurrency: {group: google-course-runtime-operations, cancel-in-progress: false}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Require accepted CI on the current source before changing job templates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 48); do
+            run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&event=push&per_page=20" --jq '.workflow_runs[0].id // empty')"
+            if test -n "$run_id"; then
+              conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" --jq '.jobs[] | select(.name == "CI Required Gate") | .conclusion // empty')"
+              if test "$conclusion" = success; then exit 0; fi
+              if test -n "$conclusion"; then echo 'Required CI did not pass'; exit 1; fi
+            fi
+            sleep 10
+          done
+          echo 'Required CI did not finish'; exit 1
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Pin course tests while preserving owner Studio and existing executions
+        env:
+          QA_BROWSER_REVISION: ${{ inputs.browser_revision }}
+          QA_BROWSER_IMAGE_SHA: ${{ inputs.browser_image_sha }}
+        run: node scripts/gcp/pin-course-qa-revision.mjs

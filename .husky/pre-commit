@@ -1,0 +1,46 @@
+#!/bin/sh
+# Prevent committing .env.local
+if git diff --cached --name-only | grep -q "\.env\.local"; then
+  echo "❌ ERROR: Attempting to commit .env.local"
+  echo "This file contains sensitive credentials."
+  exit 1
+fi
+
+# Check for API keys in staged files (excluding documentation)
+# Exclude: .md files, .example files, and lines with "example" or "..." placeholders
+if git diff --cached --diff-filter=AM -- ':!*.md' ':!*.example' ':!.env.example' | \
+   grep "^+" | grep -v "^+++" | \
+   grep -E "(sk-[a-zA-Z0-9]{48}|eyJ[a-zA-Z0-9]{100,}|AKIA[A-Z0-9]{16}|whsec_[a-zA-Z0-9]{32})" | \
+   grep -v "example" | \
+   grep -v "\.\.\." > /dev/null; then
+  echo "⚠️  WARNING: Possible API key detected"
+  echo "Please review your changes."
+  exit 1
+fi
+
+# Run quality gates on staged .tsx and .ts files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+if [ -n "$STAGED_FILES" ]; then
+  echo "🔍 Running quality gates..."
+  ./scripts/quality-gates.sh || exit 1
+fi
+
+# Logger error signature audit — catches object literals, error.message misuse
+echo "🔍 Running logger.error audit..."
+corepack pnpm audit:logger || exit 1
+
+# Case-sensitivity audit — catches skeleton.tsx vs Skeleton.tsx collisions
+echo "🔍 Running path-casing audit..."
+corepack pnpm audit:casing || exit 1
+
+# Full-workspace LMS typechecking is intentionally deferred to PR/CI because
+# this repository is large enough to exhaust memory in constrained local/agent
+# environments. Run it explicitly before release when desired with:
+#   PRECOMMIT_FULL_TYPECHECK=1 git commit ...
+# CI remains the authoritative full-workspace typecheck/build gate.
+if [ "${PRECOMMIT_FULL_TYPECHECK:-0}" = "1" ]; then
+  echo "🔍 Running full LMS TypeScript check..."
+  corepack pnpm --filter @elevate/lms exec tsc --noEmit || exit 1
+else
+  echo "ℹ️  Full LMS TypeScript check deferred to PR/CI (set PRECOMMIT_FULL_TYPECHECK=1 to run locally)."
+fi

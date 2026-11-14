@@ -1,0 +1,126 @@
+{
+  "taxYear": 2026,
+  "processingYear": 2027,
+  "code": {
+    "localXmlValidator": true,
+    "localPackageBuilder": true,
+    "irsXmlGenerator": false,
+    "businessRuleValidator": false,
+    "a2aTransport": false
+  },
+  "config": {
+    "IRS_EFIN": false,
+    "IRS_ETIN": false,
+    "IRS_SOFTWARE_ID": false,
+    "IRS_APPSYSID": false,
+    "IRS_WSDL_PATH": false,
+    "IRS_BUSINESS_RULES_PATH": false,
+    "IRS_A2A_CERT_PATH": false
+  },
+  "scenarios": [
+    {
+      "id": "TY2026-1040-1",
+      "sourceVerified": true,
+      "missingRegistryForms": [
+        "SCHEDULE_2",
+        "SCHEDULE_3",
+        "SCHEDULE_H",
+        "5695",
+        "1062",
+        "1062_SCHEDULE_A"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-2",
+      "sourceVerified": true,
+      "missingRegistryForms": [
+        "SCHEDULE_1",
+        "8283"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-3",
+      "sourceVerified": true,
+      "missingRegistryForms": [
+        "1099-R",
+        "SCHEDULE_1",
+        "SCHEDULE_2",
+        "SCHEDULE_F",
+        "4835"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-4",
+      "sourceVerified": true,
+      "missingRegistryForms": [
+        "SCHEDULE_1",
+        "SCHEDULE_3",
+        "SCHEDULE_3_A",
+        "8862",
+        "SCHEDULE_EIC",
+        "SCHEDULE_8812"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-5",
+      "sourceVerified": true,
+      "missingRegistryForms": [
+        "8888"
+      ],
+      "atsAccepted": false
+    },
+    {
+      "id": "TY2026-1040-6",
+      "sourceVerified": true,
+      "missingRegistryForms": [
+        "W2G",
+        "SCHEDULE_1"
+      ],
+      "atsAccepted": false
+    }
+  ],
+  "parity": [
+    {
+      "file": "lib/tax-software/calculation/ty2026-base-1040.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/diagnostics/return-diagnostics.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/document-extraction.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/form-registry-2026.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/mef-readiness.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/paris-interview.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/self-file-pricing.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/transmission/hub.ts",
+      "identical": true
+    },
+    {
+      "file": "lib/tax-software/transmission/adapters/certification-export.ts",
+      "identical": true
+    }
+  ],
+  "atsAccepted": false,
+  "preparationAvailable": true
+}

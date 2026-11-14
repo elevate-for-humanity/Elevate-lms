@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {load} from 'js-yaml';
+const workflow = readFileSync(new URL('../../.github/workflows/repair-google-studio-browser.yml', import.meta.url), 'utf8');
+const {jobs} = load(workflow);
+test('Studio CI waits, image builds and container tests do not occupy the shared runtime slot', () => {
+  const build = jobs['build-browser'];
+  assert.equal(build.concurrency.group, 'google-studio-browser-build-main');
+  assert.equal(build.concurrency['cancel-in-progress'], false);
+  assert.equal(build.concurrency.queue, 'max');
+  const names = build.steps.map(step => step.name);
+  const gate = names.indexOf('Require CI acceptance on this exact commit before building');
+  const compile = names.indexOf('Build actual immutable Studio browser container');
+  const proof = names.indexOf('Prove actual server startup, persistent storage and authorization');
+  const publish = names.indexOf('Publish tested browser image');
+  assert.ok(gate >= 0 && gate < compile && compile < proof && proof < publish);
+  assert.ok(!JSON.stringify(build).includes('repair-studio-browser-cloud-run.mjs'));
+  assert.equal(build.outputs.digest, '${{ steps.upload.outputs.digest }}');
+});
+test('only the tested-image runtime rollout holds the shared lock and retains cutover safeguards', () => {
+  const rollout = jobs.repair;
+  assert.equal(rollout.needs, 'build-browser');
+  assert.equal(rollout.concurrency.group, 'google-runtime-us-central1');
+  assert.equal(rollout.concurrency.queue, 'max');
+  assert.equal(rollout.concurrency['cancel-in-progress'], false);
+  assert.equal(rollout.env.TESTED_IMAGE_DIGEST, '${{ needs.build-browser.outputs.digest }}');
+  const source = JSON.stringify(rollout);
+  assert.ok(!source.includes('docker build') && !source.includes('Require CI acceptance'));
+  for (const safeguard of ['preflight-studio-browser-permissions.mjs', 'verify-studio-service-identity.mjs', 'inspectRegionalCapacity', 'repair-studio-browser-cloud-run.mjs', 'verify-studio-connected-runtime.mjs', 'inputs.candidate_only']) assert.ok(source.includes(safeguard), safeguard);
+  const script = readFileSync(new URL('./repair-studio-browser-cloud-run.mjs', import.meta.url), 'utf8');
+  assert.ok(script.indexOf('TESTED_IMAGE_DIGEST!==digest') < script.indexOf("command(['run','deploy'"));
+});

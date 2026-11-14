@@ -1,0 +1,117 @@
+
+> efh-autopilot@2.0.0 test /workspaces/Elevate-lms
+> vitest --run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.17 [39m[90m/workspaces/Elevate-lms[39m
+
+[90mstderr[2m | tests/unit/pages/workone-partner-packet.test.tsx[2m > [22m[2mWorkOnePartnerPacketPage[2m > [22m[2mrenders the page without crashing
+[22m[39mReceived `true` for a non-boolean attribute `fill`.
+
+If you want to write it to the DOM, pass a string instead: fill="true" or fill={value.toString()}.
+
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+ [32m✓[39m tests/unit/pages/workone-partner-packet.test.tsx [2m([22m[2m14 tests[22m[2m)[22m[33m 2422[2mms[22m[39m
+     [33m[2m✓[22m[39m displays the main heading [33m 387[2mms[22m[39m
+ [32m✓[39m tests/unit/pages/government.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 1638[2mms[22m[39m
+       [33m[2m✓[22m[39m should have correct page metadata structure [33m 1630[2mms[22m[39m
+[90mstderr[2m | tests/unit/pages/fundingimpact.test.tsx[2m > [22m[2mFundingImpactPage[2m > [22m[2mrenders the page without crashing
+[22m[39mReceived `true` for a non-boolean attribute `fill`.
+
+If you want to write it to the DOM, pass a string instead: fill="true" or fill={value.toString()}.
+
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's load() method
+ [32m✓[39m tests/unit/pages/fundingimpact.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 1922[2mms[22m[39m
+     [33m[2m✓[22m[39m displays the main heading [33m 534[2mms[22m[39m
+ [32m✓[39m tests/unit/admin/applications-table-client.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 547[2mms[22m[39m
+     [33m[2m✓[22m[39m Approve button uses canonical approve endpoint [33m 545[2mms[22m[39m
+ [32m✓[39m tests/unit/pipeline-e-table-schema-contract.test.ts [2m([22m[2m167 tests[22m[2m)[22m[33m 1184[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-null-safety.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 70[2mms[22m[39m
+ [32m✓[39m tests/unit/useVideoProgress.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+ [32m✓[39m tests/unit/pipeline-d-fssa-exit-validation.test.ts [2m([22m[2m32 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-hardening-regression.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+[90mstderr[2m | tests/unit/catch-block-error-binding.test.ts[2m > [22m[2mCatch Block Error Binding[2m > [22m[2mReturn Value Patterns[2m > [22m[2mshould return null on error (auth pattern)
+[22m[39mError: Error: Auth failed
+    at getAuthUser [90m(/workspaces/Elevate-lms/[39mtests/unit/catch-block-error-binding.test.ts:208:17[90m)[39m
+    at [90m/workspaces/Elevate-lms/[39mtests/unit/catch-block-error-binding.test.ts:215:14
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.17_@opentelemetry+api@1.9.1_@types+node@24.10.1_@vitest+ui@4.0.17_happy-dom@_0ca6867661d868e6c53472c4a0f57177/node_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.17_@opentelemetry+api@1.9.1_@types+node@24.10.1_@vitest+ui@4.0.17_happy-dom@_0ca6867661d868e6c53472c4a0f57177/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+
+[90mstderr[2m | tests/unit/catch-block-error-binding.test.ts[2m > [22m[2mCatch Block Error Binding[2m > [22m[2mReturn Value Patterns[2m > [22m[2mshould return empty array on error (list pattern)
+[22m[39mError: Error: Database error
+    at getItems [90m(/workspaces/Elevate-lms/[39mtests/unit/catch-block-error-binding.test.ts:235:17[90m)[39m
+    at [90m/workspaces/Elevate-lms/[39mtests/unit/catch-block-error-binding.test.ts:242:14
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.17_@opentelemetry+api@1.9.1_@types+node@24.10.1_@vitest+ui@4.0.17_happy-dom@_0ca6867661d868e6c53472c4a0f57177/node_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.17_@opentelemetry+api@1.9.1_@types+node@24.10.1_@vitest+ui@4.0.17_happy-dom@_0ca6867661d868e6c53472c4a0f57177/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+
+[90mstderr[2m | tests/unit/catch-block-error-binding.test.ts[2m > [22m[2mCatch Block Error Binding[2m > [22m[2mReturn Value Patterns[2m > [22m[2mshould return false on error (boolean pattern)
+[22m[39mError: Error: Check failed
+    at checkSomething [90m(/workspaces/Elevate-lms/[39mtests/unit/catch-block-error-binding.test.ts:248:17[90m)[39m
+    at [90m/workspaces/Elevate-lms/[39mtests/unit/catch-block-error-binding.test.ts:255:14
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.17/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.17_@opentelemetry+api@1.9.1_@types+node@24.10.1_@vitest+ui@4.0.17_happy-dom@_0ca6867661d868e6c53472c4a0f57177/node_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///workspaces/Elevate-lms/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.17_@opentelemetry+api@1.9.1_@types+node@24.10.1_@vitest+ui@4.0.17_happy-dom@_0ca6867661d868e6c53472c4a0f57177/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+
+ [32m✓[39m tests/unit/catch-block-error-binding.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ ELIFECYCLE  Test failed. See above for more details.

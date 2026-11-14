@@ -1,0 +1,57 @@
+name: Verify Cloud Asset Inventory Access
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-cloud-asset-inventory.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify API enablement and actual project resource search
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {spawnSync} from 'node:child_process';
+          const project='elegant-racer-299721';
+          const run=(args)=>spawnSync('gcloud',[...args,'--project='+project],{encoding:'utf8',timeout:60000,maxBuffer:1024*1024});
+          const classify=(r)=>{
+            const msg=String(r.stderr||r.error?.message||'');
+            if(/SERVICE_DISABLED|has not been used|is disabled/i.test(msg))return 'api_disabled';
+            if(/PERMISSION_DENIED|permission.*denied|does not have permission|cloudasset.assets.searchAllResources/i.test(msg))return 'permission_denied';
+            if(/DEADLINE_EXCEEDED|timed? out|ETIMEDOUT/i.test(msg))return 'timeout';
+            return 'unknown_error';
+          };
+          const enabled=run(['services','list','--enabled','--format=value(config.name)']);
+          if(enabled.status!==0){console.log(JSON.stringify({check:'api_enablement',ok:false,reason:classify(enabled)}));process.exitCode=1;}
+          else {
+            const apiEnabled=enabled.stdout.split(/\s+/).includes('cloudasset.googleapis.com');
+            console.log(JSON.stringify({check:'api_enablement',ok:apiEnabled,reason:apiEnabled?null:'api_disabled'}));
+            if(!apiEnabled)process.exitCode=1;
+          }
+          const result=run(['asset','search-all-resources','--scope=projects/'+project,'--limit=1','--format=json']);
+          if(result.status!==0){console.log(JSON.stringify({check:'asset_search',ok:false,reason:classify(result)}));process.exitCode=1;}
+          else {
+            try{const rows=JSON.parse(result.stdout);if(!Array.isArray(rows))throw Error('shape');console.log(JSON.stringify({check:'asset_search',ok:true,receivedRows:rows.length}));}
+            catch{console.log(JSON.stringify({check:'asset_search',ok:false,reason:'invalid_response'}));process.exitCode=1;}
+          }
+          NODE
+      - name: Verify complete inventory without changing resources
+        run: node scripts/gcp/audit-cost-resources.mjs

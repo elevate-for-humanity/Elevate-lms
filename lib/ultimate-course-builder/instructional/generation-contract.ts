@@ -1,0 +1,1 @@
+export interface UltimateInstructionalGenerator{objectives(input:unknown):Promise<unknown>;prerequisites(input:unknown):Promise<unknown>;teachingSequence(input:unknown):Promise<unknown>;instructorScript(input:unknown):Promise<unknown>;storyboard(input:unknown):Promise<unknown>}

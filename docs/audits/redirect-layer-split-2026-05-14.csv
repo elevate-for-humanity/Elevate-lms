@@ -1,0 +1,58 @@
+source_path,target_path,recommended_layer,migration_candidate,notes
+app/apply/fssa/page.tsx,/apply,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/apply/fssa/success/page.tsx,/apply,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/apply/impact/page.tsx,/apply,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/apply/intake/page.tsx,/apply,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/apply/quick/page.tsx,/apply,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/auth/forgot-password/page.tsx,/reset-password,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/cert/verify/[certificateId]/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/client-portal/demo/page.tsx,/start,nextjs_redirects,nextjs_primary,compatibility path
+app/cm/learners/[id]/schedule/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/courses/[courseId]/learn/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/ebook/barber-theory/page.tsx,/lms/courses,nextjs_redirects,nextjs_primary,compatibility path
+app/fssa-impact/page.tsx,/snap/snap-et,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/fssa-partnership-request/page.tsx,/snap/snap-et,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/help/tutorials/accessing-courses/page.tsx,/help,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/help/tutorials/how-to-apply/page.tsx,/help,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/help/tutorials/submitting-assignments/page.tsx,/help,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/help/tutorials/troubleshooting/page.tsx,/help,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/instructor/dashboard/page.tsx,https://admin.elevateforhumanity.org/instructor,edge_or_next,edge_candidate_after_parity,external redirect; good edge fit
+app/intake/page.tsx,/apply,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/lms/page.tsx,/login?redirect=/lms,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/mentor/page.tsx,/mentor/dashboard,nextjs_redirects,nextjs_primary,compatibility path
+app/onboarding/barber-apprenticeship/page.tsx,/programs/barber-apprenticeship/orientation,nextjs_redirects,nextjs_primary,compatibility path
+app/partner/page.tsx,/partner/dashboard,nextjs_redirects,nextjs_primary,compatibility path
+app/(partner)/partners/attendance/page.tsx,/partner/attendance,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/(partner)/partners/dashboard/page.tsx,/partner/dashboard,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/(partner)/partners/documents/page.tsx,/partner/documents,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/(partner)/partners/hours/page.tsx,/partner/hours,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/(partner)/partners/login/page.tsx,/partner/login,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/(partner)/partners/students/page.tsx,/partner/students,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/partner-portal/page.tsx,/partner/dashboard,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/programs/building-services-technician/apply/page.tsx,/apply?program=building-services-technician,nextjs_redirects,nextjs_primary,compatibility path
+app/programs/[program]/enroll/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/programs/[program]/inquiry/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/(public)/admin-portal/page.tsx,/admin-login,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/pwa/barber/page.tsx,/pwa/barber/onboarding,nextjs_redirects,nextjs_primary,compatibility path
+app/pwa/barber/profile/page.tsx,/student-portal/profile,nextjs_redirects,nextjs_primary,compatibility path
+app/pwa/barber/training/page.tsx,/programs/barber-apprenticeship/orientation,nextjs_redirects,nextjs_primary,compatibility path
+app/rise/page.tsx,/tax,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+apps/admin/app/admin/certifications/page.tsx,/admin/certificates,nextjs_redirects,nextjs_now_edge_later,stable canonical mapping
+apps/admin/app/admin/compliance-dashboard/page.tsx,/admin/compliance,nextjs_redirects,nextjs_now_edge_later,stable canonical mapping
+apps/admin/app/admin/dashboard-enhanced/page.tsx,/admin/dashboard,nextjs_redirects,nextjs_primary,compatibility path
+apps/admin/app/admin/funding/allocations/page.tsx,/login,nextjs_redirects,nextjs_primary,compatibility path
+apps/admin/app/admin/lms-dashboard/page.tsx,/admin/dashboard,nextjs_redirects,nextjs_primary,compatibility path
+apps/admin/app/admin/page.tsx,/admin/dashboard,nextjs_redirects,nextjs_primary,compatibility path
+apps/admin/app/admin/reporting/page.tsx,/admin/reports,nextjs_redirects,nextjs_now_edge_later,stable canonical mapping
+apps/admin/app/page.tsx,/admin/dashboard,nextjs_redirects,nextjs_primary,compatibility path
+app/snap/page.tsx,/snap/snap-et,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/store/licenses/managed/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/store/licensing/enterprise/page.tsx,/store/licenses/enterprise-license,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/store/licensing/managed/page.tsx,/store/licenses/managed,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/store/licensing/page.tsx,/store/licenses,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/store/licensing/partnerships/page.tsx,/store/licenses,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/store/licensing/success/page.tsx,/store/licenses/success,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/store/request-license/page.tsx,(dynamic-or-unknown),keep_shell_until_manual_map,manual_first,dynamic target extraction needed
+app/support/documentation/page.tsx,/help,nextjs_redirects,nextjs_primary,auth/intake stability first
+app/tax/rise-up-foundation/faq/page.tsx,/help,nextjs_redirects,nextjs_now_reassess,campaign cadence may change
+app/tax/rise-up-foundation/free-tax-help/page.tsx,/contact,nextjs_redirects,nextjs_now_reassess,campaign cadence may change

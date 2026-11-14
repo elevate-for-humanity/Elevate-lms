@@ -1,0 +1,57 @@
+name: Verify private Google services
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  health:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [marketing, admin, lms]
+    steps:
+      - uses: google-github-actions/auth@v3
+        id: auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - name: Verify runtime and database health
+        env:
+          TOKEN: ${{ steps.auth.outputs.id_token }}
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { appendFileSync } from 'node:fs';
+          const component = process.env.COMPONENT;
+          const url = 'https://elevate-' + component + '-migration-aabnh2y32a-uc.a.run.app';
+          const response = await fetch(url + '/api/health', {
+            headers: { 'X-Serverless-Authorization': 'Bearer ' + process.env.TOKEN },
+            redirect: 'manual',
+            signal: AbortSignal.timeout(90000),
+          });
+          let body;
+          try { body = await response.json(); } catch { body = {}; }
+          const expectedCommit = component === 'lms'
+            ? '9d3afde89e96b5fc558d7290f0a24aacdc4a0fc6'
+            : '84bfb2d94563efdf0fb00a0b85e4bfa64e79c44c';
+          const passed = response.status === 200 && body.service === component &&
+            body.healthy === true && body.ready === true &&
+            body.dependencies?.supabase?.ok === true && body.commit === expectedCommit;
+          // Emit only allowlisted health metadata, never response bodies or tokens.
+          const result = { component, httpStatus: response.status, healthy: body.healthy === true,
+            ready: body.ready === true, supabase: body.dependencies?.supabase?.ok === true,
+            commitMatches: body.commit === expectedCommit, passed };
+          console.log(JSON.stringify(result));
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, JSON.stringify(result) + '\n');
+          if (!passed) process.exitCode = 1;
+          NODE

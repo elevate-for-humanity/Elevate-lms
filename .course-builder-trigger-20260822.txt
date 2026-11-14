@@ -1,0 +1,1 @@
+Trigger canonical Business Administration #10005173 Course Builder acceptance after pre-generation workflow correction.

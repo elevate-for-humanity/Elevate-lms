@@ -1,0 +1,510 @@
+import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
+import { programInstallmentTerms, installmentSchedule, firstWeeklyInvoiceDate } from '@/lib/programs/installment-terms';
+import { InvoiceTermsConflict } from '@/lib/billing/revise-unpaid-program-invoice';
+import { activateProgramInstallments } from '@/lib/billing/activate-program-installments';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+/**
+ * CANONICAL PROGRAM ENROLLMENT CHECKOUT
+ *
+ * This is the single, canonical endpoint for ALL program enrollments.
+ * Every program (Barber, HVAC, CPR, etc.) must use this endpoint.
+ *
+ * Fulfillment contract:
+ *   kind: 'program_enrollment'
+ *   program_id: UUID from programs.id
+ *   student_id: auth user id
+ *   program_slug: slug for routing
+ *   funding_source: 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer'
+ *
+ * The QuickBooks webhook activates the pending enrollment after invoice payment.
+ */
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+import { NextRequest, NextResponse } from 'next/server';
+
+import { createClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
+import { affirm } from '@/lib/affirm/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { isAffirmInvoiceAmount } from '@/lib/billing/invoice-checkout';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ENCHANTED_HEARTS } from '@/lib/partners/enchanted-hearts';
+import { resolveQuickBooksProgramPromotion } from '@/lib/payments/quickbooks-program-promotion';
+import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
+
+type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
+
+interface CheckoutRequest {
+  program_id: string;
+  require_full_application?: boolean;
+  funding_source?: FundingSource;
+  payment_plan?: 'full' | 'installments';
+  down_payment_cents?: number;
+  coupon_code?: string;
+  partner_key?: string;
+  payment_method?: 'quickbooks' | 'affirm';
+}
+
+export async function POST(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'payment');
+  if (rateLimited) return rateLimited;
+  try {
+    const supabase = await createClient();
+
+    // Require authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body: CheckoutRequest = await request.json();
+    const requiresFullApplication = body.require_full_application !== false;
+    const paymentMethod = body.payment_method ?? 'quickbooks';
+    if (body.payment_plan && !['full', 'installments'].includes(body.payment_plan))
+      return NextResponse.json({ error: 'Invalid payment plan.' }, { status: 400 });
+    if (!['quickbooks', 'affirm'].includes(paymentMethod))
+      return NextResponse.json({ error: 'Choose a supported payment method.' }, { status: 400 });
+    const {
+      program_id,
+      funding_source = 'self_pay',
+      coupon_code = '',
+      partner_key,
+    } = body;
+
+    if (!program_id) {
+      return NextResponse.json({ error: 'program_id is required' }, { status: 400 });
+    }
+
+    // Validate funding_source
+    const validFundingSources: FundingSource[] = [
+      'self_pay',
+      'workone',
+      'wioa',
+      'grant',
+      'employer',
+    ];
+    if (!validFundingSources.includes(funding_source)) {
+      return NextResponse.json({ error: 'Invalid funding_source' }, { status: 400 });
+    }
+
+    // Read the same published catalog available to anonymous visitors. Keep
+    // authentication and student-owned enrollment checks on the session client.
+    const admin = await requireAdminClient();
+    const { data: program, error: programError } = await admin
+      .from('programs')
+      .select(
+        'id, title, slug, price, tuition, total_cost, status, is_free',
+      )
+      .eq('id', program_id)
+      .eq('published', true)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (programError) {
+      logger.error('Enrollment catalog lookup failed', programError);
+      return NextResponse.json(
+        { error: 'Program details are temporarily unavailable. Please try again.' },
+        { status: 503 },
+      );
+    }
+    if (!program) {
+      return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+    }
+    const payment_plan = body.payment_plan ?? (/apprentice/i.test(program.slug) ? 'installments' : 'full');
+    if (body.down_payment_cents !== undefined &&
+        (payment_plan !== 'installments' || funding_source !== 'self_pay' || !/apprentice/i.test(program.slug)))
+      return NextResponse.json({ error: 'A custom down payment requires the apprenticeship payment plan.' }, { status: 400 });
+
+    if (program.status !== 'active') {
+      return NextResponse.json(
+        { error: 'Program is not available for enrollment' },
+        { status: 400 },
+      );
+    }
+
+    // Check for existing active enrollment
+    const { data: existingEnrollment } = await supabase
+      .from('program_enrollments')
+      .select('id, status')
+      .eq('student_id', user.id)
+      .eq('program_id', program_id)
+      .in('status', ['active', 'pending', 'checkout_pending'])
+      .maybeSingle();
+
+    if (existingEnrollment && existingEnrollment.status !== 'checkout_pending') {
+      return NextResponse.json(
+        { error: 'You are already enrolled in this program' },
+        { status: 409 },
+      );
+    }
+
+    // Calculate amount based on funding source
+    const stickerPrice = Number(program.price ?? program.tuition ?? program.total_cost ?? 0);
+    if (funding_source === 'self_pay' && stickerPrice <= 0 && program.is_free !== true) {
+      return NextResponse.json(
+        {
+          error:
+            'Tuition is not published for this program yet. Contact admissions before checkout.',
+        },
+        { status: 409 },
+      );
+    }
+    const agencyFundingRequested = funding_source !== 'self_pay';
+    const publicFundingRequested = ['workone', 'wioa', 'grant'].includes(funding_source);
+    const verifiedFunding = getVerifiedProgramFunding(program.slug);
+    const publicFundingAllowed =
+      funding_source === 'grant'
+        ? Boolean(verifiedFunding?.etplListedFor2Exclusive && verifiedFunding.wrgEligible)
+        : Boolean(
+            verifiedFunding?.etplListedFor2Exclusive &&
+            verifiedFunding.wioaEligible &&
+            ['workone', 'wioa'].includes(funding_source),
+          );
+
+    if (publicFundingRequested && !publicFundingAllowed) {
+      return NextResponse.json(
+        {
+          error:
+            'This program does not have a verified public-funding checkout path for the selected source. Choose self-pay, employer sponsorship when documented, or contact admissions.',
+        },
+        { status: 409 },
+      );
+    }
+    // A public-funding or employer-sponsorship request is not a payment
+    // authorization. Keep the enrollment pending until written authorization
+    // or sponsorship is recorded.
+    const amountToCharge = agencyFundingRequested ? 0 : stickerPrice;
+
+    const partnerProgram =
+      ENCHANTED_HEARTS.programs.find((item) => item.programId === program.id) ?? null;
+    if (
+      ['enchanted-hearts', 'healthcare-training'].includes(partner_key || '') &&
+      !partnerProgram
+    ) {
+      return NextResponse.json(
+        { error: 'This program is not assigned to that partner.' },
+        { status: 400 },
+      );
+    }
+    if (
+      partnerProgram &&
+      !agencyFundingRequested &&
+      (payment_plan !== 'full' || coupon_code.trim())
+    ) {
+      return NextResponse.json(
+        { error: 'This program requires full tuition payment without a promotion code.' },
+        { status: 400 },
+      );
+    }
+    let fullAmountCents = agencyFundingRequested
+      ? 0
+      : (partnerProgram?.retailPriceCents ?? Math.round(amountToCharge * 100));
+    let requestedDownCents = getInitialProgramInvoiceCents(program.slug, fullAmountCents);
+    if (payment_plan === 'installments' && funding_source === 'self_pay') {
+      try {
+        requestedDownCents = programInstallmentTerms(program.slug, fullAmountCents, body.down_payment_cents).downPaymentCents;
+      } catch (error) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Invalid down payment.' }, { status: 400 });
+      }
+    }
+    let appliedCoupon: { code: string; discountAmountCents: number; scope: 'deposit' | 'tuition' } | null = null;
+    if (coupon_code.trim() && funding_source === 'self_pay') {
+      const result = await resolveQuickBooksProgramPromotion({
+        admin,
+        code: coupon_code,
+        amountCents: fullAmountCents,
+        depositCents: payment_plan === 'installments' ? requestedDownCents : undefined,
+        maximumDiscountCents: partnerProgram
+          ? partnerProgram.retailPriceCents - partnerProgram.providerShareCents
+          : undefined,
+      });
+      if ('error' in result) return NextResponse.json({ error: result.error }, { status: 400 });
+      appliedCoupon = result.promotion;
+      if (appliedCoupon.scope === 'tuition') fullAmountCents -= appliedCoupon.discountAmountCents;
+    }
+    const amountCents =
+      funding_source === 'self_pay' && payment_plan === 'installments'
+        ? Math.min(requestedDownCents, fullAmountCents) - (appliedCoupon?.scope === 'deposit' ? appliedCoupon.discountAmountCents : 0)
+        : fullAmountCents;
+    const billingTerms = installmentSchedule(program.slug, fullAmountCents - amountCents);
+    const scheduleDescription = billingTerms.installmentCount
+      ? `$${(amountCents / 100).toFixed(2)} down; remaining tuition $${(billingTerms.balanceCents / 100).toFixed(2)} in up to ${billingTerms.installmentCount} ${billingTerms.cadence} payments of $${(billingTerms.installmentCents / 100).toFixed(2)}; final payment $${(billingTerms.finalInstallmentCents / 100).toFixed(2)}.`
+      : 'Tuition payment in full.';
+
+    // Get user profile for customer details
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email, full_name')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const customerEmail = profile?.email || user.email || '';
+
+    const lmsUrl = (
+      process.env.NEXT_PUBLIC_LMS_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'https://app.elevateforhumanity.org'
+    ).replace(/\/$/, '');
+
+    const partnerHolderId = partnerProgram ? ENCHANTED_HEARTS.programHolderId : null;
+    if (partnerHolderId) {
+      const { data: assignment } = await admin
+        .from('program_holder_programs')
+        .select('id')
+        .eq('program_holder_id', partnerHolderId)
+        .eq('program_id', program.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      if (!assignment) {
+        return NextResponse.json(
+          { error: 'Partner assignment is not active yet.' },
+          { status: 409 },
+        );
+      }
+    }
+    const fullApplicationRequired = !partnerProgram || requiresFullApplication;
+    const pending =
+      existingEnrollment?.status === 'checkout_pending'
+        ? { data: { id: existingEnrollment.id }, error: null }
+        : await admin
+            .from('program_enrollments')
+            .insert({
+              program_id: program.id,
+              program_slug: program.slug,
+              student_id: user.id,
+              user_id: user.id,
+              email: customerEmail,
+              full_name: profile?.full_name || customerEmail,
+              funding_source,
+              status: agencyFundingRequested
+                ? 'pending'
+                : amountCents > 0
+                  ? 'checkout_pending'
+                  : 'active',
+              payment_status: agencyFundingRequested
+                ? 'authorization_pending'
+                : amountCents > 0
+                  ? 'pending'
+                  : 'paid',
+              enrollment_state: agencyFundingRequested
+                ? 'pending_funding_verification'
+                : amountCents > 0
+                  ? 'payment_required'
+                  : 'active',
+              next_required_action: agencyFundingRequested
+                ? 'FUNDING_AUTHORIZATION'
+                : amountCents > 0
+                  ? 'PAYMENT'
+                  : 'ONBOARDING',
+              amount_paid_cents: 0,
+              billing_provider: amountCents > 0 ? 'quickbooks' : null,
+              program_holder_id: partnerHolderId,
+            })
+            .select('id')
+            .single();
+    if (pending.error || !pending.data)
+      throw new Error(pending.error?.message || 'Enrollment could not be prepared.');
+
+    if (agencyFundingRequested) {
+      return NextResponse.json({
+        success: true,
+        authorization_pending: true,
+        url: `${lmsUrl}/lms/dashboard?funding=authorization-pending`,
+        enrollment_id: pending.data.id,
+      });
+    }
+    if (amountCents === 0) {
+      return NextResponse.json({
+        success: true,
+        url: `${lmsUrl}/lms/dashboard?enrollment=created`,
+        enrollment_id: pending.data.id,
+      });
+    }
+
+    if (!customerEmail) throw new Error('An email address is required for a QuickBooks invoice.');
+    if (paymentMethod === 'affirm' && payment_plan !== 'full')
+      return NextResponse.json(
+        { error: 'Choose full tuition for Affirm checkout.' },
+        { status: 400 },
+      );
+    if (paymentMethod === 'affirm') {
+      if (!isAffirmInvoiceAmount(amountCents))
+        return NextResponse.json(
+          { error: 'This amount is not eligible for Affirm financing.' },
+          { status: 400 },
+        );
+      await hydrateProcessEnv();
+      affirm.tryLateConfig();
+      if (!affirm.isConfigured())
+        return NextResponse.json(
+          { error: 'Affirm is temporarily unavailable. Please choose QuickBooks payment.' },
+          { status: 503 },
+        );
+    }
+    const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
+      idempotencyKey: `program:${pending.data.id}`,
+      allowUnpaidProgramRevision: body.payment_plan !== undefined && paymentMethod === 'quickbooks',
+      customer: {
+        externalKey: `user:${user.id}`,
+        displayName: profile?.full_name || customerEmail,
+        email: customerEmail,
+      },
+      lines: [
+        {
+          canonicalKey: `program-${program.slug}`,
+          name: program.title,
+          description: `Enrollment in ${program.title}. ${scheduleDescription}${appliedCoupon ? ` Coupon ${appliedCoupon.code}.` : ''}`,
+          quantity: 1,
+          unitAmountCents: amountCents,
+        },
+      ],
+      dueDate: new Date().toISOString().slice(0, 10),
+      memo: `Program enrollment ${pending.data.id}. Tuition $${(fullAmountCents / 100).toFixed(2)}. ${scheduleDescription}`,
+      fulfillment: {
+        type: 'program_enrollment',
+        payload: {
+          enrollment_id: pending.data.id,
+          full_application_required: fullApplicationRequired,
+          required_amount_cents: amountCents,
+          total_tuition_cents: fullAmountCents,
+          amount_cents: amountCents,
+          program_id: program.id,
+          program_slug: program.slug,
+          student_id: user.id,
+          program_holder_id: partnerHolderId,
+          coupon_code: appliedCoupon?.code || null,
+          discount_amount_cents: appliedCoupon?.discountAmountCents || 0,
+          payment_plan,
+        },
+      },
+    });
+    if (!invoice.paymentUrl && paymentMethod === 'quickbooks')
+      throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
+    if (invoice.totalCents !== amountCents)
+      return NextResponse.json({ error: 'An existing payment request has different terms. Contact admissions before paying.' }, { status: 409 });
+    const trackedInvoice = await admin.from('billing_invoices').select('id')
+      .eq('idempotency_key', `program:${pending.data.id}`).single();
+    if (trackedInvoice.error) throw new Error('Payment request could not be tracked.');
+    // School invoice liabilities are recorded by confirmed-payment fulfillment,
+    // separately from the graduation/PayPal payout workflow.
+    if (payment_plan === 'installments' && fullAmountCents > amountCents) {
+      const balanceCents = fullAmountCents - amountCents;
+      const terms = billingTerms;
+      const installmentCents = terms.installmentCents;
+      const weekly = terms.cadence === 'weekly';
+      const next = new Date();
+      next.setUTCMonth(next.getUTCMonth() + 1);
+      const schedule = await admin.from('billing_schedules').upsert(
+        {
+          customer_external_key: `user:${user.id}`,
+          customer_name: profile?.full_name || customerEmail,
+          customer_email: customerEmail,
+          canonical_product_key: `program-installments-${program.id}`,
+          product_name: `${program.title} installment`,
+          provider: 'quickbooks',
+          amount_cents: installmentCents,
+          cadence: weekly ? 'weekly' : 'monthly',
+          next_invoice_date: weekly ? firstWeeklyInvoiceDate() : next.toISOString().slice(0, 10),
+          remaining_invoices: terms.installmentCount,
+          status: fullApplicationRequired ? 'paused' : 'active',
+          updated_at: new Date().toISOString(),
+          fulfillment_type: 'tuition_payment',
+          fulfillment_payload: {
+            enrollment_id: pending.data.id,
+            user_id: user.id,
+            amount_cents: installmentCents,
+            remaining_tuition_cents: balanceCents,
+            initial_invoice_id: trackedInvoice.data.id,
+            initial_payment_amount_cents: amountCents,
+            total_tuition_cents: fullAmountCents,
+            program_id: program.id,
+            program_slug: program.slug,
+            student_id: user.id,
+          },
+        },
+        { onConflict: 'provider,customer_external_key,canonical_product_key' },
+      );
+      if (schedule.error)
+        throw new Error(
+          `Initial invoice created but installment schedule failed: ${schedule.error.message}`,
+        );
+      if (fullApplicationRequired) {
+        // A learner can pay an already-open provider link while this retry is
+        // saving its schedule. Recheck after upsert so a concurrently completed
+        // application cannot leave the matching weekly schedule paused.
+        const current = await admin.from('program_enrollments')
+          .select('status,payment_status,payment_reference,amount_paid_cents')
+          .eq('id', pending.data.id).eq('student_id', user.id).maybeSingle();
+        if (current.error) throw new Error('Enrollment payment state could not be reconciled.');
+        if (current.data?.status === 'active' && current.data.payment_status === 'paid' &&
+            current.data.payment_reference === trackedInvoice.data.id && Number(current.data.amount_paid_cents) === amountCents)
+          await activateProgramInstallments(admin, { userId: user.id, programId: program.id,
+            invoiceId: trackedInvoice.data.id, paidCents: amountCents, tuitionCents: fullAmountCents });
+      }
+    } else if (/apprentice/i.test(program.slug)) {
+      const stopped = await admin.from('billing_schedules').update({ status: 'canceled', updated_at: new Date().toISOString() })
+        .eq('provider', 'quickbooks').eq('customer_external_key', `user:${user.id}`)
+        .eq('canonical_product_key', `program-installments-${program.id}`).in('status', ['paused', 'active']);
+      if (stopped.error) throw new Error('The previous installment schedule could not be stopped. Refresh checkout before paying.');
+    }
+
+    logger.info('Program enrollment checkout created', {
+      invoiceId: invoice.providerInvoiceId,
+      programId: program.id,
+      programSlug: program.slug,
+      studentId: user.id,
+      fundingSource: funding_source,
+      amountCents,
+    });
+
+    return NextResponse.json({
+      success: true,
+      url:
+        paymentMethod === 'affirm'
+          ? `https://app.${PLATFORM_DEFAULTS.canonicalDomain}/account/payment-methods`
+          : invoice.paymentUrl,
+      invoice_id: invoice.providerInvoiceId,
+      billing_invoice_id: trackedInvoice.data.id,
+      coupon: appliedCoupon,
+    });
+  } catch (error) {
+    if (error instanceof InvoiceTermsConflict)
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    logger.error(
+      'Program enrollment checkout error',
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    return NextResponse.json({ error: 'Failed to create QuickBooks invoice' }, { status: 500 });
+  }
+}
+
+/**
+ * GET - Return API documentation
+ */
+export async function GET() {
+  return NextResponse.json({
+    name: 'Program Enrollment Checkout API',
+    description: 'Canonical endpoint for all program enrollments',
+    method: 'POST',
+    authentication: 'Required (user must be logged in)',
+    request: {
+      program_id: 'UUID - Required - The program ID from programs.id',
+      funding_source:
+        'Optional - One of: self_pay, workone, wioa, grant, employer (default: self_pay)',
+    },
+    response: {
+      success: 'boolean',
+      url: 'QuickBooks Pay Now URL to redirect the user',
+      invoice_id: 'QuickBooks invoice ID for tracking',
+    },
+    webhook_provisioning:
+      'When QuickBooks reports the invoice paid, the pending enrollment becomes active.',
+  });
+}

@@ -1,0 +1,19 @@
+
+> efh-autopilot@2.0.0 test:e2e /workspaces/Elevate-lms
+> playwright test tests/smoke.spec.ts --project=chromium
+
+[1A[2K[2m[WebServer] [22m[@sentry/nextjs] DEPRECATION WARNING: autoInstrumentMiddleware is deprecated and will be removed in a future version. Use webpack.autoInstrumentMiddleware instead.
+[2m[WebServer] [22m[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
+
+[1A[2K[2m[WebServer] [22m[@sentry/nextjs] DEPRECATION WARNING: autoInstrumentMiddleware is deprecated and will be removed in a future version. Use webpack.autoInstrumentMiddleware instead.
+
+[1A[2K[2m[WebServer] [22m[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
+
+Error: Process from config.webServer exited early.
+
+[1A[2K
+To open last HTML report run:
+[36m[39m
+[36m  pnpm exec playwright show-report[39m
+[36m[39m
+ ELIFECYCLE  Command failed with exit code 1.

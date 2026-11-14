@@ -1,0 +1,112 @@
+> Historical baseline inventory. The subsequently verified full suite passed 3,966 tests with zero failures and five skipped. This list preserves the original untouched-main comparison; it is not an open failure list.
+
+# Reproduced main test failures
+
+Base: `965b693884269906cf993578c1d864042bcbe4a8`. All 48 failing files were rerun unchanged. 106 failures reproduced; these need triage rather than automatic assertion removal.
+
+- tests/unit/admin-dashboard-resilience.test.ts > Admin dashboard resilience > does not classify an intentional generation pause as degraded health
+- tests/unit/admin-dashboard-resilience.test.ts > Admin dashboard resilience > resolves the Cloud Browser target through canonical configuration
+- tests/unit/admin-mobile-grid-contract.test.ts > Admin and Studio mobile grid contract > does not force three-or-more columns at the base mobile breakpoint
+- tests/unit/apprentice-entry-surfaces.test.ts > apprenticeship entry surfaces > shows the cosmetology hero before the enrollment promotion
+- tests/unit/apprentice-self-service-contract.test.ts > apprentice self-service portal contracts > retires Stripe setup while keeping the authenticated legacy portal lookup fail-safe
+- tests/unit/billing-provider-config.test.ts > billing provider configuration > blocks new Stripe charges in archive mode
+- tests/unit/billing-provider-config.test.ts > billing provider configuration > defaults new billing to QuickBooks and Stripe to archive-only
+- tests/unit/course-builder-operator-preview-contract.test.ts > Course Builder operator preview contract > routes canonical programs through their non-uniform credential blueprints
+- tests/unit/course-builder-route-consolidation.test.ts > Admin UI route consolidation > keeps course operations wired into the canonical builder
+- tests/unit/course-builder-route-consolidation.test.ts > Admin UI route consolidation > routes direct course and lifecycle URLs back into the master builder
+- tests/unit/course-builder-route-consolidation.test.ts > Admin UI route consolidation > surfaces the complete per-course Studio workspace inside the canonical builder shell
+- tests/unit/course-builder-single-authority.test.ts > single Course Builder authority > keeps alternate production build workflows manual-only
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > blocks Studio publication until canonical media is complete
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > bounds every final storyboard and its projected cost before rendering
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > keeps GPU fallback and Remotion on the same canonical job identity
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > locks repository voice and Pexels-first media policy in Course Builder jobs
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > records renderer provider evidence on terminal state
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > rejects backward replay and preserves licensed-source provenance
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > uses Supabase resumable uploads instead of retrying a 413 whole-file request
+- tests/unit/course-factory/media-authority.test.ts > canonical Course Factory media architecture > uses the same Course Factory media state in Studio and ESB acceptance
+- tests/unit/course-media-paid-inference-recovery.test.ts > course media paid-inference recovery > accepts only exact trusted issue commands as plugin triggers
+- tests/unit/course-package/readiness.test.ts > evaluateCourseReadiness > blocks incomplete generated assets from publication
+- tests/unit/ellie-message-router.test.ts > durable orchestration planning > does not turn a read-only request with a deployment prohibition into a deployment plan
+- tests/unit/ellie-message-router.test.ts > routeEllieMessage > routes read-only course lookup to unified platform tools
+- tests/unit/ellie-message-router.test.ts > selectStudioAgent > routes Audit RLS policies and verified claims to LIZZY
+- tests/unit/ellie-message-router.test.ts > selectStudioAgent > routes Build an adaptive CNA course to LIZZY
+- tests/unit/ellie-message-router.test.ts > selectStudioAgent > routes Inspect the failed deployment workflow to LIZZY
+- tests/unit/ellie-message-router.test.ts > selectStudioAgent > routes Interview a business owner and build their website to LIZZY
+- tests/unit/home-hero-slideshow-regression.test.ts > homepage hero slideshow rendering > loads the homepage content before the hero video without a splash transition
+- tests/unit/home-platform-hub-regression.test.ts > homepage platform introduction > describes Elevate as the connected hub for the complete workforce journey
+- tests/unit/homepage-mobile-curation.test.tsx > homepage curation > keeps visual career sections and the program-specific funding notice
+- tests/unit/host-shop-acquisition.test.ts > host shop acquisition architecture > uses qualified claims and tracks completed Host Site applications
+- tests/unit/host-shop-loader.test.ts > approved host directory data > keeps the salon out of barber results and includes its approved nail pathway
+- tests/unit/host-shop-trade-target.test.ts > host shop trade target resolution > configures cosmetology as a time-based apprenticeship
+- tests/unit/host-shop-trade-target.test.ts > host shop trade target resolution > normalizes the cosmetology shorthand
+- tests/unit/instructional-quality-gate.test.ts > instructional quality gate > rejects internal prompt instructions leaked into learner narration
+- tests/unit/instructional-script-repair.test.ts > instructional script repair > repairs an undersized lesson from canonical HTML
+- tests/unit/issue-935-hardening.test.ts > issue #935 production hardening contracts > surfaces HTTP status and correlation IDs for PARIS failures
+- tests/unit/lib/upload-lesson-media.test.ts > completed MP4 disk upload > keeps the rendered MP4 when the upload session fails
+- tests/unit/license/webhook-routes-unified.test.ts > Canonical Stripe webhook ownership > keeps one canonical Marketing writer and a mutation-free LMS adapter
+- tests/unit/licensing/billing-authority.test.ts > billing-authority > Tier Classification > getBillingAuthority > returns stripe for subscription tiers
+- tests/unit/licensing/billing-authority.test.ts > billing-authority > isLicenseActiveNow - Subscription (Stripe-authoritative) > allows subscription with valid data and future cpe
+- tests/unit/marketing-build-warning-contract.test.ts > marketing build warning boundary > keeps the Next server-minification workaround that protects static metadata builds
+- tests/unit/narration-provider-policy.test.ts > publication narration provider policy > selects the configured production provider before the request starts
+- tests/unit/navigation/navigation.test.ts > public navigation discoverability > keeps microcourses discoverable without replacing programs
+- tests/unit/pages/workone-partner-packet.test.tsx > WorkOnePartnerPacketPage > renders only verified workforce-funded program records
+- tests/unit/paid-provider-boundary.test.ts > paid provider boundary > keeps metered Course Builder dispatch inside an explicit authorization boundary
+- tests/unit/paris-execute-route.test.ts > PARIS execution audit boundary > stores and logs a safe classified summary when execution throws a credential-bearing error
+- tests/unit/platform-evaluator.test.ts > platform execution evidence > rejects a read-only OpenHands status result as engineering execution evidence
+- tests/unit/portal-auth-boundaries-contract.test.ts > portal authorization boundaries > apps/lms/app/host-shop/dashboard/layout.tsx enforces a server-side authorization boundary
+- tests/unit/portal-auth-boundaries-contract.test.ts > portal authorization boundaries > components/lms/LearnerWorkspaceLayout.tsx enforces a server-side authorization boundary
+- tests/unit/portal-auth-routes.test.ts > deployed portal middleware auth coverage > LMS PROTECTED_PREFIXES includes /parent-portal/dashboard
+- tests/unit/portal-auth-routes.test.ts > deployed portal middleware auth coverage > renders the marketing homepage from the conversion-focused static hero
+- tests/unit/public-information-architecture-regression.test.ts > public information architecture regressions > keeps program selection visitor-controlled and avoids duplicating it on the homepage
+- tests/unit/public-information-architecture-regression.test.ts > public information architecture regressions > publishes canonical high-value destinations in the sitemap registry
+- tests/unit/slide-lesson-audiovisual-policy.test.ts > SlideLesson audiovisual policy > shows a photographic poster before lesson motion and narration
+- tests/unit/studio-browser-secure-input.test.tsx > switches mobile browser panels without resetting the session, stream or input draft
+- tests/unit/studio-surface-contract.test.ts > Admin Dashboard and Studio surface contract > enforces production confirmation at server execution boundaries
+- tests/unit/studio-surface-contract.test.ts > Admin Dashboard and Studio surface contract > keeps core Studio available when only GitHub repository writes are unavailable
+- tests/unit/studio-user-facing-status.test.ts > Studio user-facing status > explains paid inference approval without exposing its internal error code
+- tests/unit/studio-user-facing-status.test.ts > Studio user-facing status > keeps provider brands and raw credential failures out of LIZZY
+- tests/unit/studio-user-facing-status.test.ts > Studio user-facing status > uses capability labels instead of provider identities
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > accepts one-key directory choices and contains the correct departments
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > advances on the actual no-input invalid event and reads Gary, Texas and every enabled holder
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > assigns the program callback before the interview finishes or the caller disconnects
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > collects the full extension after star without routing the first digit
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > continues through every directory page and retries a failed page with another voice
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > copies voicemail notification to Admin without transferring the call or changing its holder
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > does not duplicate the voicemail row when recording delivery is repeated
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > does not hang up after the observed voice-provider timeout
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > does not reinterpret empty invalid input as administrator option zero
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > does not restart a cancelled gather or a call that already ended
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > does not route a retired single-digit holder shortcut
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > does not route an incomplete extension 1 to the technology menu option
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > keeps a technology callback with technology
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > keeps an unanswered holder call with PARIS rather than dialing Admin
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > notifies Admin only once when Admin is already the assigned recipient
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > only hangs up after an explicit finished choice and completed goodbye
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > preserves the greeting while making menu keys immediate
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > reassigns an esthetician callback from technology to the configured beauty extension
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > recognizes the observed voicemail_prompt recording event using its persisted callback source
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > requests provider retry rather than acknowledging a voicemail that could not be saved
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > routes extension 206 to its coordinator or holder without requiring a menu option
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > routes extension 207 to its coordinator or holder without requiring a menu option
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > routes extension 208 to its coordinator or holder without requiring a menu option
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > routes extension 209 to its coordinator or holder without requiring a menu option
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > routes full extension 105 to its assigned owner when unavailable
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > uses current holder assignments as well as department keywords
+- tests/unit/telnyx-call-recovery.test.ts > Telnyx webhook recovery and routing (provider verification mocked) > uses saved conversation history when the caller resumes
+- tests/unit/top-risk-auth-guards.test.ts > Top-risk routes have auth guards > /api/stripe/connect/create requires apiRequireAdmin
+- tests/unit/ultimate-build-panel-status.test.tsx > prevents another start while the durable worker job is running
+- tests/unit/ultimate-build-panel-status.test.tsx > shows a failed durable job and allows resuming an existing build whose aggregate state still says running
+- tests/unit/ultimate-build-panel-status.test.tsx > shows an expired running job as stalled and enables recovery instead of falsely confirming a worker
+- tests/unit/ultimate-build-panel-status.test.tsx > starts the Google worker for the existing queued build without creating a duplicate course build
+- tests/unit/ultimate-builder-recovery.test.ts > Ultimate builder recovery > blocks Ultimate rendering when stored Envato visuals do not cover every scene
+- tests/unit/ultimate-builder-recovery.test.ts > Ultimate builder recovery > renews a checkpointed licensed video URL immediately before rendering
+- tests/unit/ultimate-builder-recovery.test.ts > Ultimate builder recovery > selectively repairs failed media QA and resumes downstream stages
+- tests/unit/ultimate-course-builder-cutover-contract.test.ts > Ultimate Course Builder production cutover > keeps standard React available to the standalone Remotion worker
+- tests/unit/ultimate-course-builder-cutover-contract.test.ts > Ultimate Course Builder production cutover > makes Ultimate the only active Admin build surface
+- tests/unit/ultimate-envato-acquisition-resume.test.ts > Ultimate Course Builder Envato acquisition bridge > acquires only approved missing Envato media and persists it before attachment
+- tests/unit/ultimate-envato-acquisition-resume.test.ts > Ultimate Course Builder Envato acquisition bridge > preserves entitlement and acquisition evidence instead of manufacturing approval
+- tests/unit/ultimate-job-lifecycle.test.ts > terminal Ultimate job lifecycle > preserves failure history and fences dependency waits to the current generation
+- tests/unit/ultimate-no-llm-instruction.test.ts > source-grounded instruction > builds the registered barber lesson from the authorized curriculum blueprint
+- tests/unit/universal-payment-method-complete.test.ts > universal payment-method completion > rejects a completed session belonging to a different user
+- tests/unit/universal-payment-method-complete.test.ts > universal payment-method completion > sets the test card as default only after a matching completed Setup session
+- tests/unit/universal-payment-method-setup.test.ts > POST /api/billing/payment-method/setup > fails closed because saved-card setup is retired

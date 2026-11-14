@@ -1,0 +1,2202 @@
+{
+  "status": "approved_visual_reference_requires_final_audio_repair",
+  "ownerCorrections": [
+    "no duplicated or overlapping narration",
+    "no missing speech or unexplained silent gaps",
+    "no blank transition delays",
+    "whole pictures with side instructions and bottom captions",
+    "fresh recap after each teaching moment",
+    "picture reuse allowed when it teaches a different visible technique"
+  ],
+  "sourceMediaIncluded": false,
+  "baselineTimingIsNotFinalProductionTiming": true,
+  "moments": [
+    {
+      "teachingMoment": "Trim client hair",
+      "number": "01",
+      "spokenSourceId": "base-0",
+      "baselineStartSeconds": 0,
+      "baselineDurationSeconds": 20.416666666666668,
+      "cues": [
+        {
+          "id": "001",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 3.53,
+          "action": "A controlled clipper service",
+          "sideInstructions": [
+            "Prepare safely.",
+            "Choose and secure a guard.",
+            "Control and inspect the finish."
+          ],
+          "imageFiles": [
+            "original0.png"
+          ]
+        },
+        {
+          "id": "002",
+          "baselineStartWithinMoment": 3.53,
+          "baselineEndWithinMoment": 12.36,
+          "action": "The service sequence",
+          "sideInstructions": [
+            "Preparation comes first.",
+            "Controlled cutting follows.",
+            "Finish with an inspection."
+          ],
+          "imageFiles": [
+            "prep0.png",
+            "atlas3.png"
+          ]
+        },
+        {
+          "id": "003",
+          "baselineStartWithinMoment": 12.36,
+          "baselineEndWithinMoment": 15.26,
+          "action": "Illustrated teaching pictures",
+          "sideInstructions": [
+            "Each picture explains a step.",
+            "Match the cue to the procedure."
+          ],
+          "imageFiles": [
+            "atlas2.png"
+          ]
+        },
+        {
+          "id": "004",
+          "baselineStartWithinMoment": 15.26,
+          "baselineEndWithinMoment": 20.4167,
+          "action": "Practice with your instructor",
+          "sideInstructions": [
+            "Observe, then practise.",
+            "Ask for a supervised check."
+          ],
+          "imageFiles": [
+            "Professional barber training session.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Tools for this service",
+      "number": "02",
+      "spokenSourceId": "base-2",
+      "baselineStartSeconds": 20.416666666666668,
+      "baselineDurationSeconds": 22.416666666666668,
+      "cues": [
+        {
+          "id": "005",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 4.76,
+          "action": "Clippers remove length",
+          "sideInstructions": [
+            "Build the haircut shape.",
+            "Keep the equipment serviceable."
+          ],
+          "imageFiles": [
+            "tools0.png"
+          ]
+        },
+        {
+          "id": "006",
+          "baselineStartWithinMoment": 4.76,
+          "baselineEndWithinMoment": 8.02,
+          "action": "Guards control remaining length",
+          "sideInstructions": [
+            "Read the marked length.",
+            "Check tool compatibility."
+          ],
+          "imageFiles": [
+            "real0.png",
+            "real1.png",
+            "real2.png",
+            "real3.png"
+          ]
+        },
+        {
+          "id": "007",
+          "baselineStartWithinMoment": 8.02,
+          "baselineEndWithinMoment": 11.13,
+          "action": "Trimmers detail the outline",
+          "sideInstructions": [
+            "Work carefully around edges.",
+            "Keep pressure light."
+          ],
+          "imageFiles": [
+            "tools0.png"
+          ]
+        },
+        {
+          "id": "008",
+          "baselineStartWithinMoment": 11.13,
+          "baselineEndWithinMoment": 16.87,
+          "action": "Inspect before starting",
+          "sideInstructions": [
+            "Check cord or battery.",
+            "Inspect the blade and guard teeth."
+          ],
+          "imageFiles": [
+            "ready0.png"
+          ]
+        },
+        {
+          "id": "009",
+          "baselineStartWithinMoment": 16.87,
+          "baselineEndWithinMoment": 20.06,
+          "action": "Do not use damaged equipment",
+          "sideInstructions": [
+            "A cracked guard is unsafe.",
+            "Remove damaged tools from use."
+          ],
+          "imageFiles": [
+            "ready3.png"
+          ]
+        },
+        {
+          "id": "010",
+          "baselineStartWithinMoment": 20.06,
+          "baselineEndWithinMoment": 22.4167,
+          "action": "Keep a comb and mirror ready",
+          "sideInstructions": [
+            "Comb to guide and check.",
+            "Use the mirror to inspect shape."
+          ],
+          "imageFiles": [
+            "ready2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Tools recap",
+      "number": "02",
+      "spokenSourceId": "base-2",
+      "baselineStartSeconds": 42.833333333333336,
+      "baselineDurationSeconds": 2.4583333333333335,
+      "cues": [
+        {
+          "id": "011",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 2.4583,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Clippers, guards and trimmer.",
+            "Shears, comb and mirror.",
+            "Clean cape and fresh strip."
+          ],
+          "imageFiles": [
+            "tools2.png",
+            "tools3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Tools recap",
+      "number": "02",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 45.29166666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "012",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Clippers, guards and trimmer.",
+            "Shears, comb and mirror.",
+            "Clean cape and fresh strip."
+          ],
+          "imageFiles": [
+            "tools2.png",
+            "tools3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Consultation and preparation",
+      "number": "03",
+      "spokenSourceId": "base-1",
+      "baselineStartSeconds": 50.79166666666667,
+      "baselineDurationSeconds": 24.041666666666668,
+      "cues": [
+        {
+          "id": "013",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 8.68,
+          "action": "Start with consultation",
+          "sideInstructions": [
+            "Ask what the client wants.",
+            "Use a reference and confirm."
+          ],
+          "imageFiles": [
+            "prep0.png"
+          ]
+        },
+        {
+          "id": "014",
+          "baselineStartWithinMoment": 8.68,
+          "baselineEndWithinMoment": 10.65,
+          "action": "Inspect hair and scalp",
+          "sideInstructions": [
+            "Observe growth and condition.",
+            "Check readiness for service."
+          ],
+          "imageFiles": [
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "015",
+          "baselineStartWithinMoment": 10.65,
+          "baselineEndWithinMoment": 16.61,
+          "action": "Stop and follow the procedure",
+          "sideInstructions": [
+            "Report safety concerns.",
+            "Ask your instructor before proceeding."
+          ],
+          "imageFiles": [
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "016",
+          "baselineStartWithinMoment": 16.61,
+          "baselineEndWithinMoment": 18.2,
+          "action": "Complete hand hygiene",
+          "sideInstructions": [
+            "Use the established procedure.",
+            "Dry hands before setup."
+          ],
+          "imageFiles": [
+            "prep2.png"
+          ]
+        },
+        {
+          "id": "017",
+          "baselineStartWithinMoment": 18.2,
+          "baselineEndWithinMoment": 21.0,
+          "action": "Use prepared tools",
+          "sideInstructions": [
+            "Prepare a serviceable kit.",
+            "Have client protection ready."
+          ],
+          "imageFiles": [
+            "prep3.png"
+          ]
+        },
+        {
+          "id": "018",
+          "baselineStartWithinMoment": 21.0,
+          "baselineEndWithinMoment": 22.88,
+          "action": "Use a fresh neck strip",
+          "sideInstructions": [
+            "Fit it comfortably.",
+            "Maintain a barrier at the collar."
+          ],
+          "imageFiles": [
+            "drape1.png"
+          ]
+        },
+        {
+          "id": "019",
+          "baselineStartWithinMoment": 22.88,
+          "baselineEndWithinMoment": 24.0417,
+          "action": "Secure a clean cape",
+          "sideInstructions": [
+            "Cover the clothing.",
+            "Keep the collar off bare skin."
+          ],
+          "imageFiles": [
+            "drape2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Draping \u00b7 guided review",
+      "number": "03",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 74.83333333333334,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "020",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 3.0,
+          "action": "Fit a fresh neck strip",
+          "sideInstructions": [
+            "Follow its instructions.",
+            "Fit comfortably around the neck."
+          ],
+          "imageFiles": [
+            "drape1.png"
+          ]
+        },
+        {
+          "id": "021",
+          "baselineStartWithinMoment": 3.0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Secure the clean cape",
+          "sideInstructions": [
+            "Keep the strip between collar and skin.",
+            "Confirm comfort and clothing coverage."
+          ],
+          "imageFiles": [
+            "drape2.png",
+            "drape3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Preparation recap",
+      "number": "03",
+      "spokenSourceId": "base-1",
+      "baselineStartSeconds": 80.33333333333334,
+      "baselineDurationSeconds": 5.041666666666667,
+      "cues": [
+        {
+          "id": "022",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.0417,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Agree on the service.",
+            "Inspect and complete hand hygiene.",
+            "Protect the client comfortably."
+          ],
+          "imageFiles": [
+            "prep0.png",
+            "drape3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Preparation recap",
+      "number": "03",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 85.37500000000001,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "023",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Agree on the service.",
+            "Inspect and complete hand hygiene.",
+            "Protect the client comfortably."
+          ],
+          "imageFiles": [
+            "prep0.png",
+            "drape3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard selection and attachment",
+      "number": "04",
+      "spokenSourceId": "base-3",
+      "baselineStartSeconds": 90.87500000000001,
+      "baselineDurationSeconds": 22.291666666666668,
+      "cues": [
+        {
+          "id": "024",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.29,
+          "action": "Begin with more length",
+          "sideInstructions": [
+            "Start conservatively.",
+            "Follow the agreed service plan."
+          ],
+          "imageFiles": [
+            "real3.png",
+            "result3.png"
+          ]
+        },
+        {
+          "id": "025",
+          "baselineStartWithinMoment": 5.29,
+          "baselineEndWithinMoment": 10.4,
+          "action": "Shorten gradually",
+          "sideInstructions": [
+            "You can take more off.",
+            "You cannot replace removed hair."
+          ],
+          "imageFiles": [
+            "result3.png",
+            "result1.png"
+          ]
+        },
+        {
+          "id": "026",
+          "baselineStartWithinMoment": 10.4,
+          "baselineEndWithinMoment": 14.45,
+          "action": "Read the marked length",
+          "sideInstructions": [
+            "Check the guard itself.",
+            "Check the manufacturer guide."
+          ],
+          "imageFiles": [
+            "real3.png"
+          ]
+        },
+        {
+          "id": "027",
+          "baselineStartWithinMoment": 14.45,
+          "baselineEndWithinMoment": 16.08,
+          "action": "Numbering can vary",
+          "sideInstructions": [
+            "Read the length, not just the number.",
+            "Verify your equipment."
+          ],
+          "imageFiles": [
+            "real0.png",
+            "real3.png"
+          ]
+        },
+        {
+          "id": "028",
+          "baselineStartWithinMoment": 16.08,
+          "baselineEndWithinMoment": 19.3,
+          "action": "Switch off to change guards",
+          "sideInstructions": [
+            "Keep the clipper off.",
+            "Fit the compatible attachment."
+          ],
+          "imageFiles": [
+            "ready1.png"
+          ]
+        },
+        {
+          "id": "029",
+          "baselineStartWithinMoment": 19.3,
+          "baselineEndWithinMoment": 22.2917,
+          "action": "Confirm a secure fit",
+          "sideInstructions": [
+            "Check the guard is seated.",
+            "Check before switching on."
+          ],
+          "imageFiles": [
+            "ready3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Attachment recap",
+      "number": "04",
+      "spokenSourceId": "base-3",
+      "baselineStartSeconds": 113.16666666666669,
+      "baselineDurationSeconds": 3.375,
+      "cues": [
+        {
+          "id": "030",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 3.375,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Choose conservatively.",
+            "Switch off to fit attachments.",
+            "Confirm the guard is secure."
+          ],
+          "imageFiles": [
+            "ready1.png",
+            "ready3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Attachment recap",
+      "number": "04",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 116.54166666666669,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "031",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Choose conservatively.",
+            "Switch off to fit attachments.",
+            "Confirm the guard is secure."
+          ],
+          "imageFiles": [
+            "ready1.png",
+            "ready3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #1 \u00b7 1/8 inch / about 3 mm",
+      "number": "#1",
+      "spokenSourceId": "guard-0",
+      "baselineStartSeconds": 122.04166666666669,
+      "baselineDurationSeconds": 25.333333333333332,
+      "cues": [
+        {
+          "id": "032",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 8.66,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real0.png"
+          ]
+        },
+        {
+          "id": "033",
+          "baselineStartWithinMoment": 8.66,
+          "baselineEndWithinMoment": 12.53,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real0.png",
+            "use0.png"
+          ]
+        },
+        {
+          "id": "034",
+          "baselineStartWithinMoment": 12.53,
+          "baselineEndWithinMoment": 15.51,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use0.png",
+            "result0.png"
+          ]
+        },
+        {
+          "id": "035",
+          "baselineStartWithinMoment": 15.51,
+          "baselineEndWithinMoment": 19.96,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result0.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "036",
+          "baselineStartWithinMoment": 19.96,
+          "baselineEndWithinMoment": 25.3333,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result0.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #1 recap",
+      "number": "#1",
+      "spokenSourceId": "guard-0",
+      "baselineStartSeconds": 147.37500000000003,
+      "baselineDurationSeconds": 6.875,
+      "cues": [
+        {
+          "id": "037",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 6.875,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 1/8 inch.",
+            "Approximately 3 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real0.png",
+            "result0.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #1 recap",
+      "number": "#1",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 154.25000000000003,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "038",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 1/8 inch.",
+            "Approximately 3 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real0.png",
+            "result0.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #2 \u00b7 1/4 inch / about 6 mm",
+      "number": "#2",
+      "spokenSourceId": "guard-1",
+      "baselineStartSeconds": 159.75000000000003,
+      "baselineDurationSeconds": 25.5,
+      "cues": [
+        {
+          "id": "039",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 8.83,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real1.png"
+          ]
+        },
+        {
+          "id": "040",
+          "baselineStartWithinMoment": 8.83,
+          "baselineEndWithinMoment": 12.7,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real1.png",
+            "use1.png"
+          ]
+        },
+        {
+          "id": "041",
+          "baselineStartWithinMoment": 12.7,
+          "baselineEndWithinMoment": 15.68,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use1.png",
+            "result1.png"
+          ]
+        },
+        {
+          "id": "042",
+          "baselineStartWithinMoment": 15.68,
+          "baselineEndWithinMoment": 20.12,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result1.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "043",
+          "baselineStartWithinMoment": 20.12,
+          "baselineEndWithinMoment": 25.5,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result1.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #2 recap",
+      "number": "#2",
+      "spokenSourceId": "guard-1",
+      "baselineStartSeconds": 185.25000000000003,
+      "baselineDurationSeconds": 7.0,
+      "cues": [
+        {
+          "id": "044",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.0,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 1/4 inch.",
+            "Approximately 6 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real1.png",
+            "result1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #2 recap",
+      "number": "#2",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 192.25000000000003,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "045",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 1/4 inch.",
+            "Approximately 6 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real1.png",
+            "result1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #3 \u00b7 3/8 inch / about 10 mm",
+      "number": "#3",
+      "spokenSourceId": "guard-2",
+      "baselineStartSeconds": 197.75000000000003,
+      "baselineDurationSeconds": 25.583333333333332,
+      "cues": [
+        {
+          "id": "046",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 8.94,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real2.png"
+          ]
+        },
+        {
+          "id": "047",
+          "baselineStartWithinMoment": 8.94,
+          "baselineEndWithinMoment": 12.8,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real2.png",
+            "use2.png"
+          ]
+        },
+        {
+          "id": "048",
+          "baselineStartWithinMoment": 12.8,
+          "baselineEndWithinMoment": 15.78,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use2.png",
+            "result2.png"
+          ]
+        },
+        {
+          "id": "049",
+          "baselineStartWithinMoment": 15.78,
+          "baselineEndWithinMoment": 20.23,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result2.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "050",
+          "baselineStartWithinMoment": 20.23,
+          "baselineEndWithinMoment": 25.5833,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result2.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #3 recap",
+      "number": "#3",
+      "spokenSourceId": "guard-2",
+      "baselineStartSeconds": 223.33333333333337,
+      "baselineDurationSeconds": 7.125,
+      "cues": [
+        {
+          "id": "051",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.125,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 3/8 inch.",
+            "Approximately 10 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real2.png",
+            "result2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #3 recap",
+      "number": "#3",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 230.45833333333337,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "052",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 3/8 inch.",
+            "Approximately 10 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real2.png",
+            "result2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #4 \u00b7 1/2 inch / about 13 mm",
+      "number": "#4",
+      "spokenSourceId": "guard-3",
+      "baselineStartSeconds": 235.95833333333337,
+      "baselineDurationSeconds": 25.541666666666668,
+      "cues": [
+        {
+          "id": "053",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 8.89,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real3.png"
+          ]
+        },
+        {
+          "id": "054",
+          "baselineStartWithinMoment": 8.89,
+          "baselineEndWithinMoment": 12.75,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real3.png",
+            "use3.png"
+          ]
+        },
+        {
+          "id": "055",
+          "baselineStartWithinMoment": 12.75,
+          "baselineEndWithinMoment": 15.73,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use3.png",
+            "result3.png"
+          ]
+        },
+        {
+          "id": "056",
+          "baselineStartWithinMoment": 15.73,
+          "baselineEndWithinMoment": 20.18,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result3.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "057",
+          "baselineStartWithinMoment": 20.18,
+          "baselineEndWithinMoment": 25.5417,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result3.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #4 recap",
+      "number": "#4",
+      "spokenSourceId": "guard-3",
+      "baselineStartSeconds": 261.50000000000006,
+      "baselineDurationSeconds": 7.083333333333333,
+      "cues": [
+        {
+          "id": "058",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.0833,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 1/2 inch.",
+            "Approximately 13 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real3.png",
+            "result3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #4 recap",
+      "number": "#4",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 268.58333333333337,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "059",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 1/2 inch.",
+            "Approximately 13 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real3.png",
+            "result3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #5 \u00b7 5/8 inch / about 16 mm",
+      "number": "#5",
+      "spokenSourceId": "guard-4",
+      "baselineStartSeconds": 274.08333333333337,
+      "baselineDurationSeconds": 25.916666666666668,
+      "cues": [
+        {
+          "id": "060",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 9.26,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real4.png"
+          ]
+        },
+        {
+          "id": "061",
+          "baselineStartWithinMoment": 9.26,
+          "baselineEndWithinMoment": 13.14,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real4.png",
+            "use4.png"
+          ]
+        },
+        {
+          "id": "062",
+          "baselineStartWithinMoment": 13.14,
+          "baselineEndWithinMoment": 16.11,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use4.png",
+            "result4.png"
+          ]
+        },
+        {
+          "id": "063",
+          "baselineStartWithinMoment": 16.11,
+          "baselineEndWithinMoment": 20.56,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result4.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "064",
+          "baselineStartWithinMoment": 20.56,
+          "baselineEndWithinMoment": 25.9167,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result4.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #5 recap",
+      "number": "#5",
+      "spokenSourceId": "guard-4",
+      "baselineStartSeconds": 300.00000000000006,
+      "baselineDurationSeconds": 7.5,
+      "cues": [
+        {
+          "id": "065",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.5,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 5/8 inch.",
+            "Approximately 16 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real4.png",
+            "result4.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #5 recap",
+      "number": "#5",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 307.50000000000006,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "066",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 5/8 inch.",
+            "Approximately 16 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real4.png",
+            "result4.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #6 \u00b7 3/4 inch / about 19 mm",
+      "number": "#6",
+      "spokenSourceId": "guard-5",
+      "baselineStartSeconds": 313.00000000000006,
+      "baselineDurationSeconds": 25.875,
+      "cues": [
+        {
+          "id": "067",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 9.18,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real5.png"
+          ]
+        },
+        {
+          "id": "068",
+          "baselineStartWithinMoment": 9.18,
+          "baselineEndWithinMoment": 13.05,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real5.png",
+            "use5.png"
+          ]
+        },
+        {
+          "id": "069",
+          "baselineStartWithinMoment": 13.05,
+          "baselineEndWithinMoment": 16.03,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use5.png",
+            "result5.png"
+          ]
+        },
+        {
+          "id": "070",
+          "baselineStartWithinMoment": 16.03,
+          "baselineEndWithinMoment": 20.47,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result5.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "071",
+          "baselineStartWithinMoment": 20.47,
+          "baselineEndWithinMoment": 25.875,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result5.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #6 recap",
+      "number": "#6",
+      "spokenSourceId": "guard-5",
+      "baselineStartSeconds": 338.87500000000006,
+      "baselineDurationSeconds": 7.375,
+      "cues": [
+        {
+          "id": "072",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.375,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 3/4 inch.",
+            "Approximately 19 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real5.png",
+            "result5.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #6 recap",
+      "number": "#6",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 346.25000000000006,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "073",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 3/4 inch.",
+            "Approximately 19 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real5.png",
+            "result5.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #7 \u00b7 7/8 inch / about 22 mm",
+      "number": "#7",
+      "spokenSourceId": "guard-6",
+      "baselineStartSeconds": 351.75000000000006,
+      "baselineDurationSeconds": 25.958333333333332,
+      "cues": [
+        {
+          "id": "074",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 9.3,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real6.png"
+          ]
+        },
+        {
+          "id": "075",
+          "baselineStartWithinMoment": 9.3,
+          "baselineEndWithinMoment": 13.16,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real6.png",
+            "use6.png"
+          ]
+        },
+        {
+          "id": "076",
+          "baselineStartWithinMoment": 13.16,
+          "baselineEndWithinMoment": 16.14,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use6.png",
+            "result6.png"
+          ]
+        },
+        {
+          "id": "077",
+          "baselineStartWithinMoment": 16.14,
+          "baselineEndWithinMoment": 20.59,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result6.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "078",
+          "baselineStartWithinMoment": 20.59,
+          "baselineEndWithinMoment": 25.9583,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result6.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #7 recap",
+      "number": "#7",
+      "spokenSourceId": "guard-6",
+      "baselineStartSeconds": 377.70833333333337,
+      "baselineDurationSeconds": 7.5,
+      "cues": [
+        {
+          "id": "079",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.5,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 7/8 inch.",
+            "Approximately 22 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real6.png",
+            "result6.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #7 recap",
+      "number": "#7",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 385.20833333333337,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "080",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 7/8 inch.",
+            "Approximately 22 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real6.png",
+            "result6.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #8 \u00b7 1 inch / about 25 mm",
+      "number": "#8",
+      "spokenSourceId": "guard-7",
+      "baselineStartSeconds": 390.70833333333337,
+      "baselineDurationSeconds": 25.125,
+      "cues": [
+        {
+          "id": "081",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 8.46,
+          "action": "Read this guard",
+          "sideInstructions": [
+            "Identify its number.",
+            "Verify the marked length."
+          ],
+          "imageFiles": [
+            "real7.png"
+          ]
+        },
+        {
+          "id": "082",
+          "baselineStartWithinMoment": 8.46,
+          "baselineEndWithinMoment": 12.32,
+          "action": "Compare guard and placement",
+          "sideInstructions": [
+            "The real guard is at left.",
+            "The generated example shows use."
+          ],
+          "imageFiles": [
+            "real7.png",
+            "use7.png"
+          ]
+        },
+        {
+          "id": "083",
+          "baselineStartWithinMoment": 12.32,
+          "baselineEndWithinMoment": 15.3,
+          "action": "Approximate remaining length",
+          "sideInstructions": [
+            "This is an illustrated example.",
+            "Check the actual result on the head."
+          ],
+          "imageFiles": [
+            "use7.png",
+            "result7.png"
+          ]
+        },
+        {
+          "id": "084",
+          "baselineStartWithinMoment": 15.3,
+          "baselineEndWithinMoment": 19.74,
+          "action": "Appearance can vary",
+          "sideInstructions": [
+            "Hair texture changes the look.",
+            "Growth direction and blade setting matter."
+          ],
+          "imageFiles": [
+            "result7.png",
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "085",
+          "baselineStartWithinMoment": 19.74,
+          "baselineEndWithinMoment": 25.125,
+          "action": "Length is only one part",
+          "sideInstructions": [
+            "A guard controls cutting length.",
+            "Blending and shape create the style."
+          ],
+          "imageFiles": [
+            "result7.png",
+            "atlas3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #8 recap",
+      "number": "#8",
+      "spokenSourceId": "guard-7",
+      "baselineStartSeconds": 415.83333333333337,
+      "baselineDurationSeconds": 6.666666666666667,
+      "cues": [
+        {
+          "id": "086",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 6.6667,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Nominal length: 1 inch.",
+            "Approximately 25 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real7.png",
+            "result7.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Guard #8 recap",
+      "number": "#8",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 422.50000000000006,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "087",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Nominal length: 1 inch.",
+            "Approximately 25 mm.",
+            "Read your guard and check the setup."
+          ],
+          "imageFiles": [
+            "real7.png",
+            "result7.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Controlled cutting passes",
+      "number": "05",
+      "spokenSourceId": "base-4",
+      "baselineStartSeconds": 428.00000000000006,
+      "baselineDurationSeconds": 22.375,
+      "cues": [
+        {
+          "id": "088",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 6.21,
+          "action": "Comb and identify growth",
+          "sideInstructions": [
+            "Comb into natural fall.",
+            "Identify the direction of growth."
+          ],
+          "imageFiles": [
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "089",
+          "baselineStartWithinMoment": 6.21,
+          "baselineEndWithinMoment": 13.08,
+          "action": "Use short controlled passes",
+          "sideInstructions": [
+            "Fit the selected guard.",
+            "Work against growth where required."
+          ],
+          "imageFiles": [
+            "action0.png"
+          ]
+        },
+        {
+          "id": "090",
+          "baselineStartWithinMoment": 13.08,
+          "baselineEndWithinMoment": 16.73,
+          "action": "Maintain light contact",
+          "sideInstructions": [
+            "Keep the guard in contact.",
+            "Use light pressure."
+          ],
+          "imageFiles": [
+            "action0.png"
+          ]
+        },
+        {
+          "id": "091",
+          "baselineStartWithinMoment": 16.73,
+          "baselineEndWithinMoment": 19.13,
+          "action": "Never force through tangles",
+          "sideInstructions": [
+            "Stop and comb first.",
+            "Keep the client comfortable."
+          ],
+          "imageFiles": [
+            "prep1.png"
+          ]
+        },
+        {
+          "id": "092",
+          "baselineStartWithinMoment": 19.13,
+          "baselineEndWithinMoment": 22.375,
+          "action": "Comb out and inspect",
+          "sideInstructions": [
+            "Remove cut hair with the comb.",
+            "Check between passes."
+          ],
+          "imageFiles": [
+            "action2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Cutting recap",
+      "number": "05",
+      "spokenSourceId": "base-4",
+      "baselineStartSeconds": 450.37500000000006,
+      "baselineDurationSeconds": 3.375,
+      "cues": [
+        {
+          "id": "093",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 3.375,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Comb and identify growth.",
+            "Short passes with light pressure.",
+            "Inspect between passes."
+          ],
+          "imageFiles": [
+            "action0.png",
+            "action2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Cutting recap",
+      "number": "05",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 453.75000000000006,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "094",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Comb and identify growth.",
+            "Short passes with light pressure.",
+            "Inspect between passes."
+          ],
+          "imageFiles": [
+            "action0.png",
+            "action2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Blending and shape checks",
+      "number": "06",
+      "spokenSourceId": "base-5",
+      "baselineStartSeconds": 459.25000000000006,
+      "baselineDurationSeconds": 22.416666666666668,
+      "cues": [
+        {
+          "id": "095",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 3.41,
+          "action": "Work in small sections",
+          "sideInstructions": [
+            "Keep the planned shape in mind.",
+            "Make controlled adjustments."
+          ],
+          "imageFiles": [
+            "action0.png"
+          ]
+        },
+        {
+          "id": "096",
+          "baselineStartWithinMoment": 3.41,
+          "baselineEndWithinMoment": 9.82,
+          "action": "Lift away at the transition",
+          "sideInstructions": [
+            "Gradually scoop away.",
+            "Preserve the longer hair above."
+          ],
+          "imageFiles": [
+            "action0.png",
+            "action1.png"
+          ]
+        },
+        {
+          "id": "097",
+          "baselineStartWithinMoment": 9.82,
+          "baselineEndWithinMoment": 12.61,
+          "action": "Check with comb and mirror",
+          "sideInstructions": [
+            "Inspect the developing shape.",
+            "Compare both sides."
+          ],
+          "imageFiles": [
+            "action2.png"
+          ]
+        },
+        {
+          "id": "098",
+          "baselineStartWithinMoment": 12.61,
+          "baselineEndWithinMoment": 17.55,
+          "action": "Assess a visible line",
+          "sideInstructions": [
+            "Identify the length needing correction.",
+            "Avoid removing more hair blindly."
+          ],
+          "imageFiles": [
+            "result3.png",
+            "result1.png"
+          ]
+        },
+        {
+          "id": "099",
+          "baselineStartWithinMoment": 17.55,
+          "baselineEndWithinMoment": 22.4167,
+          "action": "Ask your instructor",
+          "sideInstructions": [
+            "Stop when you are unsure.",
+            "Do not repeatedly shorten the same area."
+          ],
+          "imageFiles": [
+            "Professional barber training session.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Blending recap",
+      "number": "06",
+      "spokenSourceId": "base-5",
+      "baselineStartSeconds": 481.66666666666674,
+      "baselineDurationSeconds": 2.9166666666666665,
+      "cues": [
+        {
+          "id": "100",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 2.9167,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Work in small sections.",
+            "Lift out gradually at transitions.",
+            "Assess before shortening."
+          ],
+          "imageFiles": [
+            "action1.png",
+            "action2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Blending recap",
+      "number": "06",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 484.5833333333334,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "101",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Work in small sections.",
+            "Lift out gradually at transitions.",
+            "Assess before shortening."
+          ],
+          "imageFiles": [
+            "action1.png",
+            "action2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Finish and inspect",
+      "number": "07",
+      "spokenSourceId": "base-6",
+      "baselineStartSeconds": 490.0833333333334,
+      "baselineDurationSeconds": 24.208333333333332,
+      "cues": [
+        {
+          "id": "102",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 7.3,
+          "action": "Detail the agreed outline",
+          "sideInstructions": [
+            "Use light trimmer pressure.",
+            "Watch the skin closely."
+          ],
+          "imageFiles": [
+            "action3.png"
+          ]
+        },
+        {
+          "id": "103",
+          "baselineStartWithinMoment": 7.3,
+          "baselineEndWithinMoment": 11.76,
+          "action": "Inspect the complete shape",
+          "sideInstructions": [
+            "Compare both sides.",
+            "Check ears and neckline."
+          ],
+          "imageFiles": [
+            "action2.png"
+          ]
+        },
+        {
+          "id": "104",
+          "baselineStartWithinMoment": 11.76,
+          "baselineEndWithinMoment": 15.85,
+          "action": "Confirm client feedback",
+          "sideInstructions": [
+            "Show the result in the mirror.",
+            "Confirm the agreed finish."
+          ],
+          "imageFiles": [
+            "action2.png",
+            "drape0.png"
+          ]
+        },
+        {
+          "id": "105",
+          "baselineStartWithinMoment": 15.85,
+          "baselineEndWithinMoment": 24.2083,
+          "action": "Close and clean the service",
+          "sideInstructions": [
+            "Remove loose hair.",
+            "Clean and disinfect reusable tools."
+          ],
+          "imageFiles": [
+            "clean0.png",
+            "clean1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Finish recap",
+      "number": "07",
+      "spokenSourceId": "base-6",
+      "baselineStartSeconds": 514.2916666666667,
+      "baselineDurationSeconds": 4.25,
+      "cues": [
+        {
+          "id": "106",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 4.25,
+          "action": "What you learned",
+          "sideInstructions": [
+            "Inspect sides and neckline.",
+            "Confirm the client feedback.",
+            "Complete the after-service reset."
+          ],
+          "imageFiles": [
+            "action2.png",
+            "drape0.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Finish recap",
+      "number": "07",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 518.5416666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "107",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Inspect sides and neckline.",
+            "Confirm the client feedback.",
+            "Complete the after-service reset."
+          ],
+          "imageFiles": [
+            "action2.png",
+            "drape0.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "After-service sanitation",
+      "number": "08",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 524.0416666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "108",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Clean before disinfection",
+          "sideInstructions": [
+            "Switch off the equipment.",
+            "Remove loose hair and debris."
+          ],
+          "imageFiles": [
+            "clean0.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "After-service sanitation",
+      "number": "08",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 529.5416666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "109",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Disinfect compatible tools",
+          "sideInstructions": [
+            "Follow product and tool instructions.",
+            "Observe dilution and contact time.",
+            "Never immerse electrical equipment."
+          ],
+          "imageFiles": [
+            "clean1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "After-service sanitation",
+      "number": "08",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 535.0416666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "110",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Clean and disinfect the station",
+          "sideInstructions": [
+            "Treat work surfaces and contact areas.",
+            "Follow the stated wet contact time."
+          ],
+          "imageFiles": [
+            "clean2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "After-service sanitation",
+      "number": "08",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 540.5416666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "111",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Prepare for the next client",
+          "sideInstructions": [
+            "Discard the used neck strip.",
+            "Handle the used cape per procedure.",
+            "Prepare clean tools and fresh protection."
+          ],
+          "imageFiles": [
+            "clean3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Sanitation recap",
+      "number": "08",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 546.0416666666667,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "112",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Recap \u00b7 check yourself",
+          "sideInstructions": [
+            "Clean before disinfecting.",
+            "Follow the stated instructions.",
+            "Reset supplies for the next client."
+          ],
+          "imageFiles": [
+            "clean0.png",
+            "clean3.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Test and practical checkoff",
+      "number": "09",
+      "spokenSourceId": "base-7",
+      "baselineStartSeconds": 551.5416666666667,
+      "baselineDurationSeconds": 30.708333333333332,
+      "cues": [
+        {
+          "id": "113",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 3.93,
+          "action": "Pause and answer",
+          "sideInstructions": [
+            "The interactive test follows the video.",
+            "Answer before checking feedback."
+          ],
+          "imageFiles": [
+            "ready3.png"
+          ]
+        },
+        {
+          "id": "114",
+          "baselineStartWithinMoment": 3.93,
+          "baselineEndWithinMoment": 6.15,
+          "action": "Why begin with more length?",
+          "sideInstructions": [
+            "Think about what can be corrected.",
+            "Keep the agreed finish in mind."
+          ],
+          "imageFiles": [
+            "real3.png",
+            "result3.png"
+          ]
+        },
+        {
+          "id": "115",
+          "baselineStartWithinMoment": 6.15,
+          "baselineEndWithinMoment": 8.78,
+          "action": "What must you check?",
+          "sideInstructions": [
+            "Inspect the tool.",
+            "Check guard security."
+          ],
+          "imageFiles": [
+            "ready0.png",
+            "ready3.png"
+          ]
+        },
+        {
+          "id": "116",
+          "baselineStartWithinMoment": 8.78,
+          "baselineEndWithinMoment": 12.53,
+          "action": "Unsure about a visible line?",
+          "sideInstructions": [
+            "Assess the shape.",
+            "Ask your instructor."
+          ],
+          "imageFiles": [
+            "result2.png"
+          ]
+        },
+        {
+          "id": "117",
+          "baselineStartWithinMoment": 12.53,
+          "baselineEndWithinMoment": 22.65,
+          "action": "Review the answers",
+          "sideInstructions": [
+            "Preserve the option to shorten.",
+            "Check the tool and guard.",
+            "Stop, assess and ask."
+          ],
+          "imageFiles": [
+            "real3.png",
+            "ready3.png"
+          ]
+        },
+        {
+          "id": "118",
+          "baselineStartWithinMoment": 22.65,
+          "baselineEndWithinMoment": 30.7083,
+          "action": "Instructor practical checkoff",
+          "sideInstructions": [
+            "Demonstrate guard attachment.",
+            "Show three controlled passes.",
+            "Complete a mirror check."
+          ],
+          "imageFiles": [
+            "ready1.png",
+            "prep1.png",
+            "drape0.png"
+          ]
+        }
+      ]
+    },
+    {
+      "teachingMoment": "Take the interactive test",
+      "number": "09",
+      "spokenSourceId": null,
+      "baselineStartSeconds": 582.2500000000001,
+      "baselineDurationSeconds": 5.5,
+      "cues": [
+        {
+          "id": "119",
+          "baselineStartWithinMoment": 0,
+          "baselineEndWithinMoment": 5.5,
+          "action": "Continue below the player",
+          "sideInstructions": [
+            "Answer all three questions.",
+            "Check the feedback.",
+            "Discuss the practical task."
+          ],
+          "imageFiles": [
+            "ready3.png",
+            "drape0.png"
+          ]
+        }
+      ]
+    }
+  ],
+  "spokenSources": [
+    {
+      "id": "base-0",
+      "duration": 18.912
+    },
+    {
+      "id": "base-1",
+      "duration": 22.512
+    },
+    {
+      "id": "base-2",
+      "duration": 20.88
+    },
+    {
+      "id": "base-3",
+      "duration": 20.784
+    },
+    {
+      "id": "base-4",
+      "duration": 20.856
+    },
+    {
+      "id": "base-5",
+      "duration": 20.88
+    },
+    {
+      "id": "base-6",
+      "duration": 22.704
+    },
+    {
+      "id": "base-7",
+      "duration": 29.208
+    },
+    {
+      "id": "guard-0",
+      "duration": 23.808
+    },
+    {
+      "id": "guard-1",
+      "duration": 23.976
+    },
+    {
+      "id": "guard-2",
+      "duration": 24.072
+    },
+    {
+      "id": "guard-3",
+      "duration": 24.024
+    },
+    {
+      "id": "guard-4",
+      "duration": 24.408
+    },
+    {
+      "id": "guard-5",
+      "duration": 24.336
+    },
+    {
+      "id": "guard-6",
+      "duration": 24.432
+    },
+    {
+      "id": "guard-7",
+      "duration": 23.592
+    }
+  ]
+}

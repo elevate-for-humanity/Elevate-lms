@@ -1,0 +1,122 @@
+name: Promote Staging -> Production (supervised)
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for promotion (shown in PR body)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify-staging:
+    name: Verify staging health
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require staging endpoints
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+          STAGING_ADMIN_URL: ${{ secrets.STAGING_ADMIN_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$STAGING_URL" || { echo '::error::STAGING_URL is required; promotion cannot be proven.'; exit 1; }
+          test -n "$STAGING_ADMIN_URL" || { echo '::error::STAGING_ADMIN_URL is required; promotion cannot be proven.'; exit 1; }
+
+      - name: Check LMS staging health
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+        run: |
+          set -euo pipefail
+          for i in 1 2 3; do
+            STATUS=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "${STAGING_URL}/api/health" || true)
+            echo "Attempt $i: HTTP $STATUS"
+            [ "$STATUS" = "200" ] && exit 0
+            sleep 10
+          done
+          echo '::error::LMS staging health check failed.'
+          exit 1
+
+      - name: Check Admin staging health
+        env:
+          STAGING_ADMIN_URL: ${{ secrets.STAGING_ADMIN_URL }}
+        run: |
+          set -euo pipefail
+          for i in 1 2 3; do
+            STATUS=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "${STAGING_ADMIN_URL}/api/health" || true)
+            echo "Attempt $i: HTTP $STATUS"
+            [ "$STATUS" = "200" ] && exit 0
+            sleep 10
+          done
+          echo '::error::Admin staging health check failed.'
+          exit 1
+
+  open-pr:
+    name: Open staging -> main PR
+    runs-on: ubuntu-latest
+    needs: verify-staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate staging has promotable commits
+        id: diff
+        run: |
+          set -euo pipefail
+          git fetch origin main staging
+          COUNT=$(git rev-list --count origin/main..origin/staging)
+          if [ "$COUNT" -eq 0 ]; then
+            echo '::error::staging has no commits ahead of main.'
+            exit 1
+          fi
+          COMMITS=$(git log origin/main..origin/staging --oneline | head -20)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "commits<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$COMMITS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update supervised PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REASON: ${{ github.event.inputs.reason }}
+          COUNT: ${{ steps.diff.outputs.count }}
+          COMMITS: ${{ steps.diff.outputs.commits }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/promotion-pr.md <<EOF
+          ## Staging -> Production Promotion
+
+          **Triggered by:** @${ACTOR}
+          **Reason:** ${REASON}
+          **Commits ahead of main:** ${COUNT}
+
+          ### Commits included
+          \`\`\`
+          ${COMMITS}
+          \`\`\`
+
+          ### Required production checks
+          - [x] LMS staging health returned HTTP 200
+          - [x] Admin staging health returned HTTP 200
+          - [ ] Canonical recovery/integrity gates are green
+          - [ ] Database migrations reviewed/applied if required
+          - [ ] Production environment variables verified
+          - [ ] Exact deploy SHA approved by recovery supervisor
+
+          Direct auto-merge is disabled. Merge only after required checks pass.
+          EOF
+
+          EXISTING=$(gh pr list --base main --head staging --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh pr edit "$EXISTING" --body-file /tmp/promotion-pr.md
+          else
+            gh pr create --base main --head staging \
+              --title "chore: promote staging -> production ($(date -u +%Y-%m-%d))" \
+              --body-file /tmp/promotion-pr.md
+          fi

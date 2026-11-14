@@ -1,0 +1,21 @@
+-- ============================================================================
+-- BASELINE MIGRATION
+-- ============================================================================
+-- This is a placeholder baseline migration.
+-- 
+-- The database schema was created manually/via Supabase dashboard before
+-- migrations were properly set up. All 428 tables already exist with RLS.
+--
+-- This migration marks the baseline state. Future migrations should be
+-- incremental changes from this point forward.
+--
+-- To generate a full schema dump, run:
+--   npx supabase db dump --schema public > supabase/schema.sql
+--
+-- Created: 2026-01-23
+-- Tables: 428
+-- RLS Policies: 428 tables covered
+-- ============================================================================
+
+-- No-op to mark baseline
+SELECT 1;

@@ -1,0 +1,199 @@
+import { logger } from '@/lib/logger';
+/**
+ * Cron Job: Check License Status
+ * Runs daily to suspend expired licenses and check subscription status
+ *
+ * Set up as scheduled cron: "0 6 * * *" (6 AM daily)
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+import { withRuntime } from '@/lib/api/withRuntime';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const runtime = 'nodejs';
+export const maxDuration = 300;
+
+async function _GET(request: NextRequest) {
+  // Verify cron secret (for security)
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const supabase = await createClient();
+  const results = {
+    checked: 0,
+    suspended: 0,
+    reactivated: 0,
+    errors: [] as string[],
+  };
+
+  try {
+    // 1. Check for expired licenses (one-time purchases)
+    const { data: expiredLicenses } = await supabase
+      .from('licenses')
+      .select('id, tenant_id, admin_email, company_name')
+      .eq('status', 'active')
+      .lt('expires_at', new Date().toISOString())
+      .not('expires_at', 'is', null);
+
+    for (const license of expiredLicenses || []) {
+      try {
+        await supabase
+          .from('licenses')
+          .update({ status: 'expired', updated_at: new Date().toISOString() })
+          .eq('id', license.id);
+
+        await supabase.from('tenants').update({ active: false }).eq('id', license.tenant_id);
+
+        // Send expiration notification
+        await sendExpirationEmail(license.admin_email, license.company_name);
+
+        results.suspended++;
+      } catch (error) {
+        results.errors.push(`Failed to expire license ${license.id}: ${error}`);
+      }
+      results.checked++;
+    }
+
+    // 2. Enforce provider-neutral subscription periods.
+    // QuickBooks payment fulfillment advances the period. PayPal collection is
+    // reconciled into that ledger by the dedicated billing reconciliation job.
+    const { data: subscriptionLicenses } = await supabase
+      .from('licenses')
+      .select(
+        'id, tenant_id, billing_provider, provider_subscription_id, current_period_end, status, suspended_reason',
+      )
+      .not('provider_subscription_id', 'is', null);
+
+    const now = Date.now();
+    for (const license of subscriptionLicenses || []) {
+      try {
+        const periodEnd = license.current_period_end
+          ? Date.parse(license.current_period_end)
+          : Number.NaN;
+        if (!Number.isFinite(periodEnd)) {
+          results.errors.push(`Subscription license ${license.id} is missing current_period_end`);
+          results.checked++;
+          continue;
+        }
+
+        const shouldBeActive = periodEnd > now;
+        const isActive = license.status === 'active';
+        const provider = String(license.billing_provider || 'quickbooks');
+        const billingSuspension = String(license.suspended_reason || '').startsWith(
+          'Billing period ended',
+        );
+
+        if (shouldBeActive && !isActive && billingSuspension) {
+          await supabase
+            .from('licenses')
+            .update({ status: 'active', suspended_at: null, suspended_reason: null })
+            .eq('id', license.id);
+          await supabase.from('tenants').update({ active: true }).eq('id', license.tenant_id);
+          results.reactivated++;
+        } else if (!shouldBeActive && isActive) {
+          await supabase
+            .from('licenses')
+            .update({
+              status: 'suspended',
+              suspended_at: new Date().toISOString(),
+              suspended_reason: `Billing period ended (${provider})`,
+            })
+            .eq('id', license.id);
+          await supabase.from('tenants').update({ active: false }).eq('id', license.tenant_id);
+          results.suspended++;
+        }
+
+        results.checked++;
+      } catch (error) {
+        results.errors.push(`Failed to check subscription for license ${license.id}: ${error}`);
+      }
+    }
+
+    // 3. Send warning emails for licenses expiring soon (7 days)
+    const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: expiringLicenses } = await supabase
+      .from('licenses')
+      .select('id, admin_email, company_name, expires_at')
+      .eq('status', 'active')
+      .lt('expires_at', sevenDaysFromNow)
+      .gt('expires_at', new Date().toISOString())
+      .not('expiry_warning_sent', 'is', true);
+
+    for (const license of expiringLicenses || []) {
+      try {
+        await sendExpiryWarningEmail(license.admin_email, license.company_name, license.expires_at);
+        await supabase.from('licenses').update({ expiry_warning_sent: true }).eq('id', license.id);
+      } catch (error) {
+        results.errors.push(`Failed to send warning for license ${license.id}: ${error}`);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      ...results,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error('License check cron failed:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Internal server error',
+        ...results,
+      },
+      { status: 500 },
+    );
+  }
+}
+
+async function sendExpirationEmail(email: string, companyName: string): Promise<void> {
+  try {
+    const { sendEmail } = await import('@/lib/email/sendgrid');
+    await sendEmail({
+      to: email,
+      subject: `Your Elevate LMS License Has Expired - ${companyName}`,
+      html: `
+        <h1>License Expired</h1>
+        <p>Your Elevate LMS license for <strong>${companyName}</strong> has expired.</p>
+        <p>Your platform access has been suspended. To continue using Elevate LMS:</p>
+        <p><a href="${PLATFORM_DEFAULTS.siteUrl}/store/licenses" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none;">Renew Your License</a></p>
+        <p>Your data is preserved and will be available when you renew.</p>
+      `,
+    });
+  } catch (error) {
+    logger.error('Failed to send expiration email:', error);
+  }
+}
+
+async function sendExpiryWarningEmail(
+  email: string,
+  companyName: string,
+  expiresAt: string,
+): Promise<void> {
+  try {
+    const { sendEmail } = await import('@/lib/email/sendgrid');
+    const expiryDate = new Date(expiresAt).toLocaleDateString();
+    await sendEmail({
+      to: email,
+      subject: `⚠️ Your Elevate LMS License Expires Soon - ${companyName}`,
+      html: `
+        <h1>License Expiring Soon</h1>
+        <p>Your Elevate LMS license for <strong>${companyName}</strong> will expire on <strong>${expiryDate}</strong>.</p>
+        <p>Renew now to avoid any interruption in service:</p>
+        <p><a href="${PLATFORM_DEFAULTS.siteUrl}/store/licenses" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none;">Renew Your License</a></p>
+      `,
+    });
+  } catch (error) {
+    logger.error('Failed to send expiry warning email:', error);
+  }
+}
+export const GET = withRuntime(withApiAudit('/api/cron/check-licenses', _GET));

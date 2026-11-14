@@ -1,0 +1,70 @@
+name: Configure owned PBX media relay
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/configure-pbx-turn.py', 'scripts/gcp/configure-pbx-turn.mjs', 'scripts/gcp/bind-pbx-media-runtime.mjs', '.github/workflows/configure-owned-pbx-turn.yml']
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('turn-dispatch-{0}', github.ref) }}
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/configure-owned-pbx-turn.yml/dispatches" -f ref=main
+  configure:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: |
+          node --check scripts/gcp/configure-pbx-turn.mjs
+          python3 -m py_compile scripts/gcp/configure-pbx-turn.py
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Install PBX-only authenticated relay and verify real external media
+        run: node scripts/gcp/configure-pbx-turn.mjs
+  bind-apps:
+    needs: configure
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [admin, lms]
+    concurrency:
+      group: ${{ matrix.component == 'admin' && 'google-admin-runtime-operations' || 'google-runtime-operations' }}
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Bind verified relay on the existing application image and verify the new runtime
+        run: node scripts/gcp/bind-pbx-media-runtime.mjs ${{ matrix.component }}

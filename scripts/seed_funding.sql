@@ -1,0 +1,229 @@
+-- =====================================================
+-- SEED FUNDING PROGRAMS
+-- WRG, WIOA, JRI, EmployIndy, DOL
+-- =====================================================
+
+-- Insert funding programs (Mon=1..Sun=7; report_day=5 is Friday)
+insert into funding_programs(code, name, contact_email, report_day) values
+('WRG', 'Workforce Ready Grant', 'wrg@elevateforhumanity.org', 5)
+on conflict (code) do update set 
+  name = excluded.name,
+  contact_email = excluded.contact_email,
+  report_day = excluded.report_day;
+
+insert into funding_programs(code, name, contact_email, report_day) values
+('WIOA', 'WorkOne / WIOA', 'wioa@elevateforhumanity.org', 5)
+on conflict (code) do update set 
+  name = excluded.name,
+  contact_email = excluded.contact_email,
+  report_day = excluded.report_day;
+
+insert into funding_programs(code, name, contact_email, report_day) values
+('JRI', 'Justice Reinvestment Initiative', 'jri@elevateforhumanity.org', 5)
+on conflict (code) do update set 
+  name = excluded.name,
+  contact_email = excluded.contact_email,
+  report_day = excluded.report_day;
+
+insert into funding_programs(code, name, contact_email, report_day) values
+('EMPLOYINDY', 'EmployIndy', 'contact@employindy.org', 5)
+on conflict (code) do update set 
+  name = excluded.name,
+  contact_email = excluded.contact_email,
+  report_day = excluded.report_day;
+
+insert into funding_programs(code, name, contact_email, report_day) values
+('DOL', 'DOL Apprenticeship', 'apprenticeship@elevateforhumanity.org', 5)
+on conflict (code) do update set 
+  name = excluded.name,
+  contact_email = excluded.contact_email,
+  report_day = excluded.report_day;
+
+-- Enable RLS on funding tables
+alter table funding_applications enable row level security;
+alter table funding_documents enable row level security;
+
+-- Users can view their own applications
+create policy if not exists "Users can view own funding applications"
+  on funding_applications for select
+  using (auth.uid() = user_id);
+
+-- Users can create their own applications
+create policy if not exists "Users can create funding applications"
+  on funding_applications for insert
+  with check (auth.uid() = user_id);
+
+-- Admins can view all applications
+create policy if not exists "Admins can view all funding applications"
+  on funding_applications for select
+  using (
+    exists (
+      select 1 from user_profiles
+      where user_id = auth.uid() and role = 'admin'
+    )
+  );
+
+-- Admins can update applications
+create policy if not exists "Admins can update funding applications"
+  on funding_applications for update
+  using (
+    exists (
+      select 1 from user_profiles
+      where user_id = auth.uid() and role = 'admin'
+    )
+  );
+
+-- Users can view their own documents
+create policy if not exists "Users can view own funding documents"
+  on funding_documents for select
+  using (
+    exists (
+      select 1 from funding_applications
+      where id = funding_documents.application_id
+        and user_id = auth.uid()
+    )
+  );
+
+-- Attendance/completion report function (with user_id and course_id for admin actions)
+create or replace function report_for_program(pid uuid)
+returns table(
+  user_id uuid,
+  course_id uuid,
+  learner text,
+  email text,
+  course text,
+  start_date date,
+  minutes int,
+  percent numeric,
+  status text,
+  certificate_id text
+) language sql as $$
+  select
+    u.id as user_id,
+    c.id as course_id,
+    concat(up.first_name, ' ', up.last_name) as learner,
+    u.email::text as email,
+    c.title as course,
+    date(e.started_at) as start_date,
+    coalesce(sum(lp.time_spent_seconds)/60, 0)::int as minutes,
+    round(coalesce(e.progress_percent, 0), 1) as percent,
+    e.status,
+    max(cert.serial) as certificate_id
+  from enrollments e
+  join courses c on c.id = e.course_id
+  join auth.users u on u.id = e.user_id
+  left join user_profiles up on up.user_id = u.id
+  left join lesson_progress lp on lp.user_id = e.user_id
+  left join certificates cert on cert.user_id = e.user_id and cert.course_id = e.course_id
+  where e.funding_program_id = pid
+  group by u.id, c.id, up.first_name, up.last_name, u.email, c.title, e.started_at, e.status, e.progress_percent
+  order by e.started_at desc;
+$$;
+
+-- Admin application listing function
+create or replace function admin_list_applications(pcode text)
+returns table(
+  id uuid,
+  program_code text,
+  learner_email text,
+  course_title text,
+  status text,
+  submitted_at timestamptz
+) language sql security definer as $$
+  select
+    fa.id,
+    fp.code as program_code,
+    u.email as learner_email,
+    c.title as course_title,
+    fa.status,
+    fa.submitted_at
+  from funding_applications fa
+  join funding_programs fp on fp.id = fa.program_id
+  left join public.courses c on c.id = fa.course_id
+  join auth.users u on u.id = fa.user_id
+  where (pcode is null or fp.code = pcode)
+  order by fa.submitted_at desc;
+$$;
+
+-- Audit log table
+create table if not exists audit_log(
+  id bigint generated by default as identity primary key,
+  who uuid references auth.users(id),
+  action text not null,
+  subject text,
+  meta jsonb,
+  at timestamptz default now()
+);
+
+-- Vouchers table
+create table if not exists vouchers(
+  code text primary key,
+  program_code text not null,
+  course_id uuid references public.courses(id),
+  max_redemptions int default 1,
+  redeemed_count int default 0,
+  expires_at timestamptz,
+  created_at timestamptz default now()
+);
+
+-- Certificate serial index
+create unique index if not exists idx_cert_serial on certificates(serial);
+
+-- Approval tokens for one-click case manager approval
+create table if not exists approval_tokens(
+  token uuid primary key default gen_random_uuid(),
+  application_id uuid references funding_applications(id) on delete cascade,
+  created_at timestamptz default now(),
+  used_at timestamptz
+);
+
+create index if not exists idx_approval_tokens_app on approval_tokens(application_id);
+
+-- Enrollment events for KPI tracking
+create table if not exists enrollment_events(
+  id bigint generated by default as identity primary key,
+  user_id uuid references auth.users(id),
+  course_id uuid references public.courses(id),
+  funding_program_id uuid references public.funding_programs(id),
+  kind text not null, -- ENROLLED|COMPLETED
+  at timestamptz default now()
+);
+
+create index if not exists idx_enrollment_events_program on enrollment_events(funding_program_id, kind, at);
+
+-- KPI aggregation function (12-week trends)
+create or replace function kpi_weeks_for_program(pid uuid, weeks_back int)
+returns table(week_start date, enrolled int, completed int, minutes int) language sql as $$
+  with weeks as (
+    select generate_series(
+      date_trunc('week', now())::date - (interval '7 days' * (weeks_back - 1)),
+      date_trunc('week', now())::date,
+      interval '7 days'
+    )::date as wk
+  )
+  select
+    w.wk as week_start,
+    coalesce((
+      select count(*)::int
+      from enrollment_events e
+      where e.funding_program_id = pid
+        and e.kind = 'ENROLLED'
+        and date_trunc('week', e.at) = w.wk
+    ), 0) as enrolled,
+    coalesce((
+      select count(*)::int
+      from enrollment_events e
+      where e.funding_program_id = pid
+        and e.kind = 'COMPLETED'
+        and date_trunc('week', e.at) = w.wk
+    ), 0) as completed,
+    coalesce((
+      select sum(lp.time_spent_seconds)::int / 60
+      from enrollments en
+      join lesson_progress lp on lp.user_id = en.user_id
+      where en.funding_program_id = pid
+        and date_trunc('week', en.started_at) = w.wk
+    ), 0) as minutes
+  from weeks w
+  order by w.wk;
+$$;

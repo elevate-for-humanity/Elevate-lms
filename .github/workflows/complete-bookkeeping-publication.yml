@@ -1,0 +1,35 @@
+name: Complete verified Bookkeeping publication
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/complete-bookkeeping-publication.yml', 'scripts/courses/complete-bookkeeping-publication.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: complete-verified-bookkeeping-publication
+  cancel-in-progress: false
+jobs:
+  request:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/complete-bookkeeping-publication.yml/dispatches" -f ref=main
+  complete:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/courses/complete-bookkeeping-publication.test.mjs
+      - name: Resume repaired media, wait for verified core release, and publish the final
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/courses/complete-bookkeeping-publication.mjs

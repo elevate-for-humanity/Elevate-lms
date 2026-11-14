@@ -1,0 +1,128 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
+import { test } from 'node:test';
+
+const source = stripTypeScriptTypes(
+  readFileSync(new URL('../../lib/ultimate-course-builder/core/repair-router.ts', import.meta.url), 'utf8'),
+  { mode: 'transform' },
+).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm, '').replaceAll('export ', '');
+const { isDurableExternalBlocker, routeSelectiveRepairs, requiresIndependentMediaDelivery, COURSE_RECOVERY_CONTRACT_VERSION } =
+  new Function(source + '\nreturn { isDurableExternalBlocker, routeSelectiveRepairs, requiresIndependentMediaDelivery, COURSE_RECOVERY_CONTRACT_VERSION };')();
+
+test('caption coverage repairs both synchronization and dependent encoded film', () => {
+ assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'Media quality gate failed: captions do not cover rendered narration'}]),
+ [{step:'synchronization',codes:['Media quality gate failed'],rebuildOnlyThisStage:true},
+  {step:'lesson_film_render',codes:['Media quality gate failed'],rebuildOnlyThisStage:true}]);
+});
+
+test('unchanged producer output is an internal repair failure, not an external blocker', () => {
+  assert.equal(isDurableExternalBlocker({ code: 'REPAIR_PRODUCER_UNCHANGED' }), false);
+  assert.equal(routeSelectiveRepairs([{ code: 'REPAIR_PRODUCER_UNCHANGED', message: 'unchanged' }]).length, 0);
+});
+
+test('license and authorization evidence remains an external blocker', () => {
+  assert.equal(isDurableExternalBlocker({ code: 'MEDIA_LICENSE_REQUIRED' }), true);
+  assert.equal(isDurableExternalBlocker({ code: 'PAID_INFERENCE_AUTHORIZATION_REQUIRED' }), true);
+});
+
+test('phone-size unreadable text routes to the scene producer', () => {
+  assert.deepEqual(
+    routeSelectiveRepairs([{ code: 'MEDIA_TEXT_UNREADABLE', message: 'MEDIA_TEXT_UNREADABLE:3:390' }]),
+    [{ step: 'scene_construction', codes: ['MEDIA_TEXT_UNREADABLE'], rebuildOnlyThisStage: true }],
+  );
+});
+
+test('failed encoded caption pixels require a changed film producer, not repeated unchanged OCR', () => {
+  for (const width of [390,1280]) {
+    assert.deepEqual(
+      routeSelectiveRepairs([{code:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED',message:'APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED:scene:seg-check:'+width}]),
+      [{step:'lesson_film_render',codes:['APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED'],rebuildOnlyThisStage:true}],
+    );
+  }
+});
+
+
+test('picture mismatch from render routes to its storyboard cue producer', () => {
+ const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:PICTURE_CUE_NOT_ALIGNED_TO_SPEECH'}];
+ assert.deepEqual(routeSelectiveRepairs(findings),[{step:'storyboard',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+});
+
+test('repeated encoded timeline and insufficient shots repair upstream visual assignment', () => {
+ const findings=[{code:'Media quality gate failed',message:'insufficient visual changes: detected 6, expected at least 12; rendered video repeats 8 earlier moving sequences'}];
+ assert.equal(routeSelectiveRepairs(findings)[0].step,'visual_assignment');
+});
+
+test('ffmpeg assembly failures stay at render stage', () => {
+ const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'FFmpeg output missing'}];
+ assert.equal(routeSelectiveRepairs(findings)[0].step,'lesson_film_render');
+});
+test('silent or inaudible approved recordings return to the narration producer',()=>{
+ for(const code of ['PREMIUM_NARRATION_SILENT_GAP','PREMIUM_NARRATION_INAUDIBLE','PREMIUM_NARRATION_MISSING'])
+  assert.deepEqual(routeSelectiveRepairs([{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:'+code}]),[{step:'natural_narration',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+});
+
+
+test('combined freeze and backward replay repair both media assembly and visuals', () => {
+ const findings=[{code:'Media quality gate failed',message:'Media quality gate failed: frozen interval 5.40s exceeds 4s; rendered video repeats 6 earlier moving sequence(s), indicating a backward timeline jump or replay'}];
+ assert.deepEqual(routeSelectiveRepairs(findings),[
+  {step:'visual_assignment',codes:['Media quality gate failed'],rebuildOnlyThisStage:true},
+  {step:'lesson_film_render',codes:['Media quality gate failed'],rebuildOnlyThisStage:true},
+ ]);
+});
+
+test('freeze-only routes to render while replay-only routes to visual assignment', () => {
+ assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'frozen interval 5.4s'}]).map(x=>x.step),['lesson_film_render']);
+ assert.deepEqual(routeSelectiveRepairs([{code:'Media quality gate failed',message:'repeats 6 earlier moving sequence(s)'}]).map(x=>x.step),['visual_assignment']);
+});
+
+test('storage capacity failures are operational blockers and never trigger unchanged rerenders', () => {
+ const finding={code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:Cannot upload files, storage cap exceeded. See the Caps & Alerts page to increase your cap.'};
+ assert.equal(isDurableExternalBlocker(finding),true);
+ assert.deepEqual(routeSelectiveRepairs([finding]),[]);
+ assert.equal(isDurableExternalBlocker({code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}),false);
+});
+
+test('recovery v2 classifies VTT storage failure as delivery-only, never rerender', () => {
+  assert.equal(COURSE_RECOVERY_CONTRACT_VERSION, 'course-recovery-v2');
+  const failedVtt = {code:'ULTIMATE_VIDEO_RENDER_FAILED', message:'ULTIMATE_VIDEO_RENDER_FAILED:COURSE_OBJECT_STORAGE_UPLOAD_FAILED:lesson-3.vtt'};
+  assert.equal(requiresIndependentMediaDelivery(failedVtt), true);
+  assert.equal(isDurableExternalBlocker(failedVtt), true);
+  assert.deepEqual(routeSelectiveRepairs([failedVtt]), []);
+  assert.equal(requiresIndependentMediaDelivery({code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}), false);
+});
+test('per-scene ASR mismatch reinspects existing encoded audio without restarting a deterministic timeline',()=>{
+ assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_SCENE_NARRATION_MISMATCH',message:'MEDIA_SCENE_NARRATION_MISMATCH:scene:0.734'}]),[{step:'finished_media_qa',codes:['MEDIA_SCENE_NARRATION_MISMATCH'],rebuildOnlyThisStage:true}]);
+});
+
+test('stale approved speech repairs narration before attempting another render',()=>{
+ for(const code of ['ULTIMATE_VIDEO_RENDER_FAILED','ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED']){
+  assert.deepEqual(routeSelectiveRepairs([{code,message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED'}]),[{step:'natural_narration',codes:[code],rebuildOnlyThisStage:true}]);
+ }
+});
+
+
+test('nested render asset failure repairs the saved visual assignment, not the film', () => {
+ const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:scene-2'}];
+ assert.deepEqual(routeSelectiveRepairs(findings),[{step:'visual_assignment',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true}]);
+});
+
+test('all course builds inherit repeated resolved visual repair instead of unchanged rendering retries', () => {
+ for (const detail of ['MEDIA_RESOLVED_VISUALS_REPEATED:9:13', 'MEDIA_RESOLVED_VISUALS_MISSING:3,7']) {
+  const findings=[{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ULTIMATE_VIDEO_RENDER_FAILED:'+detail}];
+  assert.deepEqual(routeSelectiveRepairs(findings),[
+   {step:'visual_assignment',codes:['ULTIMATE_VIDEO_RENDER_FAILED'],rebuildOnlyThisStage:true},
+  ]);
+ }
+ assert.deepEqual(routeSelectiveRepairs([{code:'ULTIMATE_VIDEO_RENDER_FAILED',message:'ffmpeg failed'}]).map(x=>x.step),['lesson_film_render']);
+ assert.deepEqual(routeSelectiveRepairs([{code:'MEDIA_LICENSE_REQUIRED',message:'license unavailable'}]),[]);
+});
+
+test('repeated resolved photos retry the render when visual assignments only reserve scenes', () => {
+  const finding = {step:'lesson_film_render',code:'ULTIMATE_VIDEO_RENDER_FAILED',
+    message:'ULTIMATE_VIDEO_RENDER_FAILED:MEDIA_RESOLVED_VISUALS_REPEATED:9:13'};
+  const deferred = {media:{assignments:[{assignmentMethod:'instructional-visual-request'}]}};
+  assert.equal(routeSelectiveRepairs([finding],deferred)[0].step,'lesson_film_render');
+  assert.equal(routeSelectiveRepairs([finding],{media:{assignments:[{assignmentMethod:'licensed'}]}})[0].step,'visual_assignment');
+  assert.equal(routeSelectiveRepairs([{...finding,message:'MEDIA_RESOLVED_VISUALS_MISSING:2'}],deferred)[0].step,'visual_assignment');
+});

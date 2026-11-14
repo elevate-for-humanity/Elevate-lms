@@ -1,0 +1,61 @@
+name: Prepare isolated Studio HTTPS endpoint
+on:
+  pull_request:
+    paths: ['scripts/gcp/prepare-studio-https*', '.github/workflows/prepare-studio-https.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/prepare-studio-https*', '.github/workflows/prepare-studio-https.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node --test scripts/gcp/prepare-studio-https.test.mjs
+  dispatch:
+    if: github.event_name == 'push'
+    needs: test
+    permissions: {actions: write}
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/prepare-studio-https.yml/dispatches" -f ref=main
+  prepare:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: test
+    permissions: {contents: read, id-token: write}
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 25
+    concurrency: {group: google-studio-browser, cancel-in-progress: false}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Prepare browser routing with the previously verified image
+        timeout-minutes: 20
+        run: node scripts/gcp/prepare-studio-https.mjs
+      - name: Remove temporary SSH access and stop any unfinished trial
+        if: always()
+        run: node scripts/gcp/prepare-studio-https.mjs --cleanup
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: studio-https-readiness-${{ github.run_id }}
+          path: reports/studio-public/readiness.json
+          if-no-files-found: warn
+          retention-days: 7

@@ -1,0 +1,61 @@
+name: Verify private Backblaze caption delivery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-private-b2-caption-production.yml']
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Use approved existing Cloud Run job environment without logging secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          CONFIG="$RUNNER_TEMP/private-course-b2-probe.json"
+          JOB="$RUNNER_TEMP/private-course-job.json"
+          trap 'rm -f "$CONFIG" "$JOB"' EXIT
+          gcloud run jobs describe elevate-course-builder --project=elegant-racer-299721 --region=us-central1 --format=json > "$JOB"
+          node --input-type=module - "$JOB" "$CONFIG" <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const job=JSON.parse(readFileSync(process.argv[2],'utf8'));
+          const containers=job.spec?.template?.spec?.template?.spec?.containers;
+          if(containers?.length!==1)throw Error('B2_PROBE_UNEXPECTED_WORKER');
+          const env=containers[0].env??[];
+          const expected=['ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_REGION','ELEVATE_MEDIA_BUCKET',
+            'ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY'];
+          const vars={};
+          for(const name of expected){
+            const entry=env.find(x=>x.name===name);
+            if(!entry || typeof entry.value!=='string' || !entry.value)throw Error('B2_PROBE_RUNTIME_VALUE_UNAVAILABLE:'+name);
+            vars[name]=entry.value;
+          }
+          if(vars.ELEVATE_MEDIA_BUCKET!=='elevate-course-media')throw Error('B2_PROBE_WRONG_BUCKET');
+          const image=containers[0].image;
+          const registry='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker';
+          if(!image.startsWith(registry+'@sha256:')&&!image.startsWith(registry+':'))throw Error('B2_PROBE_UNTRUSTED_IMAGE');
+          writeFileSync(process.argv[3],JSON.stringify(vars),{mode:0o600});
+          process.stdout.write('B2_PROBE_CONFIG_VALIDATED\n');
+          NODE
+          IMAGE="$(gcloud run jobs describe elevate-course-builder --project=elegant-racer-299721 --region=us-central1 --format='value(spec.template.spec.template.spec.containers[0].image)')"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker pull "$IMAGE" >/dev/null
+          docker run --rm -i --entrypoint node -e COURSE_B2_CONFIG_STDIN=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" /app/scripts/gcp/verify-private-b2-caption.mjs < "$CONFIG"

@@ -1,0 +1,41 @@
+import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import WebhookHealthDashboard from './WebhookHealthDashboard';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  robots: { index: false },
+  title: 'Webhook Health | Elevate For Humanity',
+  description: 'Monitor webhook ingestion health across all providers.',
+  alternates: {
+    canonical: 'https://admin.elevateforhumanity.org/system/webhooks',
+  },
+};
+
+export default async function WebhookHealthPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+
+  // Guard against null user
+  if (!user) redirect('/login');
+  const adminDb = await requireAdminClient();
+  if (adminDb) {
+    const { data: profile } = await adminDb
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (!profile || !['admin'].includes(profile.role)) {
+      redirect('/');
+    }
+  }
+
+  return <WebhookHealthDashboard />;
+}

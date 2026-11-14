@@ -1,0 +1,1 @@
+{"id":"/videos/homepage-hero-script-full.txt","path":"/videos/homepage-hero-script-full.txt","sha":"43670dba69d25246e7bf2464e5b4a6f85363a7e5","mime_type":"text/plain","size":5810,"site_id":"0a9378d2-a1d1-4062-9e9a-7be3105044df","deploy_id":"69df0487a1f5810008a809b3"}

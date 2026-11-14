@@ -1,0 +1,6 @@
+=== Elevate LMS — Env Var Audit ===
+Referenced in code: 266
+Documented in .env.example: 435
+Undocumented (in code, not in .env.example): 0
+
+All env vars are documented.

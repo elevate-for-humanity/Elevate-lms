@@ -1,0 +1,27 @@
+name: AI GEO Claim Integrity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/marketing/**'
+      - 'components/**'
+      - 'lib/programs/**'
+      - 'data/programs/**'
+      - 'scripts/audit-geo-claims.mjs'
+      - '.github/workflows/geo-claim-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  geo-claim-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit public AI/GEO claims
+        run: node scripts/audit-geo-claims.mjs

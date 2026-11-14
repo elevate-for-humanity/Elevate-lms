@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<lom xmlns="http://ltsc.ieee.org/xsd/LOM"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://ltsc.ieee.org/xsd/LOM lomLoose.xsd">
+    <general>
+        <title><string language="en-US">0-JRI- Introduction to Job Ready Indy (JRI)</string></title>
+        <language>en-US</language>
+        <description>
+            <string language="en-US">This is a Content Controller Dispatch package which targets the course 0-JRI- Introduction to Job Ready Indy (JRI)</string>
+        </description>
+    </general>
+</lom>

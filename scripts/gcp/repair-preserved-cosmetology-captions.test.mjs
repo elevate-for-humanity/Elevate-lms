@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {measuredCaptions,toSrt} from './repair-preserved-cosmetology-captions.mjs';
+test('caption groups preserve every recognized word and exact measured boundaries in reading order',()=>{const words=Array.from({length:9},(_,i)=>({word:'word'+i,start:i*.3,end:i*.3+.2}));const cues=measuredCaptions(words,4);assert.equal(cues.map(c=>c.text).join(' '),words.map(w=>w.word).join(' '));assert.equal(cues[0].start,0);assert.equal(cues.at(-1).end,2.6);assert.match(toSrt(cues),/00:00:00,000 --> 00:00:01,700/);});
+test('invalid or invented word times and caption markup are rejected',()=>{for(const w of [{word:'x',start:1,end:.5},{word:'x',start:-1,end:1},{word:'x',start:1,end:99},{word:'<tag>',start:1,end:2}])assert.throws(()=>measuredCaptions([w],4));assert.throws(()=>measuredCaptions([],4));});
+
+test('measured overlaps cannot become stacked captions in reversed reading order',()=>{const words=Array.from({length:7},(_,i)=>({word:'word'+i,start:i*.3,end:i*.3+.4}));assert.throws(()=>measuredCaptions(words,4),/OVERLAPPING_CAPTION_MEASUREMENTS/);});

@@ -1,0 +1,403 @@
+/**
+ * AUTHORITATIVE CERTIFICATE ISSUANCE SERVICE
+ *
+ * Single source of truth for Elevate-issued completion certificates.
+ * This service is intentionally limited to durable credential creation and
+ * learner notification. It never decides whether a program enrollment is
+ * complete; program completion is owned by lib/lms/completion-evaluator.ts.
+ */
+
+import { createHash, randomUUID } from 'node:crypto';
+import type { SupabaseClient } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export interface CompetencyEvidence {
+  quizScores?: Record<string, number>;
+  seatTimeHours?: number;
+  seatTimeSeconds?: number;
+  examSessionId?: string | null;
+  examProvider?: string | null;
+  examResult?: string | null;
+  examScore?: number | null;
+  examProctorId?: string | null;
+  examDate?: string | null;
+  completionVerifiedAt?: string;
+  completionMethod?: string;
+}
+
+export interface IssueCertificateParams {
+  supabase: SupabaseClient;
+  enrollmentId: string;
+  studentId: string;
+  courseId?: string;
+  programId?: string;
+  studentName: string;
+  studentEmail?: string;
+  courseTitle?: string;
+  programName?: string;
+  programHours?: number | null;
+  competencyEvidence?: CompetencyEvidence;
+  templateId?: string | null;
+  signedBy?: string | null;
+  issuedBy?: string | null;
+  issueDate?: string | null;
+  expiresAt?: string | null;
+  metadata?: Record<string, unknown>;
+  credentialStack?: Record<string, unknown> | null;
+  issuanceSnapshot?: Record<string, unknown> | null;
+  tenantId?: string | null;
+}
+
+export interface IssuedCertificateSummary {
+  id: string;
+  certificate_number: string;
+  student_name: string;
+  program_name: string;
+  completion_date: string;
+  issued_at: string;
+  verification_url: string;
+  url: string;
+}
+
+export interface IssueCertificateResult {
+  success: boolean;
+  alreadyIssued: boolean;
+  certificate?: IssuedCertificateSummary;
+  error?: string;
+}
+
+async function findExistingCertificate(
+  supabase: SupabaseClient,
+  params: Pick<IssueCertificateParams, 'enrollmentId' | 'studentId' | 'courseId' | 'programId'>,
+) {
+  const { enrollmentId, studentId, courseId, programId } = params;
+
+  if (courseId) {
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .or(`student_id.eq.${studentId},user_id.eq.${studentId}`)
+      .eq('course_id', courseId)
+      .is('revoked_at', null)
+      .order('issued_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  if (programId) {
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .or(`student_id.eq.${studentId},user_id.eq.${studentId}`)
+      .eq('program_id', programId)
+      .is('course_id', null)
+      .is('revoked_at', null)
+      .order('issued_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  const { data, error } = await supabase
+    .from('certificates')
+    .select('*')
+    .eq('enrollment_id', enrollmentId)
+    .is('revoked_at', null)
+    .order('issued_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+async function resolveTenantId(
+  supabase: SupabaseClient,
+  enrollmentId: string,
+  studentId: string,
+  programId?: string,
+): Promise<string | null> {
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('tenant_id')
+    .eq('id', enrollmentId)
+    .maybeSingle();
+  if (enrollment?.tenant_id) return enrollment.tenant_id;
+
+  if (programId) {
+    const { data: program } = await supabase
+      .from('programs')
+      .select('tenant_id')
+      .eq('id', programId)
+      .maybeSingle();
+    if (program?.tenant_id) return program.tenant_id;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('tenant_id')
+    .eq('id', studentId)
+    .maybeSingle();
+  return profile?.tenant_id || null;
+}
+
+function normalizeIssueDate(value?: string | null): string {
+  if (!value) return new Date().toISOString();
+  const parsed = new Date(value.length === 10 ? `${value}T12:00:00.000Z` : value);
+  return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+}
+
+function normalizeOptionalDate(value?: string | null): string | null {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, nested]) => [key, canonicalize(nested)]),
+    );
+  }
+  return value;
+}
+
+function withSnapshotHash(snapshot?: Record<string, unknown> | null) {
+  if (!snapshot) return null;
+  const normalized = canonicalize(snapshot) as Record<string, unknown>;
+  const hash = createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+  return { ...snapshot, snapshot_hash: hash };
+}
+
+export async function issueCertificate(
+  params: IssueCertificateParams,
+): Promise<IssueCertificateResult> {
+  const {
+    supabase,
+    enrollmentId,
+    studentId,
+    courseId,
+    programId,
+    studentName,
+    studentEmail,
+    courseTitle,
+    programName,
+    programHours,
+    competencyEvidence,
+    templateId,
+    signedBy,
+    issuedBy,
+    issueDate,
+    expiresAt,
+    metadata,
+    credentialStack,
+    issuanceSnapshot,
+    tenantId,
+  } = params;
+
+  if (Boolean(courseId) === Boolean(programId)) {
+    return {
+      success: false,
+      alreadyIssued: false,
+      error: 'Certificate issuance requires exactly one scope: courseId or programId',
+    };
+  }
+
+  try {
+    const existingCert = await findExistingCertificate(supabase, {
+      enrollmentId,
+      studentId,
+      courseId,
+      programId,
+    });
+
+    if (existingCert) {
+      const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/certificates/${existingCert.id}`;
+      const issuedAt = existingCert.issued_at || existingCert.metadata?.completion_date || '';
+      const verificationUrl =
+        existingCert.verification_url ||
+        `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/verify/${String(existingCert.verification_code || '').toLowerCase()}`;
+      return {
+        success: true,
+        alreadyIssued: true,
+        certificate: {
+          id: existingCert.id,
+          certificate_number: existingCert.certificate_number,
+          student_name: existingCert.student_name || existingCert.metadata?.student_name || studentName,
+          program_name:
+            existingCert.program_name ||
+            existingCert.course_title ||
+            existingCert.metadata?.course_name ||
+            programName ||
+            courseTitle ||
+            'Completion',
+          completion_date: issuedAt,
+          issued_at: issuedAt,
+          verification_url: verificationUrl,
+          url: certificateUrl,
+        },
+      };
+    }
+
+    const resolvedTenantId = tenantId || (await resolveTenantId(supabase, enrollmentId, studentId, programId));
+    if (!resolvedTenantId) {
+      return {
+        success: false,
+        alreadyIssued: false,
+        error: 'Certificate tenant context could not be resolved',
+      };
+    }
+
+    const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    const completionDate = normalizeIssueDate(issueDate);
+    const verificationCode = certificateNumber.split('-').pop() || certificateNumber;
+    const displayName = programName || courseTitle || 'Completion';
+
+    const certMetadata: Record<string, unknown> = {
+      ...(metadata || {}),
+      issued_via: 'canonical_issue_certificate',
+      scope: programId ? 'program' : 'course',
+      student_name: studentName,
+      completion_date: completionDate,
+      completion_method: competencyEvidence?.completionMethod || 'verified_completion',
+    };
+
+    if (competencyEvidence?.quizScores && Object.keys(competencyEvidence.quizScores).length > 0) {
+      certMetadata.quiz_scores = competencyEvidence.quizScores;
+    }
+    if (competencyEvidence?.seatTimeHours != null) {
+      certMetadata.seat_time_hours = competencyEvidence.seatTimeHours;
+      certMetadata.seat_time_seconds = competencyEvidence.seatTimeSeconds;
+    }
+    if (competencyEvidence?.examSessionId) {
+      certMetadata.exam_session_id = competencyEvidence.examSessionId;
+      certMetadata.exam_provider = competencyEvidence.examProvider;
+      certMetadata.exam_result = competencyEvidence.examResult;
+      certMetadata.exam_score = competencyEvidence.examScore;
+      certMetadata.exam_proctor_id = competencyEvidence.examProctorId;
+      certMetadata.exam_date = competencyEvidence.examDate;
+    }
+    if (competencyEvidence?.completionVerifiedAt) {
+      certMetadata.completion_verified_at = competencyEvidence.completionVerifiedAt;
+    }
+
+    const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/verify/${verificationCode.toLowerCase()}`;
+    const { data: certificate, error: certError } = await supabase
+      .from('certificates')
+      .insert({
+        tenant_id: resolvedTenantId,
+        user_id: studentId,
+        student_id: studentId,
+        student_name: studentName,
+        student_email: studentEmail || null,
+        course_id: courseId || null,
+        program_id: programId || null,
+        enrollment_id: enrollmentId,
+        certificate_number: certificateNumber,
+        serial: certificateNumber,
+        course_title: courseTitle || null,
+        program_name: programName || null,
+        title: displayName,
+        certificate_type: programId ? 'PROGRAM_COMPLETION' : 'COURSE_COMPLETION',
+        status: 'active',
+        issued_date: completionDate.split('T')[0],
+        completion_date: completionDate.split('T')[0],
+        hours_completed: competencyEvidence?.seatTimeHours ?? programHours ?? null,
+        issued_at: completionDate,
+        expires_at: normalizeOptionalDate(expiresAt),
+        exam_session_id: competencyEvidence?.examSessionId || null,
+        verification_code: verificationCode,
+        verification_url: verificationUrl,
+        metadata: certMetadata,
+        credential_stack: credentialStack || null,
+        issuance_snapshot: withSnapshotHash(issuanceSnapshot),
+        template_id: templateId || null,
+        signed_by: signedBy || PLATFORM_DEFAULTS.orgName,
+        issued_by: issuedBy || null,
+      })
+      .select()
+      .single();
+
+    if (certError || !certificate) {
+      const raced = await findExistingCertificate(supabase, {
+        enrollmentId,
+        studentId,
+        courseId,
+        programId,
+      });
+      if (raced) {
+        const racedUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/certificates/${raced.id}`;
+        return {
+          success: true,
+          alreadyIssued: true,
+          certificate: {
+            id: raced.id,
+            certificate_number: raced.certificate_number,
+            student_name: raced.student_name || studentName,
+            program_name: raced.program_name || raced.course_title || displayName,
+            completion_date: raced.issued_at || completionDate,
+            issued_at: raced.issued_at || completionDate,
+            verification_url: raced.verification_url || verificationUrl,
+            url: racedUrl,
+          },
+        };
+      }
+      logger.error('Failed to create certificate', certError as Error);
+      return { success: false, alreadyIssued: false, error: 'Failed to create certificate record' };
+    }
+
+    const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/certificates/${certificate.id}`;
+
+    if (studentEmail) {
+      try {
+        const { emailService } = await import('@/lib/notifications/email');
+        await emailService.sendCertificateNotification(
+          studentEmail,
+          studentName,
+          displayName,
+          certificateUrl,
+        );
+      } catch (emailError) {
+        logger.error('Certificate email failed', emailError as Error, { certificateId: certificate.id });
+      }
+    }
+
+    try {
+      await supabase.from('notifications').insert({
+        user_id: studentId,
+        type: 'achievement',
+        title: 'Certificate Issued!',
+        message: `Congratulations! Your certificate for ${displayName} is ready.`,
+        action_url: certificateUrl,
+      });
+    } catch (notificationError) {
+      logger.error('Certificate notification failed', notificationError as Error, {
+        certificateId: certificate.id,
+      });
+    }
+
+    return {
+      success: true,
+      alreadyIssued: false,
+      certificate: {
+        id: certificate.id,
+        certificate_number: certificateNumber,
+        student_name: studentName,
+        program_name: displayName,
+        completion_date: completionDate,
+        issued_at: completionDate,
+        verification_url: verificationUrl,
+        url: certificateUrl,
+      },
+    };
+  } catch (error) {
+    logger.error('Certificate issuance error', error as Error, { enrollmentId, courseId, programId });
+    return { success: false, alreadyIssued: false, error: 'Operation failed' };
+  }
+}

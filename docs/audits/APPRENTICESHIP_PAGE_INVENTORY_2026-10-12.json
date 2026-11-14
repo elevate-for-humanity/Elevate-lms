@@ -1,0 +1,459 @@
+[
+  {
+    "route": "/barber-apprenticeship",
+    "file": "apps/marketing/app/barber-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/barber-and-beauty-apprenticeships",
+    "file": "apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [
+      "/images/partners/kountry-kutz/interior-active-enhanced-2026.webp",
+      "/images/partners/salon-saloon/team-interior-enhanced-2026.webp",
+      "/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp",
+      "/images/pexels/esthetician.webp",
+      "/images/pexels/nail-tech.webp"
+    ],
+    "literal_links": [
+      "/apprenticeships",
+      "/barber-beauty-network",
+      "/partners/host-shops",
+      "/programs/barber-apprenticeship/apply"
+    ]
+  },
+  {
+    "route": "/apprenticeship-sponsor",
+    "file": "apps/marketing/app/apprenticeship-sponsor/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [
+      "/images/pages/apprenticeship-sponsor-page-1.webp"
+    ],
+    "literal_links": [
+      "/contact",
+      "/legal/governance",
+      "/partners/host-shop/apply",
+      "/partners/host-shops",
+      "/programs/barber-apprenticeship"
+    ]
+  },
+  {
+    "route": "/apprenticeships",
+    "file": "apps/marketing/app/apprenticeships/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [
+      "/images/pages/apprenticeship-sponsor-page-1.webp",
+      "/images/pages/apprenticeships-hero.webp",
+      "/images/pexels/barber-hero.webp",
+      "/images/pexels/cosmetology.webp",
+      "/images/pexels/esthetician.webp",
+      "/images/pexels/nail-tech.webp"
+    ],
+    "literal_links": [
+      "/apply/student",
+      "/partners/host-shops",
+      "/programs"
+    ]
+  },
+  {
+    "route": "/nail-technician-apprenticeship",
+    "file": "apps/marketing/app/nail-technician-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/cosmetology-apprenticeship",
+    "file": "apps/marketing/app/cosmetology-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/apprenticeship-programs",
+    "file": "apps/marketing/app/apprenticeship-programs/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/compliance/apprenticeship-structure",
+    "file": "apps/marketing/app/compliance/apprenticeship-structure/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [
+      "/images/pages/apprenticeship-structure.webp"
+    ],
+    "literal_links": [
+      "/apply/student",
+      "/apprenticeships",
+      "/partners/host-shop/apply"
+    ]
+  },
+  {
+    "route": "/compliance/competency-verification/cosmetology/apprenticeship-agreement",
+    "file": "apps/marketing/app/compliance/competency-verification/cosmetology/apprenticeship-agreement/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": [
+      "/compliance/competency-verification/cosmetology"
+    ]
+  },
+  {
+    "route": "/compliance/competency-verification/barber/apprenticeship-agreement",
+    "file": "apps/marketing/app/compliance/competency-verification/barber/apprenticeship-agreement/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": [
+      "/compliance/competency-verification/barber",
+      "/compliance/competency-verification/barber/final-signoff",
+      "/compliance/competency-verification/barber/monthly-ojt-evaluation",
+      "/compliance/competency-verification/barber/scoring-sheet"
+    ]
+  },
+  {
+    "route": "/programs/esthetician-apprenticeship",
+    "file": "apps/marketing/app/programs/esthetician-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": [
+      "/partners/host-shop/apply?program=esthetician"
+    ]
+  },
+  {
+    "route": "/programs/barber-apprenticeship",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [
+      "/images/pages/barber-fade.webp",
+      "/images/pages/barber-hands-on-bright.webp",
+      "/images/pages/barber-hero-main.webp",
+      "/images/partners/kountry-kutz-official.webp"
+    ],
+    "literal_links": [
+      "#host-shops",
+      "/partners/host-shops",
+      "/programs/barber-apprenticeship/payment-setup",
+      "/programs/barber-apprenticeship/payment/bnpl"
+    ]
+  },
+  {
+    "route": "/programs/nail-technician-apprenticeship",
+    "file": "apps/marketing/app/programs/nail-technician-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": [
+      "/partners/host-shop/apply?program=nail"
+    ]
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/esthetician-apprenticeship/apply",
+    "file": "apps/marketing/app/programs/esthetician-apprenticeship/apply/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/esthetician-apprenticeship/eligibility",
+    "file": "apps/marketing/app/programs/esthetician-apprenticeship/eligibility/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": [
+      "mailto:elevate4humanityedu@gmail.com"
+    ]
+  },
+  {
+    "route": "/programs/esthetician-apprenticeship/documents",
+    "file": "apps/marketing/app/programs/esthetician-apprenticeship/documents/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/esthetician-apprenticeship/orientation",
+    "file": "apps/marketing/app/programs/esthetician-apprenticeship/orientation/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/esthetician-apprenticeship/enrollment-success",
+    "file": "apps/marketing/app/programs/esthetician-apprenticeship/enrollment-success/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/apply",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/apply/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [
+      "/images/pages/barber-apprentice-learning.webp",
+      "/images/pages/barber-fade.webp",
+      "/images/pages/barber-shop-interior.webp"
+    ],
+    "literal_links": [
+      "/apply/student/interview?program=barber-apprenticeship&intent=enrollment",
+      "/partners/host-shop/apply?program=barber",
+      "/programs/barber-apprenticeship",
+      "/programs/barber-apprenticeship/request-info"
+    ]
+  },
+  {
+    "route": "/programs/barber-apprenticeship/eligibility",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/eligibility/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": [
+      "mailto:elevate4humanityedu@gmail.com"
+    ]
+  },
+  {
+    "route": "/programs/barber-apprenticeship/payment-setup",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/payment-setup/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/documents",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/documents/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/orientation",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/orientation/page.tsx",
+    "redirect": true,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/confirm",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/confirm/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": [
+      "/",
+      "/programs/barber-apprenticeship",
+      "mailto:info@elevateforhumanity.org"
+    ]
+  },
+  {
+    "route": "/programs/barber-apprenticeship/enrollment-success",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/enrollment-success/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/host-shops",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/host-shops/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/apply/success",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/apply/success/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/apply/apprentice",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/apply/apprentice/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/payment/bnpl",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/payment/bnpl/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/barber-apprenticeship/payment-setup/confirm",
+    "file": "apps/marketing/app/programs/barber-apprenticeship/payment-setup/confirm/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/nail-technician-apprenticeship/apply",
+    "file": "apps/marketing/app/programs/nail-technician-apprenticeship/apply/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/apply",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/apply/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/eligibility",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/eligibility/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": [
+      "/contact"
+    ]
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/payment-setup",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/payment-setup/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": [
+      "/programs/cosmetology-apprenticeship"
+    ]
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/orientation",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/orientation/page.tsx",
+    "redirect": true,
+    "auth": true,
+    "literal_images": [
+      "/images/pages/cosmetology-apprenticeship-hero.webp"
+    ],
+    "literal_links": [
+      "/apply/success",
+      "/programs/cosmetology-apprenticeship/orientation#documents",
+      "/store/licenses"
+    ]
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/enrollment-success",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/apply/success",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/apply/success/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/apply/apprentice",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/apply/apprentice/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/payment/bnpl",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/payment/bnpl/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/programs/cosmetology-apprenticeship/payment-setup/confirm",
+    "file": "apps/marketing/app/programs/cosmetology-apprenticeship/payment-setup/confirm/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/apprenticeships/host-shop",
+    "file": "apps/marketing/app/apprenticeships/host-shop/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/partners/barbershop-apprenticeship",
+    "file": "apps/marketing/app/partners/barbershop-apprenticeship/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/partners/esthetician-apprenticeship/apply",
+    "file": "apps/marketing/app/partners/esthetician-apprenticeship/apply/page.tsx",
+    "redirect": false,
+    "auth": true,
+    "literal_images": [],
+    "literal_links": [
+      "/apply"
+    ]
+  },
+  {
+    "route": "/partners/barbershop-apprenticeship/apply",
+    "file": "apps/marketing/app/partners/barbershop-apprenticeship/apply/page.tsx",
+    "redirect": true,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": []
+  },
+  {
+    "route": "/partners/nail-technician-apprenticeship/apply",
+    "file": "apps/marketing/app/partners/nail-technician-apprenticeship/apply/page.tsx",
+    "redirect": false,
+    "auth": false,
+    "literal_images": [],
+    "literal_links": [
+      "/apply",
+      "tel:+13179999620"
+    ]
+  }
+]

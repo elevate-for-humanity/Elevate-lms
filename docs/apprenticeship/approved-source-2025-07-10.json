@@ -1,0 +1,43 @@
+{
+  "source": {
+    "filename": "2Exclusive LLC Rev Stds Cover Page Complete 071020245 Approved.pdf",
+    "sha256": "66fb85fb01aa92fae959e32840f48319ac1b4f59853962b66b887b3968497c34",
+    "gmailMessageId": "19857620e2ca201c",
+    "approvalDate": "2025-07-10",
+    "registrationNumber": "2025-IN-132301",
+    "retrievedOn": "2026-10-31"
+  },
+  "occupations": {
+    "barber": {
+      "rapidsCode": "0030CB",
+      "competencyCount": 14,
+      "rtiHours": 260,
+      "pdfPages": [
+        3,
+        7
+      ],
+      "rtiProvider": "Elevate for Humanity Career and Technical Institute"
+    },
+    "esthetician": {
+      "rapidsCode": "2089CB",
+      "competencyCount": 20,
+      "rtiHours": 300,
+      "pdfPages": [
+        9,
+        13
+      ],
+      "rtiProvider": "Elevate for Humanity Career and Technical Institute"
+    },
+    "manicurist": {
+      "rapidsCode": "2090CB",
+      "competencyCount": 19,
+      "rtiHours": 210,
+      "pdfPages": [
+        15,
+        20
+      ],
+      "rtiProvider": "Grace Beauty College"
+    }
+  },
+  "scope": "Verified signed July 10 revision for these three occupations only; not evidence of a Hair Stylist approval or a later provider amendment."
+}

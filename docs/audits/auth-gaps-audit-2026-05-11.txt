@@ -1,0 +1,13 @@
+=== Elevate LMS — Auth Gap Audit ===
+
+--- REEXPORT: routes that re-export from another file (verify target has auth) ---
+  REEXPORT_CHECK: app/api/competency/verify-rep/route.ts → @/app/api/supervisor/verify-rep/route
+
+--- NO_AUTH: routes with no auth check ---
+  NO_AUTH: app/api/intake/application/route.ts
+
+--- ROLE_BLIND: admin/* routes that check identity but not role ---
+
+--- LEAKS_ERROR: routes returning error.message or error.toString() in response body ---
+
+=== Done ===

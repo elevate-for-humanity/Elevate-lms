@@ -1,0 +1,23 @@
+name: Audit public website entry and apprenticeship facts
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-public-entry.yml'
+      - 'scripts/gcp/verify-public-entry.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify public redirects, program facts and approved salon profile
+        run: node scripts/gcp/verify-public-entry.mjs

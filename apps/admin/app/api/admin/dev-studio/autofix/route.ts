@@ -1,0 +1,259 @@
+/**
+ * /api/admin/dev-studio/autofix
+ *
+ * Phase 3 auto-fix playbooks. Invoked by the stabilize orchestrator when it
+ * detects known failure patterns, or called directly from DevStudio UI.
+ *
+ * Supported playbooks:
+ *   auth-gap          — adds apiAuthGuard to unprotected API routes
+ *   env-gap           — checks whether Northflank environment sync is configured
+ *   devcontainer-readonly — rotates/sets GITHUB_TOKEN + switches mode to github-only
+ *   stale-image       — triggers Northflank builds for the LMS/Admin services
+ *   northflank-env    — reports Northflank env sync status
+ *
+ * POST body: { playbook: string; dryRun?: boolean; options?: Record<string, unknown> }
+ * Response:  { ok, playbook, dryRun, actions: ActionResult[], summary, timestamp }
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { spawn } from 'child_process';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+type ActionResult = {
+  action: string;
+  status: 'ok' | 'skipped' | 'error';
+  detail: string;
+};
+
+type PlaybookResult = {
+  ok: boolean;
+  playbook: string;
+  dryRun: boolean;
+  actions: ActionResult[];
+  summary: string;
+  timestamp: string;
+};
+
+type AutofixRequest = {
+  playbook: string;
+  dryRun?: boolean;
+  options?: Record<string, unknown>;
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function sh(cmd: string): Promise<{ code: number; out: string; err: string }> {
+  return new Promise((resolve) => {
+    const child = spawn(cmd, { shell: true, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let out = ''; let err = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (err += d));
+    child.on('close', (code) => resolve({ code: code ?? 1, out: out.trim(), err: err.trim() }));
+    child.on('error', (e) => resolve({ code: 1, out: '', err: String(e) }));
+  });
+}
+
+function ok(action: string, detail: string): ActionResult {
+  return { action, status: 'ok', detail };
+}
+function skipped(action: string, detail: string): ActionResult {
+  return { action, status: 'skipped', detail };
+}
+function error(action: string, detail: string): ActionResult {
+  return { action, status: 'error', detail };
+}
+
+// ── Playbooks ─────────────────────────────────────────────────────────────────
+
+/**
+ * auth-gap: scan API routes missing auth guards and report them.
+ * In non-dry-run mode, adds a TODO comment so they're easy to find.
+ */
+async function playbookAuthGap(dryRun: boolean): Promise<ActionResult[]> {
+  const actions: ActionResult[] = [];
+
+  // Find route files that export POST/PUT/DELETE but don't import any auth guard
+  const { out } = await sh(
+    `grep -rl "export async function \\(POST\\|PUT\\|DELETE\\|PATCH\\)" app/ apps/ --include="*.ts" 2>/dev/null | ` +
+    `xargs grep -L "apiAuthGuard\\|apiRequireAdmin\\|apiRequireInstructor\\|withAuth\\|getCurrentUser\\|getUser" 2>/dev/null | head -20`
+  );
+
+  const unprotected = out.split('\n').filter(Boolean);
+
+  if (unprotected.length === 0) {
+    actions.push(ok('scan-auth-gaps', 'No unprotected mutation routes found'));
+    return actions;
+  }
+
+  actions.push(error('scan-auth-gaps', `${unprotected.length} unprotected route(s) found:\n${unprotected.join('\n')}`));
+
+  if (!dryRun) {
+    for (const file of unprotected.slice(0, 10)) {
+      // Add a prominent TODO at the top of the file
+      const { code } = await sh(
+        `sed -i '1s/^/\\/\\/ TODO(autofix): add apiAuthGuard or apiRequireAdmin — route has no auth guard\\n/' "${file}"`
+      );
+      actions.push(code === 0
+        ? ok('mark-auth-gap', `Marked ${file}`)
+        : error('mark-auth-gap', `Failed to mark ${file}`)
+      );
+    }
+  } else {
+    actions.push(skipped('mark-auth-gap', `dry-run: would mark ${unprotected.length} file(s)`));
+  }
+
+  return actions;
+}
+
+/** Google deployment configuration check, never source-host dispatch. */
+async function playbookEnvGap(_dryRun: boolean): Promise<ActionResult[]> {
+  return [{
+    action: 'google-deploy-config',
+    status: 'skipped',
+    detail: 'Google Cloud Run deploys use authenticated GitHub workflows; a live dispatch verifies credentials. No Northflank credential is required.',
+  }];
+}
+
+/**
+ * devcontainer-readonly: switch DEVSTUDIO_DEVCONTAINER_MODE to github-only
+ * and verify GITHUB_TOKEN is present.
+ */
+async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResult[]> {
+  const actions: ActionResult[] = [];
+
+  const hasToken = process.env.PARIS_GITHUB_AUTH_MODE === 'app'
+    ? Boolean(await getGitHubAppToken().catch(() => null))
+    : Boolean(process.env.GITHUB_TOKEN);
+  if (!hasToken) {
+    actions.push(error('check-github-token', 'GitHub authentication is not configured in the Admin runtime'));
+    return actions;
+  }
+  actions.push(ok('check-github-token', 'GitHub repository authorization is configured'));
+
+  const currentMode = process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto';
+  if (currentMode === 'github-only') {
+    actions.push(skipped('set-mode', 'Already in github-only mode'));
+    return actions;
+  }
+
+  if (!dryRun) {
+    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in Google Secret Manager, then deploy Google Admin'));
+  } else {
+    actions.push(skipped('set-mode', `dry-run: would set DEVSTUDIO_DEVCONTAINER_MODE=github-only (currently: ${currentMode})`));
+  }
+
+  return actions;
+}
+
+/** Dispatch only the approved Google build workflows. */
+async function playbookStaleImage(dryRun: boolean, options: Record<string, unknown>): Promise<ActionResult[]> {
+  const requested = Array.isArray(options.services) ? options.services : ['admin'];
+  const actions: ActionResult[] = [];
+  for (const service of requested) {
+    if (service !== 'admin' && service !== 'marketing') {
+      actions.push(error('google-deploy', 'Unsupported Google self-build target: ' + String(service)));
+      continue;
+    }
+    if (dryRun) {
+      actions.push(skipped('google-deploy', 'dry-run: would dispatch Google ' + service));
+      continue;
+    }
+    try {
+      await dispatchGoogleDeployment(service);
+      actions.push(ok('google-deploy', service + ' workflow dispatched (live revision not yet verified)'));
+    } catch (err) {
+      console.error('Google deployment dispatch failed', err);
+      actions.push(error('google-deploy', 'Google dispatch failed; inspect server logs for details'));
+    }
+  }
+  return actions;
+}
+
+/**
+ * northflank-env: read-only Northflank environment readiness check.
+ */
+async function playbookNorthflankEnv(): Promise<ActionResult[]> {
+  return playbookEnvGap(true);
+}
+
+// ── Registry ──────────────────────────────────────────────────────────────────
+
+const PLAYBOOKS: Record<string, (dryRun: boolean, options: Record<string, unknown>) => Promise<ActionResult[]>> = {
+  'auth-gap':               (d) => playbookAuthGap(d),
+  'env-gap':                (d) => playbookEnvGap(d),
+  'devcontainer-readonly':  (d) => playbookDevcontainerReadonly(d),
+  'stale-image':            (d, o) => playbookStaleImage(d, o),
+  'northflank-env':         () => playbookNorthflankEnv(),
+};
+
+// ── Handlers ──────────────────────────────────────────────────────────────────
+
+export async function POST(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'strict');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
+  try {
+    const body = (await request.json().catch(() => ({}))) as AutofixRequest;
+    const { playbook, dryRun = false, options = {} } = body;
+
+    if (!playbook) return safeError('playbook is required', 400);
+    if (!PLAYBOOKS[playbook]) {
+      return safeError(
+        `Unknown playbook "${playbook}". Available: ${Object.keys(PLAYBOOKS).join(', ')}`,
+        400,
+      );
+    }
+
+    const actions = await PLAYBOOKS[playbook](dryRun, options);
+    const hasErrors = actions.some((a) => a.status === 'error');
+
+    const result: PlaybookResult = {
+      ok: !hasErrors,
+      playbook,
+      dryRun,
+      actions,
+      summary: hasErrors
+        ? `${actions.filter((a) => a.status === 'error').length} issue(s) found — review actions`
+        : `${actions.filter((a) => a.status === 'ok').length} action(s) completed successfully`,
+      timestamp: new Date().toISOString(),
+    };
+
+    return NextResponse.json(result);
+  } catch (err) {
+    return safeInternalError(err, 'Autofix playbook failed');
+  }
+}
+
+export async function GET(request: NextRequest) {
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
+  return NextResponse.json({
+    endpoint: '/api/admin/dev-studio/autofix',
+    method: 'POST',
+    playbooks: {
+      'auth-gap':              'Scan for unprotected API routes; mark with TODO in non-dry-run',
+      'env-gap':               'Check Google deployment configuration',
+      'devcontainer-readonly': 'Verify GITHUB_TOKEN and set github-only mode in Google',
+      'stale-image':           'Dispatch approved Google Cloud Run build workflows',
+      'northflank-env':        'Read-only Google deployment readiness guidance',
+    },
+    body: {
+      playbook: 'string (required)',
+      dryRun: 'boolean (default false) — report only, no writes',
+      options: 'object — playbook-specific options (e.g. { services, cluster } for stale-image)',
+    },
+  });
+}

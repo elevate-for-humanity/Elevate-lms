@@ -1,0 +1,50 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2024–2025 2Exclusive LLC-S
+d/b/a Elevate for Humanity Career & Training Institute
+All rights reserved.
+
+This software and its documentation are the proprietary property of
+2Exclusive LLC-S d/b/a Elevate for Humanity Career & Training Institute
+("Elevate"). This repository is published for transparency, security
+review, and platform documentation purposes only.
+
+RESTRICTIONS
+
+You may not, without a formal written agreement with Elevate:
+
+1. Use this software or any portion of it in a production environment
+2. Deploy, host, or operate this software for any purpose
+3. Modify, adapt, translate, or create derivative works
+4. Sublicense, sell, rent, lease, or transfer rights to this software
+5. Remove or alter any proprietary notices or labels
+
+PERMITTED USES
+
+Without a formal agreement, you may:
+
+1. Review this code for security research and responsible disclosure
+   (see docs/SECURITY.md for the disclosure process)
+2. Evaluate the platform for procurement or partnership purposes
+3. Reference the architecture and documentation for educational purposes
+
+EXTERNAL CONTRIBUTIONS
+
+This repository does not accept external contributions. Pull requests
+from parties without a formal agreement will not be reviewed or merged.
+
+ACCESS AND LICENSING
+
+For managed platform access or enterprise source-use licensing, contact:
+
+  Email:  info@elevateforhumanity.org
+  Phone:  (317) 314-3757
+  Web:    https://www.elevateforhumanity.org
+
+See docs/access-model.md for access tier details.
+
+DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+ELEVATE SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM USE OF
+THIS SOFTWARE OUTSIDE OF A FORMAL WRITTEN AGREEMENT.

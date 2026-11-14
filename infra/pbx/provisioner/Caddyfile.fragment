@@ -1,0 +1,14 @@
+# Merge inside the EXISTING phone.elevateforhumanity.org site block, before the
+# final catch-all response. Preserve its TLS issuer and SIP WebSocket path.
+# Server-to-server route only; the loopback service checks a GSM Bearer secret.
+@pbxProvisioner path /internal/pbx/devices /internal/pbx/devices/status /internal/pbx/devices/revoke
+handle @pbxProvisioner {
+  request_body {
+    max_size 4KB
+  }
+  reverse_proxy 127.0.0.1:8090 {
+    transport http {
+      response_header_timeout 60s
+    }
+  }
+}

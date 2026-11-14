@@ -1,0 +1,11 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Elevate for Humanity",
+  "url": "https://www.elevateforhumanity.org/",
+  "logo": "https://www.elevateforhumanity.org/branding/icons/workforce-icons.png",
+  "sameAs": [
+    "https://www.selfishinc.org/",
+    "https://www.riseforwardfoundation.org/"
+  ]
+}

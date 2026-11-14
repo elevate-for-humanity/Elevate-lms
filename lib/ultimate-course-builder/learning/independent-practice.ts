@@ -1,0 +1,2 @@
+export interface IndependentPractice{objectiveId:string;prompt:string;context:string;submissionType:'answer'|'artifact'|'simulation'|'practical_evidence';hintsAllowed:false;rubric:string[]}
+export function createIndependentPractice(input:{objectiveId:string;prompt:string;context:string;practical:boolean;rubric:string[]}):IndependentPractice{return {...input,submissionType:input.practical?'practical_evidence':'artifact',hintsAllowed:false};}

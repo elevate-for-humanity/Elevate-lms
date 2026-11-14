@@ -1,0 +1,2104 @@
+{
+  "timestamp": "2026-10-25T16:42:59.966Z",
+  "summary": "96 isolated component and shell checks passed across Chromium and WebKit; 0 checks need attention. Full authenticated production workflows were not run.",
+  "badge": "96 browser checks passed",
+  "scope": "Copied production components, production styles and isolated sample services. Not full LMS or native-device certification.",
+  "results": [
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "admin",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "reports",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "studio",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 740
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "public",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "student",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "admin",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "reports",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "studio",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "public",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "student",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "admin",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "reports",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "studio",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "public",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "student",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "admin",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "reports",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "studio",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1024
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "public",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "student",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "admin",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "reports",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "studio",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 844,
+          "height": 390
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "public",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "student",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "admin",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "reports",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "studio",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "public",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "student",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "version": "141.0.7390.37",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "admin",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "reports",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "studio",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 740
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "public",
+      "role": "",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "student",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 320,
+      "height": 740,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 740
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "admin",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "reports",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "studio",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 843.984375
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "public",
+      "role": "",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "student",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 390,
+      "height": 844,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "width": 390,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "admin",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "reports",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "studio",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 914.984375
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "public",
+      "role": "",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "student",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 412,
+      "height": 915,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "width": 412,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "admin",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "reports",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "studio",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1024
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "public",
+      "role": "",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "student",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 768,
+      "height": 1024,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "width": 768,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "admin",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "reports",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "studio",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 844,
+          "height": 390
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "public",
+      "role": "",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "student",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 844,
+      "height": 390,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 844,
+          "height": 390
+        },
+        "width": 844,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "admin",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "reports",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "studio",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "public",
+      "role": "",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "student",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "apprentice",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "host_shop",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "view": "learner",
+      "role": "program_holder",
+      "width": 1440,
+      "height": 900,
+      "pass": true,
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": []
+      }
+    }
+  ],
+  "baselines": [
+    {
+      "engine": "chromium",
+      "view": "admin",
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 900
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": [
+          {
+            "tag": "BUTTON",
+            "label": "Refresh program integrity",
+            "w": 4.359375,
+            "h": 44
+          }
+        ]
+      }
+    },
+    {
+      "engine": "chromium",
+      "view": "reports",
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 900
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": [
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          }
+        ]
+      }
+    },
+    {
+      "engine": "chromium",
+      "view": "studio",
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 68,
+          "width": 1440,
+          "height": 832
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "chromium",
+      "view": "public",
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 900
+        },
+        "width": 330,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "view": "admin",
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 900
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": [
+          {
+            "tag": "BUTTON",
+            "label": "Refresh program integrity",
+            "w": 6.671875,
+            "h": 44
+          }
+        ]
+      }
+    },
+    {
+      "engine": "webkit",
+      "view": "reports",
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 900
+        },
+        "width": 320,
+        "shellCount": 1,
+        "workspace": null,
+        "tiny": [
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          },
+          {
+            "tag": "INPUT",
+            "label": null,
+            "w": 16,
+            "h": 16
+          }
+        ]
+      }
+    },
+    {
+      "engine": "webkit",
+      "view": "studio",
+      "metric": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "width": 1440,
+        "shellCount": 1,
+        "workspace": {
+          "x": 0,
+          "y": 68,
+          "width": 1440,
+          "height": 832
+        },
+        "tiny": []
+      }
+    },
+    {
+      "engine": "webkit",
+      "view": "public",
+      "metric": {
+        "viewport": {
+          "width": 320,
+          "height": 900
+        },
+        "width": 320,
+        "shellCount": 0,
+        "workspace": null,
+        "tiny": []
+      }
+    }
+  ]
+}

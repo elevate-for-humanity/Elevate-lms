@@ -1,0 +1,19 @@
+{
+  "name": "@elevate/lms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "node ../../scripts/check-build-memory-policy.mjs && node ../../scripts/sync-pwa-public.mjs lms",
+    "build": "node ../../scripts/run-bounded-build.mjs -- node ../../scripts/build-next-app.mjs",
+    "prestart": "node ../../scripts/sync-pwa-public.mjs lms",
+    "start": "next start",
+    "lint": "node ../../scripts/run-bounded-build.mjs -- node ../../node_modules/eslint/bin/eslint.js . --ext .js,.jsx,.ts,.tsx --quiet",
+    "predev": "node ../../scripts/sync-development-public.mjs lms"
+  },
+  "dependencies": {
+    "next": "catalog:",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  }
+}

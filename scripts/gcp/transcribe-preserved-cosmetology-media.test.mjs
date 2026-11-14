@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {measuredWordCoverage} from './transcribe-preserved-cosmetology-media.mjs';
+test('independent transcript coverage exposes missing material rather than replacing it',()=>{assert.equal(measuredWordCoverage('clean then disinfect tools','clean tools'),.5);assert.equal(measuredWordCoverage('clean then disinfect tools','clean then disinfect tools'),1);assert.equal(measuredWordCoverage('clean tools','unrelated speech'),0);assert.throws(()=>measuredWordCoverage('clean tools',''));});

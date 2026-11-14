@@ -1,0 +1,54 @@
+name: Verify live Marketing LMS and Admin endpoints
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-endpoints:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Verify all live service identities and report actual serving commits
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,re,time,urllib.error,urllib.request
+          services={
+            'marketing':'https://www.elevateforhumanity.org',
+            'lms':'https://app.elevateforhumanity.org',
+            'admin':'https://admin.elevateforhumanity.org',
+          }
+          failures=[]
+          for service,base in services.items():
+            for endpoint in ['/api/ping','/api/ready','/api/health','/api/version']:
+              url=base+endpoint
+              last='unavailable'
+              for attempt in range(3):
+                try:
+                  request=urllib.request.Request(url,headers={'Cache-Control':'no-cache','User-Agent':'Elevate-production-endpoint-verifier/1.0'})
+                  with urllib.request.urlopen(request,timeout=15) as response:
+                    status=response.status
+                    body=response.read(65536)
+                    if status!=200:raise ValueError('non_200')
+                    if endpoint=='/api/health':
+                      data=json.loads(body)
+                      if data.get('service')!=service or data.get('healthy') is not True:
+                        raise ValueError('wrong_service_or_unhealthy')
+                      commit=data.get('commit')
+                      if not isinstance(commit,str) or not re.fullmatch('[0-9a-f]{40}',commit):
+                        raise ValueError('missing_serving_commit')
+                      print(json.dumps({'service':service,'endpoint':endpoint,'http':status,'serviceIdentity':data.get('service'),'commit':commit,'revision':data.get('revision')}))
+                    else:
+                      print(json.dumps({'service':service,'endpoint':endpoint,'http':status}))
+                    last=None
+                    break
+                except Exception as exc:
+                  # Never print response bodies or credentials from a failed endpoint.
+                  last=type(exc).__name__ if not isinstance(exc,ValueError) else str(exc)
+                  if attempt<2:time.sleep(3)
+              if last:failures.append({'service':service,'endpoint':endpoint,'reason':last})
+          if failures:
+            print('FAILED_ENDPOINTS='+json.dumps(failures))
+            raise SystemExit(1)
+          print('All three service endpoint families returned valid live responses. This does not certify authenticated browser journeys or a new deployment.')
+          PY

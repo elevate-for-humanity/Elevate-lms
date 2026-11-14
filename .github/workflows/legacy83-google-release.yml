@@ -1,0 +1,111 @@
+name: Legacy 83 Google release candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/legacy83-google-release.yml', '.deploy/legacy83-source/**', 'scripts/gcp/deploy-legacy83-website.mjs', 'scripts/gcp/legacy83-acceptance-gate*.mjs', 'scripts/gcp/legacy83-runtime-config*.mjs', 'scripts/gcp/legacy83-startup.sh']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: legacy83-google-release
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/legacy83-google-release.yml/dispatches" -f ref=main
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && vars.GOOGLE_RELEASE_HOLD != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: f73be3000fad06a4bd1d5aab12bfed28f0d5b2eb
+      NEXT_PUBLIC_SUPABASE_URL: https://vhulnzcfmlnsmoxixjco.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_lb8-f5trWyOLdTY-ElpX9A_ImDp8eGe
+      PROJECT: elegant-racer-299721
+      REGION: us-central1
+      SERVICE: legacy83-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Verify Legacy 83 acceptance rollback
+        run: node --test scripts/gcp/legacy83-acceptance-gate.test.mjs scripts/gcp/legacy83-runtime-config.test.mjs
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Authenticate and unpack the private customer source
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          export DECRYPTION_KEY_FILE="$RUNNER_TEMP/legacy83-source-key.pem"
+          export SOURCE_ARCHIVE="$RUNNER_TEMP/legacy83-source.tar.gz"
+          trap 'rm -f "$DECRYPTION_KEY_FILE" "$SOURCE_ARCHIVE"' EXIT
+          gcloud secrets versions access latest --secret=legacy83-source-decryption-key --project="$PROJECT" > "$DECRYPTION_KEY_FILE"
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync,appendFileSync} from 'node:fs';
+          import {decryptLegacy83Runtime,verifyLegacy83Runtime} from './scripts/gcp/legacy83-runtime-config.mjs';
+          import {createHash,privateDecrypt,createDecipheriv,constants} from 'node:crypto';
+          const manifest=JSON.parse(readFileSync('.deploy/legacy83-source/manifest.json','utf8'));
+          const expected="f73be3000fad06a4bd1d5aab12bfed28f0d5b2eb";
+          if(manifest.sourceSha!==expected || manifest.sha256!=="692462f3423277bea67aae72969ff22335eceeeb13b997a099ee5a65928b9b35")throw Error('Unexpected source revision');
+          const envelopeText=manifest.chunks.map(name=>{
+           if(!/^part-[0-9]{3}[.]txt$/.test(name))throw Error('Invalid encrypted chunk path');
+           return readFileSync('.deploy/legacy83-source/'+name,'utf8');
+          }).join('');
+          if(createHash('sha256').update(envelopeText).digest('hex')!==manifest.sha256)throw Error('Encrypted delivery hash mismatch');
+          const envelope=JSON.parse(envelopeText);
+          if(envelope.version!==1||envelope.sourceSha!==expected)throw Error('Invalid source envelope');
+          const key=privateDecrypt({key:readFileSync(process.env.DECRYPTION_KEY_FILE),padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},Buffer.from(envelope.encryptedKey,'base64'));
+          const decipher=createDecipheriv('aes-256-gcm',key,Buffer.from(envelope.iv,'base64'));
+          decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));
+          writeFileSync(process.env.SOURCE_ARCHIVE,Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext,'base64')),decipher.final()]),{mode:0o600});
+          const runtimeConfig=decryptLegacy83Runtime(envelope,key);
+          await verifyLegacy83Runtime(runtimeConfig);
+          for(const [name,value] of Object.entries(runtimeConfig)){
+           console.log('::add-mask::'+value);
+           appendFileSync(process.env.GITHUB_ENV,name+'='+value+'\n');
+          }
+          console.log('Authenticated source revision and dedicated runtime connection: '+expected);
+
+          NODE
+          node scripts/gcp/load-legacy83-client-config.mjs
+          mkdir "$RUNNER_TEMP/legacy83-source"
+          tar -xzf "$SOURCE_ARCHIVE" -C "$RUNNER_TEMP/legacy83-source"
+          test -f "$RUNNER_TEMP/legacy83-source/Dockerfile"
+      - name: Check the exact source before building
+        working-directory: ${{ runner.temp }}/legacy83-source
+        run: |
+          npm ci --no-audit --no-fund
+          npm audit --omit=dev --audit-level=high
+          node --test tests/*.test.mjs
+          SUPABASE_SERVICE_ROLE_KEY=build-only-no-live-access npx tsc --noEmit
+      - name: Build and upload the isolated customer image
+        run: |
+          set -euo pipefail
+          SOURCE_DIR="$RUNNER_TEMP/legacy83-source"
+          DOCKERFILE="$(node scripts/container-build-policy.mjs legacy83-candidate)"
+          mkdir -p "$SOURCE_DIR/.elevate-build"
+          cp scripts/build-memory-policy.mjs scripts/run-bounded-build.mjs scripts/gcp/prepare-legacy83-config.mjs "$SOURCE_DIR/.elevate-build/"
+          printf '\n!.elevate-build\n!.elevate-build/**\n' >> "$SOURCE_DIR/.dockerignore"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/legacy83-candidate:$SOURCE_SHA"
+          if ! gcloud artifacts docker images describe "$IMAGE" --project="$PROJECT" >/dev/null 2>&1; then
+            docker build -f "$DOCKERFILE" --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" --build-arg NEXT_PUBLIC_FIREBASE_API_KEY --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID --build-arg NEXT_PUBLIC_FIREBASE_APP_ID --build-arg NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID -t "$IMAGE" "$SOURCE_DIR"
+            docker push "$IMAGE"
+          fi
+      - name: Deploy and verify the isolated Google website host
+        timeout-minutes: 18
+        run: node scripts/gcp/deploy-legacy83-website.mjs

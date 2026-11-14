@@ -1,0 +1,35 @@
+name: Release verified school invoice LMS image
+on:
+  push:
+    branches: [main]
+    paths: ['config/school-invoice-lms-release.json']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify build and dispatch existing guarded Google deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const release=JSON.parse(readFileSync('config/school-invoice-lms-release.json','utf8'));
+          if(!/^[a-f0-9]{40}$/.test(release.image_sha) || !Number.isSafeInteger(release.build_run_id)) throw new Error('Invalid release reference');
+          const repository=process.env.GITHUB_REPOSITORY;
+          const get=path=>JSON.parse(execFileSync('gh',['api',`repos/${repository}/${path}`],{encoding:'utf8'}));
+          const build=get(`actions/runs/${release.build_run_id}`);
+          if(build.head_sha!==release.image_sha || build.head_branch!=='main' || build.conclusion!=='success' || build.path!=='.github/workflows/build-google-migration-images.yml') throw new Error('The requested image has no verified successful main build');
+          const changes=get(`compare/${release.image_sha}...${process.env.GITHUB_SHA}`);
+          if(!['ahead','identical'].includes(changes.status) || changes.files.length>=300) throw new Error('Cannot prove release ancestry');
+          const runtime=/^(apps\/lms\/|lib\/|components\/|packages\/|Dockerfile\.northflank-lms$|next\.config|package\.json$|pnpm-lock\.yaml$)/;
+          if(changes.files.some(file=>runtime.test(file.filename))) throw new Error('LMS source changed after the build; build current main before releasing');
+          execFileSync('gh',['api','--method','POST',`repos/${repository}/actions/workflows/deploy-google-repaired.yml/dispatches`,'--input','-'],{
+            input:JSON.stringify({ref:'main',inputs:{component:'lms',image_sha:release.image_sha}}),stdio:['pipe','inherit','inherit']});
+          console.log('Requested existing Google LMS deployment; runtime success must be verified separately.');
+          NODE

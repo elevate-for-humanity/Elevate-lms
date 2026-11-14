@@ -1,0 +1,190 @@
+/**
+ * lib/curriculum/blueprints/welding.ts
+ *
+ * Welding Technology Certificate — AWS / NCCER aligned.
+ * SOC: 51-4121.00
+ */
+import type { CredentialBlueprint } from './types';
+
+export const weldingBlueprint: CredentialBlueprint = {
+  id: 'welding-v1',
+  version: '1.0.0',
+  credentialSlug: 'welding-technician',
+  credentialTitle: 'Welding Technology Certificate — AWS D1.1 Entry Level',
+  credentialCode: 'AWS-ELW',
+  state: 'IN',
+  programSlug: 'welding',
+  trackVariants: ['standard'],
+  status: 'active',
+  skipLqs: true,
+
+  generationRules: {
+    allowRemediation: true,
+    allowExpansionLessons: false,
+    maxTotalLessons: 42,
+    requiresFinalExam: true,
+    requiresUniversalReview: false,
+    generatorMode: 'fixed',
+  },
+
+  expectedModuleCount: 6,
+  expectedLessonCount: 42,
+
+  videoConfig: {
+    videoGenerator: 'runway',
+    template: 'elevate-slide',
+    instructorName: 'Marcus Webb',
+    instructorTitle: 'Certified Welding Inspector (CWI) & Instructor',
+    instructorImagePath: '/images/instructors/marcus-webb.jpg',
+    topBarColor: '#f97316',
+    accentColor: '#78716c',
+    backgroundColor: '#1e293b',
+    ttsVoice: 'onyx',
+    ttsSpeed: 0.9,
+    slideCount: 5,
+    segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
+    generateDalleImage: true,
+    dalleImageStyle: 'natural',
+    width: 1920,
+    height: 1080,
+  },
+
+  assessmentRules: [
+    { assessmentType: 'module', scope: 'all', minQuestions: 5, maxQuestions: 10, passingThreshold: 0.75 },
+    { assessmentType: 'final', scope: 'all', minQuestions: 40, maxQuestions: 60, passingThreshold: 0.75 },
+  ],
+
+  modules: [
+    {
+      slug: 'welding-safety',
+      title: 'Welding Safety & Shop Environment',
+      orderIndex: 1,
+      domainKey: 'safety',
+      minLessons: 7, maxLessons: 9, quizRequired: true, practicalRequired: false, isCritical: true,
+      requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 6 }, { lessonType: 'checkpoint', requiredCount: 1 }],
+      competencies: [
+        { competencyKey: 'osha_safety', isCritical: true, minimumTouchpoints: 2 },
+        { competencyKey: 'ppe', isCritical: true, minimumTouchpoints: 1 },
+        { competencyKey: 'fire_prevention', isCritical: true, minimumTouchpoints: 1 },
+      ],
+      lessons: [
+        { slug: 'weld-osha-safety', title: 'OSHA Safety Standards for Welding Environments', order: 1, domainKey: 'safety' },
+        { slug: 'weld-ppe', title: 'Personal Protective Equipment: Helmet, Gloves, and Clothing', order: 2, domainKey: 'safety' },
+        { slug: 'weld-fire-prevention', title: 'Fire Prevention, Extinguishers, and Hot Work Permits', order: 3, domainKey: 'safety' },
+        { slug: 'weld-ventilation', title: 'Ventilation, Fume Extraction, and Respiratory Safety', order: 4, domainKey: 'safety' },
+        { slug: 'weld-electrical-safety', title: 'Electrical Safety for Welding Operations', order: 5, domainKey: 'safety' },
+        { slug: 'weld-shop-housekeeping', title: 'Shop Housekeeping, Material Handling, and Ergonomics', order: 6, domainKey: 'safety' },
+        { slug: 'weld-safety-checkpoint', title: 'Welding Safety & Shop — Checkpoint', order: 7, domainKey: 'safety' },
+      ],
+    },
+    {
+      slug: 'welding-theory',
+      title: 'Welding Theory & Metallurgy Basics',
+      orderIndex: 2,
+      domainKey: 'theory',
+      minLessons: 7, maxLessons: 9, quizRequired: true, practicalRequired: false, isCritical: true,
+      requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 6 }, { lessonType: 'checkpoint', requiredCount: 1 }],
+      competencies: [
+        { competencyKey: 'metallurgy', isCritical: true, minimumTouchpoints: 1 },
+        { competencyKey: 'joint_design', isCritical: true, minimumTouchpoints: 1 },
+        { competencyKey: 'weld_symbols', isCritical: false, minimumTouchpoints: 1 },
+      ],
+      lessons: [
+        { slug: 'weld-metal-properties', title: 'Metal Properties: Steel, Aluminum, and Common Alloys', order: 1, domainKey: 'theory' },
+        { slug: 'weld-heat-effects', title: 'Heat Effects on Metal: Distortion, Warping, and Control', order: 2, domainKey: 'theory' },
+        { slug: 'weld-joint-design', title: 'Weld Joint Design: Butt, Lap, T-Joint, and Corner Joints', order: 3, domainKey: 'theory' },
+        { slug: 'weld-symbols', title: 'Reading Welding Symbols and Blueprint Notation', order: 4, domainKey: 'theory' },
+        { slug: 'weld-positions', title: 'Welding Positions: 1G, 2G, 3G, 4G, 1F, 2F, 3F, 4F', order: 5, domainKey: 'theory' },
+        { slug: 'weld-quality-defects', title: 'Weld Quality Criteria and Common Defect Types', order: 6, domainKey: 'theory' },
+        { slug: 'weld-theory-checkpoint', title: 'Welding Theory & Metallurgy — Checkpoint', order: 7, domainKey: 'theory' },
+      ],
+    },
+    {
+      slug: 'welding-smaw',
+      title: 'Shielded Metal Arc Welding (SMAW)',
+      orderIndex: 3,
+      domainKey: 'smaw',
+      minLessons: 7, maxLessons: 9, quizRequired: true, practicalRequired: true, isCritical: true,
+      requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 5 }, { lessonType: 'lab', requiredCount: 1 }, { lessonType: 'checkpoint', requiredCount: 1 }],
+      competencies: [
+        { competencyKey: 'electrode_selection', isCritical: true, minimumTouchpoints: 1 },
+        { competencyKey: 'smaw_technique', isCritical: true, minimumTouchpoints: 2 },
+        { competencyKey: 'bead_running', isCritical: true, minimumTouchpoints: 1 },
+      ],
+      lessons: [
+        { slug: 'weld-smaw-equipment', title: 'SMAW Equipment Setup: Transformer, Polarity, and Amperage', order: 1, domainKey: 'smaw' },
+        { slug: 'weld-electrode-selection', title: 'Electrode Selection: E6010, E6011, E6013, E7018', order: 2, domainKey: 'smaw' },
+        { slug: 'weld-smaw-flat', title: 'SMAW Flat Position: Striking Arc and Running Beads', order: 3, domainKey: 'smaw' },
+        { slug: 'weld-smaw-horizontal', title: 'SMAW Horizontal and Vertical Position Techniques', order: 4, domainKey: 'smaw' },
+        { slug: 'weld-smaw-overhead', title: 'SMAW Overhead Position Welding', order: 5, domainKey: 'smaw' },
+        { slug: 'weld-smaw-lab', title: 'SMAW Practical Skills — Lab', order: 6, domainKey: 'smaw' },
+        { slug: 'weld-smaw-checkpoint', title: 'SMAW — Checkpoint', order: 7, domainKey: 'smaw' },
+      ],
+    },
+    {
+      slug: 'welding-gmaw-fcaw',
+      title: 'GMAW (MIG) & FCAW Welding',
+      orderIndex: 4,
+      domainKey: 'gmaw',
+      minLessons: 7, maxLessons: 9, quizRequired: true, practicalRequired: true, isCritical: true,
+      requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 5 }, { lessonType: 'lab', requiredCount: 1 }, { lessonType: 'checkpoint', requiredCount: 1 }],
+      competencies: [
+        { competencyKey: 'mig_technique', isCritical: true, minimumTouchpoints: 2 },
+        { competencyKey: 'wire_selection', isCritical: false, minimumTouchpoints: 1 },
+        { competencyKey: 'shielding_gas', isCritical: false, minimumTouchpoints: 1 },
+      ],
+      lessons: [
+        { slug: 'weld-gmaw-equipment', title: 'GMAW Equipment: Wire Feed, Drive Rolls, and Gun Setup', order: 1, domainKey: 'gmaw' },
+        { slug: 'weld-wire-gas-selection', title: 'Wire and Shielding Gas Selection for GMAW', order: 2, domainKey: 'gmaw' },
+        { slug: 'weld-gmaw-techniques', title: 'GMAW Techniques: Push vs. Drag, Travel Speed, and WFS', order: 3, domainKey: 'gmaw' },
+        { slug: 'weld-fcaw-intro', title: 'FCAW Introduction: Flux-Core vs. Metal-Core Wire', order: 4, domainKey: 'gmaw' },
+        { slug: 'weld-gmaw-positions', title: 'GMAW and FCAW All-Position Welding', order: 5, domainKey: 'gmaw' },
+        { slug: 'weld-gmaw-lab', title: 'GMAW/FCAW Practical Skills — Lab', order: 6, domainKey: 'gmaw' },
+        { slug: 'weld-gmaw-checkpoint', title: 'GMAW & FCAW — Checkpoint', order: 7, domainKey: 'gmaw' },
+      ],
+    },
+    {
+      slug: 'welding-gtaw-cutting',
+      title: 'GTAW (TIG) & Thermal Cutting Processes',
+      orderIndex: 5,
+      domainKey: 'gtaw',
+      minLessons: 6, maxLessons: 8, quizRequired: true, practicalRequired: false, isCritical: false,
+      requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 5 }, { lessonType: 'checkpoint', requiredCount: 1 }],
+      competencies: [
+        { competencyKey: 'tig_setup', isCritical: true, minimumTouchpoints: 2 },
+        { competencyKey: 'plasma_cutting', isCritical: false, minimumTouchpoints: 1 },
+        { competencyKey: 'oxyfuel', isCritical: false, minimumTouchpoints: 1 },
+      ],
+      lessons: [
+        { slug: 'weld-gtaw-equipment', title: 'GTAW Equipment: Tungsten Prep, Shielding Gas, and Torch', order: 1, domainKey: 'gtaw' },
+        { slug: 'weld-gtaw-technique', title: 'GTAW Technique: Filler Addition, Torch Angle, and Travel', order: 2, domainKey: 'gtaw' },
+        { slug: 'weld-gtaw-stainless-aluminum', title: 'GTAW Stainless Steel and Aluminum Welding', order: 3, domainKey: 'gtaw' },
+        { slug: 'weld-plasma-cutting', title: 'Plasma Arc Cutting: Setup, Technique, and Applications', order: 4, domainKey: 'gtaw' },
+        { slug: 'weld-oxyfuel-cutting', title: 'Oxyfuel Cutting: Torch Setup, Tips, and Safety', order: 5, domainKey: 'gtaw' },
+        { slug: 'weld-gtaw-checkpoint', title: 'GTAW & Cutting Processes — Checkpoint', order: 6, domainKey: 'gtaw' },
+      ],
+    },
+    {
+      slug: 'welding-certification-career',
+      title: 'AWS Certification & Career Readiness',
+      orderIndex: 6,
+      domainKey: 'exam_prep',
+      minLessons: 7, maxLessons: 9, quizRequired: true, practicalRequired: false, isCritical: true,
+      requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 4 }, { lessonType: 'checkpoint', requiredCount: 1 }, { lessonType: 'exam', requiredCount: 1 }],
+      competencies: [
+        { competencyKey: 'aws_certification', isCritical: true, minimumTouchpoints: 2 },
+        { competencyKey: 'weld_testing', isCritical: true, minimumTouchpoints: 1 },
+        { competencyKey: 'career_readiness', isCritical: true, minimumTouchpoints: 1 },
+      ],
+      lessons: [
+        { slug: 'weld-aws-certification', title: 'AWS Certified Welder Program: Requirements and Testing', order: 1, domainKey: 'exam_prep' },
+        { slug: 'weld-visual-inspection', title: 'Visual Weld Inspection Criteria (AWS D1.1 and D1.3)', order: 2, domainKey: 'exam_prep' },
+        { slug: 'weld-ndt-intro', title: 'Introduction to Non-Destructive Testing: VT, PT, and UT', order: 3, domainKey: 'exam_prep' },
+        { slug: 'weld-career-industries', title: 'Welding Career Paths: Manufacturing, Pipeline, Structural, and Aerospace', order: 4, domainKey: 'exam_prep' },
+        { slug: 'weld-portfolio', title: 'Building a Welding Portfolio and Preparing for Certification Tests', order: 5, domainKey: 'exam_prep' },
+        { slug: 'weld-cert-checkpoint', title: 'AWS Certification Prep — Checkpoint', order: 6, domainKey: 'exam_prep' },
+        { slug: 'weld-final-exam', title: 'Welding Technology Comprehensive Final Examination', order: 7, domainKey: 'exam_prep' },
+      ],
+    },
+  ],
+};

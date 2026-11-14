@@ -1,0 +1,645 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useApplicationDraft } from '@/hooks/useApplicationDraft';
+import {
+  TRANSFER_HOURS_EVIDENCE_ACCEPT,
+  uploadTransferHoursEvidence,
+} from '@/lib/applications/upload-transfer-hours-evidence';
+import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
+
+const WORKONE_INTAKE_URL = WORKONE_INDY_BOOKING_URL;
+
+interface StudentApplicationFormProps {
+  initialProgram?: string;
+  lockedProgram?: boolean;
+  initialHostShopName?: string;
+  applicationIntent?: 'inquiry' | 'enrollment';
+  paymentSessionId?: string;
+}
+
+type SubmissionResult = {
+  success: boolean;
+  message?: string;
+  error?: string;
+  warning?: string;
+};
+
+type ApiResult = Record<string, any>;
+
+type StudentForm = {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  email: string;
+  phone: string;
+  preferredContact: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  countyOfResidence: string;
+  program: string;
+  modalityPreference: string;
+  hasHostShop: string;
+  hostShopName: string;
+  transferHours: string;
+  fundingSource: string;
+  fundingEligibilityStatus: string;
+  hasWorkOneReferral: string;
+  workoneCenter: string;
+  householdIncome: string;
+  familySize: string;
+  employmentStatus: string;
+  currentEmployer: string;
+  highestEducation: string;
+  militaryConnected: string;
+  felonRecord: string;
+  felonDetails: string;
+  hasCaseManager: string;
+  caseManagerAgency: string;
+  transportationNeeds: string;
+  childcareNeeds: string;
+  supportNeeds: string;
+  goals: string;
+  howDidYouHear: string;
+};
+
+type DraftData = {
+  form: StudentForm;
+  workOneAcknowledged: boolean;
+  apprenticeshipFundingConfirmed?: boolean;
+};
+
+const PROGRAMS = [
+  { value: 'cna', label: 'Certified Nursing Assistant (CNA)' },
+  { value: 'medical-assistant', label: 'Medical Assistant' },
+  { value: 'hvac-technician', label: 'HVAC Technician' },
+  { value: 'cdl-training', label: 'CDL Training (Class A/B)' },
+  { value: 'barber-apprenticeship', label: 'Barber Apprenticeship' },
+  { value: 'cosmetology-apprenticeship', label: 'Cosmetology Apprenticeship' },
+  { value: 'esthetician-apprenticeship', label: 'Esthetician Apprenticeship' },
+  { value: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship' },
+  { value: 'phlebotomy', label: 'Phlebotomy Technician' },
+  { value: 'qma', label: 'Qualified Medication Aide (QMA)' },
+  { value: 'it-help-desk', label: 'IT Help Desk' },
+  { value: 'welding', label: 'Welding' },
+  { value: 'other', label: 'Other / Not sure yet' },
+];
+
+const STEP_LABELS = ['Contact', 'Program', 'Funding', 'Background', 'Review'];
+
+function createSubmissionKey(): string {
+  try {
+    return globalThis.crypto.randomUUID();
+  } catch {
+    return `student-apply-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+}
+
+async function postApplication(payload: Record<string, unknown>, idempotencyKey: string) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 65000);
+
+  try {
+    const res = await fetch('/api/applications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-Idempotency-Key': idempotencyKey,
+      },
+      credentials: 'same-origin',
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify(payload),
+    });
+    const data = (await res.json().catch(() => ({}))) as ApiResult;
+    return { res, data };
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+function createEmptyForm(initialProgram: string): StudentForm {
+  return {
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    email: '',
+    phone: '',
+    preferredContact: 'phone',
+    address: '',
+    city: '',
+    state: 'Indiana',
+    zipCode: '',
+    countyOfResidence: '',
+    program: initialProgram,
+    modalityPreference: '',
+    hasHostShop: '',
+    hostShopName: '',
+    transferHours: '',
+    fundingSource: initialProgram.includes('apprenticeship') ? 'self_pay' : '',
+    fundingEligibilityStatus: '',
+    hasWorkOneReferral: '',
+    workoneCenter: '',
+    householdIncome: '',
+    familySize: '',
+    employmentStatus: '',
+    currentEmployer: '',
+    highestEducation: '',
+    militaryConnected: '',
+    felonRecord: '',
+    felonDetails: '',
+    hasCaseManager: '',
+    caseManagerAgency: '',
+    transportationNeeds: '',
+    childcareNeeds: '',
+    supportNeeds: '',
+    goals: '',
+    howDidYouHear: '',
+  };
+}
+
+export default function StudentApplicationForm({
+  initialProgram = '',
+  applicationIntent = 'inquiry',
+  paymentSessionId = '',
+  lockedProgram = false,
+  initialHostShopName = '',
+}: StudentApplicationFormProps) {
+  const router = useRouter();
+  const [form, setForm] = useState<StudentForm>(() => ({
+    ...createEmptyForm(initialProgram),
+    ...(initialHostShopName ? { hasHostShop: 'yes', hostShopName: initialHostShopName } : {}),
+  }));
+  const [submissionKey] = useState(createSubmissionKey);
+  const [step, setStep] = useState(1);
+  const [showResume, setShowResume] = useState(false);
+  const [workOneAcknowledged, setWorkOneAcknowledged] = useState(false);
+  const [apprenticeshipFundingConfirmed, setApprenticeshipFundingConfirmed] = useState(false);
+  const [consentAcknowledged, setConsentAcknowledged] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<SubmissionResult | null>(null);
+  const [transferHoursDocument, setTransferHoursDocument] = useState<File | null>(null);
+
+  const { hasDraft, savedData, savedStep, savedAt, saveDraft, clearDraft } =
+    useApplicationDraft<DraftData>('student-apply');
+  const draftPromptHandled = useRef(false);
+
+  useEffect(() => {
+    if (hasDraft && !draftPromptHandled.current) {
+      draftPromptHandled.current = true;
+      setShowResume(true);
+    }
+  }, [hasDraft]);
+
+  const requiresWorkOne = form.fundingSource === 'wioa' || form.fundingSource === 'wrg';
+  const isApprenticeship = form.program.includes('apprenticeship');
+  const apprenticeshipFundingSelected =
+    isApprenticeship && Boolean(form.fundingSource) && form.fundingSource !== 'self_pay';
+  const transferHoursClaimed = Math.max(0, Number.parseInt(form.transferHours || '0', 10) || 0);
+
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) {
+    const { name, value } = e.target;
+    if (lockedProgram && name === 'program') return;
+    setResult(null);
+    if (name === 'program' && value.includes('apprenticeship')) {
+      setForm((prev) => ({ ...prev, program: value, fundingSource: 'self_pay' }));
+      setWorkOneAcknowledged(false);
+      setApprenticeshipFundingConfirmed(false);
+      return;
+    }
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'fundingSource' && value !== 'wioa' && value !== 'wrg') {
+      setWorkOneAcknowledged(false);
+    }
+    if (name === 'fundingSource') setApprenticeshipFundingConfirmed(false);
+    if (name === 'program' && !value.includes('apprenticeship')) {
+      setTransferHoursDocument(null);
+    }
+    if (name === 'transferHours' && (Number.parseInt(value || '0', 10) || 0) <= 0) {
+      setTransferHoursDocument(null);
+    }
+  }
+
+  function persist(nextStep = step) {
+    draftPromptHandled.current = true;
+    saveDraft({ form, workOneAcknowledged, apprenticeshipFundingConfirmed }, nextStep);
+  }
+
+  function resumeDraft() {
+    if (!savedData) return;
+    const resumed = lockedProgram
+      ? { ...savedData.form, program: initialProgram, ...(initialHostShopName ? { hasHostShop: 'yes', hostShopName: initialHostShopName } : {}) }
+      : savedData.form;
+    setForm(resumed.program.includes('apprenticeship') ? { ...resumed, fundingSource: 'self_pay' } : resumed);
+    setWorkOneAcknowledged(savedData.workOneAcknowledged);
+    setApprenticeshipFundingConfirmed(Boolean(savedData.apprenticeshipFundingConfirmed));
+    setTransferHoursDocument(null);
+    setStep(Math.min(Math.max(savedStep || 1, 1), 5));
+    setShowResume(false);
+  }
+
+  function validateStep(current: number): string | null {
+    if (current === 1) {
+      if (!form.firstName || !form.lastName || !form.dateOfBirth || !form.email || !form.phone) {
+        return 'Complete your name, date of birth, email, and phone number.';
+      }
+      if (!form.address || !form.city || !form.state || !form.zipCode) {
+        return 'Complete your current address, city, state, and ZIP code.';
+      }
+    }
+    if (current === 2) {
+      if (!form.program) return 'Select a program of interest.';
+      if (isApprenticeship && form.hasHostShop === 'yes' && !form.hostShopName) {
+        return 'Enter the name of your current or proposed Host Shop.';
+      }
+      if (isApprenticeship && transferHoursClaimed > 0 && !transferHoursDocument) {
+        return 'Upload documentation showing the apprenticeship hours you want transferred.';
+      }
+    }
+    if (current === 3) {
+      if (!form.fundingSource) return 'Select a funding/payment option or choose Not sure yet.';
+      if (apprenticeshipFundingSelected) return 'Apprenticeship enrollment is self-pay only. Choose self-pay.';
+      if (requiresWorkOne && !workOneAcknowledged) {
+        return 'For WIOA or Workforce Ready Grant, confirm that you scheduled or started the WorkOne intake process.';
+      }
+    }
+    return null;
+  }
+
+  function nextStep() {
+    const error = validateStep(step);
+    if (error) {
+      setResult({ success: false, error });
+      return;
+    }
+    const next = Math.min(step + 1, 5);
+    persist(next);
+    setStep(next);
+    setResult(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function previousStep() {
+    const previous = Math.max(step - 1, 1);
+    persist(previous);
+    setStep(previous);
+    setResult(null);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setResult(null);
+
+    if (applicationIntent === 'enrollment' && !paymentSessionId) {
+      setResult({
+        success: false,
+        error: 'Complete the verified payment or BNPL checkout before submitting this enrollment application.',
+      });
+      return;
+    }
+
+    const priorErrors = [1, 2, 3].map(validateStep).find(Boolean);
+    if (priorErrors) {
+      setResult({ success: false, error: priorErrors });
+      return;
+    }
+    if (!consentAcknowledged) {
+      setResult({
+        success: false,
+        error: 'Confirm the application certification and information-verification consent before submitting.',
+      });
+      return;
+    }
+
+    setSubmitting(true);
+
+    const supportSummary = [
+      form.employmentStatus ? `Employment status: ${form.employmentStatus}` : '',
+      form.currentEmployer ? `Current employer: ${form.currentEmployer}` : '',
+      form.highestEducation ? `Highest education: ${form.highestEducation}` : '',
+      form.militaryConnected ? `Military connected: ${form.militaryConnected}` : '',
+      form.felonRecord ? `Criminal record response: ${form.felonRecord}` : '',
+      form.felonDetails ? `Record details: ${form.felonDetails}` : '',
+      form.transportationNeeds ? `Transportation needs: ${form.transportationNeeds}` : '',
+      form.childcareNeeds ? `Childcare needs: ${form.childcareNeeds}` : '',
+      form.goals ? `Career goals: ${form.goals}` : '',
+      form.supportNeeds ? `Other support needs: ${form.supportNeeds}` : '',
+    ]
+      .filter(Boolean)
+      .join(' | ');
+
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      dateOfBirth: form.dateOfBirth,
+      email: form.email,
+      phone: form.phone,
+      preferredContact: form.preferredContact,
+      address: form.address,
+      city: form.city,
+      state: form.state,
+      zip: form.zipCode,
+      zipCode: form.zipCode,
+      countyOfResidence: form.countyOfResidence || undefined,
+      program: form.program,
+      programSlug: form.program,
+      modalityPreference: form.modalityPreference || undefined,
+      hasHostShop: isApprenticeship ? form.hasHostShop || undefined : undefined,
+      hostShopName: isApprenticeship ? form.hostShopName || undefined : undefined,
+      transferHours: isApprenticeship ? form.transferHours || '0' : '0',
+      fundingType: form.fundingSource,
+      funding: form.fundingSource,
+      fundingEligibilityStatus: form.fundingEligibilityStatus || undefined,
+      householdIncome: form.householdIncome || undefined,
+      familySize: form.familySize || undefined,
+      hasCaseManager: form.hasCaseManager || undefined,
+      caseManagerAgency: form.caseManagerAgency || undefined,
+      supportNeeds: supportSummary || undefined,
+      howDidYouHear: form.howDidYouHear || undefined,
+      workoneIntakeCompleted: requiresWorkOne ? 'scheduled_or_in_process' : undefined,
+      workOneAppointmentConfirmed: requiresWorkOne ? workOneAcknowledged : false,
+      workoneCenter: requiresWorkOne ? form.workoneCenter || undefined : undefined,
+      workoneChecklist: requiresWorkOne
+        ? ['WorkOne intake appointment scheduled or intake process started']
+        : undefined,
+      workOneAppointmentUrl: requiresWorkOne ? WORKONE_INTAKE_URL : undefined,
+      source: 'student-application',
+      applicationCertification: true,
+      applicationIntent,
+      billingInvoiceId: paymentSessionId || undefined,
+      apprenticeshipFundingApprovalAcknowledged: apprenticeshipFundingSelected
+        ? apprenticeshipFundingConfirmed
+        : undefined,
+    };
+
+    try {
+      if (isApprenticeship && transferHoursClaimed > 0) {
+        if (!transferHoursDocument) {
+          setResult({
+            success: false,
+            error: 'Upload documentation showing the apprenticeship hours you want transferred.',
+          });
+          return;
+        }
+        await uploadTransferHoursEvidence({
+          file: transferHoursDocument,
+          email: form.email,
+          program: form.program,
+          hoursClaimed: transferHoursClaimed,
+        });
+      }
+
+      const { res, data } = await postApplication(payload, submissionKey);
+      if (res.ok && (data.ok === true || data.success === true) && (data.id || data.applicationId || data.referenceNumber)) {
+        clearDraft();
+        const duplicateWarning = data.duplicateWarning || undefined;
+        setResult({
+          success: true,
+          message: data.recordType === 'lead'
+            ? 'Inquiry received. Opening secure deposit checkout; enrollment is not yet submitted.'
+            : applicationIntent === 'enrollment' ? 'Enrollment activated. Opening your dashboard.' : 'Intake Application received. Your enrollment is not yet active.',
+          ...(duplicateWarning ? { warning: duplicateWarning } : {}),
+        });
+        const ref = data.referenceNumber || '';
+        const prog = data.program || form.program || '';
+        const q = new URLSearchParams();
+        if (ref) q.set('ref', ref);
+        if (prog) q.set('program', prog);
+        const suffix = q.toString() ? `?${q.toString()}` : '';
+        const nextStepUrl =
+          typeof data.nextStepUrl === 'string' && (data.nextStepUrl.startsWith('/') && !data.nextStepUrl.startsWith('//') || ['https://app.elevateforhumanity.org/apprentice', 'https://app.elevateforhumanity.org/learner/dashboard'].includes(data.nextStepUrl))
+            ? data.nextStepUrl
+            : `/apply/success${suffix}`;
+        setTimeout(() => router.push(nextStepUrl), 1200);
+      } else {
+        setResult({
+          success: false,
+          error: data.error || 'The application could not be submitted. Please review the form and try again.',
+        });
+      }
+    } catch (error) {
+      persist(step);
+      setResult({
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (463) 240-1404.',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const fieldClass =
+    'w-full rounded-lg border border-slate-400 bg-white px-4 py-3 text-base text-slate-950 focus:border-brand-red-600 focus:outline-none focus:ring-2 focus:ring-red-100';
+  const labelClass = 'mb-1 block text-sm font-bold text-slate-950';
+
+  if (result?.success) {
+    return (
+      <div className="rounded-xl border border-green-300 bg-white p-8 text-center sm:p-12">
+        <h3 className="text-2xl font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Enrollment Activated' : 'Intake Application Received'}</h3>
+        <p className="mt-3 text-base text-slate-800">{result.message}</p>
+        {result.warning && (
+          <div className="mx-auto mt-4 max-w-md rounded-lg border border-amber-300 bg-amber-50 p-3 text-left text-sm text-amber-950">
+            <strong>Note:</strong> {result.warning}
+          </div>
+        )}
+        <p className="mt-4 text-sm font-semibold text-slate-800">Opening your confirmation page…</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="rounded-xl border border-slate-300 bg-white p-6 sm:p-8">
+      <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Full Enrollment Application' : 'Intake Application — request information'}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{applicationIntent === 'enrollment' ? 'Payment must be verified before submission. Submitting your paid full application activates your enrollment and dashboard. Complete orientation, required documents, and any required training placement before training starts.' : 'Ask questions and let admissions help you compare programs. No payment is required for this inquiry. It does not enroll you or reserve a Host Shop placement.'}</p></div>
+      {showResume && savedData && (
+        <div className="mb-6 rounded-xl border border-blue-300 bg-blue-50 p-4 text-slate-950">
+          <p className="font-black">You have a saved application</p>
+          <p className="mt-1 text-sm">
+            Saved {savedAt ? savedAt.toLocaleString() : 'recently'}. Resume where you left off or start fresh.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={resumeDraft} className="rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white">
+              Resume application
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearDraft();
+                setTransferHoursDocument(null);
+                setShowResume(false);
+              }}
+              className="rounded-lg border border-slate-400 bg-white px-4 py-2 text-sm font-bold text-slate-950"
+            >
+              Start fresh
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-8">
+        <div className="mb-3 flex items-center justify-between text-sm font-bold text-slate-700">
+          <span>Step {step} of 5</span>
+          <button type="button" onClick={() => persist(step)} className="text-brand-blue-700 underline">
+            Save progress
+          </button>
+        </div>
+        <div className="grid grid-cols-5 gap-1">
+          {STEP_LABELS.map((label, index) => {
+            const number = index + 1;
+            return (
+              <div key={label} className="text-center">
+                <div className={`h-2 rounded-full ${number <= step ? 'bg-brand-red-600' : 'bg-slate-200'}`} />
+                <span className={`mt-2 hidden text-xs sm:block ${number === step ? 'font-black text-slate-950' : 'text-slate-500'}`}>
+                  {label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {step === 1 && (
+        <section className="space-y-5">
+          <div>
+            <h3 className="text-xl font-black text-slate-950">Personal and contact information</h3>
+            <p className="mt-1 text-sm text-slate-700">Use your legal name and current contact information.</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><label htmlFor="firstName" className={labelClass}>First Name *</label><input id="firstName" aria-label="First Name" name="firstName" required value={form.firstName} onChange={handleChange} className={fieldClass} autoComplete="given-name" /></div>
+            <div><label htmlFor="lastName" className={labelClass}>Last Name *</label><input id="lastName" aria-label="Last Name" name="lastName" required value={form.lastName} onChange={handleChange} className={fieldClass} autoComplete="family-name" /></div>
+            <div><label htmlFor="dateOfBirth" className={labelClass}>Date of Birth *</label><input id="dateOfBirth" aria-label="Date of Birth" type="date" name="dateOfBirth" required value={form.dateOfBirth} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="preferredContact" className={labelClass}>Preferred Contact</label><select id="preferredContact" name="preferredContact" value={form.preferredContact} onChange={handleChange} className={fieldClass}><option value="phone">Phone</option><option value="text">Text</option><option value="email">Email</option></select></div>
+            <div><label htmlFor="email" className={labelClass}>Email *</label><input id="email" aria-label="Email" type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} autoComplete="email" /></div>
+            <div><label htmlFor="phone" className={labelClass}>Phone *</label><input id="phone" aria-label="Phone" type="tel" name="phone" required value={form.phone} onChange={handleChange} className={fieldClass} autoComplete="tel" /></div>
+            <div className="sm:col-span-2"><label htmlFor="address" className={labelClass}>Street Address *</label><input id="address" aria-label="Street Address" name="address" required value={form.address} onChange={handleChange} className={fieldClass} autoComplete="street-address" /></div>
+            <div><label htmlFor="city" className={labelClass}>City *</label><input id="city" aria-label="City" name="city" required value={form.city} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="state" className={labelClass}>State *</label><input id="state" aria-label="State" name="state" required value={form.state} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="zipCode" className={labelClass}>ZIP Code *</label><input id="zipCode" aria-label="ZIP Code" name="zipCode" required value={form.zipCode} onChange={handleChange} className={fieldClass} inputMode="numeric" maxLength={10} /></div>
+            <div><label htmlFor="countyOfResidence" className={labelClass}>County of Residence</label><input id="countyOfResidence" aria-label="County of Residence" name="countyOfResidence" value={form.countyOfResidence} onChange={handleChange} className={fieldClass} /></div>
+          </div>
+        </section>
+      )}
+
+      {step === 2 && (
+        <section className="space-y-5">
+          <div>
+            <h3 className="text-xl font-black text-slate-950">Program and training preferences</h3>
+            <p className="mt-1 text-sm text-slate-700">Tell us what you want to study and how you prefer to train.</p>
+          </div>
+          <div><label htmlFor="program" className={labelClass}>Program of Interest *</label><select id="program" name="program" required disabled={lockedProgram} value={form.program} onChange={handleChange} className={fieldClass}>{!lockedProgram && <option value="">Select a program</option>}{PROGRAMS.filter(program => !lockedProgram || program.value === initialProgram).map((program) => <option key={program.value} value={program.value}>{program.label}</option>)}</select></div>
+          <div><label htmlFor="modalityPreference" className={labelClass}>Training Preference</label><select id="modalityPreference" name="modalityPreference" value={form.modalityPreference} onChange={handleChange} className={fieldClass}><option value="">No preference</option><option value="in_person">In person</option><option value="hybrid">Hybrid</option><option value="online">Online where available</option></select></div>
+          {isApprenticeship && (
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-5">
+              <h4 className="font-black text-slate-950">Apprenticeship placement information</h4>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div><label htmlFor="hasHostShop" className={labelClass}>Do you already have a Host Shop?</label><select id="hasHostShop" name="hasHostShop" value={form.hasHostShop} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="need_help">I need placement help</option></select></div>
+                <div><label htmlFor="hostShopName" className={labelClass}>Host Shop Name</label><input id="hostShopName" name="hostShopName" value={form.hostShopName} onChange={handleChange} className={fieldClass} /></div>
+                <div><label htmlFor="transferHours" className={labelClass}>Prior/Transfer Hours Claimed</label><input id="transferHours" type="number" min="0" name="transferHours" value={form.transferHours} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Claimed hours require documentation and verification before credit is awarded.</p></div>
+                {transferHoursClaimed > 0 && (
+                  <div className="sm:col-span-2 rounded-lg border border-amber-300 bg-amber-50 p-4">
+                    <label className={labelClass}>Transfer Hours Documentation *</label>
+                    <input
+                      type="file"
+                      required
+                      accept={TRANSFER_HOURS_EVIDENCE_ACCEPT}
+                      onChange={(event) => {
+                        setTransferHoursDocument(event.target.files?.[0] ?? null);
+                        setResult(null);
+                      }}
+                      className="block w-full rounded-lg border border-amber-300 bg-white px-3 py-3 text-sm text-slate-950 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:font-bold file:text-white"
+                    />
+                    <p className="mt-2 text-xs font-semibold text-amber-950">Upload an official transcript, hours statement, state-board record, prior school record, or employer/apprenticeship hours verification. PDF, JPG, PNG, or WEBP; maximum 10 MB.</p>
+                    {transferHoursDocument && <p className="mt-2 text-xs text-slate-700">Selected: {transferHoursDocument.name}</p>}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {step === 3 && (
+        <section className="space-y-5">
+          <div><h3 className="text-xl font-black text-slate-950">{isApprenticeship ? "Self-pay enrollment" : "Funding and eligibility"}</h3><p className="mt-1 text-sm text-slate-700">{isApprenticeship ? "Apprenticeship tuition is self-pay only. Review your program’s published tuition and payment terms." : "Funding eligibility is determined by the applicable workforce agency, not by submitting this form."}</p></div>
+          {isApprenticeship ? <ApprenticeshipFundingNotice /> : null}
+          <div><label htmlFor="fundingSource" className={labelClass}>How do you plan to pay? *</label><select id="fundingSource" name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option>{!isApprenticeship ? <><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option></> : null}{!isApprenticeship ? <option value="not_sure">Not sure yet</option> : null}</select></div>
+
+          {requiresWorkOne && (
+            <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-5 text-amber-950">
+              <h4 className="font-black">WorkOne intake required for this funding path</h4>
+              <p className="mt-2 text-sm leading-6">Schedule or begin your WorkOne intake before submitting a WIOA/WRG-funded application.</p>
+              <a href={WORKONE_INTAKE_URL} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-extrabold text-white">Schedule WorkOne Intake</a>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div><label htmlFor="fundingEligibilityStatus" className={labelClass}>WorkOne Status</label><select id="fundingEligibilityStatus" name="fundingEligibilityStatus" value={form.fundingEligibilityStatus} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="needs_appointment">Need appointment</option><option value="appointment_scheduled">Appointment scheduled</option><option value="in_process">Eligibility in process</option><option value="approved">Approved / referred</option></select></div>
+                <div><label htmlFor="workoneCenter" className={labelClass}>WorkOne Center / Region</label><input id="workoneCenter" name="workoneCenter" value={form.workoneCenter} onChange={handleChange} className={fieldClass} /></div>
+              </div>
+              <label className="mt-4 flex items-start gap-3 text-sm font-bold"><input type="checkbox" checked={workOneAcknowledged} onChange={(event) => setWorkOneAcknowledged(event.target.checked)} className="mt-1 h-5 w-5" /><span>I have scheduled the WorkOne intake appointment or I am already working with WorkOne on this funding request.</span></label>
+            </div>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><label htmlFor="hasWorkOneReferral" className={labelClass}>Referred by WorkOne?</label><select id="hasWorkOneReferral" name="hasWorkOneReferral" value={form.hasWorkOneReferral} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="familySize" className={labelClass}>Household Size</label><input id="familySize" type="number" min="1" name="familySize" value={form.familySize} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="householdIncome" className={labelClass}>Approximate Annual Household Income</label><input id="householdIncome" type="number" min="0" name="householdIncome" value={form.householdIncome} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Used only for preliminary funding/support screening. Workforce agencies make final eligibility decisions.</p></div>
+          </div>
+        </section>
+      )}
+
+      {step === 4 && (
+        <section className="space-y-5">
+          <div><h3 className="text-xl font-black text-slate-950">Background and support needs</h3><p className="mt-1 text-sm text-slate-700">These answers help admissions and workforce staff identify the correct pathway and support services.</p></div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><label htmlFor="employmentStatus" className={labelClass}>Employment Status</label><select id="employmentStatus" name="employmentStatus" value={form.employmentStatus} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="unemployed">Unemployed</option><option value="part_time">Employed part-time</option><option value="full_time">Employed full-time</option><option value="self_employed">Self-employed</option></select></div>
+            <div><label htmlFor="currentEmployer" className={labelClass}>Current Employer</label><input id="currentEmployer" name="currentEmployer" value={form.currentEmployer} onChange={handleChange} className={fieldClass} /></div>
+            <div><label htmlFor="highestEducation" className={labelClass}>Highest Education</label><select id="highestEducation" name="highestEducation" value={form.highestEducation} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="less_than_hs">Less than high school</option><option value="hs_ged">High school / GED / HSE</option><option value="some_college">Some college</option><option value="associate">Associate degree</option><option value="bachelor_plus">Bachelor degree or higher</option></select></div>
+            <div><label htmlFor="militaryConnected" className={labelClass}>Military Connected?</label><select id="militaryConnected" name="militaryConnected" value={form.militaryConnected} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="felonRecord" className={labelClass}>Criminal Record?</label><select id="felonRecord" name="felonRecord" value={form.felonRecord} onChange={handleChange} className={fieldClass}><option value="">Prefer not to answer / Select</option><option value="none">No</option><option value="misdemeanor">Misdemeanor</option><option value="felony">Felony</option></select></div>
+            {form.felonRecord && form.felonRecord !== 'none' && <div><label htmlFor="felonDetails" className={labelClass}>Record Details / Reentry Support Needed</label><input id="felonDetails" name="felonDetails" value={form.felonDetails} onChange={handleChange} className={fieldClass} /></div>}
+            <div><label htmlFor="hasCaseManager" className={labelClass}>Do you have a Case Manager?</label><select id="hasCaseManager" name="hasCaseManager" value={form.hasCaseManager} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            {form.hasCaseManager === 'yes' && <div><label htmlFor="caseManagerAgency" className={labelClass}>Case Manager / Agency</label><input id="caseManagerAgency" name="caseManagerAgency" value={form.caseManagerAgency} onChange={handleChange} className={fieldClass} /></div>}
+            <div><label htmlFor="transportationNeeds" className={labelClass}>Transportation Support Needed?</label><select id="transportationNeeds" name="transportationNeeds" value={form.transportationNeeds} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div><label htmlFor="childcareNeeds" className={labelClass}>Childcare Support Needed?</label><select id="childcareNeeds" name="childcareNeeds" value={form.childcareNeeds} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+          </div>
+          <div><label htmlFor="supportNeeds" className={labelClass}>Other Support Needs</label><textarea id="supportNeeds" name="supportNeeds" rows={3} value={form.supportNeeds} onChange={handleChange} className={fieldClass} placeholder="Housing, technology, uniforms, testing accommodations, scheduling, etc." /></div>
+          <div><label htmlFor="goals" className={labelClass}>Career Goals</label><textarea id="goals" name="goals" rows={3} value={form.goals} onChange={handleChange} className={fieldClass} /></div>
+          <div><label htmlFor="howDidYouHear" className={labelClass}>How did you hear about Elevate?</label><select id="howDidYouHear" name="howDidYouHear" value={form.howDidYouHear} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="workone">WorkOne / workforce agency</option><option value="referral">Referral</option><option value="google">Google / web search</option><option value="social">Social media</option><option value="community">Community event / organization</option><option value="employer">Employer</option><option value="other">Other</option></select></div>
+        </section>
+      )}
+
+      {step === 5 && (
+        <section className="space-y-5">
+          <div><h3 className="text-xl font-black text-slate-950">Review and certify</h3><p className="mt-1 text-sm text-slate-700">Review the key information below before submission.</p></div>
+          <div className="grid gap-3 rounded-xl bg-slate-50 p-5 text-sm text-slate-900 sm:grid-cols-2">
+            <p><strong>Applicant:</strong> {form.firstName} {form.lastName}</p>
+            <p><strong>Program:</strong> {PROGRAMS.find((p) => p.value === form.program)?.label || form.program}</p>
+            <p><strong>Email:</strong> {form.email}</p>
+            <p><strong>Phone:</strong> {form.phone}</p>
+            <p><strong>Location:</strong> {form.city}, {form.state} {form.zipCode}</p>
+            <p><strong>{isApprenticeship ? "Payment:" : "Funding:"}</strong> {form.fundingSource || 'Not selected'}</p>
+            {isApprenticeship && <p><strong>Host Shop:</strong> {form.hasHostShop === 'yes' ? form.hostShopName || 'Yes' : form.hasHostShop || 'Not provided'}</p>}
+            {isApprenticeship && transferHoursClaimed > 0 && <p><strong>Transfer Hours:</strong> {transferHoursClaimed.toLocaleString()} claimed — evidence: {transferHoursDocument?.name || 'required'}</p>}
+          </div>
+          <label className="flex items-start gap-3 rounded-xl border border-slate-300 p-4 text-sm font-semibold leading-6 text-slate-900">
+            <input type="checkbox" checked={consentAcknowledged} onChange={(event) => setConsentAcknowledged(event.target.checked)} className="mt-1 h-5 w-5 shrink-0" />
+            <span>I certify that the information provided is accurate to the best of my knowledge. I authorize Elevate for Humanity to use this information for admissions, program placement, funding coordination, credential verification, and necessary communication with workforce or training partners involved in my enrollment. {applicationIntent === 'enrollment' ? 'I understand that submitting this full application after verified payment activates my enrollment and dashboard. Required onboarding and any training placement must be completed before training begins.' : 'I understand that intake does not activate enrollment or a dashboard.'} Public funding is not guaranteed.</span>
+          </label>
+        </section>
+      )}
+
+      {result?.error && <div role="alert" className="mt-6 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-950">{result.error}</div>}
+
+      <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
+        {step > 1 ? <button type="button" onClick={previousStep} className="min-h-12 w-full rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900 sm:w-auto">Back</button> : <span />}
+        {step < 5 ? <button key="continue" type="button" onClick={nextStep} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 sm:w-auto">Continue</button> : <button key="submit" type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="min-h-12 w-full rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600 sm:w-auto">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : applicationIntent === 'enrollment' ? 'Submit Full Enrollment Application' : 'Submit Intake Application'}</button>}
+      </div>
+    </form>
+  );
+}

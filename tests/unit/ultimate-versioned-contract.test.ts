@@ -1,0 +1,144 @@
+import { describe, it, expect, vi } from 'vitest';
+import { UltimateBuildRunner } from '../../lib/ultimate-course-builder/core/build-runner';
+import {
+  contractHash,
+  currentEvidence,
+  stepInputHash,
+  validateStepOutput,
+  practicalVisualFailures,
+  ULTIMATE_LESSON_CONTRACT_VERSION,
+  MAX_TARGETED_REPAIRS,
+} from '../../lib/ultimate-course-builder/core/lesson-contract';
+import type { UltimateRunContext } from '../../lib/ultimate-course-builder/core/build-runner';
+const profile: any = {
+  id: 'course:test',
+  title: 'Safety',
+  authority: 'course-defined',
+  standardVersion: '1',
+  sourceDocuments: [],
+  competencies: [
+    {
+      id: 'one',
+      title: 'Safety',
+      description: 'Safety',
+      type: 'knowledge',
+      authorityRequirementIds: [],
+      requiresDemonstration: false,
+      requiresPracticalEvidence: false,
+    },
+  ],
+};
+const context = (): UltimateRunContext => ({
+  buildId: 'test:one',
+  courseId: 'test',
+  profile,
+  artifacts: {},
+  findings: [],
+  passedSteps: new Set(),
+});
+const standards = { requirements: { competencies: profile.competencies, version: '1' } };
+describe('versioned lesson contract', () => {
+  it('rechecks practical graphics checkpoints while retaining actual licensed footage', () => {
+    const artifacts: any={storyboard:{storyboard:{scenes:[{id:'demo',stage:'demonstration'}]}},
+      visual_assignment:{media:{assignments:[{sceneId:'demo',assetId:'clip',licenseEvidenceUrl:'https://media.example/license'}],
+        readyAssets:[{id:'clip',entitlement_id:'license',mime_type:'video/mp4',public_url:'https://media.example/video'}]}}};
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual([]);
+    artifacts.visual_assignment.media.assignments[0].generatedInstructionalVisual=true;
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual(['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED']);
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:false})).toEqual([]);
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true,type:'knowledge'})).toEqual([]);
+  });
+  it('rejects label-only QA and empty objectives', () => {
+    expect(
+      validateStepOutput('finished_media_qa', { mediaQA: { pass: true, distinctShots: 7 } }),
+    ).toContain('ENCODED_MP4_INSPECTION_REQUIRED');
+    expect(validateStepOutput('learning_objectives', { objectives: [] })).toContain(
+      'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED',
+    );
+    expect(validateStepOutput('learner_runthrough', { learnerQA: { pass: true } })).toContain(
+      'BROWSER_RUNTHROUGH_REQUIRED',
+    );
+  });
+  it('never executes downstream stages after missing content', async () => {
+    const downstream = vi.fn();
+    const c = context();
+    await new UltimateBuildRunner({
+      standards_lock: async () => ({ artifacts: standards }),
+      learning_objectives: async () => ({ artifacts: { objectives: [] } }),
+      prerequisites: downstream,
+    }).run(c);
+    expect(downstream).not.toHaveBeenCalled();
+    expect(c.findings.some((f) => f.code === 'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED')).toBe(true);
+  });
+  it('error findings block even if a handler claims passed', async () => {
+    const downstream = vi.fn();
+    const c = context();
+    await new UltimateBuildRunner({
+      standards_lock: async () => ({
+        artifacts: standards,
+        passed: true,
+        findings: [
+          {
+            step: 'standards_lock',
+            severity: 'error',
+            code: 'SOURCE_INVALID',
+            message: 'Invalid source',
+          },
+        ],
+      }),
+      learning_objectives: downstream,
+    }).run(c);
+    expect(downstream).not.toHaveBeenCalled();
+  });
+  it('binds evidence to exact inputs and output, invalidating tampered checkpoints', () => {
+    const hash = stepInputHash('standards_lock', profile, {});
+    const a: any = {
+      ...standards,
+      contractEvidence: {
+        version: ULTIMATE_LESSON_CONTRACT_VERSION,
+        inputHash: hash,
+        outputHash: contractHash(standards),
+        passed: true,
+      },
+    };
+    expect(currentEvidence(a, hash)).toBe(true);
+    a.requirements = { ...a.requirements, version: '2' };
+    expect(currentEvidence(a, hash)).toBe(false);
+  });
+  it('executes bounded transient repairs and records attempts', async () => {
+    let calls = 0;
+    const c = context();
+    await new UltimateBuildRunner({
+      standards_lock: async () => {
+        calls++;
+        throw new Error('HTTP 503');
+      },
+    }).run(c);
+    expect(calls).toBe(MAX_TARGETED_REPAIRS + 1);
+    expect((c.artifacts.selective_repair as any).repair.attempts).toHaveLength(MAX_TARGETED_REPAIRS);
+    expect(c.findings).toHaveLength(1);
+  });
+  it('does not retry absent sources as if a retry could supply them', async () => {
+    const handler = vi.fn(async () => {
+      throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
+    });
+    const c = context();
+    await new UltimateBuildRunner({ standards_lock: handler }).run(c);
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+  it.each(['ULTIMATE_INSTRUCTIONAL_SOURCES_REQUIRED','ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED'])('defers %s without consuming internal repair attempts',async(code)=>{
+    const handler=vi.fn(async()=>{throw new Error(code);});
+    const c=context();await new UltimateBuildRunner({standards_lock:handler}).run(c);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect((c.artifacts.selective_repair as any).repair.attempts).toEqual([]);
+    expect(c.findings[0].code).toBe(code);
+  });
+});
+
+it('publication settings preserve saved teaching hashes without accepting instructional changes',()=>{
+ for(const step of ['standards_lock','natural_narration','lesson_film_render'] as const){
+  const original=stepInputHash(step,profile,{});
+  expect(stepInputHash(step,{...profile,publishCompletedLessons:true,preservedPublishedLessonIds:['prior-lesson']},{})).toBe(original);
+  expect(stepInputHash(step,{...profile,title:'A different instructional course'},{})).not.toBe(original);
+ }
+});

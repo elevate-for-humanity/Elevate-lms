@@ -1,0 +1,433 @@
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
+import { curateShopGallery } from '@/lib/partners/curated-shop-media';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { formatHostShopAddress } from '@/lib/partners/host-shop-address';
+import { ExternalLink, MapPin, Navigation, Phone, ShieldCheck } from 'lucide-react';
+import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
+import { getFeaturedHostPartnerBySlug, type FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
+import { getPublicHostShopBySlug } from '@/lib/partners/public-host-shops';
+import { getApprovedShopByPublicSlug, type HostShop } from '@/lib/programs/host-shops';
+
+export const dynamic = 'force-dynamic';
+const SITE_URL = 'https://www.elevateforhumanity.org';
+type PageProps = { params: Promise<{ slug: string }> };
+
+function directionsUrl(address: string) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+}
+function mapEmbedUrl(address: string) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(address)}&z=15&output=embed`;
+}
+function applyHref(program: string, shopName: string, shopId: string) {
+  const slug = program.includes('cosmet') ? 'cosmetology-apprenticeship' : program.includes('esthetic') ? 'esthetician-apprenticeship' : program.includes('nail') ? 'nail-technician-apprenticeship' : 'barber-apprenticeship';
+  return `/programs/${slug}/apply?hostShop=${encodeURIComponent(shopName)}&hostShopId=${shopId}`;
+}
+function programLabel(program: string) {
+  if (program.includes('cosmet')) return 'Cosmetology Apprenticeship';
+  if (program.includes('esthetic')) return 'Esthetician Apprenticeship';
+  if (program.includes('nail')) return 'Nail Technician Apprenticeship';
+  return 'Barber Apprenticeship';
+}
+function businessType(programs: string[]) {
+  return programs.some((program) => program.includes('barber')) ? 'HairSalon' : 'BeautySalon';
+}
+function absoluteMediaUrl(url: string) {
+  return new URL(url, SITE_URL).toString();
+}
+function dedupeMedia(items: Array<{ url: string; alt?: string; source?: string }>) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.url.trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const [profile, approvedRecord, network] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug), getHostShopNetwork()]);
+  const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
+  const approved = approvedRecord && entry ? {
+    ...approvedRecord,
+    description: entry.description,
+    mediaGallery: entry.gallery,
+    videoUrl: entry.videoUrl,
+    website: entry.website,
+    booking: entry.booking,
+  } : approvedRecord;
+  if (!approved) return { robots: { index: false, follow: false } };
+  if (!profile || !approved) {
+    const featured = getFeaturedHostPartnerBySlug(slug);
+    if (!featured && approved) {
+      const canonical = `${SITE_URL}/host-shops/${approved.publicSlug}`;
+      const description = approved.description || `${approved.name} is an approved Elevate apprenticeship Host Site${approved.city ? ` in ${approved.city}, ${approved.state}` : ''}.`;
+      return {
+        title: `${approved.name}${approved.city ? ` in ${approved.city}, ${approved.state}` : ''} | Host Site`,
+        description,
+        keywords: [approved.name, `${approved.city} ${approved.state} host shop`, ...approved.programs.map(programLabel)].filter(Boolean),
+        alternates: { canonical },
+        robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+        openGraph: { title: `${approved.name} | Apprenticeship Host Site`, description, url: canonical, type: 'website' },
+      };
+    }
+    if (!featured) return {};
+    const canonical = `${SITE_URL}/host-shops/${featured.slug}`;
+    const image = featured.media?.find((media) => media.kind !== 'video');
+    return {
+      title: `${featured.dba ?? featured.name} in ${featured.city}, ${featured.state} | Host Shop`,
+      description: featured.marketingBlurb ?? featured.note,
+      keywords: [
+        featured.dba ?? featured.name,
+        `${featured.businessType === 'BarberShop' ? 'barbershop' : 'hair salon'} in ${featured.city}`,
+        `${featured.city} ${featured.state} apprenticeship host shop`,
+        ...featured.programs.map(programLabel),
+      ],
+      alternates: { canonical },
+      robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+      openGraph: {
+        title: `${featured.dba ?? featured.name} | Apprenticeship Host Shop Partner`,
+        description: featured.marketingBlurb ?? featured.note,
+        url: canonical,
+        type: 'website',
+        images: image ? [{ url: absoluteMediaUrl(image.src), alt: image.alt }] : undefined,
+      },
+      twitter: { card: 'summary_large_image', title: `${featured.dba ?? featured.name} | Elevate Host Shop`, description: featured.marketingBlurb ?? featured.note, images: image ? [absoluteMediaUrl(image.src)] : undefined },
+    };
+  }
+  const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
+  const description = approved.description || `${approved.name} is an approved Elevate apprenticeship Host Site${approved.city ? ` in ${approved.city}, ${approved.state}` : ''}.`;
+  const gallery = curateShopGallery(slug, [...(approved.mediaGallery ?? []), ...(Array.isArray(profile.media_gallery) ? profile.media_gallery : [])]);
+  const image = gallery[0]?.url || profile.logo_url || profile.flyer_url;
+  return {
+    title: `${approved.name}${approved.city ? ` in ${approved.city}, ${approved.state}` : ''} | Host Site`,
+    description,
+    keywords: [approved.name, `${approved.city} ${approved.state} host shop`, ...approved.programs.map(programLabel)].filter(Boolean),
+    alternates: { canonical },
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+    openGraph: { title: `${approved.name} | Apprenticeship Host Site`, description, url: canonical, type: 'website', images: image ? [{ url: image, alt: `${approved.name} Host Site` }] : undefined },
+    twitter: { card: 'summary_large_image', title: `${approved.name} | Elevate Host Site`, description, images: image ? [image] : undefined },
+  };
+}
+
+export default async function HostShopProfilePage({ params }: PageProps) {
+  const { slug } = await params;
+  const [profile, approvedRecord, network] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug), getHostShopNetwork()]);
+  const entry = network.find((shop) => shop.slug === slug || shop.id === approvedRecord?.id);
+  const approved = approvedRecord && entry ? {
+    ...approvedRecord,
+    description: entry.description,
+    mediaGallery: entry.gallery,
+    videoUrl: entry.videoUrl,
+    website: entry.website,
+    booking: entry.booking,
+  } : approvedRecord;
+  if (!approved) return notFound();
+  if (!profile || !approved) {
+    const featured = getFeaturedHostPartnerBySlug(slug);
+    if (!featured && approved) return <ApprovedHostShopProfile shop={approved} />;
+    if (!featured) return notFound();
+    const currentMedia = curateShopGallery(featured.slug, [...(approved.mediaGallery ?? []), ...(featured.media ?? []).filter((media) => media.kind !== 'video').map((media) => ({ url: media.src, alt: media.alt }))]);
+    const shop: FeaturedHostPartner = approved ? {
+      ...featured,
+      programs: approved.programs,
+      address: approved.address || featured.address,
+      city: approved.city || featured.city,
+      state: approved.state || featured.state,
+      zip: approved.zip || featured.zip,
+      phone: approved.phone || featured.phone,
+      websiteUrl: approved.website || featured.websiteUrl,
+      media: [
+        ...(currentMedia ?? []).map((media) => ({ src: media.url, alt: media.alt || `${featured.name} portfolio`, kind: 'photo' as const })),
+        ...(approved.videoUrl ? [{ src: approved.videoUrl, alt: `${approved.name} shop video`, kind: 'video' as const, script: featured.media?.find(media => media.src === approved.videoUrl)?.script }] : (featured.media ?? []).filter((media) => media.kind === 'video')),
+      ],
+    } : featured;
+    return <FeaturedHostShopProfile shop={shop} />;
+  }
+
+  const address = formatHostShopAddress(approved);
+  const externalUrl = profile.website_url || profile.website || getFeaturedHostPartnerBySlug(slug)?.websiteUrl;
+  const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
+  const gallery = curateShopGallery(slug, [...(approved.mediaGallery ?? []), ...(Array.isArray(profile.media_gallery) ? profile.media_gallery : [])]);
+  const featuredFallback = getFeaturedHostPartnerBySlug(slug);
+  const featuredFallbackImages = (featuredFallback?.media ?? [])
+    .filter((media) => media.kind !== 'video')
+    .map((media) => ({ url: media.src, alt: media.alt }));
+  const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
+  const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
+  const videoUrl = approved.videoUrl || profile.video_url || featuredFallbackVideo || undefined;
+  const authoredVideoScript = featuredFallbackVideoMedia?.src === videoUrl ? featuredFallbackVideoMedia?.script : undefined;
+  const videoScript = authoredVideoScript || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
+  const items = curateShopGallery(slug, dedupeMedia([
+    ...gallery,
+    ...featuredFallbackImages,
+    ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
+    ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
+  ]));
+  const programs = approved.programs;
+  const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': businessType(programs),
+    '@id': `${canonical}#business`,
+    name: approved.name,
+    url: canonical,
+    description: approved.description || undefined,
+    telephone: approved.phone || undefined,
+    image: items.map((item) => absoluteMediaUrl(item.url)),
+    address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
+    sameAs: [externalUrl, featuredFallback?.socialUrl, featuredFallback?.bookingUrl].filter(Boolean),
+    potentialAction: featuredFallback?.bookingUrl ? { '@type': 'ReserveAction', target: featuredFallback.bookingUrl, name: `Book with ${approved.name}` } : undefined,
+    hasMap: mapUrl,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: programs.map(programLabel),
+  };
+
+  return (
+    <main className="overflow-x-hidden bg-white text-slate-950">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+
+      <section
+        className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50"
+        data-scroll-narration={!videoUrl ? '' : undefined}
+        data-narration={videoScript}
+        data-narration-rate={videoScript ? '0.82' : undefined}
+        data-narration-style={videoScript ? 'instructor' : undefined}
+      >
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
+          <div className="min-w-0">
+            <p className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
+            <h1 className="mt-4 break-words text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{approved.name}</h1>
+            {approved.description ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">{approved.description}</p> : null}
+            {programs.length ? <div className="mt-5 flex flex-wrap gap-2">{programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}</div> : null}
+            {approved.supervisor ? <p className="mt-4 text-sm font-semibold text-slate-600">Approved supervisor: <span className="text-slate-950">{approved.supervisor}</span></p> : null}
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white sm:justify-start"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
+              {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
+              {featuredFallback?.socialUrl ? <a href={featuredFallback.socialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">{featuredFallback.socialUrl.includes('instagram.com/') ? 'View shop Instagram' : 'View shop social pages'} <ExternalLink className="h-4 w-4" /></a> : null}
+              {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
+              {featuredFallback?.bookingUrl ? <a href={featuredFallback.bookingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Book a service <ExternalLink className="h-4 w-4" /></a> : null}
+            </div>
+          </div>
+          <div className="min-w-0">
+            {items.length || videoUrl ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={videoUrl} videoScript={authoredVideoScript} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
+          <div className="min-w-0">
+            <h2 className="text-2xl font-black">Visit {approved.name}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">Explore the shop portfolio and contact the business for services, prices, appointments, and current hours. Call the shop to confirm walk-in availability before visiting.</p>
+            <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+              {address ? <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span className="break-words">{address}</span></p> : null}
+              {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="mt-4 flex items-center gap-3 font-bold"><Phone className="h-5 w-5 shrink-0 text-brand-red-700" /> {approved.phone}</a> : null}
+            </div>
+            <p className="mt-5 text-sm leading-6 text-slate-600">The address shown here is the worksite on the approved apprenticeship Host Site record. A business may maintain other public storefront, mailing, booking, or service addresses. Placement at this worksite depends on occupation approval, apprentice fit, supervisor capacity, and current availability.</p>
+          </div>
+          {address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-300 sm:aspect-[16/10]"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-10 text-center sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-3xl font-black">Train at {approved.name}</h2>
+          <p className="mx-auto mt-4 max-w-3xl leading-7 text-slate-700">Apply through Elevate and identify this approved Host Site. Admissions and apprenticeship staff confirm the correct occupation and current placement availability.</p>
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+            {programs.map((program) => <Link key={program} href={applyHref(program, approved.name, approved.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white">Apply — {programLabel(program)}</Link>)}
+            <Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-extrabold">View all Host Sites</Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function ApprovedHostShopProfile({ shop }: { shop: HostShop & { booking?: string } }) {
+  const address = formatHostShopAddress(shop);
+  const canonical = `${SITE_URL}/host-shops/${shop.publicSlug}`;
+  const mapUrl = address ? directionsUrl(address) : undefined;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': businessType(shop.programs),
+    '@id': `${canonical}#business`,
+    name: shop.name,
+    url: canonical,
+    description: shop.description,
+    telephone: shop.phone || undefined,
+    address: address ? {
+      '@type': 'PostalAddress',
+      streetAddress: shop.address || undefined,
+      addressLocality: shop.city || undefined,
+      addressRegion: shop.state || undefined,
+      postalCode: shop.zip || undefined,
+      addressCountry: 'US',
+    } : undefined,
+    hasMap: mapUrl,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: shop.programs.map(programLabel),
+  };
+
+  return (
+    <main className="overflow-x-hidden bg-white text-slate-950">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-7xl">
+          {shop.mediaGallery?.length || shop.videoUrl ? <div className="mb-7"><HostShopMediaCarousel shopName={shop.name} items={shop.mediaGallery ?? []} videoUrl={shop.videoUrl} spacious /></div> : null}
+          <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{shop.description}</p>
+          <div className="mt-6 flex flex-wrap gap-2">{shop.programs.map((program) => <span key={program} className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-black">{programLabel(program)}</span>)}</div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            {shop.booking ? <a href={shop.booking} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 font-bold text-slate-950">Book a service</a> : null}
+            {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 px-5 py-3 font-bold">Visit shop website</a> : null}
+            {shop.phone ? <a href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {shop.phone}</a> : null}
+            {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-extrabold"><Navigation className="h-4 w-4" /> Map & directions</a> : null}
+          </div>
+        </div>
+      </section>
+      <section className="px-4 py-12 sm:px-6">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <h2 className="text-2xl font-black">Approved training location</h2>
+            {address ? <p className="mt-5 flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /> {address}</p> : null}
+            <p className="mt-5 text-sm leading-6 text-slate-600">Apprentice placement depends on occupation fit, supervisor capacity, sponsor review, and current availability.</p>
+          </div>
+          {address ? <div className="aspect-[16/10] overflow-hidden rounded-2xl border border-slate-300"><iframe title={`Map — ${shop.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+        </div>
+      </section>
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-12 text-center sm:px-6">
+        <div className="mx-auto max-w-4xl"><h2 className="text-3xl font-black">Explore opportunities with {shop.name}</h2><p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Apply through Elevate and select this Host Site. Staff will confirm the program and current placement availability.</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">{shop.programs.map((program) => <Link key={program} href={applyHref(program, shop.name, shop.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white">Apply — {programLabel(program)}</Link>)}<Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-black">View network</Link></div></div>
+      </section>
+    </main>
+  );
+}
+
+function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
+  const isBarberShop =
+    shop.businessType === 'BarberShop' ||
+    shop.programs.some((program) => program.toLowerCase().includes('barber'));
+  const hostLabel = isBarberShop ? 'Elevate Host Shop' : 'Elevate Host Salon';
+  const trainingSetting = isBarberShop ? 'barbershop' : 'salon';
+  const address = formatHostShopAddress(shop);
+  const imageItems = curateShopGallery(shop.slug, (shop.media ?? [])
+    .filter((media) => media.kind !== 'video')
+    .map((media) => ({ url: media.src, alt: media.alt })));
+  const videoMedia = shop.media?.find((media) => media.kind === 'video');
+  const videoUrl = videoMedia?.src;
+  const videoScript =
+    videoMedia?.script ??
+    `Welcome to ${shop.dba ?? shop.name}, an Elevate ${hostLabel}. This participating ${trainingSetting} supports supervised apprenticeship training in a real workplace. Placement, employment, supervision, and enrollment approval are confirmed through Elevate before training begins.`;
+  const mapUrl = directionsUrl(address);
+  const canonical = `${SITE_URL}/host-shops/${shop.slug}`;
+  const publicUrls = [shop.websiteUrl, shop.bookingUrl, shop.socialUrl, shop.onlineListingUrl].filter(Boolean);
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': shop.businessType === 'BarberShop' ? 'HairSalon' : 'BeautySalon',
+    '@id': `${canonical}#business`,
+    name: shop.dba ?? shop.name,
+    legalName: shop.dba ? shop.name : undefined,
+    url: canonical,
+    description: shop.marketingBlurb ?? shop.note,
+    telephone: shop.phone,
+    image: imageItems.map((item) => absoluteMediaUrl(item.url)),
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: shop.address,
+      addressLocality: shop.city,
+      addressRegion: shop.state,
+      postalCode: shop.zip,
+      addressCountry: 'US',
+    },
+    hasMap: mapUrl,
+    sameAs: publicUrls,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: shop.programs.map(programLabel),
+    potentialAction: shop.bookingUrl ? { '@type': 'ReserveAction', target: shop.bookingUrl, name: `Book with ${shop.dba ?? shop.name}` } : undefined,
+  };
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Host Shops', item: `${SITE_URL}/partners/host-shops` },
+      { '@type': 'ListItem', position: 2, name: shop.dba ?? shop.name, item: canonical },
+    ],
+  };
+
+  return (
+    <main className="overflow-x-hidden bg-white text-slate-950">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }} />
+      {videoUrl ? (
+        <section
+          className="border-b border-slate-200 bg-white px-4 py-8 sm:px-6 sm:py-12"
+
+        >
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
+              <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{shop.dba ?? shop.name}</h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
+              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Play the shop tour or use fullscreen for a larger view.</p>
+            </div>
+            <div className="min-w-0">
+              <HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={[]} videoUrl={videoUrl} videoScript={videoMedia?.script} spacious />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="border-b border-slate-200 bg-slate-50" data-scroll-narration data-narration={videoUrl ? undefined : videoScript}>
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
+          <div className="min-w-0">
+            <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>
+            {videoUrl ? <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">Explore the shop portfolio</h2> : <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">{shop.dba ?? shop.name}</h1>}
+            {!videoUrl ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">{shop.marketingBlurb ?? shop.note}</p> : null}
+            <div className="mt-5 flex flex-wrap gap-2">
+              {shop.programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}
+            </div>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              {shop.phone ? <a href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {shop.phone}</a> : null}
+              <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold"><Navigation className="h-4 w-4" /> Map & directions</a>
+              {shop.socialUrl ? <a href={shop.socialUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">View social portfolio ↗</a> : null}
+              {shop.bookingUrl ? <a href={shop.bookingUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">Book a service ↗</a> : null}
+              {shop.onlineListingUrl ? <a href={shop.onlineListingUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">Business listing ↗</a> : null}
+              {shop.websiteUrl ? <a href={shop.websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
+            </div>
+          </div>
+          <div className="order-first lg:order-none"><HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={imageItems} /></div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
+          <div className="min-w-0">
+            <h2 className="text-2xl font-black">Visit {shop.dba ?? shop.name}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">Explore the portfolio and use the shop’s booking, website, or phone links to plan your visit. Contact the shop to confirm current hours and walk-in availability.</p>
+            <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+              <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span>{address}</span></p>
+            </div>
+            <p className="mt-5 text-sm leading-6 text-slate-600">Apprenticeship placement depends on occupation fit, sponsor review, supervisor capacity, and current availability.</p>
+          </div>
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-300 sm:aspect-[16/10]"><iframe title={`Map — ${shop.dba ?? shop.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-10 text-center sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-3xl font-black">Interested in training with {shop.dba ?? shop.name}?</h2>
+          <p className="mx-auto mt-4 max-w-3xl leading-7 text-slate-700">Apply through Elevate and identify this Host Shop. Admissions staff will confirm the correct occupation and current placement availability.</p>
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+            {shop.programs.map((program) => <Link key={program} href={`/programs/${program}/apply?hostShop=${encodeURIComponent(shop.dba ?? shop.name)}`} className="rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white">Apply — {programLabel(program)}</Link>)}
+            <Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-extrabold">View all Host Shops</Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

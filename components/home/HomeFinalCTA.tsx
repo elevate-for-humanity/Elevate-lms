@@ -1,0 +1,64 @@
+import HomeSectionNarration from './HomeSectionNarration';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight, Phone } from 'lucide-react';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export function HomeFinalCTA() {
+  return (
+    <section className="bg-white px-4 pb-8 sm:pb-12" aria-labelledby="final-cta-heading">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-white text-slate-950 sm:grid sm:grid-cols-2">
+        <div className="relative aspect-[16/9] sm:aspect-auto sm:min-h-80">
+          <Image
+            src="/images/programs/refresh-20261101/home.webp"
+            alt="Illustrative adult learners collaborating in career training"
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="px-5 py-7 sm:px-8 sm:py-9">
+          <h2
+            id="final-cta-heading"
+            className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl"
+          >
+            Ready to get started?
+          </h2>
+          <p className="mt-3 max-w-xl text-base leading-6 text-slate-700">
+            Apply for training or talk with our team about your next step.
+          </p>
+          <HomeSectionNarration section="final" />
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link
+              href="/apply"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-brand-red-700"
+            >
+              Start my application <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link
+              href="/check-eligibility"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-slate-50"
+            >
+              Check my options
+            </Link>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+            <a
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`}
+              className="inline-flex min-h-11 items-center gap-2 font-semibold text-slate-950 hover:text-red-800"
+            >
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              {PLATFORM_DEFAULTS.mainPhone}
+            </a>
+            <Link
+              href="/contact"
+              className="inline-flex min-h-11 items-center font-semibold text-slate-950 hover:text-red-800"
+            >
+              Contact us
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

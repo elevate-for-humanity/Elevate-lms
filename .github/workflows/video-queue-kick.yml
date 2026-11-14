@@ -1,0 +1,163 @@
+name: Process approved course video queues
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Recovery sweep for durable queued jobs. Concurrency below prevents
+    # overlapping production drains when a manual or push run is active.
+    - cron: '17 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/video-queue-kick.yml'
+      - '.github/video-queue-trigger'
+      - 'lib/video/**'
+      - 'lib/course-factory/media-service.ts'
+      - 'lib/course-builder/licensed-media.ts'
+      - 'remotion-src/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: controlled-course-video-production
+  # A newer release supersedes a worker that is still waiting on an older
+  # deployment identity. Active render batches are database-leased and recover
+  # safely; stale workflow orchestrators must not block the corrected one.
+  cancel-in-progress: true
+
+jobs:
+  process:
+    if: github.ref == 'refs/heads/main'
+    name: Process universal canonical course video queue
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    steps:
+      - name: Check out release history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate trusted Admin media release ancestry
+        run: node --test scripts/gcp/verify-admin-media-release.test.mjs
+
+      - name: Resolve the approved Admin runtime revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Keep this path set aligned with deploy-admin.yml. The media worker
+          # must wait for the newest revision that can actually trigger an Admin
+          # deployment, not an unrelated shared component change.
+          required_admin_sha=$(git log -1 --format=%H -- \
+            apps/admin \
+            lib \
+            remotion-src \
+            packages \
+            components/admin \
+            components/studio \
+            components/pwa \
+            public/manifest-admin.json \
+            public/sw-admin.js \
+            public/offline.html \
+            'public/icon-*.png' \
+            'public/icon-*.webp' \
+            public/logo.svg \
+            public/logo.png \
+            public/logo.webp \
+            'public/logo-*.png' \
+            'public/logo-*.svg' \
+            'public/logo-*.webp' \
+            public/fonts \
+            scripts/northflank \
+            scripts/course-factory \
+            scripts/verify-admin-instrumentation-boundary.mjs \
+            scripts/guard-admin-routes.sh \
+            instrumentation.ts \
+            scripts/verify-no-retired-admin-ui-routes.mjs \
+            scripts/verify-portal-production-contracts.mjs \
+            next.config.mjs \
+            tailwind.config.js \
+            tsconfig.json \
+            proxy.ts \
+            Dockerfile.admin \
+            pnpm-lock.yaml \
+            package.json \
+            pnpm-workspace.yaml \
+            .github/workflows/deploy-admin.yml)
+          test -n "$required_admin_sha"
+          echo "REQUIRED_ADMIN_SHA=$required_admin_sha" >> "$GITHUB_ENV"
+          echo "Waiting for Admin runtime revision $required_admin_sha"
+
+      - name: Wait for the approved Admin media planner release
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            live_sha=$((curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/api/version" || true) | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const p=JSON.parse(d);process.stdout.write(p.commitSha||'')}catch{}})")
+            if bash scripts/gcp/verify-admin-media-release.sh "$REQUIRED_ADMIN_SHA" "$live_sha" "$GITHUB_SHA"; then
+              echo "Approved Admin media planner release is live (required=$REQUIRED_ADMIN_SHA, serving=$live_sha)"
+              exit 0
+            fi
+            echo "Admin media planner not live yet (attempt $attempt/90, live=$live_sha)"
+            sleep 60
+          done
+          echo "::error::Approved Admin media planner release did not become live"
+          exit 1
+
+      - name: Process all eligible canonical course queues
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CRON_SECRET"
+          transient_errors=0
+          while true; do
+            status=$(curl -sS --connect-timeout 30 --max-time 1800 \
+              -o /tmp/video-worker.json -w '%{http_code}' \
+              -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data '{"maxJobs":2}')
+            cat /tmp/video-worker.json
+            case "$status" in
+              200|202)
+                transient_errors=0
+                ;;
+              500|502|503|504)
+                transient_errors=$((transient_errors + 1))
+                echo "::warning::Transient video worker HTTP $status ($transient_errors/10); retrying"
+                if [ "$transient_errors" -ge 10 ]; then
+                  echo "::error::Video worker returned 10 consecutive transient server errors"
+                  exit 1
+                fi
+                sleep 30
+                continue
+                ;;
+              *)
+                echo "::error::Video worker returned HTTP $status"
+                exit 1
+                ;;
+            esac
+            started=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.started||0))")
+            reason=$(node -e "const p=require('/tmp/video-worker.json'); process.stdout.write(String(p.reason||''))")
+            if [ "$started" = "0" ]; then
+              if [ "$reason" = "render-capacity-full" ]; then
+                sleep 30
+                continue
+              fi
+              case "$reason" in
+                queue-empty|no-draft-or-queued-job) break ;;
+                course-builder-generation-paused|course-generation-paused)
+                  echo "::error::Eligible course generation is paused ($reason)"
+                  exit 1
+                  ;;
+                *)
+                  echo "::error::Queue made no progress (reason=$reason)"
+                  exit 1
+                  ;;
+              esac
+            fi
+            sleep 5
+          done

@@ -1,0 +1,20 @@
+name: Activate recovered exact Admin release
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/activate-recovered-admin-candidate.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Retry tested activation of the existing immutable Admin candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/activate-admin-candidate.yml/dispatches" \
+            -f ref=main \
+            -f 'inputs[revision]=elevate-admin-migration-00077-44f' \
+            -f 'inputs[image_sha]=21de9a5784357535b77cf60f6a50d3f15e5b3022'

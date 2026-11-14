@@ -1,0 +1,326 @@
+import type { ModuleSeed } from '../../../lib/curriculum/course-builder-types';
+
+export const module8: ModuleSeed = {
+  slug: 'barber-module-8',
+  title: 'Module 8: State Board Exam Preparation',
+  order: 8,
+  objective:
+    'Prepare for the Indiana barber state board written and practical exams through structured review and practice.',
+  lessons: [
+    {
+      slug: 'barber-lesson-46',
+      title: 'Indiana State Board Exam Overview',
+      durationMin: 20,
+      domain: 'STATE_BOARD_PREP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'Exam components: Written exam — 100 multiple choice questions, 75% passing score required, administered by PSI/NIC. Practical exam — performed on a mannequin or live model, graded by state board examiners.\n\nWritten exam topic weights: Infection control & sanitation 25%. Hair science & scalp analysis 20%. Haircutting & styling 25%. Chemical services 15%. Indiana laws & regulations 15%.\n\nPractical exam skills: Haircut with fade — clean fade with smooth transitions, no visible lines. Shave service — correct angle, grain direction, and skin tension. Sanitation procedures — pre-clean → disinfect → contact time, tested in sequence. Client draping — neck strip before cape, cape must not contact bare skin.\n\nApprenticeship vs. school path: School path requires 1,500 hours. Apprenticeship path (this program) requires 2,000 OJT hours. Both paths require the same written and practical exams.',
+      competencyChecks: [
+        {
+          id: 'passing-score',
+          type: 'KNOWLEDGE',
+          description: 'States the written exam passing score (75%) without prompting',
+          required: true,
+        },
+        {
+          id: 'topic-weights',
+          type: 'KNOWLEDGE',
+          description: 'Identifies the five topic areas and their approximate weights',
+          required: true,
+        },
+        {
+          id: 'practical-criteria',
+          type: 'KNOWLEDGE',
+          description: 'Describes what the practical exam tests — draping, sanitation, fade, shave',
+          required: true,
+        },
+        {
+          id: 'ojt-hours',
+          type: 'KNOWLEDGE',
+          description: 'States the OJT hour requirement for the apprenticeship path (2,000)',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-47',
+      title: 'Written Exam Review — Sanitation & Science',
+      durationMin: 25,
+      domain: 'STATE_BOARD_PREP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.5,
+      content:
+        'Key sanitation facts: Between-client requirement is disinfection — not sterilization. Disinfectant type must be EPA-registered. Sharps disposal requires a puncture-resistant sharps container — never regular trash. Solution must be changed daily or when visibly contaminated. Tinea capitis — no service, refer to physician immediately. Pre-clean rule — remove debris before applying disinfectant, debris blocks effectiveness.\n\nKey hair science facts: Cortex contains melanin (color) and keratin (strength). Anagen phase is active growth lasting 2–7 years. Normal daily hair loss is 50–100 hairs per day. High porosity means damaged cuticle — absorbs quickly, loses moisture fast. Patch test timing is 24–48 hours before chemical services.\n\nInfection control is the single largest topic on the written exam at 25%. Know the disinfection sequence (pre-clean → disinfect → contact time → store), the difference between sanitation/disinfection/sterilization, and all blood exposure protocol steps.',
+      competencyChecks: [
+        {
+          id: 'between-client-requirement',
+          type: 'KNOWLEDGE',
+          description:
+            'States the between-client disinfection requirement — disinfection, not sterilization',
+          required: true,
+        },
+        {
+          id: 'sharps-disposal-method',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies the correct sharps disposal method — puncture-resistant container',
+          required: true,
+        },
+        {
+          id: 'hair-shaft-review',
+          type: 'KNOWLEDGE',
+          description: 'Names the three layers of the hair shaft and their functions from memory',
+          required: true,
+        },
+        {
+          id: 'growth-cycle-review',
+          type: 'KNOWLEDGE',
+          description: 'States the three phases of the hair growth cycle with correct durations',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-48',
+      title: 'Written Exam Review — Techniques & Laws',
+      durationMin: 25,
+      domain: 'STATE_BOARD_PREP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.5,
+      content:
+        "Key technique facts: Parietal ridge is the widest part of head and high fade reference point. Occipital bone is at the back of skull and low/mid fade reference point. Razor angle is 30 degrees. Neckline placement is two finger-widths above the Adam's apple. First shave pass goes with the grain (WTG). Thinning shears remove bulk without changing length.\n\nKey Indiana law facts: Apprenticeship OJT hours — 2,000. School hours — 1,500. Written exam passing score — 75%. License renewal — every 2 years. License display — must be displayed at the workstation. Governing law — Indiana Code Title 25, Article 8.\n\nCommon exam traps: Sterilization vs. disinfection — barbershops require disinfection, not sterilization. Apprenticeship hours (2,000) vs. school hours (1,500) — frequently confused. Written exam passing score is 75%, not 70%. Module checkpoints use 70%.",
+      competencyChecks: [
+        {
+          id: 'fade-reference-points',
+          type: 'KNOWLEDGE',
+          description: 'Identifies parietal ridge and occipital bone as fade reference points',
+          required: true,
+        },
+        {
+          id: 'razor-angle-recall',
+          type: 'KNOWLEDGE',
+          description: 'States correct razor angle (30 degrees) without prompting',
+          required: true,
+        },
+        {
+          id: 'apprenticeship-hours',
+          type: 'KNOWLEDGE',
+          description: 'Distinguishes apprenticeship hours (2,000) from school hours (1,500)',
+          required: true,
+        },
+        {
+          id: 'written-passing-score',
+          type: 'KNOWLEDGE',
+          description: 'States the written exam passing score (75%) — not 70%',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-49',
+      title: 'Practical Exam Preparation',
+      durationMin: 20,
+      domain: 'STATE_BOARD_PREP',
+      ojtCategory: 'ASSESSMENT',
+      hoursCredit: 0.25,
+      content:
+        'What examiners look for: Draping — neck strip placed before cape, cape does not contact bare skin. Sanitation — pre-clean → disinfect → contact time, sequence must be correct. Fade — clean fade line, smooth transitions, no visible blend lines. Lineup — sharp, even edges, natural hairline preserved. Shave — correct angle (30°), skin tension maintained, correct grain direction. Demeanor — professional throughout, no rushing, no unsafe tool handling.\n\nPractice checklist — run this before every practice session: Drape client correctly with neck strip and cape. Disinfect all tools before beginning — pre-clean first, then disinfect, then maintain contact time. Establish fade line and work upward with progressively larger guards. Blend all transitions — check from multiple angles, no visible lines. Execute clean lineup at hairline, temples, and nape. Perform shave with correct angle and grain direction. Apply post-shave care. Clean and disinfect station after service.\n\nExaminers are not trying to fail you — they are verifying that you are safe to practice on the public. Sanitation sequence errors are automatic deductions.',
+      competencyChecks: [
+        {
+          id: 'draping-sequence',
+          type: 'PROCEDURE',
+          description: 'Drapes client correctly with neck strip before cape — no prompting needed',
+          required: true,
+        },
+        {
+          id: 'sanitation-sequence-exam',
+          type: 'SANITATION',
+          description:
+            'Performs sanitation sequence in correct order before service — pre-clean → disinfect → contact time',
+          required: true,
+        },
+        {
+          id: 'fade-execution',
+          type: 'TECHNIQUE',
+          description: 'Executes fade with smooth transitions and no visible lines',
+          required: true,
+        },
+        {
+          id: 'shave-execution',
+          type: 'TECHNIQUE',
+          description: 'Performs shave with correct angle and grain direction',
+          required: true,
+        },
+        {
+          id: 'post-service-cleanup',
+          type: 'SANITATION',
+          description: 'Cleans and disinfects station after service',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-hairstyling-curl-wave-texture-techniques',
+      title: 'Hairstyling: Curl, Wave & Texture Techniques',
+      durationMin: 60,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 1.0,
+      curriculumChapter: 'Barbering Ch. 10 — Hairstyling',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'style-thermal',
+          type: 'TECHNIQUE',
+          description: 'Uses thermal tools safely to create curl and wave patterns',
+          required: true,
+        },
+        {
+          id: 'style-product',
+          type: 'TECHNIQUE',
+          description:
+            'Selects and applies appropriate styling products for desired texture result',
+          required: true,
+        },
+        {
+          id: 'style-heat-safety',
+          type: 'SAFETY',
+          description: 'Demonstrates safe heat tool handling to prevent client burns',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-facial-treatments-massage-techniques',
+      title: 'Facial Treatments & Massage Techniques',
+      durationMin: 60,
+      domain: 'SHAVING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 1.0,
+      curriculumChapter: 'Barbering Ch. 11 — Facial Treatments',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'facial-massage-movements',
+          type: 'TECHNIQUE',
+          description:
+            'Performs the five massage movements: effleurage, petrissage, tapotement, friction, vibration',
+          required: true,
+        },
+        {
+          id: 'facial-contraindications',
+          type: 'SAFETY',
+          description: 'Identifies contraindications for facial massage services',
+          required: true,
+        },
+        {
+          id: 'facial-steam',
+          type: 'TECHNIQUE',
+          description: 'Uses facial steamer safely to prepare skin for treatment',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-business-law-employment',
+      title: 'Business Law & Employment for Barbers',
+      durationMin: 45,
+      domain: 'BUSINESS_PROFESSIONAL',
+      ojtCategory: 'PROFESSIONAL_DEVELOPMENT',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Foundations Ch. 10 — The Beauty Business',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'biz-booth-rental',
+          type: 'KNOWLEDGE',
+          description: 'Explains the legal and tax differences between booth rental and employment',
+          required: true,
+        },
+        {
+          id: 'biz-indiana-law',
+          type: 'KNOWLEDGE',
+          description: 'Identifies Indiana employment law requirements for barbershop workers',
+          required: true,
+        },
+        {
+          id: 'biz-contracts',
+          type: 'KNOWLEDGE',
+          description: 'Describes key elements of a booth rental or employment contract',
+          required: true,
+        },
+      ],
+    },
+  ],
+  checkpoint: {
+    slug: 'barber-indiana-state-board-exam',
+    title: 'Program Final Exam',
+    durationMin: 30,
+    domain: 'STATE_BOARD_PREP',
+    ojtCategory: 'ASSESSMENT',
+    hoursCredit: 0.5,
+    passingScore: 70,
+    questions: [
+      {
+        prompt: 'What is the passing score for the Indiana barber written exam?',
+        choices: ['60%', '70%', '75%', '80%'],
+        answerIndex: 2,
+        rationale: 'Indiana requires a 75% passing score on the written state board exam.',
+      },
+      {
+        prompt: 'How many OJT hours are required for the apprenticeship path in Indiana?',
+        choices: ['1,000', '1,500', '2,000', '2,500'],
+        answerIndex: 2,
+        rationale:
+          'The DOL-registered apprenticeship path requires 2,000 on-the-job training hours.',
+      },
+      {
+        prompt: 'Which layer of the hair contains melanin?',
+        choices: ['Cuticle', 'Cortex', 'Medulla', 'Follicle'],
+        answerIndex: 1,
+        rationale: 'The cortex contains melanin granules that determine hair color.',
+      },
+      {
+        prompt: 'What is required between every client in Indiana?',
+        choices: ['Sterilization', 'Sanitation', 'Disinfection', 'Rinsing'],
+        answerIndex: 2,
+        rationale: 'EPA-registered disinfection of all tools is required between every client.',
+      },
+      {
+        prompt: 'The neckline should be set:',
+        choices: [
+          'At the jawline',
+          "At the Adam's apple",
+          "Two finger-widths above the Adam's apple",
+          'At the occipital bone',
+        ],
+        answerIndex: 2,
+        rationale: "Two finger-widths above the Adam's apple is the standard neckline position.",
+      },
+      {
+        prompt: 'A client has tinea capitis. You should:',
+        choices: [
+          'Proceed with gloves',
+          'Perform a dry cut only',
+          'Decline service and refer to a physician',
+          'Use medicated shampoo first',
+        ],
+        answerIndex: 2,
+        rationale: 'Tinea capitis is contagious — no services should be performed.',
+      },
+      {
+        prompt: 'The first pass in a straight razor shave goes:',
+        choices: ['Against the grain', 'Across the grain', 'With the grain', 'In circles'],
+        answerIndex: 2,
+        rationale: 'Always start with the grain to safely remove bulk before closer passes.',
+      },
+      {
+        prompt: 'Indiana barber licenses must be renewed every:',
+        choices: ['1 year', '2 years', '3 years', '5 years'],
+        answerIndex: 1,
+        rationale: 'Indiana requires barber license renewal every two years.',
+      },
+    ],
+  },
+};

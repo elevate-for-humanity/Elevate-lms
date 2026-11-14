@@ -1,0 +1,74 @@
+name: Verify owned operator routing and voicemail delivery
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspect current routing or run one explicitly authorized owned-number test
+        type: choice
+        options: [preflight, operator, voicemail, mailbox, handset]
+        default: preflight
+  push:
+    branches: [main]
+    paths: ['.github/workflows/phone-live-acceptance.yml', 'scripts/gcp/phone-acceptance-preflight.py', 'scripts/gcp/phone-live-acceptance.mjs', 'scripts/gcp/owned-phone-test-receiver.mjs', 'scripts/gcp/phone-voicemail-diagnostics.py', 'scripts/gcp/observe-voicemail-self-call.py', 'scripts/gcp/phone-push-readiness.mjs']
+permissions: {contents: read, actions: write, id-token: write}
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('phone-acceptance-dispatch-{0}', github.ref) }}
+  cancel-in-progress: false
+  queue: max
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          mode=preflight
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/phone-live-acceptance.yml/dispatches" -f ref=main -f "inputs[mode]=$mode"
+  acceptance:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify phone acceptance guards
+        run: |
+          node --test scripts/gcp/exercise-paris-self-call.test.mjs scripts/gcp/phone-live-acceptance.test.mjs
+          python3 scripts/gcp/test-observe-voicemail-self-call.py
+          python3 scripts/gcp/test-repair-pbx-voicemail-prompts.py
+      - name: Install pinned protocol-test dependencies in the disposable runner
+        if: inputs.mode == 'operator'
+        run: npm install --prefix /tmp/elevate-phone-protocol --ignore-scripts --no-audit --no-fund sip.js@0.21.2 playwright@1.57.0
+      - name: Install the official browser engine for the isolated WebRTC test receiver
+        if: inputs.mode == 'operator'
+        run: node /tmp/elevate-phone-protocol/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Verify owned VM identity
+        run: test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Read current operator routing and voicemail worker health without dialing
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-acceptance-preflight.py
+      - name: Inspect operator mailbox permissions, sound prompts, and fixed warning classes
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/phone-voicemail-diagnostics.py
+      - name: Inspect durable voicemail spool and worker receipts without reading audio
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py
+      - name: Inspect serving push bindings without sending a notification
+        run: node scripts/gcp/phone-push-readiness.mjs
+      - name: Verify private trace setup and cleanup before any optional test call
+        if: inputs.mode != 'preflight'
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo env OWNED_PHONE_TRACE_PREFLIGHT=1 python3 -' < scripts/gcp/observe-voicemail-self-call.py
+      - name: Verify only the approved owner and exercise the selected phone path
+        env: {AUTHORIZED_SELF_TEST_DID: '+14632401404', PHONE_ACCEPTANCE_MODE: '${{ inputs.mode }}', AUTHORIZED_OWNER_HANDSET_TEST: '${{ inputs.mode == ''handset'' && ''317-956-2748'' || '''' }}'}
+        run: node scripts/gcp/phone-live-acceptance.mjs
+      - name: Read voicemail worker receipts and retries after the acceptance run
+        if: always()
+        run: gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/audit-inbound-voicemail.py

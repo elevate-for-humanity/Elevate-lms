@@ -1,0 +1,7 @@
+**/.next
+**/.turbo
+**/node_modules
+**/coverage
+**/.cache
+.git/objects/pack
+.git/lfs

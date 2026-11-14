@@ -1,0 +1,318 @@
+import type { ModuleSeed } from '../../../lib/curriculum/course-builder-types';
+
+export const module4: ModuleSeed = {
+  slug: 'barber-module-4',
+  title: 'Module 4: Haircutting Techniques',
+  order: 4,
+  objective:
+    'Execute foundational and advanced haircutting techniques with correct sanitation, safety, and NIC-compliant infection control on every service.',
+  lessons: [
+    {
+      slug: 'barber-lesson-22',
+      title: 'Head Shape & Sectioning',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'Sections of the head: Top (crown to front hairline), Sides (temples to behind the ears), Back (occipital bone to nape), Nape (hairline at the back of the neck).\n\nKey reference points: Occipital bone — bony protrusion at the back of the skull, key reference for fade lines. Parietal ridge — widest part of the head, determines where the fade transitions. Temporal recession — natural recession at the temples.\n\nPre-service sanitation (required): Wash or sanitize hands. Pre-clean all tools — remove hair and debris before applying disinfectant. Apply EPA-registered disinfectant and maintain full contact time per label. Discard all single-use items after use.\n\nStop conditions: Stop service immediately if you observe open cuts or broken skin on the scalp, signs of scalp infection or inflammation, client reports pain or discomfort, or tool malfunction.',
+      competencyChecks: [
+        {
+          id: 'head-sections',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies all head sections and reference points correctly without prompting',
+          required: true,
+        },
+        {
+          id: 'pre-service-sanitation',
+          type: 'SANITATION',
+          description: 'Follows pre-clean → disinfect → contact time sequence before every service',
+          required: true,
+        },
+        {
+          id: 'stop-condition-response',
+          type: 'SAFETY',
+          description: 'Stops service and follows blood exposure protocol if skin is broken',
+          required: true,
+        },
+        {
+          id: 'single-use-disposal',
+          type: 'SANITATION',
+          description: 'Discards single-use items immediately after use',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-23',
+      title: 'The Fade — Low, Mid & High',
+      durationMin: 30,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.5,
+      content:
+        'Fade types: Low fade — starts just above the ear and nape, conservative and professional. Mid fade — starts at the temple, versatile and most requested. High fade — starts at the parietal ridge, bold and dramatic. Skin fade (bald fade) — goes to bare skin, requires #0 or foil shaver.\n\nFade technique: Establish the fade line with a #1 or #2. Work upward with progressively larger guards. Use the open/close lever to blend between guard sizes. Blend with a flicking motion at each transition. Check for lines from all angles and blend until smooth.\n\nPre-service sanitation: Pre-clean clipper blades before applying disinfectant spray. Use clipper disinfectant spray — keep blades visibly wet for full contact time per label. Disinfect workstation and chair after each client.\n\nStop conditions: Stop service immediately if you observe open cuts or broken skin, signs of scalp infection or inflammation, client reports pain, or clipper malfunction or overheating.',
+      competencyChecks: [
+        {
+          id: 'fade-types',
+          type: 'KNOWLEDGE',
+          description: 'Identifies low, mid, and high fade by starting point without prompting',
+          required: true,
+        },
+        {
+          id: 'smooth-transitions',
+          type: 'TECHNIQUE',
+          description:
+            'Executes fade with smooth transitions — no visible lines between guard sizes',
+          required: true,
+        },
+        {
+          id: 'clipper-disinfection',
+          type: 'SANITATION',
+          description:
+            'Uses clipper disinfectant spray with correct dwell time on blades before service',
+          required: true,
+        },
+        {
+          id: 'blood-exposure-response',
+          type: 'SAFETY',
+          description: 'Stops service and follows blood exposure protocol if skin is broken',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-24',
+      title: 'Clipper Over Comb',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Clipper over comb technique: Hold the comb flat against the head at the desired angle. Lift the comb slightly to expose the hair to be cut. Run the clipper along the top of the comb in a smooth, continuous motion. Work in sections, overlapping each pass slightly.\n\nCommon mistakes: Comb too far from head — creates uneven results, keep comb close to the scalp. Moving too slowly — causes clipper lines, keep motion smooth and continuous. Not following head curve — creates flat spots, follow the contour of the head.\n\nPre-service sanitation: Pre-clean clipper blades before applying disinfectant spray. Apply clipper disinfectant spray and maintain full contact time per label. Disinfect workstation and chair after each client.',
+      competencyChecks: [
+        {
+          id: 'comb-angle-consistency',
+          type: 'TECHNIQUE',
+          description:
+            'Executes clipper-over-comb with consistent angle and smooth continuous motion',
+          required: true,
+        },
+        {
+          id: 'head-contour-follow',
+          type: 'TECHNIQUE',
+          description: 'Follows the contour of the head — no flat spots',
+          required: true,
+        },
+        {
+          id: 'clipper-spray-dwell',
+          type: 'SANITATION',
+          description: 'Uses clipper disinfectant spray with correct dwell time on blades',
+          required: true,
+        },
+        {
+          id: 'stop-on-injury',
+          type: 'SAFETY',
+          description: 'Stops service and follows blood exposure protocol if skin is broken',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-25',
+      title: 'Scissor Over Comb',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Scissor over comb technique: Comb hair upward or outward from the head. Position the comb at the desired length. Cut along the top of the comb with the shears. Work in consistent sections.\n\nAdvanced techniques: Point cutting — cut into the ends at an angle to remove weight and add texture, hold shears vertically and make small snips into the hair ends. Slide cutting — thin and taper hair by sliding the open shears down the hair shaft, used for blending and removing bulk.\n\nPre-service sanitation: Pre-clean shears and combs before applying disinfectant. Apply EPA-registered disinfectant and maintain full contact time per label. Disinfect workstation and chair after each client.',
+      competencyChecks: [
+        {
+          id: 'scissor-comb-angle',
+          type: 'TECHNIQUE',
+          description: 'Executes scissor-over-comb with consistent angle and soft finish',
+          required: true,
+        },
+        {
+          id: 'point-cutting',
+          type: 'TECHNIQUE',
+          description:
+            'Demonstrates point cutting correctly — vertical shear angle, small snips into ends',
+          required: true,
+        },
+        {
+          id: 'shear-disinfection',
+          type: 'SANITATION',
+          description:
+            'Disinfects shears and combs with EPA-registered disinfectant before service',
+          required: true,
+        },
+        {
+          id: 'blood-protocol',
+          type: 'SAFETY',
+          description: 'Stops service and follows blood exposure protocol if skin is broken',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-26',
+      title: 'Lineup & Edging',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        "A lineup is a finishing service. Its job is to sharpen the front hairline, temples, sideburn edges, around the ears, and nape. The barber's rule: define what is already there. Do not invent a new hairline unless the service plan clearly calls for it.\n\nContraindications — do not use razor over: cuts, abrasions, or open skin; active acne or inflamed bumps; rash or infection; skin that is already irritated; areas prone to keloid scarring.\n\nService order: Front hairline → temples → around ears → sideburns → nape → symmetry check → razor detailing if appropriate.\n\nProcedure: Establish the front hairline at center and work outward. Use light pressure and short controlled motions. Remove only overgrowth — do not push the line back. Shape the temples based on haircut, growth pattern, and client preference. Outline around the ears with short controlled movements. Balance the sideburns — check from the front, not only from the side. Create the nape outline per client preference. Check symmetry from the front view. Razor detailing if skin is healthy: apply lather, stretch skin firmly, hold razor at low angle with light pressure, use short controlled strokes.\n\nPre-service sanitation: Wash or sanitize hands. Pre-clean all tools. Apply EPA-registered disinfectant and maintain full contact time. Use clipper disinfectant spray on trimmer blades with full contact time. Discard single-use razor blades in a sharps container immediately after use.",
+      competencyChecks: [
+        {
+          id: 'contraindication-check',
+          type: 'SAFETY',
+          description:
+            'Identifies contraindications before service and does not use razor over broken or irritated skin',
+          required: true,
+        },
+        {
+          id: 'natural-hairline',
+          type: 'TECHNIQUE',
+          description:
+            'Preserves natural hairline — does not push line back without intentional redesign',
+          required: true,
+        },
+        {
+          id: 'symmetry-check',
+          type: 'TECHNIQUE',
+          description: 'Checks symmetry from the front view and corrects only the uneven side',
+          required: true,
+        },
+        {
+          id: 'short-controlled-strokes',
+          type: 'TECHNIQUE',
+          description: 'Uses short controlled strokes — not one long sweep',
+          required: true,
+        },
+        {
+          id: 'sharps-disposal',
+          type: 'SANITATION',
+          description: 'Disposes of used razor blades in a sharps container immediately after use',
+          required: true,
+        },
+        {
+          id: 'blood-exposure-lineup',
+          type: 'SAFETY',
+          description: 'Stops service and follows blood exposure protocol if skin is broken',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-27',
+      title: 'Flat Top & Classic Cuts',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Flat top procedure: Establish the height on top with a pick and clipper. Use a level comb or flat top comb to guide the cut. Work from front to back, maintaining a flat plane. Fade or taper the sides. Check the level from multiple angles — front, side, and above.\n\nClassic taper procedure: Start with the longest guard on top. Work down with progressively shorter guards. Blend each transition smoothly. Finish with a clean lineup.\n\nPre-service sanitation: Pre-clean all tools before applying disinfectant. Apply EPA-registered disinfectant. Use clipper disinfectant spray on blades and maintain full contact time per label. Discard all single-use items after use. Disinfect workstation and chair after each client.',
+      competencyChecks: [
+        {
+          id: 'flat-top-level',
+          type: 'TECHNIQUE',
+          description:
+            'Executes flat top with level, even surface across the top — checked from multiple angles',
+          required: true,
+        },
+        {
+          id: 'classic-taper-blend',
+          type: 'TECHNIQUE',
+          description: 'Executes classic taper with smooth transitions from top to nape',
+          required: true,
+        },
+        {
+          id: 'pre-service-sanitation-27',
+          type: 'SANITATION',
+          description: 'Follows pre-clean → disinfect → contact time sequence before service',
+          required: true,
+        },
+        {
+          id: 'blood-protocol-27',
+          type: 'SAFETY',
+          description: 'Stops service and follows blood exposure protocol if skin is broken',
+          required: true,
+        },
+      ],
+    },
+  ],
+  checkpoint: {
+    slug: 'barber-module-4-checkpoint',
+    title: 'Haircutting Checkpoint',
+    durationMin: 20,
+    domain: 'HAIRCUTTING',
+    ojtCategory: 'ASSESSMENT',
+    hoursCredit: 0.25,
+    passingScore: 70,
+    questions: [
+      {
+        prompt: 'A mid fade starts at which reference point?',
+        choices: ['The nape', 'The occipital bone', 'The temple', 'The parietal ridge'],
+        answerIndex: 2,
+        rationale: 'A mid fade starts at the temple area, between the low and high fade.',
+      },
+      {
+        prompt: 'Which technique produces a softer result than clipper over comb?',
+        choices: ['Skin fade', 'Scissor over comb', 'Razor cutting', 'Clipper flicking'],
+        answerIndex: 1,
+        rationale: 'Scissor over comb produces a softer, more natural finish.',
+      },
+      {
+        prompt: 'What is the parietal ridge?',
+        choices: [
+          'The hairline at the nape',
+          'The bony protrusion at the back of the skull',
+          'The widest part of the head',
+          'The front hairline',
+        ],
+        answerIndex: 2,
+        rationale:
+          'The parietal ridge is the widest part of the head and a key reference for high fades.',
+      },
+      {
+        prompt: 'When performing a lineup, you should never:',
+        choices: [
+          'Use a razor',
+          'Cut above the natural temple hairline',
+          'Square the nape',
+          'Use a trimmer',
+        ],
+        answerIndex: 1,
+        rationale:
+          'Cutting above the natural temple hairline creates an unnatural appearance and pushes the hairline back.',
+      },
+      {
+        prompt: 'Point cutting is used to:',
+        choices: [
+          'Create a blunt, heavy line',
+          'Remove weight and add texture',
+          'Create a skin fade',
+          'Establish the guide line',
+        ],
+        answerIndex: 1,
+        rationale: 'Point cutting removes weight from the ends and adds texture and movement.',
+      },
+      {
+        prompt: 'The flat top is technically demanding because it requires:',
+        choices: [
+          'The most guards',
+          'A perfectly level surface on top',
+          'The longest cutting time',
+          'Special clippers',
+        ],
+        answerIndex: 1,
+        rationale:
+          'Maintaining a perfectly flat, level plane on top of the head requires precision and skill.',
+      },
+    ],
+  },
+};

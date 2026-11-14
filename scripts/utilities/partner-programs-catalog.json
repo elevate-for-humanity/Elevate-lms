@@ -1,0 +1,181 @@
+{
+  "government_funded_programs": {
+    "wioa": {
+      "program_name": "WIOA Programs",
+      "funding_source": "Workforce Innovation and Opportunity Act",
+      "category": "Government Funded",
+      "cost_to_student": 0,
+      "eligibility": "Indianapolis/Marion County residents",
+      "programs": [
+        {
+          "program_id": "wioa-cna",
+          "name": "CNA / HHA",
+          "cost": 0,
+          "funding": "WIOA",
+          "duration": "4-8 weeks",
+          "track": "Healthcare",
+          "description": "State-aligned training with clinicals and direct employer placement"
+        },
+        {
+          "program_id": "wioa-welding",
+          "name": "Welding (AWS SENSE)",
+          "cost": 0,
+          "funding": "WIOA",
+          "duration": "6-10 weeks",
+          "track": "Construction",
+          "description": "Hands-on welding lab and industry-recognized AWS SENSE credentials"
+        },
+        {
+          "program_id": "wioa-nail-tech",
+          "name": "Nail Technology",
+          "cost": 0,
+          "funding": "WIOA",
+          "duration": "8-12 weeks",
+          "track": "Beauty",
+          "description": "State board preparation with salon-ready portfolio"
+        },
+        {
+          "program_id": "wioa-cdl",
+          "name": "CDL (A/B) Prep",
+          "cost": 0,
+          "funding": "WIOA",
+          "duration": "3-6 weeks",
+          "track": "Transportation",
+          "description": "Permit prep, simulator practice, and employer-ready onboarding"
+        },
+        {
+          "program_id": "wioa-office-tech",
+          "name": "Office Tech & AI",
+          "cost": 0,
+          "funding": "WIOA",
+          "duration": "4-6 weeks",
+          "track": "Technology",
+          "description": "Docs, Sheets, CRM, and AI workflows for modern office careers"
+        },
+        {
+          "program_id": "wioa-osha-cpr",
+          "name": "OSHA-10 + CPR",
+          "cost": 0,
+          "funding": "WIOA",
+          "duration": "1-2 weeks",
+          "track": "Safety",
+          "description": "Worksite safety fundamentals plus life-saving CPR/AED certification"
+        }
+      ]
+    },
+    "indiana_dwd": {
+      "program_name": "Indiana DWD Programs",
+      "funding_source": "Indiana Department of Workforce Development",
+      "category": "State Funded",
+      "cost_to_student": 0,
+      "eligibility": "Indiana residents",
+      "programs": [
+        {
+          "program_id": "dwd-apprenticeship",
+          "name": "Registered Apprenticeship Programs",
+          "cost": 0,
+          "funding": "State",
+          "duration": "Varies",
+          "track": "Multiple",
+          "description": "State-registered apprenticeships with paid OJT"
+        }
+      ]
+    }
+  },
+  "credentialing_partners": {
+    "ahima": {
+      "partner_name": "AHIMA",
+      "partner_full_name": "American Health Information Management Association",
+      "category": "Healthcare",
+      "website": "https://www.ahima.org",
+      "stripe_account_id": "acct_ahima_placeholder",
+      "funding_eligible": true,
+      "note": "Can be FREE through WIOA funding or self-pay with 50% markup",
+      "programs": [
+        {
+          "program_id": "ahima-rhia",
+          "name": "RHIA - Registered Health Information Administrator",
+          "partner_price": 299,
+          "student_price": 449,
+          "duration": "12-16 weeks",
+          "level": "advanced",
+          "certification_type": "Healthcare IT"
+        },
+        {
+          "program_id": "ahima-rhit",
+          "name": "RHIT - Registered Health Information Technician",
+          "partner_price": 249,
+          "student_price": 374,
+          "duration": "10-12 weeks",
+          "level": "intermediate",
+          "certification_type": "Healthcare IT"
+        },
+        {
+          "program_id": "ahima-cphims",
+          "name": "CPHIMS - Certified Professional in Healthcare Information Management",
+          "partner_price": 349,
+          "student_price": 524,
+          "duration": "14-16 weeks",
+          "level": "advanced",
+          "certification_type": "Healthcare IT"
+        },
+        {
+          "program_id": "ahima-cahims",
+          "name": "CAHIMS - Certified Associate in Healthcare Information Management",
+          "partner_price": 199,
+          "student_price": 299,
+          "duration": "8-10 weeks",
+          "level": "beginner",
+          "certification_type": "Healthcare IT"
+        }
+      ]
+    },
+    "comptia": {
+      "partner_name": "CompTIA",
+      "partner_full_name": "Computing Technology Industry Association",
+      "category": "IT/Technology",
+      "website": "https://www.comptia.org",
+      "stripe_account_id": "acct_comptia_placeholder",
+      "funding_eligible": true,
+      "note": "Can be FREE through WIOA funding or self-pay with 50% markup",
+      "programs": [
+        {
+          "program_id": "comptia-aplus",
+          "name": "CompTIA A+",
+          "partner_price": 239,
+          "student_price": 359,
+          "duration": "6-8 weeks",
+          "level": "beginner",
+          "certification_type": "IT"
+        },
+        {
+          "program_id": "comptia-network",
+          "name": "CompTIA Network+",
+          "partner_price": 289,
+          "student_price": 434,
+          "duration": "8-10 weeks",
+          "level": "intermediate",
+          "certification_type": "IT"
+        },
+        {
+          "program_id": "comptia-security",
+          "name": "CompTIA Security+",
+          "partner_price": 339,
+          "student_price": 509,
+          "duration": "10-12 weeks",
+          "level": "intermediate",
+          "certification_type": "Cybersecurity"
+        },
+        {
+          "program_id": "comptia-linux",
+          "name": "CompTIA Linux+",
+          "partner_price": 289,
+          "student_price": 434,
+          "duration": "8-10 weeks",
+          "level": "intermediate",
+          "certification_type": "IT"
+        }
+      ]
+    }
+  }
+}

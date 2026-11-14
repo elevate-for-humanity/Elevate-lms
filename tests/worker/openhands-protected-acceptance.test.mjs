@@ -45,11 +45,15 @@ test('missing, failing, pending and truncated CI all fail closed', () => {
 
 const repairId = 'd1507c12-93f7-459e-9aaf-b73286e2bd5c';
 const repair = { id: repairId, status: 'verified', release_sha: MERGE };
-const correlatedTask = { tool_name: 'openhands.execute', correlation_id: 'original:repair' };
+const correlatedTask = { id: 'same-task', tool_name: 'openhands.execute',
+  correlation_id: `paris-repair:${repairId}:attempt:1`,
+  tool_output: { start_task_id: 'same-start', conversation_id: 'same-conversation' } };
 const services = [{ service: 'admin', ready: true, servingSha: MERGE },
   { service: 'lms', ready: true, servingSha: MERGE },
   { service: 'marketing', ready: true, servingSha: MERGE }];
-const accepted = { originalRepairId: repairId, repair, correlatedTask, mergeSha: MERGE,
+const accepted = { originalRepairId: repairId, repair, correlatedTask,
+  originalTaskId: 'same-task', providerStartTaskId: 'same-start',
+  providerConversationId: 'same-conversation', mergeSha: MERGE,
   services, originalDefectRegressionPassed: true };
 
 test('original repair acceptance requires durable repair receipt, exact serving SHA and regression', () => {
@@ -58,6 +62,9 @@ test('original repair acceptance requires durable repair receipt, exact serving 
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, repair: { ...repair, release_sha: null } }).accepted, false);
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, originalRepairId: 'another' }).accepted, false);
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, correlatedTask: null }).accepted, false);
+  assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, originalTaskId: 'replacement-task' }).accepted, false);
+  assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, providerConversationId: 'replacement-conversation' }).accepted, false);
+  assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, correlatedTask: { ...correlatedTask, correlation_id: 'paris-repair:other:attempt:1' } }).accepted, false);
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, services: [{ ready: true, servingSha: HEAD }] }).accepted, false);
   assert.equal(evaluateOriginalRepairAcceptance({ ...accepted, originalDefectRegressionPassed: false }).accepted, false);
 });

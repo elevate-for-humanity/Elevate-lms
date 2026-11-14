@@ -9,6 +9,8 @@ function database(
   holders = ['academy'],
   archived = false,
   hostMailboxes = ['mesmerized.by.beauty.cosmetology.academy-2@elevateforhumanity.org'],
+  partnerPrograms = ['esthetician-apprenticeship', 'nail-technician-apprenticeship'],
+  activeMember = true,
 ) {
   const from = vi.fn((table: string) => {
     const query: any = {
@@ -16,6 +18,7 @@ function database(
       eq: () => query,
       ilike: vi.fn(() => query),
       in: () => query,
+      neq: () => query,
       maybeSingle: async () => ({
         data: table === 'program_holders'
           ? { user_id: 'holder-owner', features: { portal_access_archived: archived } }
@@ -28,9 +31,22 @@ function database(
             table === 'applications'
               ? applications
               : table === 'program_holder_students'
-                ? holders.map((id) => ({ program_holder_id: id, program_id: 'cdl' }))
+                ? holders.map((id) => ({
+                    program_holder_id: id, program_id: applications[0]?.program_id || 'cdl',
+                  }))
                 : table === 'program_holder_programs'
-                  ? holders.map((id) => ({ program_holder_id: id, program_id: 'cdl' }))
+                  ? holders.map((id) => ({
+                    program_holder_id: id,
+                    program_id: applications[0]?.program_id || 'cdl',
+                    program_slug: applications[0]?.program_slug || 'cdl-training',
+                  }))
+                  : table === 'partner_users'
+                    ? activeMember ? [{ partner_id: 'mesmerized-partner', role: 'owner' }] : []
+                    : table === 'partners'
+                      ? [{ id: 'mesmerized-partner', status: 'active', approval_status: 'approved',
+                        is_active: true, programs: partnerPrograms }]
+                      : table === 'shops'
+                        ? [{ id: 'mesmerized-shop', partner_id: 'mesmerized-partner', active: true }]
                   : table === 'communication_email_mailbox_members'
                     ? hostMailboxes.map((address) => ({ access_level: 'manager', mailbox: { address, mailbox_kind: 'host_shop', active: true } }))
                     : [{ address: 'the.cdl.academy@elevateforhumanity.org' }],
@@ -128,7 +144,7 @@ describe('assigned program interoffice conversations', () => {
   });
   it('routes archived Program Holder applicant mail exclusively to the owned Host Shop inbox', async () => {
     expect(await programConversationRoute(
-      database(undefined, ['academy'], true),
+      database([{ program_slug: 'esthetician-apprenticeship', program_id: 'esthetician' }], ['academy'], true),
       ['student@example.com'],
       ['admissions@elevateforhumanity.org'],
     )).toMatchObject({
@@ -137,9 +153,50 @@ describe('assigned program interoffice conversations', () => {
   });
   it('fails closed rather than sharing applicant mail across multiple Host Shops', async () => {
     expect(await programConversationRoute(
-      database(undefined, ['academy'], true, ['shop-one@example.org', 'shop-two@example.org']),
+      database([{ program_slug: 'nail-technician-apprenticeship', program_id: 'nails' }], ['academy'], true, ['shop-one@example.org', 'shop-two@example.org']),
       ['student@example.com'],
       ['admissions@elevateforhumanity.org'],
+    )).toBeNull();
+  });
+  it('denies archived holder barber, cosmetology, and CDL copies at a beauty-only shop', async () => {
+    for (const slug of ['barber-apprenticeship', 'cosmetology-apprenticeship', 'cdl-training']) {
+      expect(await programConversationRoute(
+        database([{ program_slug: slug, program_id: 'legacy' }], ['academy'], true),
+        ['student@example.com'], ['admissions@elevateforhumanity.org'],
+      )).toBeNull();
+    }
+  });
+  it('denies historic copies when approved Host Shop membership is absent', async () => {
+    expect(await programConversationRoute(
+      database([{ program_slug: 'esthetician-apprenticeship', program_id: 'esthetician' }],
+        ['academy'], true, undefined, undefined, false),
+      ['student@example.com'], ['admissions@elevateforhumanity.org'],
+    )).toBeNull();
+  });
+  it('fails closed for multiple partners rather than combining their program permissions', async () => {
+    const db = database([{ program_slug: 'esthetician-apprenticeship', program_id: 'esthetician' }],
+      ['academy'], true);
+    const from = db.from;
+    db.from = (table: string) => {
+      const q = from(table);
+      if (table === 'partner_users') q.then = (resolve: any) => Promise.resolve({ data: [
+        { partner_id: 'mesmerized-partner', role: 'owner' },
+        { partner_id: 'other-partner', role: 'owner' },
+      ], error: null }).then(resolve);
+      if (table === 'partners') q.then = (resolve: any) => Promise.resolve({ data: [
+        { id: 'mesmerized-partner', programs: ['esthetician-apprenticeship'],
+          status: 'active', approval_status: 'approved', is_active: true },
+        { id: 'other-partner', programs: ['barber-apprenticeship'],
+          status: 'active', approval_status: 'approved', is_active: true },
+      ], error: null }).then(resolve);
+      if (table === 'shops') q.then = (resolve: any) => Promise.resolve({ data: [
+        { id: 'mesmerized-shop', partner_id: 'mesmerized-partner', active: true },
+        { id: 'other-shop', partner_id: 'other-partner', active: true },
+      ], error: null }).then(resolve);
+      return q;
+    };
+    expect(await programConversationRoute(
+      db, ['student@example.com'], ['admissions@elevateforhumanity.org'],
     )).toBeNull();
   });
   it('keeps different applicants separate even with identical outreach subjects', () => {

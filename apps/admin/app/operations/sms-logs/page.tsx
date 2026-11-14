@@ -64,7 +64,7 @@ export default async function SmsDeliveryPage() {
       <div>
         <h1 className="text-2xl font-semibold text-gray-950">SMS Delivery</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Telnyx message requests recorded by the notification service. Recipients are masked.
+          Twilio message requests recorded by the notification service. Recipients are masked.
         </p>
       </div>
 

@@ -4,6 +4,7 @@
   Commercial License. No resale, sublicensing, or redistribution allowed.
 */
 
+const { publicPhone } = require('./phone-config.cjs');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -98,7 +99,7 @@ class VeteranServicesSystem {
             'Mental health and wellness resources',
           ],
           contact: {
-            phone: '317-760-7908 ext. 101',
+            phone: `${publicPhone} ext. 101`,
             email: 'veterans@elevateforhumanity.org',
             hours: 'Monday-Friday 8AM-6PM EST',
           },
@@ -311,12 +312,12 @@ class VeteranServicesSystem {
         ],
         contact: {
           veteranServices: {
-            phone: '317-760-7908 ext. 101',
+            phone: `${publicPhone} ext. 101`,
             email: 'veterans@elevateforhumanity.org',
             hours: 'Monday-Friday 8AM-6PM EST',
           },
           accessibility: {
-            phone: '317-760-7908 ext. 102',
+            phone: `${publicPhone} ext. 102`,
             email: 'accessibility@elevateforhumanity.org',
             hours: 'Monday-Friday 8AM-5PM EST',
           },
@@ -637,7 +638,7 @@ class VeteranServicesSystem {
 
       // Add next steps
       eligibility.nextSteps = [
-        'Contact our Veteran Services office at 317-760-7908 ext. 101',
+        `Contact our Veteran Services office at ${publicPhone} ext. 101`,
         'Schedule benefits counseling appointment',
         'Gather required documentation',
         'Apply for appropriate benefits',
@@ -676,7 +677,7 @@ class VeteranServicesSystem {
           'You will receive a confirmation email shortly',
           'A veteran services counselor will contact you within ' + request.expectedResponse,
           'Please have your DD-214 and any medical documentation ready',
-          'Call 317-760-7908 ext. 101 if you have urgent questions',
+          `Call ${publicPhone} ext. 101 if you have urgent questions`,
         ],
       });
     } catch (error) {

@@ -4,6 +4,7 @@
   Commercial License. No resale, sublicensing, or redistribution allowed.
 */
 
+const { publicPhone } = require('./phone-config.cjs');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -277,7 +278,7 @@ class PhilanthropySystem {
         },
         contact: {
           email: 'giving@elevateforhumanity.org',
-          phone: '317-760-7908 ext. 201',
+          phone: `${publicPhone} ext. 201`,
           address: this.philanthropyData.legal.address,
         },
       };
@@ -564,7 +565,7 @@ class PhilanthropySystem {
         timeline: application.reviewTimeline,
         contact: {
           email: 'grants@elevateforhumanity.org',
-          phone: '317-760-7908 ext. 202',
+          phone: `${publicPhone} ext. 202`,
         },
       });
     } catch (error) {
@@ -673,7 +674,7 @@ class PhilanthropySystem {
         ],
         contact: {
           email: 'volunteer@elevateforhumanity.org',
-          phone: '317-760-7908 ext. 203',
+          phone: `${publicPhone} ext. 203`,
         },
       };
 

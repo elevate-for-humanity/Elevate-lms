@@ -51,4 +51,4 @@ No authoritative DNS changes are performed by the verification workflow. Legacy 
 
 ## Telephone carrier continuity
 
-Telnyx remains the production carrier and existing public number route. The independent Asterisk registration/PARIS path must pass authenticated registration and controlled real-call acceptance before any separately authorized telephone traffic cutover. Never reuse Telnyx SIP credentials for Asterisk or claim PBX readiness from a health response.
+Twilio is the active carrier for +14632401404, connected to the Google-hosted Asterisk/PARIS path. The retired Telnyx number was released by run 41279025715 on November 1, 2026. Do not restore retired carrier credentials, webhooks, numbers, or setup commands. Registration, handset ringing, transfer, two-way audio and voicemail delivery still require controlled real-call acceptance; health responses alone do not prove these work.

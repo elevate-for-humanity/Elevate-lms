@@ -59,3 +59,15 @@ test('API-key ownership verification cannot authorize binding a rejected webhook
     assert.equal(calls.filter(x=>x.includes('/IncomingPhoneNumbers/')).length,2);
   } finally {console.error=old;}
 });
+
+test('Twilio binding removes every retired carrier variable without mutating its source', () => {
+  const source = structuredClone(config);
+  source.runtimeEnvironment.TELNYX_API_KEY = 'retired-test-only';
+  source.runtimeEnvironment.TELNYX_PHONE_NUMBER = '+13179999620';
+  source.runtimeEnvironment.TELNYX_CONNECTION_ID = 'retired-test-only';
+  source.runtimeEnvironment.TELNYX_FUTURE_SETTING = 'retired-test-only';
+  const next = mergeTwilioBindings(source, { TWILIO_PHONE_NUMBER: '+14632401404' });
+  assert.equal(Object.keys(next.runtimeEnvironment).some(key => /^TELNYX_/i.test(key)), false);
+  assert.equal(next.runtimeEnvironment.PRESERVE, 'yes');
+  assert.equal(source.runtimeEnvironment.TELNYX_API_KEY, 'retired-test-only');
+});

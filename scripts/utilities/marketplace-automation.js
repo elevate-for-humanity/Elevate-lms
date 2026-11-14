@@ -16,6 +16,7 @@
   See LICENSE file for details.
 */
 
+const { getAlertPhone } = require('./phone-config.cjs');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -718,7 +719,7 @@ Please include your background and acquisition experience in your inquiry.
   async setupSMSAlerts() {
 
     const smsConfig = {
-      phone: '3177607908',
+      phone: getAlertPhone(),
       alerts: {
         immediate: [
           'Payment received',
@@ -741,6 +742,7 @@ Please include your background and acquisition experience in your inquiry.
       path.join(__dirname, 'sms-alert-handler.js'),
       `
 // SMS Alert Handler for Marketplace Activity
+const { getAlertPhone, requireAlertPhone } = require('./phone-config.cjs');
 const express = require('express');
 
 function sendSMSAlert(phone, message) {
@@ -756,7 +758,7 @@ function sendSMSAlert(phone, message) {
     },
     body: new URLSearchParams({
       From: '+1YOURTWILINUMBER',
-      To: phone,
+      To: requireAlertPhone(phone),
       Body: message
     })
   });
@@ -772,14 +774,14 @@ function trackDemoVisit() {
 
   // Alert every 10 visits or hourly, whichever comes first
   if (visitCount % 10 === 0 || (now - lastAlertTime) > 3600000) {
-    sendSMSAlert('3177607908', \`🔥 Demo site activity: \${visitCount} visits today. Ready for sales!\`);
+    sendSMSAlert(getAlertPhone(), \`🔥 Demo site activity: \${visitCount} visits today. Ready for sales!\`);
     lastAlertTime = now;
   }
 }
 
 // Payment success handler
 function alertPaymentReceived(amount, program) {
-  sendSMSAlert('3177607908', \`💰 SALE ALERT: $\${amount} payment received for \${program}!\`);
+  sendSMSAlert(getAlertPhone(), \`💰 SALE ALERT: $\${amount} payment received for \${program}!\`);
 }
 
 module.exports = { sendSMSAlert, trackDemoVisit, alertPaymentReceived };

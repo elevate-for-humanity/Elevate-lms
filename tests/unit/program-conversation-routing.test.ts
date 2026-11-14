@@ -153,14 +153,18 @@ describe('assigned program interoffice conversations', () => {
       ).toBeNull();
     }
   });
-  it('routes archived Program Holder applicant mail exclusively to the owned Host Shop inbox', async () => {
-    expect(await programConversationRoute(
-      database([{ program_slug: 'esthetician-apprenticeship', program_id: 'esthetician' }], ['academy'], true),
-      ['student@example.com'],
-      ['admissions@elevateforhumanity.org'],
-    )).toMatchObject({
-      addresses: ['admissions@elevateforhumanity.org', 'mesmerized.by.beauty.cosmetology.academy-2@elevateforhumanity.org'],
-    });
+  it('does not convert archived Program Holder applicant history into Host Shop mail', async () => {
+    // Even a same-program application and an active Host Shop mailbox do not
+    // establish an approved placement or authorize copying applicant content.
+    for (const slug of ['esthetician-apprenticeship', 'nail-technician-apprenticeship']) {
+      const db = database([{ program_slug: slug, program_id: slug }], ['academy'], true);
+      expect(await programConversationRoute(
+        db, ['student@example.com'], ['admissions@elevateforhumanity.org'],
+      )).toBeNull();
+      // Never query Host Shop partners or mailboxes to route archived-holder mail.
+      expect(db.from.mock.calls.map((call: string[]) => call[0])).not.toContain('partner_users');
+      expect(db.from.mock.calls.map((call: string[]) => call[0])).not.toContain('communication_email_mailbox_members');
+    }
   });
   it('fails closed rather than sharing applicant mail across multiple Host Shops', async () => {
     expect(await programConversationRoute(

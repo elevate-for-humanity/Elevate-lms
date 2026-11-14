@@ -23,7 +23,7 @@ export async function ensureActorMailboxes(
   // Mailbox reads must not change identity or membership. Provisioning is handled
   // by the database lifecycle triggers and explicit administrative workflows.
 
-  const [{ data, error }, { data: profile }, { data: archivedHolder, error: holderError }] = await Promise.all([
+  const [{ data, error }, { data: profile }, { data: holderRecords, error: holderError }] = await Promise.all([
     db
       .from('communication_email_mailbox_members')
       .select(
@@ -32,14 +32,16 @@ export async function ensureActorMailboxes(
       .eq('user_id', userId)
       .eq('mailbox.active', true),
     db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle(),
-    db.from('program_holders').select('id,features').eq('user_id',userId).limit(1).maybeSingle(),
+    // Match the session role guard: any archived holder record must hide its
+    // historical mailbox, even when it is not the first record returned.
+    db.from('program_holders').select('features').eq('user_id', userId),
   ]);
   if (error || holderError) throw error || holderError;
   // Archived Program Holder mail remains stored for later administrative
   // restoration, but a Host Shop-only account must not access that mailbox
   // through its current dashboard or interoffice API.
   const holderPortalArchived = profile?.role === 'host_shop' &&
-    archivedHolder?.features?.portal_access_archived === true;
+    (holderRecords ?? []).some((holder: any) => holder?.features?.portal_access_archived === true);
 
   const mailboxes = (data ?? [])
     .map((membership: any) => {

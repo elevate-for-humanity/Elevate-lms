@@ -177,6 +177,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'certificates', label: 'Certificates', href: p('lms', 'certificates'), icon: Award },
         { id: 'career', label: 'Career Services', href: p('lms', 'career'), icon: Briefcase },
+        { id: 'job-ready', label: 'Job Ready Indy', href: p('lms', 'career/job-ready'), icon: BookOpen },
         { id: 'resume', label: 'Resume Builder', href: p('lms', 'resume-builder'), icon: FileText },
         { id: 'profile', label: 'My Profile & Photo', href: p('lms', 'profile'), icon: Users },
       ],
@@ -219,6 +220,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'documents', label: 'Documents', href: p('apprentice', 'documents'), icon: FileText },
         { id: 'career', label: 'Career Services', href: '/lms/career', icon: Briefcase },
+        { id: 'job-ready', label: 'Job Ready Indy', href: p('lms', 'career/job-ready'), icon: BookOpen },
         { id: 'resume', label: 'Resume Builder', href: '/lms/resume-builder', icon: FileText },
         {
           id: 'credentials',
@@ -735,13 +737,13 @@ export function getFlatNavItems(role: UserRole): NavItem[] {
 const WORKSPACE_GROUPS: Partial<Record<NavigationRole, Array<[string, string, string[]]>>> = {
   student: [
     ['today', 'Start here', ['dashboard', 'courses', 'assignments', 'calendar', 'learner-support']],
-    ['learning', 'Learning & progress', ['workbooks', 'progress', 'certificates', 'upload-credential']],
+    ['learning', 'Learning & progress', ['workbooks', 'job-ready', 'progress', 'certificates', 'upload-credential']],
     ['records', 'Documents & setup', ['onboarding', 'documents', 'agreements', 'handbook', 'profile', 'dashboard-orientation']],
     ['connect', 'Messages & career', ['learner-messages', 'interoffice-email', 'community', 'career', 'resume']],
   ],
   apprentice: [
     ['today', 'Daily training', ['dashboard', 'theory', 'workbook', 'timeclock', 'hours']],
-    ['learning', 'Theory & progress', ['class-assignments', 'class-quizzes', 'class-grades', 'class-calendar', 'theory-schedule', 'syllabus', 'rti', 'competencies', 'training-records']],
+    ['learning', 'Theory & progress', ['job-ready', 'class-assignments', 'class-quizzes', 'class-grades', 'class-calendar', 'theory-schedule', 'syllabus', 'rti', 'competencies', 'training-records']],
     ['setup', 'Documents & requirements', ['profile', 'orientation', 'documents', 'handbook', 'timeclock-policy', 'state-board']],
     ['billing', 'Payments', ['billing', 'payment-policy']],
     ['connect', 'Messages & career', ['email', 'community', 'credentials', 'career', 'resume']],

@@ -7,6 +7,8 @@ import {
 function database(
   applications: any[] = [{ program_slug: 'cdl-training', program_id: 'cdl' }],
   holders = ['academy'],
+  archived = false,
+  hostMailboxes = ['mesmerized.by.beauty.cosmetology.academy-2@elevateforhumanity.org'],
 ) {
   const from = vi.fn((table: string) => {
     const query: any = {
@@ -14,6 +16,12 @@ function database(
       eq: () => query,
       ilike: () => query,
       in: () => query,
+      maybeSingle: async () => ({
+        data: table === 'program_holders'
+          ? { user_id: 'holder-owner', features: { portal_access_archived: archived } }
+          : table === 'profiles' ? { role: 'host_shop' } : null,
+        error: null,
+      }),
       then: (resolve: any) =>
         Promise.resolve({
           data:
@@ -23,7 +31,9 @@ function database(
                 ? holders.map((id) => ({ program_holder_id: id, program_id: 'cdl' }))
                 : table === 'program_holder_programs'
                   ? holders.map((id) => ({ program_holder_id: id, program_id: 'cdl' }))
-                  : [{ address: 'the.cdl.academy@elevateforhumanity.org' }],
+                  : table === 'communication_email_mailbox_members'
+                    ? hostMailboxes.map((address) => ({ access_level: 'manager', mailbox: { address, mailbox_kind: 'host_shop', active: true } }))
+                    : [{ address: 'the.cdl.academy@elevateforhumanity.org' }],
           error: null,
         }).then(resolve),
     };
@@ -97,6 +107,22 @@ describe('assigned program interoffice conversations', () => {
         ),
       ).toBeNull();
     }
+  });
+  it('routes archived Program Holder applicant mail exclusively to the owned Host Shop inbox', async () => {
+    expect(await programConversationRoute(
+      database(undefined, ['academy'], true),
+      ['student@example.com'],
+      ['admissions@elevateforhumanity.org'],
+    )).toMatchObject({
+      addresses: ['admissions@elevateforhumanity.org', 'mesmerized.by.beauty.cosmetology.academy-2@elevateforhumanity.org'],
+    });
+  });
+  it('fails closed rather than sharing applicant mail across multiple Host Shops', async () => {
+    expect(await programConversationRoute(
+      database(undefined, ['academy'], true, ['shop-one@example.org', 'shop-two@example.org']),
+      ['student@example.com'],
+      ['admissions@elevateforhumanity.org'],
+    )).toBeNull();
   });
   it('keeps different applicants separate even with identical outreach subjects', () => {
     expect(applicantConversationSubject('Re: WorkOne status', 'a@example.com')).toBe(

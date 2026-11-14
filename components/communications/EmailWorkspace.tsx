@@ -959,7 +959,7 @@ export function EmailWorkspace({
             )}
           </section>
 
-          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white md:static md:z-auto md:block md:max-h-[75dvh] md:overflow-y-auto' : 'hidden md:block'} min-w-0`} aria-label="Email reading pane">
+          <section className={`${data.selectedThread ? 'fixed inset-0 z-[70] flex flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:static md:pt-0 md:pl-0 md:pr-0 md:z-auto md:block md:max-h-[75dvh] md:overflow-y-auto' : 'hidden md:block'} min-w-0`} aria-label="Email reading pane">
             {data.selectedThread ? (
               <>
                 <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 p-3 sm:gap-3 sm:p-4">
@@ -1000,7 +1000,7 @@ export function EmailWorkspace({
                       className={`max-w-full min-w-0 rounded-2xl border p-3 shadow-sm sm:max-w-3xl sm:p-4 ${message.direction === 'outbound' ? 'ml-auto border-blue-200 bg-blue-50' : 'border-slate-200 bg-white'}`}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div>
+                        <div className="min-w-0 max-w-full [overflow-wrap:anywhere]">
                           <p className="text-sm font-black text-slate-950">
                             {message.sender_name || message.sender_email}
                           </p>
@@ -1010,7 +1010,7 @@ export function EmailWorkspace({
                           {formatDate(message.sent_at || message.received_at || message.created_at)}
                         </p>
                       </div>
-                      <p className="mt-4 whitespace-pre-wrap break-words text-[15px] leading-7 text-slate-900">
+                      <p className="mt-4 whitespace-pre-wrap [overflow-wrap:anywhere] text-[15px] leading-7 text-slate-900">
                         {message.text_body || '(No text content)'}
                       </p>
                       {message.attachments?.length ? (
@@ -1019,9 +1019,9 @@ export function EmailWorkspace({
                             <a
                               key={attachment.id}
                               href={`${apiPath}?attachmentId=${encodeURIComponent(attachment.id)}`}
-                              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-blue-800"
+                              className="inline-flex max-w-full items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-blue-800 [overflow-wrap:anywhere]"
                             >
-                              <FileText className="h-4 w-4" /> {attachment.file_name}
+                              <FileText className="h-4 w-4 shrink-0" /> <span className="min-w-0">{attachment.file_name}</span>
                             </a>
                           ))}
                         </div>
@@ -1055,7 +1055,7 @@ export function EmailWorkspace({
           aria-modal="true"
           className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/50 p-4"
         >
-          <div className="max-h-[90vh] w-full max-w-xl overflow-auto rounded-2xl bg-white p-6">
+          <div className="max-h-[90vh] supports-[height:100dvh]:max-h-[90dvh] w-full max-w-xl overflow-auto rounded-2xl bg-white p-6">
             <h2 className="text-xl font-bold">Filters & copy rules</h2>
             <p className="mt-2 text-sm text-slate-700">
               New incoming messages use these rules in order. Skip prevents a copy from being stored
@@ -1244,14 +1244,14 @@ export function EmailWorkspace({
       )}
       {compose ? (
         <div
-          className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/50 p-3 sm:items-center"
+          className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/50 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center"
           role="dialog"
           aria-modal="true"
           aria-label="Compose email"
         >
           <form
             onSubmit={sendMessage}
-            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
+            className="max-h-[92vh] supports-[height:100dvh]:max-h-[92dvh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-slate-200 p-5">
               <div>

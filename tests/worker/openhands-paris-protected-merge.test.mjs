@@ -10,6 +10,7 @@ const fixtures = {
     commit_id: HEAD, submitted_at: '2026-11-14T01:00:00Z' }],
   [`/commits/${HEAD}/check-runs?per_page=100`]: { check_runs: [{ name: 'CI Required Gate', status: 'completed', conclusion: 'success' }] },
   [`/commits/${HEAD}/statuses?per_page=100`]: [],
+  '/collaborators/human/permission': { permission: 'write' },
   '/git/ref/heads/main': { object: { sha: MAIN } },
   [`/compare/${MERGE}...${MAIN}`]: { status: 'ahead' },
   '/rules/branches/main': [
@@ -115,4 +116,36 @@ test('exact candidate, protected merge and main ancestry are mandatory', async (
   assert.equal((await verifyProtectedParisMerge({
     pr, expectedHeadSha: HEAD, gh: github({ [`/compare/${MERGE}...${MAIN}`]: { status: 'diverged' } }),
   })).accepted, false);
+});
+
+test('PARIS reviewer permission and unresolved change requests block protected acceptance', async () => {
+  const permissionPath = '/collaborators/human/permission';
+  for (const permission of ['read', 'triage', 'unknown']) {
+    const result = await verifyProtectedParisMerge({
+      pr, expectedHeadSha: HEAD, gh: github({ [permissionPath]: { permission } }),
+    });
+    assert.equal(result.accepted, false);
+  }
+  const requested = { user: { login: 'reviewer-two', type: 'User' },
+    state: 'CHANGES_REQUESTED', commit_id: HEAD, submitted_at: '2026-11-14T02:00:00Z' };
+  const result = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({
+      '/pulls/2613/reviews?per_page=100': [...fixtures['/pulls/2613/reviews?per_page=100'], requested],
+      '/collaborators/reviewer-two/permission': { permission: 'write' },
+    }),
+  });
+  assert.equal(result.accepted, false);
+  assert.match(result.reasons.join(' '), /Outstanding changes requested/);
+});
+
+test('PARIS requires all independent protected approvals, not merely one', async () => {
+  const result = await verifyProtectedParisMerge({
+    pr, expectedHeadSha: HEAD, gh: github({
+      '/branches/main/protection': {
+        required_pull_request_reviews: { required_approving_review_count: 2 },
+        required_status_checks: { checks: [{ context: 'CI Required Gate' }] },
+      },
+    }),
+  });
+  assert.equal(result.accepted, false);
 });

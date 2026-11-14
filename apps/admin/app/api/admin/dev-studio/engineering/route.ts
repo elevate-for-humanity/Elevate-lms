@@ -2,6 +2,7 @@ import {NextRequest,NextResponse} from 'next/server';
 import {apiRequireDevStudio} from '@/lib/devstudio/api-auth';
 import {applyRateLimit} from '@/lib/api/withRateLimit';
 import {requireAdminClient} from '@/lib/supabase/admin';
+import {repairDashboardReceipt,repairTaskId} from '@/lib/devstudio/repair-dashboard';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
@@ -43,22 +44,18 @@ export async function GET(request: NextRequest){
  const auth=await apiRequireDevStudio(request);if(auth.error)return auth.error;
  const db=await requireAdminClient();
  const {data,error}=await db.from('paris_code_repairs')
-  .select('id,status,source_job_id,workflow_run_id,candidate,verification,release_sha,updated_at')
+  .select('id,status,source_job_id,workflow_run_id,candidate,verification,release_sha,error_code,updated_at')
   .eq('actor_id',auth.id).order('updated_at',{ascending:false}).limit(25);
  if(error)return NextResponse.json({error:'Repair status is temporarily unavailable.'},{status:503});
- const repairs=(data??[]).map(row=>{
-  const candidate=row.candidate as any,verification=row.verification as any;
-  const branch=candidate?.branch?.name??candidate?.checkpoint?.branch;
-  const taskId=candidate?.openhands_task_id??candidate?.checkpoint?.taskId;
-  const pr=verification?.pullRequest;
-  const releaseSha=/^[a-f0-9]{40}$/.test(row.release_sha??'')?row.release_sha:null;
-  return {repairId:row.id,status:row.status,area:row.source_job_id?'Course Builder':'Engineering',
-   engine:!candidate||candidate?.provider==='openhands'||candidate?.kind==='openhands-checkpoint'?'openhands':'internal',
-   taskId:typeof taskId==='string'?taskId:null,
-   branch:typeof branch==='string'&&/^studio\/[a-zA-Z0-9/_-]+$/.test(branch)?branch:null,
-   pullRequest:typeof pr?.number==='number'?{number:pr.number,url:`https://github.com/elevate-for-humanity/Elevate-lms/pull/${pr.number}`}:null,
-   workflowUrl:Number.isSafeInteger(row.workflow_run_id)?`https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/${row.workflow_run_id}`:null,
-   releaseSha,verifiedLive:row.status==='verified'&&Boolean(releaseSha),updatedAt:row.updated_at};
- });
+ const taskIds=[...new Set((data??[]).map(repairTaskId).filter((id):id is string=>Boolean(id)))];
+ const tasks=new Map<string,any>();
+ if(taskIds.length){
+  const receipt=await db.from('ai_tasks')
+   .select('id,user_id,tenant_id,tool_name,requires_approval,approval_status,tool_output')
+   .eq('user_id',auth.id).eq('tool_name','openhands.execute').is('tenant_id',null).in('id',taskIds);
+  if(receipt.error)return NextResponse.json({error:'Repair approval evidence is temporarily unavailable.'},{status:503});
+  for(const task of receipt.data??[])tasks.set(task.id,task);
+ }
+ const repairs=(data??[]).map(row=>repairDashboardReceipt(row,tasks.get(repairTaskId(row)??''),auth.id));
  return NextResponse.json({repairs},{headers:{'Cache-Control':'no-store'}});
 }

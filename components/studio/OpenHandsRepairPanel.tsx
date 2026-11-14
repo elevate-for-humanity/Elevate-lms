@@ -2,8 +2,9 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-type Repair = {repairId:string;status:string;area:string;engine:string;taskId:string|null;
-  pullRequest:{number:number;url:string}|null;workflowUrl:string|null;releaseSha:string|null;verifiedLive:boolean};
+import type {repairDashboardReceipt} from '@/lib/devstudio/repair-dashboard';
+
+type Repair = ReturnType<typeof repairDashboardReceipt>;
 
 export default function OpenHandsRepairPanel(){
  const [goal,setGoal]=useState(''),[repairs,setRepairs]=useState<Repair[]>([]);
@@ -39,12 +40,20 @@ export default function OpenHandsRepairPanel(){
   {message&&<p className="mt-3 text-gray-200" role="status">{message}</p>}
   {error&&<p className="mt-3 text-amber-200" role="alert">{error}</p>}
   <ul className="mt-4 space-y-3">{repairs.map(repair=><li key={repair.repairId} className="rounded border border-[#3c3c3c] p-3">
-   <p>{repair.area} · {repair.repairId.slice(0,8)}</p>
+   <p className="break-all">{repair.area} · {repair.repairId}</p>
+   <p className="mt-1 break-all text-gray-300">{repair.operation} · {repair.repository}</p>
+   {repair.sourceJobId&&<p className="mt-1 break-all text-gray-300">Original job: {repair.sourceJobId}</p>}
+   <p className="mt-1 text-gray-300">Risk: {repair.riskClassification}</p>
+   <p className="mt-1 text-gray-300">Task approval: {repair.approvalStatus.replaceAll('_',' ')} · Authority: {repair.approvalAuthority}</p>
+   {repair.blockerCode&&<p className="mt-1 break-all text-amber-200">Blocker: {repair.blockerCode}</p>}
    <p className="mt-1 text-gray-300">{repair.status.replaceAll('_',' ')}{repair.verifiedLive?' · production verified':' · production not yet verified'}</p>
+   {repair.conversationId&&<p className="mt-1 break-all text-gray-300">Existing conversation: {repair.conversationId}</p>}
+   {repair.branch&&<p className="mt-1 break-all text-gray-300">Branch: {repair.branch}</p>}
+   {repair.changedFiles.length>0&&<details className="mt-2"><summary className="cursor-pointer">Proposed files ({repair.changedFiles.length})</summary><ul className="mt-2 space-y-1">{repair.changedFiles.map(path=><li key={path} className="break-all">{path}</li>)}</ul></details>}
    {repair.taskId&&<p className="mt-1 break-all text-gray-300">OpenHands task: {repair.taskId}</p>}
    <div className="mt-2 flex flex-wrap gap-4">{repair.pullRequest&&<a className="inline-flex min-h-11 items-center underline" href={repair.pullRequest.url} target="_blank" rel="noreferrer">Review PR #{repair.pullRequest.number}</a>}
     {repair.workflowUrl&&<a className="inline-flex min-h-11 items-center underline" href={repair.workflowUrl} target="_blank" rel="noreferrer">Validation &amp; release</a>}</div>
-   {repair.releaseSha&&<p className="break-all text-gray-300">Release: {repair.releaseSha.slice(0,12)}</p>}
+   {repair.releaseSha&&<p className="break-all text-gray-300">Release: {repair.releaseSha}</p>}
   </li>)}</ul>
  </section>;
 }

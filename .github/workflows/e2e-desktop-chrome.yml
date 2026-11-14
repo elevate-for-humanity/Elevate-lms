@@ -60,6 +60,16 @@ jobs:
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Verify Course Builder chat controls in short and landscape panels
         run: node scripts/test-course-chat-layout.mjs
+      # The broad test:e2e command runs desktop-chrome only. Certify the same
+      # dedicated Host Shop identity on tablet and phone when configured.
+      # A missing identity does NOT certify the Host Shop release.
+      - name: Authenticated Host Shop desktop, tablet and mobile geometry
+        if: ${{ env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
+        run: >-
+          pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
+          --grep "critical Host Shop surfaces fit the active device viewport"
+          --project=desktop-chrome --project=tablet-chrome
+          --project=android-chrome --project=iphone-webkit
       - name: Run desktop-chrome E2E (marketing, admin, lms)
         run: pnpm test:e2e
       - name: Upload Playwright report

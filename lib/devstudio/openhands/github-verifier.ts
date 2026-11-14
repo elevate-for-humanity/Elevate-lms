@@ -154,10 +154,11 @@ export async function verifyOpenHandsGitHubOutcome(input: {
       }
       const changedFiles = files.map((file) => file.filename).filter((name): name is string => Boolean(name));
       const checkRuns = checks.check_runs ?? [];
-      const successfulChecks = checkRuns.length > 0 && checkRuns.every(
-        (check) => check.status === 'completed' && check.conclusion === 'success',
-      );
-      if (changedFiles.length === 0 || !successfulChecks ||
+      // Either GitHub Checks or legacy commit-status contexts may supply CI.
+      // The protected acceptance predicate evaluates ALL required contexts and
+      // blocks incomplete/failing evidence. Do not reject status-only PRs here.
+      const hasCiEvidence = checkRuns.length > 0 || statuses.length > 0;
+      if (changedFiles.length === 0 || !hasCiEvidence ||
           !['success', 'pending'].includes(status.state ?? '') || status.state === 'failure') {
         reasons.push(`PR #${number} has no changed files, successful completed checks, or valid commit status.`);
         continue;

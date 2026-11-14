@@ -253,6 +253,8 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
             raise ValueError('live_tls_endpoint_reload_not_confirmed')
         if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport, re.I):
             raise ValueError('live_server_certificate_verification_not_confirmed')
+        if not re.search(r'trust_id_inbound\s*:\s*(?:true|yes)\b', endpoint, re.I):
+            raise ValueError('live_inbound_caller_identity_not_confirmed')
     except Exception:
         main.write_text(previous)
         if existed:

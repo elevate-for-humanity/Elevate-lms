@@ -14,7 +14,7 @@ function database(
     const query: any = {
       select: () => query,
       eq: () => query,
-      ilike: () => query,
+      ilike: vi.fn(() => query),
       in: () => query,
       maybeSingle: async () => ({
         data: table === 'program_holders'
@@ -42,6 +42,24 @@ function database(
   return { from } as any;
 }
 describe('assigned program interoffice conversations', () => {
+  it('escapes SQL wildcard metacharacters in both applicant identity filters', async () => {
+    const db = database();
+    await programConversationRoute(
+      db,
+      ['STUDENT_10%OFF@example.com'],
+      ['admissions@elevateforhumanity.org'],
+    );
+    const filters = db.from.mock.calls.map((args: string[], index: number) => ({
+      table: args[0],
+      ilike: db.from.mock.results[index].value.ilike.mock.calls,
+    }));
+    expect(filters.find((item: any) => item.table === 'applications')?.ilike).toContainEqual([
+      'email', String.raw`student\_10\%off@example.com`,
+    ]);
+    expect(filters.find((item: any) => item.table === 'program_holder_students')?.ilike).toContainEqual([
+      'applicant_email', String.raw`student\_10\%off@example.com`,
+    ]);
+  });
   it('routes non-CDL programs through their canonical holder assignment', async () => {
     expect(await programConversationRoute(database([{program_slug:'barber-apprenticeship',program_id:'cdl'}]),['student@example.com'],['admissions@elevateforhumanity.org'])).not.toBeNull();
   });

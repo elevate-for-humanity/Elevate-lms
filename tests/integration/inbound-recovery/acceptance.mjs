@@ -21,9 +21,9 @@ if (process.env.INBOUND_TEST_PGLITE === '1') {
       const substituted = sql.replace(/\$(\d+)/g, (_, index) => literal(values[Number(index)-1]));
       if (/^\s*(insert|update|delete)\b/i.test(substituted)) {
         if (!/\breturning\b/i.test(substituted)) { await execute(substituted); return {rows:[]}; }
-        return {rows:JSON.parse(await execute("with result as ("+substituted+") select coalesce(json_agg(result),'[]'::json) from result"))};
+        return {rows:JSON.parse(await execute("with result as ("+substituted+") select coalesce(json_agg(row_to_json(result.*)),'[]'::json) from result"))};
       }
-      return { rows: JSON.parse(await execute("select coalesce(json_agg(result),'[]'::json) from ("+substituted+") result")) };
+      return { rows: JSON.parse(await execute("select coalesce(json_agg(row_to_json(result.*)),'[]'::json) from ("+substituted+") result")) };
     },
   };
 }
@@ -62,6 +62,16 @@ async function claim(id,type='email.received') {
 async function finish(id,token,status,retrySafe=false) {
  return rpc('finish_inbound_webhook_event',{p_event_id:id,p_token:token,p_status:status,p_error:status==='errored'?'transient':null,p_retry_safe:retrySafe});
 }
+test('database adapter preserves scalar RPC results inside named row envelopes',async()=>{
+ assert.deepEqual((await db.query("select jsonb_build_object('state','claimed') as result")).rows,[{result:{state:'claimed'}}]);
+ assert.deepEqual((await db.query('select true as result')).rows,[{result:true}]);
+ assert.deepEqual((await db.query('select null::jsonb as result')).rows,[{result:null}]);
+ await db.exec('create table adapter_result_fixture(result jsonb)');
+ try {
+  assert.deepEqual((await db.query('insert into adapter_result_fixture(result) values($1) returning result',[{state:'claimed'}])).rows,[{result:{state:'claimed'}}]);
+  assert.deepEqual((await db.query('delete from adapter_result_fixture returning result')).rows,[{result:{state:'claimed'}}]);
+ } finally {await db.exec('drop table adapter_result_fixture');}
+});
 test('errored storage delivery is reclaimed once, records its old receipt and completes',async()=>{
  const first=await claim('recover');assert.equal(first.data.state,'claimed');
  assert.equal((await finish('recover',first.token,'errored')).data,true);

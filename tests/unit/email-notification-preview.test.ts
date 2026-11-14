@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest';
 import { alertPresentation } from '@/lib/notifications/pwa-alert-settings';
 import { notifyParisMailResult } from '@/lib/email/paris-mail-notification';
-it('identifies incoming sender, mailbox and subject without exposing the body', () => {
+it('shows the authorized sender, subject and short preview without leaking the unselected full body', () => {
   expect(
     alertPresentation(
       {
@@ -9,6 +9,7 @@ it('identifies incoming sender, mailbox and subject without exposing the body', 
           sender_email: 'andrew@epa.gov',
           mailbox_address: 'testing@elevateforhumanity.org',
           subject: 'Application review',
+          preview: 'Your application is under review',
         },
         text_body: 'private details',
       },
@@ -16,8 +17,14 @@ it('identifies incoming sender, mailbox and subject without exposing the body', 
     ),
   ).toEqual({
     title: 'New email from andrew@epa.gov',
-    body: 'testing@elevateforhumanity.org · Application review',
+    body: 'Application review · Your application is under review',
   });
+  const preview = alertPresentation({
+    metadata: { sender_email: 'andrew@epa.gov', subject: 'Application review', preview: 'Short authorized preview' },
+    text_body: 'Confidential extended message',
+  }, 'email');
+  expect(preview.body).toContain('Short authorized preview');
+  expect(preview.body).not.toContain('Confidential extended message');
 });
 it('distinguishes PARIS sent and failed replies and strips control characters', () => {
   expect(

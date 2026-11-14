@@ -86,7 +86,7 @@ export async function storeInboundCommunicationEmail(
   const unknownBusiness = recipients.some(address =>
     address.endsWith('@elevateforhumanity.org') && !mailboxes.some(mailbox => mailbox.address === address));
   if (!options.internalCopy && unknownBusiness) {
-    const fallback = await db.from('communication_email_mailboxes').select('id,address').eq('address', 'admissions@elevateforhumanity.org').eq('active', true).maybeSingle();
+    const fallback = await db.from('communication_email_mailboxes').select('id,address,mailbox_kind,program_holder_id').eq('address', 'admissions@elevateforhumanity.org').eq('active', true).maybeSingle();
     if (fallback.error) throw new Error('Admissions fallback unavailable');
     if (fallback.data && !mailboxes.some(mailbox => mailbox.id === fallback.data.id)) mailboxes = [...mailboxes, fallback.data];
   }

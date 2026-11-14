@@ -40,8 +40,13 @@ export function isParisProviderBranchCandidate(
     typeof task.user_id === 'string' &&
     task.user_id.length > 0 &&
     (task.tenant_id ?? null) === null &&
-    ((task.requires_approval === false && task.approval_status === 'not_required') ||
-      isProviderConfirmationSnapshot(task)) &&
+    // An explicit recorded owner approval is sufficient for terminal source
+    // inspection even when a legacy requires_approval bit remains true.
+    // Provider-generated confirmation waits retain their separate fenced path;
+    // neither pending policy approval nor an awaiting_approval task is consent.
+    (((task.approval_status === 'approved' ||
+        (task.requires_approval === false && task.approval_status === 'not_required')) &&
+       task.status !== 'awaiting_approval') || isProviderConfirmationSnapshot(task)) &&
     input.repository === REPOSITORY &&
     input.branch === branch &&
     prompt.startsWith(`PARIS owner-authorized engineering repair ${repairId}.\nRepository: ${REPOSITORY}. `) &&

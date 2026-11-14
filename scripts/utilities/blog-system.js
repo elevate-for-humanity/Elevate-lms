@@ -4,6 +4,7 @@
   See LICENSE file for details.
 */
 
+const { publicPhone } = require('./phone-config.cjs');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -164,7 +165,7 @@ class BlogSystem {
           <li>Begin training once approved</li>
         </ol>
 
-        <p>Our team can help guide you through the entire process. Contact us at 317-760-7908 to get started.</p>
+        <p>Our team can help guide you through the entire process. Contact us at ${publicPhone} to get started.</p>
       `,
       'data-science-bootcamp-success': `
         <h2>Real Success Stories</h2>

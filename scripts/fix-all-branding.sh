@@ -9,7 +9,9 @@ echo "╚═══════════════════════�
 echo ""
 
 # Real contact information from repository
-REAL_PHONE="(317) 760-7908"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REAL_PHONE="$(node -e 'process.stdout.write(require(process.argv[1]).publicPhone)' "$SCRIPT_DIR/utilities/phone-config.cjs")"
+[[ "$REAL_PHONE" =~ ^\+[1-9][0-9]{7,14}$ ]] || { echo "Invalid configured public phone" >&2; exit 1; }
 REAL_EMAIL="elizabethpowell6262@gmail.com"
 REAL_ADDRESS="7009 E 56th St Ste F, Indianapolis, IN 46226"
 REAL_CONTACT="Elizabeth Greene"
@@ -27,7 +29,7 @@ echo "Step 1: Updating contact information..."
 find app components -type f \( -name "*.tsx" -o -name "*.jsx" \) -exec sed -i \
   -e "s/(317) 555-1234/$REAL_PHONE/g" \
   -e "s/317-555-1234/$REAL_PHONE/g" \
-  -e "s/\+13175551234/+13177607908/g" \
+  -e "s/\+13175551234/$REAL_PHONE/g" \
   {} \;
 
 # Update email addresses

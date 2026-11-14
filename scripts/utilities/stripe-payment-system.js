@@ -16,6 +16,7 @@
   See LICENSE file for details.
 */
 
+const { getAlertPhone } = require('./phone-config.cjs');
 const express = require('express');
 const stripe = require('stripe')(
   process.env.STRIPE_SECRET_KEY || 'sk_test_dummy'
@@ -175,14 +176,14 @@ class StripePaymentSystem {
           `${req.protocol}://${req.get('host')}/payment-cancelled`,
         metadata: {
           ...metadata,
-          phone_alerts: '3177607908',
+          phone_alerts: getAlertPhone(),
           emergency_sale: 'true',
           created_at: new Date().toISOString(),
         },
         payment_intent_data: {
           metadata: {
             ...metadata,
-            phone_alerts: '3177607908',
+            phone_alerts: getAlertPhone(),
           },
         },
       });
@@ -226,7 +227,7 @@ class StripePaymentSystem {
           amount: session.amount_total / 100,
           email: session.customer_details?.email,
           session_id: session.id,
-          phone: '3177607908',
+          phone: getAlertPhone(),
         });
 
         // Process successful payment
@@ -303,7 +304,7 @@ class StripePaymentSystem {
           !process.env.STRIPE_SECRET_KEY ||
           process.env.STRIPE_SECRET_KEY.includes('test'),
         emergency_sale_active: true,
-        phone_alerts: '3177607908',
+        phone_alerts: getAlertPhone(),
       });
     } catch (error) {
       res.status(500).json({
@@ -359,7 +360,7 @@ class StripePaymentSystem {
           ? [
               'Products are created and ready',
               'Checkout system is functional',
-              'Payment alerts will go to 3177607908',
+              getAlertPhone() ? `Payment alert recipient: ${getAlertPhone()}` : 'SMS alerts require SMS_ALERT_PHONE configuration',
               'Ready to accept payments immediately!',
             ]
           : [

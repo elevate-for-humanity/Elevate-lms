@@ -1,9 +1,18 @@
 import Link from 'next/link';
+import StudentOnboardingLinks from './StudentOnboardingLinks';
 
 export const HOST_SHOP_STUDENT_APPLICATION_URL =
   'https://www.elevateforhumanity.org/apply/student/form?intent=enrollment';
 
-export default function HostShopStudentInvitation() {
+export default function HostShopStudentInvitation({
+  partnerId,
+  shopName,
+  programs,
+}: {
+  partnerId: string;
+  shopName: string;
+  programs: string[];
+}) {
   return (
     <section
       aria-label="Invite students to enroll"
@@ -15,14 +24,7 @@ export default function HostShopStudentInvitation() {
         your shop.
       </p>
       <div className="mt-4 flex flex-wrap gap-3">
-        <a
-          href={HOST_SHOP_STUDENT_APPLICATION_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-5 py-3 font-bold text-white"
-        >
-          Invite a student ↗
-        </a>
+        <StudentOnboardingLinks partnerId={partnerId} shopName={shopName} programs={programs} />
         <Link
           href="/host-shop/email"
           className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 px-5 py-3 font-bold"

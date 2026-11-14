@@ -174,9 +174,8 @@ export default function StudioCommandWorkspace({
     return () => controller.abort();
   }, [activeConversationId]);
 
-  useEffect(() => {
-    if (surface === 'course') setFocusMode(true);
-  }, [surface]);
+  // Course Builder stays inside the Studio workspace unless expanded explicitly.
+  // Automatically fixing it over the viewport hides the underlying navigation and composer.
 
   const courseBuilderUrl = useMemo(
     () =>

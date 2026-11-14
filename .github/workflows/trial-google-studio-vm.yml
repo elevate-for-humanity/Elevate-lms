@@ -82,7 +82,7 @@ jobs:
       - name: Stop trial and remove its temporary SSH rule
         if: always()
         run: node scripts/gcp/deploy-studio-vm-trial.mjs --cleanup
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: studio-vm-trial-${{ github.run_id }}

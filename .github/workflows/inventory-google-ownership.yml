@@ -41,7 +41,7 @@ jobs:
           node scripts/gcp/inventory-google-ownership.mjs || result=$?
           cat google-ownership-inventory.json
           exit "${result:-0}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: google-ownership-inventory

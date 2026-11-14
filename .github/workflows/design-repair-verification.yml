@@ -61,7 +61,7 @@ jobs:
         run: pnpm exec playwright test --config playwright.design-audit.config.ts --project=1440px
         env:
           DESIGN_AUDIT_EVIDENCE_DIR: artifacts/design-repair/original-public-desktop
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: design-repair-responsive-evidence
@@ -91,7 +91,7 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - run: node scripts/verify-playwright-runtime.mjs chromium
       - run: node tests/browser/learning-workspace-layout.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: learning-workspace-browser-evidence

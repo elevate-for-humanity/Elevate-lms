@@ -19,6 +19,6 @@
     "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "supports-color": "10.2.2"
+    "supports-color": "11.0.0"
   }
 }

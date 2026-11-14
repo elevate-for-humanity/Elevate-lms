@@ -130,6 +130,10 @@ export async function verifyOpenHandsGitHubOutcome(input: {
         `/repos/${repository}/commits/${encodeURIComponent(headSha)}/status`,
         token,
       );
+      const statuses = await gh<Array<{ context?: string; state?: string }>>(
+        `/repos/${repository}/commits/${encodeURIComponent(headSha)}/statuses?per_page=100`,
+        token,
+      );
       const checks = await gh<{ check_runs?: Array<{ name?: string; status?: string; conclusion?: string | null }> }>(
         `/repos/${repository}/commits/${encodeURIComponent(headSha)}/check-runs?per_page=100`,
         token,
@@ -197,7 +201,7 @@ export async function verifyOpenHandsGitHubOutcome(input: {
       const protectionVerified = Boolean(policyToken) && protectedMainPolicyVerified({ rules, classic });
       const requiredChecks = requiredMainChecks({ rules, classic });
       const protectedAcceptance = evaluateProtectedPullRequest({
-        pr, reviews, checks: checkRuns, requiredChecks, ancestryVerified, protectionVerified,
+        pr, reviews, checks: checkRuns, statuses, requiredChecks, ancestryVerified, protectionVerified,
       });
       if (!protectedAcceptance.accepted) {
         reasons.push(`PR #${number} lacks protected acceptance: ${protectedAcceptance.reasons.join('; ')}.`);

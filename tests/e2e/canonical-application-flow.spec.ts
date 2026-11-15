@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { siteUrls } from '../../lib/utils/site-urls';
+import { peerOrigin } from './helpers/app-origins';
 
 test.describe('Canonical application flow', () => {
   test('homepage exposes a visible application path', async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe('Canonical application flow', () => {
     await page.getByRole('link', { name: /^Host Shop/ }).click();
     await expect(page).toHaveURL(/\/partners\/host-shop\/apply/);
     await expect(page.getByRole('heading', { name: 'Become an approved apprenticeship Host Site' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${siteUrls.app}/host-shop/login`);
+    await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${peerOrigin('lms')}/host-shop/login`);
     await expect(page.getByRole('checkbox', { name: 'Cosmetology Apprenticeship', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Save application and finish later' })).toBeEnabled();
     const submit = page.getByRole('button', { name: 'Submit Host Site Application', exact: true });

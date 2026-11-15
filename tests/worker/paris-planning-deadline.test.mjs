@@ -17,3 +17,9 @@ test('PARIS checks remaining time before each long inference call',()=>{
  assert.match(source,/await checkpoint\(\);[\s\S]*?PARIS_REPAIR_PLANNING_DEADLINE_REACHED/);
  assert.match(workflow,/timeout-minutes: 40/);
 });
+test('the cold-start model probe runs only before the first turn',()=>{
+ // Probing again on a continuation spends 55s of the Admin route's 300s request
+ // budget, which can push an edit-sized turn past the platform deadline and
+ // surface as an unattributed HTTP 502.
+ assert.match(source,/provider==='elevate' && !continuation\?\.checkpoint/);
+});

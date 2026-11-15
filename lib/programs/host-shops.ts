@@ -83,6 +83,9 @@ function isPubliclyListedHostShop(shop: HostShop): boolean {
   if (!shop.name.trim()) return false;
   if (/\[qa(?:\s+e2e)?\]|qa[ -]?e2e|qa test|test only|100 qa test way|@qa\.invalid|@example\.(?:com|org|net)|@test\.|\.invalid\b/.test(identity)) return false;
   if (/razor[’'\s-]*s?\s+image|razorsimage|marvel(?:ous|ouz)?[\s-]*(?:cuts|cutz)/.test(identity)) return false;
+  // Public delisting is independent of operational approval. This canonical
+  // public loader feeds directory cards, direct profiles, sitemap, and API.
+  if (/prestige[\s-]+elevation[\s-]+barber[\s-]+and[\s-]+beauty[\s-]+institute/.test(identity)) return false;
   return true;
 }
 

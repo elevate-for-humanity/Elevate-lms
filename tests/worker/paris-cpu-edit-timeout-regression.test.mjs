@@ -15,7 +15,7 @@ test('verified CPU source reads use a smaller edit allowance with inference head
   const discovery = repairCompletionTokens('cpu', ['READ_REJECTED lib/missing.ts']);
   const edit = repairCompletionTokens('cpu', ['READ lib/source.ts (sha verified): exact source']);
   assert.equal(discovery, 384);
-  assert.equal(edit, 1280);
+  assert.equal(edit, 1536);
   assert.ok(edit > 768, 'must still be able to propose a small exact edit');
   assert.ok(edit < 2048, 'must not repeat the proven timeout-sized allowance');
   assert.equal(REPAIR_INFERENCE_TIMEOUT_MS, 210_000);

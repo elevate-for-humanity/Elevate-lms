@@ -84,6 +84,31 @@ async function infrastructureGitHub(path:string,init:RequestInit={}) {
  if(result.errors?.length)throw Error('PARIS_INFRASTRUCTURE_PULL_REQUEST_AUTOMERGE_REJECTED');
  return result;
 }
+/** Branch-policy reads need Administration: read, which the workflow job token
+ * and some App installations lack. Resolve the configured policy credential
+ * (a repository collaborator PAT) so protected-policy verification is not
+ * silently downgraded to "unverified" for a permission reason. Falls back to
+ * the verifier credential, then the App installation. */
+async function parisPolicyGitHub(path:string,init:RequestInit={}) {
+ const {getSecret}=await import('@/lib/secrets');
+ const token=(process.env.PARIS_POLICY_TOKEN?.trim()
+  ||await getSecret('PARIS_POLICY_TOKEN')
+  ||process.env.PARIS_VERIFIER_TOKEN?.trim()
+  ||await getSecret('PARIS_VERIFIER_TOKEN')
+  ||'').trim();
+ if(!token)return infrastructureGitHub(path,init);
+ const endpoint=`https://api.github.com/repos/${REPAIR_REPOSITORY}${path}`;
+ const response=await fetch(endpoint,{...init,headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},cache:'no-store',signal:AbortSignal.timeout(20000)});
+ if(!response.ok){
+  let policyAbsent=false;
+  if(response.status===404&&path==='/branches/main/protection'){
+   const body=await response.json().catch(()=>null);
+   policyAbsent=body?.message==='Branch not protected';
+  }
+  throw Object.assign(Error('PARIS_POLICY_GITHUB_HTTP_'+response.status),{status:response.status,policyAbsent});
+ }
+ return response.json();
+}
 export async function enqueueParisRepair({actorId,goal,candidate,fingerprint,sourceJobId}:{actorId:string;goal:string;candidate?:any;fingerprint?:string;sourceJobId?:string}){
  const db=await requireAdminClient();
  // A worker failure is durable across source releases. Reuse the original
@@ -189,6 +214,47 @@ export async function prepareParisRepair(id:string,runId:number){
   },true);
   throw error;
  }
+}
+/** Independently authorize a protected merge against the durable repair record.
+ * The signed merge workflow must not trust its own inputs: it proves the PR it
+ * was asked to merge is the exact pull request this repair recorded, at the
+ * exact head that was validated, while the repair is still awaiting merge. */
+export async function authorizeParisProtectedMerge(id:string,prNumber:number,expectedHeadSha:string){
+ const db=await requireAdminClient();
+ const {data:row,error}=await db.from('paris_code_repairs').select('id,status,verification').eq('id',id).single();
+ if(error)throw error;
+ const recorded=row?.verification?.pullRequest;
+ const reasons:string[]=[];
+ if(!Number.isInteger(prNumber)||prNumber<1)reasons.push('Requested pull request number is invalid');
+ if(!/^[a-f0-9]{40}$/.test(expectedHeadSha??''))reasons.push('Requested head SHA is invalid');
+ if(!recorded||typeof recorded!=='object')reasons.push('Repair has no recorded pull request');
+ else{
+  if(Number(recorded.number)!==prNumber)reasons.push('Requested pull request is not the one this repair recorded');
+  if(String(recorded.headSha)!==expectedHeadSha)reasons.push('Requested head SHA is not the one this repair validated');
+ }
+ if(row?.status!=='validating')reasons.push('Repair is not awaiting a protected merge');
+ return {authorized:reasons.length===0,reasons,recordedPrNumber:Number(recorded?.number)||null,recordedHeadSha:String(recorded?.headSha??'')||null};
+}
+/** Persist the signed protected-merge workflow outcome. A successful merge is
+ * not completion: the reconciler independently re-reads the merged PR and
+ * requires protected acceptance before deployment. A failed merge is recorded
+ * so the reconciler can retry the request after its stale window. */
+export async function recordParisMergeResult(id:string,result:{merged:boolean;mergeCommitSha?:string|null;reason?:string|null;reasons?:string[];runId?:number}){
+ const db=await requireAdminClient();
+ const {data:row,error}=await db.from('paris_code_repairs').select('id,verification').eq('id',id).single();
+ if(error)throw error;
+ const prior=row?.verification??{};
+ const protectedMergeResult={
+  merged:result.merged===true,
+  mergeCommitSha:/^[a-f0-9]{40}$/.test(result.mergeCommitSha??'')?result.mergeCommitSha:null,
+  reason:result.reason??null,
+  reasons:Array.isArray(result.reasons)?result.reasons.slice(0,8):undefined,
+  runId:Number.isSafeInteger(result.runId)?result.runId:null,
+  at:new Date().toISOString(),
+ };
+ const {error:writeError}=await db.from('paris_code_repairs').update({verification:{...prior,protectedMergeResult},updated_at:new Date().toISOString()}).eq('id',id);
+ if(writeError)throw writeError;
+ return {recorded:true};
 }
 export async function publishParisRepair(id:string,runId:number){
  const db=await requireAdminClient();const {data:row,error}=await db.from('paris_code_repairs').select('*').eq('id',id).single();
@@ -523,10 +589,31 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    try{
     const pr=await gh('/pulls/'+repair.verification.pullRequest.number);
     const sha=infrastructureMergeEvidence(pr,repair.verification.pullRequest.headSha);
-    if(!sha)continue;
+    if(!sha){
+     // The PR is open and not yet merged. Nothing else in the system approves
+     // or merges it, so dispatch the signed protected-merge workflow once. It
+     // uses the independent verifier collaborator identity to approve and merge
+     // only if the exact validated head still satisfies the protected policy.
+     const requestedAt=repair.verification?.protectedMergeRequestedAt;
+     const requestNumber=repair.verification?.protectedMergeRequest?.prNumber;
+     const alreadyRequested=requestNumber===pr.number && repair.verification?.protectedMergeRequest?.headSha===repair.verification.pullRequest.headSha;
+     const staleRequest=requestedAt && Date.now()-Date.parse(requestedAt)>20*60000;
+     if(!alreadyRequested || staleRequest){
+      try{
+       await gh(`/actions/workflows/paris-protected-merge.yml/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',inputs:{repair_id:repair.id,pr_number:String(pr.number),expected_head_sha:repair.verification.pullRequest.headSha}})});
+      }catch(error){
+       // A rejected dispatch is durable: record it and let the next tick retry
+       // only after the stale window, never silently drop the repair.
+       await update(repair.id,{verification:{...repair.verification,protectedMergeRequest:{prNumber:pr.number,headSha:repair.verification.pullRequest.headSha},protectedMergeRequestedAt:new Date().toISOString(),protectedMergeDispatchError:String(error instanceof Error?error.message:error).slice(0,300)}});
+       continue;
+      }
+      await update(repair.id,{verification:{...repair.verification,protectedMergeRequest:{prNumber:pr.number,headSha:repair.verification.pullRequest.headSha},protectedMergeRequestedAt:new Date().toISOString(),protectedMergeDispatchError:null}});
+     }
+     continue;
+    }
     const protectedEvidence=await verifyProtectedParisMerge({
      pr,expectedHeadSha:repair.verification.pullRequest.headSha,gh,
-     policyGh:infrastructureGitHub, // scoped GitHub App, not the workflow job token
+     policyGh:parisPolicyGitHub, // policy credential with Administration: read
     });
     if(!protectedEvidence.accepted){
      await update(repair.id,{

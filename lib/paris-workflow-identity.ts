@@ -7,6 +7,7 @@ const AUDIENCE='elevate-paris-code-repair';
 const JWKS=createRemoteJWKSet(new URL(ISSUER+'/.well-known/jwks'));
 const WORKFLOWS=new Set([
  '.github/workflows/paris-code-repair.yml',
+ '.github/workflows/paris-protected-merge.yml',
  '.github/workflows/verify-paris-production-authorization.yml',
 ]);
 async function verifyParisWorkflowIdentity(header:string|null, allowedWorkflows:Set<string>):Promise<boolean>{

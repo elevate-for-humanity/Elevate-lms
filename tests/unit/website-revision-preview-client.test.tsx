@@ -3,6 +3,8 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import saved from '../fixtures/legacy83-saved-config.json';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ResponsivePreviewClient } from '../../apps/marketing/app/apps/website-builder/edit/[websiteId]/preview/ResponsivePreviewClient';
+import { TenantPreviewProvider } from '@/components/tenant/TenantPreviewContext';
+import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComposableSite';
 import { tenantSiteHref } from '@/lib/tenant/site-links';
 afterEach(cleanup);
 const revision = '11111111-1111-4111-8111-111111111111';
@@ -18,6 +20,13 @@ describe('saved-version review navigation', () => {
   expect(frame.style.width).toBe('390px');
   expect(frame.contentDocument!.querySelector('fieldset')).toBeDisabled();
   expect(within(frame.contentDocument!.body).queryByRole('button', { name: 'Need help? Ask PARIS' })).toBeNull();
+ });
+ it('does not expose external purchase destinations in a saved product preview', () => {
+  const config = structuredClone(saved) as TenantSiteConfig;
+  config.pages![0].sections = [{ id: 'products', type: 'products', content: { title: 'Shop', items: [{ name: 'Product', href: 'https://checkout.example/pay', buttonText: 'Buy product' }] } }];
+  render(<TenantPreviewProvider websiteId="site-a" readOnly><fieldset disabled><PublicTenantComposableSite site={{ id: 'site-a', subdomain: 'customer', siteName: 'Customer', organizationId: null, config }} /></fieldset></TenantPreviewProvider>);
+  expect(screen.queryByRole('link', { name: 'Buy product' })).toBeNull();
+  expect(screen.getByText('Buy product')).toHaveAttribute('aria-disabled', 'true');
  });
  it('keeps copied internal links inside the chosen saved version', () => {
   const base = `/apps/website-builder/edit/site-a/preview?revision=${revision}&page=`;

@@ -70,8 +70,12 @@ test('source-first admission separates real application edits from test-only or 
  assert.equal(hasApplicationSourceCorrection(['tests/e2e/helpers/guard.spec.ts']),false);
  assert.match(nextRepairActionConstraint(['read:lib/a.ts'],1,['tests/regression.test.ts']),/NEXT action must correct/);
  const source=readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts',import.meta.url),'utf8');
- assert.match(source,/action\.path\.startsWith\('tests\/'\)/);
- assert.ok(source.includes('helpers\\//'), 'the create gate must exempt shared test helpers');
+ // The create gate and the final completion gate must agree, and both must use
+ // the single shared predicate so a helper-file repair cannot be accepted by one
+ // check and rejected by another.
+ assert.match(source,/action\.path\.startsWith\('tests\/'\) && !isApplicationSourceCorrection\(action\.path\)/);
+ assert.match(source,/isApplicationSourceCorrection\(path\)/);
  assert.match(source,/hasApplicationSourceCorrection\(\[\.\.\.changedFiles\]\)/);
+ assert.ok(!/!\^tests\\\/\(\?:e2e\\\/\)\?helpers/.test(source), 'no inline duplicate of the helper rule');
  assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes,\[\.\.\.changedFiles\]\)/);
 });

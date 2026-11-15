@@ -48,3 +48,16 @@ test('the redacted diagnostic never discloses a bearer token, jwt or key',()=>{
   assert.ok(failure.diagnostic.length<=401);
 });
 
+test('the nested cause is redacted, not just the primary message',()=>{
+  const inner=new Error('upstream rejected Authorization: Bearer sk-live-abcdef1234567890');
+  const outer=new Error('provider call failed',{cause:inner});
+  const failure=describeParisPhaseFailure(outer);
+  assert.ok(failure.cause, 'the cause must be preserved for diagnosis');
+  assert.ok(!failure.cause.includes('sk-live-abcdef1234567890'),'the cause must not leak the token');
+  assert.ok(failure.cause.includes('<redacted>'));
+  // A jwt-bearing cause is also redacted and bounded.
+  const jwtCause=describeParisPhaseFailure(new Error('outer',{cause:new Error('x eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.sig')}));
+  assert.ok(!jwtCause.cause.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'));
+  assert.ok(jwtCause.cause.length<=401);
+});
+

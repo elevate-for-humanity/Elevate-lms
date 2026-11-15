@@ -7,6 +7,36 @@ export async function resumeRepairedCourseJobs({imageSha,imageDigest,env=process
  if(!/^[a-f0-9]{40}$/.test(imageSha??'')||!/^sha256:[a-f0-9]{64}$/.test(imageDigest??''))throw Error('VERIFIED_REPAIR_IMAGE_REQUIRED');
  const token=env.SUPABASE_SERVICE_ROLE_KEY;if(!token)throw Error('DATABASE_AUTH_REQUIRED');
  const headers={apikey:token,Authorization:'Bearer '+token};
+ // A job can be left status='queued' after its retry budget is exhausted:
+ // queue.fail() only sets 'failed' when attempts>=max_attempts, but a later
+ // bounded repair requeue (requeueForRepair) or lease expiry can return it to
+ // 'queued' without restoring the budget. Such a row is NOT claimable — the
+ // claim predicate requires attempts<max_attempts — and it is NOT 'failed', so
+ // the recovery scan below never sees it. The whole course then stalls with
+ // zero runnable stages. Normalize these stranded rows to 'failed' so the
+ // existing recovery scan can resume them from their saved cursor. This is a
+ // truthful correction: an exhausted row is failed, not runnable.
+ const zombieUrl=new URL(ROOT);
+ zombieUrl.searchParams.set('select','id,status,attempts,max_attempts,execution_generation,lease_owner,lease_expires_at');
+ zombieUrl.searchParams.set('status','eq.queued');
+ const zombieResponse=await request(zombieUrl,{headers,signal:AbortSignal.timeout(15000)});
+ if(!zombieResponse.ok)throw Error('REPAIR_ZOMBIE_READ_HTTP_'+zombieResponse.status);
+ const queuedRows=await zombieResponse.json();
+ if(!Array.isArray(queuedRows))throw Error('REPAIR_ZOMBIE_INVENTORY_INVALID');
+ const zombies=queuedRows.filter(j=>Number.isSafeInteger(j.attempts)&&Number.isSafeInteger(j.max_attempts)&&
+  j.max_attempts>=1&&j.attempts>=j.max_attempts&&!j.lease_owner&&!j.lease_expires_at);
+ for(const zombie of zombies){
+  const target=new URL(ROOT);
+  target.searchParams.set('id','eq.'+zombie.id);
+  target.searchParams.set('status','eq.queued');
+  target.searchParams.set('attempts','eq.'+zombie.attempts);
+  target.searchParams.set('execution_generation','eq.'+zombie.execution_generation);
+  const changed=await request(target,{method:'PATCH',headers:{...headers,'Content-Type':'application/json',Prefer:'return=representation'},
+   body:JSON.stringify({status:'failed',updated_at:now.toISOString()}),signal:AbortSignal.timeout(15000)});
+  // A concurrent claim/repair may have changed the row first; never fail the
+  // whole scan for a lost compare-and-swap.
+  if(!changed.ok&&changed.status!==409)throw Error('REPAIR_ZOMBIE_WRITE_HTTP_'+changed.status);
+ }
  const url=new URL(ROOT);
  url.searchParams.set('select','id,build_id,payload,status,attempts,max_attempts,execution_generation,lease_expires_at,last_error,monitor,build:ultimate_course_builds!inner(course_id,status,profile)');
  url.searchParams.set('status','eq.failed');

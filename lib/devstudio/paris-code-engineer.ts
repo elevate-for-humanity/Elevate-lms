@@ -1,6 +1,6 @@
 import {courseDiagnosticQuery} from './paris-course-repair-evidence.mjs';
 import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-source-discovery.mjs';
-import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
+import {missingRepairDeliverables,isApplicationSourceCorrection} from './paris-repair-deliverables.mjs';
 import {rememberVerifiedRepairSource,discardChangedRepairSource,repairPlannerObservations} from './paris-source-evidence.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
@@ -656,8 +656,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         // Shared helpers/fixtures are the exception: a defect there is itself
         // application code and cannot be fixed by editing an existing test, so a
         // new helper is a legitimate correction. Assertion suites stay blocked.
-        if (action.path.startsWith('tests/') &&
-            !/^tests\/(?:e2e\/)?helpers\//.test(action.path) &&
+        if (action.path.startsWith('tests/') && !isApplicationSourceCorrection(action.path) &&
             !hasApplicationSourceCorrection([...changedFiles])) {
           observations.push('CREATE BLOCKED '+action.path+': first commit a justified application correction, then create a new regression test. No test-only repair was staged.');
           continue;
@@ -732,8 +731,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         { status: 422 },
       );
     }
-    if (!newRegressionTests.size || ![...changedFiles].some(path =>
-      !path.startsWith('tests/') && !/\.(?:test|spec)\.[cm]?[jt]sx?$/.test(path))) {
+    if (!newRegressionTests.size || ![...changedFiles].some(path => isApplicationSourceCorrection(path))) {
       return NextResponse.json({
         error: 'Repair requires an application correction and a new regression test before independent validation.',
         repository: REPOSITORY, branch: { name: branch, sha: branchSha }, base_sha: baseSha,

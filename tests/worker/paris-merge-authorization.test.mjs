@@ -33,8 +33,11 @@ test('the merge workflow driver authorizes before any GitHub write', () => {
   assert.ok(authorizeAt < approveAt, 'authorization must precede the approval');
   assert.ok(authorizeAt < mergeAt, 'authorization must precede the merge');
   assert.match(driver, /report\('merge-authorize'/, 'the driver must request authorization');
-  // Every merge-result report carries the workflow run id the Admin route requires.
-  const results = driver.match(/report\('merge-result'[^\n]*/g) ?? [];
-  assert.ok(results.length >= 5, 'expected several merge-result reports');
-  for (const call of results) assert.match(call, /runId:/, 'every merge-result report must include runId');
+  // Every report call the Admin authority receives must carry the workflow run
+  // id. The Admin route rejects any repair report without a safe-integer runId
+  // before dispatch, so a report missing it fails the whole phase (this exact
+  // omission previously made every protected merge fail authorization).
+  const reports = driver.match(/report\('(merge-authorize|merge-result)'[^\n]*/g) ?? [];
+  assert.ok(reports.length >= 6, 'expected the authorize and merge-result reports');
+  for (const call of reports) assert.match(call, /runId:/, 'every Admin report must include runId: ' + call);
 });

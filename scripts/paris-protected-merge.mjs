@@ -96,7 +96,7 @@ async function report(phase, payload) {
 /** The Admin authority must confirm this PR and head are the ones the durable
  * repair record validated. Workflow inputs alone are never sufficient. */
 async function authorizeMerge() {
-  const result = await report('merge-authorize', { prNumber: PR_NUMBER, expectedHeadSha: EXPECTED_HEAD_SHA });
+  const result = await report('merge-authorize', { runId: RUN_ID, prNumber: PR_NUMBER, expectedHeadSha: EXPECTED_HEAD_SHA });
   if (result?.authorized !== true) {
     throw Error('PARIS_MERGE_NOT_AUTHORIZED: ' + (Array.isArray(result?.reasons) ? result.reasons.join('; ') : 'denied'));
   }

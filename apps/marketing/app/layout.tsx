@@ -67,7 +67,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Elevate for Humanity',
-    url: siteUrl,
     title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
     description:
       'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',

@@ -943,7 +943,7 @@ export default function ProgramDetailPage({
       </section>
 
       {/* CURRICULUM */}
-      <section className="py-12">
+      <section id="curriculum" className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">What You&apos;ll Learn</h2>
           <p className="text-slate-500 text-sm mb-8">

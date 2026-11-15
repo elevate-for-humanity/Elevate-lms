@@ -39,7 +39,7 @@ export const organizationSchema: WithContext<Organization> = {
   },
   sameAs: [
     'https://www.facebook.com/61578240192934/',
-    'https://www.linkedin.com/company/elevateforhumanity',
+    'https://linkedin.com/company/elevate-for-humanity',
     'https://www.instagram.com/elevateforhumanity',
   ],
 };

@@ -139,6 +139,17 @@ type PendingCookie = {
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
+  // Admin is private: never advertise the public marketing sitemap here.
+  if (pathname === '/robots.txt') return new NextResponse('User-agent: *\nDisallow: /\n', {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Robots-Tag': 'noindex' },
+  });
+  if (pathname === '/sitemap.xml') return new NextResponse(null, {
+    status: 404, headers: { 'X-Robots-Tag': 'noindex' },
+  });
+  if (pathname === '/.well-known/security.txt') {
+    return NextResponse.redirect(new URL('https://www.elevateforhumanity.org/.well-known/security.txt'), 307);
+  }
+
   const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio'];
   const legacyStudioPrefix = legacyStudioPrefixes.find(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),

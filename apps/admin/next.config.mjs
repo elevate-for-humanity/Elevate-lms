@@ -71,6 +71,15 @@ const adminConfig = {
   async headers() {
     return [
       {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Keep first-party portal embeds; block framing by unrelated origins.
+          { key: 'Content-Security-Policy', value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self' https://*.elevateforhumanity.org" },
+        ],
+      },
+      {
         source: '/studio/:path*',
         headers: [
           { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },

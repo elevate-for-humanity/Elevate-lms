@@ -6,6 +6,7 @@ import config from '../../apps/admin/next.config.mjs';
 
 test('Admin headers prevent unrelated framing without blocking portal embeds or scripts', async () => {
   const rules = await config.headers();
+  assert.ok(config.htmlLimitedBots.test('Mozilla/5.0'));
   const headers = Object.fromEntries(rules.find(r => r.source === '/:path*').headers.map(h => [h.key, h.value]));
   assert.equal(headers['Strict-Transport-Security'], 'max-age=31536000');
   assert.equal(headers['X-Content-Type-Options'], 'nosniff');
@@ -39,4 +40,12 @@ test('login and reset labels point to distinct real fields', () => {
   assert.deepEqual(labels, inputs);
   assert.match(form, /Privacy policy/);
   assert.match(form, /Contact support/);
+});
+
+test('reading preference exposes its visible action as the accessible name', () => {
+  const source = readFileSync(new URL('../../components/accessibility/DashboardReadingSupport.tsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(source, /aria-label="Reading view"/);
+  assert.match(source, /Use standard text/);
+  assert.match(source, /Use larger text/);
+  assert.match(source, /aria-pressed=\{enabled\}/);
 });

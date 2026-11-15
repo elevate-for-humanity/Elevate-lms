@@ -31,6 +31,10 @@ const adminConfig = {
 
   eslint: { ignoreDuringBuilds: true },
 
+  // Admin metadata is small and static. Resolve it before streaming so every
+  // client receives metadata in head, including accessibility/HTML scanners.
+  htmlLimitedBots: /.*/,
+
   // Serve packaged assets directly, as the other standalone applications do.
   images: { unoptimized: true },
 

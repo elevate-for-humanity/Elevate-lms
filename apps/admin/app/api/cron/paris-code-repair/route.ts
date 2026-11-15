@@ -4,7 +4,7 @@ import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {probeOpenHandsReadiness} from '@/lib/devstudio/paris-openhands-readiness';
 import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
-import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,reportParisDispatchFailure,diagnoseParisGitHubCredential,recordParisMergeResult} from '@/lib/ai/runtime/code-repair';
+import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,reportParisDispatchFailure,diagnoseParisGitHubCredential,recordParisMergeResult,authorizeParisProtectedMerge} from '@/lib/ai/runtime/code-repair';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
@@ -53,17 +53,31 @@ export async function POST(request:NextRequest){
    return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await (body.phase==='prepare'?prepareParisRepair:publishParisRepair)(body.repairId,body.runId)));
   }
   if(body.phase==='failure'){await reportParisRepairFailure(body.repairId,body.runId);return NextResponse.json({recorded:true});}
+  if(body.phase==='merge-authorize'){
+   // The signed protected-merge workflow must not trust its own inputs. It
+   // proves the PR and head it was asked to merge match the durable repair
+   // record before approving or merging anything.
+   const token=request.headers.get('x-paris-github-token');
+   if(!token)return NextResponse.json({error:'Temporary workflow authorization required.',errorCode:'PARIS_WORKFLOW_GITHUB_TOKEN_REQUIRED'},{status:400});
+   if(!/^[a-f0-9-]{36}$/.test(body.repairId??''))return NextResponse.json({error:'Repair ID required'},{status:400});
+   const prNumber=Number(body.prNumber);
+   if(!Number.isInteger(prNumber)||prNumber<1)return NextResponse.json({error:'Pull request number required'},{status:400});
+   if(!/^[a-f0-9]{40}$/.test(body.expectedHeadSha??''))return NextResponse.json({error:'Expected head SHA required'},{status:400});
+   return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await authorizeParisProtectedMerge(body.repairId,prNumber,body.expectedHeadSha)));
+  }
   if(body.phase==='merge-result'){
    // The signed protected-merge workflow reports its outcome. A merge failure is
    // recorded for the reconciler but never blocks the durable repair receipt.
    const token=request.headers.get('x-paris-github-token');
    if(!token)return NextResponse.json({error:'Temporary workflow authorization required.',errorCode:'PARIS_WORKFLOW_GITHUB_TOKEN_REQUIRED'},{status:400});
    if(!/^[a-f0-9-]{36}$/.test(body.repairId??''))return NextResponse.json({error:'Repair ID required'},{status:400});
+   if(!Number.isSafeInteger(body.runId))return NextResponse.json({error:'Workflow run required'},{status:400});
    return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await recordParisMergeResult(body.repairId,{
     merged:body.merged===true,
     mergeCommitSha:typeof body.mergeCommitSha==='string'?body.mergeCommitSha:null,
     reason:typeof body.reason==='string'?body.reason:null,
     reasons:Array.isArray(body.reasons)?body.reasons.slice(0,8).map(String):undefined,
+    runId:body.runId,
    })));
   }
   return NextResponse.json({error:'Unsupported phase'},{status:400});

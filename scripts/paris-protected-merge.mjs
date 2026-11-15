@@ -27,6 +27,7 @@ const PR_NUMBER = Number(process.env.PR_NUMBER);
 const EXPECTED_HEAD_SHA = process.env.EXPECTED_HEAD_SHA || '';
 const REPAIR_ID = process.env.REPAIR_ID || '';
 const ADMIN_URL = process.env.ADMIN_URL || 'https://admin.elevateforhumanity.org';
+const RUN_ID = Number(process.env.GITHUB_RUN_ID);
 
 function requireEnv(name) {
   const value = process.env[name]?.trim();
@@ -92,13 +93,32 @@ async function report(phase, payload) {
   return text ? JSON.parse(text) : {};
 }
 
+/** The Admin authority must confirm this PR and head are the ones the durable
+ * repair record validated. Workflow inputs alone are never sufficient. */
+async function authorizeMerge() {
+  const result = await report('merge-authorize', { prNumber: PR_NUMBER, expectedHeadSha: EXPECTED_HEAD_SHA });
+  if (result?.authorized !== true) {
+    throw Error('PARIS_MERGE_NOT_AUTHORIZED: ' + (Array.isArray(result?.reasons) ? result.reasons.join('; ') : 'denied'));
+  }
+  return result;
+}
+
 async function main() {
   if (!Number.isInteger(PR_NUMBER) || PR_NUMBER < 1) throw Error('PARIS_MERGE_PR_NUMBER_REQUIRED');
   if (!/^[a-f0-9]{40}$/.test(EXPECTED_HEAD_SHA)) throw Error('PARIS_MERGE_EXPECTED_HEAD_REQUIRED');
   const verifier = requireEnv('PARIS_VERIFIER_TOKEN');
   const policy = process.env.PARIS_POLICY_TOKEN?.trim() || verifier;
 
+  // Fail closed before any GitHub read or write: the repair record is the only
+  // authority for which PR may be merged.
+  await authorizeMerge();
+
   const pr = await ghJson(`/repos/${REPOSITORY}/pulls/${PR_NUMBER}`, { token: verifier });
+  // Independently re-confirm the PR GitHub actually returned is the recorded one.
+  if (pr.number !== PR_NUMBER || pr.head?.sha !== EXPECTED_HEAD_SHA) {
+    await report('merge-result', { merged: false, runId: process.env.GITHUB_RUN_ID ? Number(process.env.GITHUB_RUN_ID) : undefined, reason: 'PARIS_MERGE_PR_MISMATCH' });
+    throw Error('PARIS_MERGE_PR_MISMATCH');
+  }
   const checks = (await ghJson(`/repos/${REPOSITORY}/commits/${EXPECTED_HEAD_SHA}/check-runs?per_page=100`, { token: verifier })).check_runs ?? [];
   const reviews = await ghJson(`/repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100`, { token: verifier });
 
@@ -112,7 +132,7 @@ async function main() {
   const requiredApprovalCount = requiredMainReviewCount({ rules, classic });
 
   if (!protectionVerified) {
-    await report('merge-result', { merged: false, reason: 'PARIS_MERGE_PROTECTION_UNVERIFIED' });
+    await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_PROTECTION_UNVERIFIED' });
     throw Error('PARIS_MERGE_PROTECTION_UNVERIFIED');
   }
 
@@ -135,7 +155,7 @@ async function main() {
     pr, expectedHeadSha: EXPECTED_HEAD_SHA, checks, requiredChecks, reviews, reviewerPermissions,
   });
   if (!readiness.ready) {
-    await report('merge-result', { merged: false, reason: 'PARIS_MERGE_NOT_READY', reasons: readiness.reasons.slice(0, 8) });
+    await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_NOT_READY', reasons: readiness.reasons.slice(0, 8) });
     throw Error('PARIS_MERGE_NOT_READY: ' + readiness.reasons.join('; '));
   }
 
@@ -151,7 +171,7 @@ async function main() {
     });
     if (!review.ok && review.status !== 422) {
       const detail = (await review.text().catch(() => '')).slice(0, 200);
-      await report('merge-result', { merged: false, reason: 'PARIS_MERGE_APPROVAL_FAILED', detail });
+      await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_APPROVAL_FAILED', detail });
       throw Error(`PARIS_MERGE_APPROVAL_FAILED_${review.status}: ${detail}`);
     }
   }
@@ -159,14 +179,14 @@ async function main() {
   // Required checks must be green on the exact head at merge time.
   const stillGreen = requiredChecksSatisfied({ checks, requiredChecks });
   if (!stillGreen.satisfied) {
-    await report('merge-result', { merged: false, reason: 'PARIS_MERGE_CHECKS_REGRESSED', reasons: stillGreen.reasons.slice(0, 8) });
+    await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_CHECKS_REGRESSED', reasons: stillGreen.reasons.slice(0, 8) });
     throw Error('PARIS_MERGE_CHECKS_REGRESSED');
   }
 
   // A fresh head read closes the approve→merge race.
   const current = await ghJson(`/repos/${REPOSITORY}/pulls/${PR_NUMBER}`, { token: verifier });
   if (current.head?.sha !== EXPECTED_HEAD_SHA) {
-    await report('merge-result', { merged: false, reason: 'PARIS_MERGE_HEAD_MOVED' });
+    await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_HEAD_MOVED' });
     throw Error('PARIS_MERGE_HEAD_MOVED');
   }
 
@@ -176,11 +196,11 @@ async function main() {
   });
   if (!merged.ok) {
     const detail = (await merged.text().catch(() => '')).slice(0, 300);
-    await report('merge-result', { merged: false, reason: 'PARIS_MERGE_FAILED', detail });
+    await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_FAILED', detail });
     throw Error(`PARIS_MERGE_FAILED_${merged.status}: ${detail}`);
   }
   const result = await merged.json();
-  await report('merge-result', { merged: true, mergeCommitSha: result.sha, prNumber: PR_NUMBER });
+  await report('merge-result', { merged: true, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, mergeCommitSha: result.sha, prNumber: PR_NUMBER });
   process.stdout.write(JSON.stringify({ merged: true, mergeCommitSha: result.sha }) + '\n');
 }
 

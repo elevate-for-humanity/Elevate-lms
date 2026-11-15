@@ -215,11 +215,31 @@ export async function prepareParisRepair(id:string,runId:number){
   throw error;
  }
 }
+/** Independently authorize a protected merge against the durable repair record.
+ * The signed merge workflow must not trust its own inputs: it proves the PR it
+ * was asked to merge is the exact pull request this repair recorded, at the
+ * exact head that was validated, while the repair is still awaiting merge. */
+export async function authorizeParisProtectedMerge(id:string,prNumber:number,expectedHeadSha:string){
+ const db=await requireAdminClient();
+ const {data:row,error}=await db.from('paris_code_repairs').select('id,status,verification').eq('id',id).single();
+ if(error)throw error;
+ const recorded=row?.verification?.pullRequest;
+ const reasons:string[]=[];
+ if(!Number.isInteger(prNumber)||prNumber<1)reasons.push('Requested pull request number is invalid');
+ if(!/^[a-f0-9]{40}$/.test(expectedHeadSha??''))reasons.push('Requested head SHA is invalid');
+ if(!recorded||typeof recorded!=='object')reasons.push('Repair has no recorded pull request');
+ else{
+  if(Number(recorded.number)!==prNumber)reasons.push('Requested pull request is not the one this repair recorded');
+  if(String(recorded.headSha)!==expectedHeadSha)reasons.push('Requested head SHA is not the one this repair validated');
+ }
+ if(row?.status!=='validating')reasons.push('Repair is not awaiting a protected merge');
+ return {authorized:reasons.length===0,reasons,recordedPrNumber:Number(recorded?.number)||null,recordedHeadSha:String(recorded?.headSha??'')||null};
+}
 /** Persist the signed protected-merge workflow outcome. A successful merge is
  * not completion: the reconciler independently re-reads the merged PR and
  * requires protected acceptance before deployment. A failed merge is recorded
  * so the reconciler can retry the request after its stale window. */
-export async function recordParisMergeResult(id:string,result:{merged:boolean;mergeCommitSha?:string|null;reason?:string|null;reasons?:string[]}){
+export async function recordParisMergeResult(id:string,result:{merged:boolean;mergeCommitSha?:string|null;reason?:string|null;reasons?:string[];runId?:number}){
  const db=await requireAdminClient();
  const {data:row,error}=await db.from('paris_code_repairs').select('id,verification').eq('id',id).single();
  if(error)throw error;
@@ -229,6 +249,7 @@ export async function recordParisMergeResult(id:string,result:{merged:boolean;me
   mergeCommitSha:/^[a-f0-9]{40}$/.test(result.mergeCommitSha??'')?result.mergeCommitSha:null,
   reason:result.reason??null,
   reasons:Array.isArray(result.reasons)?result.reasons.slice(0,8):undefined,
+  runId:Number.isSafeInteger(result.runId)?result.runId:null,
   at:new Date().toISOString(),
  };
  const {error:writeError}=await db.from('paris_code_repairs').update({verification:{...prior,protectedMergeResult},updated_at:new Date().toISOString()}).eq('id',id);

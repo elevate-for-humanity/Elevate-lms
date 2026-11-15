@@ -37,3 +37,13 @@ test('an authorized outstanding change request blocks the merge', () => {
   const superseded = [...reviews, { user: { login: 'reviewer' }, state: 'APPROVED', submitted_at: '2026-11-15T01:00:00Z' }];
   assert.equal(blockingReviewPresent({ reviews: superseded, reviewerPermissions: { reviewer: 'write' } }), false);
 });
+
+test('an unknown reviewer permission fails closed and still blocks the merge', () => {
+  const reviews = [{ user: { login: 'mystery', type: 'User' }, state: 'CHANGES_REQUESTED', submitted_at: '2026-11-15T00:00:00Z' }];
+  // Missing permission entry (unresolvable) must not be treated as harmless.
+  assert.equal(blockingReviewPresent({ reviews, reviewerPermissions: {} }), true);
+  assert.equal(blockingReviewPresent({ reviews, reviewerPermissions: { mystery: 'unknown' } }), true);
+  assert.equal(protectedMergeReadiness({ pr: openPr, expectedHeadSha: HEAD, checks: [greenCheck], requiredChecks: required, reviews, reviewerPermissions: {} }).ready, false);
+  // Only a definitively powerless reviewer (read/none) is ignored.
+  assert.equal(blockingReviewPresent({ reviews, reviewerPermissions: { mystery: 'none' } }), false);
+});

@@ -29,11 +29,15 @@ async function getSessionContext() {
   if (!user) return null;
 
   const db = await requireAdminClient();
-  const { data: profile } = await db
+  const { data: profile, error: profileError } = await db
     .from('profiles')
-    .select('id, role, full_name, email, phone')
+    .select('id, role, full_name, email, phone, is_active, suspended')
     .eq('id', user.id)
     .maybeSingle();
+  // These endpoints use a privileged database client, not the page's
+  // requireRole guard. Fail closed for revoked/suspended or missing profiles.
+  if (profileError) throw new Error('HOST_SHOP_PROFILE_LOOKUP_FAILED');
+  if (!profile || profile.is_active === false || profile.suspended === true) return null;
 
   // Existing employers may also own Host Shops. Honor the same active
   // partner membership used by the shared portal role guard.

@@ -259,7 +259,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
                     Email
                   </label>
                   <input
-                id="admin-reset-email"
+                    id="admin-reset-email"
                     type="email"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
@@ -290,8 +290,9 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
           </div>
         )}
 
-        <nav aria-label="Account support" className="flex justify-center gap-4 mt-6 text-sm text-slate-300">
-          <a href="https://www.elevateforhumanity.org/privacy" className="underline">Privacy policy</a>
+        <nav aria-label="Account support" className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-slate-300">
+          <a href="https://www.elevateforhumanity.org/about" className="underline">About</a>
+          <a href="https://www.elevateforhumanity.org/privacy-policy" className="underline">Privacy policy</a>
           <a href="https://www.elevateforhumanity.org/contact" className="underline">Contact support</a>
         </nav>
         <p className="text-center text-slate-600 text-xs mt-6">

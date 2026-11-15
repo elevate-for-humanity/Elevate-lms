@@ -11,12 +11,12 @@ describe('universal dashboard reading view', () => {
         <a href="/students">My students</a>
       </DashboardReadingSupport>,
     );
-    expect(screen.getByRole('button', { name: 'Reading view' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /Use (standard|larger) text/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
     expect(screen.getByText('Text size: Larger')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Reading view' }).textContent).toBe(
+    expect(screen.getByRole('button', { name: /Use (standard|larger) text/ }).textContent).toBe(
       'Use standard text',
     );
     expect(screen.getByRole('link', { name: 'My students' })).toHaveAttribute('href', '/students');
@@ -28,19 +28,19 @@ describe('universal dashboard reading view', () => {
       </DashboardReadingSupport>,
     );
     expect(screen.getByRole('heading', { name: 'Public home page' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Reading view' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Use (standard|larger) text/ })).toBeNull();
   });
   it('lets the user switch views and remembers the presentation choice', () => {
     const { unmount } = render(<DashboardReadingSupport>Dashboard</DashboardReadingSupport>);
-    fireEvent.click(screen.getByRole('button', { name: 'Reading view' }));
+    fireEvent.click(screen.getByRole('button', { name: /Use (standard|larger) text/ }));
     expect(localStorage.getItem('elevate-reading-view')).toBe('compact');
     unmount();
     render(<DashboardReadingSupport>Dashboard</DashboardReadingSupport>);
-    expect(screen.getByRole('button', { name: 'Reading view' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /Use (standard|larger) text/ })).toHaveAttribute(
       'aria-pressed',
       'false',
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Reading view' }));
+    fireEvent.click(screen.getByRole('button', { name: /Use (standard|larger) text/ }));
     expect(localStorage.getItem('elevate-reading-view')).toBe('reading');
   });
 });

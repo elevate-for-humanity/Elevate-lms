@@ -1,5 +1,5 @@
 import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
-import {classifyParisPhaseError} from '@/lib/devstudio/paris-phase-error.mjs';
+import {describeParisPhaseFailure} from '@/lib/devstudio/paris-phase-error.mjs';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {probeOpenHandsReadiness} from '@/lib/devstudio/paris-openhands-readiness';
 import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
@@ -55,9 +55,12 @@ export async function POST(request:NextRequest){
   if(body.phase==='failure'){await reportParisRepairFailure(body.repairId,body.runId);return NextResponse.json({recorded:true});}
   return NextResponse.json({error:'Unsupported phase'},{status:400});
  }catch(error){
-  const {errorCode,status}=classifyParisPhaseError(error);
-  console.error('[PARIS] repair phase failed',errorCode);
-  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode},{status});
+  const failure=describeParisPhaseFailure(error);
+  // Preserve the redacted diagnostic in the protected execution log. The
+  // workflow only ever sees the allow-listed code, so this log line is the one
+  // place an unattributed HTTP 502 can be traced to its real cause.
+  console.error('[PARIS] repair phase failed',failure.errorCode,failure.diagnostic,failure.cause??'');
+  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode:failure.errorCode},{status:failure.status});
  }
 
 }

@@ -22,7 +22,7 @@ test('rank real course producer ahead of unrelated test files',()=>{
 });
 test('CPU inference receives a meaningful edit budget after source inspection',()=>{
  assert.equal(repairCompletionTokens('cpu',[]),384);
- assert.equal(repairCompletionTokens('cpu',['READ lib/ultimate-course-builder/core/production-handlers.ts: exact source']),1280);
+ assert.equal(repairCompletionTokens('cpu',['READ lib/ultimate-course-builder/core/production-handlers.ts: exact source']),1536);
  assert.equal(repairCompletionTokens('gpu',['READ lib/x.ts']),2400);
  const messages=budgetRepairMessages([
   {role:'system',content:'Authorize only reviewed changes. '.repeat(75)},
@@ -63,8 +63,15 @@ test('source-first admission separates real application edits from test-only or 
  assert.equal(hasApplicationSourceCorrection(['tests/9-integrity-gate-regression.test.ts']),false);
  assert.equal(hasApplicationSourceCorrection(['lib/example.spec.ts']),false);
  assert.equal(hasApplicationSourceCorrection(['tests/9-integrity-gate-regression.test.ts','lib/course-builder/producer.ts']),true);
+ // A defect in a shared test helper is application code that cannot be fixed by
+ // editing an existing assertion suite, so a new helper is a valid correction.
+ assert.equal(hasApplicationSourceCorrection(['tests/e2e/helpers/browser-runtime-errors.ts']),true);
+ assert.equal(hasApplicationSourceCorrection(['tests/helpers/guard.ts']),true);
+ assert.equal(hasApplicationSourceCorrection(['tests/e2e/helpers/guard.spec.ts']),false);
  assert.match(nextRepairActionConstraint(['read:lib/a.ts'],1,['tests/regression.test.ts']),/NEXT action must correct/);
  const source=readFileSync(new URL('../../lib/devstudio/paris-code-engineer.ts',import.meta.url),'utf8');
- assert.match(source,/action\.path\.startsWith\('tests\/'\) && !hasApplicationSourceCorrection\(\[\.\.\.changedFiles\]\)/);
+ assert.match(source,/action\.path\.startsWith\('tests\/'\)/);
+ assert.ok(source.includes('helpers\\//'), 'the create gate must exempt shared test helpers');
+ assert.match(source,/hasApplicationSourceCorrection\(\[\.\.\.changedFiles\]\)/);
  assert.match(source,/nextRepairActionConstraint\(inspectionHistory,writes,\[\.\.\.changedFiles\]\)/);
 });

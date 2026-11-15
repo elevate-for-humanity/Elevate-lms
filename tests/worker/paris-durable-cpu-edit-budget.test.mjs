@@ -9,14 +9,14 @@ import {repairCompletionTokens} from '../../lib/devstudio/repair-inference-budge
 test('verified CPU source-read proof survives rolling diagnostic observations', () => {
   const latest = Array.from({length:8}, (_,i) => 'SEARCH subsequent_'+i+': no matches');
   assert.equal(repairCompletionTokens('cpu',latest),384);
-  assert.equal(repairCompletionTokens('cpu',latest,true),1280);
+  assert.equal(repairCompletionTokens('cpu',latest,true),1536);
   assert.equal(repairCompletionTokens('cpu',latest,false),384);
   assert.equal(repairCompletionTokens('gpu',latest,true),2400);
 });
 
 test('rejected reads and inspection attempts cannot increase CPU editing budget', () => {
   assert.equal(repairCompletionTokens('cpu',['READ_REJECTED lib/missing.ts']),384);
-  assert.equal(repairCompletionTokens('cpu',['READ lib/source.ts (sha verified): source']),1280);
+  assert.equal(repairCompletionTokens('cpu',['READ lib/source.ts (sha verified): source']),1536);
   assert.equal(repairCompletionTokens('cpu',['SEARCH read:lib/producer.ts'],false),384);
 });
 

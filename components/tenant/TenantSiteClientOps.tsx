@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, FormEvent, ReactNode } from 'react';
-import { useTenantRequestHeaders } from './TenantPreviewContext';
+import { useTenantRequestHeaders, useReadOnlyTenantPreview } from './TenantPreviewContext';
 
 function sessionKey() {
   if (typeof window === 'undefined') return '';
@@ -40,7 +40,9 @@ export function TenantTrackedLink({ href, eventName, children, className, style,
   external?: boolean;
 }) {
   const previewHeaders = useTenantRequestHeaders();
+  const readOnly = useReadOnlyTenantPreview();
   function track() {
+    if (readOnly) return;
     void fetch('/api/tenant-sites/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...previewHeaders },
@@ -49,6 +51,7 @@ export function TenantTrackedLink({ href, eventName, children, className, style,
     }).catch(() => undefined);
   }
 
+  if (readOnly && (external || !href.startsWith('/') || href.startsWith('//'))) return <span aria-disabled="true" className={className} style={style}>{children}</span>;
   return <a href={href} onClick={track} className={className} style={style} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>{children}</a>;
 }
 

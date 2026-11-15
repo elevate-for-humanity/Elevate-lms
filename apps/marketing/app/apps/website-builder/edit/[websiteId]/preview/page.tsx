@@ -14,7 +14,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-type Props = { params: Promise<{ websiteId: string }>; searchParams: Promise<{ page?: string; device?: string }> };
+type Props = { params: Promise<{ websiteId: string }>; searchParams: Promise<{ page?: string; device?: string; revision?: string }> };
 
 export default async function WebsiteResponsivePreviewPage({ params, searchParams }: Props) {
   const { websiteId } = await params;
@@ -23,7 +23,12 @@ export default async function WebsiteResponsivePreviewPage({ params, searchParam
   const initialDevice = query.device === 'mobile' || query.device === 'tablet' ? query.device : 'desktop';
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?redirect=${encodeURIComponent(`/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(pageSlug)}`)}`);
+  if (!user) {
+    const reviewQuery = new URLSearchParams({ page: pageSlug });
+    if (query.revision) reviewQuery.set('revision', query.revision);
+    if (initialDevice !== 'desktop') reviewQuery.set('device', initialDevice);
+    redirect(`/login?redirect=${encodeURIComponent(`/apps/website-builder/edit/${websiteId}/preview?${reviewQuery}`)}`);
+  }
 
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
@@ -38,14 +43,24 @@ export default async function WebsiteResponsivePreviewPage({ params, searchParam
 
   if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) notFound();
 
-  const siteName = (site.site_name as string | null) ?? 'My Site';
+  let previewConfig = site.site_config;
+  let previewName = site.site_name;
+  if (query.revision) {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query.revision)) notFound();
+    const { data: revision, error } = await admin.from('website_revisions')
+      .select('site_name, site_config').eq('website_id', websiteId).eq('id', query.revision).maybeSingle();
+    if (error || !revision) notFound();
+    previewConfig = revision.site_config;
+    previewName = revision.site_name;
+  }
+  const siteName = (previewName as string | null) ?? 'My Site';
   const base = buildDefaultSiteConfig({ organizationName: siteName });
-  const config = site.site_config && typeof site.site_config === 'object'
-    ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>)
+  const config = previewConfig && typeof previewConfig === 'object'
+    ? mergeSiteConfig(base, previewConfig as Partial<TenantSiteConfig>)
     : base;
 
   const composed = ensureComposableSiteConfig(config);
   if (!composed.pages?.some((page) => page.slug === pageSlug)) notFound();
   const { data: workspace } = await admin.from('website_paris_workspaces').select('enabled').eq('website_id', site.id).maybeSingle();
-  return <ResponsivePreviewClient websiteId={site.id} siteName={siteName} config={await loadPublishedOfferings(composed)} pageSlug={pageSlug} parisEnabled={workspace?.enabled === true} initialDevice={initialDevice} />;
+  return <ResponsivePreviewClient websiteId={site.id} siteName={siteName} config={await loadPublishedOfferings(composed)} pageSlug={pageSlug} revisionId={query.revision} parisEnabled={!query.revision && workspace?.enabled === true} initialDevice={initialDevice} />;
 }

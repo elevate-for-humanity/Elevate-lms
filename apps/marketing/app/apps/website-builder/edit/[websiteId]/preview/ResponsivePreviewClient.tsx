@@ -11,11 +11,11 @@ import { TenantPreviewProvider } from '@/components/tenant/TenantPreviewContext'
 type Device = 'desktop' | 'tablet' | 'mobile';
 const widths: Record<Device, number> = { desktop: 1280, tablet: 768, mobile: 390 };
 
-export function ResponsivePreviewClient({ websiteId, siteName, config: initialConfig, pageSlug = '/', parisEnabled = false, initialDevice = 'desktop' }: { websiteId: string; siteName: string; config: TenantSiteConfig; pageSlug?: string; parisEnabled?: boolean; initialDevice?: Device }) {
+export function ResponsivePreviewClient({ websiteId, siteName, config: initialConfig, pageSlug = '/', parisEnabled = false, initialDevice = 'desktop', revisionId }: { websiteId: string; siteName: string; config: TenantSiteConfig; pageSlug?: string; parisEnabled?: boolean; initialDevice?: Device; revisionId?: string }) {
   const [device, setDevice] = useState<Device>(initialDevice);
   const config = useMemo(() => ensureComposableSiteConfig(initialConfig), [initialConfig]);
   const site = useMemo(() => ({ id: websiteId, subdomain: '', siteName, organizationId: null, config, parisEnabled }), [websiteId, siteName, config, parisEnabled]);
-  const reviewHref = (slug: string) => `/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(slug)}${device === 'desktop' ? '' : `&device=${device}`}`;
+  const reviewHref = (slug: string) => `/apps/website-builder/edit/${websiteId}/preview?page=${encodeURIComponent(slug)}${device === 'desktop' ? '' : `&device=${device}`}${revisionId ? `&revision=${encodeURIComponent(revisionId)}` : ''}`;
   function navigate(slug: string) { window.location.assign(reviewHref(slug)); }
 
   return (
@@ -38,10 +38,11 @@ export function ResponsivePreviewClient({ websiteId, siteName, config: initialCo
       </header>
 
       <section className="overflow-auto px-4 py-8">
+        {revisionId ? <p role="status" className="mb-4 text-center text-sm font-bold text-slate-700">Saved version preview · Forms, checkout and PARIS are disabled. Your current website is unchanged.</p> : null}
         <div className="mx-auto transition-[width] duration-200" style={{ width: widths[device] }}>
           <div className="overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-xl">
             <div className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-center text-xs font-bold text-slate-500">{device.toUpperCase()} · {widths[device]}px · {pageSlug}</div>
-            <TenantPreviewProvider websiteId={websiteId}><TenantDraftViewport key={pageSlug} width={widths[device]} title={`${siteName} ${device} preview`}><PublicTenantComposableSite site={site} pathname={pageSlug} basePath={`/apps/website-builder/edit/${websiteId}/preview?page=`} onNavigate={navigate} /></TenantDraftViewport></TenantPreviewProvider>
+            <TenantPreviewProvider websiteId={websiteId} readOnly={Boolean(revisionId)}><TenantDraftViewport key={pageSlug} width={widths[device]} title={`${siteName} ${device} preview`}><fieldset disabled={Boolean(revisionId)} className="m-0 min-w-0 border-0 p-0"><PublicTenantComposableSite site={site} pathname={pageSlug} basePath={`/apps/website-builder/edit/${websiteId}/preview?${revisionId ? `revision=${encodeURIComponent(revisionId)}&` : ''}page=`} onNavigate={navigate} /></fieldset></TenantDraftViewport></TenantPreviewProvider>
           </div>
           <p role="status" className="mt-4 text-center text-xs text-slate-500">Private review · Sign-in and project access required. Desktop, tablet, and mobile previews use the selected screen width. Contact forms send to the business.</p>
         </div>

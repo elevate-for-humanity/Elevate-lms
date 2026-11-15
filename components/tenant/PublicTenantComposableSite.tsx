@@ -176,7 +176,7 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
   }
 
   if (section.type === 'rich_text') {
-    return <section data-section-id={section.id} className="mx-auto max-w-4xl px-5 py-14 sm:px-6"><h2 className="text-3xl font-black">{text(c.title)}</h2><div className="mt-5 whitespace-pre-wrap text-base leading-8 text-slate-600">{text(c.text)}</div>{text(c.email) ? <p className="mt-4 font-bold"><a href={`mailto:${text(c.email)}`} style={{ color: primary }}>{text(c.email)}</a></p> : null}{text(c.phone) ? <p className="mt-2 font-bold"><a href={`tel:${text(c.phone)}`} style={{ color: primary }}>{text(c.phone)}</a></p> : null}</section>;
+    return <section data-section-id={section.id} className="mx-auto max-w-4xl px-5 py-14 sm:px-6"><h2 className="text-3xl font-black">{text(c.title)}</h2><div className="mt-5 whitespace-pre-wrap text-base leading-8 text-slate-600">{text(c.text)}</div>{text(c.email) ? <p className="mt-4 font-bold"><a href={`mailto:${text(c.email)}`} style={{ color: primary }}>{text(c.email)}</a></p> : null}{text(c.phone) ? <p className="mt-2 font-bold"><a href={`tel:${text(c.phone)}`} style={{ color: primary }}>{text(c.phone)}</a></p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</section>;
   }
 
   if (section.type === 'features' || section.type === 'services' || section.type === 'pricing' || section.type === 'team') {

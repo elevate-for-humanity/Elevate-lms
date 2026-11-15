@@ -37,10 +37,11 @@ describe('shared subscriber compositions', () => {
     expect(site.config).toEqual(original);
   });
   it('uses existing text rendering when the image has not been supplied', () => {
-    const { container } = render(<PublicTenantComposableSite site={subscriber('rich_text', '')} />);
+    const { container } = render(<PublicTenantComposableSite site={subscriber('rich_text', '')} basePath="/sites/customer-business" />);
     expect(container.querySelector('.tenant-editorial-split')).toBeNull();
     expect(screen.getByRole('heading', { name: 'Owner story' })).toBeTruthy();
     expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Talk to us' })).toHaveAttribute('href', '/sites/customer-business/contact');
   });
   it('includes every subscriber destination in keyboard-operable compact navigation', () => {
     render(<PublicTenantComposableSite site={subscriber('rich_text')} basePath="/sites/customer-business" />);

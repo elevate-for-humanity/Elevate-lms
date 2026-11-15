@@ -129,6 +129,9 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
 
   if (section.type === 'hero') {
     const image = text(c.image);
+    const imageFit = section.settings?.imageFit === 'contain' || section.settings?.imageFit === 'cover' ? section.settings.imageFit : undefined;
+    const imageFrame = section.settings?.imageFrame === 'plain' ? 'plain' : undefined;
+    const mobileOrder = section.settings?.mobileOrder === 'copy-first' || section.settings?.mobileOrder === 'image-first' ? section.settings.mobileOrder : undefined;
     const Heading = isPageHeading ? 'h1' : 'h2';
     const title = text(c.title);
     const highlight = text(c.titleHighlight);
@@ -138,7 +141,7 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
     const highlightIcons = [ChartNoAxesCombined, UsersRound, Sprout];
     const imageSegment = typeof c.imageSegment === 'number' && c.imageSegment >= 0 && c.imageSegment <= 3 ? c.imageSegment : null;
     return (
-      <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)} data-variant={variant} data-layout={text(section.settings?.layout) || 'split'}>
+      <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)} data-image-frame={imageFrame} data-mobile-order={mobileOrder} data-variant={variant} data-layout={text(section.settings?.layout) || 'split'}>
         <div className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
           <div className={centered || !image ? 'text-center' : ''}>
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
@@ -149,7 +152,7 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
             {text(c.buttonText) || text(c.secondaryButtonText) ? <div className={`tenant-hero-actions mt-8 flex flex-wrap gap-4 ${centered || !image ? 'justify-center' : ''}`}>{text(c.buttonText) ? <ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink> : null}{text(c.secondaryButtonText) ? <ActionLink href={text(c.secondaryButtonHref) || '/services'} primary={secondary} basePath={basePath}>{text(c.secondaryButtonText)}</ActionLink> : null}</div> : null}
             {highlights.length ? <div className="tenant-hero-highlights">{highlights.slice(0, 3).map((item, index) => { const Icon = highlightIcons[index] || Sprout; return <div key={index}><Icon aria-hidden="true" /><strong>{text(item.title)}</strong><span>{text(item.text)}</span></div>; })}</div> : null}
           </div>
-          {image ? <figure className="tenant-hero-media"><div data-image-strip={imageSegment !== null} className="tenant-hero-image-frame overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl ring-1 ring-black/5"><img src={image} alt={text(c.imageAlt) || text(c.title)} style={imageSegment !== null ? { width: '400%', maxWidth: 'none', height: 'auto', minHeight: 0, position: 'absolute', top: '50%', left: 0, transform: `translate(-${imageSegment * 25}%, -50%)` } : text(c.imageMask).startsWith('/images/legacy83/') ? { maskImage: `url("${text(c.imageMask)}")`, maskSize: '100% 100%', maskRepeat: 'no-repeat' } : undefined} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div>{text(c.imageCaption) ? <figcaption className="mt-6 text-center text-sm">{text(c.imageCaption)}</figcaption> : null}</figure> : null}
+          {image ? <figure className="tenant-hero-media"><div data-image-strip={imageSegment !== null} className="tenant-hero-image-frame overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl ring-1 ring-black/5"><img src={image} alt={text(c.imageAlt) || text(c.title)} style={{ ...(imageSegment !== null ? { width: '400%', maxWidth: 'none', height: 'auto', minHeight: 0, position: 'absolute' as const, top: '50%', left: 0, transform: `translate(-${imageSegment * 25}%, -50%)` } : text(c.imageMask).startsWith('/images/legacy83/') ? { maskImage: `url("${text(c.imageMask)}")`, maskSize: '100% 100%', maskRepeat: 'no-repeat' } : {}), ...(imageSegment === null && imageFit ? { objectFit: imageFit } : {}) }} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div>{text(c.imageCaption) ? <figcaption className="mt-6 text-center text-sm">{text(c.imageCaption)}</figcaption> : null}</figure> : null}
         </div>
       </section>
     );

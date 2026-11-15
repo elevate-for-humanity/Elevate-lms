@@ -15,24 +15,27 @@ export function TenantParis({business,accent,basePath=''}:{business:string;accen
   const [error,setError]=useState('');
   const [messages,setMessages]=useState<Array<{role:string;text:string}>>([]);
   const recognition=useRef<BrowserSpeechRecognition|null>(null);
+  const acceptVoiceResults=useRef(false);
+  function stopMicrophone(){acceptVoiceResults.current=false;recognition.current?.stop();setListening(false);}
+  function close(){stopMicrophone();setOpen(false);}
   useEffect(()=>{
     const voice=createBrowserSpeechRecognition();
     setVoiceAvailable(Boolean(voice));
     if (!voice) return;
     voice.lang='en-US';voice.continuous=false;voice.interimResults=false;
-    voice.onresult=event=>{const result=event.results[0]?.[0]?.transcript;if(result)setInput(previous=>(previous+' '+result).trim().slice(0,1500));setListening(false);};
-    voice.onerror=()=>{setListening(false);setError('Microphone unavailable. You can type your question below.');};
-    voice.onend=()=>setListening(false);
+    voice.onresult=event=>{if(!acceptVoiceResults.current)return;const result=event.results[0]?.[0]?.transcript;if(result)setInput(previous=>(previous+' '+result).trim().slice(0,1500));setListening(false);};
+    voice.onerror=()=>{acceptVoiceResults.current=false;setListening(false);setError('Microphone unavailable. You can type your question below.');};
+    voice.onend=()=>{acceptVoiceResults.current=false;setListening(false);};
     recognition.current=voice;
-    return ()=>{voice.onresult=null;voice.onerror=null;voice.onend=null;voice.stop();recognition.current=null;};
+    return ()=>{acceptVoiceResults.current=false;voice.onresult=null;voice.onerror=null;voice.onend=null;voice.stop();recognition.current=null;};
   },[]);
   function microphone(){
     if(listening){recognition.current?.stop();setListening(false);return;}
-    try{setError('');recognition.current?.start();setListening(true);}catch{setError('Microphone unavailable. Please type your question.');}
+    try{setError('');acceptVoiceResults.current=true;recognition.current?.start();setListening(true);}catch{acceptVoiceResults.current=false;setListening(false);setError('Microphone unavailable. Please type your question.');}
   }
   async function send(event:FormEvent){
     event.preventDefault();const question=input.trim();if(!question||busy)return;
-    setBusy(true);setError('');setInput('');setMessages(previous=>[...previous,{role:'You',text:question}]);
+    stopMicrophone();setBusy(true);setError('');setInput('');setMessages(previous=>[...previous,{role:'You',text:question}]);
     try{
       const response=await fetch('/api/tenant-sites/paris',{method:'POST',headers:{'Content-Type':'application/json',...previewHeaders},body:JSON.stringify({message:question}),signal:AbortSignal.timeout(55000)});
       const data=await response.json();
@@ -43,7 +46,7 @@ export function TenantParis({business,accent,basePath=''}:{business:string;accen
   }
   return <aside className="fixed bottom-5 right-4 z-40 max-w-[calc(100vw-2rem)] font-sans">
     {open&&<section id="tenant-paris-panel" aria-label={'PARIS for '+business} className="mb-3 w-80 max-w-full rounded-2xl border border-black/10 bg-white p-5 text-slate-950 shadow-2xl">
-      <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-bold">PARIS · {business}</h2><button type="button" aria-label="Close PARIS" onClick={()=>{recognition.current?.stop();setListening(false);setOpen(false);}}>✕</button></div>
+      <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-bold">PARIS · {business}</h2><button type="button" aria-label="Close PARIS" onClick={close}>✕</button></div>
       <p className="mt-3 text-sm">Ask about this business, its published services, or how to get in touch.</p>
       <div role="log" aria-live="polite" className="mt-3 max-h-52 space-y-3 overflow-y-auto text-sm">{messages.map((message,i)=><p key={i}><strong>{message.role}: </strong>{message.text}</p>)}</div>
       {error&&<p role="status" className="mt-3 text-sm text-red-800">{error}</p>}
@@ -53,6 +56,6 @@ export function TenantParis({business,accent,basePath=''}:{business:string;accen
       {!voiceAvailable&&<p className="mt-2 text-xs">Voice input is unavailable in this browser. Keyboard input is available.</p>}
       <a href={tenantSiteHref('/contact',basePath)} className="mt-3 inline-block text-sm font-bold underline">Contact {business}</a>
     </section>}
-    <button type="button" aria-expanded={open} aria-controls="tenant-paris-panel" onClick={()=>setOpen(value=>!value)} className="rounded-full px-5 py-3 font-bold text-white shadow-xl" style={{backgroundColor:accent}}>Need help? Ask PARIS</button>
+    <button type="button" aria-expanded={open} aria-controls="tenant-paris-panel" onClick={()=>{if(open)close();else setOpen(true);}} className="rounded-full px-5 py-3 font-bold text-white shadow-xl" style={{backgroundColor:accent}}>Need help? Ask PARIS</button>
   </aside>;
 }

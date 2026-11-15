@@ -67,6 +67,9 @@ jobs:
       - name: Verify voicemail release hook and PARIS terminal-state regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test scripts/gcp/voicemail-acceptance-workflow.test.mjs scripts/gcp/paris-course-monitor.test.mjs scripts/gcp/supervise-course-queue.test.mjs
+      - name: Course preview identity isolation regressions
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test tests/worker/course-preview-identity.test.mjs
       - name: Student funding and permission regression tests
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: >-

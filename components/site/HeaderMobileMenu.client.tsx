@@ -428,7 +428,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
         className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
-        aria-controls="mobile-site-navigation"
+        aria-controls={isOpen ? 'mobile-site-navigation' : undefined}
       >
         {isOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
       </button>

@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { peerOrigin } from '../e2e/helpers/app-origins';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { BEAUTY_TRADES } from '@/lib/programs/beauty-trade-navigation';
 
@@ -20,5 +21,23 @@ describe('public Host Shop category navigation contract', () => {
     }
     expect(new Set(BEAUTY_TRADES.map(trade => trade.hostHref)).size).toBe(4);
     expect(new Set(BEAUTY_TRADES.map(trade => trade.programHref)).size).toBe(4);
+  });
+
+  it('resolves Host Shop resume login against the exact LMS browser peer', () => {
+    try {
+      // Marketing and LMS run on different origins in local Playwright;
+      // the deployed acceptance run must use the production LMS origin.
+      vi.stubEnv('PLAYWRIGHT_LMS_URL', '');
+      vi.stubEnv('PLAYWRIGHT_BASE_URL', 'http://localhost:3000');
+      expect(`${peerOrigin('lms')}/host-shop/login`).toBe('http://localhost:3002/host-shop/login');
+
+      vi.stubEnv('PLAYWRIGHT_BASE_URL', 'https://www.elevateforhumanity.org');
+      expect(`${peerOrigin('lms')}/host-shop/login`).toBe('https://lms.elevateforhumanity.org/host-shop/login');
+
+      vi.stubEnv('PLAYWRIGHT_LMS_URL', 'https://lms.qa.example.org/');
+      expect(`${peerOrigin('lms')}/host-shop/login`).toBe('https://lms.qa.example.org/host-shop/login');
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

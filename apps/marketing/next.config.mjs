@@ -58,7 +58,8 @@ const nextConfig = {
           // cannot be intercepted before it reaches the canonical origin.
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          // Admin Studio embeds deployed marketing pages from its separate origin.
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self' https://admin.elevateforhumanity.org" },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },

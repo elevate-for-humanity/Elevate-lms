@@ -41,11 +41,10 @@ export async function sendTwilioMessage(input: { from: string; to: string; body:
   // the bare number. When one is configured, send through it so carriers accept
   // the message; otherwise fall back to the sender number.
   const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
-  const params = new URLSearchParams({ To: input.to, Body: input.body,
+  const params = new URLSearchParams({ From: input.from, To: input.to, Body: input.body,
     StatusCallback: TWILIO_SMS_WEBHOOK + '/status' });
   if (messagingServiceSid && /^MG[a-f0-9]{32}$/i.test(messagingServiceSid))
     params.set('MessagingServiceSid', messagingServiceSid);
-  else params.set('From', input.from);
   for (const url of input.mediaUrls || []) params.append('MediaUrl', url);
   const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid()}/Messages.json`, {
     method: 'POST', headers: { Authorization: twilioAuthorization(), 'Content-Type': 'application/x-www-form-urlencoded' },

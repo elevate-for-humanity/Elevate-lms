@@ -85,7 +85,7 @@ export default function SmsTermsPage() {
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/contact" className="rounded-lg bg-brand-blue-700 px-5 py-3 font-bold text-white hover:bg-brand-blue-800">Contact us</Link>
             <Link href="/privacy" className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100">Privacy Policy</Link>
-            <Link href="/terms" className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100">Terms of Service</Link>
+            <Link href="/terms-of-service" className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100">Terms of Service</Link>
           </div>
         </section>
       </section>

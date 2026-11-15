@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { verifyPortalPreviewHandoff } from './portal-preview-handoff';
 import { resolvePortalPreviewSubject } from './portal-preview';
+import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
 
 export const COURSE_PREVIEW_COOKIE = 'elevate_course_preview';
 const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
@@ -23,7 +24,18 @@ export async function resolveCoursePreview(courseId?: string) {
       .eq('status', 'active')
       .is('revoked_at', null)
       .maybeSingle();
-    if (error || !enrollment) return { active: false as const, db: null };
+    if (error) return { active: false as const, db: null };
+    if (!enrollment) {
+      // A verified administrator can preview the apprentice's assigned draft
+      // before publication provisions a learner course enrollment. Resolve the
+      // same operational assignment as Theory; never grant arbitrary courses.
+      const runtime = await resolveApprenticeshipRuntimeContext(db, {
+        userId: subject.userId,
+        requireRegisteredStandard: false,
+      });
+      if (runtime?.enrollment.course_id !== courseId)
+        return { active: false as const, db: null };
+    }
     return { active: true as const, db, courseId };
   }
   const db = await requireAdminClient();

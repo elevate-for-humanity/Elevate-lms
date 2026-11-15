@@ -34,6 +34,16 @@ test('DND and a closed schedule do not ring devices', () => {
   assert.match(scheduled, /09:00-16:59,mon/);
   assert.match(scheduled, /Goto\(unavailable\)/);
 });
+test('the admin extension rings its external handset before voicemail', () => {
+  const admin = { ...record, extension: '0', adminExtension: '0', externalFallback: '+13179562748' };
+  const plan = renderConfiguration([admin]).dialplan;
+  assert.match(plan, /Dial\(PJSIP\/\+13179562748@twilio,\d+\)/);
+  assert.match(plan, /GotoIf\(\$\["\$\{DIALSTATUS\}"="ANSWER"\]\?finished\)/);
+  // A non-admin extension or a missing number must never emit a carrier dial.
+  assert.doesNotMatch(renderConfiguration([{ ...record, externalFallback: null }]).dialplan, /@twilio/);
+  assert.throws(() => renderConfiguration([{ ...record, extension: '101', adminExtension: '0', externalFallback: '+13179562748' }]), /invalid_stored_record/);
+  assert.throws(() => renderConfiguration([{ ...admin, externalFallback: '317-956-2748' }]), /invalid_stored_record/);
+});
 test('contact existence and qualified reachability are distinct', () => {
   assert.deepEqual(parseContacts(`Aor: ${endpoint} 1\nContact: ${endpoint}/sip:x unknown Unavail 0.0`, endpoint), { contactCount: 1, reachableContactCount: 0 });
   assert.deepEqual(parseContacts(`Aor: ${endpoint} 1\nContact: ${endpoint}/sip:x unknown Avail 1.0`, endpoint), { contactCount: 1, reachableContactCount: 1 });

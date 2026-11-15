@@ -40,7 +40,9 @@ function validateRecord(record) {
       !Number.isSafeInteger(record.expiresAt) || !EXTENSION.test(record.adminExtension) ||
       !/^[A-Za-z_]+(?:\/[A-Za-z_+-]+)+$/.test(record.timezone) ||
       !['ring', 'vibrate', 'silent', 'do_not_disturb', 'offline'].includes(record.ringMode) ||
-      !['manual', 'schedule'].includes(record.availabilitySource)) {
+      !['manual', 'schedule'].includes(record.availabilitySource) ||
+      !(record.externalFallback === null || record.externalFallback === undefined ||
+        (record.extension === record.adminExtension && /^\+[1-9]\d{7,14}$/.test(record.externalFallback)))) {
     throw new ProvisioningError('invalid_stored_record');
   }
   return record;
@@ -105,7 +107,16 @@ export function renderConfiguration(records) {
     dialplan.push(
       ' same => n,GotoIf($[${LEN(${PWA_CONTACTS})}=0]?unavailable)',
       ` same => n,Dial(\${PWA_CONTACTS},${devices[0].ringSeconds})`,
-      ' same => n,Return()', ' same => n(unavailable),Set(DIALSTATUS=CHANUNAVAIL)', ' same => n,Return()');
+      ' same => n,GotoIf($["${DIALSTATUS}"="ANSWER"]?finished)');
+    // Ring the administrator's own handset when no device answers, before the
+    // owning dialplan falls through to voicemail. Only the admin extension that
+    // carries the platform business number generates this route.
+    if (policy.externalFallback && policy.extension === policy.adminExtension) {
+      dialplan.push(` same => n(unavailable),Dial(PJSIP/${policy.externalFallback}@twilio,${devices[0].ringSeconds})`,
+        ' same => n(finished),Return()');
+    } else {
+      dialplan.push(' same => n(unavailable),Set(DIALSTATUS=CHANUNAVAIL)', ' same => n(finished),Return()');
+    }
   }
   if (records.length && !extensionOwners.has('0')) {
     const adminExtension = records[0].adminExtension;
@@ -140,7 +151,7 @@ async function supabaseOwner(identity, config, fetchImpl) {
   const query = new URL('/rest/v1/communication_extensions', config.supabaseUrl);
   query.searchParams.set('id', `eq.${identity.extensionId}`);
   query.searchParams.set('profile_id', `eq.${identity.profileId}`);
-  query.searchParams.set('select', 'id,profile_id,extension,enabled,webrtc_provider,ring_seconds,ring_mode,availability_source,availability_schedule,communication_workspaces!inner(phone_system_id,phone_systems!inner(admin_extension,timezone,status))');
+  query.searchParams.set('select', 'id,profile_id,extension,enabled,webrtc_provider,ring_seconds,ring_mode,availability_source,availability_schedule,admin_external_fallback,external_fallback_number,communication_workspaces!inner(phone_system_id,phone_systems!inner(admin_extension,timezone,status))');
   const response = await fetchImpl(query, {
     headers: { apikey: config.supabaseKey, authorization: `Bearer ${config.supabaseKey}` },
     signal: AbortSignal.timeout(10000), redirect: 'error',
@@ -159,9 +170,16 @@ async function supabaseOwner(identity, config, fetchImpl) {
   }
   try { new Intl.DateTimeFormat('en-US', { timeZone: system.timezone }).format(); }
   catch { throw new ProvisioningError('phone_system_configuration_invalid'); }
+  // The operator's external fallback rings the administrator's own handset when
+  // no WebRTC device answers, so a caller reaches a person instead of voicemail.
+  // Only an enabled admin extension with the platform business number may use it.
+  const externalFallback = row.admin_external_fallback === true &&
+    system.admin_extension === row.extension &&
+    /^\+[1-9]\d{7,14}$/.test(row.external_fallback_number || '')
+    ? row.external_fallback_number : null;
   return { extension: row.extension, ringSeconds: Number.isInteger(row.ring_seconds) ? Math.max(5, Math.min(60, row.ring_seconds)) : 20,
     ringMode: row.ring_mode, availabilitySource: row.availability_source, availabilitySchedule: row.availability_schedule,
-    adminExtension: system.admin_extension, timezone: system.timezone };
+    adminExtension: system.admin_extension, timezone: system.timezone, externalFallback };
 }
 
 async function confirmActiveDevice(identity, endpointId, config, fetchImpl) {

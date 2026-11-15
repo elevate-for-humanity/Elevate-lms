@@ -22,11 +22,13 @@ export default async function ApprenticeTheoryPage() {
     requireRegisteredStandard: false,
   });
   if (runtime?.enrollment.course_id) {
-    redirect(
-      subject.previewing
-        ? `https://admin.elevateforhumanity.org/api/admin/course-builder/preview?courseId=${runtime.enrollment.course_id}`
-        : courseOverviewPath(runtime.enrollment.course_id),
-    );
+    // A learner portal route must never hand a student (or an administrator
+    // previewing one) off to the Admin host. Landing on
+    // admin.elevateforhumanity.org from a learner surface reads as a permission
+    // error and loses the learner's place. Course Builder owns its own preview
+    // entry point, so this page always stays inside the LMS; the course layout
+    // already renders the read-only administrator preview in place.
+    redirect(courseOverviewPath(runtime.enrollment.course_id));
   }
   return (
     <main className="mx-auto max-w-3xl space-y-4 p-6">

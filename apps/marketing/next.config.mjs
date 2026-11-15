@@ -52,6 +52,18 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/(.*)',
+        headers: [
+          // Force HTTPS for a year so a downgrade or a stray http:// link
+          // cannot be intercepted before it reaches the canonical origin.
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Admin Studio embeds deployed marketing pages from its separate origin.
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self' https://admin.elevateforhumanity.org" },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+      {
         source: '/images/:path*',
         headers: [
           {
@@ -64,6 +76,15 @@ const nextConfig = {
   },
 
   experimental: { staticGenerationRetryCount: 3 },
+  // Next 15 streams metadata into <body> for any UA outside this list, so a
+  // crawler that does not execute JavaScript (or reads only <head>) never sees
+  // the title, description, canonical or Open Graph tags. The default list
+  // omits plain Googlebot, every AI crawler, and common validators, so pages
+  // rendered those tags in the body. Force a blocking render for search, social
+  // and AI crawlers so metadata is always emitted in <head>. Browsers keep the
+  // faster streaming path.
+  htmlLimitedBots:
+    /[\w-]+-Google|Google-[\w-]+|Googlebot|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight|GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|Perplexity-User|CCBot|Amazonbot|Applebot-Extended|meta-externalagent|cohere-ai|YouBot|Diffbot|Bytespider|PetalBot|SemrushBot|AhrefsBot|MJ12bot|DotBot|squirrelscan/i,
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
   transpilePackages: ['buffer', 'process'],

@@ -48,7 +48,7 @@ export default function StructuredData() {
     },
     sameAs: [
       'https://www.facebook.com/61578240192934/',
-      'https://linkedin.com/company/elevateforhumanity',
+      'https://linkedin.com/company/elevate-for-humanity',
       'https://instagram.com/elevateforhumanity',
       'https://www.youtube.com/@elevateforhumanity',
     ],

@@ -8,11 +8,11 @@ const source = stripTypeScriptTypes(await readFile(new URL('../apps/admin/app/ap
   .replace(/^import .*;\n/gm, '').replaceAll('export ', '');
 function route({ authorized = true, token = 'ghs_fixture_app_installation', error } = {}) {
   let appCalls = 0, contextCalls = 0, headers;
-  const factory = new Function('authorizeParisWorkflow', 'authorizeParisDeploymentAppDiagnostic', 'getGitHubAppToken', 'diagnoseParisGitHubCredential', 'withWorkflowGitHubToken', 'NextResponse', 'classifyParisPhaseError', 'describeParisPhaseFailure', 'recordParisMergeResult', source + '\nreturn POST;');
+  const factory = new Function('authorizeParisWorkflow', 'authorizeParisDeploymentAppDiagnostic', 'getGitHubAppToken', 'diagnoseParisGitHubCredential', 'withWorkflowGitHubToken', 'NextResponse', 'classifyParisPhaseError', 'describeParisPhaseFailure', 'recordParisMergeResult', 'authorizeParisProtectedMerge', source + '\nreturn POST;');
   const post = factory(async () => authorized, async () => false, async () => { appCalls++; if (error) throw error; return token; },
     async h => { headers = h; return { diagnosticVersion: 2, repository: { ok: true } }; },
     () => { contextCalls++; throw Error('must not use workflow token'); },
-    { json: (body, options = {}) => ({ body, status: options.status ?? 200, headers: options.headers }) }, classifyParisPhaseError, describeParisPhaseFailure, async () => ({ recorded: true }));
+    { json: (body, options = {}) => ({ body, status: options.status ?? 200, headers: options.headers }) }, classifyParisPhaseError, describeParisPhaseFailure, async () => ({ recorded: true }), async () => ({ authorized: false, reasons: ['test'] }));
   return { post: () => post({ headers: new Headers({ authorization: 'Bearer identity', 'x-paris-github-token': 'different-workflow-token' }), json: async () => ({ phase: 'app-auth-diagnostic' }) }),
     calls: () => ({ appCalls, contextCalls, headers }) };
 }

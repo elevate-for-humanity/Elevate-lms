@@ -62,6 +62,10 @@ describe('school invoice tuition checkout', () => {
     expect(state.schedule).toHaveBeenCalledWith(expect.objectContaining({ amount_cents: 180000, remaining_invoices: 3, fulfillment_payload: expect.objectContaining({ amount_cents: 180000 }) }));
   });
   it('rejects a reused QuickBooks invoice with mismatched payment terms', async () => {
+    // The non-partner "nails" program permits installments; a partner program
+    // rejects them with 400 before an invoice exists, so it cannot reach the
+    // reused-invoice conflict this test exercises.
+    state.nail = true;
     state.createInvoice.mockResolvedValueOnce({ providerInvoiceId: 'old', paymentUrl: 'https://example.test/old', totalCents: 35000 });
     const response = await POST(request({ program_id: 'nails', payment_plan: 'installments' }));
     expect(response.status).toBe(409);

@@ -59,7 +59,7 @@ for (const route of [
     if (route === '/apply/student') {
       await expect(
         page.getByRole('heading', {
-          name: 'Talk with PARIS while your application builds beside you.',
+          name: 'Intake Application — talk with PARIS',
           exact: true,
         }),
       ).toBeVisible();

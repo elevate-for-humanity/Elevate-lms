@@ -6,6 +6,8 @@ import { NextRequest } from 'next/server';
 // returned to a Host Shop admin preview.
 const fixture = vi.hoisted(() => ({
   selected: 'partner-a' as string | undefined,
+  profileState: 'active' as 'active' | 'inactive' | 'suspended' | 'missing',
+  profileError: false,
   filters: [] as unknown[][],
   matchQueryExecuted: false,
 }));
@@ -31,9 +33,15 @@ vi.mock('@/lib/supabase/admin', () => ({
         };
       }
       const result = () => ({
-        data: table === 'profiles' ? { role: 'admin' } :
-          table === 'shops' ? [{ id: 'shop-a' }] : [],
-        error: null,
+        data: table === 'profiles'
+          ? fixture.profileState === 'missing' ? null : {
+            role: 'admin',
+            is_active: fixture.profileState !== 'inactive',
+            suspended: fixture.profileState === 'suspended',
+          }
+          : table === 'shops' ? [{ id: 'shop-a' }] : [],
+        error: table === 'profiles' && fixture.profileError
+          ? new Error('profile read failed') : null,
         count: 0,
       });
       q.maybeSingle = async () => result();
@@ -45,11 +53,16 @@ vi.mock('@/lib/supabase/admin', () => ({
     },
   }),
 }));
-import { GET } from '@/apps/lms/app/api/host-shop/match-requests/route';
+import { GET, POST } from '@/apps/lms/app/api/host-shop/match-requests/route';
+import {
+  GET as getMatchDetail, PATCH as patchMatchDetail,
+} from '@/apps/lms/app/api/host-shop/match-requests/[id]/route';
 
 describe('Host Shop matching admin preview boundary', () => {
   beforeEach(() => {
     fixture.selected = 'partner-a';
+    fixture.profileState = 'active';
+    fixture.profileError = false;
     fixture.filters = [];
     fixture.matchQueryExecuted = false;
   });
@@ -89,4 +102,37 @@ describe('Host Shop matching admin preview boundary', () => {
     ]);
     expect(fixture.matchQueryExecuted).toBe(false);
   });
+
+  it.each(['inactive', 'suspended', 'missing'] as const)(
+    'fails closed for %s accounts on list, create, detail and mutation routes',
+    async (profileState) => {
+      fixture.profileState = profileState;
+      const list = await GET(new NextRequest(
+        'https://app.elevateforhumanity.org/api/host-shop/match-requests',
+      ));
+      const create = await POST(new NextRequest(
+        'https://app.elevateforhumanity.org/api/host-shop/match-requests',
+        { method: 'POST', body: JSON.stringify({ host_shop_id: 'shop-a', program_slug: 'barber-apprenticeship' }) },
+      ));
+      const details = await getMatchDetail(new NextRequest(
+        'https://app.elevateforhumanity.org/api/host-shop/match-requests/match-a',
+      ), { params: Promise.resolve({ id: 'match-a' }) });
+      const patch = await patchMatchDetail(new NextRequest(
+        'https://app.elevateforhumanity.org/api/host-shop/match-requests/match-a',
+        { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) },
+      ), { params: Promise.resolve({ id: 'match-a' }) });
+      expect([list.status, create.status, details.status, patch.status]).toEqual([401, 401, 401, 401]);
+      expect(fixture.matchQueryExecuted).toBe(false);
+      expect(fixture.filters.every(([table]) => table === 'profiles')).toBe(true);
+    },
+  );
+
+  it('fails closed on a database profile read failure, before privileged student queries', async () => {
+    fixture.profileError = true;
+    await expect(GET(new NextRequest(
+      'https://app.elevateforhumanity.org/api/host-shop/match-requests',
+    ))).rejects.toThrow('HOST_SHOP_PROFILE_LOOKUP_FAILED');
+    expect(fixture.matchQueryExecuted).toBe(false);
+  });
+
 });

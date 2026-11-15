@@ -1,6 +1,6 @@
 import {courseDiagnosticQuery} from './paris-course-repair-evidence.mjs';
 import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-source-discovery.mjs';
-import {missingRepairDeliverables} from './paris-repair-deliverables.mjs';
+import {missingRepairDeliverables,isApplicationSourceCorrection} from './paris-repair-deliverables.mjs';
 import {rememberVerifiedRepairSource,discardChangedRepairSource,repairPlannerObservations} from './paris-source-evidence.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
 import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
@@ -351,7 +351,13 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
   if(!actorId)return NextResponse.json({error:'PARIS repair actor is required.'},{status:403});
   const db=await requireAdminClient();
   const provider=(process.env.AI_PROVIDER??'elevate').trim().toLowerCase();
-  if(provider==='elevate'){
+  // The cold-start readiness probe is only needed before the first turn. On a
+  // planner continuation the owned model just served the previous turn, so
+  // probing again spends 55s of the Admin route's 300s request budget and can
+  // push an edit-sized turn (up to 210s inference + GitHub write/readback) past
+  // the platform deadline, which surfaces as an unattributed HTTP 502. A model
+  // that goes down between turns is reported by the inference path itself.
+  if(provider==='elevate' && !continuation?.checkpoint){
     const owned = await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS});
     if (!owned.verified) {
       const transient = owned.status === 'request_failed' || [408, 429, 500, 502, 503, 504].includes(owned.httpStatus ?? 0);
@@ -647,7 +653,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         if (writes >= MAX_WRITES) throw new Error('Internal engineering write limit reached.');
         // A test-only patch cannot validate a production repair. Preserve the
         // checkpoint and redirect the planner before creating a test artifact.
-        if (action.path.startsWith('tests/') && !hasApplicationSourceCorrection([...changedFiles])) {
+        // Shared helpers/fixtures are the exception: a defect there is itself
+        // application code and cannot be fixed by editing an existing test, so a
+        // new helper is a legitimate correction. Assertion suites stay blocked.
+        if (action.path.startsWith('tests/') && !isApplicationSourceCorrection(action.path) &&
+            !hasApplicationSourceCorrection([...changedFiles])) {
           observations.push('CREATE BLOCKED '+action.path+': first commit a justified application correction, then create a new regression test. No test-only repair was staged.');
           continue;
         }
@@ -721,8 +731,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         { status: 422 },
       );
     }
-    if (!newRegressionTests.size || ![...changedFiles].some(path =>
-      !path.startsWith('tests/') && !/\.(?:test|spec)\.[cm]?[jt]sx?$/.test(path))) {
+    if (!newRegressionTests.size || ![...changedFiles].some(path => isApplicationSourceCorrection(path))) {
       return NextResponse.json({
         error: 'Repair requires an application correction and a new regression test before independent validation.',
         repository: REPOSITORY, branch: { name: branch, sha: branchSha }, base_sha: baseSha,

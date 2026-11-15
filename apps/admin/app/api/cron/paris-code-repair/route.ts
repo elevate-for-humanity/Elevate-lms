@@ -1,10 +1,10 @@
 import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
-import {classifyParisPhaseError} from '@/lib/devstudio/paris-phase-error.mjs';
+import {describeParisPhaseFailure} from '@/lib/devstudio/paris-phase-error.mjs';
 import {getGitHubAppToken} from '@/lib/devstudio/github-app-token';
 import {probeOpenHandsReadiness} from '@/lib/devstudio/paris-openhands-readiness';
 import {authorizeParisWorkflow,authorizeParisDeploymentAppDiagnostic} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
-import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,reportParisDispatchFailure,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
+import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,reportParisDispatchFailure,diagnoseParisGitHubCredential,recordParisMergeResult} from '@/lib/ai/runtime/code-repair';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
@@ -53,11 +53,27 @@ export async function POST(request:NextRequest){
    return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await (body.phase==='prepare'?prepareParisRepair:publishParisRepair)(body.repairId,body.runId)));
   }
   if(body.phase==='failure'){await reportParisRepairFailure(body.repairId,body.runId);return NextResponse.json({recorded:true});}
+  if(body.phase==='merge-result'){
+   // The signed protected-merge workflow reports its outcome. A merge failure is
+   // recorded for the reconciler but never blocks the durable repair receipt.
+   const token=request.headers.get('x-paris-github-token');
+   if(!token)return NextResponse.json({error:'Temporary workflow authorization required.',errorCode:'PARIS_WORKFLOW_GITHUB_TOKEN_REQUIRED'},{status:400});
+   if(!/^[a-f0-9-]{36}$/.test(body.repairId??''))return NextResponse.json({error:'Repair ID required'},{status:400});
+   return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await recordParisMergeResult(body.repairId,{
+    merged:body.merged===true,
+    mergeCommitSha:typeof body.mergeCommitSha==='string'?body.mergeCommitSha:null,
+    reason:typeof body.reason==='string'?body.reason:null,
+    reasons:Array.isArray(body.reasons)?body.reasons.slice(0,8).map(String):undefined,
+   })));
+  }
   return NextResponse.json({error:'Unsupported phase'},{status:400});
  }catch(error){
-  const {errorCode,status}=classifyParisPhaseError(error);
-  console.error('[PARIS] repair phase failed',errorCode);
-  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode},{status});
+  const failure=describeParisPhaseFailure(error);
+  // Preserve the redacted diagnostic in the protected execution log. The
+  // workflow only ever sees the allow-listed code, so this log line is the one
+  // place an unattributed HTTP 502 can be traced to its real cause.
+  console.error('[PARIS] repair phase failed',failure.errorCode,failure.diagnostic,failure.cause??'');
+  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode:failure.errorCode},{status:failure.status});
  }
 
 }

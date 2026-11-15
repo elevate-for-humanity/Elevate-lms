@@ -3,7 +3,7 @@ import {resumeRepairedCourseJobs} from './resume-repaired-course-jobs.mjs';
 const imageSha='a'.repeat(40),imageDigest='sha256:'+'b'.repeat(64),env={SUPABASE_SERVICE_ROLE_KEY:'test'};
 const base={id:'job',build_id:'build',payload:{nextCompetencyIndex:18,autopilot:{competencyId:'lesson'}},status:'failed',attempts:1,max_attempts:5,execution_generation:8,lease_expires_at:null,last_error:'ULTIMATE_INTERNAL_REPAIR_REQUIRED:lesson:SELECTED_COURSE_SOURCE_DURATION_REQUIRED',
  monitor:{enabled:true},build:{course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',status:'blocked',profile:{ownerPaused:false,canonicalLessonIds:{lesson:'11111111-1111-4111-8111-111111111111'}}}};
-async function run(job,conflict=false,mediaAvailable=true,runEnv=env,activeJobs=[],repairStatus='blocked'){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env:runEnv,request:async(url,options)=>{
+async function run(job,conflict=false,mediaAvailable=true,runEnv=env,activeJobs=[],repairStatus='blocked',queuedJobs=[]){const writes=[];const result=await resumeRepairedCourseJobs({imageSha,imageDigest,env:runEnv,request:async(url,options)=>{
  if(options.method==='PATCH'){writes.push({url:String(url),body:JSON.parse(options.body)});return {ok:true,json:async()=>conflict?[]:[{id:'job',status:'queued',execution_generation:9}]};}
  if(String(url).includes('/paris_code_repairs'))return {ok:true,json:async()=>[{
   id:new URL(url).searchParams.get('id').slice(3),status:repairStatus,source_job_id:job.id
@@ -12,6 +12,8 @@ async function run(job,conflict=false,mediaAvailable=true,runEnv=env,activeJobs=
   entitlement_id:'22222222-2222-4222-8222-222222222222',match_score:1,status:'attached'
  }]};
  if(String(url).includes('/course_videos'))return {ok:true,json:async()=>mediaAvailable?[{id:'entitled-source'}]:[]};
+ // The stranded-queued normalization scan reads status=eq.queued.
+ if(new URL(url).searchParams.get('status')==='eq.queued')return {ok:true,json:async()=>queuedJobs};
  return {ok:true,json:async()=>String(url).includes('status=in.')?activeJobs:[job]};
  }});return {writes,result};}
 test('new verified repair queues an exhausted internal failure, retaining checkpoints and previous error',async()=>{
@@ -223,4 +225,21 @@ test('a PARIS-owned source cannot resume while its code repair is queued or exec
   assert.equal((await run(job,false,true,env,[waiter('quality','job')],state)).writes.length,0);
  assert.equal((await run(job,false,true,env,[waiter('quality','job')],'blocked')).writes.length,1);
  assert.equal((await run({...job,monitor:{enabled:true,repairId:'invalid-owner'}},false,true,env,[waiter('quality','job')])).writes.length,0);
+});
+
+test('a queued job whose retry budget is exhausted is normalized to failed for recovery',async()=>{
+ // The stranded row is NOT claimable (claim needs attempts<max_attempts) and is
+ // NOT failed, so without normalization the whole course stalls at zero ready
+ // stages. It must be corrected to 'failed' so the recovery scan can resume it.
+ const zombie={id:'zombie',status:'queued',attempts:5,max_attempts:5,execution_generation:9,lease_owner:null,lease_expires_at:null};
+ const {writes}=await run(base,false,true,env,[],[], [zombie]);
+ const normalized=writes.find(w=>w.body.status==='failed');
+ assert.ok(normalized,'the stranded queued row must be normalized to failed');
+ assert.match(normalized.url,/status=eq\.queued/);
+ assert.match(normalized.url,/attempts=eq\.5/);
+ assert.match(normalized.url,/execution_generation=eq\.9/);
+ // A runnable queued row (budget remaining) must NOT be touched.
+ const live={id:'live',status:'queued',attempts:1,max_attempts:5,execution_generation:3,lease_owner:null,lease_expires_at:null};
+ const {writes:second}=await run(base,false,true,env,[],[], [live]);
+ assert.equal(second.filter(w=>w.body.status==='failed'&&/live/.test(w.url)).length,0);
 });

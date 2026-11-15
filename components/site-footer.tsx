@@ -34,7 +34,7 @@ export function SiteFooter() {
             <Link href={PARTNER_LINKS.riseForwardFoundation} className="mt-2 inline-flex min-h-11 items-center text-sm font-bold text-emerald-800 hover:underline">Learn about Rise Forward Foundation</Link>
             <div className="mt-3 flex gap-3">
               <a href="https://www.facebook.com/61578240192934/" target="_blank" rel="noopener noreferrer" className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-950" aria-label="Elevate for Humanity on Facebook"><Facebook className="h-5 w-5" aria-hidden="true" /></a>
-              <a href="https://linkedin.com/company/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-950" aria-label="LinkedIn"><Linkedin className="h-5 w-5" aria-hidden="true" /></a>
+              <a href={contactConfig.social.linkedin} target="_blank" rel="noopener noreferrer" className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-950" aria-label="Elevate for Humanity on LinkedIn"><Linkedin className="h-5 w-5" aria-hidden="true" /></a>
               <a href="https://instagram.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-950" aria-label="Instagram"><Instagram className="h-5 w-5" aria-hidden="true" /></a>
             </div>
           </div>

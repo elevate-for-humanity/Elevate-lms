@@ -1,7 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { PlatformVideoRoom } from './PlatformVideoRoom';
+import dynamic from 'next/dynamic';
+
+// Load the WebRTC conferencing runtime only when an accepted call renders a room.
+// Public login pages share dashboard chrome but never render a video room.
+const PlatformVideoRoom = dynamic(() => import('./PlatformVideoRoom').then(module => module.PlatformVideoRoom));
 
 type Call = { roomId: string; title: string; direction: 'incoming' | 'outgoing'; state: 'ringing' | 'accepted' };
 export function DashboardVideoCalls({ extension, disabled = false, dialPad = false }: { extension?: string; disabled?: boolean; dialPad?: boolean }) {

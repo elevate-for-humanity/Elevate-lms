@@ -64,7 +64,13 @@ function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
 export async function getHostShopNetwork(includeOnboarding = false): Promise<HostShopNetworkEntry[]> {
   // Compatibility parameter must never publish incomplete onboarding records.
   void includeOnboarding;
-  const approved = await getApprovedShops();
+  // Owner-directed public delisting: the Prestige Elevation Barber and Beauty
+  // Institute listing has an incorrect address. Keep its operational approval,
+  // enrollment, and historical records untouched while removing public promotion.
+  const approved = (await getApprovedShops()).filter((shop) => {
+    const identity = [shop.name, shop.publicSlug].join(' ').toLowerCase();
+    return !/prestige[\s-]+elevation[\s-]+barber[\s-]+and[\s-]+beauty[\s-]+institute/.test(identity);
+  });
 
   const operational = approved.map((shop): HostShopNetworkEntry => {
     const featured = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) =>

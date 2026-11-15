@@ -49,25 +49,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   },
 
   {
-    slug: 'prestige-elevation-barber-and-beauty-institute',
-    name: 'Prestige Elevation Barber and Beauty Institute LLC',
-    businessType: 'BarberShop',
-    city: 'Indianapolis',
-    state: 'IN',
-    zip: '',
-    address: '120 East Market Street, Suite 560',
-    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
-    primaryProgram: 'barber-apprenticeship',
-    marketingBlurb: 'An Indianapolis barber and beauty business offering haircuts, beard grooming, styling and client care. Explore the shop portfolio and contact Elevate about supervised apprenticeship placement.',
-    media: [
-      { src: '/images/beauty/program-barber-training.webp', alt: 'Representative barber service image from Elevate’s earlier program collection', kind: 'photo' },
-      { src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Natural iron-out bob styling artwork from Prestige Elevation’s published portfolio', kind: 'photo' },
-    ],
-    websiteUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
-    websiteLabel: 'Explore services and book with Prestige Elevation',
-    bookingUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
-  },
-  {
     slug: 'kountry-kutz-barbershop',
     name: 'Kountry Kutz Barbershop',
     businessType: 'BarberShop',

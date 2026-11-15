@@ -174,6 +174,9 @@ export default async function BarberApprenticeshipPage() {
               videoSrcDesktop={heroBanner.videoSrcDesktop}
               videoSrcMobile={heroBanner.videoSrcMobile ?? heroBanner.videoSrcDesktop}
               posterImage={BARBER_HERO_IMAGE}
+              posterAlt={getProgramImageAlt('barber-apprenticeship')}
+              heightClassName="h-[clamp(240px,58vw,360px)] lg:h-[clamp(330px,35vw,470px)]"
+              deferVideoMs={1200}
               transcript={heroBanner.transcript}
               narrateTranscript={false}
               showTranscriptControl={false}

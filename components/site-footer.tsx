@@ -61,6 +61,7 @@ export function SiteFooter() {
           <nav aria-label="Legal and policies" className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-700">
             <Link href="/privacy" className={legalLinkClass}>Privacy Policy</Link>
             <Link href="/terms-of-service" className={legalLinkClass}>Terms of Service</Link>
+            <Link href="/sms-terms" className={legalLinkClass}>SMS Terms &amp; Consent</Link>
             <Link href="/security-and-data-protection" className={legalLinkClass}>Security &amp; Data</Link>
             <Link href="/accessibility" className={legalLinkClass}>Accessibility</Link>
             <Link href="/federal-compliance" className={legalLinkClass}>Federal Compliance</Link>

@@ -4,7 +4,7 @@ export function tenantSiteHref(href: string, basePath = ''): string {
   // Authenticated review pages select their page in the URL rather than
   // exposing a published customer route. Real hrefs also support new tabs,
   // copied links, and browser history without relying on click interception.
-  if (basePath.endsWith('?page=')) {
+  if (/[?&]page=$/.test(basePath)) {
     if (href.startsWith(basePath)) return href;
     const url = new URL(href, 'https://tenant.invalid');
     return `${basePath}${encodeURIComponent(url.pathname)}${url.search ? `&${url.search.slice(1)}` : ''}${url.hash}`;

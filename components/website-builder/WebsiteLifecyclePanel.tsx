@@ -133,6 +133,7 @@ export function WebsiteLifecyclePanel({
                     <p className="font-bold text-slate-800">{revision.reason.replaceAll('_', ' ')} · {revision.is_published ? 'published' : 'draft'}</p>
                     <p className="text-xs text-slate-500">{new Date(revision.created_at).toLocaleString()}</p>
                   </div>
+                  <a href={`/apps/website-builder/edit/${websiteId}/preview?revision=${encodeURIComponent(revision.id)}`} className="text-xs font-bold underline">Preview saved version</a>
                   <button type="button" disabled={busy} onClick={() => void restore(revision.id)} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-800 disabled:opacity-50">
                     <ArchiveRestore className="h-4 w-4" /> Restore
                   </button>

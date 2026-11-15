@@ -2,6 +2,8 @@ import AdminLoginForm from './LoginForm';
 
 export const metadata = {
   title: 'Sign In — Elevate Admin',
+  description: 'Sign in to the secure Elevate for Humanity Admin portal to manage training programs, courses, student support, and authorized operations.',
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/login' },
 };
 
 export default async function AdminLoginPage({

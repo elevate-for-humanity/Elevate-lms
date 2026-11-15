@@ -31,6 +31,10 @@ const adminConfig = {
 
   eslint: { ignoreDuringBuilds: true },
 
+  // Admin metadata is small and static. Resolve it before streaming so every
+  // client receives metadata in head, including accessibility/HTML scanners.
+  htmlLimitedBots: /.*/,
+
   // Serve packaged assets directly, as the other standalone applications do.
   images: { unoptimized: true },
 
@@ -70,6 +74,15 @@ const adminConfig = {
 
   async headers() {
     return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Keep first-party portal embeds; block framing by unrelated origins.
+          { key: 'Content-Security-Policy', value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self' https://*.elevateforhumanity.org" },
+        ],
+      },
       {
         source: '/studio/:path*',
         headers: [

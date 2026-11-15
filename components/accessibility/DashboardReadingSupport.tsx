@@ -52,7 +52,6 @@ export function DashboardReadingSupport({
         <button
           type="button"
           aria-pressed={enabled}
-          aria-label="Reading view"
           onClick={toggle}
           className="min-h-12 rounded-lg border-2 border-slate-700 px-4 py-2 font-bold focus-visible:outline focus-visible:outline-4 focus-visible:outline-blue-700"
         >

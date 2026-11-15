@@ -26,11 +26,15 @@ async function getContext() {
   if (!user) return null;
 
   const db = await requireAdminClient();
-  const { data: profile } = await db
+  const { data: profile, error: profileError } = await db
     .from('profiles')
-    .select('id, role')
+    .select('id, role, is_active, suspended')
     .eq('id', user.id)
     .maybeSingle();
+  // Match detail and mutation routes must enforce the same account status
+  // as portal pages before accessing service-role scoped student records.
+  if (profileError) throw new Error('HOST_SHOP_PROFILE_LOOKUP_FAILED');
+  if (!profile || profile.is_active === false || profile.suspended === true) return null;
 
   // Existing employers may also own Host Shops. Honor the same active
   // partner membership used by the shared portal role guard.

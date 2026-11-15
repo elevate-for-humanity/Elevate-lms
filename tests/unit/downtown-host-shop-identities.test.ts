@@ -21,17 +21,19 @@ vi.mock('@/lib/programs/host-shops', () => ({
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 
 describe('downtown businesses sharing a training address', () => {
-  it('keeps Mesmerized and Prestige names, photos, and programs separate', async () => {
+  it('keeps Mesmerized scoped to its own esthetics/nail programs while delisting the inaccurate Prestige public profile', async () => {
+    // Both approval records remain present in the mocked operational source.
+    // Public delisting must not merge Prestige's barber/cosmetology programs,
+    // address, or media into Mesmerized or publish the inaccurate shop.
     const shops = await getHostShopNetwork();
-    expect(shops).toHaveLength(2);
+    expect(shops).toHaveLength(1);
+    expect(shops.map((shop) => shop.id)).not.toContain('prestige');
     const mesmerized = shops.find((shop) => shop.id === 'mesmerized');
-    const prestige = shops.find((shop) => shop.id === 'prestige');
     expect(mesmerized?.slug).toBe('mesmerized-by-beauty-cosmetology-academy-8420fefa');
     expect(mesmerized?.name).toBe('Mesmerized by Beauty Cosmetology Academy');
     expect(mesmerized?.programs).toEqual(['nail-technician-apprenticeship', 'esthetician-apprenticeship']);
     expect(mesmerized?.gallery?.every((image) => image.url.includes('mesmerized-by-beauty'))).toBe(true);
-    expect(prestige?.programs).toEqual(['barber-apprenticeship', 'cosmetology-apprenticeship']);
-    expect(prestige?.gallery?.some((image) => image.url.includes('downtown-cosmetology-program'))).toBe(false);
-    expect(prestige?.gallery?.some((image) => image.url.includes('program-barber-training'))).toBe(true);
+    expect(shops.flatMap((shop) => shop.programs)).not.toContain('barber-apprenticeship');
+    expect(shops.flatMap((shop) => shop.programs)).not.toContain('cosmetology-apprenticeship');
   });
 });

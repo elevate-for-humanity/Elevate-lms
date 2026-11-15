@@ -84,6 +84,55 @@ jobs:
             test-results/
           retention-days: 14
 
+  # An isolated, public-only regression must finish even if the broad
+  # cross-app E2E suite runs into unrelated Course Builder/Program Holder failures.
+  # Keep the full E2E job intact: this supplements, never bypasses, its result.
+  public-host-shop-category:
+    name: Public Host Shop navigation and application (five devices)
+    runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
+      options: --init --shm-size=1g
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 30
+    env:
+      PLAYWRIGHT_HTML_OPEN: never
+      PLAYWRIGHT_APPS: marketing
+      PLAYWRIGHT_BASE_URL: https://www.elevateforhumanity.org
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify browser engines for desktop and mobile
+        run: node scripts/verify-playwright-runtime.mjs chromium firefox webkit
+      - name: Certify deployed Host Shop navigation and invalid-submit flow
+        run: >-
+          pnpm exec playwright test
+          tests/e2e/public-runtime-acceptance.spec.ts
+          tests/e2e/canonical-application-flow.spec.ts
+          --grep 'navigation destination /partners/host-shops:|Host Shop application provides resume access'
+          --project=desktop-chrome --project=laptop-chrome
+          --project=tablet-chrome --project=android-chrome --project=iphone-webkit
+      - name: Upload focused Host Shop browser evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: public-host-shop-category
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
   email-device-browsers:
     name: Email device browsers
     runs-on: ubuntu-24.04

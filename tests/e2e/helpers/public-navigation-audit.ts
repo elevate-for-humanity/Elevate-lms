@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { NAV_ITEMS } from '../../../lib/navigation';
+import { BEAUTY_TRADES } from '../../../lib/programs/beauty-trade-navigation';
 
 const origin = 'https://www.elevateforhumanity.org';
 const destinations = [...new Set(NAV_ITEMS.flatMap(item => [item.href, ...(item.subItems ?? []).map(sub => sub.href)]).filter((href): href is string => Boolean(href?.startsWith('/'))))];
@@ -32,11 +33,25 @@ export function registerPublicNavigationAudit() {
       await expect(page.locator('h1').first()).toBeVisible();
       await expect(page.locator('body')).not.toContainText(/Application error: a client-side exception|Lorem ipsum|Under construction/i);
       if (href === '/partners/host-shops') {
-        // Hold the visitor-visible slide while checking its images. Rotation
-        // replaces live nodes, which otherwise detaches an image mid-scroll.
-        await page.getByRole('button', { name: 'Pause host shop slideshow', exact: true }).click();
-        await expect(page.getByRole('button', { name: 'Resume host shop slideshow', exact: true }))
-          .toHaveAttribute('aria-pressed', 'true');
+        // This page is now a static four-trade directory, not an autoplay
+        // slideshow. Certify each real route and enrollment link on every
+        // browser/device instead of waiting for removed playback controls.
+        await expect(page.getByRole('heading', { name: 'Choose your Host Shop category', exact: true }))
+          .toBeVisible();
+        const cards = page.locator('main article');
+        await expect(cards).toHaveCount(BEAUTY_TRADES.length);
+        for (const trade of BEAUTY_TRADES) {
+          const card = cards.filter({
+            has: page.getByRole('heading', { level: 3, name: trade.label, exact: true }),
+          });
+          await expect(card, trade.label).toHaveCount(1);
+          await expect(card.getByRole('link', { name: `View ${trade.label} Host Shops`, exact: false }))
+            .toHaveAttribute('href', trade.hostHref);
+          await expect(card.getByRole('link', { name: 'Explore training', exact: true }))
+            .toHaveAttribute('href', trade.programHref);
+        }
+        await expect(page.getByRole('link', { name: 'Apply to become a Host Shop', exact: true }))
+          .toHaveAttribute('href', '/partners/host-shop/apply');
       }
       const imageSelector = await page.locator('main').count() ? 'main img' : 'body img';
       // Lazy images only load after entering the viewport. Exercise the actual

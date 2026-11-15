@@ -155,8 +155,28 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
     );
   }
 
+  // Both the generator and saved projects use this composition; it is not tied
+  // to one customer's template or a parallel standalone application.
+  if ((section.type === 'rich_text' || section.type === 'cta') && section.settings?.layout === 'split' && text(c.image)) {
+    const imageFirst = section.settings?.imagePosition === 'left';
+    return <section data-section-id={section.id} data-image-position={imageFirst ? 'left' : 'right'} className="tenant-editorial-split mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-6 lg:grid-cols-2">
+      <div className="tenant-editorial-copy min-w-0">
+        {text(c.eyebrow) ? <p className="text-xs font-bold uppercase tracking-[.2em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
+        <h2 className="mt-4 text-3xl font-black sm:text-4xl">{text(c.title)}</h2>
+        {text(c.text) ? <div className="mt-5 whitespace-pre-wrap leading-8 text-slate-600">{text(c.text)}</div> : null}
+        {text(c.email) ? <p className="mt-4"><a href={`mailto:${text(c.email)}`}>{text(c.email)}</a></p> : null}
+        {text(c.phone) ? <p className="mt-2"><a href={`tel:${text(c.phone)}`}>{text(c.phone)}</a></p> : null}
+        {text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}
+      </div>
+      <figure className="tenant-editorial-media min-w-0">
+        <img src={text(c.image)} alt={text(c.imageAlt)} loading="lazy" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+        {text(c.imageCaption) ? <figcaption className="mt-3 text-sm text-slate-600">{text(c.imageCaption)}</figcaption> : null}
+      </figure>
+    </section>;
+  }
+
   if (section.type === 'rich_text') {
-    return <section data-section-id={section.id} className="mx-auto max-w-4xl px-5 py-14 sm:px-6"><h2 className="text-3xl font-black">{text(c.title)}</h2><div className="mt-5 whitespace-pre-wrap text-base leading-8 text-slate-600">{text(c.text)}</div>{text(c.email) ? <p className="mt-4 font-bold"><a href={`mailto:${text(c.email)}`} style={{ color: primary }}>{text(c.email)}</a></p> : null}{text(c.phone) ? <p className="mt-2 font-bold"><a href={`tel:${text(c.phone)}`} style={{ color: primary }}>{text(c.phone)}</a></p> : null}</section>;
+    return <section data-section-id={section.id} className="mx-auto max-w-4xl px-5 py-14 sm:px-6"><h2 className="text-3xl font-black">{text(c.title)}</h2><div className="mt-5 whitespace-pre-wrap text-base leading-8 text-slate-600">{text(c.text)}</div>{text(c.email) ? <p className="mt-4 font-bold"><a href={`mailto:${text(c.email)}`} style={{ color: primary }}>{text(c.email)}</a></p> : null}{text(c.phone) ? <p className="mt-2 font-bold"><a href={`tel:${text(c.phone)}`} style={{ color: primary }}>{text(c.phone)}</a></p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</section>;
   }
 
   if (section.type === 'features' || section.type === 'services' || section.type === 'pricing' || section.type === 'team') {
@@ -280,7 +300,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
           <TenantBagButton />{navigation.some((item) => item.slug === '/contact') ? <a href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</a> : null}
         </div>
       </header>
-      {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
+      {isLegacy83 || design ? <div className={`tenant-mobile-menu ${isLegacy83 ? 'legacy83-mobile-menu' : ''}`}><details key={page.slug}><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} aria-current={item.slug === page.slug ? 'page' : undefined}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
       <main>{page.sections.map((section, index) => <TenantSectionBoundary key={`${site.id}:${page.slug}:${section.id}`} sectionId={section.id}><Section section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} /></TenantSectionBoundary>)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>

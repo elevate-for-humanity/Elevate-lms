@@ -195,8 +195,8 @@ export async function prepareParisRepair(id:string,runId:number){
    });
    if(candidate.pending===true)return candidate;
   }
-  // Preserve in-flight internal checkpoints and their committed source. New
-  // repairs use OpenHands when available, otherwise the internal engine.
+  // Preserve historical provider checkpoints and their committed source. New
+  // repairs use the owned internal engine unless explicitly opted into OpenHands.
   if(!candidate || candidate.kind==='planner-checkpoint') {
    let sourceEvidence;
    if(claimed.source_job_id){
@@ -860,9 +860,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   if(blocked.error)throw blocked.error;
  }
  if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
- // New repairs use OpenHands; the local inference service is not an admission
- // dependency for that engine. A read-only Cloud response is required before
- // spending an attempt; it never proves execution or a completed repair.
+ // New repairs use the owned internal engine by default. Explicit OpenHands
+ // opt-in still requires read-only provider authorization before admission;
+ // readiness alone never proves successful execution or a completed repair.
  // Old planner checkpoints retain
  // their original engine and its readiness check.
  // OpenHands is optional: a new repair with no OpenHands checkpoint falls back

@@ -350,6 +350,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
 
   if(!actorId)return NextResponse.json({error:'PARIS repair actor is required.'},{status:403});
   const db=await requireAdminClient();
+  // Direct callers and resumed turns must satisfy the same current-owner
+  // policy as the OpenHands adapter before model calls or repository writes.
+  const owner=await db.from('profiles').select('role').eq('id',actorId).maybeSingle();
+  if(owner.error||!['admin','super_admin'].includes(owner.data?.role??''))
+    return NextResponse.json({error:'PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED'},{status:403});
   const provider=(process.env.AI_PROVIDER??'elevate').trim().toLowerCase();
   // The cold-start readiness probe is only needed before the first turn. On a
   // planner continuation the owned model just served the previous turn, so

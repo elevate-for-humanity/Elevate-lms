@@ -360,5 +360,16 @@ export async function getOpenHandsLifecycle(input: {
       error: 'OpenHands conversation was not found',
     };
   }
-  return lifecycleFromConversation(conversation, startTask?.id ?? input.startTaskId ?? null);
+  if(conversation.id!==conversationId)throw new Error('OpenHands conversation receipt mismatch');
+  const lifecycle=lifecycleFromConversation(conversation, startTask?.id ?? input.startTaskId ?? null);
+  // Some conversation responses omit sandbox_id. Recover it only from the
+  // original start receipt, and require both receipts to identify this exact
+  // conversation. Never enumerate sandboxes or create a replacement task.
+  if(!lifecycle.sandboxId&&input.startTaskId){
+    startTask??=await getOpenHandsStartTask(input.startTaskId);
+    if(startTask?.id!==input.startTaskId||startTask.app_conversation_id!==conversationId)
+      throw new Error('OpenHands start-task receipt mismatch');
+    lifecycle.sandboxId=startTask.sandbox_id??null;
+  }
+  return lifecycle;
 }

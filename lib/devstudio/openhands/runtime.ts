@@ -654,6 +654,7 @@ export async function refreshOpenHandsTask(input: {
     ...external,
     start_task_id: lifecycle.startTaskId ?? external.start_task_id ?? null,
     conversation_id: lifecycle.conversationId ?? external.conversation_id ?? null,
+    sandbox_id: lifecycle.sandboxId ?? external.sandbox_id ?? null,
     sandbox_status: lifecycle.sandboxStatus ?? null,
     execution_status: lifecycle.executionStatus ?? null,
     repository: lifecycle.repository ?? null,

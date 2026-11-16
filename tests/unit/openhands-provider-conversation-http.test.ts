@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ hydrate: vi.fn() }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: mocks.hydrate }));
-import { sendOpenHandsMessage } from '@/lib/devstudio/openhands/client';
+import { sendOpenHandsMessage, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
 
 const previousKey = process.env.OPENHANDS_API_KEY;
 const previousOrigin = process.env.OPENHANDS_API_URL;
@@ -25,6 +25,23 @@ afterEach(() => {
 });
 
 describe('OpenHands provider conversation contract (controlled HTTP)', () => {
+  it('recovers a missing sandbox only from the original matching start receipt',async()=>{
+    const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>Response.json(String(input).includes('/start-tasks?')?
+      {id:'start-123',app_conversation_id:'conversation-123',sandbox_id:'sandbox-123'}:
+      {id:'conversation-123',sandbox_status:'PAUSED',selected_repository:'elevate-for-humanity/Elevate-lms'}));
+    globalThis.fetch=fetcher as typeof fetch;
+    expect(await getOpenHandsLifecycle({startTaskId:'start-123',conversationId:'conversation-123'})).toMatchObject({sandboxId:'sandbox-123',sandboxStatus:'PAUSED'});
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls.every(([,init])=>!init||init.method==='GET')).toBe(true);
+  });
+  it.each([
+    {id:'start-other',app_conversation_id:'conversation-123',sandbox_id:'sandbox-other'},
+    {id:'start-123',app_conversation_id:'conversation-other',sandbox_id:'sandbox-other'},
+  ])('rejects a mismatched sandbox receipt',async(receipt)=>{
+    globalThis.fetch=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>Response.json(String(input).includes('/start-tasks?')?receipt:{id:'conversation-123',sandbox_status:'PAUSED'})) as typeof fetch;
+    await expect(getOpenHandsLifecycle({startTaskId:'start-123',conversationId:'conversation-123'})).rejects.toThrow('receipt mismatch');
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
   it('continues the original conversation with authenticated Bearer request and no new agent start', async () => {
     const requests: Array<{ path: string; method: string; auth: string | null; body: unknown }> = [];
     globalThis.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {

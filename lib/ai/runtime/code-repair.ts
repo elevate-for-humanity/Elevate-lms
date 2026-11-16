@@ -148,6 +148,11 @@ export async function prepareParisRepair(id:string,runId:number){
  }
  if(!claimed)throw Error('REPAIR_ALREADY_CLAIMED');
  try{
+  // Queue admission is historical evidence, not continuing write authority.
+  // Check before either engine, including forced internal and continuations.
+  const owner=await db.from('profiles').select('role').eq('id',claimed.actor_id).maybeSingle();
+  if(owner.error||!claimed.actor_id||!['admin','super_admin'].includes(owner.data?.role??''))
+   throw Error('PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED');
   let candidate=claimed.candidate;
   if(untouchedPlannerNeedsFreshGeneration(claimed)) {
    const priorCheckpoint=candidate.checkpoint;

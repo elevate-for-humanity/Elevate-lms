@@ -154,9 +154,9 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Chef instructor supervising culinary skills practice in a teaching kitchen',
   },
   'hvac-technician': {
-    card: '/images/refresh-20261014/trades.webp',
-    hero: '/images/refresh-20261014/trades.webp',
-    alt: 'Illustrative HVAC instructor supervising a learner inspecting an HVAC unit',
+    card: '/images/hvac-training-vibrant-2026.webp',
+    hero: '/images/hvac-training-vibrant-2026.webp',
+    alt: 'HVAC technicians examining an air-conditioning system',
   },
   'cdl-training': {
     card: '/images/refresh-20261014/cdl.webp',

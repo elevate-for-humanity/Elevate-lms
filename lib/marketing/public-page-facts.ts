@@ -1,3 +1,5 @@
+import { getEnchantedHeartsProgram } from '@/lib/partners/enchanted-hearts';
+import { resolveSlug } from '@/lib/program-registry';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 export type PublicPageFact = { question: string; answer: string; href: string; link: string };
 export type PublicPageFacts = { title: string; imageProgram?: string; facts: PublicPageFact[] };
@@ -10,13 +12,15 @@ const apprenticeshipFacts: PublicPageFact[] = [
 ];
 
 export function getPublicPageFacts(pathname: string): PublicPageFacts {
-  const programSlug = pathname.match(/^\/programs\/([^/]+)/)?.[1];
-  if (/apprenticeship/.test(pathname)) {
-    const contract = programSlug ? getRegisteredProgramStandard(programSlug) : null;
-    const facts = contract ? [...apprenticeshipFacts.slice(0, 3), { question: 'What are the completion requirements for this occupation?', answer: `${contract.standard.occupationTitle} requires ${contract.completion.competencyCount} verified occupational competencies and ${contract.completion.requiredRtiHours} hours of related technical instruction, with supervised Host Shop practice. Work hours are training evidence, not a fixed graduation denominator. Apprenticeship completion and Indiana licensing requirements are separate steps.`, href: `/programs/${programSlug}`, link: 'Review the complete occupation requirements' }] : apprenticeshipFacts;
+  const programPath = pathname.match(/^\/programs\/(?:(healthcare|healthcare-training)\/)?([^/]+)\/?$/);
+  const programSlug = programPath?.[2];
+  const applicationSlug = programSlug ? resolveSlug(programSlug) : undefined;
+  const contract = programSlug ? getRegisteredProgramStandard(programSlug) : null;
+  if (contract || /^\/apprenticeships(?:\/|$)/.test(pathname) || (programSlug?.endsWith('-apprenticeship') ?? false)) {
+    const facts = contract ? [...apprenticeshipFacts.slice(0, 3), { question: 'What are the completion requirements for this occupation?', answer: `${contract.standard.occupationTitle} requires ${contract.completion.competencyCount} verified occupational competencies and ${contract.completion.requiredRtiHours} hours of related technical instruction, with supervised Host Shop practice. Work hours are training evidence, not a fixed graduation denominator. Apprenticeship completion and Indiana licensing requirements are separate steps.`, href: pathname, link: 'Review the complete occupation requirements' }] : apprenticeshipFacts;
     return { title: 'Apprenticeship facts before you apply', imageProgram: programSlug || 'barber-apprenticeship', facts };
   }
-  if (/host-shop|barber-beauty-network/.test(pathname)) return {
+  if (/^\/(?:partners\/)?(?:host-shops?|barber-beauty-network)(?:\/|$)/.test(pathname)) return {
     title: 'Host Shop and network questions', imageProgram: 'barber-apprenticeship', facts: [
       { question: 'Is it free to join as a Host Shop?', answer: 'There is no Host Shop application or placement fee. The shop still covers employee wages, insurance and normal business expenses. Apprenticeship tuition is self-pay only.', href: '/host-shop/apply', link: 'Apply free as a Host Shop' },
       { question: 'Can any business begin training apprentices immediately?', answer: 'Elevate verifies the occupation, worksite, licenses, insurance and supervising professional before approval and placement. Submitting an application is not approval.', href: '/partners/host-shops', link: 'Review Host Shop requirements' },
@@ -30,7 +34,7 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
     { question: 'Do demos use my real business records?', answer: 'Demo environments illustrate product workflows. Use your authenticated workspace for your own business or learner records.', href: '/store/demos', link: 'Explore demos' },
     { question: 'What should I check before buying?', answer: 'Review the specific offer’s price, billing frequency, availability, included features and terms. Product availability and plan limits differ between offers.', href: '/store/proof', link: 'Review offer details and limits' },
   ] };
-  if (/employer|jobs|career/.test(pathname)) return { title: 'Jobs and employer questions', facts: [
+  if (/^\/(?:employers?|jobs|careers?|career-services)(?:\/|$)/.test(pathname)) return { title: 'Jobs and employer questions', facts: [
     { question: 'Where do I post an opening?', answer: 'Start with the employer job-posting page and complete the required onboarding and approval steps.', href: '/employers/post-job', link: 'Post a job' },
     { question: 'Where do I find participating employers?', answer: 'The employer directory provides a place to explore participating businesses. A directory listing does not guarantee a current vacancy or a job offer.', href: '/employers/directory', link: 'Browse employers' },
     { question: 'Does completing training guarantee employment?', answer: 'Training and career support do not guarantee hiring. Employers make their own hiring decisions and confirm job requirements and availability.', href: '/career-services', link: 'Explore career support' },
@@ -40,10 +44,29 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
     { question: 'Is funding available for every career program?', answer: 'No. Workforce funding is specific to the evidenced program and the applicant. The responsible agency determines eligibility and written authorization before funded enrollment.', href: '/funding', link: 'Review program-specific funding' },
     { question: 'Does applying guarantee approval?', answer: 'An application is a request for review. It does not guarantee funding, enrollment, placement or employment.', href: '/programs', link: 'Compare program requirements' },
   ] };
-  return { title: 'Quick answers before your next step', imageProgram: programSlug, facts: [
-    { question: 'Where do I find the schedule, cost and entry requirements?', answer: 'Open the exact program or product you are considering. Review its published details and required steps before applying or purchasing.', href: '/programs', link: 'Explore program details' },
-    apprenticeshipFacts[0],
-    { question: 'Does an inquiry enroll me?', answer: 'An inquiry requests information. Enrollment requires the applicable application, intake, payment and enrollment requirements to be completed.', href: '/apply/student', link: 'Start an application' },
-    { question: 'Where can I find shops, employers and opportunities?', answer: 'Use the Host Shop and employer directories. Availability and placement are confirmed for the specific occupation and business.', href: '/partners/host-shops', link: 'Explore the network' },
-  ] };
+  if (pathname === '/testing' || pathname.startsWith('/testing/')) return {
+    title: 'Testing appointment questions', facts: [
+      { question: 'How do I choose a testing date?', answer: 'Select your provider and exam, then choose an available date and appointment time in the booking form. Only published appointments with enough space for your group can be selected.', href: '/testing#booking', link: 'Choose a testing appointment' },
+      { question: 'Does adding an exam to the cart reserve my appointment?', answer: 'Adding an exam to the cart does not reserve a date. Complete the appointment selection and secure checkout. Review your booking confirmation before attending.', href: '/testing#booking', link: 'Complete your booking' },
+      { question: 'What if no appointment is available?', answer: 'Contact the testing center for scheduling assistance before paying. An unavailable date cannot be booked.', href: '/contact', link: 'Contact the testing center' },
+    ],
+  };
+  if (programSlug && (applicationSlug || getEnchantedHeartsProgram(programSlug) || programPath?.[1])) return {
+    title: 'Questions about this program', imageProgram: programSlug, facts: [
+      { question: 'Where are this program’s schedule, cost and entry requirements?', answer: 'Review the schedule, tuition, included materials and admission requirements on this program page. Requirements and payment arrangements are specific to the selected program.', href: pathname, link: 'Review this program' },
+      ...(applicationSlug ? [{ question: 'How do I apply for this program?', answer: 'An inquiry requests information. Admission requires the applicable application, documents and enrollment steps for this program. An inquiry alone does not reserve a place.', href: `/apply/student?program=${encodeURIComponent(applicationSlug)}`, link: 'Apply for this program' }] : []),
+      { question: 'Does completing the course award a certification?', answer: 'Course completion and an external certification or license are separate steps. Review the credentials and any examination requirements listed for this program.', href: pathname, link: 'Review program credentials' },
+    ],
+  };
+  // Unrelated pages already contain their own content. Do not append another
+  // program’s tuition, Host Shop instructions or enrollment block to them.
+  return { title: '', facts: [] };
+}
+
+export function getPublicFundingNotice(pathname: string): string | null {
+  if (!/^\/(?:programs|funding|apprenticeships)(?:\/|$)/.test(pathname)) return null;
+  const programSlug = pathname.match(/^\/programs\/([^/]+)/)?.[1];
+  const apprenticeship = pathname.startsWith('/apprenticeships') || Boolean(programSlug && (getRegisteredProgramStandard(programSlug) || programSlug.endsWith('-apprenticeship')));
+  const workforce = 'Public WIOA or Workforce Ready Grant labels are shown only for programs with verified program-level evidence; participant eligibility and written authorization remain agency decisions.';
+  return apprenticeship ? `Apprenticeship programs are self-pay unless the exact program page documents another approved payment source. ${workforce}` : workforce;
 }

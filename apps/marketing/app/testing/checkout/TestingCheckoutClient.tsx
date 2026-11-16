@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
-import { testingAppointmentLabel } from '@/lib/testing/booking-calendar';
-import { CalendarDays, Check, CreditCard, Loader2, Sparkles, Tag } from 'lucide-react';
+import TestingAppointmentPicker from '@/components/testing/TestingAppointmentPicker';
+import { Check, CreditCard, Loader2, Sparkles, Tag } from 'lucide-react';
 
 type Provider = {
   key: string;
@@ -318,41 +318,7 @@ export default function TestingCheckoutClient({
           </p>
         </div>
 
-        <div className="mt-7">
-          <label
-            htmlFor="testing-slot"
-            className="flex items-center gap-2 text-base font-bold text-slate-800"
-          >
-            <CalendarDays className="h-5 w-5" /> Appointment
-          </label>
-          <select
-            id="testing-slot"
-            value={slotId}
-            onChange={(event) => setSlotId(event.target.value)}
-            disabled={slotsLoading || slots.length === 0}
-            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base disabled:bg-slate-100"
-          >
-            <option value="">
-              {slotsLoading
-                ? 'Loading appointments…'
-                : slots.length
-                  ? 'Select an appointment'
-                  : 'No appointments currently available'}
-            </option>
-            {slots.map((slot) => (
-              <option key={slot.id} value={slot.id} disabled={slot.spotsRemaining < quantity}>
-                {testingAppointmentLabel(slot.startTime)}
-                {slot.location ? ` — ${slot.location}` : ''} ({slot.spotsRemaining} open)
-              </option>
-            ))}
-          </select>
-          {!slotsLoading && !slots.length ? (
-            <p className="mt-2 text-sm font-semibold text-amber-700">
-              No eligible appointment is published for this provider. Contact the testing center
-              before paying.
-            </p>
-          ) : null}
-        </div>
+        <TestingAppointmentPicker key={providerKey} slots={slots} quantity={quantity} value={slotId} onChange={setSlotId} loading={slotsLoading} />
 
         {provider?.addOn && quantity === 1 ? (
           <div className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5">

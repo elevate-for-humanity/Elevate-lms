@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { getPublicPageFacts } from '@/lib/marketing/public-page-facts';
+import { getPublicPageFacts, getPublicFundingNotice } from '@/lib/marketing/public-page-facts';
 
 describe('public page self-service facts', () => {
+  it('scopes funding disclosures to training and funding pages', () => {
+    expect(getPublicFundingNotice('/testing')).toBeNull();
+    expect(getPublicFundingNotice('/contact')).toBeNull();
+    expect(getPublicFundingNotice('/programs/hvac-technician')).not.toContain('Apprenticeship');
+    expect(getPublicFundingNotice('/programs/barber-apprenticeship')).toContain('self-pay');
+    expect(getPublicFundingNotice('/funding')).toContain('written authorization');
+  });
   it.each(['/apprenticeships', '/programs/barber-apprenticeship', '/programs/cosmetology-apprenticeship', '/programs/esthetician-apprenticeship', '/programs/nail-technician-apprenticeship'])('states self-pay only on %s', (route) => {
     const page = getPublicPageFacts(route);
     expect(page.facts.some((fact) => /self-pay only/i.test(fact.answer))).toBe(true);
@@ -16,9 +23,36 @@ describe('public page self-service facts', () => {
     const facts = getPublicPageFacts('/store').facts;
     expect(facts.find((fact) => /student kits/.test(fact.question))?.answer).toContain('not available to order yet');
   });
-  it('provides program and application answers on pages outside the known families', () => {
-    const facts = getPublicPageFacts('/about').facts;
-    expect(facts.length).toBeGreaterThanOrEqual(3);
-    expect(facts.some((fact) => fact.href === '/apply/student')).toBe(true);
+  it.each(['/about', '/contact', '/privacy', '/testing', '/testing/checkout', '/programs/hvac-technician', '/programs/cna'])('keeps unrelated apprenticeship and Host Shop content off %s', (route) => {
+    const facts = getPublicPageFacts(route).facts;
+    expect(JSON.stringify(facts)).not.toMatch(/apprenticeship|Host Shop|host-shops/);
+  });
+  it('does not classify a store offer by a keyword inside its product name', () => {
+    expect(getPublicPageFacts('/store/products/apprenticeship-tools').title).toBe('Before you choose a store product');
+  });
+  it('keeps testing instructions within the booking flow', () => {
+    expect(getPublicPageFacts('/testing').facts[0].href).toBe('/testing#booking');
+  });
+  it('does not append enrollment FAQs to unrelated informational pages', () => {
+    expect(getPublicPageFacts('/about').facts).toEqual([]);
+  });
+  it.each(['/programs/healthcare', '/programs/healthcare-training', '/programs/business', '/programs/not-a-program'])('does not create an application for category or unknown route %s', (route) => {
+    expect(getPublicPageFacts(route).facts).toEqual([]);
+  });
+  it.each([['/programs/healthcare/nha-patient-care-technician', 'nha-patient-care-technician'], ['/programs/healthcare-training/enchanted-hearts-cpr-instructor', null]])('preserves nested detail and validated application links for %s', (route, slug) => {
+    const facts = getPublicPageFacts(route).facts;
+    expect(facts.length).toBeGreaterThan(0);
+    expect(facts.filter((fact) => !fact.href.startsWith('/apply/')).every((fact) => fact.href === route)).toBe(true);
+    const application = facts.find((fact) => fact.href.startsWith('/apply/'));
+    if (slug) expect(application?.href).toBe(`/apply/student?program=${slug}`);
+    else expect(application).toBeUndefined();
+  });
+  it('keeps dedicated partner program facts without an unsupported application link', () => {
+    const facts = getPublicPageFacts('/programs/qma').facts;
+    expect(facts.length).toBeGreaterThan(0);
+    expect(facts.every((fact) => fact.href === '/programs/qma')).toBe(true);
+  });
+  it('keeps a program application linked to the selected program', () => {
+    expect(getPublicPageFacts('/programs/hvac-technician').facts[1].href).toBe('/apply/student?program=hvac-technician');
   });
 });

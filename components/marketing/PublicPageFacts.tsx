@@ -8,7 +8,7 @@ export default function PublicPageFacts() {
   const pathname = usePathname() || '/';
   const content = getPublicPageFacts(pathname);
   // The homepage already ends with its own illustrated enrollment CTA.
-  if (pathname === '/') return null;
+  if (pathname === '/' || content.facts.length === 0) return null;
   return (
     <section
       aria-labelledby="page-facts-heading"

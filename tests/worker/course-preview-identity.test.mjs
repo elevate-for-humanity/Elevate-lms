@@ -8,8 +8,8 @@ const source = stripTypeScriptTypes(readFileSync(new URL('../../lib/admin/course
   .replace(/^export /gm, '');
 
 function fixture({ userId = null, authError = null, handoff = null, portalActor = null,
-  role = 'admin', suspended = false, active = true, enrolled = true, enrollmentError = null } = {}) {
-  const reads = [], subjects = [];
+  role = 'admin', suspended = false, active = true, enrolled = true, enrollmentError = null, assignedCourse = null } = {}) {
+  const reads = [], subjects = [], assignments = [];
   const db = { from(table) {
     reads.push(table);
     const q = { select() { return q; }, eq() { return q; }, is() { return q; },
@@ -22,6 +22,11 @@ function fixture({ userId = null, authError = null, handoff = null, portalActor 
     cookies: async () => ({ get: () => ({ value: 'cookie' }) }),
     createClient: async () => ({ auth: { getUser: async () => ({ data: { user: userId ? { id: userId } : null }, error: authError }) } }),
     requireAdminClient: async () => db,
+    resolveApprenticeshipRuntimeContext: async (client, options) => {
+      assert.equal(client, db);
+      assignments.push(options);
+      return assignedCourse ? { enrollment: { course_id: assignedCourse } } : null;
+    },
     verifyPortalPreviewHandoff: () => handoff,
     resolvePortalPreviewSubject: async (_, authenticatedId) => {
       subjects.push(authenticatedId);
@@ -29,7 +34,7 @@ function fixture({ userId = null, authError = null, handoff = null, portalActor 
       return { userId: previewing ? 'selected-learner' : authenticatedId, previewing };
     },
   };
-  return { reads, subjects, resolve: new Function(...Object.keys(dependencies), `${source}; return resolveCoursePreview;`)(...Object.values(dependencies)) };
+  return { reads, subjects, assignments, resolve: new Function(...Object.keys(dependencies), `${source}; return resolveCoursePreview;`)(...Object.values(dependencies)) };
 }
 
 for (const userId of ['amanda', 'other-apprentice', 'student', 'host-shop', 'program-holder']) {
@@ -69,7 +74,7 @@ test('another course cannot reuse the course review token', async () => {
   assert.equal((await f.resolve('course')).active, false);
 });
 for (const options of [{ enrolled: false }, { enrollmentError: Error('unavailable') }]) {
-  test('portal preview still requires an accessible active enrollment', async () => {
+  test('portal preview denies missing enrollment without assignment or failed enrollment lookup', async () => {
     const f = fixture({ ...options, userId: 'admin', portalActor: 'admin' });
     assert.equal((await f.resolve('course')).active, false);
   });
@@ -78,4 +83,19 @@ test('valid portal preview uses the authenticated administrator identity', async
   const f = fixture({ userId: 'admin', portalActor: 'admin' });
   assert.equal((await f.resolve('course')).active, true);
   assert.deepEqual(f.subjects, ['admin']);
+});
+
+test('verified portal preview can inspect only its exact assigned draft course', async () => {
+  const f = fixture({ userId: 'admin', portalActor: 'admin', enrolled: false, assignedCourse: 'draft-course' });
+  assert.equal((await f.resolve('draft-course')).active, true);
+  assert.deepEqual(f.assignments, [{ userId: 'selected-learner', requireRegisteredStandard: false }]);
+  assert.equal((await f.resolve('unrelated-course')).active, false);
+});
+test('operational assignment cannot bypass failed enrollment lookup or ordinary learner authorization', async () => {
+  const unavailable = fixture({ userId: 'admin', portalActor: 'admin', enrolled: false, assignedCourse: 'course', enrollmentError: Error('unavailable') });
+  assert.equal((await unavailable.resolve('course')).active, false);
+  assert.deepEqual(unavailable.assignments, []);
+  const learner = fixture({ userId: 'student', portalActor: 'admin', enrolled: false, assignedCourse: 'course' });
+  assert.equal((await learner.resolve('course')).active, false);
+  assert.deepEqual(learner.assignments, []);
 });

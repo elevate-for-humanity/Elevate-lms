@@ -138,6 +138,12 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
     await persist(next, 'Section content updated.');
   }
 
+  async function updateSectionLayout(layout: string) {
+    if (!page || !selectedSection) return;
+    const nextSection = { ...selectedSection, settings: { ...selectedSection.settings, layout } };
+    await persist(replacePage({ ...page, sections: page.sections.map(section => section.id === selectedSection.id ? nextSection : section) }), 'Section layout updated.');
+  }
+
   const fieldValues = useMemo(() => {
     const c = selectedSection?.content || {};
     return {
@@ -176,7 +182,9 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
                 {selectedSection ? <div key={selectedSection.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wider text-indigo-700">Selected section</p><h3 className="font-black capitalize">{selectedSection.type.replaceAll('_', ' ')}</h3></div><div className="flex gap-1"><button type="button" disabled={busy || selectedSectionIndex <= 0} onClick={() => void moveSection(-1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section up"><ArrowUp className="h-4 w-4" /></button><button type="button" disabled={busy || selectedSectionIndex >= (page?.sections.length || 0) - 1} onClick={() => void moveSection(1)} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Move section down"><ArrowDown className="h-4 w-4" /></button><button type="button" disabled={busy} onClick={() => void removeSection()} className="rounded-lg border border-red-200 bg-white p-2 text-red-700" aria-label="Delete section"><Trash2 className="h-4 w-4" /></button></div></div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2"><QuickField label="Title" value={fieldValues.title} onSave={(value) => updateSectionField('title', value)} /><QuickField label="Text" value={fieldValues.text} onSave={(value) => updateSectionField('text', value)} multiline /><QuickField label="Image URL" value={fieldValues.image} onSave={(value) => updateSectionField('image', value)} /><QuickField label="Image alt text" value={fieldValues.imageAlt} onSave={(value) => updateSectionField(selectedSection.type === 'image' ? 'alt' : 'imageAlt', value)} /><QuickField label="Button text" value={fieldValues.buttonText} onSave={(value) => updateSectionField('buttonText', value)} /><QuickField label="Button destination" value={fieldValues.buttonHref} onSave={(value) => updateSectionField('buttonHref', value)} /></div>
                   {['hero','image','cta'].includes(selectedSection.type) ? <SectionImagePicker websiteId={websiteId} onSelect={url=>updateSectionField('image',url)} images={[...new Set((config.pages || []).flatMap(p=>p.sections.map(s=>typeof s.content.image==='string'?s.content.image:'')).filter(Boolean))].slice(0,12)} /> : null}
-                  {selectedSection.type === 'products' ? <ProductItemsEditor key={JSON.stringify(selectedSection.content.items)} items={Array.isArray(selectedSection.content.items) ? selectedSection.content.items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item)) : []} busy={busy} onSave={(items) => updateSectionField('items', items)} /> : null}
+                  {selectedSection.type === 'cta' ? <label className="mt-4 block"><span className="mb-1 block text-xs font-black text-slate-600">Call to action layout</span><select aria-label="Call to action layout" disabled={busy} value={typeof selectedSection.settings?.layout === 'string' ? selectedSection.settings.layout : ''} onChange={event => void updateSectionLayout(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="">Standard</option><option value="split">Split image and text</option><option value="choices">Guided choices</option></select></label> : null}
+                  {selectedSection.type === 'cta' && selectedSection.settings?.layout === 'choices' ? <SectionItemsEditor kind="choices" key={JSON.stringify(selectedSection.content.items)} items={Array.isArray(selectedSection.content.items) ? selectedSection.content.items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item)) : []} busy={busy} onSave={(items) => updateSectionField('items', items)} /> : null}
+                  {selectedSection.type === 'products' ? <SectionItemsEditor kind="products" key={JSON.stringify(selectedSection.content.items)} items={Array.isArray(selectedSection.content.items) ? selectedSection.content.items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object' && !Array.isArray(item)) : []} busy={busy} onSave={(items) => updateSectionField('items', items)} /> : null}
                 </div> : <div className="rounded-xl border border-dashed border-slate-300 p-6 text-sm text-slate-500">Select a section to edit it without code.</div>}
               </div>
             </div>
@@ -195,13 +203,19 @@ function QuickField({ label, value, onSave, multiline = false }: { label: string
   return <label className="block"><span className="mb-1 block text-xs font-black text-slate-600">{label}</span>{multiline ? <textarea {...common} rows={4} /> : <input {...common} />}</label>;
 }
 
-function ProductItemsEditor({ items, busy, onSave }: {
+function SectionItemsEditor({ kind, items, busy, onSave }: {
+  kind: 'products' | 'choices';
   items: Record<string, unknown>[];
   busy: boolean;
   onSave: (items: Record<string, unknown>[]) => Promise<unknown>;
 }) {
   const [draft, setDraft] = useState(() => items.map(item => ({ ...item })));
-  const fields = [
+  const choices = kind === 'choices';
+  const singular = choices ? 'choice' : 'product';
+  const nameField = choices ? 'label' : 'name';
+  const fields = choices ? [
+    ['label', 'Choice label'], ['description', 'Explanation'], ['href', 'Destination'], ['buttonText', 'Link text'],
+  ] as const : [
     ['name', 'Product name'], ['description', 'Description'], ['price', 'Displayed price'],
     ['image', 'Product image URL'], ['imageAlt', 'Image description'],
     ['href', 'Product page or checkout URL'], ['buttonText', 'Button text'],
@@ -210,10 +224,10 @@ function ProductItemsEditor({ items, busy, onSave }: {
     setDraft(current => current.map((item, i) => i === index ? { ...item, [field]: value } : item));
   }
   return <fieldset disabled={busy} className="mt-5 space-y-4">
-    <legend className="font-black">Products</legend>
-    <p className="text-sm text-slate-600">Edit the products displayed in this section. Purchase links must point to your configured checkout.</p>
+    <legend className="font-black">{choices ? 'Guided choices' : 'Products'}</legend>
+    <p className="text-sm text-slate-600">{choices ? 'Each choice shows its own explanation and link. Selecting a choice does not submit a form.' : 'Edit the products displayed in this section. Purchase links must point to your configured checkout.'}</p>
     {draft.map((item, index) => <div key={index} className="rounded-xl border border-slate-200 bg-white p-4">
-      <h4 className="mb-3 font-bold">Product {index + 1}</h4>
+      <h4 className="mb-3 font-bold">{choices ? 'Choice' : 'Product'} {index + 1}</h4>
       <div className="grid gap-3 sm:grid-cols-2">{fields.map(([field, label]) => <label key={field} className="block">
         <span className="mb-1 block text-xs font-black text-slate-600">{label}</span>
         {field === 'description'
@@ -222,8 +236,8 @@ function ProductItemsEditor({ items, busy, onSave }: {
       </label>)}</div>
     </div>)}
     <div className="flex flex-wrap gap-3">
-      <button type="button" disabled={busy || draft.length >= 60} onClick={() => setDraft(current => [...current, { name: '', description: '' }])} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">Add product</button>
-      <button type="button" disabled={busy || draft.some(item => typeof item.name !== 'string' || !item.name.trim())} onClick={() => void onSave(draft)} className="rounded-lg bg-indigo-700 px-3 py-2 text-sm font-black text-white disabled:opacity-40">Save products</button>
+      <button type="button" disabled={busy || draft.length >= (choices ? 12 : 60)} onClick={() => setDraft(current => [...current, { [nameField]: '', description: '' }])} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">Add {singular}</button>
+      <button type="button" disabled={busy || draft.some(item => typeof item[nameField] !== 'string' || !(item[nameField] as string).trim())} onClick={() => void onSave(draft)} className="rounded-lg bg-indigo-700 px-3 py-2 text-sm font-black text-white disabled:opacity-40">Save {choices ? 'choices' : 'products'}</button>
     </div>
   </fieldset>;
 }

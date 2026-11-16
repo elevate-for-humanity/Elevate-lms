@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   // Server-owned roles and exact organization membership remain mandatory.
   const admin = await requireAdminClient();
-  const { data: site, error: readError } = await admin.from('user_websites').select('id, user_id, site_name, subdomain, site_config, is_published').eq('id', websiteId).maybeSingle();
+  const { data: site, error: readError } = await admin.from('user_websites').select('id, user_id, site_name, subdomain, site_config, is_published, updated_at').eq('id', websiteId).maybeSingle();
   if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
   if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
 
@@ -90,21 +90,25 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const nextConfig = applySiteOperations(currentConfig, operations);
   const nextSiteName = safeString(generated.siteName, 120) || site.site_name || 'My Website';
-  const { error: revisionError } = await admin.from('website_revisions').insert({
+  const { data: backup, error: revisionError } = await admin.from('website_revisions').insert({
     website_id: websiteId, user_id: user.id, site_name: site.site_name,
     subdomain: site.subdomain, site_config: site.site_config,
     is_published: site.is_published, reason: 'before_paris_edit',
-  });
-  if (revisionError) return NextResponse.json({ error: 'Could not preserve the current revision. No website changes were saved.' }, { status: 503 });
+  }).select('id').single();
+  if (revisionError || !backup?.id) return NextResponse.json({ error: 'Could not preserve the current revision. No website changes were saved.', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 503 });
 
-  const { data: saved, error: saveError } = await admin.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
+  let saveQuery = admin.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId);
+  saveQuery = site.updated_at === null ? saveQuery.is('updated_at', null) : saveQuery.eq('updated_at', site.updated_at);
+  const { data: saved, error: saveError } = await saveQuery.select('id, site_name, subdomain, is_published, site_config').maybeSingle();
 
-  if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save PARIS changes', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 500 });
+  if (saveError) return NextResponse.json({ error: saveError.message || 'Could not save PARIS changes', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 500 });
+  if (!saved) return NextResponse.json({ error: 'The website changed while PARIS was working. Refresh before requesting another edit.', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 409 });
 
   return NextResponse.json({
     message: safeString(generated.message, 500) || `I completed ${operations.length} website change${operations.length === 1 ? '' : 's'}.`,
     operationsApplied: operations.length,
     website: saved,
+    backupRevisionId: backup.id,
     creditsCharged: credit.charged,
     creditsRemaining: credit.balance,
   });

@@ -19,8 +19,14 @@ test('missing website denies access',async()=>assert.equal(await canManageHosted
 const { readFile } = await import('node:fs/promises');
 const { stripTypeScriptTypes } = await import('node:module');
 const revisionRoute = await readFile(new URL('../apps/marketing/app/api/apps/website-builder/sites/[websiteId]/revisions/route.ts', import.meta.url), 'utf8');
-const routeFactory = new Function('canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess',
-  stripTypeScriptTypes(revisionRoute).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn { POST };');
+const dependencyNames = ['canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
+function compileRoute(source) {
+  return new Function('dependencies', `const { ${dependencyNames.join(', ')} } = dependencies;\n` + stripTypeScriptTypes(source).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn { POST: typeof POST === "undefined" ? null : POST, PATCH: typeof PATCH === "undefined" ? null : PATCH };');
+}
+const routeFactories = { restore: compileRoute(revisionRoute) };
+for (const [mode, suffix] of [['save', 'route.ts'], ['paris', 'paris/route.ts']]) {
+  routeFactories[mode] = compileRoute(await readFile(new URL('../apps/marketing/app/api/apps/website-builder/sites/[websiteId]/' + suffix, import.meta.url), 'utf8'));
+}
 
 function restoreFixture(options = {}) {
   const current = { id: 'site-a', user_id: 'owner', site_name: 'Current', subdomain: 'existing', site_config: { pages: [{ id: 'current' }] }, is_published: false, updated_at: options.nullTimestamp ? null : '2026-11-01T00:00:00Z' };
@@ -62,11 +68,29 @@ function restoreFixture(options = {}) {
     }
     return query;
   } };
-  const { POST } = routeFactory(async () => options.canManage !== false,
-    { json: (body, init) => Response.json(body, init) },
-    async () => ({ auth: { getUser: async () => ({ data: { user: options.signedIn === false ? null : { id: 'owner' } } }) } }),
-    async () => db, async () => ({ allowed: options.hasAccess !== false }));
-  return { state, async request(revisionId = 'revision-a') { return POST({ json: async () => ({ revisionId }) }, { params: Promise.resolve({ websiteId: 'site-a' }) }); } };
+  const mode = options.mode || 'restore';
+  const handlers = routeFactories[mode]({
+    canManageHostedWebsite: async () => options.canManage !== false,
+    NextResponse: { json: (body, init) => Response.json(body, init) },
+    createClient: async () => ({ auth: { getUser: async () => ({ data: { user: options.signedIn === false ? null : { id: 'owner' } } }) } }),
+    requireAdminClient: async () => db,
+    getWebsiteBuilderAccess: async () => ({ allowed: options.hasAccess !== false }),
+    buildDefaultSiteConfig: () => ({}), mergeSiteConfig: (base, patch) => ({ ...base, ...patch }),
+    bridgeLegacyPatchIntoComposition: value => value,
+    validateSiteConfig: () => ({ valid: true }), isReservedTenantSubdomain: () => false,
+    loadVerifiedWebsiteClaims: async () => [], hydrateProcessEnv: async () => {},
+    consumeWebsiteBuilderCredits: async () => ({ allowed: options.hasAccess !== false, charged: 1, balance: 9 }),
+    aiChat: async () => {
+      if (options.concurrentInference) Object.assign(current, { site_name: 'Newer edit', site_config: { pages: [{ id: 'newer' }] }, updated_at: '2026-11-02T00:00:00Z' });
+      return { content: JSON.stringify({ message: 'Updated', siteName: 'Saved', operations: [{ type: 'update_brand', value: { logoText: 'Saved' } }] }) };
+    },
+    ensureComposableSiteConfig: value => value,
+    applySiteOperations: value => ({ ...value, generated: true }),
+  });
+  return { state, async request(revisionId = 'revision-a') {
+    const handler = mode === 'save' ? handlers.PATCH : handlers.POST;
+    return handler({ json: async () => mode === 'restore' ? { revisionId } : mode === 'save' ? { siteName: 'Saved', siteConfig: { pages: [{ id: 'saved' }] } } : { instruction: 'Update branding' } }, { params: Promise.resolve({ websiteId: 'site-a' }) });
+  } };
 }
 
 test('restore stops before any draft update if its rollback insert fails', async () => {
@@ -132,4 +156,60 @@ for (const [name, options, expected] of [
   assert.equal((await request()).status, expected);
   assert.equal(state.backups.length, 0);
   assert.equal(state.updateAttempts, 0);
+});
+
+for (const mode of ['save', 'paris']) {
+  test(`${mode} stops before writing if backup insertion fails or returns no durable ID`, async () => {
+    for (const options of [{ backupError: true }, { missingBackup: true }]) {
+      const { state, request } = restoreFixture({ mode, ...options });
+      assert.equal((await request()).status, 503);
+      assert.equal(state.updateAttempts, 0);
+      assert.equal(state.current.site_name, 'Current');
+    }
+  });
+  test(`${mode} returns its preserved backup when saving succeeds`, async () => {
+    const { state, request } = restoreFixture({ mode });
+    const before = JSON.parse(JSON.stringify(state.current.site_config));
+    const response = await request();
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).backupRevisionId, 'backup-a');
+    assert.equal(state.current.site_name, 'Saved');
+    assert.equal(state.backups.length, 1);
+    assert.deepEqual(state.backups[0].site_config, before);
+    assert.equal(state.backups[0].reason, mode === 'paris' ? 'before_paris_edit' : 'save');
+  });
+  test(`${mode} cannot overwrite a save that occurs after its draft read`, async () => {
+    const { state, request } = restoreFixture({ mode, concurrentEdit: true });
+    assert.equal((await request()).status, 409);
+    assert.equal(state.current.site_name, 'Newer edit');
+    assert.deepEqual(state.current.site_config, { pages: [{ id: 'newer' }] });
+    assert.equal(state.backups.length, 1);
+  });
+  test(`${mode} retains rollback history if the update fails`, async () => {
+    const { state, request } = restoreFixture({ mode, updateError: true });
+    assert.equal((await request()).status, 500);
+    assert.equal(state.current.site_name, 'Current');
+    assert.equal(state.backups.length, 1);
+  });
+  test(`${mode} handles legacy null timestamps without dropping concurrency protection`, async () => {
+    assert.equal((await restoreFixture({ mode, nullTimestamp: true }).request()).status, 200);
+    const concurrent = restoreFixture({ mode, nullTimestamp: true, concurrentEdit: true });
+    assert.equal((await concurrent.request()).status, 409);
+    assert.equal(concurrent.state.current.site_name, 'Newer edit');
+  });
+  test(`${mode} denies signed-out and unassigned callers without creating revisions`, async () => {
+    for (const [options, status] of [[{ signedIn: false }, 401], [{ canManage: false }, 404]]) {
+      const { state, request } = restoreFixture({ mode, ...options });
+      assert.equal((await request()).status, status);
+      assert.equal(state.backups.length, 0);
+      assert.equal(state.updateAttempts, 0);
+    }
+  });
+}
+test('PARIS cannot overwrite manual edits made while inference was in flight', async () => {
+  const { state, request } = restoreFixture({ mode: 'paris', concurrentInference: true });
+  const response = await request();
+  assert.equal(response.status, 409);
+  assert.equal(state.current.site_name, 'Newer edit');
+  assert.equal((await response.json()).creditsCharged, 1);
 });

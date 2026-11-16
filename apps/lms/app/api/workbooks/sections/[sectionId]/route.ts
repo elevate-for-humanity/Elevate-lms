@@ -86,21 +86,44 @@ export async function POST(
       p_reviewed: body.reviewed,
       p_expected_version: body.expectedVersion,
     });
-    if (error?.code === '40001')
-      return reply(
-        {
-          error:
-            'Newer answers were saved in another tab or device. Copy your changes before reloading.',
-        },
-        409,
-      );
+    let saved = Array.isArray(data) ? data[0] : null;
+    if (error?.code === '40001') {
+      // A response can time out after the transaction commits. A retry must
+      // acknowledge identical stored work without overwriting a newer draft.
+      const existing = await db
+        .from('digital_workbook_responses')
+        .select('section_id,answers,reviewed,version,updated_at')
+        .eq('user_id', user.id)
+        .eq('section_id', sectionId)
+        .maybeSingle();
+      if (existing.error)
+        return reply(
+          { error: 'Saved answers could not be checked. Keep your browser copy and retry.' },
+          503,
+        );
+      const row = existing.data;
+      if (
+        row &&
+        row.version > body.expectedVersion &&
+        row.reviewed === body.reviewed &&
+        Object.entries(body.answers).every(([key, value]) => row.answers?.[key] === value)
+      ) {
+        saved = row;
+      } else
+        return reply(
+          {
+            error:
+              'Newer answers were saved in another tab or device. Copy your changes before reloading.',
+          },
+          409,
+        );
+    }
     if (error?.code === '42501')
       return reply({ error: 'This workbook section is not available for your account.' }, 403);
-    if (error) {
+    if (error && error.code !== '40001') {
       logger.error('Workbook save failed', error, { code: error.code });
       return reply({ error: 'Answers could not be saved. Please retry.' }, 503);
     }
-    const saved = Array.isArray(data) ? data[0] : null;
     // The RPC must return the actual stored row, not merely an accepted version.
     // Never tell a learner their writing saved when the returned database copy
     // differs from what they submitted (a common cause of missing practice work).

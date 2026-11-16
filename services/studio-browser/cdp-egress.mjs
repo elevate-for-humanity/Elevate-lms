@@ -6,10 +6,10 @@ import dns from 'node:dns/promises';
 export function isPrivateAddress(input) {
   const address=String(input).toLowerCase().replace(/^\[|\]$/g,'');
   if(net.isIPv4(address)){
-    const [a,b,c]=address.split('.').map(Number);
+    const [a,b,c,d]=address.split('.').map(Number);
     return a===0||a===10||a===127||a>=224||
       (a===100&&b>=64&&b<=127)||(a===169&&b===254)||
-      (a===172&&b>=16&&b<=31)||(a===192&&(b===168||b===0||b===2))||
+      (a===172&&b>=16&&b<=31)||(a===192&&(b===168||(b===0&&(c===2||(c===0&&d!==9&&d!==10)))))||
       (a===198&&(b===18||b===19||(b===51&&c===100)))||(a===203&&b===0&&c===113);
   }
   // Reject unspecified, mapped IPv4, local, multicast and transition ranges.
@@ -55,6 +55,7 @@ export async function createBrowserEgress({lookup=dns.lookup,request=http.reques
       upstream.on('socket',track);
       upstream.setTimeout(30_000,()=>upstream.destroy());
       upstream.once('error',()=>deny(res));
+      res.once('close',()=>{if(head||!res.writableFinished)upstream.destroy();});
       req.once('aborted',()=>upstream.destroy());
       if(head){
         upstream.once('upgrade',(response,socket,pending)=>{
@@ -71,7 +72,7 @@ export async function createBrowserEgress({lookup=dns.lookup,request=http.reques
       if(head)upstream.end();else req.pipe(upstream);
     }catch{deny(res);}
   };
-  const server=http.createServer((req,res)=>{void forward(req,res);});
+  const server=http.createServer((req,res)=>{res.on('error',()=>res.destroy());void forward(req,res);});
   server.on('connection',track);
   server.on('upgrade',(req,socket,head)=>{void forward(req,socket,head);});
   server.on('connect',(req,client,head)=>{let upstream,established=false;client.once('error',()=>upstream?.destroy());void(async()=>{
@@ -81,6 +82,7 @@ export async function createBrowserEgress({lookup=dns.lookup,request=http.reques
       upstream=track(connect({host:target.address,port:target.port}));
       upstream.setTimeout(60_000,()=>upstream.destroy());
       upstream.once('error',()=>established?client.destroy():deny(client));
+      upstream.once('close',()=>{if(!client.writableEnded)client.destroy();});
       upstream.once('connect',()=>{
         if(client.destroyed)return upstream.destroy();
         established=true;

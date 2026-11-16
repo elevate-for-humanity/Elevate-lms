@@ -12,8 +12,8 @@ async function proxyGet(proxy,url){return new Promise((resolve,reject)=>{
  });request.once('error',reject);
 });}
 test('denies private, mapped, special-use and unsupported destinations',async()=>{
- for(const address of ['127.0.0.1','10.0.0.1','169.254.169.254','100.64.0.1','0.0.0.0','224.0.0.1','::','::1','::ffff:7f00:1','fc00::1','fe80::1','2001:0000::1','2002:7f00:1::'])assert.equal(isPrivateAddress(address),true,address);
- for(const address of ['8.8.8.8','93.184.216.34','2001:4860:4860::8888'])assert.equal(isPrivateAddress(address),false,address);
+ for(const address of ['127.0.0.1','10.0.0.1','169.254.169.254','100.64.0.1','0.0.0.0','224.0.0.1','::','::1','::ffff:7f00:1','fc00::1','fe80::1','2001:0000::1','2002:7f00:1::','192.0.0.1','192.0.2.1','192.168.0.1'])assert.equal(isPrivateAddress(address),true,address);
+ for(const address of ['8.8.8.8','93.184.216.34','192.0.78.24','192.2.2.2','192.0.0.9','192.0.0.10','2001:4860:4860::8888'])assert.equal(isPrivateAddress(address),false,address);
  for(const target of ['file:///etc/passwd','ftp://public.test','http://user:secret@public.test','https://public.test:8443'])await assert.rejects(publicDestination(target,{lookup:publicLookup}));
  await assert.rejects(publicDestination('http://mixed.test',{lookup:async()=>[{address:'8.8.8.8'},{address:'127.0.0.1'}]}));
 });
@@ -87,4 +87,14 @@ test('reset upgraded sockets are contained on both sides',async t=>{
   req.once('error',()=>{clearTimeout(timeout);resolve();});req.once('upgrade',(_response,socket)=>{socket.on('error',()=>{});socket.once('close',()=>{clearTimeout(timeout);resolve();});socket.write('upgrade fixture');});req.end();
  });
  assert.equal((await proxyGet(proxy.url,'http://127.0.0.1/private')).status,403);
+});
+
+test('an upstream close without an error closes the browser CONNECT socket',async t=>{
+ const origin=net.createServer(socket=>socket.end());await new Promise(r=>origin.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>origin.close(r)));
+ const proxy=await createBrowserEgress({lookup:publicLookup,connect:options=>net.connect({...options,host:'127.0.0.1',port:origin.address().port})});t.after(()=>proxy.close());
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(Error('closed upstream left client open')),1000);const p=new URL(proxy.url);
+  const req=http.request({host:p.hostname,port:p.port,method:'CONNECT',path:'public.test:443'});
+  req.once('error',()=>{clearTimeout(timeout);resolve();});req.once('connect',(_response,socket)=>{socket.on('error',()=>{});socket.resume();socket.once('close',()=>{clearTimeout(timeout);resolve();});});req.end();
+ });
 });

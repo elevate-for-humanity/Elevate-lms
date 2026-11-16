@@ -4,6 +4,7 @@ import WorkbookNarration from '@/components/lms/WorkbookNarration';
 import { HVAC_PRACTICE_LESSONS } from '@/lib/lms/hvac-workbook-contract';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import { useTheoryTimeclock } from '@/lib/lms/useTheoryTimeclock';
 import { TheoryTimeclockPanel } from '@/components/lms/TheoryTimeclock';
@@ -41,6 +42,7 @@ export default function LessonProgressClient({
   passingScore,
   questions,
 }: Props) {
+  const router = useRouter();
   const startedAt = useRef(Date.now());
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<string>('');
@@ -81,6 +83,8 @@ export default function LessonProgressClient({
       throw new Error(data.message || data.error || 'Unable to mark lesson complete.');
     }
     setCompleted(true);
+    // Invalidate prefetched locked lesson pages after server-confirmed completion.
+    router.refresh();
     return data;
   }
 

@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
     lt: vi.fn(),
   },
   reviews: {
+    maybeSingle: vi.fn(),
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     in: vi.fn(),
@@ -51,6 +52,7 @@ beforeEach(() => {
     error: null,
   });
   mocks.sections.lt.mockResolvedValue({ data: [], error: null });
+  mocks.reviews.maybeSingle.mockResolvedValue({ data: null, error: null });
   mocks.reviews.in.mockResolvedValue({ data: [], error: null });
   mocks.getUser.mockResolvedValue({ data: { user: { id: 'current-user' } }, error: null });
 });
@@ -239,4 +241,39 @@ describe('Workbook API', () => {
     ).toBe(400);
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
+});
+
+it('acknowledges a committed save after its response was lost, without writing over newer work', async () => {
+  mocks.rpc.mockResolvedValue({ data: null, error: { code: '40001' } });
+  mocks.reviews.maybeSingle.mockResolvedValue({
+    data: { section_id: section, answers: save.answers, reviewed: false, version: 1 },
+    error: null,
+  });
+  const response = await POST(request(save), { params: Promise.resolve({ sectionId: section }) });
+  expect(response.status).toBe(200);
+  expect((await response.json()).version).toBe(1);
+  expect(mocks.reviews.eq).toHaveBeenCalledWith('user_id', 'current-user');
+  expect(mocks.rpc).toHaveBeenCalledOnce();
+});
+it('preserves genuinely different newer answers on retry', async () => {
+  mocks.rpc.mockResolvedValue({ data: null, error: { code: '40001' } });
+  mocks.reviews.maybeSingle.mockResolvedValue({
+    data: {
+      section_id: section,
+      answers: { ...save.answers, practice1: 'Newer work' },
+      reviewed: false,
+      version: 1,
+    },
+    error: null,
+  });
+  expect(
+    (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
+  ).toBe(409);
+});
+it('does not claim a retry saved when the stored copy cannot be checked', async () => {
+  mocks.rpc.mockResolvedValue({ data: null, error: { code: '40001' } });
+  mocks.reviews.maybeSingle.mockResolvedValue({ data: null, error: { message: 'offline' } });
+  expect(
+    (await POST(request(save), { params: Promise.resolve({ sectionId: section }) })).status,
+  ).toBe(503);
 });

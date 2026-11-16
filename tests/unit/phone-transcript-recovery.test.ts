@@ -1,5 +1,5 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const h=vi.hoisted(()=>({actor:null as any,notify:vi.fn(),writes:[] as string[],transcript:'',failWrite:false,foreign:false,missingExtension:false,failTable:''}));
+const h=vi.hoisted(()=>({actor:null as any,notify:vi.fn(),writes:[] as string[],transcript:'',failWrite:false,foreign:false,missingExtension:false,failTable:'',source:'voicemail'}));
 vi.mock('@/lib/phone/actor-response',()=>({phoneActorResponse:async()=>({actor:h.actor})}));
 vi.mock('@/lib/phone/recordings',()=>({loadPhoneRecording:async()=>new Response(new Uint8Array([1,2,3]))}));
 vi.mock('@/lib/phone/speech-audio',()=>({phoneSpeechChunks:async()=>[Buffer.from('wav')]}));
@@ -8,13 +8,13 @@ import {transcribePhoneMessage} from '@/lib/phone/transcript-api';
 const id='11111111-1111-4111-a111-111111111111';
 const invoke=(kind='voicemail')=>transcribePhoneMessage(new Request('https://phone.test'),{params:Promise.resolve({kind,id})});
 beforeEach(()=>{
- vi.clearAllMocks();h.notify.mockReset();h.transcript='';h.writes=[];h.failWrite=false;h.foreign=false;h.missingExtension=false;h.failTable='';
+ vi.clearAllMocks();h.notify.mockReset();h.transcript='';h.writes=[];h.failWrite=false;h.foreign=false;h.missingExtension=false;h.failTable='';h.source='voicemail';
  h.actor={previewing:false,user:{id:'owner'},system:{id:'system'},roles:['staff'],db:{from:(table:string)=>{
   let update:any;const eqs:any[]=[];
   const q:any={select:()=>q,eq:(key:string,value:any)=>{eqs.push([key,value]);return q;},update:(value:any)=>{update=value;return q;},maybeSingle:async()=>{
    if(table==='communication_extensions')return {data:{extension:'101'},error:null};
    if(table==='phone_callback_tasks'&&eqs.some(([k])=>k==='call_id'))return {data:{id:'paired-task',assigned_profile_id:h.foreign?'other':'owner',extension_id:h.missingExtension?null:'extension',callback_number:'+13175550100'},error:null};
-   return {data:{recording_url:'supabase://phone-voicemails/test.wav',call_id:'call',assigned_profile_id:'owner',extension_id:'extension',source:'voicemail',transcription:h.transcript},error:null};
+   return {data:{recording_url:'supabase://phone-voicemails/test.wav',call_id:'call',assigned_profile_id:'owner',extension_id:'extension',source:h.source,...(table==='voicemails'?{transcription:h.transcript}:{transcript:h.transcript})},error:null};
   },then:(resolve:any)=>{h.writes.push(table);if(!h.failWrite&&update?.transcription)h.transcript=update.transcription;return Promise.resolve({error:h.failWrite||table===h.failTable?{message:'failure'}:null}).then(resolve);}};return q;
  }}};
  vi.stubGlobal('fetch',vi.fn(async(url:any)=>String(url).includes('metadata.google.internal')?Response.json({access_token:'fixture'},{headers:{'Metadata-Flavor':'Google'}}):Response.json({results:[{alternatives:[{transcript:'Please call about enrollment.'}]}]})));
@@ -61,4 +61,10 @@ it('repairs a partial callback write before consuming a recovered notification c
 });
 it('does not notify an existing transcript while its paired record still fails to save',async()=>{
  h.transcript='Saved voicemail text';h.failTable='phone_callback_tasks';expect((await invoke()).status).toBe(503);expect(h.notify).not.toHaveBeenCalled();
+});
+
+it('retrieves an existing PARIS transcript without rewriting its saved summary',async()=>{
+ h.source='paris';h.transcript='Existing PARIS transcript';
+ expect((await invoke('callback')).status).toBe(200);
+ expect(h.writes).toEqual([]);expect(h.notify).not.toHaveBeenCalled();
 });

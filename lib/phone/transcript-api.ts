@@ -69,7 +69,10 @@ export async function transcribePhoneMessage(
   try {
     // A previous retry may have stored the transcript before notification
     // completed. Durable per-channel claims make this retry safe.
-    if(existing){await persistTranscript(existing,existing.slice(0,1000));await notifyRecovered(existing);return NextResponse.json({transcript:existing});}
+    if(existing){
+      if(kind==='voicemail'||row.source==='voicemail')await persistTranscript(existing,existing.slice(0,1000));
+      await notifyRecovered(existing);return NextResponse.json({transcript:existing});
+    }
     const audio = await loadPhoneRecording(row.recording_url, { db: ctx.db, callId: row.call_id });
     const chunks = await phoneSpeechChunks(Buffer.from(await audio.arrayBuffer()));
     const metadata = await fetch(

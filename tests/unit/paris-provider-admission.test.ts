@@ -49,8 +49,8 @@ it('a readiness exception or a lost queue claim never acknowledges dispatch',asy
  h.verified=true;h.claimWon=false;
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toEqual({enabled:true,dispatched:0});
 });
-it('new OpenHands work admits one fenced claim while the local model is unavailable',async()=>{
- h.candidate=null;
+it('explicit OpenHands opt-in admits one fenced claim while the local model is unavailable',async()=>{
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
  expect(h.probe).not.toHaveBeenCalled();expect(h.openhands).toHaveBeenCalledOnce();
  expect(h.updates).toHaveLength(1);
@@ -58,8 +58,8 @@ it('new OpenHands work admits one fenced claim while the local model is unavaila
  expect(h.updates[0].filters).toEqual(expect.arrayContaining([['id','pending'],['status','queued'],['attempt_count',0]]));
  expect(vi.mocked(fetch).mock.calls.some(([,options])=>(options as any)?.method==='POST')).toBe(false);
 });
-it('unconfigured OpenHands falls back to the internal engine, which still requires a ready owned model',async()=>{
- h.candidate=null;
+it('unconfigured explicitly selected OpenHands falls back to the internal engine, which still requires a ready owned model',async()=>{
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;
  for(const config of [{apiKeyResolved:false,repositoryMatches:true},
   {apiKeyResolved:true,repositoryMatches:false}]){
   h.openhands.mockResolvedValue({...config,verified:false,status:'not_configured'});
@@ -68,7 +68,7 @@ it('unconfigured OpenHands falls back to the internal engine, which still requir
  expect(h.updates).toEqual([]);expect(h.probe).toHaveBeenCalledTimes(2);
 });
 it.each(['authorization_failed','provider_request_failed','configuration_unavailable','origin_not_verified','invalid_provider_response'])('OpenHands %s does not block: a ready owned model admits one fenced claim',async status=>{
- h.candidate=null;h.verified=true;h.openhands.mockResolvedValueOnce({verified:false,status});
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;h.verified=true;h.openhands.mockResolvedValueOnce({verified:false,status});
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
  expect(h.probe).toHaveBeenCalledOnce();expect(h.updates).toHaveLength(1);
  expect(h.updates[0]).toMatchObject({values:{status:'dispatched',attempt_count:1}});
@@ -80,9 +80,20 @@ it('an accepted OpenHands checkpoint still waits for OpenHands instead of switch
  expect(h.updates).toEqual([]);expect(h.probe).not.toHaveBeenCalled();
 });
 it('a lost OpenHands admission claim is never reported as a dispatch',async()=>{
- h.candidate=null;h.claimWon=false;
+ vi.stubEnv('PARIS_REPAIR_ENGINE','openhands');h.candidate=null;h.claimWon=false;
  expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toEqual({enabled:true,dispatched:0});
  expect(h.probe).not.toHaveBeenCalled();
+});
+it('defaults new repairs to internal engine without an OpenHands dependency',async()=>{
+ h.candidate=null;h.verified=true;vi.stubEnv('PARIS_REPAIR_ENGINE','');
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatchRequired:true,repairId:'pending'});
+ expect(h.openhands).not.toHaveBeenCalled();expect(h.probe).toHaveBeenCalledOnce();
+ expect(h.updates).toHaveLength(1);
+});
+it('unconfigured default fails closed without an owned model and never contacts OpenHands',async()=>{
+ h.candidate=null;vi.stubEnv('PARIS_REPAIR_ENGINE','');
+ expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({dispatched:0,awaitingProvider:true,reason:'OWNED_MODEL_READINESS_UNVERIFIED'});
+ expect(h.openhands).not.toHaveBeenCalled();expect(h.updates).toEqual([]);
 });
 it('PARIS_REPAIR_ENGINE=internal admits new work on the owned model without contacting OpenHands',async()=>{
  h.candidate=null;h.verified=true;vi.stubEnv('PARIS_REPAIR_ENGINE','internal');

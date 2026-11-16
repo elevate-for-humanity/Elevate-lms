@@ -1,3 +1,4 @@
+import { commitWebsiteDraft } from '@/lib/apps/website-builder-draft-commit';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -67,6 +68,7 @@ function normalizeProvidedConfig(provided: unknown, fallback: TenantSiteConfig):
       : fallback.contact,
     stats: incoming.stats && typeof incoming.stats === 'object' && !Array.isArray(incoming.stats) ? { ...fallback.stats, ...incoming.stats } : fallback.stats,
     testimonial: incoming.testimonial && typeof incoming.testimonial === 'object' && !Array.isArray(incoming.testimonial) ? { quote: stringValue(incoming.testimonial.quote, '', 1200), author: stringValue(incoming.testimonial.author, '', 160) } : fallback.testimonial,
+    navigationGroups: incoming.navigationGroups,
     navigation: Array.isArray(incoming.navigation) ? incoming.navigation.slice(0, 16).map((item: any) => ({ label: stringValue(item?.label, 'Page', 60), href: stringValue(item?.href, '/', 1600) })) : fallback.navigation,
     footer: { ...fallback.footer, ...(incoming.footer && typeof incoming.footer === 'object' ? incoming.footer : {}), description: stringValue(incoming.footer?.description, fallback.footer.description, 700), contactEmail: stringValue(incoming.footer?.contactEmail, fallback.footer.contactEmail || '', 180) },
     seo: incoming.seo && typeof incoming.seo === 'object' ? { title: stringValue(incoming.seo.title, fallback.seo?.title || fallback.branding.logoText, 180), description: stringValue(incoming.seo.description, fallback.seo?.description || '', 500), keywords: Array.isArray(incoming.seo.keywords) ? incoming.seo.keywords.map((keyword: unknown) => stringValue(keyword, '', 80)).filter(Boolean).slice(0, 30) : fallback.seo?.keywords } : fallback.seo,
@@ -84,7 +86,8 @@ export async function POST(request: NextRequest) {
   if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason }, { status: 403 });
 
   const admin = await requireAdminClient();
-  const { data: ownedSites } = await admin.from('user_websites').select('id, site_config').eq('user_id', user.id).order('updated_at', { ascending: false });
+  const { data: ownedSites, error: ownedSitesError } = await admin.from('user_websites').select('id, site_config, updated_at').eq('user_id', user.id).order('updated_at', { ascending: false });
+  if (ownedSitesError) return NextResponse.json({ error: 'Could not load existing websites' }, { status: 503 });
   const body = await request.json().catch(() => ({}));
   const existingSiteId = typeof body.existingSiteId === 'string' && /^[0-9a-f-]{36}$/i.test(body.existingSiteId) ? body.existingSiteId : null;
   const existing = existingSiteId ? (ownedSites || []).find((site) => site.id === existingSiteId) : null;
@@ -106,18 +109,11 @@ export async function POST(request: NextRequest) {
       licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }),
     },
   });
-  const payload = { user_id: user.id, site_name: siteName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
-
-  if (existing && !interviewPending(existing.site_config)) {
-    const { data: current, error: currentError } = await admin.from('user_websites').select('id,user_id,site_name,subdomain,site_config,is_published').eq('id', existing.id).eq('user_id', user.id).single();
-    if (currentError || !current) return NextResponse.json({ error: 'Unable to preserve existing website revision' }, { status: 503 });
-    const { error: revisionError } = await admin.from('website_revisions').insert({ website_id: current.id, user_id: current.user_id, site_name: current.site_name, subdomain: current.subdomain, site_config: current.site_config, is_published: current.is_published, reason: 'Before importing updated website content' });
-    if (revisionError) return NextResponse.json({ error: 'Unable to create backup revision; original site unchanged' }, { status: 503 });
-  }
-  const query = reusable?.id
-    ? admin.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
-    : admin.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });
-  const { data: site, error } = await query.select('id, site_name, subdomain, is_published, updated_at').maybeSingle();
-  if (error || !site) return NextResponse.json({ error: error?.message || 'Could not create website' }, { status: 500 });
-  return NextResponse.json({ website: site }, { status: reusable?.id ? 200 : 201 });
+  const { data: committed, error, requestId } = await commitWebsiteDraft(admin, {
+    p_actor_id: user.id, p_website_id: reusable?.id || null, p_expected_updated_at: reusable?.updated_at || null,
+    p_site_name: siteName, p_template_id: config.template.id, p_site_config: config,
+    p_plan: Object.hasOwn(PLAN_SITE_LIMITS, plan) ? plan : 'starter', p_operation: 'import', p_charge_trial: false,
+  });
+  if (error || !committed?.website) return NextResponse.json({ error: 'Could not commit website draft. Refresh before trying again.', requestId }, { status: error?.code === 'P0409' ? 409 : error?.code === 'P0404' ? 404 : 503 });
+  return NextResponse.json({ website: committed.website }, { status: reusable?.id ? 200 : 201 });
 }

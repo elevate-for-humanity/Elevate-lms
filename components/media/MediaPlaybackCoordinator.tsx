@@ -3,8 +3,8 @@
 import { useEffect } from 'react';
 
 /**
- * Enforces one audible media source at a time across the public site.
- * Starting any video or audio pauses every other playing media element.
+ * Enforces one audible playback group at a time across the public site.
+ * A deliberately grouped narration and music bed may play together.
  */
 export function MediaPlaybackCoordinator() {
   useEffect(() => {
@@ -15,7 +15,9 @@ export function MediaPlaybackCoordinator() {
       // Narrated tours deliberately pair a muted video with a separate voice track.
       if ((active.muted || active.volume === 0) && !active.hasAttribute('data-narrated-tour')) return;
 
+      const group = active.closest('[data-media-playback-group]');
       document.querySelectorAll<HTMLMediaElement>('video, audio').forEach((media) => {
+        if (group && media.closest('[data-media-playback-group]') === group) return;
         if (media !== active && !media.paused && (!media.muted && media.volume > 0 || media.hasAttribute('data-narrated-tour'))) media.pause();
       });
     };

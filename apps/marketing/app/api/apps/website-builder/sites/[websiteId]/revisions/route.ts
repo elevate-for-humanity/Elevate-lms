@@ -27,7 +27,7 @@ async function authorize(websiteId: string) {
   const admin = await requireAdminClient();
   const { data: site, error } = await admin
     .from('user_websites')
-    .select('id, user_id, site_name, subdomain, site_config, is_published')
+    .select('id, user_id, site_name, subdomain, site_config, is_published, updated_at')
     .eq('id', websiteId)
     .maybeSingle();
   if (error) return { supabase, user, site: null, response: NextResponse.json({ error: error.message }, { status: 500 }) };
@@ -80,7 +80,7 @@ export async function POST(
   if (revisionError) return NextResponse.json({ error: revisionError.message }, { status: 500 });
   if (!revision) return NextResponse.json({ error: 'Revision not found' }, { status: 404 });
 
-  await auth.supabase.from('website_revisions').insert({
+  const { data: backup, error: backupError } = await auth.supabase.from('website_revisions').insert({
     website_id: websiteId,
     user_id: auth.user.id,
     site_name: auth.site.site_name,
@@ -88,9 +88,14 @@ export async function POST(
     site_config: auth.site.site_config || {},
     is_published: Boolean(auth.site.is_published),
     reason: 'before_restore',
-  });
+  }).select('id').single();
 
-  const { data: restored, error: restoreError } = await auth.supabase
+  // A restore must never discard the current draft without a durable rollback.
+  if (backupError || !backup?.id) {
+    return NextResponse.json({ error: 'Could not save the current version. Nothing was restored.' }, { status: 500 });
+  }
+
+  let restoreQuery = auth.supabase
     .from('user_websites')
     .update({
       site_name: revision.site_name,
@@ -100,16 +105,22 @@ export async function POST(
       status: revision.is_published ? 'published' : 'draft',
       updated_at: new Date().toISOString(),
     })
-    .eq('id', websiteId)
+    .eq('id', websiteId);
+  // Do not overwrite a save made while this request was preparing its backup.
+  restoreQuery = auth.site.updated_at === null
+    ? restoreQuery.is('updated_at', null)
+    : restoreQuery.eq('updated_at', auth.site.updated_at);
+  const { data: restored, error: restoreError } = await restoreQuery
     .select('id, site_name, subdomain, site_config, is_published')
     .maybeSingle();
 
-  if (restoreError || !restored) {
-    return NextResponse.json({ error: restoreError?.message || 'Could not restore revision' }, { status: 500 });
+  if (restoreError) return NextResponse.json({ error: 'Could not restore revision' }, { status: 500 });
+  if (!restored) {
+    return NextResponse.json({ error: 'The website changed. Refresh before restoring a version.' }, { status: 409 });
   }
 
   const publicUrl = restored.subdomain && restored.is_published
     ? `/sites/${restored.subdomain}`
     : null;
-  return NextResponse.json({ website: restored, publicUrl });
+  return NextResponse.json({ website: restored, publicUrl, backupRevisionId: backup.id });
 }

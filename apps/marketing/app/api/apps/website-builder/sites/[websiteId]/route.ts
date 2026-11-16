@@ -20,6 +20,7 @@ type SiteRow = {
   subdomain: string | null;
   site_config: unknown;
   is_published: boolean | null;
+  updated_at: string | null;
 };
 
 function parseSubdomain(value: unknown): { valid: boolean; value: string | null } {
@@ -33,7 +34,7 @@ function parseSubdomain(value: unknown): { valid: boolean; value: string | null 
 async function loadOwnedSite(supabase: Awaited<ReturnType<typeof requireAdminClient>>, websiteId: string, userId: string) {
   const { data: site, error } = await supabase
     .from('user_websites')
-    .select('id, user_id, site_name, subdomain, site_config, is_published')
+    .select('id, user_id, site_name, subdomain, site_config, is_published, updated_at')
     .eq('id', websiteId)
     .maybeSingle();
   if (error) return { site: null, error };
@@ -42,7 +43,7 @@ async function loadOwnedSite(supabase: Awaited<ReturnType<typeof requireAdminCli
 }
 
 async function snapshotRevision(supabase: Awaited<ReturnType<typeof requireAdminClient>>, site: SiteRow, userId: string, reason: string) {
-  await supabase.from('website_revisions').insert({
+  const { data, error } = await supabase.from('website_revisions').insert({
     website_id: site.id,
     user_id: userId,
     site_name: site.site_name,
@@ -50,7 +51,8 @@ async function snapshotRevision(supabase: Awaited<ReturnType<typeof requireAdmin
     site_config: site.site_config && typeof site.site_config === 'object' ? site.site_config : {},
     is_published: Boolean(site.is_published),
     reason,
-  }).then(() => undefined, () => undefined);
+  }).select('id').single();
+  return !error && data?.id ? data.id : null;
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ websiteId: string }> }) {
@@ -118,14 +120,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   const reason = body.publish === true ? 'publish' : body.publish === false ? 'unpublish' : 'save';
-  await snapshotRevision(admin, site, user.id, reason);
+  const backupRevisionId = await snapshotRevision(admin, site, user.id, reason);
+  if (!backupRevisionId) return NextResponse.json({ error: 'Could not preserve the current revision. No website changes were saved.' }, { status: 503 });
 
-  const { data: saved, error: saveError } = await admin.from('user_websites').update(update).eq('id', websiteId).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
-  if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save website' }, { status: 500 });
+  let saveQuery = admin.from('user_websites').update(update).eq('id', websiteId);
+  saveQuery = site.updated_at === null ? saveQuery.is('updated_at', null) : saveQuery.eq('updated_at', site.updated_at);
+  const { data: saved, error: saveError } = await saveQuery.select('id, site_name, subdomain, is_published, site_config').maybeSingle();
+  if (saveError) return NextResponse.json({ error: saveError.message || 'Could not save website' }, { status: 500 });
+  if (!saved) return NextResponse.json({ error: 'The website changed. Refresh before saving your changes.' }, { status: 409 });
 
   validation = validateSiteConfig(saved.site_config as TenantSiteConfig);
   const publicUrl = saved.subdomain && saved.is_published ? `/sites/${saved.subdomain}` : null;
-  return NextResponse.json({ website: saved, publicUrl, validation });
+  return NextResponse.json({ website: saved, publicUrl, validation, backupRevisionId });
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ websiteId: string }> }) {

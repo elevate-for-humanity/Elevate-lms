@@ -30,6 +30,7 @@ jobs:
       PLAYWRIGHT_LMS_URL: https://lms.elevateforhumanity.org
       PLAYWRIGHT_APPS: lms
       TEST_MODE: 'true'
+      QA_CROSS_SHOP_ACCEPTANCE: '1'
       QA_CROSS_SHOP_PREFIX: .qa-host-shop-cross
     steps:
       - uses: actions/checkout@v4

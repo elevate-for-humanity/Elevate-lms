@@ -2,9 +2,15 @@
 
 import { useRef } from 'react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import { introductionMediaUrl, TenantRecordedIntroduction } from './TenantRecordedIntroduction';
 
 /** Optional, visitor-controlled media; never starts sound on page load. */
-export function TenantIntroduction({ narration, musicUrl, narrator = 'warm' }: { narration: string; musicUrl?: string; narrator?: string }) {
+export function TenantIntroduction({ narration, musicUrl, narrator = 'warm', audioUrl }: { narration: string; musicUrl?: string; narrator?: string; audioUrl?: string }) {
+  const recording = introductionMediaUrl(audioUrl);
+  return recording ? <TenantRecordedIntroduction key={`${recording}:${musicUrl}:${narration}`} narration={narration} audioUrl={recording} musicUrl={introductionMediaUrl(musicUrl)} /> : <TenantSpokenIntroduction key={narration} narration={narration} musicUrl={musicUrl} narrator={narrator} />;
+}
+
+function TenantSpokenIntroduction({ narration, musicUrl, narrator }: { narration: string; musicUrl?: string; narrator: string }) {
   const voice = useNaturalVoice();
   const music = useRef<HTMLAudioElement>(null);
   const approvedMusic = musicUrl && /^\/audio\/[a-z0-9/_-]+\.(mp3|ogg|wav)$/i.test(musicUrl) ? musicUrl : undefined;

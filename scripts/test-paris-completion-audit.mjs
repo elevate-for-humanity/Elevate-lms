@@ -69,18 +69,22 @@ test('Search 401 falls back to directory discovery only after exact repository a
     await assert.rejects(rejected.searchCode('route failure'),new RegExp('repository authorization failed: '+status));
   }
 });
-test('runtime engineer and independent workflow agree: secret files protected, App auth code repairable',async()=>{
+test('runtime engineer and independent workflow protect authorization, release controls and secret files',async()=>{
   const e=engineer([]);
   const workflow=await source('.github/workflows/paris-code-repair.yml');
-  const pattern=workflow.match(/re\.search\(r'(\(\^\|\/\)\(\\\.env[^']+)',path,re\.I\)/)?.[1];
-  assert.ok(pattern,'independent workflow must retain a secret-file check');
-  for(const path of ['.env','apps/admin/.env.production','deploy/key.pem']){
+  const patterns=[...workflow.matchAll(/re\.search\(r'([^']+)',path(,re\.I)?\)/g)]
+    .map(match=>new RegExp(match[1],match[2]?'i':''));
+  assert.ok(patterns.length>=4,'independent workflow must retain control, fixed-test and secret-file checks');
+  for(const path of ['.env','apps/admin/.env.production','deploy/key.pem',
+    'lib/devstudio/github-app-token.ts','lib/devstudio/github-token.ts',
+    'lib/devstudio/workflow-github-context.ts','.github/workflows/ci.yml',
+    'tests/unit/course-builder-live-preview.test.tsx']){
     assert.equal(e.blockedPath(path),true,path);
-    assert.equal(new RegExp(pattern,'i').test(path),true,path);
+    assert.equal(patterns.some(pattern=>pattern.test(path)),true,path);
   }
-  for(const path of ['lib/devstudio/github-app-token.ts','lib/devstudio/github-token.ts','lib/devstudio/workflow-github-context.ts','components/learner/Example.tsx']){
+  for(const path of ['components/learner/Example.tsx','services/studio-browser/server.mjs']){
     assert.equal(e.blockedPath(path),false,path);
-    assert.equal(new RegExp(pattern,'i').test(path),false,path);
+    assert.equal(patterns.some(pattern=>pattern.test(path)),false,path);
   }
 });
 

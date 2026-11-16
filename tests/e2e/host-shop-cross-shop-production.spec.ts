@@ -56,8 +56,8 @@ test('separate approved Host Shop identities cannot read or mutate the other sho
     try {
       const roster=await page.goto(BASE+'/host-shop/dashboard/apprentices',{waitUntil:'domcontentloaded'});
       expect(roster?.status()).toBe(200);
-      await expect(page.locator('main')).toContainText(own.studentEmail,{timeout:20_000});
-      await expect(page.locator('main')).not.toContainText(other.studentEmail);
+      await expect(page.locator('main').last()).toContainText(own.studentEmail,{timeout:20_000});
+      await expect(page.locator('main').last()).not.toContainText(other.studentEmail);
       const list=await page.request.get(BASE+'/api/host-shop/match-requests?status=all',{failOnStatusCode:false});
       expect(list.status()).toBe(200);
       const data=await list.json();

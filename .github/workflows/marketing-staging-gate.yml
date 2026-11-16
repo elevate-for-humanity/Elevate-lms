@@ -45,6 +45,9 @@ jobs:
       - name: Verify public claim integrity
         run: node scripts/check-public-claims.mjs
 
+      - name: Verify Marketing CSS dependency scope
+        run: node --test scripts/marketing-tailwind-content.test.mjs scripts/build-marketing-css.test.mjs
+
       - name: Verify canonical hero media registry
         run: pnpm tsx scripts/verify-hero-video-registry.ts
 

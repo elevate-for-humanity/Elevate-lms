@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "node ../../scripts/check-build-memory-policy.mjs && node ../../scripts/sync-pwa-public.mjs marketing",
-    "build": "node ../../scripts/run-bounded-build.mjs -- node ../../scripts/build-next-app.mjs",
+    "build": "node ../../scripts/build-marketing-css.mjs && node ../../scripts/run-bounded-build.mjs -- node ../../scripts/build-next-app.mjs && node ../../scripts/build-marketing-css.mjs --verify",
     "prestart": "node ../../scripts/sync-pwa-public.mjs marketing",
     "start": "next start",
     "lint": "node ../../scripts/run-bounded-build.mjs -- node ../../node_modules/eslint/bin/eslint.js . --ext .js,.jsx,.ts,.tsx --quiet",

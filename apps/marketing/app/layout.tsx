@@ -7,7 +7,10 @@ import './client-polyfills';
 
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import './globals.css';
+import '@marketing-css/core.css';
+import '@marketing-css/part-1.css';
+import '@marketing-css/part-2.css';
+import '@marketing-css/part-3.css';
 import './layout.css';
 import '../../../styles/contrast-guardrails.css';
 import '../../../styles/responsive-guardrails.css';

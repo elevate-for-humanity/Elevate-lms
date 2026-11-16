@@ -15,6 +15,8 @@ on:
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
       - 'scripts/build-next-app.*'
+      - 'scripts/build-marketing-css.*'
+      - 'scripts/marketing-tailwind-content.*'
       - 'scripts/container-build-policy.mjs'
       - 'lib/**'
       - 'packages/**'

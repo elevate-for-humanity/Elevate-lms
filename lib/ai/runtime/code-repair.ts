@@ -20,8 +20,9 @@ import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-contex
 import {readRecentRepairEvents} from './repair-events';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled} from './code-repair-policy.mjs';
 
-// PARIS_REPAIR_ENGINE=internal runs new repairs without contacting OpenHands.
-const internalEngineForced=()=>(process.env.PARIS_REPAIR_ENGINE??'').trim().toLowerCase()==='internal';
+// Default new repairs to the owned internal engine; OpenHands requires an explicit opt-in.
+// Historical OpenHands checkpoints retain their original provider and approval gates.
+const internalEngineForced=()=>(process.env.PARIS_REPAIR_ENGINE??'internal').trim().toLowerCase()!=='openhands';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status

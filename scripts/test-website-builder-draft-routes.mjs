@@ -5,7 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const compile=(s,dep,returns)=>new Function('d',`const {${Object.keys(dep).join(',')}}=d;`+stripTypeScriptTypes(s).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+`;return ${returns};`)(dep);
-const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID},'commitWebsiteDraft');
+const diagnostics=[];
+const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
 const sources={generate:await read('apps/marketing/app/api/apps/website-builder/ai-generate/route.ts'),import:await read('apps/marketing/app/api/apps/website-builder/sites/route.ts')};
 const config={template:{id:'executive'},branding:{},homepage:{},footer:{},meta:{parisInterviewCompleted:true},pages:[]};
 function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allowed:true,plan:'starter'},sites=[],readError=null,rpcError=null}={}){
@@ -38,3 +39,18 @@ test('import rejects another owner target',async()=>{const f=fixture('import');a
 test('lost commit response retries exact receipt arguments once',async()=>{const calls=[];const admin={rpc:async(n,a)=>{calls.push(a);return calls.length===1?{data:null,error:{message:'lost response'}}:{data:{website:{id:'saved'}},error:null}}};const result=await commitWebsiteDraft(admin,{});assert.equal(calls.length,2);assert.deepEqual(calls[0],calls[1]);assert.equal(result.data.website.id,'saved')});
 
 test('import preserves shared grouped navigation through normalization',async()=>{const f=fixture('import');const groups=[{label:'Explore',pageIds:['home']}];await f.post(request({siteConfig:{...config,navigationGroups:groups}}));assert.deepEqual(f.calls[0].args.p_site_config.navigationGroups,groups)});
+
+test('failed commit logs one bounded diagnostic without customer payload',async()=>{
+ for(const code of ['42501','PGRST202','P0503',undefined]) {
+  diagnostics.length=0;let calls=0;
+  const result=await commitWebsiteDraft({rpc:async()=>{calls++;return {data:null,error:{code,message:'SECRET SITE CONTENT',details:'PRIVATE BACKUP'}}}}, {p_operation:'import',p_site_config:{secret:'DO NOT LOG'}});
+  assert.equal(calls,code?1:2);assert.equal(diagnostics.length,1);
+  assert.deepEqual(diagnostics[0][1],{requestId:result.requestId,operation:'import',code:code||'UNKNOWN'});
+  assert.doesNotMatch(JSON.stringify(diagnostics),/SECRET|PRIVATE|DO NOT LOG/);
+ }
+});
+test('a recovered transport response does not log a failed commit',async()=>{
+ diagnostics.length=0;let calls=0;
+ await commitWebsiteDraft({rpc:async()=>++calls===1?{data:null,error:{message:'transport'}}:{data:{website:{id:'saved'}},error:null}},{});
+ assert.equal(diagnostics.length,0);
+});

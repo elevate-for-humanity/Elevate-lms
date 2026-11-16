@@ -117,6 +117,22 @@ try {
  await db.exec(call(13,{plan:'enterprise',charge:false}));
  assert.equal(await scalar('select count(*) from user_websites'),'3');
  assert.equal(await scalar('select balance from user_app_credit_wallets'),'1');
+ // A downgrade must not make already-counted sites uneditable by import.
+ const completed=JSON.parse(await scalar("select json_agg(json_build_object('id',id,'stamp',updated_at)) from user_websites"));
+ for(let i=0;i<completed.length;i++) {
+  const replacement=JSON.parse(await db.exec(call(40+i,{id:completed[i].id,stamp:completed[i].stamp,operation:'import',charge:false})));
+  assert.ok(replacement.backupRevisionId,'downgraded existing import retains rollback');
+ }
+ assert.equal(await scalar('select count(*) from user_websites'),'3','imports add no sites');
+ assert.equal(await scalar('select balance from user_app_credit_wallets'),'1','imports never charge');
+ await scalar(`insert into user_websites(id,user_id,site_config,updated_at) values('${other}','${owner}','{"meta":{"parisInterviewCompleted":false}}',now())`);
+ const pendingStamp=await scalar(`select updated_at::text from user_websites where id='${other}'`);
+ await fails(call(45,{id:other,stamp:pendingStamp,charge:false,operation:'import'}),/plan limit/);
+ await fails(call(46,{charge:false,operation:'import'}),/plan limit/);
+ // Missing metadata in a legacy completed site must not turn it into a placeholder.
+ await scalar(`update user_websites set site_config='{}' where id='${completed[0].id}'`);
+ const legacyStamp=await scalar(`select updated_at::text from user_websites where id='${completed[0].id}'`);
+ assert.ok(JSON.parse(await db.exec(call(47,{id:completed[0].id,stamp:legacyStamp,charge:false,operation:'import'}))).backupRevisionId);
  for(const role of ['anon','authenticated']) await fails(`set role ${role};select public.commit_website_builder_draft(null,null,null,null,null,null,null,null,null,null);`,/permission denied/);
  // Two separate sessions must overlap while the owner and request locks are held.
  await scalar('delete from user_websites; update user_app_credit_wallets set balance=180;');

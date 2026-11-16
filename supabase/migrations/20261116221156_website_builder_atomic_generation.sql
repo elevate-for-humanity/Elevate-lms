@@ -47,7 +47,10 @@ begin
  select count(*) into v_count from public.user_websites where user_id=p_actor_id
   and (p_website_id is null or id<>p_website_id)
   and (site_config#>'{meta,parisInterviewCompleted}') is distinct from 'false'::jsonb;
- if v_limit is not null and v_count>=v_limit then
+ -- Replacing an already-counted site adds no entitlement usage, even after downgrade.
+ if v_limit is not null and v_count>=v_limit
+  and (p_website_id is null
+   or (v_site.site_config#>'{meta,parisInterviewCompleted}') is not distinct from 'false'::jsonb) then
   raise exception 'Website plan limit reached' using errcode='P0409';
  end if;
  if p_website_id is not null then

@@ -201,6 +201,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           ADMIN_URL: https://admin.elevateforhumanity.org
           REPAIR_ID: ${{ inputs.repair_id }}
+          PARIS_REPAIR_MAX_TURNS: ${{ vars.PARIS_REPAIR_MAX_TURNS }}
+          PARIS_REPAIR_BUDGET_MINUTES: ${{ vars.PARIS_REPAIR_BUDGET_MINUTES }}
         run: |
           python - <<'PY'
           import json,os,re,time,urllib.request,urllib.parse,urllib.error

@@ -25,6 +25,7 @@ jobs:
         env:
           FRESHNESS: ${{ inputs.freshness }}
         run: |
+          set -o pipefail
           case "$FRESHNESS" in ''|*[!0-9dhm]*) echo "Invalid freshness: $FRESHNESS"; exit 1;; esac
           FILTER='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND (textPayload:"kokoro-narration-worker" OR textPayload:"KOKORO_" OR jsonPayload.message:"kokoro-narration-worker" OR jsonPayload.message:"KOKORO_")'
           gcloud logging read "$FILTER" --project=elegant-racer-299721 --freshness="$FRESHNESS" --limit=40 \

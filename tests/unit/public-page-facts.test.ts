@@ -29,6 +29,14 @@ describe('public page self-service facts', () => {
   it('does not append enrollment FAQs to unrelated informational pages', () => {
     expect(getPublicPageFacts('/about').facts).toEqual([]);
   });
+  it.each(['/programs/healthcare', '/programs/healthcare-training', '/programs/business', '/programs/not-a-program'])('does not create an application for category or unknown route %s', (route) => {
+    expect(getPublicPageFacts(route).facts).toEqual([]);
+  });
+  it.each(['/programs/healthcare/nha-patient-care-technician', '/programs/healthcare-training/enchanted-hearts-cpr-instructor'])('preserves nested detail links without inventing an application slug for %s', (route) => {
+    const facts = getPublicPageFacts(route).facts;
+    expect(facts.length).toBeGreaterThan(0);
+    expect(facts.every((fact) => fact.href === route)).toBe(true);
+  });
   it('keeps a program application linked to the selected program', () => {
     expect(getPublicPageFacts('/programs/hvac-technician').facts[1].href).toBe('/apply/student?program=hvac-technician');
   });

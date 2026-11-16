@@ -1,3 +1,4 @@
+import { resolveSlug } from '@/lib/program-registry';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 export type PublicPageFact = { question: string; answer: string; href: string; link: string };
 export type PublicPageFacts = { title: string; imageProgram?: string; facts: PublicPageFact[] };
@@ -10,10 +11,12 @@ const apprenticeshipFacts: PublicPageFact[] = [
 ];
 
 export function getPublicPageFacts(pathname: string): PublicPageFacts {
-  const programSlug = pathname.match(/^\/programs\/([^/]+)/)?.[1];
+  const programPath = pathname.match(/^\/programs\/(?:(healthcare|healthcare-training)\/)?([^/]+)\/?$/);
+  const programSlug = programPath?.[2];
+  const applicationSlug = programSlug ? resolveSlug(programSlug) : undefined;
   const contract = programSlug ? getRegisteredProgramStandard(programSlug) : null;
   if (contract || /^\/apprenticeships(?:\/|$)/.test(pathname) || (programSlug?.endsWith('-apprenticeship') ?? false)) {
-    const facts = contract ? [...apprenticeshipFacts.slice(0, 3), { question: 'What are the completion requirements for this occupation?', answer: `${contract.standard.occupationTitle} requires ${contract.completion.competencyCount} verified occupational competencies and ${contract.completion.requiredRtiHours} hours of related technical instruction, with supervised Host Shop practice. Work hours are training evidence, not a fixed graduation denominator. Apprenticeship completion and Indiana licensing requirements are separate steps.`, href: `/programs/${programSlug}`, link: 'Review the complete occupation requirements' }] : apprenticeshipFacts;
+    const facts = contract ? [...apprenticeshipFacts.slice(0, 3), { question: 'What are the completion requirements for this occupation?', answer: `${contract.standard.occupationTitle} requires ${contract.completion.competencyCount} verified occupational competencies and ${contract.completion.requiredRtiHours} hours of related technical instruction, with supervised Host Shop practice. Work hours are training evidence, not a fixed graduation denominator. Apprenticeship completion and Indiana licensing requirements are separate steps.`, href: pathname, link: 'Review the complete occupation requirements' }] : apprenticeshipFacts;
     return { title: 'Apprenticeship facts before you apply', imageProgram: programSlug || 'barber-apprenticeship', facts };
   }
   if (/^\/(?:partners\/)?(?:host-shops?|barber-beauty-network)(?:\/|$)/.test(pathname)) return {
@@ -47,11 +50,11 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
       { question: 'What if no appointment is available?', answer: 'Contact the testing center for scheduling assistance before paying. An unavailable date cannot be booked.', href: '/contact', link: 'Contact the testing center' },
     ],
   };
-  if (programSlug) return {
+  if (programSlug && (applicationSlug || programPath?.[1])) return {
     title: 'Questions about this program', imageProgram: programSlug, facts: [
-      { question: 'Where are this program’s schedule, cost and entry requirements?', answer: 'Review the schedule, tuition, included materials and admission requirements on this program page. Requirements and payment arrangements are specific to the selected program.', href: `/programs/${programSlug}`, link: 'Review this program' },
-      { question: 'How do I apply for this program?', answer: 'An inquiry requests information. Admission requires the applicable application, documents and enrollment steps for this program. An inquiry alone does not reserve a place.', href: `/apply/student?program=${encodeURIComponent(programSlug)}`, link: 'Apply for this program' },
-      { question: 'Does completing the course award a certification?', answer: 'Course completion and an external certification or license are separate steps. Review the credentials and any examination requirements listed for this program.', href: `/programs/${programSlug}`, link: 'Review program credentials' },
+      { question: 'Where are this program’s schedule, cost and entry requirements?', answer: 'Review the schedule, tuition, included materials and admission requirements on this program page. Requirements and payment arrangements are specific to the selected program.', href: pathname, link: 'Review this program' },
+      ...(applicationSlug ? [{ question: 'How do I apply for this program?', answer: 'An inquiry requests information. Admission requires the applicable application, documents and enrollment steps for this program. An inquiry alone does not reserve a place.', href: `/apply/student?program=${encodeURIComponent(applicationSlug)}`, link: 'Apply for this program' }] : []),
+      { question: 'Does completing the course award a certification?', answer: 'Course completion and an external certification or license are separate steps. Review the credentials and any examination requirements listed for this program.', href: pathname, link: 'Review program credentials' },
     ],
   };
   // Unrelated pages already contain their own content. Do not append another

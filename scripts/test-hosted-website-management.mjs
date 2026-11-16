@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { canManageHostedWebsite } from '../lib/websites/can-manage-hosted-website.ts';
@@ -19,7 +20,7 @@ test('missing website denies access',async()=>assert.equal(await canManageHosted
 const { readFile } = await import('node:fs/promises');
 const { stripTypeScriptTypes } = await import('node:module');
 const revisionRoute = await readFile(new URL('../apps/marketing/app/api/apps/website-builder/sites/[websiteId]/revisions/route.ts', import.meta.url), 'utf8');
-const dependencyNames = ['canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
+const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
 function compileRoute(source) {
   return new Function('dependencies', `const { ${dependencyNames.join(', ')} } = dependencies;\n` + stripTypeScriptTypes(source).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn { POST: typeof POST === "undefined" ? null : POST, PATCH: typeof PATCH === "undefined" ? null : PATCH };');
 }
@@ -31,9 +32,24 @@ for (const [mode, suffix] of [['save', 'route.ts'], ['paris', 'paris/route.ts']]
 function restoreFixture(options = {}) {
   const current = { id: 'site-a', user_id: 'owner', site_name: 'Current', subdomain: 'existing', site_config: { pages: [{ id: 'current' }] }, is_published: false, updated_at: options.nullTimestamp ? null : '2026-11-01T00:00:00Z' };
   const revision = { id: 'revision-a', website_id: 'site-a', site_name: 'Saved', subdomain: 'saved', site_config: { pages: [{ id: 'saved' }] }, is_published: false };
-  const state = { current, revision, backups: [], updateAttempts: 0, reads: [] };
+  const state = { current, revision, backups: [], updateAttempts: 0, reads: [], rpcArgs: [], committed: null };
   const clone = value => JSON.parse(JSON.stringify(value));
-  const db = { from(table) {
+  const db = {
+    async rpc(name, args) {
+      assert.equal(name, 'commit_website_builder_paris_edit');
+      state.rpcArgs.push(clone(args));
+      if (state.committed) return { data: state.committed, error: null };
+      assert.equal(args.p_charge_trial, true);
+      if (options.concurrentEdit) Object.assign(current, { site_name: 'Newer edit', site_config: { pages: [{ id: 'newer' }] }, updated_at: '2026-11-02T00:00:00Z' });
+      if (current.updated_at !== args.p_expected_updated_at) return { data: null, error: { code: 'P0409' } };
+      if (options.backupError || options.missingBackup) return { data: null, error: { code: 'P0503' } };
+      if (options.updateError) return { data: null, error: { code: 'P0500' } };
+      state.backups.push({ website_id: current.id, site_config: clone(current.site_config), reason: 'before_paris_edit', id: 'backup-a' });
+      state.updateAttempts++;
+      Object.assign(current, { site_name: args.p_site_name, site_config: args.p_site_config });
+      state.committed = { website: clone(current), backupRevisionId: 'backup-a', creditsCharged: 8, creditsRemaining: 8 };
+      return options.transportErrorOnce ? { data: null, error: { message: 'Lost response' } } : { data: state.committed, error: null };
+    }, from(table) {
     const filters = [];
     let operation = 'read', values;
     const query = {
@@ -70,6 +86,7 @@ function restoreFixture(options = {}) {
   } };
   const mode = options.mode || 'restore';
   const handlers = routeFactories[mode]({
+    randomUUID,
     canManageHostedWebsite: async () => options.canManage !== false,
     NextResponse: { json: (body, init) => Response.json(body, init) },
     createClient: async () => ({ auth: { getUser: async () => ({ data: { user: options.signedIn === false ? null : { id: 'owner' } } }) } }),
@@ -79,7 +96,7 @@ function restoreFixture(options = {}) {
     bridgeLegacyPatchIntoComposition: value => value,
     validateSiteConfig: () => ({ valid: true }), isReservedTenantSubdomain: () => false,
     loadVerifiedWebsiteClaims: async () => [], hydrateProcessEnv: async () => {},
-    consumeWebsiteBuilderCredits: async () => ({ allowed: options.hasAccess !== false, charged: 1, balance: 9 }),
+    consumeWebsiteBuilderCredits: async (_db, _user, operation, options) => { assert.equal(operation, 'paris_edit'); assert.equal(options.deferDebitUntilCommit, true); return { allowed: true, charged: 0, balance: 16, isTrial: true }; },
     aiChat: async () => {
       if (options.concurrentInference) Object.assign(current, { site_name: 'Newer edit', site_config: { pages: [{ id: 'newer' }] }, updated_at: '2026-11-02T00:00:00Z' });
       return { content: JSON.stringify({ message: 'Updated', siteName: 'Saved', operations: [{ type: 'update_brand', value: { logoText: 'Saved' } }] }) };
@@ -183,13 +200,13 @@ for (const mode of ['save', 'paris']) {
     assert.equal((await request()).status, 409);
     assert.equal(state.current.site_name, 'Newer edit');
     assert.deepEqual(state.current.site_config, { pages: [{ id: 'newer' }] });
-    assert.equal(state.backups.length, 1);
+    assert.equal(state.backups.length, mode === 'paris' ? 0 : 1);
   });
-  test(`${mode} retains rollback history if the update fails`, async () => {
+  test(mode === 'paris' ? 'PARIS failure leaves the original intact and rolls back the transaction' : 'save retains rollback history if the update fails', async () => {
     const { state, request } = restoreFixture({ mode, updateError: true });
     assert.equal((await request()).status, 500);
     assert.equal(state.current.site_name, 'Current');
-    assert.equal(state.backups.length, 1);
+    assert.equal(state.backups.length, mode === 'paris' ? 0 : 1);
   });
   test(`${mode} handles legacy null timestamps without dropping concurrency protection`, async () => {
     assert.equal((await restoreFixture({ mode, nullTimestamp: true }).request()).status, 200);
@@ -211,5 +228,34 @@ test('PARIS cannot overwrite manual edits made while inference was in flight', a
   const response = await request();
   assert.equal(response.status, 409);
   assert.equal(state.current.site_name, 'Newer edit');
-  assert.equal((await response.json()).creditsCharged, 1);
+  assert.equal((await response.json()).creditsCharged, 0);
+  assert.equal(state.backups.length, 0);
+});
+
+const trialSource = await readFile(new URL('../lib/apps/website-builder-trial.ts', import.meta.url), 'utf8');
+const trialFactory = new Function('getWebsiteBuilderAccess', stripTypeScriptTypes(trialSource).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn consumeWebsiteBuilderCredits;');
+for (const [balance, allowed] of [[16,true],[8,true],[0,false]]) test(`actual trial helper preflights ${balance} credits without debiting`, async () => {
+ const calls=[];
+ const consume=trialFactory(async()=>({allowed:true,status:'trial'}));
+ const result=await consume({rpc:async(name)=>{calls.push(name);return {data:balance,error:null}}},'owner','paris_edit',{deferDebitUntilCommit:true});
+ assert.equal(result.allowed,allowed);assert.equal(result.charged,0);assert.equal(result.isTrial,true);
+ assert.deepEqual(calls,['ensure_app_trial_wallet']);
+});
+test('actual credit helper retains immediate debit for other operations',async()=>{
+ const calls=[];const consume=trialFactory(async()=>({allowed:true,status:'trial'}));
+ const result=await consume({rpc:async(name)=>{calls.push(name);return {data:name==='ensure_app_trial_wallet'?500:{success:true,balance:440},error:null}}},'owner','initial_site_generation');
+ assert.equal(result.charged,60);assert.deepEqual(calls,['ensure_app_trial_wallet','consume_app_credits']);
+});
+test('deferred credit preflight retains canonical entitlement denial',async()=>{
+ const consume=trialFactory(async()=>({allowed:false,reason:'trial_expired'}));
+ const result=await consume({rpc:()=>{throw Error('must not call')}},'owner','paris_edit',{deferDebitUntilCommit:true});
+ assert.equal(result.allowed,false);assert.equal(result.charged,0);
+});
+
+test('PARIS reconciles a lost commit response with the same idempotency key', async () => {
+ const {state,request}=restoreFixture({mode:'paris',transportErrorOnce:true});
+ const response=await request();assert.equal(response.status,200);
+ assert.equal((await response.json()).creditsCharged,8);
+ assert.equal(state.backups.length,1);assert.equal(state.updateAttempts,1);
+ assert.equal(state.rpcArgs.length,2);assert.deepEqual(state.rpcArgs[0],state.rpcArgs[1]);
 });

@@ -101,6 +101,11 @@ test('launch rejects debugging or profile overrides', async () => {
     '--remote-debugging-pipe',
     '--user-data-dir=/tmp/shared',
     '--profile-directory=Default',
+    '--no-proxy-server',
+    '--proxy-bypass-list=*',
+    '--proxy-server=http://untrusted',
+    '--host-resolver-rules=MAP * 127.0.0.1',
+    '--enable-quic',
   ]) {
     await assert.rejects(
       launchConnection({ executablePath: '/unused', args: [argument] }),
@@ -143,6 +148,10 @@ input.on('data', chunk => {
     assert.equal(browser.connection.connected, true);
     const args = browser.process.spawnargs;
     assert.ok(args.includes('--remote-debugging-pipe'));
+    assert.ok(args.some(arg=>arg.startsWith('--proxy-server=http://127.0.0.1:')));
+    assert.ok(args.includes('--proxy-bypass-list=<-loopback>'));
+    assert.ok(args.includes('--disable-quic'));
+    assert.ok(args.includes('--force-webrtc-ip-handling-policy=disable_non_proxied_udp'));
     assert.equal(
       args.some((arg) => arg.startsWith('--remote-debugging-port')),
       false,

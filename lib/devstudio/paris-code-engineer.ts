@@ -70,10 +70,13 @@ function normalizePath(value: unknown): string {
   return value.replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/{2,}/g, '/').trim();
 }
 
-/** Only paths that cannot be a source correction are forbidden: traversal,
- * git internals, build output and secret material. Mirrors repairPathForbidden. */
+/** Broad application repairs remain allowed. Authorization, validation and
+ * release controls require a separately reviewed change, never self-approval. */
 export function blockedPath(path: string): boolean {
-  return !path || path.includes('..') || path.startsWith('/') ||
+  return /^(?:apps\/admin\/app\/api\/(?:cron\/paris-code-repair|dev-studio|internal)(?:\/|$)|lib\/ai\/paid-inference[^/]*|\.github(?:\/|$)|scripts(?:\/|$)|lib\/(?:devstudio|ai\/runtime|auth|rbac|supabase|secrets)(?:\/|\.|$)|lib\/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(?:\.|$)|(?:package(?:-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)/.test(path) ||
+    /(?:^|\/)(?:tsconfig[^/]*\.json|vitest\.config\.[^/]+|eslint\.config\.[^/]+|\.npmrc|AGENTS\.md)$/.test(path) ||
+    /^(?:tests\/unit\/(?:course-builder-live-preview|course-builder-assessment-preview|paris-course-integration)\.test\.tsx?|tests\/worker\/approved-picture-timeline\.test\.mjs)$/.test(path) ||
+    !path || path.includes('..') || path.startsWith('/') ||
     path === '.git' || path.startsWith('.git/') ||
     /(?:^|\/)(?:node_modules|\.next)(?:\/|$)/.test(path) ||
     /(?:^|\/)(?:\.env(?:\.[^/]*)?|[^/]*\.(?:pem|key|p12|pfx)|id_(?:rsa|ed25519)[^/]*)$/i.test(path);

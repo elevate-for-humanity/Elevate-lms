@@ -136,11 +136,11 @@ test('diff gate requires a source correction and an added regression test on a d
     assert.throws(() => assertOpenHandsRepairDiff({...comparison, ...replacement}, blockedPath));
   }
 });
-test('only secret files and traversal are protected; PARIS may edit its own controller and existing tests', () => {
-  for (const path of ['.env', 'config/service.pem', 'scripts/gcp/../escape.mjs']) {
+test('application repairs and existing tests are allowed, while independent controls cannot self-modify', () => {
+  for (const path of ['.env', 'config/service.pem', 'scripts/gcp/../escape.mjs', 'lib/auth/access.ts', 'lib/devstudio/paris-openhands-adapter.ts', 'lib/devstudio/paris-openhands-repair.mjs', '.github/workflows/paris-code-repair.yml', 'AGENTS.md', 'scripts/gcp/validate-infrastructure-repair.mjs', 'package.json', 'pnpm-lock.yaml', 'apps/admin/tsconfig.json', 'apps/admin/app/api/cron/paris-code-repair/route.ts', 'lib/ai/paid-inference-gateway.ts', 'tests/unit/paris-course-integration.test.ts']) {
     assert.throws(() => assertOpenHandsRepairDiff({...comparison, files: [file(path, 'modified'), testFile]}, blockedPath), /PROTECTED_REPAIR_BOUNDARY/);
   }
-  for (const path of ['lib/auth/access.ts', 'lib/devstudio/paris-openhands-adapter.ts', 'lib/devstudio/paris-openhands-repair.mjs', '.github/workflows/paris-code-repair.yml', 'AGENTS.md', 'lib/payments/charge.ts', 'services/studio-browser/server.mjs']) {
+  for (const path of ['lib/payments/charge.ts', 'services/studio-browser/server.mjs', 'apps/admin/app/example/page.tsx']) {
     assert.ok(assertOpenHandsRepairDiff({...comparison, files: [file(path, 'modified'), testFile]}, blockedPath).includes(path), path);
   }
   assert.ok(assertOpenHandsRepairDiff({...comparison, files: [sourceFile, {...testFile, status: 'modified'}]}, blockedPath).includes(testFile.filename));

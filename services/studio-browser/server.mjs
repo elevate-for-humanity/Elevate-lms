@@ -1,3 +1,5 @@
+import {isPrivateAddress} from './cdp-egress.mjs';
+export {isPrivateAddress} from './cdp-egress.mjs';
 import { readBrowserSnapshot } from './cdp-snapshot.mjs';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -420,25 +422,6 @@ async function readBody(req) {
   return chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : {};
 }
 
-export function isPrivateAddress(address) {
-  if (net.isIPv4(address)) {
-    const [a, b] = address.split('.').map(Number);
-    return (
-      a === 10 ||
-      a === 127 ||
-      a === 0 ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168)
-    );
-  }
-  return (
-    address === '::1' ||
-    address.startsWith('fc') ||
-    address.startsWith('fd') ||
-    address.startsWith('fe80:')
-  );
-}
 
 function browserTarget(input) {
   let url;

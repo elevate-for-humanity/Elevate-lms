@@ -261,7 +261,6 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
-      id-token: write
     env:
       NODE_OPTIONS: --max-old-space-size=6144
       CI: 'true'
@@ -287,6 +286,8 @@ jobs:
           for line in changes:
             status,path=line.split('\t',1)
             if status not in ['A','M']: raise SystemExit('Repair must add or modify files')
+            if re.search(r'^(apps/admin/app/api/(cron/paris-code-repair|dev-studio|internal)(/|$)|lib/ai/paid-inference[^/]*|\.github(/|$)|scripts(/|$)|lib/(devstudio|ai/runtime|auth|rbac|supabase|secrets)(/|\.|$)|lib/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(\.|$)|(package(-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)',path) or re.search(r'(^|/)(tsconfig[^/]*\.json|vitest\.config\.[^/]+|eslint\.config\.[^/]+|\.npmrc|AGENTS\.md)$',path): raise SystemExit('Independent repair controls require separate review')
+            if re.search(r'^(tests/unit/(course-builder-live-preview|course-builder-assessment-preview|paris-course-integration)\.test\.tsx?|tests/worker/approved-picture-timeline\.test\.mjs)$',path): raise SystemExit('Independent repair checks require separate review')
             if '..' in path or path.startswith(('/','.git/')) or re.search(r'(^|/)(node_modules|\.next)(/|$)',path) or re.search(r'(^|/)(\.env(\.[^/]*)?|[^/]*\.(pem|key|p12|pfx)|id_(rsa|ed25519)[^/]*)$',path,re.I): raise SystemExit('Protected repair boundary')
             if path.startswith('tests/') and re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)
           if not tests: raise SystemExit('A new or updated regression test is required')

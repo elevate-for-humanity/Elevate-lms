@@ -62,6 +62,12 @@ const SPECS: Record<E2EApp, string[]> = {
   ],
 };
 
+// This production-only authenticated fixture requires two GitHub-provisioned shops.
+// Never include it in general browser suites without its isolated QA lifecycle.
+if (process.env.QA_CROSS_SHOP_ACCEPTANCE === '1') {
+  SPECS.lms.push('host-shop-cross-shop-production.spec.ts');
+}
+
 // Production acceptance specs with hard-coded production origins. They run only
 // when a workflow explicitly targets a deployed environment.
 const LIVE_ONLY_SPECS = ['public-runtime-acceptance.spec.ts'];

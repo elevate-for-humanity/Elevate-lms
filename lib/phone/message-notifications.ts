@@ -41,6 +41,23 @@ async function defaultAdminRoute(db: any, system: System) {
     : {};
 }
 
+const SMS_SCRIPT_CHARS = 480;
+
+export function phoneSmsBody(
+  input: { caller: string; urgency: string; extension?: string; callbackNumber?: string; summary?: string; transcript?: string; source?: 'voicemail' | 'paris'; adminCopy?: boolean },
+  url: string,
+) {
+  const script = (input.transcript || input.summary || '').replace(/\s+/g, ' ').trim();
+  const clipped = script.length > SMS_SCRIPT_CHARS ? `${script.slice(0, SMS_SCRIPT_CHARS - 1)}…` : script;
+  return [
+    `${input.urgency === 'urgent' ? 'URGENT ' : ''}Elevate ${input.source === 'voicemail' ? 'voicemail' : 'PARIS message'}${input.adminCopy ? ' (admin copy)' : ''}`,
+    `From: ${input.caller}${input.extension ? ` · Ext ${input.extension}` : ''}`,
+    input.callbackNumber && input.callbackNumber !== input.caller ? `Callback: ${input.callbackNumber}` : '',
+    clipped ? `${input.transcript ? 'Message' : 'Summary'}: "${clipped}"` : '',
+    `Listen/reply: ${url}`,
+  ].filter(Boolean).join('\n');
+}
+
 async function notifyRecipient(
   db: any,
   input: {
@@ -110,8 +127,7 @@ async function notifyRecipient(
   const readableDetails = detailLines.join('\n');
   if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
     deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'sms' }, async () => {
-      const result = await sendSMS(preferences.sms_phone,
-        `${input.urgency === 'urgent' ? 'URGENT: ' : ''}A new phone message is in your secure Elevate inbox. ${url}`);
+      const result = await sendSMS(preferences.sms_phone, phoneSmsBody(input, url));
       return { accepted: result.success, providerMessageId: result.messageId };
     }));
   }

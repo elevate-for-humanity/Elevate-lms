@@ -29,11 +29,24 @@ export function recoveredIncident(repair: any, events: any[]) {
     recoveredAt: recovery.created_at, verifiedRepair: false };
 }
 
+/** A completed originating job is only a source-stage observation.
+ * It never certifies publication, live traffic, or autonomous repair acceptance;
+ * it must not suppress work still needed on a running course build. */
+export function completedSourceIncident(repair: any, source: any) {
+  if (!repair.source_job_id || !['queued', 'blocked'].includes(repair.status) ||
+    repair.attempt_count !== 0 || repair.workflow_run_id != null || repair.candidate != null ||
+    !['SOURCE_DEFECT_RESOLVED', 'SOURCE_DEPENDENCY_EVIDENCE_REQUIRED',
+      'SOURCE_WORKER_COMPLETED_ACCEPTANCE_PENDING'].includes(repair.error_code)) return null;
+  if (source?.id !== repair.source_job_id || source.status !== 'completed') return null;
+  return {disposition:'source_stage_completed_publication_unverified',
+    sourceJobId:source.id,sourceStatus:source.status,verifiedRepair:false,liveVerified:false};
+}
+
 export async function reconcileRecoveredRepairs(db: any, events: any[]) {
   const rows: any[] = [];
   for (let page = 0; ; page++) {
     if (page >= 10) throw Error('PARIS_REPAIR_RECONCILIATION_SCAN_LIMIT');
-    const result = await db.from('paris_code_repairs').select('id,status,goal,fingerprint,source_job_id,updated_at,created_at,error_code,verification')
+    const result = await db.from('paris_code_repairs').select('id,status,goal,fingerprint,source_job_id,updated_at,created_at,error_code,verification,attempt_count,workflow_run_id,candidate')
       .in('status', ['queued', 'blocked']).order('created_at', { ascending: true }).order('id', { ascending: true })
       .range(page * 200, page * 200 + 199);
     if (result.error) throw result.error;
@@ -41,8 +54,37 @@ export async function reconcileRecoveredRepairs(db: any, events: any[]) {
     rows.push(...result.data);
     if (result.data.length < 200) break;
   }
+  // Read the exact source job once per ID. A status label from the repair
+  // itself is never authoritative evidence of source completion.
+  const eligible = rows.filter(repair => repair.source_job_id &&
+    repair.attempt_count === 0 && repair.workflow_run_id == null && repair.candidate == null &&
+    ['SOURCE_DEFECT_RESOLVED', 'SOURCE_DEPENDENCY_EVIDENCE_REQUIRED',
+      'SOURCE_WORKER_COMPLETED_ACCEPTANCE_PENDING'].includes(repair.error_code) &&
+    repair.verification?.sourceCompletion?.sourceJobId !== repair.source_job_id);
+  const ids = [...new Set(eligible.map(repair => repair.source_job_id))];
+  const sources = new Map<string, any>();
+  if (ids.length) {
+    const result = await db.from('ultimate_build_jobs').select('id,status').in('id', ids);
+    if (result.error) throw result.error;
+    if (!Array.isArray(result.data)) throw Error('PARIS_SOURCE_RECONCILIATION_EVIDENCE_REQUIRED');
+    for (const source of result.data) sources.set(source.id, source);
+  }
   let retired = 0;
   for (const repair of rows) {
+    const sourceEvidence = completedSourceIncident(repair, sources.get(repair.source_job_id));
+    if (sourceEvidence && repair.verification?.sourceCompletion?.sourceJobId !== repair.source_job_id) {
+      // Evidence only: do not touch status, error, attempts, candidate, history,
+      // or release SHA. Other workers can still complete/publish this course.
+      const saved = await db.from('paris_code_repairs').update({
+        verification:{...repair.verification,sourceCompletion:sourceEvidence},
+        updated_at:new Date().toISOString(),
+      }).eq('id',repair.id).eq('status',repair.status)
+        .eq('attempt_count',0).eq('updated_at',repair.updated_at)
+        .select('id').maybeSingle();
+      if (saved.error) throw saved.error;
+      if (!saved.data?.id) throw Error('PARIS_SOURCE_COMPLETION_LOST_CAS');
+      continue;
+    }
     const evidence = recoveredIncident(repair, events);
     if (!evidence || repair.verification?.reconciliation?.replay === false) continue;
     const result = await db.from('paris_code_repairs').update({status:'blocked',

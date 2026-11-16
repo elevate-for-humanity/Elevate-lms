@@ -44,8 +44,9 @@ function narrationStyleFor(section: HTMLElement) {
 }
 
 function pauseOtherAudibleMedia(except?: HTMLMediaElement) {
+  const group = except?.closest('[data-media-playback-group]');
   document.querySelectorAll<HTMLMediaElement>('audio, video').forEach((media) => {
-    if (media === except || media.paused || media.muted || media.volume === 0) return;
+    if (media === except || (group && media.closest('[data-media-playback-group]') === group) || media.paused || media.muted || media.volume === 0) return;
     media.pause();
   });
 }

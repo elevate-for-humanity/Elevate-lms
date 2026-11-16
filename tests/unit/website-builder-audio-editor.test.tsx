@@ -27,3 +27,37 @@ it('saves customer recording/transcript fields through the shared draft API and 
  expect(screen.getByLabelText('Introduction transcript')).toHaveValue('Approved transcript');
  expect(saved.pages![0].sections[0].content.image).toBe('/approved.jpg');
 });
+it('saves and reopens the introduction band placement and heading through the draft API', async () => {
+  let saved = buildDefaultSiteConfig({ organizationName: 'Subscriber band' });
+  saved.pages = [{ id: 'home', slug: '/', title: 'Home', sections: [{
+    id: 'intro', type: 'hero', settings: { imageFit: 'contain' },
+    content: { title: 'Owner headline', image: '/owner.jpg', narration: 'Approved transcript', audioUrl: '/audio/approved.mp3', musicUrl: '/audio/music.mp3' },
+  }] }];
+  vi.stubGlobal('fetch', vi.fn(async (url: string, options: RequestInit) => {
+    expect(url).toBe('/api/apps/website-builder/sites/customer');
+    expect(options.method).toBe('PATCH');
+    saved = ensureComposableSiteConfig(JSON.parse(String(options.body)).siteConfig);
+    return { ok: true, json: async () => ({ website: { site_config: saved } }) };
+  }));
+  const openSection = () => {
+    fireEvent.click(screen.getByText('Detailed page & section controls'));
+    fireEvent.click(screen.getByRole('button', { name: '1. hero' }));
+  };
+  const { unmount } = render(<ZeroCodeStructureEditor websiteId="customer" initialConfig={saved} />);
+  openSection();
+  fireEvent.change(screen.getByLabelText('Introduction placement'), { target: { value: 'before-hero' } });
+  await waitFor(() => expect(screen.getByText('Introduction placement updated.')).toBeTruthy());
+  const heading = screen.getByLabelText('Introduction heading');
+  fireEvent.change(heading, { target: { value: 'A note from the owner' } });
+  fireEvent.blur(heading);
+  await waitFor(() => expect(screen.getByText('Section content updated.')).toBeTruthy());
+  unmount();
+  render(<ZeroCodeStructureEditor websiteId="customer" initialConfig={saved} />);
+  openSection();
+  expect(screen.getByLabelText('Introduction placement')).toHaveValue('before-hero');
+  expect(screen.getByLabelText('Introduction heading')).toHaveValue('A note from the owner');
+  expect(saved.pages![0].sections[0]).toMatchObject({
+    settings: { imageFit: 'contain', introductionPlacement: 'before-hero' },
+    content: { title: 'Owner headline', image: '/owner.jpg', narration: 'Approved transcript', audioUrl: '/audio/approved.mp3', musicUrl: '/audio/music.mp3' },
+  });
+});

@@ -53,6 +53,7 @@ export async function consumeWebsiteBuilderCredits(
   supabase: SupabaseClient<any>,
   userId: string,
   operation: WebsiteBuilderCreditOperation,
+  options: { deferDebitUntilCommit?: boolean } = {},
 ): Promise<TrialCreditResult> {
   // Use the same canonical access decision as the builder pages and APIs.
   // This preserves Stripe-synchronized customer enforcement while allowing
@@ -94,6 +95,17 @@ export async function consumeWebsiteBuilderCredits(
   }
 
   const cost = WEBSITE_BUILDER_CREDIT_COSTS[operation];
+  // PARIS commits the debit and website write in one DB transaction. This is
+  // only an access/balance preflight; it never authorizes an uncharged write.
+  if (options.deferDebitUntilCommit) {
+    if (operation !== 'paris_edit') throw new Error('Deferred debit is only supported for atomic PARIS edits');
+    const balance = typeof ensured === 'number' ? ensured : null;
+    const allowed = balance !== null && balance >= cost;
+    return { allowed, charged: 0, balance, isTrial: true,
+      error: allowed ? undefined : 'Trial credits are used up. Upgrade or add credits to keep building.',
+      upgradeUrl: allowed ? undefined : '/store/apps/website-builder' };
+  }
+
   const { data: consumed, error: consumeError } = await supabase.rpc('consume_app_credits', {
     p_user_id: userId,
     p_app_slug: 'website-builder',

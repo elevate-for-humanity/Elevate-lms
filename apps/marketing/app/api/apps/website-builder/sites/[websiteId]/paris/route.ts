@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     ? body.conversation.slice(-12).map((message: any) => ({ role: message?.role === 'assistant' ? 'assistant' : 'user', content: safeString(message?.content, 1500) })).filter((message: any) => message.content)
     : [];
 
-  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'paris_edit');
+  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'paris_edit', { deferDebitUntilCommit: true });
   if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
 
   const base = buildDefaultSiteConfig({ organizationName: site.site_name || 'My Website' });
@@ -90,26 +91,34 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const nextConfig = applySiteOperations(currentConfig, operations);
   const nextSiteName = safeString(generated.siteName, 120) || site.site_name || 'My Website';
-  const { data: backup, error: revisionError } = await admin.from('website_revisions').insert({
-    website_id: websiteId, user_id: user.id, site_name: site.site_name,
-    subdomain: site.subdomain, site_config: site.site_config,
-    is_published: site.is_published, reason: 'before_paris_edit',
-  }).select('id').single();
-  if (revisionError || !backup?.id) return NextResponse.json({ error: 'Could not preserve the current revision. No website changes were saved.', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 503 });
-
-  let saveQuery = admin.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId);
-  saveQuery = site.updated_at === null ? saveQuery.is('updated_at', null) : saveQuery.eq('updated_at', site.updated_at);
-  const { data: saved, error: saveError } = await saveQuery.select('id, site_name, subdomain, is_published, site_config').maybeSingle();
-
-  if (saveError) return NextResponse.json({ error: saveError.message || 'Could not save PARIS changes', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 500 });
-  if (!saved) return NextResponse.json({ error: 'The website changed while PARIS was working. Refresh before requesting another edit.', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 409 });
+  // The service-only RPC atomically fences the version, preserves rollback,
+  // debits trial credits, saves the edit and records an idempotent receipt.
+  const commitArgs = {
+    p_request_id: randomUUID(), p_website_id: websiteId, p_actor_id: user.id,
+    p_expected_updated_at: site.updated_at, p_site_name: nextSiteName,
+    p_site_config: nextConfig, p_charge_trial: credit.isTrial,
+  };
+  let { data: committed, error: commitError } = await admin.rpc('commit_website_builder_paris_edit', commitArgs);
+  // A lost transport response may follow a committed transaction. Reuse the
+  // exact request ID once; the receipt prevents a second debit or save.
+  if (commitError && !commitError.code) {
+    ({ data: committed, error: commitError } = await admin.rpc('commit_website_builder_paris_edit', commitArgs));
+  }
+  if (commitError) {
+    const status = commitError.code === 'P0409' ? 409 : commitError.code === 'P0402' ? 402 : commitError.code === 'P0503' ? 503 : 500;
+    return NextResponse.json({ error: commitError.code === 'P0409'
+      ? 'The website changed while PARIS was working. Refresh before requesting another edit.'
+      : 'Could not commit PARIS changes. No partial database changes are applied.',
+      creditsCharged: commitError.code ? 0 : null, creditsRemaining: null, requestId: commitArgs.p_request_id }, { status });
+  }
+  if (!committed?.website || !committed.backupRevisionId) return NextResponse.json({ error: 'Could not verify the edit commit' }, { status: 503 });
 
   return NextResponse.json({
     message: safeString(generated.message, 500) || `I completed ${operations.length} website change${operations.length === 1 ? '' : 's'}.`,
     operationsApplied: operations.length,
-    website: saved,
-    backupRevisionId: backup.id,
-    creditsCharged: credit.charged,
-    creditsRemaining: credit.balance,
+    website: committed.website,
+    backupRevisionId: committed.backupRevisionId,
+    creditsCharged: committed.creditsCharged,
+    creditsRemaining: committed.creditsRemaining,
   });
 }

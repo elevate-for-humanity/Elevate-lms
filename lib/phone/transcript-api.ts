@@ -51,10 +51,32 @@ export async function transcribePhoneMessage(
       caller:task.data.callback_number||'unknown',extension:extension.data?.extension,
       urgency:'normal',source:'voicemail',transcript,summary,awaitingTranscript:false,transcriptUpdate:true},ctx.system);
   };
+  const persistTranscript=async(transcript:string,summary:string)=>{
+    const voicemail = await ctx.db
+      .from('voicemails')
+      .update({ transcription: transcript, summary })
+      .eq('call_id', row.call_id);
+    const callback = await ctx.db
+      .from('phone_callback_tasks')
+      .update({
+        transcript,
+        summary,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('call_id', row.call_id);
+    if (voicemail.error || callback.error) throw Error('Transcript storage unavailable');
+  };
   try {
     // A previous retry may have stored the transcript before notification
     // completed. Durable per-channel claims make this retry safe.
-    if(existing){await notifyRecovered(existing);return NextResponse.json({transcript:existing});}
+    if(existing){
+      // The first write may have succeeded while the paired task write failed.
+      // Reconcile both inbox records before consuming any notification claim.
+      const summary=existing.slice(0,1000);
+      if(kind==='voicemail'||row.source==='voicemail')await persistTranscript(existing,summary);
+      await notifyRecovered(existing,summary);
+      return NextResponse.json({transcript:existing});
+    }
     const audio = await loadPhoneRecording(row.recording_url, { db: ctx.db, callId: row.call_id });
     const chunks = await phoneSpeechChunks(Buffer.from(await audio.arrayBuffer()));
     const metadata = await fetch(
@@ -104,19 +126,7 @@ export async function transcribePhoneMessage(
     }
     const transcript = parts.filter(Boolean).join('\n');
     const summary=transcript.slice(0,1000)||'No speech was detected. Open the recording to listen.';
-    const voicemail = await ctx.db
-      .from('voicemails')
-      .update({ transcription: transcript, summary })
-      .eq('call_id', row.call_id);
-    const callback = await ctx.db
-      .from('phone_callback_tasks')
-      .update({
-        transcript,
-        summary,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('call_id', row.call_id);
-    if (voicemail.error || callback.error) throw Error('Transcript storage unavailable');
+    await persistTranscript(transcript,summary);
     await notifyRecovered(transcript,summary);
     if(!transcript)return NextResponse.json({error:'No speech was detected. Listen to the recording.'},{status:422});
     return NextResponse.json({ transcript });

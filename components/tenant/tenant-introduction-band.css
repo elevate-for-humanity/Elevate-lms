@@ -1,0 +1,64 @@
+/* Opt-in layout for the shared introduction, independent of a customer template. */
+.tenant-introduction-band.tenant-introduction-band {
+  padding: 20px 24px;
+  background: #faf7f0;
+  border-bottom: 1px solid #0001;
+}
+.tenant-introduction-band > div {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  gap: 16px 24px;
+  align-items: start;
+}
+.tenant-introduction-band .tenant-introduction-title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: .06em;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tenant-introduction-band .tenant-introduction {
+  display: contents;
+  margin: 0;
+  max-width: none;
+}
+.tenant-introduction-band [aria-label="Introduction audio controls"],
+.tenant-introduction-band .tenant-introduction > button {
+  grid-column: 2;
+  justify-content: flex-end;
+}
+.tenant-introduction-band .tenant-introduction button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: inherit;
+  background: transparent;
+}
+.tenant-introduction-band .tenant-introduction details {
+  grid-column: 1 / -1;
+  margin: 0;
+  min-width: 0;
+  font-size: 13px;
+}
+.tenant-introduction-band .tenant-introduction details p {
+  max-width: 75ch;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tenant-introduction-band .tenant-introduction > audio { display: none; }
+@media (max-width: 640px) {
+  .tenant-introduction-band > div { grid-template-columns: minmax(0, 1fr); }
+  .tenant-introduction-band [aria-label="Introduction audio controls"],
+  .tenant-introduction-band .tenant-introduction > button {
+    grid-column: 1;
+    justify-content: flex-start;
+  }
+  .tenant-introduction-band .tenant-introduction button {
+    max-width: 100%;
+    white-space: normal;
+  }
+}

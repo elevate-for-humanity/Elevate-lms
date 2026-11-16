@@ -4,6 +4,7 @@
 import { Component, type ErrorInfo, type MouseEvent, type ReactNode } from 'react';
 import './legacy83-premium.css';
 import './website-designs.css';
+import './tenant-introduction-band.css';
 import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
 import { TenantCommerce, TenantBagButton, TenantAddToBag } from './TenantShoppingBag';
 import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
@@ -143,7 +144,18 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
     const highlights = list(c.highlights);
     const highlightIcons = [ChartNoAxesCombined, UsersRound, Sprout];
     const imageSegment = typeof c.imageSegment === 'number' && c.imageSegment >= 0 && c.imageSegment <= 3 ? c.imageSegment : null;
+    const introduction = text(c.narration).trim() ? <TenantIntroduction narration={text(c.narration)} audioUrl={text(c.audioUrl)} musicUrl={text(c.musicUrl)} narrator={text(c.narrator) || 'warm'} /> : null;
+    const introductionAbove = section.settings?.introductionPlacement === 'before-hero';
     return (
+      <>
+        {introductionAbove && introduction ? (
+          <section className="tenant-introduction-band" aria-label={text(c.introductionTitle) || 'Listen to this page'} style={{ color: primary }}>
+            <div>
+              <p className="tenant-introduction-title">{text(c.introductionTitle) || 'Listen to this page'}</p>
+              {introduction}
+            </div>
+          </section>
+        ) : null}
       <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)} data-image-frame={imageFrame} data-mobile-order={mobileOrder} data-variant={variant} data-layout={text(section.settings?.layout) || 'split'}>
         <div className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
           <div className={centered || !image ? 'text-center' : ''}>
@@ -151,13 +163,14 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
             <Heading className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{titleLines.length ? titleLines.map((line, index) => <span className="tenant-title-line" key={index}>{index > 0 ? ' ' : ''}{highlight && line.includes(highlight) ? <>{line.slice(0, line.indexOf(highlight))}<em>{highlight}</em>{line.slice(line.indexOf(highlight) + highlight.length)}</> : line}</span>) : highlightAt >= 0 ? <><span className="tenant-title-prefix">{title.slice(0, highlightAt)}</span><span className="tenant-title-highlight">{highlight}</span>{title.slice(highlightAt + highlight.length)}</> : title}</Heading>
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
             {text(c.veteranAcknowledgement) ? <p className="tenant-veteran-note"><Flag aria-hidden="true" /><span>{text(c.veteranAcknowledgement)}</span></p> : null}
-            {text(c.narration) ? <TenantIntroduction narration={text(c.narration)} audioUrl={text(c.audioUrl)} musicUrl={text(c.musicUrl)} narrator={text(c.narrator) || 'warm'} /> : null}
+            {!introductionAbove ? introduction : null}
             {text(c.buttonText) || text(c.secondaryButtonText) ? <div className={`tenant-hero-actions mt-8 flex flex-wrap gap-4 ${centered || !image ? 'justify-center' : ''}`}>{text(c.buttonText) ? <ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink> : null}{text(c.secondaryButtonText) ? <ActionLink href={text(c.secondaryButtonHref) || '/services'} primary={secondary} basePath={basePath}>{text(c.secondaryButtonText)}</ActionLink> : null}</div> : null}
             {highlights.length ? <div className="tenant-hero-highlights">{highlights.slice(0, 3).map((item, index) => { const Icon = highlightIcons[index] || Sprout; return <div key={index}><Icon aria-hidden="true" /><strong>{text(item.title)}</strong><span>{text(item.text)}</span></div>; })}</div> : null}
           </div>
           {image ? <figure className="tenant-hero-media"><div data-image-strip={imageSegment !== null} className="tenant-hero-image-frame overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl ring-1 ring-black/5"><img src={image} alt={text(c.imageAlt) || text(c.title)} style={{ ...(imageSegment !== null ? { width: '400%', maxWidth: 'none', height: 'auto', minHeight: 0, position: 'absolute' as const, top: '50%', left: 0, transform: `translate(-${imageSegment * 25}%, -50%)` } : text(c.imageMask).startsWith('/images/legacy83/') ? { maskImage: `url("${text(c.imageMask)}")`, maskSize: '100% 100%', maskRepeat: 'no-repeat' } : {}), ...(imageSegment === null && imageFit ? { objectFit: imageFit } : {}) }} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div>{text(c.imageCaption) ? <figcaption className="mt-6 text-center text-sm">{text(c.imageCaption)}</figcaption> : null}</figure> : null}
         </div>
       </section>
+      </>
     );
   }
 

@@ -1,3 +1,4 @@
+import { resolveSiteLinkGroups } from './site-navigation';
 import type {
   TenantSiteConfig,
   TenantSitePage,
@@ -360,5 +361,9 @@ export function applySiteOperations(config: TenantSiteConfig, operations: ParisS
   }
 
   pages = sanitizePages(pages);
-  return ensureComposableSiteConfig({ ...next, branding, ...(seo ? { seo } : {}), pages });
+  const groupsForPages = (groups: unknown) => resolveSiteLinkGroups(groups, pages).map(group => ({ label: group.label, pageIds: group.links.map(page => page.id) }));
+  return ensureComposableSiteConfig({ ...next, branding, ...(seo ? { seo } : {}), pages,
+    ...(next.navigationGroups ? { navigationGroups: groupsForPages(next.navigationGroups) } : {}),
+    footer: { ...next.footer, ...(next.footer.linkGroups ? { linkGroups: groupsForPages(next.footer.linkGroups) } : {}) },
+  });
 }

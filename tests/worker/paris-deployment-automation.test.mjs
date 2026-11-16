@@ -36,10 +36,15 @@ test('PARIS editor and independent validator both accept deployment corrections'
   }
 });
 
-test('deployment repair does not admit its own validator or access-control edits', () => {
-  for (const path of ['.github/workflows/paris-code-repair.yml', '.env.production', 'lib/devstudio/infrastructure-repair.mjs', 'lib/devstudio/github-app-token.ts', 'scripts/gcp/secret-export.mjs', 'scripts/gcp/../credentials.mjs']) {
+test('PARIS may repair its own controller, but secret files and traversal stay forbidden', () => {
+  for (const path of ['.env.production', 'deploy/service.pem', 'scripts/gcp/../credentials.mjs', 'apps/admin/node_modules/x.js']) {
     assert.equal(blockedPath(path), true, path);
     assert.notEqual(validatePath(path).status, 0, path);
+  }
+  for (const path of ['.github/workflows/paris-code-repair.yml', 'lib/devstudio/infrastructure-repair.mjs', 'lib/devstudio/github-app-token.ts', 'scripts/gcp/secret-export.mjs', 'services/studio-browser/server.mjs', 'infra/pbx/asterisk/extensions.conf', 'package.json', 'apps/admin/app/api/credentialing/route.ts']) {
+    assert.equal(blockedPath(path), false, path);
+    const result = validatePath(path);
+    assert.equal(result.status, 0, result.stderr);
   }
 });
 

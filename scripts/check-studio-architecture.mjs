@@ -94,7 +94,7 @@ for (const unifiedRuntimeInvariant of [
   '/workspace/files',
   '/workspace/file',
   '/workspace/exec',
-  'allowedExecCommands',
+  'executeWorkspaceCommand',
   'workspaceRoot',
   '/workspace/terminal',
   '/workspace/repository/sync',

@@ -6,11 +6,11 @@ const checkpoint=()=>({tabs:['https://account.envato.com/sign_in'],storageState:
  {origin:'https://account.envato.com',localStorage:[]},
  {origin:'https://embedded.example',localStorage:[{name:'preference',value:'retained'}]},
 ]}});
-test('restores public embedded origins without widening top-level navigation',async()=>{
+test('restores public embedded origins and allows any public top-level navigation by default',async()=>{
  const state=checkpoint();await validateRestoredBrowserWorkspace(state,{lookup});
  assert.equal(state.storageState.origins[1].localStorage[0].value,'retained');
- state.tabs=['https://embedded.example/'];
- await assert.rejects(validateRestoredBrowserWorkspace(state,{lookup}),/invalid_target/);
+ state.tabs=['https://github.com/','https://supabase.com/','https://app.all-hands.dev/'];
+ await validateRestoredBrowserWorkspace(state,{lookup});
 });
 test('storage restoration still rejects private networks and malformed origins',async()=>{
  for(const origin of ['file:///private','https://user:secret@embedded.example','https://embedded.example/path','https://embedded.example:8443']){

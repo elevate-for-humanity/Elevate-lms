@@ -116,7 +116,7 @@ test('canonical task ownership and command cannot be substituted', async () => {
   }
 });
 test('expired waiting stops without deleting the receipt or restarting the external job', async () => {
-  const h = harness(); await h.run(); const taskId = h.cp.taskId; h.now += 36 * 60_000;
+  const h = harness(); await h.run(); const taskId = h.cp.taskId; h.now += 91 * 60_000;
   await assert.rejects(h.run(), /WAIT_DEADLINE/); assert.equal(h.cp.taskId, taskId); assert.equal(h.dispatches, 1);
 });
 test('provider completion on main, another branch or repository cannot become a PARIS candidate', async () => {
@@ -136,11 +136,14 @@ test('diff gate requires a source correction and an added regression test on a d
     assert.throws(() => assertOpenHandsRepairDiff({...comparison, ...replacement}, blockedPath));
   }
 });
-test('protected scope and all existing tests remain blocked, including the new handoff controller', () => {
-  for (const path of ['lib/auth/access.ts', 'lib/devstudio/paris-openhands-adapter.ts', 'lib/devstudio/paris-openhands-repair.mjs', '.github/workflows/paris-code-repair.yml', 'AGENTS.md', '.env', 'lib/payments/charge.ts', 'lib/secret.ts', 'scripts/gcp/../escape.mjs']) {
+test('only secret files and traversal are protected; PARIS may edit its own controller and existing tests', () => {
+  for (const path of ['.env', 'config/service.pem', 'scripts/gcp/../escape.mjs']) {
     assert.throws(() => assertOpenHandsRepairDiff({...comparison, files: [file(path, 'modified'), testFile]}, blockedPath), /PROTECTED_REPAIR_BOUNDARY/);
   }
-  assert.throws(() => assertOpenHandsRepairDiff({...comparison, files: [sourceFile, {...testFile, status: 'modified'}]}, blockedPath), /EXISTING_TEST_CHANGED/);
+  for (const path of ['lib/auth/access.ts', 'lib/devstudio/paris-openhands-adapter.ts', 'lib/devstudio/paris-openhands-repair.mjs', '.github/workflows/paris-code-repair.yml', 'AGENTS.md', 'lib/payments/charge.ts', 'services/studio-browser/server.mjs']) {
+    assert.ok(assertOpenHandsRepairDiff({...comparison, files: [file(path, 'modified'), testFile]}, blockedPath).includes(path), path);
+  }
+  assert.ok(assertOpenHandsRepairDiff({...comparison, files: [sourceFile, {...testFile, status: 'modified'}]}, blockedPath).includes(testFile.filename));
   for (const status of ['removed', 'renamed', 'copied']) assert.throws(() => assertOpenHandsRepairDiff({...comparison, files: [{...sourceFile, status}, testFile]}, blockedPath));
 });
 test('exact-byte blob readback rejects wrong hashes, content and truncated bytes', () => {

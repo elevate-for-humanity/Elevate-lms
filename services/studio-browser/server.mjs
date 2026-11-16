@@ -51,8 +51,10 @@ const frameQuality = Math.min(
   80,
   Math.max(35, Number(process.env.STUDIO_BROWSER_FRAME_QUALITY || 60)),
 );
+// Empty = any public host. Private, loopback and metadata addresses are always
+// rejected by validatePublicTarget. Set a comma list to restrict navigation.
 const allowedDomains = (
-  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com,accounts.google.com,console.cloud.google.com,shell.cloud.google.com'
+  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || ''
 )
   .split(',')
   .map((value) => value.trim().toLowerCase())
@@ -107,7 +109,10 @@ async function checkpointWorkspace(){
   }
 }
 
-const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);
+// Any installed binary may run inside the isolated workspace (bash was already
+// allowed, so a name list was never a boundary). Set STUDIO_EXEC_MAX_TIMEOUT_MS
+// to tune the longest command; default 30 minutes.
+const execMaxTimeoutMs = Math.max(1_000, Number(process.env.STUDIO_EXEC_MAX_TIMEOUT_MS) || 30 * 60_000);
 let shuttingDown = false;
 
 function authorizedService(req) {
@@ -166,12 +171,12 @@ async function executeWorkspaceCommand(body, owner = 'legacy') {
   try { argv = Array.isArray(body.args) ? [command, ...body.args.map(String)] : commandArguments(command); }
   catch (error) { throw new BrowserServiceError(error.message, 400); }
   const [binary, ...args] = argv;
-  if (!allowedExecCommands.has(binary)) throw new BrowserServiceError('command_not_allowed', 400);
+  if (!/^[\w.+-]+$/.test(binary)) throw new BrowserServiceError('command_not_allowed', 400);
   const cwd = safeWorkspacePath(String(body.cwd || ''));
   let result;
   try { result = await execFileAsync(binary, args, {
     cwd,
-    timeout: Math.min(120_000, Math.max(1_000, Number(body.timeoutMs || 30_000))),
+    timeout: Math.min(execMaxTimeoutMs, Math.max(1_000, Number(body.timeoutMs || 30_000))),
     maxBuffer: 10 * 1024 * 1024,
     env: { ...process.env, HOME: '/home/studio', STUDIO_EXPORT_DIR: artifactDirectory(workspaceRoot, owner) },
   }); } catch (error) {

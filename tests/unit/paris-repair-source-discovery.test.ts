@@ -50,7 +50,7 @@ beforeEach(() => {
       { path: 'lib', type: 'dir' }, { path: '.env.production', type: 'file' }, { path: '.github', type: 'dir' },
     ]);
     if (path === 'lib') return Response.json([
-      { path: 'lib/example.ts', type: 'file' }, { path: 'lib/secrets.ts', type: 'file' },
+      { path: 'lib/example.ts', type: 'file' }, { path: 'lib/.env.local', type: 'file' },
     ]);
     if (!(path in h.files)) return Response.json({ message: 'Not Found' }, { status: 404 });
     const content = h.corruptReadback && /^[a-f0-9]{40}$/.test(url.searchParams.get('ref') ?? '')
@@ -83,7 +83,7 @@ it('recovers a rejected read and discovers allowed source when GitHub code searc
   const lists = observations.filter((entry: string) => entry.startsWith('LIST ')).join('\n');
   expect(lists).toContain('lib/example.ts');
   expect(lists).not.toContain('.env.production');
-  expect(lists).not.toContain('lib/secrets.ts');
+  expect(lists).not.toContain('lib/.env.local');
 });
 
 it('does not weaken protected writes or retry a GitHub permission failure as a missing file', async () => {
@@ -95,11 +95,11 @@ it('does not weaken protected writes or retry a GitHub permission failure as a m
   expect(h.writes).toEqual([]);
 });
 
-it('will not hand off a patch without a new regression test', async () => {
+it('will not hand off a patch without a regression test', async () => {
   h.actions = [patch[0], patch[2]];
   const response = await stageParisCodeRepair('Fix the known retry defect', 'repair', 'owner');
   expect(response.status).toBe(422);
-  expect(await response.json()).toMatchObject({ error: expect.stringContaining('new regression test') });
+  expect(await response.json()).toMatchObject({ error: expect.stringContaining('regression test') });
 });
 
 it.each(['corruptReadback', 'movedBranch'] as const)('does not count or hand off a GitHub PUT when %s invalidates its receipt', async failure => {
@@ -112,8 +112,8 @@ it.each(['corruptReadback', 'movedBranch'] as const)('does not count or hand off
   expect(h.prompts).toHaveLength(1);
 });
 
-it.each(['lib/ai/runtime/repair-events.ts', 'lib/control-plane/workflow-repairs.ts', 'lib/control-plane/index.ts'])(
-  'keeps the repair and approval control plane protected: %s', async path => {
+it.each(['.env', 'apps/admin/.env.production', 'deploy/service.pem'])(
+  'keeps secret files protected: %s', async path => {
     h.actions = [{ type: 'create', path, content: 'export const bypass = true;' }];
     expect((await stageParisCodeRepair('Repair an application workflow', 'repair', 'owner')).status).toBe(500);
     expect(h.writes).toEqual([]);

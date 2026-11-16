@@ -69,16 +69,19 @@ test('Search 401 falls back to directory discovery only after exact repository a
     await assert.rejects(rejected.searchCode('route failure'),new RegExp('repository authorization failed: '+status));
   }
 });
-test('runtime engineer and independent workflow both protect App authentication code',async()=>{
+test('runtime engineer and independent workflow agree: secret files protected, App auth code repairable',async()=>{
   const e=engineer([]);
   const workflow=await source('.github/workflows/paris-code-repair.yml');
-  const pattern=workflow.match(/if re\.search\(r'([^']+)',path,re.I\)/)?.[1];
-  assert.ok(pattern,'independent workflow must retain a protected-path check');
-  for(const path of ['lib/devstudio/github-app-token.ts','lib/devstudio/github-token.ts','lib/devstudio/workflow-github-context.ts']){
-    assert.equal(e.blockedPath(path),true);
-    assert.equal(new RegExp(pattern,'i').test(path),true);
+  const pattern=workflow.match(/re\.search\(r'(\(\^\|\/\)\(\\\.env[^']+)',path,re\.I\)/)?.[1];
+  assert.ok(pattern,'independent workflow must retain a secret-file check');
+  for(const path of ['.env','apps/admin/.env.production','deploy/key.pem']){
+    assert.equal(e.blockedPath(path),true,path);
+    assert.equal(new RegExp(pattern,'i').test(path),true,path);
   }
-  assert.equal(e.blockedPath('components/learner/Example.tsx'),false);
+  for(const path of ['lib/devstudio/github-app-token.ts','lib/devstudio/github-token.ts','lib/devstudio/workflow-github-context.ts','components/learner/Example.tsx']){
+    assert.equal(e.blockedPath(path),false,path);
+    assert.equal(new RegExp(pattern,'i').test(path),false,path);
+  }
 });
 
 test('health checks validate App-authenticated repository reads without claiming writes are proven',async()=>{

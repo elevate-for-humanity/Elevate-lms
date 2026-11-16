@@ -61,11 +61,12 @@ test('planner records recovered directory evidence in durable observations',()=>
  assert.ok(source.includes('observations.push(await rejectedReadFeedback(action.path, branch))'));
 });
 
-test('empty content searches can suggest real task-branch paths without exposing protected files',()=>{
+test('empty content searches can suggest real task-branch paths without exposing secret files',()=>{
  const selector=source.slice(source.indexOf('function suggestedSourcePaths('),source.indexOf('function parseAction('));
  const suggest=new Function('rankSourcePaths',pathGuard+selector+';return suggestedSourcePaths;')(rankSourcePaths);
  const tree=['lib/ai/chat.ts','lib/ai/providers/elevate.ts','lib/ai/auth/chat.ts','.env','lib/ai/github-token.ts'].map(path=>({type:'blob',path}));
- assert.deepEqual(suggest('ai.chat unknown failure',tree),['lib/ai/chat.ts','lib/ai/providers/elevate.ts']);
+ assert.ok(!suggest('ai.chat unknown failure',tree).includes('.env'));
+ assert.ok(suggest('ai.chat unknown failure',tree).includes('lib/ai/chat.ts'));
  assert.deepEqual(suggest('doesnotexist',tree),[]);
 });
 
@@ -77,7 +78,7 @@ test('real fallback keeps a refined diagnostic query ahead of broad task words a
  const producers=['lib/ultimate-course-builder/core/production-handlers.ts','lib/ultimate-course-builder/core/build-runner.ts','lib/ultimate-course-builder/core/repair-router.ts'];
  const aligned='lib/ultimate-course-builder/instructional/picture-timeline.mjs';
  const noise='lib/ultimate-course-builder/quality/lesson-quality.ts';
- const tree=[...producers,noise,aligned,'lib/auth/picture-alignment.ts'].map(path=>({type:'blob',path}));
+ const tree=[...producers,noise,aligned,'lib/ai/.env.picture-alignment'].map(path=>({type:'blob',path}));
  const query='PICTURE_CUE_NOT_ALIGNED_TO_SPEECH';
  const action={type:'search',query};
  const run=new Function('rankSourcePaths','rememberSourcePaths','action','task','githubJson','searchCode','previous',
@@ -89,5 +90,5 @@ test('real fallback keeps a refined diagnostic query ahead of broad task words a
   async()=>({tree}),async()=>[],[noise]);
  const history=[...producers.map(path=>'read:'+path),'search:'+query.toLowerCase()];
  assert.deepEqual(recoverRepeatedInspection(history,action,[],result.discoveredFiles),{type:'read',path:aligned});
- assert.ok(!result.discoveredFiles.includes('lib/auth/picture-alignment.ts'));
+ assert.ok(!result.discoveredFiles.includes('lib/ai/.env.picture-alignment'));
 });

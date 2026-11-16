@@ -100,3 +100,8 @@ it('keeps existing natural voice as the default for sites without approved recor
   fireEvent.click(screen.getByRole('button',{name:'Listen to the introduction'}));
   expect(natural.play).toHaveBeenCalledWith('Existing subscriber introduction',expect.objectContaining({voice:'warm'}));
 });
+it('also suppresses the legacy natural-voice music player in read-only saved versions', () => {
+  const {container}=render(<TenantPreviewProvider websiteId="review" readOnly><TenantIntroduction narration="Transcript" musicUrl="/audio/customer/music.mp3" /></TenantPreviewProvider>);
+  expect(screen.getByRole('button',{name:'Listen to the introduction'})).toBeDisabled();
+  expect(container.querySelector('audio')).toBeNull();
+});

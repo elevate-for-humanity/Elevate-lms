@@ -2,7 +2,7 @@ import {beforeEach,expect,it,vi} from 'vitest';
 const m=vi.hoisted(()=>({push:vi.fn(),delivery:vi.fn(),pushEnabled:true}));
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/notifications/push-service',()=>({PushNotificationService:class{sendToUserWithDatabase=m.push;}}));
-vi.mock('@/lib/phone/notification-delivery',()=>({phoneEmailReady:()=>true,deliverPhoneNotification:async(db:any,id:any,send:any)=>{m.delivery(id);return (await send()).accepted?'accepted':'review_required';}}));
+vi.mock('@/lib/phone/notification-delivery',()=>({phoneNotificationKind:(input:any)=>input.source||'paris',deliverPhoneNotification:async(db:any,id:any,send:any)=>{m.delivery(id);return (await send()).accepted?'accepted':'review_required';}}));
 vi.mock('@/lib/email/sendgrid',()=>({sendEmail:vi.fn()}));
 vi.mock('@/lib/notifications/sms',()=>({sendSMS:vi.fn()}));
 import {notifyAssignee} from '@/lib/phone/message-notifications';

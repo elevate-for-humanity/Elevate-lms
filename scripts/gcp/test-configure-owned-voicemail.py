@@ -19,8 +19,10 @@ class Registration(unittest.TestCase):
    with self.assertRaises(ValueError):v.operator_route(system,bad)
   for bad in [{**system,'tenant_id':'customer'},{**system,'admin_extension':'104'}]:
    with self.assertRaises(ValueError):v.operator_route(bad,owner)
-  for mode in ['offline','do_not_disturb']:
-   self.assertEqual(v.operator_route(system,{**owner,'ring_mode':mode}),v.OPERATOR)
+  self.assertEqual(v.operator_route(system,{**owner,'ring_mode':'do_not_disturb'}),v.OPERATOR)
+  offline=v.operator_route(system,{**owner,'ring_mode':'offline'})
+  self.assertIn('Dial(PJSIP/+13179562748@twilio,25,U(elevate-owner-accept))',offline)
+  self.assertLess(offline.index('Dial(PJSIP/'),offline.index('VoiceMail(0@elevate,u)'))
   self.assertEqual(v.operator_route(system,{**owner,'admin_external_fallback':False}),v.OPERATOR)
  def test_module_running_and_mailbox_definitions_do_not_prove_application_registration(self):
   self.assertFalse(v.application_registered('app_voicemail.so Comedian Mail 0 Not Running'))

@@ -1,6 +1,6 @@
 import 'server-only';
 import {sendEmail} from '@/lib/email/sendgrid';
-import {deliverPhoneNotification,phoneEmailReady} from '@/lib/phone/notification-delivery';
+import {deliverPhoneNotification,phoneNotificationKind} from '@/lib/phone/notification-delivery';
 import {PushNotificationService} from '@/lib/notifications/push-service';
 import {sendSMS} from '@/lib/notifications/sms';
 type System={id:string;admin_extension?:string|null};
@@ -41,6 +41,23 @@ async function defaultAdminRoute(db: any, system: System) {
     : {};
 }
 
+const SMS_SCRIPT_CHARS = 480;
+
+export function phoneSmsBody(
+  input: { caller: string; urgency: string; extension?: string; callbackNumber?: string; summary?: string; transcript?: string; source?: 'voicemail' | 'paris'; adminCopy?: boolean },
+  url: string,
+) {
+  const script = (input.transcript || input.summary || '').replace(/\s+/g, ' ').trim();
+  const clipped = script.length > SMS_SCRIPT_CHARS ? `${script.slice(0, SMS_SCRIPT_CHARS - 1)}…` : script;
+  return [
+    `${input.urgency === 'urgent' ? 'URGENT ' : ''}Elevate ${input.source === 'voicemail' ? 'voicemail' : 'PARIS message'}${input.adminCopy ? ' (admin copy)' : ''}`,
+    `From: ${input.caller}${input.extension ? ` · Ext ${input.extension}` : ''}`,
+    input.callbackNumber && input.callbackNumber !== input.caller ? `Callback: ${input.callbackNumber}` : '',
+    clipped ? `${input.transcript ? 'Message' : 'Summary'}: "${clipped}"` : '',
+    `Listen/reply: ${url}`,
+  ].filter(Boolean).join('\n');
+}
+
 async function notifyRecipient(
   db: any,
   input: {
@@ -59,6 +76,7 @@ async function notifyRecipient(
     source?: 'voicemail' | 'paris';
     responsibleHolder?: string;
     awaitingTranscript?: boolean;
+    transcriptUpdate?: boolean;
   },
 ) {
   const url = input.adminCopy
@@ -67,9 +85,11 @@ async function notifyRecipient(
   const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
   const inboxLabel = input.source === 'voicemail' ? 'Voicemail inbox' : 'PARIS phone inbox';
   if (!input.profileId || !input.taskId) return;
-  const identity = { taskId: input.taskId, profileId: input.profileId, kind: input.source || 'paris' as const };
+  const identity = { taskId: input.taskId, profileId: input.profileId, kind: phoneNotificationKind(input) };
   const deliveries: Array<Promise<unknown>> = [];
-  const sendPush = () => deliverPhoneNotification(db, { ...identity, channel: 'push' }, async () => {
+  // Push always announces the same recording, including ingestion retries.
+  // Only SMS/email need separate recording-only and transcript identities.
+  const sendPush = () => deliverPhoneNotification(db, { ...identity, kind: input.source || 'paris', channel: 'push' }, async () => {
     const acceptedDeviceCount = await push.sendToUserWithDatabase(db, input.profileId!, {
     title: `Elevate for Humanity · ${input.urgency === 'urgent' ? 'Urgent ' : ''}${input.source === 'voicemail' ? 'voicemail' : 'PARIS message'}${input.adminCopy ? ' · Admin copy' : ''}`,
     body: `${inboxLabel}${input.extension ? ` · Extension ${input.extension}` : ''}: ${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
@@ -92,7 +112,7 @@ async function notifyRecipient(
   if (profileResult.error || preferencesResult.error) throw new Error('Phone notification preferences unavailable');
   const profile = profileResult.data;
   const preferences = preferencesResult.data;
-  if (preferences?.push_enabled !== false) deliveries.push(sendPush());
+  if (preferences?.push_enabled !== false && !input.transcriptUpdate) deliveries.push(sendPush());
   const detailLines = [
     input.adminCopy ? 'Admin oversight copy — callback responsibility remains with the assigned holder.' : '',
     input.source === 'voicemail' ? 'A voicemail was left. Open the secure inbox to listen.' : '',
@@ -108,14 +128,14 @@ async function notifyRecipient(
     input.transcript ? `Transcript: ${input.transcript}` : '',
   ].filter(Boolean);
   const readableDetails = detailLines.join('\n');
+  // A recording-only alert and its later transcript use distinct durable kinds.
   if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
     deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'sms' }, async () => {
-      const result = await sendSMS(preferences.sms_phone,
-        `${input.urgency === 'urgent' ? 'URGENT: ' : ''}A new phone message is in your secure Elevate inbox. ${url}`);
+      const result = await sendSMS(preferences.sms_phone, phoneSmsBody(input, url));
       return { accepted: result.success, providerMessageId: result.messageId };
     }));
   }
-  if (profile?.email && preferences?.email_missed_calls !== false && phoneEmailReady(input)) {
+  if (profile?.email && preferences?.email_missed_calls !== false) {
     deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'email' }, async () => {
       const result = await sendEmail({
         from: 'Elevate Phone <noreply@elevateforhumanity.org>', to: profile.email,

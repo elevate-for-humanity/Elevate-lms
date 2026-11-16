@@ -33,7 +33,7 @@ describe('owned voicemail boundary',()=>{
   const {writes,upload}=database();expect((await POST(request())).status).toBe(200);
   expect(upload).toHaveBeenCalledWith(id+'.wav',expect.any(Buffer),expect.objectContaining({contentType:'audio/wav'}));
   expect(writes.find(x=>x.table==='voicemails').value).toMatchObject({assigned_profile_id:'recipient',transcription:'Please return my call.',recording_url:'supabase://phone-voicemails/'+id+'.wav'});
-  expect(mock.notice).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({profileId:'recipient',source:'voicemail',transcript:'Please return my call.'}),expect.anything());
+  expect(mock.notice).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({profileId:'recipient',source:'voicemail',extension:'101',transcript:'Please return my call.'}),expect.anything());
  });
  it('does not send a notice after a lost voicemail write',async()=>{
   database(undefined,'voicemails');expect((await POST(request())).status).toBe(503);expect(mock.notice).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe('non-delivering voicemail acceptance',()=>{
    expect(log).toHaveBeenCalledWith('phone_voicemail_transcription_deferred',{reason:'speech_http_403'});
    expect(upload).toHaveBeenCalled();
    expect(writes.find((write:any)=>write.table==='voicemails')?.value).toMatchObject({transcription:null});
-   expect(mock.notice).toHaveBeenCalled();
+   expect(mock.notice).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({awaitingTranscript:true,extension:'101',summary:expect.stringContaining('temporarily unavailable')}),expect.anything());
    expect(JSON.stringify(log.mock.calls)).not.toContain('private provider details');
   }finally{log.mockRestore();}
  });

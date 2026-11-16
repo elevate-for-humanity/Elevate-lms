@@ -31,6 +31,21 @@ export async function transcribePhoneMessage(
   if (error || !row?.recording_url || !row.call_id)
     return NextResponse.json({ error: 'Recording unavailable.' }, { status: 404 });
   const existing = 'transcription' in row ? row.transcription : row.transcript;
+  const persistTranscript=async(transcript:string,summary:string)=>{
+    const voicemail = await ctx.db
+      .from('voicemails')
+      .update({ transcription: transcript, summary })
+      .eq('call_id', row.call_id);
+    const callback = await ctx.db
+      .from('phone_callback_tasks')
+      .update({
+        transcript,
+        summary,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('call_id', row.call_id);
+    if (voicemail.error || callback.error) throw Error('Transcript storage unavailable');
+  };
   const notifyRecovered=async(transcript:string,summary?:string)=>{
     if(kind!=='voicemail'&&row.source!=='voicemail')return;
     // Resolve the canonical paired task: its ID owns delivery claims even
@@ -51,32 +66,10 @@ export async function transcribePhoneMessage(
       caller:task.data.callback_number||'unknown',extension:extension.data?.extension,
       urgency:'normal',source:'voicemail',transcript,summary,awaitingTranscript:false,transcriptUpdate:true},ctx.system);
   };
-  const persistTranscript=async(transcript:string,summary:string)=>{
-    const voicemail = await ctx.db
-      .from('voicemails')
-      .update({ transcription: transcript, summary })
-      .eq('call_id', row.call_id);
-    const callback = await ctx.db
-      .from('phone_callback_tasks')
-      .update({
-        transcript,
-        summary,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('call_id', row.call_id);
-    if (voicemail.error || callback.error) throw Error('Transcript storage unavailable');
-  };
   try {
     // A previous retry may have stored the transcript before notification
     // completed. Durable per-channel claims make this retry safe.
-    if(existing){
-      // The first write may have succeeded while the paired task write failed.
-      // Reconcile both inbox records before consuming any notification claim.
-      const summary=existing.slice(0,1000);
-      if(kind==='voicemail'||row.source==='voicemail')await persistTranscript(existing,summary);
-      await notifyRecovered(existing,summary);
-      return NextResponse.json({transcript:existing});
-    }
+    if(existing){await persistTranscript(existing,existing.slice(0,1000));await notifyRecovered(existing);return NextResponse.json({transcript:existing});}
     const audio = await loadPhoneRecording(row.recording_url, { db: ctx.db, callId: row.call_id });
     const chunks = await phoneSpeechChunks(Buffer.from(await audio.arrayBuffer()));
     const metadata = await fetch(

@@ -54,6 +54,11 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - run: node --test scripts/visual/*.test.mjs
       - run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Stage canonical shared media for the production browser server
+        run: |
+          node scripts/sync-development-public.mjs marketing
+          test -s apps/marketing/public/images/refresh-20261014/home-signed-20261017.webp
+          test -s apps/marketing/public/audio/legacy83/home.mp3
       - name: Build the production Marketing bundle before browser acceptance
         run: pnpm run build:marketing
       - run: pnpm exec playwright test --config playwright.design-repair.config.ts

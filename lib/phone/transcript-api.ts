@@ -31,7 +31,7 @@ export async function transcribePhoneMessage(
   if (error || !row?.recording_url || !row.call_id)
     return NextResponse.json({ error: 'Recording unavailable.' }, { status: 404 });
   const existing = 'transcription' in row ? row.transcription : row.transcript;
-  const notifyRecovered=async(transcript:string)=>{
+  const notifyRecovered=async(transcript:string,summary?:string)=>{
     if(kind!=='voicemail'&&row.source!=='voicemail')return;
     // Resolve the canonical paired task: its ID owns delivery claims even
     // when this endpoint was opened through the voicemail inbox.
@@ -44,12 +44,12 @@ export async function transcribePhoneMessage(
     if(!task.data)return;
     if(task.data.assigned_profile_id!==row.assigned_profile_id)
       throw Error('Voicemail notification routing unavailable');
-    const extension=await ctx.db.from('communication_extensions').select('extension')
-      .eq('id',task.data.extension_id).maybeSingle();
-    if(extension.error||!extension.data)throw Error('Voicemail extension unavailable');
+    const extension=task.data.extension_id?await ctx.db.from('communication_extensions').select('extension')
+      .eq('id',task.data.extension_id).maybeSingle():{data:null,error:null};
+    if(extension.error)throw Error('Voicemail extension unavailable');
     await notifyAssignee(ctx.db,{profileId:task.data.assigned_profile_id,taskId:task.data.id,
-      caller:task.data.callback_number||'unknown',extension:extension.data.extension,
-      urgency:'normal',source:'voicemail',transcript},ctx.system);
+      caller:task.data.callback_number||'unknown',extension:extension.data?.extension,
+      urgency:'normal',source:'voicemail',transcript,summary,awaitingTranscript:false,transcriptUpdate:true},ctx.system);
   };
   try {
     // A previous retry may have stored the transcript before notification
@@ -103,25 +103,22 @@ export async function transcribePhoneMessage(
       parts.push(...batch);
     }
     const transcript = parts.filter(Boolean).join('\n');
-    if (!transcript)
-      return NextResponse.json(
-        { error: 'No speech was detected. Listen to the recording.' },
-        { status: 422 },
-      );
+    const summary=transcript.slice(0,1000)||'No speech was detected. Open the recording to listen.';
     const voicemail = await ctx.db
       .from('voicemails')
-      .update({ transcription: transcript, summary: transcript.slice(0, 1000) })
+      .update({ transcription: transcript, summary })
       .eq('call_id', row.call_id);
     const callback = await ctx.db
       .from('phone_callback_tasks')
       .update({
         transcript,
-        summary: transcript.slice(0, 1000),
+        summary,
         updated_at: new Date().toISOString(),
       })
       .eq('call_id', row.call_id);
     if (voicemail.error || callback.error) throw Error('Transcript storage unavailable');
-    await notifyRecovered(transcript);
+    await notifyRecovered(transcript,summary);
+    if(!transcript)return NextResponse.json({error:'No speech was detected. Listen to the recording.'},{status:422});
     return NextResponse.json({ transcript });
   } catch {
     return NextResponse.json(

@@ -12,7 +12,7 @@ export type PhoneDeliveryResult = {
  */
 export async function deliverPhoneNotification(
   db: any,
-  identity: { taskId: string; profileId: string; kind: 'paris' | 'voicemail'; channel: 'email' | 'sms' | 'push' },
+  identity: { taskId: string; profileId: string; kind: 'paris' | 'voicemail' | 'voicemail_recording'; channel: 'email' | 'sms' | 'push' },
   send: () => Promise<PhoneDeliveryResult>,
 ): Promise<'accepted' | 'duplicate' | 'review_required'> {
   const { data, error } = await db.from('phone_notification_deliveries').insert({
@@ -41,7 +41,8 @@ export async function deliverPhoneNotification(
   }
 }
 
-/** Keep the email claim available until the readable voicemail transcript arrives. */
-export function phoneEmailReady(input: {source?: 'voicemail' | 'paris';awaitingTranscript?: boolean;transcript?: string}) {
-  return input.source !== 'voicemail' || !input.awaitingTranscript || Boolean(input.transcript?.trim());
+/** A recording-only outage alert must not consume the later transcript claim. */
+export function phoneNotificationKind(input: {source?: 'voicemail' | 'paris';awaitingTranscript?: boolean;transcript?: string}): 'paris'|'voicemail'|'voicemail_recording' {
+  return input.source==='voicemail'&&input.awaitingTranscript&&!input.transcript?.trim()
+    ?'voicemail_recording':input.source||'paris';
 }

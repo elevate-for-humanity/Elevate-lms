@@ -24,6 +24,7 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:s
 }})}));
 import {tickParisCodeRepairs} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
+ vi.unstubAllEnvs();
  h.verified=false;h.claimWon=true;h.candidate={kind:'planner-checkpoint'};h.updates=[];h.probe.mockReset();h.openhands.mockReset();
  h.probe.mockImplementation(async()=>({configured:true,verified:h.verified,status:h.verified?'reachable':'request_failed'}));
  h.openhands.mockResolvedValue({verified:true,status:'read_authorization_verified'});

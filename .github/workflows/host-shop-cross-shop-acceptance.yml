@@ -71,14 +71,14 @@ jobs:
       - name: Install dependencies and Chromium
         run: |
           pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
-          pnpm exec playwright install chromium --with-deps
+          pnpm exec playwright install chromium webkit --with-deps
       - name: Provision two disposable approved Host Shop identities and match requests
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs provision
       - name: Certify authenticated roster and cross-shop API isolation
         run: >-
           pnpm exec playwright test tests/e2e/host-shop-cross-shop-production.spec.ts
           --config playwright.config.ts --reporter=line
-          --project=desktop-chrome --workers=1 --retries=0
+          --project=desktop-chrome --project=android-chrome --project=iphone-webkit --workers=1 --retries=0
       - name: Confirm production SHA unchanged after test
         if: success()
         shell: bash

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const gate = workflow.split('\n  ci-gate:')[1];
-const dependencies = ['preflight', 'typecheck', 'lint', 'enrollment-database', 'diagnostics'];
+const dependencies = ['preflight', 'typecheck', 'lint', 'enrollment-database', 'website-database', 'diagnostics'];
 const runBlock = gate.split('        run: |\n')[1].split('\n').map(line => line.replace(/^          /, '')).join('\n');
 function execute(results) {
   const script = runBlock.replace(/\$\{\{ needs\.([\w-]+)\.result \}\}/g, (_, name) => results[name]);

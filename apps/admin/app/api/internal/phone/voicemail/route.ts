@@ -52,6 +52,7 @@ export async function POST(request:Request){
   const {data:previous,error:previousError}=await db.from('voicemails').select('transcription').eq('id',body.id).maybeSingle();
   if(previousError)throw Error('voicemail_lookup_unavailable');
   let transcript:string=previous?.transcription||'';
+  let awaitingTranscript=false;
   if(!transcript){
    try{transcript=await speech(audio);}
    catch(error){
@@ -61,6 +62,7 @@ export async function POST(request:Request){
     const reason=error instanceof Error && /^(speech_http_[0-9]{3}|voice_identity_unavailable)$/.test(error.message)?error.message:error instanceof Error && error.name==='TimeoutError'?'speech_timeout':'speech_unavailable';
     console.error('phone_voicemail_transcription_deferred',{reason});
     transcript='';
+    awaitingTranscript=true;
    }
   }
   if(body.validateOnly===true)return NextResponse.json({validated:true,transcriptAvailable:Boolean(transcript)});
@@ -73,13 +75,16 @@ export async function POST(request:Request){
   const {error:audioError}=await db.storage.from('phone-voicemails').upload(key,audio,{contentType:'audio/wav',upsert:true});
   if(audioError)throw Error('audio_persistence_unavailable');
   const callId=body.id;
+  const summary=transcript.slice(0,1000)||(awaitingTranscript
+   ?'Transcription is temporarily unavailable. Open the recording to listen.'
+   :'No speech was detected. Open the recording to listen.');
   const {error:callError}=await db.from('phone_calls').upsert({id:callId,phone_system_id:systemId,provider:'asterisk',provider_call_id:'voicemail-'+body.id,direction:'inbound',from_number:caller,to_number:body.extension,status:'completed',started_at:createdAt.toISOString(),ended_at:new Date(createdAt.getTime()+duration*1000).toISOString(),duration_seconds:Math.round(duration),recording_url:location,assigned_extension_id:extension.id,assigned_profile_id:extension.profile_id},{onConflict:'id'});
   if(callError)throw Error('call_persistence_unavailable');
-  const {error:voicemailError}=await db.from('voicemails').upsert({id:body.id,user_id:extension.profile_id,phone_system_id:systemId,call_id:callId,extension_id:extension.id,assigned_profile_id:extension.profile_id,phone_number:caller,recording_url:location,duration_seconds:Math.round(duration),transcription:transcript||null,summary:transcript.slice(0,1000)||'No speech was detected. Open the recording to listen.',created_at:createdAt.toISOString()},{onConflict:'id'});
+  const {error:voicemailError}=await db.from('voicemails').upsert({id:body.id,user_id:extension.profile_id,phone_system_id:systemId,call_id:callId,extension_id:extension.id,assigned_profile_id:extension.profile_id,phone_number:caller,recording_url:location,duration_seconds:Math.round(duration),transcription:transcript||null,summary,created_at:createdAt.toISOString()},{onConflict:'id'});
   if(voicemailError)throw Error('voicemail_persistence_unavailable');
-  const {error:taskError}=await db.from('phone_callback_tasks').upsert({id:body.id,call_id:callId,extension_id:extension.id,assigned_profile_id:extension.profile_id,source:'voicemail',callback_number:caller,program_or_department:extension.department,transcript:transcript||null,summary:transcript.slice(0,1000)||'No speech was detected. Open the recording to listen.',recording_url:location,created_at:createdAt.toISOString()},{onConflict:'id'});
+  const {error:taskError}=await db.from('phone_callback_tasks').upsert({id:body.id,call_id:callId,extension_id:extension.id,assigned_profile_id:extension.profile_id,source:'voicemail',callback_number:caller,program_or_department:extension.department,transcript:transcript||null,summary,recording_url:location,created_at:createdAt.toISOString()},{onConflict:'id'});
   if(taskError)throw Error('callback_persistence_unavailable');
-  await notifyAssignee(db,{profileId:extension.profile_id,taskId:body.id,caller,urgency:'normal',source:'voicemail',transcript:transcript||undefined,summary:transcript?undefined:'No speech was detected. Open the recording to listen.'},system);
+  await notifyAssignee(db,{profileId:extension.profile_id,taskId:body.id,caller,extension:body.extension,urgency:'normal',source:'voicemail',awaitingTranscript,transcript:transcript||undefined,summary:transcript?undefined:summary},system);
   return NextResponse.json({saved:true,transcriptAvailable:Boolean(transcript)});
  }catch(error){
   const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';

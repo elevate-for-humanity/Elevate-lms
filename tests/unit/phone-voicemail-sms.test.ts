@@ -2,7 +2,7 @@ import {beforeEach,expect,it,vi} from 'vitest';
 const m=vi.hoisted(()=>({sms:vi.fn(),delivery:vi.fn()}));
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/notifications/push-service',()=>({PushNotificationService:class{sendToUserWithDatabase=async()=>1;}}));
-vi.mock('@/lib/phone/notification-delivery',()=>({phoneEmailReady:()=>true,deliverPhoneNotification:async(db:any,id:any,send:any)=>{m.delivery(id);return (await send()).accepted?'accepted':'review_required';}}));
+vi.mock('@/lib/phone/notification-delivery',()=>({phoneEmailReady:(input:any)=>input.source!=='voicemail'||!input.awaitingTranscript||Boolean(input.transcript?.trim()),deliverPhoneNotification:async(db:any,id:any,send:any)=>{m.delivery(id);return (await send()).accepted?'accepted':'review_required';}}));
 vi.mock('@/lib/email/sendgrid',()=>({sendEmail:vi.fn()}));
 vi.mock('@/lib/notifications/sms',()=>({sendSMS:m.sms}));
 import {notifyAssignee,phoneSmsBody} from '@/lib/phone/message-notifications';
@@ -34,4 +34,8 @@ it('a provider rejection is flagged for review instead of reported as sent',asyn
  await notifyAssignee(db(),{profileId:'owner',taskId:'vm',caller:'+13175550100',urgency:'normal',source:'voicemail'},{id:'system'});
  expect(m.delivery).toHaveBeenCalledWith(expect.objectContaining({channel:'sms'}));
  expect(log).toHaveBeenCalledWith(expect.stringContaining('requires review'));
+});
+it('leaves the SMS claim available while voicemail transcription is deferred',async()=>{
+ await notifyAssignee(db(),{profileId:'owner',taskId:'vm',caller:'+13175550100',urgency:'normal',source:'voicemail',awaitingTranscript:true},{id:'system'});
+ expect(m.sms).not.toHaveBeenCalled();expect(m.delivery).not.toHaveBeenCalledWith(expect.objectContaining({channel:'sms'}));
 });

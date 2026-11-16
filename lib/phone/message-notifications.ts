@@ -125,7 +125,9 @@ async function notifyRecipient(
     input.transcript ? `Transcript: ${input.transcript}` : '',
   ].filter(Boolean);
   const readableDetails = detailLines.join('\n');
-  if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
+  // Keep the SMS claim available for the recovered transcript. Push still
+  // announces the durable recording while Speech is temporarily unavailable.
+  if (preferences?.sms_missed_calls === true && preferences?.sms_phone && phoneEmailReady(input)) {
     deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'sms' }, async () => {
       const result = await sendSMS(preferences.sms_phone, phoneSmsBody(input, url));
       return { accepted: result.success, providerMessageId: result.messageId };

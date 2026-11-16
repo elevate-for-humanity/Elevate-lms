@@ -148,6 +148,7 @@ export async function launchConnection({
   headless = true,
   args = [],
   launchTimeoutMs = 30000,
+  egressFactory = createBrowserEgress,
   ...transportOptions
 } = {}) {
   if (!executablePath) throw new Error('Chromium executablePath is required');
@@ -204,7 +205,7 @@ export async function launchConnection({
     return closing;
   };
   try {
-    egress = await createBrowserEgress();
+    egress = await egressFactory();
     child = spawn(
       executablePath,
       [

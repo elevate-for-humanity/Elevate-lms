@@ -48,3 +48,43 @@ test('Chromium cannot bypass the proxy for localhost navigation',{skip:process.e
  await page.goto(`http://127.0.0.1:${fixture.address().port}/private`).catch(()=>{});
  assert.equal(hits,0);
 });
+test('the production foundation exception admits only exact unexpired synthetic fixtures',async()=>{
+ const {foundationFixtureDestination}=await import('./server.mjs');
+ const nonce='11111111-1111-4111-a111-111111111111';const fixtures=new Map([[nonce,{expiresAt:200}]]);
+ const input=`http://127.0.0.1:3100/foundation-fixture/${nonce}/start`;
+ const options={fixtures,fixturePort:3100,now:100};
+ assert.equal(foundationFixtureDestination(input,options).address,'127.0.0.1');
+ for(const denied of [input.replace('/start','/api/secrets'),input.replace('3100','3101'),input.replace('127.0.0.1','localhost'),input+'?redirect=/api',input.replace(nonce,'22222222-2222-4222-a222-222222222222')])assert.equal(foundationFixtureDestination(denied,options),null);
+ assert.equal(foundationFixtureDestination(input,{...options,now:201}),null);
+});
+test('a partial HTTP response closes the browser-facing stream promptly',async t=>{
+ const origin=http.createServer((_req,res)=>{res.writeHead(200,{'Content-Length':'1000'});res.write('partial');setImmediate(()=>res.socket.destroy());});
+ await new Promise(r=>origin.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>origin.close(r)));
+ const proxy=await createBrowserEgress({lookup:publicLookup,request:(options,callback)=>http.request({...options,hostname:'127.0.0.1',port:origin.address().port},callback)});t.after(()=>proxy.close());
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(Error('downstream was left open')),2000);const finish=()=>{clearTimeout(timeout);resolve();};
+  const p=new URL(proxy.url);const req=http.get({hostname:p.hostname,port:p.port,path:'http://public.test/partial'},res=>{res.resume();res.once('aborted',finish);res.once('error',finish);res.once('end',finish);});req.once('error',finish);
+ });
+});
+test('reset CONNECT sockets are contained and do not terminate the proxy',async t=>{
+ const origin=net.createServer(socket=>{socket.on('error',()=>{});socket.on('data',()=>socket.resetAndDestroy());});
+ await new Promise(r=>origin.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>origin.close(r)));
+ const proxy=await createBrowserEgress({lookup:publicLookup,connect:options=>net.connect({...options,host:'127.0.0.1',port:origin.address().port})});t.after(()=>proxy.close());
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(Error('reset tunnel stayed open')),2000);const p=new URL(proxy.url);
+  const req=http.request({host:p.hostname,port:p.port,method:'CONNECT',path:'public.test:443'});
+  req.once('error',()=>{clearTimeout(timeout);resolve();});req.once('connect',(_response,socket)=>{socket.on('error',()=>{});socket.once('close',()=>{clearTimeout(timeout);resolve();});socket.write('TLS fixture');});req.end();
+ });
+ assert.equal((await proxyGet(proxy.url,'http://127.0.0.1/private')).status,403);
+});
+test('reset upgraded sockets are contained on both sides',async t=>{
+ const origin=http.createServer();origin.on('upgrade',(_req,socket)=>{socket.on('error',()=>{});socket.write('HTTP/1.1 101 Switching Protocols\r\nConnection: Upgrade\r\nUpgrade: fixture\r\n\r\n');socket.on('data',()=>socket.resetAndDestroy());});
+ await new Promise(r=>origin.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>origin.close(r)));
+ const proxy=await createBrowserEgress({lookup:publicLookup,request:(options,callback)=>http.request({...options,hostname:'127.0.0.1',port:origin.address().port},callback)});t.after(()=>proxy.close());
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(Error('reset upgrade stayed open')),2000);const p=new URL(proxy.url);
+  const req=http.request({host:p.hostname,port:p.port,path:'http://public.test/socket',headers:{Connection:'Upgrade',Upgrade:'fixture'}});
+  req.once('error',()=>{clearTimeout(timeout);resolve();});req.once('upgrade',(_response,socket)=>{socket.on('error',()=>{});socket.once('close',()=>{clearTimeout(timeout);resolve();});socket.write('upgrade fixture');});req.end();
+ });
+ assert.equal((await proxyGet(proxy.url,'http://127.0.0.1/private')).status,403);
+});

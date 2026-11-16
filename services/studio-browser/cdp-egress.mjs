@@ -32,23 +32,25 @@ export async function publicDestination(input,{lookup=dns.lookup}={}){
  * DNS is checked for every connection and the checked IP is used for the socket;
  * Chromium never resolves the public hostname again after this check. TLS stays
  * end-to-end, preserving browser certificate and SNI validation. */
-export async function createBrowserEgress({lookup=dns.lookup,request=http.request,connect=net.connect}={}){
+export async function createBrowserEgress({lookup=dns.lookup,request=http.request,connect=net.connect,fixtureDestination=()=>null}={}){
   const sockets=new Set();
-  const track=socket=>{sockets.add(socket);socket.once('close',()=>sockets.delete(socket));return socket;};
+  const track=socket=>{sockets.add(socket);socket.on('error',()=>{});socket.once('close',()=>sockets.delete(socket));return socket;};
   const deny=response=>{
-    if(response instanceof http.ServerResponse){if(!response.headersSent)response.writeHead(403);response.end('Browser destination unavailable');}
+    if(response instanceof http.ServerResponse){if(response.headersSent)return response.destroy();response.writeHead(403);response.end('Browser destination unavailable');}
     else if(!response.destroyed){response.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');}
   };
   const forward=async(req,res,head)=>{
     try{
-      const target=await publicDestination(req.url,{lookup});
+      // Only trusted in-process fixture code can grant a synthetic local route.
+      const fixture=fixtureDestination(req.url,req.method);
+      const target=fixture??await publicDestination(req.url,{lookup});
       if(target.url.protocol!=='http:')throw Error('BROWSER_EGRESS_DENIED');
       const headers={...req.headers,host:target.url.host};
       delete headers['proxy-authorization'];delete headers['proxy-connection'];
       const upstream=request({hostname:target.address,port:target.port,method:req.method,
         path:target.url.pathname+target.url.search,headers,agent:false},response=>{
         if(head){response.resume();return deny(res);}
-        res.writeHead(response.statusCode,response.headers);response.pipe(res);
+        res.writeHead(response.statusCode,response.headers);response.once('aborted',()=>res.destroy());response.once('error',()=>res.destroy());response.pipe(res);
       });
       upstream.on('socket',track);
       upstream.setTimeout(30_000,()=>upstream.destroy());
@@ -56,6 +58,9 @@ export async function createBrowserEgress({lookup=dns.lookup,request=http.reques
       req.once('aborted',()=>upstream.destroy());
       if(head){
         upstream.once('upgrade',(response,socket,pending)=>{
+          track(socket);
+          socket.once('error',()=>res.destroy());res.once('error',()=>socket.destroy());
+          socket.once('close',()=>res.destroy());
           if(res.destroyed)return socket.destroy();
           res.write(`HTTP/1.1 ${response.statusCode} Switching Protocols\r\n`+
             Object.entries(response.headers).map(([key,value])=>`${key}: ${value}\r\n`).join('')+'\r\n');
@@ -69,15 +74,16 @@ export async function createBrowserEgress({lookup=dns.lookup,request=http.reques
   const server=http.createServer((req,res)=>{void forward(req,res);});
   server.on('connection',track);
   server.on('upgrade',(req,socket,head)=>{void forward(req,socket,head);});
-  server.on('connect',(req,client,head)=>{void(async()=>{
+  server.on('connect',(req,client,head)=>{let upstream,established=false;client.once('error',()=>upstream?.destroy());void(async()=>{
     try{
       const target=await publicDestination('https://'+req.url,{lookup});
       if(target.url.pathname!=='/'||target.url.search||target.url.hash)throw Error('BROWSER_EGRESS_DENIED');
-      const upstream=track(connect({host:target.address,port:target.port}));
+      upstream=track(connect({host:target.address,port:target.port}));
       upstream.setTimeout(60_000,()=>upstream.destroy());
-      upstream.once('error',()=>deny(client));
+      upstream.once('error',()=>established?client.destroy():deny(client));
       upstream.once('connect',()=>{
         if(client.destroyed)return upstream.destroy();
+        established=true;
         client.write('HTTP/1.1 200 Connection Established\r\n\r\n');
         if(head.length)upstream.write(head);
         upstream.pipe(client);client.pipe(upstream);

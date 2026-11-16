@@ -32,6 +32,7 @@ jobs:
         run: >-
           docker run --rm --init
           -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+          -e STUDIO_BROWSER_LIVE_EGRESS_TEST=1
           -v "$PWD/services/studio-browser:/tests:ro"
           --entrypoint sh studio-cdp-validation
           -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs'

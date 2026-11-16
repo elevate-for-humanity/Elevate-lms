@@ -1,4 +1,4 @@
-import {isPrivateAddress} from './cdp-egress.mjs';
+import {isPrivateAddress,createBrowserEgress} from './cdp-egress.mjs';
 export {isPrivateAddress} from './cdp-egress.mjs';
 import { readBrowserSnapshot } from './cdp-snapshot.mjs';
 import crypto from 'node:crypto';
@@ -277,6 +277,9 @@ export function createBrowserLifecycleManager({
       let candidate;
       try {
         candidate = await launch({
+          // The authenticated foundation probe uses expiring synthetic fixtures,
+          // never arbitrary local routes or a caller-provided proxy setting.
+          egressFactory:()=>createBrowserEgress({fixtureDestination:(url,method)=>['GET','HEAD'].includes(method)?foundationFixtureDestination(url):null}),
           headless: true,
           executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH || '/usr/bin/chromium',
           args: [
@@ -712,6 +715,14 @@ export async function receiveBrowserUpload(session, request, limit = 32 * 1024 *
   } finally {
     await file.close();
   }
+}
+
+export function foundationFixtureDestination(input,{fixtures=foundationFixtures,fixturePort=port,now=Date.now()}={}){
+  let url;try{url=new URL(input);}catch{return null;}
+  const match=url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download|one|two)$/);
+  const fixture=match&&fixtures.get(match[1]);
+  if(url.protocol!=='http:'||url.hostname!=='127.0.0.1'||url.port!==String(fixturePort)||url.username||url.password||url.search||url.hash||!fixture||fixture.expiresAt<=now)return null;
+  return {url,address:'127.0.0.1',port:fixturePort};
 }
 
 async function runBrowserFoundationTest() {

@@ -20,6 +20,7 @@ export type OpenHandsStartTask = {
 
 export type OpenHandsConversation = {
   id: string;
+  sandbox_id?: string | null;
   sandbox_status?: string | null;
   execution_status?: string | null;
   selected_repository?: string | null;
@@ -36,6 +37,7 @@ export type OpenHandsLifecycle = {
   status: OpenHandsLifecycleStatus;
   startTaskId?: string | null;
   conversationId?: string | null;
+  sandboxId?: string | null;
   sandboxStatus?: string | null;
   executionStatus?: string | null;
   repository?: string | null;
@@ -248,6 +250,13 @@ export async function sendOpenHandsMessage(
   return result;
 }
 
+/** Idempotent provider call: resumes the SAME paused sandbox; it never starts a conversation. */
+export async function resumeOpenHandsSandbox(sandboxId: string): Promise<void> {
+  const id = sandboxId.trim();
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(id)) throw new Error('OpenHands sandbox id is invalid');
+  await requestJson(`/api/v1/sandboxes/${encodeURIComponent(id)}/resume`, { method: 'POST' });
+}
+
 export async function getOpenHandsStartTask(startTaskId: string): Promise<OpenHandsStartTask | null> {
   const id = startTaskId.trim();
   if (!id) return null;
@@ -294,6 +303,7 @@ function lifecycleFromConversation(
     status,
     startTaskId: startTaskId ?? null,
     conversationId: conversation.id,
+    sandboxId: conversation.sandbox_id ?? null,
     sandboxStatus: conversation.sandbox_status ?? null,
     executionStatus: conversation.execution_status ?? null,
     repository: conversation.selected_repository ?? null,

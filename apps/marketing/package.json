@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node ../../scripts/build-marketing-css.mjs && next dev",
+    "dev": "next dev",
     "prebuild": "node ../../scripts/check-build-memory-policy.mjs && node ../../scripts/sync-pwa-public.mjs marketing",
     "build": "node ../../scripts/build-marketing-css.mjs && node ../../scripts/run-bounded-build.mjs -- node ../../scripts/build-next-app.mjs && node ../../scripts/build-marketing-css.mjs --verify",
     "prestart": "node ../../scripts/sync-pwa-public.mjs marketing",

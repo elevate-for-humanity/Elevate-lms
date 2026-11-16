@@ -38,7 +38,11 @@ export function buildMarketingCss() {
         output,
         '--minify',
       ],
-      { cwd: path.join(root, 'apps/marketing'), stdio: 'inherit' },
+      {
+        cwd: path.join(root, 'apps/marketing'),
+        env: { ...process.env, NODE_ENV: 'production' },
+        stdio: 'inherit',
+      },
     );
     if (compiled.status !== 0) throw new Error('Marketing CSS compilation failed');
     const chunks = partitionMarketingCss(fs.readFileSync(output, 'utf8'));

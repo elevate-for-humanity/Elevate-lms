@@ -169,6 +169,15 @@ const nextConfig = {
 
   webpack: (config, { dev, isServer }) => {
     config.parallelism = 1;
+    // Preserve live Tailwind updates in development; bound only production CSS.
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@marketing-css/core.css$': path.join(__dirname, 'app', dev ? 'globals.css' : 'generated-css/marketing-0.css'),
+      ...Object.fromEntries([1, 2, 3].map(index => [
+        `@marketing-css/part-${index}.css$`,
+        path.join(__dirname, dev ? 'styles/empty.css' : `app/generated-css/marketing-${index}.css`),
+      ])),
+    };
     // Keep Next.js-managed webpack caching. CI can reuse its build cache when persisted.
     if (!isServer) {
       config.resolve.fallback = {

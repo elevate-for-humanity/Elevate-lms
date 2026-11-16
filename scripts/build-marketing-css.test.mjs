@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { partitionMarketingCss, verifyMarketingCss } from './build-marketing-css.mjs';
+import marketingConfig from '../apps/marketing/next.config.mjs';
 
 test('bounded CSS chunks retain every rule, declaration and override in order', () => {
   const css =
@@ -37,5 +38,24 @@ test('the release guard checks final emitted CSS, not only the source chunks', (
     assert.equal(verifyMarketingCss(directory)[0].bytes, 18);
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('development loads live source CSS while production resolves ordered generated chunks', () => {
+  const configure = (dev) =>
+    marketingConfig.webpack({ resolve: { alias: {} } }, { dev, isServer: true }).resolve.alias;
+  const development = configure(true);
+  const production = configure(false);
+  assert.ok(development['@marketing-css/core.css$'].endsWith('/app/globals.css'));
+  assert.ok(fs.existsSync(development['@marketing-css/core.css$']));
+  assert.ok(production['@marketing-css/core.css$'].endsWith('/app/generated-css/marketing-0.css'));
+  for (const index of [1, 2, 3]) {
+    assert.ok(development[`@marketing-css/part-${index}.css$`].endsWith('/styles/empty.css'));
+    assert.ok(fs.existsSync(development[`@marketing-css/part-${index}.css$`]));
+    assert.ok(
+      production[`@marketing-css/part-${index}.css$`].endsWith(
+        `/app/generated-css/marketing-${index}.css`,
+      ),
+    );
   }
 });

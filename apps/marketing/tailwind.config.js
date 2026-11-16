@@ -5,7 +5,17 @@ import { marketingTailwindContent } from '../../scripts/marketing-tailwind-conte
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'], // FORCE: Disable auto dark mode
-  content: marketingTailwindContent(),
+  content:
+    process.env.NODE_ENV === 'production'
+      ? marketingTailwindContent()
+      : [
+          './app/**/*.{js,ts,jsx,tsx,mdx}',
+          './components/**/*.{js,ts,jsx,tsx,mdx}',
+          './lib/**/*.{js,ts,jsx,tsx,mdx}',
+          '../../components/**/*.{js,ts,jsx,tsx,mdx}',
+          '../../content/**/*.{js,ts,jsx,tsx,mdx}',
+          '../../lib/**/*.{js,ts,jsx,tsx,mdx}',
+        ],
   theme: {
     extend: {
       // DESIGN SYSTEM TOKENS - 10/10

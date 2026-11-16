@@ -16,9 +16,17 @@ describe('public page self-service facts', () => {
     const facts = getPublicPageFacts('/store').facts;
     expect(facts.find((fact) => /student kits/.test(fact.question))?.answer).toContain('not available to order yet');
   });
-  it('provides program and application answers on pages outside the known families', () => {
-    const facts = getPublicPageFacts('/about').facts;
-    expect(facts.length).toBeGreaterThanOrEqual(3);
-    expect(facts.some((fact) => fact.href === '/apply/student')).toBe(true);
+  it.each(['/about', '/contact', '/privacy', '/testing', '/testing/checkout', '/programs/hvac-technician', '/programs/cna'])('keeps unrelated apprenticeship and Host Shop content off %s', (route) => {
+    const facts = getPublicPageFacts(route).facts;
+    expect(JSON.stringify(facts)).not.toMatch(/apprenticeship|Host Shop|host-shops/);
+  });
+  it('keeps testing instructions within the booking flow', () => {
+    expect(getPublicPageFacts('/testing').facts[0].href).toBe('/testing#booking');
+  });
+  it('does not append enrollment FAQs to unrelated informational pages', () => {
+    expect(getPublicPageFacts('/about').facts).toEqual([]);
+  });
+  it('keeps a program application linked to the selected program', () => {
+    expect(getPublicPageFacts('/programs/hvac-technician').facts[1].href).toBe('/apply/student?program=hvac-technician');
   });
 });

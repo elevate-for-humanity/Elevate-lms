@@ -83,7 +83,7 @@ export function HvacLabHero() {
 
 export function HvacProgramFilm({ assistance = true }: { assistance?: boolean }) {
   return (
-    <section id="hvac-program-film" aria-labelledby="hvac-film-title" className="mt-8 grid items-center gap-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-8 lg:grid-cols-[1fr_1fr]">
+    <section id="hvac-program-film" aria-labelledby="hvac-film-title" className="mt-8 grid items-start gap-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-8 lg:grid-cols-[1fr_0.65fr]">
       <div>
         <p className="text-sm font-bold uppercase tracking-widest text-orange-800">Inside the program</p>
         <h3 id="hvac-film-title" className="mt-3 text-3xl font-black text-slate-950">See your next chapter.</h3>
@@ -98,10 +98,10 @@ export function HvacProgramFilm({ assistance = true }: { assistance?: boolean })
           controls
           playsInline
           preload="metadata"
-          poster={`${imageRoot}/program-film-poster.webp`}
+          poster="/images/hvac-training-vibrant-2026.webp"
           width={720}
           height={900}
-          className="mx-auto block h-auto w-full max-w-[36rem] rounded-xl bg-slate-950"
+          className="mx-auto block h-auto w-full max-w-[24rem] rounded-xl bg-slate-950"
         >
           Your browser does not support embedded video.
         </video>
@@ -115,12 +115,15 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
   const Heading = 'h2';
   const headingId = compact ? 'hvac-home-showcase' : 'hvac-training-gallery';
   // Keep homepage previews distinct from the full program gallery.
-  const selectedScenes = compact ? scenes.slice(0, 3) : scenes.slice(3);
+  const selectedScenes = compact ? scenes.slice(0, 3) : [
+    { image: '/images/hvac-hero.webp', title: 'Air-conditioning systems', description: 'Prepare for HVAC work with system inspection, safety and maintenance fundamentals.', alt: 'Technician inspecting an outdoor air-conditioning unit' },
+    { image: '/images/pexels/hvac.webp', title: 'Tools and diagnostics', description: 'Connect coursework with the tools used to inspect and service HVAC equipment.', alt: 'HVAC technician checking an outdoor condenser with service tools' },
+  ];
   return (
     <section
       aria-labelledby={headingId}
       data-hvac-training-showcase="20261029"
-      className={`border-y-4 border-orange-500 bg-white px-4 text-slate-950 ${compact ? "sm:px-4" : "sm:px-6"} ${compact ? 'py-7 sm:py-10' : 'py-14 sm:py-20'}`}
+      className={`border-y-4 border-orange-500 bg-white px-4 text-slate-950 ${compact ? "sm:px-4" : "sm:px-6"} ${compact ? 'py-7 sm:py-10' : 'py-8 sm:py-12'}`}
     >
       <div className={compact ? "mx-auto max-w-6xl" : "mx-auto max-w-7xl"}>
         <p className="text-sm font-bold uppercase tracking-widest text-orange-800">
@@ -152,24 +155,17 @@ export default function HvacTrainingShowcase({ compact = false }: { compact?: bo
         </div>
         {!compact && <HvacProgramFilm />}
         <p className="mt-5 text-sm leading-6 text-slate-600">
-          AI-generated lab concept, training demonstrations, and career illustrations.
+          {compact ? 'Illustrative training scenes.' : 'HVAC service photos illustrate the equipment and skills covered; they are not photos of the Elevate training site.'}
         </p>
-        <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {selectedScenes.map((scene, index) => (
+        <div className={`mt-7 grid gap-6 sm:grid-cols-2 ${compact ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
+          {selectedScenes.map((scene) => (
             <figure
               key={scene.image}
               className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
             >
-              <div data-home-card-image={compact || undefined} className={`relative overflow-hidden bg-slate-100 ${compact ? 'aspect-[4/3]' : 'aspect-[4/5]'}`}>
-                <Image
-                  src={`${imageRoot}/${scene.image}.webp`}
-                  alt={scene.alt}
-                  fill
-                  loading="lazy"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px"
-                  className={compact ? "object-cover object-[center_35%]" : "object-contain"}
-                />
-              </div>
+              {compact ? <div data-home-card-image className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                <Image src={`${imageRoot}/${scene.image}.webp`} alt={scene.alt} fill loading="lazy" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 410px" className="object-cover object-[center_35%]" />
+              </div> : <Image src={scene.image} alt={scene.alt} width={scene.image.includes('pexels') ? 915 : 1880} height={scene.image.includes('pexels') ? 650 : 1253} loading="lazy" sizes="(max-width: 640px) 100vw, 50vw" className="block h-auto w-full" />}
               <figcaption className="p-5">
                 <h3 className="text-xl font-bold text-slate-950">{scene.title}</h3>
                 <p className="mt-2 leading-7 text-slate-600">{scene.description}</p>

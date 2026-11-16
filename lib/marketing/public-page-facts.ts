@@ -40,10 +40,21 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
     { question: 'Is funding available for every career program?', answer: 'No. Workforce funding is specific to the evidenced program and the applicant. The responsible agency determines eligibility and written authorization before funded enrollment.', href: '/funding', link: 'Review program-specific funding' },
     { question: 'Does applying guarantee approval?', answer: 'An application is a request for review. It does not guarantee funding, enrollment, placement or employment.', href: '/programs', link: 'Compare program requirements' },
   ] };
-  return { title: 'Quick answers before your next step', imageProgram: programSlug, facts: [
-    { question: 'Where do I find the schedule, cost and entry requirements?', answer: 'Open the exact program or product you are considering. Review its published details and required steps before applying or purchasing.', href: '/programs', link: 'Explore program details' },
-    apprenticeshipFacts[0],
-    { question: 'Does an inquiry enroll me?', answer: 'An inquiry requests information. Enrollment requires the applicable application, intake, payment and enrollment requirements to be completed.', href: '/apply/student', link: 'Start an application' },
-    { question: 'Where can I find shops, employers and opportunities?', answer: 'Use the Host Shop and employer directories. Availability and placement are confirmed for the specific occupation and business.', href: '/partners/host-shops', link: 'Explore the network' },
-  ] };
+  if (pathname === '/testing' || pathname.startsWith('/testing/')) return {
+    title: 'Testing appointment questions', facts: [
+      { question: 'How do I choose a testing date?', answer: 'Select your provider and exam, then choose an available date and appointment time in the booking form. Only published appointments with enough space for your group can be selected.', href: '/testing#booking', link: 'Choose a testing appointment' },
+      { question: 'Does adding an exam to the cart reserve my appointment?', answer: 'Adding an exam to the cart does not reserve a date. Complete the appointment selection and secure checkout. Review your booking confirmation before attending.', href: '/testing#booking', link: 'Complete your booking' },
+      { question: 'What if no appointment is available?', answer: 'Contact the testing center for scheduling assistance before paying. An unavailable date cannot be booked.', href: '/contact', link: 'Contact the testing center' },
+    ],
+  };
+  if (programSlug) return {
+    title: 'Questions about this program', imageProgram: programSlug, facts: [
+      { question: 'Where are this program’s schedule, cost and entry requirements?', answer: 'Review the schedule, tuition, included materials and admission requirements on this program page. Requirements and payment arrangements are specific to the selected program.', href: `/programs/${programSlug}`, link: 'Review this program' },
+      { question: 'How do I apply for this program?', answer: 'An inquiry requests information. Admission requires the applicable application, documents and enrollment steps for this program. An inquiry alone does not reserve a place.', href: `/apply/student?program=${encodeURIComponent(programSlug)}`, link: 'Apply for this program' },
+      { question: 'Does completing the course award a certification?', answer: 'Course completion and an external certification or license are separate steps. Review the credentials and any examination requirements listed for this program.', href: `/programs/${programSlug}`, link: 'Review program credentials' },
+    ],
+  };
+  // Unrelated pages already contain their own content. Do not append another
+  // program’s tuition, Host Shop instructions or enrollment block to them.
+  return { title: '', facts: [] };
 }

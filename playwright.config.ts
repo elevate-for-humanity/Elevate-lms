@@ -51,7 +51,6 @@ const SPECS: Record<E2EApp, string[]> = {
     'employer-onboarding.spec.ts',
     'enrollment-lifecycle.spec.ts',
     'hvac-live-lesson-playback.spec.ts',
-    'host-shop-cross-shop-production.spec.ts',
     'jordan-magic-link.spec.ts',
     'portal-responsive-design.spec.ts',
     'program-holder-unauth-redirect.spec.ts',
@@ -62,6 +61,12 @@ const SPECS: Record<E2EApp, string[]> = {
     'student-portal.spec.ts',
   ],
 };
+
+// This production-only authenticated fixture requires two GitHub-provisioned shops.
+// Never include it in general browser suites without its isolated QA lifecycle.
+if (process.env.QA_CROSS_SHOP_ACCEPTANCE === '1') {
+  SPECS.lms.push('host-shop-cross-shop-production.spec.ts');
+}
 
 // Production acceptance specs with hard-coded production origins. They run only
 // when a workflow explicitly targets a deployed environment.

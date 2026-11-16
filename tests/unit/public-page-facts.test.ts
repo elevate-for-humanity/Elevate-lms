@@ -20,6 +20,9 @@ describe('public page self-service facts', () => {
     const facts = getPublicPageFacts(route).facts;
     expect(JSON.stringify(facts)).not.toMatch(/apprenticeship|Host Shop|host-shops/);
   });
+  it('does not classify a store offer by a keyword inside its product name', () => {
+    expect(getPublicPageFacts('/store/products/apprenticeship-tools').title).toBe('Before you choose a store product');
+  });
   it('keeps testing instructions within the booking flow', () => {
     expect(getPublicPageFacts('/testing').facts[0].href).toBe('/testing#booking');
   });

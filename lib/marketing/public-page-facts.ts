@@ -11,12 +11,12 @@ const apprenticeshipFacts: PublicPageFact[] = [
 
 export function getPublicPageFacts(pathname: string): PublicPageFacts {
   const programSlug = pathname.match(/^\/programs\/([^/]+)/)?.[1];
-  if (/apprenticeship/.test(pathname)) {
-    const contract = programSlug ? getRegisteredProgramStandard(programSlug) : null;
+  const contract = programSlug ? getRegisteredProgramStandard(programSlug) : null;
+  if (contract || /^\/apprenticeships(?:\/|$)/.test(pathname) || (programSlug?.endsWith('-apprenticeship') ?? false)) {
     const facts = contract ? [...apprenticeshipFacts.slice(0, 3), { question: 'What are the completion requirements for this occupation?', answer: `${contract.standard.occupationTitle} requires ${contract.completion.competencyCount} verified occupational competencies and ${contract.completion.requiredRtiHours} hours of related technical instruction, with supervised Host Shop practice. Work hours are training evidence, not a fixed graduation denominator. Apprenticeship completion and Indiana licensing requirements are separate steps.`, href: `/programs/${programSlug}`, link: 'Review the complete occupation requirements' }] : apprenticeshipFacts;
     return { title: 'Apprenticeship facts before you apply', imageProgram: programSlug || 'barber-apprenticeship', facts };
   }
-  if (/host-shop|barber-beauty-network/.test(pathname)) return {
+  if (/^\/(?:partners\/)?(?:host-shops?|barber-beauty-network)(?:\/|$)/.test(pathname)) return {
     title: 'Host Shop and network questions', imageProgram: 'barber-apprenticeship', facts: [
       { question: 'Is it free to join as a Host Shop?', answer: 'There is no Host Shop application or placement fee. The shop still covers employee wages, insurance and normal business expenses. Apprenticeship tuition is self-pay only.', href: '/host-shop/apply', link: 'Apply free as a Host Shop' },
       { question: 'Can any business begin training apprentices immediately?', answer: 'Elevate verifies the occupation, worksite, licenses, insurance and supervising professional before approval and placement. Submitting an application is not approval.', href: '/partners/host-shops', link: 'Review Host Shop requirements' },
@@ -30,7 +30,7 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
     { question: 'Do demos use my real business records?', answer: 'Demo environments illustrate product workflows. Use your authenticated workspace for your own business or learner records.', href: '/store/demos', link: 'Explore demos' },
     { question: 'What should I check before buying?', answer: 'Review the specific offer’s price, billing frequency, availability, included features and terms. Product availability and plan limits differ between offers.', href: '/store/proof', link: 'Review offer details and limits' },
   ] };
-  if (/employer|jobs|career/.test(pathname)) return { title: 'Jobs and employer questions', facts: [
+  if (/^\/(?:employers?|jobs|careers?|career-services)(?:\/|$)/.test(pathname)) return { title: 'Jobs and employer questions', facts: [
     { question: 'Where do I post an opening?', answer: 'Start with the employer job-posting page and complete the required onboarding and approval steps.', href: '/employers/post-job', link: 'Post a job' },
     { question: 'Where do I find participating employers?', answer: 'The employer directory provides a place to explore participating businesses. A directory listing does not guarantee a current vacancy or a job offer.', href: '/employers/directory', link: 'Browse employers' },
     { question: 'Does completing training guarantee employment?', answer: 'Training and career support do not guarantee hiring. Employers make their own hiring decisions and confirm job requirements and availability.', href: '/career-services', link: 'Explore career support' },

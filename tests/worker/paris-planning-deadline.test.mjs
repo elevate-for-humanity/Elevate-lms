@@ -11,11 +11,11 @@ test('PARIS carries a workflow planning start time across durable continuations'
  assert.match(source,/continuation\.save\(\{version:1,boundedCpuEdits:true,startedAt/);
 });
 test('PARIS checks remaining time before each long inference call',()=>{
- assert.match(source,/REPAIR_PLANNING_BUDGET_MS = 35 \* 60_000/);
+ assert.match(source,/REPAIR_PLANNING_BUDGET_MS = repairSetting\('PARIS_REPAIR_BUDGET_MINUTES', 90\) \* 60_000/);
  assert.match(source,/REPAIR_TURN_RESERVE_MS = REPAIR_INFERENCE_TIMEOUT_MS \+ REPAIR_MODEL_PROBE_TIMEOUT_MS \+ 30_000/);
  assert.match(source,/PARIS_REPAIR_PLANNING_DEADLINE_REACHED/);
  assert.match(source,/await checkpoint\(\);[\s\S]*?PARIS_REPAIR_PLANNING_DEADLINE_REACHED/);
- assert.match(workflow,/timeout-minutes: 40/);
+ assert.match(workflow,/timeout-minutes: 100/);
 });
 test('the cold-start model probe runs only before the first turn',()=>{
  // Probing again on a continuation spends 55s of the Admin route's 300s request

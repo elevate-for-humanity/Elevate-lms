@@ -27,23 +27,47 @@ function validatePath(path) {
   } finally { rmSync(directory, { recursive: true }); }
 }
 
-test('PARIS editor and independent validator both accept deployment corrections', () => {
+test('deployment corrections require separate review outside autonomous candidates', () => {
   for (const path of ['.github/workflows/ci.yml', '.github/workflows/deploy-google-store-runtime.yml', '.github/workflows/deploy-google-marketing-trigger.yml', '.github/workflows/deploy-admin.yml', 'Dockerfile.marketing', 'scripts/gcp/activate-tested-public-revision.mjs']) {
     assert.equal(infrastructureRepairPath(path), true);
+    assert.equal(blockedPath(path), true, path);
+    const result = validatePath(path);
+    assert.notEqual(result.status, 0, path);
+  }
+});
+
+test('authorization, release controls, secret files and traversal stay forbidden', () => {
+  for (const path of ['.env.production', 'deploy/service.pem', 'scripts/gcp/../credentials.mjs',
+    'apps/admin/node_modules/x.js','.github/workflows/paris-code-repair.yml',
+    'lib/devstudio/infrastructure-repair.mjs','lib/devstudio/github-app-token.ts',
+    'scripts/gcp/secret-export.mjs','package.json','tests/unit/course-builder-live-preview.test.tsx']) {
+    assert.equal(blockedPath(path), true, path);
+    assert.notEqual(validatePath(path).status, 0, path);
+  }
+  for (const path of ['services/studio-browser/server.mjs','infra/pbx/asterisk/extensions.conf',
+    'apps/admin/app/api/credentialing/route.ts','components/learner/Example.tsx',
+    'tests/unit/application-regression.test.ts']) {
     assert.equal(blockedPath(path), false, path);
     const result = validatePath(path);
     assert.equal(result.status, 0, result.stderr);
   }
 });
 
-test('deployment repair does not admit its own validator or access-control edits', () => {
-  for (const path of ['.github/workflows/paris-code-repair.yml', '.env.production', 'lib/devstudio/infrastructure-repair.mjs', 'lib/devstudio/github-app-token.ts', 'scripts/gcp/secret-export.mjs', 'scripts/gcp/../credentials.mjs']) {
-    assert.equal(blockedPath(path), true, path);
-    assert.notEqual(validatePath(path).status, 0, path);
+test('protected workflow writes fail before credentials or GitHub mutations', async () => {
+  let calls=0;
+  const forbidden=()=>{calls++;throw Error('must not reach GitHub or credentials');};
+  const factory=new Function('fetch','getGitHubHeaders','getGitHubAppToken','assertCommittedWriteReadback',
+    compiled+'\nreturn writeFile;');
+  const write=factory(forbidden,forbidden,forbidden,assertCommittedWriteReadback);
+  for(const path of ['.github/workflows/deploy-google-store-runtime.yml',
+    'lib/devstudio/github-app-token.ts','tests/unit/course-builder-live-preview.test.tsx']){
+    await assert.rejects(write({path,content:'candidate',branch:'studio/repair',message:'fixture'}),
+      /Repository path is not allowed/);
   }
+  assert.equal(calls,0);
 });
 
-test('a workflow file is actually written with App authority and cannot fall back to a job token', async () => {
+test('application writes retain authenticated committed-content and branch readback', async () => {
   const calls = [];
   const factory = new Function('fetch', 'getGitHubHeaders', 'getGitHubAppToken', 'assertCommittedWriteReadback', compiled + '\nreturn writeFile;');
   const fetcher = async (url, init) => {
@@ -52,13 +76,13 @@ test('a workflow file is actually written with App authority and cannot fall bac
     if (url.includes('/git/ref/heads/')) return Response.json({ object: { sha: 'b'.repeat(40) } });
     return Response.json({ sha: 'c'.repeat(40), content: Buffer.from('owner-authorized fixture').toString('base64') });
   };
-  const input = { path: '.github/workflows/deploy-google-store-runtime.yml', content: 'owner-authorized fixture', branch: 'studio/repair', message: 'Correct disk capacity' };
-  const write = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => 'app-fixture', assertCommittedWriteReadback);
+  const input = { path: 'components/learner/Example.tsx', content: 'owner-authorized fixture', branch: 'studio/repair', message: 'Correct application behavior' };
+  const write = factory(fetcher, async () => ({ Authorization: 'Bearer app-fixture' }), async () => {assert.fail('protected workflow path must never be admitted');}, assertCommittedWriteReadback);
   assert.equal((await write(input)).commitSha, 'b'.repeat(40));
   assert.equal(calls[0].init.headers.Authorization, 'Bearer app-fixture');
   assert.equal(JSON.parse(calls[0].init.body).branch, 'studio/repair');
-  const denied = factory(fetcher, async () => ({ Authorization: 'Bearer job-fixture' }), async () => null, assertCommittedWriteReadback);
-  await assert.rejects(denied(input), /WORKFLOW_APP_AUTHORITY_REQUIRED/);
+  const denied = factory(fetcher, async () => {throw Error('GITHUB_APP_AUTHORITY_REQUIRED');}, async () => null, assertCommittedWriteReadback);
+  await assert.rejects(denied(input), /GITHUB_APP_AUTHORITY_REQUIRED/);
   assert.equal(calls.length, 3);
   assert.match(calls[1].url, /ref=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/);
   assert.match(calls[2].url, /git\/ref\/heads\/studio%2Frepair/);

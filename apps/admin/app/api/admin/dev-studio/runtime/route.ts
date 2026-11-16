@@ -9,7 +9,7 @@ import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 120;
+export const maxDuration = 1800;
 
 function runtimeAuthenticationFailure() {
   // The operator passed Admin authorization. A rejection by the private
@@ -189,7 +189,13 @@ async function writeRuntime(request: NextRequest) {
                             timeoutMs: Number(body.timeoutMs || 30_000),
                           },
           ),
-    signal: AbortSignal.timeout(120_000),
+    // Exec waits as long as the requested command (plus headroom) so long
+    // commands return their output instead of an aborted proxy response.
+    signal: AbortSignal.timeout(
+      target.endsWith('/workspace/exec')
+        ? Math.max(120_000, Number(body.timeoutMs || 30_000) + 30_000)
+        : 120_000,
+    ),
   });
   if (response.status === 401 || response.status === 403) return runtimeAuthenticationFailure();
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));

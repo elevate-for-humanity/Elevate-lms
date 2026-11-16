@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 import {completeStagedLesson} from './learner-runthrough.mjs';
 import { launchBrowser } from './cdp-browser.mjs';
+import {fixtureEgressFactory} from './cdp-fixture-egress.mjs';
 
 const executablePath = process.env.STUDIO_BROWSER_EXECUTABLE_PATH;
 const listen = (server) => new Promise((resolve) => server.listen(0, '0.0.0.0', resolve));
@@ -104,7 +105,7 @@ test(
       await closeServer(server);
       await fs.rm(directory, { recursive: true, force: true });
     });
-    browser = await launchBrowser({ executablePath, headless: true, args: ['--no-sandbox'] });
+    browser = await launchBrowser({ executablePath, egressFactory:fixtureEgressFactory([origin,crossOrigin]), headless: true, args: ['--no-sandbox'] });
     const runtimeErrors = [];
     browser.on('runtimeerror', (error) => runtimeErrors.push(error.message));
     const context = await browser.newContext();

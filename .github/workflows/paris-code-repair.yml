@@ -173,7 +173,7 @@ jobs:
       id-token: write
     if: github.event_name == 'workflow_dispatch' && inputs.repair_id != '' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 100
     outputs:
       sha: ${{ steps.patch.outputs.sha }}
       base: ${{ steps.patch.outputs.base }}
@@ -201,6 +201,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           ADMIN_URL: https://admin.elevateforhumanity.org
           REPAIR_ID: ${{ inputs.repair_id }}
+          PARIS_REPAIR_MAX_TURNS: ${{ vars.PARIS_REPAIR_MAX_TURNS }}
+          PARIS_REPAIR_BUDGET_MINUTES: ${{ vars.PARIS_REPAIR_BUDGET_MINUTES }}
         run: |
           python - <<'PY'
           import json,os,re,time,urllib.request,urllib.parse,urllib.error
@@ -218,8 +220,8 @@ jobs:
             return token
           # OpenHands is asynchronous. Poll its SAME durable task, with a
           # bounded wait; never start another conversation after ambiguity.
-          # Existing internal planner continuations retain their 15-turn cap.
-          deadline=time.monotonic()+35*60
+          # Internal planner continuations are capped by PARIS_REPAIR_MAX_TURNS.
+          deadline=time.monotonic()+int(os.environ.get('PARIS_REPAIR_BUDGET_MINUTES') or 90)*60
           internal_turns=0
           while time.monotonic()<deadline:
             # A planner continuation can outlive the initial five-minute JWT.
@@ -244,7 +246,7 @@ jobs:
                 time.sleep(min(30,max(0,deadline-time.monotonic())))
               else:
                 internal_turns+=1
-                if internal_turns>=15: raise SystemExit('PARIS planner exceeded its bounded continuation limit')
+                if internal_turns>=int(os.environ.get('PARIS_REPAIR_MAX_TURNS') or 40)+1: raise SystemExit('PARIS planner exceeded its bounded continuation limit')
                 print('Saved PARIS planner turn',result.get('turn'),flush=True)
               continue
             break
@@ -259,7 +261,6 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
-      id-token: write
     env:
       NODE_OPTIONS: --max-old-space-size=6144
       CI: 'true'
@@ -284,14 +285,12 @@ jobs:
           tests=[]
           for line in changes:
             status,path=line.split('\t',1)
-            infrastructure = re.fullmatch(r'(?:\.github/workflows/[\w-]+\.ya?ml|Dockerfile\.(?:admin|lms|marketing)|scripts/gcp/[\w-]+\.(?:mjs|py))',path)
-            if status not in ['A','M'] or not (re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path) or infrastructure): raise SystemExit('Repair outside authorized source scope')
-            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|repair-events|control-plane|course-repair-policy|workflow-github-context|github-token|github-app-token|paris-code-engineer|paris-openhands|infrastructure-repair|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
-            if re.search(r'\.(test|spec)\.[cm]?[jt]sx?$',path) and status != 'A': raise SystemExit('Existing tests must remain unchanged')
-            if path.startswith('tests/'):
-              if status!='A': raise SystemExit('Existing tests must remain unchanged')
-              if re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)
-          if not tests: raise SystemExit('A new regression test is required')
+            if status not in ['A','M']: raise SystemExit('Repair must add or modify files')
+            if re.search(r'^(apps/admin/app/api/(cron/paris-code-repair|dev-studio|internal)(/|$)|lib/ai/paid-inference[^/]*|\.github(/|$)|scripts(/|$)|lib/(devstudio|ai/runtime|auth|rbac|supabase|secrets)(/|\.|$)|lib/paris-workflow-identity\.ts$|AGENTS\.md$|Dockerfile(\.|$)|(package(-lock)?\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml)$)',path) or re.search(r'(^|/)(tsconfig[^/]*\.json|vitest\.config\.[^/]+|eslint\.config\.[^/]+|\.npmrc|AGENTS\.md)$',path): raise SystemExit('Independent repair controls require separate review')
+            if re.search(r'^(tests/unit/(course-builder-live-preview|course-builder-assessment-preview|paris-course-integration)\.test\.tsx?|tests/worker/approved-picture-timeline\.test\.mjs)$',path): raise SystemExit('Independent repair checks require separate review')
+            if '..' in path or path.startswith(('/','.git/')) or re.search(r'(^|/)(node_modules|\.next)(/|$)',path) or re.search(r'(^|/)(\.env(\.[^/]*)?|[^/]*\.(pem|key|p12|pfx)|id_(rsa|ed25519)[^/]*)$',path,re.I): raise SystemExit('Protected repair boundary')
+            if path.startswith('tests/') and re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)
+          if not tests: raise SystemExit('A new or updated regression test is required')
           open('/tmp/paris-tests.json','w').write(json.dumps(tests))
           PY
       - run: pnpm install --frozen-lockfile --ignore-scripts

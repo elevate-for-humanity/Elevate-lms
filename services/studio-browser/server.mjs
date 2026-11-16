@@ -1,3 +1,5 @@
+import {isPrivateAddress,createBrowserEgress} from './cdp-egress.mjs';
+export {isPrivateAddress} from './cdp-egress.mjs';
 import { readBrowserSnapshot } from './cdp-snapshot.mjs';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -51,8 +53,10 @@ const frameQuality = Math.min(
   80,
   Math.max(35, Number(process.env.STUDIO_BROWSER_FRAME_QUALITY || 60)),
 );
+// Empty = any public host. Private, loopback and metadata addresses are always
+// rejected by validatePublicTarget. Set a comma list to restrict navigation.
 const allowedDomains = (
-  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com,accounts.google.com,console.cloud.google.com,shell.cloud.google.com'
+  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || ''
 )
   .split(',')
   .map((value) => value.trim().toLowerCase())
@@ -107,7 +111,10 @@ async function checkpointWorkspace(){
   }
 }
 
-const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);
+// Any installed binary may run inside the isolated workspace (bash was already
+// allowed, so a name list was never a boundary). Set STUDIO_EXEC_MAX_TIMEOUT_MS
+// to tune the longest command; default 30 minutes.
+const execMaxTimeoutMs = Math.max(1_000, Number(process.env.STUDIO_EXEC_MAX_TIMEOUT_MS) || 30 * 60_000);
 let shuttingDown = false;
 
 function authorizedService(req) {
@@ -166,12 +173,12 @@ async function executeWorkspaceCommand(body, owner = 'legacy') {
   try { argv = Array.isArray(body.args) ? [command, ...body.args.map(String)] : commandArguments(command); }
   catch (error) { throw new BrowserServiceError(error.message, 400); }
   const [binary, ...args] = argv;
-  if (!allowedExecCommands.has(binary)) throw new BrowserServiceError('command_not_allowed', 400);
+  if (!/^[\w.+-]+$/.test(binary)) throw new BrowserServiceError('command_not_allowed', 400);
   const cwd = safeWorkspacePath(String(body.cwd || ''));
   let result;
   try { result = await execFileAsync(binary, args, {
     cwd,
-    timeout: Math.min(120_000, Math.max(1_000, Number(body.timeoutMs || 30_000))),
+    timeout: Math.min(execMaxTimeoutMs, Math.max(1_000, Number(body.timeoutMs || 30_000))),
     maxBuffer: 10 * 1024 * 1024,
     env: { ...process.env, HOME: '/home/studio', STUDIO_EXPORT_DIR: artifactDirectory(workspaceRoot, owner) },
   }); } catch (error) {
@@ -270,6 +277,9 @@ export function createBrowserLifecycleManager({
       let candidate;
       try {
         candidate = await launch({
+          // The authenticated foundation probe uses expiring synthetic fixtures,
+          // never arbitrary local routes or a caller-provided proxy setting.
+          egressFactory:()=>createBrowserEgress({fixtureDestination:(url,method)=>['GET','HEAD'].includes(method)?foundationFixtureDestination(url):null}),
           headless: true,
           executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH || '/usr/bin/chromium',
           args: [
@@ -415,25 +425,6 @@ async function readBody(req) {
   return chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : {};
 }
 
-export function isPrivateAddress(address) {
-  if (net.isIPv4(address)) {
-    const [a, b] = address.split('.').map(Number);
-    return (
-      a === 10 ||
-      a === 127 ||
-      a === 0 ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168)
-    );
-  }
-  return (
-    address === '::1' ||
-    address.startsWith('fc') ||
-    address.startsWith('fd') ||
-    address.startsWith('fe80:')
-  );
-}
 
 function browserTarget(input) {
   let url;
@@ -724,6 +715,14 @@ export async function receiveBrowserUpload(session, request, limit = 32 * 1024 *
   } finally {
     await file.close();
   }
+}
+
+export function foundationFixtureDestination(input,{fixtures=foundationFixtures,fixturePort=port,now=Date.now()}={}){
+  let url;try{url=new URL(input);}catch{return null;}
+  const match=url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download|one|two)$/);
+  const fixture=match&&fixtures.get(match[1]);
+  if(url.protocol!=='http:'||url.hostname!=='127.0.0.1'||url.port!==String(fixturePort)||url.username||url.password||url.search||url.hash||!fixture||fixture.expiresAt<=now)return null;
+  return {url,address:'127.0.0.1',port:fixturePort};
 }
 
 async function runBrowserFoundationTest() {

@@ -1,3 +1,4 @@
+import {createBrowserEgress} from './cdp-egress.mjs';
 import { EventEmitter } from 'node:events';
 import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -147,6 +148,7 @@ export async function launchConnection({
   headless = true,
   args = [],
   launchTimeoutMs = 30000,
+  egressFactory = createBrowserEgress,
   ...transportOptions
 } = {}) {
   if (!executablePath) throw new Error('Chromium executablePath is required');
@@ -157,7 +159,7 @@ export async function launchConnection({
     args.some(
       (arg) =>
         typeof arg !== 'string' ||
-        /^--(?:remote-debugging(?:-[^=]*)?|user-data-dir|profile-directory)(?:=|$)/i.test(arg),
+        /^--(?:remote-debugging(?:-[^=]*)?|user-data-dir|profile-directory|proxy-server|proxy-bypass-list|proxy-pac-url|no-proxy-server|host-resolver-rules|force-webrtc-ip-handling-policy|enable-quic)(?:=|$)/i.test(arg),
     )
   ) {
     throw new Error('Browser arguments may not override debugging or profile configuration');
@@ -165,6 +167,7 @@ export async function launchConnection({
   const profile = await mkdtemp(join(tmpdir(), 'studio-cdp-'));
   let child;
   let connection;
+  let egress;
   let closing;
   let exited = false;
   const ownsProcessGroup = process.platform !== 'win32';
@@ -196,15 +199,21 @@ export async function launchConnection({
         });
       }
       signalProcess('SIGKILL');
+      await egress?.close();
       await cleanup();
     });
     return closing;
   };
   try {
+    egress = await egressFactory();
     child = spawn(
       executablePath,
       [
         ...args,
+        `--proxy-server=${egress.url}`,
+        '--proxy-bypass-list=<-loopback>',
+        '--disable-quic',
+        '--force-webrtc-ip-handling-policy=disable_non_proxied_udp',
         ...(headless ? ['--headless=new'] : []),
         '--no-first-run',
         '--no-default-browser-check',

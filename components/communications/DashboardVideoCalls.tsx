@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 
 // Load the WebRTC conferencing runtime only when an accepted call renders a room.
 // Public login pages share dashboard chrome but never render a video room.
-const PlatformVideoRoom = dynamic(() => import('./PlatformVideoRoom').then(module => module.PlatformVideoRoom));
+// React.lazy, not next/dynamic: this shared chrome is bundled by every app, and
+// next/dynamic's server loadable runtime breaks Admin startup and Marketing builds.
+const PlatformVideoRoom = lazy(() => import('./PlatformVideoRoom').then(module => ({ default: module.PlatformVideoRoom })));
 
 type Call = { roomId: string; title: string; direction: 'incoming' | 'outgoing'; state: 'ringing' | 'accepted' };
 export function DashboardVideoCalls({ extension, disabled = false, dialPad = false }: { extension?: string; disabled?: boolean; dialPad?: boolean }) {
@@ -69,6 +70,6 @@ export function DashboardVideoCalls({ extension, disabled = false, dialPad = fal
     </section> : null}
     {error ? <p role="alert" className="rounded bg-red-50 p-3 text-red-800">{error}</p> : null}
     {incoming ? <section role="dialog" aria-label="Incoming video call" className="fixed inset-x-3 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[105] mx-auto max-h-[calc(100dvh-2rem-env(safe-area-inset-bottom))] max-w-lg overflow-y-auto rounded-2xl bg-slate-950 p-4 text-white shadow-xl sm:p-6 max-lg:bottom-[calc(6rem+env(safe-area-inset-bottom))]"><h2 className="text-xl font-bold">Incoming video call</h2><p>{incoming.title}</p><div className="mt-4 flex flex-wrap gap-3"><button type="button" disabled={busy} onClick={() => void act('accept', incoming)} className="min-h-12 min-w-0 flex-1 rounded bg-emerald-700 px-4">Answer video call</button><button type="button" disabled={busy} onClick={() => void act('decline', incoming)} className="min-h-12 min-w-0 flex-1 rounded bg-red-700 px-4">Decline video call</button></div></section> : null}
-    {current ? <section role="dialog" aria-label="Video call" className="fixed inset-0 z-[110] overflow-y-auto overscroll-contain bg-slate-950 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-white sm:p-4"><div className="mx-auto max-w-6xl space-y-4"><div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-xl font-bold">{current.title}</h2><p role="status">{current.state === 'accepted' ? 'Invitation accepted' : 'Calling extension…'}</p></div><button type="button" disabled={busy} onClick={() => void act('end', current)} className="min-h-12 rounded bg-red-700 px-4 font-bold">End video call</button></div><div className="text-slate-950"><PlatformVideoRoom tokenEndpoint={`/api/communications/video-calls/${current.roomId}/token`} /></div></div></section> : null}
+    {current ? <section role="dialog" aria-label="Video call" className="fixed inset-0 z-[110] overflow-y-auto overscroll-contain bg-slate-950 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-white sm:p-4"><div className="mx-auto max-w-6xl space-y-4"><div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-xl font-bold">{current.title}</h2><p role="status">{current.state === 'accepted' ? 'Invitation accepted' : 'Calling extension…'}</p></div><button type="button" disabled={busy} onClick={() => void act('end', current)} className="min-h-12 rounded bg-red-700 px-4 font-bold">End video call</button></div><div className="text-slate-950"><Suspense fallback={<p role="status" className="text-white">Connecting video…</p>}><PlatformVideoRoom tokenEndpoint={`/api/communications/video-calls/${current.roomId}/token`} /></Suspense></div></div></section> : null}
   </>;
 }

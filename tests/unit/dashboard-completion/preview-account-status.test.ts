@@ -5,6 +5,9 @@ const state = vi.hoisted(() => ({ flags: { is_active: true, suspended: false } }
 vi.mock('next/headers', () => ({
   cookies: async () => ({ get: () => ({ value: 'signed-handoff' }) }),
 }));
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: async () => ({ auth: { getUser: async () => ({ data: { user: null }, error: null }) } }),
+}));
 vi.mock('@/lib/admin/portal-preview-handoff', () => ({
   verifyPortalPreviewHandoff: () => ({ actorId: 'admin', targetId: 'target' }),
 }));

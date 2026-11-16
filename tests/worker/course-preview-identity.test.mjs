@@ -28,6 +28,7 @@ function fixture({ userId = null, authError = null, handoff = null, portalActor 
       const previewing = Boolean(portalActor && (!authenticatedId || authenticatedId === portalActor));
       return { userId: previewing ? 'selected-learner' : authenticatedId, previewing };
     },
+    resolveApprenticeshipRuntimeContext: async () => null,
   };
   return { reads, subjects, resolve: new Function(...Object.keys(dependencies), `${source}; return resolveCoursePreview;`)(...Object.values(dependencies)) };
 }

@@ -7,6 +7,9 @@ const state = vi.hoisted(() => ({
   runtime: vi.fn(),
 }));
 vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: async () => ({ auth: { getUser: async () => ({ data: { user: null }, error: null }) } }),
+}));
 vi.mock('@/lib/admin/portal-preview', () => ({ resolvePortalPreviewSubject: async () => state.subject }));
 vi.mock('@/lib/apprenticeship/runtime-context', () => ({ resolveApprenticeshipRuntimeContext: state.runtime }));
 const db = { from: () => {

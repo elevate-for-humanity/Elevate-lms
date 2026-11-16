@@ -191,6 +191,8 @@ RUN set -eux; \
     test -f /app/apps/admin/lib/ultimate-course-builder/instructional/narration-numbers.mjs; \
     test -f /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-visual.ts; \
     test -f /app/apps/admin/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts; \
+    test -f /app/lib/video/kokoro-narration-worker.mjs; \
+    test -e /app/node_modules/kokoro-js; \
     test -d /app/node_modules/sharp; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \

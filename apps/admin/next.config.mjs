@@ -144,7 +144,7 @@ const adminConfig = {
   outputFileTracingRoot: ROOT,
   outputFileTracingExcludes: { '*': sharedStandaloneTraceExcludes },
   outputFileTracingIncludes: {
-    '/api/**': ['lib/logger.ts'],
+    '/api/**': ['lib/logger.ts', 'lib/video/kokoro-narration-worker.mjs'],
     '/studio/**': ['lib/logger.ts'],
   },
 

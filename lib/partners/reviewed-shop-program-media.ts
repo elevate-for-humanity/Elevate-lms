@@ -132,7 +132,8 @@ export const REVIEWED_HOST_SHOP_MEDIA: ReadonlyArray<{
     "assets": [
       "/images/host-shops/dbo-hair-studios/evelyn.webp",
       "/images/host-shops/dbo-hair-studios/team-portrait-2.webp",
-      "/images/host-shops/dbo-hair-studios/team-portrait-3.webp"
+      "/images/host-shops/dbo-hair-studios/team-portrait-3.webp",
+      "/images/host-shops/dbo-hair-studios/official-blowout-service-2026.webp"
     ]
   },
   {
@@ -145,7 +146,15 @@ export const REVIEWED_HOST_SHOP_MEDIA: ReadonlyArray<{
       "/images/host-shops/executivecutz/interior-2.webp",
       "/images/host-shops/executivecutz/interior-3.webp",
       "/images/host-shops/executivecutz/interior-4.webp",
-      "/images/host-shops/executivecutz/interior-5.webp"
+      "/images/host-shops/executivecutz/interior-5.webp",
+      "/images/host-shops/executivecutz/official-shampoo-chair-2026.webp",
+      "/images/host-shops/executivecutz/official-floor-2026.webp",
+      "/images/host-shops/executivecutz/official-seating-2026.webp",
+      "/images/host-shops/executivecutz/official-workstations-2026.webp",
+      "/images/host-shops/executivecutz/official-stations-2026.webp",
+      "/images/host-shops/executivecutz/official-main-floor-2026.webp",
+      "/images/host-shops/executivecutz/official-wide-interior-2026.webp",
+      "/images/host-shops/executivecutz/official-storefront-2026.webp"
     ]
   },
   {

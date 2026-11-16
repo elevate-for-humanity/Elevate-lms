@@ -10,10 +10,13 @@ describe('complete public shop promotion', () => {
     const [shop] = await getHostShopNetwork();
     expect(shop.name).toBe('DBO Hair Studios');
     expect(shop.approval).toBe('approved');
-    expect(shop.gallery).toHaveLength(3);
+    expect(shop.gallery).toHaveLength(4);
     expect(shop.gallery?.every((photo) => photo.url.includes('/dbo-hair-studios/'))).toBe(true);
     expect(shop.booking).toBe('https://www.dbohairstudios.com/book');
     expect(shop.description).toContain('Evelyn Estevez');
+    expect(shop.description).toContain('2001');
+    expect(shop.description).toContain('2012');
+    expect(shop.gallery?.some(photo => photo.url.endsWith('official-blowout-service-2026.webp'))).toBe(true);
   });
   it('retains B-52’s professional portfolio after the business becomes operationally approved', async () => {
     const shop = (await getHostShopNetwork()).find((candidate) => candidate.id === 'b52');

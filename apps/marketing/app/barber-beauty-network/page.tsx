@@ -103,13 +103,13 @@ export default async function BarberBeautyNetworkPage() {
               href="https://app.elevateforhumanity.org/signup"
               className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600"
             >
-              Join the Barber &amp; Beauty Network <ArrowRight className="h-4 w-4" />
+              Join the Barber &amp; Beauty Network for Free <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/partners/host-shop/apply"
               className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10"
             >
-              Apply as a Host Shop <ArrowRight className="h-4 w-4" />
+              Host Shops: Apply Free <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="#shop-directory"
@@ -155,7 +155,7 @@ export default async function BarberBeautyNetworkPage() {
         <div className="mx-auto max-w-6xl">
           <div>
             <p className="text-sm font-black uppercase text-red-700">Free network membership</p>
-            <h2 className="mt-2 text-3xl font-black">Your talent deserves to be seen.</h2>
+            <h2 className="mt-2 text-3xl font-black">Need exposure? We’ve got your shop covered.</h2>
             <p className="mt-4 leading-7">
               The Barber &amp; Beauty Network brings professionals, customers, students, and
               apprenticeship host shops together. Explore real portfolios, follow business links,
@@ -166,7 +166,7 @@ export default async function BarberBeautyNetworkPage() {
                 href="https://app.elevateforhumanity.org/signup"
                 className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white"
               >
-                Join the Barber &amp; Beauty Network — Create Account
+                Join the Barber &amp; Beauty Network for Free — Create Account
               </Link>
               <Link
                 href="/partners/host-shop/apply"

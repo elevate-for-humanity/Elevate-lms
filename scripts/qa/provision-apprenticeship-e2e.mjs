@@ -166,6 +166,9 @@ async function provision() {
 
     const hostShop = await must(
       db.from('host_shops').insert({
+        // Match requests FK to host_shops.id, whereas placement rosters use shops.id.
+        // The two canonical records must share the exact ID for this QA fixture.
+        id: shop.id,
         name: `[QA E2E] Host Shop ${runId}`,
         owner_id: host.id,
         tenant_id: program.tenant_id || tenantId,

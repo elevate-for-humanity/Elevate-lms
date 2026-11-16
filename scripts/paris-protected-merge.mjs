@@ -143,7 +143,7 @@ async function main() {
       .filter(r => ['APPROVED', 'CHANGES_REQUESTED'].includes(r.state))
       .map(r => r.user?.login?.toLowerCase()).filter(Boolean));
     for (const login of decisionLogins) {
-      if (login in reviewerPermissions) continue;
+      if (Object.hasOwn(reviewerPermissions, login)) continue;
       if (!/^[a-z0-9](?:[a-z0-9-]{0,38})$/.test(login)) continue;
       try {
         const collaborator = await ghJson(`/repos/${REPOSITORY}/collaborators/${encodeURIComponent(login)}/permission`, { token: policy });

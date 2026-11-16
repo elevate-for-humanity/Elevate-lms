@@ -1,14 +1,14 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const m=vi.hoisted(()=>({sms:vi.fn(),email:vi.fn(),delivery:vi.fn(),claims:new Set<string>()}));
+const m=vi.hoisted(()=>({sms:vi.fn(),email:vi.fn(),push:vi.fn(),delivery:vi.fn(),claims:new Set<string>()}));
 vi.mock('server-only',()=>({}));
-vi.mock('@/lib/notifications/push-service',()=>({PushNotificationService:class{sendToUserWithDatabase=async()=>1;}}));
+vi.mock('@/lib/notifications/push-service',()=>({PushNotificationService:class{sendToUserWithDatabase=m.push;}}));
 vi.mock('@/lib/phone/notification-delivery',()=>({phoneNotificationKind:(input:any)=>input.source==='voicemail'&&input.awaitingTranscript&&!input.transcript?.trim()?'voicemail_recording':input.source||'paris',deliverPhoneNotification:async(db:any,id:any,send:any)=>{m.delivery(id);const key=JSON.stringify(id);if(m.claims.has(key))return 'duplicate';m.claims.add(key);return (await send()).accepted?'accepted':'review_required';}}));
 vi.mock('@/lib/email/sendgrid',()=>({sendEmail:m.email}));
 vi.mock('@/lib/notifications/sms',()=>({sendSMS:m.sms}));
 import {notifyAssignee,phoneSmsBody} from '@/lib/phone/message-notifications';
 const prefs={email_missed_calls:false,sms_missed_calls:true,sms_phone:'+13179562748',push_enabled:false};
 function db(preferences=prefs,email:string|null=null){return{from:(table:string)=>{const q:any={select:()=>q,eq:()=>q,maybeSingle:async()=>({data:table==='profiles'?{full_name:'Owner',email}:preferences,error:null})};return q;}};}
-beforeEach(()=>{vi.clearAllMocks();m.claims.clear();m.sms.mockResolvedValue({success:true,messageId:'SM1'});m.email.mockResolvedValue({success:true,data:{messageId:'email1'}});});
+beforeEach(()=>{vi.clearAllMocks();m.claims.clear();m.push.mockResolvedValue(1);m.sms.mockResolvedValue({success:true,messageId:'SM1'});m.email.mockResolvedValue({success:true,data:{messageId:'email1'}});});
 it('texts the caller number, extension and voicemail transcript',async()=>{
  await notifyAssignee(db(),{profileId:'owner',taskId:'vm',caller:'+13175550100',urgency:'normal',source:'voicemail',extension:'0',transcript:'Hi,  please call me about   enrollment.'},{id:'system'});
  expect(m.sms).toHaveBeenCalledTimes(1);
@@ -51,4 +51,14 @@ it('alerts email-only recipients about a saved recording and sends one recovered
  await notifyAssignee(database,{...input,transcript:'Recovered transcript',transcriptUpdate:true},{id:'system'});
  await notifyAssignee(database,{...input,transcript:'Recovered transcript',transcriptUpdate:true},{id:'system'});
  expect(m.email).toHaveBeenCalledTimes(2);expect(m.email.mock.calls[1][0].text).toContain('Recovered transcript');
+});
+
+it('keeps one push across an outage and successful ingestion retry but sends both readable notices',async()=>{
+ const database=db({...prefs,push_enabled:true,email_missed_calls:true},'owner@example.invalid');
+ const input={profileId:'owner',taskId:'vm',caller:'+13175550100',urgency:'normal',source:'voicemail' as const};
+ await notifyAssignee(database,{...input,awaitingTranscript:true},{id:'system'});
+ await notifyAssignee(database,{...input,awaitingTranscript:false,transcript:'Recovered after retry'},{id:'system'});
+ await notifyAssignee(database,{...input,awaitingTranscript:false,transcript:'Recovered after retry'},{id:'system'});
+ expect(m.push).toHaveBeenCalledTimes(1);
+ expect(m.sms).toHaveBeenCalledTimes(2);expect(m.email).toHaveBeenCalledTimes(2);
 });

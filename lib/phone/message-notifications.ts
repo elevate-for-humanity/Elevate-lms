@@ -87,7 +87,9 @@ async function notifyRecipient(
   if (!input.profileId || !input.taskId) return;
   const identity = { taskId: input.taskId, profileId: input.profileId, kind: phoneNotificationKind(input) };
   const deliveries: Array<Promise<unknown>> = [];
-  const sendPush = () => deliverPhoneNotification(db, { ...identity, channel: 'push' }, async () => {
+  // Push always announces the same recording, including ingestion retries.
+  // Only SMS/email need separate recording-only and transcript identities.
+  const sendPush = () => deliverPhoneNotification(db, { ...identity, kind: input.source || 'paris', channel: 'push' }, async () => {
     const acceptedDeviceCount = await push.sendToUserWithDatabase(db, input.profileId!, {
     title: `Elevate for Humanity · ${input.urgency === 'urgent' ? 'Urgent ' : ''}${input.source === 'voicemail' ? 'voicemail' : 'PARIS message'}${input.adminCopy ? ' · Admin copy' : ''}`,
     body: `${inboxLabel}${input.extension ? ` · Extension ${input.extension}` : ''}: ${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,

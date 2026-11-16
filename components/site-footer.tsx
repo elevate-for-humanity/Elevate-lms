@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { getPublicFundingNotice } from '@/lib/marketing/public-page-facts';
 import PublicPageFacts from '@/components/marketing/PublicPageFacts';
 import { siteConfig } from '@/content/site';
 import { siteConfig as contactConfig } from '@/lib/config/site';
@@ -20,12 +22,13 @@ const GROUPS = [
 const legalLinkClass = 'inline-flex min-h-11 items-center hover:text-slate-950 hover:underline';
 
 export function SiteFooter() {
+  const fundingNotice = getPublicFundingNotice(usePathname() || '/');
   return (
     <>
     <PublicPageFacts />
     <footer data-public-footer className="border-t border-slate-200 bg-slate-50 text-slate-950">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-        <p className="mb-7 max-w-4xl text-sm leading-6 text-slate-700"><strong className="text-slate-950">Funding notice:</strong> Apprenticeship programs are self-pay unless the exact program page documents another approved payment source. Public WIOA or Workforce Ready Grant labels are shown only for programs with verified program-level evidence; participant eligibility and written authorization remain agency decisions.</p>
+        {fundingNotice && <p className="mb-7 max-w-4xl text-sm leading-6 text-slate-700"><strong className="text-slate-950">Funding notice:</strong> {fundingNotice}</p>}
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5 lg:gap-7">
           <div>
             <p className="text-lg font-bold text-slate-950">{siteConfig.name}</p>

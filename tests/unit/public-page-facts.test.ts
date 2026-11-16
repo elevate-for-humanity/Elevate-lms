@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { getPublicPageFacts } from '@/lib/marketing/public-page-facts';
+import { getPublicPageFacts, getPublicFundingNotice } from '@/lib/marketing/public-page-facts';
 
 describe('public page self-service facts', () => {
+  it('scopes funding disclosures to training and funding pages', () => {
+    expect(getPublicFundingNotice('/testing')).toBeNull();
+    expect(getPublicFundingNotice('/contact')).toBeNull();
+    expect(getPublicFundingNotice('/programs/hvac-technician')).not.toContain('Apprenticeship');
+    expect(getPublicFundingNotice('/programs/barber-apprenticeship')).toContain('self-pay');
+    expect(getPublicFundingNotice('/funding')).toContain('written authorization');
+  });
   it.each(['/apprenticeships', '/programs/barber-apprenticeship', '/programs/cosmetology-apprenticeship', '/programs/esthetician-apprenticeship', '/programs/nail-technician-apprenticeship'])('states self-pay only on %s', (route) => {
     const page = getPublicPageFacts(route);
     expect(page.facts.some((fact) => /self-pay only/i.test(fact.answer))).toBe(true);

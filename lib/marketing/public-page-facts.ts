@@ -61,3 +61,11 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
   // program’s tuition, Host Shop instructions or enrollment block to them.
   return { title: '', facts: [] };
 }
+
+export function getPublicFundingNotice(pathname: string): string | null {
+  if (!/^\/(?:programs|funding|apprenticeships)(?:\/|$)/.test(pathname)) return null;
+  const programSlug = pathname.match(/^\/programs\/([^/]+)/)?.[1];
+  const apprenticeship = pathname.startsWith('/apprenticeships') || Boolean(programSlug && (getRegisteredProgramStandard(programSlug) || programSlug.endsWith('-apprenticeship')));
+  const workforce = 'Public WIOA or Workforce Ready Grant labels are shown only for programs with verified program-level evidence; participant eligibility and written authorization remain agency decisions.';
+  return apprenticeship ? `Apprenticeship programs are self-pay unless the exact program page documents another approved payment source. ${workforce}` : workforce;
+}

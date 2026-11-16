@@ -9,6 +9,7 @@ import { TenantCommerce, TenantBagButton, TenantAddToBag } from './TenantShoppin
 import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
 import { WellnessStorefront } from '@/components/tenant/WellnessStorefront';
 import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
+import { TenantChoiceSection } from '@/components/tenant/TenantChoiceSection';
 import { TenantParis } from '@/components/tenant/TenantParis';
 import { TenantHiringApplication } from '@/components/tenant/TenantHiringApplication';
 import { tenantSiteHref as hrefFor } from '@/lib/tenant/site-links';
@@ -160,6 +161,9 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
 
   // Both the generator and saved projects use this composition; it is not tied
   // to one customer's template or a parallel standalone application.
+  if (section.type === 'cta' && section.settings?.layout === 'choices') {
+    return <TenantChoiceSection content={c} primary={primary} basePath={basePath} />;
+  }
   if ((section.type === 'rich_text' || section.type === 'cta') && section.settings?.layout === 'split' && text(c.image)) {
     const imageFirst = section.settings?.imagePosition === 'left';
     return <section data-section-id={section.id} data-image-position={imageFirst ? 'left' : 'right'} className="tenant-editorial-split mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-6 lg:grid-cols-2">

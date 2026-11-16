@@ -25,19 +25,25 @@
         "url": "/images/host-shops/dbo-hair-studios/team-portrait-3.webp",
         "alt": "DBO Hair Studios team portrait at the Indianapolis salon",
         "source": "https://www.dbohairstudios.com/team"
+      },
+      {
+        "url": "/images/host-shops/dbo-hair-studios/official-blowout-service-2026.webp",
+        "alt": "DBO Hair Studios stylist providing a Dominican blowout in the Indianapolis salon",
+        "source": "https://www.dbohairstudios.com/our-story"
       }
     ],
     "programs": [
       "cosmetology-apprenticeship"
-    ]
+    ],
+    "businessDescription": "Founded in Indianapolis in 2001, DBO Hair Studios is a multicultural salon rooted in Dominican hair care. Owner and master stylist Evelyn Estevez has led the family business since 2012. Explore Dominican blowouts, cuts, color and personalized styling, meet the team, and book directly with the salon."
   },
   {
     "slug": "executivecutz",
     "name": "Executivecutz",
     "address": "2049 Veterans Memorial Pkwy S, Suite 8, Lafayette, IN 47909",
     "city": "Lafayette",
-    "phone": "765-269-6243",
-    "website": "https://getsquire.com/discover/barbershop/executivecutz-lafayette",
+    "phone": "765-775-0521",
+    "website": "https://www.executivecutz.com/",
     "source": "https://getsquire.com/discover/barbershop/executivecutz-lafayette/barber/ivan-c-owner",
     "programs": [
       "barber-apprenticeship"
@@ -67,8 +73,51 @@
         "url": "/images/host-shops/executivecutz/interior-5.webp",
         "alt": "Executivecutz shop interior — view 5",
         "source": "https://getsquire.com/discover/barbershop/executivecutz-lafayette/barber/ivan-c-owner"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-storefront-2026.webp",
+        "alt": "Executive Cutz storefront on Veterans Memorial Parkway South in Lafayette",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-wide-interior-2026.webp",
+        "alt": "Executive Cutz full shop interior with barber chairs and workstations",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-main-floor-2026.webp",
+        "alt": "Executive Cutz main floor and barber stations",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-stations-2026.webp",
+        "alt": "Executive Cutz barber chairs and barbers at work",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-workstations-2026.webp",
+        "alt": "Executive Cutz workstation area in Lafayette",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-seating-2026.webp",
+        "alt": "Executive Cutz reception seating and barber shop floor",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-floor-2026.webp",
+        "alt": "Executive Cutz barber stations across the shop",
+        "source": "https://www.executivecutz.com/"
+      },
+      {
+        "url": "/images/host-shops/executivecutz/official-shampoo-chair-2026.webp",
+        "alt": "Executive Cutz shampoo chair and service area",
+        "source": "https://www.executivecutz.com/"
       }
-    ]
+    ],
+    "booking": "https://web.getsquire.com/book/executivecutz-lafayette",
+    "instagram": "https://www.instagram.com/executivecutz/",
+    "businessDescription": "Executive Cutz is a Lafayette barbershop led by Ivan Castro. Explore haircuts, beard grooming and hot-towel shaves in a spacious shop on Veterans Memorial Parkway South. View the shop, choose your barber and book directly through Squire."
   },
   {
     "slug": "studio-phresh",

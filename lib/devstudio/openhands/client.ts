@@ -316,6 +316,7 @@ function lifecycleFromConversation(
 export async function getOpenHandsLifecycle(input: {
   startTaskId?: string | null;
   conversationId?: string | null;
+  recordedSandboxId?: string | null;
 }): Promise<OpenHandsLifecycle> {
   let conversationId = input.conversationId?.trim() || null;
   let startTask: OpenHandsStartTask | null = null;
@@ -365,7 +366,9 @@ export async function getOpenHandsLifecycle(input: {
   // Some conversation responses omit sandbox_id. Recover it only from the
   // original start receipt, and require both receipts to identify this exact
   // conversation. Never enumerate sandboxes or create a replacement task.
-  if(!lifecycle.sandboxId&&input.startTaskId){
+  if(!lifecycle.sandboxId&&input.conversationId===conversationId&&/^[A-Za-z0-9_-]{1,128}$/.test(input.recordedSandboxId??''))
+    lifecycle.sandboxId=input.recordedSandboxId;
+  if(!lifecycle.sandboxId&&String(lifecycle.sandboxStatus).toUpperCase()==='PAUSED'&&input.startTaskId){
     startTask??=await getOpenHandsStartTask(input.startTaskId);
     if(startTask?.id!==input.startTaskId||startTask.app_conversation_id!==conversationId)
       throw new Error('OpenHands start-task receipt mismatch');

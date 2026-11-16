@@ -86,3 +86,13 @@ describe('OpenHands provider conversation contract (controlled HTTP)', () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 });
+it.each(['finished','running'])('does not make %s lifecycle depend on an unused start receipt',async(execution_status)=>{
+ globalThis.fetch=vi.fn(async()=>Response.json({id:'conversation-123',execution_status,sandbox_status:'RUNNING'})) as typeof fetch;
+ expect(await getOpenHandsLifecycle({startTaskId:'start-123',conversationId:'conversation-123'})).toMatchObject({status:execution_status==='finished'?'completed':'running'});
+ expect(fetch).toHaveBeenCalledTimes(1);
+});
+it('uses the canonical saved sandbox receipt before querying the startup endpoint',async()=>{
+ globalThis.fetch=vi.fn(async()=>Response.json({id:'conversation-123',sandbox_status:'PAUSED'})) as typeof fetch;
+ expect(await getOpenHandsLifecycle({startTaskId:'start-123',conversationId:'conversation-123',recordedSandboxId:'saved-sandbox'})).toMatchObject({sandboxId:'saved-sandbox'});
+ expect(fetch).toHaveBeenCalledTimes(1);
+});

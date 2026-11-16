@@ -578,6 +578,7 @@ export async function refreshOpenHandsTask(input: {
   const lifecycle = await getOpenHandsLifecycle({
     startTaskId: typeof external.start_task_id === 'string' ? external.start_task_id : null,
     conversationId: typeof external.conversation_id === 'string' ? external.conversation_id : null,
+    recordedSandboxId: typeof external.sandbox_id === 'string' ? external.sandbox_id : null,
   });
 
   let githubEvidence: OpenHandsGitHubEvidence | null = null;

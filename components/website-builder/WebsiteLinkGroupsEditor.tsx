@@ -16,7 +16,7 @@ export function WebsiteLinkGroupsEditor({ config, busy, onSave }: {
   function controls(label: string, groups: TenantSiteLinkGroup[], update: (groups: TenantSiteLinkGroup[]) => void) {
     return <fieldset disabled={busy} className="space-y-3"><legend className="font-bold">{label}</legend>{groups.map((group, index) => <fieldset key={index} className="rounded border p-3">
       <legend>{label} group {index + 1}</legend>
-      <label className="block">Group label<input className="ml-2 rounded border p-2" value={group.label} onChange={e => update(groups.map((g, i) => i === index ? { ...g, label: e.target.value } : g))} /></label>
+      <label className="block">Group label<input className="ml-2 rounded border p-2" maxLength={100} value={group.label} onChange={e => update(groups.map((g, i) => i === index ? { ...g, label: e.target.value } : g))} /></label>
       <p className="my-2 text-sm">Choose pages in the order they should appear. Hidden pages can be included explicitly.</p>
       {(config.pages || []).map(page => <label key={page.id} className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={group.pageIds.includes(page.id)} onChange={e => update(groups.map((g, i) => i === index ? { ...g, pageIds: e.target.checked ? [...g.pageIds, page.id] : g.pageIds.filter(id => id !== page.id) } : g))} />{page.title}</label>)}
       <div className="flex flex-wrap gap-3"><button type="button" disabled={index === 0} onClick={() => { const next = [...groups]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; update(next); }}>Move group up</button><button type="button" onClick={() => update(groups.filter((_, i) => i !== index))}>Remove group</button></div>

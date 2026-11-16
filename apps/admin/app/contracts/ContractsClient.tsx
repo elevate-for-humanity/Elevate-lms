@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { listContractTemplates } from './actions';
 import {
   Upload, FileText, File, ChevronRight, Loader2,
   CheckCircle2, AlertTriangle, Clock, Archive,
@@ -76,7 +76,6 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function ContractsClient() {
-  const supabase = useMemo(() => createClient(), []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [contracts, setContracts] = useState<ContractTemplate[]>([]);
@@ -95,14 +94,14 @@ export default function ContractsClient() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('contract_templates')
-      .select('id,title,agency_name,source_type,file_name,file_type,file_size,status,created_at')
-      .order('created_at', { ascending: false })
-      .limit(50);
-    setContracts(data ?? []);
-    setLoading(false);
-  }, [supabase]);
+    try {
+      setContracts((await listContractTemplates()) as typeof contracts);
+    } catch {
+      setUploadError('Contract templates could not load. Refresh to try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 
@@ -338,3 +337,4 @@ export default function ContractsClient() {
     </div>
   );
 }
+

@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
             ...entry,
             review_ledger: sameDayHoursLedger(entry, ledger, programs),
           })),
+        disputed: entries.filter((e) => e.status === 'disputed'),
         disputedCount: entries.filter((e) => e.status === 'disputed').length,
         disputedHours: entries
           .filter((e) => e.status === 'disputed')
@@ -42,3 +43,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

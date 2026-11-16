@@ -35,9 +35,7 @@ export default async function DealsPage() {
     .select(
       `
       id, title, stage, value, probability,
-      expected_close_date, notes, created_at,
-      contact:contact_id ( id ),
-      assignee:assigned_to ( id )
+      expected_close_date, notes, created_at, contact_id, assigned_to
     `,
     )
     .order('created_at', { ascending: false });
@@ -209,3 +207,4 @@ export default async function DealsPage() {
     </div>
   );
 }
+

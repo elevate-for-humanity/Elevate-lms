@@ -2,7 +2,7 @@ import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
 import { summarizeJriReport, type JriReportRow } from '@/lib/learner/jri-report-summary';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, Download, ArrowLeft, CheckCircle, Briefcase, Users } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function JRIReportsPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
 
 
@@ -132,3 +132,4 @@ export default async function JRIReportsPage() {
     </div>
   );
 }
+

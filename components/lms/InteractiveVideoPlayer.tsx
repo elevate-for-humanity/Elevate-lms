@@ -192,6 +192,26 @@ export default function InteractiveVideoPlayer({
     });
     setPlaybackEvidenceError(result.saved ? null : result.error || 'Playback could not be recorded.');
   };
+  const recordPlaybackEventRef = useRef(recordPlaybackEvent);
+  recordPlaybackEventRef.current = recordPlaybackEvent;
+  useEffect(() => {
+    // Save the latest position when the learner leaves mid-video, not only every 30 seconds.
+    const saveOnLeave = () => {
+      const video = videoRef.current;
+      if (!video || video.paused || video.ended || video.currentTime <= 0) return;
+      void recordPlaybackEventRef.current('pause', video.currentTime, video.duration);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') saveOnLeave();
+    };
+    window.addEventListener('pagehide', saveOnLeave);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      saveOnLeave();
+      window.removeEventListener('pagehide', saveOnLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
 
   const effectiveQuizzes = useMemo(() => {
     const checkpointQuizzes: VideoQuiz[] = checkpoints
@@ -1374,4 +1394,5 @@ export default function InteractiveVideoPlayer({
     </div>
   );
 }
+
 

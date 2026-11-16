@@ -420,10 +420,7 @@ export function ScrollNarrator() {
         </span>
       </button>
       {notice && enabled ? (
-        <p
-          role="status"
-          className="mt-2 max-w-[min(15rem,calc(100vw-5rem))] rounded-lg bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-800 shadow-lg"
-        >
+        <p role="status" className="sr-only">
           {notice}
         </p>
       ) : null}
@@ -431,3 +428,4 @@ export function ScrollNarrator() {
   );
   return videoDock ? createPortal(controls, videoDock) : controls;
 }
+

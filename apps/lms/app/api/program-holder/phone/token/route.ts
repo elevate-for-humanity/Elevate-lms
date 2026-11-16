@@ -73,9 +73,14 @@ export async function POST(request: Request) {
       { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
     );
   } catch (cause) {
+    console.error('[phone/token] device provisioning failed', {
+      extensionId: extension.id,
+      reason: cause instanceof Error ? cause.message : String(cause),
+    });
     return NextResponse.json(
       { error: 'The phone device could not connect. Please retry or contact the administrator.' },
       { status: 502 },
     );
   }
 }
+

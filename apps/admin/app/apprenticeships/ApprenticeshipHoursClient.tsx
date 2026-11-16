@@ -16,6 +16,7 @@ export default function ApprenticeshipHoursClient() {
   const [signInRequired, setSignInRequired] = useState(false);
   const [entries, setEntries] = useState<AdminHoursEntry[]>([]);
   const [disputes, setDisputes] = useState({ count: 0, hours: 0 });
+  const [disputed, setDisputed] = useState<AdminHoursEntry[]>([]);
   const [incompleteCount, setIncompleteCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -50,6 +51,7 @@ export default function ApprenticeshipHoursClient() {
       setDetail(null);
       setIncompleteCount(data.incompleteCount);
       setDisputes({ count: data.disputedCount || 0, hours: data.disputedHours || 0 });
+      setDisputed(Array.isArray(data.disputed) ? data.disputed : []);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : 'Could not load hours. Please refresh.');
     } finally {
@@ -88,6 +90,36 @@ export default function ApprenticeshipHoursClient() {
       setNotice(`${approved} ${approved === 1 ? 'entry approved' : 'entries approved'}.`);
     } catch (e) {
       failure = `${approved ? `${approved} entries were approved. ` : ''}${e instanceof Error ? e.message : 'Approval failed'}`;
+    } finally {
+      await load();
+      router.refresh();
+      setError(failure);
+      setBusy(false);
+    }
+  };
+
+  const resolve = async (entry: AdminHoursEntry, action: 'approve' | 'delete') => {
+    const label = `${entry.name} ${formatHoursDate(entry.work_date)} (${roundHours(entry.hours_worked)} hours)`;
+    if (
+      action === 'delete' &&
+      !window.confirm(`Delete the clock-in for ${label}? The student can clock in again.`)
+    )
+      return;
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    let failure: string | null = null;
+    try {
+      const res = await fetch('/api/admin/apprenticeships/hours/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: entry.id, action }),
+      });
+      const data = await readResponse(res);
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Could not update the entry');
+      setNotice(`${label} ${action === 'approve' ? 'approved' : 'deleted'}.`);
+    } catch (e) {
+      failure = e instanceof Error ? e.message : 'Could not update the entry';
     } finally {
       await load();
       router.refresh();
@@ -319,6 +351,15 @@ export default function ApprenticeshipHoursClient() {
                     >
                       Approve
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => void resolve(e, 'delete')}
+                      aria-label={`Delete ${e.name} ${e.work_date} clock-in`}
+                      disabled={busy || loading}
+                      className="ml-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 disabled:opacity-40"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -327,10 +368,45 @@ export default function ApprenticeshipHoursClient() {
         </div>
       )}
       {disputes.count > 0 && (
-        <p className="border-t border-slate-100 px-5 py-3 text-sm text-amber-900">
-          {disputes.count} disputed entries ({roundHours(disputes.hours)} hours) remain unresolved
-          and are excluded from approval.
-        </p>
+        <div className="border-t border-slate-100 px-5 py-4">
+          <h3 className="text-sm font-semibold text-amber-900">
+            Disputed entries · {disputes.count} ({roundHours(disputes.hours)} hours)
+          </h3>
+          <p className="mt-1 text-xs text-slate-600">
+            Approve an entry to count its recorded hours, or delete it so the student can clock in
+            again.
+          </p>
+          <ul className="mt-3 divide-y divide-slate-100">
+            {disputed.map((e) => (
+              <li key={e.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
+                <div className="min-w-0 text-sm">
+                  <p className="font-medium text-slate-900">
+                    {e.name} · {formatHoursDate(e.work_date)} · {roundHours(e.hours_worked)} hours
+                  </p>
+                  {e.notes && <p className="mt-1 text-xs text-slate-600">{e.notes}</p>}
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void resolve(e, 'approve')}
+                    disabled={busy || loading}
+                    className="min-h-11 rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-800 disabled:opacity-40"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void resolve(e, 'delete')}
+                    disabled={busy || loading}
+                    className="min-h-11 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 disabled:opacity-40"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       {incompleteCount > 0 && (
         <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">
@@ -341,3 +417,4 @@ export default function ApprenticeshipHoursClient() {
     </section>
   );
 }
+

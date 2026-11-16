@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { deleteCurriculumUpload, listCurriculumUploads, recordCurriculumUpload } from './actions';
 
 type UploadRecord = {
   id: string;
@@ -71,19 +72,14 @@ export default function CurriculumUploadClient() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadRecords = useCallback(async () => {
-    const { data, error: err } = await supabase
-      .from('curriculum_uploads')
-      .select('id,title,file_name,file_path,file_type,file_size,public_url,category,created_at')
-      .order('created_at', { ascending: false })
-      .limit(50);
-
+    const { records: data, error: err } = await listCurriculumUploads();
     if (err) {
-      setLoadError(err.message);
+      setLoadError(err);
       return;
     }
     setLoadError(null);
-    setRecords(data ?? []);
-  }, [supabase]);
+    setRecords(data as UploadRecord[]);
+  }, []);
 
   useEffect(() => { loadRecords(); }, [loadRecords]);
 
@@ -113,7 +109,7 @@ export default function CurriculumUploadClient() {
 
       const { data: publicData } = supabase.storage.from('curriculum').getPublicUrl(filePath);
 
-      const { error: dbErr } = await supabase.from('curriculum_uploads').insert({
+      const { error: dbErr } = await recordCurriculumUpload({
         title: title.trim() || file.name,
         category,
         file_name: file.name,
@@ -121,10 +117,9 @@ export default function CurriculumUploadClient() {
         file_type: file.type,
         file_size: file.size,
         public_url: publicData.publicUrl,
-        status: 'uploaded',
       });
 
-      if (dbErr) throw dbErr;
+      if (dbErr) throw new Error(dbErr);
 
       setTitle('');
       setMessage(`"${file.name}" uploaded successfully.`);
@@ -150,8 +145,8 @@ export default function CurriculumUploadClient() {
     const { error: storageErr } = await supabase.storage.from('curriculum').remove([record.file_path]);
     if (storageErr) { setError(storageErr.message); return; }
 
-    const { error: dbErr } = await supabase.from('curriculum_uploads').delete().eq('id', record.id);
-    if (dbErr) { setError(dbErr.message); return; }
+    const { error: dbErr } = await deleteCurriculumUpload(record.id);
+    if (dbErr) { setError(dbErr); return; }
 
     setMessage('File deleted.');
     await loadRecords();
@@ -309,3 +304,4 @@ export default function CurriculumUploadClient() {
     </div>
   );
 }
+

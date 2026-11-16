@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { createEmployee as saveEmployee, listEmployees } from './actions';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<any[]>([]);
@@ -16,9 +16,7 @@ export default function EmployeesPage() {
   async function fetchEmployees() {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data } = await supabase.from('employees').select('*').order('last_name');
-      setEmployees(data || []);
+      setEmployees(await listEmployees());
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
@@ -26,8 +24,8 @@ export default function EmployeesPage() {
   async function createEmployee() {
     if (!form.first_name || !form.last_name || !form.email) return;
     try {
-      const supabase = createClient();
-      await supabase.from('employees').insert({ ...form, status: 'active' });
+      const { error } = await saveEmployee(form);
+      if (error) throw new Error(error);
       setShowCreate(false);
       setForm({ first_name: '', last_name: '', email: '', phone: '', role: 'staff', department: '' });
       fetchEmployees();
@@ -98,3 +96,4 @@ export default function EmployeesPage() {
     </div>
   );
 }
+

@@ -96,7 +96,7 @@ export default async function RegisteredRtiReviewPage() {
 
   let pendingQuery = db
     .from('apprenticeship_rti_entries')
-    .select('id,enrollment_id,user_id,standard_key,requirement_id,instruction_date,delivery_method,minutes_claimed,evidence_url,evidence_notes,status,created_at,profiles:user_id(full_name,email),apprenticeship_rti_requirements:requirement_id(title,required_hours)')
+    .select('id,enrollment_id,user_id,standard_key,requirement_id,instruction_date,delivery_method,minutes_claimed,evidence_url,evidence_notes,status,created_at,apprenticeship_rti_requirements:requirement_id(title,required_hours)')
     .in('standard_key', standardKeys.length ? standardKeys : ['__none__'])
     .eq('status', 'pending')
     .order('instruction_date', { ascending: true });
@@ -105,6 +105,13 @@ export default async function RegisteredRtiReviewPage() {
   }
   const { data: pending, error: pendingError } = await pendingQuery;
   if (pendingError) throw new Error(`RTI_QUEUE_LOAD_FAILED:${pendingError.message}`);
+  // apprenticeship_rti_entries.user_id has no FK to profiles, so names are hydrated separately.
+  const pendingUserIds = [...new Set((pending || []).map((entry: any) => entry.user_id).filter(Boolean))];
+  const { data: pendingProfiles, error: pendingProfilesError } = pendingUserIds.length
+    ? await db.from('profiles').select('id,full_name,email').in('id', pendingUserIds)
+    : { data: [], error: null };
+  if (pendingProfilesError) throw new Error(`RTI_PROFILES_LOAD_FAILED:${pendingProfilesError.message}`);
+  const profileById = new Map((pendingProfiles || []).map((p: any) => [p.id, p]));
 
   const pendingByStandard = new Map<string, number>();
   for (const entry of pending || []) pendingByStandard.set(entry.standard_key, (pendingByStandard.get(entry.standard_key) || 0) + 1);
@@ -154,7 +161,7 @@ export default async function RegisteredRtiReviewPage() {
         ) : (
           <div className="divide-y divide-slate-200">
             {pending.map((entry: any) => {
-              const apprentice = entry.profiles || {};
+              const apprentice = profileById.get(entry.user_id) || {};
               const requirement = entry.apprenticeship_rti_requirements || {};
               const standard: any = standardByKey.get(entry.standard_key) || {};
               return (
@@ -205,3 +212,4 @@ export default async function RegisteredRtiReviewPage() {
 function Metric({ label, value }: { label: string; value: string }) {
   return <div className="rounded-xl bg-slate-50 p-3"><p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{label}</p><p className="mt-1 font-black text-slate-950">{value}</p></div>;
 }
+

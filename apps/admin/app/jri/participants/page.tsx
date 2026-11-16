@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { User, ArrowLeft, Search } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function JRIParticipantsPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   const { data: participants, error } = await supabase
     .from('jri_participants')
@@ -129,3 +129,4 @@ export default async function JRIParticipantsPage() {
     </div>
   );
 }
+

@@ -481,6 +481,11 @@ jobs:
           console.log('Live natural speech verified: HTTP 200, audio/mpeg, ' + bytes.length + ' bytes.');
           NODE
 
+      - name: Warm public image cache on the live revision
+        timeout-minutes: 6
+        continue-on-error: true
+        run: node scripts/warm-marketing-images.mjs
+
       - name: Publish verified live deployment status
         if: ${{ success() }}
         env:
@@ -560,3 +565,4 @@ jobs:
           if incomplete:
               raise SystemExit('Release incomplete; required jobs failed or were skipped: ' + json.dumps(incomplete))
           PY
+

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Shield, XCircle, Clock, Eye } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function AdminVerificationReviewPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   const { data: rawVerifications, error: verificationsError } = await supabase
     .from('id_verifications')
@@ -137,10 +137,13 @@ export default async function AdminVerificationReviewPage() {
                     {getStatusIcon(verification.status)}
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">
-                        {verification.first_name} {verification.last_name}
+                        {[verification.first_name, verification.last_name].filter(Boolean).join(' ') ||
+                          verification.profiles?.full_name ||
+                          verification.profiles?.email ||
+                          'Unnamed applicant'}
                       </h3>
                       <p className="text-sm text-black">
-                        {verification.id_type
+                        {(verification.id_type || 'ID type not provided')
                           .replace(/_/g, ' ')
                           .replace(/\b\w/g, (l: string) => l.toUpperCase())}{' '}
                         •{(verification.profiles as any)?.email} (
@@ -178,10 +181,13 @@ export default async function AdminVerificationReviewPage() {
                     {getStatusIcon(verification.status)}
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">
-                        {verification.first_name} {verification.last_name}
+                        {[verification.first_name, verification.last_name].filter(Boolean).join(' ') ||
+                          verification.profiles?.full_name ||
+                          verification.profiles?.email ||
+                          'Unnamed applicant'}
                       </h3>
                       <p className="text-sm text-black">
-                        {verification.id_type
+                        {(verification.id_type || 'ID type not provided')
                           .replace(/_/g, ' ')
                           .replace(/\b\w/g, (l: string) => l.toUpperCase())}{' '}
                         •{(verification.profiles as any)?.email} (
@@ -222,3 +228,4 @@ export default async function AdminVerificationReviewPage() {
     </div>
   );
 }
+

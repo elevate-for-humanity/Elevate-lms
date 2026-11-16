@@ -29,6 +29,8 @@ function friendlyNumber(value: string) {
     : value || 'Unknown caller';
 }
 
+const PHONE_RETRY_PAUSE_KEY = 'elevate-phone-retry-paused-until';
+
 export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone', includeVideoCalls = true }: { phoneHref?: string; includeVideoCalls?: boolean } = {}) {
   const pathname = usePathname();
   const phonePage = /\/(login|signup|reset-password|auth)(\/|$)/.test(pathname) || ['/program-holder/phone', '/host-shop/dashboard/phone', '/communications/phone', '/phone/dial-pad'].includes(pathname);
@@ -84,6 +86,9 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
       if (settings.readOnly) return;
       const ringMode = String(settings?.extension?.ringMode || 'offline');
       if (['offline', 'do_not_disturb'].includes(ringMode)) return;
+      // A failed device enrollment pauses retries across page navigations.
+      const pausedUntil = Number(window.sessionStorage.getItem(PHONE_RETRY_PAUSE_KEY) || 0);
+      if (pausedUntil > Date.now()) return;
       const tokenResponse = await fetch('/api/program-holder/phone/token', {
         signal: controller.signal,
         method: 'POST',
@@ -91,7 +96,13 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
         body: JSON.stringify({ deviceId: id }),
       });
       if (!active) return;
-      if (!tokenResponse.ok) throw new Error('phone_enrollment_unavailable');
+      if (!tokenResponse.ok) {
+        if (tokenResponse.status >= 500) {
+          window.sessionStorage.setItem(PHONE_RETRY_PAUSE_KEY, String(Date.now() + 10 * 60_000));
+        }
+        throw new Error('phone_enrollment_unavailable');
+      }
+      window.sessionStorage.removeItem(PHONE_RETRY_PAUSE_KEY);
       const token = await tokenResponse.json();
       if (!audioRef.current) throw new Error('phone_audio_unavailable');
       client = await createPhoneClient(token, audioRef.current, { signal: controller.signal });
@@ -289,3 +300,4 @@ export function ProgramHolderPhoneReceiver({ phoneHref = '/program-holder/phone'
     </>
   );
 }
+

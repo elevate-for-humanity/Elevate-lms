@@ -2,6 +2,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import type { SupabaseClient } from '@/lib/supabase';
 const state = vi.hoisted(() => ({ flags: { is_active: true, suspended: false } }));
+vi.mock('@/lib/supabase/server', () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: { id: 'admin' } }, error: null }) } }) }));
 vi.mock('next/headers', () => ({
   cookies: async () => ({ get: () => ({ value: 'signed-handoff' }) }),
 }));

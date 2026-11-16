@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   error: null as object | null,
   runtime: vi.fn(),
 }));
+vi.mock('@/lib/supabase/server', () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: { id: 'admin' } }, error: null }) } }) }));
 vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
 vi.mock('@/lib/admin/portal-preview', () => ({ resolvePortalPreviewSubject: async () => state.subject }));
 vi.mock('@/lib/apprenticeship/runtime-context', () => ({ resolveApprenticeshipRuntimeContext: state.runtime }));

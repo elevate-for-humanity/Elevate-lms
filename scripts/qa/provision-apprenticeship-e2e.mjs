@@ -80,8 +80,12 @@ async function provision() {
   try {
     const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
     state.host = host;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
     const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
     state.apprentice = apprentice;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     const program = await must(
       db.from('programs').select('id,slug,organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(),
@@ -135,6 +139,8 @@ async function provision() {
       'create QA host-shop partner',
     );
     state.partnerId = partner.id;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     await must(
       db.from('partner_users').insert({
@@ -163,6 +169,8 @@ async function provision() {
       'create QA shop',
     );
     state.shopId = shop.id;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     const hostShop = await must(
       db.from('host_shops').insert({
@@ -180,6 +188,8 @@ async function provision() {
       'create canonical QA host_shop',
     );
     state.hostShopId = hostShop.id;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     await must(
       db.from('shop_staff').insert({
@@ -227,6 +237,8 @@ async function provision() {
       'create QA apprentice enrollment',
     );
     state.enrollmentId = enrollment.id;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     const placement = await must(
       db.from('apprentice_placements').insert({
@@ -241,6 +253,8 @@ async function provision() {
       'create QA apprentice placement',
     );
     state.placementId = placement.id;
+    // Persist every completed resource immediately so interrupted QA can clean it.
+    await writePrivateQaState(statePath, state);
 
     await writePrivateQaState(statePath, state);
 

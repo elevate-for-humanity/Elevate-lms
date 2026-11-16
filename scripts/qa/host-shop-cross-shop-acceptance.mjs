@@ -22,7 +22,7 @@ async function fixture(index, operation) {
     QA_E2E_STATE_PATH: statePaths[index], GITHUB_ENV: '' };
   const child = spawnSync(process.execPath,
     ['scripts/qa/provision-apprenticeship-e2e.mjs', operation],
-    { env, encoding: 'utf8', timeout: 180_000 });
+    { env, encoding: 'utf8' });
   if (child.status !== 0) {
     // Child logs contain no passwords; never print the private fixture state.
     throw new Error('QA shop ' + index + ' ' + operation + ' failed: ' +
@@ -35,14 +35,18 @@ async function cleanup() {
   let ids = [];
   try { ids = JSON.parse(await readFile(registryPath, 'utf8')).requestIds || []; }
   catch { /* No match fixture was persisted. */ }
+  const failures = [];
   for (const id of ids) {
     const { error } = await db.from('host_shop_match_requests').delete().eq('id', id);
-    if (error) throw new Error('QA match cleanup failed for ' + id + ': ' + error.message);
+    if (error) failures.push('QA match cleanup failed for ' + id + ': ' + error.message);
   }
+  // Attempt cleanup of both shops even if the first fails. Keep the explicit
+  // failure visible and never imply teardown succeeded without verification.
   for (const index of [1, 0]) {
     try { await fixture(index, 'cleanup'); }
-    catch (error) { console.error(String(error)); throw error; }
+    catch (error) { failures.push(String(error)); }
   }
+  if (failures.length) throw new Error('Disposable QA cleanup incomplete: ' + failures.join(' | '));
   console.log('Disposable cross-shop fixture cleanup complete');
 }
 async function provision() {

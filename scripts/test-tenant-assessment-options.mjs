@@ -1,12 +1,19 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { sanitizeSection, ensureComposableSiteConfig } from '../lib/tenant/site-composition.ts';
 import { tenantSiteHref } from '../lib/tenant/site-links.ts';
 import fs from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
 
+// Node's type stripping does not apply Next's extensionless import resolution.
+// Load the real composition and navigation modules; keep the dependency explicit
+// so a missing module or changed import still fails the release check.
+const compositionSource = await fs.readFile(new URL('../lib/tenant/site-composition.ts', import.meta.url), 'utf8');
+assert.ok(compositionSource.includes("'./site-navigation'"));
+const compositionUrl = 'data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(compositionSource.replace("'./site-navigation'", JSON.stringify(new URL('../lib/tenant/site-navigation.ts', import.meta.url).href)))).toString('base64');
+const { sanitizeSection, ensureComposableSiteConfig, applySiteOperations } = await import(compositionUrl);
+
 const bridgeSource = await fs.readFile(new URL('../lib/tenant/legacy-composition-bridge.ts', import.meta.url), 'utf8');
-const bridgeModule = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(bridgeSource.replace("'@/lib/tenant/site-composition'", JSON.stringify(new URL('../lib/tenant/site-composition.ts', import.meta.url).href)))).toString('base64'));
+const bridgeModule = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(bridgeSource.replace("'@/lib/tenant/site-composition'", JSON.stringify(compositionUrl)))).toString('base64'));
 
 function canonicalFixture() {
   return {homepage:{heroTitle:'Old summary',features:[{title:'Old features'}]},programs:[],pages:[
@@ -69,4 +76,18 @@ test('all nine saved page routes remain discoverable', () => {
   const slugs = ['/', '/about','/services','/academy','/resources','/growth-iq','/journal','/events','/contact'];
   const config = ensureComposableSiteConfig({pages:slugs.map((slug,i)=>({id:String(i),slug,title:slug,sections:[]}))});
   assert.deepEqual(config.navigation.map(item=>item.href),slugs);
+});
+
+test('page deletion prunes navigation and footer groups using the production resolver', () => {
+  const config = {
+    ...canonicalFixture(),
+    navigationGroups: [{label:'Explore',pageIds:['home','services']}],
+    footer: {linkGroups:[{label:'Services',pageIds:['services']}]},
+  };
+  const before = structuredClone(config);
+  const saved = applySiteOperations(config, [{type:'delete_page',pageId:'services'}]);
+  assert.deepEqual(saved.navigationGroups, [{label:'Explore',pageIds:['home']}]);
+  assert.deepEqual(saved.footer.linkGroups, []);
+  assert.deepEqual(saved.pages.map(page => page.id), ['home']);
+  assert.deepEqual(config, before);
 });

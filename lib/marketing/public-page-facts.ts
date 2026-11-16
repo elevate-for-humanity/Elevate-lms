@@ -1,3 +1,4 @@
+import { getEnchantedHeartsProgram } from '@/lib/partners/enchanted-hearts';
 import { resolveSlug } from '@/lib/program-registry';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 export type PublicPageFact = { question: string; answer: string; href: string; link: string };
@@ -50,7 +51,7 @@ export function getPublicPageFacts(pathname: string): PublicPageFacts {
       { question: 'What if no appointment is available?', answer: 'Contact the testing center for scheduling assistance before paying. An unavailable date cannot be booked.', href: '/contact', link: 'Contact the testing center' },
     ],
   };
-  if (programSlug && (applicationSlug || programPath?.[1])) return {
+  if (programSlug && (applicationSlug || getEnchantedHeartsProgram(programSlug) || programPath?.[1])) return {
     title: 'Questions about this program', imageProgram: programSlug, facts: [
       { question: 'Where are this program’s schedule, cost and entry requirements?', answer: 'Review the schedule, tuition, included materials and admission requirements on this program page. Requirements and payment arrangements are specific to the selected program.', href: pathname, link: 'Review this program' },
       ...(applicationSlug ? [{ question: 'How do I apply for this program?', answer: 'An inquiry requests information. Admission requires the applicable application, documents and enrollment steps for this program. An inquiry alone does not reserve a place.', href: `/apply/student?program=${encodeURIComponent(applicationSlug)}`, link: 'Apply for this program' }] : []),

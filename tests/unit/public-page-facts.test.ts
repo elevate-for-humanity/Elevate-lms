@@ -47,6 +47,11 @@ describe('public page self-service facts', () => {
     if (slug) expect(application?.href).toBe(`/apply/student?program=${slug}`);
     else expect(application).toBeUndefined();
   });
+  it('keeps dedicated partner program facts without an unsupported application link', () => {
+    const facts = getPublicPageFacts('/programs/qma').facts;
+    expect(facts.length).toBeGreaterThan(0);
+    expect(facts.every((fact) => fact.href === '/programs/qma')).toBe(true);
+  });
   it('keeps a program application linked to the selected program', () => {
     expect(getPublicPageFacts('/programs/hvac-technician').facts[1].href).toBe('/apply/student?program=hvac-technician');
   });

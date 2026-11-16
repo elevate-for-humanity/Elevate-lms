@@ -1,9 +1,12 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const h=vi.hoisted(()=>({row:null as any,updates:[] as any[],validation:'success',branchSha:'b'.repeat(40),infrastructure:false,onOwnedWrite:null as null|(()=>void)}));
+const h=vi.hoisted(()=>({row:null as any,updates:[] as any[],validation:'success',branchSha:'b'.repeat(40),infrastructure:false,ownerRole:'admin' as string|null,ownerError:null as any,onOwnedWrite:null as null|(()=>void)}));
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'})}));
 vi.mock('@/lib/devstudio/github-app-token',()=>({getGitHubAppToken:async()=> 'app-only-fixture'}));
-vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{
+vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:string)=>{
+ if(table==='profiles'){
+  const profile:any={select:()=>profile,eq:()=>profile,maybeSingle:async()=>({data:h.ownerRole?{role:h.ownerRole}:null,error:h.ownerError})};return profile;
+ }
  let values:any;const eqs:any[]=[];
  const q:any={select:()=>q,eq:(k:any,v:any)=>{eqs.push([k,v]);return q;},in:()=>q,update:(v:any)=>{values=v;return q;},single:async()=>({data:h.row,error:null}),
   maybeSingle:async()=>{
@@ -20,6 +23,7 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>{
 import {publishParisRepair,prepareParisRepair} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
  h.row={id:'repair',status:'validating',workflow_run_id:7,candidate:{base_sha:'a'.repeat(40),branch:{name:'studio/task',sha:'b'.repeat(40)}}};h.updates=[];h.validation='success';h.branchSha='b'.repeat(40);h.infrastructure=false;h.onOwnedWrite=null;
+ h.ownerRole='admin';h.ownerError=null;vi.unstubAllEnvs();
  vi.stubGlobal('fetch',vi.fn(async(url:string,init:any={})=>{
   if(url.includes('/artifacts?'))return new Response(JSON.stringify({artifacts:[{name:'paris-validated-repair-'+'b'.repeat(40),expired:false}]}));
   if(url.includes('/jobs?'))return new Response(JSON.stringify({jobs:[{name:'validate',status:'completed',conclusion:h.validation}]}));
@@ -34,6 +38,20 @@ beforeEach(()=>{
   if(url.endsWith('/actions/runs/7'))return new Response(JSON.stringify({path:'.github/workflows/other.yml',event:'workflow_dispatch',head_branch:'main'}));
   throw Error('Unexpected HTTP '+url);
  }));
+});
+it.each([
+ ['demoted owner','student',null,false],
+ ['missing owner',null,null,false],
+ ['unreadable owner','admin',{message:'database unavailable'},false],
+ ['forced internal with demoted owner','student',null,true],
+])('blocks %s before engine selection or repository writes',async(_name,role,error,forced)=>{
+ h.row={id:'repair',actor_id:'owner',status:'patching',workflow_run_id:7,candidate:null};
+ h.ownerRole=role as string|null;h.ownerError=error;
+ if(forced)vi.stubEnv('PARIS_REPAIR_ENGINE','internal');
+ vi.mocked(fetch).mockResolvedValueOnce(Response.json({path:'.github/workflows/paris-code-repair.yml',event:'workflow_dispatch',head_branch:'main',status:'in_progress'}));
+ await expect(prepareParisRepair('repair',7)).rejects.toThrow('PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED');
+ expect(h.row.status).toBe('blocked');
+ expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
 });
 it('never publishes a failed independent validation',async()=>{
  h.validation='failure';await expect(publishParisRepair('repair',7)).rejects.toThrow('INDEPENDENT_REPAIR_VALIDATION_REQUIRED');

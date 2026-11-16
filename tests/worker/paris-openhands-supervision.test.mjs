@@ -120,3 +120,43 @@ test('a source that pauses during terminal readback cannot be claimed',async()=>
  assert.equal(result.dispatchRequired,undefined);assert.equal(h.claims.length,0);assert.equal(checks,2);
  assert.equal(h.records[0].openhandsObservation.state,'source_ineligible');
 });
+test('a paused provider sandbox is resumed in place, without a new start or candidate admission',async()=>{
+ const h=fixture();const resumed=[];h.lifecycle={...h.lifecycle,status:'queued',sandboxStatus:'PAUSED',sandboxId:'sandbox-1'};
+ h.observe=()=>observeAcceptedOpenHandsRepair({repairId,actorId:'owner',attempt:1,runId:12,goal,checkpoint:h.cp},{
+  now:()=>now,findTask:async()=>h.task,refresh:async()=>{h.refreshes++;return {task:h.task,lifecycle:h.lifecycle}},
+  resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{h.reads++;return h.candidate}});
+ assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});
+ assert.deepEqual(resumed,['sandbox-1']);assert.equal(h.reads,0);
+});
+test('a starting or running sandbox is never sent a resume',async()=>{
+ for(const sandboxStatus of ['STARTING','RUNNING',null]){
+  const h=fixture();h.lifecycle={...h.lifecycle,status:sandboxStatus==='RUNNING'?'running':'queued',sandboxStatus,sandboxId:'sandbox-1'};
+  assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});
+ }
+});
+test('a paused sandbox without a provider id fails closed instead of waiting forever',async()=>{
+ const h=fixture();h.lifecycle={...h.lifecycle,status:'queued',sandboxStatus:'PAUSED'};
+ await assert.rejects(h.observe(),/PARIS_OPENHANDS_SANDBOX_ID_REQUIRED/);
+});
+test('an unresumable sandbox stops observation with its named reason; a provider outage stays transient',async()=>{
+ const h=fixture();h.observe=async()=>{throw Error('PARIS_OPENHANDS_SANDBOX_NOT_RESUMABLE')};
+ h.supervise=()=>superviseAcceptedOpenHandsRepair(h.repair,{now:()=>now,workflow:async()=>h.run,
+  sourceEligible:async()=>true,observe:h.observe,record:async value=>h.records.push(value),claim:async()=>true});
+ assert.deepEqual(await h.supervise(),{handled:true,awaitingProvider:false});
+ assert.equal(h.records.at(-1).openhandsObservation.state,'rejected');
+ assert.equal(h.records.at(-1).openhandsObservation.reason,'PARIS_OPENHANDS_SANDBOX_NOT_RESUMABLE');
+ h.observe=async()=>{throw Error('OpenHands API 502: runtime unavailable')};
+ h.supervise=()=>superviseAcceptedOpenHandsRepair(h.repair,{now:()=>now,workflow:async()=>h.run,
+  sourceEligible:async()=>true,observe:h.observe,record:async value=>h.records.push(value),claim:async()=>true});
+ assert.deepEqual(await h.supervise(),{handled:true,awaitingProvider:true});
+ assert.equal(h.records.at(-1).openhandsObservation.state,'unverified');
+});
+test('a provider-confirmation snapshot still pending approval is read but its paused sandbox is never woken',async()=>{
+ const {PROVIDER_CONFIRMATION_REASON}=await import('../../lib/devstudio/openhands/provider-confirmation.mjs');
+ const h=fixture();const resumed=[];Object.assign(h.task,{approval_status:'pending',approval_reason:PROVIDER_CONFIRMATION_REASON});
+ h.lifecycle={...h.lifecycle,status:'queued',sandboxStatus:'PAUSED',sandboxId:'sandbox-1'};
+ h.observe=()=>observeAcceptedOpenHandsRepair({repairId,actorId:'owner',attempt:1,runId:12,goal,checkpoint:h.cp},{
+  now:()=>now,findTask:async()=>h.task,refresh:async()=>({task:h.task,lifecycle:h.lifecycle}),
+  resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{throw Error('no read')}});
+ assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});assert.deepEqual(resumed,[]);
+});

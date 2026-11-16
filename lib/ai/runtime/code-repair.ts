@@ -20,6 +20,9 @@ import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-contex
 import {readRecentRepairEvents} from './repair-events';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled} from './code-repair-policy.mjs';
 
+// PARIS_REPAIR_ENGINE=internal runs new repairs without contacting OpenHands.
+const internalEngineForced=()=>(process.env.PARIS_REPAIR_ENGINE??'').trim().toLowerCase()==='internal';
+
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
  * and permission booleans, never credential values or upstream response bodies.
@@ -145,6 +148,11 @@ export async function prepareParisRepair(id:string,runId:number){
  }
  if(!claimed)throw Error('REPAIR_ALREADY_CLAIMED');
  try{
+  // Queue admission is historical evidence, not continuing write authority.
+  // Check before either engine, including forced internal and continuations.
+  const owner=await db.from('profiles').select('role').eq('id',claimed.actor_id).maybeSingle();
+  if(owner.error||!claimed.actor_id||!['admin','super_admin'].includes(owner.data?.role??''))
+   throw Error('PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED');
   let candidate=claimed.candidate;
   if(untouchedPlannerNeedsFreshGeneration(claimed)) {
    const priorCheckpoint=candidate.checkpoint;
@@ -163,7 +171,12 @@ export async function prepareParisRepair(id:string,runId:number){
    if(!archived.data)throw Error('PARIS_REPAIR_CHECKPOINT_OWNERSHIP_LOST');
    candidate=null;
   }
-  if(!candidate || candidate.kind==='openhands-checkpoint') {
+  let openHandsAvailable=candidate?.kind==='openhands-checkpoint';
+  if(!candidate && !internalEngineForced()){
+   const {probeOpenHandsReadiness}=await import('@/lib/devstudio/paris-openhands-readiness');
+   openHandsAvailable=(await probeOpenHandsReadiness().catch(()=>({verified:false}))).verified===true;
+  }
+  if(openHandsAvailable) {
    const {stageParisOpenHandsRepair}=await import('@/lib/devstudio/paris-openhands-adapter');
    candidate=await stageParisOpenHandsRepair({repairId:id,actorId:claimed.actor_id,
     attempt:claimed.attempt_count,runId,goal:claimed.goal,
@@ -182,8 +195,8 @@ export async function prepareParisRepair(id:string,runId:number){
    if(candidate.pending===true)return candidate;
   }
   // Preserve in-flight internal checkpoints and their committed source. New
-  // repairs above use the existing tracked OpenHands engineering dispatcher.
-  if(candidate?.kind==='planner-checkpoint') {
+  // repairs use OpenHands when available, otherwise the internal engine.
+  if(!candidate || candidate.kind==='planner-checkpoint') {
    let sourceEvidence;
    if(claimed.source_job_id){
     const source=await db.from('ultimate_build_jobs').select('id,build_id,job_type,last_error,payload,monitor').eq('id',claimed.source_job_id).single();
@@ -851,14 +864,22 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  // spending an attempt; it never proves execution or a completed repair.
  // Old planner checkpoints retain
  // their original engine and its readiness check.
- if(parisRepairEngine(pending.candidate)==='openhands'){
+ // OpenHands is optional: a new repair with no OpenHands checkpoint falls back
+ // to the internal engine when OpenHands is unavailable, instead of waiting.
+ let useInternalEngine=parisRepairEngine(pending.candidate)==='internal' ||
+  (!pending.candidate && internalEngineForced());
+ if(!useInternalEngine){
   const {probeOpenHandsReadiness}=await import('@/lib/devstudio/paris-openhands-readiness');
   const readiness=await probeOpenHandsReadiness();
-  if(!readiness.verified)return {
-   enabled:true,dispatched:0,awaitingProvider:true,
-   reason:readiness.status==='not_configured'?'OPENHANDS_CONFIGURATION_REQUIRED':'OPENHANDS_READINESS_UNVERIFIED',
-   providerStatus:readiness.status,readiness};
- }else if((process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
+  if(!readiness.verified){
+   if(pending.candidate)return {
+    enabled:true,dispatched:0,awaitingProvider:true,
+    reason:readiness.status==='not_configured'?'OPENHANDS_CONFIGURATION_REQUIRED':'OPENHANDS_READINESS_UNVERIFIED',
+    providerStatus:readiness.status,readiness};
+   useInternalEngine=true;
+  }
+ }
+ if(useInternalEngine && (process.env.AI_PROVIDER??'elevate').trim().toLowerCase()==='elevate'){
   const {probeOwnedModel}=await import('@/lib/ai/providers/owned-model-health.mjs');
   const health=ownedProviderReadiness??await probeOwnedModel({timeoutMs:REPAIR_MODEL_PROBE_TIMEOUT_MS}).catch(()=>({verified:false,status:'request_failed'}));
   if(!health.verified)return {enabled:true,dispatched:0,awaitingProvider:true,

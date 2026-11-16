@@ -2,7 +2,7 @@ import 'server-only';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {dispatchOpenHandsTask, refreshOpenHandsTask} from './openhands/runtime';
-import {getHydratedOpenHandsConfig} from './openhands/client';
+import {getHydratedOpenHandsConfig, resumeOpenHandsSandbox} from './openhands/client';
 import {blockedPath} from './paris-code-engineer';
 import {prepareOpenHandsRepair, observeAcceptedOpenHandsRepair, assertOpenHandsRepairDiff, assertOpenHandsBlobReadback} from './paris-openhands-repair.mjs';
 
@@ -57,6 +57,16 @@ async function repairDependencies(input: RepairInput) {
       const lifecycle = await refreshOpenHandsTask({taskId, actorId});
       const task = await findTask(`paris-repair:${input.repairId}:attempt:${input.attempt}`);
       return {lifecycle, task};
+    },
+    resumeSandbox: async (sandboxId: string) => {
+      try { await resumeOpenHandsSandbox(sandboxId); }
+      catch (error) {
+        // Gone or not resumable is terminal for this execution; 5xx stays transient.
+        if (error instanceof Error && /^OpenHands API (?:404|409|410)\b/.test(error.message)) {
+          throw Error('PARIS_OPENHANDS_SANDBOX_NOT_RESUMABLE', {cause: error});
+        }
+        throw error;
+      }
     },
     readCandidate: async (checkpoint: any) => {
       const refPath = '/git/ref/heads/' + encodeURIComponent(checkpoint.branch);

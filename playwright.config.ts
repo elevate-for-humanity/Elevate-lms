@@ -51,6 +51,7 @@ const SPECS: Record<E2EApp, string[]> = {
     'employer-onboarding.spec.ts',
     'enrollment-lifecycle.spec.ts',
     'hvac-live-lesson-playback.spec.ts',
+    'host-shop-cross-shop-production.spec.ts',
     'jordan-magic-link.spec.ts',
     'portal-responsive-design.spec.ts',
     'program-holder-unauth-redirect.spec.ts',

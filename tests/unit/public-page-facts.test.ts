@@ -32,10 +32,13 @@ describe('public page self-service facts', () => {
   it.each(['/programs/healthcare', '/programs/healthcare-training', '/programs/business', '/programs/not-a-program'])('does not create an application for category or unknown route %s', (route) => {
     expect(getPublicPageFacts(route).facts).toEqual([]);
   });
-  it.each(['/programs/healthcare/nha-patient-care-technician', '/programs/healthcare-training/enchanted-hearts-cpr-instructor'])('preserves nested detail links without inventing an application slug for %s', (route) => {
+  it.each([['/programs/healthcare/nha-patient-care-technician', 'nha-patient-care-technician'], ['/programs/healthcare-training/enchanted-hearts-cpr-instructor', null]])('preserves nested detail and validated application links for %s', (route, slug) => {
     const facts = getPublicPageFacts(route).facts;
     expect(facts.length).toBeGreaterThan(0);
-    expect(facts.every((fact) => fact.href === route)).toBe(true);
+    expect(facts.filter((fact) => !fact.href.startsWith('/apply/')).every((fact) => fact.href === route)).toBe(true);
+    const application = facts.find((fact) => fact.href.startsWith('/apply/'));
+    if (slug) expect(application?.href).toBe(`/apply/student?program=${slug}`);
+    else expect(application).toBeUndefined();
   });
   it('keeps a program application linked to the selected program', () => {
     expect(getPublicPageFacts('/programs/hvac-technician').facts[1].href).toBe('/apply/student?program=hvac-technician');

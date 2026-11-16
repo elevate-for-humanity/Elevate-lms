@@ -1,14 +1,13 @@
 name: Host Shop authenticated isolation acceptance
 
 # Dedicated production security suite. Do not blend its result with Admin Studio E2E.
+# Production service-role credentials must never execute source from PR heads.
+# Certify only reviewed main after the LMS release workflow completes.
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'tests/e2e/host-shop-cross-shop-production.spec.ts'
-      - 'scripts/qa/host-shop-cross-shop-acceptance.mjs'
-      - '.github/workflows/host-shop-cross-shop-acceptance.yml'
+  workflow_run:
+    workflows: ['Deploy LMS automatically on Google']
+    types: [completed]
 
 permissions:
   contents: read
@@ -20,6 +19,7 @@ concurrency:
 
 jobs:
   authenticated-cross-shop:
+    if: ${{ (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'workflow_dispatch') }}
     name: Authenticated cross-shop isolation (production)
     runs-on: ubuntu-24.04
     timeout-minutes: 40

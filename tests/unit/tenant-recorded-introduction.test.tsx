@@ -92,7 +92,7 @@ it('does not request recording URLs or enable playback in private saved-version 
   expect(screen.getByRole('button',{name:'Background music off'})).toBeDisabled();
   for(const audio of container.querySelectorAll('audio')) expect(audio).not.toHaveAttribute('src');
 });
-it.each(['javascript:alert(1)','//elsewhere.example/x.mp3','/\\elsewhere/x.mp3','https://user:password@example.com/x.mp3','data:audio/mp3;base64,x','http://example.com/x.mp3'])('rejects unsafe recorded media %s', value => {
+it.each(['/audio/\u0000bad.mp3','/audio/\u001fbad.mp3','javascript:alert(1)','//elsewhere.example/x.mp3','/\\elsewhere/x.mp3','https://user:password@example.com/x.mp3','data:audio/mp3;base64,x','http://example.com/x.mp3'])('rejects unsafe recorded media %s', value => {
   expect(introductionMediaUrl(value)).toBeUndefined();
 });
 it('keeps existing natural voice as the default for sites without approved recordings', () => {

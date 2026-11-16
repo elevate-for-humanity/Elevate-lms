@@ -18,7 +18,7 @@
  *   ADMIN_URL             - Admin authority base URL
  *   PARIS_ID_TOKEN        - short-lived signed workflow identity
  */
-import { protectedMergeReadiness, requiredChecksSatisfied } from '../lib/devstudio/openhands/protected-merge-decision.mjs';
+import { approvalsSatisfied, protectedMergeReadiness, requiredChecksSatisfied } from '../lib/devstudio/openhands/protected-merge-decision.mjs';
 import { protectedMainPolicyVerified, requiredMainChecks, requiredMainReviewCount } from '../lib/devstudio/openhands/acceptance-contract.mjs';
 
 const REPOSITORY = process.env.REPAIR_REPOSITORY || 'elevate-for-humanity/Elevate-lms';
@@ -138,21 +138,25 @@ async function main() {
 
   // Reviewer authority is read with the policy credential, never inferred.
   const reviewerPermissions = {};
-  const decisionLogins = new Set(reviews
-    .filter(r => ['APPROVED', 'CHANGES_REQUESTED'].includes(r.state))
-    .map(r => r.user?.login?.toLowerCase()).filter(Boolean));
-  for (const login of decisionLogins) {
-    if (!/^[a-z0-9](?:[a-z0-9-]{0,38})$/.test(login)) continue;
-    try {
-      const collaborator = await ghJson(`/repos/${REPOSITORY}/collaborators/${encodeURIComponent(login)}/permission`, { token: policy });
-      reviewerPermissions[login] = collaborator.permission ?? 'unknown';
-    } catch {
-      reviewerPermissions[login] = 'unknown';
+  const readReviewerPermissions = async reviewList => {
+    const decisionLogins = new Set(reviewList
+      .filter(r => ['APPROVED', 'CHANGES_REQUESTED'].includes(r.state))
+      .map(r => r.user?.login?.toLowerCase()).filter(Boolean));
+    for (const login of decisionLogins) {
+      if (login in reviewerPermissions) continue;
+      if (!/^[a-z0-9](?:[a-z0-9-]{0,38})$/.test(login)) continue;
+      try {
+        const collaborator = await ghJson(`/repos/${REPOSITORY}/collaborators/${encodeURIComponent(login)}/permission`, { token: policy });
+        reviewerPermissions[login] = collaborator.permission ?? 'unknown';
+      } catch {
+        reviewerPermissions[login] = 'unknown';
+      }
     }
-  }
+  };
+  await readReviewerPermissions(reviews);
 
   const readiness = protectedMergeReadiness({
-    pr, expectedHeadSha: EXPECTED_HEAD_SHA, checks, requiredChecks, reviews, reviewerPermissions,
+    pr, expectedHeadSha: EXPECTED_HEAD_SHA, checks, requiredChecks, reviews, reviewerPermissions, requiredApprovalCount,
   });
   if (!readiness.ready) {
     await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_NOT_READY', reasons: readiness.reasons.slice(0, 8) });
@@ -174,6 +178,18 @@ async function main() {
       await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_APPROVAL_FAILED', detail });
       throw Error(`PARIS_MERGE_APPROVAL_FAILED_${review.status}: ${detail}`);
     }
+  }
+
+  // Prove the configured number of independent approvals on the exact head,
+  // including the verifier's own review, before attempting the merge.
+  const finalReviews = await ghJson(`/repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100`, { token: verifier });
+  await readReviewerPermissions(Array.isArray(finalReviews) ? finalReviews : []);
+  const approvals = approvalsSatisfied({
+    pr, expectedHeadSha: EXPECTED_HEAD_SHA, reviews: finalReviews, reviewerPermissions, requiredApprovalCount,
+  });
+  if (!approvals.satisfied) {
+    await report('merge-result', { merged: false, runId: Number.isSafeInteger(RUN_ID) ? RUN_ID : undefined, reason: 'PARIS_MERGE_APPROVALS_INSUFFICIENT', reasons: approvals.reasons.slice(0, 8) });
+    throw Error('PARIS_MERGE_APPROVALS_INSUFFICIENT: ' + approvals.reasons.join('; '));
   }
 
   // Required checks must be green on the exact head at merge time.

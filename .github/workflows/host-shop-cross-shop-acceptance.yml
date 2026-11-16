@@ -1,0 +1,103 @@
+name: Host Shop authenticated isolation acceptance
+
+# Dedicated production security suite. Do not blend its result with Admin Studio E2E.
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tests/e2e/host-shop-cross-shop-production.spec.ts'
+      - 'scripts/qa/host-shop-cross-shop-acceptance.mjs'
+      - '.github/workflows/host-shop-cross-shop-acceptance.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: host-shop-cross-shop-qa-${{ github.ref }}
+  # Never terminate a running fixture cleanup to start a newer test.
+  cancel-in-progress: false
+
+jobs:
+  authenticated-cross-shop:
+    name: Authenticated cross-shop isolation (production)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      PLAYWRIGHT_LMS_URL: https://lms.elevateforhumanity.org
+      PLAYWRIGHT_APPS: lms
+      TEST_MODE: 'true'
+      QA_CROSS_SHOP_PREFIX: .qa-host-shop-cross
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Validate production-only, approved QA configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}"
+          test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}"
+          test -n "${SUPABASE_SERVICE_ROLE_KEY:-}"
+          case "${NEXT_PUBLIC_SUPABASE_URL}" in
+            https://cuxzzpsyufcewtmicszk.supabase.co) ;;
+            *) echo "::error::Refusing to provision against an unexpected database"; exit 1 ;;
+          esac
+          test "${PLAYWRIGHT_LMS_URL}" = "https://lms.elevateforhumanity.org"
+      - name: Verify exact current-main production serving SHA before QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAIN_SHA=$(git ls-remote origin refs/heads/main | cut -f1)
+          test -n "$MAIN_SHA"
+          echo "QA_EXPECTED_MAIN_SHA=$MAIN_SHA" >> "$GITHUB_ENV"
+          EXPECTED_SHA="$MAIN_SHA" node --input-type=module -e '
+            const r=await fetch("https://lms.elevateforhumanity.org/api/ready",{headers:{"Cache-Control":"no-cache"}});
+            const j=await r.json();
+            if (!r.ok || j.ready!==true || j.service!=="lms" || j.commit!==process.env.EXPECTED_SHA || (j.missing||[]).length)
+              throw new Error("Production LMS readiness/commit mismatch");
+            console.log("Production LMS exact SHA:",j.commit);
+          '
+      - name: Install dependencies and Chromium
+        run: |
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
+          pnpm exec playwright install chromium --with-deps
+      - name: Provision two disposable approved Host Shop identities and match requests
+        run: node scripts/qa/host-shop-cross-shop-acceptance.mjs provision
+      - name: Certify authenticated roster and cross-shop API isolation
+        run: >-
+          pnpm exec playwright test tests/e2e/host-shop-cross-shop-production.spec.ts
+          --config playwright.config.ts --reporter=line
+          --project=desktop-chrome --workers=1 --retries=0
+      - name: Confirm production SHA unchanged after test
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_SHA="$QA_EXPECTED_MAIN_SHA" node --input-type=module -e '
+            const r=await fetch("https://lms.elevateforhumanity.org/api/ready",{headers:{"Cache-Control":"no-cache"}});
+            const j=await r.json();
+            if (!r.ok || j.ready!==true || j.commit!==process.env.EXPECTED_SHA)
+              throw new Error("Serving LMS commit changed during security acceptance");
+            console.log("Authenticated isolation validated on exact serving SHA:",j.commit);
+          '
+      - name: Remove disposable match requests, shops, placements, and QA users
+        if: always()
+        run: node scripts/qa/host-shop-cross-shop-acceptance.mjs cleanup
+      - name: Upload redacted Playwright failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-shop-cross-shop-qa-failure
+          path: |
+            test-results/
+          retention-days: 7

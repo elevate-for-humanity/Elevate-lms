@@ -228,6 +228,16 @@ export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResul
 
   for (const nav of config.navigation || []) inspectHref(nav.href, knownPaths, issues, pages.find((page) => page.slug === nav.href) || pages[0] || { id: 'site', slug: '/', title: 'Site', sections: [] });
 
+  for (const groups of [config.navigationGroups, config.footer.linkGroups]) {
+    if (groups === undefined) continue;
+    if (!Array.isArray(groups) || groups.length > 8) { issues.push({ severity: 'error', code: 'invalid_link_groups', message: 'Use at most eight navigation or footer groups.' }); continue; }
+    for (const group of groups) {
+      if (!group || typeof group.label !== 'string' || !group.label.trim() || group.label.length > 100 || !Array.isArray(group.pageIds) || !group.pageIds.length || group.pageIds.some(id => typeof id !== 'string' || !pages.some(page => page.id === id))) {
+        issues.push({ severity: 'error', code: 'invalid_link_group', message: 'Each link group needs a label and saved page IDs from this website.' });
+      }
+    }
+  }
+
   scanWellnessClaims(config, issues);
   scanProductDestinations(config, issues);
   scanPublishedClaims(config, issues);

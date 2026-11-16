@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { SectionImagePicker } from './SectionImagePicker';
+import { WebsiteLinkGroupsEditor } from './WebsiteLinkGroupsEditor';
 import { WebsiteDesignPanel } from './WebsiteDesignPanel';
 import { useWebsiteConfig } from '@/components/website-builder/WebsiteConfigProvider';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from 'lucide-react';
@@ -93,7 +94,8 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
     if (!page || page.slug === '/') return;
     if (!window.confirm(`Delete the ${page.title} page?`)) return;
     const remaining = pages.filter((item) => item.id !== page.id);
-    const saved = await persist(ensureComposableSiteConfig({ ...config, pages: remaining }), `${page.title} removed.`);
+    const prune = (groups: TenantSiteConfig['navigationGroups']) => groups?.map(group => ({ ...group, pageIds: group.pageIds.filter(id => id !== page.id) })).filter(group => group.pageIds.length);
+    const saved = await persist(ensureComposableSiteConfig({ ...config, pages: remaining, navigationGroups: prune(config.navigationGroups), footer: { ...config.footer, linkGroups: prune(config.footer.linkGroups) } }), `${page.title} removed.`);
     if (saved) { setSelectedPage('/'); setSelectedSectionId(null); }
   }
 
@@ -165,6 +167,7 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
           <p className="mt-2 text-sm leading-6 text-slate-600">Open these controls when you need to add, rename, reorder, or precisely edit pages and sections. Routine changes still require no code.</p>
           {(message || error) ? <div className={`mt-4 rounded-xl border p-3 text-sm font-semibold ${error ? 'border-red-200 bg-red-50 text-red-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error || message}</div> : null}
 
+          <WebsiteLinkGroupsEditor config={config} busy={busy} onSave={next => void persist(next, 'Navigation groups saved.')} />
           <div className="mt-5 grid gap-5 lg:grid-cols-[280px_1fr]">
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <h2 className="font-black">Pages</h2>

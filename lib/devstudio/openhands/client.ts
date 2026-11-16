@@ -20,6 +20,7 @@ export type OpenHandsStartTask = {
 
 export type OpenHandsConversation = {
   id: string;
+  sandbox_id?: string | null;
   sandbox_status?: string | null;
   execution_status?: string | null;
   selected_repository?: string | null;
@@ -36,6 +37,7 @@ export type OpenHandsLifecycle = {
   status: OpenHandsLifecycleStatus;
   startTaskId?: string | null;
   conversationId?: string | null;
+  sandboxId?: string | null;
   sandboxStatus?: string | null;
   executionStatus?: string | null;
   repository?: string | null;
@@ -248,6 +250,13 @@ export async function sendOpenHandsMessage(
   return result;
 }
 
+/** Idempotent provider call: resumes the SAME paused sandbox; it never starts a conversation. */
+export async function resumeOpenHandsSandbox(sandboxId: string): Promise<void> {
+  const id = sandboxId.trim();
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(id)) throw new Error('OpenHands sandbox id is invalid');
+  await requestJson(`/api/v1/sandboxes/${encodeURIComponent(id)}/resume`, { method: 'POST' });
+}
+
 export async function getOpenHandsStartTask(startTaskId: string): Promise<OpenHandsStartTask | null> {
   const id = startTaskId.trim();
   if (!id) return null;
@@ -294,6 +303,7 @@ function lifecycleFromConversation(
     status,
     startTaskId: startTaskId ?? null,
     conversationId: conversation.id,
+    sandboxId: conversation.sandbox_id ?? null,
     sandboxStatus: conversation.sandbox_status ?? null,
     executionStatus: conversation.execution_status ?? null,
     repository: conversation.selected_repository ?? null,
@@ -306,6 +316,7 @@ function lifecycleFromConversation(
 export async function getOpenHandsLifecycle(input: {
   startTaskId?: string | null;
   conversationId?: string | null;
+  recordedSandboxId?: string | null;
 }): Promise<OpenHandsLifecycle> {
   let conversationId = input.conversationId?.trim() || null;
   let startTask: OpenHandsStartTask | null = null;
@@ -350,5 +361,18 @@ export async function getOpenHandsLifecycle(input: {
       error: 'OpenHands conversation was not found',
     };
   }
-  return lifecycleFromConversation(conversation, startTask?.id ?? input.startTaskId ?? null);
+  if(conversation.id!==conversationId)throw new Error('OpenHands conversation receipt mismatch');
+  const lifecycle=lifecycleFromConversation(conversation, startTask?.id ?? input.startTaskId ?? null);
+  // Some conversation responses omit sandbox_id. Recover it only from the
+  // original start receipt, and require both receipts to identify this exact
+  // conversation. Never enumerate sandboxes or create a replacement task.
+  if(!lifecycle.sandboxId&&input.conversationId===conversationId&&/^[A-Za-z0-9_-]{1,128}$/.test(input.recordedSandboxId??''))
+    lifecycle.sandboxId=input.recordedSandboxId;
+  if(!lifecycle.sandboxId&&String(lifecycle.sandboxStatus).toUpperCase()==='PAUSED'&&input.startTaskId){
+    startTask??=await getOpenHandsStartTask(input.startTaskId);
+    if(startTask?.id!==input.startTaskId||startTask.app_conversation_id!==conversationId)
+      throw new Error('OpenHands start-task receipt mismatch');
+    lifecycle.sandboxId=startTask.sandbox_id??null;
+  }
+  return lifecycle;
 }

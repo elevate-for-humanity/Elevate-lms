@@ -1,3 +1,5 @@
+export type TenantSiteLinkGroup = { label: string; pageIds: string[] };
+
 export type TenantSiteProduct = {
   name: string;
   /** Canonical persisted offer used to create checkout for this product. */
@@ -120,7 +122,8 @@ export type TenantSiteConfig = {
   };
   testimonial?: { quote: string; author: string };
   navigation: Array<{ label: string; href: string }>;
-  footer: { description: string; contactEmail?: string };
+  navigationGroups?: TenantSiteLinkGroup[];
+  footer: { description: string; contactEmail?: string; linkGroups?: TenantSiteLinkGroup[] };
   seo?: { title: string; description: string; keywords?: string[] };
   claims?: TenantSiteClaim[];
   meta?: Record<string, unknown>;

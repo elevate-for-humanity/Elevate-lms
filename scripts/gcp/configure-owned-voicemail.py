@@ -26,9 +26,9 @@ def operator_route(system,owner):
         return OPERATOR
     if owner.get('external_fallback_number')!=FORWARD_NUMBER:
         raise ValueError('operator_forward_number_requires_review')
-    # Offline browser presence must not prevent cellular fallback. Explicit DND
-    # and off-duty ring modes still suppress it.
-    if owner.get('ring_mode') in ['offline','do_not_disturb']:
+    # An offline extension (no app/handset online) still forwards to the cell;
+    # only explicit Do Not Disturb goes straight to voicemail.
+    if owner.get('ring_mode')=='do_not_disturb':
         return OPERATOR
     return OPERATOR.replace('?voicemail)', '?cellular)').replace(
         ' same => n(voicemail),VoiceMail(0@elevate,u)',

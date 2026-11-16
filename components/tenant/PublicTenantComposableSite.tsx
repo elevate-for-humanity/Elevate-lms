@@ -8,6 +8,8 @@ import { readWebsiteDesign } from '@/lib/website-builder/design-choices';
 import { TenantCommerce, TenantBagButton, TenantAddToBag } from './TenantShoppingBag';
 import { ChartNoAxesCombined, UsersRound, Sprout, Flag } from 'lucide-react';
 import { WellnessStorefront } from '@/components/tenant/WellnessStorefront';
+import { TenantGroupedLinks } from './TenantGroupedLinks';
+import { resolveSiteLinkGroups } from '@/lib/tenant/site-navigation';
 import { TenantIntroduction } from '@/components/tenant/TenantIntroduction';
 import { TenantChoiceSection } from '@/components/tenant/TenantChoiceSection';
 import { TenantParis } from '@/components/tenant/TenantParis';
@@ -277,6 +279,9 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const background = config.branding.backgroundColor || '#ffffff';
   const textColor = config.branding.textColor || '#0f172a';
   const navigation = (config.pages || []).filter((item) => item.showInNavigation !== false);
+  const groupedIds = new Set(resolveSiteLinkGroups(config.navigationGroups, config.pages || []).flatMap(group => group.links.map(page => page.id)));
+  const flatNavigation = navigation.filter(page => !groupedIds.has(page.id));
+  const footerGroups = resolveSiteLinkGroups(config.footer.linkGroups, config.pages || []);
   const design = config.meta?.designPreferences ? readWebsiteDesign(config.meta.designPreferences) : null;
   const isLegacy83 = config.template.id === 'legacy83-premium';
   function navigateDraft(event: MouseEvent<HTMLDivElement>) {
@@ -303,14 +308,14 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
           <a href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></a>
-          <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.filter((item) => item.slug !== '/contact').map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</a>)}</nav>
+          <nav aria-label="Main navigation" className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{flatNavigation.filter((item) => item.slug !== '/contact').map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</a>)}<TenantGroupedLinks config={config} basePath={basePath} pathname={page.slug} /></nav>
           <TenantBagButton />{navigation.some((item) => item.slug === '/contact') ? <a href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>{text(config.meta?.headerCtaText) || 'Contact'}</a> : null}
         </div>
       </header>
-      {isLegacy83 || design ? <div className={`tenant-mobile-menu ${isLegacy83 ? 'legacy83-mobile-menu' : ''}`}><details key={page.slug}><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} aria-current={item.slug === page.slug ? 'page' : undefined}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
+      {isLegacy83 || design ? <div className={`tenant-mobile-menu ${isLegacy83 ? 'legacy83-mobile-menu' : ''}`}><details key={page.slug}><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation"><TenantGroupedLinks config={config} basePath={basePath} pathname={page.slug} mobile />{flatNavigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)} aria-current={item.slug === page.slug ? 'page' : undefined}>{item.navLabel || item.title}</a>)}</nav></details></div> : null}
       <main>{page.sections.map((section, index) => <TenantSectionBoundary key={`${site.id}:${page.slug}:${section.id}`} sectionId={section.id}><Section section={section} websiteId={site.id} businessName={site.siteName} isPageHeading={index === page.sections.findIndex((item) => item.type === 'hero' && item.visible !== false)} primary={primary} secondary={secondary} basePath={basePath} /></TenantSectionBoundary>)}</main>
       {site.parisEnabled ? <TenantParis key={site.id} business={site.siteName} accent={primary} basePath={basePath} /> : null}
-      <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
+      <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}<nav aria-label="Footer navigation" className="flex w-full flex-wrap gap-5 text-sm font-bold">{footerGroups.length ? <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"><TenantGroupedLinks config={config} basePath={basePath} pathname={page.slug} footer /></div> : navigation.map((item) => <a key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</a>)}</nav></div></footer>
     </div></TenantCommerce>
   );
 }

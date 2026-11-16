@@ -62,10 +62,11 @@ export function TenantRecordedIntroduction({ narration, audioUrl, musicUrl }: {
       setStatus(previous => previous === 'playing' || previous === 'loading' ? 'paused' : previous);
     }} onEnded={() => finish()} onError={() => finish(true)} />
     {musicUrl ? <audio ref={music} src={readOnly ? undefined : musicUrl} preload="none" loop onError={() => { musicWanted.current = false; setMusicEnabled(false); }} /> : null}
-    <button type="button" disabled={readOnly} onClick={() => status === 'playing' || status === 'loading' ? pause() : void play()}>
+    <div role="group" aria-label="Introduction audio controls" className="flex flex-wrap items-center gap-x-4 gap-y-2">
+    <button className="min-h-11 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-60" type="button" disabled={readOnly} onClick={() => status === 'playing' || status === 'loading' ? pause() : void play()}>
       {status === 'loading' ? 'Cancel introduction' : status === 'playing' ? 'Pause introduction' : status === 'paused' ? 'Resume introduction' : status === 'ended' ? 'Replay introduction' : 'Listen to the introduction'}
     </button>
-    {musicUrl ? <button type="button" disabled={readOnly} aria-pressed={musicEnabled} onClick={() => {
+    {musicUrl ? <button className="min-h-11 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-60" type="button" disabled={readOnly} aria-pressed={musicEnabled} onClick={() => {
       const enabled = !musicEnabled; musicWanted.current = enabled; setMusicEnabled(enabled);
       const bed = music.current;
       if (!bed) return;
@@ -76,6 +77,7 @@ export function TenantRecordedIntroduction({ narration, audioUrl, musicUrl }: {
         void bed.play().then(() => { if (!mounted.current || !voiceWanted.current || !musicWanted.current) bed.pause(); }).catch(() => { if (version === attempt.current) { musicWanted.current = false; setMusicEnabled(false); } });
       }
     }}>Background music {musicEnabled ? 'on' : 'off'}</button> : null}
+    </div>
     <details><summary>Read the introduction</summary><p>{narration}</p></details>
     <p role="status" className={status === 'error' ? '' : 'sr-only'}>{status === 'error' ? 'The spoken introduction is temporarily unavailable. You can read it above.' : status === 'playing' ? 'Introduction playing.' : status}</p>
   </div>;

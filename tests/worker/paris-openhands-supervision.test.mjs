@@ -151,3 +151,12 @@ test('an unresumable sandbox stops observation with its named reason; a provider
  assert.deepEqual(await h.supervise(),{handled:true,awaitingProvider:true});
  assert.equal(h.records.at(-1).openhandsObservation.state,'unverified');
 });
+test('a provider-confirmation snapshot still pending approval is read but its paused sandbox is never woken',async()=>{
+ const {PROVIDER_CONFIRMATION_REASON}=await import('../../lib/devstudio/openhands/provider-confirmation.mjs');
+ const h=fixture();const resumed=[];Object.assign(h.task,{approval_status:'pending',approval_reason:PROVIDER_CONFIRMATION_REASON});
+ h.lifecycle={...h.lifecycle,status:'queued',sandboxStatus:'PAUSED',sandboxId:'sandbox-1'};
+ h.observe=()=>observeAcceptedOpenHandsRepair({repairId,actorId:'owner',attempt:1,runId:12,goal,checkpoint:h.cp},{
+  now:()=>now,findTask:async()=>h.task,refresh:async()=>({task:h.task,lifecycle:h.lifecycle}),
+  resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{throw Error('no read')}});
+ assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});assert.deepEqual(resumed,[]);
+});

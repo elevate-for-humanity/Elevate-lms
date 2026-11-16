@@ -212,3 +212,12 @@ test('prepare resumes a paused sandbox of the SAME tracked task and never dispat
   h.lifecycle = {status: 'queued', sandboxStatus: 'STARTING', sandboxId: 'sandbox-1'};
   assert.equal((await h.run()).pending, true); assert.deepEqual(resumed, ['sandbox-1']);
 });
+
+test('a transient resume failure keeps polling the same task; a named provider refusal stops it', async () => {
+  const h = harness(); await h.run();
+  h.lifecycle = {status: 'queued', sandboxStatus: 'PAUSED', sandboxId: 'sandbox-1'};
+  h.deps.resumeSandbox = async () => {throw Error('OpenHands API 502: runtime unavailable');};
+  assert.equal((await h.run()).pending, true); assert.equal(h.dispatches, 1);
+  h.deps.resumeSandbox = async () => {throw Error('PARIS_OPENHANDS_SANDBOX_NOT_RESUMABLE');};
+  await assert.rejects(h.run(), /PARIS_OPENHANDS_SANDBOX_NOT_RESUMABLE/); assert.equal(h.dispatches, 1);
+});

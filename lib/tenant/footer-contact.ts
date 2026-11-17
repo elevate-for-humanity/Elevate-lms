@@ -10,7 +10,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
   const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
 
   const emails = rawSources
-    .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:\"]+@[^\s<>()\x5b\x5d,;:\"]+/g) || [])
+    .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || [])
     .map(value => {
       const token = value.replace(/[.!?]+$/, '');
       const pairedQuotes = [

@@ -65,9 +65,9 @@ export default async function ContactsPage({
     byEmail.set(key, {
       ...inquiry,
       ...contact,
-      name: inquiry.name ?? contact.name ?? null,
-      message: inquiry.message ?? contact.message ?? null,
-      program_interest: inquiry.program_interest ?? contact.program_interest ?? null,
+      name: contact.name ?? inquiry.name ?? null,
+      message: contact.message ?? inquiry.message ?? null,
+      program_interest: contact.program_interest ?? inquiry.program_interest ?? null,
       created_at: latestCreatedAt,
       updated_at: latestUpdatedAt,
     });

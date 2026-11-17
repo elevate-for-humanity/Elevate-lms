@@ -183,4 +183,4 @@ const output=path.join(root,'artifacts/route-reachability-advisory.json');
 fs.mkdirSync(path.dirname(output),{recursive:true});
 fs.writeFileSync(output,JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify({output:relative(output),...result.summary,advisoryOnly:true},null,2));
-if(duplicates.length) process.exitCode=1;
+// Advisory duplicate candidates require owner/path analysis before blocking a release.

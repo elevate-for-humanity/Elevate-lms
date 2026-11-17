@@ -2,11 +2,11 @@
 
 import { requireRole } from '@/lib/auth/require-role';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export async function createContactAction(formData: FormData) {
   const { user } = await requireRole(['admin', 'staff']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   const first_name = (formData.get('first_name') as string)?.trim();
   const last_name = (formData.get('last_name') as string)?.trim();

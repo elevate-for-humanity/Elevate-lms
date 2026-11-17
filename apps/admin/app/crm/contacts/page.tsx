@@ -1,5 +1,6 @@
 import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Users, Search, Filter, Plus, Mail, Phone, MoreVertical, Building2 } from 'lucide-react';
@@ -20,7 +21,8 @@ export default async function ContactsPage({
   const supabase = await createClient();
 
   const pendingReview = (await searchParams).review === 'pending';
-  const crmQuery = supabase
+  const db = await requireAdminClient();
+  const crmQuery = db
     .from('crm_contacts')
     .select('id,first_name,last_name,email,phone,company,contact_type,status,created_at,updated_at')
     .order('created_at', { ascending: false })

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -30,7 +31,8 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { data, error } = await supabase
+    const db = await requireAdminClient();
+    const { data, error } = await db
       .from('crm_deals')
       .insert({
         title: body.title,
@@ -70,7 +72,7 @@ async function _GET(request: NextRequest) {
 
   await requireAdmin();
 
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
   const { data, error } = await supabase
     .from('crm_deals')
     .select('*')

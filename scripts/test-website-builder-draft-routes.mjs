@@ -269,6 +269,7 @@ test('generation rejects split area codes and ordinary counts while preserving l
   ['We served 123 customers and need a contact footer.','123'],
   ['We supported 988 learners and need a contact footer.','988'],
   ['We served 988 (learners) and need a contact footer.','988'],
+  ['Annual reach:\n211 (learners receiving support)','211'],
   ['Support services.\nWe served 988 learners.','988'],
   ['Support services:\nWe served 988 learners.','988'],
   ['Phone: 317-555-0123\nWe served 988 customers last year.','988'],

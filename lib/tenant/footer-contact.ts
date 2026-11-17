@@ -89,6 +89,8 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const hasBoundedAnnotation = candidateAtLineStart !== null
             && /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
             && !lineHasIndependentPhone(candidateSuffix);
+          const hasTrailingContactAnnotation = hasBoundedAnnotation
+            && contactKeyword.test(candidateSuffix);
           const hasExplicitPreviousLineLabel = (candidateOccupiesLine || hasBoundedAnnotation)
             && !/\d/.test(previousLineLabel)
             && (
@@ -99,7 +101,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
                 && contactKeyword.test(previousLineLabel)
               )
             );
-          if (!hasInlineContext && !hasExplicitPreviousLineLabel) continue;
+          if (!hasInlineContext && !hasExplicitPreviousLineLabel && !hasTrailingContactAnnotation) continue;
         }
         if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;
         if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;

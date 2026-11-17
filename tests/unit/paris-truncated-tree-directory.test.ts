@@ -49,4 +49,36 @@ describe('PARIS truncated-tree directory recovery', () => {
       {type:'search',query:'marketing program'},
       [{type:'blob',path:'apps/marketing/lib/programs.ts'}], 'marketing program',allow)).toBeNull();
   });
+  it('finds a still-uninspected ranked directory after twelve exhausted matches', () => {
+    const dirs = Array.from({length:13}, (_, i) =>
+      `apps/marketing/host-shops-${String(i).padStart(2, '0')}`);
+    const history = [...repeat, ...dirs.slice(0, 12).map(path => `list:${path}`)];
+    const tree = dirs.map(path => ({type:'tree', path}));
+    expect(recoverRepeatedDirectoryInspection(history,
+      {type:'search', query:'marketing program'}, tree,
+      'marketing host shops', allow)).toEqual({type:'list', path:dirs[12]});
+    expect(history).toHaveLength(14);
+  });
+
+  it('ranks only authorized, new blob parents instead of capping exhausted files', () => {
+    const dirs = Array.from({length:13}, (_, i) =>
+      `apps/marketing/host-shops-${String(i).padStart(2, '0')}`);
+    const history = [...repeat, ...dirs.slice(0, 12).map(path => `list:${path}`)];
+    const tree = dirs.map(path => ({type:'blob', path:`${path}/catalog.ts`}));
+    expect(recoverRepeatedDirectoryInspection(history,
+      {type:'search', query:'marketing program'}, tree,
+      'marketing host shops catalog', allow)).toEqual({type:'list', path:dirs[12]});
+  });
+
+  it('cannot let forbidden tree directories occupy the twelve-directory cap', () => {
+    const denied = Array.from({length:12}, (_, i) =>
+      ({type:'tree', path:`apps/admin/marketing-host-shops-${String(i).padStart(2,'0')}`}));
+    const permitted = 'apps/marketing/host-shops-99';
+    expect(recoverRepeatedDirectoryInspection(repeat,
+      {type:'search', query:'marketing program'},
+      [...denied, {type:'tree',path:permitted}],
+      'marketing host shops', allow)).toEqual({type:'list',path:permitted});
+  });
+
+
 });

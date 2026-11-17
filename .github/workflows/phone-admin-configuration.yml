@@ -1,0 +1,54 @@
+name: Phone Admin configuration contract
+on:
+  pull_request:
+    paths:
+      - 'apps/admin/app/phone/**'
+      - 'lib/phone/**'
+      - 'tests/integration/phone-extension/**'
+      - 'supabase/migrations/*phone*'
+      - 'tests/phone-admin-configuration.node.test.mjs'
+      - '.github/workflows/phone-admin-configuration.yml'
+permissions:
+  contents: read
+jobs:
+  configuration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/phone-admin-configuration.node.test.mjs
+
+  atomic-extension-database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: efh_phone_extension_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d efh_phone_extension_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify duplicate migration and atomic extension saves
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGDATABASE: efh_phone_extension_test
+        run: |
+          psql -v ON_ERROR_STOP=1 --single-transaction \
+            -f tests/integration/phone-extension/schema.sql \
+            -f supabase/migrations/20261117091246_phone_one_enabled_destination_per_extension.sql \
+            -f supabase/migrations/20261117093000_phone_atomic_extension_save.sql \
+            -f tests/integration/phone-extension/assertions.sql

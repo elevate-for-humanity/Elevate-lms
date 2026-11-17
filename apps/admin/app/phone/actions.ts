@@ -4,7 +4,7 @@ import { assertGoogleCalendarAvailable } from '@/lib/calendar/google-calendar';
 import { revalidatePath } from 'next/cache';
 import { requireRole, type AuthResult } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/phone/config';
+import { businessHoursFromForm, normalizeUsPhone, validMenuDigit, validPhoneExtension } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import {hydrateProcessEnv} from '@/lib/secrets';
@@ -424,8 +424,8 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
   const phoneNumberId = String(formData.get('phoneNumberId') ?? '');
   const profileId = String(formData.get('profileId') ?? '').trim() || null;
   const extension = String(formData.get('extension') ?? '').trim() || null;
-  if (extension && !/^\d{2,6}$/.test(extension)) {
-    throw new Error('Extension must contain 2 to 6 digits.');
+  if (extension && !validPhoneExtension(extension)) {
+    throw new Error('Use 0 for the operator or a 2 to 6 digit extension.');
   }
   if (profileId) {
     const { data: profile } = await db
@@ -451,71 +451,16 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
   const profileId = String(formData.get('profileId') ?? '').trim();
   const extension = String(formData.get('extension') ?? '').trim();
   const department = String(formData.get('department') ?? '').trim() || null;
-  if (!profileId || !/^\d{2,6}$/.test(extension)) {
-    throw new Error('Select a staff member or Program Holder and enter a 2 to 6 digit extension.');
+  if (!profileId || !validPhoneExtension(extension)) {
+    throw new Error('Select a staff member or Program Holder and enter 0 for the operator or a 2 to 6 digit extension.');
   }
-  const { data: profile } = await db
-    .from('profiles')
-    .select('id,full_name,email,role')
-    .eq('id', profileId)
-    .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
-    .maybeSingle();
-  if (!profile) throw new Error('Select a valid staff or Program Holder account.');
-  const { data: savedExtension, error } = await db
-    .from('communication_extensions')
-    .upsert(
-      {
-        workspace_id: workspace.id,
-        profile_id: profile.id,
-        extension,
-        display_name: profile.full_name || profile.email || 'Team member',
-        department,
-        enabled: true,
-        webrtc_provider: 'asterisk',
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'workspace_id,profile_id' },
-    )
-    .select('id,display_name,department,extension,destination_id')
-    .single();
+  const { error } = await db.rpc('save_phone_extension', {
+    p_workspace_id: workspace.id,
+    p_profile_id: profileId,
+    p_extension: extension,
+    p_department: department,
+  });
   if (error) throw new Error(error.message);
-  if (!workspace.phone_system_id)
-    throw new Error('The communications workspace has no phone system.');
-  const { data: existingDestination } = await db
-    .from('phone_destinations')
-    .select('id')
-    .eq('phone_system_id', workspace.phone_system_id)
-    .eq('extension_id', savedExtension.id)
-    .order('created_at')
-    .limit(1)
-    .maybeSingle();
-  const destinationValues = {
-    phone_system_id: workspace.phone_system_id,
-    extension_id: savedExtension.id,
-    name: savedExtension.display_name,
-    department: savedExtension.department,
-    destination_type: 'webrtc',
-    destination: null,
-    ring_seconds: 20,
-    fallback_to_voicemail: true,
-    enabled: true,
-    updated_at: new Date().toISOString(),
-  };
-  const destinationResult = existingDestination
-    ? await db
-        .from('phone_destinations')
-        .update(destinationValues)
-        .eq('id', existingDestination.id)
-        .select('id')
-        .single()
-    : await db.from('phone_destinations').insert(destinationValues).select('id').single();
-  if (destinationResult.error) throw new Error(destinationResult.error.message);
-  const { error: linkError } = await db
-    .from('communication_extensions')
-    .update({ destination_id: destinationResult.data.id, updated_at: new Date().toISOString() })
-    .eq('id', savedExtension.id)
-    .eq('workspace_id', workspace.id);
-  if (linkError) throw new Error(linkError.message);
   revalidatePath('/phone');
   revalidatePath('/program-holder/dashboard');
 }

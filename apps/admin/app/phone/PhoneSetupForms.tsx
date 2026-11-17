@@ -328,8 +328,12 @@ export function PhoneSetupForms({
           </div>
         </section>
         <button disabled={savePending} className={button}>
-          {savePending ? 'Saving configuration…' : 'Save phone configuration'}
+          {savePending ? 'Saving preferences…' : 'Save phone preferences'}
         </button>
+        <p className="text-sm text-amber-900">
+          These preferences are saved to the database. Live PBX application and verification are
+          separate.
+        </p>
         <Result state={saved} />
       </form>
 
@@ -399,6 +403,7 @@ export function PhoneSetupForms({
                 .map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
+                    {item.destination ? ` — ${item.destination}` : ''}
                   </option>
                 ))}
             </select>

@@ -39,6 +39,80 @@ export async function GET(req: NextRequest) {
 
   const canReviewUploads = hasAnyRole(auth.effectiveRoles, ['admin']);
   const noUploads = { data: [], count: 0, error: null };
+  const alertTarget = 11;
+  const pageSize = 50;
+
+  const loadLearnerDocumentAlerts = async () => {
+    const alerts: AdminNavNotif[] = [];
+    for (let offset = 0; alerts.length < alertTarget; offset += pageSize) {
+      const { data, error } = await effectiveDb
+        .from('documents')
+        .select('id,user_id,file_name,file_path,storage_path,file_url,metadata,created_at')
+        .in('status', pendingDocumentStatuses)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1);
+      if (error) return { data: alerts, count: alerts.length, error };
+
+      const rows = data ?? [];
+      const userIds = [...new Set(rows.map((doc) => doc.user_id).filter(Boolean))];
+      const profiles = userIds.length
+        ? await effectiveDb.from('profiles').select('id,full_name,email').in('id', userIds)
+        : { data: [], error: null };
+      if (profiles.error) return { data: alerts, count: alerts.length, error: profiles.error };
+      const profileById = new Map((profiles.data ?? []).map((profile) => [profile.id, profile]));
+
+      for (const doc of rows) {
+        const hydrated = { ...doc, profiles: profileById.get(doc.user_id) ?? null };
+        if (isQaDocumentRecord(hydrated) || !resolveDocumentStorageLocator(hydrated)) continue;
+        alerts.push({
+          id: `document-upload:${doc.id}`,
+          unread: true,
+          href: `/documents/review/${doc.id}`,
+          title: 'New document awaiting review',
+          time: doc.created_at ?? '',
+        });
+        if (alerts.length >= alertTarget) break;
+      }
+      if (rows.length < pageSize) break;
+    }
+    return { data: alerts, count: alerts.length, error: null };
+  };
+
+  const loadProgramHolderDocumentAlerts = async () => {
+    const alerts: AdminNavNotif[] = [];
+    for (let offset = 0; alerts.length < alertTarget; offset += pageSize) {
+      const { data, error } = await effectiveDb
+        .from('program_holder_documents')
+        .select('id,user_id,file_name,file_url,created_at')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1);
+      if (error) return { data: alerts, count: alerts.length, error };
+
+      const rows = data ?? [];
+      const userIds = [...new Set(rows.map((doc) => doc.user_id).filter(Boolean))];
+      const profiles = userIds.length
+        ? await effectiveDb.from('profiles').select('id,full_name,email').in('id', userIds)
+        : { data: [], error: null };
+      if (profiles.error) return { data: alerts, count: alerts.length, error: profiles.error };
+      const profileById = new Map((profiles.data ?? []).map((profile) => [profile.id, profile]));
+
+      for (const doc of rows) {
+        const hydrated = { ...doc, profiles: profileById.get(doc.user_id) ?? null };
+        if (isQaDocumentRecord(hydrated) || !doc.file_url?.trim()) continue;
+        alerts.push({
+          id: `holder-document-upload:${doc.id}`,
+          unread: true,
+          href: '/program-holder-documents',
+          title: 'New program holder document awaiting review',
+          time: doc.created_at ?? '',
+        });
+        if (alerts.length >= alertTarget) break;
+      }
+      if (rows.length < pageSize) break;
+    }
+    return { data: alerts, count: alerts.length, error: null };
+  };
 
   try {
     const [
@@ -60,14 +134,7 @@ export async function GET(req: NextRequest) {
         .from('applications')
         .select('id', { count: 'exact', head: true })
         .in('status', ['submitted', 'in_review']),
-      canReviewUploads
-        ? effectiveDb
-            .from('documents')
-            .select('id,file_name,file_path,storage_path,file_url,metadata,created_at')
-            .in('status', pendingDocumentStatuses)
-            .order('created_at', { ascending: false })
-            .limit(30)
-        : Promise.resolve(noUploads),
+      canReviewUploads ? loadLearnerDocumentAlerts() : Promise.resolve(noUploads),
       effectiveDb
         .from('compliance_alerts')
         .select('id', { count: 'exact', head: true })
@@ -89,14 +156,7 @@ export async function GET(req: NextRequest) {
         .eq('metadata->>source', 'service-billing')
         .order('created_at', { ascending: false })
         .limit(20),
-      canReviewUploads
-        ? effectiveDb
-            .from('program_holder_documents')
-            .select('id,file_name,file_url,created_at')
-            .eq('status', 'pending')
-            .order('created_at', { ascending: false })
-            .limit(20)
-        : Promise.resolve(noUploads),
+      canReviewUploads ? loadProgramHolderDocumentAlerts() : Promise.resolve(noUploads),
     ]);
 
     const unavailableSources = (
@@ -140,26 +200,9 @@ export async function GET(req: NextRequest) {
         time: 'Pending action',
       });
     }
-    const documentAlerts = [
-      ...(docsRes.data ?? [])
-        .filter((doc) => !isQaDocumentRecord(doc) && resolveDocumentStorageLocator(doc))
-        .map((doc) => ({
-          id: `document-upload:${doc.id}`,
-          unread: true,
-          href: `/documents/review/${doc.id}`,
-          title: 'New document awaiting review',
-          time: doc.created_at,
-        })),
-      ...(holderUploads.data ?? [])
-        .filter((doc) => !isQaDocumentRecord(doc) && doc.file_url?.trim())
-        .map((doc) => ({
-          id: `holder-document-upload:${doc.id}`,
-          unread: true,
-          href: '/program-holder-documents',
-          title: 'New program holder document awaiting review',
-          time: doc.created_at,
-        })),
-    ].sort((a, b) => String(b.time).localeCompare(String(a.time)));
+    const documentAlerts = [...(docsRes.data ?? []), ...(holderUploads.data ?? [])].sort(
+      (a, b) => String(b.time).localeCompare(String(a.time)),
+    );
     notifs.unshift(
       ...documentAlerts.slice(0, 10).map((alert) => ({
         ...alert,

@@ -74,7 +74,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
           {visible.map((shop) => (
             <article
               key={shop.id}
-              className="group flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-white/15 bg-white text-slate-950 shadow-xl"
+              className="group flex min-h-0 flex-col self-start overflow-hidden rounded-3xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
               <HostShopMediaCarousel
                 shopName={shop.name}
@@ -190,7 +190,7 @@ export default function HostShopNetworkDirectory({ shops, programSlug }: Props) 
                 ) : null}
                 <Link
                   href={`/host-shops/${shop.slug}`}
-                  className="mt-auto inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-red-700"
+                  className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-red-700"
                 >
                   View shop profile
                 </Link>

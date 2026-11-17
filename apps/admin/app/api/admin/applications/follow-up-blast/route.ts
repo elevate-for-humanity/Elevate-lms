@@ -6,6 +6,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { excludeQaProfiles } from '@/lib/admin/operational-profile-query';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -35,7 +36,7 @@ function buildFollowUpHtml(firstName: string, programInterest: string): string {
 
     <p>We received your application for the <strong>${program}</strong> program and we have not forgotten about you.</p>
 
-    <p>We want to make sure you get started. <strong>Training is free for most applicants</strong> through WIOA, WRG, or Job Ready Indy funding — the government pays your tuition so you pay nothing out of pocket.</p>
+    <p>Funding may be available to applicants who qualify through WIOA, WRG, or Job Ready Indy. Eligibility and covered costs are determined by the funding program.</p>
 
     <h2 style="color:#1e293b;font-size:17px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:28px">YOUR NEXT STEP — DO THIS TODAY</h2>
 
@@ -53,7 +54,7 @@ function buildFollowUpHtml(firstName: string, programInterest: string): string {
 
     <div style="background:#f9fafb;border:1px solid #e5e7eb;border-left:4px solid #f97316;padding:16px;border-radius:0 6px 6px 0;margin:12px 0">
       <h3 style="margin-top:0;color:#1e293b">Step 3 — Call Us After Your WorkOne Appointment</h3>
-      <p>Once WorkOne approves your funding, call us at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong> or reply to this email. We will get you enrolled and give you a start date.</p>
+      <p>Once WorkOne approves your funding, call us at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong> or reply to this email. We will review your next steps and available start dates.</p>
     </div>
 
     <div style="background:#fef2f2;border:1px solid #fecaca;padding:14px 16px;border-radius:6px;margin:20px 0;font-weight:bold;color:#991b1b;text-align:center">
@@ -87,7 +88,7 @@ function buildFollowUpText(firstName: string, programInterest: string): string {
 
 We received your application for the ${program} program at ${PLATFORM_DEFAULTS.orgName} and we have not forgotten about you.
 
-Training is free for most applicants through WIOA, WRG, or Job Ready Indy funding.
+Funding may be available to applicants who qualify through WIOA, WRG, or Job Ready Indy. Eligibility and covered costs are determined by the funding program.
 
 YOUR NEXT STEPS:
 
@@ -126,6 +127,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const statusFilter: string[] = body.statuses || PENDING_STATUSES;
   const programFilter: string | null = body.program || null;
+  const includeTest = body.includeTest === true;
 
   let query = db
     .from('applications')
@@ -133,6 +135,7 @@ export async function POST(request: Request) {
     .in('status', statusFilter)
     .not('email', 'is', null);
 
+  if (!includeTest) query = excludeQaProfiles(query);
   if (programFilter) {
     query = query.ilike('program_interest', `%${programFilter}%`);
   }

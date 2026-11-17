@@ -17,6 +17,15 @@ test('Legacy /lms/login bookmarks redirect safely to the actual sign-in page', (
   assert.ok(!existsSync('apps/lms/app/lms/login/page.tsx'));
 });
 
+test('Retired AI Tutor URL is backed by a real authenticated destination', () => {
+  const marketing = source('apps/marketing/app/platform/student-portal/page.tsx');
+  const config = source('apps/lms/next.config.mjs');
+  assert.ok(marketing.includes('https://app.elevateforhumanity.org/lms/ai-team'));
+  assert.ok(!marketing.includes('https://app.elevateforhumanity.org/lms/ai-tutor'));
+  assert.match(config, /source:\s*'\/lms\/ai-tutor',\s*destination:\s*'\/lms\/ai-team',\s*permanent:\s*false/);
+  assert.ok(existsSync('apps/lms/app/lms/(app)/ai-team/page.tsx'));
+});
+
 test('Route analysis is non-destructive and does not treat missing static references as proof of orphaning', () => {
   const audit = source('scripts/audit-route-reachability.mjs');
   assert.match(audit, /orphan-candidate-NOT-proven/);

@@ -16,13 +16,18 @@ def command(args):
 
 def failure_stages(journal):
     events = []
+    initial_failures = []
     for line in journal.splitlines():
         match = re.fullmatch(r'PBX (ownership/runtime reconciliation failed|expired-credential revocation stage): ([a-z_]+)', line)
         if match and match[2] in CODES:
             event = {'stage': STAGES[match[1]], 'code': match[2]}
+            if event['code'] != 'provisioner_quarantined' and event not in initial_failures and len(initial_failures) < 20:
+                initial_failures.append(event)
             if not events or events[-1] != event:
                 events.append(event)
     return {'recentStages': events[-20:],
+            'initialFailureStages': initial_failures,
+            'initialFailureObserved': bool(initial_failures),
             'quarantineObserved': any(e['code'] == 'provisioner_quarantined' for e in events),
             'startupFailureObserved': 'PBX provisioner startup failed. No credentials were logged.' in journal.splitlines()}
 
@@ -56,8 +61,11 @@ def generation_summary(root=ROOT, now=None):
         return {'state': 'unavailable'}
 
 def main():
-    status, journal = command(['journalctl', '-u', 'elevate-pbx-provisioner.service', '--since', '2 hours ago', '-n', '500', '--no-pager', '-o', 'cat'])
+    # Five-second quarantine retries can otherwise evict the initiating failure.
+    # Keep a bounded history and emit only fixed allowlisted stage/code pairs.
+    status, journal = command(['journalctl', '-u', 'elevate-pbx-provisioner.service', '--since', '24 hours ago', '-n', '20000', '--no-pager', '-o', 'cat'])
     report = {'journalRead': status == 0, **failure_stages(journal if status == 0 else ''),
+              'journalWindowHours': 24, 'journalLineLimit': 20000,
               'generation': generation_summary(), 'readOnly': True, 'callsPlaced': 0, 'configurationChanged': False}
     status, output = command(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', 'pjsip show endpoint twilio'])
     report['carrierIdentity'] = carrier_identity(output if status == 0 else '')
@@ -70,3 +78,4 @@ if __name__ == '__main__':
     except Exception:
         print(json.dumps({'provisionerFailureDiagnostics': {'error': 'diagnostic_unavailable', 'readOnly': True, 'callsPlaced': 0}}))
         raise SystemExit(1)
+

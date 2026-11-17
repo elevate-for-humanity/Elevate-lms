@@ -5,12 +5,22 @@ name: Host Shop authenticated isolation acceptance
 # Certify only reviewed main after the LMS release workflow completes.
 on:
   workflow_dispatch:
+    inputs:
+      deployed_sha:
+        description: Exact main LMS commit from a successful release handoff
+        required: false
+        type: string
+      deployment_run_id:
+        description: Trusted source LMS deployment workflow run ID
+        required: false
+        type: string
   workflow_run:
     workflows: ['Deploy LMS automatically on Google']
     types: [completed]
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: host-shop-cross-shop-qa-${{ github.ref }}
@@ -54,14 +64,35 @@ jobs:
             *) echo "::error::Refusing to provision against an unexpected database"; exit 1 ;;
           esac
           test "${PLAYWRIGHT_LMS_URL}" = "https://lms.elevateforhumanity.org"
-      - name: Verify exact current-main production serving SHA before QA
+      - name: Verify source release completed before dispatched security acceptance
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.deployed_sha != '' || inputs.deployment_run_id != '') }}
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: lms
+          ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
+          ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
+        run: |
+          set -euo pipefail
+          test -n "$ACCEPTANCE_SHA"
+          test -n "$ACCEPTANCE_RUN_ID"
+          node scripts/gcp/production-acceptance.mjs verify
+      - name: Verify exact source-release and current-main production SHA before QA
+        shell: bash
+        env:
+          # Bind a dispatched release to its attested SHA; workflow_run carries its own SHA.
+          DEPLOYED_SHA: ${{ inputs.deployed_sha || github.event.workflow_run.head_sha || '' }}
         run: |
           set -euo pipefail
           MAIN_SHA=$(git ls-remote origin refs/heads/main | cut -f1)
           test -n "$MAIN_SHA"
-          echo "QA_EXPECTED_MAIN_SHA=$MAIN_SHA" >> "$GITHUB_ENV"
-          EXPECTED_SHA="$MAIN_SHA" node --input-type=module -e '
+          if [[ -n "$DEPLOYED_SHA" ]]; then
+            [[ "$DEPLOYED_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::Invalid source release SHA"; exit 1; }
+            test "$MAIN_SHA" = "$DEPLOYED_SHA" || { echo "::error::main advanced beyond source release"; exit 1; }
+          fi
+          EXPECTED_SHA="${DEPLOYED_SHA:-$MAIN_SHA}"
+          echo "QA_EXPECTED_MAIN_SHA=$EXPECTED_SHA" >> "$GITHUB_ENV"
+          EXPECTED_SHA="$EXPECTED_SHA" node --input-type=module -e '
             const r=await fetch("https://lms.elevateforhumanity.org/api/ready",{headers:{"Cache-Control":"no-cache"}});
             const j=await r.json();
             if (!r.ok || j.ready!==true || j.service!=="lms" || j.commit!==process.env.EXPECTED_SHA || (j.missing||[]).length)
@@ -79,11 +110,13 @@ jobs:
           pnpm exec playwright test tests/e2e/host-shop-cross-shop-production.spec.ts
           --config playwright.config.ts --reporter=line
           --project=desktop-chrome --project=android-chrome --project=iphone-webkit --workers=1 --retries=0
-      - name: Confirm production SHA unchanged after test
+      - name: Confirm exact source-release SHA and current main unchanged after test
         if: success()
         shell: bash
         run: |
           set -euo pipefail
+          MAIN_SHA=$(git ls-remote origin refs/heads/main | cut -f1)
+          test "$MAIN_SHA" = "$QA_EXPECTED_MAIN_SHA" || { echo "::error::main advanced during Host Shop acceptance"; exit 1; }
           EXPECTED_SHA="$QA_EXPECTED_MAIN_SHA" node --input-type=module -e '
             const r=await fetch("https://lms.elevateforhumanity.org/api/ready",{headers:{"Cache-Control":"no-cache"}});
             const j=await r.json();

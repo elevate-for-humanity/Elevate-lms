@@ -33,6 +33,7 @@ export async function dispatchAcceptance(env=process.env,request=fetch) {
   const {component,sha,runId,token}=identity(env);
   const evidence=await live(component,sha,request);
   await api('actions/workflows/registered-apprenticeship-e2e.yml/dispatches',token,request,{ref:'main',inputs:{deployed_sha:sha,deployment_run_id:runId,component}});
+  if(component==='lms')await api('actions/workflows/host-shop-cross-shop-acceptance.yml/dispatches',token,request,{ref:'main',inputs:{deployed_sha:sha,deployment_run_id:runId}});
   if(component==='admin')await api('actions/workflows/verify-owned-voicemail-speech.yml/dispatches',token,request,{ref:'main'});
   if(component==='store')await api('actions/workflows/migrate-store-paypal-config.yml/dispatches',token,request,{ref:'main',inputs:{apply:'false',routing:'validate',store_sha:sha,deployment_run_id:runId}});
   return {...evidence,acceptanceDispatched:true,acceptancePassed:false};

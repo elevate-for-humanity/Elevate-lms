@@ -42,9 +42,35 @@ export default async function ContactsPage({
           .limit(50),
   ]);
   const byEmail = new Map<string, Record<string, string | null>>();
-  for (const contact of [...(crm.data ?? []), ...(marketing.data ?? [])]) {
+  for (const contact of crm.data ?? []) {
     const key = contact.email?.trim().toLowerCase() || contact.id;
-    if (!byEmail.has(key)) byEmail.set(key, contact);
+    byEmail.set(key, contact);
+  }
+  for (const inquiry of marketing.data ?? []) {
+    const key = inquiry.email?.trim().toLowerCase() || inquiry.id;
+    const contact = byEmail.get(key);
+    if (!contact) {
+      byEmail.set(key, inquiry);
+      continue;
+    }
+
+    const latestCreatedAt = [contact.created_at, inquiry.created_at]
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .pop() ?? null;
+    const latestUpdatedAt = [contact.updated_at, inquiry.updated_at, inquiry.created_at]
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .pop() ?? latestCreatedAt;
+    byEmail.set(key, {
+      ...inquiry,
+      ...contact,
+      name: inquiry.name ?? contact.name ?? null,
+      message: inquiry.message ?? contact.message ?? null,
+      program_interest: inquiry.program_interest ?? contact.program_interest ?? null,
+      created_at: latestCreatedAt,
+      updated_at: latestUpdatedAt,
+    });
   }
   const contacts = [...byEmail.values()]
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))

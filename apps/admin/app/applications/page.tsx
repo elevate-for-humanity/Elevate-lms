@@ -246,8 +246,12 @@ export default async function ApplicationsPage({
           >
             {includeTest ? 'Operational applications' : 'Include test applications'}
           </Link>
-          <BulkOnboardingButton guestCount={guestPendingCount ?? 0} />
-          <FollowUpBlastButton pendingCount={followUpPending} />
+          <BulkOnboardingButton guestCount={guestPendingCount ?? 0} includeTest={includeTest} />
+          <FollowUpBlastButton
+            pendingCount={followUpPending}
+            includeTest={includeTest}
+            statuses={[...APPLICATION_REVIEW_STATUSES]}
+          />
         </div>
       }
     >

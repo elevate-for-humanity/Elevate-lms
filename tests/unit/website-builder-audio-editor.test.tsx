@@ -75,10 +75,10 @@ it('saves and reopens a supplied decorative hero image, placement and opacity',a
  await waitFor(()=>expect(saved.pages![0].sections[0].content.backdropImage).toBe('/approved-graphic.svg'));
  fireEvent.change(screen.getByLabelText('Backdrop placement'),{target:{value:'right'}});
  await waitFor(()=>expect(saved.pages![0].sections[0].settings?.backdropPosition).toBe('right'));
- fireEvent.change(screen.getByLabelText('Backdrop opacity'),{target:{value:'20'}});
- await waitFor(()=>expect(saved.pages![0].sections[0].settings?.backdropOpacity).toBe(20));
+ const opacity=screen.getByLabelText('Backdrop opacity (%)');fireEvent.change(opacity,{target:{value:'42.5'}});fireEvent.blur(opacity);
+ await waitFor(()=>expect(saved.pages![0].sections[0].settings?.backdropOpacity).toBe(42.5));
  unmount();render(<ZeroCodeStructureEditor websiteId="customer" initialConfig={saved}/>);open();
  expect(screen.getByLabelText('Decorative hero image URL')).toHaveValue('/approved-graphic.svg');
- expect(screen.getByLabelText('Backdrop placement')).toHaveValue('right');expect(screen.getByLabelText('Backdrop opacity')).toHaveValue('20');
+ expect(screen.getByLabelText('Backdrop placement')).toHaveValue('right');expect(screen.getByLabelText('Backdrop opacity (%)')).toHaveValue('42.5');
  expect(saved.pages![0].sections[0].content.image).toBe('/owner.webp');expect(saved.pages![0].sections[0].settings?.imageFit).toBe('contain');
 });

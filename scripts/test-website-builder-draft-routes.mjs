@@ -263,6 +263,22 @@ test('generation keeps complete phones after prose separators and valid service 
 });
 
 
+
+test('generation preserves explicit trailing service destinations from contacts answers',async()=>{
+ for(const [source,phone] of [
+  ['911 (emergency)','911'],
+  ['988 (phone)','988'],
+  ['988 (call or text)','988'],
+ ]) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  const response=await f.post(request({brief:undefined,answers:{businessName:'Example',contacts:source}}));
+  assert.equal(response.status,201,JSON.stringify(response.body));
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+});
+
+
 test('generation rejects split area codes and ordinary counts while preserving labeled adjacent phones',async()=>{
  for(const [source,phone] of [
   ['Phone:\n317\n555-0123','555-0123'],

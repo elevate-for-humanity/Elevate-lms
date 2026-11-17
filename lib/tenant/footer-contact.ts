@@ -66,9 +66,89 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const previousLineStart = source.lastIndexOf('\n', previousLineEnd - 1) + 1;
           const currentLine = source.slice(lineStart, lineEnd);
           const previousLine = source.slice(previousLineStart, previousLineEnd);
-          const hasInlineContext = /\b(call|phone|dial|text|hotline|support|emergency)\b/i.test(currentLine);
-          const hasExplicitPreviousLineLabel =
-            /^\s*(?:call|phone|dial|text|hotline|support|emergency)\s*:?[ \t\r]*$/i.test(previousLine);
+          const contactKeyword = /\b(call|phone|dial|text|hotline|support|emergency)\b/i;
+          const hasInlineContext = contactKeyword.test(currentLine);
+          const previousLineLabel = previousLine.trim();
+          const candidateOccupiesLine =
+            new RegExp(`^\\s*${escapeRegExp(cleaned)}\\s*[.!?]?\\s*import type { TenantSiteConfig, TenantSiteContact } from './site-types';
+
+/** Model output is a candidate; retain only values copied from owner-supplied contact text. */
+export function suppliedWebsiteContact(input: unknown, sources: string[]): TenantSiteContact {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  const candidate = input as Record<string, unknown>;
+  const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
+  const rawSources = sources.filter((value): value is string => typeof value === 'string');
+  const supplied = rawSources.map(fold);
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
+
+  const emails = rawSources
+    .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:\"]+@[^\s<>()\x5b\x5d,;:\"]+/g) || [])
+    .map(value => {
+      const token = value.replace(/[.!?]+$/, '');
+      const pairedQuotes = [
+        ["'", "'"],
+        ['“', '”'],
+        ['‘', '’'],
+      ] as const;
+      const pair = pairedQuotes.find(([open, close]) => token.startsWith(open) && token.endsWith(close));
+      return pair ? token.slice(1, -1) : token.replace(/['’]$/, '');
+    });
+
+  const supportedServiceCodes = new Set(['211', '311', '411', '511', '611', '711', '811', '911', '988']);
+  const validPhoneShape = (value: string) => {
+    if (!/^\+?\s*[\d(). -]+$/.test(value)) return false;
+    const digits = value.replace(/\D/g, '');
+    if (!(digits.length === 3 && /^\d{3}$/.test(value) && supportedServiceCodes.has(digits))
+      && (digits.length < 7 || digits.length > 15)) return false;
+    let depth = 0;
+    for (const character of value) {
+      if (character === '(') depth += 1;
+      if (character === ')') {
+        depth -= 1;
+        if (depth < 0) return false;
+      }
+    }
+    return depth === 0;
+  };
+
+  const phoneTokens = (line: string) =>
+    line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
+  const lineHasIndependentPhone = (line: string) =>
+    phoneTokens(line).some(token => validPhoneShape(token.trim()));
+
+  const suppliedPhone = (value: unknown, limit: number) => {
+    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
+    const cleaned = value.trim();
+    if (!validPhoneShape(cleaned)) return undefined;
+    const pattern = new RegExp(cleaned.split(/\s+/).map(escapeRegExp).join('\\s+'), 'g');
+
+    for (const source of rawSources) {
+      for (const match of source.matchAll(pattern)) {
+        const start = match.index ?? 0;
+        const end = start + match[0].length;
+        const before = source[start - 1] || '';
+        const after = source[end] || '';
+
+        if (/[\p{L}\p{N}+(]/u.test(before) || /[\p{L}\p{N})]/u.test(after)) continue;
+        if (cleaned.replace(/\D/g, '').length === 3) {
+          const lineStart = source.lastIndexOf('\n', start - 1) + 1;
+          const lineEndIndex = source.indexOf('\n', end);
+          const lineEnd = lineEndIndex === -1 ? source.length : lineEndIndex;
+          const previousLineEnd = Math.max(0, lineStart - 1);
+          const previousLineStart = source.lastIndexOf('\n', previousLineEnd - 1) + 1;
+          const currentLine = source.slice(lineStart, lineEnd);
+          const previousLine = source.slice(previousLineStart, previousLineEnd);
+).test(currentLine);
+          const hasExplicitPreviousLineLabel = candidateOccupiesLine
+            && !/\d/.test(previousLineLabel)
+            && (
+              /^(?:call|phone|dial|text|hotline|support|emergency)\s*:?$/i.test(previousLineLabel)
+              || (
+                previousLineLabel.length <= 80
+                && previousLineLabel.endsWith(':')
+                && contactKeyword.test(previousLineLabel)
+              )
+            );
           if (!hasInlineContext && !hasExplicitPreviousLineLabel) continue;
         }
         if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;

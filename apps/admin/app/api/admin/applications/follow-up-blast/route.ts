@@ -99,7 +99,7 @@ YOUR NEXT STEPS:
    Bring: photo ID, proof of income, proof of address.
 
 3. After your WorkOne appointment, call us at ${PLATFORM_DEFAULTS.supportPhone} or reply to this email.
-   We will get you enrolled and give you a start date.
+   We will review your next steps and available start dates.
 
 WorkOne appointments fill up fast. Call today.
 
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
 
   let query = db
     .from('applications')
-    .select('id, first_name, full_name, email, program_interest, status')
+    .select('id, first_name, full_name, email, program_interest, status, follow_up_notes')
     .in('status', statusFilter)
     .not('email', 'is', null);
 
@@ -171,10 +171,16 @@ export async function POST(request: Request) {
         text: buildFollowUpText(firstName, program),
       });
 
-      // Log the follow-up so we don't spam
+      // Keep outreach history separate from applicant support/intake notes.
+      const followUpEntry = `Follow-up email sent ${new Date().toISOString()}`;
+      const existingFollowUpNotes = app.follow_up_notes?.trim();
       await db
         .from('applications')
-        .update({ support_notes: `Follow-up email sent ${new Date().toISOString()}` })
+        .update({
+          follow_up_notes: existingFollowUpNotes
+            ? `${existingFollowUpNotes}\n${followUpEntry}`
+            : followUpEntry,
+        })
         .eq('id', app.id);
 
       sent++;

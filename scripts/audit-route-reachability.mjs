@@ -53,7 +53,7 @@ const activeCode = [...texts].filter(([file]) =>
 // take quadratic time in a large monorepo and stall the audit gate.
 const inboundIndex=new Map();
 for(const [file,body] of activeCode){
-  const references=new Set(body.match(/\\/(?:[A-Za-z0-9_-]+\\/)*[A-Za-z0-9_-]+/g)||[]);
+  const references=new Set(body.match(/\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+/g)||[]);
   for(const ref of references){
     const files=inboundIndex.get(ref)||[];
     if(files.length<40) files.push(file);
@@ -83,6 +83,11 @@ function matchesServiceRoute(service, candidate){
 const appConfigByService={root:'next.config.mjs',marketing:'apps/marketing/next.config.mjs',
   admin:'apps/admin/next.config.mjs',lms:'apps/lms/next.config.mjs',
   'website-builder':'apps/website-builder/next.config.mjs'};
+// Top-level Next configs are outside the scanned app subtrees.
+for(const file of Object.values(appConfigByService)){
+  const source=path.join(root,file);
+  if(fs.existsSync(source)) texts.set(file,fs.readFileSync(source,'utf8'));
+}
 const configuredRedirects = new Map();
 for(const [service,file] of Object.entries(appConfigByService)){
   const source=texts.get(file)||'';

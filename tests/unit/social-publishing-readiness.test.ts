@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { publishingReadinessError } from '@/lib/social/publishing-readiness';
+import { publicSocialImageUrl, publishingReadinessError } from '@/lib/social/publishing-readiness';
 
 const account = {
   enabled: true,
@@ -48,5 +48,29 @@ describe('social publishing activation', () => {
   it('does not activate platforms without a publishing handler', () => {
     expect(publishingReadinessError('linkedin', account)).toContain('handler');
     expect(publishingReadinessError('youtube', account)).toContain('handler');
+  });
+});
+
+describe('public article media URLs', () => {
+  it('resolves approved site paths on the public website', () => {
+    expect(publicSocialImageUrl('/images/heroes-hq/funding-hero.jpg')).toBe(
+      'https://www.elevateforhumanity.org/images/heroes-hq/funding-hero.jpg',
+    );
+    expect(publicSocialImageUrl('https://example.com/approved.jpg')).toBe(
+      'https://example.com/approved.jpg',
+    );
+  });
+
+  it('rejects missing, ambiguous, and insecure media URLs', () => {
+    for (const input of [
+      null,
+      '',
+      'image.jpg',
+      '//example.com/image.jpg',
+      'http://example.com/image.jpg',
+      'https://user:pass@example.com/image.jpg',
+    ]) {
+      expect(publicSocialImageUrl(input)).toBeNull();
+    }
   });
 });

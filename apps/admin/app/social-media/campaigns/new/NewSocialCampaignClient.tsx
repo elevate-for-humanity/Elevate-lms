@@ -46,13 +46,13 @@ const destinations = [
   {
     id: 'facebook',
     name: 'Facebook Page',
-    detail: 'Article link, approved image or Reel',
+    detail: 'Article link and a Reel storyboard for manual review',
     icon: FileText,
   },
   {
     id: 'instagram',
     name: 'Instagram Business',
-    detail: 'Approved image, carousel or Reel',
+    detail: 'Image post when the article has approved public media',
     icon: Instagram,
   },
 ] as const;
@@ -100,7 +100,8 @@ export default function NewSocialCampaignClient({
       const result = await response.json();
       if (!response.ok || !result.success)
         throw new Error(result.error || 'Draft generation failed');
-      setGeneratedPosts(result.posts ?? []);
+      if (!result.posts?.length) throw new Error('No matching published articles were found.');
+      setGeneratedPosts(result.posts);
       setSelectedPreview(0);
       toast.success(`${result.posts?.length ?? 0} approval-ready packages created`);
     } catch (error) {
@@ -130,7 +131,11 @@ export default function NewSocialCampaignClient({
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Campaign could not be saved');
-      toast.success('Campaign saved as a draft');
+      toast.success(
+        result.draftCount > 0
+          ? `Campaign saved with ${result.draftCount} drafts for review`
+          : 'Campaign plan saved. No post drafts were created.',
+      );
       router.push('/social-media');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Campaign could not be saved');
@@ -393,8 +398,8 @@ export default function NewSocialCampaignClient({
                 {plannedCount} planned packages over {duration || 0} days
               </div>
               <p className="mt-2 text-xs leading-5 text-slate-500">
-                Saving creates a campaign record only. Publishing remains blocked until each
-                destination is connected and each post is approved.
+                Saving stores the campaign and any built post drafts. Publishing remains blocked
+                until each destination is connected and each post is approved.
               </p>
               <button
                 onClick={saveDraft}

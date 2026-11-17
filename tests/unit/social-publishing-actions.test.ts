@@ -4,7 +4,11 @@ const mocks = vi.hoisted(() => ({ guard: vi.fn(), db: vi.fn(), revalidate: vi.fn
 vi.mock('@/lib/auth/require-role', () => ({ requireRole: mocks.guard }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: mocks.db }));
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidate }));
-vi.mock('next/navigation', () => ({ redirect: (url: string) => { throw new Error(url); } }));
+vi.mock('next/navigation', () => ({
+  redirect: (url: string) => {
+    throw new Error(url);
+  },
+}));
 import { approveSocialPost, enableApprovedPublishing } from '@/apps/admin/app/social-media/actions';
 
 describe('existing social queue approval wiring', () => {
@@ -15,24 +19,58 @@ describe('existing social queue approval wiring', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     writes = [];
-    account = { enabled: true, connection_status: 'verified_read_only', organization_id: 'page',
-      granted_scopes: ['pages_manage_posts'], dry_run: false, updated_at: version };
-    post = { id: 'post', platform: 'facebook', destination_type: 'facebook_page', source_id: 'blog', updated_at: version };
+    account = {
+      enabled: true,
+      connection_status: 'verified_read_only',
+      organization_id: 'page',
+      granted_scopes: ['pages_manage_posts'],
+      dry_run: false,
+      updated_at: version,
+    };
+    post = {
+      id: 'post',
+      platform: 'facebook',
+      destination_type: 'facebook_page',
+      source_id: 'blog',
+      updated_at: version,
+    };
     mocks.guard.mockResolvedValue({ user: { id: 'admin-123' } });
-    mocks.db.mockResolvedValue({ from: (table: string) => {
-      let updating = false;
-      const chain: any = {
-        select: () => chain, eq: () => chain, in: () => chain,
-        single: async () => ({ data: table === 'social_media_settings' ? account : table === 'social_media_posts' ? post : { id: 'blog' }, error: null }),
-        update: (data: Record<string, unknown>) => { updating = true; writes.push({ table, data }); return chain; },
-        then: (resolve: (value: unknown) => unknown) => resolve({ data: updating ? [{ id: 'updated' }] : [], error: null }),
-      };
-      return chain;
-    } });
+    mocks.db.mockResolvedValue({
+      from: (table: string) => {
+        let updating = false;
+        const chain: any = {
+          select: () => chain,
+          eq: () => chain,
+          in: () => chain,
+          single: async () => ({
+            data:
+              table === 'social_media_settings'
+                ? account
+                : table === 'social_media_posts'
+                  ? post
+                  : { id: 'blog' },
+            error: null,
+          }),
+          maybeSingle: async () => ({
+            data: table === 'social_media_settings' ? account : { id: 'blog' },
+            error: null,
+          }),
+          update: (data: Record<string, unknown>) => {
+            updating = true;
+            writes.push({ table, data });
+            return chain;
+          },
+          then: (resolve: (value: unknown) => unknown) =>
+            resolve({ data: updating ? [{ id: 'updated' }] : [], error: null }),
+        };
+        return chain;
+      },
+    });
   });
   function approval() {
     const form = new FormData();
-    form.set('id', 'post'); form.set('updated_at', version);
+    form.set('id', 'post');
+    form.set('updated_at', version);
     form.set('caption', 'Reviewed factual caption with the approved website link.');
     return form;
   }
@@ -40,7 +78,24 @@ describe('existing social queue approval wiring', () => {
     await approveSocialPost(approval());
     expect(mocks.guard).toHaveBeenCalledWith(['admin', 'super_admin']);
     expect(writes).toHaveLength(1);
-    expect(writes[0].data).toMatchObject({ status: 'queued', approval_state: 'approved', approved_by: 'admin-123', caption: 'Reviewed factual caption with the approved website link.' });
+    expect(writes[0].data).toMatchObject({
+      status: 'queued',
+      approval_state: 'approved',
+      approved_by: 'admin-123',
+      caption: 'Reviewed factual caption with the approved website link.',
+    });
+  });
+  it('blocks unlinked legacy drafts and leaves the stored caption unchanged', async () => {
+    post.source_id = null;
+    await expect(approveSocialPost(approval())).rejects.toThrow('no%20approved%20source');
+    expect(writes).toHaveLength(0);
+  });
+  it('blocks a supported destination when its platform does not match', async () => {
+    post.platform = 'instagram';
+    await expect(approveSocialPost(approval())).rejects.toThrow(
+      'unavailable%20for%20this%20destination',
+    );
+    expect(writes).toHaveLength(0);
   });
   it('does not queue posts against a read-only account', async () => {
     account.dry_run = true;
@@ -54,7 +109,8 @@ describe('existing social queue approval wiring', () => {
   });
   it('does not turn on publication without the provider permission', async () => {
     account.granted_scopes = ['pages_read_engagement'];
-    const form = new FormData(); form.set('platform', 'facebook');
+    const form = new FormData();
+    form.set('platform', 'facebook');
     await expect(enableApprovedPublishing(form)).rejects.toThrow('publishing%20permissions');
     expect(writes).toHaveLength(0);
   });

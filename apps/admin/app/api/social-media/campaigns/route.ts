@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { publicSocialImageUrl } from '@/lib/social/publishing-readiness';
 import { generateBlogSocialPackage } from '@/lib/social/blog-social-pipeline';
 
 export const runtime = 'nodejs';
@@ -125,7 +126,8 @@ const _POST = withAuth(
       for (const blog of sourceBlogs ?? []) {
         const generated = await generateBlogSocialPackage(blog);
         const caption = `${generated.package.caption}\n\n${generated.package.hashtags.join(' ')}`;
-        const approvedImage = blog.featured_image || blog.image || null;
+        const approvedImage =
+          publicSocialImageUrl(blog.featured_image) ?? publicSocialImageUrl(blog.image);
         const version = String(blog.updated_at || blog.id)
           .replace(/[^A-Za-z0-9]/g, '')
           .slice(0, 24);
@@ -169,11 +171,7 @@ const _POST = withAuth(
             idempotency_key: `campaign:${data.id}:blog:${blog.id}:facebook_personal_draft:${version}`,
           });
         }
-        if (
-          platforms.includes('instagram') &&
-          typeof approvedImage === 'string' &&
-          approvedImage.startsWith('https://')
-        ) {
+        if (platforms.includes('instagram') && approvedImage) {
           rows.push({
             ...common,
             platform: 'instagram',
@@ -191,7 +189,6 @@ const _POST = withAuth(
           .select('id');
         if (draftError) return NextResponse.json({ error: draftError.message }, { status: 500 });
         draftCount = drafts?.length ?? 0;
-        await db.from('social_campaigns').update({ scheduled_posts: draftCount }).eq('id', data.id);
       }
     }
 

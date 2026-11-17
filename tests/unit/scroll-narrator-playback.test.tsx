@@ -177,6 +177,9 @@ describe('automatic page narration', () => {
     }).mockResolvedValue(true);
     setup(); await advance(1400);
     expect(screen.getByRole('status')).toHaveTextContent('Tap the speaker');
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss narration notice' }));
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play narration for this section' })).toBeVisible();
     expect(screen.queryByText(/Narration could not start/)).not.toBeInTheDocument();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Play narration for this section' }));

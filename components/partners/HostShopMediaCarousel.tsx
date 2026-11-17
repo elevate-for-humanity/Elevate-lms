@@ -52,9 +52,20 @@ export default function HostShopMediaCarousel({
   const [loadedUrls, setLoadedUrls] = useState<Set<string>>(() => new Set());
   const [failedUrls, setFailedUrls] = useState<Set<string>>(() => new Set());
   const [lastLoadedUrl, setLastLoadedUrl] = useState<string>();
-  const [playing, setPlaying] = useState(!compact);
+  const [playing, setPlaying] = useState(true);
+  // Honor the visitor's motion preference without preventing manual navigation.
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const applyPreference = () => {
+      if (preference.matches) setPlaying(false);
+    };
+    applyPreference();
+    preference.addEventListener('change', applyPreference);
+    return () => preference.removeEventListener('change', applyPreference);
+  }, []);
   const containerRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [hovered, setHovered] = useState(false);
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -65,13 +76,13 @@ export default function HostShopMediaCarousel({
   const [videoPlaying, setVideoPlaying] = useState(false);
   useEffect(() => setVideoPlaying(false), [index]);
   useEffect(() => {
-    if (!inView || !playing || videoPlaying || media.length < 2) return;
+    if (!inView || !playing || hovered || videoPlaying || media.length < 2) return;
     const timer = window.setInterval(
       () => setIndex((current) => (current + 1) % media.length),
       5000,
     );
     return () => window.clearInterval(timer);
-  }, [inView, playing, videoPlaying, media, index]);
+  }, [inView, playing, hovered, videoPlaying, media, index]);
 
   const requestedUrl = media[Math.min(index, media.length - 1)]?.url;
   useEffect(() => {
@@ -96,6 +107,12 @@ export default function HostShopMediaCarousel({
   return (
     <div
       ref={containerRef}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={(event) => {
+        // Pointer focus must not flip Pause to Play before its click runs.
+        if (event.target.matches(':focus-visible')) setPlaying(false);
+      }}
       className={
         compact
           ? 'w-full min-w-0 overflow-hidden bg-white'
@@ -136,18 +153,18 @@ export default function HostShopMediaCarousel({
                       spacious
                         ? '(max-width: 767px) 100vw, 560px'
                         : compact
-                          ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
+                          ? '(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 400px'
                           : '(max-width: 640px) 90vw, 480px'
                     }
                     alt={item.alt || `${shopName} promotional image`}
                     aria-hidden={item.url !== active.url}
-                    className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-300`}
+                    className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 motion-reduce:transition-none`}
                     style={{
                       opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0,
                     }}
-                    loading={compact ? 'lazy' : 'eager'}
+                    loading={!compact && itemIndex === 0 ? 'eager' : 'lazy'}
                     decoding="async"
-                    fetchPriority={compact ? 'auto' : itemIndex === 0 ? 'high' : 'low'}
+                    fetchPriority={!compact && itemIndex === 0 ? 'high' : 'auto'}
                     onLoad={() => {
                       setLoadedUrls((current) => new Set(current).add(item.url));
                       if (item.url === requested.url || !lastLoadedUrl) setLastLoadedUrl(item.url);

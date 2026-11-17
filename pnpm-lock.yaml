@@ -822,6 +822,12 @@ importers:
         specifier: '*'
         version: 2.89.0
 
+  packages/laminar-runtime:
+    dependencies:
+      '@lmnr-ai/lmnr':
+        specifier: 0.9.4
+        version: 0.9.4(supports-color@11.0.0)
+
   packages/shared: {}
 
   packages/ui:
@@ -20079,7 +20085,7 @@ snapshots:
       esbuild: 0.28.1
       postcss: 8.5.28
 
-  terser-webpack-plugin@5.6.1(esbuild@0.28.1)(postcss@8.5.29)(webpack@5.105.0(postcss@8.5.29)):
+  terser-webpack-plugin@5.6.1(esbuild@0.28.1)(postcss@8.5.29)(webpack@5.105.0(esbuild@0.28.1)(postcss@8.5.29)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
@@ -20693,7 +20699,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.5.0
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(esbuild@0.28.1)(postcss@8.5.29)(webpack@5.105.0(postcss@8.5.29))
+      terser-webpack-plugin: 5.6.1(esbuild@0.28.1)(postcss@8.5.29)(webpack@5.105.0(esbuild@0.28.1)(postcss@8.5.29))
       watchpack: 2.5.2
       webpack-sources: 3.5.1
     transitivePeerDependencies:

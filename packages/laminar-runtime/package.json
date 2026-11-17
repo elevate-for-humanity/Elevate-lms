@@ -1,0 +1,7 @@
+{
+  "name": "@elevate/laminar-runtime",
+  "private": true,
+  "dependencies": {
+    "@lmnr-ai/lmnr": "0.9.4"
+  }
+}

@@ -1,7 +1,24 @@
+FROM node:22-bookworm-slim AS laminar-deps
+WORKDIR /workspace
+ENV CI=true npm_config_ignore_scripts=true
+RUN corepack disable && npm install --global pnpm@10.28.2 && test "$(pnpm --version)" = "10.28.2"
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY packages/laminar-runtime/package.json ./packages/laminar-runtime/package.json
+# The workspace's locked braces override must resolve during filtered installs.
+COPY packages/bounded-braces ./packages/bounded-braces
+# Derive a dedicated frozen graph from the selected workspace importer. The
+# package has no workspace dependencies; do not install the root application.
+RUN pnpm --filter @elevate/laminar-runtime deploy --prod --frozen-lockfile --ignore-scripts \
+    --config.inject-workspace-packages=true /laminar-runtime
+RUN cd /laminar-runtime && node --input-type=module -e "import assert from 'node:assert/strict'; const {Laminar}=await import('@lmnr-ai/lmnr'); assert.equal(typeof Laminar.initialize,'function'); await Laminar.flush(); await Laminar.shutdown();"
+
 # The approved CPU narration/alignment runtime is immutable and already smoke-tested.
 # Source changes replace the complete builder; no lesson output/checkpoint is copied.
 FROM us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:c3ff77f903eeb1621312d295fa05cb380b60ccc513028955fa00f98ca4159d35
 WORKDIR /app
+# Add only the isolated SDK closure; retain every inherited native/media package.
+COPY --from=laminar-deps /laminar-runtime /opt/elevate-laminar
+RUN node --input-type=module -e "import {mkdirSync,realpathSync,symlinkSync} from 'node:fs'; mkdirSync('/app/node_modules/@lmnr-ai',{recursive:true}); symlinkSync(realpathSync('/opt/elevate-laminar/node_modules/@lmnr-ai/lmnr'),'/app/node_modules/@lmnr-ai/lmnr','dir');"
 # Resolve aliases from this release, independent of the pinned runtime's config.
 COPY tsconfig.ultimate-worker.json ./tsconfig.json
 ENV TSX_TSCONFIG_PATH=/app/tsconfig.json
@@ -16,11 +33,17 @@ COPY lib/video ./lib/video
 COPY remotion-src ./remotion-src
 COPY lib/storage ./lib/storage
 COPY lib/ai ./lib/ai
+COPY lib/observability ./lib/observability
+COPY lib/secrets.ts ./lib/secrets.ts
+COPY lib/supabase/public-config.ts lib/supabase/normalize-url.ts ./lib/supabase/
 COPY docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json ./docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
 COPY tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts ./tests/integration/
 COPY tests/worker/narration-storage-reference.test.mjs tests/worker/kokoro-liveness-smoke.mjs ./tests/worker/
 COPY tests/worker/hvac-saved-safety-role.test.mjs ./tests/worker/
 RUN find lib -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
+# Verify the SDK closure and the copied runtime wrapper without any credentials
+# or local .env files; missing tracing configuration must leave startup usable.
+RUN env -u LMNR_PROJECT_API_KEY -u SUPABASE_SERVICE_ROLE_KEY -u SUPABASE_URL -u NEXT_PUBLIC_SUPABASE_URL NODE_ENV=production node --import=tsx --input-type=module -e "import assert from 'node:assert/strict'; const {Laminar}=await import('@lmnr-ai/lmnr'); assert.equal(typeof Laminar.initialize,'function'); const runtime=await import('./lib/observability/laminar-runtime.ts'); await runtime.initializeLaminar('ultimate-worker'); const tracing=await import('./lib/observability/laminar.ts'); let calls=0; assert.equal(await tracing.withLaminarSpan('worker.packaging',{},async()=>++calls),1); assert.equal(calls,1); await Laminar.flush(); await Laminar.shutdown();"
 RUN node --test lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs && node --import=tsx --test tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts
 RUN node --test tests/worker/narration-storage-reference.test.mjs
 RUN node --test tests/worker/hvac-saved-safety-role.test.mjs

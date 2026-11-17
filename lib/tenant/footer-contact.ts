@@ -1,4 +1,27 @@
-import type { TenantSiteConfig } from './site-types';
+import type { TenantSiteConfig, TenantSiteContact } from './site-types';
+
+/** Model output is a candidate; retain only values copied from owner-supplied contact text. */
+export function suppliedWebsiteContact(input: unknown, sources: string[]): TenantSiteContact {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  const candidate = input as Record<string, unknown>;
+  const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
+  const supplied = sources.filter(value => typeof value === 'string').map(fold);
+  const copy = (value: unknown, limit: number) => {
+    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
+    const cleaned = value.trim();
+    return supplied.some(source => source.includes(fold(cleaned))) ? cleaned : undefined;
+  };
+  const result: TenantSiteContact = {};
+  for (const [key, limit] of [['email', 180], ['phone', 80], ['address', 300]] as const) {
+    const value = copy(candidate[key], limit);
+    if (value) result[key] = value;
+  }
+  if (Array.isArray(candidate.hours)) {
+    const hours = candidate.hours.slice(0, 14).map(value => copy(value, 120)).filter((value): value is string => value !== undefined);
+    if (hours.length) result.hours = hours;
+  }
+  return result;
+}
 
 /** Inspect the opt-in before any import/generation normalization. */
 export function validateFooterContactFields(input: unknown) {
@@ -23,3 +46,4 @@ export function footerContactDetails(config: TenantSiteConfig) {
     phoneHref: /^\+?[\d ().-]{3,80}$/.test(phone) && /\d{3}/.test(phone.replace(/\D/g, '')) ? `tel:${phone.replace(/[^+\d]/g, '')}` : null,
   };
 }
+

@@ -56,3 +56,20 @@ test('phone directory scopes both tenant and legacy organization profiles', asyn
   assert.deepEqual(calls,[['or','tenant_id.eq.00000000-0000-0000-0000-000000000099,and(tenant_id.is.null,organization_id.eq.00000000-0000-0000-0000-000000000099)']]);
   assert.throws(()=>scopePhoneProfileQuery(query,'bad,or(expression)'));
 });
+
+test('form and save resolve identical scopes for tenant-admin platform fallback and first setup', async () => {
+  const { findPhoneWorkspace, phoneWorkspaceTenant } = await import('../lib/phone/workspace.ts');
+  const tenant='00000000-0000-0000-0000-000000000099';
+  const platform={id:'platform',tenant_id:null};
+  function dbWith(results) {
+    return {from(){return {select(){return this;},limit(){return this;},eq(){return this;},is(){return this;},async maybeSingle(){return {data:results.shift(),error:null};}};}};
+  }
+  const existing=await findPhoneWorkspace(dbWith([null,platform]),tenant,true,'system');
+  assert.equal(phoneWorkspaceTenant(existing,tenant),null);
+  const missing=await findPhoneWorkspace(dbWith([null,null]),tenant,true,'system');
+  assert.equal(phoneWorkspaceTenant(missing,tenant),tenant);
+  const own={id:'own',tenant_id:tenant};
+  assert.equal(await findPhoneWorkspace(dbWith([own]),tenant,true,'system'),own);
+  assert.equal(phoneWorkspaceTenant(own,tenant),tenant);
+  assert.equal(await findPhoneWorkspace(dbWith([null]),tenant,false,'system'),null);
+});

@@ -6,6 +6,7 @@ import { requireRole, type AuthResult } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { businessHoursFromForm, normalizeUsPhone, validMenuDigit, validPhoneExtension } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
+import { findPhoneWorkspace } from '@/lib/phone/workspace';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import {hydrateProcessEnv} from '@/lib/secrets';
 
@@ -62,21 +63,8 @@ async function requireSystemId() {
 async function requireWorkspace() {
   const { db, tenantId, platformAdmin } = await requirePhoneContext();
   const { id: phoneSystemId } = await requireSystemId();
-  let query = db.from('communication_workspaces').select('*').limit(1);
-  query = tenantId ? query.eq('tenant_id', tenantId) : query.is('tenant_id', null);
-  const { data: tenantWorkspace, error } = await query.maybeSingle();
-  if (error) throw new Error(error.message);
-  if (tenantWorkspace) return { db, workspace: tenantWorkspace };
-  if (platformAdmin && tenantId) {
-    const { data: platformWorkspace, error: platformError } = await db
-      .from('communication_workspaces')
-      .select('*')
-      .eq('phone_system_id', phoneSystemId)
-      .limit(1)
-      .maybeSingle();
-    if (platformError) throw new Error(platformError.message);
-    if (platformWorkspace) return { db, workspace: platformWorkspace };
-  }
+  const existingWorkspace = await findPhoneWorkspace(db, tenantId, platformAdmin, phoneSystemId);
+  if (existingWorkspace) return { db, workspace: existingWorkspace };
   const readiness = liveKitReadiness();
   const { data, error: createError } = await db
     .from('communication_workspaces')

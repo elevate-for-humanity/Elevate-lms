@@ -21,6 +21,7 @@ import {
   PHONE_EXTENSION_PATTERN,
   phoneProfileLabel,
 } from '@/lib/phone/config';
+import { findPhoneWorkspace, phoneWorkspaceTenant } from '@/lib/phone/workspace';
 import { scopePhoneProfileQuery } from '@/lib/phone/profile-scope';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -62,6 +63,10 @@ export default async function PhonePage() {
       : { data: null };
   const system = tenantSystem ?? platformSystem;
   const systemId = system?.id as string | undefined;
+  const existingWorkspace = systemId
+    ? await findPhoneWorkspace(db, tenantId, platformAdmin, systemId)
+    : null;
+  const profileTenantId = phoneWorkspaceTenant(existingWorkspace, tenantId);
 
   const [
     numbersResult,
@@ -96,14 +101,10 @@ export default async function PhonePage() {
           .select('*', { count: 'exact', head: true })
           .eq('phone_system_id', systemId)
           .eq('is_read', false),
-        db
-          .from('communication_workspaces')
-          .select('id,status')
-          .eq('phone_system_id', systemId)
-          .maybeSingle(),
+        Promise.resolve({ data: existingWorkspace }),
         scopePhoneProfileQuery(
           db.from('profiles').select('id,full_name,email,role,program_holder_id'),
-          system.tenant_id ?? null,
+          profileTenantId,
         ).in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
           .order('full_name'),
         db

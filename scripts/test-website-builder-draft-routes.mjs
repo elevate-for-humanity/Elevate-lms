@@ -5,10 +5,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const compile=(s,dep,returns)=>new Function('d',`const {${Object.keys(dep).join(',')}}=d;`+stripTypeScriptTypes(s).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+`;return ${returns};`)(dep);
+const validateFooterContactFields=compile(await read('lib/tenant/footer-contact.ts'),{},'validateFooterContactFields');
 const validateHeroBackdropFields=compile(await read('lib/tenant/site-validation.ts'),{},'validateHeroBackdropFields');
 const resolveSiteLinkGroups=compile(await read('lib/tenant/site-navigation.ts'),{},'resolveSiteLinkGroups');
 const composition=compile(await read('lib/tenant/site-composition.ts'),{resolveSiteLinkGroups},'({ensureComposableSiteConfig,sanitizePages,normalizePageSlug})');
-const realValidateSiteConfig=compile(await read('lib/tenant/site-validation.ts'),composition,'validateSiteConfig');
+const realValidateSiteConfig=compile(await read('lib/tenant/site-validation.ts'),{...composition,validateFooterContactFields},'validateSiteConfig');
 const realDesign=compile(await read('lib/website-builder/design-choices.ts'),{},'({readWebsiteDesign,interviewWebsiteDesign,applyWebsiteDesign,websiteCatalog})');
 const diagnostics=[];
 const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
@@ -22,7 +23,7 @@ function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allo
   getWebsiteBuilderAccess:async()=>access,buildDefaultSiteConfig:()=>config,ensureComposableSiteConfig:realNormalization?composition.ensureComposableSiteConfig:x=>x,sanitizePages:realNormalization?composition.sanitizePages:x=>x,
   buildLicensedAssetProjectPolicy:()=>({}),NextResponse:{json:(body,options={})=>({body,status:options.status||200})},
   applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(generated)}),
-  validateHeroBackdropFields,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
+  validateHeroBackdropFields,validateFooterContactFields,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
   missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:realNormalization?realDesign.readWebsiteDesign:x=>x,interviewWebsiteDesign:realNormalization?realDesign.interviewWebsiteDesign:x=>x,applyWebsiteDesign:realNormalization?realDesign.applyWebsiteDesign:x=>x,websiteCatalog:realNormalization?realDesign.websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
  return {calls,post:compile(sources[mode],deps,'POST')};
 }
@@ -76,4 +77,19 @@ for(const mode of ['generate','import']) test(mode+' persists valid backdrop wit
  const hero=f.calls[0].args.p_site_config.pages[0].sections[0];
  assert.equal(hero.content.backdropImage,'/approved-studio.svg');assert.equal(hero.content.image,'/owner.webp');assert.equal(hero.settings.backdropOpacity,20);
  assert.equal(realValidateSiteConfig(f.calls[0].args.p_site_config).valid,true);
+});
+
+
+for(const mode of ['generate','import']) test(mode+' validates and persists the optional footer contact setting',async()=>{
+ for(const invalid of [null,'true',1,[],{}]) {
+  const bad={...config,footer:{showContactDetails:invalid}};
+  const f=fixture(mode,{generated:bad,realNormalization:true});
+  const response=await f.post(request({siteConfig:bad}));
+  assert.equal(response.status,422);assert.equal(f.calls.length,0);
+  assert.equal(response.body.validation.errors[0].code,'invalid_footer_contact');
+ }
+ const good={...config,footer:{showContactDetails:true}};
+ const f=fixture(mode,{generated:good,realNormalization:true});
+ assert.equal((await f.post(request({siteConfig:good}))).status,201);
+ assert.equal(f.calls[0].args.p_site_config.footer.showContactDetails,true);
 });

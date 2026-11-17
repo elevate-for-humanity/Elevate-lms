@@ -1,3 +1,4 @@
+import { validateFooterContactFields } from '@/lib/tenant/footer-contact';
 import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -74,8 +75,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const base = buildDefaultSiteConfig({ organizationName: siteName });
   const existing = site.site_config && typeof site.site_config === 'object' ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>) : base;
   const configPatch = body.siteConfig && typeof body.siteConfig === 'object' ? body.siteConfig as Partial<TenantSiteConfig> : {};
-  const backdropErrors = validateHeroBackdropFields(configPatch);
-  if (backdropErrors.length) return NextResponse.json({ error: 'Invalid hero backdrop configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
+  const backdropErrors = [...validateHeroBackdropFields(configPatch), ...validateFooterContactFields(configPatch)];
+  if (backdropErrors.length) return NextResponse.json({ error: 'Invalid website presentation configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
   const merged = bridgeLegacyPatchIntoComposition(mergeSiteConfig(existing, configPatch), configPatch, existing);
 
   // Verification state is server authority. Never trust claims embedded in a
@@ -154,3 +155,4 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
+

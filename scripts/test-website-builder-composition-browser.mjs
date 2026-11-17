@@ -69,6 +69,16 @@ try {
     });
     console.log(JSON.stringify({ legacy, width, position, measurements: result }));
     assert.equal(result.scroll, width, 'horizontal overflow');
+    const contact = page.getByRole('region', { name: 'Business contact details' });
+    if (position === 'off') {
+      assert.equal(await contact.count(), 0, 'default footer has no contact column');
+    } else {
+    await contact.waitFor();
+    assert.ok((await contact.innerText()).includes('Suite 7'));
+    assert.equal(await contact.locator('a').count(), 0, 'read-only contact actions suppressed');
+    const contactBox = await contact.boundingBox();
+    assert.ok(contactBox.x >= 0 && contactBox.x + contactBox.width <= width + 1, 'footer contact fits viewport');
+    }
     assert.ok(result.band.bottom <= result.hero.y + 1, 'introduction precedes hero');
     assert.ok(result.portrait.loaded && result.portrait.width > 0 && result.portrait.height > 0, 'foreground portrait remains visible');
     if (position === 'off') assert.equal(result.backdrop, null);
@@ -91,3 +101,4 @@ try {
   if (server) await new Promise((resolve, reject) => server.httpServer.close(error => error ? reject(error) : resolve()));
   await rm(temp, { recursive:true, force:true });
 }
+

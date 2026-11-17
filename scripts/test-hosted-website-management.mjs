@@ -20,9 +20,10 @@ test('missing website denies access',async()=>assert.equal(await canManageHosted
 const { readFile } = await import('node:fs/promises');
 const { stripTypeScriptTypes } = await import('node:module');
 const validationSource=await readFile(new URL('../lib/tenant/site-validation.ts',import.meta.url),'utf8');
+const validateFooterContactFields=new Function(stripTypeScriptTypes(await readFile(new URL('../lib/tenant/footer-contact.ts',import.meta.url),'utf8')).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+';return validateFooterContactFields;')();
 const validateHeroBackdropFields=new Function(stripTypeScriptTypes(validationSource).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+';return validateHeroBackdropFields;')();
 const revisionRoute = await readFile(new URL('../apps/marketing/app/api/apps/website-builder/sites/[websiteId]/revisions/route.ts', import.meta.url), 'utf8');
-const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateHeroBackdropFields', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
+const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateHeroBackdropFields', 'validateFooterContactFields', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
 function compileRoute(source) {
   return new Function('dependencies', `const { ${dependencyNames.join(', ')} } = dependencies;\n` + stripTypeScriptTypes(source).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn { POST: typeof POST === "undefined" ? null : POST, PATCH: typeof PATCH === "undefined" ? null : PATCH };');
 }
@@ -97,6 +98,7 @@ function restoreFixture(options = {}) {
     buildDefaultSiteConfig: () => ({}), mergeSiteConfig: (base, patch) => ({ ...base, ...patch }),
     bridgeLegacyPatchIntoComposition: value => value,
     validateHeroBackdropFields,
+    validateFooterContactFields,
     validateSiteConfig: () => ({ valid: true }), isReservedTenantSubdomain: () => false,
     loadVerifiedWebsiteClaims: async () => [], hydrateProcessEnv: async () => {},
     consumeWebsiteBuilderCredits: async (_db, _user, operation, options) => { assert.equal(operation, 'paris_edit'); assert.equal(options.deferDebitUntilCommit, true); return { allowed: true, charged: 0, balance: 16, isTrial: true }; },
@@ -268,5 +270,14 @@ test('actual manual save/publish rejects raw malformed backdrop settings before 
   const {state,request}=restoreFixture({mode:'save',publish,siteConfig:{pages:[{id:'home',slug:'/',sections:[{id:'hero',type:'hero',content:{},settings}]}]}});
   const response=await request();assert.equal(response.status,422);assert.equal(state.backups.length,0);assert.equal(state.updateAttempts,0);
   assert.ok((await response.json()).validation.errors[0].code.startsWith('invalid_hero_backdrop'));
+ }
+});
+
+
+test('manual save/publish rejects malformed footer opt-in before backup or write',async()=>{
+ for(const publish of [true,false,undefined]) for(const value of [null,'true',1,[],{}]) {
+  const {state,request}=restoreFixture({mode:'save',publish,siteConfig:{footer:{showContactDetails:value}}});
+  const response=await request();assert.equal(response.status,422);assert.equal(state.backups.length,0);assert.equal(state.updateAttempts,0);
+  assert.equal((await response.json()).validation.errors[0].code,'invalid_footer_contact');
  }
 });

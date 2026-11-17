@@ -1,3 +1,4 @@
+import { validateFooterContactFields } from '@/lib/tenant/footer-contact';
 import { validateHeroBackdropFields } from '@/lib/tenant/site-validation';
 import { commitWebsiteDraft } from '@/lib/apps/website-builder-draft-commit';
 import { NextRequest, NextResponse } from 'next/server';
@@ -102,8 +103,8 @@ export async function POST(request: NextRequest) {
 
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';
   const fallback = buildDefaultSiteConfig({ organizationName: siteName, contactEmail: user.email || undefined });
-  const backdropErrors = validateHeroBackdropFields(body.siteConfig);
-  if (backdropErrors.length) return NextResponse.json({ error: 'Invalid hero backdrop configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
+  const backdropErrors = [...validateHeroBackdropFields(body.siteConfig), ...validateFooterContactFields(body.siteConfig)];
+  if (backdropErrors.length) return NextResponse.json({ error: 'Invalid website presentation configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
   const normalizedConfig = normalizeProvidedConfig(body.siteConfig, fallback);
   const config = ensureComposableSiteConfig({
     ...normalizedConfig,
@@ -120,3 +121,4 @@ export async function POST(request: NextRequest) {
   if (error || !committed?.website) return NextResponse.json({ error: 'Could not commit website draft. Refresh before trying again.', requestId }, { status: error?.code === 'P0409' ? 409 : error?.code === 'P0404' ? 404 : 503 });
   return NextResponse.json({ website: committed.website }, { status: reusable?.id ? 200 : 201 });
 }
+

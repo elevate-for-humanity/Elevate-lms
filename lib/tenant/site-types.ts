@@ -123,7 +123,7 @@ export type TenantSiteConfig = {
   testimonial?: { quote: string; author: string };
   navigation: Array<{ label: string; href: string }>;
   navigationGroups?: TenantSiteLinkGroup[];
-  footer: { description: string; contactEmail?: string; linkGroups?: TenantSiteLinkGroup[] };
+  footer: { showContactDetails?: boolean; description: string; contactEmail?: string; linkGroups?: TenantSiteLinkGroup[] };
   seo?: { title: string; description: string; keywords?: string[] };
   claims?: TenantSiteClaim[];
   meta?: Record<string, unknown>;
@@ -137,3 +137,4 @@ export type PublishedTenantSite = {
   config: TenantSiteConfig;
   parisEnabled?: boolean;
 };
+

@@ -355,7 +355,11 @@ jobs:
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Run required Vitest suite
         run: pnpm exec vitest run
-      - name: Install isolated composition browser\n        run: pnpm exec playwright install --with-deps chromium\n      - name: Verify shared hero composition in Chromium\n        run: node scripts/test-website-builder-composition-browser.mjs\n      - name: Preserve composition browser captures
+      - name: Install isolated composition browser
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Verify shared hero composition in Chromium
+        run: node scripts/test-website-builder-composition-browser.mjs
+      - name: Preserve composition browser captures
         if: always()
         uses: actions/upload-artifact@v4
         with:

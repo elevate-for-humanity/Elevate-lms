@@ -42,6 +42,11 @@ export function auditE2EServiceConfiguration(env = process.env) {
       failures.push('E2E_SUPABASE_TEST_URL_INVALID');
     }
   }
+  // This gate certifies all three apps. A hidden app-selection override would
+  // silently omit whole mandatory suites and misrepresent green acceptance.
+  if (String(env.PLAYWRIGHT_APPS ?? '').trim()) {
+    failures.push('E2E_FULL_SUITE_APP_SELECTION_OVERRIDE_UNEXPECTED');
+  }
   for (const key of ['PLAYWRIGHT_BASE_URL','PLAYWRIGHT_MARKETING_URL','PLAYWRIGHT_ADMIN_URL','PLAYWRIGHT_LMS_URL']) {
     if (String(env[key] ?? '').trim()) {
       failures.push('E2E_LOCAL_SERVER_ORIGIN_OVERRIDE_UNEXPECTED: ' + key);

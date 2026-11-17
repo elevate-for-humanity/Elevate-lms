@@ -14,6 +14,7 @@ export function auditE2EServiceConfiguration(env = process.env) {
     'TEST_PROGRAM_HOLDER_EMAIL', 'TEST_PROGRAM_HOLDER_PASSWORD',
     'E2E_ADMIN_EMAIL', 'E2E_ADMIN_PASSWORD',
     'E2E_PROGRAM_HOLDER_EMAIL', 'E2E_PROGRAM_HOLDER_PASSWORD',
+    'E2E_HOST_SHOP_EMAIL', 'E2E_HOST_SHOP_PASSWORD',
   ];
   const missing = required.filter(key => !String(env[key] ?? '').trim());
   const failures = [];

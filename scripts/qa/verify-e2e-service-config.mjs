@@ -15,6 +15,11 @@ export function auditE2EServiceConfiguration(env = process.env) {
     'E2E_ADMIN_EMAIL', 'E2E_ADMIN_PASSWORD',
     'E2E_PROGRAM_HOLDER_EMAIL', 'E2E_PROGRAM_HOLDER_PASSWORD',
     'E2E_HOST_SHOP_EMAIL', 'E2E_HOST_SHOP_PASSWORD',
+    'E2E_APPRENTICE_EMAIL', 'E2E_APPRENTICE_PASSWORD',
+    'E2E_EMPLOYER_EMAIL', 'E2E_EMPLOYER_PASSWORD',
+    'E2E_INSTRUCTOR_EMAIL', 'E2E_INSTRUCTOR_PASSWORD',
+    'E2E_STAFF_EMAIL', 'E2E_STAFF_PASSWORD',
+    'E2E_CASE_MANAGER_EMAIL', 'E2E_CASE_MANAGER_PASSWORD',
   ];
   const missing = required.filter(key => !String(env[key] ?? '').trim());
   const failures = [];

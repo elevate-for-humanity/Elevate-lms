@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest';
-const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, sourceError: false, stageLookups: [] as any[], releases: [] as any[], enqueues: [] as any[] }));
+const h = vi.hoisted(() => ({ queue: [] as any[], active: [] as any[], writes: [] as any[], token: true, claimLost: false, dispositionLost: false, sourceError: false, stageLookups: [] as any[], releases: [] as any[], enqueues: [] as any[] }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/devstudio/paris-openhands-readiness', () => ({ probeOpenHandsReadiness: async () => ({ verified: true, status: 'read_authorization_verified' }) }));
 vi.mock('@/lib/ai/providers/owned-model-health.mjs', () => ({ probeOwnedModel: async () => ({ verified: true, status: 'reachable' }) }));
@@ -26,7 +26,7 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
         if (inserted) data = {id:'release-repair'};
         else if (values) {
           h.writes.push({ values, filters: { ...filters } });
-          data = values.status === 'dispatched' && !h.claimLost ? { id: filters.id } : null;
+          data = (values.status === 'dispatched' ? !h.claimLost : !h.dispositionLost) ? { id: filters.id } : null;
         } else if (filters.status === 'queued') data = h.queue;
         else if (Array.isArray(filters.status) && filters.status.includes('patching')) data = h.active;
       }
@@ -45,7 +45,7 @@ vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => ({ from
 } }) }));
 import { tickParisCodeRepairs } from '@/lib/ai/runtime/code-repair';
 beforeEach(() => {
-  h.queue = []; h.active = []; h.writes = []; h.stageLookups = []; h.releases = []; h.enqueues = []; h.token = true; h.claimLost = false; h.sourceError = false;
+  h.queue = []; h.active = []; h.writes = []; h.stageLookups = []; h.releases = []; h.enqueues = []; h.token = true; h.claimLost = false; h.dispositionLost = false; h.sourceError = false;
   vi.stubGlobal('fetch', vi.fn(async (url: string) => new Response(JSON.stringify(url.includes('/actions/runs?') ? {workflow_runs:h.releases} : { object: { sha: 'a'.repeat(40) } }))));
 });
 it('durably hands a failed deployment to PARIS while preserving the active repair and duplicate incident identity', async () => {
@@ -69,6 +69,17 @@ it('returns without dispatch when every scanned source is paused', async () => {
   expect(await tickParisCodeRepairs({ workflowOwnedDispatch: true })).toMatchObject({ dispatched: 0, reason: 'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE' });
   expect(h.writes.every(w => w.values.status === 'blocked')).toBe(true);
 });
+it('rejects a lost compare-and-swap on paused-source disposition without dispatch', async () => {
+  h.queue = [{ id: 'paused-repair', attempt_count: 0, source_job_id: 'paused' }];
+  h.dispositionLost = true;
+  await expect(tickParisCodeRepairs({ workflowOwnedDispatch: true })).rejects.toThrow('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+  expect(h.writes).toHaveLength(1);
+  expect(h.writes[0]).toMatchObject({
+    values: { status: 'blocked', error_code: 'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE' },
+    filters: { id: 'paused-repair', status: 'queued', attempt_count: 0 },
+  });
+});
+
 it('cannot dispatch after losing the compare-and-set claim', async () => {
   h.queue = [{ id: 'eligible', attempt_count: 0, source_job_id: 'failed' }]; h.claimLost = true;
   expect(await tickParisCodeRepairs({ workflowOwnedDispatch: true })).not.toHaveProperty('dispatchRequired');

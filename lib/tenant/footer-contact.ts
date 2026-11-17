@@ -89,7 +89,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const hasBoundedAnnotation = candidateAtLineStart !== null
             && /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
             && !lineHasIndependentPhone(candidateSuffix);
-          const trailingContactDestination = /^(?:\s*\(\s*|\s*[—–-]\s*)(?:hotline|helpline|emergency(?:\s+(?:line|number))?|support\s+(?:line|hotline|number)|phone(?:\s+(?:line|number))?|(?:call|dial|text)\s+(?:us|this|here|the\s+number)|call\s+or\s+text|crisis\s+(?:support\s+)?hotline)(?:\s*,\s*[^()\r\n]{1,60})?\s*\)?\s*[.!?]?\s*$/i;
+          const trailingContactDestination = /^(?:\s*\(\s*|\s*[—–-]\s*)(?:hotline|helpline|emergency(?:\s+(?:line|number))?|support\s+(?:line|hotline|number)|phone(?:\s+(?:line|number))?|(?:call|dial|text)\s+(?:us|this|here|the\s+number)|call\s+or\s+text|crisis\s+(?:support\s+)?hotline)(?:\s*,\s*(?:(?:available|open)\s+(?:24\s*\/\s*7|around\s+the\s+clock)|24\s*\/\s*7))?\s*\)?\s*[.!?]?\s*$/i;
           const hasTrailingContactAnnotation = hasBoundedAnnotation
             && trailingContactDestination.test(candidateSuffix);
           const hasExplicitPreviousLineLabel = (candidateOccupiesLine || hasBoundedAnnotation)

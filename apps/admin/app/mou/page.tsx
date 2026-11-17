@@ -49,11 +49,42 @@ export default async function MOUPage({
     supabase.from('partners').select('id,name').order('name'),
   ]);
 
+  const holderIds = [
+    ...new Set((signatures ?? []).map((signature) => signature.program_holder_id).filter(Boolean)),
+  ];
+  const holderCountersigns = holderIds.length
+    ? await supabase
+        .from('program_holders')
+        .select('id,mou_status,mou_signed_at,mou_admin_signed_at')
+        .in('id', holderIds)
+    : { data: [], error: null };
+  const holderCountersignById = new Map(
+    (holderCountersigns.data ?? []).map((row) => [
+      row.id,
+      row.mou_admin_signed_at ||
+        (['countersigned', 'fully_executed'].includes(row.mou_status)
+          ? row.mou_signed_at
+          : null),
+    ]),
+  );
+  const reconciledSignatures = (signatures ?? []).map((signature) => ({
+    ...signature,
+    countersigned_at:
+      signature.countersigned_at ||
+      holderCountersignById.get(signature.program_holder_id) ||
+      null,
+  }));
   const names = new Map((partners ?? []).map((partner) => [partner.id, partner.name]));
   return (
     <MouAdminClient
       filteredHolder={Boolean(holderId)}
-      unavailable={Boolean(mouError || templateError || signatureError || partnersError)}
+      unavailable={Boolean(
+        mouError ||
+          templateError ||
+          signatureError ||
+          partnersError ||
+          holderCountersigns.error
+      )}
       partners={partners ?? []}
       partnerMous={(partnerMous ?? []).map((mou) => ({
         ...mou,
@@ -61,7 +92,7 @@ export default async function MOUPage({
       }))}
       mouCount={mouError ? null : (mouCount ?? 0)}
       templates={templates ?? []}
-      signatures={signatures ?? []}
+      signatures={reconciledSignatures}
       sigCount={signatureError ? null : (sigCount ?? 0)}
     />
   );

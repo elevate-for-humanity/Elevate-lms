@@ -189,11 +189,11 @@ function scanPublishedClaims(config: TenantSiteConfig, issues: SiteValidationIss
   }
 }
 
-export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {
-  const config = ensureComposableSiteConfig(input);
+export function validateHeroBackdropFields(input: unknown): SiteValidationIssue[] {
+  const candidate = input && typeof input === 'object' ? input as Record<string, unknown> : {};
   const issues: SiteValidationIssue[] = [];
   // Inspect supplied backdrop fields before normalization can drop malformed objects.
-  for (const page of Array.isArray(input?.pages) ? input.pages : []) {
+  for (const page of Array.isArray(candidate.pages) ? candidate.pages : []) {
     if (!page || typeof page !== 'object') continue;
     for (const section of Array.isArray(page.sections) ? page.sections : []) {
       if (!section || typeof section !== 'object') continue;
@@ -209,6 +209,13 @@ export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResul
       }
     }
   }
+
+  return issues;
+}
+
+export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {
+  const config = ensureComposableSiteConfig(input);
+  const issues = validateHeroBackdropFields(input);
 
   const pages = config.pages || [];
   const knownPaths = new Set(pages.map((page) => page.slug));

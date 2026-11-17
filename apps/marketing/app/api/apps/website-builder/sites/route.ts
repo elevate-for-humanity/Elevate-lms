@@ -1,3 +1,4 @@
+import { validateHeroBackdropFields } from '@/lib/tenant/site-validation';
 import { commitWebsiteDraft } from '@/lib/apps/website-builder-draft-commit';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -101,6 +102,8 @@ export async function POST(request: NextRequest) {
 
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';
   const fallback = buildDefaultSiteConfig({ organizationName: siteName, contactEmail: user.email || undefined });
+  const backdropErrors = validateHeroBackdropFields(body.siteConfig);
+  if (backdropErrors.length) return NextResponse.json({ error: 'Invalid hero backdrop configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
   const normalizedConfig = normalizeProvidedConfig(body.siteConfig, fallback);
   const config = ensureComposableSiteConfig({
     ...normalizedConfig,

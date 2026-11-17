@@ -82,3 +82,20 @@ it('saves and reopens a supplied decorative hero image, placement and opacity',a
  expect(screen.getByLabelText('Backdrop placement')).toHaveValue('right');expect(screen.getByLabelText('Backdrop opacity (%)')).toHaveValue('42.5');
  expect(saved.pages![0].sections[0].content.image).toBe('/owner.webp');expect(saved.pages![0].sections[0].settings?.imageFit).toBe('contain');
 });
+
+it('does not persist nonnumeric or out-of-range opacity and repairs a visible invalid saved value',async()=>{
+ const config=buildDefaultSiteConfig({organizationName:'Repair studio'});
+ config.pages=[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Welcome'},settings:{backdropOpacity:null}}]}];
+ const save=vi.fn(async(_url:string,options:RequestInit)=>({ok:true,json:async()=>({website:{site_config:JSON.parse(String(options.body)).siteConfig}})}));
+ vi.stubGlobal('fetch',save);render(<ZeroCodeStructureEditor websiteId="customer" initialConfig={config}/>);
+ fireEvent.click(screen.getByText('Detailed page & section controls'));fireEvent.click(screen.getByRole('button',{name:'1. hero'}));
+ const field=screen.getByLabelText('Backdrop opacity (%)');expect(field).toHaveValue('null');
+ for(const value of ['abc','Infinity','-1','101','']) {
+  fireEvent.change(field,{target:{value}});fireEvent.blur(field);
+  await waitFor(()=>expect(screen.getByText('Backdrop opacity must be a number between 0 and 100.')).toBeTruthy());
+  expect(save).not.toHaveBeenCalled();expect(field).toHaveValue(value);
+ }
+ fireEvent.change(field,{target:{value:'12'}});fireEvent.blur(field);
+ await waitFor(()=>expect(save).toHaveBeenCalledTimes(1));
+ expect(JSON.parse(String(save.mock.calls[0][1].body)).siteConfig.pages[0].sections[0].settings.backdropOpacity).toBe(12);
+});

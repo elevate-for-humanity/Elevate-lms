@@ -7,7 +7,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig, sanitizePages } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
-import { validateSiteConfig } from '@/lib/tenant/site-validation';
+import { validateSiteConfig, validateHeroBackdropFields } from '@/lib/tenant/site-validation';
 import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -133,6 +133,8 @@ async function _POST(request: NextRequest) {
     });
 
     const generated = cleanJson(result.content);
+    const backdropErrors = validateHeroBackdropFields(generated);
+    if (backdropErrors.length) return NextResponse.json({ error: 'Invalid hero backdrop configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
     const pages = sanitizePages(generated.pages);
     config = ensureComposableSiteConfig({
       ...fallback,

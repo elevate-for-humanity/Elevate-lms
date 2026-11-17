@@ -5,19 +5,23 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const compile=(s,dep,returns)=>new Function('d',`const {${Object.keys(dep).join(',')}}=d;`+stripTypeScriptTypes(s).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+`;return ${returns};`)(dep);
+const validateHeroBackdropFields=compile(await read('lib/tenant/site-validation.ts'),{},'validateHeroBackdropFields');
+const resolveSiteLinkGroups=compile(await read('lib/tenant/site-navigation.ts'),{},'resolveSiteLinkGroups');
+const composition=compile(await read('lib/tenant/site-composition.ts'),{resolveSiteLinkGroups},'({ensureComposableSiteConfig,sanitizePages,normalizePageSlug})');
+const realValidateSiteConfig=compile(await read('lib/tenant/site-validation.ts'),composition,'validateSiteConfig');
 const diagnostics=[];
 const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
 const sources={generate:await read('apps/marketing/app/api/apps/website-builder/ai-generate/route.ts'),import:await read('apps/marketing/app/api/apps/website-builder/sites/route.ts')};
-const config={template:{id:'executive'},branding:{},homepage:{},footer:{},meta:{parisInterviewCompleted:true},pages:[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Example',backdropImage:'/approved-studio.svg',image:'/owner.webp'},settings:{backdropPosition:'right',backdropOpacity:20}}]}]};
-function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allowed:true,plan:'starter'},sites=[],readError=null,rpcError=null}={}){
+const config={template:{id:'executive'},branding:{logoText:'Example'},seo:{title:'Example',description:'A customer studio.'},homepage:{},footer:{},meta:{parisInterviewCompleted:true},pages:[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Example',backdropImage:'/approved-studio.svg',image:'/owner.webp'},settings:{backdropPosition:'right',backdropOpacity:20}}]}]};
+function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allowed:true,plan:'starter'},sites=[],readError=null,rpcError=null,generated=config,realNormalization=false}={}){
  const calls=[];
  const db={from(table){assert.equal(table,'user_websites');return {select(){return this},eq(){return this},order(){return Promise.resolve({data:sites,error:readError})}}},auth:{getUser:async()=>({data:{user}})}};
  const admin={...db,rpc:async(name,args)=>{calls.push({name,args});return {error:rpcError,data:rpcError?null:{website:{id:'saved'},creditsCharged:60,creditsRemaining:100}}}};
  const deps={createClient:async()=>db,requireAdminClient:async()=>admin,commitWebsiteDraft,
-  getWebsiteBuilderAccess:async()=>access,buildDefaultSiteConfig:()=>config,ensureComposableSiteConfig:x=>x,sanitizePages:x=>x,
+  getWebsiteBuilderAccess:async()=>access,buildDefaultSiteConfig:()=>config,ensureComposableSiteConfig:realNormalization?composition.ensureComposableSiteConfig:x=>x,sanitizePages:realNormalization?composition.sanitizePages:x=>x,
   buildLicensedAssetProjectPolicy:()=>({}),NextResponse:{json:(body,options={})=>({body,status:options.status||200})},
-  applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(config)}),
-  validateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
+  applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(generated)}),
+  validateHeroBackdropFields,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
   missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:x=>x,interviewWebsiteDesign:x=>x,applyWebsiteDesign:x=>x,websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
  return {calls,post:compile(sources[mode],deps,'POST')};
 }
@@ -56,3 +60,17 @@ test('a recovered transport response does not log a failed commit',async()=>{
 });
 
 test('generation preserves approved decorative layer independently of foreground image',async()=>{const f=fixture('generate');await f.post(request());const hero=f.calls[0].args.p_site_config.pages[0].sections[0];assert.equal(hero.content.backdropImage,'/approved-studio.svg');assert.equal(hero.content.image,'/owner.webp');assert.equal(hero.settings.backdropPosition,'right');assert.equal(hero.settings.backdropOpacity,20)});
+
+for(const mode of ['generate','import']) test(mode+' rejects raw malformed backdrop fields before normalization or commit',async()=>{
+ for(const patch of [{settings:{backdropPosition:['right']}},{settings:{backdropOpacity:{value:12}}},{settings:{backdropOpacity:null}},{content:{backdropImage:{url:'/graphic.svg'}}}]) {
+  const bad=structuredClone(config);Object.assign(bad.pages[0].sections[0],patch);
+  const f=fixture(mode,{generated:bad,realNormalization:true});const response=await f.post(request({siteConfig:bad}));
+  assert.equal(response.status,422);assert.equal(f.calls.length,0);assert.ok(response.body.validation.errors[0].code.startsWith('invalid_hero_backdrop'));
+ }
+});
+
+for(const mode of ['generate','import']) test(mode+' persists valid backdrop with real normalization and validation',async()=>{
+ const f=fixture(mode,{realNormalization:true});const r=await f.post(request({siteConfig:config}));
+ assert.equal(r.status,201,JSON.stringify(r.body));assert.equal(f.calls[0].args.p_site_config.pages[0].sections[0].settings.backdropPosition,'right');
+ assert.equal(realValidateSiteConfig(f.calls[0].args.p_site_config).valid,true);
+});

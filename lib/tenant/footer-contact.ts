@@ -84,7 +84,13 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
             ? currentLine.slice(candidateAtLineStart[0].length)
             : '';
           const candidateOccupiesLine = new RegExp(
-            '^\\s*' + escapeRegExp(cleaned) + '\\s*[.!?]?\\s*
+            '^\\s*' + escapeRegExp(cleaned) + '\\s*[.!?]?\\s*$',
+          ).test(currentLine);
+          const hasBoundedAnnotation = candidateAtLineStart !== null
+            && /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
+            && !lineHasIndependentPhone(candidateSuffix);
+          const hasExplicitPreviousLineLabel = (candidateOccupiesLine || hasBoundedAnnotation)
+            && !/\d/.test(previousLineLabel)
             && (
               /^(?:call|phone|dial|text|hotline|support|emergency)\s*:?$/i.test(previousLineLabel)
               || (

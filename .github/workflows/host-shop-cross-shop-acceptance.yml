@@ -4,6 +4,10 @@ name: Host Shop authenticated isolation acceptance
 # Production service-role credentials must never execute source from PR heads.
 # Certify only reviewed main after the LMS release workflow completes.
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/host-shop-cross-shop-acceptance.yml'
+      - 'scripts/gcp/production-acceptance.*'
   workflow_dispatch:
     inputs:
       deployed_sha:
@@ -28,6 +32,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  cleanup-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test scripts/gcp/production-acceptance.test.mjs
   authenticated-cross-shop:
     if: ${{ (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'workflow_dispatch') }}
     name: Authenticated cross-shop isolation (production)
@@ -127,8 +144,9 @@ jobs:
           '
       - name: Remove disposable match requests, shops, placements, and QA users
         # A pre-provision failure has no fixtures; avoid masking the original error
-        # with an import failure when pnpm install never ran. Clean partial provisioning.
-        if: ${{ always() && (steps.provision.outcome == 'success' || steps.provision.outcome == 'failure') }}
+        # with an import failure when pnpm install never ran. Cancellation can leave
+        # partial fixtures too, so clean up every started provisioning outcome.
+        if: ${{ always() && (steps.provision.outcome == 'success' || steps.provision.outcome == 'failure' || steps.provision.outcome == 'cancelled') }}
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs cleanup
       - name: Upload redacted Playwright failure evidence
         if: failure()

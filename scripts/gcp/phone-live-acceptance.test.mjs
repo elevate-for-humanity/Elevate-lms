@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {verifyOwner,verifyCredential,operatorAudioPassed,verifyVoicemailEvidence,verifyHandsetAuthorization} from './phone-live-acceptance.mjs';
+import {verifyOwner,verifyCredential,operatorAudioPassed,verifyVoicemailEvidence,verifyHandsetAuthorization,voicemailCallerEvidence} from './phone-live-acceptance.mjs';
 const profileId='964dc85a-bce8-4e67-92eb-198ffafb2384',extensionId='ea5439e0-014b-4020-8e25-e305f20c53d6';
 const system={id:'341f59a3-b1d6-4360-8463-0ce0402f86fe',status:'active',admin_extension:'0',voicemail_enabled:true};
 const extension={id:extensionId,profile_id:profileId,extension:'0',enabled:true,webrtc_provider:'asterisk'};
@@ -27,11 +27,13 @@ test('temporary credentials cannot change the device owner or SIP host',()=>{
  for(const bad of [{...value,wsUrl:'ws://phone.elevateforhumanity.org/ws'},{...value,sipDomain:'other.example'},{...value,endpointId:'pwa-'+'a'.repeat(40)}])assert.throws(()=>verifyCredential(bad,identity),/DEVICE_UNVERIFIED/);
 });
 test('ringing, registration and packet counts alone cannot certify two-way operator audio',()=>{
- const call={liveGreetingAcceptance:'PASS',operatorTransferAcceptance:'PASS'};
+ const call={liveGreetingAcceptance:'FAIL',operatorGreetingAcceptance:'PASS',operatorTransferAcceptance:'PASS'};
  const device={received:true,answered:true,dtlsConnected:true,inboundBytes:5000,outboundBytes:5000,remoteAudibleWindows:10,failed:false};
  assert.equal(operatorAudioPassed(call,device),true);
  for(const change of [{answered:false},{dtlsConnected:false},{remoteAudibleWindows:0},{outboundBytes:0},{failed:true}])assert.equal(operatorAudioPassed(call,{...device,...change}),false);
  assert.equal(operatorAudioPassed({...call,operatorTransferAcceptance:'FAIL'},device),false);
+ assert.equal(operatorAudioPassed({...call,operatorGreetingAcceptance:'FAIL'},device),false);
+ assert.equal(operatorAudioPassed({liveGreetingAcceptance:'PASS',operatorTransferAcceptance:'PASS'},device),false);
 });
 test('the guarded acceptance dispatcher must parse as shell before it can start a live test',async()=>{
  const {readFileSync}=await import('node:fs');const {spawnSync}=await import('node:child_process');
@@ -44,8 +46,30 @@ test('the guarded acceptance dispatcher must parse as shell before it can start 
 test('voicemail acceptance requires a real assigned call, callback, private recording and the synthetic message',()=>{
  const id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
  const voicemail={id,assigned_profile_id:profileId,extension_id:extensionId,phone_system_id:system.id,phone_number:'+14632401404',recording_url:'supabase://phone-voicemails/'+id+'.wav',transcription:'This is an authorized Elevate phone system test. No callback is needed. Voicemail routing test complete.'};
- const call={id,phone_system_id:system.id,assigned_profile_id:profileId,assigned_extension_id:extensionId};const task={id,assigned_profile_id:profileId,extension_id:extensionId,source:'voicemail'};
+ const call={id,phone_system_id:system.id,assigned_profile_id:profileId,assigned_extension_id:extensionId,from_number:'+14632401404'};const task={id,assigned_profile_id:profileId,extension_id:extensionId,source:'voicemail',callback_number:'+14632401404'};
  assert.equal(verifyVoicemailEvidence(voicemail,call,task),true);
  for(const change of [{transcription:null},{assigned_profile_id:extensionId},{phone_number:'+15555555555'},{recording_url:'https://public.example/audio.wav'}])assert.equal(verifyVoicemailEvidence({...voicemail,...change},call,task),false);
  assert.equal(verifyVoicemailEvidence(voicemail,{},task),false);assert.equal(verifyVoicemailEvidence(voicemail,call,{}),false);
+ assert.equal(verifyVoicemailEvidence(voicemail,{...call,from_number:'+13175550100'},task),false);
+ assert.equal(verifyVoicemailEvidence(voicemail,call,{...task,callback_number:'unknown'}),false);
+});
+
+test('an owned-number self-call cannot certify preservation of a distinct original caller',()=>{
+ const id='test-message',number='+14632401404';
+ const evidence=voicemailCallerEvidence(number,{id,phone_number:number},{id,from_number:number},{id,callback_number:number});
+ assert.deepEqual(evidence,{linkedCallerFieldsMatch:true,originalCallerIdentityAcceptance:'NOT_VERIFIED',originalCallerIdentityReason:'self_call_uses_business_number'});
+});
+
+test('distinct caller evidence rejects business-number substitution in every linked record',()=>{
+ const id='test-message',caller='+13175550100',business='+14632401404';
+ const voicemail={id,phone_number:caller},call={id,from_number:caller},task={id,callback_number:caller};
+ assert.equal(voicemailCallerEvidence(caller,voicemail,call,task).originalCallerIdentityAcceptance,'PASS');
+ for(const [v,c,t] of [
+  [{...voicemail,phone_number:business},call,task],
+  [voicemail,{...call,from_number:business},task],
+  [voicemail,call,{...task,callback_number:business}],
+  [{...voicemail,phone_number:business},{...call,from_number:business},{...task,callback_number:business}],
+  [voicemail,{...call,id:'unrelated'},task],[voicemail,call,{...task,id:'unrelated'}],
+ ])assert.equal(voicemailCallerEvidence(caller,v,c,t).originalCallerIdentityAcceptance,'FAIL');
+ for(const invalid of [undefined,'unknown','101','+01234567890'])assert.equal(voicemailCallerEvidence(invalid,voicemail,call,task).originalCallerIdentityAcceptance,'FAIL');
 });

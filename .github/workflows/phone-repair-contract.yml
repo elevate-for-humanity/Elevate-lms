@@ -19,6 +19,9 @@ on:
       - 'apps/admin/app/api/webhooks/twilio/**'
       - 'tests/unit/asterisk-*.test.ts'
       - 'scripts/gcp/*pbx*'
+      - 'scripts/gcp/*phone-live-acceptance*'
+      - 'scripts/gcp/*exercise-paris-self-call*'
+      - 'scripts/gcp/*live-phone-configuration*'
       - 'lib/notifications/processor.ts'
       - 'lib/email/sendgrid.ts'
       - 'infra/pbx/**'
@@ -56,6 +59,9 @@ jobs:
       - run: pnpm exec vitest run tests/unit/google-runtime-secret-scope.test.ts tests/unit/asterisk-device.test.ts
       - run: pnpm exec vitest run tests/unit/phone-personal-entry.test.tsx tests/unit/phone-admin-api-parity.test.ts tests/unit/phone-automatic-activation.test.tsx tests/unit/phone-assigned-access.test.ts tests/unit/phone-owner-receiver.test.tsx tests/unit/asterisk-browser-client.test.ts
       - run: node --test infra/pbx/provisioner/server.test.mjs
+      - run: node --test infra/pbx/voicemail/worker.test.mjs scripts/gcp/exercise-paris-self-call.test.mjs scripts/gcp/phone-live-acceptance.test.mjs
+      - run: python3 scripts/gcp/test-diagnose-pbx-provisioner.py
+      - run: python3 scripts/gcp/test-live-phone-configuration.py
       - run: node --test infra/pbx/paris/*.test.mjs infra/pbx/runtime-secrets.test.mjs
       - run: python3 scripts/gcp/test-audit-pbx-runtime.py
       - run: python3 scripts/gcp/test-pbx-bootstrap.py

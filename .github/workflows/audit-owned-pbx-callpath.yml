@@ -8,6 +8,8 @@ on:
     paths:
       - '.github/workflows/audit-owned-pbx-callpath.yml'
       - 'scripts/gcp/audit-pbx-runtime.py'
+      - 'scripts/gcp/diagnose-pbx-provisioner.py'
+      - 'scripts/gcp/test-diagnose-pbx-provisioner.py'
       - 'scripts/gcp/audit-live-phone-configuration.py'
       - 'scripts/gcp/test-live-phone-configuration.py'
       - 'scripts/gcp/review-pbx-source.py'
@@ -34,6 +36,7 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 scripts/gcp/test-audit-pbx-runtime.py
+      - run: python3 scripts/gcp/test-diagnose-pbx-provisioner.py
       - run: node --check scripts/gcp/verify-pbx-transport.mjs
       - run: node --test infra/pbx/paris/*.test.mjs
   dispatch:
@@ -83,6 +86,14 @@ jobs:
           set -euo pipefail
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command='sudo python3 -' < scripts/gcp/audit-pbx-runtime.py | tee pbx-runtime-evidence.json
+      - name: Capture allowlisted provisioner failure stages and carrier identity configuration
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/gcp/test-diagnose-pbx-provisioner.py
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command='sudo python3 -' < scripts/gcp/diagnose-pbx-provisioner.py | tee pbx-provisioner-diagnostic-evidence.json
       - name: Probe authenticated operator ownership without creating credentials
         if: always()
         shell: bash

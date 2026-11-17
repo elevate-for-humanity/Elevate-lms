@@ -396,6 +396,13 @@ export default function DigitalWorkbook({
         </a>
         <p className="mt-4 font-semibold tracking-wide">ELEVATE FOR HUMANITY · TRAINING WORKBOOK</p>
         <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
+        {workbook.cover_image && (
+          <img
+            src={workbookCover(workbook.slug, workbook.cover_image)}
+            alt={`${workbook.title} cover`}
+            className="my-5 h-auto max-h-64 w-full max-w-sm rounded-lg object-contain"
+          />
+        )}
         {workbook.slug === HVAC_WORKBOOK_SLUG && (
           <details className="my-4 rounded-xl border border-slate-300 bg-white p-4">
             <summary className="cursor-pointer font-bold">
@@ -444,15 +451,8 @@ export default function DigitalWorkbook({
         </p>
         <details className="my-4 rounded-xl border border-stone-300 bg-white p-4">
           <summary className="cursor-pointer font-semibold">
-            Workbook cover and licensed access
+            Workbook license and access
           </summary>
-          {workbook.cover_image && (
-            <img
-              src={workbookCover(workbook.slug, workbook.cover_image)}
-              alt={`${workbook.title} cover`}
-              className="my-4 max-h-96 w-full object-contain"
-            />
-          )}
           <p className="text-sm leading-relaxed">
             © 2026 Elevate for Humanity. All rights reserved. This workbook is licensed only to the
             authorized learner. Unauthorized copying, recording, resale, scraping, and

@@ -230,12 +230,32 @@ test('generation keeps complete phones after prose separators and valid service 
  ]) {
   const contact={phone};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
-  assert.equal((await f.post(request({brief:source}))).status,201);
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
   assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
  }
  for(const phone of ['9-5','55','1234']) {
   const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
-  assert.equal((await f.post(request({brief:'Hours 9-5. Call 988 for help.'}))).status,201);
+  assert.equal((await f.post(request({brief:'Build the requested business website. Hours 9-5. Call 988 for help.'}))).status,201);
   assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});
+
+
+test('generation rejects split area codes and ordinary counts while preserving labeled adjacent phones',async()=>{
+ for(const [source,phone] of [
+  ['Phone:\n317\n555-0123','555-0123'],
+  ['We served 123 customers and need a contact footer.','123'],
+  ['We supported 988 learners and need a contact footer.','988'],
+ ]) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+ for(const phone of ['317-555-0123','800-555-0199']) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  const source='Phone lines:\n317-555-0123\n800-555-0199 (toll free)';
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
  }
 });

@@ -18,10 +18,12 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
         : token.replace(/'$/, '');
     });
 
+  const supportedServiceCodes = new Set(['211', '311', '411', '511', '611', '711', '811', '911', '988']);
   const validPhoneShape = (value: string) => {
     if (!/^\+?\s*[\d(). -]+$/.test(value)) return false;
     const digits = value.replace(/\D/g, '');
-    if (!(digits.length === 3 && /^\d{3}$/.test(value)) && (digits.length < 7 || digits.length > 15)) return false;
+    if (!(digits.length === 3 && /^\d{3}$/.test(value) && supportedServiceCodes.has(digits))
+      && (digits.length < 7 || digits.length > 15)) return false;
     let depth = 0;
     for (const character of value) {
       if (character === '(') depth += 1;
@@ -31,6 +33,11 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
       }
     }
     return depth === 0;
+  };
+
+  const lineHasIndependentPhone = (line: string) => {
+    const tokens = line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
+    return tokens.some(token => validPhoneShape(token.trim()));
   };
 
   const suppliedPhone = (value: unknown, limit: number) => {
@@ -47,6 +54,13 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
         const after = source[end] || '';
 
         if (/[\p{L}\p{N}+(]/u.test(before) || /[\p{L}\p{N})]/u.test(after)) continue;
+        if (cleaned.replace(/\D/g, '').length === 3) {
+          const lineStart = source.lastIndexOf('\n', start - 1) + 1;
+          const lineEndIndex = source.indexOf('\n', end);
+          const lineEnd = lineEndIndex === -1 ? source.length : lineEndIndex;
+          const context = source.slice(lineStart, lineEnd);
+          if (!/\b(call|phone|dial|text|hotline|support|emergency)\b/i.test(context)) continue;
+        }
         if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;
         if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;
 
@@ -54,14 +68,14 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
         const previous = source[start - leftGap.length - 1] || '';
         if (leftGap && /[+()\d]/.test(previous)) {
           const priorLine = source.slice(0, start - leftGap.length).split(/\r?\n/).pop()?.trim() || '';
-          if (!leftGap.includes('\n') || !validPhoneShape(priorLine)) continue;
+          if (!leftGap.includes('\n') || !lineHasIndependentPhone(priorLine)) continue;
         }
 
         const rightGap = source.slice(end).match(/^\s+/)?.[0] || '';
         const next = source[end + rightGap.length] || '';
         if (rightGap && /[+\d]/.test(next)) {
           const nextLine = source.slice(end + rightGap.length).split(/\r?\n/)[0]?.trim() || '';
-          if (!rightGap.includes('\n') || !validPhoneShape(nextLine)) continue;
+          if (!rightGap.includes('\n') || !lineHasIndependentPhone(nextLine)) continue;
         }
         return cleaned;
       }

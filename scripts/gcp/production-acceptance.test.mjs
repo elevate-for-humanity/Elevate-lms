@@ -121,3 +121,12 @@ test('all four real deployment jobs explicitly hand off acceptance, never their 
   assert.ok(job.includes('node scripts/gcp/production-acceptance.mjs dispatch'));
  }
 });
+
+test('Host Shop browser acceptance stays pinned to dispatched source SHA and current main',()=>{
+ const workflow=readFileSync(new URL('../../.github/workflows/host-shop-cross-shop-acceptance.yml',import.meta.url),'utf8');
+ assert.match(workflow,/DEPLOYED_SHA:.*inputs\.deployed_sha.*workflow_run\.head_sha/);
+ assert.ok(workflow.includes('test "$MAIN_SHA" = "$DEPLOYED_SHA"'));
+ assert.ok(workflow.includes('QA_EXPECTED_MAIN_SHA=$EXPECTED_SHA'));
+ assert.ok(workflow.includes('EXPECTED_SHA="$QA_EXPECTED_MAIN_SHA"'));
+ assert.ok(workflow.includes('test "$MAIN_SHA" = "$QA_EXPECTED_MAIN_SHA"'));
+});

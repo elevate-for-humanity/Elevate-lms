@@ -21,6 +21,7 @@ import {
   PHONE_EXTENSION_PATTERN,
   phoneProfileLabel,
 } from '@/lib/phone/config';
+import { scopePhoneProfileQuery } from '@/lib/phone/profile-scope';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import {
@@ -49,6 +50,7 @@ export default async function PhonePage() {
   const platformAdmin = auth.effectiveRoles.some(
     (role) => role === 'admin' || role === 'super_admin',
   );
+  if (!tenantId && !platformAdmin) throw new Error('Your account is not attached to an organization.');
   let systemQuery = db.from('phone_systems').select('*').limit(1);
   systemQuery = tenantId
     ? systemQuery.eq('tenant_id', tenantId)
@@ -99,10 +101,10 @@ export default async function PhonePage() {
           .select('id,status')
           .eq('phone_system_id', systemId)
           .maybeSingle(),
-        db
-          .from('profiles')
-          .select('id,full_name,email,role,program_holder_id')
-          .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
+        scopePhoneProfileQuery(
+          db.from('profiles').select('id,full_name,email,role,program_holder_id'),
+          system.tenant_id ?? null,
+        ).in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
           .order('full_name'),
         db
           .from('communication_extensions')

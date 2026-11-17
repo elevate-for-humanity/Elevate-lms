@@ -44,3 +44,15 @@ test('database and browser enforce the same extension contract', () => {
   );
   assert.ok(sql.includes(`'${'^' + PHONE_EXTENSION_PATTERN + '$'}'`));
 });
+
+test('phone directory scopes both tenant and legacy organization profiles', async () => {
+  const { scopePhoneProfileQuery } = await import('../lib/phone/profile-scope.ts');
+  const calls=[];
+  const query={or(filter){calls.push(['or',filter]);return this;},is(column,value){calls.push(['is',column,value]);return this;}};
+  scopePhoneProfileQuery(query,null);
+  assert.deepEqual(calls,[['is','tenant_id',null],['is','organization_id',null]]);
+  calls.length=0;
+  scopePhoneProfileQuery(query,'00000000-0000-0000-0000-000000000099');
+  assert.deepEqual(calls,[['or','tenant_id.eq.00000000-0000-0000-0000-000000000099,and(tenant_id.is.null,organization_id.eq.00000000-0000-0000-0000-000000000099)']]);
+  assert.throws(()=>scopePhoneProfileQuery(query,'bad,or(expression)'));
+});

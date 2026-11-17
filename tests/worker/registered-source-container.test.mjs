@@ -7,15 +7,42 @@ import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
+function runtimeSourceCopies(dockerfile){
+ const lines=dockerfile.split('\n');
+ const finalStage=lines.findLastIndex(line=>/^FROM\s/.test(line));
+ assert.ok(finalStage>=0,'Worker Dockerfile must declare its runtime stage');
+ const copies=[];
+ for(const line of lines.slice(finalStage+1).filter(line=>line.startsWith('COPY '))){
+  const parts=line.slice(5).trim().split(/\s+/);
+  if(parts[0].startsWith('--from=')){
+   // This test reconstructs context-authored instructional sources, not the
+   // independently smoke-tested SDK dependency stage. Do not treat its flag or
+   // container path as a file in the repository.
+   assert.equal(line,'COPY --from=laminar-deps /laminar-runtime /opt/elevate-laminar',
+    'An unrecognized cross-stage source needs an explicit fixture contract');
+   continue;
+  }
+  assert.ok(!parts.some(part=>part.startsWith('--')),'Unsupported context COPY option');
+  const destination=parts.pop();
+  assert.ok(parts.length&&destination,'Context COPY requires a source and destination');
+  copies.push({sources:parts,destination});
+ }
+ return copies;
+}
+
+test('source reconstruction uses only final-stage context files and recognizes the isolated SDK copy',()=>{
+ const dockerfile='FROM node:22 AS laminar-deps\nCOPY private-builder-config ./\nFROM approved-runtime\nCOPY --from=laminar-deps /laminar-runtime /opt/elevate-laminar\nCOPY lib/curriculum ./lib/curriculum\n';
+ assert.deepEqual(runtimeSourceCopies(dockerfile),[{sources:['lib/curriculum'],destination:'./lib/curriculum'}]);
+ assert.throws(()=>runtimeSourceCopies(dockerfile.replace('/laminar-runtime /opt/elevate-laminar','/other-source /app/lib/curriculum')),/unrecognized cross-stage/);
+});
+
 test('source-only worker image resolves registered instructional sources without inherited source or configuration',()=>{
  const directory=mkdtempSync(join(tmpdir(),'elevate-worker-source-'));
  try {
   const dockerfile=readFileSync(join(root,'Dockerfile.ultimate-worker'),'utf8');
-  for(const line of dockerfile.split('\n').filter(line=>line.startsWith('COPY '))){
-   const parts=line.slice(5).trim().split(/\s+/);
-   const destination=parts.pop();
-   for(const source of parts){
-    const target=join(directory,destination,parts.length>1||destination.endsWith('/')?basename(source):'');
+  for(const {sources,destination} of runtimeSourceCopies(dockerfile)){
+   for(const source of sources){
+    const target=join(directory,destination,sources.length>1||destination.endsWith('/')?basename(source):'');
     mkdirSync(dirname(target),{recursive:true});
     cpSync(join(root,source),target,{recursive:true});
    }

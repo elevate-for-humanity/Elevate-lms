@@ -95,10 +95,10 @@ export async function consumeWebsiteBuilderCredits(
   }
 
   const cost = WEBSITE_BUILDER_CREDIT_COSTS[operation];
-  // PARIS commits the debit and website write in one DB transaction. This is
+  // Generation and PARIS commit the debit and website write in one DB transaction. This is
   // only an access/balance preflight; it never authorizes an uncharged write.
   if (options.deferDebitUntilCommit) {
-    if (operation !== 'paris_edit') throw new Error('Deferred debit is only supported for atomic PARIS edits');
+    if (operation !== 'paris_edit' && operation !== 'initial_site_generation') throw new Error('Deferred debit is only supported for atomic website commits');
     const balance = typeof ensured === 'number' ? ensured : null;
     const allowed = balance !== null && balance >= cost;
     return { allowed, charged: 0, balance, isTrial: true,

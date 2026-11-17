@@ -1,3 +1,5 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { commitWebsiteDraft } from '@/lib/apps/website-builder-draft-commit';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { runAITask } from '@/lib/ai/orchestrator';
@@ -45,7 +47,7 @@ async function _POST(request: NextRequest) {
 
   const [access, sitesResult] = await Promise.all([
     getWebsiteBuilderAccess(user.id, supabase),
-    supabase.from('user_websites').select('id, site_config, organization_id, subdomain').eq('user_id', user.id).order('updated_at', { ascending: false }),
+    supabase.from('user_websites').select('id, site_config, organization_id, subdomain, updated_at').eq('user_id', user.id).order('updated_at', { ascending: false }),
   ]);
   if (sitesResult.error) return NextResponse.json({ error: 'Could not load your existing websites. No new website was created.' }, { status: 503 });
   const ownedSites = sitesResult.data;
@@ -64,7 +66,7 @@ async function _POST(request: NextRequest) {
   const reusable = (ownedSites || []).find((site) => placeholder(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !placeholder(site.site_config)).length;
   const plan = access.plan || 'starter';
-  const limit = PLAN_SITE_LIMITS[plan] ?? 1;
+  const limit = Object.hasOwn(PLAN_SITE_LIMITS, plan) ? PLAN_SITE_LIMITS[plan] : 1;
   if (!reusable && limit !== null && completedCount >= limit) return NextResponse.json({ error: `${plan} plan allows ${limit} website${limit === 1 ? '' : 's'}`, upgradeUrl: '/store/apps/website-builder' }, { status: 409 });
 
   const body = await request.json().catch(() => ({}));
@@ -164,19 +166,21 @@ async function _POST(request: NextRequest) {
     );
   }
 
-  const credit = access.isAdmin
-    ? { allowed: true, charged: 0, balance: null as number | null, upgradeUrl: null as string | null, error: null as string | null }
-    : await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation');
+  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation', { deferDebitUntilCommit: true });
   if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
 
-  const payload = { user_id: user.id, site_name: businessName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
-  const query = reusable?.id
-    ? supabase.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
-    : supabase.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });
-  const { data: site, error } = await query.select('id, site_name, subdomain, is_published, updated_at').maybeSingle();
-
-  if (error || !site) return NextResponse.json({ error: error?.message || 'Could not create AI website' }, { status: 500 });
-  return NextResponse.json({ website: site, generated: true, editUrl: `/apps/website-builder/edit/${site.id}`, creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: reusable?.id ? 200 : 201 });
+  const admin = await requireAdminClient();
+  const { data: committed, error, requestId } = await commitWebsiteDraft(admin, {
+    p_actor_id: user.id, p_website_id: reusable?.id || null, p_expected_updated_at: reusable?.updated_at || null,
+    p_site_name: businessName, p_template_id: config.template.id, p_site_config: config,
+    p_plan: Object.hasOwn(PLAN_SITE_LIMITS, plan) ? plan : 'starter',
+    p_operation: 'initial_site_generation', p_charge_trial: credit.isTrial,
+  });
+  if (error || !committed?.website) return NextResponse.json({ error: 'Could not commit generated draft. Refresh before trying again.',
+    creditsCharged: error?.code ? 0 : null, requestId }, { status: error?.code === 'P0409' ? 409 : error?.code === 'P0402' ? 402 : 503 });
+  const site = committed.website;
+  return NextResponse.json({ website: site, generated: true, editUrl: `/apps/website-builder/edit/${site.id}`,
+    creditsCharged: committed.creditsCharged, creditsRemaining: committed.creditsRemaining }, { status: reusable?.id ? 200 : 201 });
 }
 
 export const POST = withApiAudit('/api/apps/website-builder/ai-generate', _POST);

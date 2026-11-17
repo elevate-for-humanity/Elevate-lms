@@ -421,7 +421,11 @@ jobs:
       - name: Test atomic credits, rollback, idempotency and concurrent sessions
         env:
           WEBSITE_ATOMIC_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/elevate_website_regression
-        run: node scripts/test-website-builder-atomic.mjs
+        run: |
+          node --test scripts/test-website-builder-draft-routes.mjs
+          node scripts/test-website-builder-atomic.mjs
+          psql "$WEBSITE_ATOMIC_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE website_draft_tests"
+          WEBSITE_ATOMIC_TEST_DATABASE_URL="${WEBSITE_ATOMIC_TEST_DATABASE_URL%/*}/website_draft_tests" node scripts/test-website-builder-drafts.mjs
 
   ci-gate:
     name: CI Required Gate

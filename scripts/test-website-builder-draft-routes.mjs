@@ -248,6 +248,8 @@ test('generation rejects split area codes and ordinary counts while preserving l
   ['Phone:\n317\n555-0123','555-0123'],
   ['We served 123 customers and need a contact footer.','123'],
   ['We supported 988 learners and need a contact footer.','988'],
+  ['Support services.\nWe served 988 learners.','988'],
+  ['Phone: 317-555-0123\nWe served 988 customers last year.','988'],
  ]) {
   const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
   assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);

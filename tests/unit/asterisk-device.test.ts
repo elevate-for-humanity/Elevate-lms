@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   asteriskDeviceStatus,
+  phoneConnectionFailure,
   deviceIceServers,
   provisionAsteriskDevice,
 } from '@/lib/phone/asterisk';
@@ -108,14 +109,69 @@ describe('independent phone credential boundary', () => {
   });
 });
 
-
 it('requires explicit Google authority for production phone credentials', async () => {
   const { db } = setup();
   vi.stubEnv('NODE_ENV', 'production');
   vi.stubEnv('ELEVATE_RUNTIME_CONFIG_PROVIDER', '');
   vi.stubEnv('PBX_RUNTIME_CONFIG_PROVIDER', '');
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ok:true,json:async()=>credential}));
-  await expect(provisionAsteriskDevice(db,identity)).rejects.toThrow('Google Secret Manager');
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => credential }));
+  await expect(provisionAsteriskDevice(db, identity)).rejects.toThrow('Google Secret Manager');
   vi.stubEnv('PBX_RUNTIME_CONFIG_PROVIDER', 'google-secret-manager');
-  expect((await provisionAsteriskDevice(db,identity)).provider).toBe('asterisk');
+  expect((await provisionAsteriskDevice(db, identity)).provider).toBe('asterisk');
+});
+
+describe('phone connection failure isolation', () => {
+  it.each([
+    [401, 'unauthorized', 'PHONE_CONTROL_AUTH_FAILED'],
+    [403, 'forbidden', 'PHONE_CONTROL_AUTH_FAILED'],
+    [503, 'provisioner_quarantined', 'PHONE_PROVISIONER_UNAVAILABLE'],
+    [409, 'device_limit_reached', 'PHONE_DEVICE_LIMIT_REACHED'],
+    [409, 'device_assignment_conflict', 'PHONE_DEVICE_ASSIGNMENT_CONFLICT'],
+    [409, 'secret-credential-and-internal-host', 'PHONE_CONTROL_REJECTED'],
+    [400, 'secret-credential-and-internal-host', 'PHONE_CONTROL_REJECTED'],
+  ])('classifies HTTP %s without reflecting provider data', async (status, error, code) => {
+    const { db, upsert } = setup();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ error }, { status })));
+    const cause = await provisionAsteriskDevice(db, identity).catch((error) => error);
+    const failure = phoneConnectionFailure(cause);
+    expect(failure.code).toBe(code);
+    expect(JSON.stringify(failure)).not.toContain('secret-credential-and-internal-host');
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
+  it('identifies missing authoritative runtime bindings before contacting any service', async () => {
+    const { db } = setup();
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('PBX_RUNTIME_CONFIG_PROVIDER', '');
+    vi.stubEnv('ELEVATE_RUNTIME_CONFIG_PROVIDER', '');
+    const fetcher = vi.fn();
+    vi.stubGlobal('fetch', fetcher);
+    const failure = phoneConnectionFailure(
+      await provisionAsteriskDevice(db, identity).catch((error) => error),
+    );
+    expect(failure.code).toBe('PHONE_RUNTIME_BINDINGS_MISSING');
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [new DOMException('private timeout content', 'TimeoutError'), 'PHONE_CONTROL_TIMEOUT'],
+    [new Error('private transport content'), 'PHONE_CONTROL_UNREACHABLE'],
+  ])('classifies transport failures without leaking exceptions', async (cause, code) => {
+    const { db } = setup();
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(cause));
+    const failure = phoneConnectionFailure(
+      await provisionAsteriskDevice(db, identity).catch((error) => error),
+    );
+    expect(failure.code).toBe(code);
+    expect(JSON.stringify(failure)).not.toContain('private');
+  });
+
+  it('redacts arbitrary unknown exceptions', () => {
+    expect(phoneConnectionFailure(new Error('credential-secret'))).toMatchObject({
+      code: 'PHONE_CONTROL_REJECTED',
+    });
+    expect(JSON.stringify(phoneConnectionFailure(new Error('credential-secret')))).not.toContain(
+      'credential-secret',
+    );
+  });
 });

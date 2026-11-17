@@ -64,11 +64,12 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const lineEnd = lineEndIndex === -1 ? source.length : lineEndIndex;
           const previousLineEnd = Math.max(0, lineStart - 1);
           const previousLineStart = source.lastIndexOf('\n', previousLineEnd - 1) + 1;
-          const context = [
-            source.slice(previousLineStart, previousLineEnd),
-            source.slice(lineStart, lineEnd),
-          ].join(' ');
-          if (!/\b(call|phone|dial|text|hotline|support|emergency)\b/i.test(context)) continue;
+          const currentLine = source.slice(lineStart, lineEnd);
+          const previousLine = source.slice(previousLineStart, previousLineEnd);
+          const hasInlineContext = /\b(call|phone|dial|text|hotline|support|emergency)\b/i.test(currentLine);
+          const hasExplicitPreviousLineLabel =
+            /^\s*(?:call|phone|dial|text|hotline|support|emergency)\s*:?[ \t]*$/i.test(previousLine);
+          if (!hasInlineContext && !hasExplicitPreviousLineLabel) continue;
         }
         if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;
         if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;

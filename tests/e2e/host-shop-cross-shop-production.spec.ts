@@ -73,10 +73,17 @@ test('separate approved Host Shop identities cannot read or mutate the other sho
       const mutation=await page.request.patch(BASE+'/api/host-shop/match-requests/'+other.matchId,{
         data:{status:'approved',shop_notes:'QA unauthorized update - must not persist'},failOnStatusCode:false});
       expect([403,404]).toContain(mutation.status());
-      // Status must remain pending after a forbidden cross-shop mutation.
-      const verify=await page.request.get(BASE+'/api/host-shop/match-requests/'+own.matchId,{failOnStatusCode:false});
-      expect(verify.status()).toBe(200);
-      expect((await verify.json()).request.status).toBe('pending');
+      // Verify the actual MUTATION TARGET using its authorized shop identity.
+      // Checking only the attacker's own record cannot catch a forbidden write.
+      const targetSession=await signIn(browser,other);
+      try {
+        const verify=await targetSession.page.request.get(
+          BASE+'/api/host-shop/match-requests/'+other.matchId,{failOnStatusCode:false});
+        expect(verify.status()).toBe(200);
+        const targetRecord=(await verify.json()).request;
+        assertMinimal(targetRecord,other.matchId,other.studentEmail);
+        expect(targetRecord.status).toBe('pending');
+      } finally {await targetSession.context.close();}
       await page.screenshot({path:test.info().outputPath('host-shop-'+i+'-roster.png')});
     } finally {await context.close();}
   }

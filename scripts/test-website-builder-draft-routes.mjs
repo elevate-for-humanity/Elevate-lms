@@ -9,6 +9,7 @@ const validateHeroBackdropFields=compile(await read('lib/tenant/site-validation.
 const resolveSiteLinkGroups=compile(await read('lib/tenant/site-navigation.ts'),{},'resolveSiteLinkGroups');
 const composition=compile(await read('lib/tenant/site-composition.ts'),{resolveSiteLinkGroups},'({ensureComposableSiteConfig,sanitizePages,normalizePageSlug})');
 const realValidateSiteConfig=compile(await read('lib/tenant/site-validation.ts'),composition,'validateSiteConfig');
+const realDesign=compile(await read('lib/website-builder/design-choices.ts'),{},'({readWebsiteDesign,interviewWebsiteDesign,applyWebsiteDesign,websiteCatalog})');
 const diagnostics=[];
 const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
 const sources={generate:await read('apps/marketing/app/api/apps/website-builder/ai-generate/route.ts'),import:await read('apps/marketing/app/api/apps/website-builder/sites/route.ts')};
@@ -22,7 +23,7 @@ function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allo
   buildLicensedAssetProjectPolicy:()=>({}),NextResponse:{json:(body,options={})=>({body,status:options.status||200})},
   applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(generated)}),
   validateHeroBackdropFields,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
-  missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:x=>x,interviewWebsiteDesign:x=>x,applyWebsiteDesign:x=>x,websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
+  missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:realNormalization?realDesign.readWebsiteDesign:x=>x,interviewWebsiteDesign:realNormalization?realDesign.interviewWebsiteDesign:x=>x,applyWebsiteDesign:realNormalization?realDesign.applyWebsiteDesign:x=>x,websiteCatalog:realNormalization?realDesign.websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
  return {calls,post:compile(sources[mode],deps,'POST')};
 }
 const request=(body={})=>({json:async()=>({businessName:'Example',brief:'A sufficiently detailed business description for generation.',...body})});
@@ -72,5 +73,7 @@ for(const mode of ['generate','import']) test(mode+' rejects raw malformed backd
 for(const mode of ['generate','import']) test(mode+' persists valid backdrop with real normalization and validation',async()=>{
  const f=fixture(mode,{realNormalization:true});const r=await f.post(request({siteConfig:config}));
  assert.equal(r.status,201,JSON.stringify(r.body));assert.equal(f.calls[0].args.p_site_config.pages[0].sections[0].settings.backdropPosition,'right');
+ const hero=f.calls[0].args.p_site_config.pages[0].sections[0];
+ assert.equal(hero.content.backdropImage,'/approved-studio.svg');assert.equal(hero.content.image,'/owner.webp');assert.equal(hero.settings.backdropOpacity,20);
  assert.equal(realValidateSiteConfig(f.calls[0].args.p_site_config).valid,true);
 });

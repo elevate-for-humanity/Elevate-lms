@@ -235,7 +235,7 @@ export async function publishFacebookPageReel(input: {
 export async function publishInstagramImage(input: {
   caption: string;
   imageUrl: string;
-}): Promise<{ postId: string; publishedUrl: string }> {
+}): Promise<{ postId: string; publishedUrl: string | null }> {
   const tokens = await getSocialTokens('instagram');
   const accountId = tokens?.organization_id?.trim();
   if (!tokens?.access_token || !accountId) {
@@ -263,18 +263,24 @@ export async function publishInstagramImage(input: {
   );
   const postId = String(published.id ?? '');
   if (!postId) throw new Error('META_INVALID_RESPONSE: Instagram returned no post ID.');
-  const media = await graphGet(
-    encodeURIComponent(postId),
-    new URLSearchParams({
-      fields: 'permalink',
-      access_token: tokens.access_token,
-    }),
-  );
-  const publishedUrl = String(media.permalink ?? '');
-  if (!publishedUrl.startsWith('https://www.instagram.com/')) {
-    throw new Error('META_INVALID_RESPONSE: Instagram returned no verified permalink.');
+  return { postId, publishedUrl: await instagramPermalink(postId, tokens.access_token) };
+}
+
+async function instagramPermalink(postId: string, accessToken: string): Promise<string | null> {
+  try {
+    const media = await graphGet(
+      encodeURIComponent(postId),
+      new URLSearchParams({
+        fields: 'permalink',
+        access_token: accessToken,
+      }),
+    );
+    const url = String(media.permalink ?? '');
+    return url.startsWith('https://www.instagram.com/') ? url : null;
+  } catch {
+    // The provider already accepted the post. A URL lookup failure must not trigger a resend.
+    return null;
   }
-  return { postId, publishedUrl };
 }
 
 async function waitForInstagramContainer(creationId: string, accessToken: string): Promise<void> {
@@ -300,7 +306,7 @@ async function waitForInstagramContainer(creationId: string, accessToken: string
 export async function publishInstagramReel(input: {
   caption: string;
   videoUrl: string;
-}): Promise<{ postId: string; publishedUrl: string }> {
+}): Promise<{ postId: string; publishedUrl: string | null }> {
   const tokens = await getSocialTokens('instagram');
   const accountId = tokens?.organization_id?.trim();
   if (!tokens?.access_token || !accountId) {
@@ -331,18 +337,7 @@ export async function publishInstagramReel(input: {
   );
   const postId = String(published.id ?? '');
   if (!postId) throw new Error('META_INVALID_RESPONSE: Instagram returned no post ID.');
-  const media = await graphGet(
-    encodeURIComponent(postId),
-    new URLSearchParams({
-      fields: 'permalink',
-      access_token: tokens.access_token,
-    }),
-  );
-  const publishedUrl = String(media.permalink ?? '');
-  if (!publishedUrl.startsWith('https://www.instagram.com/')) {
-    throw new Error('META_INVALID_RESPONSE: Instagram returned no verified permalink.');
-  }
-  return { postId, publishedUrl };
+  return { postId, publishedUrl: await instagramPermalink(postId, tokens.access_token) };
 }
 
 export function nextRetryAt(attempt: number): string {

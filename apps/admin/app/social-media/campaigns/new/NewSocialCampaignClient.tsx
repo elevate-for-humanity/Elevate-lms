@@ -46,7 +46,7 @@ const destinations = [
   {
     id: 'facebook',
     name: 'Facebook Page',
-    detail: 'Article link and a Reel storyboard for manual review',
+    detail: 'Article link for the connected Facebook Page',
     icon: FileText,
   },
   {

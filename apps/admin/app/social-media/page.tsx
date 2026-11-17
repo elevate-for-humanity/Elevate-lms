@@ -57,7 +57,7 @@ export default async function SocialMediaPage({
   const postsQuery = db
     .from('social_media_posts')
     .select(
-      'id,title,caption,content,platform,destination_type,post_type,status,approval_state,updated_at,media_url,thumbnail_url,video_url,error_message,source_id',
+      'id,title,caption,content,platform,destination_type,post_type,status,approval_state,updated_at,media_url,thumbnail_url,video_url,error_message,source_id,published_url,platform_post_id,claim_expires_at',
       { count: 'exact' },
     );
   const [
@@ -436,6 +436,30 @@ export default async function SocialMediaPage({
                           )}
                         </form>
                       )}
+                      {['published', 'posted'].includes(post.status) &&
+                        (post.published_url?.startsWith('https://') ? (
+                          <a
+                            href={post.published_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 block text-xs font-bold text-blue-700"
+                          >
+                            View published post
+                          </a>
+                        ) : (
+                          post.platform_post_id && (
+                            <p className="mt-2 text-xs text-slate-600">
+                              Provider post ID: {post.platform_post_id}
+                            </p>
+                          )
+                        ))}
+                      {post.status === 'publishing' &&
+                        post.claim_expires_at &&
+                        Date.parse(post.claim_expires_at) <= Date.now() && (
+                          <p className="mt-2 text-xs text-amber-800">
+                            Check the provider for this post before attempting another publication.
+                          </p>
+                        )}
                       {post.error_message && (
                         <p className="mt-2 text-xs text-red-700">{post.error_message}</p>
                       )}

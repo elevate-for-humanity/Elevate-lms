@@ -163,13 +163,6 @@ const _POST = withAuth(
             post_type: 'blog_link',
             idempotency_key: `campaign:${data.id}:blog:${blog.id}:facebook_page:${version}`,
           });
-          rows.push({
-            ...common,
-            platform: 'facebook',
-            destination_type: 'facebook_personal_draft',
-            post_type: 'reel_draft',
-            idempotency_key: `campaign:${data.id}:blog:${blog.id}:facebook_personal_draft:${version}`,
-          });
         }
         if (platforms.includes('instagram') && approvedImage) {
           rows.push({

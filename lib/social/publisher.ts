@@ -67,10 +67,10 @@ async function publishNow(
   content: GeneratedContent,
   platform: SocialPlatform,
   mediaUrls?: string[]
-): Promise<{ success: boolean; postId: string; publishedUrl: string }> {
+): Promise<{ success: boolean; postId: string; publishedUrl: string | null }> {
   const message = [content.text, ...content.hashtags].filter(Boolean).join('\n');
   const video = content.media?.find(media => media.type === 'video')?.url;
-  let published: { postId: string; publishedUrl: string };
+  let published: { postId: string; publishedUrl: string | null };
   if (platform === 'facebook') {
     published = video
       ? await publishFacebookPageReel({ description: message, videoUrl: video })
@@ -232,7 +232,7 @@ export async function getPostMetrics(postId: string, platform: SocialPlatform): 
 async function logPublishedPost(
   content: GeneratedContent,
   platform: SocialPlatform,
-  result: { success: boolean; postId: string; publishedUrl: string }
+  result: { success: boolean; postId: string; publishedUrl: string | null }
 ): Promise<void> {
   const supabase = await requireAdminClient();
   const { error } = await supabase.from('published_posts').insert({

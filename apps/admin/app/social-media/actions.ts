@@ -88,6 +88,8 @@ export async function approveSocialPost(form: FormData) {
       approved_at: now,
       scheduled_at: now,
       next_attempt_at: null,
+      attempt_count: 0,
+      dead_lettered_at: null,
       status: 'queued',
       updated_at: now,
       error_message: null,

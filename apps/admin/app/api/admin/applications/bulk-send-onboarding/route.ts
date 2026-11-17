@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { runPostApprovalActions } from '@/lib/enrollment/post-approval';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { excludeQaProfiles } from '@/lib/admin/operational-profile-query';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -27,14 +28,19 @@ async function _POST(req: NextRequest) {
   const db = await requireAdminClient();
   const body = await req.json().catch(() => ({}));
   const limit = Math.min(body.limit ?? 50, 50);
+  const includeTest = body.includeTest === true;
 
   // Fetch guest apps with no onboarding email sent
-  const { data: apps, error } = await db
+  let query = db
     .from('applications')
-    .select('id, email, first_name, last_name, phone, program_slug, program_interest, program_id, funding_type, status')
+    .select(
+      'id, email, full_name, first_name, last_name, phone, program_slug, program_interest, program_id, funding_type, status',
+    )
     .is('user_id', null)
     .is('onboarding_sent_at', null)
-    .in('status', ['submitted', 'pending_admin_review', 'under_review', 'approved'])
+    .in('status', ['submitted', 'pending_admin_review', 'under_review', 'approved']);
+  if (!includeTest) query = excludeQaProfiles(query);
+  const { data: apps, error } = await query
     .order('created_at', { ascending: true })
     .limit(limit);
 

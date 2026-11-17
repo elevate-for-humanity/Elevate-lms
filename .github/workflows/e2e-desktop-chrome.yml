@@ -47,6 +47,16 @@ jobs:
       TEST_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
       E2E_PROGRAM_HOLDER_EMAIL: ${{ secrets.E2E_PROGRAM_HOLDER_EMAIL }}
       E2E_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
+      E2E_APPRENTICE_EMAIL: ${{ secrets.E2E_APPRENTICE_EMAIL }}
+      E2E_APPRENTICE_PASSWORD: ${{ secrets.E2E_APPRENTICE_PASSWORD }}
+      E2E_EMPLOYER_EMAIL: ${{ secrets.E2E_EMPLOYER_EMAIL }}
+      E2E_EMPLOYER_PASSWORD: ${{ secrets.E2E_EMPLOYER_PASSWORD }}
+      E2E_INSTRUCTOR_EMAIL: ${{ secrets.E2E_INSTRUCTOR_EMAIL }}
+      E2E_INSTRUCTOR_PASSWORD: ${{ secrets.E2E_INSTRUCTOR_PASSWORD }}
+      E2E_STAFF_EMAIL: ${{ secrets.E2E_STAFF_EMAIL }}
+      E2E_STAFF_PASSWORD: ${{ secrets.E2E_STAFF_PASSWORD }}
+      E2E_CASE_MANAGER_EMAIL: ${{ secrets.E2E_CASE_MANAGER_EMAIL }}
+      E2E_CASE_MANAGER_PASSWORD: ${{ secrets.E2E_CASE_MANAGER_PASSWORD }}
       # Only a designated disposable Host Shop identity may certify authenticated
       # shop dashboard geometry; never borrow Admin or Program Holder credentials.
       E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}

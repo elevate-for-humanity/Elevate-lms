@@ -66,6 +66,8 @@ export default async function ContactsPage({
       ...inquiry,
       ...contact,
       name: contact.name ?? inquiry.name ?? null,
+      phone: contact.phone ?? inquiry.phone ?? null,
+      company: contact.company ?? inquiry.company ?? null,
       message: contact.message ?? inquiry.message ?? null,
       program_interest: contact.program_interest ?? inquiry.program_interest ?? null,
       created_at: latestCreatedAt,

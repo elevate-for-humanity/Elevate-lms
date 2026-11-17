@@ -91,7 +91,7 @@ export default function StudentPortalPage() {
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link
-                    href="https://app.elevateforhumanity.org/lms/login"
+                    href="https://app.elevateforhumanity.org/login"
                     className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg"
                   >
                     <Play className="w-5 h-5" />

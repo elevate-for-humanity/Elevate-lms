@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
     (supabase as ReturnType<typeof getAdminClient> extends Promise<infer T> ? T : never);
   const effectiveDb = db ?? supabase;
 
-  const canReviewUploads = hasAnyRole(auth.effectiveRoles, ['admin']);
+  const canReviewLearnerUploads = hasAnyRole(auth.effectiveRoles, ['admin']);
+  const canReviewHolderUploads = hasAnyRole(auth.effectiveRoles, ['admin', 'staff']);
   const noUploads = { data: [], count: 0, error: null };
   const alertTarget = 11;
   const pageSize = 50;
@@ -134,7 +135,7 @@ export async function GET(req: NextRequest) {
         .from('applications')
         .select('id', { count: 'exact', head: true })
         .in('status', ['submitted', 'in_review']),
-      canReviewUploads ? loadLearnerDocumentAlerts() : Promise.resolve(noUploads),
+      canReviewLearnerUploads ? loadLearnerDocumentAlerts() : Promise.resolve(noUploads),
       effectiveDb
         .from('compliance_alerts')
         .select('id', { count: 'exact', head: true })
@@ -156,7 +157,7 @@ export async function GET(req: NextRequest) {
         .eq('metadata->>source', 'service-billing')
         .order('created_at', { ascending: false })
         .limit(20),
-      canReviewUploads ? loadProgramHolderDocumentAlerts() : Promise.resolve(noUploads),
+      canReviewHolderUploads ? loadProgramHolderDocumentAlerts() : Promise.resolve(noUploads),
     ]);
 
     const unavailableSources = (
@@ -200,24 +201,41 @@ export async function GET(req: NextRequest) {
         time: 'Pending action',
       });
     }
-    const documentAlerts = [...(docsRes.data ?? []), ...(holderUploads.data ?? [])].sort(
-      (a, b) => String(b.time).localeCompare(String(a.time)),
-    );
+    const learnerDocumentAlerts = docsRes.data ?? [];
+    const holderDocumentAlerts = holderUploads.data ?? [];
+    const documentAlerts = [...learnerDocumentAlerts, ...holderDocumentAlerts]
+      .sort((a, b) => String(b.time).localeCompare(String(a.time)))
+      .slice(0, 10);
+    const displayedLearnerAlerts = documentAlerts.filter((alert) =>
+      alert.id.startsWith('document-upload:'),
+    ).length;
+    const displayedHolderAlerts = documentAlerts.filter((alert) =>
+      alert.id.startsWith('holder-document-upload:'),
+    ).length;
     notifs.unshift(
-      ...documentAlerts.slice(0, 10).map((alert) => ({
+      ...documentAlerts.map((alert) => ({
         ...alert,
         time: alert.time
           ? new Date(alert.time).toLocaleDateString('en-US', { timeZone: 'America/Indianapolis' })
           : 'Pending action',
       })),
     );
-    if (documentAlerts.length > 10) {
+    if (learnerDocumentAlerts.length > displayedLearnerAlerts) {
       notifs.push({
         id: 'document-upload:queue',
         unread: true,
         href: '/documents/review?status=pending',
-        title: 'More uploads awaiting review',
-        time: 'Open document review',
+        title: 'More learner uploads awaiting review',
+        time: 'Open learner document review',
+      });
+    }
+    if (holderDocumentAlerts.length > displayedHolderAlerts) {
+      notifs.push({
+        id: 'holder-document-upload:queue',
+        unread: true,
+        href: '/program-holder-documents',
+        title: 'More program holder uploads awaiting review',
+        time: 'Open program holder document review',
       });
     }
     if ((alertsRes.count ?? 0) > 0) {

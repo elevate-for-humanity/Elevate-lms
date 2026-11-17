@@ -68,7 +68,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const previousLine = source.slice(previousLineStart, previousLineEnd);
           const hasInlineContext = /\b(call|phone|dial|text|hotline|support|emergency)\b/i.test(currentLine);
           const hasExplicitPreviousLineLabel =
-            /^\s*(?:call|phone|dial|text|hotline|support|emergency)\s*:?[ \t]*$/i.test(previousLine);
+            /^\s*(?:call|phone|dial|text|hotline|support|emergency)\s*:?[ \t\r]*$/i.test(previousLine);
           if (!hasInlineContext && !hasExplicitPreviousLineLabel) continue;
         }
         if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;

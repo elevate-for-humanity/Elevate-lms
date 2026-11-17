@@ -19,6 +19,14 @@ test('same dedicated QA identities are used for both legacy TEST and canonical E
     assert.match(job,new RegExp('E2E_'+role+'_EMAIL:.*secrets\\.E2E_'+role+'_EMAIL'));
   }
 });
+test('all authenticated responsive roles map to distinct required QA variable names',()=>{
+  const job=workflow.split('  desktop-chrome:')[1]?.split('  public-host-shop-category:')[0] ?? '';
+  for(const role of ['APPRENTICE','EMPLOYER','INSTRUCTOR','STAFF','CASE_MANAGER','HOST_SHOP','LEARNER']){
+    for(const part of ['EMAIL','PASSWORD']){
+      assert.match(job,new RegExp('E2E_'+role+'_'+part+':.*secrets\\\\.E2E_'+role+'_'+part));
+    }
+  }
+});
 test('broad gate stops bounded failures without marking the suite successful',()=>{
   assert.match(config,/maxFailures: process\.env\.CI \? 12 : undefined/);
   assert.match(workflow,/run: pnpm test:e2e/);

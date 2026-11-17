@@ -8,7 +8,7 @@ const compile=(s,dep,returns)=>new Function('d',`const {${Object.keys(dep).join(
 const diagnostics=[];
 const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
 const sources={generate:await read('apps/marketing/app/api/apps/website-builder/ai-generate/route.ts'),import:await read('apps/marketing/app/api/apps/website-builder/sites/route.ts')};
-const config={template:{id:'executive'},branding:{},homepage:{},footer:{},meta:{parisInterviewCompleted:true},pages:[]};
+const config={template:{id:'executive'},branding:{},homepage:{},footer:{},meta:{parisInterviewCompleted:true},pages:[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',content:{title:'Example',backdropImage:'/approved-studio.svg',image:'/owner.webp'},settings:{backdropPosition:'right',backdropOpacity:20}}]}]};
 function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allowed:true,plan:'starter'},sites=[],readError=null,rpcError=null}={}){
  const calls=[];
  const db={from(table){assert.equal(table,'user_websites');return {select(){return this},eq(){return this},order(){return Promise.resolve({data:sites,error:readError})}}},auth:{getUser:async()=>({data:{user}})}};
@@ -54,3 +54,5 @@ test('a recovered transport response does not log a failed commit',async()=>{
  await commitWebsiteDraft({rpc:async()=>++calls===1?{data:null,error:{message:'transport'}}:{data:{website:{id:'saved'}},error:null}},{});
  assert.equal(diagnostics.length,0);
 });
+
+test('generation preserves approved decorative layer independently of foreground image',async()=>{const f=fixture('generate');await f.post(request());const hero=f.calls[0].args.p_site_config.pages[0].sections[0];assert.equal(hero.content.backdropImage,'/approved-studio.svg');assert.equal(hero.content.image,'/owner.webp');assert.equal(hero.settings.backdropPosition,'right');assert.equal(hero.settings.backdropOpacity,20)});

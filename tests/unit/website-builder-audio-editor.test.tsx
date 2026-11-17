@@ -61,3 +61,24 @@ it('saves and reopens the introduction band placement and heading through the dr
     content: { title: 'Owner headline', image: '/owner.jpg', narration: 'Approved transcript', audioUrl: '/audio/approved.mp3', musicUrl: '/audio/music.mp3' },
   });
 });
+it('saves and reopens a supplied decorative hero image, placement and opacity',async()=>{
+ let saved=buildDefaultSiteConfig({organizationName:'Subscriber studio'});
+ saved.pages=[{id:'home',slug:'/',title:'Home',sections:[{id:'hero',type:'hero',settings:{imageFit:'contain'},content:{title:'Our studio',image:'/owner.webp'}}]}];
+ vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
+  expect(url).toBe('/api/apps/website-builder/sites/customer');expect(options.method).toBe('PATCH');
+  saved=ensureComposableSiteConfig(JSON.parse(String(options.body)).siteConfig);
+  return {ok:true,json:async()=>({website:{site_config:saved}})};
+ }));
+ const open=()=>{fireEvent.click(screen.getByText('Detailed page & section controls'));fireEvent.click(screen.getByRole('button',{name:'1. hero'}))};
+ const {unmount}=render(<ZeroCodeStructureEditor websiteId="customer" initialConfig={saved}/>);open();
+ const image=screen.getByLabelText('Decorative hero image URL');fireEvent.change(image,{target:{value:'/approved-graphic.svg'}});fireEvent.blur(image);
+ await waitFor(()=>expect(saved.pages![0].sections[0].content.backdropImage).toBe('/approved-graphic.svg'));
+ fireEvent.change(screen.getByLabelText('Backdrop placement'),{target:{value:'right'}});
+ await waitFor(()=>expect(saved.pages![0].sections[0].settings?.backdropPosition).toBe('right'));
+ fireEvent.change(screen.getByLabelText('Backdrop opacity'),{target:{value:'20'}});
+ await waitFor(()=>expect(saved.pages![0].sections[0].settings?.backdropOpacity).toBe(20));
+ unmount();render(<ZeroCodeStructureEditor websiteId="customer" initialConfig={saved}/>);open();
+ expect(screen.getByLabelText('Decorative hero image URL')).toHaveValue('/approved-graphic.svg');
+ expect(screen.getByLabelText('Backdrop placement')).toHaveValue('right');expect(screen.getByLabelText('Backdrop opacity')).toHaveValue('20');
+ expect(saved.pages![0].sections[0].content.image).toBe('/owner.webp');expect(saved.pages![0].sections[0].settings?.imageFit).toBe('contain');
+});

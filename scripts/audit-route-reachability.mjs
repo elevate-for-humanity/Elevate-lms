@@ -49,6 +49,17 @@ const activeCode = [...texts].filter(([file]) =>
   !/^(docs\/|tests\/|proofs\/|internal-docs\/|scripts\/)/.test(file) &&
   !/(^|\/)(__tests__|fixtures|__fixtures__)\//.test(file)
 );
+// Build an inverted index once. Searching every file for every route would
+// take quadratic time in a large monorepo and stall the audit gate.
+const inboundIndex=new Map();
+for(const [file,body] of activeCode){
+  const references=new Set(body.match(/\\/(?:[A-Za-z0-9_-]+\\/)*[A-Za-z0-9_-]+/g)||[]);
+  for(const ref of references){
+    const files=inboundIndex.get(ref)||[];
+    if(files.length<40) files.push(file);
+    inboundIndex.set(ref,files);
+  }
+}
 const routeByService = new Map();
 for(const route of routes){
   const list=routeByService.get(route.service)||[];
@@ -89,11 +100,9 @@ const inventory=routes.map(route=>{
   const inbound=[];
   const evidence=[];
   if(!/\[[^\]]+\]/.test(route.url) && route.url!=='/'){
-    for(const [file,text] of activeCode){
-      if(file!==route.file && text.includes(route.url)){
-        inbound.push(file);
-        if(inbound.length===30)break;
-      }
+    for(const file of inboundIndex.get(route.url)||[]){
+      if(file!==route.file) inbound.push(file);
+      if(inbound.length===30)break;
     }
   }
   const configAliases=(configuredRedirects.get(route.service)||[])

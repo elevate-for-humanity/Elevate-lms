@@ -230,6 +230,8 @@ test('generation keeps complete phones after prose separators and valid service 
   ['For crisis support, call 988.','988'],
   ['Phone:\n988','988'],
   ['Phone:\r\n988','988'],
+  ['Crisis hotline:\n988','988'],
+  ['For crisis support, call:\n988','988'],
  ]) {
   const contact={phone};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
@@ -250,6 +252,7 @@ test('generation rejects split area codes and ordinary counts while preserving l
   ['We served 123 customers and need a contact footer.','123'],
   ['We supported 988 learners and need a contact footer.','988'],
   ['Support services.\nWe served 988 learners.','988'],
+  ['Support services:\nWe served 988 learners.','988'],
   ['Phone: 317-555-0123\nWe served 988 customers last year.','988'],
  ]) {
   const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});

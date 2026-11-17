@@ -32,7 +32,7 @@ test('Route analysis is non-destructive and does not treat missing static refere
   assert.match(audit, /advisoryOnly:true/);
   assert.ok(!audit.includes('rmSync('));
   assert.ok(!audit.includes('unlinkSync('));
-  assert.match(audit, /(?:\(app\)|\[\[\.\.\.)/);
+  assert.ok(audit.includes('function matchesServiceRoute'));
 });
 
 test('Route inventory classifies real routes, legacy redirect targets, and missing inbound links conservatively', async () => {

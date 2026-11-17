@@ -311,3 +311,30 @@ test('generation rejects split area codes and ordinary counts while preserving l
   assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
  }
 });
+
+
+test('generation requires destination context for inline service codes',async()=>{
+ for(const source of ['We support 988 learners each year.','Our support reached 988 learners.']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone:'988'}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+ for(const source of ['Call 988 for help.','Support: 988','For help, use the support line 988.']) {
+  const contact={phone:'988'};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+});
+
+test('generation retains a phone on the line after a postal address',async()=>{
+ for(const address of ['Indianapolis, IN 46204','123 Main Street, Indianapolis, IN 46204-1234']) {
+  const contact={phone:'317-555-0123'};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+address+'\n317-555-0123'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ const f=fixture('generate',{generated:{...config,contact:{phone:'317-555-0123'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Build the requested business website. 46204\n317-555-0123'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});

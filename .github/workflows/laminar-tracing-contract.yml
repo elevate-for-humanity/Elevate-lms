@@ -1,0 +1,77 @@
+name: Laminar Tracing Contract
+
+on:
+  pull_request:
+    paths:
+      - 'lib/observability/laminar*.ts'
+      - 'lib/ai/**'
+      - 'lib/ultimate-course-builder/worker/**'
+      - 'instrumentation.ts'
+      - 'apps/*/instrumentation.ts'
+      - 'apps/admin/server.js'
+      - 'next.config.mjs'
+      - 'apps/*/next.config.mjs'
+      - 'package.json'
+      - 'apps/*/package.json'
+      - 'pnpm-lock.yaml'
+      - 'tests/unit/laminar-*.test.ts'
+      - 'tests/unit/ai-canonical-provider.test.ts'
+      - 'tests/unit/elevate-provider-stream.test.ts'
+      - 'tests/unit/marketing-startup-priority.test.ts'
+      - 'tests/unit/ultimate-versioned-contract.test.ts'
+      - 'tests/unit/ultimate-durable-resume.test.ts'
+      - '.github/workflows/laminar-tracing-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lib/observability/laminar*.ts'
+      - 'lib/ai/**'
+      - 'lib/ultimate-course-builder/worker/**'
+      - 'instrumentation.ts'
+      - 'apps/*/instrumentation.ts'
+      - 'apps/admin/server.js'
+      - 'next.config.mjs'
+      - 'apps/*/next.config.mjs'
+      - 'package.json'
+      - 'apps/*/package.json'
+      - 'pnpm-lock.yaml'
+      - 'tests/unit/laminar-*.test.ts'
+      - 'tests/unit/ai-canonical-provider.test.ts'
+      - 'tests/unit/elevate-provider-stream.test.ts'
+      - 'tests/unit/marketing-startup-priority.test.ts'
+      - 'tests/unit/ultimate-versioned-contract.test.ts'
+      - 'tests/unit/ultimate-durable-resume.test.ts'
+      - '.github/workflows/laminar-tracing-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  tracing-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Check the server tracing boundary
+        run: pnpm exec tsc --noEmit --strict --skipLibCheck --target ES2022 --module NodeNext --moduleResolution NodeNext lib/observability/laminar.ts
+      - name: Verify privacy, cancellation, provider gates and worker resume
+        run: >-
+          pnpm exec vitest run
+          tests/unit/laminar-tracing.test.ts
+          tests/unit/laminar-stream.test.ts
+          tests/unit/laminar-admin-shutdown.test.ts
+          tests/unit/laminar-runtime.test.ts
+          tests/unit/ai-canonical-provider.test.ts
+          tests/unit/elevate-provider-stream.test.ts
+          tests/unit/marketing-startup-priority.test.ts
+          tests/unit/ultimate-versioned-contract.test.ts
+          tests/unit/ultimate-durable-resume.test.ts
+          --maxWorkers=1

@@ -149,6 +149,7 @@ const adminConfig = {
   },
 
   serverExternalPackages: [
+    '@lmnr-ai/lmnr',
     // Kokoro loads platform-specific ONNX binaries at runtime. Keep the full
     // inference stack outside webpack so Admin instrumentation never attempts
     // to parse a native `.node` binding during the production build.

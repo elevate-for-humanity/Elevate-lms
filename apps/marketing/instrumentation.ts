@@ -3,6 +3,11 @@ export async function register(): Promise<void> {
     return;
   }
 
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { initializeLaminar } = await import('../../lib/observability/laminar-runtime');
+    await initializeLaminar('marketing');
+  }
+
   try {
     const required = [
       'NEXT_PUBLIC_SUPABASE_URL',

@@ -12,6 +12,7 @@
     "predev": "node ../../scripts/sync-development-public.mjs lms"
   },
   "dependencies": {
+    "@lmnr-ai/lmnr": "0.9.4",
     "next": "catalog:",
     "react": "19.2.7",
     "react-dom": "19.2.7"

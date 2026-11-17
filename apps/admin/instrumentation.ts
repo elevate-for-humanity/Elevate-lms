@@ -11,6 +11,11 @@ export async function register(): Promise<void> {
     return;
   }
 
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { initializeLaminar } = await import('../../lib/observability/laminar-runtime');
+    await initializeLaminar('admin');
+  }
+
   try {
     const requiredSecrets = [
       'NEXT_PUBLIC_SUPABASE_URL',

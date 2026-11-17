@@ -12,6 +12,7 @@
     "predev": "node ../../scripts/sync-development-public.mjs marketing"
   },
   "dependencies": {
+    "@lmnr-ai/lmnr": "0.9.4",
     "buffer": "^6.0.3",
     "next": "catalog:",
     "process": "^0.11.10",

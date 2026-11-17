@@ -25,6 +25,7 @@
     "@hookform/resolvers": "5.2.2",
     "@livekit/components-react": "^2.9.24",
     "@livekit/components-styles": "^1.2.0",
+    "@lmnr-ai/lmnr": "0.9.4",
     "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@monaco-editor/react": "4.7.0",
     "@napi-rs/canvas": "0.1.80",

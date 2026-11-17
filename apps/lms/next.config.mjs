@@ -25,6 +25,7 @@ const nextConfig = {
   // Keep observability instrumentation in Node's runtime boundary. Bundling
   // these packages makes webpack inspect intentional dynamic require calls.
   serverExternalPackages: [
+    '@lmnr-ai/lmnr',
     '@sentry/nextjs',
     '@sentry/node',
     '@sentry/node-core',

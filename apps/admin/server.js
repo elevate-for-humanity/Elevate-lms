@@ -208,6 +208,25 @@ async function gracefulShutdown(signal, exitCode = 0) {
     });
   }
 
+  // Flush the singleton started by Next instrumentation after requests drain.
+  // Telemetry failure must never prevent this process from terminating.
+  let tracingTimer;
+  try {
+    const tracing = globalThis[Symbol.for('elevate.laminar.tracing')];
+    if (tracing?.shutdown) {
+      await Promise.race([
+        Promise.resolve().then(() => tracing.shutdown()),
+        new Promise((_, reject) => {
+          tracingTimer = setTimeout(() => reject(new Error('LAMINAR_SHUTDOWN_TIMEOUT')), 2_000);
+        }),
+      ]);
+    }
+  } catch {
+    log.warn('Laminar shutdown incomplete; continuing server shutdown.');
+  } finally {
+    clearTimeout(tracingTimer);
+  }
+
   const uptimeSeconds = Math.round(process.uptime());
   log.serverStop(signal, uptimeSeconds, { event: 'shutdown_complete' });
   process.exit(exitCode);

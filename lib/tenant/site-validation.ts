@@ -1,3 +1,4 @@
+import { validateFooterContactFields } from './footer-contact';
 import type { TenantSiteConfig, TenantSitePage, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
 
@@ -215,7 +216,7 @@ export function validateHeroBackdropFields(input: unknown): SiteValidationIssue[
 
 export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {
   const config = ensureComposableSiteConfig(input);
-  const issues = validateHeroBackdropFields(input);
+  const issues = [...validateHeroBackdropFields(input), ...validateFooterContactFields(input)];
 
   const pages = config.pages || [];
   const knownPaths = new Set(pages.map((page) => page.slug));
@@ -271,3 +272,4 @@ export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResul
   const warnings = issues.filter((issue) => issue.severity === 'warning');
   return { valid: errors.length === 0, errors, warnings, pageCount: pages.length, sectionCount };
 }
+

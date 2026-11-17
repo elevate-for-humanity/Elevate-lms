@@ -5,12 +5,22 @@ name: Host Shop authenticated isolation acceptance
 # Certify only reviewed main after the LMS release workflow completes.
 on:
   workflow_dispatch:
+    inputs:
+      deployed_sha:
+        description: Exact main LMS commit from a successful release handoff
+        required: false
+        type: string
+      deployment_run_id:
+        description: Trusted source LMS deployment workflow run ID
+        required: false
+        type: string
   workflow_run:
     workflows: ['Deploy LMS automatically on Google']
     types: [completed]
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: host-shop-cross-shop-qa-${{ github.ref }}
@@ -54,6 +64,19 @@ jobs:
             *) echo "::error::Refusing to provision against an unexpected database"; exit 1 ;;
           esac
           test "${PLAYWRIGHT_LMS_URL}" = "https://lms.elevateforhumanity.org"
+      - name: Verify source release completed before dispatched security acceptance
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.deployed_sha != '' || inputs.deployment_run_id != '') }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: lms
+          ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
+          ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
+        run: |
+          set -euo pipefail
+          test -n "$ACCEPTANCE_SHA"
+          test -n "$ACCEPTANCE_RUN_ID"
+          node scripts/gcp/production-acceptance.mjs verify
       - name: Verify exact current-main production serving SHA before QA
         shell: bash
         run: |

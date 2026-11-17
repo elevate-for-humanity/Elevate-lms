@@ -399,6 +399,23 @@ export default async function SocialMediaPage({
                             Build a replacement from an approved blog
                           </Link>
                         )}
+                      {reviewable && !approvedSourceIds.has(post.source_id) && (
+                        <div className="mt-3 space-y-2">
+                          <p className="whitespace-pre-wrap rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-700">
+                            {post.caption || post.content || 'No caption was saved for this legacy draft.'}
+                          </p>
+                          {(post.video_url || post.media_url || post.thumbnail_url) && (
+                            <a
+                              href={post.video_url || post.media_url || post.thumbnail_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-xs text-blue-700"
+                            >
+                              Review attached media
+                            </a>
+                          )}
+                        </div>
+                      )}
                       {reviewable && approvedSourceIds.has(post.source_id) && (
                         <form action={approveSocialPost} className="mt-3 space-y-2">
                           <input type="hidden" name="id" value={post.id} />

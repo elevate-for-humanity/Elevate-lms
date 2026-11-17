@@ -150,6 +150,50 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(report['result'], 'RECOVERY_UNVERIFIED')
         self.assertFalse(any(c[:2] == ['systemctl', 'start'] for c in commands))
 
+    def test_post_stop_invalidation_waits_for_bounded_endpoint_settling(self):
+        (self.root / 'current').unlink()
+        with patch.object(m, 'run', return_value='0'), \
+             patch.object(m, 'cli', side_effect=[self.output['pjsip show endpoints'], 'Objects found: 0']) as inventory, \
+             patch.object(m.time, 'sleep') as sleep:
+            m.verify_stopped_invalidation()
+        self.assertEqual(inventory.call_count, 2)
+        sleep.assert_called_once_with(0.25)
+
+    def test_persistent_endpoint_never_passes_stop_verification(self):
+        (self.root / 'current').unlink()
+        with patch.object(m, 'run', return_value='0'), \
+             patch.object(m, 'cli', return_value=self.output['pjsip show endpoints']) as inventory, \
+             patch.object(m.time, 'sleep') as sleep, \
+             self.assertRaisesRegex(m.Blocked, 'invalidation_unverified'):
+            m.verify_stopped_invalidation()
+        self.assertEqual(inventory.call_count, 12)
+        self.assertEqual(sleep.call_count, 11)
+
+    def test_reappearing_process_or_unknown_inventory_blocks_settling(self):
+        (self.root / 'current').unlink()
+        with patch.object(m, 'run', side_effect=['0', '123']), \
+             patch.object(m, 'cli', return_value=self.output['pjsip show endpoints']), \
+             patch.object(m.time, 'sleep'), self.assertRaisesRegex(m.Blocked, 'stop_unverified'):
+            m.verify_stopped_invalidation()
+        with patch.object(m, 'run', return_value='0'), patch.object(m, 'cli', return_value=''), \
+             self.assertRaisesRegex(m.Blocked, 'endpoint_inventory_unverified'):
+            m.verify_stopped_invalidation()
+
+    def test_failed_stop_never_polls_or_starts_even_if_invalidation_looks_complete(self):
+        evidence = self.inspect()
+        def fail_stop(args):
+            self.assertEqual(args[:2], ['systemctl', 'stop'])
+            (self.root / 'current').unlink()
+            raise m.Blocked('command_unverified')
+        with patch.object(m, 'inspect', return_value=evidence), \
+             patch.object(m, 'idle_inventory', return_value=[ID]), \
+             patch.object(m, 'run', side_effect=fail_stop) as command, \
+             patch.object(m, 'verify_stopped_invalidation') as verify:
+            report = m.recover(Path('/unused'), evidence['fingerprint'])
+        self.assertEqual(report['result'], 'RECOVERY_UNVERIFIED')
+        self.assertEqual(command.call_count, 1)
+        verify.assert_not_called()
+
     def test_probe_executes_only_verified_bytes(self):
         # Undo fixture mock to exercise the actual subprocess boundary.
         real_probe = SPEC.loader.get_code('recovery')
@@ -187,3 +231,4 @@ class RecoveryTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

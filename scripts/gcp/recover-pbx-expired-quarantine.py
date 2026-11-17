@@ -194,6 +194,21 @@ def snapshot(evidence):
     return folder.name
 
 
+def verify_stopped_invalidation():
+    # Only called after a successful stop, including its existing invalidate hook.
+    # Never excuse a failed hook: it may have failed before dialplan reload.
+    for attempt in range(12):
+        require(run(['systemctl', 'show', UNIT, '--property=MainPID', '--value']).strip() == '0', 'stop_unverified')
+        require(not (ROOT / 'current').exists() and not (ROOT / 'current').is_symlink(), 'invalidation_unverified')
+        endpoints = cli('pjsip show endpoints')
+        require(re.search(r'Objects found:\s*\d+', endpoints), 'endpoint_inventory_unverified')
+        if not re.search(r'^\s*Endpoint:\s+pwa-', endpoints, re.M):
+            return
+        if attempt < 11:
+            time.sleep(0.25)
+    raise Blocked('invalidation_unverified')
+
+
 def recover(probe_path, expected=None):
     evidence = inspect(probe_path)
     report = {'result': 'PREVIEW', 'stateSha256': evidence['fingerprint'],
@@ -209,11 +224,7 @@ def recover(probe_path, expected=None):
     report['serviceChanged'] = True
     try:
         run(['systemctl', 'stop', UNIT])  # Retain the existing --invalidate hook.
-        require(run(['systemctl', 'show', UNIT, '--property=MainPID', '--value']).strip() == '0', 'stop_unverified')
-        require(not (ROOT / 'current').exists() and not (ROOT / 'current').is_symlink(), 'invalidation_unverified')
-        endpoints = cli('pjsip show endpoints')
-        require(re.search(r'Objects found:\s*\d+', endpoints) and
-                not re.search(r'^\s*Endpoint:\s+pwa-', endpoints, re.M), 'invalidation_unverified')
+        verify_stopped_invalidation()
         run(['systemctl', 'start', UNIT])
         # Never stop again or restore expired credentials after start: a legitimate
         # new device may register immediately. Preserve evidence on any failure.
@@ -257,3 +268,4 @@ if __name__ == '__main__':
         print(json.dumps({'result': 'BLOCKED', 'code': str(error) if isinstance(error, Blocked) else 'recovery_precondition_unverified',
                           'callsPlaced': 0}))
         raise SystemExit(1)
+

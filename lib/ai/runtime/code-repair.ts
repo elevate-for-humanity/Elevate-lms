@@ -816,8 +816,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    // attempt reset, worker restart, or data mutation beyond its repair receipt.
    const limited=await db.from('paris_code_repairs').update({
     status:'blocked',error_code:'PARIS_REPAIR_ATTEMPT_BUDGET_EXHAUSTED',updated_at:new Date().toISOString()
-   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
    if(limited.error)throw limited.error;
+   if(!limited.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
    continue;
   }
   if(!candidate.source_job_id){
@@ -835,8 +836,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
      const retained=await db.from('paris_code_repairs').update({status:'blocked',
       error_code:disposition.state==='invalid-source'?'SOURCE_WORKFLOW_EVIDENCE_INVALID':'SOURCE_WORKFLOW_SUPERSEDED_NOT_REPAIR_VERIFIED',
       verification:{...((candidate.verification??{}) as Record<string,unknown>),queuedWorkflowEvidence:disposition},updated_at:new Date().toISOString()})
-      .eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+      .eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
      if(retained.error)throw retained.error;
+     if(!retained.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
      continue;
     }
    }
@@ -856,8 +858,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     disposition==='evidence_required'?'SOURCE_DEFECT_EVIDENCE_REQUIRED':
     'SOURCE_REPAIR_INELIGIBLE_CURRENT_STATE',
    updated_at:new Date().toISOString(),
-  }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count);
+  }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
   if(blocked.error)throw blocked.error;
+  if(!blocked.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
  }
  if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
  // New repairs use the owned internal engine by default. Explicit OpenHands

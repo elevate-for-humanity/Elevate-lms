@@ -12,7 +12,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
     const token = value.replace(/[.!?]+$/, '');
     return token.startsWith("'") && token.endsWith("'") ? token.slice(1, -1) : token.replace(/'$/, '');
   });
-  // Fold whitespace before tokenization; parenthesized digit groups exclude availability ranges.
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\  // Fold whitespace before tokenization; parenthesized digit groups exclude availability ranges.
   const phones = supplied.flatMap(source => [...source.matchAll(/(?:\+\d+|\(\d+\)|\d+)(?:[ -]*(?:\(\d+\)|\d+)|\.(?=\d)\d+)*/g)].filter(match => {
     const before = source[(match.index ?? 0) - 1] || '';
     const after = source[(match.index ?? 0) + match[0].length] || '';
@@ -22,6 +22,46 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
     const cleaned = value.trim();
     const matches = kind === 'email' ? emails.includes(cleaned) : kind === 'phone' ? phones.includes(fold(cleaned)) : supplied.some(source => source.includes(fold(cleaned)));
+    return matches ? cleaned : undefined;
+  };');
+  const suppliedPhone = (value: unknown, limit: number) => {
+    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
+    const cleaned = value.trim();
+    const digits = cleaned.replace(/\D/g, '');
+    if (digits.length < 7 || digits.length > 15 || !/^\+?\s*[\d(). -]+$/.test(cleaned)) return undefined;
+    let depth = 0;
+    for (const character of cleaned) {
+      if (character === '(') depth += 1;
+      if (character === ')' && --depth < 0) return undefined;
+    }
+    if (depth !== 0) return undefined;
+    // Match the complete generated candidate against owner text. Flexible whitespace
+    // keeps a number split across a line, but newlines still separate two numbers.
+    const pattern = new RegExp(cleaned.split(/\s+/).map(escapeRegExp).join('\\s+'), 'g');
+    for (const source of rawSources) {
+      for (const match of source.matchAll(pattern)) {
+        const start = match.index ?? 0;
+        const end = start + match[0].length;
+        const before = source[start - 1] || '';
+        const after = source[end] || '';
+        if (/[\p{L}\p{N}+.(\-]/u.test(before) || /[\p{L}\p{N})]/u.test(after)) continue;
+        if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;
+        const leftSpaces = source.slice(0, start).match(/ +$/)?.[0].length ?? 0;
+        const previous = source[start - leftSpaces - 1] || '';
+        if (leftSpaces && /[+().\d-]/.test(previous)) continue;
+        const rightSpaces = source.slice(end).match(/^ +/)?.[0].length ?? 0;
+        const next = source[end + rightSpaces] || '';
+        if (rightSpaces && /[\d+]/.test(next)) continue;
+        return cleaned;
+      }
+    }
+    return undefined;
+  };
+  const copy = (value: unknown, limit: number, kind?: 'email' | 'phone' | 'address') => {
+    if (kind === 'phone') return suppliedPhone(value, limit);
+    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
+    const cleaned = value.trim();
+    const matches = kind === 'email' ? emails.includes(cleaned) : supplied.some(source => source.includes(fold(cleaned)));
     return matches ? cleaned : undefined;
   };
   const result: TenantSiteContact = {};

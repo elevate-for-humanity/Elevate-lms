@@ -173,7 +173,7 @@ export default function HostShopMediaCarousel({
                   />
                 ) : null,
               )}
-              {failedUrls.size === media.length ? (
+              {media.every((item) => failedUrls.has(item.url)) ? (
                 <p className="relative px-6 text-center text-sm text-white" role="status">
                   The shop photos could not load. Please use the shop website link below to view its
                   portfolio.

@@ -17,6 +17,15 @@ afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 const items = [{ url: '/first.webp', alt: 'First photo' }, { url: '/second.webp', alt: 'Second photo' }];
 
 describe('Host Shop mobile media loading', () => {
+  it('reports loading failures only for the current gallery after its items change', () => {
+    const { rerender } = render(<HostShopMediaCarousel shopName="Shop" items={[items[0]]} />);
+    fireEvent.error(screen.getByAltText('First photo'));
+    expect(screen.getByRole('status')).toHaveTextContent('could not load');
+    rerender(<HostShopMediaCarousel shopName="Shop" items={[items[1]]} />);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    fireEvent.error(screen.getByAltText('Second photo'));
+    expect(screen.getByRole('status')).toHaveTextContent('could not load');
+  });
   it('loads one offscreen compact photo and rotates when visible', () => {
     render(<HostShopMediaCarousel shopName="Test shop" compact items={items} />);
     expect(document.querySelectorAll('img')).toHaveLength(1);

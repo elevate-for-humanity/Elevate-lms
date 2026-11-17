@@ -32,14 +32,7 @@ export default async function DealsPage() {
 
   const { data: deals, error } = await db
     .from('crm_deals')
-    .select(
-      `
-      id, title, stage, value, probability,
-      expected_close_date, notes, created_at,
-      contact:contact_id ( id ),
-      assignee:assigned_to ( id )
-    `,
-    )
+    .select('id, title, stage, value, probability, expected_close_date, created_at')
     .order('created_at', { ascending: false });
 
   // Pipeline aggregates from real data

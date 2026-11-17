@@ -27,10 +27,10 @@ interface AnalyticsData {
     totalSent: number;
     totalOpens: number;
     totalClicks: number;
-    totalBounces: number;
+    totalBounces: number | null;
     openRate: number;
     clickRate: number;
-    bounceRate: number;
+    bounceRate: number | null;
   };
   campaigns: Array<{
     id: string;
@@ -60,19 +60,21 @@ export default function AnalyticsPage() {
 
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [data, setData] = useState<AnalyticsData | null>(null);
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
+    setError('');
     try {
       const response = await fetch(`/api/email/analytics?range=${timeRange}`);
       const result = await response.json();
-      if (result.success) {
-        setData(result.data);
-      }
-    } catch (error) {
-      /* Error handled silently */
-      // Error handled
+      if (!response.ok || !result.success)
+        throw new Error(result.error || 'Email analytics could not be loaded.');
+      setData(result.data);
+    } catch (err) {
+      setData(null);
+      setError(err instanceof Error ? err.message : 'Email analytics could not be loaded.');
     } finally {
       setLoading(false);
     }
@@ -113,7 +115,9 @@ export default function AnalyticsPage() {
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
-          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
+          <Image
+            placeholder="blur"
+            blurDataURL={IMAGE_LOADING_BLUR}
             src="/images/pages/admin-email-analytics-detail.webp"
             alt="Analytics"
             fill
@@ -163,7 +167,12 @@ export default function AnalyticsPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-black mx-auto mb-4" />
-          <p className="text-black">No analytics data available</p>
+          <p role="alert" className="text-black">
+            {error || 'No analytics data available'}
+          </p>
+          <button type="button" onClick={fetchAnalytics} className="mt-4 underline">
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -213,6 +222,11 @@ export default function AnalyticsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {data.campaigns.length === 0 && (
+            <p role="status" className="col-span-full text-slate-700">
+              No sent campaigns were recorded in this date range.
+            </p>
+          )}
           <StatCard
             title="Total Sent"
             value={data.overview.totalSent.toLocaleString()}
@@ -236,12 +250,14 @@ export default function AnalyticsPage() {
           />
           <StatCard
             title="Bounce Rate"
-            value={`${data.overview.bounceRate.toFixed(1)}%`}
+            value={
+              data.overview.bounceRate === null
+                ? 'Unavailable'
+                : `${data.overview.bounceRate.toFixed(1)}%`
+            }
             icon={AlertCircle}
             color="red"
-            trend={
-              data.overview.bounceRate < 2 ? 'up' : data.overview.bounceRate > 5 ? 'down' : null
-            }
+            trend={null}
           />
         </div>
 
@@ -279,10 +295,12 @@ export default function AnalyticsPage() {
               <AlertCircle className="w-5 h-5 text-brand-orange-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-2">
-              {data.overview.totalBounces.toLocaleString()}
+              {data.overview.totalBounces?.toLocaleString() ?? 'Unavailable'}
             </div>
             <div className="text-sm text-black">
-              {data.overview.bounceRate.toFixed(1)}% of emails sent
+              {data.overview.bounceRate === null
+                ? 'Bounce data is unavailable for tracked campaigns.'
+                : `${data.overview.bounceRate.toFixed(1)}% of emails sent`}
             </div>
           </div>
         </div>
@@ -306,7 +324,7 @@ export default function AnalyticsPage() {
                       <div
                         className="bg-brand-blue-600 h-2 rounded-full"
                         style={{
-                          width: `${(day.sent / Math.max(...data.timeline.map((d) => d.sent))) * 100}%`,
+                          width: `${(day.sent / Math.max(1, ...data.timeline.map((d) => d.sent))) * 100}%`,
                         }}
                       />
                     </div>
@@ -317,7 +335,7 @@ export default function AnalyticsPage() {
                       <div
                         className="bg-brand-green-600 h-2 rounded-full"
                         style={{
-                          width: `${(day.opens / Math.max(...data.timeline.map((d) => d.opens))) * 100}%`,
+                          width: `${(day.opens / Math.max(1, ...data.timeline.map((d) => d.opens))) * 100}%`,
                         }}
                       />
                     </div>
@@ -328,7 +346,7 @@ export default function AnalyticsPage() {
                       <div
                         className="bg-brand-blue-600 h-2 rounded-full"
                         style={{
-                          width: `${(day.clicks / Math.max(...data.timeline.map((d) => d.clicks))) * 100}%`,
+                          width: `${(day.clicks / Math.max(1, ...data.timeline.map((d) => d.clicks))) * 100}%`,
                         }}
                       />
                     </div>

@@ -12,23 +12,12 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
     const token = value.replace(/[.!?]+$/, '');
     return token.startsWith("'") && token.endsWith("'") ? token.slice(1, -1) : token.replace(/'$/, '');
   });
-  const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\  // Fold whitespace before tokenization; parenthesized digit groups exclude availability ranges.
-  const phones = supplied.flatMap(source => [...source.matchAll(/(?:\+\d+|\(\d+\)|\d+)(?:[ -]*(?:\(\d+\)|\d+)|\.(?=\d)\d+)*/g)].filter(match => {
-    const before = source[(match.index ?? 0) - 1] || '';
-    const after = source[(match.index ?? 0) + match[0].length] || '';
-    return !/[\p{L}\p{N}+(]/u.test(before) && !/[\p{L}\p{N})]/u.test(after);
-  }).map(match => fold(match[0])));
-  const copy = (value: unknown, limit: number, kind?: 'email' | 'phone' | 'address') => {
-    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
-    const cleaned = value.trim();
-    const matches = kind === 'email' ? emails.includes(cleaned) : kind === 'phone' ? phones.includes(fold(cleaned)) : supplied.some(source => source.includes(fold(cleaned)));
-    return matches ? cleaned : undefined;
-  };');
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const suppliedPhone = (value: unknown, limit: number) => {
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
     const cleaned = value.trim();
     const digits = cleaned.replace(/\D/g, '');
-    if (digits.length < 7 || digits.length > 15 || !/^\+?\s*[\d(). -]+$/.test(cleaned)) return undefined;
+    if (digits.length < 7 || digits.length > 15 || !/^\+?\s*[\d(). -]+$/.test(fold(cleaned))) return undefined;
     let depth = 0;
     for (const character of cleaned) {
       if (character === '(') depth += 1;
@@ -46,12 +35,25 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
         const after = source[end] || '';
         if (/[\p{L}\p{N}+.(\-]/u.test(before) || /[\p{L}\p{N})]/u.test(after)) continue;
         if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;
-        const leftSpaces = source.slice(0, start).match(/ +$/)?.[0].length ?? 0;
-        const previous = source[start - leftSpaces - 1] || '';
-        if (leftSpaces && /[+().\d-]/.test(previous)) continue;
-        const rightSpaces = source.slice(end).match(/^ +/)?.[0].length ?? 0;
-        const next = source[end + rightSpaces] || '';
-        if (rightSpaces && /[\d+]/.test(next)) continue;
+        const left = source.slice(0, start);
+        const leftGap = left.match(/\s+$/)?.[0] ?? '';
+        const previousText = left.slice(0, left.length - leftGap.length);
+        if (leftGap && /[+().\d-]$/.test(previousText)) {
+          const preceding = previousText.match(/[+\d(). \t-]+$/)?.[0] ?? '';
+          // A line separates complete numbers only when combining them would exceed the phone limit.
+          // Ambiguous short prefixes remain attached instead of authorizing a different recipient.
+          const previousDigits = preceding.replace(/\D/g, '').length;
+          if (!/[\r\n]/.test(leftGap) || previousDigits < 7 || previousDigits + digits.length <= 15) continue;
+        }
+        const right = source.slice(end);
+        const rightGap = right.match(/^\s+/)?.[0] ?? '';
+        const followingText = right.slice(rightGap.length);
+        const availability = /^\(\d{1,2}\s*[-–]\s*\d{1,2}\)/.test(followingText);
+        if (rightGap && /^[\d+(]/.test(followingText) && !availability) {
+          const following = followingText.match(/^[+\d(). \t-]+/)?.[0] ?? '';
+          const followingDigits = following.replace(/\D/g, '').length;
+          if (!/[\r\n]/.test(rightGap) || followingDigits < 7 || followingDigits + digits.length <= 15) continue;
+        }
         return cleaned;
       }
     }
@@ -99,6 +101,3 @@ export function footerContactDetails(config: TenantSiteConfig) {
     phoneHref: /^\+?[\d ().-]{3,80}$/.test(phone) && /\d{3}/.test(phone.replace(/\D/g, '')) ? `tel:${phone.replace(/[^+\d]/g, '')}` : null,
   };
 }
-
-
-

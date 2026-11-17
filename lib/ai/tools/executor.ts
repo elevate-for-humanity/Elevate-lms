@@ -443,7 +443,16 @@ export async function executeRegisteredAITool(
   if (authorization) headers.set('authorization', authorization);
   headers.set('x-elevate-ai-agent', context.agent);
   if (context.correlationId) headers.set('x-correlation-id', context.correlationId);
-  if (context.idempotencyKey) headers.set('idempotency-key', context.idempotencyKey);
+  if (context.idempotencyKey) {
+    // The Studio engineering route intentionally requires a UUID-shaped key.
+    // Internal orchestrator keys such as plan-<id>:s1 are stable but not UUIDs.
+    // Normalize only this owned tool's request identity; do not loosen route
+    // validation or mutate audit/correlation identities for other tools.
+    const {engineeringRequestKey} = await import('./engineering-request-key.mjs');
+    headers.set('idempotency-key', tool.name === 'studio.engineering.execute'
+      ? engineeringRequestKey(context.actorId, context.idempotencyKey)
+      : context.idempotencyKey);
+  }
 
   const attempts = Math.max(1, tool.retryAttempts);
   let lastError = '';

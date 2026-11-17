@@ -40,7 +40,9 @@ export async function dispatchAcceptance(env=process.env,request=fetch) {
 }
 export async function verifyAcceptance(env=process.env,request=fetch,delay=ms=>new Promise(resolve=>setTimeout(resolve,ms))) {
   const {component,sha,runId,token}=identity(env);
-  for(let attempt=0;attempt<36;attempt++) {
+  // GitHub can queue the final source-release confirmation after the LMS is live.
+  // Bound the wait to 20 minutes; never accept an incomplete/failed source run.
+  for(let attempt=0;attempt<240;attempt++) {
     const source=await api('actions/runs/'+runId,token,request);
     if(source.head_sha!==sha || source.head_branch!=='main' || source.event!=='workflow_dispatch' || source.path?.split('@')[0]!=='.github/workflows/'+targets[component][1])throw Error('ACCEPTANCE_DEPLOYMENT_SOURCE_MISMATCH');
     if(source.status==='completed') {

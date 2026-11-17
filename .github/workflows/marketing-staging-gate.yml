@@ -1,6 +1,8 @@
 name: Marketing Staging Gate
 
 on:
+  push:
+    branches: ['fix/layout-media-validation-20261117']
   pull_request:
     branches: [main]
   workflow_dispatch:

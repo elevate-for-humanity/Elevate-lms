@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const compile=(s,dep,returns)=>new Function('d',`const {${Object.keys(dep).join(',')}}=d;`+stripTypeScriptTypes(s).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+`;return ${returns};`)(dep);
+const suppliedWebsiteContact=compile(await read('lib/tenant/footer-contact.ts'),{},'suppliedWebsiteContact');
 const validateFooterContactFields=compile(await read('lib/tenant/footer-contact.ts'),{},'validateFooterContactFields');
 const validateHeroBackdropFields=compile(await read('lib/tenant/site-validation.ts'),{},'validateHeroBackdropFields');
 const resolveSiteLinkGroups=compile(await read('lib/tenant/site-navigation.ts'),{},'resolveSiteLinkGroups');
@@ -23,7 +24,7 @@ function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allo
   getWebsiteBuilderAccess:async()=>access,buildDefaultSiteConfig:()=>config,ensureComposableSiteConfig:realNormalization?composition.ensureComposableSiteConfig:x=>x,sanitizePages:realNormalization?composition.sanitizePages:x=>x,
   buildLicensedAssetProjectPolicy:()=>({}),NextResponse:{json:(body,options={})=>({body,status:options.status||200})},
   applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(generated)}),
-  validateHeroBackdropFields,validateFooterContactFields,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
+  validateHeroBackdropFields,validateFooterContactFields,suppliedWebsiteContact,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
   missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:realNormalization?realDesign.readWebsiteDesign:x=>x,interviewWebsiteDesign:realNormalization?realDesign.interviewWebsiteDesign:x=>x,applyWebsiteDesign:realNormalization?realDesign.applyWebsiteDesign:x=>x,websiteCatalog:realNormalization?realDesign.websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
  return {calls,post:compile(sources[mode],deps,'POST')};
 }
@@ -92,4 +93,22 @@ for(const mode of ['generate','import']) test(mode+' validates and persists the 
  const f=fixture(mode,{generated:good,realNormalization:true});
  assert.equal((await f.post(request({siteConfig:good}))).status,201);
  assert.equal(f.calls[0].args.p_site_config.footer.showContactDetails,true);
+});
+
+
+for(const briefMode of [true,false]) test('generation persists only supplied contact values through real transformations: brief='+briefMode, async()=>{
+ const contact={email:'public@example.test',phone:'+1 (555) 123-4567',address:'123 Example Road',hours:['Monday 9–5']};
+ const generated={...config,footer:{showContactDetails:true},contact};
+ const f=fixture('generate',{generated,realNormalization:true});
+ const supplied=Object.values(contact).flat().join(' | ');
+ const body=briefMode?{brief:'Owner requests a contact footer. Publish these contact values: '+supplied}:{brief:undefined,answers:{businessName:'Example',contacts:supplied}};
+ const response=await f.post(request(body));assert.equal(response.status,201,JSON.stringify(response.body));
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ assert.equal(f.calls[0].args.p_site_config.footer.showContactDetails,true);
+});
+test('generation omits fabricated, malformed, account-only and oversized contact data',async()=>{
+ for(const contact of [null,[],{email:'owner@example.test',phone:123,address:{text:'123 Road'},hours:['Unprovided hours']},{email:'x'.repeat(181),hours:'Monday'}]) {
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request())).status,201);assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
 });

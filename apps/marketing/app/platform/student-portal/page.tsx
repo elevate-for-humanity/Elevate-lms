@@ -65,7 +65,7 @@ const DASHBOARD_SECTIONS = [
   { name: 'Grades', description: 'View your grades and academic progress', href: 'https://app.elevateforhumanity.org/lms/grades' },
   { name: 'Certificates', description: 'Download your earned certificates', href: 'https://app.elevateforhumanity.org/lms/certificates' },
   { name: 'Calendar', description: 'See upcoming deadlines and events', href: 'https://app.elevateforhumanity.org/lms/calendar' },
-  { name: 'AI Tutor', description: 'Get help with your coursework', href: 'https://app.elevateforhumanity.org/lms/ai-tutor' },
+  { name: 'AI Tutor', description: 'Get help with your coursework', href: 'https://app.elevateforhumanity.org/lms/ai-team' },
 ];
 
 export default function StudentPortalPage() {

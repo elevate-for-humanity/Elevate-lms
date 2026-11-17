@@ -235,6 +235,7 @@ export function SectionEditor({
                       const next = [draft.answers.practice3, record].filter(Boolean).join('\n\n');
                       if (next.length > 6000) return false;
                       edit({ answers: { ...draft.answers, practice3: next }, reviewed: false });
+                      onReviewSaved?.(section.id, false);
                       return save();
                     }}
                   />

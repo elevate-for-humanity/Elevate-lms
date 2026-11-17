@@ -8,6 +8,19 @@ import {
 } from '@/lib/lms/bookkeeping-workbook-contract';
 import { bookkeepingWorkedExample } from '@/lib/lms/bookkeeping-workbook-guidance';
 import { loadLessonWorkbook } from '@/lib/lms/lesson-workbook';
+import { BUSINESS_RETAIL_WORKBOOK_SLUG } from '@/lib/lms/business-retail-workbook.mjs';
+
+vi.mock('@/components/lms/BusinessRetailWorkbookLab', () => ({
+  default: ({ onRecord }: { onRecord: (record: string) => Promise<boolean> }) => (
+    <button
+      onClick={() => {
+        void onRecord('New business lab evidence.');
+      }}
+    >
+      Record lab practice
+    </button>
+  ),
+}));
 
 afterEach(() => {
   cleanup();
@@ -119,6 +132,34 @@ it('recommends a computer for spreadsheet files while preserving phone study and
     'href',
     `/workbooks/${BOOKKEEPING_WORKBOOK_SLUG}`,
   );
+});
+
+it('clears a saved chapter review when a learner records new lab evidence', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ section_id: 'section-1', version: 2 }), { status: 200 }),
+      ),
+  );
+  render(
+    <DigitalWorkbook
+      workbook={{ ...workbook, slug: BUSINESS_RETAIL_WORKBOOK_SLUG }}
+      sections={sections}
+      responses={[
+        { section_id: 'section-1', answers, reviewed: true, version: 1, updated_at: 'now' },
+      ]}
+      accountId="learner"
+      readOnly={false}
+    />,
+  );
+  expect(screen.getByRole('button', { name: 'Next chapter', exact: true })).toBeEnabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Record lab practice' }));
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'Next chapter', exact: true })).toBeDisabled(),
+  );
+  expect(screen.getByText(/0 reviewed/)).toBeVisible();
 });
 
 it('separates the worked example from the task while preserving every amount and instruction', () => {

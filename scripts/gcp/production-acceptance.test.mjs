@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {dispatchAcceptance,verifyAcceptance} from './production-acceptance.mjs';
 const env={GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',ACCEPTANCE_COMPONENT:'admin',ACCEPTANCE_SHA:'a'.repeat(40),ACCEPTANCE_RUN_ID:'123',GH_TOKEN:'private-token'};
 const health={service:'admin',commit:env.ACCEPTANCE_SHA,ready:true,healthy:true,dependencies:{supabase:{ok:true}},revision:'verified-revision'};
@@ -129,6 +130,20 @@ test('Host Shop blocks unverified manual dispatch and runs cleanup only after fi
  assert.ok(workflow.includes("if: " + "$" + "{{ github.event_name == 'workflow_dispatch' }}"));
  assert.match(workflow,/name: Provision two disposable approved Host Shop identities and match requests\n\s+id: provision/);
  assert.ok(workflow.includes("steps.provision.outcome == 'success' || steps.provision.outcome == 'failure'"));
+});
+
+test('Host Shop cancellation cleans partial fixtures but skips cleanup before provisioning starts',()=>{
+ const workflow=readFileSync(new URL('../../.github/workflows/host-shop-cross-shop-acceptance.yml',import.meta.url),'utf8');
+ const step=workflow.split('      - name: Remove disposable match requests, shops, placements, and QA users\n')[1]?.split('\n      - name:')[0];
+ assert.ok(step,'fixture cleanup step must exist');
+ const expression=step.match(/if:\s*\$\{\{\s*(.*?)\s*\}\}/)?.[1];
+ assert.ok(expression,'fixture cleanup must have an explicit condition');
+ assert.match(expression,/\balways\(\)/,'cancellation must not apply the implicit success gate');
+ assert.match(step,/run: node scripts\/qa\/host-shop-cross-shop-acceptance\.mjs cleanup/);
+ for(const [outcome,expected] of [['success',true],['failure',true],['cancelled',true],['skipped',false],['',false]]){
+  const selected=runInNewContext(expression,{always:()=>true,steps:{provision:{outcome}}},{timeout:100});
+  assert.equal(selected,expected,`cleanup scheduling after provisioning outcome ${JSON.stringify(outcome)}`);
+ }
 });
 
 test('other services cannot start Store payment validation',async()=>{

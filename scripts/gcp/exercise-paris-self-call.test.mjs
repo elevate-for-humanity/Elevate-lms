@@ -5,8 +5,8 @@ import {exerciseSelfCall,greetingMatch,summarizeSpeech,heardMenuDigits,recogniti
 const account='AC75bcca01e19767614252902185ed948f',number='+14632401404',sid='CA'+'a'.repeat(32),trunk='TK'+'b'.repeat(32),recording='RE'+'c'.repeat(32);
 const greeting='Thank you for calling Elevate for Humanity. I am Paris your virtual assistant. How can I help you with your career training today?';
 const bindings={TWILIO_ACCOUNT_SID:account,TWILIO_PHONE_NUMBER:number,TWILIO_AUTH_TOKEN:'private-test-token'};
-function fixture({active=false,secure=true,createError=false,callStatus='completed',absent=false}={}){
- const requests=[];const wav=Buffer.alloc(44);wav.write('RIFF',0);wav.write('WAVE',8);
+function fixture({active=false,secure=true,createError=false,callStatus='completed',absent=false,recordingDuration=30,mediaBytes=44,completeAfter=0}={}){
+ const requests=[];let polls=0;const wav=Buffer.alloc(mediaBytes);wav.write('RIFF',0);wav.write('WAVE',8);
  const request=async(url,options={})=>{
   url=String(url);requests.push({url,options});
   if(url.includes('/IncomingPhoneNumbers.json'))return Response.json({incoming_phone_numbers:[{account_sid:account,phone_number:number,trunk_sid:trunk}]});
@@ -14,8 +14,8 @@ function fixture({active=false,secure=true,createError=false,callStatus='complet
   if(url.endsWith('/Trunks/'+trunk))return Response.json({account_sid:account,domain_name:'elevate-4632401404.pstn.twilio.com',secure});
   if(url.includes('/Calls.json?'))return Response.json({calls:active?[{}]:[]});
   if(url.endsWith('/Calls.json')){if(createError)throw Error('network failed');return Response.json({sid,account_sid:account,to:number,from:number,status:'queued'});}
-  if(url.endsWith('/Calls/'+sid+'.json'))return Response.json({sid,status:options.method==='POST'?'completed':callStatus,duration:'31'});
-  if(url.includes('/Calls/'+sid+'/Recordings.json'))return Response.json({recordings:[{sid:recording,account_sid:account,call_sid:sid,status:absent?'absent':'completed',duration:absent?'-1':'30',error_code:absent?16101:null}]});
+  if(url.endsWith('/Calls/'+sid+'.json'))return Response.json({sid,status:options.method==='POST'?'completed':polls++>=completeAfter?callStatus:'in-progress',duration:'31'});
+  if(url.includes('/Calls/'+sid+'/Recordings.json'))return Response.json({recordings:[{sid:recording,account_sid:account,call_sid:sid,status:absent?'absent':'completed',duration:absent?'-1':String(recordingDuration),error_code:absent?16101:null}]});
   if(url.endsWith('/Recordings/'+recording+'.wav'))return new Response(wav);
   throw Error('Unexpected request');
  };
@@ -74,6 +74,19 @@ test('menu-only self-call waits for the full opening without dialing staff or cl
  assert.equal(result.operatorTransferAcceptance,'NOT_TESTED');
  assert.equal(result.voicemailDeliveryAcceptance,'NOT_TESTED');
 });
+test('conversation waits for a long opening and keeps polling, recording and media limits consistent',async()=>{
+ const f=fixture({recordingDuration:104,mediaBytes:3360044,completeAfter:54});
+ const result=await exerciseSelfCall(bindings,{...options(f),expectConversation:true,transcribe:async()=>({segments:[{channel:1,text:greeting+' Audio test complete.',lateWords:['Audio','test','complete']}]})});
+ const creates=f.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');assert.equal(creates.length,1);
+ const params=new URLSearchParams(creates[0].options.body);
+ assert.equal(params.get('TimeLimit'),'105');
+ assert.match(params.get('Twiml'),/<Pause length="74"\/><Say>For this phone check, please say audio test complete[.]<\/Say>/);
+ assert.equal(result.liveGreetingAcceptance,'PASS');assert.equal(result.liveConversationAcceptance,'PASS');
+ const tooLong=fixture({recordingDuration:106});
+ await assert.rejects(exerciseSelfCall(bindings,{...options(tooLong),expectConversation:true}),/RECORDING_UNAVAILABLE/);
+ const tooLarge=fixture({mediaBytes:3600001});
+ await assert.rejects(exerciseSelfCall(bindings,{...options(tooLarge),expectConversation:true}),/AUDIO_INVALID/);
+});
 test('menu self-call refuses missing, duplicate or injected options before placing a call',async()=>{
  for(const expectedMenuDigits of [[],['5','5'],['SIP/attacker']]){
   const f=fixture();await assert.rejects(exerciseSelfCall(bindings,{...options(f),menuTest:true,expectedMenuDigits}),/MENU_INVALID/);
@@ -83,7 +96,7 @@ test('menu self-call refuses missing, duplicate or injected options before placi
 test('places exactly one bounded self-call and verifies only received greeting audio',async()=>{
  const f=fixture();const result=await exerciseSelfCall(bindings,options(f));assert.equal(result.liveGreetingAcceptance,'PASS');
  const creates=f.requests.filter(r=>r.url.endsWith('/Calls.json')&&r.options.method==='POST');assert.equal(creates.length,1);
- const params=new URLSearchParams(creates[0].options.body);assert.equal(params.get('To'),number);assert.equal(params.get('From'),number);assert.equal(params.get('TimeLimit'),'45');assert.equal(params.get('RecordingTrack'),'both');assert.equal(params.get('RecordingChannels'),'dual');assert.ok(!params.get('Twiml').includes('operator'));
+ const params=new URLSearchParams(creates[0].options.body);assert.equal(params.get('To'),number);assert.equal(params.get('From'),number);assert.equal(params.get('TimeLimit'),'80');assert.ok(params.get('Twiml').includes('Pause length="74"'));assert.equal(params.get('RecordingTrack'),'both');assert.equal(params.get('RecordingChannels'),'dual');assert.ok(!params.get('Twiml').includes('operator'));
  assert.equal(result.operatorTransferAcceptance,'NOT_TESTED');assert.equal(result.voicemailDeliveryAcceptance,'NOT_TESTED');assert.ok(!JSON.stringify(result).includes('private-test-token'));
 });
 for(const change of [{TWILIO_PHONE_NUMBER:'+15550000000'},{TWILIO_ACCOUNT_SID:'AC'+'d'.repeat(32)}])test('rejects unverified self-call identity '+Object.keys(change)[0],async()=>{
@@ -122,6 +135,19 @@ test('operator marker must be heard from the greeting channel, not the caller or
  assert.equal(summarizeSpeech(greeting,heard).operatorMarkerMatched,false);
  heard.segments.push({channel:1,text:'Operator audio test confirmed',lateWords:['Operator','audio','test','confirmed']});
  assert.equal(summarizeSpeech(greeting,heard).operatorMarkerMatched,true);
+});
+test('operator transfer accepts an intentionally interrupted greeting without certifying the full script',async()=>{
+ const longGreeting=greeting+' Our training center offers several career pathways. Listen to every option to find your department. For barber and beauty training press one. For healthcare training press two. For building trades training press three. For administration press zero. You may also speak with Paris about enrollment and funding options.';
+ const prefix=longGreeting.split(/\s+/).slice(0,20).join(' ');
+ const recognition={segments:[{channel:1,text:prefix,lateWords:[]},{channel:1,text:'Operator audio test confirmed',lateWords:['Operator','audio','test','confirmed']},{channel:2,text:'Incoming operator audio test. This is a controlled system check.',lateWords:['Incoming','operator','audio','test']}]};
+ const f=fixture();const result=await exerciseSelfCall(bindings,{...options(f),expectedGreeting:longGreeting,operatorTest:true,transcribe:async()=>recognition});
+ assert.equal(result.liveGreetingAcceptance,'FAIL','a partial opening is never full-script acceptance');
+ assert.equal(result.operatorGreetingAcceptance,'PASS');
+ assert.equal(result.operatorTransferAcceptance,'PASS');
+ const mixed={segments:[recognition.segments[0],recognition.segments[2]]};
+ assert.equal(summarizeSpeech(longGreeting,mixed).operatorMarkerMatched,false,'caller marker cannot certify received operator audio');
+ const fallback={segments:[{channel:1,text:'Thank you for calling Elevate for Humanity. Please leave a message after the beep.',lateWords:['Operator','audio','test','confirmed']}]};
+ assert.equal(summarizeSpeech(longGreeting,fallback).operatorMarkerMatched,false,'fallback greeting cannot identify the PARIS channel');
 });
 test('operator and voicemail scenarios stay bounded to the business DID and do not accept mixed scenarios',async()=>{
  const f=fixture();await exerciseSelfCall(bindings,{...options(f),operatorTest:true});

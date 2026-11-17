@@ -5,6 +5,7 @@ Never dial, deliver a message, change routing, or emit credentials/caller data.
 Run on the existing PBX via the protected deployment identity.
 """
 import base64
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
@@ -13,6 +14,7 @@ import struct
 import subprocess
 import urllib.error
 import urllib.request
+from zoneinfo import ZoneInfo
 
 SYSTEM = '341f59a3-b1d6-4360-8463-0ce0402f86fe'
 DATABASE = 'https://cuxzzpsyufcewtmicszk.supabase.co'
@@ -80,6 +82,49 @@ def compare_configuration(system, extensions, turn, gateway, menu=None):
         'voicemailEnabledInDashboard': system.get('voicemail_enabled') is True,
         'transcriptionEnabledInDashboard': system.get('voicemail_transcription_enabled') is True,
     }
+
+
+def extension_inventory(row, plan, time_zone, observed_at):
+    """Report saved policy separately from actual receiving-device acceptance."""
+    enabled = row.get('enabled') is True
+    mode = row.get('ring_mode')
+    if mode not in {'ring', 'vibrate', 'silent', 'do_not_disturb', 'offline'}:
+        mode = 'unverified'
+    source = row.get('availability_source')
+    if source not in {'manual', 'schedule'}:
+        source = 'unverified'
+    schedule = {}
+    for day, window in (row.get('availability_schedule') or {}).items() if isinstance(row.get('availability_schedule'), dict) else []:
+        if day in {'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'} and isinstance(window, list) and len(window) == 2 and all(isinstance(value, str) and re.fullmatch(r'(?:[01][0-9]|2[0-3]):[0-5][0-9]', value) for value in window) and window[0] < window[1]:
+            schedule[day] = window
+    within_schedule = None
+    if source == 'schedule':
+        try:
+            local = observed_at.astimezone(ZoneInfo(time_zone))
+            day = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][local.weekday()]
+            window = schedule.get(day)
+            within_schedule = bool(window and window[0] <= local.strftime('%H:%M') < window[1])
+        except (ValueError, TypeError, KeyError):
+            pass
+    policy = 'RING_ALLOWED_BY_POLICY'
+    if not enabled:
+        policy = 'DISABLED'
+    elif mode in {'offline', 'do_not_disturb'}:
+        policy = mode.upper()
+    elif source == 'unverified' or mode == 'unverified' or (source == 'schedule' and within_schedule is None):
+        policy = 'UNVERIFIED_POLICY'
+    elif source == 'schedule' and not within_schedule:
+        policy = 'OUTSIDE_SCHEDULE'
+    elif mode in {'silent', 'vibrate'}:
+        policy = mode.upper() + '_ALERT'
+    extension = row['extension']
+    return {'extension': extension, 'enabled': enabled,
+            'generatedRoutePresent': bool(re.search(r"^\s*'" + extension + r"'\s*=>\s*1\.", plan, re.M)),
+            'savedVoicemailGreetingPresent': bool(row.get('voicemail_greeting')),
+            'ringMode': mode, 'availabilitySource': source, 'availabilitySchedule': schedule,
+            'withinSchedule': within_schedule, 'ringPolicy': policy,
+            'liveRinging': 'NOT_TESTED', 'twoWayAudio': 'NOT_TESTED',
+            'originalCallerNumber': 'NOT_TESTED', 'voicemailDelivery': 'NOT_TESTED'}
 
 
 def mulaw_payload(wav):
@@ -173,10 +218,10 @@ def main():
         return base64.b64decode(body['payload']['data']).decode().strip()
     key = secret(config.get('SUPABASE_SERVICE_ROLE_KEY_SECRET', ''))
     headers = {'apikey': key, 'Authorization': 'Bearer ' + key}
-    status, systems = request(DATABASE + '/rest/v1/phone_systems?select=status,greeting,ai_instructions,ai_enabled,ai_voice,voicemail_enabled,voicemail_transcription_enabled&id=eq.' + SYSTEM, headers)
+    status, systems = request(DATABASE + '/rest/v1/phone_systems?select=status,timezone,greeting,ai_instructions,ai_enabled,ai_voice,voicemail_enabled,voicemail_transcription_enabled&id=eq.' + SYSTEM, headers)
     if status != 200 or len(systems) != 1:
         raise ValueError('phone_system_unverified')
-    status, extensions = request(DATABASE + '/rest/v1/communication_extensions?select=extension,destination_id,webrtc_provider,voicemail_greeting,communication_workspaces!inner(phone_system_id)&enabled=eq.true&communication_workspaces.phone_system_id=eq.' + SYSTEM, headers)
+    status, extensions = request(DATABASE + '/rest/v1/communication_extensions?select=extension,enabled,ring_mode,availability_source,availability_schedule,destination_id,webrtc_provider,voicemail_greeting,communication_workspaces!inner(phone_system_id)&communication_workspaces.phone_system_id=eq.' + SYSTEM, headers)
     if status != 200 or not extensions or any(not re.fullmatch(r'0|[1-9][0-9]{2}', row['extension']) for row in extensions):
         raise ValueError('phone_extensions_unverified')
     turn = process_environment('elevate-paris-turn.service')
@@ -184,17 +229,20 @@ def main():
     status, menu = request(DATABASE + '/rest/v1/phone_menu_options?select=digit,label,destination_id&enabled=eq.true&order=position.asc,digit.asc&phone_system_id=eq.' + SYSTEM, headers)
     if status != 200 or not isinstance(menu, list):
         raise ValueError('phone_menu_unverified')
-    comparison = compare_configuration(systems[0], extensions, turn, gateway, menu)
+    enabled_extensions = [row for row in extensions if row.get('enabled') is True]
+    comparison = compare_configuration(systems[0], enabled_extensions, turn, gateway, menu)
     cli = lambda value: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', value])
     routes = []
-    for row in extensions:
+    observed_at = datetime.now(timezone.utc)
+    for row in sorted(extensions, key=lambda value: int(value['extension'])):
         extension = row['extension']
         context = 'elevate-pwa-extensions' if extension == '0' else 'elevate-paris-directory'
         plan = cli('dialplan show ' + extension + '@' + context)
-        routes.append({'extension': extension, 'generatedRoutePresent': bool(re.search(r"^\s*'" + extension + r"'\s*=>\s*1\.", plan, re.M)),
-                       'savedVoicemailGreetingPresent': bool(row.get('voicemail_greeting'))})
+        routes.append(extension_inventory(row, plan, systems[0].get('timezone'), observed_at))
     report = {'configuration': comparison, 'extensions': routes,
-              'enabledExtensionCount': len(extensions), 'callsPlaced': 0, 'messagesDelivered': 0,
+              'extensionCount': len(extensions), 'enabledExtensionCount': len(enabled_extensions),
+              'observedAt': observed_at.isoformat(), 'fullExtensionAcceptance': 'NOT_VERIFIED',
+              'callsPlaced': 0, 'messagesDelivered': 0,
               'liveCallAcceptance': 'NOT_TESTED', 'configurationChanged': False,
               'provisionerSourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/provisioner/server.mjs').read_bytes()).hexdigest(),
               'turnSourceSha256': __import__('hashlib').sha256(Path('/opt/elevate-pbx/paris/turn-adapter.mjs').read_bytes()).hexdigest(),
@@ -205,7 +253,7 @@ def main():
     token=secret(paris.get('PARIS_TURN_TOKEN_SECRET', ''))
     report['speech'] = voice_probe(token, identity['access_token'], menu=menu)
     report['privateGatewayGreeting']=private_gateway_probe(token)
-    report['result'] = 'PASS' if report['privateGatewayGreeting'].get('audioReturned') is True and all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'spokenMenuDigitsVerified', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
+    report['result'] = 'PASS' if enabled_extensions and report['privateGatewayGreeting'].get('audioReturned') is True and all(comparison.values()) and all(row['generatedRoutePresent'] for row in routes if row['enabled']) and all(report['speech'].get(k) is True for k in ['greetingAudioReturned', 'spokenMenuDigitsVerified', 'operatorSpeechRouteVerified', 'operatorReplyAudioReturned']) else 'FAIL'
     return report
 
 

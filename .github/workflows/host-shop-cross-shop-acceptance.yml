@@ -8,11 +8,11 @@ on:
     inputs:
       deployed_sha:
         description: Exact main LMS commit from a successful release handoff
-        required: false
+        required: true
         type: string
       deployment_run_id:
         description: Trusted source LMS deployment workflow run ID
-        required: false
+        required: true
         type: string
   workflow_run:
     workflows: ['Deploy LMS automatically on Google']
@@ -65,7 +65,7 @@ jobs:
           esac
           test "${PLAYWRIGHT_LMS_URL}" = "https://lms.elevateforhumanity.org"
       - name: Verify source release completed before dispatched security acceptance
-        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.deployed_sha != '' || inputs.deployment_run_id != '') }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -104,6 +104,7 @@ jobs:
           pnpm install --frozen-lockfile --strict-peer-dependencies=false --ignore-scripts
           pnpm exec playwright install chromium webkit --with-deps
       - name: Provision two disposable approved Host Shop identities and match requests
+        id: provision
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs provision
       - name: Certify authenticated roster and cross-shop API isolation
         run: >-
@@ -125,7 +126,9 @@ jobs:
             console.log("Authenticated isolation validated on exact serving SHA:",j.commit);
           '
       - name: Remove disposable match requests, shops, placements, and QA users
-        if: always()
+        # A pre-provision failure has no fixtures; avoid masking the original error
+        # with an import failure when pnpm install never ran. Clean partial provisioning.
+        if: ${{ always() && (steps.provision.outcome == 'success' || steps.provision.outcome == 'failure') }}
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs cleanup
       - name: Upload redacted Playwright failure evidence
         if: failure()

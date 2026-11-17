@@ -6,6 +6,8 @@ import { requireRole, type AuthResult } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { businessHoursFromForm, normalizeUsPhone, validMenuDigit, validPhoneExtension } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
+import { scopePhoneProfileQuery } from '@/lib/phone/profile-scope';
+import { findPhoneWorkspace } from '@/lib/phone/workspace';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import {hydrateProcessEnv} from '@/lib/secrets';
 
@@ -62,21 +64,8 @@ async function requireSystemId() {
 async function requireWorkspace() {
   const { db, tenantId, platformAdmin } = await requirePhoneContext();
   const { id: phoneSystemId } = await requireSystemId();
-  let query = db.from('communication_workspaces').select('*').limit(1);
-  query = tenantId ? query.eq('tenant_id', tenantId) : query.is('tenant_id', null);
-  const { data: tenantWorkspace, error } = await query.maybeSingle();
-  if (error) throw new Error(error.message);
-  if (tenantWorkspace) return { db, workspace: tenantWorkspace };
-  if (platformAdmin && tenantId) {
-    const { data: platformWorkspace, error: platformError } = await db
-      .from('communication_workspaces')
-      .select('*')
-      .eq('phone_system_id', phoneSystemId)
-      .limit(1)
-      .maybeSingle();
-    if (platformError) throw new Error(platformError.message);
-    if (platformWorkspace) return { db, workspace: platformWorkspace };
-  }
+  const existingWorkspace = await findPhoneWorkspace(db, tenantId, platformAdmin, phoneSystemId);
+  if (existingWorkspace) return { db, workspace: existingWorkspace };
   const readiness = liveKitReadiness();
   const { data, error: createError } = await db
     .from('communication_workspaces')
@@ -427,14 +416,21 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
   if (extension && !validPhoneExtension(extension)) {
     throw new Error('Use 0 for the operator or a 2 to 6 digit extension.');
   }
-  if (profileId) {
-    const { data: profile } = await db
-      .from('profiles')
-      .select('id,role')
-      .eq('id', profileId)
+  const { data: number, error: numberError } = await db.from('phone_numbers')
+    .select('assigned_profile_id').eq('id', phoneNumberId).eq('phone_system_id', id).single();
+  if (numberError || !number) throw new Error('Select a valid phone number.');
+  // Retain an existing assignee even when no longer present in the directory.
+  // A changed assignee must belong to the number's phone-system organization.
+  if (profileId && profileId !== number.assigned_profile_id) {
+    const { data: system, error: systemError } = await db.from('phone_systems')
+      .select('tenant_id').eq('id', id).single();
+    if (systemError || !system) throw new Error('Unable to load phone system.');
+    const { data: profile, error: profileError } = await scopePhoneProfileQuery(
+      db.from('profiles').select('id,role'), system.tenant_id ?? null,
+    ).eq('id', profileId)
       .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
       .maybeSingle();
-    if (!profile) throw new Error('Select a valid staff or Program Holder account.');
+    if (profileError || !profile) throw new Error('Select a valid team member in this phone system.');
   }
   const { error } = await db
     .from('phone_numbers')

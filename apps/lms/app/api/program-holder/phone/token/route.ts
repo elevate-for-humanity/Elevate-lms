@@ -2,7 +2,11 @@
 import { NextResponse } from 'next/server';
 import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { provisionAsteriskDevice, asteriskDeviceId } from '@/lib/phone/asterisk';
+import {
+  provisionAsteriskDevice,
+  asteriskDeviceId,
+  phoneConnectionFailure,
+} from '@/lib/phone/asterisk';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,7 +44,10 @@ export async function POST(request: Request) {
   // Do not change existing extension ownership or telephone routing here.
   if (extension.webrtc_provider !== 'asterisk') {
     return NextResponse.json(
-      { error: 'This extension is still assigned to the retired phone provider. An administrator must migrate this extension to Elevate Phone before device registration.' },
+      {
+        error:
+          'This extension is still assigned to the retired phone provider. An administrator must migrate this extension to Elevate Phone before device registration.',
+      },
       { status: 409 },
     );
   }
@@ -73,9 +80,9 @@ export async function POST(request: Request) {
       { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
     );
   } catch (cause) {
-    return NextResponse.json(
-      { error: 'The phone device could not connect. Please retry or contact the administrator.' },
-      { status: 502 },
-    );
+    return NextResponse.json(phoneConnectionFailure(cause), {
+      status: 502,
+      headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' },
+    });
   }
 }

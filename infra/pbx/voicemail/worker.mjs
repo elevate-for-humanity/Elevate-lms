@@ -1,12 +1,10 @@
 import {readFile,writeFile,mkdir,readdir,stat,realpath} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
 const SYSTEM=process.env.PBX_PHONE_SYSTEM_ID;
-if(!/^[0-9a-f-]{36}$/i.test(SYSTEM||''))throw Error('VOICEMAIL_SYSTEM_UNCONFIGURED');
 const SECRET=process.env.PBX_PROVISIONING_TOKEN_SECRET;
-if(!/^projects\/(elegant-racer-299721|484736877039)\/secrets\/[A-Za-z0-9_-]+\/versions\/([0-9]+|latest)$/.test(SECRET||''))throw Error('VOICEMAIL_SECRET_UNCONFIGURED');
 const ledger='/var/lib/elevate-pbx/voicemail';
-await mkdir(ledger,{recursive:true,mode:0o700});
 async function token(){
  const metadata=await fetch('http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token',{headers:{'Metadata-Flavor':'Google'},signal:AbortSignal.timeout(5000),redirect:'error'});
  if(!metadata.ok)throw Error('VOICEMAIL_IDENTITY_UNAVAILABLE');
@@ -21,13 +19,19 @@ function messageIdentity(extension,metadata){
  const hash=createHash('sha256').update(SYSTEM+':'+extension+':'+metadata.origtime+':'+metadata.callerchan).digest('hex').slice(0,32);
  return hash.slice(0,8)+'-'+hash.slice(8,12)+'-5'+hash.slice(13,16)+'-a'+hash.slice(17,20)+'-'+hash.slice(20);
 }
-function caller(value){
- const selected=String(value||'').match(/<([^>]+)>/)?.[1]||'unknown';
- const digits=selected.replace(/[^0-9]/g,'');
- if(digits.length===10)return '+1'+digits;
- if(digits.length===11&&digits[0]==='1')return '+'+digits;
- if(digits.length<=3&&digits.length)return digits;
- if(/^[+][1-9][0-9]{7,14}$/.test(selected))return selected;
+export function caller(value){
+ const input=String(value||'').trim();
+ // Asterisk metadata may contain a display name with <number> or only the
+ // number. Do not recover digits from an ambiguous or malformed identifier.
+ const bracket=/^[^<>\r\n]*<([^<>\r\n]+)>$/.exec(input);
+ const selected=(bracket?bracket[1]:input).trim();
+ if(/^[0-9]{1,3}$/.test(selected))return selected;
+ // Preserve conventional phone formatting without stripping arbitrary text.
+ if(!/^[+]?(?:[0-9]+[ .-]?)?(?:\([0-9]{2,4}\)[ .-]?)?[0-9]+(?:[ .-][0-9]+)*$/.test(selected))return 'unknown';
+ const number=selected.replace(/[ ().-]/g,'');
+ if(/^[0-9]{10}$/.test(number))return '+1'+number;
+ if(/^1[0-9]{10}$/.test(number))return '+'+number;
+ if(/^[+][1-9][0-9]{7,14}$/.test(number))return number;
  return 'unknown';
 }
 async function scan(){
@@ -65,4 +69,10 @@ async function scan(){
   }
  }
 }
-for(;;){try{await scan();}catch{process.stderr.write('OWNED_VOICEMAIL_SCAN_REQUIRES_RETRY'+String.fromCharCode(10));}await new Promise(resolve=>setTimeout(resolve,15000));}
+export async function runWorker(){
+ if(!/^[0-9a-f-]{36}$/i.test(SYSTEM||''))throw Error('VOICEMAIL_SYSTEM_UNCONFIGURED');
+ if(!/^projects\/(elegant-racer-299721|484736877039)\/secrets\/[A-Za-z0-9_-]+\/versions\/([0-9]+|latest)$/.test(SECRET||''))throw Error('VOICEMAIL_SECRET_UNCONFIGURED');
+ await mkdir(ledger,{recursive:true,mode:0o700});
+ for(;;){try{await scan();}catch{process.stderr.write('OWNED_VOICEMAIL_SCAN_REQUIRES_RETRY'+String.fromCharCode(10));}await new Promise(resolve=>setTimeout(resolve,15000));}
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await runWorker();

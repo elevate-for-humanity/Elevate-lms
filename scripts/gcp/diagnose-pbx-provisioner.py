@@ -9,6 +9,10 @@ import time
 CODES = frozenset('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split())
 STAGES = {'ownership/runtime reconciliation failed': 'reconciliation', 'expired-credential revocation stage': 'revocation'}
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
+JOURNAL_WINDOW_HOURS = 24
+# Two expiry lines every five seconds plus reconciliation each minute: 36,000/day.
+# Leave margin, but higher log rates or journal rotation can still evict evidence.
+JOURNAL_LINE_LIMIT = 50000
 
 def command(args):
     result = subprocess.run(args, capture_output=True, text=True, timeout=20)
@@ -61,11 +65,10 @@ def generation_summary(root=ROOT, now=None):
         return {'state': 'unavailable'}
 
 def main():
-    # Five-second quarantine retries can otherwise evict the initiating failure.
     # Keep a bounded history and emit only fixed allowlisted stage/code pairs.
-    status, journal = command(['journalctl', '-u', 'elevate-pbx-provisioner.service', '--since', '24 hours ago', '-n', '20000', '--no-pager', '-o', 'cat'])
+    status, journal = command(['journalctl', '-u', 'elevate-pbx-provisioner.service', '--since', f'{JOURNAL_WINDOW_HOURS} hours ago', '-n', str(JOURNAL_LINE_LIMIT), '--no-pager', '-o', 'cat'])
     report = {'journalRead': status == 0, **failure_stages(journal if status == 0 else ''),
-              'journalWindowHours': 24, 'journalLineLimit': 20000,
+              'journalWindowHours': JOURNAL_WINDOW_HOURS, 'journalLineLimit': JOURNAL_LINE_LIMIT,
               'generation': generation_summary(), 'readOnly': True, 'callsPlaced': 0, 'configurationChanged': False}
     status, output = command(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', 'pjsip show endpoint twilio'])
     report['carrierIdentity'] = carrier_identity(output if status == 0 else '')

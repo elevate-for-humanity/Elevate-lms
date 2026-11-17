@@ -1,13 +1,91 @@
 import importlib.util
+import contextlib
+import io
+import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('diagnostic', Path(__file__).with_name('diagnose-pbx-provisioner.py'))
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
 class DiagnosticTests(unittest.TestCase):
+    def capture_report(self, entries, journal_status=0):
+        # Simulate journalctl's time filter and latest-N tail before parsing.
+        # Entry ages are seconds before capture; no live journal/host is accessed.
+        def run(args, **kwargs):
+            self.assertEqual(kwargs, {'capture_output': True, 'text': True, 'timeout': 20})
+            if args[0] == 'journalctl':
+                self.assertEqual(args, ['journalctl', '-u', 'elevate-pbx-provisioner.service',
+                                       '--since', '24 hours ago', '-n', '50000',
+                                       '--no-pager', '-o', 'cat'])
+                hours = int(args[args.index('--since') + 1].split()[0])
+                limit = int(args[args.index('-n') + 1])
+                lines = [line for age, line in entries if age <= hours * 3600]
+                return subprocess.CompletedProcess(args, journal_status, '\n'.join(lines[-limit:]))
+            self.assertEqual(args, ['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx',
+                                   'pjsip show endpoint twilio'])
+            return subprocess.CompletedProcess(args, 0, ' Endpoint: twilio/fixture Not in use\n')
+
+        output = io.StringIO()
+        with patch.object(m.subprocess, 'run', side_effect=run) as runner, \
+                patch.object(m, 'generation_summary', return_value={'state': 'observed'}), \
+                contextlib.redirect_stdout(output):
+            self.assertEqual(m.main(), 0 if journal_status == 0 else 1)
+        self.assertEqual(runner.call_count, 2)
+        self.assertNotIn('private', output.getvalue())
+        self.assertNotIn('PBX ', output.getvalue())
+        report = json.loads(output.getvalue())['provisionerFailureDiagnostics']
+        self.assertEqual(report['journalWindowHours'], 24)
+        self.assertEqual(report['journalLineLimit'], 50000)
+        self.assertTrue(report['readOnly'])
+        self.assertEqual(report['callsPlaced'], 0)
+        self.assertFalse(report['configurationChanged'])
+        return report
+
+    def test_capture_retains_initiating_failure_at_daily_baseline_with_margin(self):
+        cause = 'PBX expired-credential revocation stage: asterisk_rollback_failed'
+        entries = [(86399, cause)]
+        for elapsed in range(5, 86401, 5):
+            entries.extend([(86400 - elapsed, 'PBX expired-credential revocation stage: provisioner_quarantined'),
+                            (86400 - elapsed, 'PBX expired-credential revocation failed; investigate immediately.')])
+            if elapsed % 60 == 0:
+                entries.append((86400 - elapsed, 'PBX ownership/runtime reconciliation failed: provisioner_quarantined'))
+        self.assertEqual(len(entries), 36001)
+        # Demonstrate why the old tail loses the cause, then add 25% noise margin.
+        self.assertNotIn(cause, [line for _, line in entries[-20000:]])
+        entries.extend([(0, 'PBX ownership/runtime reconciliation failed: unknown password=private')] * 9000)
+        report = self.capture_report(entries)
+        self.assertTrue(report['initialFailureObserved'])
+        self.assertEqual(report['initialFailureStages'], [{'stage': 'revocation', 'code': 'asterisk_rollback_failed'}])
+        self.assertTrue(report['quarantineObserved'])
+        self.assertEqual(len(report['recentStages']), 20)
+
+    def test_capture_over_limit_explicitly_reports_absent_initial_evidence(self):
+        entries = [(100, 'PBX expired-credential revocation stage: asterisk_rollback_failed')]
+        entries.extend([(0, 'PBX expired-credential revocation stage: provisioner_quarantined')] * 50000)
+        report = self.capture_report(entries)
+        self.assertTrue(report['journalRead'])
+        self.assertTrue(report['quarantineObserved'])
+        self.assertFalse(report['initialFailureObserved'])
+        self.assertEqual(report['initialFailureStages'], [])
+
+    def test_capture_excludes_failures_outside_time_window(self):
+        report = self.capture_report([(86401, 'PBX expired-credential revocation stage: asterisk_rollback_failed'),
+                                      (0, 'PBX expired-credential revocation stage: provisioner_quarantined')])
+        self.assertFalse(report['initialFailureObserved'])
+        self.assertEqual(report['initialFailureStages'], [])
+
+    def test_failed_capture_does_not_treat_partial_stdout_as_evidence(self):
+        report = self.capture_report([(0, 'PBX expired-credential revocation stage: asterisk_rollback_failed')], journal_status=1)
+        self.assertFalse(report['journalRead'])
+        self.assertFalse(report['initialFailureObserved'])
+        self.assertEqual(report['initialFailureStages'], [])
+        self.assertEqual(report['recentStages'], [])
+
     def test_initial_failure_survives_repeated_quarantine_events(self):
         journal = '\n'.join(['PBX expired-credential revocation stage: asterisk_rollback_failed'] +
                             ['PBX expired-credential revocation stage: provisioner_quarantined',

@@ -68,3 +68,20 @@ export function validMenuDigit(value: FormDataEntryValue | null): number | null 
   const digit = Number(value);
   return Number.isInteger(digit) && digit >= 0 && digit <= 9 ? digit : null;
 }
+
+/** Operator zero is a first-class extension; keep browser/server validation aligned. */
+export const PHONE_EXTENSION_PATTERN = '(0|[0-9]{2,6})';
+export function validPhoneExtension(value: string): boolean {
+  return new RegExp(`^${PHONE_EXTENSION_PATTERN}$`).test(value);
+}
+
+/** Distinguish login accounts without merging their permissions or records. */
+export function phoneProfileLabel(profile: {
+  full_name?: string | null;
+  email?: string | null;
+}): string {
+  const name = profile.full_name?.trim();
+  return name && profile.email
+    ? `${name} (${profile.email})`
+    : name || profile.email || 'Team member';
+}

@@ -1,0 +1,23 @@
+name: Phone Admin configuration contract
+on:
+  pull_request:
+    paths:
+      - 'apps/admin/app/phone/**'
+      - 'lib/phone/config.ts'
+      - 'supabase/migrations/*phone*'
+      - 'tests/phone-admin-configuration.node.test.mjs'
+      - '.github/workflows/phone-admin-configuration.yml'
+permissions:
+  contents: read
+jobs:
+  configuration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/phone-admin-configuration.node.test.mjs

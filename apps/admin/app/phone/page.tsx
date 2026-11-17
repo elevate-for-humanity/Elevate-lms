@@ -15,7 +15,12 @@ import {
 } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
+import {
+  formatUsPhone,
+  parseBusinessHours,
+  PHONE_EXTENSION_PATTERN,
+  phoneProfileLabel,
+} from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import {
@@ -175,9 +180,7 @@ export default async function PhonePage() {
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  // A database row or legacy Telnyx probe cannot certify live Twilio/PBX calling.
-  // Keep the dashboard fail-closed until independent carrier and audio acceptance.
-  const carrierReady = false;
+  // Saved configuration is distinct from unobserved live carrier acceptance.
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(
     (number: any) =>
@@ -188,14 +191,23 @@ export default async function PhonePage() {
       ? Boolean(system?.ai_enabled)
       : menuOptions.some((option: any) => option.enabled && option.destination_id);
   const setupSteps = [
-    { label: 'Assign PWA extensions', complete: destinations.some((item: any) => item.enabled) },
+    {
+      label: 'Assign PWA extensions',
+      complete: destinations.some((item: any) => item.enabled),
+    },
     { label: 'Choose call routing', complete: routingReady },
-    { label: 'Create extensions', complete: extensions.some((item: any) => item.enabled) },
-    { label: 'Connect one PWA phone', complete: (devicesResult.count ?? 0) > 0 },
+    {
+      label: 'Create extensions',
+      complete: extensions.some((item: any) => item.enabled),
+    },
+    {
+      label: 'Connect one PWA phone',
+      complete: (devicesResult.count ?? 0) > 0,
+    },
     { label: 'Call history recorded', complete: (callsResult.count ?? 0) > 0 },
   ];
-  const phoneReady =
-    Boolean(primaryNumber) && setupSteps.every((step) => step.complete) && carrierReady;
+  const phoneConfigured =
+    Boolean(primaryNumber) && routingReady && extensions.some((entry: any) => entry.enabled);
   const { data: onboarding } = workspaceResult.data?.id
     ? await db
         .from('communication_onboarding_progress')
@@ -286,24 +298,14 @@ export default async function PhonePage() {
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        <div
-          className={`rounded-xl border p-4 text-sm ${carrierReady ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-200 bg-amber-50 text-amber-950'}`}
-        >
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
           <div className="flex items-center gap-2 font-black">
             <Radio className="h-4 w-4" />
-            Phone network:{' '}
-            {phoneReady
-              ? 'Ready'
-              : carrierReady
-                ? 'Connected — setup incomplete'
-                : 'Setup required'}
+            Phone configuration: {phoneConfigured ? 'Saved' : 'Setup incomplete'}
           </div>
           <p className="mt-1">
-            {phoneReady
-              ? 'The carrier number and dashboard routes are configured. Verify ringing and two-way audio with a test call.'
-              : carrierReady
-                ? 'The carrier is connected, but one or more routing, extension, destination, or testing steps are incomplete.'
-                : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
+            Live carrier status is unverified here. Saved numbers and routes do not confirm phone
+            registration, ringing, or two-way audio. Open the dial pad to check your connection.
           </p>
         </div>
         <div
@@ -332,7 +334,10 @@ export default async function PhonePage() {
         destinations={destinations.map((item: any) => ({
           id: item.id,
           name: item.name,
-          destination: item.destination,
+          destination:
+            item.destination_type === 'webrtc'
+              ? `ext. ${extensions.find((entry: any) => entry.id === item.extension_id)?.extension ?? 'unassigned'} — ${item.department || 'Team'}`
+              : item.destination,
           enabled: item.enabled,
         }))}
       />
@@ -374,14 +379,14 @@ export default async function PhonePage() {
                       <option value="">Unassigned</option>
                       {programHolders.map((profile: any) => (
                         <option key={profile.id} value={profile.id}>
-                          {profile.full_name || profile.email}
+                          {phoneProfileLabel(profile)}
                         </option>
                       ))}
                     </select>
                     <input
                       name="extension"
                       inputMode="numeric"
-                      pattern="[0-9]{2,6}"
+                      pattern={PHONE_EXTENSION_PATTERN}
                       defaultValue={item.extension ?? ''}
                       placeholder="Ext."
                       aria-label={`Extension for ${item.label}`}
@@ -434,6 +439,9 @@ export default async function PhonePage() {
                     id={item.id}
                     enabled={item.enabled}
                     isDefault={system?.default_destination_id === item.id}
+                    extension={
+                      extensions.find((entry: any) => entry.id === item.extension_id)?.extension
+                    }
                   />
                 </li>
               ))}
@@ -497,7 +505,7 @@ export default async function PhonePage() {
             <option value="">Choose Program Holder</option>
             {programHolders.map((profile: any) => (
               <option key={profile.id} value={profile.id}>
-                {profile.full_name || profile.email}
+                {phoneProfileLabel(profile)}
               </option>
             ))}
           </select>
@@ -505,7 +513,7 @@ export default async function PhonePage() {
             name="extension"
             required
             inputMode="numeric"
-            pattern="[0-9]{2,6}"
+            pattern={PHONE_EXTENSION_PATTERN}
             placeholder="Extension"
             className="min-h-11 min-w-11 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />

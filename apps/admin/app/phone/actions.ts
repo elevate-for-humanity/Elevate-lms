@@ -4,7 +4,7 @@ import { assertGoogleCalendarAvailable } from '@/lib/calendar/google-calendar';
 import { revalidatePath } from 'next/cache';
 import { requireRole, type AuthResult } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/phone/config';
+import { businessHoursFromForm, normalizeUsPhone, validMenuDigit, validPhoneExtension } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import {hydrateProcessEnv} from '@/lib/secrets';
@@ -424,8 +424,8 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
   const phoneNumberId = String(formData.get('phoneNumberId') ?? '');
   const profileId = String(formData.get('profileId') ?? '').trim() || null;
   const extension = String(formData.get('extension') ?? '').trim() || null;
-  if (extension && !/^\d{2,6}$/.test(extension)) {
-    throw new Error('Extension must contain 2 to 6 digits.');
+  if (extension && !validPhoneExtension(extension)) {
+    throw new Error('Use 0 for the operator or a 2 to 6 digit extension.');
   }
   if (profileId) {
     const { data: profile } = await db
@@ -451,8 +451,8 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
   const profileId = String(formData.get('profileId') ?? '').trim();
   const extension = String(formData.get('extension') ?? '').trim();
   const department = String(formData.get('department') ?? '').trim() || null;
-  if (!profileId || !/^\d{2,6}$/.test(extension)) {
-    throw new Error('Select a staff member or Program Holder and enter a 2 to 6 digit extension.');
+  if (!profileId || !validPhoneExtension(extension)) {
+    throw new Error('Select a staff member or Program Holder and enter 0 for the operator or a 2 to 6 digit extension.');
   }
   const { data: profile } = await db
     .from('profiles')

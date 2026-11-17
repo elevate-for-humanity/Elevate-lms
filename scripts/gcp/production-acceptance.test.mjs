@@ -94,6 +94,43 @@ test('Host Shop release source must finish successfully on the exact trusted LMS
  assert.ok(workflow.includes('actions: read'));
 });
 
+test('queued release-result beyond the historical three-minute window is not mistaken for failure',async()=>{
+ const lmsEnv={...env,ACCEPTANCE_COMPONENT:'lms'};
+ const lmsSource={...source,path:'.github/workflows/deploy-google-lms-trigger.yml'};
+ const f=fixture({live:{...health,service:'lms'},run:lmsSource});
+ let reads=0,waits=0;
+ const result=await verifyAcceptance(lmsEnv,async(url,options)=>{
+  if(url.endsWith('/runs/123')){
+   reads++;
+   return Response.json(reads<=48?{...lmsSource,status:'in_progress',conclusion:null}:lmsSource);
+  }
+  return f.request(url,options);
+ },async(ms)=>{assert.equal(ms,5000);waits++;});
+ assert.equal(reads,49);
+ assert.equal(waits,48);
+ assert.equal(result.sourceVerified,true);
+ assert.equal(result.commit,env.ACCEPTANCE_SHA);
+});
+test('release completion verification remains finite and never trusts a perpetually queued run',async()=>{
+ const lmsEnv={...env,ACCEPTANCE_COMPONENT:'lms'};
+ const queued={...source,path:'.github/workflows/deploy-google-lms-trigger.yml',status:'in_progress',conclusion:null};
+ let reads=0,waits=0;
+ await assert.rejects(verifyAcceptance(lmsEnv,async(url)=>{
+  if(url.endsWith('/runs/123')){reads++;return Response.json(queued);}
+  throw Error('unexpected health request before verified completion');
+ },async()=>{waits++;}),/ACCEPTANCE_DEPLOYMENT_COMPLETION_TIMEOUT/);
+ assert.equal(reads,240);
+ assert.equal(waits,240);
+});
+test('Host Shop blocks unverified manual dispatch and runs cleanup only after fixture provisioning',()=>{
+ const workflow=readFileSync(new URL('../../.github/workflows/host-shop-cross-shop-acceptance.yml',import.meta.url),'utf8');
+ assert.match(workflow,/deployed_sha:\s*[\s\S]*?required: true/);
+ assert.match(workflow,/deployment_run_id:\s*[\s\S]*?required: true/);
+ assert.ok(workflow.includes("if: " + "$" + "{{ github.event_name == 'workflow_dispatch' }}"));
+ assert.match(workflow,/name: Provision two disposable approved Host Shop identities and match requests\n\s+id: provision/);
+ assert.ok(workflow.includes("steps.provision.outcome == 'success' || steps.provision.outcome == 'failure'"));
+});
+
 test('other services cannot start Store payment validation',async()=>{
  for(const component of ['admin','marketing','lms']) {
   const f=fixture({live:{...health,service:component}});

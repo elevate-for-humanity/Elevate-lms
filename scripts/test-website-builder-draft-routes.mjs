@@ -184,3 +184,31 @@ test('generation folds phone whitespace without accepting fragments',async()=>{
   }
  }
 });
+
+test('generation preserves fully parenthesized phones and rejects partial variants',async()=>{
+ for(const phone of ['(317-555-0123)','(317 555 0123)']) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website with this exact owner-supplied phone: '+phone+'.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ for(const phone of ['317-555-0123','(317-555-0123','317-555-0123)','9-5']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. Call (317-555-0123). Hours 9-5.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});
+
+test('generation keeps spaced international prefixes and separate phone lines intact',async()=>{
+ const international='+ 44 20 7946 0958';
+ for(const phone of [international,'317-555-0123','800-555-0199']) {
+  const source=phone===international?'Call '+international+' today.':'Phone lines:\n317-555-0123\n800-555-0199';
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ const f=fixture('generate',{generated:{...config,contact:{phone:'44 20 7946 0958'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Call '+international+' today.'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});

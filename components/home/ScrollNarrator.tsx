@@ -80,6 +80,8 @@ export function ScrollNarrator() {
   const [enabled, setEnabled] = useState(true);
   const [hasNarration, setHasNarration] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+  useEffect(() => setNoticeDismissed(false), [notice]);
   const narratedRef = useRef(new Set<string>());
   const pendingRef = useRef<string | null>(null);
   const playbackGenerationRef = useRef(0);
@@ -420,13 +422,22 @@ export function ScrollNarrator() {
           {enabled && !needsPlaybackGesture ? 'Stop narration' : 'Play narration'}
         </span>
       </button>
-      {notice && enabled ? (
-        <p
+      {notice && enabled && !noticeDismissed ? (
+        <div
           role="status"
-          className="mt-2 max-w-[min(15rem,calc(100vw-5rem))] rounded-lg bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-800 shadow-lg"
+          className="mt-2 flex max-w-[min(15rem,calc(100vw-5rem))] items-start gap-2 rounded-lg bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-800 shadow-lg"
         >
-          {notice}
-        </p>
+          <span>{notice}</span>
+          <button
+            type="button"
+            data-page-narrator-control
+            aria-label="Dismiss narration notice"
+            onClick={() => setNoticeDismissed(true)}
+            className="shrink-0 rounded p-1 focus-visible:outline focus-visible:outline-2"
+          >
+            ×
+          </button>
+        </div>
       ) : null}
     </div>
   );

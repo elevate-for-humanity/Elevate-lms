@@ -108,6 +108,96 @@ test('monitor uses fenced changes and never resets attempts or changes worker pa
 test('read or write failures cannot be reported as monitoring success',async()=>{
  await assert.rejects(monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},request:async()=>({ok:false,status:503})}),/HTTP_503/);
 });
+const monitorEnv={GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'};
+test('transient queue read retries the same cursor without duplicate observations or writes',async()=>{
+ const reads=[],signals=[],written=[],waits=[];
+ const rows=Array.from({length:100},(_,i)=>job({id:String(i).padStart(3,'0')}));
+ let failed=false;
+ const result=await monitorCourseQueue({env:monitorEnv,now,wait:async ms=>waits.push(ms),
+  request:async(url,options)=>{
+   if(options.method==='PATCH'){
+    written.push(new URL(url).searchParams.get('id'));
+    return {ok:true,json:async()=>[{id:'saved'}]};
+   }
+   const cursor=new URL(url).searchParams.get('id');reads.push(cursor);signals.push(options.signal);
+   if(cursor && !failed){failed=true;throw new DOMException('timed out','TimeoutError');}
+   return {ok:true,json:async()=>cursor?[job({id:'100'})]:rows};
+  }});
+ assert.deepEqual(reads,[null,'gt.099','gt.099']);
+ assert.notEqual(signals[1],signals[2]);assert.equal(signals[2].aborted,false);
+ assert.deepEqual(waits,[2000]);assert.equal(result.length,101);
+ assert.equal(new Set(result.map(row=>row.jobId)).size,101);
+ assert.equal(written.length,101);assert.equal(new Set(written).size,101);
+});
+test('readiness transport and body-read failures retry only the same pure verdict',async()=>{
+ const row=job({payload:{autopilot:{role:'media'}},available_at:now.toISOString()});
+ const bodies=[],signals=[],waits=[];let writes=0;
+ const result=await monitorCourseQueue({env:monitorEnv,now,wait:async ms=>waits.push(ms),
+  request:async(url,options)=>{
+   if(String(url).includes('/rpc/ultimate_autopilot_ready_jobs')){
+    bodies.push(options.body);signals.push(options.signal);
+    if(bodies.length===1)throw new TypeError('fetch failed',{cause:{code:'ECONNRESET'}});
+    if(bodies.length===2)return {ok:true,json:async()=>{throw new DOMException('body timed out','TimeoutError');}};
+    return {ok:true,json:async()=>['job']};
+   }
+   if(options.method==='PATCH'){writes++;return {ok:true,json:async()=>[{id:'job'}]};}
+   return {ok:true,json:async()=>[row]};
+  }});
+ assert.equal(bodies.length,3);assert.equal(new Set(bodies).size,1);
+ assert.deepEqual(JSON.parse(bodies[0]),{p_jobs:['job']});
+ assert.equal(new Set(signals).size,3);assert.deepEqual(waits,[2000,4000]);
+ assert.equal(writes,1);assert.equal(result[0].state,'awaiting_assignment');
+});
+test('exhausted transient queue reads preserve the terminal error and never write',async()=>{
+ const errors=Array.from({length:3},()=>new DOMException('timed out','TimeoutError'));
+ let reads=0;const waits=[];
+ await assert.rejects(monitorCourseQueue({env:monitorEnv,now,wait:async ms=>waits.push(ms),
+  request:async(_url,options)=>{
+   assert.equal(options.method,undefined);
+   throw errors[reads++];
+  }}),error=>error===errors[2]);
+ assert.equal(reads,3);assert.deepEqual(waits,[2000,4000]);
+});
+test('authorization and answered server failures do not replay monitor reads',async()=>{
+ for(const status of [401,403,503])for(const readiness of [false,true]){
+  let failedReads=0,writes=0;
+  await assert.rejects(monitorCourseQueue({env:monitorEnv,now,
+   wait:async()=>assert.fail('an HTTP answer must not retry'),
+   request:async(url,options)=>{
+    if(options.method==='PATCH'){writes++;assert.fail('a failed read cannot write');}
+    if(!readiness||String(url).includes('/rpc/')){failedReads++;return {ok:false,status};}
+    return {ok:true,json:async()=>[job({payload:{autopilot:{role:'media'}},available_at:now.toISOString()})]};
+   }}),new RegExp((readiness?'PARIS_ROLE_READINESS_HTTP_':'PARIS_MONITOR_READ_HTTP_')+status));
+  assert.equal(failedReads,1);assert.equal(writes,0);
+ }
+});
+test('malformed monitor read bodies and explicit aborts are not retried',async()=>{
+ for(const error of [new SyntaxError('invalid JSON'),new DOMException('cancelled','AbortError')]){
+  let reads=0;
+  await assert.rejects(monitorCourseQueue({env:monitorEnv,now,
+   wait:async()=>assert.fail('permanent failures must not retry'),
+   request:async()=>{reads++;return {ok:true,json:async()=>{throw error;}};}
+  }),observed=>observed===error);
+  assert.equal(reads,1);
+ }
+});
+test('ambiguous monitor writes and write-body failures are never replayed',async()=>{
+ for(const bodyFailure of [false,true]){
+  let writes=0;
+  const error=new DOMException('ambiguous write','TimeoutError');
+  await assert.rejects(monitorCourseQueue({env:monitorEnv,now,
+   wait:async()=>assert.fail('writes must not enter the read retry path'),
+   request:async(_url,options)=>{
+    if(options.method==='PATCH'){
+     writes++;
+     if(bodyFailure)return {ok:true,json:async()=>{throw error;}};
+     throw error;
+    }
+    return {ok:true,json:async()=>[job()]};
+   }}),observed=>observed===error);
+  assert.equal(writes,1);
+ }
+});
 test('fresh running observation clears an obsolete waiting reason',async()=>{
  const row=job({status:'running',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,reason:'Waiting for a fresh worker heartbeat'}});
  let body;

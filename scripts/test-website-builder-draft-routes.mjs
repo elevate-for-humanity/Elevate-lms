@@ -270,6 +270,8 @@ test('generation preserves explicit trailing service destinations from contacts 
   ['988 (phone)','988'],
   ['988 (call or text)','988'],
   ['988 (crisis hotline, available 24/7)','988'],
+  ['988 (crisis hotline, free and confidential)','988'],
+  ['211 (helpline, open weekdays)','211'],
  ]) {
   const contact={phone};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});

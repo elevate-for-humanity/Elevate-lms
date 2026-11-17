@@ -22,12 +22,21 @@ type EmailLogRow = {
   campaign_id: string | null;
   action: string | null;
   subject: string | null;
+  status: string | null;
+  provider: string | null;
+  message_id: string | null;
   sent_at: string;
 };
 
 type DeliveryEventRow = {
   email_log_id: string;
   event_type: string;
+};
+
+type CanonicalDelivery = {
+  key: string;
+  row: EmailLogRow;
+  logIds: Set<string>;
 };
 
 type CampaignAggregate = {
@@ -38,6 +47,26 @@ type CampaignAggregate = {
   clicks: number;
   sentAt: string;
 };
+
+function deliveryKey(row: EmailLogRow): string | null {
+  if (row.status === 'failed') return null;
+
+  const messageId = row.message_id?.trim();
+  if (messageId) return `message:${row.provider || 'unknown'}:${messageId}`;
+
+  // Transport rows are canonical even when a provider did not return an ID.
+  // Preserve older Gmail/Resend records and legacy rows without an action, but
+  // exclude companion feature-audit rows that describe the same delivery.
+  if (
+    row.action === 'email_transport_send' ||
+    row.provider === 'gmail' ||
+    row.provider === 'resend' ||
+    !row.action
+  ) {
+    return `log:${row.id}`;
+  }
+  return null;
+}
 
 export async function GET(request: NextRequest) {
   const limited = await applyRateLimit(request, 'api');
@@ -57,12 +86,11 @@ export async function GET(request: NextRequest) {
   if (days) start.setUTCDate(start.getUTCDate() - days + 1);
 
   const pageSize = 500;
-  const logs: EmailLogRow[] = [];
+  const rawLogs: EmailLogRow[] = [];
   for (let offset = 0; ; offset += pageSize) {
     let query = db
       .from('email_logs')
-      .select('id,campaign_id,action,subject,sent_at')
-      .in('status', ['accepted', 'sent', 'delivered'])
+      .select('id,campaign_id,action,subject,status,provider,message_id,sent_at')
       .not('sent_at', 'is', null)
       .order('sent_at', { ascending: false })
       .order('id')
@@ -70,13 +98,30 @@ export async function GET(request: NextRequest) {
     if (days) query = query.gte('sent_at', start.toISOString());
     const { data, error } = await query;
     if (error) return safeDbError(error, 'Email analytics could not be loaded.');
-    logs.push(...((data ?? []) as EmailLogRow[]));
+    rawLogs.push(...((data ?? []) as EmailLogRow[]));
     if ((data?.length ?? 0) < pageSize) break;
   }
 
-  const logIds = new Set(logs.map((row) => row.id));
-  const openedLogIds = new Set<string>();
-  const clickedLogIds = new Set<string>();
+  const deliveryByKey = new Map<string, CanonicalDelivery>();
+  const deliveryKeyByLogId = new Map<string, string>();
+  for (const row of rawLogs) {
+    const key = deliveryKey(row);
+    if (!key) continue;
+    const delivery = deliveryByKey.get(key);
+    if (delivery) {
+      delivery.logIds.add(row.id);
+      deliveryKeyByLogId.set(row.id, key);
+      if (row.action === 'email_transport_send' && delivery.row.action !== 'email_transport_send') {
+        delivery.row = row;
+      }
+    } else {
+      deliveryByKey.set(key, { key, row, logIds: new Set([row.id]) });
+      deliveryKeyByLogId.set(row.id, key);
+    }
+  }
+
+  const openedDeliveryKeys = new Set<string>();
+  const clickedDeliveryKeys = new Set<string>();
   for (let offset = 0; ; offset += pageSize) {
     let query = db
       .from('email_delivery_events')
@@ -89,19 +134,22 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
     if (error) return safeDbError(error, 'Email engagement analytics could not be loaded.');
     for (const event of (data ?? []) as DeliveryEventRow[]) {
-      if (!logIds.has(event.email_log_id)) continue;
-      if (trackedOpenEvents.includes(event.event_type)) openedLogIds.add(event.email_log_id);
-      if (trackedClickEvents.includes(event.event_type)) clickedLogIds.add(event.email_log_id);
+      const key = deliveryKeyByLogId.get(event.email_log_id);
+      if (!key) continue;
+      if (trackedOpenEvents.includes(event.event_type)) openedDeliveryKeys.add(key);
+      if (trackedClickEvents.includes(event.event_type)) clickedDeliveryKeys.add(key);
     }
     if ((data?.length ?? 0) < pageSize) break;
   }
 
+  const deliveries = [...deliveryByKey.values()];
   const campaignMap = new Map<string, CampaignAggregate>();
   const timeline = new Map<string, { date: string; sent: number; opens: number; clicks: number }>();
-  for (const row of logs) {
-    const opened = openedLogIds.has(row.id);
-    const clicked = clickedLogIds.has(row.id);
-    const key = row.campaign_id || row.subject || row.action || row.id;
+  for (const delivery of deliveries) {
+    const row = delivery.row;
+    const opened = openedDeliveryKeys.has(delivery.key);
+    const clicked = clickedDeliveryKeys.has(delivery.key);
+    const key = row.campaign_id || row.subject || row.action || delivery.key;
     const campaign = campaignMap.get(key) ?? {
       id: row.campaign_id || row.id,
       name: row.subject || row.action || 'Direct email',
@@ -131,13 +179,14 @@ export async function GET(request: NextRequest) {
       openRate: rate(campaign.opens, campaign.sent),
       clickRate: rate(campaign.clicks, campaign.sent),
     }));
+  const totalSent = deliveries.length;
   const overview = {
-    totalSent: logs.length,
-    totalOpens: openedLogIds.size,
-    totalClicks: clickedLogIds.size,
+    totalSent,
+    totalOpens: openedDeliveryKeys.size,
+    totalClicks: clickedDeliveryKeys.size,
     totalBounces: null,
-    openRate: rate(openedLogIds.size, logs.length),
-    clickRate: rate(clickedLogIds.size, logs.length),
+    openRate: rate(openedDeliveryKeys.size, totalSent),
+    clickRate: rate(clickedDeliveryKeys.size, totalSent),
     bounceRate: null,
   };
 

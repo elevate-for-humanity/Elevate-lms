@@ -7,11 +7,16 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
   const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
   const rawSources = sources.filter(value => typeof value === 'string');
   const supplied = rawSources.map(fold);
-  const emails = rawSources.flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || []).map(value => value.replace(/\.+$/, ''));
-  const phones = rawSources.flatMap(source => [...source.matchAll(/[+(\d](?:[+\d ()-]|\.(?=\d))*\d[)]?/g)].filter(match => {
+  // Strip prose suffixes and paired quotes, retaining unsupported address prefixes.
+  const emails = rawSources.flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || []).map(value => {
+    const token = value.replace(/[.!?]+$/, '');
+    return token.startsWith("'") && token.endsWith("'") ? token.slice(1, -1) : token.replace(/'$/, '');
+  });
+  // Fold whitespace before tokenization; parenthesized digit groups exclude availability ranges.
+  const phones = supplied.flatMap(source => [...source.matchAll(/(?:\+\d+|\(\d+\)|\d+)(?:[ -]*(?:\(\d+\)|\d+)|\.(?=\d)\d+)*/g)].filter(match => {
     const before = source[(match.index ?? 0) - 1] || '';
     const after = source[(match.index ?? 0) + match[0].length] || '';
-    return !/[\p{L}\p{N}+]/u.test(before) && !/[\p{L}\p{N}]/u.test(after);
+    return !/[\p{L}\p{N}+(]/u.test(before) && !/[\p{L}\p{N})]/u.test(after);
   }).map(match => fold(match[0])));
   const copy = (value: unknown, limit: number, kind?: 'email' | 'phone' | 'address') => {
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;

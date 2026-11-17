@@ -214,7 +214,7 @@ test('generation keeps spaced international prefixes and separate phone lines in
 });
 
 test('generation rejects incomplete phone continuations on either side of a line break',async()=>{
- for(const [source,phone] of [['+1 (317)\n555-0123','555-0123'],['+44 20 7946\n0958','+44 20 7946'],['+1 (317)\t555-0123','555-0123'],['+44 20 7946\n0958000','0958000'],['+44 20 7946\n0958000','+44 20 7946']]) {
+ for(const [source,phone] of [['+1 (317)\n555-0123','555-0123'],['+44 20 7946\n0958','+44 20 7946'],['+1 (317)\t555-0123','555-0123'],['+44 20 7946\n0958000','0958000'],['+44 20 7946\n0958000','+44 20 7946'],['Open 2026, call +44 20 7946\n0958000','0958000']]) {
   const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
   assert.equal((await f.post(request({brief:'Build the requested business website from the owner contact details: '+source}))).status,201);
   assert.deepEqual(f.calls[0].args.p_site_config.contact,{});

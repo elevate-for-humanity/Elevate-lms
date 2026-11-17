@@ -1,6 +1,8 @@
 import { readHoursPages } from '@/lib/apprenticeship/admin-hours';
 import { loadCourseActivity } from '@/lib/learner/course-activity';
 import { loadLessonAvailability } from '@/lib/lms/lesson-availability';
+import BookkeepingStudyGuide from '@/components/learner/BookkeepingStudyGuide';
+import { BOOKKEEPING_COURSE_ID } from '@/lib/lms/bookkeeping-workbook-contract';
 import Image from 'next/image';
 import { getPrestigeCourseCover } from '@/lib/lms/prestige-course-covers';
 import type { Metadata } from 'next';
@@ -288,6 +290,7 @@ export default async function CourseLandingPage({
           <p className="mt-4 max-w-4xl text-base font-medium leading-7 text-slate-700">
             {course.description || 'Course lessons, checkpoints, and required assessments.'}
           </p>
+          {course.id === BOOKKEEPING_COURSE_ID ? <div className="mt-5"><BookkeepingStudyGuide coursePage /></div> : null}
           {savedActivity && (
             <p className="mt-4 rounded-xl border border-teal-300 bg-teal-50 p-4 font-semibold">
               {savedActivity.assessmentsPassed} lesson assessments passed ·{' '}

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import WorkbookNarration from './WorkbookNarration';
 import LearningWorkspace from './LearningWorkspace';
 import WorkbookLessonPicture from './WorkbookLessonPicture';
@@ -23,6 +23,15 @@ import type { Workbook, WorkbookSection, WorkbookResponse } from '@/lib/lms/digi
 import { useWorkbookSave } from './useWorkbookSave';
 import type { WorkbookAnswers } from '@/lib/lms/workbook-validation';
 import { workbookWritingComplete } from '@/lib/lms/workbook-progression';
+import { BOOKKEEPING_WORKBOOK_SLUG } from '@/lib/lms/bookkeeping-workbook-contract';
+import { bookkeepingWorkedExample } from '@/lib/lms/bookkeeping-workbook-guidance';
+
+function PromptText({ text, id }: { text: string; id?: string }) {
+  const parts = text.split(/\s+(?=Guided:|Independent:|Expected |Reviewer rubric:)/);
+  return <div id={id} className="mt-4 max-w-prose space-y-3 text-base leading-relaxed sm:text-lg">
+    {parts.map((part, index) => <p key={index}>{part}</p>)}
+  </div>;
+}
 
 export function SectionEditor({
   section,
@@ -34,6 +43,7 @@ export function SectionEditor({
   workbookSlug,
   onReviewSaved,
   sectionPicker,
+  showTimeclock = true,
 }: {
   section: WorkbookSection;
   initial?: WorkbookResponse;
@@ -44,6 +54,7 @@ export function SectionEditor({
   workbookSlug: string;
   onReviewSaved?: (sectionId: string, reviewed: boolean) => void;
   sectionPicker: ReactNode;
+  showTimeclock?: boolean;
 }) {
   const { draft, edit, save, status, error, recoveryText } = useWorkbookSave(
     section.id,
@@ -59,6 +70,9 @@ export function SectionEditor({
   const [step, setStep] = useState(0);
   const [moving, setMoving] = useState(false);
   const slide = slides[step];
+  const bookkeeping = workbookSlug === BOOKKEEPING_WORKBOOK_SLUG;
+  const workedExample = bookkeeping ? bookkeepingWorkedExample(section.prompts[1] || '') : null;
+  const activityText = slide.field === 'practice2' && workedExample ? workedExample.activity : slide.text;
   const positionKey = `workbook-screen:${accountId}:${section.id}`;
   useEffect(() => {
     if (readOnly) return;
@@ -100,6 +114,7 @@ export function SectionEditor({
           <>
             {sectionPicker}
             {!hidden &&
+            showTimeclock &&
             !readOnly &&
             section.course_id &&
             section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' &&
@@ -107,6 +122,7 @@ export function SectionEditor({
               <TheoryTimeclock courseId={section.course_id} lessonId={section.lesson_id} />
             ) : null}
             {!hidden &&
+            showTimeclock &&
             readOnly &&
             section.course_id &&
             section.course_id !== 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201' ? (
@@ -115,13 +131,19 @@ export function SectionEditor({
                 Clocking and saving are disabled in admin preview.
               </p>
             ) : null}
-            <p className="text-sm text-slate-600">Guided workbook · {section.unit}</p>
+            <p className="text-sm text-slate-600">Guided workbook · {section.unit.split(' — Objectives:')[0]}</p>
             <h2
               id={`section-${section.id}`}
-              className="mt-2 text-2xl font-bold leading-relaxed break-words"
+              className="mt-2 break-words text-xl font-bold leading-snug sm:text-2xl"
             >
               {section.section_number}. {section.title}
             </h2>
+            {section.course_id && section.lesson_id ? (
+              <a className="inline-flex min-h-12 items-center font-bold underline"
+                href={`/lms/courses/${section.course_id}/lessons/${section.lesson_id}`}>
+                Open the matching course lesson
+              </a>
+            ) : null}
             <div className="my-6 overflow-hidden rounded-2xl border border-stone-300 bg-white shadow-sm">
               <div className="bg-teal-50 p-5 text-slate-950 sm:p-8">
                 <p className="text-sm font-semibold text-teal-800">
@@ -133,11 +155,17 @@ export function SectionEditor({
                   max={slides.length}
                   className="my-3 h-2 w-full accent-amber-300"
                 />
-                <h3 className="text-2xl font-bold leading-relaxed sm:text-3xl">{slide.title}</h3>
-                <p className="mt-4 max-w-prose text-xl leading-relaxed">{slide.text}</p>
+                <h3 className="text-xl font-bold leading-snug sm:text-2xl">{slide.title}</h3>
+                <PromptText text={activityText} id={`${section.id}-activity-instructions`} />
               </div>
               <div className="p-5 sm:p-8">
                 {!hidden && <WorkbookNarration text={slide.narration} />}
+                {workedExample && slide.field && slide.field !== 'nextGoal' ? (
+                  <aside aria-label="Worked bookkeeping example" className="my-5 rounded-xl border border-slate-300 bg-slate-50 p-4">
+                    <h4 className="font-bold">Worked example — read before writing</h4>
+                    <PromptText text={workedExample.example} />
+                  </aside>
+                ) : null}
                 {slide.field && (
                   <div className="my-5">
                     <label
@@ -147,20 +175,22 @@ export function SectionEditor({
                       {slide.field === 'notes'
                         ? 'My key ideas, words to define, and questions for my instructor'
                         : slide.field === 'nextGoal'
-                          ? 'Trainer feedback and my next practice goal'
-                          : slide.text}
+                          ? 'My next practice goal and any instructor feedback'
+                          : `My answer for ${slide.title.toLowerCase()}`}
                     </label>
                     <textarea
                       id={`${section.id}-${slide.field}`}
+                      aria-describedby={`${section.id}-activity-instructions`}
                       value={draft.answers[slide.field]}
                       disabled={readOnly}
-                      onChange={(event) =>
+                      onChange={(event) => {
                         edit({
                           ...draft,
                           answers: { ...draft.answers, [slide.field!]: event.target.value },
                           reviewed: false,
-                        })
-                      }
+                        });
+                        onReviewSaved?.(section.id, false);
+                      }}
                       onBlur={() => {
                         void save();
                       }}
@@ -221,6 +251,10 @@ export function SectionEditor({
                             {draft.answers[item.field!] ||
                               'No response yet. Return to this activity to add your answer.'}
                           </dd>
+                          {(draft.answers[item.field!] || '').trim().length < 10 ? (
+                            <p className="mt-2 text-sm font-semibold text-amber-900">Add a complete response of at least 10 characters before reviewing this chapter.</p>
+                          ) : null}
+                          <button type="button" disabled={moving} onClick={() => { void move(slides.indexOf(item)); }} className="mt-2 min-h-12 rounded-lg border border-slate-400 px-4 py-3 font-semibold">Edit {item.title.toLowerCase()}</button>
                         </div>
                       ))}
                   </dl>
@@ -250,7 +284,7 @@ export function SectionEditor({
                     }}
                     className="min-h-12 rounded-lg bg-stone-900 px-5 py-3 font-semibold text-white disabled:opacity-40"
                   >
-                    {moving ? 'Saving…' : 'Next'}
+                    {moving ? 'Saving…' : slide.review ? 'Review below' : 'Next'}
                   </button>
                 </nav>
               </div>
@@ -330,13 +364,15 @@ export function SectionEditor({
               <WorkbookLessonPicture key={visual.src} visual={visual} />
             ) : (
               <p className="rounded-xl border border-slate-200 bg-white p-5 leading-relaxed">
-                {slide.text}
+                {section.course_id && section.lesson_id
+                  ? 'Use Open the matching course lesson to review the teaching. The activity instructions and answer box are in Workbook instructions & answers.'
+                  : 'Follow the activity instructions and write in the answer box. Use Back to check an earlier screen.'}
               </p>
             )}
 
             <p className="text-sm leading-relaxed text-slate-600">
-              Use the instructions and answer fields on the left. Choose Next to continue the
-              workbook activity.
+              Read the activity instructions, write in the answer box, then choose Next.
+              On a phone, the practice preview appears below the answer area in Split view.
             </p>
           </>
         }
@@ -362,9 +398,16 @@ export default function DigitalWorkbook({
   // Existing writing is preserved, but a saved browser slide position must never
   // teleport a learner to Week 7 or conceal earlier sections.
   const [active, setActive] = useState(sections[0]?.id ?? '');
-  const [, setReviewedIds] = useState<Set<string>>(
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(
     () => new Set(responses.filter((row) => row.reviewed).map((row) => row.section_id)),
   );
+  const chapterNavigation = useRef<HTMLDivElement>(null);
+  const previousChapter = useRef(active);
+  useEffect(() => {
+    if (previousChapter.current === active) return;
+    previousChapter.current = active;
+    chapterNavigation.current?.focus();
+  }, [active]);
   useEffect(() => {
     function selectLinkedSection() {
       const requested = window.location.hash.replace(/^#section-/, '');
@@ -382,25 +425,25 @@ export default function DigitalWorkbook({
       else next.delete(id);
       return next;
     });
-    // A successful saved review advances to the next lesson in this same
-    // workbook; never redirect through an unrelated dashboard.
-    const index = sections.findIndex((section) => section.id === id);
-    if (reviewed && index >= 0 && index < sections.length - 1) setActive(sections[index + 1].id);
+    // Let the learner decide when to move on after a confirmed saved review.
   };
+  const chapterIndex = sections.findIndex((section) => section.id === active);
+  const courseId = sections.find((section) => section.course_id)?.course_id;
   const visuals = workbookVisualAssignments(workbook.slug, sections);
   return (
     <div className="min-h-screen bg-stone-50 px-4 py-8 text-slate-900">
       <div className="mx-auto max-w-[1600px]">
-        <a href="/workbooks" className="inline-block py-3 underline">
-          All my workbooks
-        </a>
-        <p className="mt-4 font-semibold tracking-wide">ELEVATE FOR HUMANITY · TRAINING WORKBOOK</p>
-        <h1 className="mt-3 text-3xl font-bold leading-relaxed">{workbook.title}</h1>
+        <nav aria-label="Workbook navigation" className="flex flex-wrap gap-5">
+          <a href="/workbooks" className="inline-block py-3 underline">All my workbooks</a>
+          {courseId ? <a href={`/lms/courses/${courseId}`} className="inline-block py-3 underline">Back to my course</a> : null}
+        </nav>
+        <p className="mt-3 text-sm font-semibold">ELEVATE FOR HUMANITY · WORKBOOK</p>
+        <h1 className="mt-2 text-2xl font-bold leading-snug sm:text-3xl">{workbook.slug === BOOKKEEPING_WORKBOOK_SLUG ? 'Bookkeeping practice workbook' : workbook.title}</h1>
         {workbook.cover_image && (
           <img
             src={workbookCover(workbook.slug, workbook.cover_image)}
             alt={`${workbook.title} cover`}
-            className="my-5 h-auto max-h-64 w-full max-w-sm rounded-lg object-contain"
+            className="my-4 h-auto max-h-40 w-full max-w-xs rounded-lg object-contain sm:max-h-56"
           />
         )}
         {workbook.slug === HVAC_WORKBOOK_SLUG && (
@@ -445,10 +488,16 @@ export default function DigitalWorkbook({
             )}
           </details>
         )}
-        <p className="my-4 text-lg leading-relaxed">
-          Read and answer on the left. View the example or practice on the right. Choose Next when
-          you are ready.
-        </p>
+        <section aria-label="How to use this workbook" className="my-4 rounded-xl border border-teal-300 bg-teal-50 p-4">
+          <h2 className="text-lg font-bold">What do I do first?</h2>
+          <ol className="mt-3 list-decimal space-y-2 pl-5 leading-relaxed">
+            <li>Choose a chapter. Read or watch its matching course lesson first.</li>
+            <li>Write your notes and answer each practice activity. Next saves your work and opens the next screen.</li>
+            <li>Write your next practice goal. On Review your work, check your answers and mark the chapter reviewed.</li>
+            <li>Wait for “Saved to your account,” then choose Next chapter. Use Back to my course for lesson assessments.</li>
+          </ol>
+          <p className="mt-3 text-sm leading-relaxed">Saving writing and reviewing a chapter do not by themselves complete the course or award training hours.</p>
+        </section>
         <details className="my-4 rounded-xl border border-stone-300 bg-white p-4">
           <summary className="cursor-pointer font-semibold">
             Workbook license and access
@@ -474,6 +523,14 @@ export default function DigitalWorkbook({
         )}
         {sections.length ? (
           <>
+            <div ref={chapterNavigation} tabIndex={-1} className="my-5 scroll-mt-4 rounded-xl border border-slate-300 bg-white p-4 focus:outline focus:outline-2 focus:outline-teal-700">
+              <label htmlFor="workbook-section" className="mb-2 block text-lg font-bold">Choose a workbook section</label>
+              <select id="workbook-section" value={active} onChange={(event) => setActive(event.target.value)} className="min-h-12 w-full min-w-0 rounded-lg border border-slate-400 bg-white p-3 text-base">
+                {sections.map((section) => <option key={section.id} value={section.id}>{section.section_number}. {section.title}</option>)}
+              </select>
+              <p className="mt-3 text-sm leading-relaxed" aria-live="polite">Available chapter {chapterIndex + 1} of {sections.length} · {sections.filter((section) => reviewedIds.has(section.id)).length} reviewed</p>
+              <p className="mt-2 text-sm leading-relaxed">You may return to any available chapter. Chapters still being prepared are not shown here.</p>
+            </div>
             {sections.map((section) => (
               <SectionEditor
                 key={section.id}
@@ -485,44 +542,15 @@ export default function DigitalWorkbook({
                 readOnly={readOnly}
                 accountId={accountId}
                 onReviewSaved={reviewSaved}
-                sectionPicker={
-                  section.id === active ? (
-                    <>
-                      <label
-                        htmlFor="workbook-section"
-                        className="mb-2 block text-lg font-semibold"
-                      >
-                        Choose a workbook section
-                      </label>
-                      <select
-                        id="workbook-section"
-                        value={active}
-                        onChange={(event) => {
-                          const index = sections.findIndex(
-                            (section) => section.id === event.target.value,
-                          );
-                          if (index >= 0) setActive(event.target.value);
-                        }}
-                        className="mb-6 min-h-12 w-full rounded-lg border border-slate-400 bg-white p-3 text-base"
-                      >
-                        {sections.map((section) => (
-                          <option key={section.id} value={section.id}>
-                            {section.section_number}. {section.title}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="mb-6 leading-relaxed text-slate-600">
-                        You can open and save writing in any available workbook chapter without
-                        repeating earlier lesson quizzes. Check a chapter as reviewed once its
-                        writing is complete. Finishing the course requires all chapters reviewed;
-                        saving answers alone does not mark a course lesson complete or award
-                        training hours.
-                      </p>
-                    </>
-                  ) : null
-                }
+                sectionPicker={null}
               />
             ))}
+            <nav aria-label="Workbook chapters" className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white p-4">
+              <button type="button" disabled={chapterIndex <= 0} onClick={() => setActive(sections[chapterIndex - 1].id)} className="min-h-12 rounded-lg border px-4 py-3 font-bold disabled:opacity-40">Previous chapter</button>
+              <button type="button" disabled={chapterIndex >= sections.length - 1 || !reviewedIds.has(active)} onClick={() => setActive(sections[chapterIndex + 1].id)} className="min-h-12 rounded-lg bg-teal-900 px-4 py-3 font-bold text-white disabled:opacity-40">Next chapter</button>
+              {!reviewedIds.has(active) ? <p className="w-full text-sm leading-relaxed">Complete the writing and save your chapter review to use Next chapter. You can use the chapter menu to revisit other available work.</p> : null}
+              {chapterIndex === sections.length - 1 && reviewedIds.has(active) ? <p className="w-full leading-relaxed">This is the last currently available chapter. Return to your course for assessments and any remaining requirements.</p> : null}
+            </nav>
           </>
         ) : (
           <p className="rounded-lg border p-5 leading-relaxed">

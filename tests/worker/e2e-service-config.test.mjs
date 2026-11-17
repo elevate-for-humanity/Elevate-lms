@@ -34,3 +34,8 @@ test('public URL override does not masquerade as three isolated test servers',()
   const res=auditE2EServiceConfiguration({...testEnv(),PLAYWRIGHT_BASE_URL:'https://www.elevateforhumanity.org'});
   assert.ok(res.failures.some(e=>e.endsWith('PLAYWRIGHT_BASE_URL')));
 });
+test('full test gate rejects silent Marketing-only app-selection overrides',()=>{
+  const res=auditE2EServiceConfiguration({...testEnv(),PLAYWRIGHT_APPS:'marketing'});
+  assert.equal(res.ok,false);
+  assert.ok(res.failures.includes('E2E_FULL_SUITE_APP_SELECTION_OVERRIDE_UNEXPECTED'));
+});

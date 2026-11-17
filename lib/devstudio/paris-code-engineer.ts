@@ -524,7 +524,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // Redirect once to a verified filename; normal read authorization and
       // duplicate-inspection limits remain enforced below.
       let recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
-      if (!recovered && checkInspectionBudget(inspectionHistory, action).decision !== 'inspect') {
+      if (!recovered && ['redirect','stop'].includes(checkInspectionBudget(inspectionHistory, action).decision)) {
         // A stale discovered-files list can contain nothing relevant to the
         // diagnosed source. Recover only from the authenticated task-branch
         // tree, never from guessed paths or test/log instructions. The normal

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import { sendEmail } from '@/lib/email';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -30,16 +31,25 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'A rejection reason is required' }, { status: 400 });
     }
 
+    const file = await getAdminDocumentUrl({
+      adminId: auth.id,
+      documentId,
+      context: 'review_preflight',
+    });
+    if (!file) {
+      return NextResponse.json(
+        { error: 'The stored file is unavailable for review.' },
+        { status: 409 },
+      );
+    }
+
     const status = action === 'approve' ? 'approved' : 'rejected';
-    const { data: updatedDoc, error: updateError } = await db.rpc(
-      'review_document_with_audit',
-      {
-        p_document_id: documentId,
-        p_action: action,
-        p_actor_id: auth.id,
-        p_rejection_reason: action === 'reject' ? String(rejectionReason).trim() : null,
-      },
-    );
+    const { data: updatedDoc, error: updateError } = await db.rpc('review_document_with_audit', {
+      p_document_id: documentId,
+      p_action: action,
+      p_actor_id: auth.id,
+      p_rejection_reason: action === 'reject' ? String(rejectionReason).trim() : null,
+    });
 
     if (updateError) {
       return NextResponse.json(
@@ -79,7 +89,11 @@ async function _POST(request: NextRequest) {
         actorId: auth.id,
         entityType: 'documents',
         entityId: documentId,
-        metadata: { decision: action, file_name: document.file_name, student_user_id: studentUserId },
+        metadata: {
+          decision: action,
+          file_name: document.file_name,
+          student_user_id: studentUserId,
+        },
         req: request,
       });
     } catch {

@@ -13,6 +13,12 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import {
+  isQaDocumentRecord,
+  pendingDocumentStatuses,
+  resolveDocumentStorageLocator,
+} from '@/lib/admin/document-record';
+import { hasAnyRole } from '@/lib/rbac/role-matrix';
 import { logger } from '@/lib/logger';
 import type { AdminNavNotif } from '@/components/admin/AdminNav';
 
@@ -31,49 +37,73 @@ export async function GET(req: NextRequest) {
     (supabase as ReturnType<typeof getAdminClient> extends Promise<infer T> ? T : never);
   const effectiveDb = db ?? supabase;
 
+  const canReviewUploads = hasAnyRole(auth.effectiveRoles, ['admin']);
+  const noUploads = { data: [], count: 0, error: null };
+
   try {
-    const [profileRes, appsRes, docsRes, alertsRes, wioaDocsRes, staleLeadsRes, billingRes] =
-      await Promise.all([
-        effectiveDb
-          .from('profiles')
-          .select('full_name, first_name')
-          .eq('id', auth.user.id)
-          .maybeSingle(),
-        effectiveDb
-          .from('applications')
-          .select('id', { count: 'exact', head: true })
-          .in('status', ['submitted', 'in_review']),
-        effectiveDb
-          .from('documents')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'pending'),
-        effectiveDb
-          .from('compliance_alerts')
-          .select('id', { count: 'exact', head: true })
-          .not('status', 'eq', 'resolved'),
-        effectiveDb
-          .from('wioa_documents')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'pending'),
-        effectiveDb
-          .from('leads')
-          .select('id', { count: 'exact', head: true })
-          .lt('updated_at', new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString())
-          .not('status', 'in', '("closed_won","closed_lost","Closed Won","Closed Lost")'),
-        effectiveDb
-          .from('notifications')
-          .select('id,title,created_at', { count: 'exact' })
-          .eq('user_id', auth.user.id)
-          .eq('read', false)
-          .eq('metadata->>source', 'service-billing')
-          .order('created_at', { ascending: false })
-          .limit(20),
-      ]);
+    const [
+      profileRes,
+      appsRes,
+      docsRes,
+      alertsRes,
+      wioaDocsRes,
+      staleLeadsRes,
+      billingRes,
+      holderUploads,
+    ] = await Promise.all([
+      effectiveDb
+        .from('profiles')
+        .select('full_name, first_name')
+        .eq('id', auth.user.id)
+        .maybeSingle(),
+      effectiveDb
+        .from('applications')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['submitted', 'in_review']),
+      canReviewUploads
+        ? effectiveDb
+            .from('documents')
+            .select('id,file_name,file_path,storage_path,file_url,metadata,created_at')
+            .in('status', pendingDocumentStatuses)
+            .order('created_at', { ascending: false })
+            .limit(30)
+        : Promise.resolve(noUploads),
+      effectiveDb
+        .from('compliance_alerts')
+        .select('id', { count: 'exact', head: true })
+        .not('status', 'eq', 'resolved'),
+      effectiveDb
+        .from('wioa_documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+      effectiveDb
+        .from('leads')
+        .select('id', { count: 'exact', head: true })
+        .lt('updated_at', new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString())
+        .not('status', 'in', '("closed_won","closed_lost","Closed Won","Closed Lost")'),
+      effectiveDb
+        .from('notifications')
+        .select('id,title,created_at', { count: 'exact' })
+        .eq('user_id', auth.user.id)
+        .eq('read', false)
+        .eq('metadata->>source', 'service-billing')
+        .order('created_at', { ascending: false })
+        .limit(20),
+      canReviewUploads
+        ? effectiveDb
+            .from('program_holder_documents')
+            .select('id,file_name,file_url,created_at')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+            .limit(20)
+        : Promise.resolve(noUploads),
+    ]);
 
     const unavailableSources = (
       [
         ['applications', appsRes],
         ['documents', docsRes],
+        ['program-holder uploads', holderUploads],
         ['compliance', alertsRes],
         ['wioa', wioaDocsRes],
         ['leads', staleLeadsRes],
@@ -110,13 +140,41 @@ export async function GET(req: NextRequest) {
         time: 'Pending action',
       });
     }
-    if ((docsRes.count ?? 0) > 0) {
+    const documentAlerts = [
+      ...(docsRes.data ?? [])
+        .filter((doc) => !isQaDocumentRecord(doc) && resolveDocumentStorageLocator(doc))
+        .map((doc) => ({
+          id: `document-upload:${doc.id}`,
+          unread: true,
+          href: `/documents/review/${doc.id}`,
+          title: 'New document awaiting review',
+          time: doc.created_at,
+        })),
+      ...(holderUploads.data ?? [])
+        .filter((doc) => !isQaDocumentRecord(doc) && doc.file_url?.trim())
+        .map((doc) => ({
+          id: `holder-document-upload:${doc.id}`,
+          unread: true,
+          href: '/program-holder-documents',
+          title: 'New program holder document awaiting review',
+          time: doc.created_at,
+        })),
+    ].sort((a, b) => String(b.time).localeCompare(String(a.time)));
+    notifs.unshift(
+      ...documentAlerts.slice(0, 10).map((alert) => ({
+        ...alert,
+        time: alert.time
+          ? new Date(alert.time).toLocaleDateString('en-US', { timeZone: 'America/Indianapolis' })
+          : 'Pending action',
+      })),
+    );
+    if (documentAlerts.length > 10) {
       notifs.push({
-        id: 'docs',
+        id: 'document-upload:queue',
         unread: true,
-        href: '/documents/review',
-        title: `${docsRes.count} document${docsRes.count !== 1 ? 's' : ''} need review`,
-        time: 'Compliance required',
+        href: '/documents/review?status=pending',
+        title: 'More uploads awaiting review',
+        time: 'Open document review',
       });
     }
     if ((alertsRes.count ?? 0) > 0) {

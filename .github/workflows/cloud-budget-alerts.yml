@@ -57,4 +57,11 @@ jobs:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           test -n "$CRON_SECRET" || { echo '::error::CRON_SECRET is missing'; exit 1; }
-          curl --fail --silent --show-error --max-time 90 -o /dev/null -H "Authorization: Bearer $CRON_SECRET" https://admin.elevateforhumanity.org/api/cron/cloud-budget
+          response="$(mktemp)"
+          trap 'rm -f "$response"' EXIT
+          status="$(curl --silent --show-error --max-time 90 -o "$response" -w '%{http_code}' -H "Authorization: Bearer $CRON_SECRET" https://admin.elevateforhumanity.org/api/cron/cloud-budget)"
+          if [[ "$status" != 200 ]]; then
+            code="$(jq -r '.error // "" | select(test("^(CLOUD_BUDGET_[A-Z_0-9]+|SERVICE_BILLING_ALERTS_UNAVAILABLE)$"))' "$response" 2>/dev/null || true)"
+            echo "::error::Cloud spending refresh returned HTTP $status ${code:-}"
+            exit 1
+          fi

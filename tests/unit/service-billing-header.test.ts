@@ -4,6 +4,7 @@ const state = vi.hoisted(() => ({
   auth: vi.fn(),
   rows: [] as any[],
   billingError: false,
+  documents: [] as any[],
   filters: [] as any[],
 }));
 const database = {
@@ -36,6 +37,7 @@ const database = {
             error: state.billingError ? { message: 'unavailable' } : null,
           }).then(resolve);
         }
+        if (table === 'documents') return Promise.resolve({ data: state.documents }).then(resolve);
         return Promise.resolve({ count: 2, data: [] }).then(resolve);
       },
     };
@@ -48,7 +50,8 @@ vi.mock('@/lib/supabase/admin', () => ({ getAdminClient: async () => database })
 vi.mock('@/lib/supabase/server', () => ({ createClient: async () => database }));
 import { GET } from '@/apps/admin/app/api/admin/header-data/route';
 beforeEach(() => {
-  state.auth.mockResolvedValue({ user: { id: 'elizabeth-admin' } });
+  state.auth.mockResolvedValue({ user: { id: 'elizabeth-admin' }, effectiveRoles: ['admin'] });
+  state.documents = [];
   state.rows = [];
   state.filters = [];
   state.billingError = false;
@@ -100,4 +103,25 @@ it('marks billing data unavailable without claiming all notification sources suc
     status: 'degraded',
     unavailableSources: ['service-billing'],
   });
+});
+
+it('links stored uploads to review and omits missing files and known QA uploads', async () => {
+  state.documents = [
+    { id: 'ready', file_name: 'identity.pdf', storage_path: 'learner/identity.pdf' },
+    { id: 'missing', file_name: 'unavailable.pdf' },
+    { id: 'qa', file_name: 'qa-proof.pdf', file_path: 'fixtures/qa-proof.pdf' },
+  ];
+  const response = await GET(
+    new NextRequest('https://admin.elevateforhumanity.org/api/admin/header-data'),
+  );
+  const body = await response.json();
+  expect(body.notifs.filter((item: any) => item.id.startsWith('document-upload:'))).toEqual([
+    {
+      id: 'document-upload:ready',
+      unread: true,
+      href: '/documents/review/ready',
+      title: 'New document awaiting review',
+      time: 'Pending action',
+    },
+  ]);
 });

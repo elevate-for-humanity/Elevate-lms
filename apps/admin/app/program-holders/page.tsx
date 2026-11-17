@@ -49,6 +49,23 @@ export default async function AdminProgramHoldersPage() {
           .in('program_holder_id', holderIds)
       : { data: [] };
 
+  const { data: signatures, error: signatureError } = holderIds.length
+    ? await supabase
+        .from('mou_signatures')
+        .select('program_holder_id,signed_at,countersigned_at')
+        .in('program_holder_id', holderIds)
+        .not('signed_at', 'is', null)
+        .order('signed_at', { ascending: false })
+    : { data: [], error: null };
+  const signatureByHolder = new Map<
+    string,
+    { signed_at: string; countersigned_at: string | null }
+  >();
+  for (const signature of signatures ?? []) {
+    if (!signatureByHolder.has(signature.program_holder_id))
+      signatureByHolder.set(signature.program_holder_id, signature);
+  }
+
   const countMap: Record<string, number> = {};
   (programCounts || []).forEach((pc: any) => {
     countMap[pc.program_holder_id] = (countMap[pc.program_holder_id] || 0) + 1;
@@ -68,7 +85,9 @@ export default async function AdminProgramHoldersPage() {
   });
   const pending = items.filter((h: any) => h.status === 'pending').length;
   const active = items.filter((h: any) => ['active', 'approved'].includes(h.status)).length;
-  const linkedUserIds = new Set((holders || []).map((holder: any) => holder.user_id).filter(Boolean));
+  const linkedUserIds = new Set(
+    (holders || []).map((holder: any) => holder.user_id).filter(Boolean),
+  );
   const linkedHolderIds = new Set((holders || []).map((holder: any) => holder.id));
   const unlinkedRoleProfiles = (roleProfiles || []).filter((profile: any) => {
     const email = String(profile.email || '').toLowerCase();
@@ -121,12 +140,20 @@ export default async function AdminProgramHoldersPage() {
             </div>
             <p className="text-3xl font-bold text-brand-green-600">{active}</p>
           </div>
-          <div className={`rounded-lg border p-6 shadow-sm ${unlinkedRoleProfiles.length ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+          <div
+            className={`rounded-lg border p-6 shadow-sm ${unlinkedRoleProfiles.length ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}
+          >
             <div className="mb-2 flex items-center gap-2">
-              <AlertTriangle className={`h-5 w-5 ${unlinkedRoleProfiles.length ? 'text-amber-700' : 'text-slate-500'}`} />
+              <AlertTriangle
+                className={`h-5 w-5 ${unlinkedRoleProfiles.length ? 'text-amber-700' : 'text-slate-500'}`}
+              />
               <h3 className="text-sm font-medium text-slate-700">Unlinked Role Accounts</h3>
             </div>
-            <p className={`text-3xl font-bold ${unlinkedRoleProfiles.length ? 'text-amber-800' : 'text-slate-900'}`}>{unlinkedRoleProfiles.length}</p>
+            <p
+              className={`text-3xl font-bold ${unlinkedRoleProfiles.length ? 'text-amber-800' : 'text-slate-900'}`}
+            >
+              {unlinkedRoleProfiles.length}
+            </p>
           </div>
         </div>
 
@@ -135,17 +162,27 @@ export default async function AdminProgramHoldersPage() {
             <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-amber-800" />
               <div>
-                <h2 className="text-lg font-black text-amber-950">Program Holder role accounts need review</h2>
+                <h2 className="text-lg font-black text-amber-950">
+                  Program Holder role accounts need review
+                </h2>
                 <p className="mt-1 text-sm leading-6 text-amber-950">
-                  These active user profiles have a Program Holder or Site Coordinator role but no linked Program Holder organization. They cannot receive programs, applicants, phone, email, or a complete dashboard until an approved organization record is linked.
+                  These active user profiles have a Program Holder or Site Coordinator role but no
+                  linked Program Holder organization. They cannot receive programs, applicants,
+                  phone, email, or a complete dashboard until an approved organization record is
+                  linked.
                 </p>
               </div>
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {unlinkedRoleProfiles.map((profile: any) => (
-                <article key={profile.id} className="rounded-xl border border-amber-200 bg-white p-4">
+                <article
+                  key={profile.id}
+                  className="rounded-xl border border-amber-200 bg-white p-4"
+                >
                   <p className="font-black text-slate-950">{profile.full_name || 'Unnamed user'}</p>
-                  <p className="mt-1 text-sm text-slate-700">{profile.email || 'No email recorded'}</p>
+                  <p className="mt-1 text-sm text-slate-700">
+                    {profile.email || 'No email recorded'}
+                  </p>
                   <p className="mt-2 text-xs font-black uppercase tracking-wide text-amber-800">
                     {String(profile.role).replaceAll('_', ' ')} · organization link required
                   </p>
@@ -191,10 +228,21 @@ export default async function AdminProgramHoldersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        {h.mou_signed ? (
-                          <CheckCircle className="w-4 h-4 text-brand-green-600 mx-auto" />
+                        {signatureByHolder.has(h.id) ? (
+                          <Link
+                            href={`/mou?holder=${h.id}`}
+                            className="font-semibold text-brand-blue-700 underline"
+                          >
+                            {signatureByHolder.get(h.id)?.countersigned_at
+                              ? 'Countersigned'
+                              : 'Signature recorded'}
+                          </Link>
+                        ) : signatureError ? (
+                          <span>Unavailable</span>
+                        ) : h.mou_signed ? (
+                          <span>Signed status on file</span>
                         ) : (
-                          <XCircle className="w-4 h-4 text-slate-700 mx-auto" />
+                          <span>No signature recorded</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -217,7 +265,13 @@ export default async function AdminProgramHoldersPage() {
                             Review
                           </Link>
                           <ResendOnboardingButton holderId={h.id} />
-                          {h.user_id ? <OpenPortalPreviewButton targetUserId={h.user_id} label="Open Portal" reason={`Admin review of Program Holder ${h.id}`} /> : null}
+                          {h.user_id ? (
+                            <OpenPortalPreviewButton
+                              targetUserId={h.user_id}
+                              label="Open Portal"
+                              reason={`Admin review of Program Holder ${h.id}`}
+                            />
+                          ) : null}
                         </div>
                       </td>
                     </tr>

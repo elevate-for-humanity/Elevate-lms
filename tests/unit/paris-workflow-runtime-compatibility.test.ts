@@ -4,19 +4,18 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 const source = readFileSync('.github/workflows/paris-code-repair.yml', 'utf8');
-const start = source.indexOf('          # Require the deployed control plane');
-const finish = source.indexOf(
-  "          endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'",
-  start,
-);
-const guard = source
-  .slice(start, finish)
+const tick = source.split('      - name: Tick PARIS and dispatch the claimed repair with workflow-owned identity')[1]
+  ?.split('      - name: Report blocked recovery')[0];
+const python = tick?.match(/python - <<'PYCODE'\r?\n([\s\S]*?)^          PYCODE\s*$/m)?.[1]
   .split('\n')
   .map((line) => line.slice(10))
   .join('\n');
+const finish = python?.indexOf("\nendpoint=origin+'/api/cron/paris-code-repair'") ?? -1;
+if (!python || finish < 0) throw new Error('PARIS monitor Python compatibility boundary not found');
+const guard = python.slice(0, finish);
 function check(fixture: unknown) {
   const program =
-    `import os,json,re,urllib.request,io,sys\nf=json.load(sys.stdin)\nos.environ.update({'GITHUB_SHA':'a'*40,'GITHUB_REPOSITORY':'elevate-for-humanity/Elevate-lms','GH_TOKEN':'fixture'})\ndef response(req,timeout):\n return io.StringIO(json.dumps(f['health'] if req.full_url.endswith('/api/ready') else f['comparison']))\nurllib.request.urlopen=response\n` +
+    `import os,json,re,urllib.request,io,sys\nf=json.load(sys.stdin)\nos.environ.update({'GITHUB_SHA':'a'*40,'GITHUB_REPOSITORY':'elevate-for-humanity/Elevate-lms','GH_TOKEN':'fixture','PARIS_ADMIN_ORIGIN':'https://admin.example','PARIS_HEALTH_TIMEOUT_SECONDS':'10','PARIS_GITHUB_TIMEOUT_SECONDS':'10'})\nos.environ.pop('GITHUB_OUTPUT',None)\ndef response(req,timeout):\n return io.StringIO(json.dumps(f['health'] if req.full_url.endswith('/api/ready') else f['releases'] if '/actions/runs?' in req.full_url else f['comparison']))\nurllib.request.urlopen=response\n` +
     guard +
     "\nprint('COMPATIBLE')\n";
   return execFileSync('python3', ['-c', program], {
@@ -57,6 +56,22 @@ it('defers unhealthy, divergent, renamed server code and incomplete comparison e
   expect(
     check({ health: { ready: false, agenticExecutorReady: true, commit: 'a'.repeat(40) } }),
   ).not.toContain('COMPATIBLE');
+});
+
+it('accepts a newer runtime only with its exact successful main Admin release', () => {
+  const health = { ready: true, agenticExecutorReady: true, commit: 'b'.repeat(40) };
+  const release = { head_sha: health.commit, head_branch: 'main',
+    path: '.github/workflows/deploy-admin.yml', event: 'workflow_dispatch',
+    status: 'completed', conclusion: 'success' };
+  const fixture = { health, comparison: { status: 'behind', files: [] } };
+  expect(check({ ...fixture, releases: { workflow_runs: [release] } })).toContain('COMPATIBLE');
+  for (const changed of [
+    { head_sha: 'c'.repeat(40) }, { head_branch: 'work' },
+    { path: '.github/workflows/deploy-lms.yml' }, { event: 'push' },
+    { status: 'queued' }, { conclusion: 'failure' },
+  ]) expect(check({ ...fixture, releases: { workflow_runs: [{ ...release, ...changed }] } }))
+    .not.toContain('COMPATIBLE');
+  expect(check({ ...fixture, releases: { workflow_runs: [] } })).not.toContain('COMPATIBLE');
 });
 
 it('does not starve unchanged repairs behind the two public-only routing modules', () => {

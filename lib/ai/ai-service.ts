@@ -1,4 +1,5 @@
 import { recordParisObservation } from './runtime/supervision';
+import { withLaminarSpan, withLaminarStream } from '@/lib/observability/laminar';
 import { logger } from '@/lib/logger';
 import { requirePaidInferenceContext } from './paid-inference-context';
 import { withResilience, breakers, CircuitBreaker, CircuitOpenError } from '@/lib/resilience';
@@ -183,6 +184,10 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+  return withLaminarSpan('ai.chat', {}, () => aiChatInternal(options));
+}
+
+async function aiChatInternal(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   const started = Date.now();
   const { correlationId, ...input } = options;
   let provider: AIProvider | undefined;
@@ -207,7 +212,17 @@ async function executeConfiguredChat(options: ChatCompletionOptions, provider: A
   for (let pass = 0; pass < passes; pass += 1) {
     try {
       const providerOptions = { ...options, provider: provider.name as AIProviderName };
-      const result = await withResilience(() => provider.chat(providerOptions), {
+      const result = await withResilience(() => withLaminarSpan(
+        'ai.provider.chat',
+        { provider: provider.name },
+        () => provider.chat(providerOptions),
+        (response) => ({
+          model: /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,159}$/.test(response.model) ? response.model : undefined,
+          inputTokens: response.usage?.promptTokens,
+          outputTokens: response.usage?.completionTokens,
+          totalTokens: response.usage?.totalTokens,
+        }),
+      ), {
         circuitBreaker: CircuitBreaker.for(`ai:${provider.name}`, {
           failureThreshold: 5,
           resetTimeoutMs: 30_000,
@@ -247,7 +262,7 @@ async function executeConfiguredChat(options: ChatCompletionOptions, provider: A
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
   const started = Date.now();
   try {
-    yield* executeConfiguredStream(options);
+    yield* withLaminarStream('ai.stream', {}, () => executeConfiguredStream(options));
     await recordParisObservation({kind:'inference',operation:'ai.stream',status:'completed',durationMs:Date.now()-started});
   } catch (error) {
     await recordParisObservation({kind:'inference',operation:'ai.stream',status:'failed',durationMs:Date.now()-started,error});
@@ -265,10 +280,12 @@ async function* executeConfiguredStream(options: ChatCompletionOptions): AsyncIt
     const streamProvider = provider as {
       chatStream: (opts: ChatCompletionOptions) => AsyncIterable<string>;
     };
-    yield* streamProvider.chatStream(options);
+    yield* withLaminarStream('ai.provider.stream', { provider: provider.name }, () => streamProvider.chatStream(options));
   } else {
-    const result = await provider.chat(options);
-    if (result.content) yield result.content;
+    yield* withLaminarStream('ai.provider.stream', { provider: provider.name }, async function* () {
+      const result = await provider.chat(options);
+      if (result.content) yield result.content;
+    });
   }
 }
 

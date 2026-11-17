@@ -1,4 +1,5 @@
 import { PARIS_SYSTEM_IDENTITY } from './paris-identity';
+import { withLaminarSpan } from '@/lib/observability/laminar';
 /**
  * lib/ai/orchestrator.ts
  *
@@ -243,6 +244,10 @@ async function persistOperationalResult(
 // ─── Main orchestrator ────────────────────────────────────────────────────────
 
 export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
+  return withLaminarSpan('ai.task', { task: input.task }, () => runAITaskInternal(input));
+}
+
+async function runAITaskInternal(input: AITaskInput): Promise<AITaskResult> {
   const { task, prompt, context = {}, maxTokens, temperature } = input;
 
   // Moderation

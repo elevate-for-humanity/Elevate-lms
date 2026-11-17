@@ -15,6 +15,7 @@ const useStandaloneOutput =
 const nextConfig = {
   // Disable Next's built-in lint step during build - ESLint runs separately
   serverExternalPackages: [
+    '@lmnr-ai/lmnr',
     'tesseract.js',
     'tesseract.js-core',
     'sharp',

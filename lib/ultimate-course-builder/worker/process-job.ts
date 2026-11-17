@@ -1,4 +1,6 @@
 import {verifySavedCourseLessons} from './verify-saved-course.mjs';
+import { withLaminarSpan } from '../../observability/laminar';
+import { initializeLaminar } from '../../observability/laminar-runtime';
 import { checkpointContinuousLesson, continuousCourseLease } from './continuous-course-lease.mjs';
 import { attachCompletedLessonMedia } from './attach-lesson-media.mjs';
 import { preservedCourseCursor } from './preserve-completed.mjs';
@@ -33,6 +35,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
+  await initializeLaminar('course_worker');
+  return withLaminarSpan('course.job', {}, () => processUltimateJobInternal(db, workerId, queue, job));
+}
+
+async function processUltimateJobInternal(
+  db: SupabaseClient,
+  workerId: string,
+  queue: UltimateJobQueue,
+  job: NonNullable<Awaited<ReturnType<UltimateJobQueue['claim']>>>,
+) {
   const executionStarted = Date.now();
   const generation = Number(job.execution_generation);
   if (!Number.isSafeInteger(generation) || generation < 1)

@@ -163,8 +163,9 @@ describe('Host Shop E2E identity isolation', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/e2e-desktop-chrome.yml'), 'utf8');
     const desktop = workflow.split('  desktop-chrome:')[1]?.split('  email-device-browsers:')[0] || '';
     expect(desktop).not.toBe(''); // Reject a renamed or missing browser job before asserting its identity.
-    expect(desktop).toContain('E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL || secrets.TEST_HOST_SHOP_EMAIL }}');
-    expect(desktop).toContain('E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD || secrets.TEST_HOST_SHOP_PASSWORD }}');
+    expect(desktop).toContain('E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}');
+    expect(desktop).toContain('E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}');
+    expect(desktop).not.toContain('secrets.TEST_HOST_SHOP_');
     expect(desktop).not.toMatch(/E2E_HOST_SHOP_(?:EMAIL|PASSWORD):[^\r\n]*(?:ADMIN|PROGRAM_HOLDER|STUDENT)/);
     expect(desktop).toContain('Authenticated Host Shop desktop, tablet and mobile geometry');
     expect(desktop).toContain('env.E2E_HOST_SHOP_EMAIL !=');

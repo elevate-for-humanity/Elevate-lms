@@ -8,7 +8,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
   const rawSources = sources.filter(value => typeof value === 'string');
   const supplied = rawSources.map(fold);
   const emails = rawSources.flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || []).map(value => value.replace(/\.+$/, ''));
-  const phones = rawSources.flatMap(source => [...source.matchAll(/[+(\d][+\d ().-]*\d[)]?/g)].filter(match => {
+  const phones = rawSources.flatMap(source => [...source.matchAll(/[+(\d](?:[+\d ()-]|\.(?=\d))*\d[)]?/g)].filter(match => {
     const before = source[(match.index ?? 0) - 1] || '';
     const after = source[(match.index ?? 0) + match[0].length] || '';
     return !/[\p{L}\p{N}+]/u.test(before) && !/[\p{L}\p{N}]/u.test(after);

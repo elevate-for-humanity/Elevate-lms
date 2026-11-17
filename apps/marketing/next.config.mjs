@@ -92,6 +92,7 @@ const nextConfig = {
   // these packages makes webpack inspect require-in-the-middle's intentional
   // dynamic require calls and emits noisy critical-dependency warnings.
   serverExternalPackages: [
+    '@lmnr-ai/lmnr',
     '@sentry/nextjs',
     '@sentry/node',
     '@sentry/node-core',

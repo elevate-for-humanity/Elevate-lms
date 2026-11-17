@@ -140,3 +140,11 @@ test('generation never strips unsupported email prefixes or contact-adjacent let
  assert.equal((await f.post(request({brief:'Use these details exactly: %sales@example.com and ABC5551234567XYZ, no invented contacts.'}))).status,201);
  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
 });
+
+test('generation retains complete phones before sentence-ending periods and numeric addresses',async()=>{
+ for(const phone of ['317-555-0123','317.555.0123']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone,address:'123 Main Street'}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Owner asks to publish: Call '+phone+'. 123 Main Street. Contact column requested.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{phone,address:'123 Main Street'});
+ }
+});

@@ -12,6 +12,7 @@
     "predev": "node ../../scripts/sync-development-public.mjs admin"
   },
   "dependencies": {
+    "@lmnr-ai/lmnr": "0.9.4",
     "@napi-rs/canvas": "^0.1.80",
     "fontkit": "^2.0.4",
     "next": "catalog:",

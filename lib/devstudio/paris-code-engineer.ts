@@ -523,9 +523,21 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // inspecting any of the exact filenames already discovered on this branch.
       // Redirect once to a verified filename; normal read authorization and
       // duplicate-inspection limits remain enforced below.
-      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
+      let recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
+      if (!recovered && checkInspectionBudget(inspectionHistory, action).decision !== 'inspect') {
+        // A stale discovered-files list can contain nothing relevant to the
+        // diagnosed source. Recover only from the authenticated task-branch
+        // tree, never from guessed paths or test/log instructions. The normal
+        // readFile allowlist and repetition budget still apply to the result.
+        const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
+        if (!Array.isArray(tree.tree) || tree.truncated === true)
+          throw Error('PARIS_REPAIR_SOURCE_TREE_INCOMPLETE');
+        const paths = suggestedSourcePaths(task, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));
+        discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
+        recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
+      }
       if (recovered) {
-        observations.push('INSPECTION REDIRECTED to previously discovered source: '+recovered.path);
+        observations.push('INSPECTION REDIRECTED to authenticated goal-relevant source: '+recovered.path);
         action = recovered as AgentAction;
       }
       const inspection = checkInspectionBudget(inspectionHistory, action);

@@ -89,8 +89,9 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const hasBoundedAnnotation = candidateAtLineStart !== null
             && /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
             && !lineHasIndependentPhone(candidateSuffix);
+          const trailingContactDestination = /\b(?:phone|call|dial|text|hotline|helpline|emergency(?:\s+(?:line|number))?|support\s+(?:line|hotline|number))\b/i;
           const hasTrailingContactAnnotation = hasBoundedAnnotation
-            && contactKeyword.test(candidateSuffix);
+            && trailingContactDestination.test(candidateSuffix);
           const hasExplicitPreviousLineLabel = (candidateOccupiesLine || hasBoundedAnnotation)
             && !/\d/.test(previousLineLabel)
             && (

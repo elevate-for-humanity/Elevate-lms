@@ -30,19 +30,37 @@ jobs:
     env:
       PLAYWRIGHT_HTML_OPEN: never
       NODE_OPTIONS: '--max-old-space-size=6144'
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL || secrets.E2E_ADMIN_EMAIL }}
-      TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD || secrets.E2E_ADMIN_PASSWORD }}
-      TEST_STUDENT_EMAIL: ${{ secrets.TEST_STUDENT_EMAIL || secrets.E2E_STUDENT_EMAIL }}
-      TEST_STUDENT_PASSWORD: ${{ secrets.TEST_STUDENT_PASSWORD || secrets.E2E_STUDENT_PASSWORD }}
-      TEST_PROGRAM_HOLDER_EMAIL: ${{ secrets.TEST_PROGRAM_HOLDER_EMAIL }}
-      TEST_PROGRAM_HOLDER_PASSWORD: ${{ secrets.TEST_PROGRAM_HOLDER_PASSWORD }}
+      # Isolated QA only: the full local-dev suite includes service-role
+      # writes. Never use the production learner database or its service key.
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      TEST_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      TEST_STUDENT_EMAIL: ${{ secrets.E2E_LEARNER_EMAIL }}
+      TEST_STUDENT_PASSWORD: ${{ secrets.E2E_LEARNER_PASSWORD }}
+      E2E_LEARNER_EMAIL: ${{ secrets.E2E_LEARNER_EMAIL }}
+      E2E_LEARNER_PASSWORD: ${{ secrets.E2E_LEARNER_PASSWORD }}
+      TEST_PROGRAM_HOLDER_EMAIL: ${{ secrets.E2E_PROGRAM_HOLDER_EMAIL }}
+      TEST_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
+      E2E_PROGRAM_HOLDER_EMAIL: ${{ secrets.E2E_PROGRAM_HOLDER_EMAIL }}
+      E2E_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
+      E2E_APPRENTICE_EMAIL: ${{ secrets.E2E_APPRENTICE_EMAIL }}
+      E2E_APPRENTICE_PASSWORD: ${{ secrets.E2E_APPRENTICE_PASSWORD }}
+      E2E_EMPLOYER_EMAIL: ${{ secrets.E2E_EMPLOYER_EMAIL }}
+      E2E_EMPLOYER_PASSWORD: ${{ secrets.E2E_EMPLOYER_PASSWORD }}
+      E2E_INSTRUCTOR_EMAIL: ${{ secrets.E2E_INSTRUCTOR_EMAIL }}
+      E2E_INSTRUCTOR_PASSWORD: ${{ secrets.E2E_INSTRUCTOR_PASSWORD }}
+      E2E_STAFF_EMAIL: ${{ secrets.E2E_STAFF_EMAIL }}
+      E2E_STAFF_PASSWORD: ${{ secrets.E2E_STAFF_PASSWORD }}
+      E2E_CASE_MANAGER_EMAIL: ${{ secrets.E2E_CASE_MANAGER_EMAIL }}
+      E2E_CASE_MANAGER_PASSWORD: ${{ secrets.E2E_CASE_MANAGER_PASSWORD }}
       # Only a designated disposable Host Shop identity may certify authenticated
       # shop dashboard geometry; never borrow Admin or Program Holder credentials.
-      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL || secrets.TEST_HOST_SHOP_EMAIL }}
-      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD || secrets.TEST_HOST_SHOP_PASSWORD }}
+      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}
+      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}
       TEST_MODE: 'true'
     steps:
       - uses: actions/checkout@v4
@@ -56,6 +74,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify isolated QA database and three-service E2E configuration
+        run: node scripts/qa/verify-e2e-service-config.mjs
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Verify published marketing artwork through Next image loader

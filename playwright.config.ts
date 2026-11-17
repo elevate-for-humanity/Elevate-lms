@@ -166,6 +166,10 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
+  // A broken shared service otherwise repeats hundreds of failures until
+  // GitHub cancels the 120-minute job. Fail with an explicit nonzero verdict
+  // after a bounded failure sample; never mark unexecuted tests as passed.
+  maxFailures: process.env.CI ? 12 : undefined,
   workers: 1,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'html',
   timeout: 60000,

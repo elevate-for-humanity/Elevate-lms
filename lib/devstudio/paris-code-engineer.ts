@@ -530,8 +530,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         // tree, never from guessed paths or test/log instructions. The normal
         // readFile allowlist and repetition budget still apply to the result.
         const tree = await githubJson(`/git/trees/${headSha}?recursive=1`);
-        if (!Array.isArray(tree.tree) || tree.truncated === true)
-          throw Error('PARIS_REPAIR_SOURCE_TREE_INCOMPLETE');
+        // A truncated GitHub tree is incomplete discovery evidence, not a fatal
+        // repository failure. Retain authenticated paths already discovered and
+        // continue through the normal allowlisted read/list workflow.
+        if (!Array.isArray(tree.tree)) throw Error('PARIS_REPAIR_SOURCE_TREE_INVALID');
+        if (tree.truncated === true) observations.push('SOURCE_TREE_TRUNCATED: using partial authenticated paths; continue with targeted list/read.');
         const paths = suggestedSourcePaths(task, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));
         discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
         recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);

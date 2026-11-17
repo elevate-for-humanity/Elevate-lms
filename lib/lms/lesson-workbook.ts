@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@/lib/supabase';
 import { HVAC_COURSE_ID, HVAC_WORKBOOK_SLUG, HVAC_RESPONSE_FIELDS } from './hvac-workbook-contract';
 import content from './hvac-workbook-content.json';
 import type { Workbook, WorkbookSection, WorkbookResponse } from './digital-workbooks';
+import { BOOKKEEPING_COURSE_ID, BOOKKEEPING_WORKBOOK_SLUG } from './bookkeeping-workbook-contract';
 
 export async function loadLessonWorkbook(
   db: SupabaseClient,
@@ -11,25 +12,30 @@ export async function loadLessonWorkbook(
   userId: string | undefined,
   preview = false,
 ) {
-  if (courseId !== HVAC_COURSE_ID) return null;
+  const bookkeeping = courseId === BOOKKEEPING_COURSE_ID;
+  if (courseId !== HVAC_COURSE_ID && !bookkeeping) return null;
   const chapter = content.chapters.find((chapter) => chapter.lesson_id === lessonId);
-  if (!chapter) return null; // Separate practice examinations have no writing chapter.
+  if (!bookkeeping && !chapter) return null; // Separate HVAC practice exams have no writing chapter.
   const book = await db
     .from('digital_workbooks')
     .select('id,slug,title,program_id,cover_image')
-    .eq('slug', HVAC_WORKBOOK_SLUG)
+    .eq('slug', bookkeeping ? BOOKKEEPING_WORKBOOK_SLUG : HVAC_WORKBOOK_SLUG)
     .eq('is_active', true)
     .maybeSingle();
   if (book.error || !book.data) throw new Error('Matching workbook could not be loaded.');
-  const section = await db
+  let sectionQuery = db
     .from('digital_workbook_sections')
     .select('id,workbook_id,section_number,title,unit,pdf_page,prompts,lesson_id')
     .eq('workbook_id', book.data.id)
-    .eq('id', chapter.section_id)
-    .eq('lesson_id', lessonId)
-    .maybeSingle();
-  if (section.error || !section.data)
+    .eq('lesson_id', lessonId);
+  if (chapter && !bookkeeping) sectionQuery = sectionQuery.eq('id', chapter.section_id);
+  const section = await sectionQuery.maybeSingle();
+  if (section.error)
     throw new Error('Matching workbook chapter could not be loaded.');
+  if (!section.data) {
+    if (bookkeeping) return null;
+    throw new Error('Matching workbook chapter could not be loaded.');
+  }
   let response: WorkbookResponse | undefined;
   let readOnly = true;
   if (!preview && userId) {
@@ -51,6 +57,7 @@ export async function loadLessonWorkbook(
     response: response || undefined,
     accountId: userId || 'admin-preview',
     readOnly,
+    requiredForCompletion: !bookkeeping,
   };
 }
 

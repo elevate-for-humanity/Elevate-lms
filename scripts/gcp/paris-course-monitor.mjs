@@ -1,4 +1,5 @@
 import {inspectCourseAutopilot,COURSE_AI_ROLES} from '../../lib/ultimate-course-builder/worker/paris-monitor.mjs';
+import {autopilotRpcVerdict,AUTOPILOT_RPC_TIMEOUT_MS} from './deploy-lesson-autopilots.mjs';
 
 /** Resolve only the latest job generation for a build/role. UUID sort is not
  * chronological; an older completed producer cannot certify a newer failure.
@@ -33,11 +34,23 @@ export function latestRoleJobs(rows) {
 }
 
 /** Runs outside Admin so a 503 in the dashboard cannot stop queue supervision. */
-export async function monitorCourseQueue({request=fetch,env=process.env,now=new Date(),dispatchState,jobIds,conflictRetries=2}={}) {
+export async function monitorCourseQueue({request=fetch,env=process.env,now=new Date(),dispatchState,jobIds,conflictRetries=2,
+  wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}) {
   if(env.GITHUB_REPOSITORY!=='elevate-for-humanity/Elevate-lms'||!env.SUPABASE_SERVICE_ROLE_KEY)
     throw Error('PARIS_MONITOR_AUTHORITY_REQUIRED');
   const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
   const headers={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY};
+  // Queue projections and the readiness verdict are replay-safe reads. An
+  // unanswered transient read must not stop all coordination, but an answered
+  // HTTP failure, invalid body, or ambiguous write remains a real failure.
+  const read=async(url,optionsFor,errorPrefix)=>{
+    const result=await autopilotRpcVerdict(url,optionsFor,{wait,request:async(value,options)=>{
+      const response=await request(value,options);
+      if(!response.ok)throw Error(errorPrefix+response.status);
+      return response;
+    }});
+    return result.value;
+  };
   const url=new URL(root);
   url.searchParams.set('select','id,build_id,job_type,status,created_at,available_at,payload,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,external_execution_id,execution_generation,last_error,monitor,ultimate_course_builds(status,findings,ownerPaused:profile->ownerPaused)');
   url.searchParams.set('order','id.asc');
@@ -49,9 +62,8 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     const pageUrl=new URL(url);
     if(cursor)pageUrl.searchParams.set('id','gt.'+cursor);
     pageUrl.searchParams.set('limit',String(pageSize));
-    const response=await request(pageUrl,{headers,signal:AbortSignal.timeout(15000)});
-    if(!response.ok)throw Error('PARIS_MONITOR_READ_HTTP_'+response.status);
-    const page=await response.json();
+    const page=await read(pageUrl,()=>({headers,signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)}),
+      'PARIS_MONITOR_READ_HTTP_');
     if(!Array.isArray(page))throw Error('PARIS_MONITOR_RESPONSE_INVALID');
     rows.push(...page);
     if(page.length<pageSize)break;
@@ -77,12 +89,11 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   const readyRoleIds=new Set();
   for(let i=0;i<readinessCandidates.length;i+=1000){
     const batch=readinessCandidates.slice(i,i+1000).map(job=>job.id);
-    const result=await request(
+    const ids=await read(
       'https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/rpc/ultimate_autopilot_ready_jobs',
-      {method:'POST',headers:{...headers,'Content-Type':'application/json'},
-       body:JSON.stringify({p_jobs:batch}),signal:AbortSignal.timeout(15000)});
-    if(!result.ok)throw Error('PARIS_ROLE_READINESS_HTTP_'+result.status);
-    const ids=await result.json();
+      ()=>({method:'POST',headers:{...headers,'Content-Type':'application/json'},
+       body:JSON.stringify({p_jobs:batch}),signal:AbortSignal.timeout(AUTOPILOT_RPC_TIMEOUT_MS)}),
+      'PARIS_ROLE_READINESS_HTTP_');
     const expected=new Set(batch);
     if(!Array.isArray(ids)||ids.some(id=>typeof id!=='string'||!expected.has(id))||
        new Set(ids).size!==ids.length)throw Error('PARIS_ROLE_READINESS_INVALID');
@@ -180,7 +191,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(!changed.ok)throw Error('PARIS_MONITOR_WRITE_HTTP_'+changed.status);
     const saved=await changed.json();
     if(Array.isArray(saved)&&saved.length===0 && conflictRetries>0){
-      const reconciled=await monitorCourseQueue({request,env,now,dispatchState,jobIds:[job.id],conflictRetries:conflictRetries-1});
+      const reconciled=await monitorCourseQueue({request,env,now,dispatchState,jobIds:[job.id],conflictRetries:conflictRetries-1,wait});
       observations.push(...(reconciled.length?reconciled:[{jobId:job.id,state:'changed',action:'none',saved:false}]));
     }else{
       observations.push({jobId:job.id,...observation,saved:Array.isArray(saved)&&saved.length===1});

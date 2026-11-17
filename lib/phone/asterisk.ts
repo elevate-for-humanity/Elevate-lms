@@ -27,6 +27,7 @@ export type PhoneConnectionFailureCode =
   | 'PHONE_RUNTIME_BINDINGS_MISSING'
   | 'PHONE_CONTROL_NOT_CONFIGURED'
   | 'PHONE_CONTROL_AUTH_FAILED'
+  | 'PHONE_DEVICE_NOT_AUTHORIZED'
   | 'PHONE_CONTROL_TIMEOUT'
   | 'PHONE_CONTROL_UNREACHABLE'
   | 'PHONE_PROVISIONER_UNAVAILABLE'
@@ -39,6 +40,7 @@ const FAILURE_MESSAGES: Record<PhoneConnectionFailureCode, string> = {
   PHONE_RUNTIME_BINDINGS_MISSING:
     'The phone service requires Google Secret Manager runtime bindings.',
   PHONE_CONTROL_NOT_CONFIGURED: 'The phone provisioning service is not configured.',
+  PHONE_DEVICE_NOT_AUTHORIZED: 'This phone device is not authorized for the assigned extension.',
   PHONE_CONTROL_AUTH_FAILED:
     'The dashboard could not authenticate with the phone provisioning service.',
   PHONE_CONTROL_TIMEOUT: 'The phone provisioning service timed out.',
@@ -97,8 +99,8 @@ async function controlRequest<T>(path: string, identity: DeviceIdentity): Promis
     );
   }
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403)
-      throw new PhoneConnectionError('PHONE_CONTROL_AUTH_FAILED');
+    if (response.status === 401) throw new PhoneConnectionError('PHONE_CONTROL_AUTH_FAILED');
+    if (response.status === 403) throw new PhoneConnectionError('PHONE_DEVICE_NOT_AUTHORIZED');
     if (response.status >= 500) throw new PhoneConnectionError('PHONE_PROVISIONER_UNAVAILABLE');
     if (response.status === 409) {
       // Only these two fixed service codes are accepted, never arbitrary text.

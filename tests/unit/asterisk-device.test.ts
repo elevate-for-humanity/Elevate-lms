@@ -123,7 +123,7 @@ it('requires explicit Google authority for production phone credentials', async 
 describe('phone connection failure isolation', () => {
   it.each([
     [401, 'unauthorized', 'PHONE_CONTROL_AUTH_FAILED'],
-    [403, 'forbidden', 'PHONE_CONTROL_AUTH_FAILED'],
+    [403, 'device_not_authorized', 'PHONE_DEVICE_NOT_AUTHORIZED'],
     [503, 'provisioner_quarantined', 'PHONE_PROVISIONER_UNAVAILABLE'],
     [409, 'device_limit_reached', 'PHONE_DEVICE_LIMIT_REACHED'],
     [409, 'device_assignment_conflict', 'PHONE_DEVICE_ASSIGNMENT_CONFLICT'],

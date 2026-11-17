@@ -21,7 +21,8 @@ import {
   PHONE_EXTENSION_PATTERN,
   phoneProfileLabel,
 } from '@/lib/phone/config';
-import { scopePhoneProfileQuery } from '@/lib/phone/profile-scope';
+import { findPhoneWorkspace, phoneWorkspaceTenant } from '@/lib/phone/workspace';
+import { scopePhoneProfileQuery, phoneNumberProfileChoices } from '@/lib/phone/profile-scope';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import {
@@ -62,6 +63,10 @@ export default async function PhonePage() {
       : { data: null };
   const system = tenantSystem ?? platformSystem;
   const systemId = system?.id as string | undefined;
+  const existingWorkspace = systemId
+    ? await findPhoneWorkspace(db, tenantId, platformAdmin, systemId)
+    : null;
+  const profileTenantId = phoneWorkspaceTenant(existingWorkspace, tenantId);
 
   const [
     numbersResult,
@@ -71,6 +76,7 @@ export default async function PhonePage() {
     voicemailResult,
     workspaceResult,
     programHoldersResult,
+    numberHoldersResult,
     extensionsResult,
     devicesResult,
   ] = systemId
@@ -96,15 +102,16 @@ export default async function PhonePage() {
           .select('*', { count: 'exact', head: true })
           .eq('phone_system_id', systemId)
           .eq('is_read', false),
-        db
-          .from('communication_workspaces')
-          .select('id,status')
-          .eq('phone_system_id', systemId)
-          .maybeSingle(),
+        Promise.resolve({ data: existingWorkspace }),
         scopePhoneProfileQuery(
           db.from('profiles').select('id,full_name,email,role,program_holder_id'),
-          system.tenant_id ?? null,
+          profileTenantId,
         ).in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
+          .order('full_name'),
+        scopePhoneProfileQuery(
+          db.from('profiles').select('id,full_name,email,role'),
+          system.tenant_id ?? null,
+        ).in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
           .order('full_name'),
         db
           .from('communication_extensions')
@@ -128,6 +135,7 @@ export default async function PhonePage() {
         { data: null },
         { data: [] },
         { data: [] },
+        { data: [] },
         { count: 0 },
       ] as any);
 
@@ -138,6 +146,9 @@ export default async function PhonePage() {
   const destinations = destinationsResult.data ?? [];
   const menuOptions = menuResult.data ?? [];
   const programHolders = (programHoldersResult.data ?? []).filter(
+    (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
+  );
+  const numberHolders = (numberHoldersResult.data ?? []).filter(
     (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
   );
   const extensions = extensionsResult.data ?? [];
@@ -379,7 +390,7 @@ export default async function PhonePage() {
                       className="min-h-11 min-w-11 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs"
                     >
                       <option value="">Unassigned</option>
-                      {programHolders.map((profile: any) => (
+                      {phoneNumberProfileChoices(numberHolders, item.assigned_profile_id).map((profile: any) => (
                         <option key={profile.id} value={profile.id}>
                           {phoneProfileLabel(profile)}
                         </option>

@@ -50,5 +50,5 @@ jobs:
           psql -v ON_ERROR_STOP=1 --single-transaction \
             -f tests/integration/phone-extension/schema.sql \
             -f supabase/migrations/20261117091246_phone_one_enabled_destination_per_extension.sql \
-            -f supabase/migrations/20261117093000_phone_atomic_extension_save.sql \
+            -f supabase/migrations/20261117094731_phone_atomic_extension_save.sql \
             -f tests/integration/phone-extension/assertions.sql

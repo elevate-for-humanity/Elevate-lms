@@ -183,3 +183,25 @@ it('shows a connected owner device in admin preview without opening a second pho
  expect(screen.getByRole('button',{name:'Connect phone'})).toBeDisabled();
  expect(mock.create).not.toHaveBeenCalled();
 });
+
+it('keeps a token API failure offline, shows its specific cause, and retries only on request', async () => {
+  let tokenAttempts = 0;
+  mock.create.mockClear();
+  vi.stubGlobal('fetch', vi.fn(async (_url: string, init?: RequestInit) => {
+    if (!init?.method) return Response.json(data);
+    if (init.method === 'POST') {
+      tokenAttempts += 1;
+      return Response.json({ code: 'PHONE_CONTROL_AUTH_FAILED', error: 'The dashboard could not authenticate with the phone provisioning service.' }, { status: 502 });
+    }
+    return Response.json({});
+  }));
+  render(<ProgramHolderPhone />);
+  await screen.findByText('The dashboard could not authenticate with the phone provisioning service.');
+  expect(screen.getByText('Phone offline')).toBeTruthy();
+  expect(mock.create).not.toHaveBeenCalled();
+  expect(tokenAttempts).toBe(1);
+  fireEvent.click(screen.getByRole('button', { name: 'Connect phone' }));
+  await waitFor(() => expect(tokenAttempts).toBe(2));
+  await screen.findByText('The dashboard could not authenticate with the phone provisioning service.');
+  expect(mock.create).not.toHaveBeenCalled();
+});

@@ -68,6 +68,32 @@ test('Store hands exact deployed source and run to validation-only payment accep
  assert.equal(result.acceptancePassed,false);
  assert.equal(f.calls.filter(c=>c.options.method==='POST').length,2);
 });
+
+test('LMS explicitly dispatches Host Shop QA with the exact source release identity',async()=>{
+ const f=fixture({live:{...health,service:'lms'}});
+ const result=await dispatchAcceptance({...env,ACCEPTANCE_COMPONENT:'lms'},f.request);
+ const host=f.calls.find(c=>c.url.endsWith('/host-shop-cross-shop-acceptance.yml/dispatches'));
+ assert.ok(host);
+ assert.equal(host.options.method,'POST');
+ assert.deepEqual(JSON.parse(host.options.body),{ref:'main',inputs:{deployed_sha:env.ACCEPTANCE_SHA,deployment_run_id:'123'}});
+ assert.equal(result.acceptancePassed,false);
+ assert.equal(f.calls.filter(c=>c.options.method==='POST').length,2);
+});
+test('Host Shop release source must finish successfully on the exact trusted LMS workflow',async()=>{
+ const lmsEnv={...env,ACCEPTANCE_COMPONENT:'lms'};
+ const lmsHealth={...health,service:'lms'};
+ const lmsSource={...source,path:'.github/workflows/deploy-google-lms-trigger.yml'};
+ const good=fixture({live:lmsHealth,run:lmsSource});
+ assert.equal((await verifyAcceptance(lmsEnv,good.request)).sourceVerified,true);
+ for(const bad of [{...lmsSource,conclusion:'failure'},{...lmsSource,path:'.github/workflows/ci.yml'},{...lmsSource,head_sha:'b'.repeat(40)}]){
+  const f=fixture({live:lmsHealth,run:bad});
+  await assert.rejects(verifyAcceptance(lmsEnv,f.request),/ACCEPTANCE_DEPLOYMENT_/);
+ }
+ const workflow=readFileSync(new URL('../../.github/workflows/host-shop-cross-shop-acceptance.yml',import.meta.url),'utf8');
+ assert.ok(workflow.includes('node scripts/gcp/production-acceptance.mjs verify'));
+ assert.ok(workflow.includes('actions: read'));
+});
+
 test('other services cannot start Store payment validation',async()=>{
  for(const component of ['admin','marketing','lms']) {
   const f=fixture({live:{...health,service:component}});

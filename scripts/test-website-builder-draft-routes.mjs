@@ -150,7 +150,7 @@ test('generation retains complete phones before sentence-ending periods and nume
 });
 
 test('generation retains email addresses surrounded by prose punctuation',async()=>{
- for(const supplied of ['sales@example.com!','sales@example.com?','sales@example.com\u0027',"'sales@example.com'"]) {
+ for(const supplied of ['sales@example.com!','sales@example.com?','sales@example.com\u0027',"'sales@example.com'",'“sales@example.com”.','‘sales@example.com’!']) {
   const contact={email:'sales@example.com'};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
   assert.equal((await f.post(request({brief:'Build the requested business website with these owner-supplied details. Email us at '+supplied}))).status,201);
@@ -226,7 +226,9 @@ test('generation keeps complete phones after prose separators and valid service 
  for(const [source,phone] of [
   ['Call us. 317-555-0123','317-555-0123'],
   ['Phone - 317-555-0123','317-555-0123'],
+  ['Call 317-555-0123 9am–5pm weekdays.','317-555-0123'],
   ['For crisis support, call 988.','988'],
+  ['Phone:\n988','988'],
  ]) {
   const contact={phone};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});

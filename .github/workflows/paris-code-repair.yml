@@ -31,6 +31,20 @@ permissions:
   contents: read
   id-token: write
   actions: write
+# PARIS operational controls are explicitly configured in repository variables.
+env:
+  PARIS_ADMIN_ORIGIN: ${{ vars.PARIS_ADMIN_ORIGIN }}
+  PARIS_HEALTH_TIMEOUT_SECONDS: ${{ vars.PARIS_HEALTH_TIMEOUT_SECONDS }}
+  PARIS_GITHUB_TIMEOUT_SECONDS: ${{ vars.PARIS_GITHUB_TIMEOUT_SECONDS }}
+  PARIS_PREFLIGHT_TIMEOUT_SECONDS: ${{ vars.PARIS_PREFLIGHT_TIMEOUT_SECONDS }}
+  PARIS_TICK_TIMEOUT_SECONDS: ${{ vars.PARIS_TICK_TIMEOUT_SECONDS }}
+  PARIS_DISPATCH_FAILURE_TIMEOUT_SECONDS: ${{ vars.PARIS_DISPATCH_FAILURE_TIMEOUT_SECONDS }}
+  PARIS_PREPARE_REQUEST_TIMEOUT_SECONDS: ${{ vars.PARIS_PREPARE_REQUEST_TIMEOUT_SECONDS }}
+  PARIS_OPENHANDS_POLL_SECONDS: ${{ vars.PARIS_OPENHANDS_POLL_SECONDS }}
+  PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS: ${{ vars.PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS }}
+  PARIS_VALIDATION_HEAP_MB: ${{ vars.PARIS_VALIDATION_HEAP_MB }}
+  PARIS_REPAIR_BUDGET_MINUTES: ${{ vars.PARIS_REPAIR_BUDGET_MINUTES }}
+  PARIS_REPAIR_MAX_TURNS: ${{ vars.PARIS_REPAIR_MAX_TURNS }}
 # Monitor observations are coalescible; explicit per-repair dispatches are not.
 # Keep the protected source-release transaction serialized by its durable
 # active-repair DB claim, while leaving a fresh monitor runnable during
@@ -43,7 +57,7 @@ jobs:
       queue: single
     if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.repair_id == '') || (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' && (github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success')))
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: ${{ fromJSON(vars.PARIS_MONITOR_JOB_TIMEOUT_MINUTES) }}
     steps:
       - name: Obtain short-lived PARIS workflow identity
         env:
@@ -69,9 +83,17 @@ jobs:
         run: |
           python - <<'PYCODE'
           import os,json,re,urllib.request,urllib.error
+          from urllib.parse import urlsplit
+          def positive(name,upper=7200):
+            value=os.environ.get(name,'')
+            if not re.fullmatch(r'[1-9][0-9]*',value) or int(value)>upper: raise SystemExit('PARIS_SETTING_REQUIRED:'+name)
+            return int(value)
+          origin=os.environ.get('PARIS_ADMIN_ORIGIN','').rstrip('/')
+          parsed=urlsplit(origin)
+          if parsed.scheme!='https' or not parsed.hostname or parsed.path or parsed.query or parsed.fragment or parsed.username or parsed.password: raise SystemExit('PARIS_ADMIN_ORIGIN_INVALID')
           # Require the deployed control plane, not unrelated UI/browser commit identity.
-          health_req=urllib.request.Request('https://admin.elevateforhumanity.org/api/ready',headers={'Cache-Control':'no-store'})
-          health=json.load(urllib.request.urlopen(health_req,timeout=30))
+          health_req=urllib.request.Request(origin+'/api/ready',headers={'Cache-Control':'no-store'})
+          health=json.load(urllib.request.urlopen(health_req,timeout=positive('PARIS_HEALTH_TIMEOUT_SECONDS')))
           runtime_sha=health.get('commitSha') or health.get('commit')
           compatible=health.get('ready') is True and health.get('agenticExecutorReady') is True and isinstance(runtime_sha,str) and re.fullmatch(r'[a-f0-9]{40}',runtime_sha)
           def affects_control_plane(path):
@@ -83,7 +105,7 @@ jobs:
           if compatible and runtime_sha!=os.environ['GITHUB_SHA']:
             compare_url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/compare/'+runtime_sha+'...'+os.environ['GITHUB_SHA']
             compare_req=urllib.request.Request(compare_url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
-            comparison=json.load(urllib.request.urlopen(compare_req,timeout=20))
+            comparison=json.load(urllib.request.urlopen(compare_req,timeout=positive('PARIS_GITHUB_TIMEOUT_SECONDS')))
             files=comparison.get('files')
             # GitHub returns at most 300 changed files. A full page cannot prove
             # the absence of an omitted control-plane change; defer safely.
@@ -100,7 +122,7 @@ jobs:
               # readiness alone must not authorize an unverified descendant.
               releases_url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs?head_sha='+runtime_sha+'&event=workflow_dispatch&status=completed&per_page=100'
               releases_req=urllib.request.Request(releases_url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
-              releases=json.load(urllib.request.urlopen(releases_req,timeout=20))
+              releases=json.load(urllib.request.urlopen(releases_req,timeout=positive('PARIS_GITHUB_TIMEOUT_SECONDS')))
               runs=releases.get('workflow_runs')
               compatible=isinstance(runs,list) and any(
                 run.get('head_sha')==runtime_sha and run.get('head_branch')=='main' and
@@ -114,12 +136,12 @@ jobs:
               with open(os.environ['GITHUB_OUTPUT'],'a') as output:
                 output.write('recovery_blocked=admin_source\n')
             raise SystemExit(0)
-          endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
+          endpoint=origin+'/api/cron/paris-code-repair'
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
             output.write('runtime_sha='+runtime_sha+'\n')
           headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'}
           preflight=urllib.request.Request(endpoint,data=json.dumps({'phase':'auth-diagnostic'}).encode(),headers=headers)
-          capability=json.load(urllib.request.urlopen(preflight,timeout=60))
+          capability=json.load(urllib.request.urlopen(preflight,timeout=positive('PARIS_PREFLIGHT_TIMEOUT_SECONDS')))
           if capability.get('workflowAuthorization')!='temporary-job-v1' or capability.get('diagnosticVersion')!=2 or capability.get('plannerContinuation')!='durable-turn-v1':
             print('Repair monitor deferred until the compatible Admin runtime is deployed.')
             with open(os.environ['GITHUB_OUTPUT'],'a') as output:
@@ -129,7 +151,7 @@ jobs:
             raise SystemExit('PARIS_GITHUB_CONNECTIVITY_CHECK_FAILED')
           req=urllib.request.Request(endpoint,data=json.dumps({'phase':'tick'}).encode(),headers=headers)
           try:
-            result=json.load(urllib.request.urlopen(req,timeout=120))
+            result=json.load(urllib.request.urlopen(req,timeout=int(os.environ['PARIS_TICK_TIMEOUT_SECONDS'])))
             print(json.dumps(result))
             if result.get('dispatchRequired'):
               repair_id=result['repairId']
@@ -140,7 +162,7 @@ jobs:
                 # A failed API call may still have reached GitHub. Block with a
                 # durable unconfirmed receipt; do not retry an ambiguous POST.
                 failure_req=urllib.request.Request(endpoint,data=json.dumps({'phase':'dispatch-failure','repairId':repair_id}).encode(),headers=headers)
-                urllib.request.urlopen(failure_req,timeout=30).read()
+                urllib.request.urlopen(failure_req,timeout=positive('PARIS_DISPATCH_FAILURE_TIMEOUT_SECONDS')).read()
                 raise
           except urllib.error.HTTPError as error:
             print(error.read().decode()[:1000])
@@ -173,7 +195,7 @@ jobs:
       id-token: write
     if: github.event_name == 'workflow_dispatch' && inputs.repair_id != '' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 100
+    timeout-minutes: ${{ fromJSON(vars.PARIS_PREPARE_JOB_TIMEOUT_MINUTES) }}
     outputs:
       sha: ${{ steps.patch.outputs.sha }}
       base: ${{ steps.patch.outputs.base }}
@@ -199,13 +221,18 @@ jobs:
         id: patch
         env:
           GH_TOKEN: ${{ github.token }}
-          ADMIN_URL: https://admin.elevateforhumanity.org
+          ADMIN_URL: ${{ vars.PARIS_ADMIN_ORIGIN }}
           REPAIR_ID: ${{ inputs.repair_id }}
-          PARIS_REPAIR_MAX_TURNS: ${{ vars.PARIS_REPAIR_MAX_TURNS }}
-          PARIS_REPAIR_BUDGET_MINUTES: ${{ vars.PARIS_REPAIR_BUDGET_MINUTES }}
         run: |
           python - <<'PY'
           import json,os,re,time,urllib.request,urllib.parse,urllib.error
+          from urllib.parse import urlsplit
+          def required_int(name,upper):
+            value=os.environ.get(name,'')
+            if not re.fullmatch(r'[1-9][0-9]*',value) or int(value)>upper: raise SystemExit('PARIS_SETTING_REQUIRED:'+name)
+            return int(value)
+          parsed=urlsplit(os.environ.get('ADMIN_URL',''))
+          if parsed.scheme!='https' or not parsed.hostname or parsed.path or parsed.query or parsed.fragment or parsed.username or parsed.password: raise SystemExit('PARIS_ADMIN_ORIGIN_INVALID')
           if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
           body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
           def fresh_identity():
@@ -214,14 +241,14 @@ jobs:
             query.append(('audience','elevate-paris-code-repair'))
             url=urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(query)))
             request=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
-            token=json.load(urllib.request.urlopen(request,timeout=30)).get('value')
+            token=json.load(urllib.request.urlopen(request,timeout=required_int('PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS',300))).get('value')
             if not isinstance(token,str) or len(token.split('.'))!=3: raise SystemExit('Invalid fresh workflow identity')
             print('::add-mask::'+token,flush=True)
             return token
           # OpenHands is asynchronous. Poll its SAME durable task, with a
           # bounded wait; never start another conversation after ambiguity.
           # Internal planner continuations are capped by PARIS_REPAIR_MAX_TURNS.
-          deadline=time.monotonic()+int(os.environ.get('PARIS_REPAIR_BUDGET_MINUTES') or 90)*60
+          deadline=time.monotonic()+required_int('PARIS_REPAIR_BUDGET_MINUTES',1440)*60
           internal_turns=0
           while time.monotonic()<deadline:
             # A planner continuation can outlive the initial five-minute JWT.
@@ -229,7 +256,7 @@ jobs:
             token=fresh_identity()
             req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+token,'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
             try:
-              result=json.load(urllib.request.urlopen(req,timeout=285))
+              result=json.load(urllib.request.urlopen(req,timeout=required_int('PARIS_PREPARE_REQUEST_TIMEOUT_SECONDS',3600)))
             except urllib.error.HTTPError as error:
               # The Admin route emits a bounded, allow-listed failure code.
               # Preserve the failed mutation without retrying an ambiguous POST.
@@ -243,10 +270,10 @@ jobs:
             if result.get('pending') is True:
               if result.get('provider')=='openhands':
                 print('Waiting for tracked OpenHands task',result.get('taskId'),flush=True)
-                time.sleep(min(30,max(0,deadline-time.monotonic())))
+                time.sleep(min(required_int('PARIS_OPENHANDS_POLL_SECONDS',300),max(0,deadline-time.monotonic())))
               else:
                 internal_turns+=1
-                if internal_turns>=int(os.environ.get('PARIS_REPAIR_MAX_TURNS') or 40)+1: raise SystemExit('PARIS planner exceeded its bounded continuation limit')
+                if internal_turns>=required_int('PARIS_REPAIR_MAX_TURNS',1000)+1: raise SystemExit('PARIS planner exceeded its bounded continuation limit')
                 print('Saved PARIS planner turn',result.get('turn'),flush=True)
               continue
             break
@@ -258,11 +285,11 @@ jobs:
   validate:
     needs: prepare
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: ${{ fromJSON(vars.PARIS_VALIDATE_JOB_TIMEOUT_MINUTES) }}
     permissions:
       contents: read
     env:
-      NODE_OPTIONS: --max-old-space-size=6144
+      NODE_OPTIONS: --max-old-space-size=${{ vars.PARIS_VALIDATION_HEAP_MB }}
       CI: 'true'
     steps:
       - uses: actions/checkout@v4
@@ -340,7 +367,7 @@ jobs:
         with:
           name: paris-validated-${{ inputs.repair_id }}-${{ needs.prepare.outputs.sha }}
           path: /tmp/paris-validation.json
-          retention-days: 7
+          retention-days: ${{ fromJSON(vars.PARIS_VALIDATION_ARTIFACT_RETENTION_DAYS) }}
   publish:
     permissions:
       contents: write
@@ -348,7 +375,7 @@ jobs:
       id-token: write
     needs: [prepare,validate]
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: ${{ fromJSON(vars.PARIS_PUBLISH_JOB_TIMEOUT_MINUTES) }}
     steps:
       - name: Obtain short-lived PARIS workflow identity
         env:
@@ -375,8 +402,8 @@ jobs:
           python - <<'PY'
           import os,json,urllib.request
           data=json.dumps({'phase':'publish','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
-          result=json.load(urllib.request.urlopen(req,timeout=120))
+          req=urllib.request.Request(os.environ['PARIS_ADMIN_ORIGIN'].rstrip('/')+'/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'X-Paris-GitHub-Token':os.environ['GH_TOKEN'],'Content-Type':'application/json'})
+          result=json.load(urllib.request.urlopen(req,timeout=int(os.environ['PARIS_TICK_TIMEOUT_SECONDS'])))
           print(json.dumps({'status':result.get('status'),'sha':result.get('sha'),'verifiedLive':False}))
           PY
   report:
@@ -407,6 +434,6 @@ jobs:
           python - <<'PY'
           import os,json,urllib.request
           data=json.dumps({'phase':'failure','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
-          urllib.request.urlopen(req,timeout=30).read()
+          req=urllib.request.Request(os.environ['PARIS_ADMIN_ORIGIN'].rstrip('/')+'/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
+          urllib.request.urlopen(req,timeout=int(os.environ['PARIS_DISPATCH_FAILURE_TIMEOUT_SECONDS'])).read()
           PY

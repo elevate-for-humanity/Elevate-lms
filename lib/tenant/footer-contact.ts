@@ -5,74 +5,90 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
   if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
   const candidate = input as Record<string, unknown>;
   const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
-  const rawSources = sources.filter(value => typeof value === 'string');
+  const rawSources = sources.filter((value): value is string => typeof value === 'string');
   const supplied = rawSources.map(fold);
-  // Strip prose suffixes and paired quotes, retaining unsupported address prefixes.
-  const emails = rawSources.flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || []).map(value => {
-    const token = value.replace(/[.!?]+$/, '');
-    return token.startsWith("'") && token.endsWith("'") ? token.slice(1, -1) : token.replace(/'$/, '');
-  });
-  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
+
+  const emails = rawSources
+    .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:\"]+@[^\s<>()\x5b\x5d,;:\"]+/g) || [])
+    .map(value => {
+      const token = value.replace(/[.!?]+$/, '');
+      return token.startsWith("'") && token.endsWith("'")
+        ? token.slice(1, -1)
+        : token.replace(/'$/, '');
+    });
+
+  const validPhoneShape = (value: string) => {
+    if (!/^\+?\s*[\d(). -]+$/.test(value)) return false;
+    const digits = value.replace(/\D/g, '');
+    if (!(digits.length === 3 && /^\d{3}$/.test(value)) && (digits.length < 7 || digits.length > 15)) return false;
+    let depth = 0;
+    for (const character of value) {
+      if (character === '(') depth += 1;
+      if (character === ')') {
+        depth -= 1;
+        if (depth < 0) return false;
+      }
+    }
+    return depth === 0;
+  };
+
   const suppliedPhone = (value: unknown, limit: number) => {
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
     const cleaned = value.trim();
-    const digits = cleaned.replace(/\D/g, '');
-    if (digits.length < 7 || digits.length > 15 || !/^\+?\s*[\d(). -]+$/.test(fold(cleaned))) return undefined;
-    let depth = 0;
-    for (const character of cleaned) {
-      if (character === '(') depth += 1;
-      if (character === ')' && --depth < 0) return undefined;
-    }
-    if (depth !== 0) return undefined;
-    // Match the complete generated candidate against owner text. Flexible whitespace
-    // keeps a number split across a line, but newlines still separate two numbers.
+    if (!validPhoneShape(cleaned)) return undefined;
     const pattern = new RegExp(cleaned.split(/\s+/).map(escapeRegExp).join('\\s+'), 'g');
+
     for (const source of rawSources) {
       for (const match of source.matchAll(pattern)) {
         const start = match.index ?? 0;
         const end = start + match[0].length;
         const before = source[start - 1] || '';
         const after = source[end] || '';
-        if (/[\p{L}\p{N}+.(\-]/u.test(before) || /[\p{L}\p{N})]/u.test(after)) continue;
+
+        if (/[\p{L}\p{N}+(]/u.test(before) || /[\p{L}\p{N})]/u.test(after)) continue;
+        if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;
         if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;
-        const left = source.slice(0, start);
-        const leftGap = left.match(/\s+$/)?.[0] ?? '';
-        const previousText = left.slice(0, left.length - leftGap.length);
-        if (leftGap && /[+().\d-]$/.test(previousText)) {
-          const preceding = previousText.match(/[+\d(). \t-]+$/)?.[0] ?? '';
-          // A line separates complete numbers only when combining them would exceed the phone limit.
-          // Ambiguous short prefixes remain attached instead of authorizing a different recipient.
-          const previousDigits = preceding.replace(/\D/g, '').length;
-          if (!/[\r\n]/.test(leftGap) || previousDigits < 7 || previousDigits + digits.length <= 15) continue;
+
+        const leftGap = source.slice(0, start).match(/\s+$/)?.[0] || '';
+        const previous = source[start - leftGap.length - 1] || '';
+        if (leftGap && /[+()\d]/.test(previous)) {
+          const priorLine = source.slice(0, start - leftGap.length).split(/\r?\n/).pop()?.trim() || '';
+          if (!leftGap.includes('\n') || !validPhoneShape(priorLine)) continue;
         }
-        const right = source.slice(end);
-        const rightGap = right.match(/^\s+/)?.[0] ?? '';
-        const followingText = right.slice(rightGap.length);
-        const availability = /^\(\d{1,2}\s*[-–]\s*\d{1,2}\)/.test(followingText);
-        if (rightGap && /^[\d+(]/.test(followingText) && !availability) {
-          const following = followingText.match(/^[+\d(). \t-]+/)?.[0] ?? '';
-          const followingDigits = following.replace(/\D/g, '').length;
-          if (!/[\r\n]/.test(rightGap) || followingDigits < 7 || followingDigits + digits.length <= 15) continue;
+
+        const rightGap = source.slice(end).match(/^\s+/)?.[0] || '';
+        const next = source[end + rightGap.length] || '';
+        if (rightGap && /[+\d]/.test(next)) {
+          const nextLine = source.slice(end + rightGap.length).split(/\r?\n/)[0]?.trim() || '';
+          if (!rightGap.includes('\n') || !validPhoneShape(nextLine)) continue;
         }
         return cleaned;
       }
     }
     return undefined;
   };
+
   const copy = (value: unknown, limit: number, kind?: 'email' | 'phone' | 'address') => {
     if (kind === 'phone') return suppliedPhone(value, limit);
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
     const cleaned = value.trim();
-    const matches = kind === 'email' ? emails.includes(cleaned) : supplied.some(source => source.includes(fold(cleaned)));
+    const matches = kind === 'email'
+      ? emails.includes(cleaned)
+      : supplied.some(source => source.includes(fold(cleaned)));
     return matches ? cleaned : undefined;
   };
+
   const result: TenantSiteContact = {};
   for (const [key, limit] of [['email', 180], ['phone', 80], ['address', 300]] as const) {
     const value = copy(candidate[key], limit, key);
     if (value) result[key] = value;
   }
   if (Array.isArray(candidate.hours)) {
-    const hours = candidate.hours.slice(0, 14).map(value => copy(value, 120)).filter((value): value is string => value !== undefined);
+    const hours = candidate.hours
+      .slice(0, 14)
+      .map(value => copy(value, 120))
+      .filter((value): value is string => value !== undefined);
     if (hours.length) result.hours = hours;
   }
   return result;

@@ -220,3 +220,22 @@ test('generation rejects incomplete phone continuations on either side of a line
   assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
  }
 });
+
+
+test('generation keeps complete phones after prose separators and valid service short codes',async()=>{
+ for(const [source,phone] of [
+  ['Call us. 317-555-0123','317-555-0123'],
+  ['Phone - 317-555-0123','317-555-0123'],
+  ['For crisis support, call 988.','988'],
+ ]) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ for(const phone of ['9-5','55','1234']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Hours 9-5. Call 988 for help.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});

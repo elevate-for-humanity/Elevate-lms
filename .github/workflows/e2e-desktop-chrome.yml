@@ -49,8 +49,8 @@ jobs:
       E2E_PROGRAM_HOLDER_PASSWORD: ${{ secrets.E2E_PROGRAM_HOLDER_PASSWORD }}
       # Only a designated disposable Host Shop identity may certify authenticated
       # shop dashboard geometry; never borrow Admin or Program Holder credentials.
-      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL || secrets.TEST_HOST_SHOP_EMAIL }}
-      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD || secrets.TEST_HOST_SHOP_PASSWORD }}
+      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}
+      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}
       TEST_MODE: 'true'
     steps:
       - uses: actions/checkout@v4

@@ -87,9 +87,110 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const hasBoundedSuffix = /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
             && !lineHasIndependentPhone(candidateSuffix);
           const hasBoundedAnnotation = candidateAtLineStart !== null && hasBoundedSuffix;
-          const trailingContactDestination = /^(?:\s*\(\s*|\s*[—–-]\s*)(?:hotline|helpline|emergency(?:\s+(?:line|number))?|support\s+(?:line|hotline|number)|phone(?:\s+(?:line|number))?|(?:call|dial|text)\s+(?:us|this|here|the\s+number)|call\s+or\s+text|crisis\s+(?:support\s+)?hotline)(?:\s*,\s*(?:(?:available|open)\s+(?:24\s*\/\s*7|around\s+the\s+clock|weekdays|weekends|daily|during\s+business\s+hours)|24\s*\/\s*7|(?:toll[- ]?free|free)(?:\s+and\s+confidential)?|confidential))?\s*\)?\s*[.!?]?\s*$/i;
+          const boundedDay = String.raw`(?:mon(?:day)?s?|tue(?:sday)?s?|wed(?:nesday)?s?|thu(?:rsday)?s?|fri(?:day)?s?|sat(?:urday)?s?|sun(?:day)?s?)`;
+          const boundedDayRange = `${boundedDay}(?:\\s*(?:[-–—]|to|through)\\s*${boundedDay})?`;
+          const boundedTime = String.raw`\\d{1,2}(?::\\d{2})?\\s*(?:a\\.?m\\.?|p\\.?m\\.?)\\s*(?:[-–—]|to|through)\\s*\\d{1,2}(?::\\d{2})?\\s*(?:a\\.?m\\.?|p\\.?m\\.?)`;
+          const boundedAvailability = new RegExp(
+            `^(?:24\\s*\\/\\s*7|around\\s+the\\s+clock|weekdays|weekends|daily|during\\s+business\\s+hours|${boundedDayRange}(?:\\s*,\\s*${boundedTime})?|${boundedTime})import type { TenantSiteConfig, TenantSiteContact } from './site-types';
+
+/** Model output is a candidate; retain only values copied from owner-supplied contact text. */
+export function suppliedWebsiteContact(input: unknown, sources: string[]): TenantSiteContact {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  const candidate = input as Record<string, unknown>;
+  const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
+  const rawSources = sources.filter((value): value is string => typeof value === 'string');
+  const supplied = rawSources.map(fold);
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
+
+  const emails = rawSources
+    .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || [])
+    .map(value => {
+      const token = value.replace(/[.!?]+$/, '');
+      const pairedQuotes = [
+        ["'", "'"],
+        ['“', '”'],
+        ['‘', '’'],
+      ] as const;
+      const pair = pairedQuotes.find(([open, close]) => token.startsWith(open) && token.endsWith(close));
+      return pair ? token.slice(1, -1) : token.replace(/['’]$/, '');
+    });
+
+  const supportedServiceCodes = new Set(['211', '311', '411', '511', '611', '711', '811', '911', '988']);
+  const validPhoneShape = (value: string) => {
+    if (!/^\+?\s*[\d(). -]+$/.test(value)) return false;
+    const digits = value.replace(/\D/g, '');
+    if (!(digits.length === 3 && /^\d{3}$/.test(value) && supportedServiceCodes.has(digits))
+      && (digits.length < 7 || digits.length > 15)) return false;
+    let depth = 0;
+    for (const character of value) {
+      if (character === '(') depth += 1;
+      if (character === ')') {
+        depth -= 1;
+        if (depth < 0) return false;
+      }
+    }
+    return depth === 0;
+  };
+
+  const phoneTokens = (line: string) =>
+    line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
+  const lineHasIndependentPhone = (line: string) =>
+    phoneTokens(line).some(token => validPhoneShape(token.trim()));
+
+  const suppliedPhone = (value: unknown, limit: number) => {
+    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
+    const cleaned = value.trim();
+    if (!validPhoneShape(cleaned)) return undefined;
+    const pattern = new RegExp(cleaned.split(/\s+/).map(escapeRegExp).join('\\s+'), 'g');
+
+    for (const source of rawSources) {
+      for (const match of source.matchAll(pattern)) {
+        const start = match.index ?? 0;
+        const end = start + match[0].length;
+        const before = source[start - 1] || '';
+        const after = source[end] || '';
+
+        if (/[\p{L}\p{N}+()]/u.test(before) || /[\p{L}\p{N}]/u.test(after)) continue;
+        if (after === ')') {
+          const currentLineStart = source.lastIndexOf('\n', start - 1) + 1;
+          const prefixOnLine = source.slice(currentLineStart, start);
+          const openParens = (prefixOnLine.match(/\(/g) || []).length;
+          const closeParens = (prefixOnLine.match(/\)/g) || []).length;
+          if (openParens <= closeParens) continue;
+        }
+        if (cleaned.replace(/\D/g, '').length === 3) {
+          const lineStart = source.lastIndexOf('\n', start - 1) + 1;
+          const lineEndIndex = source.indexOf('\n', end);
+          const lineEnd = lineEndIndex === -1 ? source.length : lineEndIndex;
+          const previousLineEnd = Math.max(0, lineStart - 1);
+          const previousLineStart = source.lastIndexOf('\n', previousLineEnd - 1) + 1;
+          const currentLine = source.slice(lineStart, lineEnd);
+          const previousLine = source.slice(previousLineStart, previousLineEnd);
+          const contactKeyword = /\b(call|phone|dial|text|hotline|support|emergency)\b/i;
+          const relativeStart = start - lineStart;
+          const hasInlineContext = contactKeyword.test(currentLine.slice(0, relativeStart));
+          const previousLineLabel = previousLine.trim();
+          const candidateAtLineStart = new RegExp(
+            '^\\s*' + escapeRegExp(cleaned),
+          ).exec(currentLine);
+          const candidateSuffix = currentLine.slice(relativeStart + match[0].length);
+          const candidateOccupiesLine = new RegExp(
+            '^\\s*' + escapeRegExp(cleaned) + '\\s*[.!?]?\\s*$',
+          ).test(currentLine);
+          const hasBoundedSuffix = /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
+            && !lineHasIndependentPhone(candidateSuffix);
+          const hasBoundedAnnotation = candidateAtLineStart !== null && hasBoundedSuffix;
+,
+            'i',
+          );
+          const trailingContactDestination = /^(?:\s*\(\s*|\s*[—–-]\s*)(?:hotline|helpline|emergency(?:\s+(?:line|number))?|support\s+(?:line|hotline|number)|phone(?:\s+(?:line|number))?|(?:call|dial|text)\s+(?:us|this|here|the\s+number)|call\s+or\s+text|crisis\s+(?:support\s+)?hotline)(?:\s*,\s*(?:(?:available|open)\s+([^()\r\n,]+(?:\s*,\s*[^()\r\n,]+)?)|24\s*\/\s*7|(?:toll[- ]?free|free)(?:\s+and\s+confidential)?|confidential))?\s*\)?\s*[.!?]?\s*$/i;
+          const trailingDestinationMatch = trailingContactDestination.exec(candidateSuffix);
+          const trailingAvailability = trailingDestinationMatch?.[1]?.trim();
+          const hasAllowedAvailability = !trailingAvailability
+            || boundedAvailability.test(trailingAvailability);
           const hasTrailingContactAnnotation = hasBoundedSuffix
-            && trailingContactDestination.test(candidateSuffix);
+            && trailingDestinationMatch !== null
+            && hasAllowedAvailability;
           const hasExplicitPreviousLineLabel = (candidateOccupiesLine || hasBoundedAnnotation)
             && !/\d/.test(previousLineLabel)
             && (

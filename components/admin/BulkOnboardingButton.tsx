@@ -5,9 +5,10 @@ import { Send, Loader2, CheckCircle } from 'lucide-react';
 
 interface Props {
   guestCount: number;
+  includeTest: boolean;
 }
 
-export function BulkOnboardingButton({ guestCount }: Props) {
+export function BulkOnboardingButton({ guestCount, includeTest }: Props) {
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [result, setResult] = useState<{ sent: number; failed: number } | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -23,7 +24,7 @@ export function BulkOnboardingButton({ guestCount }: Props) {
       const res = await fetch('/api/admin/applications/bulk-send-onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ limit: 50 }),
+        body: JSON.stringify({ limit: 50, includeTest }),
       });
       const data = await res.json();
       if (!res.ok) {

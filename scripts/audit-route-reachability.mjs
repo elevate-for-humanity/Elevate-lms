@@ -58,11 +58,32 @@ for(const route of routes){
 function matchesServiceRoute(service, candidate){
   const normalized=candidate.split(/[?#]/,1)[0].replace(/\/$/,'')||'/';
   return (routeByService.get(service)||[]).some(route=>{
-    const exp=route.url.split('/').filter(Boolean).map(segment=>{
-      if(/^\[\[\.\.\.[^\]]+\]\]$/.test(segment)) return '(?:/.*)?';
-      if(/^\[\.\.\.[^\]]+\]$/.test(segment)) return '/.+';
-      if(/^\[[^\]]+\]$/.test(segment)) return '/[^/]+';
-      return '/'+segment.replace(/[.*+?^${}()|[\]\\]/g,'\\const inventory=routes.map(route=>{
+    const segments=route.url.split('/').filter(Boolean);
+    let pattern='';
+    for(const segment of segments){
+      if(/^\[\[\.\.\.[^\]]+\]\]$/.test(segment)) pattern+='(?:/.*)?';
+      else if(/^\[\.\.\.[^\]]+\]$/.test(segment)) pattern+='/.+';
+      else if(/^\[[^\]]+\]$/.test(segment)) pattern+='/[^/]+';
+      else pattern+='/'+segment.replace(/[^a-zA-Z0-9_-]/g,match=>'\\'+match);
+    }
+    try{return new RegExp('^'+(pattern||'/')+'/?$').test(normalized);}catch{return false;}
+  });
+}
+const appConfigByService={root:'next.config.mjs',marketing:'apps/marketing/next.config.mjs',
+  admin:'apps/admin/next.config.mjs',lms:'apps/lms/next.config.mjs',
+  'website-builder':'apps/website-builder/next.config.mjs'};
+const configuredRedirects = new Map();
+for(const [service,file] of Object.entries(appConfigByService)){
+  const source=texts.get(file)||'';
+  const redirectPairs=[...source.matchAll(/\{\s*source:\s*['"]([^'"]+)['"]\s*,\s*destination:\s*['"]([^'"]+)['"]/g)]
+    .map(match=>({source:match[1],destination:match[2],config:file}));
+  configuredRedirects.set(service,redirectPairs);
+}
+function staticDestination(body){
+  const match=body.match(/\b(?:permanentRedirect|redirect)\s*\(\s*['"]([^'"]+)['"]/);
+  return match?.[1]||null;
+}
+const inventory=routes.map(route=>{
   const body=texts.get(route.file)||'';
   const target=route.kind==='page'?staticDestination(body):null;
   const inbound=[];

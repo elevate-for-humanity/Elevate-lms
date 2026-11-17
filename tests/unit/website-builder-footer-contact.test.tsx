@@ -34,3 +34,7 @@ describe('optional saved footer contact column', () => {
     expect(validateFooterContactFields(config(value))).toEqual([]);
   });
 });
+
+it.each(['owner@example.test\nBcc:other@example.test','owner%0d%0a@example.test','owner@example.test?subject=x'])('does not create a mail action for control/header-like content: %s', email => {
+  expect(footerContactDetails(config(true, { email }))?.emailHref).toBeNull();
+});

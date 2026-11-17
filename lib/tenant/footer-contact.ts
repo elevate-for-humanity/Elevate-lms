@@ -19,7 +19,7 @@ export function footerContactDetails(config: TenantSiteConfig) {
   if (!email && !phone && !address && !hours.length) return null;
   return {
     email, phone, address, hours,
-    emailHref: /^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email) && !/[\u0000-\u001f\u007f]/.test(email) ? `mailto:${email}` : null,
+    emailHref: /^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email) && ![...email].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127) ? `mailto:${email}` : null,
     phoneHref: /^\+?[\d ().-]{3,80}$/.test(phone) && /\d{3}/.test(phone.replace(/\D/g, '')) ? `tel:${phone.replace(/[^+\d]/g, '')}` : null,
   };
 }

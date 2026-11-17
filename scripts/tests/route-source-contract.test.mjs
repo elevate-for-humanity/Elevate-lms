@@ -34,3 +34,38 @@ test('Route analysis is non-destructive and does not treat missing static refere
   assert.ok(!audit.includes('unlinkSync('));
   assert.match(audit, /(?:\(app\)|\[\[\.\.\.)/);
 });
+
+test('Route inventory classifies real routes, legacy redirect targets, and missing inbound links conservatively', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join, dirname } = await import('node:path');
+  const { spawnSync } = await import('node:child_process');
+  const temp = mkdtempSync(join(tmpdir(), 'efh-route-map-'));
+  const put = (file, body) => {
+    const target = join(temp, file);
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, body);
+  };
+  try {
+    put('apps/lms/app/login/page.tsx', 'export default function Login() {}');
+    put('apps/lms/app/lms/(app)/ai-team/page.tsx', 'export default function Team() {}');
+    put('apps/lms/app/lms/(app)/grades/page.tsx', 'export default function Grades() {}');
+    put('apps/lms/app/legacy/page.tsx', "import { redirect } from 'next/navigation'; export default function Legacy(){redirect('/lms/grades')}");
+    put('apps/lms/next.config.mjs', "export default {redirects(){return [{ source: '/lms/login', destination: '/login', permanent: false }]}}");
+    put('apps/marketing/app/platform/student-portal/page.tsx', "const login = { href: 'https://app.elevateforhumanity.org/login' }; const broken = { href: 'https://app.elevateforhumanity.org/lms/unknown' };");
+    put('scripts/audit-route-reachability.mjs', source('scripts/audit-route-reachability.mjs'));
+    const run = spawnSync(process.execPath, ['scripts/audit-route-reachability.mjs'], {
+      cwd: temp, encoding: 'utf8', timeout: 30000
+    });
+    assert.equal(run.status, 0, run.stderr || run.stdout);
+    const report = JSON.parse(readFileSync(join(temp, 'artifacts/route-reachability-advisory.json'), 'utf8'));
+    assert.equal(report.advisoryOnly, true);
+    assert.equal(report.inventory.find(route => route.url === '/legacy').classification, 'connected-compatibility-redirect');
+    assert.equal(report.inventory.find(route => route.url === '/lms/grades').classification, 'connected-static-source-reference');
+    assert.ok(report.redirectOnlyAliases.some(route => route.source === '/lms/login' && route.targetExists === true));
+    assert.ok(report.crossHostLinks.some(link => link.url.endsWith('/lms/unknown') && link.classification === 'target-needs-runtime-verification'));
+    assert.ok(report.crossHostLinks.some(link => link.url.endsWith('/login') && link.classification === 'target-source-defined'));
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});

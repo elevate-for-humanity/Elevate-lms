@@ -301,6 +301,12 @@ const hasUnboundedGlobStar = (body, options) => {
       let end = i + 1;
       for (; end < body.length; end++) {
         if (body[end] === '\\') { end++; continue; }
+        if (body[end] === '[' && body[end + 1] === ':') {
+          const posixEnd = body.indexOf(':]', end + 2);
+          if (posixEnd === -1) return body.slice(i).includes('*');
+          end = posixEnd + 1;
+          continue;
+        }
         if (body[end] === ']') break;
       }
       // An unclosed class is reparsed as literal '[' plus glob tokens.

@@ -19,8 +19,10 @@ test('missing website denies access',async()=>assert.equal(await canManageHosted
 // authorization, backup ordering and conditional update all execute unchanged.
 const { readFile } = await import('node:fs/promises');
 const { stripTypeScriptTypes } = await import('node:module');
+const validationSource=await readFile(new URL('../lib/tenant/site-validation.ts',import.meta.url),'utf8');
+const validateHeroBackdropFields=new Function(stripTypeScriptTypes(validationSource).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+';return validateHeroBackdropFields;')();
 const revisionRoute = await readFile(new URL('../apps/marketing/app/api/apps/website-builder/sites/[websiteId]/revisions/route.ts', import.meta.url), 'utf8');
-const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
+const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateHeroBackdropFields', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
 function compileRoute(source) {
   return new Function('dependencies', `const { ${dependencyNames.join(', ')} } = dependencies;\n` + stripTypeScriptTypes(source).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn { POST: typeof POST === "undefined" ? null : POST, PATCH: typeof PATCH === "undefined" ? null : PATCH };');
 }
@@ -94,6 +96,7 @@ function restoreFixture(options = {}) {
     getWebsiteBuilderAccess: async () => ({ allowed: options.hasAccess !== false }),
     buildDefaultSiteConfig: () => ({}), mergeSiteConfig: (base, patch) => ({ ...base, ...patch }),
     bridgeLegacyPatchIntoComposition: value => value,
+    validateHeroBackdropFields,
     validateSiteConfig: () => ({ valid: true }), isReservedTenantSubdomain: () => false,
     loadVerifiedWebsiteClaims: async () => [], hydrateProcessEnv: async () => {},
     consumeWebsiteBuilderCredits: async (_db, _user, operation, options) => { assert.equal(operation, 'paris_edit'); assert.equal(options.deferDebitUntilCommit, true); return { allowed: true, charged: 0, balance: 16, isTrial: true }; },
@@ -106,7 +109,7 @@ function restoreFixture(options = {}) {
   });
   return { state, async request(revisionId = 'revision-a') {
     const handler = mode === 'save' ? handlers.PATCH : handlers.POST;
-    return handler({ json: async () => mode === 'restore' ? { revisionId } : mode === 'save' ? { siteName: 'Saved', siteConfig: { pages: [{ id: 'saved' }] } } : { instruction: 'Update branding' } }, { params: Promise.resolve({ websiteId: 'site-a' }) });
+    return handler({ json: async () => mode === 'restore' ? { revisionId } : mode === 'save' ? { siteName: 'Saved', siteConfig: options.siteConfig || { pages: [{ id: 'saved' }] }, publish: options.publish } : { instruction: 'Update branding' } }, { params: Promise.resolve({ websiteId: 'site-a' }) });
   } };
 }
 
@@ -258,4 +261,12 @@ test('PARIS reconciles a lost commit response with the same idempotency key', as
  assert.equal((await response.json()).creditsCharged,8);
  assert.equal(state.backups.length,1);assert.equal(state.updateAttempts,1);
  assert.equal(state.rpcArgs.length,2);assert.deepEqual(state.rpcArgs[0],state.rpcArgs[1]);
+});
+
+test('actual manual save/publish rejects raw malformed backdrop settings before backup or write',async()=>{
+ for(const publish of [true,false,undefined]) for(const settings of [{backdropPosition:['right']},{backdropOpacity:{value:12}},{backdropOpacity:null}]) {
+  const {state,request}=restoreFixture({mode:'save',publish,siteConfig:{pages:[{id:'home',slug:'/',sections:[{id:'hero',type:'hero',content:{},settings}]}]}});
+  const response=await request();assert.equal(response.status,422);assert.equal(state.backups.length,0);assert.equal(state.updateAttempts,0);
+  assert.ok((await response.json()).validation.errors[0].code.startsWith('invalid_hero_backdrop'));
+ }
 });

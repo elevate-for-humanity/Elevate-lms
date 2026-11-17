@@ -35,6 +35,13 @@ function text(value: unknown) {
   return typeof value === 'string' ? value : '';
 }
 
+function safeBackdropImage(value: unknown) {
+  const url = text(value).trim();
+  if (!url || [...url].some(character => character.charCodeAt(0) <= 32 || character === '\\')) return '';
+  if (url.startsWith('/') && !url.startsWith('//')) return url;
+  try { const parsed = new URL(url); return parsed.protocol === 'https:' && !parsed.username && !parsed.password ? url : ''; } catch { return ''; }
+}
+
 function list(value: unknown): Array<Record<string, unknown>> {
   return Array.isArray(value)
     ? value.filter((item) => item && typeof item === 'object') as Array<Record<string, unknown>>
@@ -133,6 +140,9 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
 
   if (section.type === 'hero') {
     const image = text(c.image);
+    const backdropImage = safeBackdropImage(c.backdropImage);
+    const backdropPosition = section.settings?.backdropPosition === 'right' || section.settings?.backdropPosition === 'left' ? section.settings.backdropPosition : 'full';
+    const backdropOpacity = typeof section.settings?.backdropOpacity === 'number' && Number.isFinite(section.settings.backdropOpacity) ? Math.min(100, Math.max(0, section.settings.backdropOpacity)) / 100 : 0.12;
     const imageFit = section.settings?.imageFit === 'contain' || section.settings?.imageFit === 'cover' ? section.settings.imageFit : undefined;
     const imageFrame = section.settings?.imageFrame === 'plain' ? 'plain' : undefined;
     const mobileOrder = section.settings?.mobileOrder === 'copy-first' || section.settings?.mobileOrder === 'image-first' ? section.settings.mobileOrder : undefined;
@@ -156,8 +166,9 @@ function Section({ section, primary, secondary, basePath, websiteId, businessNam
             </div>
           </section>
         ) : null}
-      <section className="tenant-hero border-b border-black/5" data-has-image={Boolean(image)} data-image-frame={imageFrame} data-mobile-order={mobileOrder} data-variant={variant} data-layout={text(section.settings?.layout) || 'split'}>
-        <div className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
+      <section className="tenant-hero border-b border-black/5" data-has-backdrop={Boolean(backdropImage)} style={backdropImage ? { position: 'relative', isolation: 'isolate', overflow: 'hidden' } : undefined} data-has-image={Boolean(image)} data-image-frame={imageFrame} data-mobile-order={mobileOrder} data-variant={variant} data-layout={text(section.settings?.layout) || 'split'}>
+        {backdropImage ? <img className="tenant-hero-backdrop" src={backdropImage} alt="" aria-hidden="true" draggable={false} style={{ position: 'absolute', top: 0, bottom: 0, ...(backdropPosition === 'left' ? { left: 0 } : { right: 0 }), width: backdropPosition === 'full' ? '100%' : '65%', height: '100%', objectFit: 'cover', opacity: backdropOpacity, pointerEvents: 'none', zIndex: 0 }} /> : null}
+        <div style={backdropImage ? { position: 'relative', zIndex: 1 } : undefined} className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
           <div className={centered || !image ? 'text-center' : ''}>
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
             <Heading className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{titleLines.length ? titleLines.map((line, index) => <span className="tenant-title-line" key={index}>{index > 0 ? ' ' : ''}{highlight && line.includes(highlight) ? <>{line.slice(0, line.indexOf(highlight))}<em>{highlight}</em>{line.slice(line.indexOf(highlight) + highlight.length)}</> : line}</span>) : highlightAt >= 0 ? <><span className="tenant-title-prefix">{title.slice(0, highlightAt)}</span><span className="tenant-title-highlight">{highlight}</span>{title.slice(highlightAt + highlight.length)}</> : title}</Heading>

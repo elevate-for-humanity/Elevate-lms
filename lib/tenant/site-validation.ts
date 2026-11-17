@@ -189,9 +189,34 @@ function scanPublishedClaims(config: TenantSiteConfig, issues: SiteValidationIss
   }
 }
 
+export function validateHeroBackdropFields(input: unknown): SiteValidationIssue[] {
+  const candidate = input && typeof input === 'object' ? input as Record<string, unknown> : {};
+  const issues: SiteValidationIssue[] = [];
+  // Inspect supplied backdrop fields before normalization can drop malformed objects.
+  for (const page of Array.isArray(candidate.pages) ? candidate.pages : []) {
+    if (!page || typeof page !== 'object') continue;
+    for (const section of Array.isArray(page.sections) ? page.sections : []) {
+      if (!section || typeof section !== 'object') continue;
+      if (section.type === 'hero') {
+        const image = text(section.content?.backdropImage);
+        let safeImage = !image || (image.startsWith('/') && !image.startsWith('//'));
+        if (image && !safeImage) { try { const url = new URL(image); safeImage = url.protocol === 'https:' && !url.username && !url.password; } catch { safeImage = false; } }
+        if ((section.content?.backdropImage !== undefined && typeof section.content?.backdropImage !== 'string') || (image && (!safeImage || [...image].some(character => character.charCodeAt(0) <= 32 || character === '\\')))) issues.push({ severity: 'error', code: 'invalid_hero_backdrop', message: 'Hero backdrop must be a local path or HTTPS image URL without credentials.', page: page.slug, sectionId: section.id });
+        const opacity = section.settings?.backdropOpacity;
+        if (opacity !== undefined && (typeof opacity !== 'number' || !Number.isFinite(opacity) || opacity < 0 || opacity > 100)) issues.push({ severity: 'error', code: 'invalid_hero_backdrop_opacity', message: 'Hero backdrop opacity must be between 0 and 100.', page: page.slug, sectionId: section.id });
+        const position = section.settings?.backdropPosition;
+        if (position !== undefined && (typeof position !== 'string' || !['full', 'left', 'right'].includes(position))) issues.push({ severity: 'error', code: 'invalid_hero_backdrop_position', message: 'Choose full, left or right backdrop placement.', page: page.slug, sectionId: section.id });
+      }
+    }
+  }
+
+  return issues;
+}
+
 export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {
   const config = ensureComposableSiteConfig(input);
-  const issues: SiteValidationIssue[] = [];
+  const issues = validateHeroBackdropFields(input);
+
   const pages = config.pages || [];
   const knownPaths = new Set(pages.map((page) => page.slug));
 

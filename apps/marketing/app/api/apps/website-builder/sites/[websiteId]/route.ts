@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import { bridgeLegacyPatchIntoComposition } from '@/lib/tenant/legacy-composition-bridge';
-import { validateSiteConfig } from '@/lib/tenant/site-validation';
+import { validateSiteConfig, validateHeroBackdropFields } from '@/lib/tenant/site-validation';
 import { isReservedTenantSubdomain } from '@/lib/tenant/middleware-tenant-routing';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
@@ -74,6 +74,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const base = buildDefaultSiteConfig({ organizationName: siteName });
   const existing = site.site_config && typeof site.site_config === 'object' ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>) : base;
   const configPatch = body.siteConfig && typeof body.siteConfig === 'object' ? body.siteConfig as Partial<TenantSiteConfig> : {};
+  const backdropErrors = validateHeroBackdropFields(configPatch);
+  if (backdropErrors.length) return NextResponse.json({ error: 'Invalid hero backdrop configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
   const merged = bridgeLegacyPatchIntoComposition(mergeSiteConfig(existing, configPatch), configPatch, existing);
 
   // Verification state is server authority. Never trust claims embedded in a

@@ -131,6 +131,42 @@ const inventory=routes.map(route=>{
     configuredRedirects:configAliases,
     activeSourceReferences:inbound};
 });
+// Redirect-only aliases are public routes even without a page.tsx file.
+const redirectOnlyAliases=[...configuredRedirects].flatMap(([service,rules])=>
+  rules.filter(rule=>!rule.source.includes(':') && !matchesServiceRoute(service,rule.source))
+    .map(rule=>({
+      service,source:rule.source,destination:rule.destination,config:rule.config,
+      targetExists:rule.destination.startsWith('/')?
+        matchesServiceRoute(service,rule.destination):null,
+      classification:rule.destination.startsWith('https://')?'external-redirect-verify-host':
+        matchesServiceRoute(service,rule.destination)?'redirect-to-source-defined-route':
+        'redirect-target-needs-runtime-verification'
+    }))
+);
+// Report exact cross-host links from active application source; results are
+// evidence candidates, not authoritative runtime 404 assessments.
+const hostServices={
+  'app.elevateforhumanity.org':'lms',
+  'lms.elevateforhumanity.org':'lms',
+  'admin.elevateforhumanity.org':'admin',
+  'www.elevateforhumanity.org':'marketing'
+};
+const crossHostLinks=[];
+for(const [file,body] of activeCode){
+  const links=[...body.matchAll(/(?:href\s*[:=]\s*|router\.(?:push|replace)\s*\(\s*)['"]((?:https:\/\/)[^'"]+)['"]/g)];
+  for(const [,link] of links){
+    let address;
+    try{address=new URL(link);}catch{continue;}
+    const service=hostServices[address.hostname];
+    if(!service)continue;
+    const pathname=address.pathname.replace(/\/$/,'')||'/';
+    const configured=(configuredRedirects.get(service)||[]).some(rule=>rule.source===pathname);
+    const exists=matchesServiceRoute(service,pathname);
+    crossHostLinks.push({source:file,url:link,service,
+      classification:exists?'target-source-defined':
+        configured?'target-is-configured-redirect':'target-needs-runtime-verification'});
+  }
+}
 const result={
   advisoryOnly:true,
   generatedAt:new Date().toISOString(),
@@ -140,8 +176,8 @@ const result={
     'Same path in two deployed services is not a duplicate.',
     'Before any removal, prove canonical replacement, check production behavior and preserve auth/payment/student flows.'
   ],
-  summary:{routeEntries:routes.length,pages:inventory.filter(r=>r.kind==='page').length,endpoints:inventory.filter(r=>r.kind==='endpoint').length,duplicates:duplicates.length,orphanCandidatesUnverified:inventory.filter(r=>r.classification==='orphan-candidate-NOT-proven').length,connectedSourceReferences:inventory.filter(r=>r.classification==='connected-static-source-reference').length,verifiedInlineRedirectTargets:inventory.filter(r=>r.classification==='connected-compatibility-redirect').length},
-  duplicates,inventory
+  summary:{routeEntries:routes.length,pages:inventory.filter(r=>r.kind==='page').length,endpoints:inventory.filter(r=>r.kind==='endpoint').length,duplicates:duplicates.length,orphanCandidatesUnverified:inventory.filter(r=>r.classification==='orphan-candidate-NOT-proven').length,connectedSourceReferences:inventory.filter(r=>r.classification==='connected-static-source-reference').length,verifiedInlineRedirectTargets:inventory.filter(r=>r.classification==='connected-compatibility-redirect').length,redirectOnlyAliases:redirectOnlyAliases.length,crossHostLinksNeedingVerification:crossHostLinks.filter(r=>r.classification==='target-needs-runtime-verification').length},
+  duplicates,inventory,redirectOnlyAliases,crossHostLinks
 };
 const output=path.join(root,'artifacts/route-reachability-advisory.json');
 fs.mkdirSync(path.dirname(output),{recursive:true});

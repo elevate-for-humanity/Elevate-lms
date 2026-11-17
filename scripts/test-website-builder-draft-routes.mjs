@@ -222,6 +222,18 @@ test('generation rejects incomplete phone continuations on either side of a line
 });
 
 
+test('generation preserves prose-wrapped phones and rejects parenthesized suffix fragments',async()=>{
+ for(const [source,phone,expected] of [
+  ['Contact us (phone: 317-555-0123).','317-555-0123',{phone:'317-555-0123'}],
+  ['Call (317)555-0123','555-0123',{}],
+  ['Call 317-555-0123)','317-555-0123',{}],
+ ]) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website using this owner contact text: '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,expected);
+ }
+});
+
 test('generation keeps complete phones after prose separators and valid service short codes',async()=>{
  for(const [source,phone] of [
   ['Call us. 317-555-0123','317-555-0123'],
@@ -232,6 +244,9 @@ test('generation keeps complete phones after prose separators and valid service 
   ['Phone:\r\n988','988'],
   ['Crisis hotline:\n988','988'],
   ['For crisis support, call:\n988','988'],
+  ['Phone:\n988 (available around the clock)','988'],
+  ['Phone:\n988 (24/7)','988'],
+  ['Phone:\n988 — available around the clock','988'],
  ]) {
   const contact={phone};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});

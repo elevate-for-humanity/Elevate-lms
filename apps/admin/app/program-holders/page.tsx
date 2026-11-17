@@ -22,7 +22,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function AdminProgramHoldersPage() {
-  await requireRole(['admin', 'staff']);
+  const { effectiveRoles } = await requireRole(['admin', 'staff']);
+  const canViewMou = effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin');
   const supabase = await requireAdminClient();
 
   // Fetch all program holders
@@ -30,7 +31,7 @@ export default async function AdminProgramHoldersPage() {
     supabase
       .from('program_holders')
       .select(
-        'id, organization_name, name, contact_name, contact_email, contact_phone, status, mou_signed, created_at, user_id',
+        'id, organization_name, name, contact_name, contact_email, contact_phone, status, mou_signed, mou_signed_at, mou_status, mou_admin_signed_at, created_at, user_id',
       )
       .order('created_at', { ascending: false }),
     supabase
@@ -65,6 +66,17 @@ export default async function AdminProgramHoldersPage() {
     if (!signatureByHolder.has(signature.program_holder_id))
       signatureByHolder.set(signature.program_holder_id, signature);
   }
+  const countersignedAtByHolder = new Map(
+    (holders ?? []).map((holder: any) => {
+      const signature = signatureByHolder.get(holder.id);
+      const holderCountersignedAt =
+        holder.mou_admin_signed_at ||
+        (['countersigned', 'fully_executed'].includes(holder.mou_status)
+          ? holder.mou_signed_at
+          : null);
+      return [holder.id, signature?.countersigned_at || holderCountersignedAt || null];
+    }),
+  );
 
   const countMap: Record<string, number> = {};
   (programCounts || []).forEach((pc: any) => {
@@ -229,14 +241,22 @@ export default async function AdminProgramHoldersPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         {signatureByHolder.has(h.id) ? (
-                          <Link
-                            href={`/mou?holder=${h.id}`}
-                            className="font-semibold text-brand-blue-700 underline"
-                          >
-                            {signatureByHolder.get(h.id)?.countersigned_at
-                              ? 'Countersigned'
-                              : 'Signature recorded'}
-                          </Link>
+                          canViewMou ? (
+                            <Link
+                              href={`/mou?holder=${h.id}`}
+                              className="font-semibold text-brand-blue-700 underline"
+                            >
+                              {countersignedAtByHolder.get(h.id)
+                                ? 'Countersigned'
+                                : 'Signature recorded'}
+                            </Link>
+                          ) : (
+                            <span>
+                              {countersignedAtByHolder.get(h.id)
+                                ? 'Countersigned'
+                                : 'Signature recorded'}
+                            </span>
+                          )
                         ) : signatureError ? (
                           <span>Unavailable</span>
                         ) : h.mou_signed ? (

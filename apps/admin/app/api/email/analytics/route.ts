@@ -25,6 +25,9 @@ type EmailLogRow = {
   status: string | null;
   provider: string | null;
   message_id: string | null;
+  recipient_email: string | null;
+  recipient: string | null;
+  to: string | null;
   sent_at: string;
 };
 
@@ -52,7 +55,16 @@ function deliveryKey(row: EmailLogRow): string | null {
   if (row.status === 'failed') return null;
 
   const messageId = row.message_id?.trim();
-  if (messageId) return `message:${row.provider || 'unknown'}:${messageId}`;
+  if (messageId) {
+    const recipient = (row.recipient_email || row.recipient || row.to)?.trim().toLowerCase();
+    if (recipient) {
+      return `message:${row.provider || 'unknown'}:${messageId}:recipient:${recipient}`;
+    }
+
+    // Without recipient identity, separate rows cannot safely be assumed to be
+    // duplicate deliveries. Preserve them rather than collapsing recipients.
+    return `message:${row.provider || 'unknown'}:${messageId}:log:${row.id}`;
+  }
 
   // Transport rows are canonical even when a provider did not return an ID.
   // Preserve older Gmail/Resend records and legacy rows without an action, but
@@ -90,7 +102,9 @@ export async function GET(request: NextRequest) {
   for (let offset = 0; ; offset += pageSize) {
     let query = db
       .from('email_logs')
-      .select('id,campaign_id,action,subject,status,provider,message_id,sent_at')
+      .select(
+        'id,campaign_id,action,subject,status,provider,message_id,recipient_email,recipient,to,sent_at',
+      )
       .not('sent_at', 'is', null)
       .order('sent_at', { ascending: false })
       .order('id')

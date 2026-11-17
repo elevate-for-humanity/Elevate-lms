@@ -523,7 +523,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       // inspecting any of the exact filenames already discovered on this branch.
       // Redirect once to a verified filename; normal read authorization and
       // duplicate-inspection limits remain enforced below.
-      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles);
+      const recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
       if (recovered) {
         observations.push('INSPECTION REDIRECTED to previously discovered source: '+recovered.path);
         action = recovered as AgentAction;

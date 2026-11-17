@@ -16,6 +16,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/lms/package.json ./apps/lms/package.json
 
 COPY packages/bounded-braces ./packages/bounded-braces
+COPY packages/bounded-picomatch-2 ./packages/bounded-picomatch-2
+COPY packages/bounded-picomatch-4 ./packages/bounded-picomatch-4
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder

@@ -1,0 +1,24 @@
+{
+  "license": "MIT",
+  "main": "index.js",
+  "engines": {
+    "node": ">=12"
+  },
+  "sideEffects": false,
+  "name": "@elevate/bounded-picomatch-4",
+  "version": "4.0.7-elevate.1",
+  "private": true,
+  "files": [
+    "index.js",
+    "posix.js",
+    "lib",
+    "LICENSE",
+    "SECURITY.md"
+  ],
+  "upstream": {
+    "name": "picomatch",
+    "version": "4.0.7",
+    "repository": "https://github.com/micromatch/picomatch",
+    "integrity": "sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA=="
+  }
+}

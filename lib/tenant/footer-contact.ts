@@ -39,10 +39,10 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
     return depth === 0;
   };
 
-  const lineHasIndependentPhone = (line: string) => {
-    const tokens = line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
-    return tokens.some(token => validPhoneShape(token.trim()));
-  };
+  const phoneTokens = (line: string) =>
+    line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
+  const lineHasIndependentPhone = (line: string) =>
+    phoneTokens(line).some(token => validPhoneShape(token.trim()));
 
   const suppliedPhone = (value: unknown, limit: number) => {
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
@@ -78,7 +78,8 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
         const previous = source[start - leftGap.length - 1] || '';
         if (leftGap && /[+()\d]/.test(previous)) {
           const priorLine = source.slice(0, start - leftGap.length).split(/\r?\n/).pop()?.trim() || '';
-          const priorDigits = priorLine.replace(/\D/g, '');
+          const priorTokens = phoneTokens(priorLine);
+          const priorDigits = (priorTokens[priorTokens.length - 1] || '').replace(/\D/g, '');
           const couldBeOnePhone = candidateDigits.length + priorDigits.length <= 15;
           if (!leftGap.includes('\n') || couldBeOnePhone || !lineHasIndependentPhone(priorLine)) continue;
         }
@@ -87,7 +88,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
         const next = source[end + rightGap.length] || '';
         if (rightGap && /[+\d]/.test(next)) {
           const nextLine = source.slice(end + rightGap.length).split(/\r?\n/)[0]?.trim() || '';
-          const nextDigits = nextLine.replace(/\D/g, '');
+          const nextDigits = (phoneTokens(nextLine)[0] || '').replace(/\D/g, '');
           const couldBeOnePhone = candidateDigits.length + nextDigits.length <= 15;
           const numericSchedule = !rightGap.includes('\n') && /^\d{1,2}\s*(?:am|pm)\b/i.test(nextLine);
           if (!numericSchedule

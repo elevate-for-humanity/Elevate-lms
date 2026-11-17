@@ -53,8 +53,8 @@ describe('host shop slideshow playback', () => {
   });
   it('rotates automatically, pauses, and resumes', () => {
     renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} />);
-    // Noncompact cards retain their original full-frame presentation.
-    expect(screen.getByAltText('First photo').className).toContain('object-cover');
+    // Portraits and logos remain completely visible in a stable frame.
+    expect(screen.getByAltText('First photo').className).toContain('object-contain');
     act(() => vi.advanceTimersByTime(5000));
     expect(screen.getByAltText('Second photo')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Pause slideshow' }));
@@ -63,6 +63,25 @@ describe('host shop slideshow playback', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Play slideshow' }));
     act(() => vi.advanceTimersByTime(5000));
     expect(screen.getByAltText('First photo')).toBeInTheDocument();
+  });
+  it('does not invert a pointer click on the Pause control during focus', () => {
+    renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
+    const pause = screen.getByRole('button', { name: 'Pause slideshow' });
+    const matches = vi.spyOn(pause, 'matches').mockReturnValue(false);
+    fireEvent.focus(pause);
+    matches.mockRestore();
+    fireEvent.click(pause);
+    expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
+  });
+  it('pauses automatic rotation on keyboard focus until explicitly restarted', () => {
+    renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
+    const nextButton = screen.getByRole('button', { name: 'Next image' });
+    const matches = vi.spyOn(nextButton, 'matches').mockReturnValue(true);
+    fireEvent.focus(nextButton);
+    matches.mockRestore();
+    expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Play slideshow' }));
+    expect(screen.getByRole('button', { name: 'Pause slideshow' })).toBeInTheDocument();
   });
   it('keeps the video separate from rotating photos and pauses photos during playback', () => {
     const { container } = renderVisible(
@@ -103,15 +122,16 @@ describe('host shop slideshow playback', () => {
   it('fills compact shop cards consistently while retaining a single playback control', () => {
     const { container } = renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
     const first = screen.getByAltText('First photo');
-    expect(screen.queryByAltText('Second photo')).not.toBeInTheDocument();
+    expect(screen.getByAltText('Second photo')).toBeInTheDocument();
     fireEvent.load(first);
-    expect(first.className).toContain('object-cover');
+    expect(first.className).toContain('object-contain');
     expect(container.querySelector('[class*="aspect-[16/10]"]')).not.toBeNull();
     expect(screen.getAllByRole('button')).toHaveLength(3);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     const second = screen.getByAltText('Second photo');
     fireEvent.load(second);
     expect(second).toHaveStyle({ opacity: '1' });
+    fireEvent.click(screen.getByRole('button', { name: 'Pause slideshow' }));
     expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
     act(() => vi.advanceTimersByTime(10000));
     expect(second).toHaveStyle({ opacity: '1' });

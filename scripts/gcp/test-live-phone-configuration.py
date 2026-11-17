@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime, timezone
 import json
 import importlib.util
 from pathlib import Path
@@ -17,6 +18,33 @@ def wav(code=7, rate=8000, data=bytes(range(256)) * 5):
 
 
 class ConfigurationTests(unittest.TestCase):
+    def test_extension_inventory_distinguishes_policy_from_all_26_live_acceptances(self):
+        observed = datetime(2026, 11, 17, 15, 0, tzinfo=timezone.utc)
+        base = {'enabled': True, 'ring_mode': 'ring', 'availability_source': 'manual'}
+        extensions = ['0'] + [str(value) for value in range(101, 108)] + [str(value) for value in range(201, 219)]
+        self.assertEqual(len(extensions), 26)
+        rows = [m.extension_inventory({**base, 'extension': extension}, " '" + extension + "' => 1. NoOp()", 'America/Indiana/Indianapolis', observed) for extension in extensions]
+        self.assertTrue(all(row['generatedRoutePresent'] for row in rows))
+        self.assertTrue(all(row['ringPolicy'] == 'RING_ALLOWED_BY_POLICY' for row in rows))
+        self.assertTrue(all(row['liveRinging'] == row['twoWayAudio'] == row['originalCallerNumber'] == row['voicemailDelivery'] == 'NOT_TESTED' for row in rows))
+        for change, policy in [({'enabled': False}, 'DISABLED'), ({'ring_mode': 'offline'}, 'OFFLINE'), ({'ring_mode': 'do_not_disturb'}, 'DO_NOT_DISTURB'), ({'ring_mode': 'silent'}, 'SILENT_ALERT'), ({'ring_mode': 'vibrate'}, 'VIBRATE_ALERT')]:
+            row = m.extension_inventory({**base, 'extension': '101', **change}, '', 'America/Indiana/Indianapolis', observed)
+            self.assertEqual(row['ringPolicy'], policy)
+            self.assertFalse(row['generatedRoutePresent'])
+
+    def test_schedule_inventory_uses_saved_timezone_and_exclusive_end_without_exposing_other_fields(self):
+        row = {'extension': '101', 'enabled': True, 'ring_mode': 'ring', 'availability_source': 'schedule',
+               'availability_schedule': {'tue': ['09:00', '10:00'], 'private': ['secret'], 'wed': ['bad', '18:00']},
+               'profile_id': 'private-profile', 'full_name': 'Private Name', 'voicemail_greeting': 'private message'}
+        before_end = datetime(2026, 11, 17, 14, 59, tzinfo=timezone.utc)
+        at_end = datetime(2026, 11, 17, 15, 0, tzinfo=timezone.utc)
+        result = m.extension_inventory(row, '', 'America/Indiana/Indianapolis', before_end)
+        self.assertTrue(result['withinSchedule'])
+        self.assertEqual(result['availabilitySchedule'], {'tue': ['09:00', '10:00']})
+        self.assertEqual(m.extension_inventory(row, '', 'America/Indiana/Indianapolis', at_end)['ringPolicy'], 'OUTSIDE_SCHEDULE')
+        self.assertEqual(m.extension_inventory(row, '', 'missing-timezone', at_end)['ringPolicy'], 'UNVERIFIED_POLICY')
+        self.assertNotIn('private', json.dumps(result).lower())
+
     def test_runtime_parity_requires_the_announced_menu_not_just_extension_numbers(self):
         extensions=[{'extension':'105','destination_id':'beauty'}]
         menu=[{'digit':5,'label':'Beauty','destination_id':'beauty'}]

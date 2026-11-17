@@ -75,7 +75,8 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const previousLine = source.slice(previousLineStart, previousLineEnd);
           const contactKeyword = /\b(call|phone|dial|text|hotline|support|emergency)\b/i;
           const relativeStart = start - lineStart;
-          const hasInlineContext = contactKeyword.test(currentLine.slice(0, relativeStart));
+          const inlinePrefix = currentLine.slice(0, relativeStart);
+          const hasInlineContext = /(?:\b(?:call|dial|text)(?:\s+(?:us|now|here|this\s+number))?|\b(?:phone|hotline|helpline|emergency(?:\s+(?:line|number))?|support(?:\s+(?:line|hotline|number)|\s*:)))\s*(?::|#|[-–—])?\s*$/i.test(inlinePrefix);
           const previousLineLabel = previousLine.trim();
           const candidateAtLineStart = new RegExp(
             '^\\s*' + escapeRegExp(cleaned),
@@ -120,7 +121,9 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const priorTokens = phoneTokens(priorLine);
           const priorDigits = (priorTokens[priorTokens.length - 1] || '').replace(/\D/g, '');
           const couldBeOnePhone = candidateDigits.length + priorDigits.length <= 15;
-          if (!leftGap.includes('\n') || couldBeOnePhone || !lineHasIndependentPhone(priorLine)) continue;
+          const priorLooksLikePostalLine = /\b[\p{L}][^\r\n]*\b\d{5}(?:-\d{4})?\s*$/u.test(priorLine);
+          if (!leftGap.includes('\n')
+            || (!priorLooksLikePostalLine && (couldBeOnePhone || !lineHasIndependentPhone(priorLine)))) continue;
         }
 
         const rightGap = source.slice(end).match(/^\s+/)?.[0] || '';

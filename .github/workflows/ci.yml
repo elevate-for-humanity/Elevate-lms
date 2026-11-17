@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [main, work, 'fix/unified-paris-acceptance-20261023']
+    branches: [main, work, 'fix/unified-paris-acceptance-20261023', 'fix/layout-media-validation-20261117']
 
 concurrency:
   # Finish active main validation; retain only the newest pending commit.

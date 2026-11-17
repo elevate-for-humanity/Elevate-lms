@@ -22,6 +22,7 @@ const source = stripTypeScriptTypes(readFileSync(productionPath, 'utf8'))
 
 function scenario(payload, completed = true, options = {}) {
   const events = [];
+  const tracing = [];
   const build = { id: 'build', course_id: 'course', status: 'blocked', profile: { competencies: [{ id: 'competency' }], ...options.profile } };
   const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }), then: resolve => resolve({data:[{competency_id:'competency',status:'built',artifacts:{}}],error:null}) };
   const profileWrites=[];
@@ -37,14 +38,15 @@ function scenario(payload, completed = true, options = {}) {
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
   const names = ['verifySavedCourseLessons','ULTIMATE_BUILD_STEPS','continuousCourseLease','checkpointContinuousLesson','attachCompletedLessonMedia','preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'ensureCourseAssessmentLesson', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
   const values = [verifySavedCourseLessons,ULTIMATE_BUILD_STEPS,continuousCourseLease,checkpointContinuousLesson,options.attach || (async ({result})=>{if(result.completed)events.push('attach');}),preservedCourseCursor,async()=>{},options.progressFactory || createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } async publishReadyLessons() { events.push('publish-ready');await options.publishReady?.(); } }, async () => ({ skipped: true }), options.nextWork || (() => ({ continue: false })), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
-  const worker = new Function(...names, 'liveCheckpointRepairReader', 'isTransientCourseFailure', 'requestFirstFailureRepair', 'notifyCourseDispatcher', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader,isTransientCourseFailure,async input=>{await options.repair?.(input);return {id:'repair'};},async()=>{});
-  return { events, build, profileWrites, run: () => worker(db, 'owner') };
+  const worker = new Function(...names, 'liveCheckpointRepairReader', 'isTransientCourseFailure', 'requestFirstFailureRepair', 'notifyCourseDispatcher', 'initializeLaminar', 'withLaminarSpan', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader,isTransientCourseFailure,async input=>{await options.repair?.(input);return {id:'repair'};},async()=>{},async service=>{tracing.push(['initialize',service]);},async(name,metadata,operation)=>{tracing.push(['span',name]);return operation();});
+  return { events, tracing, build, profileWrites, run: () => worker(db, 'owner') };
 }
 
 test('a successful targeted lesson clears course running state before releasing its job', async () => {
   for (const payload of [{ lessonBuildId: 'lesson' }, { competencyId: 'competency' }, { acceptance: true }]) {
     const s = scenario(payload);
     const result = await s.run();
+    assert.deepEqual(s.tracing,[['initialize','course_worker'],['span','course.job']]);
     assert.equal(result.completed, true);
     assert.deepEqual(s.events, ['attach', { buildId: 'build', status: 'blocked', currentStep: 'selective_repair' }, 'complete']);
   }

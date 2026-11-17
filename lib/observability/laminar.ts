@@ -160,6 +160,17 @@ export function createLaminarTracing({
     let iterator: AsyncIterator<T> | undefined;
     let completed = false;
     let failed = false;
+    async function closeSource(): Promise<void> {
+      if (completed || !iterator) return;
+      try {
+        const close = await invoke(() => iterator!.return);
+        if (close) await invoke(() => close.call(iterator));
+      } catch (error) {
+        // Preserve a provider failure; a cancellation-only cleanup failure is
+        // still returned to the consumer through its iterator.return() call.
+        if (!failed) { failed = true; throw error; }
+      }
+    }
     try {
       iterator = await invoke(() => operation()[Symbol.asyncIterator]());
       while (true) {
@@ -172,16 +183,7 @@ export function createLaminarTracing({
       throw error;
     } finally {
       try {
-        if (!completed && iterator) {
-          try {
-            const close = await invoke(() => iterator!.return);
-            if (close) await invoke(() => close.call(iterator));
-          }
-          catch (error) {
-            // A cleanup failure must not replace the original provider error.
-            if (!failed) { failed = true; throw error; }
-          }
-        }
+        await closeSource();
       } finally {
         try {
           current?.setAttribute('stream.completed', completed);

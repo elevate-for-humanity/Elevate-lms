@@ -79,5 +79,7 @@ jobs:
           tests/unit/ultimate-versioned-contract.test.ts
           tests/unit/ultimate-durable-resume.test.ts
           --maxWorkers=1
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Verify the isolated Node 22 worker tracing dependency closure
         run: docker build --target laminar-deps --file Dockerfile.ultimate-worker --tag elevate-laminar-deps .

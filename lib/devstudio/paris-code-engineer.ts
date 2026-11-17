@@ -3,7 +3,7 @@ import {rankSourcePaths,rememberSourcePaths,focusedSourceExcerpt} from './paris-
 import {missingRepairDeliverables,isApplicationSourceCorrection} from './paris-repair-deliverables.mjs';
 import {rememberVerifiedRepairSource,discardChangedRepairSource,repairPlannerObservations} from './paris-source-evidence.mjs';
 import {failedWorkflowLogExcerpt,failedWorkflowJobGuidance} from './paris-workflow-evidence.mjs';
-import {checkInspectionBudget,recoverRepeatedInspection} from './paris-inspection-budget.mjs';
+import {checkInspectionBudget,recoverRepeatedInspection,recoverRepeatedDirectoryInspection} from './paris-inspection-budget.mjs';
 import {hasApplicationSourceCorrection,nextRepairActionConstraint,assertCommittedWriteReadback} from './paris-action-loop.mjs';
 import {bindRepairWorkflowInspection,bindVerifiedFailedWorkflowInspection} from './paris-workflow-target.mjs';
 import {resolveOwnedModelConnection} from '@/lib/ai/providers/owned-model-config.mjs';
@@ -538,6 +538,14 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         const paths = suggestedSourcePaths(task, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));
         discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
         recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
+        // A truncated inventory can contain no unread relevant files. Recover
+        // once through an authenticated, allowlisted directory, not by resetting
+        // the repeat limit or inventing a source filename.
+        if (!recovered && tree.truncated === true) {
+          recovered = recoverRepeatedDirectoryInspection(inspectionHistory, action, tree.tree, task,
+            (path: string) => !blockedPath(path + '/'));
+          if (recovered) observations.push('SOURCE_TREE_TARGETED_DIRECTORY: ' + recovered.path);
+        }
       }
       if (recovered) {
         observations.push('INSPECTION REDIRECTED to authenticated goal-relevant source: '+recovered.path);

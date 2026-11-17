@@ -112,3 +112,31 @@ test('generation omits fabricated, malformed, account-only and oversized contact
   assert.equal((await f.post(request())).status,201);assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
  }
 });
+
+
+test('generation rejects partial email and phone tokens while preserving exact owner contacts',async()=>{
+ const source='Email: xsales@example.com; Phone: +1 (555) 123-4567';
+ for(const contact of [{email:'sales@example.com'}, {email:'xsales@example.co'}, {phone:'555'}, {phone:'123-4567'}, {phone:'1 (555) 123-4567'}]) {
+  const f=fixture('generate',{generated:{...config,contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Publish contact values exactly as supplied. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+ const contact={email:'xsales@example.com',phone:'+1 (555) 123-4567'};
+ const f=fixture('generate',{generated:{...config,contact},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Publish contact values exactly as supplied. '+source}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+});
+test('generation preserves hours from the actual Scheduling interview field',async()=>{
+ const questions=compile(await read('lib/website-builder/interview.ts'),{},'WEBSITE_INTERVIEW_QUESTIONS');
+ assert.ok(questions.some(question=>question.key==='scheduling'&&question.label==='Scheduling'));
+ const contact={email:'public@example.test',phone:'+1 (555) 123-4567',address:'123 Example Road',hours:['Monday 9–5']};
+ const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+ const response=await f.post(request({brief:undefined,answers:{businessName:'Example',contacts:'public@example.test; +1 (555) 123-4567',locations:'123 Example Road',scheduling:'Monday 9–5'}}));
+ assert.equal(response.status,201,JSON.stringify(response.body));assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+});
+
+test('generation never strips unsupported email prefixes or contact-adjacent letters', async()=>{
+ const f=fixture('generate',{generated:{...config,contact:{email:'sales@example.com',phone:'5551234567'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Use these details exactly: %sales@example.com and ABC5551234567XYZ, no invented contacts.'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});

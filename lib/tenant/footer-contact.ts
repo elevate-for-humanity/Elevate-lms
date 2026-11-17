@@ -5,15 +5,23 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
   if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
   const candidate = input as Record<string, unknown>;
   const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
-  const supplied = sources.filter(value => typeof value === 'string').map(fold);
-  const copy = (value: unknown, limit: number) => {
+  const rawSources = sources.filter(value => typeof value === 'string');
+  const supplied = rawSources.map(fold);
+  const emails = rawSources.flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || []).map(value => value.replace(/\.+$/, ''));
+  const phones = rawSources.flatMap(source => [...source.matchAll(/[+(\d][+\d ().-]*\d[)]?/g)].filter(match => {
+    const before = source[(match.index ?? 0) - 1] || '';
+    const after = source[(match.index ?? 0) + match[0].length] || '';
+    return !/[\p{L}\p{N}+]/u.test(before) && !/[\p{L}\p{N}]/u.test(after);
+  }).map(match => fold(match[0])));
+  const copy = (value: unknown, limit: number, kind?: 'email' | 'phone' | 'address') => {
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
     const cleaned = value.trim();
-    return supplied.some(source => source.includes(fold(cleaned))) ? cleaned : undefined;
+    const matches = kind === 'email' ? emails.includes(cleaned) : kind === 'phone' ? phones.includes(fold(cleaned)) : supplied.some(source => source.includes(fold(cleaned)));
+    return matches ? cleaned : undefined;
   };
   const result: TenantSiteContact = {};
   for (const [key, limit] of [['email', 180], ['phone', 80], ['address', 300]] as const) {
-    const value = copy(candidate[key], limit);
+    const value = copy(candidate[key], limit, key);
     if (value) result[key] = value;
   }
   if (Array.isArray(candidate.hours)) {
@@ -46,4 +54,6 @@ export function footerContactDetails(config: TenantSiteConfig) {
     phoneHref: /^\+?[\d ().-]{3,80}$/.test(phone) && /\d{3}/.test(phone.replace(/\D/g, '')) ? `tel:${phone.replace(/[^+\d]/g, '')}` : null,
   };
 }
+
+
 

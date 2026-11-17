@@ -13,9 +13,13 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
     .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:\"]+@[^\s<>()\x5b\x5d,;:\"]+/g) || [])
     .map(value => {
       const token = value.replace(/[.!?]+$/, '');
-      return token.startsWith("'") && token.endsWith("'")
-        ? token.slice(1, -1)
-        : token.replace(/'$/, '');
+      const pairedQuotes = [
+        ["'", "'"],
+        ['“', '”'],
+        ['‘', '’'],
+      ] as const;
+      const pair = pairedQuotes.find(([open, close]) => token.startsWith(open) && token.endsWith(close));
+      return pair ? token.slice(1, -1) : token.replace(/['’]$/, '');
     });
 
   const supportedServiceCodes = new Set(['211', '311', '411', '511', '611', '711', '811', '911', '988']);
@@ -58,24 +62,36 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const lineStart = source.lastIndexOf('\n', start - 1) + 1;
           const lineEndIndex = source.indexOf('\n', end);
           const lineEnd = lineEndIndex === -1 ? source.length : lineEndIndex;
-          const context = source.slice(lineStart, lineEnd);
+          const previousLineEnd = Math.max(0, lineStart - 1);
+          const previousLineStart = source.lastIndexOf('\n', previousLineEnd - 1) + 1;
+          const context = [
+            source.slice(previousLineStart, previousLineEnd),
+            source.slice(lineStart, lineEnd),
+          ].join(' ');
           if (!/\b(call|phone|dial|text|hotline|support|emergency)\b/i.test(context)) continue;
         }
         if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;
         if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;
 
+        const candidateDigits = cleaned.replace(/\D/g, '');
         const leftGap = source.slice(0, start).match(/\s+$/)?.[0] || '';
         const previous = source[start - leftGap.length - 1] || '';
         if (leftGap && /[+()\d]/.test(previous)) {
           const priorLine = source.slice(0, start - leftGap.length).split(/\r?\n/).pop()?.trim() || '';
-          if (!leftGap.includes('\n') || !lineHasIndependentPhone(priorLine)) continue;
+          const priorDigits = priorLine.replace(/\D/g, '');
+          const couldBeOnePhone = candidateDigits.length + priorDigits.length <= 15;
+          if (!leftGap.includes('\n') || couldBeOnePhone || !lineHasIndependentPhone(priorLine)) continue;
         }
 
         const rightGap = source.slice(end).match(/^\s+/)?.[0] || '';
         const next = source[end + rightGap.length] || '';
         if (rightGap && /[+\d]/.test(next)) {
           const nextLine = source.slice(end + rightGap.length).split(/\r?\n/)[0]?.trim() || '';
-          if (!rightGap.includes('\n') || !lineHasIndependentPhone(nextLine)) continue;
+          const nextDigits = nextLine.replace(/\D/g, '');
+          const couldBeOnePhone = candidateDigits.length + nextDigits.length <= 15;
+          const numericSchedule = !rightGap.includes('\n') && /^\d{1,2}\s*(?:am|pm)\b/i.test(nextLine);
+          if (!numericSchedule
+            && (!rightGap.includes('\n') || couldBeOnePhone || !lineHasIndependentPhone(nextLine))) continue;
         }
         return cleaned;
       }

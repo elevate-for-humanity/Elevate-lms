@@ -56,3 +56,13 @@ test('trusted branch-tree discovery recovers a relevant Studio producer without 
   assert.deepEqual(recoverRepeatedInspection(history,action,[],discovered,goal),
     {type:'read',path:'components/admin/studio/StudioComposer.tsx'});
 });
+
+test('exhausted and duplicate ranked paths cannot hide a relevant unread producer', () => {
+  const exhausted = 'components/admin/studio/StudioComposer.tsx';
+  const available = 'apps/admin/components/studio/StudioComposer.tsx';
+  const history = ['search:studio', 'read:' + exhausted.toLowerCase()];
+  const action = {type:'search',query:'studio'};
+  const discovered = [...Array(14).fill(exhausted),available];
+  assert.deepEqual(recoverRepeatedInspection(history, action, [], discovered,
+    'Fix Studio composer responsive viewport'), {type:'read',path:available});
+});

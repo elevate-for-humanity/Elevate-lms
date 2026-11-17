@@ -18,8 +18,11 @@ import { FollowUpBlastButton } from '@/components/admin/FollowUpBlastButton';
 import { BulkOnboardingButton } from '@/components/admin/BulkOnboardingButton';
 import ApplicationsTableClient from './ApplicationsTableClient';
 import type { ApplicationRow } from './ApplicationsTableClient';
+import { excludeQaProfiles } from '@/lib/admin/operational-profile-query';
 import {
   APPLICATION_REVIEW_STATUSES,
+  APPLICATION_AWAITING_REVIEW_STATUSES,
+  loadApplicationStatusCounts,
   applicationProgramFilter,
   applicationSearchFilter,
 } from '@/lib/admin/application-filters';
@@ -32,17 +35,25 @@ export const metadata: Metadata = {
 export default async function ApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; search?: string; page?: string; program?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    search?: string;
+    page?: string;
+    program?: string;
+    include_test?: string;
+  }>;
 }) {
   await requireRole(['admin', 'staff', 'org_admin', 'instructor']);
   const params = await searchParams;
 
   const sessionClient = await createClient();
 
+  const includeTest = params.include_test === '1';
   const rawStatus = params.status;
   const search = params.search;
   const programFilter = params.program || '';
-  const page = parseInt(params.page || '1', 10);
+  const parsedPage = Number(params.page ?? '1');
+  const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const pageSize = 25;
   const offset = (page - 1) * pageSize;
 
@@ -90,7 +101,7 @@ export default async function ApplicationsPage({
   // one for paginated results, one for counts only
   const [
     { data: applications, count: totalCount, error: applicationsError },
-    { data: countData, error: countError },
+    statusCountsResult,
     { count: guestPendingCount, error: guestError },
   ] = await Promise.all([
     // Query 1: Paginated applications with filters
@@ -98,7 +109,9 @@ export default async function ApplicationsPage({
       let query = adminDb!
         .from('applications')
         .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false });
+      if (!includeTest) query = excludeQaProfiles(query);
       if (resolvedStatuses.length === 1) query = query.eq('status', resolvedStatuses[0]);
       else if (resolvedStatuses.length > 1) query = query.in('status', resolvedStatuses);
       if (selectedProgram) query = query.or(applicationProgramFilter(selectedProgram));
@@ -106,14 +119,19 @@ export default async function ApplicationsPage({
       return query.range(offset, offset + pageSize - 1);
     })(),
     // Query 2: Status counts only (head=true to avoid transferring full rows)
-    adminDb.from('applications').select('id, status', { head: false }),
+    loadApplicationStatusCounts(adminDb, includeTest).then(
+      (data) => ({ data, error: null }),
+      (error: unknown) => ({ data: null, error }),
+    ),
     // Query 3: Guest pending count (separate count query)
-    adminDb
-      .from('applications')
-      .select('id', { count: 'exact', head: true })
-      .is('user_id', null)
-      .is('onboarding_sent_at', null)
-      .in('status', ['submitted', 'pending_admin_review', 'under_review', 'approved']),
+    (() => {
+      let query = adminDb.from('applications').select('id', { count: 'exact', head: true });
+      if (!includeTest) query = excludeQaProfiles(query);
+      return query
+        .is('user_id', null)
+        .is('onboarding_sent_at', null)
+        .in('status', ['submitted', 'pending_admin_review', 'under_review', 'approved']);
+    })(),
   ]);
 
   if (applicationsError) {
@@ -130,7 +148,8 @@ export default async function ApplicationsPage({
       </div>
     );
   }
-  if (countError) {
+  const countError = statusCountsResult.error;
+  if (countError || !statusCountsResult.data) {
     logger.error('[admin/applications] count query failed', countError);
     return (
       <div className="p-8">
@@ -150,22 +169,21 @@ export default async function ApplicationsPage({
     return !id.startsWith('intake-');
   });
 
-  // Compute status counts from countData
-  const statusCounts: Record<string, number> = {};
-  let totalApplications = 0;
-  countData?.forEach((app: { id?: string; status: string }) => {
-    const id = String(app.id ?? '');
-    statusCounts[app.status] = (statusCounts[app.status] || 0) + 1;
-    totalApplications++;
-  });
-
+  const statusCounts = statusCountsResult.data.statuses;
+  const totalApplications = statusCountsResult.data.total;
   const totalPages = Math.ceil((totalCount || 0) / pageSize);
-  const pending = APPLICATION_REVIEW_STATUSES.reduce(
+  const pending = APPLICATION_AWAITING_REVIEW_STATUSES.reduce(
+    (sum, status) => sum + (statusCounts[status] || 0),
+    0,
+  );
+  // Follow-up work includes applications already in review; summary cards do not overlap.
+  const followUpPending = APPLICATION_REVIEW_STATUSES.reduce(
     (sum, status) => sum + (statusCounts[status] || 0),
     0,
   );
 
   const paginationParams = new URLSearchParams();
+  if (includeTest) paginationParams.set('include_test', '1');
   if (rawStatus && rawStatus !== 'all') paginationParams.set('status', rawStatus);
   if (search) paginationParams.set('search', search);
   if (selectedProgram) paginationParams.set('program', selectedProgram.slug);
@@ -198,17 +216,51 @@ export default async function ApplicationsPage({
           color: 'blue',
         },
         { label: 'Rejected', value: statusCounts['rejected'] || 0, icon: XCircle, color: 'red' },
+        {
+          label: 'WorkOne / Funding',
+          value:
+            (statusCounts['pending_workone'] || 0) +
+            (statusCounts['pending_funding'] || 0) +
+            (statusCounts['funding_review'] || 0),
+          icon: Clock,
+          color: 'amber',
+        },
+        {
+          label: 'Waitlisted',
+          value: statusCounts['waitlisted'] || 0,
+          icon: Clock,
+          color: 'slate',
+        },
+        {
+          label: 'Withdrawn',
+          value: statusCounts['withdrawn'] || 0,
+          icon: XCircle,
+          color: 'slate',
+        },
       ]}
       actions={
         <div className="flex items-center gap-2">
+          <Link
+            href={includeTest ? '/applications' : '/applications?include_test=1'}
+            className="text-sm font-semibold text-white underline"
+          >
+            {includeTest ? 'Operational applications' : 'Include test applications'}
+          </Link>
           <BulkOnboardingButton guestCount={guestPendingCount ?? 0} />
-          <FollowUpBlastButton pendingCount={pending} />
+          <FollowUpBlastButton pendingCount={followUpPending} />
         </div>
       }
     >
+      <p className="text-sm text-slate-600">
+        {includeTest
+          ? 'Test and audit applications are included.'
+          : 'Test and audit applications are hidden.'}{' '}
+        Summary totals cover all applications in this view; the table below follows your filters.
+      </p>
       {/* Filters */}
       <AdminFilterBar>
         <form method="GET" className="flex flex-wrap gap-3 items-end">
+          {includeTest && <input type="hidden" name="include_test" value="1" />}
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Status</label>
             <select
@@ -224,6 +276,9 @@ export default async function ApplicationsPage({
               <option value="pending_admin_review">Pending Admin Review</option>
               <option value="pending_workone">Pending WorkOne</option>
               <option value="waitlisted">Waitlisted</option>
+              <option value="pending_funding">Pending Funding</option>
+              <option value="funding_review">Funding Review</option>
+              <option value="withdrawn">Withdrawn</option>
               <option value="approved">Approved</option>
               <option value="ready_to_enroll">Ready to Enroll</option>
               <option value="enrolled">Enrolled</option>

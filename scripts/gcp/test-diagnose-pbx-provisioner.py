@@ -8,6 +8,27 @@ m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
 class DiagnosticTests(unittest.TestCase):
+    def test_initial_failure_survives_repeated_quarantine_events(self):
+        journal = '\n'.join(['PBX expired-credential revocation stage: asterisk_rollback_failed'] +
+                            ['PBX expired-credential revocation stage: provisioner_quarantined',
+                             'PBX ownership/runtime reconciliation failed: provisioner_quarantined'] * 600)
+        report = m.failure_stages(journal)
+        self.assertEqual(report['initialFailureStages'], [{'stage': 'revocation', 'code': 'asterisk_rollback_failed'}])
+        self.assertTrue(report['initialFailureObserved'])
+        self.assertEqual(len(report['recentStages']), 20)
+
+    def test_no_initiating_failure_is_explicit_not_invented(self):
+        report = m.failure_stages('PBX expired-credential revocation stage: provisioner_quarantined')
+        self.assertFalse(report['initialFailureObserved'])
+        self.assertEqual(report['initialFailureStages'], [])
+
+    def test_initial_failures_are_deduplicated_and_redacted(self):
+        journal = '\n'.join(['PBX expired-credential revocation stage: asterisk_rollback_failed'] * 500 +
+                            ['PBX ownership/runtime reconciliation failed: unknown password=private'])
+        report = m.failure_stages(journal)
+        self.assertEqual(len(report['initialFailureStages']), 1)
+        self.assertNotIn('private', str(report))
+
     def test_exports_only_allowlisted_whole_log_events(self):
         journal = '\n'.join(['password=private', 'PBX ownership/runtime reconciliation failed: asterisk_aor_unverified', 'PBX expired-credential revocation stage: provisioner_quarantined', 'PBX expired-credential revocation stage: private', 'PBX ownership/runtime reconciliation failed: unknown token=private'])
         report = m.failure_stages(journal)
@@ -43,3 +64,4 @@ class DiagnosticTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

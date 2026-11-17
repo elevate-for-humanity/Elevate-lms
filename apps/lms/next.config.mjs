@@ -124,6 +124,8 @@ const nextConfig = {
       { source: '/', destination: '/login', permanent: false },
       // Preserve inbound bookmarks and old campaign links without a dead /lms/login page.
       { source: '/lms/login', destination: '/login', permanent: false },
+      // Legacy learner AI Tutor campaigns now use the authenticated AI Team page.
+      { source: '/lms/ai-tutor', destination: '/lms/ai-team', permanent: false },
       { source: '/reset', destination: '/support/reset-browser', permanent: true },
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
       { source: '/partners/dashboard', destination: '/host-shop/dashboard', permanent: true },

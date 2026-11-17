@@ -229,6 +229,7 @@ test('generation keeps complete phones after prose separators and valid service 
   ['Call 317-555-0123 9am–5pm weekdays.','317-555-0123'],
   ['For crisis support, call 988.','988'],
   ['Phone:\n988','988'],
+  ['Phone:\r\n988','988'],
  ]) {
   const contact={phone};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});

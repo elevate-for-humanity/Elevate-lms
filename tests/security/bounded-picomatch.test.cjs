@@ -26,6 +26,23 @@ for (const major of [2, 4]) {
     assert.equal(result.status, 0, result.stderr);
   });
 
+  test(`picomatch ${major}: malformed POSIX tokens and posix:false are bounded on reported payload`, () => {
+    const result = spawnSync(process.execPath, ['-e', `
+      const assert = require('node:assert/strict');
+      const pm = require(${JSON.stringify(location)});
+      const attack = 'fa]'.repeat(40) + '!';
+      for (const pattern of ['+([[:foo:]*a])', '+([[:alpha:]*a])']) {
+        for (const options of [{}, {posix:false}]) {
+          assert.equal(pm(pattern, options)(attack), false);
+          assert.equal(pm.makeRe(pattern, options).test(attack), false);
+          assert.equal(pm.compileRe(pm.parse(pattern, options), options).test(attack), false);
+        }
+      }
+    `], { timeout: 1800, encoding: 'utf8' });
+    assert.equal(result.error, undefined, result.stderr);
+    assert.equal(result.status, 0, result.stderr);
+  });
+
   test(`picomatch ${major}: ordinary globs and literal stars retain their meaning`, () => {
     for (const [pattern, yes, no] of [
       ['src/**/*.js', 'src/nested/app.js', 'src/app.ts'],

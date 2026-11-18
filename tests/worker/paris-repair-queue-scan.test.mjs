@@ -18,9 +18,9 @@ test('PARIS retains guarded dispatch and source-job eligibility',()=>{
 
 test('PARIS does not enqueue failed sources belonging to archived or superseded builds',()=>{
   const sweep=source.slice(source.indexOf('const failedPageSize=20;'),source.indexOf('for(const event of eligibleRepairEvents'));
-  assert.match(sweep,/from\\('ultimate_course_builds'\\)/);
-  assert.match(sweep,/\\['running','queued','building'\\]\\.includes\\(build\\.data\\.status\\)/);
-  assert.match(sweep,/build\\.data\\.profile\\?\\.ownerPaused===true/);
-  assert.match(sweep,/courseDefectDisposition\\(\\{source:job,latest:latest\\.data,build:build\\.data\\}\\)!=='repair'/);
+  assert.ok(sweep.includes("from('ultimate_course_builds')"));
+  assert.ok(sweep.includes("['running','queued','building'].includes(build.data.status)"));
+  assert.ok(sweep.includes('build.data.profile?.ownerPaused===true'));
+  assert.ok(sweep.includes("courseDefectDisposition({source:job,latest:latest.data,build:build.data})!=='repair'"));
   assert.ok(sweep.indexOf('const build=')<sweep.indexOf('await enqueueParisRepair'), 'current-build eligibility must precede enqueue');
 });

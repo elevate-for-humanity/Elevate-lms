@@ -35,6 +35,11 @@ describe('Host Shop mobile media loading', () => {
     expect(document.querySelectorAll('img')).toHaveLength(2);
     expect(screen.getByRole('button', { name: 'Pause slideshow' })).toBeTruthy();
     fireEvent.load(screen.getByAltText('First photo'));
+    // The public image audit must inspect only the displayed, decoded image.
+    // The preloaded second frame is intentionally aria-hidden while pending.
+    expect(screen.getByAltText('First photo')).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByAltText('Second photo')).toHaveAttribute('aria-hidden', 'true');
+    expect(document.querySelectorAll('img:not([aria-hidden="true"])')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     expect(screen.getByAltText('Second photo')).toBeTruthy();
   });

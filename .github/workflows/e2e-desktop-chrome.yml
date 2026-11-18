@@ -140,7 +140,7 @@ jobs:
           pnpm exec playwright test
           tests/e2e/public-runtime-acceptance.spec.ts
           tests/e2e/canonical-application-flow.spec.ts
-          --grep 'navigation destination /partners/host-shops:|Host Shop application provides resume access'
+          --grep 'navigation destination /partners/host-shops(?:/[^:]+)?:|Host Shop application provides resume access'
           --project=desktop-chrome --project=laptop-chrome
           --project=tablet-chrome --project=android-chrome --project=iphone-webkit
       - name: Upload focused Host Shop browser evidence

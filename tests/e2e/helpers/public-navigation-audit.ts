@@ -53,10 +53,25 @@ export function registerPublicNavigationAudit() {
         await expect(page.getByRole('link', { name: 'Apply to become a Host Shop', exact: true }))
           .toHaveAttribute('href', '/partners/host-shop/apply');
       }
+      // Freeze visible slide shows before the scroll audit. Otherwise a
+      // carousel swaps image nodes while Playwright is iterating nth() locators.
+      // Do not suppress failed visible images or change application state.
+      const playingCarousels = page.locator('main button[aria-label="Pause slideshow"]');
+      const initialPlayingCount = await playingCarousels.count();
+      for (let i = 0; i < initialPlayingCount; i++) {
+        await playingCarousels.first().click();
+        // The locator intentionally re-resolves after React changes the
+        // clicked button's accessible name from Pause to Play.
+        await expect(playingCarousels).toHaveCount(initialPlayingCount - i - 1);
+      }
       const imageSelector = await page.locator('main').count() ? 'main img' : 'body img';
-      // Lazy images only load after entering the viewport. Exercise the actual
-      // visitor scroll rather than waiting forever on below-the-fold decode().
-      for (const image of await page.locator(imageSelector).all()) {
+      // Inactive gallery preload frames use aria-hidden=true and opacity:0.
+      // Playwright isVisible() intentionally treats opacity:0 as visible, so
+      // their deliberately lazy, unrequested network images must not be
+      // mistaken for the user-facing photo. Every presented image still has
+      // to complete, decode, and expose nonzero natural dimensions.
+      const presentedImages = page.locator(`${imageSelector}:not([aria-hidden="true"])`);
+      for (const image of await presentedImages.all()) {
         if (!await image.isVisible()) continue;
         await image.scrollIntoViewIfNeeded();
         await expect(image, `${href} image did not finish loading`).toHaveJSProperty('complete', true, { timeout: 10_000 });

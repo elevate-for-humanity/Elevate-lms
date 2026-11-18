@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   XCircle,
@@ -25,10 +26,10 @@ export function DocumentReviewForm({ document, adminId }: Props) {
 
   // Auto-refresh URL before it expires (refresh at 45s of 60s TTL)
   useEffect(() => {
-    if (!document.file_path && !document.file_url) return;
+    if (!docUrl) return;
     const timer = setTimeout(() => setUrlExpired(true), 45_000);
     return () => clearTimeout(timer);
-  }, [document.file_path, docUrl]);
+  }, [docUrl]);
 
   const refreshUrl = useCallback(async (): Promise<string | null> => {
     setRefreshing(true);
@@ -44,6 +45,8 @@ export function DocumentReviewForm({ document, adminId }: Props) {
           return url;
         }
       }
+    } catch {
+      return null;
     } finally {
       setRefreshing(false);
     }
@@ -79,6 +82,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         throw new Error(data.error || 'Failed to review document');
       }
 
+      window.dispatchEvent(new Event('document-review-updated'));
       router.push('/documents/review?success=true');
       router.refresh();
     } catch (err: unknown) {
@@ -118,7 +122,8 @@ export function DocumentReviewForm({ document, adminId }: Props) {
               <p className="font-semibold text-black">
                 {(typeof document.document_type === 'string' && document.document_type.trim()
                   ? document.document_type
-                  : 'Uploaded Document')
+                  : 'Uploaded Document'
+                )
                   .replace(/_/g, ' ')
                   .replace(/\b\w/g, (l: string) => l.toUpperCase())}
               </p>
@@ -129,10 +134,13 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <div>
               <p className="text-sm text-black">Uploaded By</p>
               <p className="font-semibold text-black">
-                {document.profiles?.full_name || 'Unknown User'}
+                {document.profiles?.full_name ||
+                  (document.owner_type
+                    ? document.owner_type.replaceAll('_', ' ')
+                    : 'Owner not linked')}
               </p>
               <p className="text-sm text-black">
-                {document.profiles?.email} • {document.profiles?.role}
+                {[document.profiles?.email, document.profiles?.role].filter(Boolean).join(' · ')}
               </p>
             </div>
           </div>
@@ -159,11 +167,20 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         </div>
       </div>
 
+      {document.application_id && (
+        <Link
+          href={`/applications/review/${document.application_id}`}
+          className="mb-4 inline-block text-brand-blue-700 underline"
+        >
+          Open linked application
+        </Link>
+      )}
+
       {/* Document Preview */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Document Preview</h2>
-          {(document.file_path || document.file_url) && (
+          {document.hasStorageLocator && (
             <button
               onClick={refreshUrl}
               disabled={refreshing}
@@ -185,16 +202,27 @@ export function DocumentReviewForm({ document, adminId }: Props) {
           </div>
         )}
         <div className="relative border rounded-lg overflow-hidden">
-          {document.mime_type === 'application/pdf' ? (
+          {!docUrl ? (
+            <p role="status" className="p-4 text-sm text-slate-700">
+              No file could be opened from private storage.
+            </p>
+          ) : document.mime_type === 'application/pdf' ? (
             <iframe src={docUrl} className="w-full h-[600px]" title="Document Preview" />
           ) : (
             <div className="relative w-full min-h-[400px]">
-              {docUrl && <img src={docUrl} alt="Document" className="h-auto max-h-[700px] w-full object-contain" />}
+              {docUrl && (
+                <img
+                  src={docUrl}
+                  alt="Document"
+                  className="h-auto max-h-[700px] w-full object-contain"
+                />
+              )}
             </div>
           )}
         </div>
         <div className="mt-4">
           <button
+            disabled={!document.hasStorageLocator || refreshing}
             onClick={async () => {
               const freshUrl = await refreshUrl();
               if (freshUrl) window.open(freshUrl, '_blank', 'noopener,noreferrer');
@@ -207,7 +235,12 @@ export function DocumentReviewForm({ document, adminId }: Props) {
       </div>
 
       {/* Review Actions */}
-      {document.status === 'pending' && (
+      {document.status === 'pending' && !docUrl && (
+        <p role="status" className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          Open the stored file before reviewing this upload.
+        </p>
+      )}
+      {document.status === 'pending' && docUrl && (
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-2xl font-bold mb-4">Review Decision</h2>
 
@@ -296,7 +329,10 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         </form>
       )}
 
-      {document.status !== 'pending' && (
+      {document.status === 'unknown' && (
+        <p className="rounded-lg border p-4 text-slate-700">No review decision recorded.</p>
+      )}
+      {['approved', 'rejected'].includes(document.status) && (
         <div
           className={`p-6 rounded-lg border-2 ${
             document.status === 'approved'
@@ -307,9 +343,11 @@ export function DocumentReviewForm({ document, adminId }: Props) {
           <h2 className="text-xl font-bold mb-2">
             {document.status === 'approved' ? 'Document Approved' : 'Document Rejected'}
           </h2>
-          <p className="text-sm mb-4">
-            Reviewed on {new Date(document.reviewed_at).toLocaleString('en-US')}
-          </p>
+          {document.reviewed_at && (
+            <p className="text-sm mb-4">
+              Reviewed on {new Date(document.reviewed_at).toLocaleString('en-US')}
+            </p>
+          )}
           {document.rejection_reason && (
             <div className="p-4 bg-white rounded-lg border">
               <p className="text-sm font-semibold mb-1">Rejection Reason:</p>

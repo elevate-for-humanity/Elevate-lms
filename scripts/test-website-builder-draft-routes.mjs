@@ -319,7 +319,7 @@ test('generation requires destination context for inline service codes',async()=
   assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
   assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
  }
- for(const source of ['Call 988 for help.','Support: 988','For help, use the support line 988.']) {
+ for(const source of ['Call 988 for help.','Support: 988','For help, use the support line 988.', 'Phone number: 988', 'Call us at 988 for help.']) {
   const contact={phone:'988'};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
   assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
@@ -328,7 +328,7 @@ test('generation requires destination context for inline service codes',async()=
 });
 
 test('generation retains a phone on the line after a postal address',async()=>{
- for(const address of ['Indianapolis, IN 46204','123 Main Street, Indianapolis, IN 46204-1234']) {
+ for(const address of ['Indianapolis, IN 46204','123 Main Street, Indianapolis, IN 46204-1234', 'Indianapolis IN 46204', 'Indianapolis, in 46204', 'Indianapolis, Indiana 46204']) {
   const contact={phone:'317-555-0123'};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
   assert.equal((await f.post(request({brief:'Build the requested business website. '+address+'\n317-555-0123'}))).status,201);
@@ -336,5 +336,12 @@ test('generation retains a phone on the line after a postal address',async()=>{
  }
  const f=fixture('generate',{generated:{...config,contact:{phone:'317-555-0123'}},realNormalization:true});
  assert.equal((await f.post(request({brief:'Build the requested business website. 46204\n317-555-0123'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});
+
+
+test('generation rejects the tail of an international phone split after five digits',async()=>{
+ const f=fixture('generate',{generated:{...config,contact:{phone:'6789012'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Publish only the full phone. Phone: +49 12345\n6789012'}))).status,201);
  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
 });

@@ -76,7 +76,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const contactKeyword = /\b(call|phone|dial|text|hotline|support|emergency)\b/i;
           const relativeStart = start - lineStart;
           const inlinePrefix = currentLine.slice(0, relativeStart);
-          const hasInlineContext = /(?:\b(?:call|dial|text)(?:\s+(?:us|now|here|this\s+number))?|\b(?:phone|hotline|helpline|emergency(?:\s+(?:line|number))?|support(?:\s+(?:line|hotline|number)|\s*:)))\s*(?::|#|[-–—])?\s*$/i.test(inlinePrefix);
+          const hasInlineContext = /(?:\b(?:call|dial|text)(?:\s+(?:us|now|here|this\s+number))?(?:\s+at)?|\b(?:phone(?:\s+(?:line|number))?|hotline|helpline|emergency(?:\s+(?:line|number))?|support(?:\s+(?:line|hotline|number)|\s*:)))\s*(?::|#|[-–—])?\s*$/i.test(inlinePrefix);
           const previousLineLabel = previousLine.trim();
           const candidateAtLineStart = new RegExp(
             '^\\s*' + escapeRegExp(cleaned),
@@ -121,7 +121,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const priorTokens = phoneTokens(priorLine);
           const priorDigits = (priorTokens[priorTokens.length - 1] || '').replace(/\D/g, '');
           const couldBeOnePhone = candidateDigits.length + priorDigits.length <= 15;
-          const priorLooksLikePostalLine = /\p{L},\s+[A-Z]{2}\s+\d{5}(?:-\d{4})?\s*$/u.test(priorLine);
+          const priorLooksLikePostalLine = /\p{L},?\s+(?:AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|American Samoa|Guam|Northern Mariana Islands|Puerto Rico|Virgin Islands|Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|District of Columbia|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming|AS|GU|MP|PR|VI)\s+\d{5}(?:-\d{4})?\s*$/iu.test(priorLine);
           if (!leftGap.includes('\n')
             || (!priorLooksLikePostalLine && (couldBeOnePhone || !lineHasIndependentPhone(priorLine)))) continue;
         }

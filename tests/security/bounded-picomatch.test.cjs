@@ -43,6 +43,23 @@ for (const major of [2, 4]) {
     assert.equal(result.status, 0, result.stderr);
   });
 
+  test(`picomatch ${major}: unescaped class closers cannot expose a nested wildcard`, () => {
+    const pattern = String.raw`+([[:alpha:]\]*a])`;
+    const run = spawnSync(process.execPath, ['-e', `
+      const assert = require('node:assert/strict');
+      const pm = require(${JSON.stringify(location)});
+      const pattern = ${JSON.stringify(pattern)};
+      const probe = 'aa]'.repeat(40) + '!';
+      for (const options of [{ unescape: true }, { unescape: true, capture: true }, { unescape: true, fastpaths: false }]) {
+        assert.equal(pm(pattern, options)(probe), false);
+        assert.equal(pm.makeRe(pattern, options).test(probe), false);
+        assert.equal(pm.compileRe(pm.parse(pattern, options), options).test(probe), false);
+      }
+    `], { timeout: 1800, encoding: 'utf8' });
+    assert.equal(run.error, undefined, run.stderr);
+    assert.equal(run.status, 0, run.stderr);
+  });
+
   test(`picomatch ${major}: ordinary globs and literal stars retain their meaning`, () => {
     for (const [pattern, yes, no] of [
       ['src/**/*.js', 'src/nested/app.js', 'src/app.ts'],

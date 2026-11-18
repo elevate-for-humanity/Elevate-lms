@@ -301,7 +301,18 @@ const hasUnboundedGlobStar = (body, options) => {
         : body[i + 1] === '^' && body[i + 2] === ']' ? i + 2 : -1;
       let end = i + 1;
       for (; end < body.length; end++) {
-        if (body[end] === '\\') { end++; continue; }
+        if (body[end] === '\\') {
+          // With unescape:true the parser consumes the backslash and treats
+          // the following ']' as a class closer once there is a class member.
+          // The first member (or '^' followed by the first member) is literal.
+          const leadingLiteral = end === i + 1 || (end === i + 2 && body[i + 1] === '^');
+          if (options.unescape === true && body[end + 1] === ']' && !leadingLiteral) {
+            end++;
+            break;
+          }
+          end++;
+          continue;
+        }
         if (body[end] === '[' && body[end + 1] === ':' && options.posix !== false) {
           const posixEnd = body.indexOf(':]', end + 2);
           const posixName = posixEnd === -1 ? '' : body.slice(end + 2, posixEnd);

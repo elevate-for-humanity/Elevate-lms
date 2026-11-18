@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { countDirectoryActiveAccess } from '@/lib/admin/student-directory-enrollments';
 import {
   loadApplicationStatusCounts,
   APPLICATION_AWAITING_REVIEW_STATUSES,
@@ -99,4 +100,19 @@ describe('application audit reporting', () => {
     expect(filters[0]).toContain('email.is.null');
     expect(filters[1]).toContain('full_name.is.null');
   });
+});
+
+it('counts an active learner once when any active enrollment is awaiting access', () => {
+  const result = countDirectoryActiveAccess(
+    [
+      { user_id: 'mixed', status: 'active', access_granted_at: '2026-11-17' },
+      { student_id: 'mixed', status: 'enrolled', access_granted_at: null },
+      { user_id: 'mixed', status: 'confirmed', access_granted_at: null },
+      { user_id: 'ready', status: 'in_progress', access_granted_at: '2026-11-17' },
+      { user_id: 'ready', status: 'active', revoked_at: '2026-11-17' },
+      { user_id: 'excluded', status: 'active', access_granted_at: null },
+    ],
+    new Set(['mixed', 'ready']),
+  );
+  expect(result).toEqual({ activeEnrollments: 2, accessPending: 1 });
 });

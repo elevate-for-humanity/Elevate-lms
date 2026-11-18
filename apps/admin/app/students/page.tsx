@@ -1,6 +1,7 @@
 import { isTestOrAuditProfile } from '@/lib/admin/operational-profile-query';
 import {
   loadStudentDirectory,
+  countDirectoryActiveAccess,
   directoryEnrollmentState,
 } from '@/lib/admin/student-directory-enrollments';
 import { Metadata } from 'next';
@@ -93,20 +94,20 @@ export default async function StudentsPage({
         enrollment_state: directoryEnrollmentState(enrollment),
       };
   }
-  const countStudents = (states: string[], access = false) =>
+  const countStudents = (states: string[]) =>
     new Set(
       enrollments
         .filter(
           (e) =>
             operationalStudentIds.has(e.user_id ?? e.student_id) &&
-            states.includes(directoryEnrollmentState(e) ?? '') &&
-            (!access || e.access_granted_at),
+            states.includes(directoryEnrollmentState(e) ?? ''),
         )
         .map((e) => e.user_id ?? e.student_id),
     ).size;
-  const activeEnrollments = countStudents(['active', 'enrolled', 'in_progress', 'confirmed']);
-  const accessPending =
-    activeEnrollments - countStudents(['active', 'enrolled', 'in_progress', 'confirmed'], true);
+  const { activeEnrollments, accessPending } = countDirectoryActiveAccess(
+    enrollments,
+    operationalStudentIds,
+  );
   const pendingApproval = countStudents(['applied', 'pending_approval']);
   const completedEnrollments = countStudents(['completed', 'graduated']);
   const weekAgo = new Date();

@@ -9,9 +9,9 @@ import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
+// Student/learner membership is not an apprentice role and must never
+// override a verified employer, host-shop, or other portal identity.
 const APPRENTICE_ROLES = new Set([
-  'student',
-  'learner',
   'apprentice',
   'barber_apprentice',
   'cosmetology_apprentice',
@@ -173,7 +173,14 @@ export default function LoginPage() {
         destination = requestedDestination;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
-      } else if (effectiveRoles.some((role) => APPRENTICE_ROLES.has(role))) {
+      } else if (safeRedirect) {
+        // Honor an authorized, role-compatible destination from a specific
+        // portal entry first. This prevents secondary learner grants from
+        // hijacking employer/host-shop login into a student dashboard.
+        destination = requestedDestination;
+      } else if (['employer', 'sponsor', 'recruiter'].includes(profile.role)) {
+        destination = resolveDashboardUrl(profile.role, effectiveRoles);
+      } else if (APPRENTICE_ROLES.has(profile.role)) {
         // Resolve program context while keeping every apprenticeship on the
         // canonical /apprentice runtime. Non-Store redirects cannot override it.
         destination = await resolveStudentHomePath(
@@ -181,10 +188,8 @@ export default function LoginPage() {
           userId,
           typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
         );
-      } else if (effectiveRoles.some(role => ['student', 'learner'].includes(role)) && !safeRedirect && !effectiveRoles.some(role => ['admin', 'super_admin'].includes(role))) {
+      } else if (['student', 'learner'].includes(profile.role) && !effectiveRoles.some(role => ['admin', 'super_admin'].includes(role))) {
         destination = await resolveStudentHomePath(supabase, userId, profile.portal_type);
-      } else if (safeRedirect) {
-        destination = requestedDestination;
       } else {
         // portal_type is retained as enrollment metadata, not as permission to
         // invent /portal/* routes. Role ownership determines the actual portal.

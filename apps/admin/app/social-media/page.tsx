@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hasAnyRole } from '@/lib/rbac/role-matrix';
+import {
+  postPublishingReadinessError,
+  publishingReadinessError,
+  reviewablePostStatuses,
+} from '@/lib/social/publishing-readiness';
 import { approveSocialPost, enableApprovedPublishing } from './actions';
 import {
   ArrowRight,
@@ -20,6 +26,8 @@ import {
 
 export const dynamic = 'force-dynamic';
 
+const PAGE_SIZE = 8;
+
 const platformLabel = (platform: string) =>
   platform === 'google_business'
     ? 'Google Business Profile'
@@ -30,20 +38,45 @@ const platformLabel = (platform: string) =>
 export default async function SocialMediaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; page?: string; queue?: string }>;
 }) {
   const params = await searchParams;
-  await requireRole(['admin', 'staff']);
+  const { effectiveRoles } = await requireRole(['admin', 'staff']);
+  const canApprove = hasAnyRole(effectiveRoles, ['admin', 'super_admin']);
+  const requestedPage = Number(params.page ?? '1');
+  const page =
+    Number.isSafeInteger(requestedPage) && requestedPage >= 1 && requestedPage <= 100000
+      ? requestedPage
+      : 1;
+  const offset = (page - 1) * PAGE_SIZE;
+  const legacyQueue = params.queue === 'legacy';
+  const queueHref = (targetPage: number) =>
+    `/social-media?page=${targetPage}${legacyQueue ? '&queue=legacy' : ''}`;
   const db = await requireAdminClient();
 
-  const [postsResult, campaignsResult, accountsResult, blogsResult] = await Promise.all([
-    db
-      .from('social_media_posts')
-      .select(
-        'id,title,caption,content,platform,destination_type,post_type,status,approval_state,scheduled_at,created_at,updated_at,media_url,thumbnail_url,video_url,error_message',
-      )
+  const postsQuery = db
+    .from('social_media_posts')
+    .select(
+      'id,title,caption,content,platform,destination_type,post_type,status,approval_state,updated_at,media_url,thumbnail_url,video_url,error_message,source_id,published_url,platform_post_id,claim_expires_at',
+      { count: 'exact' },
+    );
+  const [
+    postsResult,
+    campaignsResult,
+    accountsResult,
+    blogsResult,
+    approvals,
+    reels,
+    scheduledPosts,
+    publishedPosts,
+  ] = await Promise.all([
+    (legacyQueue
+      ? postsQuery.is('source_id', null).in('status', reviewablePostStatuses)
+      : postsQuery.or(`source_id.not.is.null,status.not.in.(${reviewablePostStatuses.join(',')})`)
+    )
       .order('created_at', { ascending: false })
-      .limit(18),
+      .order('id')
+      .range(offset, offset + PAGE_SIZE - 1),
     db
       .from('social_campaigns')
       .select('id,name,status,platform,created_at,metadata')
@@ -52,7 +85,7 @@ export default async function SocialMediaPage({
     db
       .from('social_media_settings')
       .select(
-        'platform,profile_data,enabled,expires_at,organization_id,connection_status,last_verified_at,dry_run',
+        'platform,profile_data,enabled,expires_at,organization_id,connection_status,last_verified_at,dry_run,granted_scopes',
       ),
     db
       .from('blog_posts')
@@ -61,9 +94,37 @@ export default async function SocialMediaPage({
       .eq('share_to_social', true)
       .order('published_at', { ascending: false })
       .limit(8),
+    db
+      .from('social_media_posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('approval_state', 'pending')
+      .in('status', reviewablePostStatuses)
+      .not('source_id', 'is', null),
+    db
+      .from('social_media_posts')
+      .select('id', { count: 'exact', head: true })
+      .or('destination_type.ilike.*reel*,post_type.ilike.*reel*'),
+    db
+      .from('social_media_posts')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['scheduled', 'queued']),
+    db
+      .from('social_media_posts')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['published', 'posted']),
   ]);
 
   const posts = postsResult.data ?? [];
+  const sourceIds = [...new Set(posts.map((post) => post.source_id).filter(Boolean))];
+  const sourcesResult = sourceIds.length
+    ? await db
+        .from('blog_posts')
+        .select('id')
+        .in('id', sourceIds)
+        .eq('published', true)
+        .eq('share_to_social', true)
+    : { data: [], error: null };
+  const approvedSourceIds = new Set((sourcesResult.data ?? []).map((blog) => blog.id));
   const campaigns = campaignsResult.data ?? [];
   const blogs = blogsResult.data ?? [];
   const supportedPlatforms = [
@@ -86,35 +147,28 @@ export default async function SocialMediaPage({
       account.connection_status === 'verified_read_only' &&
       (!account.expires_at || new Date(account.expires_at) > new Date()),
   );
-  const pendingApproval = posts.filter((post) => post.approval_state === 'pending').length;
-  const reelDrafts = posts.filter(
-    (post) => post.destination_type?.includes('reel') || post.post_type?.includes('reel'),
-  ).length;
-  const scheduled = posts.filter((post) => ['scheduled', 'queued'].includes(post.status)).length;
-  const published = posts.filter((post) => ['published', 'posted'].includes(post.status)).length;
-
   const stats = [
     {
       label: 'Approval queue',
-      value: pendingApproval,
+      value: approvals.count,
       icon: ShieldCheck,
       accent: 'bg-amber-100 text-amber-800',
     },
     {
       label: 'Reel packages',
-      value: reelDrafts,
+      value: reels.count,
       icon: Video,
       accent: 'bg-violet-100 text-violet-800',
     },
     {
       label: 'Scheduled',
-      value: scheduled,
+      value: scheduledPosts.count,
       icon: CalendarClock,
       accent: 'bg-blue-100 text-blue-800',
     },
     {
       label: 'Published',
-      value: published,
+      value: publishedPosts.count,
       icon: Radio,
       accent: 'bg-emerald-100 text-emerald-800',
     },
@@ -154,13 +208,19 @@ export default async function SocialMediaPage({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                <p className="text-3xl font-black">{blogs.length}</p>
+                <p className="text-3xl font-black">
+                  {blogsResult.error ? 'Unavailable' : blogs.length}
+                </p>
                 <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-300">
                   Recent source articles
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/10 p-5">
-                <p className="text-3xl font-black">{connected.length}/5</p>
+                <p className="text-3xl font-black">
+                  {accountsResult.error
+                    ? 'Unavailable'
+                    : `${connected.length}/${supportedPlatforms.length}`}
+                </p>
                 <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-300">
                   Verified connections
                 </p>
@@ -191,7 +251,9 @@ export default async function SocialMediaPage({
               <span className={`inline-flex rounded-xl p-2.5 ${accent}`}>
                 <Icon className="h-5 w-5" />
               </span>
-              <p className="mt-4 text-3xl font-black tabular-nums text-slate-950">{value}</p>
+              <p className="mt-4 text-3xl font-black tabular-nums text-slate-950">
+                {value ?? 'Unavailable'}
+              </p>
               <p className="mt-1 text-sm font-bold text-slate-500">{label}</p>
             </div>
           ))}
@@ -213,7 +275,11 @@ export default async function SocialMediaPage({
               </Link>
             </div>
             <div className="mt-5 space-y-3">
-              {blogs.length ? (
+              {blogsResult.error ? (
+                <p role="alert" className="text-sm text-red-700">
+                  The blog library could not be loaded.
+                </p>
+              ) : blogs.length ? (
                 blogs.map((blog) => (
                   <article
                     key={blog.id}
@@ -274,75 +340,171 @@ export default async function SocialMediaPage({
                   <h2 className="text-xl font-black text-slate-950">Recent content packages</h2>
                 </div>
               </div>
+              <nav
+                aria-label="Content queues"
+                className="mt-4 flex gap-4 text-sm font-bold text-blue-700"
+              >
+                <Link href="/social-media" aria-current={!legacyQueue ? 'page' : undefined}>
+                  Content packages
+                </Link>
+                <Link
+                  href="/social-media?queue=legacy"
+                  aria-current={legacyQueue ? 'page' : undefined}
+                >
+                  Legacy drafts
+                </Link>
+              </nav>
               <div className="mt-5 space-y-3">
-                {posts.slice(0, 8).map((post) => (
-                  <div key={post.id} className="rounded-2xl bg-slate-50 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-black text-slate-900">
-                          {post.title || 'Elevate content package'}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {platformLabel(post.platform || '')} ·{' '}
-                          {(post.destination_type || post.post_type || 'draft').replaceAll(
-                            '_',
-                            ' ',
-                          )}
-                        </p>
+                {posts.map((post) => {
+                  const reviewable = reviewablePostStatuses.includes(post.status);
+                  const blocked =
+                    sourcesResult.error || accountsResult.error
+                      ? 'Unable to verify the source article or publishing account.'
+                      : postPublishingReadinessError(
+                          post,
+                          approvedSourceIds.has(post.source_id),
+                          accountByPlatform.get(post.platform) ?? null,
+                        );
+                  return (
+                    <div key={post.id} className="rounded-2xl bg-slate-50 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-black text-slate-900">
+                            {post.title || 'Elevate content package'}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {platformLabel(post.platform || '')} ·{' '}
+                            {(post.destination_type || post.post_type || 'draft').replaceAll(
+                              '_',
+                              ' ',
+                            )}
+                          </p>
+                        </div>
+                        <span
+                          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black ${post.approval_state === 'approved' ? 'bg-emerald-100 text-emerald-800' : post.status === 'configuration_required' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}
+                        >
+                          {post.status.replaceAll('_', ' ')}
+                        </span>
                       </div>
-                      <span
-                        className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black ${post.approval_state === 'approved' ? 'bg-emerald-100 text-emerald-800' : post.status === 'configuration_required' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}
-                      >
-                        {post.status.replaceAll('_', ' ')}
-                      </span>
-                    </div>
-                    {['draft', 'pending_approval', 'configuration_required'].includes(
-                      post.status,
-                    ) && (
-                      <form action={approveSocialPost} className="mt-3 space-y-2">
-                        <input type="hidden" name="id" value={post.id} />
-                        <input type="hidden" name="updated_at" value={post.updated_at} />
-                        <label className="block text-xs font-bold" htmlFor={`caption-${post.id}`}>
-                          Review the final caption
-                        </label>
-                        <textarea
-                          id={`caption-${post.id}`}
-                          name="caption"
-                          required
-                          maxLength={2200}
-                          defaultValue={post.caption || post.content || ''}
-                          rows={5}
-                          className="w-full rounded-lg border border-slate-300 p-2 text-sm"
-                        />
-                        {(post.video_url || post.media_url || post.thumbnail_url) && (
+                      {reviewable && blocked && (
+                        <p className="mt-2 text-xs text-amber-800">{blocked}</p>
+                      )}
+                      {reviewable &&
+                        !approvedSourceIds.has(post.source_id) &&
+                        !sourcesResult.error && (
+                          <Link
+                            href="/social-media/campaigns/new"
+                            className="mt-2 block text-xs font-bold text-blue-700"
+                          >
+                            Build a replacement from an approved blog
+                          </Link>
+                        )}
+                      {reviewable && !approvedSourceIds.has(post.source_id) && (
+                        <div className="mt-3 space-y-2">
+                          <p className="whitespace-pre-wrap rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-700">
+                            {post.caption || post.content || 'No caption was saved for this legacy draft.'}
+                          </p>
+                          {(post.video_url || post.media_url || post.thumbnail_url) && (
+                            <a
+                              href={post.video_url || post.media_url || post.thumbnail_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-xs text-blue-700"
+                            >
+                              Review attached media
+                            </a>
+                          )}
+                        </div>
+                      )}
+                      {reviewable && approvedSourceIds.has(post.source_id) && (
+                        <form action={approveSocialPost} className="mt-3 space-y-2">
+                          <input type="hidden" name="id" value={post.id} />
+                          <input type="hidden" name="updated_at" value={post.updated_at} />
+                          <label className="block text-xs font-bold" htmlFor={`caption-${post.id}`}>
+                            Review the final caption
+                          </label>
+                          <textarea
+                            id={`caption-${post.id}`}
+                            name="caption"
+                            readOnly={Boolean(blocked) || !canApprove}
+                            required
+                            maxLength={2200}
+                            defaultValue={post.caption || post.content || ''}
+                            rows={5}
+                            className="w-full rounded-lg border border-slate-300 p-2 text-sm"
+                          />
+                          {(post.video_url || post.media_url || post.thumbnail_url) && (
+                            <a
+                              href={post.video_url || post.media_url || post.thumbnail_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-xs text-blue-700"
+                            >
+                              Review attached media
+                            </a>
+                          )}
+                          {!blocked && canApprove && (
+                            <button
+                              type="submit"
+                              className="rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white"
+                            >
+                              Approve and queue publication
+                            </button>
+                          )}
+                        </form>
+                      )}
+                      {['published', 'posted'].includes(post.status) &&
+                        (post.published_url?.startsWith('https://') ? (
                           <a
-                            href={post.video_url || post.media_url || post.thumbnail_url}
+                            href={post.published_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block text-xs text-blue-700"
+                            className="mt-2 block text-xs font-bold text-blue-700"
                           >
-                            Review attached media
+                            View published post
                           </a>
+                        ) : (
+                          post.platform_post_id && (
+                            <p className="mt-2 text-xs text-slate-600">
+                              Provider post ID: {post.platform_post_id}
+                            </p>
+                          )
+                        ))}
+                      {post.status === 'publishing' &&
+                        post.claim_expires_at &&
+                        Date.parse(post.claim_expires_at) <= Date.now() && (
+                          <p className="mt-2 text-xs text-amber-800">
+                            Check the provider for this post before attempting another publication.
+                          </p>
                         )}
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white"
-                        >
-                          Approve and queue publication
-                        </button>
-                      </form>
-                    )}
-                    {post.error_message && (
-                      <p className="mt-2 text-xs text-red-700">{post.error_message}</p>
-                    )}
-                  </div>
-                ))}
-                {!posts.length && (
+                      {post.error_message && (
+                        <p className="mt-2 text-xs text-red-700">{post.error_message}</p>
+                      )}
+                    </div>
+                  );
+                })}
+                {postsResult.error && (
+                  <p role="alert" className="text-sm text-red-700">
+                    The production queue could not be loaded.
+                  </p>
+                )}
+                {!postsResult.error && !posts.length && (
                   <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">
                     The queue is empty.
                   </p>
                 )}
               </div>
+              {(page > 1 || (postsResult.count ?? 0) > offset + PAGE_SIZE) && (
+                <nav
+                  aria-label="Content package pages"
+                  className="mt-4 flex gap-4 text-sm font-bold text-blue-700"
+                >
+                  {page > 1 && <Link href={queueHref(page - 1)}>Previous page</Link>}
+                  {(postsResult.count ?? 0) > offset + PAGE_SIZE && (
+                    <Link href={queueHref(page + 1)}>Next page</Link>
+                  )}
+                </nav>
+              )}
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -363,6 +525,7 @@ export default async function SocialMediaPage({
                     account?.enabled === true &&
                     account.connection_status === 'verified_read_only' &&
                     (!account.expires_at || new Date(account.expires_at) > new Date());
+                  const readiness = publishingReadinessError(platform, account ?? null);
                   return (
                     <div key={platform} className="flex items-center justify-between gap-3 py-3">
                       <div>
@@ -370,16 +533,17 @@ export default async function SocialMediaPage({
                           {platformLabel(platform)}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {isConnected
-                            ? account?.dry_run === false
-                              ? 'Verified for approved publishing'
-                              : 'Verified read-only'
-                            : 'Authorization required'}
+                          {accountsResult.error
+                            ? 'Connection status unavailable'
+                            : isConnected
+                              ? !readiness && account?.dry_run === false
+                                ? 'Verified for approved publishing'
+                                : 'Verified read-only'
+                              : 'Authorization required'}
                         </p>
                       </div>
                       {isConnected ? (
-                        account?.dry_run !== false &&
-                        ['facebook', 'instagram'].includes(platform) ? (
+                        canApprove && !readiness && account?.dry_run !== false ? (
                           <form action={enableApprovedPublishing}>
                             <input type="hidden" name="platform" value={platform} />
                             <button className="rounded-lg bg-blue-700 px-3 py-2 text-xs font-bold text-white">
@@ -436,7 +600,12 @@ export default async function SocialMediaPage({
                 </span>
               </div>
             ))}
-            {!campaigns.length && (
+            {campaignsResult.error && (
+              <p role="alert" className="text-sm text-red-700">
+                Saved campaigns could not be loaded.
+              </p>
+            )}
+            {!campaignsResult.error && !campaigns.length && (
               <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
                 No campaign plans have been saved.
               </div>

@@ -8,6 +8,7 @@ import {
   publishInstagramImage,
   publishInstagramReel,
 } from '@/lib/social/blog-social-pipeline';
+import { postPublishingReadinessError } from '@/lib/social/publishing-readiness';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
@@ -31,9 +32,16 @@ async function _POST(request: NextRequest) {
 
   const results: Array<{ id: string; status: string; error?: string }> = [];
   for (const candidate of candidates ?? []) {
+    let providerReceipt: { postId: string; publishedUrl: string | null } | undefined;
     try {
-      if (candidate.approval_state !== 'approved' || !candidate.approved_at || !candidate.approved_by) {
-        throw new Error('PUBLICATION_APPROVAL_REQUIRED: A named administrator must approve this item before processing.');
+      if (
+        candidate.approval_state !== 'approved' ||
+        !candidate.approved_at ||
+        !candidate.approved_by
+      ) {
+        throw new Error(
+          'PUBLICATION_APPROVAL_REQUIRED: A named administrator must approve this item before processing.',
+        );
       }
       const { data: blog, error: blogError } = await db
         .from('blog_posts')
@@ -42,69 +50,188 @@ async function _POST(request: NextRequest) {
         .eq('published', true)
         .eq('share_to_social', true)
         .single();
-      if (blogError || !blog) throw new Error('BLOG_SOURCE_MISSING: Published source article was not found.');
+      if (blogError || !blog)
+        throw new Error('BLOG_SOURCE_MISSING: Published source article was not found.');
 
       const generated = await generateBlogSocialPackage(blog);
       // Publish the exact caption the administrator reviewed, not regenerated copy.
       const message = candidate.caption?.trim();
-      if (!message) throw new Error('PUBLICATION_APPROVAL_REQUIRED: Review and approve the final caption before publishing.');
-      const canonicalLink = new URL(candidate.link_url || `/blog/${blog.slug}`, 'https://www.elevateforhumanity.org').toString();
+      if (!message)
+        throw new Error(
+          'PUBLICATION_APPROVAL_REQUIRED: Review and approve the final caption before publishing.',
+        );
+      const canonicalLink = new URL(
+        candidate.link_url || `/blog/${blog.slug}`,
+        'https://www.elevateforhumanity.org',
+      ).toString();
 
       if (candidate.destination_type === 'facebook_personal_draft') {
-        await db.from('social_media_posts').update({
-          status: 'manual_ready', caption: message, content: message,
-          generation_payload: { ...generated.package, provider: generated.provider, model: generated.model },
-          updated_at: new Date().toISOString(), last_error_code: null, error_message: null,
-          claim_token: null, claimed_at: null, claim_expires_at: null,
-        }).eq('id', candidate.id).eq('claim_token', claimToken);
+        await db
+          .from('social_media_posts')
+          .update({
+            status: 'manual_ready',
+            caption: message,
+            content: message,
+            generation_payload: {
+              ...generated.package,
+              provider: generated.provider,
+              model: generated.model,
+            },
+            updated_at: new Date().toISOString(),
+            last_error_code: null,
+            error_message: null,
+            claim_token: null,
+            claimed_at: null,
+            claim_expires_at: null,
+          })
+          .eq('id', candidate.id)
+          .eq('claim_token', claimToken);
         results.push({ id: candidate.id, status: 'manual_ready' });
         continue;
       }
 
-      await db.from('social_media_posts').update({ status: 'publishing', caption: message, content: message }).eq('id', candidate.id).eq('claim_token', claimToken);
-      let published: { postId: string; publishedUrl: string };
+      const { data: account, error: accountError } = await db
+        .from('social_media_settings')
+        .select('enabled,connection_status,organization_id,expires_at,granted_scopes,dry_run')
+        .eq('platform', candidate.platform)
+        .maybeSingle();
+      if (accountError)
+        throw new Error('SOCIAL_ACCOUNT_QUERY_FAILED: Could not verify the publishing account.');
+      const blocker = postPublishingReadinessError(candidate, true, account);
+      if (blocker) throw new Error(`SOCIAL_CONFIGURATION_REQUIRED: ${blocker}`);
+
+      const { data: claimed, error: claimError } = await db
+        .from('social_media_posts')
+        .update({ status: 'publishing', updated_at: new Date().toISOString() })
+        .eq('id', candidate.id)
+        .eq('claim_token', claimToken)
+        .eq('status', 'generating')
+        .gt('claim_expires_at', new Date().toISOString())
+        .select('id')
+        .maybeSingle();
+      if (claimError)
+        throw new Error(
+          'SOCIAL_CLAIM_UPDATE_FAILED: Could not verify the active publication claim.',
+        );
+      if (!claimed) {
+        results.push({ id: candidate.id, status: 'claim_lost' });
+        continue;
+      }
+
+      let published: { postId: string; publishedUrl: string | null };
       if (candidate.destination_type === 'instagram_reel') {
-        if (!candidate.video_url) throw new Error('INSTAGRAM_VIDEO_REQUIRED: Reel is missing a video URL.');
+        if (!candidate.video_url)
+          throw new Error('INSTAGRAM_VIDEO_REQUIRED: Reel is missing a video URL.');
         published = await publishInstagramReel({ caption: message, videoUrl: candidate.video_url });
       } else if (candidate.destination_type === 'instagram_image') {
         const imageUrl = candidate.media_url || candidate.thumbnail_url;
-        if (!imageUrl) throw new Error('INSTAGRAM_IMAGE_REQUIRED: Instagram post is missing an image URL.');
+        if (!imageUrl)
+          throw new Error('INSTAGRAM_IMAGE_REQUIRED: Instagram post is missing an image URL.');
         published = await publishInstagramImage({ caption: message, imageUrl });
       } else if (candidate.destination_type === 'facebook_page') {
         published = candidate.video_url
           ? await publishFacebookPageReel({ description: message, videoUrl: candidate.video_url })
           : await publishFacebookPageLink({ message, link: canonicalLink });
       } else {
-        throw new Error(`DESTINATION_NOT_IMPLEMENTED: ${candidate.destination_type || 'missing destination'}`);
+        throw new Error(
+          `DESTINATION_NOT_IMPLEMENTED: ${candidate.destination_type || 'missing destination'}`,
+        );
       }
 
-      await db.from('social_media_posts').update({
-        status: 'published', platform_post_id: published.postId, published_url: published.publishedUrl,
-        posted_at: new Date().toISOString(), generation_payload: { ...generated.package, provider: generated.provider, model: generated.model },
-        last_error_code: null, error_message: null, claim_token: null, claimed_at: null,
-        claim_expires_at: null, updated_at: new Date().toISOString(),
-      }).eq('id', candidate.id).eq('claim_token', claimToken);
-      await db.from('blog_posts').update({ social_posted_at: new Date().toISOString() }).eq('id', blog.id);
+      providerReceipt = published;
+      const { data: saved, error: saveError } = await db
+        .from('social_media_posts')
+        .update({
+          status: 'published',
+          platform_post_id: published.postId,
+          published_url: published.publishedUrl,
+          posted_at: new Date().toISOString(),
+          generation_payload: {
+            ...generated.package,
+            provider: generated.provider,
+            model: generated.model,
+          },
+          last_error_code: null,
+          error_message: null,
+          claim_token: null,
+          claimed_at: null,
+          claim_expires_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', candidate.id)
+        .eq('claim_token', claimToken)
+        .select('id')
+        .maybeSingle();
+      if (saveError || !saved) {
+        throw new Error('PUBLICATION_RECEIPT_NOT_SAVED: Check the provider post before retrying.');
+      }
+      await db
+        .from('blog_posts')
+        .update({ social_posted_at: new Date().toISOString() })
+        .eq('id', blog.id);
       results.push({ id: candidate.id, status: 'published' });
     } catch (error) {
+      if (providerReceipt) {
+        // Do not put the row back in the retry queue after the provider accepted it.
+        results.push({
+          id: candidate.id,
+          status: 'receipt_not_saved',
+          error: `Provider accepted post ${providerReceipt.postId}; verify the live post before retrying.`,
+        });
+        continue;
+      }
       const attempt = Number(candidate.attempt_count ?? 0) + 1;
       const message = error instanceof Error ? error.message : 'Unknown social publication failure';
       const errorCode = message.split(':')[0];
-      const configurationRequired = errorCode.endsWith('_DRY_RUN') || errorCode.endsWith('_NOT_CONNECTED') ||
-        errorCode === 'DESTINATION_NOT_IMPLEMENTED' || errorCode === 'PUBLICATION_APPROVAL_REQUIRED';
+      const configurationRequired =
+        errorCode.endsWith('_DRY_RUN') ||
+        errorCode.endsWith('_NOT_CONNECTED') ||
+        [
+          'DESTINATION_NOT_IMPLEMENTED',
+          'PUBLICATION_APPROVAL_REQUIRED',
+          'SOCIAL_CONFIGURATION_REQUIRED',
+          'BLOG_SOURCE_MISSING',
+          'INSTAGRAM_VIDEO_REQUIRED',
+          'INSTAGRAM_IMAGE_REQUIRED',
+        ].includes(errorCode);
       const deadLetter = attempt >= Number(candidate.max_attempts ?? 6);
-      await db.from('social_media_posts').update({
-        status: configurationRequired ? 'configuration_required' : deadLetter ? 'dead_letter' : 'failed', attempt_count: attempt,
-        next_attempt_at: configurationRequired || deadLetter ? null : nextRetryAt(attempt),
-        dead_lettered_at: deadLetter ? new Date().toISOString() : null,
-        last_error_code: errorCode, error_message: message.slice(0, 1000),
-        claim_token: null, claimed_at: null, claim_expires_at: null, updated_at: new Date().toISOString(),
-      }).eq('id', candidate.id).eq('claim_token', claimToken);
-      results.push({ id: candidate.id, status: configurationRequired ? 'configuration_required' : deadLetter ? 'dead_letter' : 'failed', error: message });
+      await db
+        .from('social_media_posts')
+        .update({
+          status: configurationRequired
+            ? 'configuration_required'
+            : deadLetter
+              ? 'dead_letter'
+              : 'failed',
+          attempt_count: attempt,
+          next_attempt_at: configurationRequired || deadLetter ? null : nextRetryAt(attempt),
+          dead_lettered_at: deadLetter ? new Date().toISOString() : null,
+          last_error_code: errorCode,
+          error_message: message.slice(0, 1000),
+          claim_token: null,
+          claimed_at: null,
+          claim_expires_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', candidate.id)
+        .eq('claim_token', claimToken);
+      results.push({
+        id: candidate.id,
+        status: configurationRequired
+          ? 'configuration_required'
+          : deadLetter
+            ? 'dead_letter'
+            : 'failed',
+        error: message,
+      });
     }
   }
 
-  return NextResponse.json({ processed: results.length, results });
+  const needsReconciliation = results.some((result) => result.status === 'receipt_not_saved');
+  return NextResponse.json(
+    { processed: results.length, results },
+    { status: needsReconciliation ? 500 : 200 },
+  );
 }
 
 export const POST = withApiAudit('/api/internal/social-media/process', _POST);

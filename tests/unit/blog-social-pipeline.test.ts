@@ -177,3 +177,25 @@ describe('canonical blog social pipeline', () => {
     expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 });
+
+it('retains the accepted Instagram post when its permalink lookup fails', async () => {
+  tokenResolverMock.mockResolvedValueOnce({
+    access_token: 'instagram-test-token',
+    organization_id: 'instagram-test-account',
+    dry_run: false,
+  });
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce(Response.json({ id: 'container' }))
+    .mockResolvedValueOnce(Response.json({ id: 'published' }))
+    .mockResolvedValueOnce(Response.json({ error: { message: 'Unavailable' } }, { status: 503 }));
+  vi.stubGlobal('fetch', fetchMock);
+  await expect(
+    publishInstagramImage({
+      caption: 'Approved update',
+      imageUrl: 'https://example.com/image.jpg',
+    }),
+  ).resolves.toEqual({ postId: 'published', publishedUrl: null });
+  expect(fetchMock).toHaveBeenCalledTimes(3);
+  vi.unstubAllGlobals();
+});

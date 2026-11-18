@@ -12,15 +12,16 @@ describe('Studio, Course Builder and PWA layout regression', () => {
     expect(viewport).not.toContain("position: 'fixed'");
     expect(viewport).toContain('height: viewport?.height ?? window.innerHeight');
   });
-  it('keeps the conversation input small and the message area independently scrollable', () => {
+  it('keeps the conversation input readable and compact with independently scrollable messages', () => {
     const chat = source('components/studio/UnifiedEllieChat.tsx');
     const styles = source('components/studio/UnifiedEllieChat.module.css');
     expect(chat).toContain('rows={2}');
     expect(chat).toContain('min-h-[64px]');
     expect(chat).not.toContain('min-h-[180px]');
     expect(chat).toContain('overflow-y-auto bg-slate-50');
-    expect(styles).toContain('font-size: 1rem');
-    expect(styles).not.toContain('max(1.25rem, 20px)');
+    expect(styles).toContain('font-size: max(1.25rem, 20px)');
+    expect(chat).toContain('text-xl leading-[1.5]');
+    expect(chat).not.toContain('py-2 text-base leading-6 outline-none');
   });
   it('respects narrow screens without forcing a second column or oversized tool typography', () => {
     const studio = source('components/studio/StudioCommandWorkspace.tsx');

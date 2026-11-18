@@ -155,7 +155,20 @@ export async function resolvePortal(request: NextRequest) {
     return NextResponse.json({ path: '/login' }, { status: 401 });
   }
 
-  const path = await resolvePortalForUser(supabase, user.id);
+  // This endpoint is used by multiple dashboards, not only students.
+  // Enrollment-based learner resolution must never overwrite an employer,
+  // host-shop, staff, instructor, or program-holder portal destination.
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (profileError || !profile?.role) {
+    return NextResponse.json({ error: 'Portal role unavailable' }, { status: 403 });
+  }
+  const path = ['student', 'learner'].includes(profile.role)
+    ? await resolvePortalForUser(supabase, user.id)
+    : getRoleDestinationUrl(profile.role);
   return NextResponse.json({ path });
 }
 

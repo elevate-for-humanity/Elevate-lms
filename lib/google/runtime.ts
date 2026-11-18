@@ -82,7 +82,14 @@ export async function getGoogleService(service: GoogleServiceSummary) {
     body?.healthy === true &&
     body?.configuration?.ok === true &&
     body?.dependencies?.supabase?.ok === true;
+  const builtAt = body?.builtAt ?? body?.buildTime;
   return {
+    revision: healthy && typeof body.revision === 'string' && body.revision !== 'unknown'
+      ? body.revision.trim() || null
+      : null,
+    builtAt: healthy && typeof builtAt === 'string' && Number.isFinite(Date.parse(builtAt))
+      ? builtAt
+      : null,
     status: healthy ? 'healthy' : 'unhealthy',
     httpStatus: response.status,
     commit: body?.commit || body?.commitSha || null,

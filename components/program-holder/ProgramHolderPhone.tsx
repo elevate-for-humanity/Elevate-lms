@@ -979,7 +979,7 @@ export function ProgramHolderPhone({
       )}
 
       <div className="grid gap-6">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <section id="phone-settings" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="flex items-center gap-2 text-xl font-black text-slate-950">
             <Headphones className="h-5 w-5 text-blue-700" />
             Availability and ringing
@@ -1219,7 +1219,7 @@ export function ProgramHolderPhone({
         </section>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <section id="phone-voicemail" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black">Voicemail</h2>
         {data.voicemail?.items?.length ? (
           data.voicemail.items.map((item) => (

@@ -44,6 +44,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Reports — WIOA', href: '/reports/wioa' },
       { label: 'Notifications', href: '/notifications' },
       { label: 'Communications Hub', href: '/phone' },
+      { label: 'Phone & Ringer', href: '/phone/dial-pad' },
       { label: 'Elevate Email', href: '/phone/email' },
       { label: 'Email Accounts', href: '/phone/email/accounts' },
       { label: 'Text Messages', href: '/phone/texts' },

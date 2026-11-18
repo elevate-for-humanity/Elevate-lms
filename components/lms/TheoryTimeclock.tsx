@@ -21,7 +21,7 @@ export function TheoryTimeclockPanel({ clock }: { clock: ReturnType<typeof useTh
         <button
           type="button"
           onClick={clock.startClock}
-          disabled={clock.theoryStatus === 'active' || clock.theoryStatus === 'starting'}
+          disabled={!['paused', 'untracked'].includes(clock.theoryStatus)}
           className="rounded-lg bg-cyan-900 px-4 py-3 font-bold text-white disabled:opacity-50"
         >
           Start theory timeclock
@@ -29,7 +29,7 @@ export function TheoryTimeclockPanel({ clock }: { clock: ReturnType<typeof useTh
         <button
           type="button"
           onClick={() => void clock.stopClock()}
-          disabled={clock.theoryStatus !== 'active'}
+          disabled={!['active', 'stop_failed'].includes(clock.theoryStatus)}
           className="rounded-lg border border-slate-500 px-4 py-3 font-bold disabled:opacity-50"
         >
           Stop theory timeclock

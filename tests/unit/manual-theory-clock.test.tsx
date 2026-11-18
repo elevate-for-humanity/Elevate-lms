@@ -83,3 +83,39 @@ it('allows restarting theory tracking after a completion attempt is rejected', a
     ).toHaveLength(2),
   );
 });
+
+it('retries a disconnected stop using the same session before allowing another start', async () => {
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ tracked: true, sessionId: 'retry-session', weeklyActiveSeconds: 60 }),
+    })
+    .mockRejectedValueOnce(new TypeError('Network disconnected'))
+    .mockResolvedValueOnce({ ok: true });
+  vi.stubGlobal('fetch', fetchMock);
+  render(
+    <LessonProgressClient
+      courseId="course"
+      lessonId="lesson"
+      lessonType="lesson"
+      moduleOrder={1}
+      passingScore={80}
+      questions={[]}
+    />,
+  );
+  const start = screen.getByRole('button', { name: 'Start theory timeclock' });
+  const stop = screen.getByRole('button', { name: 'Stop theory timeclock' });
+  fireEvent.click(start);
+  await waitFor(() => expect(stop).not.toBeDisabled());
+  fireEvent.click(stop);
+  await screen.findByText('Theory timeclock could not stop. Select Stop to retry.');
+  expect(start).toBeDisabled();
+  expect(stop).not.toBeDisabled();
+  fireEvent.click(stop);
+  await waitFor(() => expect(start).not.toBeDisabled());
+  expect(fetchMock.mock.calls.slice(1).map((call) => JSON.parse(call[1].body))).toEqual([
+    { action: 'stop', sessionId: 'retry-session', creditFinal: true },
+    { action: 'stop', sessionId: 'retry-session', creditFinal: true },
+  ]);
+});

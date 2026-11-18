@@ -119,7 +119,7 @@ describe('canonical AI provider authority', () => {
         model: 'elevate-local', choices: [{ message: { content: 'owned response' } }],
       }), { status: 200, headers: { 'content-type': 'application/json' } }))
       .mockResolvedValueOnce(new Response(
-        'data: {"choices":[{"delta":{"content":"owned stream"}}]}\\n\\ndata: [DONE]\\n\\n',
+        'data: {"choices":[{"delta":{"content":"owned stream"}}]}\n\ndata: [DONE]\n\n',
         { status: 200, headers: { 'content-type': 'text/event-stream' } },
       ));
     vi.stubGlobal('fetch', request);

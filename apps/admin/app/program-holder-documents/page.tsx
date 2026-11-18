@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
 import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ChevronRight, FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
@@ -7,12 +8,12 @@ import { programHolderDocumentStatus } from '@/lib/program-holder/document-requi
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
-export const metadata: Metadata = { title: 'Program Holder Documents | Admin | Elevate For Humanity' };
+export const metadata: Metadata = {
+  title: 'Program Holder Documents | Admin | Elevate For Humanity',
+};
 
 export default async function ProgramHolderDocumentsPage() {
-  // Auth and admin-role enforcement are handled by apps/admin/app/admin/layout.tsx.
-  // Avoid re-checking with the anon client here; RLS can block profile reads and
-  // incorrectly send valid admins to /unauthorized.
+  await requireRole(['admin', 'staff']);
   const db = await getAdminClient();
 
   if (!db) {
@@ -29,11 +30,20 @@ export default async function ProgramHolderDocumentsPage() {
     { count: pending },
     { count: approved },
     { count: rejected },
-    { data: docs },
+    { data: docs, error: documentsError },
   ] = await Promise.all([
-    db.from('program_holder_documents').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    db.from('program_holder_documents').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
-    db.from('program_holder_documents').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+    db
+      .from('program_holder_documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending'),
+    db
+      .from('program_holder_documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'approved'),
+    db
+      .from('program_holder_documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'rejected'),
     db
       .from('program_holder_documents')
       .select(
@@ -65,9 +75,27 @@ export default async function ProgramHolderDocumentsPage() {
   }));
 
   const stats = [
-    { label: 'Pending Review', value: pending ?? 0, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Approved', value: approved ?? 0, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Rejected', value: rejected ?? 0, icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' },
+    {
+      label: 'Pending Review',
+      value: pending ?? 0,
+      icon: Clock,
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+    },
+    {
+      label: 'Approved',
+      value: approved ?? 0,
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bg: 'bg-green-50',
+    },
+    {
+      label: 'Rejected',
+      value: rejected ?? 0,
+      icon: XCircle,
+      color: 'text-red-600',
+      bg: 'bg-red-50',
+    },
   ];
 
   return (
@@ -94,7 +122,10 @@ export default async function ProgramHolderDocumentsPage() {
         {stats.map((s) => {
           const Icon = s.icon;
           return (
-            <div key={s.label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+            <div
+              key={s.label}
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm"
+            >
               <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
                 <Icon className={`w-4 h-4 ${s.color}`} />
               </div>
@@ -105,7 +136,12 @@ export default async function ProgramHolderDocumentsPage() {
         })}
       </div>
 
-      <ProgramHolderDocumentsClient initialDocs={docsWithProfiles} />
+      {documentsError && (
+        <p role="alert" className="text-red-700">
+          Program holder documents could not load.
+        </p>
+      )}
+      {!documentsError && <ProgramHolderDocumentsClient initialDocs={docsWithProfiles} />}
     </div>
   );
 }

@@ -20,3 +20,8 @@ it('keeps the course available and surfaces a workbook failure with a retry dest
   expect(screen.getByRole('link', { name: 'Open course' })).toHaveAttribute('href', '/lms/courses/current');
   expect(screen.getByRole('link', { name: 'Workbooks' })).toHaveAttribute('href', '/workbooks');
 });
+
+it('recovers holder course access through the holder workspace', () => {
+  render(<AssignedLearningMaterials error="Try again" courseRecoveryHref="/program-holder/programs" />);
+  expect(screen.getByRole('link', { name: 'My Courses' })).toHaveAttribute('href', '/program-holder/programs');
+});

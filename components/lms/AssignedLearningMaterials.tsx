@@ -3,9 +3,10 @@ import Link from 'next/link';
 export type LearningMaterial = { id: string; title: string; href: string };
 
 /** Links are supplied by the account-scoped workspace loader. */
-export default function AssignedLearningMaterials({ courses = [], workbooks = [], error }: {
+export default function AssignedLearningMaterials({ courses = [], workbooks = [], error, courseRecoveryHref = "/lms/courses" }: {
   courses?: LearningMaterial[];
   error?: string;
+  courseRecoveryHref?: string;
   workbooks?: LearningMaterial[];
 }) {
   if (!courses.length && !workbooks.length && !error) return null;
@@ -16,7 +17,7 @@ export default function AssignedLearningMaterials({ courses = [], workbooks = []
       {error ? <div role="alert" className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
         <p>{error}</p>
         <div className="mt-3 flex flex-wrap gap-4">
-          <Link href="/lms/courses" className="min-h-11 font-bold underline">My Courses</Link>
+          <Link href={courseRecoveryHref} className="min-h-11 font-bold underline">My Courses</Link>
           <Link href="/workbooks" className="min-h-11 font-bold underline">Workbooks</Link>
         </div>
       </div> : null}

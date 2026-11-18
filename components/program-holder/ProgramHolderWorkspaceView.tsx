@@ -591,7 +591,7 @@ export async function ProgramHolderWorkspaceView({
     <div
       className={`mx-auto max-w-5xl space-y-6 p-4 pb-24 sm:p-6 ${holderFeatures.reading_support === true ? 'text-lg' : ''}`}
     >
-      <AssignedLearningMaterials {...data.learningMaterials} />
+      <AssignedLearningMaterials {...data.learningMaterials} courseRecoveryHref="/program-holder/programs" />
       <section
         aria-labelledby="holder-todos"
         className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"

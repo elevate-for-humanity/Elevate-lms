@@ -538,7 +538,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
       const build=await db.from('ultimate_course_builds')
        .select('id,status,profile,findings').eq('id',source.data.build_id).maybeSingle();
       if(build.error)throw build.error;
-      if(!build.data || !['running','queued','building'].includes(build.data.status)
+      if(!build.data || !['running','queued','building','blocked'].includes(build.data.status)
        || build.data.profile?.ownerPaused===true)continue;
       const latest=await db.from('ultimate_build_jobs').select('id,build_id,status')
        .eq('build_id',source.data.build_id).eq('job_type',source.data.job_type)
@@ -788,7 +788,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   // a current source-repair candidate even if its monitor remains enabled.
   const build=await db.from('ultimate_course_builds').select('id,status,profile').eq('id',job.build_id).maybeSingle();
   if(build.error)throw build.error;
-  if(!build.data || !['running','queued','building'].includes(build.data.status) ||
+  if(!build.data || !['running','queued','building','blocked'].includes(build.data.status) ||
      build.data.profile?.ownerPaused===true)continue;
   if(courseDefectDisposition({source:job,latest:latest.data,build:build.data})!=='repair')continue;
   if(!isRepairableCourseFailure(job))continue;

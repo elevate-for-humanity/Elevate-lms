@@ -3,7 +3,6 @@ import { absoluteRoleDestination } from '@/lib/auth/absolute-role-destination';
 import {
   ROLE_ROUTE_CONFIG,
   getRoleDestinationUrl,
-  resolveRoleRoute,
 } from '@/lib/auth/role-destinations';
 
 function firstPathSegment(path: string): string {
@@ -67,29 +66,26 @@ export function resolveRoleCompatiblePostLoginUrl(
       return requestedUrl.toString();
     }
 
-    // A verified secondary learner role may return to its own LMS workspace.
-    // Staff precedence chooses a default, not permission to hijack course links.
-    const learnerConfig = ROLE_ROUTE_CONFIG.student;
-    const learnerUrl = new URL(getRoleDestinationUrl('student'));
-    const roles = effectiveRoles?.length ? effectiveRoles : [role];
-    if (
-      roles.some((value) => value === 'student' || value === 'learner') &&
-      requestedUrl.origin === learnerUrl.origin &&
-      firstPathSegment(requestedUrl.pathname) === firstPathSegment(learnerConfig.path)
-    ) {
-      return requestedUrl.toString();
-    }
-
-    if (requestedUrl.origin !== canonical.origin) return canonicalUrl;
-
     const requestedPrefix = firstPathSegment(requestedUrl.pathname);
-    const canonicalConfig = resolveRoleRoute(role, effectiveRoles);
-    const canonicalPrefix = firstPathSegment(canonicalConfig.path);
+    const roles = effectiveRoles?.length ? effectiveRoles : [role];
 
-    if (ROLE_OWNED_PREFIXES.has(requestedPrefix) && requestedPrefix !== canonicalPrefix) {
-      return canonicalUrl;
+    // Role-owned routes may only be resumed for a verified primary or
+    // secondary role, on that portal's deployed host. This is essential for
+    // employees who also have learner access: a requested /employer/dashboard
+    // must not turn into /lms/dashboard merely because "student" is present.
+    if (ROLE_OWNED_PREFIXES.has(requestedPrefix)) {
+      const authorized = roles.some((value) => {
+        const config = value ? ROLE_ROUTE_CONFIG[value] : undefined;
+        if (!config || firstPathSegment(config.path) !== requestedPrefix) return false;
+        const roleUrl = new URL(getRoleDestinationUrl(value));
+        return requestedUrl.origin === roleUrl.origin;
+      });
+      return authorized ? requestedUrl.toString() : canonicalUrl;
     }
 
+    // Non-portal paths remain on the selected role's own host. Never send an
+    // arbitrary cross-origin URL just because its hostname is trusted.
+    if (requestedUrl.origin !== canonical.origin) return canonicalUrl;
     return requestedUrl.toString();
   } catch {
     return canonicalUrl;

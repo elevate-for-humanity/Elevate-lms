@@ -1,9 +1,9 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 export function useTheoryTimeclock(courseId: string, lessonId: string, enabled = true) {
-  const [theoryStatus, setTheoryStatus] = useState<'starting' | 'active' | 'paused' | 'untracked'>(
-    'paused',
-  );
+  const [theoryStatus, setTheoryStatus] = useState<
+    'starting' | 'active' | 'paused' | 'untracked' | 'stopping' | 'stop_failed'
+  >('paused');
   const [theoryMessage, setTheoryMessage] = useState(
     'Start the Theory Timeclock before studying. Theory time and OJL cannot overlap.',
   );
@@ -11,10 +11,12 @@ export function useTheoryTimeclock(courseId: string, lessonId: string, enabled =
   const [weeklyTheorySeconds, setWeeklyTheorySeconds] = useState(0);
   const theorySessionId = useRef<string | null>(null);
   const lastActivityAt = useRef(Date.now());
+  const stopRequest = useRef<Promise<void> | null>(null);
   const startingTheorySession = useRef(false);
 
   const startTheorySession = useCallback(async () => {
-    if (!enabled || startingTheorySession.current || theorySessionId.current || document.hidden) return;
+    if (!enabled || startingTheorySession.current || theorySessionId.current || document.hidden)
+      return;
     startingTheorySession.current = true;
     setTheoryStatus('starting');
     try {
@@ -47,18 +49,31 @@ export function useTheoryTimeclock(courseId: string, lessonId: string, enabled =
   }, [courseId, lessonId, enabled]);
 
   const stopTheorySession = useCallback(async (creditFinal = false) => {
+    if (stopRequest.current) return stopRequest.current;
     const sessionId = theorySessionId.current;
     if (!sessionId) return;
-    theorySessionId.current = null;
-    const response = await fetch('/api/theory/session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'stop', sessionId, creditFinal }),
-      keepalive: true,
-    });
-    if (!response.ok) {
-      theorySessionId.current = sessionId;
-      throw new Error('Theory timeclock could not be stopped. Please try again.');
+
+    setTheoryStatus('stopping');
+    const request = (async () => {
+      const response = await fetch('/api/theory/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'stop', sessionId, creditFinal }),
+        keepalive: true,
+      });
+      if (!response.ok) throw new Error('Theory timeclock could not be stopped.');
+      theorySessionId.current = null;
+      setTheoryStatus('paused');
+    })();
+    stopRequest.current = request;
+    try {
+      await request;
+    } catch {
+      clockRequested.current = false;
+      setTheoryStatus('stop_failed');
+      throw new Error('Theory timeclock could not stop. Select Stop to retry.');
+    } finally {
+      stopRequest.current = null;
     }
   }, []);
 
@@ -81,13 +96,11 @@ export function useTheoryTimeclock(courseId: string, lessonId: string, enabled =
         noteActivity();
     };
     const handleVisibility = () => {
-      if (document.hidden) {
-        void stopTheorySession(true).catch(() =>
-          setTheoryMessage('Theory timeclock could not be finalized. Please retry Stop.'),
-        );
-        setTheoryStatus((status) => (status === 'untracked' ? status : 'paused'));
-        setTheoryMessage('Theory tracking paused while this lesson is not visible.');
-      } else {
+      if (document.hidden && clockRequested.current) {
+        void stopTheorySession(true)
+          .then(() => setTheoryMessage('Theory tracking paused while this lesson is not visible.'))
+          .catch((error: Error) => setTheoryMessage(error.message));
+      } else if (!document.hidden) {
         lastActivityAt.current = Date.now();
         if (clockRequested.current) void startTheorySession();
       }
@@ -106,31 +119,47 @@ export function useTheoryTimeclock(courseId: string, lessonId: string, enabled =
 
     const heartbeat = window.setInterval(async () => {
       const sessionId = theorySessionId.current;
-      if (!sessionId || document.hidden) return;
+      if (!sessionId || document.hidden || !clockRequested.current || stopRequest.current) return;
       if (Date.now() - lastActivityAt.current > 90_000) {
-        void stopTheorySession(false).catch(() =>
-          setTheoryMessage('Theory timeclock could not be finalized. Please retry Stop.'),
-        );
-        setTheoryStatus('paused');
-        setTheoryMessage(
-          'Theory tracking paused after inactivity. Interact with the lesson to resume.',
-        );
+        void stopTheorySession(false)
+          .then(() =>
+            setTheoryMessage(
+              'Theory tracking paused after inactivity. Interact with the lesson to resume.',
+            ),
+          )
+          .catch((error: Error) => setTheoryMessage(error.message));
         return;
       }
-      const response = await fetch('/api/theory/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'heartbeat', sessionId }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || data.status !== 'active') {
-        clockRequested.current = false;
-        theorySessionId.current = null;
-        setTheoryStatus('paused');
-        setTheoryMessage(data.message || data.error || 'Theory tracking is paused.');
-        return;
+      try {
+        const response = await fetch('/api/theory/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'heartbeat', sessionId }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (theorySessionId.current !== sessionId || stopRequest.current || !clockRequested.current)
+          return;
+        if (!response.ok) throw new Error(data.error);
+        if (data.status !== 'active') {
+          clockRequested.current = false;
+          theorySessionId.current = null;
+          setTheoryStatus('paused');
+          setTheoryMessage(data.message || 'Theory tracking is paused.');
+          return;
+        }
+        setWeeklyTheorySeconds(Number(data.weeklyActiveSeconds || 0));
+        setTheoryMessage('Active lesson time is being recorded for RTI review.');
+      } catch {
+        if (
+          theorySessionId.current === sessionId &&
+          clockRequested.current &&
+          !stopRequest.current
+        ) {
+          setTheoryMessage(
+            'Theory tracking could not sync. Keep this lesson open to retry, or select Stop.',
+          );
+        }
       }
-      setWeeklyTheorySeconds(Number(data.weeklyActiveSeconds || 0));
     }, 60_000);
 
     return () => {
@@ -146,7 +175,7 @@ export function useTheoryTimeclock(courseId: string, lessonId: string, enabled =
     theoryMessage,
     weeklyTheorySeconds,
     startClock() {
-      if (!enabled) return;
+      if (!enabled || theorySessionId.current) return;
       clockRequested.current = true;
       lastActivityAt.current = Date.now();
       void startTheorySession();

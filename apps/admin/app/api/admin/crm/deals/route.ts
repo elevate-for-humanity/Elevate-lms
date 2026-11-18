@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
@@ -30,7 +32,8 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { data, error } = await supabase
+    const db = await requireAdminClient();
+    const { data, error } = await db
       .from('crm_deals')
       .insert({
         title: body.title,
@@ -68,12 +71,13 @@ async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  await requireAdmin();
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
 
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
   const { data, error } = await supabase
     .from('crm_deals')
-    .select('*, contact:crm_contacts(id, first_name, last_name, company)')
+    .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -81,7 +85,19 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch deals' }, { status: 500 });
   }
 
-  return NextResponse.json({ data });
+  const contactIds = [...new Set((data ?? []).map((deal) => deal.contact_id).filter(Boolean))];
+  const contacts = contactIds.length
+    ? await supabase
+        .from('crm_contacts')
+        .select('id, first_name, last_name, company')
+        .in('id', contactIds)
+    : { data: [], error: null };
+  if (contacts.error)
+    return NextResponse.json({ error: 'Failed to fetch deal contacts' }, { status: 500 });
+  const byId = new Map((contacts.data ?? []).map((contact) => [contact.id, contact]));
+  return NextResponse.json({
+    data: (data ?? []).map((deal) => ({ ...deal, contact: byId.get(deal.contact_id) ?? null })),
+  });
 }
 export const GET = withApiAudit('/api/admin/crm/deals', _GET);
 export const POST = withApiAudit('/api/admin/crm/deals', _POST);

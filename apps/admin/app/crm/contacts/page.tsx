@@ -1,5 +1,6 @@
 import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Users, Search, Filter, Plus, Mail, Phone, MoreVertical, Building2 } from 'lucide-react';
@@ -11,45 +12,95 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function ContactsPage() {
+export default async function ContactsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ review?: string }>;
+}) {
   await requireRole(['admin', 'staff']);
   const supabase = await createClient();
 
-  // Fetch real contacts from CRM
-  const { data: contactData } = await supabase
-    .from('marketing_contacts')
-    .select(
-      'id,name,first_name,last_name,email,phone,company,contact_type,status,message,program_interest,created_at,updated_at',
-    )
+  const pendingReview = (await searchParams).review === 'pending';
+  const db = await requireAdminClient();
+  const crmQuery = db
+    .from('crm_contacts')
+    .select('id,first_name,last_name,email,phone,company,contact_type,status,created_at,updated_at')
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(pendingReview ? 100 : 50);
+  const [crm, marketing] = await Promise.all([
+    pendingReview
+      ? crmQuery.eq('status', 'Pending Review').contains('tags', ['partnership-review'])
+      : crmQuery,
+    pendingReview
+      ? Promise.resolve({ data: [], error: null })
+      : supabase
+          .from('marketing_contacts')
+          .select(
+            'id,name,first_name,last_name,email,phone,company,contact_type,status,message,program_interest,created_at,updated_at',
+          )
+          .order('created_at', { ascending: false })
+          .limit(50),
+  ]);
+  const byEmail = new Map<string, Record<string, string | null>>();
+  for (const contact of crm.data ?? []) {
+    const key = contact.email?.trim().toLowerCase() || contact.id;
+    byEmail.set(key, contact);
+  }
+  for (const inquiry of marketing.data ?? []) {
+    const key = inquiry.email?.trim().toLowerCase() || inquiry.id;
+    const contact = byEmail.get(key);
+    if (!contact) {
+      byEmail.set(key, inquiry);
+      continue;
+    }
 
-  const contacts = (contactData || []).map((c: Record<string, string | null>) => {
-    const updatedAt = new Date(c.updated_at ?? c.created_at ?? Date.now());
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - updatedAt.getTime()) / 86400000);
-    const lastContact =
-      diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
+    const latestCreatedAt = [contact.created_at, inquiry.created_at]
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .pop() ?? null;
+    const latestUpdatedAt = [contact.updated_at, inquiry.updated_at, inquiry.created_at]
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .pop() ?? latestCreatedAt;
+    byEmail.set(key, {
+      ...inquiry,
+      ...contact,
+      name: contact.name ?? inquiry.name ?? null,
+      phone: contact.phone ?? inquiry.phone ?? null,
+      company: contact.company ?? inquiry.company ?? null,
+      message: contact.message ?? inquiry.message ?? null,
+      program_interest: contact.program_interest ?? inquiry.program_interest ?? null,
+      created_at: latestCreatedAt,
+      updated_at: latestUpdatedAt,
+    });
+  }
+  const contacts = [...byEmail.values()]
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+    .slice(0, pendingReview ? 100 : 50)
+    .map((c) => {
+      const updatedAt = new Date(c.updated_at ?? c.created_at ?? Date.now());
+      const now = new Date();
+      const diffDays = Math.floor((now.getTime() - updatedAt.getTime()) / 86400000);
+      const lastContact =
+        diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
 
-    const displayName =
-      c.name ||
-      [c.first_name, c.last_name].filter(Boolean).join(' ').trim() ||
-      'Contact';
+      const displayName =
+        c.name || [c.first_name, c.last_name].filter(Boolean).join(' ').trim() || 'Contact';
 
-    return {
-      id: c.id,
-      name: displayName,
-      email: c.email || '',
-      phone: c.phone || '',
-      company: c.company || '',
-      type: c.contact_type || 'Lead',
-      status: c.status || 'Active',
-      message: c.message || '',
-      programInterest: c.program_interest || '',
-      lastContact,
-      image: null,
-    };
-  });
+      return {
+        id: c.id,
+        name: displayName,
+        email: c.email || '',
+        phone: c.phone || '',
+        company: c.company || '',
+        type: c.contact_type || 'Lead',
+        status: c.status || 'Active',
+        message: c.message || '',
+        programInterest: c.program_interest || '',
+        lastContact,
+        image: null,
+      };
+    });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,6 +130,11 @@ export default async function ContactsPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {(crm.error || marketing.error) && (
+        <p role="alert" className="mx-auto max-w-7xl p-4 text-sm text-red-700">
+          Some contacts could not be loaded. Refresh to try again.
+        </p>
+      )}
       {/* Hero Image */}
       {/* Header */}
       <section className="border-b">
@@ -101,6 +157,18 @@ export default async function ContactsPage() {
           </div>
         </div>
       </section>
+
+      <nav
+        aria-label="Contact views"
+        className="mx-auto flex max-w-7xl gap-5 px-4 py-4 text-sm font-semibold text-brand-blue-700"
+      >
+        <Link href="/crm/contacts" aria-current={!pendingReview ? 'page' : undefined}>
+          Recent contacts
+        </Link>
+        <Link href="/crm/contacts?review=pending" aria-current={pendingReview ? 'page' : undefined}>
+          Pending partnership review
+        </Link>
+      </nav>
 
       {/* Filters */}
       <section className="border-b">
@@ -178,7 +246,8 @@ export default async function ContactsPage() {
                   ) : null}
                   {contact.programInterest ? (
                     <p className="text-xs text-slate-500">
-                      Program: <span className="font-medium text-slate-700">{contact.programInterest}</span>
+                      Program:{' '}
+                      <span className="font-medium text-slate-700">{contact.programInterest}</span>
                     </p>
                   ) : null}
                   {contact.message ? (

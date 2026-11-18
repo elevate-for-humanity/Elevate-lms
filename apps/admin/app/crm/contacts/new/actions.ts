@@ -1,15 +1,12 @@
 'use server';
 
+import { requireRole } from '@/lib/auth/require-role';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export async function createContactAction(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect('/login');
+  const { user } = await requireRole(['admin', 'staff']);
+  const supabase = await requireAdminClient();
 
   const first_name = (formData.get('first_name') as string)?.trim();
   const last_name = (formData.get('last_name') as string)?.trim();
@@ -22,17 +19,18 @@ export async function createContactAction(formData: FormData) {
 
   if (!first_name || !last_name || !email) return;
 
-  await supabase.from('crm_contacts').insert({
+  const { error } = await supabase.from('crm_contacts').insert({
     first_name,
     last_name,
     email,
     phone,
     company,
-    city,
-    state,
+    address_city: city,
+    address_state: state,
     notes,
     created_by: user.id,
   });
 
+  if (error) throw new Error('The contact could not be saved.');
   redirect('/crm/contacts');
 }

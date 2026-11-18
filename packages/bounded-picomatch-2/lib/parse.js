@@ -296,17 +296,21 @@ const hasUnboundedGlobStar = (body, options) => {
     if (ch === '[' && options.nobracket !== true) {
       // The parser treats a leading ']' (also immediately after '^') as a
       // literal class member, not a closing delimiter.
-      const literalClose = body[i + 1] === ']'
-        ? i + 1
-        : body[i + 1] === '^' && body[i + 2] === ']' ? i + 2 : -1;
+      // A leading ']' is a member, including after a parser-recognized
+      // negation prefix. unescape:true also removes a prefix's backslash.
+      const isLeadingClassPosition = position => {
+        const prefix = body.slice(i + 1, position);
+        return prefix === '' || prefix === '^'
+          || (options.posix === true && prefix === '!')
+          || (options.unescape === true && (prefix === '\\^'
+            || (options.posix === true && prefix === '\\!')));
+      };
       let end = i + 1;
       for (; end < body.length; end++) {
         if (body[end] === '\\') {
           // With unescape:true the parser consumes the backslash and treats
           // the following ']' as a class closer once there is a class member.
-          // The first member (or '^' followed by the first member) is literal.
-          const leadingLiteral = end === i + 1 || (end === i + 2 && body[i + 1] === '^');
-          if (options.unescape === true && body[end + 1] === ']' && !leadingLiteral) {
+          if (options.unescape === true && body[end + 1] === ']' && !isLeadingClassPosition(end)) {
             end++;
             break;
           }
@@ -324,7 +328,7 @@ const hasUnboundedGlobStar = (body, options) => {
             continue;
           }
         }
-        if (body[end] === ']' && end !== literalClose) break;
+        if (body[end] === ']' && !isLeadingClassPosition(end)) break;
       }
       // Without a closing class, the parser may reinterpret later stars.
       if (end >= body.length) return body.slice(i).includes('*');

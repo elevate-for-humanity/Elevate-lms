@@ -60,6 +60,26 @@ for (const major of [2, 4]) {
     assert.equal(run.status, 0, run.stderr);
   });
 
+  test(`picomatch ${major}: unescaped leading class members retain negated-class behavior`, () => {
+    for (const [pattern, options] of [
+      [String.raw`+([\^\]*a])`, { unescape: true }],
+      [String.raw`+([!\]*a])`, { unescape: true, posix: true }],
+      [String.raw`+([\!\]*a])`, { unescape: true, posix: true }],
+      ['+([!]*a])', { posix: true }],
+    ]) {
+      for (const match of [
+        picomatch(pattern, options),
+        value => picomatch.makeRe(pattern, options).test(value),
+        value => picomatch.compileRe(picomatch.parse(pattern, options), options).test(value),
+      ]) {
+        assert.equal(match('bbb'), true, pattern);
+        for (const nonmember of ['a', '*', ']']) {
+          assert.equal(match(nonmember), false, pattern);
+        }
+      }
+    }
+  });
+
   test(`picomatch ${major}: ordinary globs and literal stars retain their meaning`, () => {
     for (const [pattern, yes, no] of [
       ['src/**/*.js', 'src/nested/app.js', 'src/app.ts'],

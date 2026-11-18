@@ -121,7 +121,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
           const priorTokens = phoneTokens(priorLine);
           const priorDigits = (priorTokens[priorTokens.length - 1] || '').replace(/\D/g, '');
           const couldBeOnePhone = candidateDigits.length + priorDigits.length <= 15;
-          const priorLooksLikePostalLine = /\b[\p{L}][^\r\n]*\b\d{5}(?:-\d{4})?\s*$/u.test(priorLine);
+          const priorLooksLikePostalLine = /\p{L},\s+[A-Z]{2}\s+\d{5}(?:-\d{4})?\s*$/u.test(priorLine);
           if (!leftGap.includes('\n')
             || (!priorLooksLikePostalLine && (couldBeOnePhone || !lineHasIndependentPhone(priorLine)))) continue;
         }

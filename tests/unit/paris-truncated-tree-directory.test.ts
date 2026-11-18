@@ -80,5 +80,36 @@ describe('PARIS truncated-tree directory recovery', () => {
       'marketing host shops', allow)).toEqual({type:'list',path:permitted});
   });
 
+  it('recovers a trusted Next.js dynamic route directory from tree entries', () => {
+    const route = 'apps/marketing/app/programs/[program]/discussions';
+    const history = [...repeat];
+    expect(recoverRepeatedDirectoryInspection(history,
+      {type:'search',query:'marketing program'}, [{type:'tree',path:route}],
+      'Fix marketing discussions route', allow))
+      .toEqual({type:'list',path:route});
+    expect(history).toEqual(repeat);
+  });
+
+  it('recovers parenthesized Next.js route groups and dynamic-route blob parents', () => {
+    const route = 'apps/marketing/app/(training)/programs/[program]';
+    const tree = [{type:'blob',path:route + '/page.tsx'}];
+    expect(recoverRepeatedDirectoryInspection(repeat,
+      {type:'search',query:'marketing program'}, tree,
+      'Fix marketing training program page', allow))
+      .toEqual({type:'list',path:route});
+  });
+
+  it('keeps authorization and traversal guards for dynamic routes', () => {
+    const denied = 'apps/marketing/app/(private)/[student]/records';
+    const forbidden = (path: string) => allow(path) && !path.includes('(private)');
+    expect(recoverRepeatedDirectoryInspection(repeat,
+      {type:'search',query:'marketing program'},
+      [{type:'tree',path:denied}], 'marketing private student', forbidden)).toBeNull();
+    expect(recoverRepeatedDirectoryInspection(repeat,
+      {type:'search',query:'marketing program'},
+      [{type:'tree',path:'apps/marketing/app/[program]/../private'}],
+      'marketing private program', allow)).toBeNull();
+  });
+
 
 });

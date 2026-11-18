@@ -59,9 +59,10 @@ export function registerPublicNavigationAudit() {
       const playingCarousels = page.locator('main button[aria-label="Pause slideshow"]');
       const initialPlayingCount = await playingCarousels.count();
       for (let i = 0; i < initialPlayingCount; i++) {
-        const pause = playingCarousels.first();
-        await pause.click();
-        await expect(pause).toHaveAttribute('aria-label', 'Play slideshow');
+        await playingCarousels.first().click();
+        // The locator intentionally re-resolves after React changes the
+        // clicked button's accessible name from Pause to Play.
+        await expect(playingCarousels).toHaveCount(initialPlayingCount - i - 1);
       }
       const imageSelector = await page.locator('main').count() ? 'main img' : 'body img';
       // Inactive gallery preload frames use aria-hidden=true and opacity:0.

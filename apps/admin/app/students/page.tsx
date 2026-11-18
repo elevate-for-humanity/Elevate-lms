@@ -1,5 +1,7 @@
+import { isTestOrAuditProfile } from '@/lib/admin/operational-profile-query';
 import {
   loadStudentDirectory,
+  countDirectoryActiveAccess,
   directoryEnrollmentState,
 } from '@/lib/admin/student-directory-enrollments';
 import { Metadata } from 'next';
@@ -58,21 +60,6 @@ function EnrollmentBadge({
   );
 }
 
-function isTestOrAuditProfile(student: { email?: string | null; full_name?: string | null }) {
-  const email = String(student.email || '').toLowerCase();
-  const name = String(student.full_name || '').toLowerCase();
-  return (
-    email.endsWith('.test') ||
-    email.endsWith('@qa.invalid') ||
-    email.endsWith('@elevate-test.dev') ||
-    email.endsWith('@elevatetest.com') ||
-    email.endsWith('@test.elevateforhumanity.org') ||
-    email.endsWith('@example.com') ||
-    name.startsWith('[qa') ||
-    ['test admin', 'upload tester', 'final tester', 'v2 test', 'dev studio'].includes(name)
-  );
-}
-
 export default async function StudentsPage({
   searchParams,
 }: {
@@ -107,18 +94,20 @@ export default async function StudentsPage({
         enrollment_state: directoryEnrollmentState(enrollment),
       };
   }
-  const countStudents = (states: string[], access = false) =>
+  const countStudents = (states: string[]) =>
     new Set(
       enrollments
         .filter(
           (e) =>
             operationalStudentIds.has(e.user_id ?? e.student_id) &&
-            states.includes(directoryEnrollmentState(e) ?? '') &&
-            (!access || e.access_granted_at),
+            states.includes(directoryEnrollmentState(e) ?? ''),
         )
         .map((e) => e.user_id ?? e.student_id),
     ).size;
-  const activeEnrollments = countStudents(['active', 'enrolled', 'in_progress', 'confirmed'], true);
+  const { activeEnrollments, accessPending } = countDirectoryActiveAccess(
+    enrollments,
+    operationalStudentIds,
+  );
   const pendingApproval = countStudents(['applied', 'pending_approval']);
   const completedEnrollments = countStudents(['completed', 'graduated']);
   const weekAgo = new Date();
@@ -130,7 +119,7 @@ export default async function StudentsPage({
   return (
     <AdminPageShell
       title="Students"
-      description="View and manage all registered students and their enrollment status."
+      description="View registered learner accounts and enrollment status. An application alone does not grant enrollment or LMS access."
       breadcrumbs={[{ label: 'Admin', href: '/dashboard' }, { label: 'Students' }]}
       stats={[
         {
@@ -152,6 +141,7 @@ export default async function StudentsPage({
           icon: Clock,
           color: 'amber',
         },
+        { label: 'Access Pending', value: accessPending, icon: Clock, color: 'amber' },
         {
           label: 'Completed',
           value:

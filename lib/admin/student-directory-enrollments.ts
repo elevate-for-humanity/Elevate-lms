@@ -56,3 +56,25 @@ export function directoryEnrollmentState(enrollment: {
   if (blocked.includes(enrollment.status ?? '')) return enrollment.status!;
   return enrollment.enrollment_state ?? enrollment.status;
 }
+
+const DIRECTORY_ACTIVE_STATES = ['active', 'enrolled', 'in_progress', 'confirmed'];
+
+export function countDirectoryActiveAccess(
+  enrollments: (Parameters<typeof directoryEnrollmentState>[0] & {
+    user_id?: string | null;
+    student_id?: string | null;
+    access_granted_at?: string | null;
+  })[],
+  operationalStudentIds: ReadonlySet<string>,
+) {
+  const active = new Set<string>();
+  const accessPending = new Set<string>();
+  for (const enrollment of enrollments) {
+    const userId = enrollment.user_id ?? enrollment.student_id;
+    if (!userId || !operationalStudentIds.has(userId)) continue;
+    if (!DIRECTORY_ACTIVE_STATES.includes(directoryEnrollmentState(enrollment) ?? '')) continue;
+    active.add(userId);
+    if (!enrollment.access_granted_at) accessPending.add(userId);
+  }
+  return { activeEnrollments: active.size, accessPending: accessPending.size };
+}

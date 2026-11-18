@@ -5,9 +5,11 @@ import { Mail, Loader2, CheckCircle } from 'lucide-react';
 
 interface Props {
   pendingCount: number;
+  includeTest: boolean;
+  statuses: string[];
 }
 
-export function FollowUpBlastButton({ pendingCount }: Props) {
+export function FollowUpBlastButton({ pendingCount, includeTest, statuses }: Props) {
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [sent, setSent] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
@@ -23,6 +25,7 @@ export function FollowUpBlastButton({ pendingCount }: Props) {
       const res = await fetch('/api/admin/applications/follow-up-blast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ includeTest, statuses }),
       });
       const data = await res.json();
       if (!res.ok) {

@@ -57,6 +57,7 @@ type ReviewApplication = {
   source?: string | null;
   support_notes?: string | null;
   review_notes?: string | null;
+  follow_up_notes?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
   revoked_at?: string | null;
@@ -204,6 +205,17 @@ export default async function ReviewApplicationPage({
                   <li>4. Approve, reject, or leave the application in review with clear notes.</li>
                 </ol>
               </div>
+              {application.follow_up_notes?.trim() && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <h2 className="text-sm font-black uppercase tracking-wide text-slate-950">
+                    Outreach history
+                  </h2>
+                  <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-800">
+                    {application.follow_up_notes}
+                  </p>
+                </section>
+              )}
+
               <ApplicationActions
                 applicationId={application.id}
                 currentStatus={status}

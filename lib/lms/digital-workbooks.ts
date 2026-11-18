@@ -53,6 +53,16 @@ export async function loadMyDigitalWorkbooks() {
     programIds = [
       ...new Set((result.data || []).map((row) => row.program_id).filter(Boolean)),
     ] as string[];
+    const teaching = await admin.from('instructor_assignments').select('course_id')
+      .eq('instructor_id', subject.userId).eq('active', true);
+    if (teaching.error) throw new Error('Workbook teaching access could not be verified.');
+    const teachingIds = (teaching.data ?? []).map(row => row.course_id).filter(Boolean);
+    if (teachingIds.length) {
+      const courses = await admin.from('courses').select('program_id')
+        .in('id', teachingIds).eq('is_active', true).eq('status', 'published');
+      if (courses.error) throw new Error('Workbook teaching programs could not be verified.');
+      programIds = [...new Set([...programIds, ...(courses.data ?? []).map(row => row.program_id).filter(Boolean)])];
+    }
     if (!programIds.length)
       return { user: { id: subject.userId }, workbooks: [] as Workbook[], previewing: true };
     reader = admin;

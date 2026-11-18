@@ -55,6 +55,13 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY INVOKER SET search_path TO '' AS $$
  AND c.is_active AND c.status='published' AND rpc_private.assigned_educator_course_read(c.id))
 $$;
 
+-- Some deployments had this policy installed before it was tracked in source.
+DO $$ BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polrelid='public.course_lessons'::regclass AND polname='holder_lesson_enrollment_required') THEN
+   CREATE POLICY holder_lesson_enrollment_required ON public.course_lessons
+     AS RESTRICTIVE FOR SELECT TO authenticated USING (false);
+ END IF;
+END $$;
 ALTER POLICY holder_lesson_enrollment_required ON public.course_lessons USING (
  rpc_private.assigned_educator_lesson_read(id)
  OR NOT EXISTS(SELECT 1 FROM public.profiles WHERE id=(SELECT auth.uid()) AND role='program_holder')

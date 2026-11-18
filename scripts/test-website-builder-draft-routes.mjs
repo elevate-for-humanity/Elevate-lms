@@ -112,3 +112,236 @@ test('generation omits fabricated, malformed, account-only and oversized contact
   assert.equal((await f.post(request())).status,201);assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
  }
 });
+
+
+test('generation rejects partial email and phone tokens while preserving exact owner contacts',async()=>{
+ const source='Email: xsales@example.com; Phone: +1 (555) 123-4567';
+ for(const contact of [{email:'sales@example.com'}, {email:'xsales@example.co'}, {phone:'555'}, {phone:'123-4567'}, {phone:'1 (555) 123-4567'}]) {
+  const f=fixture('generate',{generated:{...config,contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Publish contact values exactly as supplied. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+ const contact={email:'xsales@example.com',phone:'+1 (555) 123-4567'};
+ const f=fixture('generate',{generated:{...config,contact},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Publish contact values exactly as supplied. '+source}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+});
+test('generation preserves hours from the actual Scheduling interview field',async()=>{
+ const questions=compile(await read('lib/website-builder/interview.ts'),{},'WEBSITE_INTERVIEW_QUESTIONS');
+ assert.ok(questions.some(question=>question.key==='scheduling'&&question.label==='Scheduling'));
+ const contact={email:'public@example.test',phone:'+1 (555) 123-4567',address:'123 Example Road',hours:['Monday 9–5']};
+ const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+ const response=await f.post(request({brief:undefined,answers:{businessName:'Example',contacts:'public@example.test; +1 (555) 123-4567',locations:'123 Example Road',scheduling:'Monday 9–5'}}));
+ assert.equal(response.status,201,JSON.stringify(response.body));assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+});
+
+test('generation never strips unsupported email prefixes or contact-adjacent letters', async()=>{
+ const f=fixture('generate',{generated:{...config,contact:{email:'sales@example.com',phone:'5551234567'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Use these details exactly: %sales@example.com and ABC5551234567XYZ, no invented contacts.'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});
+
+test('generation retains complete phones before sentence-ending periods and numeric addresses',async()=>{
+ for(const phone of ['317-555-0123','317.555.0123']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone,address:'123 Main Street'}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Owner asks to publish: Call '+phone+'. 123 Main Street. Contact column requested.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{phone,address:'123 Main Street'});
+ }
+});
+
+test('generation retains email addresses surrounded by prose punctuation',async()=>{
+ for(const supplied of ['sales@example.com!','sales@example.com?','sales@example.com\u0027',"'sales@example.com'",'“sales@example.com”.','‘sales@example.com’!']) {
+  const contact={email:'sales@example.com'};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website with these owner-supplied details. Email us at '+supplied}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ for(const supplied of ['%sales@example.com',"o'sales@example.com","'sales@example.com",'sales@example.com!evil','sales@example.com?subject=private']) {
+  const f=fixture('generate',{generated:{...config,contact:{email:'sales@example.com'}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website using only these owner-supplied details: '+supplied}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});
+
+test('generation retains complete phones beside parenthesized availability',async()=>{
+ for(const phone of ['317-555-0123','317.555.0123','+1 (317) 555-0123','+44 (20) 7946 0958']) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website with these owner-supplied details. Call '+phone+' (9-5).'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ const f=fixture('generate',{generated:{...config,contact:{phone:'9-5'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Build the requested business website. Call 317-555-0123 (9-5).'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});
+
+test('generation folds phone whitespace without accepting fragments',async()=>{
+ for(const whitespace of ['\n','\t']) {
+  for(const phone of ['+1 (317) 555-0123','555-0123','(317) 555-0123']) {
+   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact:{phone}},realNormalization:true});
+   assert.equal((await f.post(request({brief:'Build the requested business website with these owner-supplied details. Call +1 (317)'+whitespace+'555-0123 for details.'}))).status,201);
+   assert.deepEqual(f.calls[0].args.p_site_config.contact,phone.startsWith('+1')?{phone}:{});
+  }
+ }
+});
+
+test('generation preserves fully parenthesized phones and rejects partial variants',async()=>{
+ for(const phone of ['(317-555-0123)','(317 555 0123)']) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website with this exact owner-supplied phone: '+phone+'.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ for(const phone of ['317-555-0123','(317-555-0123','317-555-0123)','9-5']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. Call (317-555-0123). Hours 9-5.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});
+
+test('generation keeps spaced international prefixes and separate phone lines intact',async()=>{
+ const international='+ 44 20 7946 0958';
+ for(const phone of [international,'317-555-0123','800-555-0199']) {
+  const source=phone===international?'Call '+international+' today.':'Phone lines:\n317-555-0123\n800-555-0199';
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website using the following exact owner contact details. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ const f=fixture('generate',{generated:{...config,contact:{phone:'44 20 7946 0958'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Build the requested business website. Call '+international+' today.'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});
+
+test('generation rejects incomplete phone continuations on either side of a line break',async()=>{
+ for(const [source,phone] of [['+1 (317)\n555-0123','555-0123'],['+44 20 7946\n0958','+44 20 7946'],['+1 (317)\t555-0123','555-0123'],['+44 20 7946\n0958000','0958000'],['+44 20 7946\n0958000','+44 20 7946'],['Open 2026, call +44 20 7946\n0958000','0958000']]) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website from the owner contact details: '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});
+
+
+test('generation preserves prose-wrapped phones and rejects parenthesized suffix fragments',async()=>{
+ for(const [source,phone,expected] of [
+  ['Contact us (phone: 317-555-0123).','317-555-0123',{phone:'317-555-0123'}],
+  ['Call (317)555-0123','555-0123',{}],
+  ['Call 317-555-0123)','317-555-0123',{}],
+ ]) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website using this owner contact text: '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,expected);
+ }
+});
+
+test('generation keeps complete phones after prose separators and valid service short codes',async()=>{
+ for(const [source,phone] of [
+  ['Call us. 317-555-0123','317-555-0123'],
+  ['Phone - 317-555-0123','317-555-0123'],
+  ['Call 317-555-0123 9am–5pm weekdays.','317-555-0123'],
+  ['For crisis support, call 988.','988'],
+  ['Phone:\n988','988'],
+  ['Phone:\r\n988','988'],
+  ['Crisis hotline:\n988','988'],
+  ['For crisis support, call:\n988','988'],
+  ['Phone:\n988 (available around the clock)','988'],
+  ['Phone:\n988 (24/7)','988'],
+  ['Phone:\n988 — available around the clock','988'],
+  ['988 (crisis hotline)','988'],
+  ['988 — crisis support hotline','988'],
+ ]) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ for(const phone of ['9-5','55','1234']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. Hours 9-5. Call 988 for help.'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+});
+
+
+
+test('generation preserves explicit trailing service destinations from contacts answers',async()=>{
+ for(const [source,phone] of [
+  ['911 (emergency)','911'],
+  ['988 (phone)','988'],
+  ['988 (call or text)','988'],
+  ['988 (crisis hotline, available 24/7)','988'],
+  ['988 (crisis hotline, free and confidential)','988'],
+  ['211 (helpline, open weekdays)','211'],
+  ['211 (helpline, open Monday-Friday)','211'],
+  ['211 (helpline, available Monday through Friday, 9am-5pm)','211'],
+  ['988 (crisis hotline, open 8:30am–5:00pm)','988'],
+ ]) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  const response=await f.post(request({brief:undefined,answers:{businessName:'Example',contacts:source}}));
+  assert.equal(response.status,201,JSON.stringify(response.body));
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+});
+
+
+test('generation rejects split area codes and ordinary counts while preserving labeled adjacent phones',async()=>{
+ for(const [source,phone] of [
+  ['Phone:\n317\n555-0123','555-0123'],
+  ['We served 123 customers and need a contact footer.','123'],
+  ['We supported 988 learners and need a contact footer.','988'],
+  ['We served 988 (learners) and need a contact footer.','988'],
+  ['Annual reach:\n211 (learners receiving support)','211'],
+  ['Annual totals:\n211 (text messages delivered)','211'],
+  ['Annual totals:\n211 (learners receiving hotline support)','211'],
+  ['Annual totals:\n211 (hotline, calls answered)','211'],
+  ['Support services.\nWe served 988 learners.','988'],
+  ['Support services:\nWe served 988 learners.','988'],
+  ['Phone: 317-555-0123\nWe served 988 customers last year.','988'],
+ ]) {
+  const f=fixture('generate',{generated:{...config,contact:{phone}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+ for(const phone of ['317-555-0123','800-555-0199']) {
+  const contact={phone};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  const source='Phone lines:\n317-555-0123\n800-555-0199 (toll free)';
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+});
+
+
+test('generation requires destination context for inline service codes',async()=>{
+ for(const source of ['We support 988 learners each year.','Our support reached 988 learners.']) {
+  const f=fixture('generate',{generated:{...config,contact:{phone:'988'}},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+ }
+ for(const source of ['Call 988 for help.','Support: 988','For help, use the support line 988.', 'Phone number: 988', 'Call us at 988 for help.']) {
+  const contact={phone:'988'};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+source}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+});
+
+test('generation retains a phone on the line after a postal address',async()=>{
+ for(const address of ['Indianapolis, IN 46204','123 Main Street, Indianapolis, IN 46204-1234', 'Indianapolis IN 46204', 'Indianapolis, in 46204', 'Indianapolis, Indiana 46204', 'APO, AE 09012', 'FPO AP 96601', 'DPO, AA 34001-1234']) {
+  const contact={phone:'317-555-0123'};
+  const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
+  assert.equal((await f.post(request({brief:'Build the requested business website. '+address+'\n317-555-0123'}))).status,201);
+  assert.deepEqual(f.calls[0].args.p_site_config.contact,contact);
+ }
+ const f=fixture('generate',{generated:{...config,contact:{phone:'317-555-0123'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Build the requested business website. 46204\n317-555-0123'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});
+
+
+test('generation rejects the tail of an international phone split after five digits',async()=>{
+ const f=fixture('generate',{generated:{...config,contact:{phone:'6789012'}},realNormalization:true});
+ assert.equal((await f.post(request({brief:'Publish only the full phone. Phone: +49 12345\n6789012'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});

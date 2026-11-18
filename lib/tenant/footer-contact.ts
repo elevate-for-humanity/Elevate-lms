@@ -5,19 +5,163 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
   if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
   const candidate = input as Record<string, unknown>;
   const fold = (value: string) => value.replace(/\s+/g, ' ').trim();
-  const supplied = sources.filter(value => typeof value === 'string').map(fold);
-  const copy = (value: unknown, limit: number) => {
+  const rawSources = sources.filter((value): value is string => typeof value === 'string');
+  const supplied = rawSources.map(fold);
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
+
+  const emails = rawSources
+    .flatMap(source => source.match(/[^\s<>()\x5b\x5d,;:"]+@[^\s<>()\x5b\x5d,;:"]+/g) || [])
+    .map(value => {
+      const token = value.replace(/[.!?]+$/, '');
+      const pairedQuotes = [
+        ["'", "'"],
+        ['“', '”'],
+        ['‘', '’'],
+      ] as const;
+      const pair = pairedQuotes.find(([open, close]) => token.startsWith(open) && token.endsWith(close));
+      return pair ? token.slice(1, -1) : token.replace(/['’]$/, '');
+    });
+
+  const supportedServiceCodes = new Set(['211', '311', '411', '511', '611', '711', '811', '911', '988']);
+  const validPhoneShape = (value: string) => {
+    if (!/^\+?\s*[\d(). -]+$/.test(value)) return false;
+    const digits = value.replace(/\D/g, '');
+    if (!(digits.length === 3 && /^\d{3}$/.test(value) && supportedServiceCodes.has(digits))
+      && (digits.length < 7 || digits.length > 15)) return false;
+    let depth = 0;
+    for (const character of value) {
+      if (character === '(') depth += 1;
+      if (character === ')') {
+        depth -= 1;
+        if (depth < 0) return false;
+      }
+    }
+    return depth === 0;
+  };
+
+  const phoneTokens = (line: string) =>
+    line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
+  const lineHasIndependentPhone = (line: string) =>
+    phoneTokens(line).some(token => validPhoneShape(token.trim()));
+
+  const suppliedPhone = (value: unknown, limit: number) => {
     if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
     const cleaned = value.trim();
-    return supplied.some(source => source.includes(fold(cleaned))) ? cleaned : undefined;
+    if (!validPhoneShape(cleaned)) return undefined;
+    const pattern = new RegExp(cleaned.split(/\s+/).map(escapeRegExp).join('\\s+'), 'g');
+
+    for (const source of rawSources) {
+      for (const match of source.matchAll(pattern)) {
+        const start = match.index ?? 0;
+        const end = start + match[0].length;
+        const before = source[start - 1] || '';
+        const after = source[end] || '';
+
+        if (/[\p{L}\p{N}+()]/u.test(before) || /[\p{L}\p{N}]/u.test(after)) continue;
+        if (after === ')') {
+          const currentLineStart = source.lastIndexOf('\n', start - 1) + 1;
+          const prefixOnLine = source.slice(currentLineStart, start);
+          const openParens = (prefixOnLine.match(/\(/g) || []).length;
+          const closeParens = (prefixOnLine.match(/\)/g) || []).length;
+          if (openParens <= closeParens) continue;
+        }
+        if (cleaned.replace(/\D/g, '').length === 3) {
+          const lineStart = source.lastIndexOf('\n', start - 1) + 1;
+          const lineEndIndex = source.indexOf('\n', end);
+          const lineEnd = lineEndIndex === -1 ? source.length : lineEndIndex;
+          const previousLineEnd = Math.max(0, lineStart - 1);
+          const previousLineStart = source.lastIndexOf('\n', previousLineEnd - 1) + 1;
+          const currentLine = source.slice(lineStart, lineEnd);
+          const previousLine = source.slice(previousLineStart, previousLineEnd);
+          const contactKeyword = /\b(call|phone|dial|text|hotline|support|emergency)\b/i;
+          const relativeStart = start - lineStart;
+          const inlinePrefix = currentLine.slice(0, relativeStart);
+          const hasInlineContext = /(?:\b(?:call|dial|text)(?:\s+(?:us|now|here|this\s+number))?(?:\s+at)?|\b(?:phone(?:\s+(?:line|number))?|hotline|helpline|emergency(?:\s+(?:line|number))?|support(?:\s+(?:line|hotline|number)|\s*:)))\s*(?::|#|[-–—])?\s*$/i.test(inlinePrefix);
+          const previousLineLabel = previousLine.trim();
+          const candidateAtLineStart = new RegExp(
+            '^\\s*' + escapeRegExp(cleaned),
+          ).exec(currentLine);
+          const candidateSuffix = currentLine.slice(relativeStart + match[0].length);
+          const candidateOccupiesLine = new RegExp(
+            '^\\s*' + escapeRegExp(cleaned) + '\\s*[.!?]?\\s*$',
+          ).test(currentLine);
+          const hasBoundedSuffix = /^(?:\s*\([^()\r\n]{1,80}\)|\s*[—–-]\s*[^\r\n]{1,80})\s*[.!?]?\s*$/.test(candidateSuffix)
+            && !lineHasIndependentPhone(candidateSuffix);
+          const hasBoundedAnnotation = candidateAtLineStart !== null && hasBoundedSuffix;
+          const boundedDay = String.raw`(?:mon(?:day)?s?|tue(?:sday)?s?|wed(?:nesday)?s?|thu(?:rsday)?s?|fri(?:day)?s?|sat(?:urday)?s?|sun(?:day)?s?)`;
+          const boundedTime = String.raw`\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)\s*(?:[-–—]|to|through)\s*\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)`;
+          const boundedDayRange = String.raw`${boundedDay}(?:\s*(?:[-–—]|to|through)\s*${boundedDay})?`;
+          const boundedAvailability = String.raw`(?:24\s*\/\s*7|around\s+the\s+clock|weekdays|weekends|daily|during\s+business\s+hours|${boundedDayRange}(?:\s*,\s*${boundedTime})?|${boundedTime})`;
+          const trailingContactDestination = new RegExp(
+            String.raw`^(?:\s*\(\s*|\s*[—–-]\s*)(?:hotline|helpline|emergency(?:\s+(?:line|number))?|support\s+(?:line|hotline|number)|phone(?:\s+(?:line|number))?|(?:call|dial|text)\s+(?:us|this|here|the\s+number)|call\s+or\s+text|crisis\s+(?:support\s+)?hotline)(?:\s*,\s*(?:(?:available|open)\s+${boundedAvailability}|${boundedAvailability}|(?:toll[- ]?free|free)(?:\s+and\s+confidential)?|confidential))?\s*\)?\s*[.!?]?\s*$`,
+            'i',
+          );
+          const hasTrailingContactAnnotation = hasBoundedSuffix
+            && trailingContactDestination.test(candidateSuffix);
+          const hasExplicitPreviousLineLabel = (candidateOccupiesLine || hasBoundedAnnotation)
+            && !/\d/.test(previousLineLabel)
+            && (
+              /^(?:call|phone|dial|text|hotline|support|emergency)\s*:?$/i.test(previousLineLabel)
+              || (
+                previousLineLabel.length <= 80
+                && previousLineLabel.endsWith(':')
+                && contactKeyword.test(previousLineLabel)
+              )
+            );
+          if (!hasInlineContext && !hasExplicitPreviousLineLabel && !hasTrailingContactAnnotation) continue;
+        }
+        if ((before === '.' || before === '-') && /\d/.test(cleaned[0] || '')) continue;
+        if ((after === '.' || after === '-') && /\d/.test(source[end + 1] || '')) continue;
+
+        const candidateDigits = cleaned.replace(/\D/g, '');
+        const leftGap = source.slice(0, start).match(/\s+$/)?.[0] || '';
+        const previous = source[start - leftGap.length - 1] || '';
+        if (leftGap && /[+()\d]/.test(previous)) {
+          const priorLine = source.slice(0, start - leftGap.length).split(/\r?\n/).pop()?.trim() || '';
+          const priorTokens = phoneTokens(priorLine);
+          const priorDigits = (priorTokens[priorTokens.length - 1] || '').replace(/\D/g, '');
+          const couldBeOnePhone = candidateDigits.length + priorDigits.length <= 15;
+          const priorLooksLikePostalLine = /(?:\p{L},?\s+(?:AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|American Samoa|Guam|Northern Mariana Islands|Puerto Rico|Virgin Islands|Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|District of Columbia|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming|AS|GU|MP|PR|VI)|\b(?:APO|FPO|DPO),?\s+(?:AA|AE|AP))\s+\d{5}(?:-\d{4})?\s*$/iu.test(priorLine);
+          if (!leftGap.includes('\n')
+            || (!priorLooksLikePostalLine && (couldBeOnePhone || !lineHasIndependentPhone(priorLine)))) continue;
+        }
+
+        const rightGap = source.slice(end).match(/^\s+/)?.[0] || '';
+        const next = source[end + rightGap.length] || '';
+        if (rightGap && /[+\d]/.test(next)) {
+          const nextLine = source.slice(end + rightGap.length).split(/\r?\n/)[0]?.trim() || '';
+          const nextDigits = (phoneTokens(nextLine)[0] || '').replace(/\D/g, '');
+          const couldBeOnePhone = candidateDigits.length + nextDigits.length <= 15;
+          const numericSchedule = !rightGap.includes('\n') && /^\d{1,2}\s*(?:am|pm)\b/i.test(nextLine);
+          if (!numericSchedule
+            && (!rightGap.includes('\n') || couldBeOnePhone || !lineHasIndependentPhone(nextLine))) continue;
+        }
+        return cleaned;
+      }
+    }
+    return undefined;
   };
+
+  const copy = (value: unknown, limit: number, kind?: 'email' | 'phone' | 'address') => {
+    if (kind === 'phone') return suppliedPhone(value, limit);
+    if (typeof value !== 'string' || !value.trim() || value.length > limit) return undefined;
+    const cleaned = value.trim();
+    const matches = kind === 'email'
+      ? emails.includes(cleaned)
+      : supplied.some(source => source.includes(fold(cleaned)));
+    return matches ? cleaned : undefined;
+  };
+
   const result: TenantSiteContact = {};
   for (const [key, limit] of [['email', 180], ['phone', 80], ['address', 300]] as const) {
-    const value = copy(candidate[key], limit);
+    const value = copy(candidate[key], limit, key);
     if (value) result[key] = value;
   }
   if (Array.isArray(candidate.hours)) {
-    const hours = candidate.hours.slice(0, 14).map(value => copy(value, 120)).filter((value): value is string => value !== undefined);
+    const hours = candidate.hours
+      .slice(0, 14)
+      .map(value => copy(value, 120))
+      .filter((value): value is string => value !== undefined);
     if (hours.length) result.hours = hours;
   }
   return result;
@@ -46,4 +190,3 @@ export function footerContactDetails(config: TenantSiteConfig) {
     phoneHref: /^\+?[\d ().-]{3,80}$/.test(phone) && /\d{3}/.test(phone.replace(/\D/g, '')) ? `tel:${phone.replace(/[^+\d]/g, '')}` : null,
   };
 }
-

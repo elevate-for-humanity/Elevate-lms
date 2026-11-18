@@ -47,10 +47,6 @@ const guardedPortals: Array<{ path: string; required: string[]; shellPath?: stri
     required: ["requireRole(['parent', 'admin', 'staff'])"],
   },
   {
-    path: 'apps/marketing/app/employer/layout.tsx',
-    required: ["requireRole(['employer', 'sponsor', 'admin', 'staff'])"],
-  },
-  {
     path: 'apps/marketing/app/provider/layout.tsx',
     required: ['OperationalPortalShell', 'portalKey="provider"'],
   },
@@ -99,10 +95,15 @@ describe('portal authorization boundaries', () => {
     });
   }
 
-  it('does not allow the Marketing employer portal to regress to login-only access', () => {
-    const employer = read('apps/marketing/app/employer/layout.tsx');
-    expect(employer).not.toContain('Only require login');
-    expect(employer).not.toContain('createClient');
-    expect(employer).toContain("requireRole(['employer', 'sponsor', 'admin', 'staff'])");
+  it('routes legacy Marketing employer URLs to the role-guarded LMS portal', () => {
+    const marketingLayout = read('apps/marketing/app/employer/layout.tsx');
+    const marketingRoot = read('apps/marketing/app/employer/page.tsx');
+    const marketingSubroute = read('apps/marketing/app/employer/[...path]/page.tsx');
+
+    expect(marketingLayout).not.toMatch(/requireRole|createClient|PlatformShell/);
+    expect(marketingRoot).toContain('const employer = PORTAL_MAP.employer;');
+    expect(marketingRoot).toContain('redirect(`${employer.host}${employer.defaultPath}`)');
+    expect(marketingSubroute).toContain('path.map((segment) => encodeURIComponent(segment))');
+    expect(marketingSubroute).toContain('redirect(`${PORTAL_MAP.employer.host}/employer/${safePath}`)');
   });
 });

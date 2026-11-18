@@ -13,7 +13,7 @@ const COMPLETION_SAFETY_TOKENS = 512;
 function requestTimeoutMs(): number {
   const configured = Number.parseInt(process.env.ELEVATE_LLM_TIMEOUT_MS ?? '', 10);
   if (!Number.isFinite(configured)) return DEFAULT_TIMEOUT_MS;
-  return Math.min(900_000, Math.max(30_000, configured));
+  // Cloud Run terminates owned CPU HTTP requests at 300s. Leave a 30s\n  // cancellation/cleanup margin rather than waiting for the platform 504.\n  return Math.min(270_000, Math.max(30_000, configured));
 }
 const SERVED_MODEL = 'elevate-local';
 

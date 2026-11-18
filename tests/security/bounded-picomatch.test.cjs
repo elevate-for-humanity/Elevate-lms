@@ -61,6 +61,20 @@ for (const major of [2, 4]) {
     assert.equal(picomatch('+(*)', {noext:true})('+(*)'), true);
     assert.equal(picomatch.scan('src/**/*.js').isGlob, true);
   });
+
+  test(`picomatch ${major}: bracket members remain literal within repeated extglobs`, () => {
+    for (const [pattern, sample] of [
+      ['+([]a*])', 'a'],
+      ['+([]a*])', '*'],
+      ['+([^]*])', 'a'],
+      ['+([[:alpha:]*[:digit:]])', 'a*1'],
+      [String.raw`+([[:alpha:]\*a])`, 'a*a'],
+    ]) {
+      assert.equal(picomatch(pattern)(sample), true, pattern);
+      assert.equal(picomatch.makeRe(pattern).test(sample), true, pattern);
+      assert.equal(picomatch.compileRe(picomatch.parse(pattern)).test(sample), true, pattern);
+    }
+  });
 }
 
 test('installed consumers resolve the maintained forks and match normal files', () => {

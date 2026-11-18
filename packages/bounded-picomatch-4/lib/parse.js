@@ -298,32 +298,31 @@ const hasUnboundedGlobStar = (body, options) => {
     if (ch === '"') { quoted = !quoted; continue; }
     if (quoted) continue;
     if (ch === '[' && options.nobracket !== true) {
+      // The parser treats a leading ']' (also immediately after '^') as a
+      // literal class member, not a closing delimiter.
+      const literalClose = body[i + 1] === ']'
+        ? i + 1
+        : body[i + 1] === '^' && body[i + 2] === ']' ? i + 2 : -1;
       let end = i + 1;
       for (; end < body.length; end++) {
         if (body[end] === '\\') { end++; continue; }
-        if (body[end] === '[' && body[end + 1] === ':') {
+        if (body[end] === '[' && body[end + 1] === ':' && options.posix !== false) {
           const posixEnd = body.indexOf(':]', end + 2);
-          if (posixEnd === -1) return body.slice(i).includes('*');
-          end = posixEnd + 1;
-          continue;
+          const posixName = posixEnd === -1 ? '' : body.slice(end + 2, posixEnd);
+          if (Object.prototype.hasOwnProperty.call(POSIX_REGEX_SOURCE, posixName)) {
+            // Only recognized POSIX tokens consume their inner ':]'. Unknown
+            // tokens and posix:false close at the first ']', exposing a
+            // following '*' as an actual unbounded wildcard.
+            end = posixEnd + 1;
+            continue;
+          }
         }
-        if (body[end] === ']') break;
+        if (body[end] === ']' && end !== literalClose) break;
       }
-      // An unclosed class is reparsed as literal '[' plus glob tokens.
-      // Fail conservatively without rescanning every unmatched opener.
+      // Without a closing class, the parser may reinterpret later stars.
       if (end >= body.length) return body.slice(i).includes('*');
-      // A POSIX-looking bracket token is only literal-safe when the parser
-      // recognizes it and its star is a final class member. Unknown classes,
-      // posix:false and a star followed by more class content can otherwise
-      // become nested regex repetition inside +(...) or *(...).
-      const bracket = body.slice(i, end + 1);
-      const posixToken = /\[:([^:\]]+):\]/.exec(bracket);
-      if (posixToken && bracket.includes('*')) {
-        const suffix = bracket.slice(bracket.indexOf(posixToken[0]) + posixToken[0].length);
-        const starAt = suffix.indexOf('*');
-        if (options.posix === false || !POSIX_REGEX_SOURCE[posixToken[1]] ||
-            (starAt !== -1 && suffix.slice(starAt + 1) !== ']')) return true;
-      }
+      // Every star still inside a genuinely closed class is literal,
+      // regardless of its position or later POSIX class members.
       i = end;
       continue;
     }

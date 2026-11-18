@@ -10,7 +10,7 @@ import {createCourseProgressWatch,reportCourseProgress} from '../../lib/ultimate
 const source=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/worker/process-job.ts',import.meta.url),'utf8'))
   .split('\n').filter(line=>!line.startsWith('import ')).join('\n').replace(/^export (?=(?:async )?function )/gm,'');
 async function run({pauseAfterAttachment=false,checkpointAccepted=true}={}){
- const calls=[],fences=[],writes=[];let paused=false,claims=0,yields=0,waits=0;
+ const calls=[],fences=[],writes=[],tracing=[];let paused=false,claims=0,yields=0,waits=0;
  const job={id:'job',build_id:'build',execution_generation:7,payload:{nextCompetencyIndex:0}};
  const profile={competencies:[{id:'first'},{id:'second'}]};
  const build={id:'build',course_id:'a6b0b712-1cf0-475a-ba79-ee2023dea8ec',profile};
@@ -21,6 +21,8 @@ async function run({pauseAfterAttachment=false,checkpointAccepted=true}={}){
   return q;
  },rpc:async()=>({error:null})};
  const dependencies={continuousCourseLease,checkpointContinuousLesson,createCourseProgressWatch,reportCourseProgress,
+  initializeLaminar:async service=>{tracing.push(['initialize',service]);},
+  withLaminarSpan:async(name,metadata,operation)=>{tracing.push(['span',name]);assert.deepEqual(metadata,{});return operation();},
   attachCompletedLessonMedia:async()=>{if(pauseAfterAttachment)paused=true;},preservedCourseCursor:(_p,p)=>p,
   recordProductionAlert:async()=>{},ULTIMATE_BUILD_STEPS:[],
   UltimateJobQueue:class{async claim(){claims++;return job;}async heartbeat(){return true;}
@@ -39,11 +41,13 @@ async function run({pauseAfterAttachment=false,checkpointAccepted=true}={}){
  };
  const processJob=new Function(...Object.keys(dependencies),source+';return processUltimateJob;')(...Object.values(dependencies));
  const result=await processJob(db,'same-worker');
- return {result,calls,fences,writes,claims,yields,waits};
+ return {result,calls,fences,writes,tracing,claims,yields,waits};
 }
 test('two lessons execute under one claim and generation with the new cursor',async()=>{
  const x=await run();assert.equal(x.claims,1);assert.equal(x.yields,0);
  assert.deepEqual(x.calls.map(c=>c.startIndex),[0,1]);
+ assert.deepEqual(x.tracing,[['initialize','course_worker'],['span','course.job']],
+  'A claimed unit has one initialization and one job span across both lesson checkpoints');
  assert.deepEqual(x.fences,[{jobId:'job',workerId:'same-worker',generation:7},{jobId:'job',workerId:'same-worker',generation:7}]);
  assert.equal(x.result.awaitingDependency,true);assert.equal(x.waits,1);
  assert.ok(x.writes.some(w=>w.payload?.nextCompetencyIndex===1));
@@ -51,7 +55,9 @@ test('two lessons execute under one claim and generation with the new cursor',as
 test('owner pause at a lesson boundary prevents the next lesson',async()=>{
  const x=await run({pauseAfterAttachment:true});assert.equal(x.calls.length,1);
  assert.equal(x.result.ownerPaused,true);assert.equal(x.waits,1);
+ assert.deepEqual(x.tracing,[['initialize','course_worker'],['span','course.job']]);
 });
 test('an unacknowledged continuation checkpoint never starts the next lesson',async()=>{
  const x=await run({checkpointAccepted:false});assert.equal(x.calls.length,1);assert.equal(x.yields,1);
+ assert.deepEqual(x.tracing,[['initialize','course_worker'],['span','course.job']]);
 });

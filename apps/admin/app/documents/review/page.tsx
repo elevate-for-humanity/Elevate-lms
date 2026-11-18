@@ -203,11 +203,22 @@ export default async function AdminDocumentReviewPage({
                     <div className="min-w-0 flex-1">
                       <h3 className="break-words font-semibold text-black">{doc.file_name}</h3>
                       <p className="mt-1 break-words text-sm text-black">
-                        {documentTypeLabel(doc.document_type)} •
-                        {(doc.profiles as any)?.full_name || 'Unknown User'} (
-                        {(doc.profiles as any)?.role}) • Uploaded{' '}
+                        {documentTypeLabel(doc.document_type)} •{' '}
+                        {doc.profiles?.full_name ||
+                          (doc.owner_type
+                            ? doc.owner_type.replaceAll('_', ' ')
+                            : 'Owner not linked')}
+                        {doc.profiles?.role && ` (${doc.profiles.role})`} • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
+                      {doc.application_id && (
+                        <Link
+                          href={`/applications/review/${doc.application_id}`}
+                          className="text-sm text-brand-blue-700 underline"
+                        >
+                          Open linked application
+                        </Link>
+                      )}
                     </div>
                   </div>
                   <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:shrink-0">
@@ -216,7 +227,7 @@ export default async function AdminDocumentReviewPage({
                       className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-brand-blue-700 sm:w-auto"
                     >
                       <Eye className="w-4 h-4" />
-                      Review
+                      {doc.has_storage_locator ? 'Review' : 'Review · file missing'}
                     </Link>
                   </div>
                 </div>
@@ -260,11 +271,22 @@ export default async function AdminDocumentReviewPage({
                     <div className="min-w-0 flex-1">
                       <h3 className="break-words font-semibold text-black">{doc.file_name}</h3>
                       <p className="mt-1 break-words text-sm text-black">
-                        {documentTypeLabel(doc.document_type)} •
-                        {(doc.profiles as any)?.full_name || 'Unknown User'} (
-                        {(doc.profiles as any)?.role}) • Uploaded{' '}
+                        {documentTypeLabel(doc.document_type)} •{' '}
+                        {doc.profiles?.full_name ||
+                          (doc.owner_type
+                            ? doc.owner_type.replaceAll('_', ' ')
+                            : 'Owner not linked')}
+                        {doc.profiles?.role && ` (${doc.profiles.role})`} • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
+                      {doc.application_id && (
+                        <Link
+                          href={`/applications/review/${doc.application_id}`}
+                          className="text-sm text-brand-blue-700 underline"
+                        >
+                          Open linked application
+                        </Link>
+                      )}
                       {doc.status === 'rejected' && doc.rejection_reason && (
                         <p className="text-sm text-brand-red-600 mt-1">
                           <strong>Reason:</strong> {doc.rejection_reason}

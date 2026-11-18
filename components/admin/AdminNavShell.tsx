@@ -67,10 +67,12 @@ export function AdminNavShell({ navSections }: AdminNavShellProps) {
     const timer = window.setInterval(refresh, 60000);
     window.addEventListener('focus', refresh);
     window.addEventListener('service-billing-updated', refresh);
+    window.addEventListener('document-review-updated', refresh);
     return () => {
       window.clearInterval(timer);
       window.removeEventListener('focus', refresh);
       window.removeEventListener('service-billing-updated', refresh);
+      window.removeEventListener('document-review-updated', refresh);
     };
   }, []);
 

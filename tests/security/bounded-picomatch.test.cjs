@@ -11,7 +11,7 @@ for (const major of [2, 4]) {
     const result = spawnSync(process.execPath, ['-e', `
       const assert = require('node:assert/strict');
       const pm = require(${JSON.stringify(location)});
-      for (const pattern of ['+(*)', '+(*a)', '*(a*)', '+(@(*a))', '+(*a|b)', '+([[a]*a)', '+([[]*a)', '+([*a)', '+([[:alpha:]]*a)', '+([[:alpha:]*a])', '+([[:foo:]*a])', 'prefix/+(*a).js']) {
+      for (const pattern of ['+(*)', '+(*a)', '*(a*)', '+(@(*a))', '+(*a|b)', '+([[a]*a)', '+([[]*a)', '+([*a)', '+([[:alpha:]]*a)', '+([[:foo:]*a])', 'prefix/+(*a).js']) {
         for (const options of [{}, {capture:true}, {windows:true}, {maxExtglobRecursion:false}, {nobracket:true}, {bash:true}, {unescape:true}, {literalBrackets:true}, {fastpaths:false}, {posix:false}]) {
           const matcher = pm(pattern, options);
           assert.equal(matcher('a'.repeat(10000) + '!'), false);
@@ -51,6 +51,9 @@ for (const major of [2, 4]) {
       ['+(ab)', 'abab', 'aba'],
       ['+([*])', '***', 'abc'],
       ['+([[:alpha:]*])', 'a*a', '123'],
+      // A recognized POSIX class with a literal '*' must remain a valid class,
+      // rather than being required to match its own glob spelling.
+      ['+([[:alpha:]*a])', 'a*a', '123'],
       ['+(\\*)', '***', 'abc'],
       ['+("*")', '***', 'abc'],
       ['!(*.test).js', 'app.js', 'app.test.js'],

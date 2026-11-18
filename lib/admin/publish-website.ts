@@ -6,6 +6,7 @@
 
 import 'server-only';
 
+import { getGoogleService, getGoogleServices } from '@/lib/google/runtime';
 import { logger } from '@/lib/logger';
 import { PUBLIC_REVALIDATE_PATHS } from '@/lib/public-revalidate-paths';
 import {
@@ -176,48 +177,30 @@ export type PublishWebsiteStatus = {
     url: string;
     status: string | null;
     lastDeployedAt: string | null;
+    revision: string | null;
+    builtAt: string | null;
   }>;
   revalidatePathCount: number;
 };
 
 export async function getPublishWebsiteStatus(): Promise<PublishWebsiteStatus> {
-  const targets = [
-    {
-      key: 'marketing',
-      id: 'elevate-marketing-migration',
-      label: 'Marketing',
-      url: 'https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app',
-    },
-    {
-      key: 'admin',
-      id: 'elevate-admin-migration',
-      label: 'Admin',
-      url: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app',
-    },
-    {
-      key: 'lms',
-      id: 'elevate-lms-migration',
-      label: 'LMS',
-      url: 'https://elevate-lms-migration-aabnh2y32a-uc.a.run.app',
-    },
-  ];
+  const targets = getGoogleServices().filter((service) => service.key !== 'store');
   const services = await Promise.all(
     targets.map(async (target) => {
-      let status = 'unreachable';
       try {
-        const response = await fetch(target.url + '/api/health', {
-          cache: 'no-store',
-          signal: AbortSignal.timeout(8000),
-        });
-        const payload = (await response.json().catch(() => null)) as { healthy?: boolean } | null;
-        status =
-          response.ok && payload?.healthy === true
-            ? 'Health probe passed; deployment revision unverified'
-            : 'unhealthy (HTTP ' + response.status + ')';
+        const health = await getGoogleService(target);
+        return {
+          ...target,
+          status: health.healthy
+            ? 'Healthy'
+            : `Unhealthy (HTTP ${health.httpStatus})`,
+          lastDeployedAt: null,
+          revision: health.revision,
+          builtAt: health.builtAt,
+        };
       } catch {
-        /* Do not treat a failed probe as healthy. */
+        return { ...target, status: 'Unreachable', lastDeployedAt: null, revision: null, builtAt: null };
       }
-      return { ...target, status, lastDeployedAt: null };
     }),
   );
   return {

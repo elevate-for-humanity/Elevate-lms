@@ -23,7 +23,8 @@ type ServiceStatus = {
   label: string;
   url: string;
   status: string | null;
-  lastDeployedAt: string | null;
+  revision: string | null;
+  builtAt: string | null;
 };
 
 type PublishStatus = {
@@ -176,7 +177,8 @@ export function PublishWebsitePanel() {
                   <p className="text-slate-500 mt-0.5">
                     Status: {svc.status ?? (status.googleReady ? 'unknown' : 'not configured')}
                   </p>
-                  <p className="text-slate-400">Last deploy: {formatWhen(svc.lastDeployedAt)}</p>
+                  <p className="text-slate-600 break-all">Live revision: {svc.revision ?? 'Unavailable'}</p>
+                  {svc.builtAt && <p className="text-slate-600">Built: {formatWhen(svc.builtAt)}</p>}
                 </div>
               ))}
             </div>

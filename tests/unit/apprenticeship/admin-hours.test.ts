@@ -97,11 +97,12 @@ describe('admin hours identities and totals', () => {
   });
   it('keeps drafts and disputes out of pending and approved totals', () => {
     const rows = hydrate([
-      entry({ status: 'draft' }),
+      entry({ id: 'draft', status: 'draft' }),
       entry({ id: 'disputed', status: 'disputed' }),
     ]);
     expect(summarizeAdminHours(rows)[0]).toMatchObject({ pending_hours: 0, approved_hours: 0 });
-    expect(rows.every((row) => row.approval_blocker)).toBe(true);
+    expect(rows.find((row) => row.id === 'draft')?.approval_blocker).toBeTruthy();
+    expect(rows.find((row) => row.id === 'disputed')?.approval_blocker).toBeNull();
   });
   it('blocks duplicate dates even across legacy IDs, canonical IDs, and verified history', () => {
     const rows = hydrate([

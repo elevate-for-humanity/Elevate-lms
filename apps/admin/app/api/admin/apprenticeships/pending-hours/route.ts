@@ -19,7 +19,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         entries: entries
-          .filter((e) => ['submitted', 'draft'].includes(e.status) && e.hours_worked > 0)
+          .filter(
+            (e) =>
+              e.status === 'disputed' ||
+              (['submitted', 'draft'].includes(e.status) && e.hours_worked > 0),
+          )
           .map((entry) => ({
             ...entry,
             review_ledger: sameDayHoursLedger(entry, ledger, programs),

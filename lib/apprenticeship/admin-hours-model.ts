@@ -88,7 +88,7 @@ export function hydrateAdminHours(
         .find((hours) => Number.isFinite(hours) && hours > 0) ?? null;
     const hours = Number(row.hours_worked);
     let blocker: string | null = null;
-    if (row.status !== 'submitted')
+    if (!['submitted', 'disputed'].includes(row.status))
       blocker = row.status === 'draft' ? 'Draft — submit before approval' : 'Not submitted';
     else if (!Number.isFinite(hours) || hours <= 0) blocker = 'No completed hours';
     else if (!row.work_date || row.work_date > new Date().toISOString().slice(0, 10))
@@ -115,14 +115,19 @@ export function hydrateAdminHours(
   });
   const sameDay = new Map<string, AdminHoursEntry[]>();
   for (const entry of entries) {
-    if (entry.hours_worked <= 0 || !['submitted', 'verified'].includes(entry.status)) continue;
+    if (entry.hours_worked <= 0 || !['submitted', 'verified', 'disputed'].includes(entry.status))
+      continue;
     const key = `${entry.student_id}:${entry.program_key}:${entry.work_date}`;
     sameDay.set(key, [...(sameDay.get(key) ?? []), entry]);
   }
   for (const group of sameDay.values()) {
     if (group.length < 2) continue;
     for (const entry of group) {
-      if (entry.status === 'submitted' && !entry.approval_blocker)
+      const conflict = group.some(
+        (other) =>
+          other.id !== entry.id && (entry.status === 'disputed' || other.status !== 'disputed'),
+      );
+      if (conflict && ['submitted', 'disputed'].includes(entry.status) && !entry.approval_blocker)
         entry.approval_blocker =
           'Multiple entries for this student, program and work date — review before approval';
     }

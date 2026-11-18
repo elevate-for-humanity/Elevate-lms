@@ -23,6 +23,7 @@ export default function ApprenticeshipHoursClient() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [detail, setDetail] = useState<AdminHoursEntry | null>(null);
+  const [resolution, setResolution] = useState('');
   const [review, setReview] = useState<AdminHoursEntry[] | null>(null);
 
   const readResponse = useCallback(async (res: Response) => {
@@ -60,7 +61,8 @@ export default function ApprenticeshipHoursClient() {
   useEffect(() => {
     void load();
   }, [load]);
-  const eligible = entries.filter((e) => !e.approval_blocker);
+  const eligible = entries.filter((e) => e.status === 'submitted' && !e.approval_blocker);
+  const resolvingDispute = review?.[0]?.status === 'disputed';
 
   const approve = async (selected: AdminHoursEntry[]) => {
     setBusy(true);
@@ -79,6 +81,7 @@ export default function ApprenticeshipHoursClient() {
           body: JSON.stringify({
             ids,
             expected: selected.slice(offset, offset + 200).map(hoursApprovalSnapshot),
+            ...(selected[0]?.status === 'disputed' ? { resolution } : {}),
           }),
         });
         const data = await readResponse(res);
@@ -240,10 +243,23 @@ export default function ApprenticeshipHoursClient() {
           <p className="mt-1 text-sm">
             Your approval will be recorded for the entries shown below.
           </p>
+          {resolvingDispute && (
+            <label className="mt-3 block text-sm font-semibold">
+              Resolution and supporting evidence
+              <textarea
+                value={resolution}
+                onChange={(event) => setResolution(event.target.value)}
+                maxLength={2000}
+                rows={3}
+                className="mt-1 block w-full rounded border p-2"
+              />
+            </label>
+          )}
           <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={() => void approve(review)}
+              disabled={resolvingDispute && resolution.trim().length < 10}
               className="rounded-lg bg-green-700 px-3 py-2 text-sm text-white"
             >
               Confirm approvals
@@ -312,12 +328,15 @@ export default function ApprenticeshipHoursClient() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setReview([e])}
+                      onClick={() => {
+                        setResolution('');
+                        setReview([e]);
+                      }}
                       aria-label={`Approve ${e.name} ${e.work_date} ${e.hours_worked} hours`}
                       disabled={busy || loading || !!loadError || !!review || !!e.approval_blocker}
                       className="rounded-lg bg-green-100 px-3 py-2 text-xs font-semibold text-green-800 disabled:opacity-40"
                     >
-                      Approve
+                      {e.status === 'disputed' ? 'Resolve and approve' : 'Approve'}
                     </button>
                   </td>
                 </tr>
@@ -328,8 +347,8 @@ export default function ApprenticeshipHoursClient() {
       )}
       {disputes.count > 0 && (
         <p className="border-t border-slate-100 px-5 py-3 text-sm text-amber-900">
-          {disputes.count} disputed entries ({roundHours(disputes.hours)} hours) remain unresolved
-          and are excluded from approval.
+          {disputes.count} disputed entries ({roundHours(disputes.hours)} hours) need individual
+          review. Eligible claims require a resolution note.
         </p>
       )}
       {incompleteCount > 0 && (

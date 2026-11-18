@@ -71,6 +71,21 @@ describe('guarded hours approval', () => {
     });
     expect((await canonicalBulk(bulk)).status).toBe(200);
   });
+  it('uses the dispute resolver only when a reviewed resolution is supplied', async () => {
+    expect(
+      (await POST(request({ ids: [id], resolution: 'Reviewed the signed timesheet.' }))).status,
+    ).toBe(200);
+    expect(mocks.rpc).toHaveBeenCalledWith('admin_resolve_apprenticeship_hours_dispute', {
+      p_id: id,
+      p_approver_id: actor,
+      p_expected: expected,
+      p_resolution: 'Reviewed the signed timesheet.',
+    });
+    mocks.rpc.mockClear();
+    expect((await POST(request({ ids: [id], resolution: 'short' }))).status).toBe(400);
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+
   it('rejects a legacy ID-only approval instead of approving unreviewed evidence', async () => {
     expect(
       (

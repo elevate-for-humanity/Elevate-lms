@@ -31,19 +31,67 @@ afterEach(() => {
 });
 describe('hours queue', () => {
   it('keeps disputed hours explicitly unresolved while bulk approval stays disabled', async () => {
-    fetchMock.mockResolvedValue(response({entries:[],incompleteCount:56,disputedCount:3,disputedHours:30}));
+    fetchMock.mockResolvedValue(
+      response({ entries: [], incompleteCount: 56, disputedCount: 3, disputedHours: 30 }),
+    );
     render(<HoursQueue />);
     expect(await screen.findByText(/3 disputed entries \(30 hours\)/)).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:/Approve all eligible/})).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Approve all eligible/ })).toBeDisabled();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('requires a resolution note and submits a dispute individually', async () => {
+    fetchMock
+      .mockResolvedValueOnce(response({ entries: [{ ...entry, status: 'disputed' }] }))
+      .mockResolvedValueOnce(response({ ok: true, approvedCount: 1 }))
+      .mockResolvedValueOnce(response({ entries: [] }));
+    render(<HoursQueue />);
+    fireEvent.click(await screen.findByRole('button', { name: /Approve Example Student/ }));
+    expect(screen.getByRole('button', { name: /Approve all eligible/ })).toBeDisabled();
+    const confirm = screen.getByRole('button', { name: 'Confirm approvals' });
+    expect(confirm).toBeDisabled();
+    fireEvent.change(screen.getByRole('textbox', { name: 'Resolution and supporting evidence' }), {
+      target: { value: 'Verified the original signed timesheet.' },
+    });
+    fireEvent.click(confirm);
+    expect(await screen.findByText('1 entry approved.')).toBeInTheDocument();
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toMatchObject({
+      ids: ['entry-1'],
+      resolution: 'Verified the original signed timesheet.',
+    });
+  });
+
   it('lets an administrator inspect blocked hours and their matching ledger without approving them', async () => {
-    fetchMock.mockResolvedValue(response({ entries: [{ ...entry, student_id: 'student', approval_blocker: 'Duplicate date', review_ledger: [{ id: 'ledger', source_type: 'timeclock', status: 'approved', hours_claimed: 8.25, accepted_hours: 8.25 }] }], incompleteCount: 0 }));
+    fetchMock.mockResolvedValue(
+      response({
+        entries: [
+          {
+            ...entry,
+            student_id: 'student',
+            approval_blocker: 'Duplicate date',
+            review_ledger: [
+              {
+                id: 'ledger',
+                source_type: 'timeclock',
+                status: 'approved',
+                hours_claimed: 8.25,
+                accepted_hours: 8.25,
+              },
+            ],
+          },
+        ],
+        incompleteCount: 0,
+      }),
+    );
     render(<HoursQueue />);
     fireEvent.click(await screen.findByRole('button', { name: /Review Example Student/ }));
-    expect(screen.getByRole('region', { name: 'Review hours for Example Student' })).toHaveTextContent('8.25 accepted');
-    expect(screen.getByRole('link', { name: 'Open student record' })).toHaveAttribute('href', '/students/student');
+    expect(
+      screen.getByRole('region', { name: 'Review hours for Example Student' }),
+    ).toHaveTextContent('8.25 accepted');
+    expect(screen.getByRole('link', { name: 'Open student record' })).toHaveAttribute(
+      'href',
+      '/students/student',
+    );
     expect(screen.getByRole('button', { name: /Approve Example Student/ })).toBeDisabled();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -91,14 +139,18 @@ describe('hours queue', () => {
       .mockResolvedValueOnce(response({ entries: [], incompleteCount: 3 }));
     render(<HoursQueue />);
     fireEvent.click((await screen.findAllByRole('button', { name: /Review Example Student/ }))[0]);
-    expect(screen.getByRole('region', { name: 'Review hours for Example Student' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Review hours for Example Student' }),
+    ).toBeInTheDocument();
     const approve = await screen.findByRole('button', { name: 'Approve all eligible (1)' });
     fireEvent.click(approve);
     expect(screen.getByRole('alertdialog')).toHaveTextContent('8.25 hours');
     fireEvent.click(screen.getByRole('button', { name: 'Confirm approvals' }));
     expect(await screen.findByText('1 entry approved.')).toBeInTheDocument();
     await waitFor(() => expect(refresh).toHaveBeenCalled());
-    expect(screen.queryByRole('region', { name: 'Review hours for Example Student' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Review hours for Example Student' }),
+    ).not.toBeInTheDocument();
     const body = JSON.parse(fetchMock.mock.calls[1][1].body);
     expect(body.ids).toEqual(['entry-1']);
     expect(body.expected).toEqual([

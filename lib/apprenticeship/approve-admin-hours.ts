@@ -11,6 +11,7 @@ export async function approveAdminHours(
   ids: string[],
   actorId: string,
   expected: HoursApprovalSnapshot[],
+  resolution?: string,
 ) {
   const db = await requireAdminClient();
   const { data: source, error: sourceError } = await db
@@ -20,11 +21,18 @@ export async function approveAdminHours(
   if (sourceError) return safeDbError(sourceError, 'Read canonical apprenticeship hours');
   if (source?.length !== ids.length)
     return safeError('Canonical hour entry not found. Refresh the queue.', 404);
-  const { data: count, error } = await db.rpc('admin_verify_apprenticeship_hours', {
-    p_ids: ids,
-    p_approver_id: actorId,
-    p_expected: expected,
-  });
+  const { data: count, error } = resolution
+    ? await db.rpc('admin_resolve_apprenticeship_hours_dispute', {
+        p_id: ids[0],
+        p_approver_id: actorId,
+        p_expected: expected,
+        p_resolution: resolution,
+      })
+    : await db.rpc('admin_verify_apprenticeship_hours', {
+        p_ids: ids,
+        p_approver_id: actorId,
+        p_expected: expected,
+      });
   if (error) {
     if (error.code === '42501') return safeError('Admin approval permission is required', 403);
     if (['P0001', '23514', '22023'].includes(error.code))

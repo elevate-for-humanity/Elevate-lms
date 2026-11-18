@@ -34,8 +34,22 @@ export async function POST(req: NextRequest) {
   const expected = (body as { expected?: unknown })?.expected;
   if (!validHoursSnapshots(ids, expected))
     return safeError('Reviewed entry values are required. Refresh the queue.', 400);
+  const resolution = (body as { resolution?: unknown }).resolution;
+  if (
+    resolution !== undefined &&
+    (typeof resolution !== 'string' ||
+      resolution.trim().length < 10 ||
+      resolution.trim().length > 2000 ||
+      ids.length !== 1)
+  )
+    return safeError(
+      'Review one dispute at a time and enter a resolution note (10–2,000 characters).',
+      400,
+    );
   try {
-    return await approveAdminHours(ids, auth.id, expected);
+    return typeof resolution === 'string'
+      ? await approveAdminHours(ids, auth.id, expected, resolution.trim())
+      : await approveAdminHours(ids, auth.id, expected);
   } catch (error) {
     return safeInternalError(error, 'Approve apprenticeship hours');
   }

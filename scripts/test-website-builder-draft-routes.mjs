@@ -328,7 +328,7 @@ test('generation requires destination context for inline service codes',async()=
 });
 
 test('generation retains a phone on the line after a postal address',async()=>{
- for(const address of ['Indianapolis, IN 46204','123 Main Street, Indianapolis, IN 46204-1234', 'Indianapolis IN 46204', 'Indianapolis, in 46204', 'Indianapolis, Indiana 46204']) {
+ for(const address of ['Indianapolis, IN 46204','123 Main Street, Indianapolis, IN 46204-1234', 'Indianapolis IN 46204', 'Indianapolis, in 46204', 'Indianapolis, Indiana 46204', 'APO, AE 09012', 'FPO AP 96601', 'DPO, AA 34001-1234']) {
   const contact={phone:'317-555-0123'};
   const f=fixture('generate',{generated:{...config,footer:{showContactDetails:true},contact},realNormalization:true});
   assert.equal((await f.post(request({brief:'Build the requested business website. '+address+'\n317-555-0123'}))).status,201);

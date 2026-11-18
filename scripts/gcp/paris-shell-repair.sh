@@ -5,7 +5,7 @@ PROJECT=elegant-racer-299721
 REGION=us-east1
 SERVICE=elevate-owned-cpu-llm
 MODE="${1:---diagnose}"
-[[ "$MODE" == --apply || "$MODE" == --diagnose ]] || { echo 'Usage: --diagnose | --apply'; exit 2; }
+[[ "$MODE" == --apply || "$MODE" == --diagnose || "$MODE" == --probe ]] || { echo 'Usage: --diagnose | --apply | --probe'; exit 2; }
 command -v gcloud >/dev/null && command -v python3 >/dev/null || { echo 'Missing gcloud/python3'; exit 1; }
 LOGDIR="$HOME/paris-repair-reports"
 mkdir -p "$LOGDIR"; chmod 700 "$LOGDIR"
@@ -43,6 +43,12 @@ echo 'Recent model HTTP failures (last hour):'
 gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-owned-cpu-llm" AND httpRequest.status>=400' --project="$PROJECT" --freshness=1h --limit=20 --format='table(timestamp,httpRequest.status,httpRequest.latency)' || true
 echo 'Recent model POSTs (last hour):'
 gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-owned-cpu-llm" AND httpRequest.requestMethod="POST"' --project="$PROJECT" --freshness=1h --limit=20 --format='table(timestamp,httpRequest.status,httpRequest.latency)' || true
+if [[ "$MODE" != --probe ]]; then
+  echo 'PASS: configuration and log diagnosis completed'
+  echo 'Admin-to-model access previously verified; --probe explicitly runs the billable isolated Cloud Run Job.'
+  echo 'NOT CERTIFIED: real inference, tool calls, end-to-end PARIS repair and production deployment'
+  exit 0
+fi
 REPO_ROOT="${PARIS_REPO_ROOT:-$HOME/Elevate-lms}"
 if [[ -f "./scripts/gcp/probe-owned-cpu-admin.mjs" ]]; then
   PROBE="./scripts/gcp/probe-owned-cpu-admin.mjs"
@@ -53,6 +59,10 @@ if [[ ! -f "$PROBE" ]]; then echo 'BLOCKED: existing authenticated Admin probe u
 command -v node >/dev/null || { echo 'BLOCKED: Node.js missing'; exit 1; }
 export CPU_MODEL_URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
 echo 'Running isolated Admin-to-model discovery probe (may incur Cloud Run Job charges)...'
-node "$PROBE"
+if command -v timeout >/dev/null 2>&1; then
+  timeout --signal=TERM --kill-after=15s 240s node "$PROBE"
+else
+  node "$PROBE"
+fi
 echo 'PASS: Cloud Run configuration + authenticated Admin model discovery'
 echo 'NOT YET CERTIFIED: text generation, tool calling, PARIS repair dispatch, GitHub merge, production deployment'

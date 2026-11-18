@@ -4,6 +4,8 @@ const state = vi.hoisted(() => ({
   auth: vi.fn(),
   rows: [] as any[],
   billingError: false,
+  documents: [] as any[],
+  holderDocuments: [] as any[],
   filters: [] as any[],
 }));
 const database = {
@@ -16,6 +18,10 @@ const database = {
       lt: () => q,
       order: () => q,
       limit: () => q,
+      range: (start: number, end: number) => {
+        filters.range = [start, end];
+        return q;
+      },
       eq: (key: string, value: unknown) => {
         filters[key] = value;
         return q;
@@ -36,6 +42,11 @@ const database = {
             error: state.billingError ? { message: 'unavailable' } : null,
           }).then(resolve);
         }
+        if (table === 'documents' || table === 'program_holder_documents') {
+          const source = table === 'documents' ? state.documents : state.holderDocuments;
+          const [start, end] = (filters.range as [number, number] | undefined) ?? [0, source.length - 1];
+          return Promise.resolve({ data: source.slice(start, end + 1), error: null }).then(resolve);
+        }
         return Promise.resolve({ count: 2, data: [] }).then(resolve);
       },
     };
@@ -48,7 +59,9 @@ vi.mock('@/lib/supabase/admin', () => ({ getAdminClient: async () => database })
 vi.mock('@/lib/supabase/server', () => ({ createClient: async () => database }));
 import { GET } from '@/apps/admin/app/api/admin/header-data/route';
 beforeEach(() => {
-  state.auth.mockResolvedValue({ user: { id: 'elizabeth-admin' } });
+  state.auth.mockResolvedValue({ user: { id: 'elizabeth-admin' }, effectiveRoles: ['admin'] });
+  state.documents = [];
+  state.holderDocuments = [];
   state.rows = [];
   state.filters = [];
   state.billingError = false;
@@ -99,5 +112,51 @@ it('marks billing data unavailable without claiming all notification sources suc
   expect(await response.json()).toMatchObject({
     status: 'degraded',
     unavailableSources: ['service-billing'],
+  });
+});
+
+it('links stored uploads to review and omits missing files and known QA uploads', async () => {
+  state.documents = [
+    { id: 'ready', file_name: 'identity.pdf', storage_path: 'learner/identity.pdf' },
+    { id: 'missing', file_name: 'unavailable.pdf' },
+    { id: 'qa', file_name: 'qa-proof.pdf', file_path: 'fixtures/qa-proof.pdf' },
+  ];
+  const response = await GET(
+    new NextRequest('https://admin.elevateforhumanity.org/api/admin/header-data'),
+  );
+  const body = await response.json();
+  expect(body.notifs.filter((item: any) => item.id.startsWith('document-upload:'))).toEqual([
+    {
+      id: 'document-upload:ready',
+      unread: true,
+      href: '/documents/review/ready',
+      title: 'New document awaiting review',
+      time: 'Pending action',
+    },
+  ]);
+});
+
+
+it('shows staff the program-holder review queue without exposing the admin-only MOU page', async () => {
+  state.auth.mockResolvedValue({ user: { id: 'staff-user' }, effectiveRoles: ['staff'] });
+  state.holderDocuments = [
+    {
+      id: 'holder-ready',
+      user_id: 'holder-user',
+      file_name: 'license.pdf',
+      file_url: 'program-holders/license.pdf',
+      created_at: '2026-11-17T12:00:00Z',
+    },
+  ];
+  const response = await GET(
+    new NextRequest('https://admin.elevateforhumanity.org/api/admin/header-data'),
+  );
+  const body = await response.json();
+  expect(body.notifs).toContainEqual({
+    id: 'holder-document-upload:holder-ready',
+    unread: true,
+    href: '/program-holder-documents',
+    title: 'New program holder document awaiting review',
+    time: '11/17/2026',
   });
 });

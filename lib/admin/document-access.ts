@@ -36,7 +36,7 @@ export async function getAdminDocumentUrl(params: {
   // DB is the sole source of truth for document metadata
   const { data: doc } = await db
     .from('documents')
-    .select('file_path, file_url, metadata, user_id, document_type')
+    .select('file_path, storage_path, file_url, metadata, user_id, document_type')
     .eq('id', documentId)
     .maybeSingle();
 

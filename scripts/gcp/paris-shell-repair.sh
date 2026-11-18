@@ -13,7 +13,17 @@ REPORT="$LOGDIR/$(date -u +%Y%m%dT%H%M%SZ)-$$.log"
 touch "$REPORT"; chmod 600 "$REPORT"
 exec > >(tee -a "$REPORT") 2>&1
 echo "PARIS recovery report: $REPORT"
-gcloud auth list --filter='status:ACTIVE' --format='value(account)' | grep -q . || { echo 'BLOCKED: no active gcloud account'; exit 1; }
+# The project printed in the Cloud Shell prompt does not prove an authenticated account.
+# Test actual CLI credentials, not merely account metadata. Never initiate
+# interactive login inside this automated repair or print access tokens.
+if ! gcloud auth print-access-token --quiet >/dev/null 2>&1; then
+  echo 'BLOCKED: no usable gcloud CLI credentials in this Cloud Shell session.'
+  echo 'ACTION: run gcloud auth login, complete the browser authorization, then rerun this repair.'
+  echo 'NOTE: gcloud auth application-default login is not needed for gcloud CLI commands.'
+  exit 3
+fi
+ACTIVE_ACCOUNT="$(gcloud auth list --filter='status:ACTIVE' --format='value(account)' 2>/dev/null | head -n 1)"
+echo "Authenticated gcloud CLI account: ${ACTIVE_ACCOUNT:-active credential detected}"
 TMP="$(mktemp)"; trap 'rm -f "$TMP"' EXIT
 readback() {
   gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > "$TMP"

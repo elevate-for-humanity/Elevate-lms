@@ -171,9 +171,12 @@ def inspect(probe_path, now=None):
 def snapshot(evidence):
     BACKUPS.mkdir(mode=0o700, parents=True, exist_ok=True)
     trusted_directory(BACKUPS)
-    require(not BACKUPS.stat().st_mode & 0o077, 'backup_permissions_unverified')
+    # Shared rollback parents may be 0755/0750. Keep their permissions intact;
+    # credential snapshots belong exclusively in our new root-only child.
     folder = BACKUPS / ('expired-quarantine-' + uuid.uuid4().hex)
     folder.mkdir(mode=0o700)
+    trusted_directory(folder)
+    require(not folder.stat().st_mode & 0o077, 'backup_permissions_unverified')
     payloads = {**evidence['files'], 'server.mjs': evidence['source'],
                 'manifest.json': json.dumps(evidence['manifest'], sort_keys=True).encode()}
     for name, data in payloads.items():

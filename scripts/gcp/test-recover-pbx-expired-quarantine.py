@@ -101,6 +101,32 @@ class RecoveryTests(unittest.TestCase):
             self.assertEqual((folder / name).stat().st_mode & 0o777, 0o600)
         self.assertEqual((folder / 'server.mjs').read_bytes(), evidence['source'])
 
+    def test_shared_backup_parent_preserved_with_private_child(self):
+        evidence = self.inspect()
+        for mode in [0o755, 0o750]:
+            with self.subTest(mode=mode):
+                m.BACKUPS.mkdir(exist_ok=True)
+                m.BACKUPS.chmod(mode)
+                existing = m.BACKUPS / 'existing-evidence'
+                existing.write_bytes(b'preserve')
+                folder = m.BACKUPS / m.snapshot(evidence)
+                self.assertEqual(m.BACKUPS.stat().st_mode & 0o777, mode)
+                self.assertEqual(existing.read_bytes(), b'preserve')
+                self.assertEqual(folder.stat().st_mode & 0o777, 0o700)
+                for path in folder.rglob('*'):
+                    self.assertEqual(path.stat().st_mode & 0o077, 0)
+
+    def test_writable_backup_parent_blocks_without_service_change(self):
+        evidence = self.inspect()
+        m.BACKUPS.mkdir(mode=0o700)
+        for mode in [0o775, 0o777]:
+            with self.subTest(mode=mode):
+                m.BACKUPS.chmod(mode)
+                with self.assertRaisesRegex(m.Blocked, 'directory_ownership_unverified'):
+                    m.recover(Path('/unused'), evidence['fingerprint'])
+                self.assertEqual(list(m.BACKUPS.iterdir()), [])
+        self.assertFalse(any(c.args[0][:2] == ['systemctl', 'stop'] for c in m.run.call_args_list))
+
     def test_mismatched_review_never_snapshots_or_stops(self):
         with self.assertRaisesRegex(m.Blocked, 'reviewed_state_changed'):
             m.recover(Path('/unused'), '0' * 64)

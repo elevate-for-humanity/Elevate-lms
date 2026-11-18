@@ -14,7 +14,16 @@ test('every explicit course-image COPY input has an automatic source-change trig
     const expression = pattern.split('**').map(part => part.split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('[^/]*')).join('.*');
     return new RegExp('^' + expression + '$').test(path);
   };
-  const inputs = [...dockerfile.matchAll(/^COPY (.+)$/gm)].flatMap(m => m[1].trim().split(/\s+/).slice(0, -1));
+  // COPY --from=<stage> reads the prior build stage, not a repository path.
+  // Exclude stage-to-stage transfers while checking every real context COPY.
+  const inputs = [...dockerfile.matchAll(/^COPY (.+)$/gm)].flatMap(([, rest]) => {
+    const tokens = rest.trim().split(/\s+/);
+    const flags = tokens.filter(token => token.startsWith('--'));
+    if (flags.some(flag => flag.startsWith('--from='))) return [];
+    return tokens.filter(token => !token.startsWith('--')).slice(0, -1);
+  });
+  assert.ok(!inputs.some(path => path.startsWith('--') || path.startsWith('/')),
+    'only build-context source paths belong in automatic trigger coverage');
   assert.ok(inputs.length > 10, 'inspect the actual worker source COPY instructions');
   const missing = inputs.filter(path => {
     // Directory inputs represent every file below that directory.

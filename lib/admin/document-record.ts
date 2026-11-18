@@ -11,6 +11,7 @@ const ADMIN_DOCUMENT_BUCKETS = new Set([
 type DocumentStorageFields = {
   file_path?: unknown;
   file_url?: unknown;
+  storage_path?: unknown;
   metadata?: unknown;
 };
 
@@ -26,7 +27,12 @@ export function resolveDocumentStorageLocator(
   if (configuredBucket && !ADMIN_DOCUMENT_BUCKETS.has(configuredBucket)) return null;
   const bucket = configuredBucket || 'documents';
 
-  const candidates = [document.file_path, metadata.storage_path, document.file_url];
+  const candidates = [
+    document.file_path,
+    document.storage_path,
+    metadata.storage_path,
+    document.file_url,
+  ];
   for (const candidate of candidates) {
     if (typeof candidate !== 'string') continue;
     let path = candidate.trim();
@@ -38,19 +44,26 @@ export function resolveDocumentStorageLocator(
   return null;
 }
 
+export const pendingDocumentStatuses = ['pending', 'pending_review', 'submitted', 'uploaded'];
+
 export function normalizeDocumentReviewStatus(
   status: unknown,
 ): 'pending' | 'approved' | 'rejected' | 'unknown' {
   const value = typeof status === 'string' ? status.trim().toLowerCase() : '';
-  if (['pending', 'pending_review', 'submitted', 'uploaded'].includes(value)) return 'pending';
+  if (pendingDocumentStatuses.includes(value)) return 'pending';
   if (['approved', 'accepted', 'verified'].includes(value)) return 'approved';
   if (['rejected', 'denied'].includes(value)) return 'rejected';
   return 'unknown';
 }
 
 /** Explicit synthetic identities stay available for QA without entering the learner queue. */
-export function isQaDocumentRecord(doc: {file_name?: string | null; profiles?: {full_name?: string | null; email?: string | null} | null}): boolean {
+export function isQaDocumentRecord(doc: {
+  file_name?: string | null;
+  profiles?: { full_name?: string | null; email?: string | null } | null;
+}): boolean {
   const fields = [doc.file_name, doc.profiles?.full_name, doc.profiles?.email].filter(Boolean);
-  return fields.some(value => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value)))
-    || /^(Final|Upload) Tester$/i.test(doc.profiles?.full_name?.trim() ?? '');
+  return (
+    fields.some((value) => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value))) ||
+    /^(Final|Upload) Tester$/i.test(doc.profiles?.full_name?.trim() ?? '')
+  );
 }

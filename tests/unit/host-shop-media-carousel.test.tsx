@@ -17,6 +17,15 @@ afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 const items = [{ url: '/first.webp', alt: 'First photo' }, { url: '/second.webp', alt: 'Second photo' }];
 
 describe('Host Shop mobile media loading', () => {
+  it('reports loading failures only for the current gallery after its items change', () => {
+    const { rerender } = render(<HostShopMediaCarousel shopName="Shop" items={[items[0]]} />);
+    fireEvent.error(screen.getByAltText('First photo'));
+    expect(screen.getByRole('status')).toHaveTextContent('could not load');
+    rerender(<HostShopMediaCarousel shopName="Shop" items={[items[1]]} />);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    fireEvent.error(screen.getByAltText('Second photo'));
+    expect(screen.getByRole('status')).toHaveTextContent('could not load');
+  });
   it('loads one offscreen compact photo and rotates when visible', () => {
     render(<HostShopMediaCarousel shopName="Test shop" compact items={items} />);
     expect(document.querySelectorAll('img')).toHaveLength(1);
@@ -26,6 +35,11 @@ describe('Host Shop mobile media loading', () => {
     expect(document.querySelectorAll('img')).toHaveLength(2);
     expect(screen.getByRole('button', { name: 'Pause slideshow' })).toBeTruthy();
     fireEvent.load(screen.getByAltText('First photo'));
+    // The public image audit must inspect only the displayed, decoded image.
+    // The preloaded second frame is intentionally aria-hidden while pending.
+    expect(screen.getByAltText('First photo')).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByAltText('Second photo')).toHaveAttribute('aria-hidden', 'true');
+    expect(document.querySelectorAll('img:not([aria-hidden="true"])')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Next image' }));
     expect(screen.getByAltText('Second photo')).toBeTruthy();
   });

@@ -28,9 +28,9 @@ export function workbookSlides(section: WorkbookSection, visualCaption?: string)
     ),
     {
       title: 'Feedback and next goal',
-      text: 'Record your trainer’s feedback. What improved, and what will you practice next?',
+      text: 'Write what you will practice next and why. Add your instructor’s feedback if you have received any; you do not need to wait for feedback to write your goal.',
       narration:
-        'Now reflect on your practice. Record your trainer’s feedback. What improved, and what will you practice next? Write a specific goal you can discuss with your trainer.',
+        'Now reflect on your practice. Write a specific goal you can discuss with your instructor. Add any feedback you have received. If you have not received feedback yet, write your own next practice goal.',
       field: 'nextGoal',
     },
     {

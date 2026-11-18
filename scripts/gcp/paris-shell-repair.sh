@@ -43,9 +43,12 @@ echo 'Recent model HTTP failures (last hour):'
 gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-owned-cpu-llm" AND httpRequest.status>=400' --project="$PROJECT" --freshness=1h --limit=20 --format='table(timestamp,httpRequest.status,httpRequest.latency)' || true
 echo 'Recent model POSTs (last hour):'
 gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-owned-cpu-llm" AND httpRequest.requestMethod="POST"' --project="$PROJECT" --freshness=1h --limit=20 --format='table(timestamp,httpRequest.status,httpRequest.latency)' || true
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd 2>/dev/null || true)"
-PROBE="$HERE/probe-owned-cpu-admin.mjs"
-if [[ ! -f "$PROBE" ]]; then PROBE="$HOME/Elevate-lms/scripts/gcp/probe-owned-cpu-admin.mjs"; fi
+REPO_ROOT="${PARIS_REPO_ROOT:-$HOME/Elevate-lms}"
+if [[ -f "./scripts/gcp/probe-owned-cpu-admin.mjs" ]]; then
+  PROBE="./scripts/gcp/probe-owned-cpu-admin.mjs"
+else
+  PROBE="$REPO_ROOT/scripts/gcp/probe-owned-cpu-admin.mjs"
+fi
 if [[ ! -f "$PROBE" ]]; then echo 'BLOCKED: existing authenticated Admin probe unavailable'; exit 1; fi
 command -v node >/dev/null || { echo 'BLOCKED: Node.js missing'; exit 1; }
 export CPU_MODEL_URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"

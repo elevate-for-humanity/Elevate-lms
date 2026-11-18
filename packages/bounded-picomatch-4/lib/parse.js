@@ -312,6 +312,18 @@ const hasUnboundedGlobStar = (body, options) => {
       // An unclosed class is reparsed as literal '[' plus glob tokens.
       // Fail conservatively without rescanning every unmatched opener.
       if (end >= body.length) return body.slice(i).includes('*');
+      // A POSIX-looking bracket token is only literal-safe when the parser
+      // recognizes it and its star is a final class member. Unknown classes,
+      // posix:false and a star followed by more class content can otherwise
+      // become nested regex repetition inside +(...) or *(...).
+      const bracket = body.slice(i, end + 1);
+      const posixToken = /\[:([^:\]]+):\]/.exec(bracket);
+      if (posixToken && bracket.includes('*')) {
+        const suffix = bracket.slice(bracket.indexOf(posixToken[0]) + posixToken[0].length);
+        const starAt = suffix.indexOf('*');
+        if (options.posix === false || !POSIX_REGEX_SOURCE[posixToken[1]] ||
+            (starAt !== -1 && suffix.slice(starAt + 1) !== ']')) return true;
+      }
       i = end;
       continue;
     }

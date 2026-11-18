@@ -127,7 +127,7 @@ export default async function StudentDashboard() {
   // requireRole above has already verified a learner membership. Keep staff
   // employment separate from the learner's coursework and requirements.
   const subjectProfile =
-    ['staff', 'instructor', 'program_holder', 'employer'].includes(String(storedSubjectProfile?.role))
+    storedSubjectProfile?.role === 'staff'
       ? { ...storedSubjectProfile, role: 'student' }
       : storedSubjectProfile;
   // Old bookmarks and installed Student app shortcuts must not create a second
@@ -137,7 +137,14 @@ export default async function StudentDashboard() {
   if (!assignedHome && isApprenticeWorkspaceRole(subjectProfile?.role))
     redirect(PortalRouter.get('apprentice'));
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
-  const { workbooks } = await loadMyDigitalWorkbooks();
+  let workbooks: Awaited<ReturnType<typeof loadMyDigitalWorkbooks>>['workbooks'] = [];
+  let workbookLoadError: string | undefined;
+  try {
+    workbooks = (await loadMyDigitalWorkbooks()).workbooks;
+  } catch {
+    logger.error('STUDENT_WORKBOOKS_UNAVAILABLE');
+    workbookLoadError = 'Workbook links could not be loaded. Open Workbooks to retry.';
+  }
   const hasHvacEnrollment = workspace.enrollments.some(
     (row) =>
       ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(row.program_slug || '') &&
@@ -678,7 +685,7 @@ export default async function StudentDashboard() {
           </section>
         )}
 
-        <AssignedLearningMaterials workbooks={workbooks.map(book => ({
+        <AssignedLearningMaterials error={workbookLoadError} workbooks={workbooks.map(book => ({
           id: book.id, title: book.title, href: `/workbooks/${book.slug}`,
         }))} />
         {hasHvacEnrollment ? <HvacStartHere studyCode={qwikStudyCode} /> : null}

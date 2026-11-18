@@ -51,7 +51,7 @@ export default async function LearnerWorkspaceLayout({
     subject.previewing || ['admin', 'super_admin'].includes(String(profile?.role));
   // The active workspace determines presentation; a staff job must not suppress
   // that same person's learner requirements or course tools.
-  const subjectRole = ['staff', 'instructor', 'program_holder', 'employer'].includes(subjectProfile.role) && authorized?.effectiveRoles.some(role => role === 'student' || role === 'learner')
+  const subjectRole = subjectProfile.role === 'staff' && authorized?.effectiveRoles.some(role => role === 'student' || role === 'learner')
     ? 'student'
     : subjectProfile.role;
   const assignedHome = !['admin', 'super_admin'].includes(String(subjectRole))

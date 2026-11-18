@@ -9,6 +9,10 @@ import time
 CODES = frozenset('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split())
 STAGES = {'ownership/runtime reconciliation failed': 'reconciliation', 'expired-credential revocation stage': 'revocation'}
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
+JOURNAL_WINDOW_HOURS = 24
+# Two expiry lines every five seconds plus reconciliation each minute: 36,000/day.
+# Leave margin, but higher log rates or journal rotation can still evict evidence.
+JOURNAL_LINE_LIMIT = 50000
 
 def command(args):
     result = subprocess.run(args, capture_output=True, text=True, timeout=20)
@@ -16,13 +20,18 @@ def command(args):
 
 def failure_stages(journal):
     events = []
+    initial_failures = []
     for line in journal.splitlines():
         match = re.fullmatch(r'PBX (ownership/runtime reconciliation failed|expired-credential revocation stage): ([a-z_]+)', line)
         if match and match[2] in CODES:
             event = {'stage': STAGES[match[1]], 'code': match[2]}
+            if event['code'] != 'provisioner_quarantined' and event not in initial_failures and len(initial_failures) < 20:
+                initial_failures.append(event)
             if not events or events[-1] != event:
                 events.append(event)
     return {'recentStages': events[-20:],
+            'initialFailureStages': initial_failures,
+            'initialFailureObserved': bool(initial_failures),
             'quarantineObserved': any(e['code'] == 'provisioner_quarantined' for e in events),
             'startupFailureObserved': 'PBX provisioner startup failed. No credentials were logged.' in journal.splitlines()}
 
@@ -56,8 +65,10 @@ def generation_summary(root=ROOT, now=None):
         return {'state': 'unavailable'}
 
 def main():
-    status, journal = command(['journalctl', '-u', 'elevate-pbx-provisioner.service', '--since', '2 hours ago', '-n', '500', '--no-pager', '-o', 'cat'])
+    # Keep a bounded history and emit only fixed allowlisted stage/code pairs.
+    status, journal = command(['journalctl', '-u', 'elevate-pbx-provisioner.service', '--since', f'{JOURNAL_WINDOW_HOURS} hours ago', '-n', str(JOURNAL_LINE_LIMIT), '--no-pager', '-o', 'cat'])
     report = {'journalRead': status == 0, **failure_stages(journal if status == 0 else ''),
+              'journalWindowHours': JOURNAL_WINDOW_HOURS, 'journalLineLimit': JOURNAL_LINE_LIMIT,
               'generation': generation_summary(), 'readOnly': True, 'callsPlaced': 0, 'configurationChanged': False}
     status, output = command(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', 'pjsip show endpoint twilio'])
     report['carrierIdentity'] = carrier_identity(output if status == 0 else '')
@@ -70,3 +81,4 @@ if __name__ == '__main__':
     except Exception:
         print(json.dumps({'provisionerFailureDiagnostics': {'error': 'diagnostic_unavailable', 'readOnly': True, 'callsPlaced': 0}}))
         raise SystemExit(1)
+

@@ -25,7 +25,7 @@ export function prepareOwnedModelConfiguration(config,component,base,token) {
  return validateConfig({...config,runtimeEnvironment:{...config.runtimeEnvironment,
   ELEVATE_LLM_URL:base,ELEVATE_LLM_CPU_URL:base,ELEVATE_LLM_SECRET:token,ELEVATE_LLM_CPU_SECRET:token,
   ELEVATE_LLM_GOOGLE_IAM:'true',PARIS_INFERENCE_TIER:'cpu',PARIS_GPU_ENABLED:'false',
-  AI_PROVIDER:'elevate',AI_PROVIDER_ORDER:'elevate',ELEVATE_LLM_TIMEOUT_MS:'300000',ELEVATE_LLM_CONTEXT_TOKENS:'8192',
+  AI_PROVIDER:'elevate',AI_PROVIDER_ORDER:'elevate',ELEVATE_LLM_TIMEOUT_MS:'270000',ELEVATE_LLM_CONTEXT_TOKENS:'8192',
   OWNED_MODEL_RUNTIME_CONFIG_PROVIDER:'google-secret-manager',
  }},component);
 }

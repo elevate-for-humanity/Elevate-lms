@@ -72,6 +72,8 @@ RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 # Production containers must be reproducible. Never mutate dependency resolution
 # during an image build.
 COPY packages/bounded-braces ./packages/bounded-braces
+COPY packages/bounded-picomatch-2 ./packages/bounded-picomatch-2
+COPY packages/bounded-picomatch-4 ./packages/bounded-picomatch-4
 COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
 RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 

@@ -6,6 +6,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY packages/laminar-runtime/package.json ./packages/laminar-runtime/package.json
 # The workspace's locked braces override must resolve during filtered installs.
 COPY packages/bounded-braces ./packages/bounded-braces
+COPY packages/bounded-picomatch-2 ./packages/bounded-picomatch-2
+COPY packages/bounded-picomatch-4 ./packages/bounded-picomatch-4
 # Derive a dedicated frozen graph from the selected workspace importer. The
 # package has no workspace dependencies; do not install the root application.
 RUN pnpm --filter @elevate/laminar-runtime deploy --prod --frozen-lockfile --ignore-scripts \

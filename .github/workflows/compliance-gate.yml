@@ -35,7 +35,7 @@ jobs:
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
       - name: Bounded brace parser security regression
-        run: node --test tests/security/bounded-braces.test.cjs
+        run: node --test tests/security/bounded-braces.test.cjs tests/security/bounded-picomatch.test.cjs
       - name: Dependency security audit
         run: pnpm audit --audit-level high
 

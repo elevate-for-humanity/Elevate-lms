@@ -38,6 +38,8 @@ COPY packages/ui/package.json ./packages/ui/package.json
 # the workspace explicitly blocks its network-dependent postinstall download.
 RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
 COPY packages/bounded-braces ./packages/bounded-braces
+COPY packages/bounded-picomatch-2 ./packages/bounded-picomatch-2
+COPY packages/bounded-picomatch-4 ./packages/bounded-picomatch-4
 COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
 RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 

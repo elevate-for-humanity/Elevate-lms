@@ -47,6 +47,8 @@ on:
       - 'lib/storage/**'
       - 'remotion-src/**'
       - 'packages/ultimate-course-worker/**'
+      - 'packages/bounded-picomatch-2/**'
+      - 'packages/bounded-picomatch-4/**'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - 'Dockerfile.ultimate-worker'

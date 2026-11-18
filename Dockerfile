@@ -21,6 +21,8 @@ COPY packages/shared/package.json ./packages/shared/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
 
 COPY packages/bounded-braces ./packages/bounded-braces
+COPY packages/bounded-picomatch-2 ./packages/bounded-picomatch-2
+COPY packages/bounded-picomatch-4 ./packages/bounded-picomatch-4
 RUN pnpm install --frozen-lockfile
 
 # Application source

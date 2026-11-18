@@ -232,7 +232,9 @@ async function executeConfiguredChat(options: ChatCompletionOptions, provider: A
         label: `aiChat:${provider.name}`,
         shouldRetry: (err) => {
           const msg = err instanceof Error ? err.message : String(err);
-          return !/\b(400|401|403|404|429)\b/.test(msg) && !msg.includes('content_policy') && !msg.includes('insufficient_quota');
+          return !/\b(400|401|403|404|408|429|504)\b/.test(msg) &&
+            !/aborterror|timeouterror|aborted|timed out|timeout/i.test(msg) &&
+            !msg.includes('content_policy') && !msg.includes('insufficient_quota');
         },
       });
       return { ...result, provider: provider.name };

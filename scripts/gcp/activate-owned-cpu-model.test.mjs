@@ -8,6 +8,7 @@ test('updates both endpoint aliases and paired credentials without mutating the 
  assert.equal(next.runtimeEnvironment.ELEVATE_LLM_URL,base);assert.equal(next.runtimeEnvironment.ELEVATE_LLM_CPU_URL,base);
  assert.equal(next.runtimeEnvironment.ELEVATE_LLM_GOOGLE_IAM,'true');assert.equal(next.runtimeEnvironment.AI_PROVIDER,'elevate');
  assert.equal(next.runtimeEnvironment.ELEVATE_LLM_CONTEXT_TOKENS,'8192');
+ assert.equal(next.runtimeEnvironment.ELEVATE_LLM_TIMEOUT_MS,'270000');
  assert.equal(next.runtimeEnvironment.PARIS_GPU_ENABLED,'false');assert.equal(next.runtimeEnvironment.UNRELATED,'keep');
  assert.equal(config.runtimeEnvironment.ELEVATE_LLM_URL,'https://retired.code.run');
  assert.throws(()=>prepareAdminCpuConfiguration(config,'https://retired.code.run','a'.repeat(32)),/ENDPOINT_UNVERIFIED/);

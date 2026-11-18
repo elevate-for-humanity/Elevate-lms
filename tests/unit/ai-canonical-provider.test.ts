@@ -88,6 +88,57 @@ describe('canonical AI provider authority', () => {
     ).toBe(true);
   });
 
+  it('does not repeat a timed-out private model request or invoke an external fallback', async () => {
+    vi.stubEnv('AI_PROVIDER', 'elevate');
+    vi.stubEnv('AI_PROVIDER_ORDER', 'elevate,cloudflare');
+    vi.stubEnv('ELEVATE_LLM_URL', 'https://configured-provider.test');
+    vi.stubEnv('ELEVATE_LLM_SECRET', 'test-secret');
+    const request = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ error: { message: 'request exceeded deadline' } }), {
+        status: 504,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    vi.stubGlobal('fetch', request);
+    const { aiChat } = await import('@/lib/ai/ai-service');
+    await expect(aiChat({ messages: [{ role: 'user', content: 'test' }] }))
+      .rejects.toThrow('Elevate LLM worker 504');
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(String(request.mock.calls[0]?.[0])).toContain('configured-provider.test');
+  });
+
+  it('clamps numeric owned CPU inference timeouts for chat and streaming', async () => {
+    vi.stubEnv('AI_PROVIDER', 'elevate');
+    vi.stubEnv('AI_PROVIDER_ORDER', 'elevate');
+    vi.stubEnv('ELEVATE_LLM_TIMEOUT_MS', '300000');
+    vi.stubEnv('ELEVATE_LLM_URL', 'https://owned-provider.test');
+    vi.stubEnv('ELEVATE_LLM_SECRET', 'owned-secret');
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout');
+    const request = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        model: 'elevate-local', choices: [{ message: { content: 'owned response' } }],
+      }), { status: 200, headers: { 'content-type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(
+        'data: {"choices":[{"delta":{"content":"owned stream"}}]}\n\ndata: [DONE]\n\n',
+        { status: 200, headers: { 'content-type': 'text/event-stream' } },
+      ));
+    vi.stubGlobal('fetch', request);
+    try {
+      const { aiChat, aiChatStream } = await import('@/lib/ai/ai-service');
+      await expect(aiChat({ messages: [{ role: 'user', content: 'test' }] }))
+        .resolves.toMatchObject({ provider: 'elevate' });
+      const chunks: string[] = [];
+      for await (const chunk of aiChatStream({ messages: [{ role: 'user', content: 'test' }] })) {
+        chunks.push(chunk);
+      }
+      expect(chunks).toEqual(['owned stream']);
+      expect(timeoutSpy.mock.calls.filter(([ms]) => ms === 270_000)).toHaveLength(2);
+      expect(request).toHaveBeenCalledTimes(2);
+    } finally {
+      timeoutSpy.mockRestore();
+    }
+  });
+
   it('rejects a caller attempting to override the configured provider', async () => {
     vi.stubEnv('AI_PROVIDER', 'elevate');
     vi.stubEnv('ELEVATE_LLM_URL', 'https://configured-provider.test');

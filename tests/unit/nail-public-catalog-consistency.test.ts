@@ -7,6 +7,8 @@ import { orientationConfigs } from '@/lms-data/orientationConfig';
 import { buildProgramAtAGlance } from '@/lib/programs/program-at-a-glance';
 import { getTotalHoursRange } from '@/lib/programs/program-schema';
 import { formatProgramDurationWeeks } from '@/lib/programs/marketing-duration';
+import { BEAUTY_PROGRAMS, formatBeautyPrice } from '@/lib/programs/beauty-programs';
+import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 
 describe('Nail Technician public catalog consistency', () => {
   it('does not advertise a fixed completion term for the competency-based standard', () => {
@@ -45,5 +47,19 @@ describe('Nail Technician public catalog consistency', () => {
       expect(config.tuition.fundingNote).not.toMatch(/no tuition|WIOA|WRG/i);
     }
   });
-
+  it('uses the published tuition and canonical $600 initial invoice in every beauty eligibility route', () => {
+    const mappings = [
+      ['cosmetology-apprenticeship', COSMETOLOGY],
+      ['esthetician', ESTHETICIAN_APPRENTICESHIP],
+      ['nail-technician-apprenticeship', NAIL_TECH],
+    ] as const;
+    for (const [route, program] of mappings) {
+      const cfg = BEAUTY_PROGRAMS[route];
+      const canonicalTuitionCents = Math.round(Number(program.selfPayCost.replace(/[^0-9.]/g, '')) * 100);
+      expect(cfg.fullTuitionCents).toBe(canonicalTuitionCents);
+      expect(cfg.depositCents).toBe(getInitialProgramInvoiceCents(program.slug, canonicalTuitionCents));
+      expect(formatBeautyPrice(cfg.fullTuitionCents)).toBe('$6,000.00');
+      expect(formatBeautyPrice(cfg.depositCents)).toBe('$600.00');
+    }
+  });
 });

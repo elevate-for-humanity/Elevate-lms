@@ -1,0 +1,68 @@
+{
+  "project_ref": "isdgjcdabhxxozarmxta",
+  "source_project_ref": "cuxzzpsyufcewtmicszk",
+  "verified_at": "2026-11-19T13:15:02Z",
+  "migration": {
+    "version": "20261119131407",
+    "name": "qa_builder_schema_contract_stage"
+  },
+  "stage": "empty_builder_database_contract",
+  "tables": [
+    "user_app_credit_ledger",
+    "user_app_credit_wallets",
+    "user_app_subscriptions",
+    "user_websites",
+    "website_builder_edit_commits",
+    "website_paris_workspaces",
+    "website_revisions"
+  ],
+  "column_count": 65,
+  "constraint_count": 23,
+  "policy_count": 28,
+  "trigger_count": 2,
+  "function_count": 6,
+  "catalog_comparison": {
+    "columns": true,
+    "constraints": true,
+    "indexes": true,
+    "rls": true,
+    "table_acls": true,
+    "policies": true,
+    "triggers": true,
+    "function_definitions": true,
+    "function_execute_acls": true
+  },
+  "all_seven_table_row_counts": 0,
+  "permissions": {
+    "anon_receipt_select": false,
+    "authenticated_receipt_select": false,
+    "anon_draft_commit_execute": false,
+    "authenticated_draft_commit_execute": false,
+    "service_role_draft_commit_execute": true
+  },
+  "production_rows_read_or_copied": 0,
+  "production_modified": false,
+  "dedicated_customer_backend_accessed": false,
+  "applied_attempts": {
+    "successful": 1,
+    "rolled_back": 2,
+    "first_error": "missing function statement terminator",
+    "second_error": "SQL wrapper before private function dependency",
+    "zero_builder_tables_verified_after_each_failure": true
+  },
+  "advisors": {
+    "rls_enabled_no_policy_before": 15,
+    "rls_enabled_no_policy_after": 16,
+    "expected_new_info": "website_builder_edit_commits has RLS and no browser policies by design",
+    "leaked_password_warning_before": 1,
+    "leaked_password_warning_after": 1
+  },
+  "full_application_e2e_ready": false,
+  "limitations": [
+    "No subscriber identity, subscription, credit balance or site was created by this stage.",
+    "Canonical trial provisioning, credit-grant functions and test fixture lifecycle still require completion.",
+    "No authenticated builder browser create/edit/save/reopen/preview or cross-tenant acceptance ran.",
+    "No AI generation, contact submission, private course, audio or microphone acceptance ran.",
+    "This stage is not production migration, independent review approval, merge or release certification."
+  ]
+}

@@ -466,11 +466,26 @@ create policy "user_websites_delete_own" on public."user_websites" as PERMISSIVE
 
 create policy "user_websites_insert_own" on public."user_websites" as PERMISSIVE for INSERT to "authenticated" with check ((( SELECT auth.uid() AS uid) = user_id));
 
-create policy "user_websites_organization_members" on public."user_websites" as PERMISSIVE for ALL to "authenticated" using ((EXISTS ( SELECT 1
-   FROM organization_users ou
-  WHERE ((ou.organization_id = user_websites.organization_id) AND (ou.user_id = ( SELECT auth.uid() AS uid)) AND (ou.status = 'active'::text))))) with check ((EXISTS ( SELECT 1
-   FROM organization_users ou
-  WHERE ((ou.organization_id = user_websites.organization_id) AND (ou.user_id = ( SELECT auth.uid() AS uid)) AND (ou.status = 'active'::text) AND (ou.role = ANY (ARRAY['org_owner'::text, 'org_admin'::text]))))));
+create policy "user_websites_organization_members_select" on public."user_websites" for SELECT to authenticated
+  using (exists (
+    select 1 from public.organization_users ou
+    where ou.organization_id = user_websites.organization_id
+      and ou.user_id = (select auth.uid()) and ou.status = 'active'
+  ));
+
+create policy "user_websites_organization_managers" on public."user_websites" for ALL to authenticated
+  using (exists (
+    select 1 from public.organization_users ou
+    where ou.organization_id = user_websites.organization_id
+      and ou.user_id = (select auth.uid()) and ou.status = 'active'
+      and ou.role in ('org_owner', 'org_admin')
+  ))
+  with check (exists (
+    select 1 from public.organization_users ou
+    where ou.organization_id = user_websites.organization_id
+      and ou.user_id = (select auth.uid()) and ou.status = 'active'
+      and ou.role in ('org_owner', 'org_admin')
+  ));
 
 create policy "user_websites_public_published" on public."user_websites" as PERMISSIVE for SELECT to "anon" using (((is_published = true) AND (status = 'active'::text)));
 
@@ -484,7 +499,20 @@ CREATE TRIGGER provision_business_paris AFTER INSERT ON public.user_websites FOR
 
 create policy "website_revisions_owner_delete" on public."website_revisions" as PERMISSIVE for DELETE to public using ((( SELECT auth.uid() AS uid) = user_id));
 
-create policy "website_revisions_owner_insert" on public."website_revisions" as PERMISSIVE for INSERT to public with check ((( SELECT auth.uid() AS uid) = user_id));
+create policy "website_revisions_owner_insert" on public."website_revisions" for INSERT to authenticated
+  with check (
+    user_id = (select auth.uid()) and exists (
+      select 1 from public.user_websites w
+      where w.id = website_revisions.website_id and (
+        w.user_id = (select auth.uid()) or exists (
+          select 1 from public.organization_users ou
+          where ou.organization_id = w.organization_id
+            and ou.user_id = (select auth.uid()) and ou.status = 'active'
+            and ou.role in ('org_owner', 'org_admin')
+        )
+      )
+    )
+  );
 
 create policy "website_revisions_owner_select" on public."website_revisions" as PERMISSIVE for SELECT to public using ((( SELECT auth.uid() AS uid) = user_id));
 

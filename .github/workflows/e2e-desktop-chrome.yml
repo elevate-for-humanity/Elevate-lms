@@ -6,6 +6,11 @@ name: E2E desktop-chrome
 # docs/audits/e2e-desktop-chrome-triage.md
 on:
   workflow_dispatch:
+    inputs:
+      exhaustive:
+        description: Run the focused intake and platform tests, then run the full suite without stopping after twelve failures
+        type: boolean
+        default: false
   pull_request:
     branches: [main]
 
@@ -94,8 +99,21 @@ jobs:
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
+      - name: Run focused intake and platform browser tests
+        id: focused
+        if: ${{ inputs.exhaustive }}
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report-focused
+        run: >-
+          pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts
+          tests/e2e/complete-platform.spec.ts --project=desktop-chrome
+          --max-failures=0 --output=test-results-focused
       - name: Run desktop-chrome E2E (marketing, admin, lms)
+        if: ${{ !inputs.exhaustive }}
         run: pnpm test:e2e
+      - name: Run every desktop-chrome E2E test
+        if: ${{ !cancelled() && inputs.exhaustive && (steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
+        run: pnpm test:e2e --max-failures=0
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7
@@ -104,6 +122,8 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            playwright-report-focused/
+            test-results-focused/
           retention-days: 14
 
   # An isolated, public-only regression must finish even if the broad

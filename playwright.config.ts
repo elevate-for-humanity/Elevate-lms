@@ -112,6 +112,7 @@ const projects: Project[] = apps.flatMap((app) =>
 
 // Specs that also call a peer app's local origin (cross-app redirects/APIs).
 const PEER_APPS: Record<string, E2EApp[]> = {
+  'complete-platform.spec.ts': ['lms'],
   'program-e2e-flows.spec.ts': ['lms'],
   'portal-responsive-design.spec.ts': ['admin', 'marketing'],
   'registered-apprenticeship-authenticated.spec.ts': ['admin'],

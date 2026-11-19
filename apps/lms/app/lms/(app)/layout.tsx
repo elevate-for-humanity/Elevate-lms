@@ -6,6 +6,7 @@ import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { redirect } from 'next/navigation';
 import { loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
 import { BeautyPaymentLock } from '@/components/apprenticeship/BeautyPaymentLock';
+import { hasApprovedPaidLearnerEnrollment } from '@/lib/learner/approved-paid-admission.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,33 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
       : null;
     const isAdmin =
       subject.previewing || ['admin', 'super_admin'].includes(String(actor?.role || ''));
+    // Fail closed for learners before rendering navigation or course data.
+    // Keep the application, payment, and required admissions steps reachable.
+    // An admin preview retains read-only access without granting learner rights.
+    const isAdmissionRoute =
+      ['/lms/payments', '/lms/enroll'].some(
+        route => pathname === route || pathname.startsWith(`${route}/`),
+      ) ||
+      [
+        '/lms/apply',
+        '/lms/apply/status',
+        '/lms/documents',
+        '/lms/documents/upload',
+        '/lms/agreements',
+        '/lms/onboarding',
+        '/lms/profile',
+        '/lms/handbook',
+        '/lms/orientation',
+        '/lms/legal/enrollment-agreement',
+        '/lms/legal/student-handbook',
+        '/lms/legal/privacy',
+        '/lms/legal/student-mou',
+        '/lms/legal/apprenticeship-agreement',
+      ].includes(pathname);
+    if (user && !isAdmin && !isAdmissionRoute) {
+      const admitted = await hasApprovedPaidLearnerEnrollment(db, user.id);
+      if (!admitted) redirect('/lms/access-pending');
+    }
     const isDashboard = pathname === '/lms' || pathname === '/lms/dashboard';
     const hasReadOnlyModule =
       subject.previewing &&
@@ -36,7 +64,7 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
     // Server-side restriction: a pending, unpaid beauty apprenticeship application
     // may authenticate for checkout, but cannot render student modules.
     // Existing activated enrollments and verified workforce-funded paths are retained.
-    if (user && !isAdmin && !pathname.startsWith('/lms/payments') && !pathname.startsWith('/lms/enroll')) {
+    if (user && !isAdmin && !isAdmissionRoute) {
       const paymentGate = await loadBeautyPaymentGate(db, user.id, user.email);
       if (paymentGate?.locked) return <BeautyPaymentLock programSlug={paymentGate.programSlug} />;
     }

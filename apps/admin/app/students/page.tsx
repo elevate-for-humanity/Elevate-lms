@@ -154,6 +154,10 @@ export default async function StudentsPage({
       ]}
       actions={
         <div className="flex flex-wrap gap-2">
+          <Link href="/faa"
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/20 transition-colors">
+            Generate WorkOne FAA
+          </Link>
           <Link
             href={includeTest ? '/students' : '/students?include_test=1'}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/20 transition-colors"

@@ -14,7 +14,9 @@ export const NAIL_TECH: ProgramSchema = {
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
-  durationWeeks: 50,
+  // No fixed term is approved for the competency-based Manicurist standard.
+  // Zero means unspecified; public duration copy must use the verified competencies/RTI.
+  durationWeeks: 0,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
@@ -48,7 +50,7 @@ export const NAIL_TECH: ProgramSchema = {
   outcomes: [
     {
       statement: 'Perform manicures, pedicures, and nail enhancements on live clients',
-      assessedAt: 'Month 3',
+      assessedAt: 'When service competency is demonstrated',
     },
     { statement: 'Complete 19 verified Appendix A competencies and 210 RTI hours with required sponsor documentation', assessedAt: 'Program completion' },
     {
@@ -56,57 +58,57 @@ export const NAIL_TECH: ProgramSchema = {
       assessedAt: 'After registered-program completion',
     },
     { statement: 'Maintain sanitation and infection control standards', assessedAt: 'Ongoing' },
-    { statement: 'Apply gel, acrylic, and nail art techniques', assessedAt: 'Month 4' },
+    { statement: 'Apply gel, acrylic, and nail art techniques', assessedAt: 'When enhancement competency is demonstrated' },
   ],
   careerPathway: [
     {
       title: 'Nail Tech Apprentice',
-      timeframe: '0–5 months',
+      timeframe: 'During supervised apprenticeship',
       requirements: 'Enrolled in apprenticeship',
       salaryRange: '$18,000–$24,000',
     },
     {
       title: 'Licensed Nail Technician',
-      timeframe: '5–12 months',
+      timeframe: 'After program completion and Indiana licensure',
       requirements: 'Indiana license',
       salaryRange: '$25,000–$40,000',
     },
     {
       title: 'Senior Nail Technician',
-      timeframe: '1–3 years',
+      timeframe: 'As professional experience and clientele develop',
       requirements: 'License + clientele',
       salaryRange: '$35,000–$55,000',
     },
     {
       title: 'Salon Owner',
-      timeframe: '3+ years',
+      timeframe: 'When prepared to operate a salon',
       requirements: 'Business experience',
       salaryRange: '$45,000–$80,000+',
     },
   ],
   weeklySchedule: [
     {
-      week: 'Month 1',
+      week: 'Competency stage 1',
       title: 'Sanitation & Nail Anatomy',
       competencyMilestone: 'Demonstrate sanitation protocols and identify nail structures',
     },
     {
-      week: 'Month 2',
+      week: 'Competency stage 2',
       title: 'Manicure & Pedicure',
       competencyMilestone: 'Perform basic manicure and pedicure services',
     },
     {
-      week: 'Month 3',
+      week: 'Competency stage 3',
       title: 'Gel & Acrylic Application',
       competencyMilestone: 'Apply gel and acrylic nail enhancements',
     },
     {
-      week: 'Month 4',
+      week: 'Competency stage 4',
       title: 'Nail Art & Advanced Techniques',
       competencyMilestone: 'Execute nail art designs and advanced shaping',
     },
     {
-      week: 'Month 5',
+      week: 'Competency stage 5',
       title: 'Exam Prep & Licensing',
       competencyMilestone: 'Pass Indiana nail tech theory and practical exams',
     },
@@ -157,7 +159,7 @@ export const NAIL_TECH: ProgramSchema = {
     {
       phase: 1,
       title: 'Foundations',
-      weeks: 'Month 1',
+      weeks: 'Foundational competency development',
       focus: 'Sanitation, nail anatomy, and basic tool handling.',
       labCompetencies: [
         'Demonstrate sanitation protocols',
@@ -168,7 +170,7 @@ export const NAIL_TECH: ProgramSchema = {
     {
       phase: 2,
       title: 'Core Services',
-      weeks: 'Months 2–3',
+      weeks: 'Core service competency development',
       focus: 'Manicure, pedicure, gel, and acrylic services.',
       labCompetencies: [
         'Perform manicure and pedicure',
@@ -179,7 +181,7 @@ export const NAIL_TECH: ProgramSchema = {
     {
       phase: 3,
       title: 'Advanced & Licensing',
-      weeks: 'Months 4–5',
+      weeks: 'Advanced competencies and licensing preparation',
       focus: 'Nail art, advanced techniques, and exam prep.',
       labCompetencies: [
         'Execute nail art designs',

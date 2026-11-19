@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, readlink, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { createProvisioner, endpointFor, parseContacts, renderConfiguration, validateIdentity } from './server.mjs';
+import { reportFailure, createProvisioner, endpointFor, parseContacts, renderConfiguration, validateIdentity } from './server.mjs';
 
 const identity = { profileId: '11111111-1111-4111-8111-111111111111', extensionId: '22222222-2222-4222-8222-222222222222', deviceId: 'asterisk_fixture_device' };
 const endpoint = endpointFor(identity);
@@ -58,6 +58,7 @@ async function fixture(t, options = {}) {
     }
     await symlink(generation, path.join(root, 'current'));
   }
+  const failures = []; let injected = [];
   let authorized = true; let contact = false; let reachable = false;
   let rejectedReadbacks = 0; let staleRemovals = 0; let waits = 0;
   let reloads = 0; let operatorMissing = options.operatorMissing || false;
@@ -67,6 +68,7 @@ async function fixture(t, options = {}) {
     asteriskGid: process.getgid(), sipDomain: 'phone.elevateforhumanity.org', wsUrl: 'wss://phone.elevateforhumanity.org/ws', generatedRoot: root };
   const service = createProvisioner(config, {
     now: () => clock,
+    writeFailure: line => failures.push(line),
     wait: async () => { waits++; },
     fetch: async url => ({ ok: true, json: async () => {
       if (String(url).includes('phone_webrtc_devices')) return [{ id: 'fixture' }];
@@ -75,6 +77,11 @@ async function fixture(t, options = {}) {
         communication_workspaces: { phone_system_id: config.phoneSystemId, phone_systems: { admin_extension: '101', timezone: record.timezone, status: 'active' } } }] : [];
     } }),
     command: async cmd => {
+      if (cmd === 'module reload res_pjsip.so' && injected.length) {
+        const result = injected.shift();
+        if (result instanceof Error) throw result;
+        return result;
+      }
       if (cmd === 'pjsip reload') throw Error('Optional CLI aliases are not installed');
       if (cmd === 'module reload res_pjsip.so' || cmd === 'dialplan reload') { reloads++; return 'Reloaded'; }
       if (cmd.startsWith('dialplan show')) {
@@ -102,7 +109,7 @@ async function fixture(t, options = {}) {
     });
     return { status: response.status, body: await response.json() };
   };
-  return { request, service, root, deny: () => authorized = false, contacts: (a,b) => {contact=a;reachable=b;},
+  return { request, service, root, failures, inject: (...values) => injected = values, deny: () => authorized = false, contacts: (a,b) => {contact=a;reachable=b;},
     reloads: () => reloads, loseOperator: () => operatorMissing = true,
     reject: (count = 12) => rejectedReadbacks = count, delayRemoval: count => staleRemovals = count, waits: () => waits, expire: () => clock += 700000 };
 }
@@ -185,4 +192,40 @@ test('a leased non-admin device cannot become the operator when the admin is off
  const config=renderConfiguration([{...record,adminExtension:'102'}]);
  assert.match(config.dialplan,/exten => 0,1,Set\(PWA_CONTACTS=\)/);
  assert.doesNotMatch(config.dialplan,/exten => 0,1,Gosub\(elevate-pwa-extensions,101,1\)/);
+});
+
+test('request apply failure preserves code after successful rollback', async t => {
+  const f = await fixture(t);
+  f.inject('Unable to reload');
+  assert.equal((await f.request()).body.error, 'asterisk_reload_failed');
+  assert.match(f.failures[0], /provision apply asterisk_reload_failed\n$/);
+  assert.match(f.failures[1], /provision request asterisk_reload_failed\n$/);
+  assert.equal((await f.request()).status, 200);
+});
+
+test('distinct apply and rollback failures retain quarantine and external error', async t => {
+  const f = await fixture(t);
+  f.inject('Unable to reload');
+  f.loseOperator();
+  assert.equal((await f.request()).body.error, 'asterisk_rollback_failed');
+  assert.match(f.failures[0], /provision apply asterisk_reload_failed\n$/);
+  assert.match(f.failures[1], /provision rollback asterisk_dialplan_unverified\n$/);
+  assert.equal((await f.request()).body.error, 'provisioner_unavailable');
+  await assert.rejects(f.service.pruneExpired(), /provisioner_quarantined/);
+});
+
+test('timer expiry retains apply evidence and sanitizes arbitrary exceptions', async t => {
+  const f = await fixture(t);
+  await f.request();
+  f.expire();
+  const malicious = Object.assign(new Error('password=private\nPBX failure injected'), { code: 'asterisk_reload_failed' });
+  f.inject(malicious);
+  await f.service.pruneExpired().catch(error => reportFailure('expiry', 'timer', error, line => f.failures.push(line)));
+  assert.match(f.failures[0], /expiry apply unknown\n$/);
+  assert.match(f.failures[1], /expiry timer asterisk_configuration_rejected\n$/);
+  assert.doesNotMatch(f.failures.join(''), /password|private|injected/);
+  const lines = [];
+  reportFailure('reconciliation', 'timer', malicious, line => lines.push(line));
+  assert.match(lines[0], /^PBX failure v1 \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z reconciliation timer unknown\n$/);
+  assert.doesNotThrow(() => reportFailure('expiry', 'timer', malicious, () => { throw Error('sink failed'); }));
 });

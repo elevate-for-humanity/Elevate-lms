@@ -1,0 +1,54 @@
+{
+  "target_project": "isdgjcdabhxxozarmxta",
+  "source_project": "cuxzzpsyufcewtmicszk",
+  "verified_at": "2026-11-19T11:57:04Z",
+  "stage": "core_schema_structural_only",
+  "migration": {
+    "version": "20261119115632",
+    "name": "qa_core_schema_structural_stage"
+  },
+  "tables": [
+    "cohorts",
+    "compliance_profiles",
+    "course_enrollments",
+    "course_versions",
+    "courses",
+    "employers",
+    "funding_programs",
+    "host_shops",
+    "lessons",
+    "organizations",
+    "partners",
+    "profiles",
+    "program_enrollments",
+    "program_holders",
+    "programs",
+    "store_instances",
+    "tenants"
+  ],
+  "column_count": 800,
+  "constraint_count": 107,
+  "nonconstraint_index_count": 126,
+  "column_contract_equal": true,
+  "constraint_contract_equal": true,
+  "index_contract_equal": true,
+  "qa_rows": 0,
+  "qa_auth_users": 0,
+  "production_rows_read_or_copied": 0,
+  "public_table_rls_all_enabled": true,
+  "anon_and_authenticated_privileges_all_revoked": true,
+  "service_role_crud_all_granted": true,
+  "copied_functions": 0,
+  "copied_noninternal_triggers": 0,
+  "copied_policies": 0,
+  "advisors": {
+    "info_rls_enabled_no_policy": 17
+  },
+  "limitations": [
+    "Only 17 of 1810 production public tables are structurally staged.",
+    "Application tables remain inaccessible to anon/authenticated roles pending reviewed RLS and grants.",
+    "Production policy/function/trigger parity is not established.",
+    "No test Auth users, application fixtures, programs, media or storage objects are seeded.",
+    "This stage is not authenticated E2E, database/RLS acceptance, release approval, or production certification."
+  ]
+}

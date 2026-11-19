@@ -49,12 +49,22 @@ test('an unknown reviewer permission fails closed and still blocks the merge', (
 });
 
 test('readiness fails closed when the required approval count is not verifiable', () => {
-  for (const requiredApprovalCount of [undefined, 0, -1, 1.5, NaN]) {
+  for (const requiredApprovalCount of [undefined, null, -1, 1.5, NaN]) {
     const result = protectedMergeReadiness({ pr: openPr, expectedHeadSha: HEAD, checks: [greenCheck], requiredChecks: required, requiredApprovalCount });
     assert.equal(result.ready, false, String(requiredApprovalCount));
   }
   const truncated = Array.from({ length: 100 }, (_, i) => ({ user: { login: 'c' + i }, state: 'COMMENTED' }));
   assert.equal(protectedMergeReadiness({ pr: openPr, expectedHeadSha: HEAD, checks: [greenCheck], requiredChecks: required, requiredApprovalCount: 1, reviews: truncated }).ready, false);
+});
+
+test('an explicit zero review count needs no approval but retains change-request and CI gates', () => {
+  const base = { pr: openPr, expectedHeadSha: HEAD, checks: [greenCheck], requiredChecks: required, requiredApprovalCount: 0, reviews: [] };
+  assert.equal(protectedMergeReadiness(base).ready, true);
+  assert.equal(approvalsSatisfied(base).satisfied, true);
+  assert.equal(protectedMergeReadiness({ ...base, checks: [] }).ready, false);
+  const blocked = { ...base, reviews: [{ user: { login: 'reviewer' }, state: 'CHANGES_REQUESTED', submitted_at: '2026-11-15T01:00:00Z' }] };
+  assert.equal(protectedMergeReadiness(blocked).ready, false);
+  assert.equal(approvalsSatisfied(blocked).satisfied, false);
 });
 
 const approve = (login, extra = {}) => ({ user: { login, type: 'User' }, state: 'APPROVED', commit_id: HEAD, submitted_at: '2026-11-15T02:00:00Z', ...extra });
@@ -87,7 +97,9 @@ test('the merge script proves required approvals after its own review and before
   const script = readFileSync(new URL('../../scripts/paris-protected-merge.mjs', import.meta.url), 'utf8');
   assert.match(script, /protectedMergeReadiness\(\{[^}]*requiredApprovalCount/);
   const approvePost = script.indexOf("event: 'APPROVE'");
-  const proof = script.indexOf('approvalsSatisfied({');
+  // Check-only has a read-only proof earlier; the final merge proof must still
+  // follow any actual review submission and precede the merge write.
+  const proof = script.lastIndexOf('approvalsSatisfied({');
   const merge = script.indexOf('/merge`');
   assert.ok(approvePost > 0 && proof > approvePost && merge > proof, 'approval proof must sit between the verifier review and the merge');
   assert.match(script, /PARIS_MERGE_APPROVALS_INSUFFICIENT/);

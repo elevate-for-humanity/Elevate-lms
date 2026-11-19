@@ -53,6 +53,9 @@ export default function HostShopMediaCarousel({
   const [failedUrls, setFailedUrls] = useState<Set<string>>(() => new Set());
   const [lastLoadedUrl, setLastLoadedUrl] = useState<string>();
   const [playing, setPlaying] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
+  // Server-rendered controls must not accept clicks before React binds them.
+  useEffect(() => setHydrated(true), []);
   // Honor the visitor's motion preference without preventing manual navigation.
   useEffect(() => {
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -205,6 +208,7 @@ export default function HostShopMediaCarousel({
           <button
             type="button"
             onClick={previous}
+            disabled={!hydrated}
             aria-label="Previous image"
             className="min-h-11 p-0 text-xs"
           >
@@ -213,6 +217,7 @@ export default function HostShopMediaCarousel({
           <button
             type="button"
             onClick={() => setPlaying((current) => !current)}
+            disabled={!hydrated}
             aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}
             className="min-h-11 p-0 text-xs"
           >
@@ -221,6 +226,7 @@ export default function HostShopMediaCarousel({
           <button
             type="button"
             onClick={next}
+            disabled={!hydrated}
             aria-label="Next image"
             className="min-h-11 p-0 text-xs"
           >
@@ -232,6 +238,7 @@ export default function HostShopMediaCarousel({
           <button
             type="button"
             onClick={previous}
+            disabled={!hydrated}
             aria-label="Previous image"
             className="flex h-11 w-11 shrink-0 p-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"
           >
@@ -243,6 +250,7 @@ export default function HostShopMediaCarousel({
           <button
             type="button"
             onClick={next}
+            disabled={!hydrated}
             aria-label="Next image"
             className="flex h-11 w-11 shrink-0 p-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"
           >
@@ -281,6 +289,7 @@ export default function HostShopMediaCarousel({
             <button
               type="button"
               onClick={() => setPlaying((current) => !current)}
+              disabled={!hydrated}
               className="min-h-11 p-0 text-sm font-bold text-slate-900"
               aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}
             >

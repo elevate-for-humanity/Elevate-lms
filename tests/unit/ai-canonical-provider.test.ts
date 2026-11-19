@@ -102,7 +102,7 @@ describe('canonical AI provider authority', () => {
     vi.stubGlobal('fetch', request);
     const { aiChat } = await import('@/lib/ai/ai-service');
     await expect(aiChat({ messages: [{ role: 'user', content: 'test' }] }))
-      .rejects.toThrow('Elevate LLM worker 504');
+      .rejects.toThrow('Elevate LLM worker HTTP 504');
     expect(request).toHaveBeenCalledTimes(1);
     expect(String(request.mock.calls[0]?.[0])).toContain('configured-provider.test');
   });

@@ -290,7 +290,8 @@ export function validateProgram(p: ProgramSchema): ValidationError[] {
   const maxTotal = p.durationWeeks * p.hoursPerWeekMax;
   const breakdownTotal = getTotalHoursFromBreakdown(p);
 
-  if (breakdownTotal < minTotal || breakdownTotal > maxTotal) {
+  // An unset calendar duration is valid for governed competency-based programs.
+  if (p.durationWeeks > 0 && (breakdownTotal < minTotal || breakdownTotal > maxTotal)) {
     errors.push({
       field: 'hoursBreakdown',
       message: `Hours breakdown (${breakdownTotal}) must be between ${minTotal}–${maxTotal} (${p.durationWeeks} weeks × ${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week)`,
@@ -410,6 +411,7 @@ export function getEnrollmentTracks(
 export function getTotalHoursRange(p: ProgramSchema): string {
   const min = p.durationWeeks * p.hoursPerWeekMin;
   const max = p.durationWeeks * p.hoursPerWeekMax;
+  if (p.durationWeeks <= 0) return 'Competency-based — hours vary with verified training';
   return min === max ? `${min} hours` : `${min}–${max} hours`;
 }
 

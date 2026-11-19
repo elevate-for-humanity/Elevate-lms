@@ -1,9 +1,15 @@
-FROM ubuntu:24.04 AS build
+FROM python:3.12-slim-bookworm AS archive-trust
+
+FROM ubuntu:24.04 AS base
+# The minimal Ubuntu image needs a CA bundle for HTTPS before apt can install
+# its own ca-certificates package. Ubuntu archive signatures are still checked.
+COPY --from=archive-trust /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+FROM base AS build
 ENV DEBIAN_FRONTEND=noninteractive \
     LLAMA_CPP_REV=5aeac37a35b44fde4bdffaec9159f2fcb253b622
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates git gcc-14 g++-14 build-essential cmake libssl-dev python3 python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=bind,source=services/llm-cpu-worker/install-ubuntu-packages.sh,target=/tmp/install-ubuntu-packages.sh \
+    sh /tmp/install-ubuntu-packages.sh ca-certificates git gcc-14 g++-14 build-essential cmake libssl-dev python3 python3-venv
 ENV CC=gcc-14 CXX=g++-14
 RUN git init /src && cd /src && git remote add origin https://github.com/ggml-org/llama.cpp.git \
     && git fetch --depth=1 origin "$LLAMA_CPP_REV" && git checkout --detach FETCH_HEAD \
@@ -34,9 +40,9 @@ RUN /venv/bin/python /tmp/bake_model.py \
     && cp /models/elevate/LICENSE /output/elevate/MODEL-LICENSE \
     && cp /src/LICENSE /output/elevate/INFERENCE-LICENSE
 
-FROM ubuntu:24.04 AS runtime
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libgomp1 libssl3t64 libstdc++6 \
-    && rm -rf /var/lib/apt/lists/* \
+FROM base AS runtime
+RUN --mount=type=bind,source=services/llm-cpu-worker/install-ubuntu-packages.sh,target=/tmp/install-ubuntu-packages.sh \
+    sh /tmp/install-ubuntu-packages.sh ca-certificates libgomp1 libssl3t64 libstdc++6 \
     && useradd --system --uid 10001 --create-home model
 COPY --from=build /src/build/bin/llama-server /opt/llama/llama-server
 COPY --from=build /output/lib/ /opt/llama/

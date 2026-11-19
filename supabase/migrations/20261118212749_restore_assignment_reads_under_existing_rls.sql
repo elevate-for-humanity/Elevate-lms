@@ -1,0 +1,1 @@
+GRANT SELECT ON public.instructor_assignments, public.program_holder_courses TO authenticated;

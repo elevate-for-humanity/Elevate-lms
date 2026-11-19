@@ -104,7 +104,7 @@ export default function BeautyOrientationPage() {
       icon: DollarSign,
       content: (
         <div className="space-y-4">
-          {cfg.earnWhileYouLearn ? (
+          {orientationCfg.tuition.total === 0 ? (
             <div className={`${c.bgLight} ${c.border} border p-5 rounded-xl`}>
               <p className={`text-2xl font-black ${c.textLight} mb-1`}>$0 Tuition</p>
               <p className={`${c.text} text-sm`}>
@@ -117,12 +117,17 @@ export default function BeautyOrientationPage() {
                 {formatCurrency(orientationCfg.tuition.total)}
               </p>
               <p className={`${c.text} text-sm`}>
-                Total program cost — deposit secures your spot, balance paid weekly.
+                Published tuition — review the deposit and approved installment schedule in your enrollment agreement.
               </p>
             </div>
           )}
+          {cfg.earnWhileYouLearn && orientationCfg.tuition.total > 0 && (
+            <p className="text-sm text-slate-700">
+              Approved apprentices may earn wages from their Host Shop. Paid work experience does not waive published tuition.
+            </p>
+          )}
           <div className="space-y-3">
-            {cfg.earnWhileYouLearn ? (
+            {orientationCfg.tuition.total === 0 ? (
               <>
                 <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
                   <span className={`w-6 h-6 ${c.bg} text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5`}>1</span>
@@ -145,14 +150,14 @@ export default function BeautyOrientationPage() {
                   <span className={`w-6 h-6 ${c.bg} text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5`}>1</span>
                   <div>
                     <p className="font-bold text-slate-900 text-sm">Deposit secures your spot</p>
-                    <p className="text-slate-600 text-sm">Pay the deposit now. Remaining balance is billed {orientationCfg.tuition.paymentFrequency.toLowerCase()}.</p>
+                    <p className="text-slate-600 text-sm">Review the required deposit and installment terms. Payment schedule: {orientationCfg.tuition.paymentFrequency}.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
                   <span className={`w-6 h-6 ${c.bg} text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5`}>2</span>
                   <div>
-                    <p className="font-bold text-slate-900 text-sm">Funding may be available</p>
-                    <p className="text-slate-600 text-sm"> (SNAP/TANF recipients) and employer sponsorship can cover part or all of your cost.</p>
+                    <p className="font-bold text-slate-900 text-sm">Funding requires individual verification</p>
+                    <p className="text-slate-600 text-sm">Self-pay applies unless a separate third-party funding authorization has been verified in writing.</p>
                   </div>
                 </div>
               </>

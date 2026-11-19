@@ -6,6 +6,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramFundingGate from '@/components/programs/ProgramFundingGate';
 import heroBanners from '@/content/heroBanners';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { BEAUTY_PROGRAMS, formatBeautyPrice } from '@/lib/programs/beauty-programs';
 
 export const metadata: Metadata = {
   title: 'Self-Pay Enrollment | Cosmetology Apprenticeship',
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 const APPLY_HREF = '/programs/cosmetology-apprenticeship/apply';
+const PRICING = BEAUTY_PROGRAMS['cosmetology-apprenticeship'];
 
 export default function CosmetologyEligibilityPage() {
   const b = heroBanners['cosmetology-apprenticeship'];
@@ -37,8 +39,8 @@ export default function CosmetologyEligibilityPage() {
             selfPayOnly
             programName="Cosmetology Apprenticeship"
             applyHref={APPLY_HREF}
-            selfPayCost="$5,500"
-            depositAmount="$600"
+            selfPayCost={formatBeautyPrice(PRICING.fullTuitionCents)}
+            depositAmount={formatBeautyPrice(PRICING.depositCents)}
             depositHref={APPLY_HREF}
             fullPayHref={APPLY_HREF}
           />

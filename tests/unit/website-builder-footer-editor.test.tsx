@@ -27,3 +27,29 @@ it('saves, reopens and disables the optional contact column without changing sav
   await waitFor(() => expect(saved.footer.showContactDetails).toBe(false));
   expect(saved.contact).toEqual(contact); expect(saved.footer.linkGroups).toEqual(groups);
 });
+
+it('saves and reopens logo, column arrangement and approved social links; rejects invalid input without a request', async () => {
+  let saved = { template: { id: 'generic' }, branding: {logoImage:'/saved-logo.svg'}, homepage: {}, programs: [], navigation: [], footer: { description: 'Owner copy', linkGroups: [{ label: 'Company', pageIds: ['home'] }] }, contact: { address: 'Saved business address' }, pages: [{ id: 'home', slug: '/', title: 'Home', sections: [] }] } as unknown as TenantSiteConfig;
+  const original=structuredClone(saved);
+  const fetch=vi.fn(async (_url, options) => { saved=JSON.parse(options.body).siteConfig; return {ok:true,json:async()=>({website:{site_config:saved}})}; });vi.stubGlobal('fetch',fetch);
+  const first=render(<ZeroCodeStructureEditor websiteId="fixture" initialConfig={saved}/>);
+  fireEvent.click(screen.getByText('Footer brand and social profiles'));
+  fireEvent.click(screen.getByLabelText('Show saved brand logo in footer'));
+  fireEvent.change(screen.getByLabelText('Footer arrangement'),{target:{value:'columns'}});
+  fireEvent.click(screen.getByRole('button',{name:'Add social profile'}));
+  fireEvent.change(screen.getByLabelText('Profile label'),{target:{value:'Our community'}});
+  fireEvent.change(screen.getByLabelText('Profile display'),{target:{value:'link'}});
+  fireEvent.change(screen.getByLabelText('Profile HTTPS URL'),{target:{value:'javascript:alert(1)'}});
+  fireEvent.click(screen.getByRole('button',{name:'Save footer presentation'}));
+  expect(await screen.findByRole('alert')).toBeTruthy();expect(fetch).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText('Profile HTTPS URL'),{target:{value:'https://social.example.test/studio'}});
+  fireEvent.click(screen.getByRole('button',{name:'Save footer presentation'}));
+  await waitFor(()=>expect(saved.footer.socialLinks).toEqual([{label:'Our community',url:'https://social.example.test/studio',icon:'link'}]));
+  expect(saved.footer.showLogo).toBe(true);expect(saved.footer.layout).toBe('columns');
+  first.unmount();render(<ZeroCodeStructureEditor websiteId="fixture" initialConfig={saved}/>);
+  expect(screen.getByLabelText('Profile label')).toHaveValue('Our community');expect(screen.getByLabelText('Profile display')).toHaveValue('link');expect(screen.getByLabelText('Footer arrangement')).toHaveValue('columns');expect(screen.getByLabelText('Show saved brand logo in footer')).toBeChecked();
+  fireEvent.click(screen.getByRole('button',{name:'Remove social profile 1'}));fireEvent.click(screen.getByLabelText('Show saved brand logo in footer'));
+  fireEvent.click(screen.getByRole('button',{name:'Save footer presentation'}));
+  await waitFor(()=>expect(saved.footer.socialLinks).toEqual([]));expect(saved.footer.showLogo).toBe(false);
+  expect(saved.contact).toEqual(original.contact);expect(saved.footer.linkGroups).toEqual(original.footer.linkGroups);expect(saved.branding).toEqual(original.branding);
+});

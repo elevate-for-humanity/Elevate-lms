@@ -39,7 +39,7 @@ export function suppliedWebsiteContact(input: unknown, sources: string[]): Tenan
     return depth === 0;
   };
 
-  const phoneTokens = (line: string) =>
+  const phoneTokens = (line: string): string[] =>
     line.match(/(?:\+\s*)?(?:\(\d[\d .-]*\)|\d)(?:[\d .()-]*\d|\(\d[\d .-]*\))?/g) || [];
   const lineHasIndependentPhone = (line: string) =>
     phoneTokens(line).some(token => validPhoneShape(token.trim()));

@@ -1,3 +1,4 @@
+import {ensureRepairMainCI,hasDurableMainCIObservation,isVerifiedMainCIReceipt} from './exact-main-ci-request.mjs';
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
 import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
@@ -18,7 +19,7 @@ import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvi
 import {verifyProtectedParisMerge} from '@/lib/devstudio/openhands/paris-protected-merge.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
 
 // Default new repairs to the owned internal engine; OpenHands requires an explicit opt-in.
 // Historical OpenHands checkpoints retain their original provider and approval gates.
@@ -321,6 +322,9 @@ export async function tickParisCodeRepairs(options:{workflowOwnedDispatch?:boole
 /** Bounded requeue of an in-flight repair that stopped progressing and no
  * longer has a live workflow run. Attempt count is intentionally preserved. */
 async function requeueTimedOutRepair(db:any,repair:any){
+ // Exact-main CI has its own bounded, persisted observation contract. Never
+ // erase dispatch intent via generic timeout before it records success/failure.
+ if(hasDurableMainCIObservation(repair))return false;
  if(!inFlightRepairTimedOut(repair))return false;
  const runOrNull=async(path:string)=>{
   try{return await gh(path);}
@@ -341,6 +345,53 @@ async function requeueTimedOutRepair(db:any,repair:any){
   .eq('updated_at',repair.updated_at).select('id').maybeSingle();
  if(requeued.error)throw requeued.error;
  return Boolean(requeued.data);
+}
+// Reconcile an immutable repair SHA to a newer main only through observed
+// ancestry, independent CI/integrity evidence and required deployments.
+// This never signs off the previous SHA or dispatches any deployment.
+async function reconcileParisNewerMain({repair,gh,deployments,currentMain}:{
+ repair:any;gh:(path:string)=>Promise<any>;deployments:any[];currentMain?:any
+}){
+ const main=currentMain??await gh('/git/ref/heads/main');
+ const currentSha=String(main?.object?.sha??'');
+ // An unavailable comparison is not evidence that the immutable release
+ // lacks ancestry. Let transient API failures retry without changing repair state.
+ if(!/^[a-f0-9]{40}$/.test(currentSha))throw Error('PARIS_CURRENT_MAIN_SHA_UNVERIFIED');
+ const comparison=await gh('/compare/'+repair.release_sha+'...'+currentSha);
+ const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
+ const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
+ const candidateChecks=candidateRuns?.workflow_runs??[];
+ // The latest exact-SHA attempt owns the decision. An older successful run
+ // cannot mask a later failed CI or a failed required production deployment.
+ const latest=(name:string)=>candidateChecks.filter((run:any)=>run.head_sha===currentSha&&run.name===name)
+  .sort((a:any,b:any)=>(Date.parse(b.run_started_at??b.created_at??'')||0)-
+   (Date.parse(a.run_started_at??a.created_at??'')||0)||(Number(b.id)||0)-(Number(a.id)||0))[0];
+ const ci=latest('CI');
+ const integrity=latest('Integrity Gate');
+ const independentlyValidated=ci?.status==='completed'&&ci.conclusion==='success'&&
+  integrity?.status==='completed'&&integrity.conclusion==='success';
+ const deploymentState=ancestry?repairDeploymentState(candidateChecks,currentSha,deployments):'pending';
+ const failedGate=[ci,integrity].find((run:any)=>run?.status==='completed'&&run.conclusion!=='success');
+ const candidateFailed=Boolean(failedGate)||deploymentState==='failed';
+ const prior=repair.verification?.releaseReconciliation;
+ const now=new Date().toISOString();
+ // Do not refresh the start of a successor observation on every monitor tick.
+ // A failed or never-observed successor must not hold the global repair queue.
+ const priorSince=prior?.currentMainSha===currentSha?Date.parse(prior.observationStartedAt??prior.checkedAt??''):NaN;
+ const observationStartedAt=Number.isFinite(priorSince)?new Date(priorSince).toISOString():now;
+ const observationWindowMs=(IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.deploying+IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.verifying)*60000;
+ const observationExpired=Date.now()-Date.parse(observationStartedAt)>=observationWindowMs;
+ const candidatePassed=ancestry&&independentlyValidated&&deploymentState==='passed';
+ const state=!ancestry?'release-not-ancestor-of-main':
+  candidateFailed?'newer-main-validation-failed':
+  candidatePassed?'validated-newer-target':
+  observationExpired?'newer-main-validation-not-observed':'newer-main-needs-independent-validation';
+ return {
+  state,independentlyValidated,immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
+  observationStartedAt,checkedAt:now,
+  failedCheck:failedGate?{name:failedGate.name,runId:failedGate.id??null,conclusion:failedGate.conclusion}:null,
+  deploymentState
+ };
 }
 async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
  const db=await requireAdminClient();
@@ -606,8 +657,8 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     if(!sha){
      // The PR is open and not yet merged. Nothing else in the system approves
      // or merges it, so dispatch the signed protected-merge workflow once. It
-     // uses the independent verifier collaborator identity to approve and merge
-     // only if the exact validated head still satisfies the protected policy.
+     // honors the independently read protected policy: no review is fabricated
+     // when the owner configures zero approvals; positive review counts remain.
      const requestedAt=repair.verification?.protectedMergeRequestedAt;
      const requestNumber=repair.verification?.protectedMergeRequest?.prNumber;
      const alreadyRequested=requestNumber===pr.number && repair.verification?.protectedMergeRequest?.headSha===repair.verification.pullRequest.headSha;
@@ -650,6 +701,41 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    const targetSha=repair.verification?.releaseReconciliation?.state==='validated-newer-target' ? repair.verification.releaseReconciliation.currentMainSha : repair.release_sha;
    const deployments=repair.verification?.protectedMerge?[...REPAIR_DEPLOYMENTS,STORE_REPAIR_DEPLOYMENT]:REPAIR_DEPLOYMENTS;
    const runs=await gh(`/actions/runs?head_sha=${targetSha}&per_page=100`);
+   // Workflow-token merges suppress push events. Only the full exact-main CI
+   // and its successful required gate can release the recorded squash SHA.
+   const mergeReceipt=repair.verification?.protectedMergeResult;
+   const priorCIRequest=repair.verification?.mainCIRequest??(
+    ['PARIS_MERGE_MAIN_CI_REQUESTED','PARIS_MERGE_MAIN_CI_DISPATCH_FAILED'].includes(mergeReceipt?.reason)&&mergeReceipt?.mergeCommitSha===targetSha
+     ?{sha:targetSha,requestedAt:mergeReceipt.at}:undefined);
+   const mainCI=await ensureRepairMainCI({repository:REPAIR_REPOSITORY,sha:targetSha,runs:runs.workflow_runs,priorRequest:priorCIRequest,gh,
+    observationWindowMs:IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.deploying*60*1000,
+    persistIntent:async(intent:any)=>{await update(repair.id,{verification:{...repair.verification,mainCIRequest:intent}});}});
+   if(mainCI.state==='pending')continue;
+   if(mainCI.state==='superseded'){
+    const releaseReconciliation=await reconcileParisNewerMain({repair,gh,deployments});
+    const terminalErrors:Record<string,string>={
+     'newer-main-validation-failed':'REPAIR_NEWER_MAIN_VALIDATION_FAILED',
+     'newer-main-validation-not-observed':'REPAIR_NEWER_MAIN_VALIDATION_NOT_OBSERVED',
+     'release-not-ancestor-of-main':'REPAIR_RELEASE_NOT_ANCESTOR_OF_MAIN'
+    };
+    const errorCode=terminalErrors[releaseReconciliation.state];
+    // Terminal evidence releases the queue but preserves the immutable SHA,
+    // attempted dispatches, cumulative history and the successor diagnostic.
+    await update(repair.id,{
+     status:errorCode?'blocked':'verifying',
+     ...(errorCode?{error_code:errorCode}:{}),
+     verification:{...repair.verification,releaseReconciliation}
+    });
+    continue;
+   }
+   // Only exact-main CI with a successful required gate can advance release.
+   // Superseded, failed or unknown evidence must never reach deployment or
+   // runtime acceptance on the previous immutable target SHA.
+   if(!isVerifiedMainCIReceipt(mainCI)){
+    await update(repair.id,{status:'blocked',error_code:mainCI.state==='blocked'
+     ?mainCI.reason:mainCI.state==='superseded'?'REPAIR_MAIN_CI_SUPERSEDED':'REPAIR_MAIN_CI_UNVERIFIED'});
+    continue;
+   }
    const state=repairDeploymentState(runs.workflow_runs??[],targetSha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
    if(state!=='passed'){
@@ -662,25 +748,8 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     if(next){
      const currentMain=await gh('/git/ref/heads/main');
      if(currentMain.object?.sha!==targetSha){
-      // A later main commit is not evidence that the repair disappeared.
-      // Preserve the immutable release receipt and defer deployment until
-      // ancestry and independent validation establish a safe new target.
-      const currentSha=String(currentMain.object?.sha??'');
-      const comparison=/^[a-f0-9]{40}$/.test(currentSha)
-       ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
-      const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
-       const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
-       const candidateChecks=candidateRuns?.workflow_runs??[];
-       const independentlyValidated=candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='CI'&&run.status==='completed'&&run.conclusion==='success')&&candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='Integrity Gate'&&run.status==='completed'&&run.conclusion==='success');
-       const candidatePassed=ancestry&&independentlyValidated&&repairDeploymentState(candidateChecks,currentSha,deployments)==='passed';
-      await update(repair.id,{status:'verifying',verification:{
-       ...repair.verification,releaseReconciliation:{
-        state:candidatePassed?'validated-newer-target':ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
-        independentlyValidated,
-        immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
-        checkedAt:new Date().toISOString()
-       }
-      }});
+      const releaseReconciliation=await reconcileParisNewerMain({repair,gh,deployments,currentMain});
+      await update(repair.id,{status:'verifying',verification:{...repair.verification,releaseReconciliation}});
       continue;
      }
      // Save dispatch intent before sending; a later tick must not duplicate it.

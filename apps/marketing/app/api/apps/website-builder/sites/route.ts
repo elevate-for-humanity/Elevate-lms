@@ -1,3 +1,4 @@
+import { validateFooterPresentationFields } from '@/lib/tenant/footer-presentation';
 import { validateFooterContactFields } from '@/lib/tenant/footer-contact';
 import { validateHeroBackdropFields } from '@/lib/tenant/site-validation';
 import { commitWebsiteDraft } from '@/lib/apps/website-builder-draft-commit';
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
 
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';
   const fallback = buildDefaultSiteConfig({ organizationName: siteName, contactEmail: user.email || undefined });
-  const backdropErrors = [...validateHeroBackdropFields(body.siteConfig), ...validateFooterContactFields(body.siteConfig)];
+  const backdropErrors = [...validateHeroBackdropFields(body.siteConfig), ...validateFooterContactFields(body.siteConfig), ...validateFooterPresentationFields(body.siteConfig)];
   if (backdropErrors.length) return NextResponse.json({ error: 'Invalid website presentation configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
   const normalizedConfig = normalizeProvidedConfig(body.siteConfig, fallback);
   const config = ensureComposableSiteConfig({

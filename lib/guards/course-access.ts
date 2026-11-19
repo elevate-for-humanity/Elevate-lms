@@ -44,31 +44,16 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
     };
   }
 
-  // Check enrollment status
-  if (enrollment.status !== 'active') {
-    return {
-      hasAccess: false,
-      enrollment,
-      reason: `enrollment_${enrollment.status}`,
-    };
+  // Enforce program-level approval and verified payment at the content
+  // boundary, not only at the dashboard UI. Pending, unpaid or revoked
+  // enrollments must never render training content.
+  const { isApprovedPaidEnrollment } = await import('@/lib/learner/approved-paid-admission.mjs');
+  if (!isApprovedPaidEnrollment(enrollment)) {
+    return { hasAccess: false, enrollment, reason: 'enrollment_not_approved_or_paid' };
   }
 
-  // Check expiration
   if (enrollment.end_date && new Date(enrollment.end_date) < new Date()) {
-    return {
-      hasAccess: false,
-      enrollment,
-      reason: 'expired',
-    };
-  }
-
-  // Check payment status
-  if (enrollment.payment_status === 'failed') {
-    return {
-      hasAccess: false,
-      enrollment,
-      reason: 'payment_failed',
-    };
+    return { hasAccess: false, enrollment, reason: 'expired' };
   }
 
   // Update last accessed

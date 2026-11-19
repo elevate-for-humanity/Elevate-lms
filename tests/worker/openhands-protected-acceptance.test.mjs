@@ -206,7 +206,7 @@ test('required approval count is enforced from both classic and ruleset policy',
   assert.equal(evaluate({ ...base, reviews: [...reviews, second],
     reviewerPermissions: { 'independent-reviewer': 'write', 'second-reviewer': 'maintain' },
   }).accepted, true);
-  assert.equal(requiredMainReviewCount({}), 0);
+  assert.equal(requiredMainReviewCount({}), null);
 });
 
 test('required GitHub App ID must match the independently reported check issuer', () => {
@@ -258,4 +258,24 @@ test('known read-only change requests do not veto sufficient authorized approval
   });
   assert.equal(unknown.accepted, false);
   assert.match(unknown.reasons.join(' '), /reviewer authority could not be verified/);
+});
+
+test('explicit zero-review protected PR policy is accepted without inventing reviews', () => {
+  const classic = {
+    required_pull_request_reviews: { required_approving_review_count: 0 },
+    required_status_checks: { checks: [{ context: 'CI Required Gate' }] },
+  };
+  assert.equal(requiredMainReviewCount({ classic, rules: [] }), 0);
+  assert.equal(protectedMainPolicyVerified({ classic, rules: [] }), true);
+  assert.equal(evaluate({ pr, reviews: [], checks, requiredChecks: ['CI Required Gate'],
+    ancestryVerified: true, protectionVerified: true, requiredApprovalCount: 0 }).accepted, true);
+  assert.equal(evaluate({ pr, reviews: [], checks, requiredChecks: ['CI Required Gate'],
+    ancestryVerified: true, protectionVerified: false, requiredApprovalCount: 0 }).accepted, false);
+  for (const count of [undefined, null, '0', -1, 1.5]) {
+    const unknown = { ...classic, required_pull_request_reviews: { required_approving_review_count: count } };
+    assert.equal(requiredMainReviewCount({ classic: unknown }), null);
+    assert.equal(protectedMainPolicyVerified({ classic: unknown }), false);
+  }
+  const stricter = [{ type: 'pull_request', parameters: { required_approving_review_count: 2 } }];
+  assert.equal(requiredMainReviewCount({ classic, rules: stricter }), 2);
 });

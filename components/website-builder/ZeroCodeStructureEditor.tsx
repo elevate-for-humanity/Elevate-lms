@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { SectionImagePicker } from './SectionImagePicker';
+import { WebsiteFooterPresentationEditor } from './WebsiteFooterPresentationEditor';
 import { WebsiteLinkGroupsEditor } from './WebsiteLinkGroupsEditor';
 import { WebsiteDesignPanel } from './WebsiteDesignPanel';
 import { useWebsiteConfig } from '@/components/website-builder/WebsiteConfigProvider';
@@ -183,7 +184,7 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
           <p className="mt-2 text-sm leading-6 text-slate-600">Open these controls when you need to add, rename, reorder, or precisely edit pages and sections. Routine changes still require no code.</p>
           {(message || error) ? <div className={`mt-4 rounded-xl border p-3 text-sm font-semibold ${error ? 'border-red-200 bg-red-50 text-red-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error || message}</div> : null}
 
-          <label className="mt-4 flex min-h-11 items-center gap-3 text-sm font-bold"><input type="checkbox" disabled={busy} checked={config.footer.showContactDetails === true} onChange={event => void persist({ ...config, footer: { ...config.footer, showContactDetails: event.target.checked } }, 'Footer contact details saved.')} />Show saved business contact details in footer</label><p className="mt-1 text-xs text-slate-500">Uses the email, phone, address and hours already saved in your business contact settings.</p><WebsiteLinkGroupsEditor config={config} busy={busy} onSave={next => void persist(next, 'Navigation groups saved.')} />
+          <label className="mt-4 flex min-h-11 items-center gap-3 text-sm font-bold"><input type="checkbox" disabled={busy} checked={config.footer.showContactDetails === true} onChange={event => void persist({ ...config, footer: { ...config.footer, showContactDetails: event.target.checked } }, 'Footer contact details saved.')} />Show saved business contact details in footer</label><p className="mt-1 text-xs text-slate-500">Uses the email, phone, address and hours already saved in your business contact settings.</p><WebsiteFooterPresentationEditor config={config} busy={busy} onSave={next => persist(next, 'Footer presentation saved.')} /><WebsiteLinkGroupsEditor config={config} busy={busy} onSave={next => void persist(next, 'Navigation groups saved.')} />
           <div className="mt-5 grid gap-5 lg:grid-cols-[280px_1fr]">
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <h2 className="font-black">Pages</h2>

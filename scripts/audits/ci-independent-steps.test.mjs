@@ -9,6 +9,17 @@ test('CI does not skip independent preflight tests after an earlier failure',()=
  let checked=0;
  for(const section of chunks){
   if(section.startsWith('      - name: Install dependencies'))continue;
+  if(section.startsWith('      - name: Verify requested CI commit')){
+   // Release identity is checked before checkout and dependency installation.
+   // It is intentionally dispatch-only; this is not an independently runnable
+   // post-install regression, so keep its stronger early guard intact.
+   assert.match(section,/if: github\.event_name == 'workflow_dispatch' && inputs\.requested_sha != ''/);
+   assert.match(section,/GITHUB_REF.*refs\/heads\/main/);
+   assert.match(section,/REQUESTED_SHA.*GITHUB_SHA/);
+   assert.ok(preflight.indexOf(section)<preflight.indexOf('      - uses: actions/checkout@v4'),
+    'Requested-commit verification must execute before repository checkout');
+   continue;
+  }
   if(!section.includes('\n        run:')&&!section.includes('\n        uses:'))continue;
   assert.match(section,/if: \$\{\{ !cancelled\(\) && steps\.dependencies\.outcome == 'success'/,
     'Missing independent execution condition: '+section.split('\n')[0]);

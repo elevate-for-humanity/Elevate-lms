@@ -103,7 +103,7 @@ function setup({ green = true, current = sha, active = false, readback = 'false'
     const path = new URL(url).pathname;
     calls.push({ path, method: init.method, body: init.body && JSON.parse(init.body) });
     if (path.endsWith('git/ref/heads/main')) return Response.json({ object: { sha: current } });
-    if (path.endsWith('ci.yml/runs')) return Response.json({ workflow_runs: [{ id: 1, head_sha: sha }] });
+    if (path.endsWith('ci.yml/runs')) return Response.json({ workflow_runs: [{ ...completedCI, id: 1, status: 'completed' }] });
     if (path.endsWith('/jobs')) return Response.json({ jobs: [{ name: 'CI Required Gate', status: 'completed', conclusion: green ? 'success' : 'failure' }] });
     if (path.endsWith('GOOGLE_RELEASE_HOLD')) {
       if (init.method === 'PATCH') return new Response(null, { status: 204 });
@@ -184,4 +184,21 @@ test('Google-only authority never falls back to the legacy secret store', async 
   let calls=0;
   await assert.rejects(resolveReleaseCredential({...legacyEnv,ELEVATE_RUNTIME_CONFIG_PROVIDER:'google-secret-manager'},async()=>{calls++;return new Response('{}',{status:401});}), /GOOGLE_CREDENTIAL_EXPIRED/);
   assert.equal(calls,1);
+});
+
+test('full CI workflow_dispatch completion uses the existing trusted main release controller', async () => {
+  const s = completionSetup();
+  const r = await dispatchCompletedMainCI({ env: ciEnv, event: { workflow_run: { ...completedCI, event: 'workflow_dispatch' } }, request: s.request });
+  assert.equal(r.status, 'requested');
+  assert.equal(s.calls.filter(c => c.method === 'POST').length, 1);
+});
+
+// The workflow itself must admit dispatched exact-main CI, not only the JS
+// handler: workflow-token merges need a real workflow_dispatch completion path.
+test('web release workflow accepts trusted dispatched CI and checks latest exact-main required gate', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/release-approved-google-web.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /github\.event\.workflow_run\.event == 'push' \|\| github\.event\.workflow_run\.event == 'workflow_dispatch'/);
+  assert.match(workflow, /await requireExactLmsCI\(process\.env, \{ attempts: 90, intervalMs: 10000 \}\)/);
+  assert.doesNotMatch(workflow, /event=push&per_page/);
+  assert.match(workflow, /if: steps\.ci\.outputs\.ready == 'true'/);
 });

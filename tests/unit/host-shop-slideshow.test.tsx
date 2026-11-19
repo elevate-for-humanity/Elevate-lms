@@ -1,4 +1,6 @@
 import type { ReactElement } from 'react';
+import { renderToString } from 'react-dom/server';
+import { hydrateRoot } from 'react-dom/client';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
@@ -29,6 +31,25 @@ describe('host shop slideshow playback', () => {
     { url: '/one.jpg', alt: 'First photo' },
     { url: '/two.jpg', alt: 'Second photo' },
   ];
+  it.each([false, true])('keeps server-rendered gallery controls unavailable until hydration (compact=%s)', async compact => {
+    const element = <HostShopMediaCarousel shopName="Shop" items={items} compact={compact} />;
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(element);
+    document.body.appendChild(container);
+    const controls = Array.from(container.querySelectorAll('button'));
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    try {
+      expect(controls).toHaveLength(3);
+      for (const control of controls) expect(control).toBeDisabled();
+      await act(async () => { root = hydrateRoot(container, element); });
+      for (const control of controls) expect(control).toBeEnabled();
+      fireEvent.click(container.querySelector('button[aria-label="Pause slideshow"]')!);
+      expect(container.querySelector('button[aria-label="Play slideshow"]')).not.toBeNull();
+    } finally {
+      if (root) act(() => root!.unmount());
+      container.remove();
+    }
+  });
   it('defers distant photos while retaining the loaded photo during a transition', () => {
     renderVisible(
       <HostShopMediaCarousel
@@ -70,6 +91,16 @@ describe('host shop slideshow playback', () => {
     const matches = vi.spyOn(pause, 'matches').mockReturnValue(false);
     fireEvent.focus(pause);
     matches.mockRestore();
+    fireEvent.click(pause);
+    expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
+  });
+  it('does not restart autoplay when the Pause control receives focus-visible before click', () => {
+    renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
+    const pause = screen.getByRole('button', { name: 'Pause slideshow' });
+    const matches = vi.spyOn(pause, 'matches').mockReturnValue(true);
+    fireEvent.focus(pause);
+    matches.mockRestore();
+    expect(screen.getByRole('button', { name: 'Pause slideshow' })).toBeInTheDocument();
     fireEvent.click(pause);
     expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
   });

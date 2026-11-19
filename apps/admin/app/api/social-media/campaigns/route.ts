@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic';
 
 type CampaignBody = {
   name?: string;
+  requestId?: string;
   contentSource?: 'blog' | 'ai' | 'manual';
   platforms?: string[];
   frequency?: string;
@@ -37,15 +39,34 @@ const _GET = withAuth(
   { roles: ['admin'] },
 );
 
+function campaignSaveError(code: string) {
+  const conflict = code === '22023';
+  return NextResponse.json(
+    {
+      error: conflict
+        ? 'This save request has changed. Reload the campaign editor before saving again.'
+        : 'The campaign save result could not be confirmed. Retry this save.',
+    },
+    { status: conflict ? 409 : 500 },
+  );
+}
+
 const _POST = withAuth(
-  async (req: NextRequest) => {
+  async (req: NextRequest, context) => {
     const body = (await req.json().catch(() => ({}))) as CampaignBody;
     const db = await requireAdminClient();
     if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
     const name = body.name?.trim();
+    const requestId = typeof body.requestId === 'string' ? body.requestId.toLowerCase() : body.requestId;
+    if (typeof requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
+      return NextResponse.json({ error: 'A valid campaign save request ID is required' }, { status: 400 });
+    }
     const platforms = Array.from(new Set((body.platforms ?? []).filter(Boolean)));
     const status = body.status ?? 'draft';
+    if (!['draft', 'active', 'paused'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid campaign status' }, { status: 400 });
+    }
 
     if (!name) {
       return NextResponse.json({ error: 'Campaign name is required' }, { status: 400 });
@@ -53,6 +74,47 @@ const _POST = withAuth(
     if (platforms.length === 0) {
       return NextResponse.json({ error: 'Select at least one social platform' }, { status: 400 });
     }
+
+    const durationDays = Math.max(1, Math.min(Number(body.duration) || 30, 365));
+    const start = new Date();
+    const end = new Date(start.getTime() + durationDays * 24 * 60 * 60 * 1000);
+
+    const sourceBlogIds = Array.from(new Set(body.sourceBlogIds ?? [])).slice(0, 90);
+    const metadata = {
+      contentSource: body.contentSource ?? 'blog',
+      platforms,
+      frequency: body.frequency ?? 'daily',
+      times: body.times ?? [],
+      program: body.program ?? 'all',
+      durationDays,
+      sourceBlogIds,
+      approvalPolicy: 'per-post-admin-approval',
+      generator: 'elevate-deterministic',
+    };
+    const campaign = {
+      id: requestId,
+      name,
+      platform: platforms.length === 1 ? platforms[0] : 'multi',
+      status,
+      start_date: start.toISOString(),
+      end_date: end.toISOString(),
+      metadata: {
+        ...metadata,
+        saveActorId: context.user.id,
+        saveFingerprint: createHash('sha256')
+          .update(JSON.stringify({ name, status, ...metadata }))
+          .digest('hex'),
+      },
+    };
+
+    // An unchanged retry must return the committed save before consulting
+    // mutable articles or account connections. A null posts payload is read-only.
+    const { data: replay, error: replayError } = await db.rpc('save_social_campaign_draft', {
+      p_campaign: campaign,
+      p_posts: null,
+    });
+    if (replayError) return campaignSaveError(replayError.code);
+    if (replay) return NextResponse.json({ success: true, ...replay });
 
     if (status === 'active') {
       const { data: connected, error: accountError } = await db
@@ -79,40 +141,7 @@ const _POST = withAuth(
       }
     }
 
-    const durationDays = Math.max(1, Math.min(Number(body.duration) || 30, 365));
-    const start = new Date();
-    const end = new Date(start.getTime() + durationDays * 24 * 60 * 60 * 1000);
-
-    const { data, error } = await db
-      .from('social_campaigns')
-      .insert({
-        name,
-        platform: platforms.length === 1 ? platforms[0] : 'multi',
-        status,
-        scheduled_posts: 0,
-        published_posts: 0,
-        failed_posts: 0,
-        start_date: start.toISOString(),
-        end_date: end.toISOString(),
-        metadata: {
-          contentSource: body.contentSource ?? 'blog',
-          platforms,
-          frequency: body.frequency ?? 'daily',
-          times: body.times ?? [],
-          program: body.program ?? 'all',
-          durationDays,
-          sourceBlogIds: Array.from(new Set(body.sourceBlogIds ?? [])).slice(0, 90),
-          approvalPolicy: 'per-post-admin-approval',
-          generator: 'elevate-deterministic',
-        },
-      })
-      .select('*')
-      .single();
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-    const sourceBlogIds = Array.from(new Set(body.sourceBlogIds ?? [])).slice(0, 90);
-    let draftCount = 0;
+    const rows: Array<Record<string, unknown>> = [];
     if (sourceBlogIds.length > 0) {
       const { data: sourceBlogs, error: sourceError } = await db
         .from('blog_posts')
@@ -120,9 +149,13 @@ const _POST = withAuth(
         .in('id', sourceBlogIds)
         .eq('published', true)
         .eq('share_to_social', true);
-      if (sourceError) return NextResponse.json({ error: sourceError.message }, { status: 500 });
+      if (sourceError) {
+        return NextResponse.json({ error: 'Campaign articles could not be loaded. No campaign was saved.' }, { status: 500 });
+      }
+      if ((sourceBlogs ?? []).length !== sourceBlogIds.length) {
+        return NextResponse.json({ error: 'One or more selected articles are no longer available for social sharing. Rebuild the draft packages.' }, { status: 409 });
+      }
 
-      const rows: Array<Record<string, unknown>> = [];
       for (const blog of sourceBlogs ?? []) {
         const generated = await generateBlogSocialPackage(blog);
         const caption = `${generated.package.caption}\n\n${generated.package.hashtags.join(' ')}`;
@@ -146,7 +179,7 @@ const _POST = withAuth(
           content_version: version,
           generation_payload: {
             ...generated.package,
-            campaignId: data.id,
+            campaignId: campaign.id,
             provider: generated.provider,
             model: generated.model,
           },
@@ -161,7 +194,7 @@ const _POST = withAuth(
             platform: 'facebook',
             destination_type: 'facebook_page',
             post_type: 'blog_link',
-            idempotency_key: `campaign:${data.id}:blog:${blog.id}:facebook_page:${version}`,
+            idempotency_key: `campaign:${campaign.id}:blog:${blog.id}:facebook_page:${version}`,
           });
         }
         if (platforms.includes('instagram') && approvedImage) {
@@ -170,22 +203,21 @@ const _POST = withAuth(
             platform: 'instagram',
             destination_type: 'instagram_image',
             post_type: 'image',
-            idempotency_key: `campaign:${data.id}:blog:${blog.id}:instagram_image:${version}`,
+            idempotency_key: `campaign:${campaign.id}:blog:${blog.id}:instagram_image:${version}`,
           });
         }
       }
-
-      if (rows.length > 0) {
-        const { data: drafts, error: draftError } = await db
-          .from('social_media_posts')
-          .upsert(rows, { onConflict: 'idempotency_key', ignoreDuplicates: true })
-          .select('id');
-        if (draftError) return NextResponse.json({ error: draftError.message }, { status: 500 });
-        draftCount = drafts?.length ?? 0;
-      }
     }
 
-    return NextResponse.json({ success: true, campaign: data, draftCount }, { status: 201 });
+    // One database transaction owns both the plan and its unapproved post rows.
+    // The RPC matches the existing partial unique index and replays the same
+    // save request without duplicating a campaign after a lost response.
+    const { data: saved, error: saveError } = await db.rpc('save_social_campaign_draft', {
+      p_campaign: campaign,
+      p_posts: rows,
+    });
+    if (saveError) return campaignSaveError(saveError.code);
+    return NextResponse.json({ success: true, ...saved }, { status: saved?.replayed ? 200 : 201 });
   },
   { roles: ['admin'] },
 );

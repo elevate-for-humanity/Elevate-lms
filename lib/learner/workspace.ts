@@ -90,7 +90,13 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
       row.accepted_at,
     ]),
   );
-  const agreements = getRequiredAgreementsForProgram(role, primaryEnrollment?.program_slug).map((agreement) => ({
+  // This loader serves the learner workspace, even when the same account's
+  // primary profile role describes employment. Keep its student participation
+  // requirements separate from agreements in educator/employer workspaces.
+  const normalizedRole = role.trim().toLowerCase();
+  const agreementRole = ['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice']
+    .includes(normalizedRole) ? normalizedRole : 'student';
+  const agreements = getRequiredAgreementsForProgram(agreementRole, primaryEnrollment?.program_slug).map((agreement) => ({
     ...agreement,
     signed: signed.has(`${agreement.type}:${agreement.version}`),
     acceptedAt: signed.get(`${agreement.type}:${agreement.version}`) ?? null,

@@ -220,3 +220,16 @@ test('PARIS keeps authorized approvals when a known reader requests changes', as
     assert.equal(result.accepted, true, JSON.stringify(result.reasons));
   }
 });
+
+test('release verification accepts explicit zero-review policy without fabricating approvals', async () => {
+  const gh = github({
+    '/pulls/2613/reviews?per_page=100': [],
+    '/rules/branches/main': [],
+    '/branches/main/protection': {
+      required_pull_request_reviews: { required_approving_review_count: 0 },
+      required_status_checks: { checks: [{ context: 'CI Required Gate' }] },
+    },
+  });
+  const result = await verifyProtectedParisMerge({ pr, expectedHeadSha: HEAD, gh });
+  assert.equal(result.accepted, true, JSON.stringify(result.reasons));
+});

@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   const { data, error } = await db
     .from('programs')
     .select(
-      'id,name,slug,description,duration_weeks,requires_license,is_free,price,total_cost,funding_eligible,category',
+      'id,name,title,slug,description,duration_weeks,requires_license,is_free,price,total_cost,funding_eligible,category',
     )
     .eq(uuid ? 'id' : 'slug', id)
     .eq('published', true)
@@ -23,15 +23,18 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       { status: 503 },
     );
   if (!data) return NextResponse.json({ error: 'Program not found.' }, { status: 404 });
+  // Canonical catalog rows use title; older rows can still carry name.
+  // Keep the public response contract as name without exposing extra fields.
+  const { title, ...enrollmentData } = data;
   const schoolProgram = ENCHANTED_HEARTS.programs.find((item) => item.programId === data.id);
   const program = schoolProgram
     ? {
-        ...data,
+        ...enrollmentData,
         name: schoolProgram.title,
         slug: schoolProgram.publicSlug,
         description: schoolProgram.summary,
         price: schoolProgram.retailPriceCents / 100,
       }
-    : data;
+    : { ...enrollmentData, name: data.name || title };
   return NextResponse.json({ program }, { headers: { 'Cache-Control': 'public, max-age=60' } });
 }

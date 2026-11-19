@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION rpc_private.ensure_app_trial_wallet(p_user_id uuid, p
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path TO ''
 AS $function$
 declare
  v_balance integer;

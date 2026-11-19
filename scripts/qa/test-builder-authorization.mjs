@@ -56,6 +56,10 @@ try {
   }
   const [owner, member] = sessions;
   const [ownerId, memberId] = users;
+  const foreignOrganization = check(await admin.from('organizations').insert({
+    name: run, slug: `${run}-foreign`,
+  }).select('id').single(), 'Unrelated organization fixture');
+  organizations.push(foreignOrganization.id);
   mustDeny(await wallet(owner, ownerId, 2147483647), 'No trial cannot mint credits');
   check(await admin.from('user_app_subscriptions').insert({
     user_id: ownerId, app_slug: 'website-builder', plan: 'starter', status: 'trial',
@@ -87,6 +91,16 @@ try {
     }).select('id').single(), 'Unpublished site fixture');
     sites.push(site.id);
   }
+  const foreignAttach = await owner.from('user_websites').insert({
+    user_id: ownerId, organization_id: foreignOrganization.id, site_name: run,
+    status: 'draft', is_published: false, site_config: { meta: { qa_run_id: run } },
+  }).select('id');
+  // Capture unexpected success too so a failing negative control cannot leak a site.
+  if (!foreignAttach.error) sites.push(...foreignAttach.data.map(site => site.id));
+  mustDeny(foreignAttach, 'An owner cannot insert a site into an unrelated organization');
+  mustDeny(await owner.from('user_websites').update({ organization_id: foreignOrganization.id })
+    .eq('id', sites[0]), 'An owner cannot move a site into an unrelated organization');
+  check(await owner.from('user_websites').update({ site_name: run }).eq('id', sites[0]), 'Own organization update positive control');
   const memberRead = check(await member.from('user_websites').select('id').eq('id', sites[0]), 'Member read positive control');
   assert.equal(memberRead.length, 1, 'A member must retain allowed read access');
   const deniedDelete = await member.from('user_websites').delete().eq('id', sites[0]).select('id');
@@ -128,7 +142,24 @@ try {
       assert.equal(remaining.length, 0);
       const revisions = check(await admin.from('website_revisions').select('id').in('website_id', sites), 'Revision cleanup verification');
       assert.equal(revisions.length, 0);
+      const workspaces = check(await admin.from('website_paris_workspaces').select('website_id').in('website_id', sites), 'Workspace cleanup verification');
+      assert.equal(workspaces.length, 0);
     } catch { cleanupErrors.push('Site/revision cleanup verification'); }
+  }
+  if (organizations.length) {
+    try {
+      const orgs = check(await admin.from('organizations').select('id').in('id', organizations), 'Organization cleanup verification');
+      assert.equal(orgs.length, 0);
+      const memberships = check(await admin.from('organization_users').select('id').in('organization_id', organizations), 'Membership cleanup verification');
+      assert.equal(memberships.length, 0);
+    } catch { cleanupErrors.push('Organization/membership cleanup verification'); }
+  }
+  for (const id of users) {
+    try {
+      const removed = await admin.auth.admin.getUserById(id);
+      assert.equal(removed.error?.status, 404);
+      assert.equal(removed.data.user, null);
+    } catch { cleanupErrors.push('Auth deletion verification'); }
   }
   for (const table of ['profiles', 'user_app_subscriptions', 'user_app_credit_wallets', 'user_app_credit_ledger']) {
     if (!users.length) break;
@@ -147,5 +178,6 @@ console.info(JSON.stringify({
   foreign_wallet_denied: true, expired_trial_denied: true,
   member_read_allowed: true, member_delete_denied: true, manager_delete_allowed: true,
   forged_revision_denied: true, owner_revision_allowed: true,
+  foreign_organization_insert_denied: true, foreign_organization_move_denied: true,
   fixture_cleanup_verified: true, browser_acceptance: false,
 }));

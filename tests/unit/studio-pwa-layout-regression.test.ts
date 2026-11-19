@@ -12,15 +12,28 @@ describe('Studio, Course Builder and PWA layout regression', () => {
     expect(viewport).not.toContain("position: 'fixed'");
     expect(viewport).toContain('height: viewport?.height ?? window.innerHeight');
   });
-  it('keeps the conversation input small and the message area independently scrollable', () => {
+  it('keeps the conversation input readable and compact with independently scrollable messages', () => {
     const chat = source('components/studio/UnifiedEllieChat.tsx');
     const styles = source('components/studio/UnifiedEllieChat.module.css');
     expect(chat).toContain('rows={2}');
     expect(chat).toContain('min-h-[64px]');
     expect(chat).not.toContain('min-h-[180px]');
     expect(chat).toContain('overflow-y-auto bg-slate-50');
-    expect(styles).toContain('font-size: 1rem');
-    expect(styles).not.toContain('max(1.25rem, 20px)');
+    expect(styles).toContain('font-size: max(1.25rem, 20px)');
+    expect(styles).toContain('max-height: max(min(28dvh, 240px), calc(2lh + 1.5rem + 2px))');
+    expect(chat).not.toContain('max-h-[min(28dvh,240px)]');
+    expect(chat).toContain('text-xl leading-[1.5]');
+    expect(chat).not.toContain('py-2 text-base leading-6 outline-none');
+  });
+  it('keeps the composer above the Admin mobile textarea zoom guard', () => {
+    const globals = source('apps/admin/app/globals.css');
+    const styles = source('components/studio/UnifiedEllieChat.module.css');
+    const mobileGuard = globals.match(/@media\s*\(max-width:\s*1024px\)\s*\{\s*input\[type='text'\][\s\S]*?textarea,[\s\S]*?font-size:\s*16px\s*!important/);
+    expect(mobileGuard).not.toBeNull();
+    const composer = styles.match(/\.root\s+\.composer\s*\{([^}]+)\}/)?.[1] || '';
+    // Equal importance, with two scoped classes outranking the global type selector.
+    expect(composer).toMatch(/font-size:\s*max\(1\.25rem,\s*20px\)\s*!important\s*;/);
+    expect(styles.match(/font-size:[^;]+!important/g)).toHaveLength(1);
   });
   it('respects narrow screens without forcing a second column or oversized tool typography', () => {
     const studio = source('components/studio/StudioCommandWorkspace.tsx');

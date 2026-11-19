@@ -65,6 +65,7 @@ export default function NewSocialCampaignClient({
   blogs?: BlogSource[];
 }) {
   const router = useRouter();
+  const [requestId] = useState(() => crypto.randomUUID());
   const [name, setName] = useState('Elevate weekly career update');
   const [program, setProgram] = useState('all');
   const [platforms, setPlatforms] = useState<string[]>(['facebook', 'instagram']);
@@ -119,6 +120,7 @@ export default function NewSocialCampaignClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
+          requestId,
           contentSource: 'blog',
           platforms,
           frequency,

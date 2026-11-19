@@ -1,3 +1,6 @@
+export type TenantSiteSocialIcon = 'facebook' | 'linkedin' | 'youtube' | 'instagram' | 'link';
+export type TenantSiteSocialLink = { label: string; url: string; icon?: TenantSiteSocialIcon };
+
 export type TenantSiteLinkGroup = { label: string; pageIds: string[] };
 
 export type TenantSiteProduct = {
@@ -123,7 +126,7 @@ export type TenantSiteConfig = {
   testimonial?: { quote: string; author: string };
   navigation: Array<{ label: string; href: string }>;
   navigationGroups?: TenantSiteLinkGroup[];
-  footer: { showContactDetails?: boolean; description: string; contactEmail?: string; linkGroups?: TenantSiteLinkGroup[] };
+  footer: { showLogo?: boolean; layout?: 'stacked' | 'columns'; socialLinks?: TenantSiteSocialLink[]; showContactDetails?: boolean; description: string; contactEmail?: string; linkGroups?: TenantSiteLinkGroup[] };
   seo?: { title: string; description: string; keywords?: string[] };
   claims?: TenantSiteClaim[];
   meta?: Record<string, unknown>;

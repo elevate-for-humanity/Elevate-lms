@@ -1,10 +1,13 @@
-/* Match the compact, readable composer used by conversation-first workspaces.
-   Keep 16px on mobile to avoid iOS input zoom; do not force a 20px editor. */
+/* Keep the primary command input readable at every viewport.
+   The 20px minimum also avoids iOS input zoom; tool typography stays unchanged. */
 .root .composer {
-  font-size: 1rem;
+  /* Override Admin's mobile textarea zoom guard only for this composer. */
+  font-size: max(1.25rem, 20px) !important;
   line-height: 1.5;
   min-height: 4rem;
-  max-height: min(28dvh, 240px);
+  /* Keep both draft lines visible even with the landscape keyboard open.
+     2lh follows font scaling; 1.5rem + 2px covers the larger padding/border. */
+  max-height: max(min(28dvh, 240px), calc(2lh + 1.5rem + 2px));
   overflow-y: auto;
   overscroll-behavior: contain;
 }

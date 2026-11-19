@@ -49,7 +49,7 @@ try {
     await page.screenshot({ path: capture, fullPage: true });
     try {
       await page.evaluate(async () => {
-        await Promise.all([...document.querySelectorAll('.tenant-hero img')].map(image => image.decode()));
+        await Promise.all([...document.querySelectorAll('.tenant-hero img, [data-footer-logo]')].map(image => image.decode()));
       });
     } catch (error) {
       console.error('Fixture image decoding failed', { legacy, width, position });
@@ -78,6 +78,31 @@ try {
     assert.equal(await contact.locator('a').count(), 0, 'read-only contact actions suppressed');
     const contactBox = await contact.boundingBox();
     assert.ok(contactBox.x >= 0 && contactBox.x + contactBox.width <= width + 1, 'footer contact fits viewport');
+    }
+    const footer = page.locator('footer');
+    const logo = footer.locator('[data-footer-logo]');
+    const social = footer.getByRole('list', { name: 'Social profiles' });
+    if (position === 'off') {
+      assert.equal(await logo.count(), 0, 'default footer does not opt into logo');
+      assert.equal(await social.count(), 0, 'default footer has no invented profiles');
+      assert.equal(await footer.getAttribute('data-footer-layout'), 'stacked');
+    } else {
+      assert.equal(await logo.count(), 1, 'saved brand logo rendered');
+      assert.equal(await logo.evaluate(image => image.closest('a')?.getAttribute('href')), '/', 'saved footer brand links Home');
+      const logoState = await logo.evaluate(image => ({loaded:image.complete && image.naturalWidth > 0, width:image.getBoundingClientRect().width}));
+      assert.ok(logoState.loaded && logoState.width > 0, 'footer logo decoded');
+      assert.equal(await social.locator('li').count(), 2);
+      assert.equal(await social.locator('a').count(), 0, 'read-only profile actions suppressed');
+      for (const target of await social.locator('[aria-disabled=true]').all()) {
+        const box = await target.boundingBox();
+        assert.ok(box.height >= 44 && box.width >= 44, 'social target dimensions');
+        assert.ok(box.x >= 0 && box.x + box.width <= width + 1, 'social label fits viewport');
+      }
+      assert.equal(await footer.getAttribute('data-footer-layout'), position === 'full' ? 'stacked' : 'columns');
+      if (width === 1280 && position === 'right') {
+        const grid = await footer.getByRole('navigation', {name:'Footer navigation'}).evaluate(nav => getComputedStyle(nav).gridTemplateColumns.split(' ').length);
+        assert.equal(grid, 5, 'brand, three link groups and contact occupy five desktop columns');
+      }
     }
     assert.ok(result.band.bottom <= result.hero.y + 1, 'introduction precedes hero');
     assert.ok(result.portrait.loaded && result.portrait.width > 0 && result.portrait.height > 0, 'foreground portrait remains visible');

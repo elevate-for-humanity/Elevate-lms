@@ -1,3 +1,4 @@
+import { validateFooterPresentationFields } from '@/lib/tenant/footer-presentation';
 import { validateFooterContactFields } from '@/lib/tenant/footer-contact';
 import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
@@ -75,7 +76,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const base = buildDefaultSiteConfig({ organizationName: siteName });
   const existing = site.site_config && typeof site.site_config === 'object' ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>) : base;
   const configPatch = body.siteConfig && typeof body.siteConfig === 'object' ? body.siteConfig as Partial<TenantSiteConfig> : {};
-  const backdropErrors = [...validateHeroBackdropFields(configPatch), ...validateFooterContactFields(configPatch)];
+  const backdropErrors = [...validateHeroBackdropFields(configPatch), ...validateFooterContactFields(configPatch), ...validateFooterPresentationFields(configPatch)];
   if (backdropErrors.length) return NextResponse.json({ error: 'Invalid website presentation configuration.', validation: { valid: false, errors: backdropErrors } }, { status: 422 });
   const merged = bridgeLegacyPatchIntoComposition(mergeSiteConfig(existing, configPatch), configPatch, existing);
 

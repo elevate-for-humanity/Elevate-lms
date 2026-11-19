@@ -49,3 +49,13 @@ test('explicit narrow query retains priority over broad release goal', () => {
     .map(path => ({path,type:'blob'}));
   assert.equal(rankSourcePaths(explicit,list,goal)[0],list[0].path);
 });
+
+test('tree-refetch ranking preserves failed-step focus when task contains appended evidence', () => {
+  const unrelated = Array.from({length: 13}, (_, i) =>
+    `lib/billing/recurring-release-${String(i + 1).padStart(2, '0')}.ts`);
+  const trustedTree = [...unrelated, studio].map(path => ({path, type: 'blob'}));
+  // Production recovery invokes suggestedSourcePaths(goal, tree, goal + JSON.stringify(evidence)).
+  const ranked = rankSourcePaths(goal, trustedTree, goal + JSON.stringify({}));
+  assert.ok(ranked.includes(studio), 'failed Studio source must survive the twelve-path cap');
+  assert.ok(ranked.every(path => !path.startsWith('lib/billing/')), 'safety-only billing terms must not re-enter ranking');
+});

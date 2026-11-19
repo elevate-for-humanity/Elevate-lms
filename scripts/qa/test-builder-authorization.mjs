@@ -30,6 +30,9 @@ const wallet = (db, id, amount) => db.rpc('ensure_app_trial_wallet', {
 });
 
 try {
+  const qaTenant = check(await admin.from('tenants').select('id')
+    .eq('slug', 'elevate-lms-qa').single(), 'Isolated QA tenant lookup');
+  assert.ok(qaTenant.id, 'The isolated QA tenant must exist');
   // Fresh real accounts avoid modifying or revoking sessions for shared personas.
   for (let index = 0; index < 2; index++) {
     const email = `${run}-${index}@example.invalid`;
@@ -46,7 +49,8 @@ try {
     organizations.push(org.id);
     check(await admin.from('profiles').insert({
       id: created.user.id, email, full_name: 'Disposable builder QA',
-      role: 'student', organization_id: org.id, enrollment_status: 'pending', is_active: true,
+      role: 'student', organization_id: org.id, tenant_id: qaTenant.id,
+      enrollment_status: 'pending', is_active: true,
     }), 'Ordinary profile fixture');
     const db = createClient(url, anon, options);
     sessions.push(db);

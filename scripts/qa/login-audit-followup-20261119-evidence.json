@@ -1,0 +1,66 @@
+{
+  "project_ref": "isdgjcdabhxxozarmxta",
+  "stage": "exact_login_queries_and_audit_sinks",
+  "production_modified": false,
+  "production_rows_copied": false,
+  "login_query_verification": {
+    "verified_at": "2026-11-19T13:02:26.885Z",
+    "real_password_authentication": true,
+    "browser_anon_key_used": true,
+    "personas_verified": 9,
+    "exact_profile_query": "profiles.select('role, portal_type, onboarding_completed').eq('id', user_id).maybeSingle()",
+    "exact_secondary_role_query": "user_roles.select('roles(name)').eq('user_id', user_id)",
+    "both_queries_passed_for_all_personas": true,
+    "sessions_signed_out": true,
+    "learner_role_mutation_denied": true,
+    "browser_redirect_certified": false
+  },
+  "concurrent_migration_observed": {
+    "version": "20261119123423",
+    "name": "qa_login_role_membership_read_policies",
+    "provenance": "unknown concurrent session; not applied by this task",
+    "changes_observed": [
+      "authenticated SELECT grants on roles, user_roles, partner_users",
+      "authenticated roles_public_read",
+      "user_roles_read_own",
+      "partner_users_read_own",
+      "restrictive privileged-session MFA policy on partner_users"
+    ],
+    "overwritten_or_reapplied_by_this_task": false
+  },
+  "audit_schema_stage": {
+    "version": "20261119130111",
+    "name": "qa_audit_sinks_structural_stage",
+    "source": "read-only production catalog metadata, no audit rows",
+    "tables": ["audit_logs", "audit_failures"],
+    "columns": 75,
+    "constraints": 3,
+    "additional_indexes": 10,
+    "rls_enabled": true,
+    "anon_authenticated_privileges_revoked": true,
+    "service_privileges": ["SELECT", "INSERT"],
+    "production_triggers_or_policies_copied": false,
+    "actual_service_api_insert_succeeded_for_both_tables": true,
+    "post_apply_catalog_comparison_completed": false
+  },
+  "cleanup": {
+    "status": "PENDING",
+    "latest_parent_read": "2026-11-19; exact timestamp not recorded",
+    "remaining_probe_rows": {
+      "audit_logs": {
+        "id": "df621ee5-18dd-4278-9544-08e515ed1237",
+        "action": "qa_login_audit_probe",
+        "count": 1
+      },
+      "audit_failures": {
+        "id": "0e936fc5-ae90-4c38-84e5-8a965362b60a",
+        "context": "qa_disposable_audit_probe",
+        "count": 1
+      }
+    },
+    "blocker": "Scoped connector DELETE calls stalled and execution runtimes were replaced; completion could not be established. Parent read still found both rows. No alternate privilege or repeated mutation path used after stop instruction.",
+    "cleanup_success_claimed": false
+  },
+  "remaining_host_shop_blocker": "Real browser flow reaches /host-shop/login?error=no_partner; correct active partner membership and shops fixture not established by this task.",
+  "full_e2e_or_release_certified": false
+}

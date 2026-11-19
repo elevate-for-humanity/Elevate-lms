@@ -1,7 +1,8 @@
 {
   "project_ref": "isdgjcdabhxxozarmxta",
-  "checked_at": "2026-11-19T12:05:02.371Z",
+  "checked_at": "2026-11-19T13:02:26.885Z",
   "stage": "auth_and_minimal_profile_read_only",
+  "browser_anon_key_used": true,
   "full_application_e2e_ready": false,
   "persona_count": 9,
   "results": [
@@ -11,7 +12,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 9,
       "own_role_verified": true,
-      "cross_user_denial_verified": false
+      "cross_user_denial_verified": false,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "LEARNER",
@@ -19,7 +23,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "PROGRAM_HOLDER",
@@ -27,7 +34,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "HOST_SHOP",
@@ -35,7 +45,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "APPRENTICE",
@@ -43,7 +56,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "EMPLOYER",
@@ -51,7 +67,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "INSTRUCTOR",
@@ -59,7 +78,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "STAFF",
@@ -67,7 +89,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 9,
       "own_role_verified": true,
-      "cross_user_denial_verified": false
+      "cross_user_denial_verified": false,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     },
     {
       "persona": "CASE_MANAGER",
@@ -75,7 +100,10 @@
       "actual_password_sign_in": true,
       "visible_profiles": 1,
       "own_role_verified": true,
-      "cross_user_denial_verified": true
+      "cross_user_denial_verified": true,
+      "exact_login_profile_query_passed": true,
+      "exact_login_secondary_role_query_passed": true,
+      "secondary_role_count": 0
     }
   ],
   "learner_role_write_denied": true,

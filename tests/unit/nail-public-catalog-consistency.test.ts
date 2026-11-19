@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { NAIL_TECH } from '@/data/programs/nail-technician-apprenticeship';
+import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
+import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
 import { NAIL_TECH_PROGRAM } from '@/lib/program-constants';
 import { orientationConfigs } from '@/lms-data/orientationConfig';
 import { buildProgramAtAGlance } from '@/lib/programs/program-at-a-glance';
@@ -32,4 +34,16 @@ describe('Nail Technician public catalog consistency', () => {
       expect(config.tuition.fundingNote).not.toMatch(/WIOA|WRG/);
     }
   });
+  it('does not mistake employer-paid apprenticeship work for free tuition', () => {
+    for (const program of [COSMETOLOGY, ESTHETICIAN_APPRENTICESHIP]) {
+      const config = orientationConfigs[program.slug];
+      const advertisedTuition = Number(program.selfPayCost.replace(/[^0-9.]/g, ''));
+      expect(advertisedTuition).toBe(6000);
+      expect(config.tuition.total).toBe(advertisedTuition);
+      expect(config.tuition.setupFeePercent).toBe(10);
+      expect(config.tuition.fundingNote).toMatch(/Self-pay only/);
+      expect(config.tuition.fundingNote).not.toMatch(/no tuition|WIOA|WRG/i);
+    }
+  });
+
 });

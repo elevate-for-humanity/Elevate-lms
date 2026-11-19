@@ -1,5 +1,5 @@
 import {beforeEach,expect,it,vi} from 'vitest';
-const h=vi.hoisted(()=>({courseStatus:'running',workerStatus:'running',verifiedRuntime:false,workflowToken:true,healthSha:'a'.repeat(40),updates:[] as any[]}));
+const h=vi.hoisted(()=>({courseStatus:'running',workerStatus:'running',verifiedRuntime:false,workflowToken:true,healthSha:'a'.repeat(40),mainSha:'a'.repeat(40),updates:[] as any[]}));
 vi.mock('server-only',()=>({}));
 vi.mock('@/lib/devstudio/workflow-github-context',()=>({currentWorkflowGitHubToken:()=>h.workflowToken?'verified-workflow-fixture':undefined}));
 vi.mock('@/lib/devstudio/github-token',()=>({getGitHubHeaders:async()=>({Authorization:'Bearer test-only'})}));
@@ -18,8 +18,8 @@ vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:(table:s
 }})}));
 import {tickParisCodeRepairs} from '@/lib/ai/runtime/code-repair';
 beforeEach(()=>{
- h.workflowToken=true;h.courseStatus='running';h.workerStatus='running';h.verifiedRuntime=false;h.healthSha='a'.repeat(40);h.updates=[];
- vi.stubGlobal('fetch',vi.fn(async(url:string)=>new Response(JSON.stringify(url.includes('/git/ref/heads/main')?{object:{sha:'a'.repeat(40)}}:url.includes('/actions/runs/42/jobs?per_page=100')?{jobs:[{name:'CI Required Gate',status:'completed',conclusion:'success'}]}:url.includes('/actions/runs?')?{workflow_runs:[{id:42,name:'CI',path:'.github/workflows/ci.yml',head_branch:'main',head_repository:{full_name:'elevate-for-humanity/Elevate-lms'},head_sha:'a'.repeat(40),event:'workflow_dispatch',status:'completed',conclusion:'success'},...['Deploy Admin','Deploy LMS automatically on Google','Deploy Google Marketing on trigger','Deploy Google Course Builder on source changes'].map(name=>({name,head_sha:'a'.repeat(40),event:'workflow_dispatch',status:'completed',conclusion:'success'}))]}:{commit:h.healthSha}))));
+ h.workflowToken=true;h.courseStatus='running';h.workerStatus='running';h.verifiedRuntime=false;h.healthSha='a'.repeat(40);h.mainSha='a'.repeat(40);h.updates=[];
+ vi.stubGlobal('fetch',vi.fn(async(url:string)=>new Response(JSON.stringify(url.includes('/git/ref/heads/main')?{object:{sha:h.mainSha}}:url.includes('/compare/')?{status:'ahead'}:url.includes('/actions/runs/42/jobs?per_page=100')?{jobs:[{name:'CI Required Gate',status:'completed',conclusion:'success'}]}:url.includes('/actions/runs?')?{workflow_runs:[{id:42,name:'CI',path:'.github/workflows/ci.yml',head_branch:'main',head_repository:{full_name:'elevate-for-humanity/Elevate-lms'},head_sha:'a'.repeat(40),event:'workflow_dispatch',status:'completed',conclusion:'success'},...['Deploy Admin','Deploy LMS automatically on Google','Deploy Google Marketing on trigger','Deploy Google Course Builder on source changes'].map(name=>({name,head_sha:'a'.repeat(40),event:'workflow_dispatch',status:'completed',conclusion:'success'}))]}:{commit:h.healthSha}))));
 });
 it('deployed healthy applications leave an unfinished course repair verifying',async()=>{
  await tickParisCodeRepairs({workflowOwnedDispatch:true});expect(h.updates).toContainEqual(expect.objectContaining({status:'verifying',verification:expect.objectContaining({courseExecution:expect.objectContaining({state:'pending'})})}));
@@ -39,5 +39,21 @@ it('a later unrelated deployment does not falsely certify the older repair relea
  await tickParisCodeRepairs({workflowOwnedDispatch:true});expect(h.updates).toContainEqual(expect.objectContaining({status:'verifying',verification:expect.objectContaining({exactRuntimeSha:false})}));
 });
 
+it('superseded exact-main CI reconciles newer main without deploying or certifying the old SHA',async()=>{
+ h.mainSha='b'.repeat(40);
+ await tickParisCodeRepairs({workflowOwnedDispatch:true});
+ expect(h.updates).toContainEqual(expect.objectContaining({
+  status:'verifying',
+  verification:expect.objectContaining({
+   releaseReconciliation:expect.objectContaining({
+    state:'newer-main-needs-independent-validation',
+    immutableReleaseSha:'a'.repeat(40),
+    currentMainSha:'b'.repeat(40),
+    independentlyValidated:false
+   })
+  })
+ }));
+ expect(h.updates.some(v=>v.status==='verified'||v.status==='deploying')).toBe(false);
+});
 it('runtime polls wait for the signed workflow without attempting mutations or dispatch',async()=>{h.workflowToken=false;const result=await tickParisCodeRepairs();expect(result).toMatchObject({awaitingWorkflow:true,dispatched:0});expect(h.updates).toEqual([]);expect(fetch).not.toHaveBeenCalled();});
 it('a boolean flag alone cannot grant a workflow credential',async()=>{h.workflowToken=false;expect(await tickParisCodeRepairs({workflowOwnedDispatch:true})).toMatchObject({awaitingWorkflow:true});expect(h.updates).toEqual([]);});

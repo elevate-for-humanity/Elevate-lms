@@ -31,11 +31,13 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
     const isAdmin =
       subject.previewing || ['admin', 'super_admin'].includes(String(actor?.role || ''));
     // Fail closed for learners before rendering navigation or course data.
-    // Enrollment and payment remain available before training admission.
+    // Keep the application, payment, and required admissions steps reachable.
     // An admin preview retains read-only access without granting learner rights.
-    const isAdmissionRoute = ['/lms/payments', '/lms/enroll'].some(
-      route => pathname === route || pathname.startsWith(`${route}/`),
-    );
+    const isAdmissionRoute =
+      ['/lms/payments', '/lms/enroll'].some(
+        route => pathname === route || pathname.startsWith(`${route}/`),
+      ) ||
+      ['/lms/documents', '/lms/documents/upload', '/lms/agreements', '/lms/onboarding'].includes(pathname);
     if (user && !isAdmin && !isAdmissionRoute) {
       const admitted = await hasApprovedPaidLearnerEnrollment(db, user.id);
       if (!admitted) redirect('/lms/access-pending');

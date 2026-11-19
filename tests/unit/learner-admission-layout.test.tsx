@@ -16,12 +16,28 @@ import Layout from '@/apps/lms/app/lms/(app)/layout';
 const render = async () => renderToStaticMarkup(await Layout({ children: <p>Route content</p> }));
 beforeEach(() => { state.pathname = '/lms/dashboard'; state.admitted = false; state.previewing = false; admission.mockClear(); });
 
-it.each(['/lms/payments', '/lms/payments/invoice', '/lms/enroll', '/lms/enroll/program'])('allows pending applicants to reach %s', async pathname => {
+it.each([
+  '/lms/payments',
+  '/lms/payments/invoice',
+  '/lms/enroll',
+  '/lms/enroll/program',
+  '/lms/documents',
+  '/lms/documents/upload',
+  '/lms/agreements',
+  '/lms/onboarding',
+])('allows pending applicants to reach %s', async pathname => {
   state.pathname = pathname;
   expect(await render()).toContain('Route content');
   expect(admission).not.toHaveBeenCalled();
 });
-it.each(['/lms/dashboard', '/lms/payments-private', '/lms/enrollment-materials'])('continues to deny protected route %s', async pathname => {
+it.each([
+  '/lms/dashboard',
+  '/lms/courses/example',
+  '/lms/payments-private',
+  '/lms/enrollment-materials',
+  '/lms/documents/course-materials',
+  '/lms/onboarding/coursework',
+])('continues to deny protected route %s', async pathname => {
   state.pathname = pathname;
   await expect(render()).rejects.toThrow('redirect:/lms/access-pending');
 });

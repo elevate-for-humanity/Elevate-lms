@@ -25,6 +25,9 @@ export default async function LearnerAccessPendingPage() {
       <Link href="/enrollment" className="mt-7 rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white">
         View enrollment steps
       </Link>
+      <Link href="/lms/onboarding" className="mt-4 font-semibold text-blue-800 underline">
+        Continue required onboarding
+      </Link>
     </main>
   );
 }

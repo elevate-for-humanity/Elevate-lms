@@ -50,9 +50,14 @@ for (const [name, role] of Object.entries(roles)) {
   }
   if (!entry.user_id) {
     // Always recover a request whose response was lost before creating another.
-    const existing = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    if (existing.error) throw new Error(`QA Auth lookup failed: ${existing.error.status || 'unknown'}`);
-    const match = existing.data.users.find(user => user.email === entry.email);
+    const pageSize = 1000;
+    let match;
+    for (let page = 1; ; page++) {
+      const existing = await db.auth.admin.listUsers({ page, perPage: pageSize });
+      if (existing.error) throw new Error(`QA Auth lookup failed: ${existing.error.status || 'unknown'}`);
+      match = existing.data.users.find(user => user.email === entry.email);
+      if (match || existing.data.users.length < pageSize) break;
+    }
     if (match) {
       if (match.app_metadata?.qa_run_id !== file.run_id || match.app_metadata?.role !== role) {
         throw new Error('Refusing to adopt an identity not owned by this QA run.');

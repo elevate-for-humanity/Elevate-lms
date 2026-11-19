@@ -45,7 +45,7 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
       a.href=url;a.download='FAA_'+name.replace(/[^a-z0-9_-]/gi,'_')+'_'+startDate+(intent==='finalize'?'_signed':'_draft')+'.pdf';
       document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);
       setResult('FAA stored in the private student binder and downloaded. WorkOne funding remains pending.');
-      setApproved(false);setConfirmName('');
+      setApproved(false);
     }catch(e){setError(e instanceof Error?e.message:'Could not generate FAA');}finally{setBusy(false);}
   }
   return <div className="space-y-6">
@@ -53,7 +53,7 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
       <h2 className="text-xl font-bold">Save your signature once</h2>
       <p className="my-2 text-sm text-slate-600">Upload a PNG of your actual signature; it is kept private and used only when you approve a specific FAA.</p>
       <label className="mt-3 block text-sm font-semibold">Your legal provider signature name
-        <input value={providerName} onChange={e=>setProviderName(e.target.value)} className="mt-1 block w-full rounded border p-2" placeholder="Elizabeth Greene"/>
+        <input value={providerName} onChange={e=>{setProviderName(e.target.value);setApproved(false);}} className="mt-1 block w-full rounded border p-2" placeholder="Elizabeth Greene"/>
       </label>
       <input type="file" accept="image/png" onChange={selectImage} className="mt-3 block w-full"/>
       <label className="mt-3 flex gap-2 text-sm"><input type="checkbox" checked={imageConsent} onChange={e=>setImageConsent(e.target.checked)}/>I own this signature and authorize its private storage.</label>
@@ -61,10 +61,10 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
     </section>
     <form onSubmit={generate} className="space-y-4 rounded-xl border bg-white p-5">
       <h2 className="text-xl font-bold">Generate WorkOne FAA</h2>
-      <label className="block text-sm font-semibold">Student<select required value={studentId} onChange={e=>setStudentId(e.target.value)} className="mt-1 block w-full rounded border p-3">
+      <label className="block text-sm font-semibold">Student<select required value={studentId} onChange={e=>{setStudentId(e.target.value);setApproved(false);}} className="mt-1 block w-full rounded border p-3">
         <option value="">Select student...</option>{students.map(s=><option key={s.id} value={s.id}>{s.name} — {s.email}</option>)}
       </select></label>
-      <label className="block text-sm font-semibold">Program<select value={programKey} onChange={e=>setProgramKey(e.target.value)} className="mt-1 block w-full rounded border p-3">
+      <label className="block text-sm font-semibold">Program<select value={programKey} onChange={e=>{setProgramKey(e.target.value);setApproved(false);}} className="mt-1 block w-full rounded border p-3">
         {programs.map(p=><option key={p.key} value={p.key}>{p.label}</option>)}
       </select></label>
       {program&&<p className="rounded bg-amber-50 p-3 text-sm text-amber-900">
@@ -74,7 +74,7 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
       <label className="block text-sm font-semibold">Provider contact name
         <input value={providerName} onChange={e=>setProviderName(e.target.value)} required className="mt-1 block w-full rounded border p-3"/>
       </label>
-      <label className="block text-sm font-semibold">Start date<input required type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} className="mt-1 block w-full rounded border p-3"/></label>
+      <label className="block text-sm font-semibold">Start date<input required type="date" value={startDate} onChange={e=>{setStartDate(e.target.value);setApproved(false);}} className="mt-1 block w-full rounded border p-3"/></label>
       <label className="block text-sm font-semibold">End date<input readOnly value={endDate} className="mt-1 block w-full rounded border bg-slate-100 p-3"/></label>
       <fieldset className="rounded border border-slate-300 p-4">
         <legend className="font-semibold">Document action</legend>

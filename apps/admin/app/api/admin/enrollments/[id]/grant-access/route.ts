@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!adminProfile || !['admin', 'staff'].includes(adminProfile.role)) {
+  if (!adminProfile || !['admin', 'super_admin'].includes(adminProfile.role)) {
     return safeError('Forbidden', 403);
   }
 
@@ -50,12 +50,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Fetch enrollment + student profile
   const { data: enrollment, error: fetchError } = await db
     .from('program_enrollments')
-    .select('id, user_id, program_id, program_slug, full_name, email, access_granted_at')
+    .select('id, user_id, program_id, program_slug, full_name, email, access_granted_at, payment_status, revoked_at, cancelled_at, suspended_at, refunded_at')
     .eq('id', enrollmentId)
     .maybeSingle();
 
   if (fetchError || !enrollment) return safeError('Enrollment not found', 404);
   if (enrollment.access_granted_at) return safeError('Access already granted', 409);
+  if (enrollment.revoked_at || enrollment.cancelled_at || enrollment.suspended_at || enrollment.refunded_at) {
+    return safeError('Enrollment is not eligible for activation', 409);
+  }
+  if (!['paid', 'paid_in_full'].includes(String(enrollment.payment_status || '').toLowerCase())) {
+    return safeError('Verified payment required before administrator can approve learner access', 409);
+  }
 
   // Fail closed: OCR submission is not verification. Every applicable
   // enrollment requirement must be verified or explicitly not applicable.
@@ -79,6 +85,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .from('program_enrollments')
     .update({
       status: 'active',
+      enrollment_state: 'active',
+      access_status: 'active',
+      approved_at: now,
+      approved_by: user.id,
       access_granted_at: now,
       updated_at: now,
       ...(resolvedCourseId ? { course_id: resolvedCourseId } : {}),

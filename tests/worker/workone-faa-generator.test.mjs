@@ -24,9 +24,11 @@ test('end date uses UTC weeks and validates illegal dates',()=>{
   assert.throws(()=>faaEndDate('bad',6),/FAA_START_DATE_INVALID/);
 });
 test('generating cannot sign without fresh per-document approval',()=>{
-  assert.match(route,/input\.sign===true/);
+  assert.match(route,/input\.intent==='finalize'/);
+  assert.match(route,/input\.intent!=='finalize'&&input\.intent!=='draft'/);
   assert.match(route,/input\.approved!==true/);
-  assert.match(route,/stored\.signer_name!==input\.confirmName\.trim\(\)/);
+  assert.match(route,/signaturePolicy:'admin_explicit_finalize_only'/);
+  assert.match(route,/stored\.signer_name!==providerName/);
   assert.match(route,/stored\.actor_id!==user\.id/);
   assert.match(route,/\.eq\('id',studentId\)/);
   assert.match(route,/from\('profiles'\)/);

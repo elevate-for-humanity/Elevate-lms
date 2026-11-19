@@ -107,3 +107,14 @@ it('unobserved successor validation has a fixed observation window, not a refres
   })})
  }));
 });
+
+it('unavailable GitHub compare cannot be mistaken for proven non-ancestry',async()=>{
+ h.mainSha='b'.repeat(40);
+ const prior=globalThis.fetch;
+ vi.stubGlobal('fetch',vi.fn(async(url:string)=>url.includes('/compare/')
+  ?new Response('temporary unavailable',{status:503})
+  :prior(url)));
+ await expect(tickParisCodeRepairs({workflowOwnedDispatch:true}))
+  .rejects.toThrow('PARIS_GITHUB_HTTP_503');
+ expect(h.updates.some(v=>v.status==='blocked'&&v.error_code==='REPAIR_RELEASE_NOT_ANCESTOR_OF_MAIN')).toBe(false);
+});

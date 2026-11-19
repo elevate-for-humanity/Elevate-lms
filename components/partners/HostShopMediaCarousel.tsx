@@ -110,8 +110,13 @@ export default function HostShopMediaCarousel({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocusCapture={(event) => {
-        // Pointer focus must not flip Pause to Play before its click runs.
-        if (event.target.matches(':focus-visible')) setPlaying(false);
+        // Keep keyboard focus on gallery navigation motion-safe, but never
+        // change playback before the Play/Pause button's own click toggles it.
+        // Some touch/browser focus sequences mark the toggle as focus-visible.
+        if (
+          event.target.matches(':focus-visible') &&
+          !event.target.closest('button[aria-label="Pause slideshow"], button[aria-label="Play slideshow"]')
+        ) setPlaying(false);
       }}
       className={
         compact

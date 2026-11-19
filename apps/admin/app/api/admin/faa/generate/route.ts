@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
   const {data:{user},error:sessionError}=await session.auth.getUser();
   if(sessionError||!user)return NextResponse.json({error:'Authentication required'},{status:401});
   const db=await requireAdminClient();
-  const {data:actor,error:actorError}=await db.from('profiles').select('role,full_name').eq('id',user.id).maybeSingle();
-  if(actorError||!actor||!['admin','super_admin'].includes(actor.role))
+  const {data:actor,error:actorError}=await db.from('profiles').select('role,full_name,is_active,suspended,status').eq('id',user.id).maybeSingle();
+  if(actorError||!actor||(!['admin','super_admin'].includes(actor.role)||actor.is_active===false||actor.suspended===true||['suspended','disabled','inactive','banned'].includes(String(actor.status||'').toLowerCase())))
     return NextResponse.json({error:'Administrator approval required'},{status:403});
   let data:unknown;try{data=await req.json();}catch{return NextResponse.json({error:'Invalid JSON'},{status:400});}
   const input=data as {studentId?:unknown;programKey?:unknown;startDate?:unknown;sign?:unknown;approved?:unknown;confirmName?:unknown;providerName?:unknown;intent?:unknown};

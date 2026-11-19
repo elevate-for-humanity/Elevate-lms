@@ -46,6 +46,21 @@ class DiagnosticTests(unittest.TestCase):
         self.assertFalse(report['configurationChanged'])
         return report
 
+    def test_initial_events_deduplicate_identity_not_timestamp(self):
+        lines = [f'PBX failure v1 2026-11-19T03:49:{second:02d}.000Z expiry apply asterisk_reload_failed'
+                 for second in range(25)]
+        lines.append('PBX failure v1 2026-11-19T03:49:25.000Z expiry rollback asterisk_dialplan_unverified')
+        report = m.failure_stages('\n'.join(lines))
+        self.assertEqual(len(report['initialFailureStages']), 2)
+        self.assertEqual(report['initialFailureStages'][0]['observedAt'], '2026-11-19T03:49:00.000Z')
+        self.assertEqual(report['initialFailureStages'][1]['code'], 'asterisk_dialplan_unverified')
+        self.assertEqual(len(report['recentStages']), 20)
+        self.assertEqual(report['recentStages'][0]['observedAt'], '2026-11-19T03:49:06.000Z')
+        self.assertEqual(report['recentStages'][-1]['phase'], 'rollback')
+        legacy = 'PBX expired-credential revocation stage: asterisk_reload_failed'
+        self.assertEqual(m.failure_stages('\n'.join([legacy] * 25))['initialFailureStages'],
+                         [{'stage': 'revocation', 'code': 'asterisk_reload_failed'}])
+
     def test_structured_events_survive_noise_and_quarantine(self):
         prefix = 'PBX failure v1 2026-11-19T03:49:00.000Z '
         entries = [(100, prefix + 'expiry apply asterisk_reload_failed'),

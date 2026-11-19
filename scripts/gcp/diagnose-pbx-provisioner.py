@@ -21,6 +21,7 @@ def command(args):
 def failure_stages(journal):
     events = []
     initial_failures = []
+    initial_keys = set()
     for line in journal.splitlines():
         match = re.fullmatch(r'PBX (ownership/runtime reconciliation failed|expired-credential revocation stage): ([a-z_]+)', line)
         event = None
@@ -31,7 +32,10 @@ def failure_stages(journal):
             event = {'stage': structured[2], 'phase': structured[3],
                      'code': structured[4], 'observedAt': structured[1]}
         if event:
-            if event['code'] not in {'provisioner_quarantined', 'provisioner_unavailable'} and event not in initial_failures and len(initial_failures) < 20:
+            # Keep the first timestamp for each failure identity, not each retry.
+            key = (event['stage'], event.get('phase'), event['code'])
+            if event['code'] not in {'provisioner_quarantined', 'provisioner_unavailable'} and key not in initial_keys and len(initial_failures) < 20:
+                initial_keys.add(key)
                 initial_failures.append(event)
             if not events or events[-1] != event:
                 events.append(event)

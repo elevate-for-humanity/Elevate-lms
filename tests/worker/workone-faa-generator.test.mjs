@@ -26,7 +26,8 @@ test('end date uses UTC weeks and validates illegal dates',()=>{
 test('generating cannot sign without fresh per-document approval',()=>{
   assert.match(route,/input\.sign===true/);
   assert.match(route,/input\.approved!==true/);
-  assert.match(route,/input\.confirmName\.trim\(\)!==actor\.full_name/);
+  assert.match(route,/stored\.signer_name!==input\.confirmName\.trim\(\)/);
+  assert.match(route,/stored\.actor_id!==user\.id/);
   assert.match(route,/\.eq\('id',studentId\)/);
   assert.match(route,/from\('profiles'\)/);
   assert.match(route,/upsert:false/);
@@ -36,6 +37,8 @@ test('generating cannot sign without fresh per-document approval',()=>{
 });
 test('private signature cannot be stored without owner consent',()=>{
   assert.match(signature,/input\.consent!==true/);
+  assert.match(signature,/signerName\.length<4/);
+  assert.match(signature,/provider\.json/);
   assert.match(signature,/image\/png/);
   assert.match(signature,/faa-signatures/);
   assert.match(signature,/from\('documents'\)/);

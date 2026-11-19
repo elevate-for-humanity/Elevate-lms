@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
   const {data:{user}}=await session.auth.getUser();
   if(!user)return NextResponse.json({error:'Sign-in required'},{status:401});
   const db=await requireAdminClient();
-  const {data:profile,error:roleError}=await db.from('profiles').select('role,full_name').eq('id',user.id).maybeSingle();
-  if(roleError||!profile||!['admin','super_admin'].includes(profile.role))
+  const {data:profile,error:roleError}=await db.from('profiles').select('role,full_name,is_active,suspended,status').eq('id',user.id).maybeSingle();
+  if(roleError||!profile||(!['admin','super_admin'].includes(profile.role)||profile.is_active===false||profile.suspended===true||['suspended','disabled','inactive','banned'].includes(String(profile.status||'').toLowerCase())))
     return NextResponse.json({error:'Administrator authorization required'},{status:403});
   let body:unknown;try{body=await req.json();}catch{return NextResponse.json({error:'Invalid request'},{status:400});}
   const input=body as {image?:unknown;consent?:unknown;signerName?:unknown};

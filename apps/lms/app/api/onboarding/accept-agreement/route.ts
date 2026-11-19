@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { getRequiredAgreementsForProgram } from '@/lib/legal/requiredAgreements';
+import { APPRENTICESHIP_AGREEMENT, getRequiredAgreementsForProgram, isApprenticeshipProgram } from '@/lib/legal/requiredAgreements';
 import { recordAgreementAcceptance } from '@/lib/legal/recordAgreementAcceptance';
 import { getUserEnrollments } from '@/lib/enrollments/getUserEnrollments';
 import { selectOnboardingEnrollment } from '@/lib/learner/onboarding-enrollment';
@@ -49,7 +49,16 @@ export async function POST(req: NextRequest) {
     const primaryEnrollment = selectOnboardingEnrollment(enrollmentResult.enrollments);
     // Match the learner workspace requirements without changing employment
     // agreements or the primary role retained in the signature audit trail.
-    const allowedAgreements = getRequiredAgreementsForProgram('student', primaryEnrollment?.program_slug);
+    const allowedAgreements = [...getRequiredAgreementsForProgram('student', primaryEnrollment?.program_slug)];
+    // The apprentice documents portal can require this signature independently
+    // of the primary learner onboarding program.
+    if (agreement_type === APPRENTICESHIP_AGREEMENT.type && enrollmentResult.enrollments.some((row) =>
+      row.source_table === 'program_enrollments' &&
+      ['active', 'enrolled', 'in_progress', 'pending'].includes(row.status.toLowerCase()) &&
+      isApprenticeshipProgram(row.program_slug),
+    )) {
+      allowedAgreements.push(APPRENTICESHIP_AGREEMENT);
+    }
     const allowed = allowedAgreements.find(
       (item) => item.type === agreement_type && item.version === document_version,
     );

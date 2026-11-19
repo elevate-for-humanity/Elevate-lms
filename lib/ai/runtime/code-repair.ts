@@ -1,4 +1,4 @@
-import {ensureRepairMainCI,hasDurableMainCIObservation} from './exact-main-ci-request.mjs';
+import {ensureRepairMainCI,hasDurableMainCIObservation,isVerifiedMainCIReceipt} from './exact-main-ci-request.mjs';
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
 import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
@@ -667,7 +667,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    // Only exact-main CI with a successful required gate can advance release.
    // Superseded, failed or unknown evidence must never reach deployment or
    // runtime acceptance on the previous immutable target SHA.
-   if(mainCI.state!=='verified'){
+   if(!isVerifiedMainCIReceipt(mainCI)){
     await update(repair.id,{status:'blocked',error_code:mainCI.state==='blocked'
      ?mainCI.reason:mainCI.state==='superseded'?'REPAIR_MAIN_CI_SUPERSEDED':'REPAIR_MAIN_CI_UNVERIFIED'});
     continue;

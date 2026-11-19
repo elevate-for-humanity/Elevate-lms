@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({error:'Invalid PNG image'},{status:422});
   // Immutable image versions prevent a failed upload from replacing an
   // already approved signature. Update the active pointer only after audit.
+  // PNG IHDR dimensions must be bounded before pdf-lib decodes the signature.
+  const width=bytes.readUInt32BE(16),height=bytes.readUInt32BE(20);
+  if(width<1||height<1||width>4096||height>4096||width*height>4000000)
+    return NextResponse.json({error:'Signature PNG dimensions are not supported'},{status:422});
   const imageId=randomUUID();
   const path=`faa-signatures/${user.id}/images/${imageId}.png`;
   const {error}=await db.storage.from('documents').upload(path,bytes,{contentType:'image/png',upsert:false,cacheControl:'no-cache'});

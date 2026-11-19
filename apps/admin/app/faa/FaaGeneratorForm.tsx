@@ -29,6 +29,7 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
       const r=await fetch('/api/admin/faa/signature',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image,consent:imageConsent,signerName:providerName})});
       const data=await r.json();if(!r.ok)throw Error(data.error||'Signature save failed');
       setSavedSignerName(data.signerName||providerName);
+      setApproved(false);
       setResult('Private signature saved for '+providerName+'. Every signed FAA still requires your approval.');setImage('');setImageConsent(false);
     }catch(e){setError(e instanceof Error?e.message:'Signature save failed');}finally{setBusy(false);}
   }
@@ -72,7 +73,7 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
         Source: {program.source}. Verify costs before signing.
       </p>}
       <label className="block text-sm font-semibold">Provider contact name
-        <input value={providerName} onChange={e=>setProviderName(e.target.value)} required className="mt-1 block w-full rounded border p-3"/>
+        <input value={providerName} onChange={e=>{setProviderName(e.target.value);setApproved(false);}} required className="mt-1 block w-full rounded border p-3"/>
       </label>
       <label className="block text-sm font-semibold">Start date<input required type="date" value={startDate} onChange={e=>{setStartDate(e.target.value);setApproved(false);}} className="mt-1 block w-full rounded border p-3"/></label>
       <label className="block text-sm font-semibold">End date<input readOnly value={endDate} className="mt-1 block w-full rounded border bg-slate-100 p-3"/></label>

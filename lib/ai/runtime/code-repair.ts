@@ -350,7 +350,7 @@ async function requeueTimedOutRepair(db:any,repair:any){
 // ancestry, independent CI/integrity evidence and required deployments.
 // This never signs off the previous SHA or dispatches any deployment.
 async function reconcileParisNewerMain({repair,gh,deployments,currentMain}:{
- repair:any;gh:(path:string)=>Promise<any>;deployments:string[];currentMain?:any
+ repair:any;gh:(path:string)=>Promise<any>;deployments:any[];currentMain?:any
 }){
  const main=currentMain??await gh('/git/ref/heads/main');
  const currentSha=String(main?.object?.sha??'');

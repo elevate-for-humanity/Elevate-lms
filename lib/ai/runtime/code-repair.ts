@@ -1,3 +1,4 @@
+import {ensureRepairMainCI} from './exact-main-ci-request.mjs';
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
 import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
@@ -18,7 +19,7 @@ import {infrastructureRepairPath,openInfrastructureRepair,infrastructureMergeEvi
 import {verifyProtectedParisMerge} from '@/lib/devstudio/openhands/paris-protected-merge.mjs';
 import {currentWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {readRecentRepairEvents} from './repair-events';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,REPAIR_DEPLOYMENTS,eligibleRepairEvents,repairFingerprint,repairIncidentFingerprint,validationPassed,repairDeploymentState,canRetryRepair,canRetryHealthyProviderRepair,canRetryVerifiedGithubAppRepair,canResumeLegacyCpuEdit,canResumeContextBudgetRepair,canResumePlannerInspectionRepair,canResumeZeroWritePlannerRepair,nextRepairDeployment,unobservedRepairDeployment,courseDefectDisposition,canDispatchParisRepairAttempt,isParisAttemptConstraintMismatch,inFlightRepairTimedOut,repairRunsSettled,IN_FLIGHT_REPAIR_TIMEOUT_MINUTES} from './code-repair-policy.mjs';
 
 // Default new repairs to the owned internal engine; OpenHands requires an explicit opt-in.
 // Historical OpenHands checkpoints retain their original provider and approval gates.
@@ -606,8 +607,8 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     if(!sha){
      // The PR is open and not yet merged. Nothing else in the system approves
      // or merges it, so dispatch the signed protected-merge workflow once. It
-     // uses the independent verifier collaborator identity to approve and merge
-     // only if the exact validated head still satisfies the protected policy.
+     // honors the independently read protected policy: no review is fabricated
+     // when the owner configures zero approvals; positive review counts remain.
      const requestedAt=repair.verification?.protectedMergeRequestedAt;
      const requestNumber=repair.verification?.protectedMergeRequest?.prNumber;
      const alreadyRequested=requestNumber===pr.number && repair.verification?.protectedMergeRequest?.headSha===repair.verification.pullRequest.headSha;
@@ -650,6 +651,17 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    const targetSha=repair.verification?.releaseReconciliation?.state==='validated-newer-target' ? repair.verification.releaseReconciliation.currentMainSha : repair.release_sha;
    const deployments=repair.verification?.protectedMerge?[...REPAIR_DEPLOYMENTS,STORE_REPAIR_DEPLOYMENT]:REPAIR_DEPLOYMENTS;
    const runs=await gh(`/actions/runs?head_sha=${targetSha}&per_page=100`);
+   // Workflow-token merges suppress push events. Only the full exact-main CI
+   // and its successful required gate can release the recorded squash SHA.
+   const mergeReceipt=repair.verification?.protectedMergeResult;
+   const priorCIRequest=repair.verification?.mainCIRequest??(
+    ['PARIS_MERGE_MAIN_CI_REQUESTED','PARIS_MERGE_MAIN_CI_DISPATCH_FAILED'].includes(mergeReceipt?.reason)&&mergeReceipt?.mergeCommitSha===targetSha
+     ?{sha:targetSha,requestedAt:mergeReceipt.at}:undefined);
+   const mainCI=await ensureRepairMainCI({repository:REPAIR_REPOSITORY,sha:targetSha,runs:runs.workflow_runs,priorRequest:priorCIRequest,gh,
+    observationWindowMs:IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.deploying*60*1000,
+    persistIntent:async(intent:any)=>{await update(repair.id,{verification:{...repair.verification,mainCIRequest:intent}});}});
+   if(mainCI.state==='blocked'){await update(repair.id,{status:'blocked',error_code:mainCI.reason});continue;}
+   if(mainCI.state==='pending')continue;
    const state=repairDeploymentState(runs.workflow_runs??[],targetSha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
    if(state!=='passed'){

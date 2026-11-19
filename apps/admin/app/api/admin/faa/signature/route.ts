@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
@@ -24,19 +25,27 @@ export async function POST(req: NextRequest) {
   const bytes=Buffer.from(input.image.split(',')[1]||'','base64');
   if(bytes.length<100||bytes.length>300000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')
     return NextResponse.json({error:'Invalid PNG image'},{status:422});
-  const path=`faa-signatures/${user.id}/provider.png`;
-  const {error}=await db.storage.from('documents').upload(path,bytes,{contentType:'image/png',upsert:true,cacheControl:'no-cache'});
-  if(error)return NextResponse.json({error:'Could not save private signature'},{status:503});
-  const metaPath=`faa-signatures/${user.id}/provider.json`;
-  const {error:metadataError}=await db.storage.from('documents').upload(
-    metaPath,JSON.stringify({signer_name:signerName,actor_id:user.id,enrolled_at:new Date().toISOString()}),
-    {contentType:'application/json',upsert:true,cacheControl:'no-cache'});
-  if(metadataError)return NextResponse.json({error:'Signature metadata could not be saved; this signature cannot be used'},{status:503});
+  // Immutable image versions prevent a failed upload from replacing an
+  // already approved signature. Update the active pointer only after audit.
+  const imageId=randomUUID();
+  const path=`faa-signatures/${user.id}/images/${imageId}.png`;
+  const {error}=await db.storage.from('documents').upload(path,bytes,{contentType:'image/png',upsert:false,cacheControl:'no-cache'});
+  if(error)return NextResponse.json({error:'Could not store private signature'},{status:503});
   const {error:auditError}=await db.from('admin_audit_events').insert({
     action:'faa.signature_enrolled',actor_user_id:user.id,actor_role:profile.role,
     target_type:'profiles',target_id:user.id,
-    metadata:{purpose:'FAA provider signature only',signer_name:signerName,signature_storage:'private documents',enrolled_at:new Date().toISOString()}
+    metadata:{purpose:'FAA provider signature only',signer_name:signerName,
+      image_id:imageId,path,signature_storage:'private documents',enrolled_at:new Date().toISOString()}
   });
-  if(auditError)return NextResponse.json({error:'Signature saved but audit record failed; signing remains blocked pending review'},{status:503});
+  if(auditError) {
+    await db.storage.from('documents').remove([path]);
+    return NextResponse.json({error:'Signature audit record failed; no new signature was activated'},{status:503});
+  }
+  const metaPath=`faa-signatures/${user.id}/provider.json`;
+  const {error:metadataError}=await db.storage.from('documents').upload(
+    metaPath,JSON.stringify({signer_name:signerName,actor_id:user.id,signature_path:path,
+      image_id:imageId,enrolled_at:new Date().toISOString()}),
+    {contentType:'application/json',upsert:true,cacheControl:'no-cache'});
+  if(metadataError)return NextResponse.json({error:'Signature image saved, but active signature binding was not updated'},{status:503});
   return NextResponse.json({ok:true,signatureReady:true,signerName,notice:'Signature saved privately. Every FAA still requires your approval to sign.'});
 }

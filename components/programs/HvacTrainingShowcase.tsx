@@ -101,7 +101,8 @@ export function HvacProgramFilm({ assistance = true }: { assistance?: boolean })
           poster="/images/hvac-training-vibrant-2026.webp"
           width={720}
           height={900}
-          className="mx-auto block h-auto w-full max-w-[24rem] rounded-xl bg-slate-950"
+          className="mx-auto block aspect-[4/5] h-auto w-full max-w-[24rem] rounded-xl bg-slate-950 object-contain"
+          style={{ aspectRatio: '4 / 5' }}
         >
           Your browser does not support embedded video.
         </video>

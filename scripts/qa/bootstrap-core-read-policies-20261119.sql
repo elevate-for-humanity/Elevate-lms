@@ -195,7 +195,8 @@ CREATE POLICY "profiles_service_role" ON public."profiles" AS PERMISSIVE FOR ALL
 CREATE POLICY "service_role_profiles_all" ON public."profiles" AS PERMISSIVE FOR ALL TO PUBLIC USING ((( SELECT auth.role() AS role) = 'service_role'::text));
 CREATE POLICY "Users can view own tenant" ON public."tenants" AS PERMISSIVE FOR SELECT TO "authenticated" USING (((id = rpc_private.get_current_tenant_id()) OR rpc_private.is_super_admin()));
 CREATE POLICY "admin_bypass_select" ON public."tenants" AS PERMISSIVE FOR SELECT TO "authenticated" USING (rpc_private.is_admin());
-CREATE POLICY "auth_read_tenants" ON public."tenants" AS PERMISSIVE FOR SELECT TO "authenticated" USING (true);
+-- QA grants authenticated tenant reads via the own-tenant and administrator
+-- policies above, without enabling the source's unrestricted tenant policy.
 CREATE POLICY "require_privileged_aal2" ON public."tenants" AS RESTRICTIVE FOR ALL TO "authenticated" USING (( SELECT security_private.privileged_session_mfa_satisfied() AS privileged_session_mfa_satisfied)) WITH CHECK (( SELECT security_private.privileged_session_mfa_satisfied() AS privileged_session_mfa_satisfied));
 CREATE POLICY "course_enrollments_admin_all" ON public."course_enrollments" AS PERMISSIVE FOR ALL TO "authenticated" USING ((rpc_private.is_super_admin() OR (rpc_private.is_admin() AND (EXISTS ( SELECT 1
    FROM profiles subject
@@ -266,3 +267,5 @@ GRANT SELECT ON public."program_holders" TO "authenticated";
 GRANT SELECT ON public."programs" TO "anon";
 GRANT SELECT ON public."programs" TO "authenticated";
 
+GRANT SELECT ON public."organizations" TO "authenticated";
+GRANT SELECT ON public."tenants" TO "authenticated";

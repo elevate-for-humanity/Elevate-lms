@@ -100,7 +100,15 @@ try {
   mustDeny(foreignAttach, 'An owner cannot insert a site into an unrelated organization');
   mustDeny(await owner.from('user_websites').update({ organization_id: foreignOrganization.id })
     .eq('id', sites[0]), 'An owner cannot move a site into an unrelated organization');
-  check(await owner.from('user_websites').update({ site_name: run }).eq('id', sites[0]), 'Own organization update positive control');
+  const ownUpdate = check(await owner.from('user_websites').update({ site_name: run }).eq('id', sites[0]).select('id'), 'Own organization update positive control');
+  assert.equal(ownUpdate.length, 1);
+  check(await admin.from('organization_users').delete()
+    .eq('organization_id', organizations[0]).eq('user_id', ownerId), 'Legacy ownership fixture');
+  const legacyUpdate = check(await owner.from('user_websites').update({ site_name: run }).eq('id', sites[0]).select('id'), 'Legacy owner update positive control');
+  assert.equal(legacyUpdate.length, 1, 'An unchanged organization must not block the actual owner');
+  check(await admin.from('organization_users').insert({
+    organization_id: organizations[0], user_id: ownerId, role: 'org_owner', status: 'active',
+  }), 'Restore fixture membership');
   const memberRead = check(await member.from('user_websites').select('id').eq('id', sites[0]), 'Member read positive control');
   assert.equal(memberRead.length, 1, 'A member must retain allowed read access');
   const deniedDelete = await member.from('user_websites').delete().eq('id', sites[0]).select('id');
@@ -179,5 +187,6 @@ console.info(JSON.stringify({
   member_read_allowed: true, member_delete_denied: true, manager_delete_allowed: true,
   forged_revision_denied: true, owner_revision_allowed: true,
   foreign_organization_insert_denied: true, foreign_organization_move_denied: true,
+  legacy_owner_update_allowed: true,
   fixture_cleanup_verified: true, browser_acceptance: false,
 }));

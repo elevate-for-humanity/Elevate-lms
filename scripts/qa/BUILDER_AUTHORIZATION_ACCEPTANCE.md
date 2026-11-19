@@ -47,3 +47,11 @@ fingerprint mismatch/foreign-owner/stale-token rejection, exact backup retention
 monotonic write tokens, saved config and import/no-charge checks. All fixture rows
 and receipts rolled back and all seven builder tables were then verified empty.
 These privileged SQL checks do not establish a nonadmin subscriber session.
+
+The organization-change guard is SECURITY INVOKER with an empty search path. It
+checks new attachments while retaining a legacy owner's ability to edit a site
+whose organization is unchanged even when the owner has no organization membership.
+The API regression includes this positive control, along with insert/move denials
+for an unrelated organization. The wallet repair also uses an empty search path.
+Both a changed wallet body and an already-existing organization guard cause refusal,
+so a later attempt must inspect rather than overwrite concurrent repairs.

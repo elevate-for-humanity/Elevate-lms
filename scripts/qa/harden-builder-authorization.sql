@@ -10,6 +10,12 @@ begin
   is distinct from 'c5a318bd58d891f036f11c4c668d381b' then
   raise exception 'Trial wallet helper changed since review; inspect before applying';
  end if;
+ if to_regprocedure('public.enforce_website_organization_write()') is not null or exists(
+  select 1 from pg_trigger where tgrelid='public.user_websites'::regclass
+   and tgname='enforce_website_organization_write' and not tgisinternal
+ ) then
+  raise exception 'Organization write guard already exists; inspect before applying';
+ end if;
 end;
 $guard$;
 
@@ -36,9 +42,32 @@ create policy user_websites_insert_own on public.user_websites for insert to aut
 drop policy if exists user_websites_update_own on public.user_websites;
 create policy user_websites_update_own on public.user_websites for update to authenticated
  using (user_id=(select auth.uid()))
- with check (user_id=(select auth.uid()) and (organization_id is null or exists(
-  select 1 from public.organization_users ou where ou.organization_id=user_websites.organization_id
-   and ou.user_id=(select auth.uid()) and ou.status='active' and ou.role in ('org_owner','org_admin'))));
+ with check (user_id=(select auth.uid()));
+
+-- Preserve a legacy owner's ordinary edits when membership is absent. Only a
+-- new organization attachment needs target-organization management authority.
+create or replace function public.enforce_website_organization_write()
+returns trigger language plpgsql security invoker set search_path to ''
+as $organization_guard$
+begin
+ if auth.role() is distinct from 'authenticated' then return new;end if;
+ if tg_op='UPDATE' then
+  if new.organization_id is not distinct from old.organization_id then return new;end if;
+ end if;
+ if new.organization_id is not null and not exists(
+  select 1 from public.organization_users ou where ou.organization_id=new.organization_id
+   and ou.user_id=auth.uid() and ou.status='active' and ou.role in ('org_owner','org_admin')
+ ) then
+  raise exception 'Organization management authority required' using errcode='42501';
+ end if;
+ return new;
+end;
+$organization_guard$;
+revoke all on function public.enforce_website_organization_write() from public,anon,authenticated;
+grant execute on function public.enforce_website_organization_write() to service_role;
+drop trigger if exists enforce_website_organization_write on public.user_websites;
+create trigger enforce_website_organization_write before insert or update on public.user_websites
+for each row execute function public.enforce_website_organization_write();
 
 drop policy if exists website_revisions_owner_insert on public.website_revisions;
 create policy website_revisions_owner_insert on public.website_revisions for insert to authenticated

@@ -20,6 +20,8 @@ describe('Studio, Course Builder and PWA layout regression', () => {
     expect(chat).not.toContain('min-h-[180px]');
     expect(chat).toContain('overflow-y-auto bg-slate-50');
     expect(styles).toContain('font-size: max(1.25rem, 20px)');
+    expect(styles).toContain('max-height: max(min(28dvh, 240px), calc(2lh + 1.5rem + 2px))');
+    expect(chat).not.toContain('max-h-[min(28dvh,240px)]');
     expect(chat).toContain('text-xl leading-[1.5]');
     expect(chat).not.toContain('py-2 text-base leading-6 outline-none');
   });

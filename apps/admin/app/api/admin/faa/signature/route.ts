@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
+import { PDFDocument } from 'pdf-lib';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
@@ -31,6 +32,13 @@ export async function POST(req: NextRequest) {
   const width=bytes.readUInt32BE(16),height=bytes.readUInt32BE(20);
   if(width<1||height<1||width>4096||height>4096||width*height>4000000)
     return NextResponse.json({error:'Signature PNG dimensions are not supported'},{status:422});
+  // Decode with the same PNG implementation used by FAA generation.
+  try {
+    const validationPdf = await PDFDocument.create();
+    await validationPdf.embedPng(bytes);
+  } catch {
+    return NextResponse.json({error:'Choose a valid, non-animated PNG signature'},{status:422});
+  }
   const imageId=randomUUID();
   const path=`faa-signatures/${user.id}/images/${imageId}.png`;
   const {error}=await db.storage.from('documents').upload(path,bytes,{contentType:'image/png',upsert:false,cacheControl:'no-cache'});

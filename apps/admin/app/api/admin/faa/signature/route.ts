@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
   if(roleError||!profile||!['admin','super_admin'].includes(profile.role))
     return NextResponse.json({error:'Administrator authorization required'},{status:403});
   let body:unknown;try{body=await req.json();}catch{return NextResponse.json({error:'Invalid request'},{status:400});}
-  const input=body as {image?:unknown;consent?:unknown};
+  const input=body as {image?:unknown;consent?:unknown;signerName?:unknown};
+  const signerName=typeof input.signerName==='string'?input.signerName.trim():'';
+  if(signerName.length<4||signerName.length>100||!/^[\\p{L} .'-]+$/u.test(signerName))
+    return NextResponse.json({error:'Enter your legal signer name before saving your signature'},{status:422});
   if(input.consent!==true||typeof input.image!=='string'||!/^data:image\/png;base64,[a-z0-9+/=]+$/i.test(input.image)||input.image.length>450000)
     return NextResponse.json({error:'A valid PNG signature and explicit enrollment consent are required'},{status:422});
   const bytes=Buffer.from(input.image.split(',')[1]||'','base64');
@@ -24,11 +27,16 @@ export async function POST(req: NextRequest) {
   const path=`faa-signatures/${user.id}/provider.png`;
   const {error}=await db.storage.from('documents').upload(path,bytes,{contentType:'image/png',upsert:true,cacheControl:'no-cache'});
   if(error)return NextResponse.json({error:'Could not save private signature'},{status:503});
+  const metaPath=`faa-signatures/${user.id}/provider.json`;
+  const {error:metadataError}=await db.storage.from('documents').upload(
+    metaPath,JSON.stringify({signer_name:signerName,actor_id:user.id,enrolled_at:new Date().toISOString()}),
+    {contentType:'application/json',upsert:true,cacheControl:'no-cache'});
+  if(metadataError)return NextResponse.json({error:'Signature metadata could not be saved; this signature cannot be used'},{status:503});
   const {error:auditError}=await db.from('admin_audit_events').insert({
     action:'faa.signature_enrolled',actor_user_id:user.id,actor_role:profile.role,
     target_type:'profiles',target_id:user.id,
-    metadata:{purpose:'FAA provider signature only',signature_storage:'private documents',enrolled_at:new Date().toISOString()}
+    metadata:{purpose:'FAA provider signature only',signer_name:signerName,signature_storage:'private documents',enrolled_at:new Date().toISOString()}
   });
   if(auditError)return NextResponse.json({error:'Signature saved but audit record failed; signing remains blocked pending review'},{status:503});
-  return NextResponse.json({ok:true,signatureReady:true,notice:'Signature saved privately. Every FAA still requires your approval to sign.'});
+  return NextResponse.json({ok:true,signatureReady:true,signerName,notice:'Signature saved privately. Every FAA still requires your approval to sign.'});
 }

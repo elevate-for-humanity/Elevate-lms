@@ -25,6 +25,14 @@ it.each([
   '/lms/documents/upload',
   '/lms/agreements',
   '/lms/onboarding',
+  '/lms/profile',
+  '/lms/handbook',
+  '/lms/orientation',
+  '/lms/legal/enrollment-agreement',
+  '/lms/legal/student-handbook',
+  '/lms/legal/privacy',
+  '/lms/legal/student-mou',
+  '/lms/legal/apprenticeship-agreement',
 ])('allows pending applicants to reach %s', async pathname => {
   state.pathname = pathname;
   expect(await render()).toContain('Route content');
@@ -37,6 +45,7 @@ it.each([
   '/lms/enrollment-materials',
   '/lms/documents/course-materials',
   '/lms/onboarding/coursework',
+  '/lms/legal/other-materials',
 ])('continues to deny protected route %s', async pathname => {
   state.pathname = pathname;
   await expect(render()).rejects.toThrow('redirect:/lms/access-pending');

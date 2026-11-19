@@ -37,7 +37,20 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
       ['/lms/payments', '/lms/enroll'].some(
         route => pathname === route || pathname.startsWith(`${route}/`),
       ) ||
-      ['/lms/documents', '/lms/documents/upload', '/lms/agreements', '/lms/onboarding'].includes(pathname);
+      [
+        '/lms/documents',
+        '/lms/documents/upload',
+        '/lms/agreements',
+        '/lms/onboarding',
+        '/lms/profile',
+        '/lms/handbook',
+        '/lms/orientation',
+        '/lms/legal/enrollment-agreement',
+        '/lms/legal/student-handbook',
+        '/lms/legal/privacy',
+        '/lms/legal/student-mou',
+        '/lms/legal/apprenticeship-agreement',
+      ].includes(pathname);
     if (user && !isAdmin && !isAdmissionRoute) {
       const admitted = await hasApprovedPaidLearnerEnrollment(db, user.id);
       if (!admitted) redirect('/lms/access-pending');

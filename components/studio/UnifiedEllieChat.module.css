@@ -1,7 +1,8 @@
 /* Keep the primary command input readable at every viewport.
    The 20px minimum also avoids iOS input zoom; tool typography stays unchanged. */
 .root .composer {
-  font-size: max(1.25rem, 20px);
+  /* Override Admin's mobile textarea zoom guard only for this composer. */
+  font-size: max(1.25rem, 20px) !important;
   line-height: 1.5;
   min-height: 4rem;
   /* Keep both draft lines visible even with the landscape keyboard open.

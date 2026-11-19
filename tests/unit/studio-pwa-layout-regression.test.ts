@@ -25,6 +25,16 @@ describe('Studio, Course Builder and PWA layout regression', () => {
     expect(chat).toContain('text-xl leading-[1.5]');
     expect(chat).not.toContain('py-2 text-base leading-6 outline-none');
   });
+  it('keeps the composer above the Admin mobile textarea zoom guard', () => {
+    const globals = source('apps/admin/app/globals.css');
+    const styles = source('components/studio/UnifiedEllieChat.module.css');
+    const mobileGuard = globals.match(/@media\s*\(max-width:\s*1024px\)\s*\{\s*input\[type='text'\][\s\S]*?textarea,[\s\S]*?font-size:\s*16px\s*!important/);
+    expect(mobileGuard).not.toBeNull();
+    const composer = styles.match(/\.root\s+\.composer\s*\{([^}]+)\}/)?.[1] || '';
+    // Equal importance, with two scoped classes outranking the global type selector.
+    expect(composer).toMatch(/font-size:\s*max\(1\.25rem,\s*20px\)\s*!important\s*;/);
+    expect(styles.match(/font-size:[^;]+!important/g)).toHaveLength(1);
+  });
   it('respects narrow screens without forcing a second column or oversized tool typography', () => {
     const studio = source('components/studio/StudioCommandWorkspace.tsx');
     const course = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');

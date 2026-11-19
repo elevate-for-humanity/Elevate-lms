@@ -62,7 +62,10 @@ describe('shared footer presentation', () => {
     const config = fixture();
     config.footer.socialLinks = [profile];
     const { container } = footer(config, true);
-    expect(screen.getByText(profile.label).closest('[aria-disabled]')).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByText(profile.label).closest('[aria-disabled]')).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
     expect(container.querySelector('a[href^="https:"], a[href^="mailto:"]')).toBeNull();
   });
   it('fails closed for unsafe URLs in older stored configs', () => {
@@ -141,3 +144,29 @@ it('rejects arbitrary icon identifiers and non-string icons', () => {
       validateFooterPresentationFields({ footer: { socialLinks: [{ ...profile, icon }] } }),
     ).toHaveLength(1);
 });
+
+it.each(['/sites/fixture', '/review?revision=saved&device=mobile&page='])(
+  'links an opted-in footer logo Home within its public or saved preview context: %s',
+  (basePath) => {
+    const config = fixture();
+    config.footer.showLogo = true;
+    config.branding.logoImage = '/saved-logo.svg';
+    render(
+      <TenantPreviewProvider websiteId="fixture" readOnly>
+        <TenantSiteFooter
+          config={config}
+          siteName="Subscriber studio"
+          navigation={config.pages!}
+          basePath={basePath}
+          pathname="/about"
+        />
+      </TenantPreviewProvider>,
+    );
+    const brand = screen.getByRole('link', { name: 'Subscriber studio' });
+    expect(brand).toHaveAttribute(
+      'href',
+      basePath.includes('?') ? '/review?revision=saved&device=mobile&page=%2F' : '/sites/fixture',
+    );
+    expect(brand.querySelector('[data-footer-logo]')).toHaveAttribute('src', '/saved-logo.svg');
+  },
+);

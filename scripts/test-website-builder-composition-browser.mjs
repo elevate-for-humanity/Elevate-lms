@@ -88,6 +88,7 @@ try {
       assert.equal(await footer.getAttribute('data-footer-layout'), 'stacked');
     } else {
       assert.equal(await logo.count(), 1, 'saved brand logo rendered');
+      assert.equal(await logo.evaluate(image => image.closest('a')?.getAttribute('href')), '/', 'saved footer brand links Home');
       const logoState = await logo.evaluate(image => ({loaded:image.complete && image.naturalWidth > 0, width:image.getBoundingClientRect().width}));
       assert.ok(logoState.loaded && logoState.width > 0, 'footer logo decoded');
       assert.equal(await social.locator('li').count(), 2);

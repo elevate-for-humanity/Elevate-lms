@@ -51,15 +51,22 @@ export function TenantSiteFooter({
   const brand = (
     <div className="min-w-0" data-footer-brand>
       {logo ? (
-        <img
-          data-footer-logo
-          src={logo}
-          alt=""
-          aria-hidden="true"
-          className="mb-3 h-14 w-auto max-w-full object-contain"
-        />
-      ) : null}
-      <p className="break-words font-black">{config.branding.logoText || siteName}</p>
+        <a
+          href={tenantSiteHref('/', basePath)}
+          className="block min-h-11 rounded focus-visible:outline focus-visible:outline-2"
+        >
+          <img
+            data-footer-logo
+            src={logo}
+            alt=""
+            aria-hidden="true"
+            className="mb-3 h-14 w-auto max-w-full object-contain"
+          />
+          <span className="break-words font-black">{config.branding.logoText || siteName}</span>
+        </a>
+      ) : (
+        <p className="break-words font-black">{config.branding.logoText || siteName}</p>
+      )}
       <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-slate-500">
         {config.footer.description}
       </p>

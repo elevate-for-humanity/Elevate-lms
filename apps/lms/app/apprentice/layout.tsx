@@ -8,6 +8,7 @@ import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
+import { hasApprovedPaidLearnerEnrollment } from '@/lib/learner/approved-paid-admission.mjs';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -49,6 +50,14 @@ export default async function Layout({ children }: { children: React.ReactNode }
           .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
+
+  // An assigned program or student role alone never grants training access.
+  // Administrator preview is isolated and does not change enrollment rights.
+  const actorIsPrivileged = ['admin', 'super_admin'].includes(String(actorProfile?.role || ''));
+  if (!actorIsPrivileged) {
+    const admitted = await hasApprovedPaidLearnerEnrollment(db, subject.userId);
+    if (!admitted) redirect('/lms/access-pending');
+  }
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const beautyProgram = programSlug ? getBeautyApprenticeshipConfig(programSlug) : null;

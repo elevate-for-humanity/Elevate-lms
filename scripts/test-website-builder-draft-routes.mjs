@@ -384,3 +384,15 @@ for (const mode of ['generate','import']) test(mode+' rejects ambiguous HTTPS pr
   assert.equal(response.status,422,url);assert.equal(f.calls.length,0);
  }
 });
+
+test('generation retains colon-adjacent supplied profile/logo tokens and rejects longer-token prefixes',async()=>{
+ const profile={label:'Studio community',url:'https://social.example.test/studio'};
+ const generated={...config,branding:{...config.branding,logoImage:'/uploads/studio.svg'},footer:{showLogo:true,socialLinks:[profile]}};
+ for(const suffix of ['', '-other']) {
+  const f=fixture('generate',{generated,realNormalization:true});
+  const response=await f.post(request({brief:'An independent studio. LinkedIn:'+profile.url+suffix+' Logo:/uploads/studio.svg'+suffix}));
+  assert.equal(response.status,201);const saved=f.calls[0].args.p_site_config;
+  assert.deepEqual(saved.footer.socialLinks,suffix?[]:[profile]);
+  assert.equal(saved.branding.logoImage,suffix?undefined:'/uploads/studio.svg');
+ }
+});

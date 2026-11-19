@@ -6,6 +6,7 @@ import { validateSiteConfig } from '@/lib/tenant/site-validation';
 import {
   validateFooterPresentationFields,
   suppliedFooterSocialLinks,
+  suppliedFooterLogo,
 } from '@/lib/tenant/footer-presentation';
 import { TenantSiteFooter } from '@/components/tenant/TenantSiteFooter';
 import { TenantPreviewProvider } from '@/components/tenant/TenantPreviewContext';
@@ -173,3 +174,10 @@ it.each(['/sites/fixture', '/review?revision=saved&device=mobile&page='])(
     expect(brand.querySelector('[data-footer-logo]')).toHaveAttribute('src', '/saved-logo.svg');
   },
 );
+
+it('retains exact profiles and logos immediately after owner labels without accepting longer-URL prefixes', () => {
+  expect(suppliedFooterSocialLinks([profile],['LinkedIn:'+profile.url])).toEqual([profile]);
+  expect(suppliedFooterLogo('/uploads/studio.svg',['Logo:/uploads/studio.svg'])).toBe('/uploads/studio.svg');
+  expect(suppliedFooterSocialLinks([profile],['LinkedIn:'+profile.url+'-other'])).toEqual([]);
+  expect(suppliedFooterLogo('/uploads/studio.svg',['Logo:/uploads/studio.svg.other'])).toBeUndefined();
+});

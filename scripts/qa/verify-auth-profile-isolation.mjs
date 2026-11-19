@@ -30,7 +30,7 @@ for (const persona of fixture.personas) {
       if (own.error || own.data.role !== 'student') throw new Error('QA role changed unexpectedly.');
     }
   } finally {
-    const { error: signOutError } = await db.auth.signOut();
+    const { error: signOutError } = await db.auth.signOut({ scope: 'local' });
     if (signOutError) throw new Error('QA session sign-out failed.');
   }
 }

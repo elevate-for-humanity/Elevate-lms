@@ -48,12 +48,14 @@ describe('paid full application gate', () => {
     expect(await verifyPaidApplication('nail-technician-apprenticeship', 'i')).toBeNull();
     expect(fixture.writes).toEqual([]);
   });
-  it('links the original application and activates its enrollment/dashboard after full submission', async () => {
+  it('records payment but keeps enrollment pending until administrator approval', async () => {
     const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
-    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/apprentice');
+    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/access-pending');
     expect(fixture.writes[0]).toMatchObject({ table: 'applications', filters: { id: 'original-application' }, value: { enrollment_id: 'e', payment_status: 'paid' } });
-    expect(fixture.writes[1]).toMatchObject({ table: 'program_enrollments', filters: { id: 'e', student_id: 'u' }, value: { status: 'active' } });
-    expect(fixture.writes[2]).toMatchObject({ table: 'profiles', filters: { id: 'u' }, value: { enrollment_status: 'active', portal_type: 'apprentice' } });
+    expect(fixture.writes[1]).toMatchObject({ table: 'program_enrollments', filters: { id: 'e', student_id: 'u' }, value: { payment_status: 'paid', next_required_action: 'ADMIN_APPROVAL_REQUIRED' } });
+    expect(fixture.writes[1].value.access_granted_at).toBeUndefined();
+    expect(fixture.writes[1].value.approved_at).toBeUndefined();
+    expect(fixture.writes[2]).toMatchObject({ table: 'profiles', filters: { id: 'u' }, value: { enrollment_status: 'pending' } });
   });
 });
 describe('standard deposit and validated promotional deposit', () => {

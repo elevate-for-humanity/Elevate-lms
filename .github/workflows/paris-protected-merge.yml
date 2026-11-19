@@ -1,6 +1,7 @@
 name: PARIS protected merge
-# Approves and merges a PARIS repair pull request that has already passed
-# independent validation, using the dedicated verifier collaborator identity.
+# Merges a validated PARIS repair under the actual protected-branch policy.
+# A positive review requirement retains the independent verifier identity;
+# an explicit zero-review policy never causes an approval submission.
 # It only merges when the exact validated head still satisfies the protected
 # branch policy (required check + no outstanding authorized change request).
 # The Admin authority remains the sole owner of repair state.
@@ -19,10 +20,16 @@ on:
         description: Exact validated PR head SHA that must be merged
         required: true
         type: string
+      check_only:
+        description: Verify exact-head readiness without GitHub writes
+        required: false
+        default: false
+        type: boolean
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   id-token: write
-  actions: read
+  actions: write
 concurrency:
   # Serialize merges so two repairs cannot race protected main.
   group: paris-protected-merge
@@ -56,7 +63,7 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
-      - name: Approve and merge the validated repair PR
+      - name: Verify policy and merge the validated repair PR
         env:
           PARIS_VERIFIER_TOKEN: ${{ secrets.PARIS_VERIFIER_TOKEN }}
           PARIS_POLICY_TOKEN: ${{ secrets.PARIS_POLICY_TOKEN }}
@@ -66,4 +73,5 @@ jobs:
           EXPECTED_HEAD_SHA: ${{ inputs.expected_head_sha }}
           REPAIR_REPOSITORY: ${{ github.repository }}
           ADMIN_URL: https://admin.elevateforhumanity.org
+          PARIS_MERGE_CHECK_ONLY: ${{ inputs.check_only }}
         run: node scripts/paris-protected-merge.mjs

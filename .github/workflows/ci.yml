@@ -2,6 +2,11 @@ name: CI
 
 on:
   workflow_dispatch:
+    inputs:
+      requested_sha:
+        description: Optional exact main SHA requested by the trusted release chain
+        required: false
+        type: string
   pull_request:
   push:
     branches: [main, work, 'fix/unified-paris-acceptance-20261023']
@@ -22,6 +27,13 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
+      - name: Verify requested CI commit
+        if: github.event_name == 'workflow_dispatch' && inputs.requested_sha != ''
+        env:
+          REQUESTED_SHA: ${{ inputs.requested_sha }}
+        run: |
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ && "$REQUESTED_SHA" == "$GITHUB_SHA" ]]
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
@@ -39,7 +51,7 @@ jobs:
         run: node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs scripts/test-tenant-assessment-options.mjs scripts/test-tenant-paris.mjs
       - name: Protected OpenHands release evidence regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test tests/worker/openhands-protected-acceptance.test.mjs tests/worker/openhands-paris-protected-merge.test.mjs tests/worker/openhands-policy-readback.test.mjs tests/worker/paris-protected-merge-decision.test.mjs tests/worker/paris-merge-authorization.test.mjs
+        run: node --test tests/worker/openhands-protected-acceptance.test.mjs tests/worker/openhands-paris-protected-merge.test.mjs tests/worker/openhands-policy-readback.test.mjs tests/worker/paris-protected-merge-decision.test.mjs tests/worker/paris-merge-authorization.test.mjs tests/worker/paris-protected-merge-driver.test.mjs tests/worker/paris-exact-main-ci-request.test.mjs
       - name: PARIS OpenHands handoff and supervision regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tests/worker/paris-openhands-handoff.test.mjs tests/worker/paris-openhands-supervision.test.mjs

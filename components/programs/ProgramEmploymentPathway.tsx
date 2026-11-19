@@ -9,7 +9,9 @@ export default function ProgramEmploymentPathway({ program }: { program: Program
   const steps = [
     {
       label: 'Training',
-      value: `${program.durationWeeks} weeks · ${program.schedule}`,
+      value: program.durationWeeks > 0
+        ? `${program.durationWeeks} weeks · ${program.schedule}`
+        : program.schedule,
     },
     {
       label: 'Credential',

@@ -6,11 +6,12 @@ import assert from 'node:assert/strict';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const compile=(s,dep,returns)=>new Function('d',`const {${Object.keys(dep).join(',')}}=d;`+stripTypeScriptTypes(s).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+`;return ${returns};`)(dep);
 const suppliedWebsiteContact=compile(await read('lib/tenant/footer-contact.ts'),{},'suppliedWebsiteContact');
+const {validateFooterPresentationFields,suppliedFooterSocialLinks,suppliedFooterLogo}=compile(await read('lib/tenant/footer-presentation.ts'),{},'({validateFooterPresentationFields,suppliedFooterSocialLinks,suppliedFooterLogo})');
 const validateFooterContactFields=compile(await read('lib/tenant/footer-contact.ts'),{},'validateFooterContactFields');
 const validateHeroBackdropFields=compile(await read('lib/tenant/site-validation.ts'),{},'validateHeroBackdropFields');
 const resolveSiteLinkGroups=compile(await read('lib/tenant/site-navigation.ts'),{},'resolveSiteLinkGroups');
 const composition=compile(await read('lib/tenant/site-composition.ts'),{resolveSiteLinkGroups},'({ensureComposableSiteConfig,sanitizePages,normalizePageSlug})');
-const realValidateSiteConfig=compile(await read('lib/tenant/site-validation.ts'),{...composition,validateFooterContactFields},'validateSiteConfig');
+const realValidateSiteConfig=compile(await read('lib/tenant/site-validation.ts'),{...composition,validateFooterContactFields,validateFooterPresentationFields},'validateSiteConfig');
 const realDesign=compile(await read('lib/website-builder/design-choices.ts'),{},'({readWebsiteDesign,interviewWebsiteDesign,applyWebsiteDesign,websiteCatalog})');
 const diagnostics=[];
 const commitWebsiteDraft=compile(await read('lib/apps/website-builder-draft-commit.ts'),{randomUUID,logger:{error:(...args)=>diagnostics.push(args)}},'commitWebsiteDraft');
@@ -24,7 +25,7 @@ function fixture(mode,{user={id:'owner',email:'owner@example.test'},access={allo
   getWebsiteBuilderAccess:async()=>access,buildDefaultSiteConfig:()=>config,ensureComposableSiteConfig:realNormalization?composition.ensureComposableSiteConfig:x=>x,sanitizePages:realNormalization?composition.sanitizePages:x=>x,
   buildLicensedAssetProjectPolicy:()=>({}),NextResponse:{json:(body,options={})=>({body,status:options.status||200})},
   applyRateLimit:async()=>null,hydrateProcessEnv:async()=>{},runAITask:async()=>({content:JSON.stringify(generated)}),
-  validateHeroBackdropFields,validateFooterContactFields,suppliedWebsiteContact,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
+  validateHeroBackdropFields,validateFooterContactFields,validateFooterPresentationFields,suppliedFooterSocialLinks,suppliedFooterLogo,suppliedWebsiteContact,validateSiteConfig:realNormalization?realValidateSiteConfig:()=>({valid:true}),consumeWebsiteBuilderCredits:async(_db,_user,operation,options)=>{assert.equal(operation,'initial_site_generation');assert.equal(options.deferDebitUntilCommit,true);return {allowed:true,charged:0,isTrial:true}},
   missingRequiredWebsiteAnswers:()=>[],readWebsiteDesign:realNormalization?realDesign.readWebsiteDesign:x=>x,interviewWebsiteDesign:realNormalization?realDesign.interviewWebsiteDesign:x=>x,applyWebsiteDesign:realNormalization?realDesign.applyWebsiteDesign:x=>x,websiteCatalog:realNormalization?realDesign.websiteCatalog:()=>[],withApiAudit:(_path,fn)=>fn,logger:{error(){},warn(){}}};
  return {calls,post:compile(sources[mode],deps,'POST')};
 }
@@ -344,4 +345,34 @@ test('generation rejects the tail of an international phone split after five dig
  const f=fixture('generate',{generated:{...config,contact:{phone:'6789012'}},realNormalization:true});
  assert.equal((await f.post(request({brief:'Publish only the full phone. Phone: +49 12345\n6789012'}))).status,201);
  assert.deepEqual(f.calls[0].args.p_site_config.contact,{});
+});
+
+for (const mode of ['generate','import']) test(mode+' rejects malformed raw footer presentation before commit', async()=>{
+ for (const footer of [{showLogo:null},{showLogo:'true'},{layout:['columns']},{layout:'invalid'},{socialLinks:null},{socialLinks:{}},{socialLinks:[{label:'Profile',url:'https://example.test',icon:'unknown'}]},{socialLinks:[{label:'Profile',url:'javascript:alert(1)'}]},{socialLinks:[{label:'Profile',url:'https://user:pass@example.test'}]},{socialLinks:Array(7).fill({label:'Profile',url:'https://example.test'})}]) {
+  const bad={...config,footer};const f=fixture(mode,{generated:bad,realNormalization:true});
+  const response=await f.post(request({siteConfig:bad}));assert.equal(response.status,422,JSON.stringify(footer));assert.equal(f.calls.length,0);
+  assert.equal(response.body.validation.errors[0].code,'invalid_footer_presentation');
+ }
+});
+for (const mode of ['generate','import']) test(mode+' persists footer brand/layout/supplied profiles through real transformations',async()=>{
+ const footer={showLogo:true,layout:'columns',socialLinks:[{label:'Our profile',url:'https://social.example.test/customer',icon:'linkedin'}],linkGroups:[{label:'Company',pageIds:['home']}]};
+ const good={...config,branding:{...config.branding,logoImage:'/supplied-logo.svg'},footer};
+ const f=fixture(mode,{generated:good,realNormalization:true});
+ const response=await f.post(request({brief:'An independent studio. Approved logo: /supplied-logo.svg Approved social profile: https://social.example.test/customer',siteConfig:good}));
+ assert.equal(response.status,201,JSON.stringify(response.body));const saved=f.calls[0].args.p_site_config;
+ assert.deepEqual(saved.footer.socialLinks,footer.socialLinks);assert.equal(saved.footer.layout,'columns');assert.equal(saved.footer.showLogo,true);
+ assert.deepEqual(saved.footer.linkGroups,footer.linkGroups);assert.equal(saved.branding.logoImage,'/supplied-logo.svg');
+ assert.equal(realValidateSiteConfig(saved).valid,true);
+});
+test('generation omits invented and partial profile URLs',async()=>{
+ const generated={...config,footer:{socialLinks:[{label:'Invented',url:'https://social.example.test/invented'},{label:'Partial',url:'https://social.example.test/customer'}]}};
+ const f=fixture('generate',{generated,realNormalization:true});
+ assert.equal((await f.post(request({brief:'An independent studio. Approved profile https://social.example.test/customer-other'}))).status,201);
+ assert.deepEqual(f.calls[0].args.p_site_config.footer.socialLinks,[]);
+});
+
+test('generation does not enable an invented logo through the footer opt-in',async()=>{
+ const generated={...config,branding:{...config.branding,logoImage:'https://images.example.test/invented.svg'},footer:{showLogo:true}};
+ const f=fixture('generate',{generated,realNormalization:true});assert.equal((await f.post(request())).status,201);
+ assert.equal(f.calls[0].args.p_site_config.branding.logoImage,undefined);
 });

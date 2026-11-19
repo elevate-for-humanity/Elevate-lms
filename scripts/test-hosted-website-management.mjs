@@ -20,10 +20,11 @@ test('missing website denies access',async()=>assert.equal(await canManageHosted
 const { readFile } = await import('node:fs/promises');
 const { stripTypeScriptTypes } = await import('node:module');
 const validationSource=await readFile(new URL('../lib/tenant/site-validation.ts',import.meta.url),'utf8');
+const validateFooterPresentationFields=new Function(stripTypeScriptTypes(await readFile(new URL('../lib/tenant/footer-presentation.ts',import.meta.url),'utf8')).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+';return validateFooterPresentationFields;')();
 const validateFooterContactFields=new Function(stripTypeScriptTypes(await readFile(new URL('../lib/tenant/footer-contact.ts',import.meta.url),'utf8')).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+';return validateFooterContactFields;')();
 const validateHeroBackdropFields=new Function(stripTypeScriptTypes(validationSource).replace(/^import .*;\r?$/gm,'').replace(/^export /gm,'')+';return validateHeroBackdropFields;')();
 const revisionRoute = await readFile(new URL('../apps/marketing/app/api/apps/website-builder/sites/[websiteId]/revisions/route.ts', import.meta.url), 'utf8');
-const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateHeroBackdropFields', 'validateFooterContactFields', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
+const dependencyNames = ['randomUUID', 'canManageHostedWebsite', 'NextResponse', 'createClient', 'requireAdminClient', 'getWebsiteBuilderAccess', 'buildDefaultSiteConfig', 'mergeSiteConfig', 'bridgeLegacyPatchIntoComposition', 'validateHeroBackdropFields', 'validateFooterContactFields', 'validateFooterPresentationFields', 'validateSiteConfig', 'isReservedTenantSubdomain', 'loadVerifiedWebsiteClaims', 'hydrateProcessEnv', 'aiChat', 'consumeWebsiteBuilderCredits', 'ensureComposableSiteConfig', 'applySiteOperations'];
 function compileRoute(source) {
   return new Function('dependencies', `const { ${dependencyNames.join(', ')} } = dependencies;\n` + stripTypeScriptTypes(source).replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '') + '\nreturn { POST: typeof POST === "undefined" ? null : POST, PATCH: typeof PATCH === "undefined" ? null : PATCH };');
 }
@@ -98,7 +99,7 @@ function restoreFixture(options = {}) {
     buildDefaultSiteConfig: () => ({}), mergeSiteConfig: (base, patch) => ({ ...base, ...patch }),
     bridgeLegacyPatchIntoComposition: value => value,
     validateHeroBackdropFields,
-    validateFooterContactFields,
+    validateFooterContactFields, validateFooterPresentationFields,
     validateSiteConfig: () => ({ valid: true }), isReservedTenantSubdomain: () => false,
     loadVerifiedWebsiteClaims: async () => [], hydrateProcessEnv: async () => {},
     consumeWebsiteBuilderCredits: async (_db, _user, operation, options) => { assert.equal(operation, 'paris_edit'); assert.equal(options.deferDebitUntilCommit, true); return { allowed: true, charged: 0, balance: 16, isTrial: true }; },
@@ -280,4 +281,18 @@ test('manual save/publish rejects malformed footer opt-in before backup or write
   const response=await request();assert.equal(response.status,422);assert.equal(state.backups.length,0);assert.equal(state.updateAttempts,0);
   assert.equal((await response.json()).validation.errors[0].code,'invalid_footer_contact');
  }
+});
+
+test('manual save/publish/unpublish rejects malformed footer presentation before any backup or update',async()=>{
+ for(const publish of [undefined,true,false]) for(const footer of [{showLogo:null},{layout:['columns']},{socialLinks:null},{socialLinks:[{label:'Bad',url:'http://example.test'}]}]) {
+  const {state,request}=restoreFixture({mode:'save',publish,siteConfig:{footer}});
+  const response=await request();assert.equal(response.status,422);assert.equal(state.backups.length,0);assert.equal(state.updateAttempts,0);
+  assert.equal((await response.json()).validation.errors[0].code,'invalid_footer_presentation');
+ }
+});
+test('manual save preserves optional footer presentation and unchanged contact/groups',async()=>{
+ const footer={showLogo:true,layout:'columns',socialLinks:[{label:'Our profile',url:'https://social.example.test/customer'}],linkGroups:[{label:'Company',pageIds:['saved']}]};
+ const contact={email:'owner@example.test'};
+ const {state,request}=restoreFixture({mode:'save',siteConfig:{pages:[{id:'saved'}],footer,contact}});
+ assert.equal((await request()).status,200);assert.deepEqual(state.current.site_config.footer,footer);assert.deepEqual(state.current.site_config.contact,contact);assert.equal(state.backups.length,1);
 });

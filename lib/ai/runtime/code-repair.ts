@@ -359,13 +359,36 @@ async function reconcileParisNewerMain({repair,gh,deployments,currentMain}:{
  const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
  const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
  const candidateChecks=candidateRuns?.workflow_runs??[];
- const independentlyValidated=candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='CI'&&run.status==='completed'&&run.conclusion==='success')&&
-  candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='Integrity Gate'&&run.status==='completed'&&run.conclusion==='success');
- const candidatePassed=ancestry&&independentlyValidated&&repairDeploymentState(candidateChecks,currentSha,deployments)==='passed';
+ // The latest exact-SHA attempt owns the decision. An older successful run
+ // cannot mask a later failed CI or a failed required production deployment.
+ const latest=(name:string)=>candidateChecks.filter((run:any)=>run.head_sha===currentSha&&run.name===name)
+  .sort((a:any,b:any)=>(Date.parse(b.run_started_at??b.created_at??'')||0)-
+   (Date.parse(a.run_started_at??a.created_at??'')||0)||(Number(b.id)||0)-(Number(a.id)||0))[0];
+ const ci=latest('CI');
+ const integrity=latest('Integrity Gate');
+ const independentlyValidated=ci?.status==='completed'&&ci.conclusion==='success'&&
+  integrity?.status==='completed'&&integrity.conclusion==='success';
+ const deploymentState=ancestry?repairDeploymentState(candidateChecks,currentSha,deployments):'pending';
+ const failedGate=[ci,integrity].find((run:any)=>run?.status==='completed'&&run.conclusion!=='success');
+ const candidateFailed=Boolean(failedGate)||deploymentState==='failed';
+ const prior=repair.verification?.releaseReconciliation;
+ const now=new Date().toISOString();
+ // Do not refresh the start of a successor observation on every monitor tick.
+ // A failed or never-observed successor must not hold the global repair queue.
+ const priorSince=prior?.currentMainSha===currentSha?Date.parse(prior.observationStartedAt??prior.checkedAt??''):NaN;
+ const observationStartedAt=Number.isFinite(priorSince)?new Date(priorSince).toISOString():now;
+ const observationWindowMs=(IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.deploying+IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.verifying)*60000;
+ const observationExpired=Date.now()-Date.parse(observationStartedAt)>=observationWindowMs;
+ const candidatePassed=ancestry&&independentlyValidated&&deploymentState==='passed';
+ const state=!ancestry?'release-not-ancestor-of-main':
+  candidateFailed?'newer-main-validation-failed':
+  candidatePassed?'validated-newer-target':
+  observationExpired?'newer-main-validation-not-observed':'newer-main-needs-independent-validation';
  return {
-  state:candidatePassed?'validated-newer-target':ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
-  independentlyValidated,immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
-  checkedAt:new Date().toISOString()
+  state,independentlyValidated,immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
+  observationStartedAt,checkedAt:now,
+  failedCheck:failedGate?{name:failedGate.name,runId:failedGate.id??null,conclusion:failedGate.conclusion}:null,
+  deploymentState
  };
 }
 async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
@@ -688,7 +711,19 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    if(mainCI.state==='pending')continue;
    if(mainCI.state==='superseded'){
     const releaseReconciliation=await reconcileParisNewerMain({repair,gh,deployments});
-    await update(repair.id,{status:'verifying',verification:{...repair.verification,releaseReconciliation}});
+    const terminalErrors:Record<string,string>={
+     'newer-main-validation-failed':'REPAIR_NEWER_MAIN_VALIDATION_FAILED',
+     'newer-main-validation-not-observed':'REPAIR_NEWER_MAIN_VALIDATION_NOT_OBSERVED',
+     'release-not-ancestor-of-main':'REPAIR_RELEASE_NOT_ANCESTOR_OF_MAIN'
+    };
+    const errorCode=terminalErrors[releaseReconciliation.state];
+    // Terminal evidence releases the queue but preserves the immutable SHA,
+    // attempted dispatches, cumulative history and the successor diagnostic.
+    await update(repair.id,{
+     status:errorCode?'blocked':'verifying',
+     ...(errorCode?{error_code:errorCode}:{}),
+     verification:{...repair.verification,releaseReconciliation}
+    });
     continue;
    }
    // Only exact-main CI with a successful required gate can advance release.

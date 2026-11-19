@@ -73,6 +73,16 @@ describe('host shop slideshow playback', () => {
     fireEvent.click(pause);
     expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
   });
+  it('does not restart autoplay when the Pause control receives focus-visible before click', () => {
+    renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
+    const pause = screen.getByRole('button', { name: 'Pause slideshow' });
+    const matches = vi.spyOn(pause, 'matches').mockReturnValue(true);
+    fireEvent.focus(pause);
+    matches.mockRestore();
+    expect(screen.getByRole('button', { name: 'Pause slideshow' })).toBeInTheDocument();
+    fireEvent.click(pause);
+    expect(screen.getByRole('button', { name: 'Play slideshow' })).toBeInTheDocument();
+  });
   it('pauses automatic rotation on keyboard focus until explicitly restarted', () => {
     renderVisible(<HostShopMediaCarousel shopName="Shop" items={items} compact />);
     const nextButton = screen.getByRole('button', { name: 'Next image' });

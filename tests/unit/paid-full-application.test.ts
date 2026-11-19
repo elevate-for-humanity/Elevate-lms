@@ -31,6 +31,28 @@ beforeEach(() => {
   };
 });
 describe('paid full application gate', () => {
+  it('preserves approved admission state when the same paid invoice is retried', async () => {
+    Object.assign(fixture.rows.program_enrollments, {
+      status: 'active', payment_reference: 'i', payment_status: 'paid',
+      approved_at: '2026-11-09T11:00:00Z', approved_by: 'admin',
+      access_granted_at: '2026-11-09T11:00:00Z', access_status: 'active',
+    });
+    const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
+    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/dashboard');
+    expect(fixture.writes).toEqual([]);
+  });
+  it('never relinks an active enrollment to a different invoice', async () => {
+    Object.assign(fixture.rows.program_enrollments, { status: 'active', payment_reference: 'other-invoice' });
+    const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
+    await expect(activatePaidApplication(proof!, 'original-application')).rejects.toThrow('administrator review');
+    expect(fixture.writes).toEqual([]);
+  });
+  it('does not grant access to an active enrollment lacking approval evidence on retry', async () => {
+    Object.assign(fixture.rows.program_enrollments, { status: 'active', payment_reference: 'i' });
+    const proof = await verifyPaidApplication('nail-technician-apprenticeship', 'i');
+    expect(await activatePaidApplication(proof!, 'original-application')).toBe('https://app.elevateforhumanity.org/lms/access-pending');
+    expect(fixture.writes).toEqual([]);
+  });
   it('verifies owned paid deposit without trusting a URL flag', async () => {
     expect(await verifyPaidApplication('nail-technician-apprenticeship', 'i')).not.toBeNull();
     expect(fixture.writes).toEqual([]);

@@ -230,6 +230,7 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
     enrollment.cancelled_at ||
     enrollment.suspended_at ||
     enrollment.refunded_at ||
+    enrollment.eligibility_status !== 'eligible' ||
     !['paid', 'paid_in_full'].includes(String(enrollment.payment_status || '').toLowerCase())
   ) {
     throw new Error(

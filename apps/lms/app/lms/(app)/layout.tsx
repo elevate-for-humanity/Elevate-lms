@@ -31,9 +31,12 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
     const isAdmin =
       subject.previewing || ['admin', 'super_admin'].includes(String(actor?.role || ''));
     // Fail closed for learners before rendering navigation or course data.
-    // Public enrollment/checkout routes are outside this protected layout.
+    // Enrollment and payment remain available before training admission.
     // An admin preview retains read-only access without granting learner rights.
-    if (user && !isAdmin) {
+    const isAdmissionRoute = ['/lms/payments', '/lms/enroll'].some(
+      route => pathname === route || pathname.startsWith(`${route}/`),
+    );
+    if (user && !isAdmin && !isAdmissionRoute) {
       const admitted = await hasApprovedPaidLearnerEnrollment(db, user.id);
       if (!admitted) redirect('/lms/access-pending');
     }
@@ -44,7 +47,7 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
     // Server-side restriction: a pending, unpaid beauty apprenticeship application
     // may authenticate for checkout, but cannot render student modules.
     // Existing activated enrollments and verified workforce-funded paths are retained.
-    if (user && !isAdmin && !pathname.startsWith('/lms/payments') && !pathname.startsWith('/lms/enroll')) {
+    if (user && !isAdmin && !isAdmissionRoute) {
       const paymentGate = await loadBeautyPaymentGate(db, user.id, user.email);
       if (paymentGate?.locked) return <BeautyPaymentLock programSlug={paymentGate.programSlug} />;
     }

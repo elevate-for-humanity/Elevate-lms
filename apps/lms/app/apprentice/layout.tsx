@@ -54,7 +54,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   // An assigned program or student role alone never grants training access.
   // Administrator preview is isolated and does not change enrollment rights.
   const actorIsPrivileged = ['admin', 'super_admin'].includes(String(actorProfile?.role || ''));
-  if (!actorIsPrivileged) {
+  if (!actorIsPrivileged && !subject.previewing) {
     const admitted = await hasApprovedPaidLearnerEnrollment(db, subject.userId);
     if (!admitted) redirect('/lms/access-pending');
   }

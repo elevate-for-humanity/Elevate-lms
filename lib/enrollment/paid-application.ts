@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { paidInvoiceMatchesProgram } from '@/lib/programs/paid-intake-policy.mjs';
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 import { activateProgramInstallments } from '@/lib/billing/activate-program-installments';
+import { isApprovedPaidEnrollment } from '@/lib/learner/approved-paid-admission.mjs';
 
 /** A URL parameter is a locator, never evidence of payment or ownership. */
 export async function verifyPaidApplication(programSlug: string, invoiceId?: string) {
@@ -27,7 +28,7 @@ export async function verifyPaidApplication(programSlug: string, invoiceId?: str
       !Number.isSafeInteger(required) || required <= 0 || row.total_cents < required ||
       !paidInvoiceMatchesProgram(row, program.data, user.email)) return null;
   const enrollment = await db.from('program_enrollments')
-    .select('id,status,revoked_at,student_id,program_id').eq('id', payload.enrollment_id)
+    .select('id,status,revoked_at,student_id,program_id,payment_reference,payment_status,approved_at,approved_by,access_granted_at,access_status,cancelled_at,suspended_at,refunded_at').eq('id', payload.enrollment_id)
     .eq('student_id', user.id).eq('program_id', program.data.id).maybeSingle();
   if (enrollment.error) throw new Error('Enrollment verification is temporarily unavailable.');
   if (!enrollment.data || enrollment.data.revoked_at ||
@@ -38,6 +39,17 @@ export async function verifyPaidApplication(programSlug: string, invoiceId?: str
 /** Called only after a full application is saved against verified payment. Retryable and idempotent. */
 export async function activatePaidApplication(evidence: NonNullable<Awaited<ReturnType<typeof verifyPaidApplication>>>, applicationId: string) {
   const { db, user, invoice, enrollment, program } = evidence;
+  // Replaying the same paid application must never downgrade an approved
+  // learner's application, profile, or next action. An active enrollment tied
+  // to another invoice requires review rather than relinking financial evidence.
+  if (enrollment.status === 'active') {
+    if (enrollment.payment_reference !== invoice.id) {
+      throw new Error('Active enrollment payment reference requires administrator review.');
+    }
+    return isApprovedPaidEnrollment(enrollment)
+      ? 'https://app.elevateforhumanity.org/lms/dashboard'
+      : 'https://app.elevateforhumanity.org/lms/access-pending';
+  }
   const now = new Date().toISOString();
   const application = await db.from('applications').update({
     user_id: user.id, enrollment_id: enrollment.id, status: 'submitted', payment_status: 'paid',

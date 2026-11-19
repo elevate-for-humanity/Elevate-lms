@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { paidInvoiceMatchesProgram } from '@/lib/programs/paid-intake-policy.mjs';
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
-import { queuePaidProgramWelcome } from './apprenticeship-welcome';
 import { activateProgramInstallments } from '@/lib/billing/activate-program-installments';
 
 /** A URL parameter is a locator, never evidence of payment or ownership. */
@@ -41,22 +40,21 @@ export async function activatePaidApplication(evidence: NonNullable<Awaited<Retu
   const { db, user, invoice, enrollment, program } = evidence;
   const now = new Date().toISOString();
   const application = await db.from('applications').update({
-    user_id: user.id, enrollment_id: enrollment.id, status: 'enrolled', payment_status: 'paid',
+    user_id: user.id, enrollment_id: enrollment.id, status: 'submitted', payment_status: 'paid',
     payment_provider: invoice.provider, payment_amount_cents: invoice.total_cents,
     payment_received_at: invoice.paid_at, payment_reference: invoice.id,
     intake_stage: 'enrollment', updated_at: now,
   }).eq('id', applicationId).select('id').single();
   if (application.error) throw new Error('Full application payment could not be linked.');
   const activated = await db.from('program_enrollments').update({
-    status: 'active', payment_status: 'paid', enrollment_state: 'active',
+    payment_status: 'paid',
     amount_paid_cents: invoice.total_cents, payment_reference: invoice.id,
-    access_granted_at: now, next_required_action: 'ONBOARDING', updated_at: now,
+    next_required_action: 'ADMIN_APPROVAL_REQUIRED', updated_at: now,
   }).eq('id', enrollment.id).eq('student_id', user.id).is('revoked_at', null)
     .in('status', ['checkout_pending', 'pending', 'active']).select('id').single();
   if (activated.error) throw new Error('Enrollment activation could not be completed. Please retry this application.');
-  const apprentice = program.is_apprenticeship || /apprentice/i.test(program.slug);
   const profile = await db.from('profiles').update({
-    enrollment_status: 'active', ...(apprentice ? { portal_type: 'apprentice' } : {}), updated_at: now,
+    enrollment_status: 'pending', updated_at: now,
   }).eq('id', user.id);
   if (profile.error) throw new Error('Dashboard activation could not be completed.');
   await activateProgramInstallments(db, {
@@ -64,6 +62,6 @@ export async function activatePaidApplication(evidence: NonNullable<Awaited<Retu
     paidCents: Number(invoice.total_cents),
     tuitionCents: Number(invoice.fulfillment_payload?.total_tuition_cents ?? Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100)),
   });
-  await queuePaidProgramWelcome(db, enrollment.id);
-  return `https://app.elevateforhumanity.org/${apprentice ? 'apprentice' : 'learner/dashboard'}`;
+  // Payment is evidence for admin review, never authorization to enter the LMS.
+  return 'https://app.elevateforhumanity.org/lms/access-pending';
 }

@@ -8,9 +8,12 @@ export const dynamic='force-dynamic';
 export const metadata={title:'WorkOne FAA Generator | Admin',robots:{index:false,follow:false}};
 
 export default async function FaaPage({searchParams}:{searchParams:Promise<{search?:string}>}) {
-  const {profile}=await requireRole(['admin','super_admin']);
+  const {user}=await requireRole(['admin','super_admin']);
   const query=String((await searchParams).search||'').trim().slice(0,100);
   const db=await requireAdminClient();
+  const {data:sigMeta}=await db.storage.from('documents').download('faa-signatures/'+user.id+'/provider.json');
+  let signerName='';
+  if(sigMeta){try{const meta=JSON.parse(await sigMeta.text());if(meta.actor_id===user.id)signerName=String(meta.signer_name||'');}catch{ /* No stored signer identity */ }}
   let studentsQuery=db.from('profiles')
     .select('id,full_name,first_name,last_name,email,phone')
     .in('role',['student','learner','apprentice','barber_apprentice','cosmetology_apprentice']);
@@ -32,7 +35,7 @@ export default async function FaaPage({searchParams}:{searchParams:Promise<{sear
       <button className="rounded-lg bg-slate-900 px-5 py-3 text-white">Find student</button>
     </form>
     {error?<div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4">Student directory is unavailable. No FAA can be generated.</div>:
-      <FaaGeneratorForm students={rows} signerName={profile?.full_name||''}
+      <FaaGeneratorForm students={rows} signerName={signerName}
         programs={Object.entries(FAA_PROGRAMS).map(([key,v])=>({key,label:v.label,weeks:v.weeks,source:v.source,total:Object.values(v.costs).reduce((a,b)=>a+b,0)}))} />}
     <p className="text-xs text-slate-600">PDFs are stored in private student document storage as immutable versions. Generating an FAA does not authorize enrollment, funding, invoicing, or WorkOne submission. Signatures require an authenticated per-document confirmation.</p>
   </main>;

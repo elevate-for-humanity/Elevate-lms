@@ -396,3 +396,11 @@ test('generation retains colon-adjacent supplied profile/logo tokens and rejects
   assert.equal(saved.branding.logoImage,suffix?undefined:'/uploads/studio.svg');
  }
 });
+
+test('generation preserves uppercase HTTPS supplied profile and logo sources through real transforms',async()=>{
+ const profile={label:'Studio community',url:'HTTPS://social.example.test/studio'};
+ const generated={...config,branding:{...config.branding,logoImage:'HTTPS://images.example.test/logo.svg'},footer:{showLogo:true,socialLinks:[profile]}};
+ const f=fixture('generate',{generated,realNormalization:true});
+ assert.equal((await f.post(request({brief:'An independent studio. LinkedIn:'+profile.url+' Logo:HTTPS://images.example.test/logo.svg'}))).status,201);
+ const saved=f.calls[0].args.p_site_config;assert.deepEqual(saved.footer.socialLinks,[profile]);assert.equal(saved.branding.logoImage,generated.branding.logoImage);
+});

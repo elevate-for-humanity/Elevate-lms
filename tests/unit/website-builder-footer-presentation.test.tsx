@@ -181,3 +181,10 @@ it('retains exact profiles and logos immediately after owner labels without acce
   expect(suppliedFooterSocialLinks([profile],['LinkedIn:'+profile.url+'-other'])).toEqual([]);
   expect(suppliedFooterLogo('/uploads/studio.svg',['Logo:/uploads/studio.svg.other'])).toBeUndefined();
 });
+
+it('retains the exact spelling of supplied uppercase HTTPS profile and logo sources without prefix matching',()=>{
+ const upper={...profile,url:'HTTPS://social.example.test/studio'};
+ expect(suppliedFooterSocialLinks([upper],['LinkedIn:'+upper.url])).toEqual([upper]);
+ expect(suppliedFooterLogo('HTTPS://images.example.test/logo.svg',['Logo:HTTPS://images.example.test/logo.svg'])).toBe('HTTPS://images.example.test/logo.svg');
+ expect(suppliedFooterSocialLinks([upper],['LinkedIn:'+upper.url+'-other'])).toEqual([]);
+});

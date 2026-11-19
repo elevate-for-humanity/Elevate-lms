@@ -114,7 +114,7 @@ export function footerSocialLinks(config: TenantSiteConfig): TenantSiteSocialLin
 function suppliedPresentationUrls(supplied: string[]) {
   return new Set(
     supplied.flatMap((text) =>
-      [...text.matchAll(/(?:^|[\s:(<>"'`])((?:https:\/\/|\/)[^\s<>"'`]+)/g)].flatMap((match) => [
+      [...text.matchAll(/(?:^|[\s:(<>"'`])((?:https:\/\/|\/)[^\s<>"'`]+)/gi)].flatMap((match) => [
         match[1],
         match[1].replace(/[.,;!?)\]}]+$/g, ''),
       ]),

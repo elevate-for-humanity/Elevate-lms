@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   let body:unknown;try{body=await req.json();}catch{return NextResponse.json({error:'Invalid request'},{status:400});}
   const input=body as {image?:unknown;consent?:unknown;signerName?:unknown};
   const signerName=typeof input.signerName==='string'?input.signerName.trim():'';
-  if(signerName.length<4||signerName.length>100||!/^[\\p{L} .'-]+$/u.test(signerName))
+  if(signerName.length<4||signerName.length>100||!/^[\p{L} .'-]+$/u.test(signerName))
     return NextResponse.json({error:'Enter your legal signer name before saving your signature'},{status:422});
   if(input.consent!==true||typeof input.image!=='string'||!/^data:image\/png;base64,[a-z0-9+/=]+$/i.test(input.image)||input.image.length>450000)
     return NextResponse.json({error:'A valid PNG signature and explicit enrollment consent are required'},{status:422});

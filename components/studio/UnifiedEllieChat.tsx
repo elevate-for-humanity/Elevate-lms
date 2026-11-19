@@ -1578,7 +1578,7 @@ export default function UnifiedEllieChat({
               }}
               rows={2}
               placeholder="Tell Paris what you need done..."
-              className={`${styles.composer} order-first min-h-[64px] max-h-[min(28dvh,240px)] w-full min-w-0 basis-full resize-y overflow-y-auto rounded-xl border px-3 py-2 text-base leading-6 outline-none sm:px-4 sm:py-3 ${inputClass}`}
+              className={`${styles.composer} order-first min-h-[64px] w-full min-w-0 basis-full resize-y overflow-y-auto rounded-xl border px-3 py-2 text-xl leading-[1.5] outline-none sm:px-4 sm:py-3 ${inputClass}`}
             />
             <button
               type="button"

@@ -141,18 +141,18 @@ export const NAIL_TECH_PROGRAM = {
   name: 'Nail Technician Apprenticeship',
   slug: 'nail-technician-apprenticeship',
 
-  // Hours and Duration
+  // Supervised practice hours are tracked as evidence, not a fixed completion term.
   totalHours: 2000,
   totalHoursFormatted: '2,000',
-  durationWeeks: 50,
-  durationMonths: 12,
-  durationFormatted: '12 months',
+  durationWeeks: 0,
+  durationMonths: 0,
+  durationFormatted: 'Competency-based (19 competencies and 210 RTI hours)',
   hoursPerWeek: 40,
 
-  // Pricing
-  tuitionCents: 249000,
-  tuitionDollars: 2490,
-  tuitionFormatted: '$2,490',
+  // Legacy display-only fallback; live enrollment uses governed program pricing.
+  tuitionCents: 600000,
+  tuitionDollars: 6000,
+  tuitionFormatted: '$6,000',
   examFeeCents: 10000,
   examFeeDollars: 100,
   examFeeFormatted: '$100',

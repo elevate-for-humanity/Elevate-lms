@@ -20,7 +20,7 @@ interface Program {
   name: string;
   slug?: string;
   description: string;
-  duration_weeks: number;
+  duration_weeks: number | null;
   requires_license: boolean;
   is_free: boolean;
   price: number | null;
@@ -295,9 +295,11 @@ export default function EnrollPage() {
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-blue-100 mt-1 text-sm sm:text-base">
-                    Duration: {program.duration_weeks} weeks
-                  </p>
+                  {program.duration_weeks !== null && program.duration_weeks > 0 && (
+                    <p className="text-blue-100 mt-1 text-sm sm:text-base">
+                      Duration: {program.duration_weeks} weeks
+                    </p>
+                  )}
                 </div>
               </div>
               <p className="text-base sm:text-lg text-blue-50">{program.description}</p>

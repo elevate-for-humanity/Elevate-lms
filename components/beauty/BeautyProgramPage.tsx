@@ -117,7 +117,7 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
           </motion.div>
         </div>
         <div className="hero-stats-bar">
-          <div className="stat-item"><span className="stat-value">{program.durationWeeks}</span><span className="stat-label">Weeks</span></div>
+          <div className="stat-item"><span className="stat-value">{program.durationWeeks > 0 ? program.durationWeeks : "Competency-based"}</span><span className="stat-label">{program.durationWeeks > 0 ? "Weeks" : "Completion"}</span></div>
           <div className="stat-item"><span className="stat-value">2,000</span><span className="stat-label">Training Hours</span></div>
           <div className="stat-item"><span className="stat-value">{program.credentials?.length || 3}</span><span className="stat-label">Credentials</span></div>
           <div className="stat-item"><span className="stat-value">{program.selfPayCost || `$${program.tuition || '4,980'}`}</span><span className="stat-label">Total Tuition</span></div>

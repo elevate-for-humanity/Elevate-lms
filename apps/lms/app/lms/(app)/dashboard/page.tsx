@@ -1,3 +1,5 @@
+import AssignedLearningMaterials from '@/components/lms/AssignedLearningMaterials';
+import { loadMyDigitalWorkbooks } from '@/lib/lms/digital-workbooks';
 import { resolveAssignedLearnerHome } from '@/lib/portal/assigned-learner-home';
 import { loadCourseActivity } from '@/lib/learner/course-activity';
 import { CareerPlan } from '@/components/career/CareerPlan';
@@ -135,6 +137,14 @@ export default async function StudentDashboard() {
   if (!assignedHome && isApprenticeWorkspaceRole(subjectProfile?.role))
     redirect(PortalRouter.get('apprentice'));
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
+  let workbooks: Awaited<ReturnType<typeof loadMyDigitalWorkbooks>>['workbooks'] = [];
+  let workbookLoadError: string | undefined;
+  try {
+    workbooks = (await loadMyDigitalWorkbooks()).workbooks;
+  } catch {
+    logger.error('STUDENT_WORKBOOKS_UNAVAILABLE');
+    workbookLoadError = 'Workbook links could not be loaded. Open Workbooks to retry.';
+  }
   const hasHvacEnrollment = workspace.enrollments.some(
     (row) =>
       ['hvac-technician', 'hvac', 'hvac-epa-608'].includes(row.program_slug || '') &&
@@ -675,6 +685,9 @@ export default async function StudentDashboard() {
           </section>
         )}
 
+        <AssignedLearningMaterials error={workbookLoadError} workbooks={workbooks.map(book => ({
+          id: book.id, title: book.title, href: `/workbooks/${book.slug}`,
+        }))} />
         {hasHvacEnrollment ? <HvacStartHere studyCode={qwikStudyCode} /> : null}
         {bookkeeping ? <BookkeepingStudyGuide /> : null}
         <LessonWorkSavingGuide />

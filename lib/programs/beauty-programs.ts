@@ -1,4 +1,9 @@
 import { HAIR_STYLIST_PROGRAM } from '@/lib/apprenticeship/hair-stylist-program';
+import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
+import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
+import { NAIL_TECH } from '@/data/programs/nail-technician-apprenticeship';
+import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
+import type { ProgramSchema } from '@/lib/programs/program-schema';
 /**
  * Config for the 4 beauty/apprenticeship programs that share a common
  * enrollment flow: apply → orientation → documents → eligibility →
@@ -27,15 +32,11 @@ export interface BeautyProgramConfig {
   progressModel: 'competency_based' | 'hybrid';
   competencyCount?: number;
   probationHours: number;
-  /** Deposit amount in cents (for Stripe payment intent) */
+  /** Published standard initial invoice in cents; not a provider charge */
   depositCents: number;
   /** Full tuition in cents */
   fullTuitionCents: number;
-  /** Stripe payment link — deposit */
-  stripeDepositLink: string;
-  /** Stripe payment link — full */
-  stripeFullLink: string;
-  /** Whether this is a paid apprenticeship (earn wages, no tuition) */
+  /** Whether the host shop pays wages; separate from tuition */
   earnWhileYouLearn: boolean;
   /** Orientation estimated time */
   orientationTime: string;
@@ -48,6 +49,25 @@ export interface BeautyProgramConfig {
 // app/programs/barber-apprenticeship/ with custom pricing, checkout,
 // and webhook logic. Do not add it here.
 
+/** Read-only marketing prices follow the published catalog and canonical invoice policy.
+ * This does not create or update a payment-provider session.
+ */
+function publishedBeautyPricing(program: Pick<ProgramSchema, 'slug' | 'selfPayCost'>) {
+  const dollars = Number(program.selfPayCost.replace(/[^0-9.]/g, ''));
+  if (!Number.isFinite(dollars) || dollars <= 0) {
+    throw new Error(`No published self-pay tuition for ${program.slug}`);
+  }
+  const fullTuitionCents = Math.round(dollars * 100);
+  return {
+    fullTuitionCents,
+    depositCents: getInitialProgramInvoiceCents(program.slug, fullTuitionCents),
+  };
+}
+
+export function formatBeautyPrice(cents: number): string {
+  return (cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+}
+
 export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
   'cosmetology-apprenticeship': {
     slug: 'cosmetology-apprenticeship',
@@ -59,10 +79,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     rtiHours: HAIR_STYLIST_PROGRAM.relatedInstructionHours,
     progressModel: HAIR_STYLIST_PROGRAM.approach,
     probationHours: HAIR_STYLIST_PROGRAM.probationaryHours,
-    depositCents: 150000,
-    fullTuitionCents: 600000,
-    stripeDepositLink: 'https://buy.stripe.com/fZu00j2UUdnofsDcfDgIo0a',
-    stripeFullLink: 'https://buy.stripe.com/9B600jbrq1EGdkvgvTgIo09',
+    ...publishedBeautyPricing(COSMETOLOGY),
     earnWhileYouLearn: true,
     orientationTime: '10–12 minutes',
     nextSteps: [
@@ -82,10 +99,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     progressModel: 'competency_based',
     competencyCount: 20,
     probationHours: 500,
-    depositCents: 112000,
-    fullTuitionCents: 320000,
-    stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
-    stripeFullLink: 'https://buy.stripe.com/bJedR91QQgzAfsD0wVgIo05',
+    ...publishedBeautyPricing(ESTHETICIAN_APPRENTICESHIP),
     earnWhileYouLearn: false,
     orientationTime: '8–10 minutes',
     nextSteps: [
@@ -105,10 +119,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     progressModel: 'competency_based',
     competencyCount: 19,
     probationHours: 500,
-    depositCents: 60000,
-    fullTuitionCents: 600000,
-    stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
-    stripeFullLink: 'https://buy.stripe.com/bJedR91QQgzAfsD0wVgIo05',
+    ...publishedBeautyPricing(NAIL_TECH),
     earnWhileYouLearn: false,
     orientationTime: '8–10 minutes',
     nextSteps: [

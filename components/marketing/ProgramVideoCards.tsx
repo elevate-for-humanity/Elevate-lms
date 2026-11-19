@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { formatProgramDurationWeeks } from '@/lib/programs/marketing-duration';
 
 const BADGE_COLORS: Record<string, string> = {
   red: 'bg-brand-red-600 text-white',
@@ -17,9 +18,10 @@ function ProgramCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
   const programHref = `/programs/${prog.slug}`;
   const badgeClass = BADGE_COLORS[prog.badgeColor ?? 'green'] ?? BADGE_COLORS.green;
   const salary = prog.laborMarket?.salaryRange ?? '';
-  const duration = prog.durationWeeks
-    ? prog.durationWeeks === 1 ? '1 week' : `${prog.durationWeeks} weeks`
-    : '';
+  const duration = formatProgramDurationWeeks(
+    prog.durationWeeks,
+    prog.programType === 'apprenticeship',
+  );
 
   return (
     <div className="group flex h-full flex-col rounded-2xl overflow-hidden bg-slate-900 shadow-md hover:shadow-xl transition-shadow">

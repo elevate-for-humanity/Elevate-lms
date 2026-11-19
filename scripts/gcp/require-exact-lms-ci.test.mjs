@@ -9,7 +9,7 @@ const token = 'test-token';
 const env = { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GITHUB_REF: 'refs/heads/main',
   GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_SHA: sha, GH_TOKEN: token };
 const ci = { id: 123, status: 'completed', conclusion: 'success', head_sha: sha,
-  name: 'CI', event: 'push', path: '.github/workflows/ci.yml', head_branch: 'main' };
+  name: 'CI', event: 'push', path: '.github/workflows/ci.yml', head_branch: 'main', head_repository: { full_name: env.GITHUB_REPOSITORY } };
 const job = { name: 'CI Required Gate', status: 'completed', conclusion: 'success' };
 const reply = value => ({ ok: true, status: 200, json: async () => value });
 function fixture({ head = sha, runs = [ci], jobs = [job] } = {}) {
@@ -91,4 +91,18 @@ test('release workflow requires exact main gate before build and deploy', () => 
   assert.match(workflow.slice(gateStart, buildStart), /node scripts\/gcp\/require-exact-lms-ci\.mjs/);
   assert.match(workflow.slice(buildStart, workflow.indexOf('  deploy:')), /needs: \[validate, ci-required\]/);
   assert.match(workflow.slice(workflow.indexOf('  release-result:')), /needs: \[validate, ci-required, build, deploy, acceptance\]/);
+});
+
+test('the same full CI dispatched on exact repository main satisfies release after a workflow-token merge', async () => {
+  const r = await inspectExactMainCI({ sha, token, request: fixture({ runs: [{ ...ci, event: 'workflow_dispatch' }] }).request });
+  assert.equal(r.status, 'verified');
+});
+test('a newer failed dispatch cannot be replaced by an older green push CI', async () => {
+  await assert.rejects(inspectExactMainCI({ sha, token, request: fixture({ runs: [ci, { ...ci, id: 124, event: 'workflow_dispatch', conclusion: 'failure' }] }).request }), /REQUIRED_CI_FAILED:124/);
+});
+test('fork, missing workflow path and untrusted event runs cannot establish exact-main CI', async () => {
+  for (const patch of [{ head_repository: { full_name: 'attacker/fork' } }, { path: undefined }, { event: 'pull_request_target' }]) {
+    const r = await inspectExactMainCI({ sha, token, request: fixture({ runs: [{ ...ci, ...patch }] }).request });
+    assert.equal(r.status, 'pending');
+  }
 });

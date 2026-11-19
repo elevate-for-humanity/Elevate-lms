@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   if(actorError||!actor||!['admin','super_admin'].includes(actor.role))
     return NextResponse.json({error:'Administrator approval required'},{status:403});
   let data:unknown;try{data=await req.json();}catch{return NextResponse.json({error:'Invalid JSON'},{status:400});}
-  const input=data as {studentId?:unknown;programKey?:unknown;startDate?:unknown;sign?:unknown;approved?:unknown;confirmName?:unknown};
+  const input=data as {studentId?:unknown;programKey?:unknown;startDate?:unknown;sign?:unknown;approved?:unknown;confirmName?:unknown;providerName?:unknown};
   const studentId=typeof input.studentId==='string'?input.studentId:'';
   const programKey=typeof input.programKey==='string'?input.programKey:'';
   const startDate=typeof input.startDate==='string'?input.startDate:'';
@@ -32,10 +32,22 @@ export async function POST(req: NextRequest) {
   const name=student.full_name||[student.first_name,student.last_name].filter(Boolean).join(' ');
   if(!name)return NextResponse.json({error:'Student name must be verified first'},{status:409});
   const sign=input.sign===true;
-  if(sign&&(input.approved!==true||typeof input.confirmName!=='string'||input.confirmName.trim()!==actor.full_name?.trim()))
-    return NextResponse.json({error:'Per-document approval and an exact signer-name confirmation are required'},{status:422});
+  const providerName=typeof input.providerName==='string'?input.providerName.trim():'';
+  if(providerName.length<4||providerName.length>100)
+    return NextResponse.json({error:'A valid provider contact name is required'},{status:422});
   let signaturePng:Uint8Array|null=null;
+  let legalSigner=providerName;
   if(sign){
+    if(input.approved!==true||typeof input.confirmName!=='string')
+      return NextResponse.json({error:'Per-document signature authorization required'},{status:422});
+    const {data:meta,error:metaError}=await db.storage.from('documents').download(`faa-signatures/${user.id}/provider.json`);
+    if(metaError||!meta)return NextResponse.json({error:'Your legal signature identity has not been registered'},{status:409});
+    let stored:{actor_id?:string;signer_name?:string};
+    try{stored=JSON.parse(await meta.text());}catch{return NextResponse.json({error:'Saved signature identity is invalid'},{status:409});}
+    if(stored.actor_id!==user.id||!stored.signer_name||
+      stored.signer_name!==input.confirmName.trim()||stored.signer_name!==providerName)
+      return NextResponse.json({error:'Signature owner and legal name confirmation do not match'},{status:403});
+    legalSigner=stored.signer_name;
     const {data:image,error:signatureError}=await db.storage.from('documents').download(`faa-signatures/${user.id}/provider.png`);
     if(signatureError||!image)return NextResponse.json({error:'Save your signature image first; the FAA has not been signed'},{status:409});
     signaturePng=new Uint8Array(await image.arrayBuffer());
@@ -44,7 +56,7 @@ export async function POST(req: NextRequest) {
   let bytes:Uint8Array;
   try{bytes=await createFaaPdf({
     student:{id:student.id,name,phone:student.phone,email:student.email},
-    program,startDate,actorName:actor.full_name||'',signaturePng,signedAt:sign?now:null
+    program,startDate,actorName:legalSigner,signaturePng,signedAt:sign?now:null
   });}catch{return NextResponse.json({error:'FAA PDF generation failed; no document was signed'},{status:500});}
   const documentId=randomUUID();
   const path=`faa/${student.id}/${documentId}.pdf`;

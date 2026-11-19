@@ -30,7 +30,8 @@ for (const persona of fixture.personas) {
       if (own.error || own.data.role !== 'student') throw new Error('QA role changed unexpectedly.');
     }
   } finally {
-    await db.auth.signOut();
+    const { error: signOutError } = await db.auth.signOut();
+    if (signOutError) throw new Error('QA session sign-out failed.');
   }
 }
 const evidence = { project_ref: QA_PROJECT_REF, checked_at: new Date().toISOString(), stage: 'auth_and_minimal_profile_read_only', full_application_e2e_ready: false, persona_count: results.length, results, learner_role_write_denied: true, sessions_signed_out: true, production_accessed: false };

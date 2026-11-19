@@ -4,6 +4,7 @@ import { NAIL_TECH_PROGRAM } from '@/lib/program-constants';
 import { orientationConfigs } from '@/lms-data/orientationConfig';
 import { buildProgramAtAGlance } from '@/lib/programs/program-at-a-glance';
 import { getTotalHoursRange } from '@/lib/programs/program-schema';
+import { formatProgramDurationWeeks } from '@/lib/programs/marketing-duration';
 
 describe('Nail Technician public catalog consistency', () => {
   it('does not advertise a fixed completion term for the competency-based standard', () => {
@@ -15,6 +16,9 @@ describe('Nail Technician public catalog consistency', () => {
     expect(duration?.answer).toContain('Competency-based');
     expect(duration?.answer).not.toMatch(/0 weeks|50 weeks/);
     expect(getTotalHoursRange(NAIL_TECH)).toContain('Competency-based');
+    expect(formatProgramDurationWeeks(NAIL_TECH.durationWeeks, true)).toContain('Competency-based');
+    expect(formatProgramDurationWeeks(0)).toBe('Duration confirmed during enrollment');
+    expect(formatProgramDurationWeeks(6)).toBe('6 weeks');
   });
 
   it('uses the same $6,000 published tuition and $600 deposit percentage in both orientation aliases', () => {

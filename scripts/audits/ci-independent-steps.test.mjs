@@ -13,7 +13,7 @@ test('CI does not skip independent preflight tests after an earlier failure',()=
    // Release identity is checked before checkout and dependency installation.
    // It is intentionally dispatch-only; this is not an independently runnable
    // post-install regression, so keep its stronger early guard intact.
-   assert.match(section,/if: github\.event_name == 'workflow_dispatch' && inputs\\.requested_sha != ''/);
+   assert.match(section,/if: github\.event_name == 'workflow_dispatch' && inputs\.requested_sha != ''/);
    assert.match(section,/GITHUB_REF.*refs\/heads\/main/);
    assert.match(section,/REQUESTED_SHA.*GITHUB_SHA/);
    assert.ok(preflight.indexOf(section)<preflight.indexOf('      - uses: actions/checkout@v4'),

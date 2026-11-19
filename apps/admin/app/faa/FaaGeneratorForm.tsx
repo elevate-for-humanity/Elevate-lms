@@ -12,6 +12,8 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
   const [startDate,setStartDate]=useState('');
   const [sign,setSign]=useState(false),[approved,setApproved]=useState(false);
   const [confirmName,setConfirmName]=useState(''),[image,setImage]=useState('');
+  const [providerName,setProviderName]=useState(signerName);
+  const [savedSignerName,setSavedSignerName]=useState(signerName);
   const [imageConsent,setImageConsent]=useState(false),[busy,setBusy]=useState(false);
   const [error,setError]=useState(''),[result,setResult]=useState('');
   const program=programs.find(p=>p.key===programKey);
@@ -24,17 +26,18 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
   async function saveSignature(){
     setError('');setResult('');setBusy(true);
     try{
-      const r=await fetch('/api/admin/faa/signature',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image,consent:imageConsent})});
+      const r=await fetch('/api/admin/faa/signature',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image,consent:imageConsent,signerName:providerName})});
       const data=await r.json();if(!r.ok)throw Error(data.error||'Signature save failed');
-      setResult('Private signature saved. Every signed FAA still requires your approval.');setImage('');setImageConsent(false);
+      setSavedSignerName(data.signerName||providerName);
+      setResult('Private signature saved for '+providerName+'. Every signed FAA still requires your approval.');setImage('');setImageConsent(false);
     }catch(e){setError(e instanceof Error?e.message:'Signature save failed');}finally{setBusy(false);}
   }
   async function generate(e:FormEvent<HTMLFormElement>){
     e.preventDefault();setError('');setResult('');setBusy(true);
     try{
-      if(!studentId||!startDate||!endDate)throw Error('Choose a student and a valid start date.');
+      if(!studentId||!startDate||!endDate||!providerName.trim())throw Error('Choose a student and a valid start date.');
       const r=await fetch('/api/admin/faa/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({studentId,programKey,startDate,sign,approved,confirmName})});
+        body:JSON.stringify({studentId,programKey,startDate,sign,approved,confirmName,providerName})});
       if(!r.ok){const data=await r.json().catch(()=>({}));throw Error(data.error||'FAA generation failed');}
       const file=await r.blob();if(file.type!=='application/pdf')throw Error('Unexpected document response');
       const url=URL.createObjectURL(file),a=document.createElement('a');
@@ -49,9 +52,12 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
     <section className="rounded-xl border bg-white p-5">
       <h2 className="text-xl font-bold">Save your signature once</h2>
       <p className="my-2 text-sm text-slate-600">Upload a PNG of your actual signature; it is kept private and used only when you approve a specific FAA.</p>
-      <input type="file" accept="image/png" onChange={selectImage} className="block w-full"/>
+      <label className="mt-3 block text-sm font-semibold">Your legal provider signature name
+        <input value={providerName} onChange={e=>setProviderName(e.target.value)} className="mt-1 block w-full rounded border p-2" placeholder="Elizabeth Greene"/>
+      </label>
+      <input type="file" accept="image/png" onChange={selectImage} className="mt-3 block w-full"/>
       <label className="mt-3 flex gap-2 text-sm"><input type="checkbox" checked={imageConsent} onChange={e=>setImageConsent(e.target.checked)}/>I own this signature and authorize its private storage.</label>
-      <button type="button" disabled={!image||!imageConsent||busy} onClick={saveSignature} className="mt-3 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50">Save signature</button>
+      <button type="button" disabled={!image||!imageConsent||busy||!providerName.trim()} onClick={saveSignature} className="mt-3 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50">Save signature</button>
     </section>
     <form onSubmit={generate} className="space-y-4 rounded-xl border bg-white p-5">
       <h2 className="text-xl font-bold">Generate WorkOne FAA</h2>
@@ -65,15 +71,18 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
         Duration: {program.weeks} weeks. Proposed total: {'$'+(program.total/100).toFixed(2)}.
         Source: {program.source}. Verify costs before signing.
       </p>}
+      <label className="block text-sm font-semibold">Provider contact name
+        <input value={providerName} onChange={e=>setProviderName(e.target.value)} required className="mt-1 block w-full rounded border p-3"/>
+      </label>
       <label className="block text-sm font-semibold">Start date<input required type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} className="mt-1 block w-full rounded border p-3"/></label>
       <label className="block text-sm font-semibold">End date<input readOnly value={endDate} className="mt-1 block w-full rounded border bg-slate-100 p-3"/></label>
       <label className="flex gap-2 text-sm"><input type="checkbox" checked={sign} onChange={e=>{setSign(e.target.checked);setApproved(false);setConfirmName('');}}/>Automatically place my saved signature on this FAA after I approve it.</label>
       {sign&&<div className="space-y-3 rounded border border-blue-300 bg-blue-50 p-4">
-        <p className="text-sm">Signer: {signerName||'Unavailable'}. This does not constitute WorkOne funding approval.</p>
+        <p className="text-sm">Saved signer: {savedSignerName||'Upload your signature first'}. This does not constitute WorkOne funding approval.</p>
         <label className="flex gap-2 text-sm"><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/>I reviewed this FAA and authorize my signature for this student.</label>
         <label className="block text-sm">Type exact signer name<input value={confirmName} onChange={e=>setConfirmName(e.target.value)} className="mt-1 block w-full rounded border p-2"/></label>
       </div>}
-      <button disabled={busy||!studentId||!startDate||(sign&&(!approved||confirmName.trim()!==signerName.trim()))} className="rounded-lg bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">
+      <button disabled={busy||!studentId||!startDate||(sign&&(!approved||!savedSignerName||confirmName.trim()!==savedSignerName.trim()||providerName.trim()!==savedSignerName.trim()))} className="rounded-lg bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">
         {busy?'Generating...':sign?'Approve, sign and download':'Generate unsigned FAA'}
       </button>
       {error&&<p role="alert" className="rounded bg-red-50 p-3 text-red-800">{error}</p>}

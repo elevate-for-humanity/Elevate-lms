@@ -60,9 +60,20 @@
   "full_application_e2e_ready": false,
   "limitations": [
     "No subscriber identity, subscription, credit balance or site was created by this stage.",
-    "Canonical trial provisioning, credit-grant functions and test fixture lifecycle still require completion.",
+    "Normal free-trial browser provisioning and two designated disposable subscriber fixture lifecycles still require execution; its wallet helper definitions are now installed.",
     "No authenticated builder browser create/edit/save/reopen/preview or cross-tenant acceptance ran.",
     "No AI generation, contact submission, private course, audio or microphone acceptance ran.",
     "This stage is not production migration, independent review approval, merge or release certification."
-  ]
+  ],
+  "followup_trial_wallet_stage": {
+    "source": "lib/trial/start-app-trial.ts on f1aa9c96dd038fff0e8d884717debee2d963727f",
+    "functions": 2,
+    "exact_source_definitions_and_acls": true,
+    "subscription_or_wallet_seeded": false,
+    "normal_trial_browser_flow_verified": false,
+    "migration": {
+      "version": "20261119131825",
+      "name": "qa_builder_trial_wallet_contract_stage"
+    }
+  }
 }

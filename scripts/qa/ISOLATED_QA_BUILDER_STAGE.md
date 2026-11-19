@@ -32,8 +32,15 @@ the intentionally private receipt table. Its existing leaked-password warning is
 unchanged. No security setting or access control was relaxed.
 
 This removes the missing builder database-contract dependency only. It does not
-establish subscriber browser acceptance. Normal free-trial provisioning, credit
-grant helpers, two designated nonadmin subscriber fixtures, fixture cleanup and
+establish subscriber browser acceptance. Normal free-trial browser provisioning, two designated nonadmin subscriber
+fixtures, fixture cleanup and
 actual create/edit/save/reopen/preview/isolation checks remain necessary. Never
 seed a fake paid subscription or use production credentials for these tests.
 No customer site configuration is opted into footer/backdrop/introduction changes.
+
+The follow-up `bootstrap-builder-trial-wallet-20261119.sql` installs both exact
+source `ensure_app_trial_wallet` functions, private implementation before public
+SQL wrapper. The definitions and execute ACLs match source. This supports the
+existing `startAppTrial` helper; it does not create a subscription or mint credits
+by itself. Its QA migration is recorded in the evidence JSON. Do not replay either
+stage: both have already been applied to the isolated QA project.

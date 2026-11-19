@@ -33,13 +33,15 @@ export async function inspectExactMainCI({ sha, token, request = fetch }) {
   const head = await api('git/ref/heads/main');
   if (head.object?.sha !== sha) throw new Error('LMS_RELEASE_MAIN_CHANGED');
 
-  const data = await api('actions/workflows/ci.yml/runs?head_sha=' + sha + '&event=push&per_page=50');
+  // A protected workflow-token merge does not emit push-triggered workflows.
+  // The signed PARIS reconciler dispatches the same full CI on exact main.
+  const data = await api('actions/workflows/ci.yml/runs?head_sha=' + sha + '&per_page=50');
   if (!Array.isArray(data.workflow_runs)) throw new Error('LMS_RELEASE_CI_INVENTORY_UNAVAILABLE');
   const runs = data.workflow_runs
-    .filter(run => run.head_sha === sha && run.event === 'push' && run.name === 'CI' &&
-      (!run.path || run.path === workflowFile) && run.head_branch === 'main')
+    .filter(run => run.head_sha === sha && ['push', 'workflow_dispatch'].includes(run.event) && run.name === 'CI' &&
+      run.path === workflowFile && run.head_branch === 'main' && run.head_repository?.full_name === repository)
     .sort((a, b) => b.id - a.id || (b.run_attempt || 1) - (a.run_attempt || 1));
-  if (!runs.length) return { status: 'pending', reason: 'LMS_RELEASE_EXACT_PUSH_CI_MISSING' };
+  if (!runs.length) return { status: 'pending', reason: 'LMS_RELEASE_EXACT_MAIN_CI_MISSING' };
   const run = runs[0];
   if (run.status !== 'completed') return { status: 'pending', reason: 'LMS_RELEASE_CI_PENDING', runId: run.id };
   if (run.conclusion !== 'success') throw new Error('LMS_RELEASE_REQUIRED_CI_FAILED:' + run.id);

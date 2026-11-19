@@ -1,3 +1,4 @@
+import type { LearningMaterial } from '@/components/lms/AssignedLearningMaterials';
 import { loadHolderOnlineStudy } from './online-study';
 import { loadHolderExitReports } from './exit-reports';
 import { curriculumProgress } from './curriculum-progress';
@@ -30,6 +31,7 @@ export type ProgramHolderWorkspace = {
   reports: any[];
   testingReports?: any[];
   courseAssignments: any[];
+  learningMaterials?: { courses: LearningMaterial[]; workbooks: LearningMaterial[]; error?: string };
   payoutProfile: any | null;
   payoutSchedules: any[];
   notificationPreferences: any | null;
@@ -424,6 +426,31 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       build: progressFor(link.course_id),
     });
   }
+  // Retired catalog records remain stored, but are not current teaching choices.
+  const currentAssignments = deliveryAssignments.filter(row => {
+    const delivery: any = deliveryMetadata.get(row.course_id);
+    const authored: any = buildMetadata.get(delivery?.canonical_course_id || row.course_id);
+    return authored?.status !== 'archived' && authored?.is_active !== false;
+  });
+  const learningMaterials: NonNullable<ProgramHolderWorkspace['learningMaterials']> = { courses: [], workbooks: [] };
+  try {
+    const assignedTeaching = await db.from('instructor_assignments').select('course_id')
+      .eq('instructor_id', profile.id).eq('active', true);
+    if (assignedTeaching.error) throw new Error('Teaching material access could not be verified.');
+    const teachingIds = new Set((assignedTeaching.data ?? []).map(row => row.course_id));
+    const teachingCourses = currentAssignments.filter(row => row.published && teachingIds.has(row.course_id));
+    learningMaterials.courses = teachingCourses.map(row => ({ id: row.course_id, title: row.title || 'Assigned course', href: `/lms/courses/${row.course_id}` }));
+    const teachingProgramIds = [...new Set(teachingCourses.map(row => row.program_id).filter(Boolean))];
+    const teachingBooks = teachingProgramIds.length
+      ? await db.from('digital_workbooks').select('id,title,slug,program_id').eq('is_active', true)
+          .in('program_id', teachingProgramIds).order('title')
+      : { data: [], error: null };
+    if (teachingBooks.error) throw new Error('Teaching workbooks could not be loaded.');
+    learningMaterials.workbooks = (teachingBooks.data ?? []).map(row => ({ id: row.id, title: row.title, href: `/workbooks/${row.slug}` }));
+  } catch {
+    logger.error('PROGRAM_HOLDER_LEARNING_MATERIALS_UNAVAILABLE');
+    learningMaterials.error = 'Learning material links could not be loaded. Open My Courses or Workbooks to retry.';
+  }
   const rosterUserIds: string[] = Array.from(
     new Set(
       [
@@ -726,7 +753,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],
     testingReports: await loadHolderExitReports(db, holderId),
-    courseAssignments: deliveryAssignments,
+    courseAssignments: currentAssignments,
+    learningMaterials,
     payoutProfile: payoutRes.data ?? null,
     payoutSchedules: schedulesRes.data ?? [],
     notificationPreferences: notificationRes.data ?? null,

@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
+import { inspectExactMainCI } from './require-exact-lms-ci.mjs';
 const repository = 'elevate-for-humanity/Elevate-lms';
 const workflows = ['deploy-admin.yml', 'deploy-google-lms-trigger.yml', 'deploy-google-marketing-trigger.yml', 'deploy-google-store-runtime.yml'];
 
@@ -9,7 +10,7 @@ export async function dispatchCompletedMainCI({ env, event, request = fetch }) {
   const run = event?.workflow_run;
   if (env.GITHUB_REPOSITORY !== repository || env.GITHUB_REF !== 'refs/heads/main' ||
       env.GITHUB_EVENT_NAME !== 'workflow_run' || run?.name !== 'CI' ||
-      run.path !== '.github/workflows/ci.yml' || run.event !== 'push' ||
+      run.path !== '.github/workflows/ci.yml' || !['push', 'workflow_dispatch'].includes(run.event) ||
       run.conclusion !== 'success' || run.head_branch !== 'main' ||
       run.head_repository?.full_name !== repository || !/^[a-f0-9]{40}$/.test(run.head_sha || '')) {
     return { status: 'ignored_untrusted_or_unsuccessful_ci', deploymentVerified: false };
@@ -50,14 +51,8 @@ export async function releaseApprovedWeb({ sha, token, releaseHold, request = fe
   }
   const head = await api('git/ref/heads/main');
   if (head.object?.sha !== sha) throw Error('RELEASE_MAIN_CHANGED');
-  const runs = await api(`actions/workflows/ci.yml/runs?head_sha=${sha}&event=push&per_page=20`);
-  let approved = false;
-  for (const run of runs.workflow_runs || []) {
-    if (run.head_sha !== sha) continue;
-    const jobs = await api(`actions/runs/${run.id}/jobs?per_page=100`);
-    if (jobs.jobs?.some(job => job.name === 'CI Required Gate' && job.status === 'completed' && job.conclusion === 'success')) approved = true;
-  }
-  if (!approved) throw Error('RELEASE_REQUIRED_CI_NOT_GREEN');
+  const ci = await inspectExactMainCI({ sha, token, request });
+  if (ci.status !== 'verified') throw Error('RELEASE_REQUIRED_CI_NOT_GREEN');
   // The main-only workflow supplies GitHub's trusted variable context. Its
   // scoped Actions token must not need administrator-level variable access.
   // Legacy explicit hold management retains its original write/readback gate.

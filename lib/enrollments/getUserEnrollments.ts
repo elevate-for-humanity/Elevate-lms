@@ -57,6 +57,7 @@ type ProgramRow = {
 
 type CourseRow = {
   id: string;
+  program_id?: string | null;
   title: string | null;
   course_name: string | null;
   description: string | null;
@@ -111,7 +112,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     courseIds.length
       ? reader
           .from('courses')
-          .select('id,title,course_name,description,short_description,duration_hours,metadata')
+          .select('id,title,course_name,description,short_description,duration_hours,metadata,program_id')
           .in('id', courseIds)
       : Promise.resolve({ data: [] as CourseRow[], error: null }),
     programHolderIds.length
@@ -183,20 +184,31 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   if (missingCourseIds.length) {
     const { data: directCourses, error: directCoursesError } = await reader
       .from('courses')
-      .select('id,title,course_name,description,short_description,duration_hours,metadata')
+      .select('id,title,course_name,description,short_description,duration_hours,metadata,program_id')
       .in('id', missingCourseIds);
     if (directCoursesError) return { enrollments: results, error: directCoursesError.message };
     for (const course of (directCourses ?? []) as CourseRow[]) coursesById.set(course.id, course);
   }
 
+  // Course-only enrollments retain their source; inherit catalog context for guidance.
+  const directProgramIds = [...new Set(directCourseIds.map(id => coursesById.get(id)?.program_id)
+    .filter((id): id is string => Boolean(id)))].filter(id => !programsById.has(id));
+  if (directProgramIds.length) {
+    const associatedPrograms = await reader.from('programs')
+      .select('id,slug,name,title,delivery_mode').in('id', directProgramIds);
+    if (associatedPrograms.error) return { enrollments: results, error: associatedPrograms.error.message };
+    for (const program of (associatedPrograms.data ?? []) as ProgramRow[]) programsById.set(program.id, program);
+  }
   const representedCourseIds = new Set(results.map((item) => item.course_id).filter(Boolean));
   for (const row of courseEnrollments ?? []) {
     if (!row.course_id || representedCourseIds.has(row.course_id)) continue;
     const course = coursesById.get(row.course_id) ?? null;
+    const program = course?.program_id ? programsById.get(course.program_id) : null;
     results.push({
       ...(course?.metadata?.assignment_kind === 'secondary' ? { assignment_kind: 'secondary' as const } : {}),
       source_table: 'course_enrollments', enrollment_id: row.id, user_key: row.student_id,
-      program_id: null, program_slug: null, program_title: null, course_id: row.course_id,
+      program_id: course?.program_id ?? null, program_slug: program?.slug ?? null,
+      program_title: program?.title ?? program?.name ?? null, course_id: row.course_id,
       course_title: course?.title ?? course?.course_name ?? null,
       course_description: course?.description ?? course?.short_description ?? null,
       duration_hours: course?.duration_hours ?? null, provider_id: null, provider_name: null,
@@ -239,7 +251,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   if (internalFallbackCourseIds.length) {
     const { data: partnerCourseFallbacks } = await reader
       .from('courses')
-      .select('id,title,course_name,description,short_description,duration_hours,metadata')
+      .select('id,title,course_name,description,short_description,duration_hours,metadata,program_id')
       .in('id', internalFallbackCourseIds);
     for (const course of (partnerCourseFallbacks ?? []) as CourseRow[]) coursesById.set(course.id, course);
   }

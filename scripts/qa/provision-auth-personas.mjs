@@ -1,6 +1,6 @@
-import { readFile, writeFile, chmod } from 'node:fs/promises';
+import { readFile, writeFile, rename, unlink } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 
 // Administrative fixture provisioning only. Never run against production.
 const { QA_PROJECT_REF, QA_SERVICE_KEY_FILE, QA_PERSONAS_FILE, QA_SDK_PACKAGE_JSON } = process.env;
@@ -31,8 +31,15 @@ catch (error) { if (error.code !== 'ENOENT') throw error; }
 if (file && file.project_ref !== QA_PROJECT_REF) throw new Error('Credential output belongs to another project.');
 file ??= { project_ref: QA_PROJECT_REF, run_id: `qa-bootstrap-${new Date().toISOString()}`, personas: [] };
 const save = async () => {
-  await writeFile(QA_PERSONAS_FILE, JSON.stringify(file, null, 2), { mode: 0o600 });
-  await chmod(QA_PERSONAS_FILE, 0o600);
+  const temporaryPath = `${QA_PERSONAS_FILE}.${randomUUID()}.tmp`;
+  try {
+    await writeFile(temporaryPath, JSON.stringify(file, null, 2), { mode: 0o600, flag: 'wx' });
+    await rename(temporaryPath, QA_PERSONAS_FILE);
+  } finally {
+    await unlink(temporaryPath).catch(error => {
+      if (error.code !== 'ENOENT') throw error;
+    });
+  }
 };
 for (const [name, role] of Object.entries(roles)) {
   let entry = file.personas.find(item => item.name === name);

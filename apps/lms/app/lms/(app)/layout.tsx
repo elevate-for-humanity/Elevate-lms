@@ -38,6 +38,8 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
         route => pathname === route || pathname.startsWith(`${route}/`),
       ) ||
       [
+        '/lms/apply',
+        '/lms/apply/status',
         '/lms/documents',
         '/lms/documents/upload',
         '/lms/agreements',

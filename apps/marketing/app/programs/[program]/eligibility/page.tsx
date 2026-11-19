@@ -31,6 +31,7 @@ export default async function BeautyEligibilityPage({ params }: Props) {
   const b = heroBanners[cfg.slug as keyof typeof heroBanners];
   const fullDollars = (cfg.fullTuitionCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
   const depositDollars = (cfg.depositCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  const applyHref = `/programs/${cfg.slug}/apply`;
 
   return (
     <div className="min-h-screen bg-white">
@@ -63,11 +64,11 @@ export default async function BeautyEligibilityPage({ params }: Props) {
           <ProgramFundingGate
             selfPayOnly
             programName={cfg.title}
-            applyHref={`/programs/${cfg.slug}/apply`}
+            applyHref={applyHref}
             selfPayCost={fullDollars}
             depositAmount={depositDollars}
-            depositHref={cfg.stripeDepositLink}
-            fullPayHref={cfg.stripeFullLink}
+            depositHref={applyHref}
+            fullPayHref={applyHref}
           />
         </div>
       </section>

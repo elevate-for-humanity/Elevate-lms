@@ -59,11 +59,11 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     rtiDescription:
       'Complete 300 hours of related esthetics instruction covering skin science, sanitation, safety, client consultation, documentation, and licensing preparation while demonstrating all 20 Appendix A competencies.',
     tuition: {
-      total: 4980,
-      setupFeePercent: 0,
-      paymentFrequency: 'Options shown at checkout',
+      total: 6000,
+      setupFeePercent: 10,
+      paymentFrequency: 'Deposit and installments under approved enrollment terms',
       fundingNote:
-        'This pathway is published as self-pay. Any employer or workforce funding must be verified and authorized in writing for the individual participant before enrollment.',
+        'Self-pay only. Review the $600 initial deposit and approved remaining payment terms before enrollment.',
     },
     accentColor: 'purple',
     estimatedTime: '8-10 minutes',
@@ -81,11 +81,11 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     rtiDescription:
       'Complete 154 verified RTI hours alongside the registered hybrid work-process requirements.',
     tuition: {
-      total: 0,
-      setupFeePercent: 0,
-      paymentFrequency: 'N/A — earn-while-you-learn apprenticeship',
+      total: 6000,
+      setupFeePercent: 10,
+      paymentFrequency: 'Deposit and installments under approved enrollment terms',
       fundingNote:
-        'This is a paid apprenticeship. You earn wages from your host salon throughout training. There is no tuition. Most apprentices also qualify for WIOA or Workforce Ready Grant support for tools and exam fees.',
+        'Self-pay only. Review the $600 initial deposit and approved remaining payment terms before enrollment.',
     },
     accentColor: 'purple',
     estimatedTime: '10-12 minutes',
@@ -103,11 +103,11 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     rtiDescription:
       'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.',
     tuition: {
-      total: 2490,
-      setupFeePercent: 35,
-      paymentFrequency: 'Billed every Friday',
+      total: 6000,
+      setupFeePercent: 10,
+      paymentFrequency: 'Deposit and installments under approved enrollment terms',
       fundingNote:
-        'If you received funding approval (WRG, WIOA, employer sponsorship), your costs may be partially or fully covered. Check your enrollment confirmation for details.',
+        'Self-pay only. Confirm the $600 initial deposit and remaining payment terms in the approved enrollment agreement.',
     },
     accentColor: 'pink',
     estimatedTime: '6-8 minutes',
@@ -125,11 +125,11 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     rtiDescription:
       'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.',
     tuition: {
-      total: 2500,
-      setupFeePercent: 35,
-      paymentFrequency: 'Billed every Friday',
+      total: 6000,
+      setupFeePercent: 10,
+      paymentFrequency: 'Deposit and installments under approved enrollment terms',
       fundingNote:
-        'If you received funding approval (WRG, WIOA, employer sponsorship), your costs may be partially or fully covered. Check your enrollment confirmation for details.',
+        'Self-pay only. Confirm the $600 initial deposit and remaining payment terms in the approved enrollment agreement.',
     },
     accentColor: 'pink',
     estimatedTime: '8-10 minutes',

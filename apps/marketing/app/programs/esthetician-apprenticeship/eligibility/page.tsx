@@ -6,11 +6,14 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramFundingGate from '@/components/programs/ProgramFundingGate';
 import heroBanners from '@/content/heroBanners';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { BEAUTY_PROGRAMS, formatBeautyPrice } from '@/lib/programs/beauty-programs';
 
 export const metadata: Metadata = {
   title: 'Self-Pay Enrollment | Esthetician Apprenticeship',
   description: 'Review apprenticeship self-pay tuition, payment options, and enrollment steps.',
 };
+
+const PRICING = BEAUTY_PROGRAMS['esthetician'];
 
 export default function EstheticianEligibilityPage() {
   const b = heroBanners['esthetician-apprenticeship'];
@@ -43,8 +46,8 @@ export default function EstheticianEligibilityPage() {
             selfPayOnly
             programName="Esthetician Apprenticeship"
             applyHref="/programs/esthetician-apprenticeship/apply"
-            selfPayCost="$6,000"
-            depositAmount="$2,100"
+            selfPayCost={formatBeautyPrice(PRICING.fullTuitionCents)}
+            depositAmount={formatBeautyPrice(PRICING.depositCents)}
             depositHref="/programs/esthetician-apprenticeship/apply"
             fullPayHref="/programs/esthetician-apprenticeship/apply"
           />

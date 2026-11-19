@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   if(actorError||!actor||!['admin','super_admin'].includes(actor.role))
     return NextResponse.json({error:'Administrator approval required'},{status:403});
   let data:unknown;try{data=await req.json();}catch{return NextResponse.json({error:'Invalid JSON'},{status:400});}
-  const input=data as {studentId?:unknown;programKey?:unknown;startDate?:unknown;sign?:unknown;approved?:unknown;confirmName?:unknown;providerName?:unknown};
+  const input=data as {studentId?:unknown;programKey?:unknown;startDate?:unknown;sign?:unknown;approved?:unknown;confirmName?:unknown;providerName?:unknown;intent?:unknown};
   const studentId=typeof input.studentId==='string'?input.studentId:'';
   const programKey=typeof input.programKey==='string'?input.programKey:'';
   const startDate=typeof input.startDate==='string'?input.startDate:'';
@@ -31,21 +31,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({error:'Student record not found or is not a learner'},{status:404});
   const name=student.full_name||[student.first_name,student.last_name].filter(Boolean).join(' ');
   if(!name)return NextResponse.json({error:'Student name must be verified first'},{status:409});
-  const sign=input.sign===true;
+  // The owner authorizes use of her saved signature when she deliberately
+  // finalizes an FAA in an authenticated admin session; drafts stay unsigned.
+  const sign=input.intent==='finalize';
+  if(input.intent!=='finalize'&&input.intent!=='draft')
+    return NextResponse.json({error:'Specify draft or finalize intent'},{status:422});
   const providerName=typeof input.providerName==='string'?input.providerName.trim():'';
   if(providerName.length<4||providerName.length>100)
     return NextResponse.json({error:'A valid provider contact name is required'},{status:422});
   let signaturePng:Uint8Array|null=null;
   let legalSigner=providerName;
   if(sign){
-    if(input.approved!==true||typeof input.confirmName!=='string')
-      return NextResponse.json({error:'Per-document signature authorization required'},{status:422});
+    if(input.approved!==true)
+      return NextResponse.json({error:'Explicit administrator finalization approval required'},{status:422});
     const {data:meta,error:metaError}=await db.storage.from('documents').download(`faa-signatures/${user.id}/provider.json`);
     if(metaError||!meta)return NextResponse.json({error:'Your legal signature identity has not been registered'},{status:409});
     let stored:{actor_id?:string;signer_name?:string;signature_path?:string;image_id?:string};
     try{stored=JSON.parse(await meta.text());}catch{return NextResponse.json({error:'Saved signature identity is invalid'},{status:409});}
     if(stored.actor_id!==user.id||!stored.signer_name||
-      stored.signer_name!==input.confirmName.trim()||stored.signer_name!==providerName)
+      stored.signer_name!==providerName)
       return NextResponse.json({error:'Signature owner and legal name confirmation do not match'},{status:403});
     if(!stored.image_id||!/^[0-9a-f-]{36}$/i.test(stored.image_id)||
       stored.signature_path!==`faa-signatures/${user.id}/images/${stored.image_id}.png`)
@@ -82,7 +86,7 @@ export async function POST(req: NextRequest) {
     target_type:'profiles',target_id:student.id,
     metadata:{documentId,path,programKey,startDate,endDate,amount_cents:faaTotalCents(program),
       status:sign?'signed_by_provider':'unsigned_draft',signed_at:sign?now:null,
-      funding_approved:false,signatureConsent:sign===true}
+      funding_approved:false,signatureConsent:sign===true,signaturePolicy:'admin_explicit_finalize_only'}
   });
   if(auditError) {
     // The document is preserved for recovery, but don't claim a completed signing

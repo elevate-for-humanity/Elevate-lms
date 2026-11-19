@@ -1,0 +1,84 @@
+{
+  "project_ref": "isdgjcdabhxxozarmxta",
+  "checked_at": "2026-11-19T12:05:02.371Z",
+  "stage": "auth_and_minimal_profile_read_only",
+  "full_application_e2e_ready": false,
+  "persona_count": 9,
+  "results": [
+    {
+      "persona": "ADMIN",
+      "role": "admin",
+      "actual_password_sign_in": true,
+      "visible_profiles": 9,
+      "own_role_verified": true,
+      "cross_user_denial_verified": false
+    },
+    {
+      "persona": "LEARNER",
+      "role": "student",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    },
+    {
+      "persona": "PROGRAM_HOLDER",
+      "role": "program_holder",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    },
+    {
+      "persona": "HOST_SHOP",
+      "role": "host_shop",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    },
+    {
+      "persona": "APPRENTICE",
+      "role": "apprentice",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    },
+    {
+      "persona": "EMPLOYER",
+      "role": "employer",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    },
+    {
+      "persona": "INSTRUCTOR",
+      "role": "instructor",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    },
+    {
+      "persona": "STAFF",
+      "role": "staff",
+      "actual_password_sign_in": true,
+      "visible_profiles": 9,
+      "own_role_verified": true,
+      "cross_user_denial_verified": false
+    },
+    {
+      "persona": "CASE_MANAGER",
+      "role": "case_manager",
+      "actual_password_sign_in": true,
+      "visible_profiles": 1,
+      "own_role_verified": true,
+      "cross_user_denial_verified": true
+    }
+  ],
+  "learner_role_write_denied": true,
+  "sessions_signed_out": true,
+  "production_accessed": false
+}

@@ -42,13 +42,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error:'Per-document signature authorization required'},{status:422});
     const {data:meta,error:metaError}=await db.storage.from('documents').download(`faa-signatures/${user.id}/provider.json`);
     if(metaError||!meta)return NextResponse.json({error:'Your legal signature identity has not been registered'},{status:409});
-    let stored:{actor_id?:string;signer_name?:string};
+    let stored:{actor_id?:string;signer_name?:string;signature_path?:string;image_id?:string};
     try{stored=JSON.parse(await meta.text());}catch{return NextResponse.json({error:'Saved signature identity is invalid'},{status:409});}
     if(stored.actor_id!==user.id||!stored.signer_name||
       stored.signer_name!==input.confirmName.trim()||stored.signer_name!==providerName)
       return NextResponse.json({error:'Signature owner and legal name confirmation do not match'},{status:403});
+    if(!stored.image_id||!/^[0-9a-f-]{36}$/i.test(stored.image_id)||
+      stored.signature_path!==`faa-signatures/${user.id}/images/${stored.image_id}.png`)
+      return NextResponse.json({error:'Signature binding validation failed'},{status:409});
     legalSigner=stored.signer_name;
-    const {data:image,error:signatureError}=await db.storage.from('documents').download(`faa-signatures/${user.id}/provider.png`);
+    const {data:image,error:signatureError}=await db.storage.from('documents').download(stored.signature_path);
     if(signatureError||!image)return NextResponse.json({error:'Save your signature image first; the FAA has not been signed'},{status:409});
     signaturePng=new Uint8Array(await image.arrayBuffer());
   }

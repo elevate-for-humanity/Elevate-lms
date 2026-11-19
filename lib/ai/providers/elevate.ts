@@ -178,7 +178,7 @@ export class ElevateProvider implements AIProvider {
     const payload = (await response.json().catch(() => ({}))) as OpenAIChatResponse;
     if (!response.ok) {
       throw new Error(
-        `Elevate LLM worker ${response.status}: ${payload.error?.message || 'request failed'}`.slice(0, 300),
+        `Elevate LLM worker HTTP ${response.status}: ${payload.error?.message || 'request failed'}`.slice(0, 300),
       );
     }
 

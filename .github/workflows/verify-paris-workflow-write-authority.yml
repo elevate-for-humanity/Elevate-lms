@@ -1,0 +1,71 @@
+name: Verify PARIS workflow write authority
+on:
+  workflow_dispatch:
+
+# This attests only the same short-lived job token class used by PARIS prepare.
+# It never proves the Admin runtime GitHub App/PAT identity, merge authority,
+# or protected-branch policy compliance.
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  verify-workflow-write:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify short-lived workflow identity without printing credentials
+        env:
+          AUDIENCE: elevate-paris-code-repair
+        run: |
+          node - <<'NODE'
+          (async () => {
+            const url = new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience', process.env.AUDIENCE);
+            const response = await fetch(url, {
+              headers: {Authorization: 'Bearer ' + process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}
+            });
+            if (!response.ok) throw Error('OIDC identity HTTP ' + response.status);
+            const token = (await response.json()).value;
+            if (typeof token !== 'string' || token.split('.').length !== 3)
+              throw Error('Signed workflow identity missing');
+            console.log('PARIS_WORKFLOW_IDENTITY_VERIFIED');
+          })().catch(error => { console.error(error.message); process.exitCode = 1; });
+          NODE
+      - name: Verify branch-ref write and remove temporary evidence ref
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_REPOSITORY: elevate-for-humanity/Elevate-lms
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REPOSITORY" != "$EXPECTED_REPOSITORY" || "$GITHUB_REF" != refs/heads/main ]]; then
+            echo "::error::PARIS_WRITE_AUTHORITY_WRONG_REPOSITORY_OR_REF"
+            exit 1
+          fi
+          probe="paris-authority-probe-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ref="refs/heads/$probe"
+          cleanup() {
+            if [[ "${created:-false}" == true ]]; then
+              if ! gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/$ref" >/dev/null; then
+                echo "::error::PARIS_WRITE_PROBE_CLEANUP_FAILED: $ref"
+                exit 1
+              fi
+            fi
+          }
+          trap cleanup EXIT
+          created=false
+          # A dedicated temporary ref proves an actual authorized write without
+          # changing main, altering source, mutating a PR, or bypassing reviews.
+          gh api -X POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=$ref" -f "sha=$GITHUB_SHA" >/dev/null
+          created=true
+          verified_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$probe" --jq '.object.sha')"
+          if [[ "$verified_sha" != "$GITHUB_SHA" ]]; then
+            echo "::error::PARIS_WRITE_AUTHORITY_READBACK_MISMATCH"
+            exit 1
+          fi
+          echo "PARIS_WORKFLOW_CONTENTS_WRITE_VERIFIED"
+          echo "This verifies job-token contents write to a temporary unprotected ref only." >> "$GITHUB_STEP_SUMMARY"
+          echo "It does not verify production Admin token, deployment, merge approval, or PARIS inference." >> "$GITHUB_STEP_SUMMARY"

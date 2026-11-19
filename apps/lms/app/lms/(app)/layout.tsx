@@ -6,6 +6,7 @@ import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { redirect } from 'next/navigation';
 import { loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
 import { BeautyPaymentLock } from '@/components/apprenticeship/BeautyPaymentLock';
+import { hasApprovedPaidLearnerEnrollment } from '@/lib/learner/approved-paid-admission.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,13 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
       : null;
     const isAdmin =
       subject.previewing || ['admin', 'super_admin'].includes(String(actor?.role || ''));
+    // Fail closed for learners before rendering navigation or course data.
+    // Public enrollment/checkout routes are outside this protected layout.
+    // An admin preview retains read-only access without granting learner rights.
+    if (user && !isAdmin) {
+      const admitted = await hasApprovedPaidLearnerEnrollment(db, user.id);
+      if (!admitted) redirect('/lms/access-pending');
+    }
     const isDashboard = pathname === '/lms' || pathname === '/lms/dashboard';
     const hasReadOnlyModule =
       subject.previewing &&

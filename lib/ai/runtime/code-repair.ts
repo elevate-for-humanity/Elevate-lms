@@ -354,8 +354,10 @@ async function reconcileParisNewerMain({repair,gh,deployments,currentMain}:{
 }){
  const main=currentMain??await gh('/git/ref/heads/main');
  const currentSha=String(main?.object?.sha??'');
- const comparison=/^[a-f0-9]{40}$/.test(currentSha)
-  ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
+ // An unavailable comparison is not evidence that the immutable release
+ // lacks ancestry. Let transient API failures retry without changing repair state.
+ if(!/^[a-f0-9]{40}$/.test(currentSha))throw Error('PARIS_CURRENT_MAIN_SHA_UNVERIFIED');
+ const comparison=await gh('/compare/'+repair.release_sha+'...'+currentSha);
  const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
  const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
  const candidateChecks=candidateRuns?.workflow_runs??[];

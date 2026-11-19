@@ -5,6 +5,7 @@ import { ArrowLeft, Phone, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import RequestInfoForm from './RequestInfoForm';
 import { getProgramBySlug } from '@/lib/programs/get-program';
+import { formatProgramDurationWeeks } from '@/lib/programs/marketing-duration';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 3600;
@@ -85,7 +86,7 @@ export default async function RequestInfoPage({ params }: Props) {
               <dl className="space-y-2 text-sm">
                 <div>
                   <dt className="text-black">Duration</dt>
-                  <dd className="font-semibold text-slate-800">{program.durationWeeks} weeks</dd>
+                  <dd className="font-semibold text-slate-800">{formatProgramDurationWeeks(program.durationWeeks, program.programType === 'apprenticeship')}</dd>
                 </div>
                 <div>
                   <dt className="text-black">Hours/Week</dt>

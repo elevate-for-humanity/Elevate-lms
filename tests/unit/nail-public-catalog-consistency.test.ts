@@ -11,6 +11,24 @@ import { BEAUTY_PROGRAMS, formatBeautyPrice } from '@/lib/programs/beauty-progra
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 
 describe('Nail Technician public catalog consistency', () => {
+  it('uses competency milestones throughout training and entry-to-license progression', () => {
+    const trainingTimeframes = [
+      ...NAIL_TECH.outcomes.map(outcome => outcome.assessedAt ?? ''),
+      ...NAIL_TECH.weeklySchedule.map(stage => stage.week),
+      ...(NAIL_TECH.trainingPhases ?? []).map(phase => phase.weeks),
+      ...NAIL_TECH.careerPathway.map(step => step.timeframe),
+    ];
+    for (const timeframe of trainingTimeframes) {
+      expect(timeframe).not.toMatch(/\b(?:week|month|year)s?\b/i);
+    }
+    expect(NAIL_TECH.careerPathway[1].timeframe).toMatch(/licens/i);
+    expect(NAIL_TECH.schedule).toContain('19 Appendix A competencies');
+    expect(NAIL_TECH.schedule).toContain('210 required RTI hours');
+    expect(NAIL_TECH.weeklySchedule.map(stage => stage.title)).toEqual([
+      'Sanitation & Nail Anatomy', 'Manicure & Pedicure', 'Gel & Acrylic Application',
+      'Nail Art & Advanced Techniques', 'Exam Prep & Licensing',
+    ]);
+  });
   it('does not advertise a fixed completion term for the competency-based standard', () => {
     expect(NAIL_TECH.durationWeeks).toBe(0);
     expect(NAIL_TECH_PROGRAM.durationWeeks).toBe(0);

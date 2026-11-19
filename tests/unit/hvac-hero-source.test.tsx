@@ -50,6 +50,9 @@ describe('server-rendered HVAC hero source', () => {
     expect(video).toHaveAttribute('width', '720');
     expect(video).toHaveAttribute('height', '900');
     expect(video?.className).toContain('h-auto');
+    expect(video?.className).toContain('aspect-[4/5]');
+    expect(video?.className).toContain('object-contain');
+    expect(video?.getAttribute('style')).toMatch(/aspect-ratio:\s*4\s*\/\s*5/);
     expect(video?.className).not.toContain('max-h-');
   });
 });

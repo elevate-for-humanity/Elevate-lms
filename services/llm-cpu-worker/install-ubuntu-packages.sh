@@ -16,7 +16,7 @@ if ! install_packages "$@"; then
   # Ubuntu's existing archive signing key and freshness checks in force.
   [ "$(dpkg --print-architecture)" = amd64 ] || exit 1
   echo 'Retrying Ubuntu package installation using the kernel.org archive mirror' >&2
-  sed -i -E 's|https://(archive|security)\.ubuntu\.com/ubuntu/?|https://mirrors.edge.kernel.org/ubuntu/|g' "$sources"
+  sed -i -E 's#https://(archive|security)\.ubuntu\.com/ubuntu/?#https://mirrors.edge.kernel.org/ubuntu/#g' "$sources"
   rm -rf /var/lib/apt/lists/*
   install_packages "$@"
 fi

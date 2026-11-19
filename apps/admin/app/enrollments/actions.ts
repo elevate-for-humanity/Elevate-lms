@@ -217,7 +217,7 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
     await db
       .from('program_enrollments')
       .select(
-        'id,user_id,student_id,funding_verified,eligibility_status,revoked_at'
+        'id,user_id,student_id,payment_status,funding_verified,eligibility_status,revoked_at,cancelled_at,suspended_at,refunded_at'
       )
       .eq('id', enrollmentId)
       .maybeSingle();
@@ -227,8 +227,10 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
     !enrollment ||
     ![enrollment.user_id, enrollment.student_id].includes(userId) ||
     enrollment.revoked_at ||
-    enrollment.funding_verified !== true ||
-    enrollment.eligibility_status !== 'eligible'
+    enrollment.cancelled_at ||
+    enrollment.suspended_at ||
+    enrollment.refunded_at ||
+    !['paid', 'paid_in_full'].includes(String(enrollment.payment_status || '').toLowerCase())
   ) {
     throw new Error(
       'Enrollment funding, eligibility, or authorization check failed'
@@ -241,6 +243,9 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
     .update({
       status: 'active',
       enrollment_state: 'active',
+      access_status: 'active',
+      approved_at: now,
+      approved_by: user.id,
       access_granted_at: now,
       updated_at: now,
     })

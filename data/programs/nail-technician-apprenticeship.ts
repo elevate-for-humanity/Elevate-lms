@@ -14,7 +14,9 @@ export const NAIL_TECH: ProgramSchema = {
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
-  durationWeeks: 50,
+  // No fixed term is approved for the competency-based Manicurist standard.
+  // Zero means unspecified; public duration copy must use the verified competencies/RTI.
+  durationWeeks: 0,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },

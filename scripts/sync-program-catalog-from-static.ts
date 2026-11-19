@@ -49,7 +49,7 @@ async function main() {
       description: program.subtitle ?? program.title,
       category: program.category ?? program.sector,
       category_norm: program.sector,
-      estimated_weeks: program.durationWeeks ?? null,
+      estimated_weeks: program.durationWeeks > 0 ? program.durationWeeks : null,
       credential_name: credentialName,
       credential_type: credentialName,
       image_url: program.heroImage ?? null,

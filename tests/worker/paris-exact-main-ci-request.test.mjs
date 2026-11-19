@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ensureRepairMainCI, hasDurableMainCIObservation } from '../../lib/ai/runtime/exact-main-ci-request.mjs';
+import { ensureRepairMainCI, hasDurableMainCIObservation, isVerifiedMainCIReceipt } from '../../lib/ai/runtime/exact-main-ci-request.mjs';
 const sha='a'.repeat(40),repository='fixture/repository',now=Date.parse('2026-11-19T14:00:00Z');
 const ci={id:42,head_sha:sha,name:'CI',path:'.github/workflows/ci.yml',head_branch:'main',event:'workflow_dispatch',head_repository:{full_name:repository},status:'completed',conclusion:'success'};
 async function fixture(patch={}) {
@@ -62,4 +62,21 @@ test('bounded merge-initiated CI request retains source-owned observation identi
   assert.equal(hasDurableMainCIObservation({ status: 'verifying', release_sha: sha, verification: { protectedMergeResult: merge } }), true);
   assert.equal(hasDurableMainCIObservation({ status: 'verifying', release_sha: sha, verification: { protectedMergeResult: { ...merge, reason: 'OTHER' } } }), false);
   assert.equal(hasDurableMainCIObservation({ status: 'deploying', release_sha: sha, verification: { releaseReconciliation: { state: 'validated-newer-target', currentMainSha: 'b'.repeat(40) }, mainCIRequest: { sha: 'b'.repeat(40), requestedAt: merge.at } } }), true);
+});
+
+test('only a successful verified exact-main required-gate receipt permits release',async()=>{
+  const successful=await fixture({runs:[ci]});
+  assert.equal(isVerifiedMainCIReceipt(successful.result),true);
+  for(const evidence of [
+    {state:'superseded'},
+    {state:'pending'},
+    {state:'blocked',reason:'REPAIR_REQUIRED_MAIN_CI_FAILED'},
+    {state:'verified'},
+    {state:'verified',runId:0},
+    {state:'verified',runId:'42'},
+    null
+  ])assert.equal(isVerifiedMainCIReceipt(evidence),false);
+  const moved=await fixture({runs:[ci],gh:async()=>({object:{sha:'b'.repeat(40)}})});
+  assert.equal(moved.result.state,'superseded');
+  assert.equal(isVerifiedMainCIReceipt(moved.result),false);
 });

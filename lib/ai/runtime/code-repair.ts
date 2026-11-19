@@ -346,6 +346,28 @@ async function requeueTimedOutRepair(db:any,repair:any){
  if(requeued.error)throw requeued.error;
  return Boolean(requeued.data);
 }
+// Reconcile an immutable repair SHA to a newer main only through observed
+// ancestry, independent CI/integrity evidence and required deployments.
+// This never signs off the previous SHA or dispatches any deployment.
+async function reconcileParisNewerMain({repair,gh,deployments,currentMain}:{
+ repair:any;gh:(path:string)=>Promise<any>;deployments:string[];currentMain?:any
+}){
+ const main=currentMain??await gh('/git/ref/heads/main');
+ const currentSha=String(main?.object?.sha??'');
+ const comparison=/^[a-f0-9]{40}$/.test(currentSha)
+  ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
+ const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
+ const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
+ const candidateChecks=candidateRuns?.workflow_runs??[];
+ const independentlyValidated=candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='CI'&&run.status==='completed'&&run.conclusion==='success')&&
+  candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='Integrity Gate'&&run.status==='completed'&&run.conclusion==='success');
+ const candidatePassed=ancestry&&independentlyValidated&&repairDeploymentState(candidateChecks,currentSha,deployments)==='passed';
+ return {
+  state:candidatePassed?'validated-newer-target':ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
+  independentlyValidated,immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
+  checkedAt:new Date().toISOString()
+ };
+}
 async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
  const db=await requireAdminClient();
  const {data:policy,error:policyError}=await db.from('paris_autopilot_policy').select('*').eq('id',true).maybeSingle();
@@ -664,6 +686,11 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     observationWindowMs:IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.deploying*60*1000,
     persistIntent:async(intent:any)=>{await update(repair.id,{verification:{...repair.verification,mainCIRequest:intent}});}});
    if(mainCI.state==='pending')continue;
+   if(mainCI.state==='superseded'){
+    const releaseReconciliation=await reconcileParisNewerMain({repair,gh,deployments});
+    await update(repair.id,{status:'verifying',verification:{...repair.verification,releaseReconciliation}});
+    continue;
+   }
    // Only exact-main CI with a successful required gate can advance release.
    // Superseded, failed or unknown evidence must never reach deployment or
    // runtime acceptance on the previous immutable target SHA.
@@ -684,25 +711,8 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     if(next){
      const currentMain=await gh('/git/ref/heads/main');
      if(currentMain.object?.sha!==targetSha){
-      // A later main commit is not evidence that the repair disappeared.
-      // Preserve the immutable release receipt and defer deployment until
-      // ancestry and independent validation establish a safe new target.
-      const currentSha=String(currentMain.object?.sha??'');
-      const comparison=/^[a-f0-9]{40}$/.test(currentSha)
-       ?await gh('/compare/'+repair.release_sha+'...'+currentSha).catch(()=>null):null;
-      const ancestry=comparison?.status==='ahead'||comparison?.status==='identical';
-       const candidateRuns=ancestry?await gh(`/actions/runs?head_sha=${currentSha}&per_page=100`):null;
-       const candidateChecks=candidateRuns?.workflow_runs??[];
-       const independentlyValidated=candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='CI'&&run.status==='completed'&&run.conclusion==='success')&&candidateChecks.some((run:any)=>run.head_sha===currentSha&&run.name==='Integrity Gate'&&run.status==='completed'&&run.conclusion==='success');
-       const candidatePassed=ancestry&&independentlyValidated&&repairDeploymentState(candidateChecks,currentSha,deployments)==='passed';
-      await update(repair.id,{status:'verifying',verification:{
-       ...repair.verification,releaseReconciliation:{
-        state:candidatePassed?'validated-newer-target':ancestry?'newer-main-needs-independent-validation':'release-not-ancestor-of-main',
-        independentlyValidated,
-        immutableReleaseSha:repair.release_sha,currentMainSha:currentSha,
-        checkedAt:new Date().toISOString()
-       }
-      }});
+      const releaseReconciliation=await reconcileParisNewerMain({repair,gh,deployments,currentMain});
+      await update(repair.id,{status:'verifying',verification:{...repair.verification,releaseReconciliation}});
       continue;
      }
      // Save dispatch intent before sending; a later tick must not duplicate it.

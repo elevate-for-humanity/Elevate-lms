@@ -18,7 +18,7 @@ const hasControl = (value: string) =>
 export function safeFooterSocialUrl(value: unknown): value is string {
   if (
     typeof value !== 'string' ||
-    !value ||
+    !/^https:\/\/[^/]/i.test(value) ||
     value.length > 2048 ||
     /[\s\\]/.test(value) ||
     hasControl(value)

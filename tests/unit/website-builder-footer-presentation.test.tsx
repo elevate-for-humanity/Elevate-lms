@@ -99,6 +99,9 @@ describe('shared footer presentation', () => {
   it.each([
     'javascript:alert(1)',
     'http://example.test',
+    'https:example.test',
+    'https:/example.test',
+    'https:///example.test',
     '//example.test',
     'https://user:pass@example.test',
     'https://example.test/with space',

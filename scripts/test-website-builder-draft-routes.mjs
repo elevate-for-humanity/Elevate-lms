@@ -376,3 +376,11 @@ test('generation does not enable an invented logo through the footer opt-in',asy
  const f=fixture('generate',{generated,realNormalization:true});assert.equal((await f.post(request())).status,201);
  assert.equal(f.calls[0].args.p_site_config.branding.logoImage,undefined);
 });
+
+for (const mode of ['generate','import']) test(mode+' rejects ambiguous HTTPS profile destinations before committing',async()=>{
+ for (const url of ['https:example.test','https:/example.test','https:///example.test']) {
+  const bad={...config,footer:{socialLinks:[{label:'Profile',url}]}};
+  const f=fixture(mode,{generated:bad,realNormalization:true});const response=await f.post(request({siteConfig:bad}));
+  assert.equal(response.status,422,url);assert.equal(f.calls.length,0);
+ }
+});

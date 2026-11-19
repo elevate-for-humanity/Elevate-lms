@@ -284,7 +284,7 @@ test('manual save/publish rejects malformed footer opt-in before backup or write
 });
 
 test('manual save/publish/unpublish rejects malformed footer presentation before any backup or update',async()=>{
- for(const publish of [undefined,true,false]) for(const footer of [{showLogo:null},{layout:['columns']},{socialLinks:null},{socialLinks:[{label:'Bad',url:'http://example.test'}]}]) {
+ for(const publish of [undefined,true,false]) for(const footer of [{showLogo:null},{layout:['columns']},{socialLinks:null},{socialLinks:[{label:'Bad',url:'http://example.test'}]}, ...['https:example.test','https:/example.test','https:///example.test'].map(url=>({socialLinks:[{label:'Bad',url}]}))]) {
   const {state,request}=restoreFixture({mode:'save',publish,siteConfig:{footer}});
   const response=await request();assert.equal(response.status,422);assert.equal(state.backups.length,0);assert.equal(state.updateAttempts,0);
   assert.equal((await response.json()).validation.errors[0].code,'invalid_footer_presentation');

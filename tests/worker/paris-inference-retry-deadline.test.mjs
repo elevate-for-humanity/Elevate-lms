@@ -21,6 +21,20 @@ test('expired inference is not retried with an already-aborted signal',async()=>
   await assert.rejects(retryRepairInference(async()=>{calls++;state.time+=210000;throw Error('The operation was aborted due to timeout');},options),/PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE/);
   assert.equal(calls,1);assert.deepEqual(state.waits,[]);
 });
+test('never duplicates a timed-out or 504 inference even with time remaining',async()=>{
+  for (const error of [Error('HTTP 504'),Error('The operation was aborted due to timeout'),Object.assign(Error('connection cancelled'),{name:'AbortError'}),Object.assign(Error('deadline exceeded'),{name:'TimeoutError'})]) {
+    const {state,options}=clock();let calls=0;
+    await assert.rejects(retryRepairInference(async()=>{calls++;state.time+=100;throw error;},options),/PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE/);
+    assert.equal(calls,1,error.message);assert.deepEqual(state.waits,[],error.message);
+  }
+});
+test('HTTP 502 and 503 still use bounded transient retries',async()=>{
+  for (const code of [502,503]) {
+    const {state,options}=clock();let calls=0;
+    assert.equal(await retryRepairInference(async()=>{if(++calls===1)throw Error('HTTP '+code);return 'recovered';},options),'recovered');
+    assert.equal(calls,2);assert.deepEqual(state.waits,[5000]);
+  }
+});
 test('open circuit waits for its provider cooldown without resetting the circuit',async()=>{
   const {state,options}=clock();let calls=0;
   assert.equal(await retryRepairInference(async()=>{if(++calls===1)throw Error('Configured AI provider "elevate" failed; Circuit "ai:elevate" is open. Retry after 30s.');return 'recovered';},options),'recovered');

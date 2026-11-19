@@ -10,8 +10,8 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
   const [studentId,setStudentId]=useState('');
   const [programKey,setProgramKey]=useState(programs[0]?.key||'');
   const [startDate,setStartDate]=useState('');
-  const [sign,setSign]=useState(false),[approved,setApproved]=useState(false);
-  const [confirmName,setConfirmName]=useState(''),[image,setImage]=useState('');
+  const [intent,setIntent]=useState<'draft'|'finalize'>('draft'),[approved,setApproved]=useState(false);
+  const [image,setImage]=useState('');
   const [providerName,setProviderName]=useState(signerName);
   const [savedSignerName,setSavedSignerName]=useState(signerName);
   const [imageConsent,setImageConsent]=useState(false),[busy,setBusy]=useState(false);
@@ -37,12 +37,12 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
     try{
       if(!studentId||!startDate||!endDate||!providerName.trim())throw Error('Choose a student and a valid start date.');
       const r=await fetch('/api/admin/faa/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({studentId,programKey,startDate,sign,approved,confirmName,providerName})});
+        body:JSON.stringify({studentId,programKey,startDate,intent,approved,providerName})});
       if(!r.ok){const data=await r.json().catch(()=>({}));throw Error(data.error||'FAA generation failed');}
       const file=await r.blob();if(file.type!=='application/pdf')throw Error('Unexpected document response');
       const url=URL.createObjectURL(file),a=document.createElement('a');
       const name=students.find(s=>s.id===studentId)?.name||'student';
-      a.href=url;a.download='FAA_'+name.replace(/[^a-z0-9_-]/gi,'_')+'_'+startDate+(sign?'_signed':'_draft')+'.pdf';
+      a.href=url;a.download='FAA_'+name.replace(/[^a-z0-9_-]/gi,'_')+'_'+startDate+(intent==='finalize'?'_signed':'_draft')+'.pdf';
       document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);
       setResult('FAA stored in the private student binder and downloaded. WorkOne funding remains pending.');
       setApproved(false);setConfirmName('');
@@ -76,14 +76,19 @@ export default function FaaGeneratorForm({students,programs,signerName}:Props){
       </label>
       <label className="block text-sm font-semibold">Start date<input required type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} className="mt-1 block w-full rounded border p-3"/></label>
       <label className="block text-sm font-semibold">End date<input readOnly value={endDate} className="mt-1 block w-full rounded border bg-slate-100 p-3"/></label>
-      <label className="flex gap-2 text-sm"><input type="checkbox" checked={sign} onChange={e=>{setSign(e.target.checked);setApproved(false);setConfirmName('');}}/>Automatically place my saved signature on this FAA after I approve it.</label>
-      {sign&&<div className="space-y-3 rounded border border-blue-300 bg-blue-50 p-4">
-        <p className="text-sm">Saved signer: {savedSignerName||'Upload your signature first'}. This does not constitute WorkOne funding approval.</p>
-        <label className="flex gap-2 text-sm"><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/>I reviewed this FAA and authorize my signature for this student.</label>
-        <label className="block text-sm">Type exact signer name<input value={confirmName} onChange={e=>setConfirmName(e.target.value)} className="mt-1 block w-full rounded border p-2"/></label>
-      </div>}
-      <button disabled={busy||!studentId||!startDate||(sign&&(!approved||!savedSignerName||confirmName.trim()!==savedSignerName.trim()||providerName.trim()!==savedSignerName.trim()))} className="rounded-lg bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">
-        {busy?'Generating...':sign?'Approve, sign and download':'Generate unsigned FAA'}
+      <fieldset className="rounded border border-slate-300 p-4">
+        <legend className="font-semibold">Document action</legend>
+        <label className="mt-2 flex gap-2 text-sm"><input type="radio" checked={intent==='draft'} onChange={()=>{setIntent('draft');setApproved(false);}}/>Save unsigned draft</label>
+        <label className="mt-2 flex gap-2 text-sm"><input type="radio" checked={intent==='finalize'} onChange={()=>{setIntent('finalize');setApproved(false);}}/>Finalize signed FAA using my saved signature</label>
+        {intent==='finalize'&&<div className="mt-3 rounded-lg bg-blue-50 p-3 text-sm">
+          <p>Saved signer: {savedSignerName||'Not yet registered'}. Only an authorized administrator can finalize an FAA. This does not approve funding or transmit the form to WorkOne.</p>
+          <label className="mt-3 flex gap-2"><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/>
+            I reviewed this student's FAA and authorize finalization using my saved signature.
+          </label>
+        </div>}
+      </fieldset>
+      <button disabled={busy||!studentId||!startDate||(intent==='finalize'&&(!approved||!savedSignerName||providerName.trim()!==savedSignerName.trim()))} className="rounded-lg bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">
+        {busy?'Generating...':intent==='finalize'?'Finalize signed FAA':'Generate unsigned FAA'}
       </button>
       {error&&<p role="alert" className="rounded bg-red-50 p-3 text-red-800">{error}</p>}
       {result&&<p role="status" className="rounded bg-green-50 p-3 text-green-800">{result}</p>}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ensureRepairMainCI } from '../../lib/ai/runtime/exact-main-ci-request.mjs';
+import { ensureRepairMainCI, hasDurableMainCIObservation } from '../../lib/ai/runtime/exact-main-ci-request.mjs';
 const sha='a'.repeat(40),repository='fixture/repository',now=Date.parse('2026-11-19T14:00:00Z');
 const ci={id:42,head_sha:sha,name:'CI',path:'.github/workflows/ci.yml',head_branch:'main',event:'workflow_dispatch',head_repository:{full_name:repository},status:'completed',conclusion:'success'};
 async function fixture(patch={}) {
@@ -44,4 +44,22 @@ test('truncated or unknown run inventory fails closed without dispatch',async()=
 });
 test('moved main never dispatches CI or treats old head as validated current main',async()=>{
   const r=await fixture({gh:async()=>({object:{sha:'b'.repeat(40)}})});assert.equal(r.result.state,'superseded');assert.deepEqual(r.writes,[]);
+});
+
+// The generic in-flight timeout must not erase a dispatch receipt at the same
+// observation deadline; the canonical CI gate must record its own failure.
+test('durable main-CI observation stays owned until the canonical gate evaluates expiry', () => {
+  const at = new Date(now - 60000).toISOString();
+  const repair = { status: 'deploying', release_sha: sha, verification: { mainCIRequest: { sha, requestedAt: at } } };
+  assert.equal(hasDurableMainCIObservation(repair), true);
+  assert.equal(hasDurableMainCIObservation({ ...repair, status: 'patching' }), false);
+  assert.equal(hasDurableMainCIObservation({ ...repair, release_sha: 'b'.repeat(40) }), false);
+  assert.equal(hasDurableMainCIObservation({ ...repair, verification: { mainCIRequest: { sha, requestedAt: 'not-a-date' } } }), false);
+});
+
+test('bounded merge-initiated CI request retains source-owned observation identity', () => {
+  const merge = { mergeCommitSha: sha, reason: 'PARIS_MERGE_MAIN_CI_REQUESTED', at: new Date(now - 60000).toISOString() };
+  assert.equal(hasDurableMainCIObservation({ status: 'verifying', release_sha: sha, verification: { protectedMergeResult: merge } }), true);
+  assert.equal(hasDurableMainCIObservation({ status: 'verifying', release_sha: sha, verification: { protectedMergeResult: { ...merge, reason: 'OTHER' } } }), false);
+  assert.equal(hasDurableMainCIObservation({ status: 'deploying', release_sha: sha, verification: { releaseReconciliation: { state: 'validated-newer-target', currentMainSha: 'b'.repeat(40) }, mainCIRequest: { sha: 'b'.repeat(40), requestedAt: merge.at } } }), true);
 });

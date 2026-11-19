@@ -192,3 +192,13 @@ test('full CI workflow_dispatch completion uses the existing trusted main releas
   assert.equal(r.status, 'requested');
   assert.equal(s.calls.filter(c => c.method === 'POST').length, 1);
 });
+
+// The workflow itself must admit dispatched exact-main CI, not only the JS
+// handler: workflow-token merges need a real workflow_dispatch completion path.
+test('web release workflow accepts trusted dispatched CI and checks latest exact-main required gate', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/release-approved-google-web.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /github\.event\.workflow_run\.event == 'push' \|\| github\.event\.workflow_run\.event == 'workflow_dispatch'/);
+  assert.match(workflow, /await requireExactLmsCI\(process\.env, \{ attempts: 90, intervalMs: 10000 \}\)/);
+  assert.doesNotMatch(workflow, /event=push&per_page/);
+  assert.match(workflow, /if: steps\.ci\.outputs\.ready == 'true'/);
+});

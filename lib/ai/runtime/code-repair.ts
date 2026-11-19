@@ -1,4 +1,4 @@
-import {ensureRepairMainCI} from './exact-main-ci-request.mjs';
+import {ensureRepairMainCI,hasDurableMainCIObservation} from './exact-main-ci-request.mjs';
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
 import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
@@ -322,6 +322,9 @@ export async function tickParisCodeRepairs(options:{workflowOwnedDispatch?:boole
 /** Bounded requeue of an in-flight repair that stopped progressing and no
  * longer has a live workflow run. Attempt count is intentionally preserved. */
 async function requeueTimedOutRepair(db:any,repair:any){
+ // Exact-main CI has its own bounded, persisted observation contract. Never
+ // erase dispatch intent via generic timeout before it records success/failure.
+ if(hasDurableMainCIObservation(repair))return false;
  if(!inFlightRepairTimedOut(repair))return false;
  const runOrNull=async(path:string)=>{
   try{return await gh(path);}

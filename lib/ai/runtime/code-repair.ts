@@ -663,8 +663,15 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    const mainCI=await ensureRepairMainCI({repository:REPAIR_REPOSITORY,sha:targetSha,runs:runs.workflow_runs,priorRequest:priorCIRequest,gh,
     observationWindowMs:IN_FLIGHT_REPAIR_TIMEOUT_MINUTES.deploying*60*1000,
     persistIntent:async(intent:any)=>{await update(repair.id,{verification:{...repair.verification,mainCIRequest:intent}});}});
-   if(mainCI.state==='blocked'){await update(repair.id,{status:'blocked',error_code:mainCI.reason});continue;}
    if(mainCI.state==='pending')continue;
+   // Only exact-main CI with a successful required gate can advance release.
+   // Superseded, failed or unknown evidence must never reach deployment or
+   // runtime acceptance on the previous immutable target SHA.
+   if(mainCI.state!=='verified'){
+    await update(repair.id,{status:'blocked',error_code:mainCI.state==='blocked'
+     ?mainCI.reason:mainCI.state==='superseded'?'REPAIR_MAIN_CI_SUPERSEDED':'REPAIR_MAIN_CI_UNVERIFIED'});
+    continue;
+   }
    const state=repairDeploymentState(runs.workflow_runs??[],targetSha,deployments);
    if(state==='failed'){await update(repair.id,{status:'blocked',error_code:'DEPLOYMENT_FAILED_SAVED_WORK_PRESERVED'});continue;}
    if(state!=='passed'){

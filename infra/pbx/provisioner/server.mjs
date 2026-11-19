@@ -21,6 +21,16 @@ class ProvisioningError extends Error {
   constructor(code, status = 503) { super(code); this.code = code; this.status = status; }
 }
 
+// Only fixed vocabulary crosses the journal boundary; never reflect exceptions.
+const FAILURE_CODES = new Set('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split(' '));
+export function reportFailure(operation, phase, error, write = line => process.stderr.write(line)) {
+  const code = error instanceof ProvisioningError && FAILURE_CODES.has(error.code) ? error.code : 'unknown';
+  if (!['provision', 'status', 'revoke', 'expiry', 'reconciliation'].includes(operation) ||
+      !['apply', 'rollback', 'request', 'timer'].includes(phase)) return;
+  // Diagnostics must never change rollback, quarantine, or response behavior.
+  try { write(`PBX failure v1 ${new Date().toISOString()} ${operation} ${phase} ${code}\n`); } catch { /* best effort */ }
+}
+
 export function validateIdentity(input) {
   if (!input || !UUID.test(input.profileId || '') || !UUID.test(input.extensionId || '') || !DEVICE.test(input.deviceId || '')) {
     throw new ProvisioningError('invalid_identity', 400);
@@ -198,6 +208,7 @@ export function createProvisioner(config, dependencies = {}) {
       !path.isAbsolute(config.generatedRoot || '')) throw new Error('Invalid PBX provisioning configuration');
   const fetchImpl = dependencies.fetch || fetch;
   const now = dependencies.now || Date.now;
+  const failure = (operation, phase, error) => reportFailure(operation, phase, error, dependencies.writeFailure);
   const wait = dependencies.wait || sleep;
   const command = dependencies.command || (value => defaultCommand(config.container, value));
   const owner = identity => supabaseOwner(identity, config, fetchImpl);
@@ -272,7 +283,7 @@ export function createProvisioner(config, dependencies = {}) {
     }
   }
 
-  async function apply(next) {
+  async function apply(next, operation) {
     const rendered = renderConfiguration(next);
     const current = path.join(config.generatedRoot, 'current');
     let previous;
@@ -295,11 +306,13 @@ export function createProvisioner(config, dependencies = {}) {
       await reloadAndVerify(next, records.filter(record => !next.some(candidate => candidate.endpointId === record.endpointId)));
       records = next;
     } catch (error) {
+      failure(operation, 'apply', error);
       try {
         if (previous) { await symlink(previous, link); await rename(link, current); }
         else await rm(current);
         await reloadAndVerify(records, next.filter(record => !records.some(candidate => candidate.endpointId === record.endpointId)));
-      } catch {
+      } catch (rollbackError) {
+        failure(operation, 'rollback', rollbackError);
         quarantined = true;
         throw new ProvisioningError('asterisk_rollback_failed');
       }
@@ -338,7 +351,7 @@ export function createProvisioner(config, dependencies = {}) {
     return serialize(async () => {
       if (quarantined) throw new ProvisioningError('provisioner_quarantined');
       const active = records.filter(record => record.expiresAt > now());
-      if (active.length !== records.length) await apply(active);
+      if (active.length !== records.length) await apply(active, 'expiry');
     });
   }
 
@@ -354,7 +367,7 @@ export function createProvisioner(config, dependencies = {}) {
       // A fresh or older empty generation still needs the operator subroutine.
       // Materialize the current renderer once at startup, even with no leases;
       // an empty record comparison alone cannot detect missing dialplan code.
-      if (!initialized || JSON.stringify(active) !== JSON.stringify(records)) await apply(active);
+      if (!initialized || JSON.stringify(active) !== JSON.stringify(records)) await apply(active, 'reconciliation');
       else {
         await inspectOperator(records);
         for (const record of records) await inspect(record);
@@ -372,14 +385,14 @@ export function createProvisioner(config, dependencies = {}) {
       if (existing && existing.extensionId !== identity.extensionId) throw new ProvisioningError('device_assignment_conflict', 409);
       if (action === 'status') {
         if (existing && existing.expiresAt <= now()) {
-          await apply(records.filter(record => record.endpointId !== endpointId)); existing = undefined;
+          await apply(records.filter(record => record.endpointId !== endpointId), action); existing = undefined;
         }
         if (existing) {
           await confirmActiveDevice(identity, endpointId, config, fetchImpl);
           const refreshed = { ...existing, ...metadata };
           if (existing.expiresAt - now() < LEASE_MS / 2) refreshed.expiresAt = now() + LEASE_MS;
           if (JSON.stringify(refreshed) !== JSON.stringify(existing)) {
-            await apply(records.map(record => record.endpointId === endpointId ? refreshed : record)); existing = refreshed;
+            await apply(records.map(record => record.endpointId === endpointId ? refreshed : record), action); existing = refreshed;
           }
         }
         const status = existing ? await inspect(existing) : { contactCount: 0, reachableContactCount: 0 };
@@ -388,7 +401,7 @@ export function createProvisioner(config, dependencies = {}) {
           expiresAt: existing ? new Date(existing.expiresAt).toISOString() : null };
       }
       if (action === 'revoke') {
-        if (existing) await apply(records.filter(record => record.endpointId !== endpointId));
+        if (existing) await apply(records.filter(record => record.endpointId !== endpointId), action);
         return { provider: 'asterisk', endpointId, revoked: true, observedAt: new Date().toISOString() };
       }
       if (records.filter(record => record.profileId === identity.profileId).length >= 10 && !existing) {
@@ -398,7 +411,7 @@ export function createProvisioner(config, dependencies = {}) {
         ...identity, ...metadata, endpointId, password: randomBytes(32).toString('base64url'), expiresAt: now() + LEASE_MS,
       };
       if (!existing || JSON.stringify(record) !== JSON.stringify(existing)) {
-        await apply([...records.filter(candidate => candidate.endpointId !== endpointId), record]);
+        await apply([...records.filter(candidate => candidate.endpointId !== endpointId), record], action);
       } else await inspect(existing);
       return { provider: 'asterisk', endpointId, sipUsername: endpointId, sipPassword: record.password,
         sipDomain: config.sipDomain, wsUrl: config.wsUrl, extensionId: identity.extensionId, extension: record.extension,
@@ -434,6 +447,7 @@ export function createProvisioner(config, dependencies = {}) {
       catch { throw new ProvisioningError('invalid_json', 400); }
       reply(200, await operate(actions.get(request.url), input));
     } catch (error) {
+      failure(actions.get(request.url), 'request', error);
       reply(error instanceof ProvisioningError ? error.status : 503,
         { error: error instanceof ProvisioningError ? error.code : 'provisioner_unavailable' });
     }
@@ -486,14 +500,11 @@ async function main() {
   });
   await service.initialize();
   service.server.listen(8090, '127.0.0.1');
-  // Preserve the running service's failure-stage diagnostics without reflecting
-  // provider exceptions or credentials. ProvisioningError codes are local constants.
-  const failureCode = error => error instanceof ProvisioningError ? error.code : 'unknown';
   const timer = setInterval(() => service.reconcile().catch(error => {
-    process.stderr.write('PBX ownership/runtime reconciliation failed: ' + failureCode(error) + '\n');
+    reportFailure('reconciliation', 'timer', error);
   }), 60000);
   const expiryTimer = setInterval(() => service.pruneExpired().catch(error => {
-    process.stderr.write('PBX expired-credential revocation stage: ' + failureCode(error) + '\n');
+    reportFailure('expiry', 'timer', error);
     process.stderr.write('PBX expired-credential revocation failed; investigate immediately.\n');
   }), 5000);
   for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => {

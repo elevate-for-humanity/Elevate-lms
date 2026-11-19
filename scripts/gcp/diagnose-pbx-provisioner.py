@@ -6,7 +6,7 @@ import re
 import subprocess
 import time
 
-CODES = frozenset('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split())
+CODES = frozenset('asterisk_command_failed asterisk_endpoint_unverified asterisk_aor_unverified asterisk_dialplan_unverified asterisk_revocation_unverified asterisk_reload_failed asterisk_configuration_rejected asterisk_rollback_failed provisioner_quarantined provisioner_unavailable ownership_unavailable device_authorization_unavailable phone_system_configuration_invalid invalid_stored_record invalid_generation invalid_stored_state unknown'.split())
 STAGES = {'ownership/runtime reconciliation failed': 'reconciliation', 'expired-credential revocation stage': 'revocation'}
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
 JOURNAL_WINDOW_HOURS = 24
@@ -23,9 +23,15 @@ def failure_stages(journal):
     initial_failures = []
     for line in journal.splitlines():
         match = re.fullmatch(r'PBX (ownership/runtime reconciliation failed|expired-credential revocation stage): ([a-z_]+)', line)
+        event = None
         if match and match[2] in CODES:
             event = {'stage': STAGES[match[1]], 'code': match[2]}
-            if event['code'] != 'provisioner_quarantined' and event not in initial_failures and len(initial_failures) < 20:
+        structured = re.fullmatch(r'PBX failure v1 (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z) (provision|status|revoke|expiry|reconciliation) (apply|rollback|request|timer) ([a-z_]+)', line)
+        if structured and structured[4] in CODES:
+            event = {'stage': structured[2], 'phase': structured[3],
+                     'code': structured[4], 'observedAt': structured[1]}
+        if event:
+            if event['code'] not in {'provisioner_quarantined', 'provisioner_unavailable'} and event not in initial_failures and len(initial_failures) < 20:
                 initial_failures.append(event)
             if not events or events[-1] != event:
                 events.append(event)

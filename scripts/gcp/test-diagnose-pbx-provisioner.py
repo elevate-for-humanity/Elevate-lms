@@ -46,6 +46,22 @@ class DiagnosticTests(unittest.TestCase):
         self.assertFalse(report['configurationChanged'])
         return report
 
+    def test_structured_events_survive_noise_and_quarantine(self):
+        prefix = 'PBX failure v1 2026-11-19T03:49:00.000Z '
+        entries = [(100, prefix + 'expiry apply asterisk_reload_failed'),
+                   (99, prefix + 'expiry rollback asterisk_dialplan_unverified')]
+        entries.extend([(0, prefix + 'expiry timer provisioner_quarantined')] * 45000)
+        entries.extend([(0, prefix + 'expiry apply unknown password=private'),
+                        (0, prefix + 'expiry apply secret'),
+                        (0, prefix + 'device_private apply unknown')])
+        report = self.capture_report(entries)
+        self.assertEqual([e['code'] for e in report['initialFailureStages']],
+                         ['asterisk_reload_failed', 'asterisk_dialplan_unverified'])
+        self.assertTrue(report['quarantineObserved'])
+        self.assertEqual(report['initialFailureStages'][0]['phase'], 'apply')
+        truncated = self.capture_report(entries[:2] + [(0, prefix + 'expiry timer provisioner_quarantined')] * 50000)
+        self.assertFalse(truncated['initialFailureObserved'])
+
     def test_capture_retains_initiating_failure_at_daily_baseline_with_margin(self):
         cause = 'PBX expired-credential revocation stage: asterisk_rollback_failed'
         entries = [(86399, cause)]

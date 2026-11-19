@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({error:'Administrator authorization required'},{status:403});
   let body:unknown;try{body=await req.json();}catch{return NextResponse.json({error:'Invalid request'},{status:400});}
   const input=body as {image?:unknown;consent?:unknown};
-  if(input.consent!==true||typeof input.image!=='string'||!/^data:image\\/png;base64,[a-z0-9+/=]+$/i.test(input.image)||input.image.length>450000)
+  if(input.consent!==true||typeof input.image!=='string'||!/^data:image\/png;base64,[a-z0-9+/=]+$/i.test(input.image)||input.image.length>450000)
     return NextResponse.json({error:'A valid PNG signature and explicit enrollment consent are required'},{status:422});
   const bytes=Buffer.from(input.image.split(',')[1]||'','base64');
   if(bytes.length<100||bytes.length>300000||bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')

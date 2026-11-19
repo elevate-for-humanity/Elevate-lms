@@ -103,11 +103,11 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     rtiDescription:
       'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.',
     tuition: {
-      total: 2490,
-      setupFeePercent: 35,
-      paymentFrequency: 'Billed every Friday',
+      total: 6000,
+      setupFeePercent: 10,
+      paymentFrequency: 'Deposit and installments under approved enrollment terms',
       fundingNote:
-        'If you received funding approval (WRG, WIOA, employer sponsorship), your costs may be partially or fully covered. Check your enrollment confirmation for details.',
+        'Self-pay only. Confirm the $600 initial deposit and remaining payment terms in the approved enrollment agreement.',
     },
     accentColor: 'pink',
     estimatedTime: '6-8 minutes',
@@ -125,11 +125,11 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     rtiDescription:
       'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.',
     tuition: {
-      total: 2500,
-      setupFeePercent: 35,
-      paymentFrequency: 'Billed every Friday',
+      total: 6000,
+      setupFeePercent: 10,
+      paymentFrequency: 'Deposit and installments under approved enrollment terms',
       fundingNote:
-        'If you received funding approval (WRG, WIOA, employer sponsorship), your costs may be partially or fully covered. Check your enrollment confirmation for details.',
+        'Self-pay only. Confirm the $600 initial deposit and remaining payment terms in the approved enrollment agreement.',
     },
     accentColor: 'pink',
     estimatedTime: '8-10 minutes',

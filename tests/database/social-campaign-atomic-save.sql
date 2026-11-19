@@ -22,6 +22,11 @@ BEGIN
     'idempotency_key', 'campaign:' || campaign_id || ':test:facebook_page:v1'
   ));
 
+  result := public.save_social_campaign_draft(campaign, NULL);
+  IF result IS NOT NULL OR EXISTS (SELECT 1 FROM public.social_campaigns WHERE id = campaign_id) THEN
+    RAISE EXCEPTION 'Replay lookup created a campaign';
+  END IF;
+
   result := public.save_social_campaign_draft(campaign, posts);
   IF (result->>'draftCount')::int <> 1 OR (result->>'replayed')::boolean THEN
     RAISE EXCEPTION 'Initial atomic save result failed';
@@ -32,7 +37,7 @@ BEGIN
         AND approved_at IS NULL AND approved_by IS NULL AND scheduled_at IS NULL) THEN
     RAISE EXCEPTION 'Draft approval/schedule boundary failed';
   END IF;
-  result := public.save_social_campaign_draft(campaign, posts);
+  result := public.save_social_campaign_draft(campaign, NULL);
   IF (result->>'draftCount')::int <> 1 OR NOT (result->>'replayed')::boolean
       OR (SELECT count(*) FROM public.social_campaigns WHERE id = campaign_id) <> 1 THEN
     RAISE EXCEPTION 'Idempotent replay duplicated data';
@@ -40,8 +45,15 @@ BEGIN
 
   BEGIN
     PERFORM public.save_social_campaign_draft(
-      jsonb_set(campaign, '{metadata,saveFingerprint}', to_jsonb(repeat('b', 64))), posts);
+      jsonb_set(campaign, '{metadata,saveFingerprint}', to_jsonb(repeat('b', 64))), NULL);
     RAISE EXCEPTION 'Changed request fingerprint was accepted';
+  EXCEPTION WHEN invalid_parameter_value THEN NULL;
+  END;
+
+  BEGIN
+    PERFORM public.save_social_campaign_draft(
+      jsonb_set(campaign, '{metadata,saveActorId}', to_jsonb('another-actor'::text)), NULL);
+    RAISE EXCEPTION 'A different actor was allowed to replay the campaign';
   EXCEPTION WHEN invalid_parameter_value THEN NULL;
   END;
 

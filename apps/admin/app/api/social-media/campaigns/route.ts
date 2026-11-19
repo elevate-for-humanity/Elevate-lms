@@ -39,6 +39,18 @@ const _GET = withAuth(
   { roles: ['admin'] },
 );
 
+function campaignSaveError(code: string) {
+  const conflict = code === '22023';
+  return NextResponse.json(
+    {
+      error: conflict
+        ? 'This save request has changed. Reload the campaign editor before saving again.'
+        : 'The campaign save result could not be confirmed. Retry this save.',
+    },
+    { status: conflict ? 409 : 500 },
+  );
+}
+
 const _POST = withAuth(
   async (req: NextRequest, context) => {
     const body = (await req.json().catch(() => ({}))) as CampaignBody;
@@ -61,31 +73,6 @@ const _POST = withAuth(
     }
     if (platforms.length === 0) {
       return NextResponse.json({ error: 'Select at least one social platform' }, { status: 400 });
-    }
-
-    if (status === 'active') {
-      const { data: connected, error: accountError } = await db
-        .from('social_media_settings')
-        .select('platform')
-        .in('platform', platforms)
-        .eq('enabled', true)
-        .not('access_token', 'is', null);
-
-      if (accountError) {
-        return NextResponse.json({ error: accountError.message }, { status: 500 });
-      }
-
-      const connectedPlatforms = new Set((connected ?? []).map((row) => row.platform));
-      const missing = platforms.filter((platform) => !connectedPlatforms.has(platform));
-      if (missing.length > 0) {
-        return NextResponse.json(
-          {
-            error: 'Campaign cannot be activated until the selected social accounts are connected.',
-            disconnectedPlatforms: missing,
-          },
-          { status: 409 },
-        );
-      }
     }
 
     const durationDays = Math.max(1, Math.min(Number(body.duration) || 30, 365));
@@ -119,6 +106,40 @@ const _POST = withAuth(
           .digest('hex'),
       },
     };
+
+    // An unchanged retry must return the committed save before consulting
+    // mutable articles or account connections. A null posts payload is read-only.
+    const { data: replay, error: replayError } = await db.rpc('save_social_campaign_draft', {
+      p_campaign: campaign,
+      p_posts: null,
+    });
+    if (replayError) return campaignSaveError(replayError.code);
+    if (replay) return NextResponse.json({ success: true, ...replay });
+
+    if (status === 'active') {
+      const { data: connected, error: accountError } = await db
+        .from('social_media_settings')
+        .select('platform')
+        .in('platform', platforms)
+        .eq('enabled', true)
+        .not('access_token', 'is', null);
+
+      if (accountError) {
+        return NextResponse.json({ error: accountError.message }, { status: 500 });
+      }
+
+      const connectedPlatforms = new Set((connected ?? []).map((row) => row.platform));
+      const missing = platforms.filter((platform) => !connectedPlatforms.has(platform));
+      if (missing.length > 0) {
+        return NextResponse.json(
+          {
+            error: 'Campaign cannot be activated until the selected social accounts are connected.',
+            disconnectedPlatforms: missing,
+          },
+          { status: 409 },
+        );
+      }
+    }
 
     const rows: Array<Record<string, unknown>> = [];
     if (sourceBlogIds.length > 0) {
@@ -195,14 +216,7 @@ const _POST = withAuth(
       p_campaign: campaign,
       p_posts: rows,
     });
-    if (saveError) {
-      return NextResponse.json(
-        { error: saveError.code === '22023'
-          ? 'This save request has changed. Reload the campaign editor before saving again.'
-          : 'Campaign and post drafts could not be saved. No partial campaign was created. Retry this save.' },
-        { status: saveError.code === '22023' ? 409 : 500 },
-      );
-    }
+    if (saveError) return campaignSaveError(saveError.code);
     return NextResponse.json({ success: true, ...saved }, { status: saved?.replayed ? 200 : 201 });
   },
   { roles: ['admin'] },

@@ -15,13 +15,17 @@ BEGIN
   IF auth.role() IS DISTINCT FROM 'service_role' THEN
     RAISE EXCEPTION 'Trusted server role required' USING ERRCODE = '42501';
   END IF;
-  IF v_id IS NULL OR jsonb_typeof(p_posts) IS DISTINCT FROM 'array'
-     OR jsonb_array_length(p_posts) > 180
-     OR coalesce(p_campaign->>'name', '') = ''
+  IF v_id IS NULL OR coalesce(p_campaign->>'name', '') = ''
      OR coalesce(p_campaign->>'status', '') NOT IN ('draft', 'active', 'paused')
      OR coalesce(p_campaign->'metadata'->>'saveFingerprint', '') !~ '^[a-f0-9]{64}$'
      OR coalesce(p_campaign->'metadata'->>'saveActorId', '') = '' THEN
     RAISE EXCEPTION 'Invalid campaign save payload' USING ERRCODE = '22023';
+  END IF;
+  IF p_posts IS NOT NULL AND jsonb_typeof(p_posts) <> 'array' THEN
+    RAISE EXCEPTION 'Invalid campaign posts payload' USING ERRCODE = '22023';
+  END IF;
+  IF jsonb_array_length(p_posts) > 180 THEN
+    RAISE EXCEPTION 'Too many campaign posts' USING ERRCODE = '22023';
   END IF;
   IF EXISTS (
     SELECT 1 FROM jsonb_array_elements(p_posts) AS post
@@ -48,6 +52,12 @@ BEGIN
     SELECT count(*) INTO v_count FROM public.social_media_posts
       WHERE generation_payload->>'campaignId' = v_id::text;
     RETURN jsonb_build_object('campaign', to_jsonb(v_campaign), 'draftCount', v_count, 'replayed', true);
+  END IF;
+
+  -- A SQL NULL posts argument only resolves an existing committed request.
+  -- It cannot create an empty campaign when a save is still pending.
+  IF p_posts IS NULL THEN
+    RETURN NULL;
   END IF;
 
   INSERT INTO public.social_campaigns (id, name, platform, status, start_date, end_date, metadata)

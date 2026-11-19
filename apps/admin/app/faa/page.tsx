@@ -7,13 +7,18 @@ import Link from 'next/link';
 export const dynamic='force-dynamic';
 export const metadata={title:'WorkOne FAA Generator | Admin',robots:{index:false,follow:false}};
 
-export default async function FaaPage() {
-  const {user,profile}=await requireRole(['admin','super_admin']);
+export default async function FaaPage({searchParams}:{searchParams:Promise<{search?:string}>}) {
+  const {profile}=await requireRole(['admin','super_admin']);
+  const query=String((await searchParams).search||'').trim().slice(0,100);
   const db=await requireAdminClient();
-  const {data:students,error}=await db.from('profiles')
+  let studentsQuery=db.from('profiles')
     .select('id,full_name,first_name,last_name,email,phone')
-    .in('role',['student','learner','apprentice','barber_apprentice','cosmetology_apprentice'])
-    .order('created_at',{ascending:false}).limit(250);
+    .in('role',['student','learner','apprentice','barber_apprentice','cosmetology_apprentice']);
+  if(query){
+    studentsQuery=query.includes('@')?studentsQuery.ilike('email','%'+query+'%'):
+      studentsQuery.ilike('full_name','%'+query+'%');
+  }
+  const {data:students,error}=await studentsQuery.order('created_at',{ascending:false}).limit(250);
   const rows=(students||[]).map(s=>({id:s.id,name:s.full_name||[s.first_name,s.last_name].filter(Boolean).join(' ')||'Unnamed student',email:s.email||''}));
   return <main className="mx-auto max-w-4xl space-y-6 px-4 py-10">
     <Link href="/students" className="text-sm font-semibold text-blue-700 underline">← Students</Link>
@@ -21,6 +26,11 @@ export default async function FaaPage() {
       <h1 className="text-3xl font-bold text-slate-900">WorkOne Financial Award Analysis</h1>
       <p className="mt-2 text-slate-700">Select a student, choose HVAC or Bookkeeping, and confirm training dates. The original program cost snapshot fills in automatically. All funding remains pending WorkOne approval.</p>
     </header>
+    <form action="/faa" method="get" className="flex flex-wrap gap-2">
+      <input name="search" defaultValue={query} aria-label="Find student by full name or email"
+        placeholder="Find any student by full name or email" className="min-w-60 flex-1 rounded-lg border p-3"/>
+      <button className="rounded-lg bg-slate-900 px-5 py-3 text-white">Find student</button>
+    </form>
     {error?<div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4">Student directory is unavailable. No FAA can be generated.</div>:
       <FaaGeneratorForm students={rows} signerName={profile?.full_name||''}
         programs={Object.entries(FAA_PROGRAMS).map(([key,v])=>({key,label:v.label,weeks:v.weeks,source:v.source,total:Object.values(v.costs).reduce((a,b)=>a+b,0)}))} />}

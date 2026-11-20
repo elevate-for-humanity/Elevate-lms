@@ -8,6 +8,14 @@ spec = importlib.util.spec_from_file_location('repair', Path(__file__).with_name
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
+CHECKOUT_PROVISIONER_DIGEST = m.NEW
+
+
+class ProvisionerSourceContract(unittest.TestCase):
+    def test_protected_repair_pin_matches_checked_in_source(self):
+        source = Path(__file__).resolve().parents[2] / 'infra/pbx/provisioner/server.mjs'
+        self.assertEqual(m.digest(source), CHECKOUT_PROVISIONER_DIGEST)
+
 class RepairTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
@@ -79,6 +87,23 @@ class RepairTests(unittest.TestCase):
             m.require_idle('0 active calls\n', 'Endpoint: pwa-' + 'a' * 40, [])
         with self.assertRaisesRegex(ValueError, 'existing_pwa_devices'):
             m.require_idle('0 active calls\n', '', [{'device': 'existing'}])
+
+    def test_expired_unregistered_devices_may_be_invalidated_by_existing_cleanup(self):
+        endpoint = 'pwa-' + 'a' * 40
+        records = [{'endpointId': endpoint, 'expiresAt': 999}]
+        endpoints = 'Endpoint: ' + endpoint + '/Unavailable'
+        empty_aor = 'Aor:  ' + endpoint[:41] + ' 1\n  Contact: <Aor/ContactUri>\n'
+        m.require_idle('0 active calls', endpoints, records,
+                       inspect_aor=lambda _: empty_aor, now_ms=1000)
+        for observed, lease, aor in [
+            (endpoints, [{**records[0], 'expiresAt': 1001}], empty_aor),
+            (endpoints, records, empty_aor + 'Contact: ' + endpoint + '/sip:device Unavail'),
+            (endpoints, records, 'No objects found'),
+            (endpoints + '\nEndpoint: pwa-' + 'b' * 40, records, empty_aor),
+        ]:
+            with self.assertRaisesRegex(ValueError, 'existing_pwa_devices'):
+                m.require_idle('0 active calls', observed, lease,
+                               inspect_aor=lambda _: aor, now_ms=1000)
 
     def test_unreviewed_source_blocks_before_service_mutation(self):
         self.source.write_bytes(b'unreviewed')

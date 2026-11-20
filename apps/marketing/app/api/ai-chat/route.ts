@@ -16,6 +16,9 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
+// Leave time for gateway cleanup and the guided response before the route expires.
+const INFERENCE_TIMEOUT_MS = 45_000;
+
 type ParisSurface = 'public' | 'learner' | 'store';
 
 interface Message {
@@ -154,6 +157,7 @@ function validMessages(value: unknown): Message[] {
 }
 
 export async function POST(req: NextRequest) {
+  const signal = AbortSignal.any([req.signal, AbortSignal.timeout(INFERENCE_TIMEOUT_MS)]);
   try {
     const body = await req.json();
     const context: ParisContext = body.context && typeof body.context === 'object' ? body.context : {};
@@ -173,6 +177,7 @@ export async function POST(req: NextRequest) {
         messages: [{ role: 'system', content: PARIS_SYSTEM_IDENTITY + '\n\n' + systemPrompt(context) }, ...messages],
         temperature: context.surface === 'store' ? 0.45 : 0.25,
         maxTokens: 700,
+        signal,
       });
 
       return NextResponse.json({ reply: result.content, provider: result.provider });

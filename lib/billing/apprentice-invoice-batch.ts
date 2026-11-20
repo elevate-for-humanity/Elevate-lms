@@ -1,5 +1,6 @@
+import { invoiceBelongsToUser } from './invoice-checkout';
 import { nextInvoiceDate } from './schedule';
-import { isIssuedStudentInvoice } from './invoice-display';
+import { invoiceLineDescriptions, isIssuedStudentInvoice } from './invoice-display';
 
 export type ApprenticeInvoiceEmailInput = {
   customerName: string;
@@ -20,6 +21,7 @@ export type ApprenticeDashboardInvoice = {
   paidAt?: string | null;
   createdAt?: string | null;
   paymentUrl: string | null;
+  descriptions?: string[];
 };
 
 type Database = any;
@@ -28,24 +30,28 @@ export async function listApprenticeInvoices(
   db: Database,
   userId: string,
   limit = 50,
+  accountEmail?: string | null,
 ): Promise<ApprenticeDashboardInvoice[]> {
-  const profile = await db.from('profiles').select('email').eq('id', userId).maybeSingle();
-  if (profile.error)
-    throw new Error(`Could not resolve apprentice billing identity: ${profile.error.message}`);
+  let email = accountEmail;
+  if (email === undefined) {
+    const profile = await db.from('profiles').select('email').eq('id', userId).maybeSingle();
+    if (profile.error) throw new Error(`Could not resolve apprentice billing identity: ${profile.error.message}`);
+    email = profile.data?.email;
+  }
 
   const select =
-    'id,provider,provider_invoice_id,invoice_number,total_cents,status,due_at,paid_at,payment_url,created_at';
+    'id,provider,provider_invoice_id,invoice_number,total_cents,status,due_at,paid_at,payment_url,created_at,customer_external_key,customer_email,provider_payload';
   const byUserKey = db
     .from('billing_invoices')
     .select(select)
     .in('customer_external_key', [userId, `user:${userId}`])
     .order('created_at', { ascending: false })
     .limit(limit);
-  const byEmail = profile.data?.email
+  const byEmail = email
     ? db
         .from('billing_invoices')
         .select(select)
-        .eq('customer_email', profile.data.email)
+        .eq('customer_email', email)
         .order('created_at', { ascending: false })
         .limit(limit)
     : Promise.resolve({ data: [], error: null });
@@ -56,7 +62,10 @@ export async function listApprenticeInvoices(
   // QuickBooks uses its own customer ID while Elevate uses the profile UUID.
   // Resolve both identities and de-duplicate by the canonical local invoice ID.
   const rows = new Map<string, any>();
-  for (const row of [...(keyResult.data || []), ...(emailResult.data || [])]) rows.set(row.id, row);
+  for (const row of emailResult.data || []) {
+    if (invoiceBelongsToUser(row, userId, email)) rows.set(row.id, row);
+  }
+  for (const row of keyResult.data || []) rows.set(row.id, row);
   return [...rows.values()]
     .filter(isIssuedStudentInvoice)
     .sort((left, right) =>
@@ -72,6 +81,7 @@ export async function listApprenticeInvoices(
       paidAt: row.paid_at || null,
       createdAt: row.created_at || null,
       paymentUrl: row.payment_url || null,
+      descriptions: invoiceLineDescriptions(row.provider_payload),
     }));
 }
 

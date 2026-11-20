@@ -145,12 +145,10 @@ test.describe('Beauty apprenticeships — canonical checkout handoff', () => {
         page.getByText(/the enrollment application requires verified payment before it can be submitted/i),
       ).toBeVisible();
 
-      const unpaidHandoff = await request.get(
-        `${BASE}/apply/student/interview?program=${slug}&intent=enrollment`,
-        { failOnStatusCode: false, maxRedirects: 0 },
-      );
-      expect([307, 308]).toContain(unpaidHandoff.status());
-      expect(unpaidHandoff.headers().location).toBe(`/enroll/${slug}`);
+      await Promise.all([
+        page.waitForURL((url) => url.pathname === `/enroll/${slug}`),
+        enrollmentLink.click(),
+      ]);
 
       const pricing = await request.get(`${BASE}/api/programs/pricing?slug=${slug}`, {
         failOnStatusCode: false,

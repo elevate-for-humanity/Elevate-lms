@@ -51,9 +51,9 @@ for (const width of [320, 390, 768, 1440]) {
       expect(box.left).toBeGreaterThanOrEqual(0);
       expect(box.right).toBeLessThanOrEqual(width + 1);
     }
-    const nav = page.getByRole('navigation', { name: 'Footer programs' });
+    const nav = page.getByRole('navigation', { name: 'Footer apprenticeships' });
     if (width < 768) {
-      const button = page.locator('footer summary').filter({ hasText: /^Programs$/ });
+      const button = page.locator('footer summary').filter({ hasText: /^Apprenticeships$/ });
       await expect(page.locator('footer details').filter({ has: button })).not.toHaveAttribute('open');
       await expect(nav).toBeHidden();
       await button.click();

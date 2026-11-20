@@ -151,8 +151,12 @@ test.describe('Enrollment Journey Guardrails', () => {
     expect([200, 404]).toContain(response?.status());
     await expect(page).toHaveURL(/\/programs\/nonexistent-program-12345(?:[?#].*)?$/);
     await expect(
-      page.getByRole('heading', { name: /get you back on the right path/i }),
+      page.getByRole('heading', { level: 2, name: 'Program Not Found', exact: true }),
     ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Browse All Programs' })).toHaveAttribute(
+      'href',
+      '/programs',
+    );
   });
 
   test('inquiry and login forms are keyboard reachable', async ({ page }) => {

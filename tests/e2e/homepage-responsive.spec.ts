@@ -20,11 +20,15 @@ test.describe('Homepage responsive acceptance', () => {
         page.getByRole('heading', { level: 1, name: 'Train for your next career.' }),
       ).toBeVisible();
 
-      const primary = page.getByRole('link', {
+      const hero = page.getByRole('region', {
+        name: 'Train for your next career.',
+        exact: true,
+      });
+      const primary = hero.getByRole('link', {
         name: 'Explore Career Training',
         exact: true,
       });
-      const funding = page.getByRole('link', {
+      const funding = hero.getByRole('link', {
         name: 'Check Funding Options',
         exact: true,
       });
@@ -88,10 +92,14 @@ test.describe('Homepage responsive acceptance', () => {
     await page.keyboard.press('Enter');
     await expect(programs).toHaveAttribute('aria-expanded', 'true');
 
-    const footerPrograms = page.locator('footer summary').filter({ hasText: /^Programs$/ });
-    await footerPrograms.focus();
+    const footerApprenticeships = page
+      .locator('footer summary')
+      .filter({ hasText: /^Apprenticeships$/ });
+    await footerApprenticeships.focus();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('navigation', { name: 'Footer programs' })).toBeVisible();
+    await expect(
+      page.getByRole('navigation', { name: 'Footer apprenticeships' }),
+    ).toBeVisible();
   });
 
   test('homepage keeps one primary heading and labeled imagery', async ({ page }) => {

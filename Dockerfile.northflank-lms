@@ -172,7 +172,21 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 WORKDIR /app
 
 COPY --from=builder /app/apps/lms/.next/standalone ./
-COPY --from=builder /export/pdf-node_modules/ ./node_modules/
+# Next can trace symlinks for these packages. Stage the exported real directories
+# separately so BuildKit does not try to copy a directory onto a traced symlink.
+COPY --from=builder /export/pdf-node_modules/ /tmp/lms-pdf-node_modules/
+RUN set -eux; \
+    test ! -L ./node_modules; \
+    test ! -L ./node_modules/@napi-rs; \
+    for package in pdf-parse pdfjs-dist @napi-rs/canvas @napi-rs/canvas-linux-x64-gnu; do \
+      source="/tmp/lms-pdf-node_modules/$package"; \
+      destination="./node_modules/$package"; \
+      test -d "$source" && test -f "$source/package.json"; \
+      mkdir -p "$(dirname "$destination")"; \
+      rm -rf -- "$destination"; \
+      cp -a -- "$source" "$destination"; \
+    done; \
+    rm -rf -- /tmp/lms-pdf-node_modules
 
 # Exercise the same Node ESM import used for Program Holder syllabus uploads.
 RUN node --input-type=module -e "const { PDFParse } = await import('pdf-parse'); if (typeof PDFParse !== 'function' || typeof globalThis.DOMMatrix !== 'function') throw new Error('LMS syllabus PDF runtime is incomplete');"

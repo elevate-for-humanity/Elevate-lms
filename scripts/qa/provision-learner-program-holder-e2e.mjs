@@ -19,7 +19,7 @@ if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
 }
 
 const db = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
-const runId = String(process.env.GITHUB_RUN_ID || Date.now());
+const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-portal-e2e-${runId}`;
 const QA_HVAC_COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 

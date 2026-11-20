@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       exhaustive:
-        description: Run the focused regressions and all four browser shards
+        description: Run focused regressions in addition to the normal four browser shards
         type: boolean
         default: false
   pull_request:
@@ -22,13 +22,13 @@ permissions:
   contents: read
 
 jobs:
-  desktop-chrome:
-    name: ${{ inputs.exhaustive && format('E2E desktop-chrome shard {0}/4', matrix.shard) || 'E2E desktop-chrome' }}
+  desktop-chrome-shard:
+    name: E2E desktop-chrome shard ${{ matrix.shard }}/4
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 2
       matrix:
-        shard: ${{ fromJSON(inputs.exhaustive && '[1,2,3,4]' || '[1]') }}
+        shard: [1, 2, 3, 4]
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -41,6 +41,7 @@ jobs:
       PLAYWRIGHT_HTML_OPEN: never
       NODE_OPTIONS: '--max-old-space-size=6144'
       EXPECTED_LMS_SHA: ${{ github.sha }}
+      QA_PORTAL_E2E_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
       # Isolated QA only: the full local-dev suite includes service-role
       # writes. Never use the production learner database or its service key.
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
@@ -88,6 +89,7 @@ jobs:
       - name: Verify isolated QA database and three-service E2E configuration
         run: node scripts/qa/verify-e2e-service-config.mjs
       - name: Verify Website Builder authorization with disposable QA sessions
+        if: ${{ matrix.shard == 1 }}
         run: node scripts/qa/test-builder-authorization.mjs
       - name: Provision disposable Learner and Program Holder QA identities
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
@@ -110,6 +112,7 @@ jobs:
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
       - name: Certify repaired authenticated portal dependencies
+        if: ${{ matrix.shard == 1 }}
         id: portal_certification
         continue-on-error: true
         run: >-
@@ -129,16 +132,17 @@ jobs:
           --project=desktop-chrome --retries=0
           --grep 'should navigate from homepage to apply page|should display application form fields|should show validation errors for empty form|should submit valid application|Host Shop application provides resume access|login, onboarding and tracking routes exist|homepage loads with all sections|eligibility quiz works end-to-end|programs page lists the published QA programs|individual program page has its title and application link|standard intake page loads with form|register page loads|should have no console errors'
           --max-failures=0 --output=test-results-focused --reporter=line
-      - name: Run desktop-chrome E2E (marketing, admin, lms)
-        if: ${{ success() && !inputs.exhaustive }}
-        run: pnpm test:e2e
       - name: Run all cases in this desktop-chrome shard
-        if: ${{ success() && inputs.exhaustive }}
+        if: ${{ success() }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: browser-shard.json
-        run: pnpm test:e2e --max-failures=0 --shard=${{ matrix.shard }}/4 --reporter=line,html,json
+          EXHAUSTIVE_BROWSER_RUN: ${{ inputs.exhaustive }}
+        run: |
+          args=()
+          if [[ "$EXHAUSTIVE_BROWSER_RUN" == true ]]; then args+=(--max-failures=0); fi
+          pnpm test:e2e --shard=${{ matrix.shard }}/4 --reporter=line,html,json "${args[@]}"
       - name: Enforce authenticated portal certification
-        if: ${{ !cancelled() && steps.portal_certification.outcome != 'success' }}
+        if: ${{ !cancelled() && matrix.shard == 1 && steps.portal_certification.outcome != 'success' }}
         run: |
           echo "Authenticated portal certification failed; broad E2E still ran for complete evidence."
           exit 1
@@ -157,13 +161,26 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.exhaustive && format('e2e-desktop-chrome-shard-{0}', matrix.shard) || 'e2e-desktop-chrome' }}
+          name: e2e-desktop-chrome-shard-${{ matrix.shard }}
           path: |
             playwright-report/
             test-results/
             test-results-focused/
             browser-shard.json
           retention-days: 14
+
+  # Preserve the exact required job name. The matrix result is successful
+  # only when every shard succeeds; skipped, canceled and failed all fail closed.
+  desktop-chrome:
+    name: E2E desktop-chrome
+    runs-on: ubuntu-24.04
+    needs: [desktop-chrome-shard]
+    if: ${{ always() }}
+    steps:
+      - name: Require successful desktop results from the full matrix
+        env:
+          SHARD_RESULT: ${{ needs.desktop-chrome-shard.result }}
+        run: test "$SHARD_RESULT" = success
 
   # An isolated, public-only regression must finish even if the broad
   # cross-app E2E suite runs into unrelated Course Builder/Program Holder failures.

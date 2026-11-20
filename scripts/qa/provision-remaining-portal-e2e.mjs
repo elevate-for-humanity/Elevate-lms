@@ -20,7 +20,7 @@ if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
 const db = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
-const runId = String(process.env.GITHUB_RUN_ID || Date.now());
+const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-portal-e2e-${runId}`;
 const roles = [
   ['admin', 'admin', 'Admin'],

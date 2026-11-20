@@ -62,19 +62,50 @@ jobs:
       - name: Obtain short-lived PARIS workflow identity
         env:
           AUDIENCE: elevate-paris-code-repair
-        run: |
+        run: &obtain_workflow_identity |
           node - <<'NODE'
-          const fs=require('node:fs');
-          (async()=>{
-            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
-            url.searchParams.set('audience',process.env.AUDIENCE);
-            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
-            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
-            const token=(await response.json()).value;
-            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
-            process.stdout.write('::add-mask::'+token+'\n');
-            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
-          })().catch(err=>{console.error(err.message);process.exitCode=1});
+          const fs = require('node:fs');
+          const { setTimeout: delay } = require('node:timers/promises');
+          const retryable = new Set([408, 429, 500, 502, 503, 504]);
+          (async () => {
+            const configuredTimeout = process.env.PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS;
+            if (!/^[1-9][0-9]*$/.test(configuredTimeout) || Number(configuredTimeout) > 300) {
+              throw Error('PARIS_SETTING_REQUIRED:PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS');
+            }
+            const timeout = Number(configuredTimeout) * 1000;
+            const url = new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience', process.env.AUDIENCE);
+            for (let attempt = 1; attempt <= 3; attempt++) {
+              let response;
+              let token;
+              try {
+                response = await fetch(url, {
+                  headers: { Authorization: 'Bearer ' + process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN },
+                  signal: AbortSignal.timeout(timeout),
+                  redirect: 'error',
+                });
+                if (response.ok) token = (await response.json())?.value;
+              } catch (error) {
+                if (error.name !== 'TimeoutError') throw error;
+                response = undefined;
+              }
+              if (response?.ok) {
+                if (typeof token !== 'string' || !/^[\w-]+\.[\w-]+\.[\w-]+$/.test(token)) {
+                  throw Error('Invalid workflow identity');
+                }
+                process.stdout.write('::add-mask::' + token + '\n');
+                fs.appendFileSync(process.env.GITHUB_ENV, 'PARIS_ID_TOKEN=' + token + '\n');
+                return;
+              }
+              const failure = response ? 'HTTP ' + response.status : 'request timed out';
+              if (attempt === 3 || (response && !retryable.has(response.status))) {
+                throw Error('Workflow identity issuance failed: ' + failure);
+              }
+              if (response?.body) await response.body.cancel().catch(() => {});
+              console.warn('Workflow identity issuance retry ' + attempt + '/2: ' + failure);
+              await delay(1000 * attempt);
+            }
+          })().catch(error => { console.error(error.message); process.exitCode = 1; });
           NODE
       - name: Tick PARIS and dispatch the claimed repair with workflow-owned identity
         id: tick
@@ -203,20 +234,7 @@ jobs:
       - name: Obtain short-lived PARIS workflow identity
         env:
           AUDIENCE: elevate-paris-code-repair
-        run: |
-          node - <<'NODE'
-          const fs=require('node:fs');
-          (async()=>{
-            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
-            url.searchParams.set('audience',process.env.AUDIENCE);
-            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
-            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
-            const token=(await response.json()).value;
-            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
-            process.stdout.write('::add-mask::'+token+'\n');
-            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
-          })().catch(err=>{console.error(err.message);process.exitCode=1});
-          NODE
+        run: *obtain_workflow_identity
       - name: Stage the PARIS patch
         id: patch
         env:
@@ -241,8 +259,27 @@ jobs:
             query.append(('audience','elevate-paris-code-repair'))
             url=urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(query)))
             request=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
-            token=json.load(urllib.request.urlopen(request,timeout=required_int('PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS',300))).get('value')
-            if not isinstance(token,str) or len(token.split('.'))!=3: raise SystemExit('Invalid fresh workflow identity')
+            timeout=required_int('PARIS_IDENTITY_HTTP_TIMEOUT_SECONDS',300)
+            for attempt in range(1,4):
+              try:
+                with urllib.request.urlopen(request,timeout=timeout) as response:
+                  token=json.load(response).get('value')
+              except urllib.error.HTTPError as error:
+                failure='HTTP '+str(error.code)
+                retryable=error.code in {408,429,500,502,503,504}
+                error.close()
+              except (TimeoutError,urllib.error.URLError) as error:
+                if isinstance(error,urllib.error.URLError) and not isinstance(error.reason,TimeoutError):
+                  raise
+                failure='request timed out'
+                retryable=True
+              else:
+                break
+              if not retryable or attempt==3:
+                raise SystemExit('Workflow identity issuance failed: '+failure)
+              print('Workflow identity issuance retry '+str(attempt)+'/2: '+failure,flush=True)
+              time.sleep(attempt)
+            if not isinstance(token,str) or not re.fullmatch(r'[\w-]+\.[\w-]+\.[\w-]+',token): raise SystemExit('Invalid fresh workflow identity')
             print('::add-mask::'+token,flush=True)
             return token
           # OpenHands is asynchronous. Poll its SAME durable task, with a
@@ -380,20 +417,7 @@ jobs:
       - name: Obtain short-lived PARIS workflow identity
         env:
           AUDIENCE: elevate-paris-code-repair
-        run: |
-          node - <<'NODE'
-          const fs=require('node:fs');
-          (async()=>{
-            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
-            url.searchParams.set('audience',process.env.AUDIENCE);
-            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
-            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
-            const token=(await response.json()).value;
-            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
-            process.stdout.write('::add-mask::'+token+'\n');
-            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
-          })().catch(err=>{console.error(err.message);process.exitCode=1});
-          NODE
+        run: *obtain_workflow_identity
       - name: Publish only the independently validated immutable patch
         env:
           GH_TOKEN: ${{ github.token }}
@@ -414,20 +438,7 @@ jobs:
       - name: Obtain short-lived PARIS workflow identity
         env:
           AUDIENCE: elevate-paris-code-repair
-        run: |
-          node - <<'NODE'
-          const fs=require('node:fs');
-          (async()=>{
-            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
-            url.searchParams.set('audience',process.env.AUDIENCE);
-            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
-            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
-            const token=(await response.json()).value;
-            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
-            process.stdout.write('::add-mask::'+token+'\n');
-            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
-          })().catch(err=>{console.error(err.message);process.exitCode=1});
-          NODE
+        run: *obtain_workflow_identity
       - env:
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |

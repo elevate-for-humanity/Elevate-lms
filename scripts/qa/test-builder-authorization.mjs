@@ -64,7 +64,23 @@ try {
     name: run, slug: `${run}-foreign`,
   }).select('id').single(), 'Unrelated organization fixture');
   organizations.push(foreignOrganization.id);
-  mustDeny(await wallet(owner, ownerId, 2147483647), 'No trial cannot mint credits');
+  const readOwnerWallet = async () => check(await admin.from('user_app_credit_wallets')
+    .select('balance,lifetime_granted').eq('user_id', ownerId).eq('app_slug', 'website-builder')
+    .maybeSingle(), 'Read back disposable wallet');
+  const countOwnerLedger = async () => {
+    const result = await admin.from('user_app_credit_ledger').select('id', { count: 'exact', head: true })
+      .eq('user_id', ownerId).eq('app_slug', 'website-builder');
+    check(result, 'Read back disposable credit ledger');
+    return result.count;
+  };
+  assert.equal(await readOwnerWallet(), null, 'A fresh user starts without a wallet');
+  const initialLedgerCount = await countOwnerLedger();
+  assert.equal(initialLedgerCount, 0, 'A fresh user starts without ledger entries');
+  const deniedWallet = await wallet(owner, ownerId, 2147483647);
+  mustDeny(deniedWallet, 'No trial cannot mint credits');
+  assert.equal(deniedWallet.data, null, 'Denied wallet initialization returns no balance');
+  assert.equal(await readOwnerWallet(), null, 'Denied wallet initialization cannot create a balance');
+  assert.equal(await countOwnerLedger(), initialLedgerCount, 'Denied initialization cannot append a ledger entry');
   check(await admin.from('user_app_subscriptions').insert({
     user_id: ownerId, app_slug: 'website-builder', plan: 'starter', status: 'trial',
     trial_ends_at: new Date(Date.now() + 86400000).toISOString(),
@@ -73,6 +89,10 @@ try {
   const saved = check(await admin.from('user_app_credit_wallets')
     .select('balance,lifetime_granted').eq('user_id', ownerId).eq('app_slug', 'website-builder').single(), 'Saved wallet');
   assert.deepEqual(saved, { balance: 500, lifetime_granted: 500 });
+  const grantedLedgerCount = await countOwnerLedger();
+  assert.equal(check(await wallet(owner, ownerId, 2147483647), 'Eligible wallet replay'), 500);
+  assert.deepEqual(await readOwnerWallet(), saved, 'Replay cannot increase the saved grant');
+  assert.equal(await countOwnerLedger(), grantedLedgerCount, 'Replay cannot append a ledger entry');
   mustDeny(await wallet(member, ownerId, 2147483647), 'Another user cannot initialize a wallet');
   const used = check(await owner.rpc('consume_app_credits', {
     p_user_id: ownerId, p_app_slug: 'website-builder', p_operation: 'qa_authorization', p_cost: 8,
@@ -186,7 +206,7 @@ try {
 if (mainError) throw new Error('Isolated QA builder authorization assertions failed.', { cause: mainError });
 console.info(JSON.stringify({
   project_ref: 'isdgjcdabhxxozarmxta', test: 'builder_authorization',
-  real_password_logins: 2, wallet_cap: 500, repeat_refill_denied: true,
+  real_password_logins: 2, wallet_cap: 500, no_trial_wallet_unchanged: true, no_trial_ledger_unchanged: true, repeat_refill_denied: true,
   foreign_wallet_denied: true, expired_trial_denied: true,
   member_read_allowed: true, member_delete_denied: true, manager_delete_allowed: true,
   forged_revision_denied: true, owner_revision_allowed: true,

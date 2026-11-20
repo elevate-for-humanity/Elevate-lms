@@ -7,6 +7,10 @@ name: E2E desktop-chrome
 on:
   workflow_dispatch:
     inputs:
+      authorization_only:
+        description: Run only the isolated QA Website Builder authorization check
+        type: boolean
+        default: false
       exhaustive:
         description: Run the focused intake and platform tests, then run the full suite without stopping after twelve failures
         type: boolean
@@ -84,16 +88,19 @@ jobs:
       - name: Verify Website Builder authorization with disposable QA sessions
         run: node scripts/qa/test-builder-authorization.mjs
       - name: Verify preinstalled Playwright browsers
+        if: ${{ !inputs.authorization_only }}
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Verify published marketing artwork through Next image loader
+        if: ${{ !inputs.authorization_only }}
         run: node --test scripts/marketing-image-config.test.mjs
       - name: Verify Course Builder chat controls in short and landscape panels
+        if: ${{ !inputs.authorization_only }}
         run: node scripts/test-course-chat-layout.mjs
       # The broad test:e2e command runs desktop-chrome only. Certify the same
       # dedicated Host Shop identity on tablet and phone when configured.
       # A missing identity does NOT certify the Host Shop release.
       - name: Authenticated Host Shop desktop, tablet and mobile geometry
-        if: ${{ env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
+        if: ${{ !inputs.authorization_only && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
         run: >-
           pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
           --grep "critical Host Shop surfaces fit the active device viewport"
@@ -101,7 +108,7 @@ jobs:
           --project=android-chrome --project=iphone-webkit
       - name: Run focused intake and platform browser tests
         id: focused
-        if: ${{ inputs.exhaustive }}
+        if: ${{ !inputs.authorization_only && inputs.exhaustive }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report-focused
         run: >-
@@ -109,13 +116,13 @@ jobs:
           tests/e2e/complete-platform.spec.ts --project=desktop-chrome
           --max-failures=0 --output=test-results-focused
       - name: Run desktop-chrome E2E (marketing, admin, lms)
-        if: ${{ !inputs.exhaustive }}
+        if: ${{ !inputs.authorization_only && !inputs.exhaustive }}
         run: pnpm test:e2e
       - name: Run every desktop-chrome E2E test
-        if: ${{ !cancelled() && inputs.exhaustive && (steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
+        if: ${{ !cancelled() && !inputs.authorization_only && inputs.exhaustive && (steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
         run: pnpm test:e2e --max-failures=0
       - name: Upload Playwright report
-        if: always()
+        if: ${{ always() && !inputs.authorization_only }}
         uses: actions/upload-artifact@v7
         with:
           name: e2e-desktop-chrome
@@ -130,6 +137,7 @@ jobs:
   # cross-app E2E suite runs into unrelated Course Builder/Program Holder failures.
   # Keep the full E2E job intact: this supplements, never bypasses, its result.
   public-host-shop-category:
+    if: ${{ !inputs.authorization_only }}
     name: Public Host Shop navigation and application (five devices)
     runs-on: ubuntu-24.04
     container:
@@ -176,6 +184,7 @@ jobs:
           retention-days: 14
 
   email-device-browsers:
+    if: ${{ !inputs.authorization_only }}
     name: Email device browsers
     runs-on: ubuntu-24.04
     container:

@@ -119,23 +119,10 @@ jobs:
           tests/e2e/portal-responsive-design.spec.ts
           --grep "Employer setup|Authenticated live HVAC lesson media|critical (Program Holder|Employer|Case Manager) surfaces"
           --project=desktop-chrome
-      - name: Run desktop-chrome E2E (marketing, admin, lms)
-        if: ${{ !cancelled() }}
-        run: pnpm test:e2e
-      - name: Enforce authenticated portal certification
-        if: ${{ !cancelled() && steps.portal_certification.outcome != 'success' }}
-        run: |
-          echo "Authenticated portal certification failed; broad E2E still ran for complete evidence."
-          exit 1
-      - name: Clean up disposable Employer, Instructor, Staff and Case Manager QA identities
-        if: always()
-        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
-      - name: Clean up disposable Learner and Program Holder QA identities
-        if: always()
-        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Verify the corrected browser assertions
         id: focused
-        if: ${{ inputs.exhaustive && matrix.shard == 1 }}
+        if: ${{ success() && inputs.exhaustive && matrix.shard == 1 }}
+        continue-on-error: true
         run: >-
           pnpm exec playwright test tests/e2e/application-flow.spec.ts
           tests/e2e/canonical-application-flow.spec.ts tests/e2e/complete-platform.spec.ts
@@ -143,13 +130,29 @@ jobs:
           --grep 'should navigate from homepage to apply page|should display application form fields|should show validation errors for empty form|should submit valid application|Host Shop application provides resume access|login, onboarding and tracking routes exist|homepage loads with all sections|eligibility quiz works end-to-end|programs page lists the published QA programs|individual program page has its title and application link|standard intake page loads with form|register page loads|should have no console errors'
           --max-failures=0 --output=test-results-focused --reporter=line
       - name: Run desktop-chrome E2E (marketing, admin, lms)
-        if: ${{ !inputs.exhaustive }}
+        if: ${{ success() && !inputs.exhaustive }}
         run: pnpm test:e2e
       - name: Run all cases in this desktop-chrome shard
-        if: ${{ !cancelled() && inputs.exhaustive && (success() || steps.focused.outcome == 'failure') }}
+        if: ${{ success() && inputs.exhaustive }}
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: browser-shard.json
         run: pnpm test:e2e --max-failures=0 --shard=${{ matrix.shard }}/4 --reporter=line,html,json
+      - name: Enforce authenticated portal certification
+        if: ${{ !cancelled() && steps.portal_certification.outcome != 'success' }}
+        run: |
+          echo "Authenticated portal certification failed; broad E2E still ran for complete evidence."
+          exit 1
+      - name: Enforce focused exhaustive regression result
+        if: ${{ !cancelled() && inputs.exhaustive && matrix.shard == 1 && steps.focused.outcome != 'success' }}
+        run: |
+          echo "Focused exhaustive browser regression failed; all shard evidence was retained."
+          exit 1
+      - name: Clean up disposable Employer, Instructor, Staff and Case Manager QA identities
+        if: always()
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
+      - name: Clean up disposable Learner and Program Holder QA identities
+        if: always()
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7

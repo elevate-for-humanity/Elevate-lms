@@ -1,8 +1,20 @@
 -- Isolated QA contract for the authenticated portal browser suite.
 -- This migration is intentionally QA-only. It creates no production learner,
 -- credit, enrollment, customer-site, or publication records.
+-- The identity row is installed separately through the Supabase control plane
+-- against the exact isolated project ref before this contract may run.
+BEGIN;
 DO $qa$
 BEGIN
+  IF to_regclass('private.qa_environment_identity') IS NULL THEN
+    RAISE EXCEPTION 'INDEPENDENT_QA_PROJECT_IDENTITY_REQUIRED';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM private.qa_environment_identity
+    WHERE project_ref = 'isdgjcdabhxxozarmxta'
+  ) THEN
+    RAISE EXCEPTION 'UNAUTHORIZED_QA_PROJECT_IDENTITY';
+  END IF;
   IF NOT EXISTS (SELECT 1 FROM public.tenants WHERE slug = 'elevate-lms-qa') THEN
     RAISE EXCEPTION 'ISOLATED_QA_TENANT_REQUIRED';
   END IF;
@@ -16,8 +28,10 @@ REVOKE ALL ON SCHEMA private FROM PUBLIC,anon;
 GRANT USAGE ON SCHEMA private TO authenticated,service_role;
 
 ALTER TABLE public.employers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_employers_owner_read ON public.employers;
 CREATE POLICY qa_employers_owner_read ON public.employers
   FOR SELECT TO authenticated USING (owner_user_id = auth.uid());
+DROP POLICY IF EXISTS qa_employers_owner_update ON public.employers;
 CREATE POLICY qa_employers_owner_update ON public.employers
   FOR UPDATE TO authenticated
   USING (owner_user_id = auth.uid())
@@ -118,30 +132,38 @@ ALTER TABLE public.job_postings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_placements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_employer_referrals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_job_postings_service ON public.job_postings;
 CREATE POLICY qa_job_postings_service ON public.job_postings
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_job_postings_employer_read ON public.job_postings;
 CREATE POLICY qa_job_postings_employer_read ON public.job_postings
   FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM public.employers e
     WHERE e.id=employer_id AND e.owner_user_id=auth.uid()
   ));
+DROP POLICY IF EXISTS qa_job_applications_service ON public.job_applications;
 CREATE POLICY qa_job_applications_service ON public.job_applications
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_job_applications_employer_read ON public.job_applications;
 CREATE POLICY qa_job_applications_employer_read ON public.job_applications
   FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM public.job_postings jp
     JOIN public.employers e ON e.id=jp.employer_id
     WHERE jp.id=job_posting_id AND e.owner_user_id=auth.uid()
   ));
+DROP POLICY IF EXISTS qa_job_placements_service ON public.job_placements;
 CREATE POLICY qa_job_placements_service ON public.job_placements
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_job_placements_employer_read ON public.job_placements;
 CREATE POLICY qa_job_placements_employer_read ON public.job_placements
   FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM public.employers e
     WHERE e.id=employer_id AND e.owner_user_id=auth.uid()
   ));
+DROP POLICY IF EXISTS qa_candidate_referrals_service ON public.candidate_employer_referrals;
 CREATE POLICY qa_candidate_referrals_service ON public.candidate_employer_referrals
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_candidate_referrals_employer_read ON public.candidate_employer_referrals;
 CREATE POLICY qa_candidate_referrals_employer_read ON public.candidate_employer_referrals
   FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM public.employers e
@@ -165,8 +187,10 @@ CREATE TABLE IF NOT EXISTS public.employer_onboarding (
 CREATE INDEX IF NOT EXISTS employer_onboarding_employer_idx
   ON public.employer_onboarding(employer_id, created_at DESC);
 ALTER TABLE public.employer_onboarding ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_employer_onboarding_service ON public.employer_onboarding;
 CREATE POLICY qa_employer_onboarding_service ON public.employer_onboarding
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_employer_onboarding_owner_read ON public.employer_onboarding;
 CREATE POLICY qa_employer_onboarding_owner_read ON public.employer_onboarding
   FOR SELECT TO authenticated USING (EXISTS (
     SELECT 1 FROM public.employers e
@@ -189,8 +213,10 @@ CREATE TABLE IF NOT EXISTS public.employer_onboarding_progress (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.employer_onboarding_progress ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_employer_progress_service ON public.employer_onboarding_progress;
 CREATE POLICY qa_employer_progress_service ON public.employer_onboarding_progress
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_employer_progress_owner ON public.employer_onboarding_progress;
 CREATE POLICY qa_employer_progress_owner ON public.employer_onboarding_progress
   FOR SELECT TO authenticated USING (user_id = auth.uid());
 GRANT SELECT ON public.employer_onboarding_progress TO authenticated;
@@ -213,8 +239,10 @@ CREATE TABLE IF NOT EXISTS public.documents (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_documents_service ON public.documents;
 CREATE POLICY qa_documents_service ON public.documents
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_documents_owner_read ON public.documents;
 CREATE POLICY qa_documents_owner_read ON public.documents
   FOR SELECT TO authenticated USING (user_id = auth.uid());
 GRANT SELECT ON public.documents TO authenticated;
@@ -222,6 +250,7 @@ GRANT ALL ON public.documents TO service_role;
 INSERT INTO storage.buckets(id, name, public, file_size_limit, allowed_mime_types)
 VALUES ('documents', 'documents', false, 10485760, ARRAY['application/pdf'])
 ON CONFLICT (id) DO NOTHING;
+DROP POLICY IF EXISTS qa_documents_storage_owner_read ON storage.objects;
 CREATE POLICY qa_documents_storage_owner_read ON storage.objects
   FOR SELECT TO authenticated
   USING (
@@ -241,8 +270,10 @@ CREATE TABLE IF NOT EXISTS public.program_holder_programs (
   UNIQUE(program_holder_id, program_id)
 );
 ALTER TABLE public.program_holder_programs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_program_holder_programs_service ON public.program_holder_programs;
 CREATE POLICY qa_program_holder_programs_service ON public.program_holder_programs
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_program_holder_programs_owner_read ON public.program_holder_programs;
 CREATE POLICY qa_program_holder_programs_owner_read ON public.program_holder_programs
   FOR SELECT TO authenticated USING (
     program_holder_id = (SELECT p.program_holder_id FROM public.profiles p WHERE p.id = auth.uid())
@@ -258,8 +289,10 @@ CREATE TABLE IF NOT EXISTS public.case_managers (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.case_managers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_case_managers_service ON public.case_managers;
 CREATE POLICY qa_case_managers_service ON public.case_managers
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_case_managers_self_read ON public.case_managers;
 CREATE POLICY qa_case_managers_self_read ON public.case_managers
   FOR SELECT TO authenticated USING (id = auth.uid());
 GRANT SELECT ON public.case_managers TO authenticated;
@@ -272,8 +305,10 @@ CREATE TABLE IF NOT EXISTS public.case_manager_assignments (
   PRIMARY KEY(application_id, case_manager_id)
 );
 ALTER TABLE public.case_manager_assignments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_case_manager_assignments_service ON public.case_manager_assignments;
 CREATE POLICY qa_case_manager_assignments_service ON public.case_manager_assignments
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_case_manager_assignments_self_read ON public.case_manager_assignments;
 CREATE POLICY qa_case_manager_assignments_self_read ON public.case_manager_assignments
   FOR SELECT TO authenticated USING (case_manager_id = auth.uid());
 GRANT SELECT ON public.case_manager_assignments TO authenticated;
@@ -321,8 +356,16 @@ AS $function$
       JOIN public.courses c ON c.id = p_course_id
       WHERE COALESCE(pe.user_id, pe.student_id) = auth.uid()
         AND (pe.course_id = p_course_id OR pe.program_id = c.program_id)
+        AND lower(COALESCE(pe.status, '')) IN ('active','enrolled','in_progress','confirmed')
+        AND lower(COALESCE(pe.payment_status, '')) IN ('paid','paid_in_full')
+        AND pe.approved_at IS NOT NULL
+        AND pe.approved_by IS NOT NULL
+        AND pe.access_granted_at IS NOT NULL
+        AND lower(COALESCE(pe.access_status, '')) IN ('active','granted')
         AND pe.revoked_at IS NULL
-        AND lower(COALESCE(pe.status, 'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+        AND pe.cancelled_at IS NULL
+        AND pe.suspended_at IS NULL
+        AND pe.refunded_at IS NULL
     );
 $function$;
 REVOKE ALL ON FUNCTION private.can_access_course_lesson(uuid,uuid) FROM PUBLIC,anon;
@@ -342,16 +385,26 @@ AS $function$
     WHERE l.id = p_lesson_id
       AND l.is_published
       AND COALESCE(pe.user_id, pe.student_id) = p_user_id
+      AND lower(COALESCE(pe.status, '')) IN ('active','enrolled','in_progress','confirmed')
+      AND lower(COALESCE(pe.payment_status, '')) IN ('paid','paid_in_full')
+      AND pe.approved_at IS NOT NULL
+      AND pe.approved_by IS NOT NULL
+      AND pe.access_granted_at IS NOT NULL
+      AND lower(COALESCE(pe.access_status, '')) IN ('active','granted')
       AND pe.revoked_at IS NULL
-      AND lower(COALESCE(pe.status, 'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+      AND pe.cancelled_at IS NULL
+      AND pe.suspended_at IS NULL
+      AND pe.refunded_at IS NULL
   );
 $function$;
 REVOKE ALL ON FUNCTION public.can_access_lesson(uuid,uuid) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.can_access_lesson(uuid,uuid) TO service_role;
 
 ALTER TABLE public.course_lessons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_course_lessons_service ON public.course_lessons;
 CREATE POLICY qa_course_lessons_service ON public.course_lessons
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_course_lessons_enrolled_read ON public.course_lessons;
 CREATE POLICY qa_course_lessons_enrolled_read ON public.course_lessons
   FOR SELECT TO authenticated USING (
     is_published AND private.can_access_course_lesson(course_id, id)
@@ -370,7 +423,9 @@ CREATE TABLE IF NOT EXISTS public.lesson_progress (
   UNIQUE(user_id, lesson_id)
 );
 ALTER TABLE public.lesson_progress ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_lesson_progress_service ON public.lesson_progress;
 CREATE POLICY qa_lesson_progress_service ON public.lesson_progress FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_lesson_progress_owner ON public.lesson_progress;
 CREATE POLICY qa_lesson_progress_owner ON public.lesson_progress FOR SELECT TO authenticated USING (user_id = auth.uid());
 GRANT SELECT ON public.lesson_progress TO authenticated;
 GRANT ALL ON public.lesson_progress TO service_role;
@@ -385,7 +440,9 @@ CREATE TABLE IF NOT EXISTS public.checkpoint_scores (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.checkpoint_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_checkpoint_scores_service ON public.checkpoint_scores;
 CREATE POLICY qa_checkpoint_scores_service ON public.checkpoint_scores FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_checkpoint_scores_owner ON public.checkpoint_scores;
 CREATE POLICY qa_checkpoint_scores_owner ON public.checkpoint_scores FOR SELECT TO authenticated USING (user_id = auth.uid());
 GRANT SELECT ON public.checkpoint_scores TO authenticated;
 GRANT ALL ON public.checkpoint_scores TO service_role;
@@ -443,13 +500,21 @@ ALTER TABLE public.learner_video_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.learner_video_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.interactive_video_quiz_answers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.learner_video_checkpoint_responses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_video_notes_service ON public.learner_video_notes;
 CREATE POLICY qa_video_notes_service ON public.learner_video_notes FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_video_notes_owner ON public.learner_video_notes;
 CREATE POLICY qa_video_notes_owner ON public.learner_video_notes FOR ALL TO authenticated USING (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id)) WITH CHECK (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id));
+DROP POLICY IF EXISTS qa_video_progress_service ON public.learner_video_progress;
 CREATE POLICY qa_video_progress_service ON public.learner_video_progress FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_video_progress_owner ON public.learner_video_progress;
 CREATE POLICY qa_video_progress_owner ON public.learner_video_progress FOR ALL TO authenticated USING (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id)) WITH CHECK (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id));
+DROP POLICY IF EXISTS qa_quiz_answers_service ON public.interactive_video_quiz_answers;
 CREATE POLICY qa_quiz_answers_service ON public.interactive_video_quiz_answers FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_quiz_answers_owner ON public.interactive_video_quiz_answers;
 CREATE POLICY qa_quiz_answers_owner ON public.interactive_video_quiz_answers FOR ALL TO authenticated USING (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id)) WITH CHECK (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id));
+DROP POLICY IF EXISTS qa_checkpoint_responses_service ON public.learner_video_checkpoint_responses;
 CREATE POLICY qa_checkpoint_responses_service ON public.learner_video_checkpoint_responses FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_checkpoint_responses_owner ON public.learner_video_checkpoint_responses;
 CREATE POLICY qa_checkpoint_responses_owner ON public.learner_video_checkpoint_responses FOR ALL TO authenticated USING (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id)) WITH CHECK (user_id=auth.uid() AND private.can_access_course_lesson(course_id,lesson_id));
 GRANT SELECT,INSERT,UPDATE,DELETE ON public.learner_video_notes TO authenticated;
 GRANT SELECT,INSERT,UPDATE ON public.learner_video_progress TO authenticated;
@@ -473,6 +538,7 @@ CREATE TABLE IF NOT EXISTS public.video_playback_events (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.video_playback_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_video_playback_service ON public.video_playback_events;
 CREATE POLICY qa_video_playback_service ON public.video_playback_events
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 GRANT ALL ON public.video_playback_events TO service_role;
@@ -481,19 +547,24 @@ CREATE TABLE IF NOT EXISTS public.digital_workbooks (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug text NOT NULL UNIQUE,
   title text NOT NULL,
-  program_id uuid REFERENCES public.programs(id) ON DELETE CASCADE,
-  cover_image text,
+  program_id uuid NOT NULL REFERENCES public.programs(id) ON DELETE CASCADE,
+  cover_image text NOT NULL,
+  source_library_id text NOT NULL,
   is_active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL DEFAULT now()
+  pdf_storage_path text
 );
+ALTER TABLE public.digital_workbooks
+  ADD COLUMN IF NOT EXISTS source_library_id text;
+ALTER TABLE public.digital_workbooks
+  ADD COLUMN IF NOT EXISTS pdf_storage_path text;
 CREATE TABLE IF NOT EXISTS public.digital_workbook_sections (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   workbook_id uuid NOT NULL REFERENCES public.digital_workbooks(id) ON DELETE CASCADE,
   section_number integer NOT NULL,
   title text NOT NULL,
-  unit text,
-  pdf_page integer,
-  prompts jsonb NOT NULL DEFAULT '[]'::jsonb,
+  unit text NOT NULL,
+  pdf_page integer NOT NULL,
+  prompts jsonb NOT NULL CHECK (jsonb_typeof(prompts)='array' AND jsonb_array_length(prompts)=3),
   lesson_id uuid REFERENCES public.course_lessons(id) ON DELETE CASCADE,
   UNIQUE(workbook_id, section_number)
 );
@@ -510,22 +581,39 @@ CREATE TABLE IF NOT EXISTS public.digital_workbook_responses (
 ALTER TABLE public.digital_workbooks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.digital_workbook_sections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.digital_workbook_responses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS qa_workbooks_service ON public.digital_workbooks;
 CREATE POLICY qa_workbooks_service ON public.digital_workbooks FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_workbooks_enrolled_read ON public.digital_workbooks;
 CREATE POLICY qa_workbooks_enrolled_read ON public.digital_workbooks FOR SELECT TO authenticated USING (EXISTS (
   SELECT 1 FROM public.program_enrollments pe
   WHERE COALESCE(pe.user_id,pe.student_id)=auth.uid() AND pe.program_id=digital_workbooks.program_id
-    AND pe.revoked_at IS NULL AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+    AND lower(COALESCE(pe.status,'')) IN ('active','enrolled','in_progress','confirmed')
+    AND lower(COALESCE(pe.payment_status,'')) IN ('paid','paid_in_full')
+    AND pe.approved_at IS NOT NULL AND pe.approved_by IS NOT NULL
+    AND pe.access_granted_at IS NOT NULL
+    AND lower(COALESCE(pe.access_status,'')) IN ('active','granted')
+    AND pe.revoked_at IS NULL AND pe.cancelled_at IS NULL
+    AND pe.suspended_at IS NULL AND pe.refunded_at IS NULL
 ));
+DROP POLICY IF EXISTS qa_workbook_sections_service ON public.digital_workbook_sections;
 CREATE POLICY qa_workbook_sections_service ON public.digital_workbook_sections FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_workbook_sections_enrolled_read ON public.digital_workbook_sections;
 CREATE POLICY qa_workbook_sections_enrolled_read ON public.digital_workbook_sections FOR SELECT TO authenticated USING (EXISTS (
   SELECT 1 FROM public.digital_workbooks w
   JOIN public.program_enrollments pe ON pe.program_id=w.program_id
   WHERE w.id=workbook_id
     AND COALESCE(pe.user_id,pe.student_id)=auth.uid()
-    AND pe.revoked_at IS NULL
-    AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+    AND lower(COALESCE(pe.status,'')) IN ('active','enrolled','in_progress','confirmed')
+    AND lower(COALESCE(pe.payment_status,'')) IN ('paid','paid_in_full')
+    AND pe.approved_at IS NOT NULL AND pe.approved_by IS NOT NULL
+    AND pe.access_granted_at IS NOT NULL
+    AND lower(COALESCE(pe.access_status,'')) IN ('active','granted')
+    AND pe.revoked_at IS NULL AND pe.cancelled_at IS NULL
+    AND pe.suspended_at IS NULL AND pe.refunded_at IS NULL
 ));
+DROP POLICY IF EXISTS qa_workbook_responses_service ON public.digital_workbook_responses;
 CREATE POLICY qa_workbook_responses_service ON public.digital_workbook_responses FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS qa_workbook_responses_owner ON public.digital_workbook_responses;
 CREATE POLICY qa_workbook_responses_owner ON public.digital_workbook_responses FOR ALL TO authenticated
   USING (user_id=auth.uid())
   WITH CHECK (
@@ -536,8 +624,13 @@ CREATE POLICY qa_workbook_responses_owner ON public.digital_workbook_responses F
       JOIN public.program_enrollments pe ON pe.program_id=w.program_id
       WHERE s.id=section_id
         AND COALESCE(pe.user_id,pe.student_id)=auth.uid()
-        AND pe.revoked_at IS NULL
-        AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+        AND lower(COALESCE(pe.status,'')) IN ('active','enrolled','in_progress','confirmed')
+        AND lower(COALESCE(pe.payment_status,'')) IN ('paid','paid_in_full')
+        AND pe.approved_at IS NOT NULL AND pe.approved_by IS NOT NULL
+        AND pe.access_granted_at IS NOT NULL
+        AND lower(COALESCE(pe.access_status,'')) IN ('active','granted')
+        AND pe.revoked_at IS NULL AND pe.cancelled_at IS NULL
+        AND pe.suspended_at IS NULL AND pe.refunded_at IS NULL
     )
   );
 GRANT SELECT ON public.digital_workbooks, public.digital_workbook_sections TO authenticated;
@@ -551,8 +644,16 @@ AS $function$
     SELECT 1 FROM public.digital_workbooks w
     JOIN public.program_enrollments pe ON pe.program_id=w.program_id
     WHERE w.id=p_workbook_id AND COALESCE(pe.user_id,pe.student_id)=auth.uid()
+      AND lower(COALESCE(pe.status,'')) IN ('active','enrolled','in_progress','confirmed')
+      AND lower(COALESCE(pe.payment_status,'')) IN ('paid','paid_in_full')
+      AND pe.approved_at IS NOT NULL
+      AND pe.approved_by IS NOT NULL
+      AND pe.access_granted_at IS NOT NULL
+      AND lower(COALESCE(pe.access_status,'')) IN ('active','granted')
       AND pe.revoked_at IS NULL
-      AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+      AND pe.cancelled_at IS NULL
+      AND pe.suspended_at IS NULL
+      AND pe.refunded_at IS NULL
   );
 $function$;
 REVOKE ALL ON FUNCTION public.can_edit_digital_workbook(uuid) FROM PUBLIC,anon;
@@ -569,8 +670,16 @@ BEGIN
     JOIN public.courses c ON c.id=p_course_id
     WHERE COALESCE(pe.user_id,pe.student_id)=actor
       AND (pe.course_id=p_course_id OR pe.program_id=c.program_id)
+      AND lower(COALESCE(pe.status,'')) IN ('active','enrolled','in_progress','confirmed')
+      AND lower(COALESCE(pe.payment_status,'')) IN ('paid','paid_in_full')
+      AND pe.approved_at IS NOT NULL
+      AND pe.approved_by IS NOT NULL
+      AND pe.access_granted_at IS NOT NULL
+      AND lower(COALESCE(pe.access_status,'')) IN ('active','granted')
       AND pe.revoked_at IS NULL
-      AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+      AND pe.cancelled_at IS NULL
+      AND pe.suspended_at IS NULL
+      AND pe.refunded_at IS NULL
   ) THEN RAISE EXCEPTION 'COURSE_ENROLLMENT_REQUIRED' USING ERRCODE='42501'; END IF;
   RETURN jsonb_build_object(
     'totalWeeks',1,
@@ -616,20 +725,27 @@ INSERT INTO public.course_lessons(
 ) ON CONFLICT (id) DO UPDATE
 SET video_url=EXCLUDED.video_url;
 
-INSERT INTO public.digital_workbooks(id,slug,title,program_id,is_active)
+INSERT INTO public.digital_workbooks(
+  id,slug,title,program_id,cover_image,source_library_id,is_active
+)
 SELECT '73c75d0c-5f03-4bc6-8fb2-e6bb8bb10f31','hvac-epa608-guided-practice',
-       'EPA 608 Guided Practice Workbook',p.id,true
+       'EPA 608 Guided Practice Workbook',p.id,
+       '/images/programs/hvac-epa608.jpg','qa-hvac-guided-practice',true
 FROM public.programs p WHERE p.slug='hvac-technician'
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  cover_image=EXCLUDED.cover_image,
+  source_library_id=EXCLUDED.source_library_id;
 
 INSERT INTO public.digital_workbook_sections(
   id,workbook_id,section_number,title,unit,pdf_page,prompts,lesson_id
 ) VALUES (
   '779f10df-ad80-404e-9557-b9dc3e66307e','73c75d0c-5f03-4bc6-8fb2-e6bb8bb10f31',1,
   'Build an evidence-based learning plan','Orientation',1,
-  '["Record your training sequence.","List questions for your instructor."]'::jsonb,
+  '["Record your training sequence.","List questions for your instructor.","Describe the safety controls you will verify."]'::jsonb,
   'f1d32b7f-7cd4-44c4-9858-6b756ef21b89'
-) ON CONFLICT (id) DO NOTHING;
+) ON CONFLICT (id) DO UPDATE SET
+  prompts=EXCLUDED.prompts,
+  lesson_id=EXCLUDED.lesson_id;
 
 DO $qa$
 BEGIN
@@ -643,3 +759,6 @@ BEGIN
       AND l.is_published AND l.status='published'
   ) THEN RAISE EXCEPTION 'QA_HVAC_PLAYBACK_CONTRACT_NOT_INSTALLED'; END IF;
 END; $qa$;
+
+
+COMMIT;

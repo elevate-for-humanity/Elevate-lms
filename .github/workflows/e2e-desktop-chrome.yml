@@ -27,7 +27,12 @@ permissions:
 
 jobs:
   desktop-chrome:
-    name: E2E desktop-chrome
+    name: ${{ inputs.exhaustive && format('E2E desktop-chrome shard {0}/4', matrix.shard) || 'E2E desktop-chrome' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        shard: ${{ fromJSON(inputs.exhaustive && !inputs.authorization_only && '[1,2,3,4]' || '[1]') }}
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -100,7 +105,7 @@ jobs:
       # dedicated Host Shop identity on tablet and phone when configured.
       # A missing identity does NOT certify the Host Shop release.
       - name: Authenticated Host Shop desktop, tablet and mobile geometry
-        if: ${{ !inputs.authorization_only && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
+        if: ${{ matrix.shard == 1 && !inputs.authorization_only && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
         run: >-
           pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
           --grep "critical Host Shop surfaces fit the active device viewport"
@@ -108,14 +113,14 @@ jobs:
           --project=android-chrome --project=iphone-webkit
       - name: Repeat homepage readiness and error check
         id: homepage_repeat
-        if: ${{ !inputs.authorization_only && inputs.exhaustive }}
+        if: ${{ matrix.shard == 1 && !inputs.authorization_only && inputs.exhaustive }}
         run: >-
           pnpm exec playwright test tests/e2e/complete-platform.spec.ts
           --project=desktop-chrome --grep "no console errors on homepage"
           --repeat-each=3 --retries=0 --output=test-results-homepage-repeat
       - name: Run focused intake and platform browser tests
         id: focused
-        if: ${{ !cancelled() && !inputs.authorization_only && inputs.exhaustive && (steps.homepage_repeat.outcome == 'success' || steps.homepage_repeat.outcome == 'failure') }}
+        if: ${{ !cancelled() && matrix.shard == 1 && !inputs.authorization_only && inputs.exhaustive && (steps.homepage_repeat.outcome == 'success' || steps.homepage_repeat.outcome == 'failure') }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report-focused
         run: >-
@@ -125,20 +130,23 @@ jobs:
       - name: Run desktop-chrome E2E (marketing, admin, lms)
         if: ${{ !inputs.authorization_only && !inputs.exhaustive }}
         run: pnpm test:e2e
-      - name: Run every desktop-chrome E2E test
-        if: ${{ !cancelled() && !inputs.authorization_only && inputs.exhaustive && (steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
-        run: pnpm test:e2e --max-failures=0
+      - name: Run desktop-chrome E2E shard
+        if: ${{ !cancelled() && !inputs.authorization_only && inputs.exhaustive && ((matrix.shard != 1 && success()) || steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: browser-shard.json
+        run: pnpm test:e2e --max-failures=0 --shard=${{ matrix.shard }}/4 --reporter=line,html,json
       - name: Upload Playwright report
         if: ${{ always() && !inputs.authorization_only }}
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-desktop-chrome
+          name: ${{ inputs.exhaustive && format('e2e-desktop-chrome-shard-{0}', matrix.shard) || 'e2e-desktop-chrome' }}
           path: |
             playwright-report/
             test-results/
             playwright-report-focused/
             test-results-focused/
             test-results-homepage-repeat/
+            browser-shard.json
           retention-days: 14
 
   # An isolated, public-only regression must finish even if the broad

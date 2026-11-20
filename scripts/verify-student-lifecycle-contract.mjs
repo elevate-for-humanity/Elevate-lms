@@ -71,7 +71,9 @@ if (handoffSource) {
     failures.push('student application must retain internal and allowlisted LMS handoffs');
   }
 }
-requireText(studentForm, 'router.push(nextStepUrl)', 'student application must navigate through the validated canonical handoff');
+requireText(studentForm, 'isExternalStudentApplicationNextStep(nextStepUrl)', 'only exact allowlisted app destinations may use external navigation');
+requireText(studentForm, 'window.location.assign(nextStepUrl)', 'the allowlisted LMS handoff must navigate across application origins');
+requireText(studentForm, 'router.push(nextStepUrl)', 'the validated same-origin handoff must use the application router');
 
 requireText(submissionApi, ".from('applications')", 'application submission must persist to canonical applications table');
 requireText(submissionApi, 'provisionAccount({', 'application submission must provision the learner account through canonical provisionAccount');

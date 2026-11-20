@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { shouldSuppressIsolatedQaApprovalNotifications } from '@/lib/enrollment/qa-notification-safety';
 
 export interface PostApprovalInput {
   db: SupabaseClient;
@@ -80,7 +81,11 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
     enrollmentId,
   } = input;
 
-
+  // Disposable isolated-QA lifecycle accounts use the reserved .invalid TLD.
+  // Suppress external email and Teams delivery only when both the database host
+  // and recipient prove this is that isolated fixture. Production behavior is
+  // unchanged for every real recipient and every other Supabase project.
+  if (shouldSuppressIsolatedQaApprovalNotifications(studentEmail)) return;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const firstName = studentName?.split(' ')[0] || studentEmail.split('@')[0];

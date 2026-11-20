@@ -22,7 +22,6 @@ const roles = [
   ['instructor', 'instructor', 'Instructor'],
   ['staff', 'staff', 'Staff'],
   ['case-manager', 'case_manager', 'Case Manager'],
-  ['admin', 'admin', 'Admin'],
 ];
 
 function password() {
@@ -128,6 +127,47 @@ async function provision() {
         if (document.error)
           throw new Error(`employer document record fixture: ${document.error.message}`);
       }
+      if (kind === 'case-manager') {
+        fixture.applicationId = randomUUID();
+        const program = await db
+          .from('programs')
+          .select('id,slug')
+          .eq('slug', 'hvac-technician')
+          .maybeSingle();
+        if (program.error || !program.data?.id)
+          throw new Error(`case manager program fixture: ${program.error?.message || 'missing HVAC program'}`);
+        const manager = await db.from('case_managers').insert({
+          id: user.id,
+          name: '[QA E2E] Case Manager',
+          agency: '[QA E2E] Isolated Agency',
+          email,
+        });
+        if (manager.error) throw new Error(`case manager fixture: ${manager.error.message}`);
+        const application = await db.from('applications').insert({
+          id: fixture.applicationId,
+          first_name: 'QA',
+          last_name: 'Participant',
+          phone: '317-555-0199',
+          email: `${marker}-participant@qa.invalid`,
+          city: 'Indianapolis',
+          zip: '46204',
+          program_interest: 'HVAC Technician',
+          program_id: program.data.id,
+          program_slug: program.data.slug,
+          has_case_manager: true,
+          case_manager_agency: '[QA E2E] Isolated Agency',
+          contact_preference: 'email',
+          status: 'submitted',
+        });
+        if (application.error)
+          throw new Error(`case manager application fixture: ${application.error.message}`);
+        const assignment = await db.from('case_manager_assignments').insert({
+          application_id: fixture.applicationId,
+          case_manager_id: user.id,
+        });
+        if (assignment.error)
+          throw new Error(`case manager assignment fixture: ${assignment.error.message}`);
+      }
     }
     await writePrivateQaState(statePath, state);
     if (process.env.GITHUB_ENV) {
@@ -136,7 +176,6 @@ async function provision() {
         instructor: 'INSTRUCTOR',
         staff: 'STAFF',
         'case-manager': 'CASE_MANAGER',
-        admin: 'ADMIN',
       };
       const lines = [];
       for (const user of state.users) {
@@ -177,6 +216,19 @@ async function cleanup() {
         await db.from('employer_onboarding').delete().eq('employer_id', user.employerId);
         await db.from('employers').delete().eq('id', user.employerId).eq('owner_user_id', user.id);
       }
+    }
+    if (user.kind === 'case-manager') {
+      const assignments = await db.from('case_manager_assignments').delete().eq('case_manager_id', user.id);
+      if (assignments.error)
+        throw new Error(`case manager assignment cleanup: ${assignments.error.message}`);
+      if (user.applicationId) {
+        const application = await db.from('applications').delete().eq('id', user.applicationId);
+        if (application.error)
+          throw new Error(`case manager application cleanup: ${application.error.message}`);
+      }
+      const manager = await db.from('case_managers').delete().eq('id', user.id);
+      if (manager.error)
+        throw new Error(`case manager cleanup: ${manager.error.message}`);
     }
     await db.from('profiles').delete().eq('id', user.id);
     const removed = await db.auth.admin.deleteUser(user.id, true);

@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { siteUrls } from '../../lib/utils/site-urls';
+import { peerOrigin, usesLocalDevServer } from './helpers/app-origins';
+
+// Playwright supplies the peer LMS URL to its own Marketing dev server. A
+// separately started or deployed server uses its configured canonical LMS URL.
+const lmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL?.trim()
+  ? peerOrigin('lms')
+  : siteUrls.lms;
 import { appOrigin, usesLocalDevServer } from './helpers/app-origins';
 
 const expectedLmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL
@@ -48,6 +55,7 @@ test.describe('Canonical application flow', () => {
     await page.getByRole('link', { name: /^Host Shop/ }).click();
     await expect(page).toHaveURL(/\/partners\/host-shop\/apply/);
     await expect(page.getByRole('heading', { name: 'Become an approved apprenticeship Host Site' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${lmsOrigin}/host-shop/login`);
     await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${expectedLmsOrigin}/host-shop/login`);
     await expect(page.getByRole('checkbox', { name: 'Cosmetology Apprenticeship', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Save application and finish later' })).toBeEnabled();
@@ -105,6 +113,7 @@ test.describe('Canonical application flow', () => {
       destination = refresh![1].replace(/&amp;/g, '&');
     }
     const target = new URL(destination);
+    expect(target.origin).toBe(new URL(lmsOrigin).origin);
     expect(target.origin).toBe(new URL(expectedLmsOrigin).origin);
     expect(target.pathname).toBe('/login');
     expect(target.searchParams.get('next')).toBe('/lms');

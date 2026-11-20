@@ -12,14 +12,67 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
+import { randomUUID } from 'node:crypto';
 
 // ── Supabase service client for persistence checks ────────────────────────────
+const ISOLATED_QA_SUPABASE_HOST = 'isdgjcdabhxxozarmxta.supabase.co';
+const LIFECYCLE_QA_EMAIL_PREFIX = 'e2e-lifecycle-';
+const LIFECYCLE_QA_EMAIL_SUFFIX = '@qa.invalid';
+
 function db() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key)
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    throw new Error('Student lifecycle E2E requires a valid isolated QA Supabase URL');
+  }
+  if (host !== ISOLATED_QA_SUPABASE_HOST) {
+    throw new Error('Student lifecycle E2E refuses any Supabase project except isolated QA');
+  }
+
   return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
+
+function isLifecycleQaEmail(email?: string | null): boolean {
+  const normalized = email?.trim().toLowerCase() ?? '';
+  return (
+    normalized.startsWith(LIFECYCLE_QA_EMAIL_PREFIX) &&
+    normalized.endsWith(LIFECYCLE_QA_EMAIL_SUFFIX)
+  );
+}
+
+async function listLifecycleQaAuthUsers(client = db()) {
+  const matches: Array<{ id: string; email?: string }> = [];
+  for (let page = 1; page <= 20; page += 1) {
+    const { data, error } = await client.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw new Error(`Failed to list isolated QA Auth users: ${error.message}`);
+    const users = data?.users ?? [];
+    matches.push(
+      ...users
+        .filter((user) => isLifecycleQaEmail(user.email))
+        .map((user) => ({ id: user.id, email: user.email })),
+    );
+    if (users.length < 1000) return matches;
+  }
+  throw new Error('Isolated QA Auth cleanup exceeded its bounded pagination limit');
+}
+
+async function cleanupOrphanedLifecycleQaAuthUsers() {
+  const client = db();
+  const staleUsers = await listLifecycleQaAuthUsers(client);
+  for (const user of staleUsers) {
+    const { error } = await client.auth.admin.deleteUser(user.id);
+    if (error) throw new Error(`Failed to remove stale lifecycle QA Auth user: ${error.message}`);
+  }
+  const remaining = await listLifecycleQaAuthUsers(client);
+  if (remaining.length !== 0) {
+    throw new Error('Lifecycle QA Auth preflight cleanup left disposable users behind');
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -42,29 +95,111 @@ async function waitForContent(page: Page, selector = 'h1, h2, main') {
 }
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
-async function createTestApplication(): Promise<string> {
-  const { data, error } = await db()
+interface TestApplication {
+  id: string;
+  email: string;
+  programId: string;
+  userId?: string;
+  enrollmentId?: string;
+}
+
+async function createTestApplication(): Promise<TestApplication> {
+  const client = db();
+  const { data: program, error: programError } = await client
+    .from('programs')
+    .select('id,slug')
+    .eq('slug', 'hvac-technician')
+    .single();
+  if (programError || !program) {
+    throw new Error(`Failed to resolve the QA HVAC program: ${programError?.message}`);
+  }
+
+  const email = `e2e-lifecycle-${Date.now()}-${randomUUID()}@qa.invalid`;
+  const { data, error } = await client
     .from('applications')
     .insert({
       first_name: 'E2E',
-      last_name: 'TestApplicant',
-      email: `e2e-applicant-${Date.now()}@elevate-test.internal`,
+      last_name: 'Lifecycle',
+      email,
       phone: '555-000-0000',
       city: 'Test City',
       state: 'TX',
       zip: '75001',
       date_of_birth: '1990-01-01',
       status: 'submitted',
-      program_interest: 'HVAC',
+      program_id: program.id,
+      program_slug: program.slug,
+      program_interest: program.slug,
+      source: 'qa-admin-portal-proof',
     })
     .select('id')
     .single();
   if (error || !data) throw new Error(`Failed to create test application: ${error?.message}`);
-  return data.id;
+  return { id: data.id, email, programId: program.id };
 }
 
-async function deleteTestApplication(id: string) {
-  await db().from('applications').delete().eq('id', id);
+async function deleteTestApplication(fixture: TestApplication) {
+  const client = db();
+  let userId = fixture.userId;
+
+  if (!userId) {
+    const { data: profile, error } = await client
+      .from('profiles')
+      .select('id')
+      .eq('email', fixture.email)
+      .maybeSingle();
+    if (error) throw new Error(`Failed to resolve QA lifecycle profile: ${error.message}`);
+    userId = profile?.id;
+    if (!userId) {
+      const authUser = (await listLifecycleQaAuthUsers(client)).find(
+        (user) => user.email?.toLowerCase() === fixture.email.toLowerCase(),
+      );
+      userId = authUser?.id;
+    }
+  }
+
+  if (userId) {
+    const cleanupResults = await Promise.all([
+      client.from('course_enrollments').delete().eq('student_id', userId),
+      client
+        .from('program_enrollments')
+        .delete()
+        .eq('user_id', userId)
+        .eq('program_id', fixture.programId),
+    ]);
+    for (const result of cleanupResults) {
+      if (result.error) throw new Error(`Failed to clean QA enrollment: ${result.error.message}`);
+    }
+  }
+
+  const { error: applicationError } = await client
+    .from('applications')
+    .delete()
+    .eq('id', fixture.id);
+  if (applicationError) {
+    throw new Error(`Failed to clean QA application: ${applicationError.message}`);
+  }
+
+  if (userId) {
+    const { error: profileError } = await client.from('profiles').delete().eq('id', userId);
+    if (profileError) throw new Error(`Failed to clean QA profile: ${profileError.message}`);
+    const { error: authError } = await client.auth.admin.deleteUser(userId);
+    if (authError) throw new Error(`Failed to clean QA Auth user: ${authError.message}`);
+  }
+
+  const verification = await Promise.all([
+    client.from('applications').select('id', { count: 'exact', head: true }).eq('id', fixture.id),
+    client.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('email', fixture.email),
+    client.from('profiles').select('id', { count: 'exact', head: true }).eq('email', fixture.email),
+  ]);
+  for (const result of verification) {
+    if (result.error) throw new Error(`QA lifecycle cleanup verification failed: ${result.error.message}`);
+    if (result.count !== 0) throw new Error('QA lifecycle cleanup left disposable rows behind');
+  }
+  const remainingAuthUser = (await listLifecycleQaAuthUsers(client)).find(
+    (user) => user.email?.toLowerCase() === fixture.email.toLowerCase(),
+  );
+  if (remainingAuthUser) throw new Error('QA lifecycle cleanup left a disposable Auth user behind');
 }
 
 async function getApplicationStatus(id: string): Promise<string | null> {
@@ -77,6 +212,10 @@ async function getApplicationStatus(id: string): Promise<string | null> {
 // =============================================================================
 
 test.describe('Admin Portal — Production Proof', () => {
+  test.beforeAll(async () => {
+    await cleanupOrphanedLifecycleQaAuthUsers();
+  });
+
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
@@ -131,56 +270,79 @@ test.describe('Admin Portal — Production Proof', () => {
   });
 
   test('application approve changes status in DB and survives reload', async ({ page }) => {
-    const appId = await createTestApplication();
+    const fixture = await createTestApplication();
     try {
-      await page.goto(`/applications/review/${appId}`);
+      await page.goto(`/applications/review/${fixture.id}`);
       await waitForContent(page, 'h1, h2, [class*="rounded"]');
 
-      const approveBtn = page.locator('button', { hasText: /approve/i }).first();
-      await expect(approveBtn).toBeVisible({ timeout: 10000 });
-      await approveBtn.click();
-      await page.waitForTimeout(4000);
+      const enrollBtn = page.getByRole('button', { name: 'Enroll', exact: true });
+      await expect(enrollBtn).toBeVisible({ timeout: 10000 });
+      const approvalResponse = page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          response.url().includes(`/api/admin/applications/${fixture.id}/approve`),
+      );
+      await enrollBtn.click();
+      const response = await approvalResponse;
+      expect(response.status()).toBe(200);
+      const approval = (await response.json()) as {
+        user_id?: string;
+        enrollment_id?: string;
+      };
+      expect(approval.user_id).toBeTruthy();
+      expect(approval.enrollment_id).toBeTruthy();
+      fixture.userId = approval.user_id;
+      fixture.enrollmentId = approval.enrollment_id;
 
       // Persistence: DB row updated
-      const statusAfter = await getApplicationStatus(appId);
-      expect(['approved', 'converted', 'enrolled']).toContain(statusAfter);
+      const statusAfter = await getApplicationStatus(fixture.id);
+      expect(statusAfter).toBe('approved');
+      const { count: enrollmentCount, error: enrollmentError } = await db()
+        .from('program_enrollments')
+        .select('id', { count: 'exact', head: true })
+        .eq('id', fixture.enrollmentId!)
+        .eq('user_id', fixture.userId!)
+        .eq('program_id', fixture.programId)
+        .eq('status', 'active');
+      expect(enrollmentError).toBeNull();
+      expect(enrollmentCount).toBe(1);
 
       // Reload preserves
       await page.reload();
       await waitForContent(page, 'h1, h2, [class*="rounded"]');
-      const bodyAfter = await page.locator('body').innerText();
-      const hasApprovedState =
-        bodyAfter.includes('approved') ||
-        bodyAfter.includes('enrolled') ||
-        bodyAfter.includes('converted');
-      expect(hasApprovedState).toBe(true);
+      await expect(page.getByText(/application has been approved/i)).toBeVisible();
     } finally {
-      await deleteTestApplication(appId);
+      await deleteTestApplication(fixture);
     }
   });
 
   test('application reject changes status in DB and survives reload', async ({ page }) => {
-    const appId = await createTestApplication();
+    const fixture = await createTestApplication();
     try {
-      await page.goto(`/applications/review/${appId}`);
+      await page.goto(`/applications/review/${fixture.id}`);
       await waitForContent(page, 'h1, h2, [class*="rounded"]');
 
-      const rejectBtn = page.locator('button', { hasText: /reject/i }).first();
+      const rejectBtn = page.getByRole('button', { name: 'Reject', exact: true });
       await expect(rejectBtn).toBeVisible({ timeout: 10000 });
+      const rejectionResponse = page.waitForResponse(
+        (response) =>
+          response.request().method() === 'PATCH' &&
+          response.url().includes(`/api/admin/applications/${fixture.id}`),
+      );
       await rejectBtn.click();
-      await page.waitForTimeout(4000);
+      const response = await rejectionResponse;
+      expect(response.status()).toBe(200);
 
       // Persistence
-      const statusAfter = await getApplicationStatus(appId);
+      const statusAfter = await getApplicationStatus(fixture.id);
       expect(statusAfter).toBe('rejected');
 
       // Reload preserves
       await page.reload();
       await waitForContent(page, 'h1, h2, [class*="rounded"]');
-      const bodyAfter = await page.locator('body').innerText();
-      expect(bodyAfter).toContain('rejected');
+      await expect(page.getByText(/application has been rejected/i)).toBeVisible();
     } finally {
-      await deleteTestApplication(appId);
+      await deleteTestApplication(fixture);
     }
   });
 
@@ -225,36 +387,24 @@ test.describe('Admin Portal — Production Proof', () => {
 
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toContain('Something went wrong');
-    await expect(page.locator('h1').first()).toContainText('Reports');
+    await expect(page.getByRole('heading', { name: 'Analytics', exact: true })).toBeVisible();
 
     // Old hardcoded sentinel values must not appear
     expect(bodyText).not.toContain('CDL Prep Course');
     expect(bodyText).not.toContain('Chart visualization coming soon');
   });
 
-  // ── 5. Users: search input present and functional ─────────────────────────
-  test('users page shows live count and search filters rows', async ({ page }) => {
-    await page.goto('/users');
+  // ── 5. Students: canonical directory and audit-record navigation ─────────
+  test('student directory exposes operational and audit record views', async ({ page }) => {
+    await page.goto('/students');
     await waitForContent(page, 'h1');
 
-    await expect(page.locator('h1').first()).toContainText('User');
-
-    const searchInput = page
-      .locator(
-        'input[placeholder*="search" i], input[placeholder*="name" i], input[placeholder*="email" i]',
-      )
-      .first();
-    await expect(searchInput).toBeVisible();
-
-    const rowsBefore = await page.locator('tbody tr').count();
-    if (rowsBefore > 0) {
-      await searchInput.fill('zzz_no_match_xyz_99');
-      await page.waitForTimeout(600);
-      const rowsAfter = await page.locator('tbody tr').count();
-      const emptyState = page.locator('text=/no users|no results|0 users/i');
-      const filtered = rowsAfter < rowsBefore || (await emptyState.isVisible());
-      expect(filtered).toBe(true);
-    }
+    await expect(page.getByRole('heading', { name: 'Students', exact: true })).toBeVisible();
+    const auditRecords = page.getByRole('link', { name: /Test & audit records/ });
+    await expect(auditRecords).toBeVisible();
+    await auditRecords.click();
+    await expect(page).toHaveURL(/\/students\?include_test=1$/);
+    await expect(page.getByRole('link', { name: 'Operational records', exact: true })).toBeVisible();
   });
 
   // ── 6. Settings: real page, no fake spinner ───────────────────────────────
@@ -265,13 +415,9 @@ test.describe('Admin Portal — Production Proof', () => {
     await expect(page.locator('h1').first()).toContainText('Settings');
     await expect(page.locator('button', { hasText: /saving\.\.\./i })).not.toBeVisible();
 
-    const bodyText = await page.locator('body').innerText();
-    // Real settings page says changes are saved to DB
-    const isReal =
-      bodyText.includes('database') ||
-      bodyText.includes('saved') ||
-      bodyText.includes('immediately');
-    expect(isReal).toBe(true);
+    await expect(page.getByRole('link', { name: /General/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Security/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Integrations & Webhooks/ })).toBeVisible();
   });
 
   // ── 7. Programs View/Manage links resolve without 404 ─────────────────────

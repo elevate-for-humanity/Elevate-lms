@@ -156,7 +156,13 @@ export default async function StudentDashboard() {
     ? await loadLearnerBillingRequirement(db, subjectId)
     : null;
   const [careerMatches, careerPlan] = await Promise.all([
-    getLearnerCareerMatches(subjectId, 4),
+    getLearnerCareerMatches(subjectId, 4).catch((error) => {
+      logger.error(
+        'STUDENT_CAREER_MATCHES_FAILED',
+        error instanceof Error ? error : new Error(String(error)),
+      );
+      return null;
+    }),
     loadCareerPlan(supabase, subjectId),
   ]);
   const { data: holderStudentRows } = await db
@@ -880,7 +886,7 @@ export default async function StudentDashboard() {
                   Career Services
                 </Link>
               </div>
-              {careerMatches.length > 0 ? (
+              {careerMatches?.length ? (
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   {careerMatches.map(
                     ({ job, eligibility, reasons, missingCredentials, applyUrl, source }) => (
@@ -902,7 +908,9 @@ export default async function StudentDashboard() {
                 </div>
               ) : (
                 <div className="mt-5 rounded-xl bg-slate-50 p-5">
-                  <p className="font-bold">No current job matches.</p>
+                  <p className="font-bold">
+                    {careerMatches === null ? 'Job matches are temporarily unavailable.' : 'No current job matches.'}
+                  </p>
                   <p className="mt-1 text-sm text-slate-600">
                     Placement support and career coaching remain available.
                   </p>

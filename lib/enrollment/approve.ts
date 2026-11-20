@@ -17,6 +17,7 @@ import { attachPartnerRouting } from '@/lib/enrollment/partner-routing';
 import { cachePortalTypeForEnrollment } from '@/lib/portal/router';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 
 export interface ApproveApplicationInput {
   applicationId: string;
@@ -110,6 +111,55 @@ export async function approveApplication(
   const email = (app.email || '').trim().toLowerCase();
   if (!email) return { success: false, error: 'Application has no email' };
 
+  const resolvedProgramId = programId || app.program_id || null;
+  if (assignedRole === 'student' && !resolvedProgramId) {
+    return { success: false, error: 'Student approval requires a canonical program assignment' };
+  }
+
+  let canonicalProgramSlug: string | null = null;
+  let profileTenantId: string | null = null;
+  if (resolvedProgramId) {
+    const { data: programRow, error: programError } = await db
+      .from('programs')
+      .select('slug,tenant_id')
+      .eq('id', resolvedProgramId)
+      .maybeSingle();
+    if (programError || !programRow?.slug || !programRow?.tenant_id) {
+      logger.error(
+        '[approve] canonical program ownership resolution failed',
+        programError ? new Error(programError.message) : undefined,
+        { resolvedProgramId, applicationId },
+      );
+      return { success: false, error: 'Failed to resolve canonical program ownership' };
+    }
+    canonicalProgramSlug = programRow.slug;
+    profileTenantId = programRow.tenant_id;
+  } else if (assignedRole !== 'student') {
+    const serverUrl = resolveServerSupabaseRawEnv().url;
+    let primaryTenantSlug = 'elevate-for-humanity';
+    try {
+      if (new URL(serverUrl ?? '').hostname === 'isdgjcdabhxxozarmxta.supabase.co') {
+        primaryTenantSlug = 'elevate-lms-qa';
+      }
+    } catch {
+      // A missing or malformed URL cannot authorize an alternate tenant.
+    }
+    const { data: primaryTenant, error: primaryTenantError } = await db
+      .from('tenants')
+      .select('id')
+      .eq('slug', primaryTenantSlug)
+      .maybeSingle();
+    if (primaryTenantError || !primaryTenant?.id) {
+      logger.error(
+        '[approve] primary tenant resolution failed for nonstudent approval',
+        primaryTenantError ? new Error(primaryTenantError.message) : undefined,
+        { applicationId, assignedRole, primaryTenantSlug },
+      );
+      return { success: false, error: 'Failed to resolve authorized tenant assignment' };
+    }
+    profileTenantId = primaryTenant.id;
+  }
+
   let userId: string | null = null;
   let isNewUser = false;
   let tempPassword: string | null = null;
@@ -117,13 +167,17 @@ export async function approveApplication(
 
   const { data: existingProfile } = await db
     .from('profiles')
-    .select('id')
+    .select('id,tenant_id')
     .eq('email', email)
     .maybeSingle();
 
   if (existingProfile) {
     userId = existingProfile.id;
   } else {
+    if (!profileTenantId) {
+      return { success: false, error: 'New learner profile requires canonical tenant assignment' };
+    }
+
     const { data: listUsers } = await db.auth.admin.listUsers({ page: 1, perPage: 100 });
     const existingUser = listUsers?.users?.find(
       (u: { email?: string; id: string }) => u.email?.toLowerCase() === email,
@@ -136,9 +190,13 @@ export async function approveApplication(
         email,
         password: tempPassword,
         email_confirm: true,
+        app_metadata: {
+          tenant_id: profileTenantId,
+          role: assignedRole,
+        },
         user_metadata: {
           full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
-          role: 'student',
+          role: assignedRole,
           must_change_password: true,
         },
       });
@@ -173,6 +231,7 @@ export async function approveApplication(
         full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
         phone: app.phone,
         role: assignedRole,
+        tenant_id: profileTenantId,
       },
       { onConflict: 'id' },
     );
@@ -181,6 +240,15 @@ export async function approveApplication(
         userId,
         applicationId,
       });
+      if (isNewUser && userId) {
+        const { error: authCleanupError } = await db.auth.admin.deleteUser(userId);
+        if (authCleanupError) {
+          logger.warn(
+            `[approve] failed to remove Auth user after profile provisioning failure for application ${applicationId}`,
+            new Error(authCleanupError.message),
+          );
+        }
+      }
       return { success: false, error: 'Failed to provision learner profile' };
     }
   }
@@ -201,30 +269,14 @@ export async function approveApplication(
 
   if (!fundingType) fundingType = app.requested_funding_source || 'pending';
 
-  const resolvedProgramId = programId || app.program_id || null;
   let enrollmentId: string | null = null;
+  let resolvedProgramSlug = app.program_slug ?? app.pathway_slug ?? null;
 
   if (assignedRole === 'student') {
-    if (!resolvedProgramId) {
-      return { success: false, error: 'Student approval requires a canonical program assignment' };
-    }
-
-    let programSlug = app.program_slug ?? app.pathway_slug ?? null;
-    if (!programSlug) {
-      const { data: programRow, error: programError } = await db
-        .from('programs')
-        .select('slug')
-        .eq('id', resolvedProgramId)
-        .maybeSingle();
-      if (programError || !programRow?.slug) {
-        logger.error(
-          '[approve] canonical program slug resolution failed',
-          programError ? new Error(programError.message) : undefined,
-          { resolvedProgramId, applicationId },
-        );
-        return { success: false, error: 'Failed to resolve canonical program' };
-      }
-      programSlug = programRow.slug;
+    const studentProgramId = resolvedProgramId!;
+    const programSlug = canonicalProgramSlug!;
+    resolvedProgramSlug = programSlug;
+    if (app.program_slug !== programSlug) {
       const { error: slugUpdateError } = await db
         .from('applications')
         .update({ program_slug: programSlug })
@@ -243,7 +295,7 @@ export async function approveApplication(
       .upsert(
         {
           user_id: userId,
-          program_id: resolvedProgramId,
+          program_id: studentProgramId,
           program_slug: programSlug,
           email,
           full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
@@ -264,13 +316,13 @@ export async function approveApplication(
       logger.error(
         '[approve] canonical program enrollment failed',
         peErr ? new Error(peErr.message) : undefined,
-        { userId, resolvedProgramId, applicationId },
+        { userId, studentProgramId, applicationId },
       );
       return { success: false, error: 'Failed to create canonical program enrollment' };
     }
     enrollmentId = pe.id;
 
-    if (userId) await cachePortalTypeForEnrollment(db, userId, resolvedProgramId);
+    if (userId) await cachePortalTypeForEnrollment(db, userId, studentProgramId);
 
     // Course enrollment has one write authority: the synchronous database
     // trigger on active program_enrollments. Verify its result instead of
@@ -278,10 +330,10 @@ export async function approveApplication(
     const { data: courses, error: coursesError } = await db
       .from('lms_courses')
       .select('id,status,is_active')
-      .eq('program_id', resolvedProgramId);
+      .eq('program_id', studentProgramId);
     if (coursesError) {
       logger.error('[approve] failed to load program courses', new Error(coursesError.message), {
-        resolvedProgramId,
+        studentProgramId,
       });
       return { success: false, error: 'Failed to verify course provisioning' };
     }
@@ -297,7 +349,7 @@ export async function approveApplication(
     // additional course access is provisioned when content is released.
     if (mappedCourses.length > 0 && availableCourses.length === 0) {
       logger.info('[approve] program enrollment created; curriculum not yet published', {
-        resolvedProgramId,
+        studentProgramId,
         mappedCourseIds: mappedCourses.map((course: { id: string }) => course.id),
       });
     }
@@ -312,7 +364,7 @@ export async function approveApplication(
       if (provisionError) {
         logger.error('[approve] failed to verify course enrollments', new Error(provisionError.message), {
           userId,
-          resolvedProgramId,
+          studentProgramId,
         });
         return { success: false, error: 'Failed to verify course access' };
       }
@@ -324,7 +376,7 @@ export async function approveApplication(
       if (missingCourseIds.length > 0) {
         logger.error('[approve] database course provisioning incomplete', undefined, {
           userId,
-          resolvedProgramId,
+          studentProgramId,
           missingCourseIds,
         });
         return { success: false, error: 'Canonical course provisioning did not complete' };
@@ -376,7 +428,12 @@ export async function approveApplication(
   }
 
   const ATOMIC_SLUGS = new Set(['cna']);
-  if (ATOMIC_SLUGS.has(app.program_slug ?? '')) {
+  const routedApplication = {
+    ...app,
+    user_id: userId,
+    ...(resolvedProgramSlug ? { program_slug: resolvedProgramSlug } : {}),
+  };
+  if (ATOMIC_SLUGS.has(resolvedProgramSlug ?? '')) {
     const { data: atomicResult, error: atomicErr } = await db.rpc(
       'approve_application_and_grant_access_atomic',
       { p_application_id: applicationId, p_actor_user_id: userId },
@@ -388,17 +445,17 @@ export async function approveApplication(
       ) {
         logger.warn('[approve] atomic RPC not found — falling back to application-layer path', {
           applicationId,
-          slug: app.program_slug,
+          slug: resolvedProgramSlug,
         });
-        await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
+        await attachPartnerRouting({ db, application: routedApplication });
       } else {
-        throw new Error(`Atomic approval failed (${app.program_slug}): ${atomicErr.message}`);
+        throw new Error(`Atomic approval failed (${resolvedProgramSlug}): ${atomicErr.message}`);
       }
     } else if (atomicResult?.status === 'blocked') {
       return { success: false, error: `Approval blocked: ${(atomicResult.blockers as string[]).join(', ')}` };
     }
   } else {
-    await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
+    await attachPartnerRouting({ db, application: routedApplication });
   }
 
   try {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { evaluateBeautyPaymentGate, isBeautyApprenticeshipSlug } from '../../lib/apprenticeship/beauty-payment-gate.mjs';
+import { evaluateBeautyPaymentGate, isBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '../../lib/apprenticeship/beauty-payment-gate.mjs';
 
 const beauty = ['barber-apprenticeship','cosmetology-apprenticeship','esthetician-apprenticeship','nail-technician-apprenticeship'];
 for (const program_slug of beauty) {
@@ -50,9 +50,53 @@ test('nail technician application also gates legacy nail-tech course alias', () 
   assert.ok(evaluateBeautyPaymentGate([{ program_slug: 'nail-technician-apprenticeship' }], [], 'nail-tech-apprenticeship'));
 });
 
-test('LMS layout, apprentice dashboard, course overview and direct lesson URL enforce the gate', () => {
+
+test('admitted learner does not depend on optional application history', async () => {
+  let applicationReads = 0;
+  const db = {
+    from(table) {
+      if (table !== 'program_enrollments') {
+        applicationReads += 1;
+        throw new Error('optional applications table unavailable');
+      }
+      return {
+        select() {
+          return this;
+        },
+        or() {
+          return this;
+        },
+        limit() {
+          return Promise.resolve({
+            data: [
+              {
+                program_slug: 'hvac-technician',
+                status: 'active',
+                enrollment_state: 'active',
+                revoked_at: null,
+              },
+            ],
+            error: null,
+          });
+        },
+      };
+    },
+  };
+
+  assert.equal(await loadBeautyPaymentGate(db, 'learner-id', 'learner@example.test'), null);
+  assert.equal(applicationReads, 0);
+});
+
+test('workspace uses canonical admission while specific training routes enforce the beauty gate', () => {
+  const layout = readFileSync(
+    new URL('../../apps/lms/app/lms/(app)/layout.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(layout, /hasApprovedPaidLearnerEnrollment\(db, user\.id\)/);
+  assert.match(layout, /redirect\('\/lms\/access-pending'\)/);
+  assert.doesNotMatch(layout, /loadBeautyPaymentGate\(/);
+
   for (const path of [
-    '../../apps/lms/app/lms/(app)/layout.tsx',
     '../../apps/lms/app/apprentice/page.tsx',
     '../../apps/lms/app/lms/courses/[courseId]/page.tsx',
     '../../apps/lms/app/lms/courses/[courseId]/lessons/[lessonId]/page.tsx',

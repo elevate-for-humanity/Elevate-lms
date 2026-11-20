@@ -4,8 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { redirect } from 'next/navigation';
-import { loadBeautyPaymentGate } from '@/lib/apprenticeship/beauty-payment-gate.mjs';
-import { BeautyPaymentLock } from '@/components/apprenticeship/BeautyPaymentLock';
 import { hasApprovedPaidLearnerEnrollment } from '@/lib/learner/approved-paid-admission.mjs';
 
 export const dynamic = 'force-dynamic';
@@ -61,13 +59,11 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
     const hasReadOnlyModule =
       subject.previewing &&
       ['/lms/calendar', '/lms/assignments', '/lms/grades', '/lms/quizzes'].includes(pathname);
-    // Server-side restriction: a pending, unpaid beauty apprenticeship application
-    // may authenticate for checkout, but cannot render student modules.
-    // Existing activated enrollments and verified workforce-funded paths are retained.
-    if (user && !isAdmin && !isAdmissionRoute) {
-      const paymentGate = await loadBeautyPaymentGate(db, user.id, user.email);
-      if (paymentGate?.locked) return <BeautyPaymentLock programSlug={paymentGate.programSlug} />;
-    }
+    // The canonical paid-and-approved enrollment check above is the workspace
+    // boundary. Do not re-read optional application history after it authorizes
+    // the learner: a missing admissions-history table must not replace an
+    // approved learner's dashboard with an error page. Program-specific beauty
+    // access remains enforced at the course, lesson, and API boundaries.
     if (hasReadOnlyModule) {
       return (
         <CanonicalLearnerWorkspaceLayout showLearnerNotices={false}>

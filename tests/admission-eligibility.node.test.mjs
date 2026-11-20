@@ -8,9 +8,13 @@ import { stripTypeScriptTypes } from 'node:module';
 const source = readFileSync(new URL('../lib/enrollment/approve.ts', import.meta.url), 'utf8');
 const executable = stripTypeScriptTypes(source.replace(/^import .*;\n/gm, '')).replace(/^export /gm, '');
 const approve = new Function('logger', 'attachPartnerRouting', 'cachePortalTypeForEnrollment',
-  'ensureDigitalBinder', `${executable}\nreturn approveApplication;`)(
+  'ensureDigitalBinder', 'randomBytes', 'PLATFORM_DEFAULTS', 'resolveServerSupabaseRawEnv',
+  `${executable}\nreturn approveApplication;`)(
   { info() {}, warn() {}, error() {} }, async () => {}, async () => {},
   async () => ({ binderId: 'binder' }),
+  () => Buffer.from('0123456789abcdef'),
+  { siteUrl: 'https://example.test' },
+  () => ({ url: 'https://cuxzzpsyufcewtmicszk.supabase.co' }),
 );
 
 for (const eligibility of ['incomplete', 'conditional_review', 'eligible', 'ineligible', null]) {
@@ -28,7 +32,9 @@ for (const eligibility of ['incomplete', 'conditional_review', 'eligible', 'inel
         update(payload) { operation = payload; writes.push({ table, payload }); return query; },
         upsert() { return query; },
         maybeSingle() { return Promise.resolve({ data: table === 'applications' ? application :
-          table === 'profiles' ? { id: 'learner' } : { id: 'enrollment' }, error: null }); },
+          table === 'profiles' ? { id: 'learner', tenant_id: 'tenant' } :
+          table === 'programs' ? { slug: 'bookkeeping', tenant_id: 'tenant' } :
+          { id: 'enrollment' }, error: null }); },
         then(resolve, reject) {
           if (table === 'applications' && operation) Object.assign(application, operation);
           return Promise.resolve({ data: [], error: null }).then(resolve, reject);
@@ -46,3 +52,210 @@ for (const eligibility of ['incomplete', 'conditional_review', 'eligible', 'inel
     assert.ok(writes.some(write => write.table === 'profiles' && write.payload.enrollment_status === 'active'));
   });
 }
+
+
+test('new learner profile inherits canonical program tenant before enrollment', async () => {
+  const application = {
+    id: 'application',
+    status: 'under_review',
+    email: 'new-learner@example.test',
+    first_name: 'New',
+    last_name: 'Learner',
+    program_id: 'program',
+    program_slug: 'stale-slug',
+    funding_verified: false,
+    has_workone_approval: false,
+  };
+  const writes = [];
+  let authCreateCount = 0;
+  let authCreateInput;
+  const atomicCalls = [];
+  const db = {
+    auth: {
+      admin: {
+        async listUsers() {
+          return { data: { users: [] }, error: null };
+        },
+        async createUser(input) {
+          authCreateCount += 1;
+          authCreateInput = input;
+          return { data: { user: { id: 'new-learner' } }, error: null };
+        },
+        async generateLink() {
+          return { data: { properties: { action_link: 'https://example.test/recover' } }, error: null };
+        },
+        async deleteUser() {
+          return { error: null };
+        },
+      },
+    },
+    from(table) {
+      let operation;
+      const query = {
+        select() { return query; },
+        eq() { return query; },
+        in() { return query; },
+        limit() { return query; },
+        update(payload) {
+          operation = payload;
+          writes.push({ table, operation: 'update', payload });
+          return query;
+        },
+        upsert(payload) {
+          operation = payload;
+          writes.push({ table, operation: 'upsert', payload });
+          return query;
+        },
+        maybeSingle() {
+          if (table === 'applications') return Promise.resolve({ data: application, error: null });
+          if (table === 'profiles') return Promise.resolve({ data: null, error: null });
+          if (table === 'programs') {
+            return Promise.resolve({
+              data: { slug: 'cna', tenant_id: 'tenant-qa' },
+              error: null,
+            });
+          }
+          if (table === 'program_enrollments') {
+            return Promise.resolve({ data: { id: 'enrollment' }, error: null });
+          }
+          if (table === 'stripe_sessions_staging') {
+            return Promise.resolve({ data: null, error: null });
+          }
+          return Promise.resolve({ data: null, error: null });
+        },
+        then(resolve, reject) {
+          if (table === 'applications' && operation) Object.assign(application, operation);
+          return Promise.resolve({ data: [], error: null }).then(resolve, reject);
+        },
+      };
+      return query;
+    },
+    async rpc(name, args) {
+      atomicCalls.push({ name, args });
+      return { data: { status: 'approved' }, error: null };
+    },
+  };
+
+  const result = await approve(db, {
+    applicationId: application.id,
+    programId: 'program',
+    bypassPaymentGate: true,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(authCreateCount, 1);
+  assert.deepEqual(authCreateInput.app_metadata, {
+    tenant_id: 'tenant-qa',
+    role: 'student',
+  });
+  assert.equal(application.program_slug, 'cna');
+  assert.deepEqual(atomicCalls, [
+    {
+      name: 'approve_application_and_grant_access_atomic',
+      args: { p_application_id: application.id, p_actor_user_id: 'new-learner' },
+    },
+  ]);
+  const profileWrite = writes.find(
+    (write) => write.table === 'profiles' && write.operation === 'upsert',
+  );
+  assert.equal(profileWrite.payload.tenant_id, 'tenant-qa');
+  assert.equal(profileWrite.payload.id, 'new-learner');
+  assert.ok(
+    writes.some(
+      (write) =>
+        write.table === 'program_enrollments' &&
+        write.payload.program_id === 'program' &&
+        write.payload.user_id === 'new-learner',
+    ),
+  );
+});
+
+
+test('nonstudent approval without a program uses the authorized primary tenant', async () => {
+  const application = {
+    id: 'employer-application',
+    status: 'under_review',
+    email: 'employer@example.test',
+    first_name: 'Test',
+    last_name: 'Employer',
+    funding_verified: false,
+    has_workone_approval: false,
+  };
+  const writes = [];
+  let authCreateInput;
+  const db = {
+    auth: {
+      admin: {
+        async listUsers() {
+          return { data: { users: [] }, error: null };
+        },
+        async createUser(input) {
+          authCreateInput = input;
+          return { data: { user: { id: 'new-employer' } }, error: null };
+        },
+        async generateLink() {
+          return { data: { properties: { action_link: 'https://example.test/recover' } }, error: null };
+        },
+        async deleteUser() {
+          return { error: null };
+        },
+      },
+    },
+    from(table) {
+      let operation;
+      const query = {
+        select() { return query; },
+        eq() { return query; },
+        in() { return query; },
+        limit() { return query; },
+        update(payload) {
+          operation = payload;
+          writes.push({ table, operation: 'update', payload });
+          return query;
+        },
+        upsert(payload) {
+          operation = payload;
+          writes.push({ table, operation: 'upsert', payload });
+          return query;
+        },
+        maybeSingle() {
+          if (table === 'applications') return Promise.resolve({ data: application, error: null });
+          if (table === 'tenants') {
+            return Promise.resolve({ data: { id: 'primary-tenant' }, error: null });
+          }
+          if (table === 'profiles' || table === 'stripe_sessions_staging') {
+            return Promise.resolve({ data: null, error: null });
+          }
+          return Promise.resolve({ data: null, error: null });
+        },
+        then(resolve, reject) {
+          if (table === 'applications' && operation) Object.assign(application, operation);
+          return Promise.resolve({ data: [], error: null }).then(resolve, reject);
+        },
+      };
+      return query;
+    },
+  };
+
+  const result = await approve(db, {
+    applicationId: application.id,
+    role: 'employer',
+    bypassPaymentGate: true,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.enrollmentId, null);
+  assert.deepEqual(authCreateInput.app_metadata, {
+    tenant_id: 'primary-tenant',
+    role: 'employer',
+  });
+  const profileWrite = writes.find(
+    (write) => write.table === 'profiles' && write.operation === 'upsert',
+  );
+  assert.equal(profileWrite.payload.tenant_id, 'primary-tenant');
+  assert.equal(profileWrite.payload.role, 'employer');
+  assert.equal(
+    writes.some((write) => write.table === 'program_enrollments'),
+    false,
+  );
+});

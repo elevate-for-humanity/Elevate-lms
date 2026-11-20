@@ -450,12 +450,11 @@ REVOKE ALL ON FUNCTION public.get_my_course_pacing(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.get_my_course_pacing(uuid) TO authenticated;
 
 INSERT INTO public.courses(
-  id,program_id,slug,title,course_name,short_description,description,status,is_active,published_at,
+  id,program_id,slug,title,short_description,description,status,is_active,published_at,
   generation_status,generation_progress,review_status,category,duration_hours,total_lessons
 )
 SELECT
   'd48c61c4-8880-4d9d-9ab5-fab4dd51b201',p.id,'epa608-replacement-20261019',
-  'EPA 608 Refrigeration — Core, Types I, II & III',
   'EPA 608 Refrigeration — Core, Types I, II & III',
   'Isolated QA playback course.','Disposable browser acceptance metadata only.',
   'published'::public.course_status,true,now(),'published',100,'approved','HVAC',4,1

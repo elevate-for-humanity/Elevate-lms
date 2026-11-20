@@ -153,14 +153,17 @@ test.describe('Critical User Journeys', () => {
     test('mobile navigation works', async ({ page }) => {
       await page.goto('/');
 
-      // Open mobile menu
-      const menuButton = page.getByRole('button', { name: /menu|open/i });
-      if (await menuButton.isVisible()) {
-        await menuButton.click();
+      const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
+      await expect(menuButton).toBeEnabled();
+      await menuButton.click();
 
-        // Verify navigation links are visible
-        await expect(page.getByRole('link', { name: /programs/i })).toBeVisible();
-        await expect(page.getByRole('link', { name: /about/i })).toBeVisible();
+      const navigation = page.getByRole('navigation', { name: 'Site navigation' });
+      await expect(navigation).toBeVisible();
+      for (const [label, href] of [['Programs', '/programs'], ['About', '/about']]) {
+        const section = navigation.getByRole('button', { name: label, exact: true });
+        await section.click();
+        await expect(section).toHaveAttribute('aria-expanded', 'true');
+        await expect(navigation.locator(`a[href="${href}"]:visible`).first()).toBeVisible();
       }
     });
 
@@ -293,11 +296,11 @@ test.describe('Critical User Journeys', () => {
     test('404 page displays correctly', async ({ page }) => {
       await page.goto('/this-page-does-not-exist-12345');
 
-      // Should show 404 content
-      await expect(page.getByText(/not found|404|doesn't exist/i)).toBeVisible();
-
-      // Should have link back to home
-      await expect(page.getByRole('link', { name: /home|back/i })).toBeVisible();
+      const content = page.getByRole('main');
+      await expect(content.getByText('404 · Page unavailable', { exact: true })).toBeVisible();
+      const homeLink = content.getByRole('link', { name: 'Return to homepage', exact: true });
+      await expect(homeLink).toBeVisible();
+      await expect(homeLink).toHaveAttribute('href', '/');
     });
 
     test('form validation shows errors', async ({ page }) => {

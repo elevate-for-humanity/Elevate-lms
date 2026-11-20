@@ -73,7 +73,7 @@ test('accepts a fork browser run by source repository identity, not base API rep
     timeoutMs: 1000, pollMs: 1, sleep: async () => {},
   });
   assert.equal(result.state, 'verified');
-  assert.equal(seen.length, 3);
+  assert.equal(seen.length, 4);
 });
 
 test('non-main PR retains normal CI without requiring a main-only browser workflow', async () => {
@@ -105,4 +105,36 @@ test('retargeted main PR or a changed source identity fails closed', async () =>
     verifyExactPrBrowserEvidence({ repository, event: event('main'), token: 'test-token', request: changedFork.request }),
     /E2E_PR_HEAD_OR_BASE_CHANGED/,
   );
+});
+
+test('a PR head movement during evidence evaluation rejects previously successful browsers', async () => {
+  let prReads = 0;
+  const { request: fallback } = mockApi(pr(), run);
+  const request = url => {
+    if (new URL(url).pathname.endsWith('/pulls/123')) {
+      prReads += 1;
+      return Promise.resolve({ ok: true, json: async () =>
+        prReads === 1 ? pr() : { ...pr(), head: { ...pr().head, sha: 'b'.repeat(40) } },
+      });
+    }
+    return fallback(url);
+  };
+  await assert.rejects(verifyExactPrBrowserEvidence({
+    repository, event: event(), token: 'test-token', request,
+    timeoutMs: 1000, pollMs: 1,
+  }), /E2E_PR_HEAD_OR_BASE_CHANGED/);
+});
+
+test('truncated or unverifiable jobs total count cannot certify browser acceptance', async () => {
+  const response = async url => {
+    const path = new URL(url).pathname;
+    const data = path.endsWith('/pulls/123') ? pr()
+      : path.endsWith('/actions/runs/123/jobs') ? { jobs, total_count: jobs.length + 1 }
+      : { workflow_runs: [run] };
+    return { ok: true, json: async () => data };
+  };
+  await assert.rejects(verifyExactPrBrowserEvidence({
+    repository, event: event(), token: 'test-token', request: response,
+    timeoutMs: 1000, pollMs: 1,
+  }), /E2E_JOB_INVENTORY_INCOMPLETE/);
 });

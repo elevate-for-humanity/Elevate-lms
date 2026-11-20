@@ -15,12 +15,64 @@ import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 
 // ── Supabase service client for persistence checks ────────────────────────────
+const ISOLATED_QA_SUPABASE_HOST = 'isdgjcdabhxxozarmxta.supabase.co';
+const LIFECYCLE_QA_EMAIL_PREFIX = 'e2e-lifecycle-';
+const LIFECYCLE_QA_EMAIL_SUFFIX = '@qa.invalid';
+
 function db() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key)
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    throw new Error('Student lifecycle E2E requires a valid isolated QA Supabase URL');
+  }
+  if (host !== ISOLATED_QA_SUPABASE_HOST) {
+    throw new Error('Student lifecycle E2E refuses any Supabase project except isolated QA');
+  }
+
   return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
+
+function isLifecycleQaEmail(email?: string | null): boolean {
+  const normalized = email?.trim().toLowerCase() ?? '';
+  return (
+    normalized.startsWith(LIFECYCLE_QA_EMAIL_PREFIX) &&
+    normalized.endsWith(LIFECYCLE_QA_EMAIL_SUFFIX)
+  );
+}
+
+async function listLifecycleQaAuthUsers(client = db()) {
+  const matches: Array<{ id: string; email?: string }> = [];
+  for (let page = 1; page <= 20; page += 1) {
+    const { data, error } = await client.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw new Error(`Failed to list isolated QA Auth users: ${error.message}`);
+    const users = data?.users ?? [];
+    matches.push(
+      ...users
+        .filter((user) => isLifecycleQaEmail(user.email))
+        .map((user) => ({ id: user.id, email: user.email })),
+    );
+    if (users.length < 1000) return matches;
+  }
+  throw new Error('Isolated QA Auth cleanup exceeded its bounded pagination limit');
+}
+
+async function cleanupOrphanedLifecycleQaAuthUsers() {
+  const client = db();
+  const staleUsers = await listLifecycleQaAuthUsers(client);
+  for (const user of staleUsers) {
+    const { error } = await client.auth.admin.deleteUser(user.id);
+    if (error) throw new Error(`Failed to remove stale lifecycle QA Auth user: ${error.message}`);
+  }
+  const remaining = await listLifecycleQaAuthUsers(client);
+  if (remaining.length !== 0) {
+    throw new Error('Lifecycle QA Auth preflight cleanup left disposable users behind');
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -98,6 +150,12 @@ async function deleteTestApplication(fixture: TestApplication) {
       .maybeSingle();
     if (error) throw new Error(`Failed to resolve QA lifecycle profile: ${error.message}`);
     userId = profile?.id;
+    if (!userId) {
+      const authUser = (await listLifecycleQaAuthUsers(client)).find(
+        (user) => user.email?.toLowerCase() === fixture.email.toLowerCase(),
+      );
+      userId = authUser?.id;
+    }
   }
 
   if (userId) {
@@ -138,6 +196,10 @@ async function deleteTestApplication(fixture: TestApplication) {
     if (result.error) throw new Error(`QA lifecycle cleanup verification failed: ${result.error.message}`);
     if (result.count !== 0) throw new Error('QA lifecycle cleanup left disposable rows behind');
   }
+  const remainingAuthUser = (await listLifecycleQaAuthUsers(client)).find(
+    (user) => user.email?.toLowerCase() === fixture.email.toLowerCase(),
+  );
+  if (remainingAuthUser) throw new Error('QA lifecycle cleanup left a disposable Auth user behind');
 }
 
 async function getApplicationStatus(id: string): Promise<string | null> {
@@ -150,6 +212,10 @@ async function getApplicationStatus(id: string): Promise<string | null> {
 // =============================================================================
 
 test.describe('Admin Portal — Production Proof', () => {
+  test.beforeAll(async () => {
+    await cleanupOrphanedLifecycleQaAuthUsers();
+  });
+
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });

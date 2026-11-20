@@ -1,6 +1,8 @@
 -- Isolated QA-only structural stage for the student application lifecycle.
 -- Preconditions make this refuse production and any concurrent/partial stage.
 -- No application, enrollment, profile, course, or credit rows are inserted.
+BEGIN;
+
 DO $qa$
 BEGIN
   IF to_regclass('public.applications') IS NOT NULL THEN
@@ -158,3 +160,5 @@ COMMENT ON TABLE public.applications IS
   'Isolated QA structural contract for real-auth student lifecycle acceptance; contains no copied production rows.';
 COMMENT ON VIEW public.lms_courses IS
   'Isolated QA canonical course projection. The QA project has no legacy training_courses source.';
+
+COMMIT;

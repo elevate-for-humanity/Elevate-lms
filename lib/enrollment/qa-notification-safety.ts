@@ -1,8 +1,10 @@
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
+
 const ISOLATED_QA_SUPABASE_HOST = 'isdgjcdabhxxozarmxta.supabase.co';
 
 export function shouldSuppressIsolatedQaApprovalNotifications(
   recipient: string,
-  supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseUrl = resolveServerSupabaseRawEnv().url,
 ): boolean {
   let host: string;
   try {

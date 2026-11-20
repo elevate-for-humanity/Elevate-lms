@@ -8,7 +8,12 @@ export function invoiceBelongsToUser(
   userId: string,
   userEmail: string | null | undefined,
 ): boolean {
-  if ([userId, `user:${userId}`].includes(invoice.customer_external_key || '')) return true;
+  const key = invoice.customer_external_key || '';
+  if ([userId, `user:${userId}`].includes(key)) return true;
+
+  // An explicit Elevate account takes precedence over a legacy billing email.
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (key.startsWith('user:') || uuid.test(key)) return false;
   return Boolean(
     userEmail &&
     invoice.customer_email &&

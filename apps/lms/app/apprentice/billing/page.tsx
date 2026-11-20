@@ -144,6 +144,9 @@ function InvoiceLedger({
                 <p className="font-bold text-slate-950">
                   Invoice {invoice.invoiceNumber || invoice.id.slice(0, 8)}
                 </p>
+                    {invoice.descriptions?.length ? (
+                      <p className="text-sm text-slate-700">{invoice.descriptions.join(' · ')}</p>
+                    ) : null}
                 <p className="mt-1 text-sm text-slate-600">
                   Due {invoice.dueDate || 'now'} · {invoice.status.replace(/_/g, ' ')}
                 </p>

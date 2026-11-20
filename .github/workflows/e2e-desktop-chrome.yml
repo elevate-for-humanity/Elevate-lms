@@ -106,9 +106,16 @@ jobs:
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
+      - name: Repeat homepage readiness and error check
+        id: homepage_repeat
+        if: ${{ !inputs.authorization_only && inputs.exhaustive }}
+        run: >-
+          pnpm exec playwright test tests/e2e/complete-platform.spec.ts
+          --project=desktop-chrome --grep "no console errors on homepage"
+          --repeat-each=3 --retries=0 --output=test-results-homepage-repeat
       - name: Run focused intake and platform browser tests
         id: focused
-        if: ${{ !inputs.authorization_only && inputs.exhaustive }}
+        if: ${{ !cancelled() && !inputs.authorization_only && inputs.exhaustive && (steps.homepage_repeat.outcome == 'success' || steps.homepage_repeat.outcome == 'failure') }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report-focused
         run: >-
@@ -131,6 +138,7 @@ jobs:
             test-results/
             playwright-report-focused/
             test-results-focused/
+            test-results-homepage-repeat/
           retention-days: 14
 
   # An isolated, public-only regression must finish even if the broad

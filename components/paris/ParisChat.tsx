@@ -342,9 +342,14 @@ export default function ParisChat({
           throw new Error('PARIS unavailable');
         }
 
-        setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
+        // Guided navigation is useful during an outage, but it is not an AI reply.
+        // Do not present canned guidance as successful live PARIS inference.
+        const reply = data.mode === 'guided' || data.liveAiAvailable === false
+          ? `Live AI is temporarily unavailable. This is basic program guidance, not a live AI answer.\n\n${data.reply}`
+          : data.reply;
+        setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
         if (autoSpeak) {
-          void voice.play(plainTextForSpeech(data.reply), {
+          void voice.play(plainTextForSpeech(reply), {
             voice: 'coral',
             style: storeSurface ? 'commercial' : 'assistant',
             rate: 1,

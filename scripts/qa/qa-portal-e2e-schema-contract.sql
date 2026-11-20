@@ -445,7 +445,7 @@ BEGIN
       'published',l.is_published,'releaseWeek',1,'opensAt',now(),'available',l.is_published
     ) ORDER BY l.order_index),'[]'::jsonb) FROM public.course_lessons l WHERE l.course_id=p_course_id)
   );
-END $function$;
+END; $function$;
 REVOKE ALL ON FUNCTION public.get_my_course_pacing(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.get_my_course_pacing(uuid) TO authenticated;
 

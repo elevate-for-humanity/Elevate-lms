@@ -465,6 +465,7 @@ jobs:
     # runs must release their concurrency slot instead of queuing more work.
     if: ${{ !cancelled() }}
     steps:
+      - uses: actions/checkout@v4
       - name: Require every CI diagnostic to pass
         shell: bash
         run: |

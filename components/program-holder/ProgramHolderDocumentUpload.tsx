@@ -2,6 +2,8 @@
 import { GuidedInvoiceFields } from './GuidedInvoiceFields';
 import { FormEvent, useEffect, useState } from 'react';
 
+import { BUSINESS_REGISTRATION_GUIDANCE } from '@/lib/program-holder/document-requirements';
+
 const commonOptions = [
   ['government_id', 'Government-issued photo ID'],
   ['business_registration', 'Business registration'],
@@ -66,14 +68,14 @@ export function ProgramHolderDocumentUpload({
         setMessage(data.error || 'Upload failed.');
         return;
       }
+      if (!data.document?.id) {
+        setMessage('Could not confirm the saved document. Reload before retrying.');
+        return;
+      }
       if (isSyllabus && data.buildStarted !== true) {
         // The document write succeeded independently from the optional build.
         // Refresh the saved-document list so the holder can immediately retry
         // without uploading the same private file a second time.
-        if (!data.document?.id) {
-          setMessage('Could not confirm the saved syllabus record. Reload before retrying.');
-          return;
-        }
         setMessage('Syllabus saved. Course Builder did not start. Your document will appear below with a Retry syllabus build button.');
         window.setTimeout(() => window.location.reload(), 1800);
         return;
@@ -244,9 +246,11 @@ export function ProgramHolderDocumentUpload({
                   : selectedType === 'lab_tracker'
                     ? '.xlsx,.xls,.csv'
                     : '.xlsx,.xls,.csv,.pdf,.docx'
-              : invoiceOnly
-                ? 'application/pdf,image/jpeg,image/png'
-                : 'application/pdf,image/jpeg,image/png,video/mp4'
+              : selectedType === 'student_video'
+                ? 'video/mp4'
+                : selectedType === 'student_photo'
+                  ? 'image/jpeg,image/png'
+                  : 'application/pdf,image/jpeg,image/png'
           }
           className="min-h-11 rounded-xl border border-blue-200 bg-white p-2 text-sm"
         />}
@@ -280,6 +284,9 @@ export function ProgramHolderDocumentUpload({
           Choose the document type first. The file you attach must match that selection.
         </p>
       )}
+      {selectedType === 'business_registration' ? (
+        <p className="mt-2 text-sm text-blue-950">{BUSINESS_REGISTRATION_GUIDANCE}</p>
+      ) : null}
       {message ? (
         <p role="status" className="mt-3 text-sm font-bold text-blue-950">
           {message}

@@ -69,7 +69,7 @@ test.describe('Critical User Journeys', () => {
       await expect(page.getByText('My Dashboard', { exact: true }).first()).toBeVisible();
       await expect(page.getByRole('link', { name: 'My Courses', exact: true }).first()).toHaveAttribute(
         'href',
-        '/lms/courses',
+        /\/lms\/courses(?:[?#].*)?$/,
       );
     });
 

@@ -40,14 +40,14 @@ for (const width of [320, 390, 768, 1440]) {
     }
     const grid = home.locator('[data-featured-shops]');
     const columns = await grid.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
-    expect(columns).toBe(width >= 1024 ? 4 : 2);
+    expect(columns).toBe(width < 640 ? 1 : width < 1024 ? 2 : 3);
     expect((await grid.boundingBox())!.width).toBeLessThanOrEqual(1152);
     const boxes = await cards.evaluateAll((nodes) => nodes.map((node) => {
       const box = node.querySelector('img')!.getBoundingClientRect();
       return { width: box.width, height: box.height, left: box.left, right: box.right };
     }));
     for (const box of boxes) {
-      expect(Math.abs(box.width / box.height - 4 / 3)).toBeLessThan(0.03);
+      expect(Math.abs(box.width / box.height - 16 / 10)).toBeLessThan(0.03);
       expect(box.left).toBeGreaterThanOrEqual(0);
       expect(box.right).toBeLessThanOrEqual(width + 1);
     }
@@ -77,13 +77,17 @@ for (const route of ['/programs/hvac-technician', '/programs/cdl-training', '/pr
     await expect(page.locator('#main-content.site-main')).toBeVisible();
     await expect(page.locator('footer[data-public-footer]')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
-    const steps = page.getByRole('button', { name: 'Your 10 enrollment and completion steps' });
+    const details = page
+      .locator('details[data-responsive-details]')
+      .filter({ hasText: 'Your 10 enrollment and completion steps' })
+      .first();
     if (route.endsWith('apprenticeship')) {
-      await expect(steps).toHaveAttribute('aria-expanded', 'false');
-      await steps.click();
-      await expect(steps).toHaveAttribute('aria-expanded', 'true');
-      const panelId = await steps.getAttribute('aria-controls');
-      expect(await page.evaluate((id) => id ? document.getElementById(id)?.hidden : true, panelId)).toBe(false);
+      await expect(details).not.toHaveAttribute('open', '');
+      const summary = details.locator('summary');
+      await expect(summary).toBeVisible();
+      await summary.click();
+      await expect(details).toHaveAttribute('open', '');
+      await expect(details.locator('.responsive-details-panel')).toBeVisible();
       await expect(page.getByText('Wages and tuition are separate.', { exact: true })).toBeVisible();
     }
   });

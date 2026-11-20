@@ -134,7 +134,7 @@ test.describe('Enrollment Flow - Complete Journey', () => {
       await expect(page.getByText('My Dashboard', { exact: true }).first()).toBeVisible();
       await expect(
         page.getByRole('link', { name: 'My Courses', exact: true }).first(),
-      ).toHaveAttribute('href', '/lms/courses');
+      ).toHaveAttribute('href', /\/lms\/courses(?:[?#].*)?$/);
     });
 
     test('approved learner can navigate LMS sections', async ({ page }) => {

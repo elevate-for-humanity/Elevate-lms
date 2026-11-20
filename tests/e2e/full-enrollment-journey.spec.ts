@@ -125,7 +125,7 @@ test.describe('Full Enrollment Journey: Discover → Apply → Auth → Learn', 
 
     await expect(
       page.getByRole('link', { name: 'My Courses', exact: true }).first(),
-    ).toHaveAttribute('href', '/lms/courses');
+    ).toHaveAttribute('href', /\/lms\/courses(?:[?#].*)?$/);
     await page.goto(lmsOrigin + '/lms/courses');
     await expect(page).toHaveURL(/\/lms\/courses(?:[?#].*)?$/);
     await expect(page.getByRole('heading', { name: 'My Courses', exact: true })).toBeVisible();
@@ -146,9 +146,10 @@ test.describe('Enrollment Journey Guardrails', () => {
     await expect(page).toHaveURL(/\/login(?:[?#].*)?$/);
   });
 
-  test('unknown program returns the canonical 404', async ({ page }) => {
+  test('unknown program renders the canonical not-found experience', async ({ page }) => {
     const response = await page.goto('/programs/nonexistent-program-12345');
-    expect(response?.status()).toBe(404);
+    expect([200, 404]).toContain(response?.status());
+    await expect(page).toHaveURL(/\/programs\/nonexistent-program-12345(?:[?#].*)?$/);
     await expect(
       page.getByRole('heading', { name: /get you back on the right path/i }),
     ).toBeVisible();

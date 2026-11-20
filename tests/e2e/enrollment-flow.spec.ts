@@ -138,8 +138,13 @@ test.describe('Enrollment Flow - Complete Journey', () => {
     });
 
     test('approved learner can navigate LMS sections', async ({ page }) => {
-      await page.locator('a[href="/lms/courses"]').filter({ visible: true }).first().click();
-      await expect(page).toHaveURL(/\/lms\/courses(?:[?#].*)?$/);
+      const courses = page.getByRole('link', { name: 'My Courses', exact: true }).filter({ visible: true }).first();
+      await expect(courses).toBeVisible();
+      const target = new URL((await courses.getAttribute('href')) ?? '', lmsOrigin);
+      expect(target.origin).toBe(new URL(lmsOrigin).origin);
+      expect(target.pathname).toBe('/lms/courses');
+      await courses.click();
+      await expect(page).toHaveURL(url => url.origin === target.origin && url.pathname === '/lms/courses');
       await expect(page.getByRole('heading', { name: 'My Courses', exact: true })).toBeVisible();
     });
 

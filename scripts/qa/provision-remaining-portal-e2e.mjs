@@ -218,10 +218,17 @@ async function cleanup() {
       }
     }
     if (user.kind === 'case-manager') {
-      await db.from('case_manager_assignments').delete().eq('case_manager_id', user.id);
-      if (user.applicationId)
-        await db.from('applications').delete().eq('id', user.applicationId);
-      await db.from('case_managers').delete().eq('id', user.id);
+      const assignments = await db.from('case_manager_assignments').delete().eq('case_manager_id', user.id);
+      if (assignments.error)
+        throw new Error(`case manager assignment cleanup: ${assignments.error.message}`);
+      if (user.applicationId) {
+        const application = await db.from('applications').delete().eq('id', user.applicationId);
+        if (application.error)
+          throw new Error(`case manager application cleanup: ${application.error.message}`);
+      }
+      const manager = await db.from('case_managers').delete().eq('id', user.id);
+      if (manager.error)
+        throw new Error(`case manager cleanup: ${manager.error.message}`);
     }
     await db.from('profiles').delete().eq('id', user.id);
     const removed = await db.auth.admin.deleteUser(user.id, true);

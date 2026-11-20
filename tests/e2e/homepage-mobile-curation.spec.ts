@@ -51,16 +51,23 @@ for (const width of [320, 390, 768, 1440]) {
       expect(box.left).toBeGreaterThanOrEqual(0);
       expect(box.right).toBeLessThanOrEqual(width + 1);
     }
-    const nav = page.getByRole('navigation', { name: 'Footer apprenticeships' });
+    const details = page
+      .locator('footer details[data-responsive-details]')
+      .filter({ hasText: /^Apprenticeships/ });
+    const button = details.locator('summary');
+    const nav = details.getByRole('navigation', { name: 'Footer apprenticeships' });
+    await expect(details).toHaveCount(1);
     if (width < 768) {
-      const button = page.locator('footer summary').filter({ hasText: /^Apprenticeships$/ });
-      await expect(page.locator('footer details').filter({ has: button })).not.toHaveAttribute('open');
+      await expect(details).not.toHaveAttribute('open');
       await expect(nav).toBeHidden();
       await button.click();
+      await expect(details).toHaveAttribute('open', '');
       await expect(nav).toBeVisible();
       await button.click();
+      await expect(details).not.toHaveAttribute('open');
       await expect(nav).toBeHidden();
     } else {
+      await expect(details).toHaveAttribute('open', '');
       await expect(nav).toBeVisible();
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);

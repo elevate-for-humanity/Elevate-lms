@@ -46,34 +46,41 @@ async function expectAuthGated(page: any, path: string) {
 test.describe('Barber Apprenticeship — student flow', () => {
   test('program landing page renders with apply CTA', async ({ page }) => {
     await expectPageOk(page, '/programs/barber-apprenticeship');
-    // Heading should mention Barber
-    await expect(page.locator('h1, h2').first()).toContainText(/barber/i);
-    // Apply CTA present
-    const applyLink = page.locator('a[href*="barber-apprenticeship/apply"], a[href*="apply"]').first();
-    await expect(applyLink).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Learn the trade where the work happens.' }),
+    ).toBeVisible();
+    await expect(page.getByText('Registered Barber Apprenticeship', { exact: true })).toBeVisible();
+    const applyLink = page.getByRole('link', { name: /apply for barber apprenticeship/i });
+    await expect(applyLink).toHaveAttribute('href', '/programs/barber-apprenticeship/apply');
   });
 
-  test('apply page renders all required form fields', async ({ page }) => {
+  test('apply page exposes the three canonical application paths', async ({ page }) => {
     await expectPageOk(page, '/programs/barber-apprenticeship/apply');
-    // First/last name or full-name field
-    const nameField = page
-      .locator('input[name*="name"], input[name*="first"], input[placeholder*="name" i]')
-      .first();
-    await expect(nameField).toBeVisible();
-    // Email field
-    await expect(page.locator('input[type="email"]').first()).toBeVisible();
-    // Submit button
-    await expect(page.locator('button[type="submit"], input[type="submit"]').first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Choose the correct Barber application' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Submit Free Inquiry' })).toHaveAttribute(
+      'href',
+      '/programs/barber-apprenticeship/request-info',
+    );
+    await expect(page.getByRole('link', { name: 'Start Enrollment' })).toHaveAttribute(
+      'href',
+      '/apply/student/interview?program=barber-apprenticeship&intent=enrollment',
+    );
+    await expect(page.getByRole('link', { name: 'Start Host Site Application' })).toHaveAttribute(
+      'href',
+      '/partners/host-shop/apply?program=barber',
+    );
   });
 
-  test('apply page shows payment/deposit calculator', async ({ page }) => {
-    await page.goto(`${BASE}/programs/barber-apprenticeship/apply?type=apprentice`);
-    const depositInput = page
-      .locator('input[name="customAmount"], input[inputmode="numeric"]')
-      .first();
-    await expect(depositInput).toBeVisible();
-    await depositInput.fill('500');
-    await expect(page.locator('text=Down payment today').locator('..')).toContainText('$500');
+  test('apply page preserves payment-before-application disclosure', async ({ page }) => {
+    await expectPageOk(page, '/programs/barber-apprenticeship/apply');
+    await expect(
+      page.getByText(/server-priced \$600 minimum deposit/i),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/payment does not replace the student application/i),
+    ).toBeVisible();
   });
 
   test('apply success page renders confirmation', async ({ page }) => {
@@ -104,9 +111,12 @@ test.describe('Barber Apprenticeship — student flow', () => {
     await expectAuthGated(page, '/programs/barber-apprenticeship/payment-setup/confirm');
   });
 
-  test('enrollment-success page renders', async ({ page }) => {
-    await expectPageOk(page, '/programs/barber-apprenticeship/enrollment-success');
-    await expect(page.locator('body')).toContainText(/success|enrolled|congratul/i);
+  test('enrollment status requires the owning learner session', async ({ page }) => {
+    await page.goto(`${BASE}/programs/barber-apprenticeship/enrollment-success`);
+    await page.waitForURL(/\/login\?/);
+    const destination = new URL(page.url()).searchParams.get('redirect');
+    expect(destination).toBe('/programs/barber-apprenticeship/enrollment-success');
+    await expect(page.locator('input[type="email"]').first()).toBeVisible();
   });
 });
 
@@ -114,7 +124,7 @@ test.describe('Barber Apprenticeship — student flow', () => {
 // 2. BEAUTY APPRENTICESHIPS — canonical PARIS application + payments
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('Beauty apprenticeships — PARIS, calculator, and BNPL', () => {
+test.describe('Beauty apprenticeships — canonical checkout handoff', () => {
   const programs = [
     { slug: 'cosmetology-apprenticeship', label: 'Cosmetology' },
     { slug: 'esthetician-apprenticeship', label: 'Esthetician' },
@@ -122,21 +132,25 @@ test.describe('Beauty apprenticeships — PARIS, calculator, and BNPL', () => {
   ];
 
   for (const { slug, label } of programs) {
-    test(`${label} application uses PARIS and published payment options`, async ({ page, request }) => {
+    test(`${label} application preserves the paid-enrollment boundary`, async ({ page, request }) => {
       const response = await page.goto(`${BASE}/programs/${slug}/apply`);
       expect(response?.status() ?? 200).toBeLessThan(500);
-      // The apply route is a choice page (inquiry / enrollment / host site); enrollment goes to PARIS.
-      await page.getByRole('link', { name: /start enrollment application/i }).click();
-      await page.waitForURL(new RegExp(`/apply/student/interview\\?program=${slug}&intent=enrollment$`));
 
+      const enrollmentLink = page.getByRole('link', { name: /start enrollment application/i });
+      await expect(enrollmentLink).toHaveAttribute(
+        'href',
+        `/apply/student/interview?program=${slug}&intent=enrollment`,
+      );
       await expect(
-        page.getByRole('heading', { name: /payment calculator, bnpl, and coupon code/i }),
+        page.getByText(/the enrollment application requires verified payment before it can be submitted/i),
       ).toBeVisible();
-      await expect(page.getByText('Payment Calculator', { exact: true })).toBeVisible();
-      await expect(page.getByText(/may appear when the transaction is eligible and enabled in Stripe/i)).toBeVisible();
-      await expect(
-        page.locator('textarea[aria-label*="answer" i], textarea[placeholder*="answer" i]').first(),
-      ).toBeVisible();
+
+      const unpaidHandoff = await request.get(
+        `${BASE}/apply/student/interview?program=${slug}&intent=enrollment`,
+        { failOnStatusCode: false, maxRedirects: 0 },
+      );
+      expect([307, 308]).toContain(unpaidHandoff.status());
+      expect(unpaidHandoff.headers().location).toBe(`/enroll/${slug}`);
 
       const pricing = await request.get(`${BASE}/api/programs/pricing?slug=${slug}`, {
         failOnStatusCode: false,
@@ -351,60 +365,40 @@ test.describe('Partner dashboard — auth-gated portal', () => {
 // 8. COSMETOLOGY API — payment routes
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('Cosmetology payment API — auth + validation', () => {
-  test('setup-intent rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/cosmetology/setup-intent`, {
-      data: { enrollmentId: 'fake-id' },
-      failOnStatusCode: false,
+test.describe('Retired cosmetology payment routes', () => {
+  for (const path of [
+    '/api/cosmetology/setup-intent',
+    '/api/cosmetology/activate-subscription',
+    '/api/cosmetology/checkout/embedded',
+  ]) {
+    test(`${path} stays retired`, async ({ request }) => {
+      const res = await request.post(`${BASE}${path}`, {
+        data: {},
+        failOnStatusCode: false,
+      });
+      expect(res.status()).toBe(404);
     });
-    expect([401, 403]).toContain(res.status());
-  });
-
-  test('activate-subscription rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/cosmetology/activate-subscription`, {
-      data: { subscriptionId: 'fake-id' },
-      failOnStatusCode: false,
-    });
-    expect([401, 403]).toContain(res.status());
-  });
-
-  test('checkout/embedded rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/cosmetology/checkout/embedded`, {
-      data: { enrollmentId: 'fake-id' },
-      failOnStatusCode: false,
-    });
-    expect([401, 403]).toContain(res.status());
-  });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 9. BARBER PAYMENT API — auth + validation
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('Barber payment API — auth + validation', () => {
-  test('setup-intent rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/barber/setup-intent`, {
-      data: { enrollmentId: 'fake-id' },
-      failOnStatusCode: false,
+test.describe('Retired Barber payment routes', () => {
+  for (const path of [
+    '/api/barber/setup-intent',
+    '/api/barber/activate-subscription',
+    '/api/barber/update-payment',
+  ]) {
+    test(`${path} stays retired`, async ({ request }) => {
+      const res = await request.post(`${BASE}${path}`, {
+        data: {},
+        failOnStatusCode: false,
+      });
+      expect(res.status()).toBe(404);
     });
-    expect([401, 403]).toContain(res.status());
-  });
-
-  test('activate-subscription rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/barber/activate-subscription`, {
-      data: { subscriptionId: 'fake-id' },
-      failOnStatusCode: false,
-    });
-    expect([401, 403]).toContain(res.status());
-  });
-
-  test('update-payment rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post(`${BASE}/api/barber/update-payment`, {
-      data: { paymentMethodId: 'pm_fake' },
-      failOnStatusCode: false,
-    });
-    expect([401, 403]).toContain(res.status());
-  });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -412,12 +406,12 @@ test.describe('Barber payment API — auth + validation', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 test.describe('Apprenticeship API — auth + validation', () => {
-  test('hours submission rejects unauthenticated POST', async ({ request }) => {
+  test('retired marketing hours proxy stays unavailable', async ({ request }) => {
     const res = await request.post(`${BASE}/api/apprenticeship/hours`, {
       data: { hoursWorked: 8, date: '2026-05-15' },
       failOnStatusCode: false,
     });
-    expect([401, 403]).toContain(res.status());
+    expect(res.status()).toBe(404);
   });
 
   test('hours approve rejects unauthenticated POST', async ({ request }) => {

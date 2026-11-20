@@ -82,6 +82,7 @@ test.describe('Homepage responsive acceptance', () => {
 
     const menu = page.getByRole('button', { name: 'Open menu', exact: true });
     await expect(menu).toBeVisible();
+    await expect(menu).toBeEnabled();
     await menu.focus();
     await page.keyboard.press('Enter');
 
@@ -92,13 +93,16 @@ test.describe('Homepage responsive acceptance', () => {
     await page.keyboard.press('Enter');
     await expect(programs).toHaveAttribute('aria-expanded', 'true');
 
-    const footerApprenticeships = page
-      .locator('footer summary')
-      .filter({ hasText: /^Apprenticeships$/ });
+    const footerDetails = page
+      .locator('footer details[data-responsive-details]')
+      .filter({ hasText: /^Apprenticeships/ });
+    const footerApprenticeships = footerDetails.locator('summary');
+    await expect(footerDetails).toHaveCount(1);
     await footerApprenticeships.focus();
     await page.keyboard.press('Enter');
+    await expect(footerDetails).toHaveAttribute('open', '');
     await expect(
-      page.getByRole('navigation', { name: 'Footer apprenticeships' }),
+      footerDetails.getByRole('navigation', { name: 'Footer apprenticeships' }),
     ).toBeVisible();
   });
 
@@ -106,7 +110,9 @@ test.describe('Homepage responsive acceptance', () => {
     await page.goto('/');
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-    const images = page.getByRole('img');
+    // SVG icons may expose role=img without accepting HTML alt text. Audit the
+    // actual <img> elements whose accessible-name contract is alt/aria-hidden.
+    const images = page.locator('img');
     const count = await images.count();
     for (let index = 0; index < count; index += 1) {
       const image = images.nth(index);

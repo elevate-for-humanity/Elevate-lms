@@ -37,7 +37,7 @@ test.describe('Enrollment Flow - Complete Journey', () => {
       await dismissCookiePreferences(page);
 
       const programs = page
-        .getByRole('link', { name: 'Browse training programs', exact: true })
+        .getByRole('link', { name: 'Explore Career Training', exact: true })
         .first();
       await expect(programs).toHaveAttribute('href', '/programs');
       await programs.click();
@@ -190,14 +190,15 @@ test.describe('Enrollment Flow - Complete Journey', () => {
       await expect(footer.locator('a[href="/contact"]').first()).toBeVisible();
     });
 
-    test('breadcrumbs show on program pages', async ({ page }) => {
+    test('program page exposes canonical enrollment navigation', async ({ page }) => {
       await page.goto('/programs/barber-apprenticeship');
 
-      const breadcrumb = page.getByRole('navigation', { name: /breadcrumb/i });
-      await expect(breadcrumb.getByRole('link', { name: 'Programs', exact: true })).toHaveAttribute(
-        'href',
-        '/programs',
-      );
+      await expect(
+        page.getByRole('link', { name: 'Apply for Barber Apprenticeship', exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: 'Explore Host Shops', exact: true }),
+      ).toHaveAttribute('href', '/programs/barber-apprenticeship/host-shops');
     });
 
     test('canonical homepage links return non-error responses', async ({ page }) => {

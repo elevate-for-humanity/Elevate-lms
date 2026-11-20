@@ -88,6 +88,23 @@ class RepairTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'existing_pwa_devices'):
             m.require_idle('0 active calls\n', '', [{'device': 'existing'}])
 
+    def test_expired_unregistered_devices_may_be_invalidated_by_existing_cleanup(self):
+        endpoint = 'pwa-' + 'a' * 40
+        records = [{'endpointId': endpoint, 'expiresAt': 999}]
+        endpoints = 'Endpoint: ' + endpoint + '/Unavailable'
+        empty_aor = 'Aor:  ' + endpoint[:41] + ' 1\n  Contact: <Aor/ContactUri>\n'
+        m.require_idle('0 active calls', endpoints, records,
+                       inspect_aor=lambda _: empty_aor, now_ms=1000)
+        for observed, lease, aor in [
+            (endpoints, [{**records[0], 'expiresAt': 1001}], empty_aor),
+            (endpoints, records, empty_aor + 'Contact: ' + endpoint + '/sip:device Unavail'),
+            (endpoints, records, 'No objects found'),
+            (endpoints + '\nEndpoint: pwa-' + 'b' * 40, records, empty_aor),
+        ]:
+            with self.assertRaisesRegex(ValueError, 'existing_pwa_devices'):
+                m.require_idle('0 active calls', observed, lease,
+                               inspect_aor=lambda _: aor, now_ms=1000)
+
     def test_unreviewed_source_blocks_before_service_mutation(self):
         self.source.write_bytes(b'unreviewed')
         with self.assertRaisesRegex(ValueError, 'source_requires_review'):

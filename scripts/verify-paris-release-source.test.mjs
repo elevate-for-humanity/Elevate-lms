@@ -33,3 +33,21 @@ test('reviewed tax-page revision adds only the Supersonic install manifest and r
   assert.equal(digest(original), entry.sourceSha256);
   assert.match(entry.localRevisionReason, /#2159/);
 });
+
+test('public PARIS loads canonical runtime credentials before checking AI availability', () => {
+  const source = readFileSync(new URL('../apps/marketing/app/api/ai-chat/route.ts', import.meta.url), 'utf8');
+  const hydrate = source.indexOf('await hydrateProcessEnv();');
+  const availability = source.indexOf('if (!isAIAvailable())', hydrate);
+  assert.ok(hydrate > 0 && availability > hydrate, 'Marketing must hydrate first');
+  assert.match(source, /mode: 'ai', liveAiAvailable: true/);
+  assert.match(source, /mode: 'guided', liveAiAvailable: false/);
+  assert.match(source, /code: 'PARIS_AI_UNAVAILABLE'/);
+  assert.match(source, /status: 503/);
+});
+
+test('public PARIS labels guided fallback instead of masquerading as a live AI response', () => {
+  const source = readFileSync(new URL('../components/paris/ParisChat.tsx', import.meta.url), 'utf8');
+  assert.match(source, /data\.mode === 'guided' \|\| data\.liveAiAvailable === false/);
+  assert.match(source, /This is basic program guidance, not a live AI answer/);
+  assert.match(source, /if \(!response\.ok && response\.status === 503/);
+});

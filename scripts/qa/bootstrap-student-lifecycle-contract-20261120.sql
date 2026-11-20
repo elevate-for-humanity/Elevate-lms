@@ -48,7 +48,7 @@ CREATE TABLE public.applications (
   created_at timestamptz DEFAULT now(),
   employer_sponsor_id uuid,
   submit_token uuid DEFAULT gen_random_uuid(),
-  program_id uuid,
+  program_id uuid REFERENCES public.programs(id),
   user_id uuid,
   pathway_slug text,
   source text DEFAULT 'direct',

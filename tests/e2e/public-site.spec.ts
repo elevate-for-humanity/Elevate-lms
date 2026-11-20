@@ -81,7 +81,10 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
 
   await page.waitForLoadState('networkidle').catch(() => undefined);
 
-  const body = (await page.locator('body').textContent()) ?? '';
+  // innerText excludes embedded scripts. The application shell intentionally
+  // contains chunk-recovery source code whose text includes "ChunkLoadError";
+  // that source is not a rendered failure and must not trip the visible-page check.
+  const body = await page.locator('body').innerText();
   expect(body.trim().length, `${route} rendered an empty body`).toBeGreaterThan(80);
   expect(body, `${route} rendered an application exception`).not.toMatch(
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,

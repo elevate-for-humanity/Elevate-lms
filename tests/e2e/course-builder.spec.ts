@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * E2E tests for AutomaticCourseBuilder — UUID resolution and redirect.
@@ -14,7 +14,23 @@ import { test, expect } from '@playwright/test';
 const VALID_UUID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 const COURSE_BUILDER_PATH = '/admin/lms/courses/new';
 
+async function loginAsAdmin(page: Page) {
+  const email = process.env.TEST_ADMIN_EMAIL;
+  const password = process.env.TEST_ADMIN_PASSWORD;
+  if (!email || !password) throw new Error('TEST_ADMIN_EMAIL / TEST_ADMIN_PASSWORD not set');
+
+  await page.goto('/login');
+  await page.locator('input[type="email"]').fill(email);
+  await page.locator('input[type="password"]').fill(password);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 30_000 });
+}
+
 test.describe('AutomaticCourseBuilder — UUID resolution', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsAdmin(page);
+  });
+
   // Intercept all upstream AI generation endpoints so the builder can reach
   // the final save step without a real OpenAI key.
   async function mockAiEndpoints(page: import('@playwright/test').Page) {

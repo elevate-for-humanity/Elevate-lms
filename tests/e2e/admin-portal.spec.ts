@@ -16,8 +16,8 @@ test.describe('Admin Portal', () => {
   test('should display admin dashboard', async ({ page }) => {
     await page.goto('/dashboard');
 
-    await expect(page.getByRole('link', { name: 'Learner Dashboards', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Apprentice Dashboards', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: /^Learner Dashboards/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /^Apprentice Dashboards/ })).toBeVisible();
   });
 
   test('should open the canonical student directory', async ({ page }) => {

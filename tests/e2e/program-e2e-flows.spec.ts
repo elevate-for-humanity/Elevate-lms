@@ -155,7 +155,8 @@ test.describe('Beauty apprenticeships — canonical checkout handoff', () => {
       });
       expect(pricing.status(), `${slug} pricing endpoint`).toBe(200);
       const body = await pricing.json();
-      expect(Number(body.tuitionCents ?? body.priceCents ?? 0)).toBeGreaterThan(0);
+      expect(body.program_slug).toBe(slug);
+      expect(Number(body.tuition_cents ?? 0)).toBeGreaterThan(0);
     });
   }
 });

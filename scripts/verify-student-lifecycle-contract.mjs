@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { stripTypeScriptTypes } from 'node:module';
 
 const root = process.cwd();
 const failures = [];
@@ -52,8 +53,24 @@ for (const path of [
 requireText(studentForm, "fetch('/api/applications'", 'student application must submit through canonical /api/applications');
 requireText(studentForm, "'X-Idempotency-Key': idempotencyKey", 'student application must preserve idempotent submission');
 requireText(studentForm, 'const nextStepUrl =', 'student application must resolve its canonical post-submission handoff');
-requireText(studentForm, "data.nextStepUrl.startsWith('/')", 'student application must limit API-provided handoffs to internal routes');
-requireText(studentForm, ': `/apply/success${suffix}`;', 'student application must retain the canonical success-route fallback');
+requireText(studentForm, 'safeStudentApplicationNextStep(data.nextStepUrl, `/apply/success${suffix}`)', 'student application must validate its handoff and retain the canonical success-route fallback');
+
+const handoffSource = read('lib/enrollment/paid-admission-response.ts');
+if (handoffSource) {
+  const module = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(handoffSource)).toString('base64'));
+  const fallback = '/apply/success?ref=fixture';
+  const external = 'https://app.elevateforhumanity.org/lms/access-pending';
+  for (const candidate of [undefined, 'https://example.org/', '//example.org/', '/%2fexample.org/', '/%5cexample.org/']) {
+    if (module.safeStudentApplicationNextStep(candidate, fallback) !== fallback) {
+      failures.push('student application must reject unsafe handoffs and keep its success-route fallback');
+    }
+  }
+  if (module.safeStudentApplicationNextStep('/apply/track', fallback) !== '/apply/track' ||
+      module.safeStudentApplicationNextStep(external, fallback) !== external ||
+      !module.isExternalStudentApplicationNextStep(external)) {
+    failures.push('student application must retain internal and allowlisted LMS handoffs');
+  }
+}
 requireText(studentForm, 'router.push(nextStepUrl)', 'student application must navigate through the validated canonical handoff');
 
 requireText(submissionApi, ".from('applications')", 'application submission must persist to canonical applications table');

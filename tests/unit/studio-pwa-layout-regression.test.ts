@@ -35,6 +35,18 @@ describe('Studio, Course Builder and PWA layout regression', () => {
     expect(composer).toMatch(/font-size:\s*max\(1\.25rem,\s*20px\)\s*!important\s*;/);
     expect(styles.match(/font-size:[^;]+!important/g)).toHaveLength(1);
   });
+  it('keeps the Studio secure-browser input above the Admin mobile zoom guard', () => {
+    const globals = source('apps/admin/app/globals.css');
+    const browser = source('components/studio/CloudBrowserWorkspace.tsx');
+    const styles = source('components/studio/CloudBrowserWorkspace.module.css');
+    const mobileGuard = globals.match(/@media\s*\(max-width:\s*1024px\)\s*\{\s*input\[type='text'\][\s\S]*?input\[type='password'\][\s\S]*?font-size:\s*16px\s*!important/);
+    expect(mobileGuard).not.toBeNull();
+    expect(browser).toContain('aria-label="Secure browser input"');
+    expect(browser).toContain('className={`${styles.secureInput} ');
+    const secureInput = styles.match(/\.root\s+\.secureInput\s*\{([^}]+)\}/)?.[1] || '';
+    expect(secureInput).toMatch(/font-size:\s*max\(1\.25rem,\s*20px\)\s*!important\s*;/);
+    expect(styles.match(/font-size:[^;]+!important/g)).toHaveLength(1);
+  });
   it('respects narrow screens without forcing a second column or oversized tool typography', () => {
     const studio = source('components/studio/StudioCommandWorkspace.tsx');
     const course = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');

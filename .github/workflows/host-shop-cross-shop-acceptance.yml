@@ -124,6 +124,7 @@ jobs:
         id: provision
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs provision
       - name: Certify authenticated roster and cross-shop API isolation
+        id: browser
         run: >-
           pnpm exec playwright test tests/e2e/host-shop-cross-shop-production.spec.ts
           --config playwright.config.ts --reporter=line
@@ -143,16 +144,36 @@ jobs:
             console.log("Authenticated isolation validated on exact serving SHA:",j.commit);
           '
       - name: Remove disposable match requests, shops, placements, and QA users
+        id: cleanup
         # A pre-provision failure has no fixtures; avoid masking the original error
         # with an import failure when pnpm install never ran. Cancellation can leave
         # partial fixtures too, so clean up every started provisioning outcome.
         if: ${{ always() && (steps.provision.outcome == 'success' || steps.provision.outcome == 'failure' || steps.provision.outcome == 'cancelled') }}
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs cleanup
-      - name: Upload redacted Playwright failure evidence
+      # Playwright screenshots, videos, traces and error contexts can contain
+      # authenticated browser state. Never upload the raw test-results directory.
+      - name: Prepare metadata-only Host Shop failure record
+        if: failure()
+        shell: bash
+        env:
+          BROWSER_OUTCOME: ${{ steps.browser.outcome }}
+          CLEANUP_OUTCOME: ${{ steps.cleanup.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p qa-safe-failure
+          {
+            printf 'run_id=%s\n' "$GITHUB_RUN_ID"
+            printf 'workflow_sha=%s\n' "$GITHUB_SHA"
+            printf 'attested_release_sha=%s\n' "${QA_EXPECTED_MAIN_SHA:-not_verified}"
+            printf 'browser_test_outcome=%s\n' "${BROWSER_OUTCOME:-not_run}"
+            printf 'fixture_cleanup_outcome=%s\n' "${CLEANUP_OUTCOME:-not_run}"
+            printf 'workflow_outcome=failed\n'
+            printf 'browser_artifacts=not_uploaded\n'
+          } > qa-safe-failure/summary.txt
+      - name: Upload metadata-only Host Shop failure record
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: host-shop-cross-shop-qa-failure
-          path: |
-            test-results/
+          path: qa-safe-failure/summary.txt
           retention-days: 7

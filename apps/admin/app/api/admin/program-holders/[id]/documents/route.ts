@@ -8,6 +8,8 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const TYPES = new Set([
   'government_id',
+  'business_registration',
+  'w9',
   'insurance',
   'epa_608',
   'state_program_approval',
@@ -31,7 +33,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!holder?.user_id)
     return NextResponse.json({ error: 'Program Holder not found.' }, { status: 404 });
 
-  const form = await request.formData();
+  const form = await request.formData().catch(() => null);
+  if (!form) return NextResponse.json({ error: 'Submit a valid file upload.' }, { status: 400 });
   const file = form.get('file');
   const documentType = String(form.get('documentType') || '');
   if (!(file instanceof File) || !TYPES.has(documentType))

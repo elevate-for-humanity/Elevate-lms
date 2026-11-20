@@ -120,6 +120,9 @@ RUN echo "LMS Build SHA: ${NF_GIT_SHA}" && \
 
 RUN pnpm run build:lms:compile --no-lint
 
+# PDF.js loads canvas dynamically, outside the standalone dependency trace.
+RUN EXPORT_ROOT=/export node scripts/export-admin-pdf-deps.mjs
+
 RUN echo "=== STANDALONE STRUCTURE ===" && \
     if [ -d "/app/apps/lms/.next/standalone" ]; then \
         find /app/apps/lms/.next/standalone -maxdepth 4 -type f | sort; \
@@ -169,6 +172,10 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 WORKDIR /app
 
 COPY --from=builder /app/apps/lms/.next/standalone ./
+COPY --from=builder /export/pdf-node_modules/ ./node_modules/
+
+# Exercise the same Node ESM import used for Program Holder syllabus uploads.
+RUN node --input-type=module -e "const { PDFParse } = await import('pdf-parse'); if (typeof PDFParse !== 'function' || typeof globalThis.DOMMatrix !== 'function') throw new Error('LMS syllabus PDF runtime is incomplete');"
 
 RUN echo "=== RUNTIME VERIFICATION ===" && \
     if [ -f "/app/server.js" ]; then \

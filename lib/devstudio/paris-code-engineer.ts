@@ -506,6 +506,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       } catch (error) {
         if (!(error instanceof Error) || error.message !== 'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE') throw error;
         await checkpoint();
+        logger.warn('[PARIS] repair inference deferred', {
+          repairId: taskId,
+          turn: turn + 1,
+          reason: 'reason' in error ? error.reason : 'unknown',
+        });
         return NextResponse.json({error:'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE',
           branch:{name:branch},changed_files:[...changedFiles],observations:observations.slice(-6)}, {status:503});
       }
@@ -535,7 +540,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
         // continue through the normal allowlisted read/list workflow.
         if (!Array.isArray(tree.tree)) throw Error('PARIS_REPAIR_SOURCE_TREE_INVALID');
         if (tree.truncated === true) observations.push('SOURCE_TREE_TRUNCATED: using partial authenticated paths; continue with targeted list/read.');
-        const paths = suggestedSourcePaths(task, tree.tree, task + JSON.stringify(sourceEvidence ?? {}));
+        // Filter spent reads before the ranker's cap so they cannot displace
+        // fresh candidates from the authenticated tree.
+        const unreadTree = tree.tree.filter((entry: { path: string }) =>
+          checkInspectionBudget(inspectionHistory, {type:'read',path:entry.path}).decision === 'inspect');
+        const paths = suggestedSourcePaths(task, unreadTree, task + JSON.stringify(sourceEvidence ?? {}));
         discoveredFiles = rememberSourcePaths(discoveredFiles, paths);
         recovered = recoverRepeatedInspection(inspectionHistory, action, observations, discoveredFiles, task);
         // A truncated inventory can contain no unread relevant files. Recover

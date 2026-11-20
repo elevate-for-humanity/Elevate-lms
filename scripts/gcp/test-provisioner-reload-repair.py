@@ -70,6 +70,14 @@ class RepairTests(unittest.TestCase):
         self.assertEqual((m.BACKUPS / ('provisioner-' + self.revision) / 'server.mjs').read_bytes(), self.old)
         self.assertFalse(any('restart' in command for command in self.commands))
 
+    def test_already_installed_never_stops_service_during_calls(self):
+        m.TARGET.write_bytes(self.new)
+        self.calls = '1 active call\n'
+        report = m.repair(self.source, self.revision)
+        self.assertFalse(report['changed'])
+        self.assertFalse(m.BACKUPS.exists())
+        self.assertNotIn(['systemctl', 'stop', m.UNIT], self.commands)
+
     def test_failed_start_restores_previous_source_and_listener(self):
         self.start_failure = True
         with self.assertRaisesRegex(ValueError, 'upgrade_rolled_back'):

@@ -48,6 +48,16 @@ class IncludeTests(unittest.TestCase):
         result=m.repair('a'*40)
         self.assertFalse(result['changed'])
         self.assertFalse(any('module reload res_pjsip.so' in c for c in self.commands))
+    def test_existing_includes_take_no_mutation_path_even_during_calls(self):
+        self.calls='1 active call\n'
+        for name,target in m.TARGETS.items():
+            (m.BASE/name).write_bytes(self.original[name] + ('#tryinclude "'+target+'"\n').encode())
+        before = {name: (m.BASE/name).read_bytes() for name in m.TARGETS}
+        self.assertFalse(m.repair('a'*40)['changed'])
+        self.assertEqual({name: (m.BASE/name).read_bytes() for name in m.TARGETS}, before)
+        self.assertFalse(m.BACKUPS.exists())
+        self.assertFalse(any('reload' in part for command in self.commands for part in command))
+
     def test_reload_failure_restores_exact_original_config(self):
         self.fail_reload=True
         with self.assertRaisesRegex(ValueError,'pwa_includes_rolled_back'):

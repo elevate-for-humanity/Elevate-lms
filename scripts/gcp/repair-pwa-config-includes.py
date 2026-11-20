@@ -70,16 +70,6 @@ def repair(revision):
     if not re.fullmatch('[a-f0-9]{40}', revision):
         raise ValueError('source_revision_unverified')
     cli = lambda command: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', command])
-    calls, endpoints = cli('core show channels count'), cli('pjsip show endpoints')
-    if ERRORS.search(calls) or ERRORS.search(endpoints):
-        raise ValueError('asterisk_command_unverified')
-    if not re.search(r'^0 active calls?\s*$', calls, re.M):
-        raise ValueError('active_call_or_unverified_state')
-    if re.search(r'^\s*Endpoint:\s+pwa-[a-f0-9]+', endpoints, re.M):
-        raise ValueError('existing_pwa_endpoints_require_review')
-    state = BASE / 'elevate-webrtc/current/state.json'
-    if state.exists() and json.loads(state.read_text()) != []:
-        raise ValueError('existing_pwa_devices_require_review')
     mounts = json.loads(run(['docker', 'inspect', 'pbx_asterisk_1', '--format', '{{json .Mounts}}']))
     if not any(m.get('Type') == 'bind' and m.get('Source') == str(BASE) and m.get('Destination') == '/etc/asterisk' for m in mounts):
         raise ValueError('asterisk_mount_unverified')
@@ -92,6 +82,16 @@ def repair(revision):
     missing = [name for name, present in before.items() if not present]
     if not missing:
         return {'result': 'PASS', 'changed': False, 'generatedIncludesVerified': True, 'carrierRoutingChanged': False}
+    calls, endpoints = cli('core show channels count'), cli('pjsip show endpoints')
+    if ERRORS.search(calls) or ERRORS.search(endpoints):
+        raise ValueError('asterisk_command_unverified')
+    if not re.search(r'^0 active calls?\s*$', calls, re.M):
+        raise ValueError('active_call_or_unverified_state')
+    if re.search(r'^\s*Endpoint:\s+pwa-[a-f0-9]+', endpoints, re.M):
+        raise ValueError('existing_pwa_endpoints_require_review')
+    state = BASE / 'elevate-webrtc/current/state.json'
+    if state.exists() and json.loads(state.read_text()) != []:
+        raise ValueError('existing_pwa_devices_require_review')
     backup = BACKUPS / ('pwa-includes-' + revision)
     backup.mkdir(parents=True, mode=0o700, exist_ok=False)
     originals = {name: ((BASE / name).read_bytes(), (BASE / name).stat()) for name in missing}

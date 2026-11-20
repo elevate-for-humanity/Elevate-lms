@@ -39,7 +39,7 @@ export function SupportForm({ defaultSubject = '' }: SupportFormProps) {
       if (!res.ok || result?.success !== true) {
         throw new Error(
           res.status === 401
-            ? 'Your session expired. Sign in again to report this issue. Your message has been kept.'
+            ? 'Your session expired. Sign in again to report this issue. Copy your message before leaving this page; it will not be saved.'
             : result?.error ||
               'The support service could not confirm your report. Your message has been kept; please retry.',
         );

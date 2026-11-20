@@ -78,13 +78,24 @@ export async function verifyExactPrBrowserEvidence({
     let jobs = null;
     if (candidates[0]?.status === 'completed' && candidates[0]?.conclusion === 'success') {
       const response = await api('/actions/runs/' + candidates[0].id + '/jobs?per_page=100');
-      if (!Array.isArray(response.jobs) || response.total_count > 100) throw Error('E2E_JOB_INVENTORY_INCOMPLETE');
+      if (!Array.isArray(response.jobs) || !Number.isSafeInteger(response.total_count) ||
+          response.total_count < 0 || response.total_count > response.jobs.length ||
+          response.jobs.length >= 100) throw Error('E2E_JOB_INVENTORY_INCOMPLETE');
       jobs = response.jobs;
     }
     const result = inspectExactPrBrowserEvidence({
       runs: data.workflow_runs, jobs, sourceRepository, headSha: sha, headBranch: branch,
     });
-    if (result.state === 'verified') return result;
+    if (result.state === 'verified') {
+      // Close the GitHub API read race: a passing run must still belong to the
+      // live PR head and base immediately before the required check succeeds.
+      const finalPr = await api('/pulls/' + event.pull_request.number);
+      if (finalPr.state !== 'open' || finalPr.head?.sha !== sha ||
+          finalPr.head?.ref !== branch || finalPr.head?.repo?.full_name !== sourceRepository ||
+          finalPr.base?.ref !== expectedBase || finalPr.base?.repo?.full_name !== repository)
+        throw Error('E2E_PR_HEAD_OR_BASE_CHANGED');
+      return result;
+    }
     if (Date.now() + pollMs >= deadline) break;
     await sleep(pollMs);
   } while (Date.now() < deadline);

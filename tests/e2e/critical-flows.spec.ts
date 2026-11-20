@@ -43,9 +43,7 @@ test.describe('Critical User Flows', () => {
 
       const main = page.getByRole('main');
       await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
-      const hvac = main.getByRole('article').filter({
-        has: main.getByRole('heading', { name: 'HVAC Certification', exact: true }),
-      });
+      const hvac = main.getByRole('article').filter({ hasText: 'HVAC Certification' });
       await expect(hvac).toBeVisible();
       await expect(hvac.getByRole('link', { name: 'View Program' })).toHaveAttribute(
         'href',

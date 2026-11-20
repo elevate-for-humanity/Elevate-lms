@@ -87,9 +87,16 @@ test('admitted learner does not depend on optional application history', async (
   assert.equal(applicationReads, 0);
 });
 
-test('LMS layout, apprentice dashboard, course overview and direct lesson URL enforce the gate', () => {
+test('workspace uses canonical admission while specific training routes enforce the beauty gate', () => {
+  const layout = readFileSync(
+    new URL('../../apps/lms/app/lms/(app)/layout.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(layout, /hasApprovedPaidLearnerEnrollment\(db, user\.id\)/);
+  assert.match(layout, /redirect\('\/lms\/access-pending'\)/);
+  assert.doesNotMatch(layout, /loadBeautyPaymentGate\(/);
+
   for (const path of [
-    '../../apps/lms/app/lms/(app)/layout.tsx',
     '../../apps/lms/app/apprentice/page.tsx',
     '../../apps/lms/app/lms/courses/[courseId]/page.tsx',
     '../../apps/lms/app/lms/courses/[courseId]/lessons/[lessonId]/page.tsx',

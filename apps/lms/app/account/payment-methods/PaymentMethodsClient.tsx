@@ -119,6 +119,9 @@ export function PaymentMethodsClient({
                     <p className="font-semibold text-slate-950">
                       Invoice {invoice.invoiceNumber || invoice.id.slice(0, 8)}
                     </p>
+                    {invoice.descriptions?.length ? (
+                      <p className="text-sm text-slate-700">{invoice.descriptions.join(' · ')}</p>
+                    ) : null}
                     <p className="text-sm text-slate-700">
                       {amount(invoice.amountCents)} · {invoice.status}
                       {invoice.dueDate ? ` · Due ${invoice.dueDate}` : ''}

@@ -50,6 +50,7 @@ export default async function BillingPage() {
       billing_invoice_id: invoice.id,
       created_at: invoice.createdAt || invoice.dueDate || '',
       source: 'quickbooks',
+      descriptions: invoice.descriptions,
     })),
     ...(legacyInvoices || []).map((invoice: any) => ({
       ...invoice,
@@ -139,6 +140,9 @@ export default async function BillingPage() {
                     <p className="font-medium text-slate-900 text-sm">
                       {inv.invoice_number ? `Invoice #${inv.invoice_number}` : 'Invoice'}
                     </p>
+                    {inv.descriptions?.length ? (
+                      <p className="text-sm text-slate-700">{inv.descriptions.join(' · ')}</p>
+                    ) : null}
                     <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {inv.due_date

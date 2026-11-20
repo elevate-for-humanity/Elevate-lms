@@ -100,6 +100,8 @@ jobs:
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
       - name: Certify repaired authenticated portal dependencies
+        id: portal_certification
+        continue-on-error: true
         run: >-
           pnpm exec playwright test
           tests/e2e/employer-onboarding.spec.ts
@@ -108,7 +110,13 @@ jobs:
           --grep "Employer setup|Authenticated live HVAC lesson media|critical (Program Holder|Employer|Case Manager) surfaces"
           --project=desktop-chrome
       - name: Run desktop-chrome E2E (marketing, admin, lms)
+        if: ${{ !cancelled() }}
         run: pnpm test:e2e
+      - name: Enforce authenticated portal certification
+        if: ${{ !cancelled() && steps.portal_certification.outcome != 'success' }}
+        run: |
+          echo "Authenticated portal certification failed; broad E2E still ran for complete evidence."
+          exit 1
       - name: Clean up disposable Employer, Instructor, Staff and Case Manager QA identities
         if: always()
         run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup

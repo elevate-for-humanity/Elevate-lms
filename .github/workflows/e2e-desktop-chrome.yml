@@ -6,11 +6,16 @@ name: E2E desktop-chrome
 # docs/audits/e2e-desktop-chrome-triage.md
 on:
   workflow_dispatch:
+    inputs:
+      exhaustive:
+        description: Run the focused regressions and all four browser shards
+        type: boolean
+        default: false
   pull_request:
     branches: [main]
 
 concurrency:
-  group: e2e-desktop-chrome-${{ github.ref }}
+  group: e2e-desktop-chrome-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions:
@@ -18,7 +23,12 @@ permissions:
 
 jobs:
   desktop-chrome:
-    name: E2E desktop-chrome
+    name: ${{ inputs.exhaustive && format('E2E desktop-chrome shard {0}/4', matrix.shard) || 'E2E desktop-chrome' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        shard: ${{ fromJSON(inputs.exhaustive && '[1,2,3,4]' || '[1]') }}
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -88,22 +98,39 @@ jobs:
       # dedicated Host Shop identity on tablet and phone when configured.
       # A missing identity does NOT certify the Host Shop release.
       - name: Authenticated Host Shop desktop, tablet and mobile geometry
-        if: ${{ env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
+        if: ${{ matrix.shard == 1 && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
         run: >-
           pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
+      - name: Verify the corrected browser assertions
+        id: focused
+        if: ${{ inputs.exhaustive && matrix.shard == 1 }}
+        run: >-
+          pnpm exec playwright test tests/e2e/application-flow.spec.ts
+          tests/e2e/canonical-application-flow.spec.ts tests/e2e/complete-platform.spec.ts
+          --project=desktop-chrome --retries=0
+          --grep 'should navigate from homepage to apply page|should display application form fields|should show validation errors for empty form|should submit valid application|Host Shop application provides resume access|login, onboarding and tracking routes exist|homepage loads with all sections|eligibility quiz works end-to-end|programs page lists the published QA programs|individual program page has its title and application link|standard intake page loads with form|register page loads|should have no console errors'
+          --max-failures=0 --output=test-results-focused --reporter=line
       - name: Run desktop-chrome E2E (marketing, admin, lms)
+        if: ${{ !inputs.exhaustive }}
         run: pnpm test:e2e
+      - name: Run all cases in this desktop-chrome shard
+        if: ${{ !cancelled() && inputs.exhaustive && (success() || steps.focused.outcome == 'failure') }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: browser-shard.json
+        run: pnpm test:e2e --max-failures=0 --shard=${{ matrix.shard }}/4 --reporter=line,html,json
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-desktop-chrome
+          name: ${{ inputs.exhaustive && format('e2e-desktop-chrome-shard-{0}', matrix.shard) || 'e2e-desktop-chrome' }}
           path: |
             playwright-report/
             test-results/
+            test-results-focused/
+            browser-shard.json
           retention-days: 14
 
   # An isolated, public-only regression must finish even if the broad

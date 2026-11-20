@@ -1,5 +1,6 @@
 'use client';
 import { FormEvent, useState } from 'react';
+import { BUSINESS_REGISTRATION_GUIDANCE } from '@/lib/program-holder/document-requirements';
 
 export function ProgramHolderAdminDocumentUpload({ holderId }: { holderId: string }) {
   const [busy, setBusy] = useState(false);
@@ -8,18 +9,23 @@ export function ProgramHolderAdminDocumentUpload({ holderId }: { holderId: strin
     event.preventDefault();
     setBusy(true);
     setMessage('');
-    const response = await fetch(`/api/admin/program-holders/${holderId}/documents`, {
-      method: 'POST',
-      body: new FormData(event.currentTarget),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      setMessage(data.error || 'Upload failed.');
+    try {
+      const response = await fetch(`/api/admin/program-holders/${holderId}/documents`, {
+        method: 'POST',
+        body: new FormData(event.currentTarget),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.document?.id) {
+        setMessage(data.error || 'Could not confirm the saved record. Refresh before trying again.');
+        return;
+      }
+      setMessage('Added to the protected file for review.');
+      window.location.reload();
+    } catch {
+      setMessage('The upload connection was interrupted. Refresh to check for the document before retrying.');
+    } finally {
       setBusy(false);
-      return;
     }
-    setMessage('Added to the protected file for review.');
-    window.setTimeout(() => window.location.reload(), 500);
   }
   return (
     <form onSubmit={submit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -27,14 +33,18 @@ export function ProgramHolderAdminDocumentUpload({ holderId }: { holderId: strin
       <p className="mt-1 text-sm text-slate-600">
         Administrative upload; files remain pending until compliance review.
       </p>
+      <p className="mt-2 text-sm text-slate-700">{BUSINESS_REGISTRATION_GUIDANCE}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
         <select
           name="documentType"
+          aria-label="Onboarding document type"
           required
           className="min-h-11 rounded-xl border border-slate-300 px-3"
         >
           <option value="">Document type</option>
           <option value="government_id">Government photo ID</option>
+          <option value="business_registration">Business registration for the contracting entity</option>
+          <option value="w9">Completed IRS Form W-9</option>
           <option value="insurance">Liability insurance</option>
           <option value="epa_608">EPA 608 credential</option>
           <option value="state_program_approval">State program approval</option>
@@ -43,6 +53,7 @@ export function ProgramHolderAdminDocumentUpload({ holderId }: { holderId: strin
         </select>
         <input
           name="file"
+          aria-label="Onboarding document file"
           type="file"
           required
           accept="application/pdf,image/jpeg,image/png"

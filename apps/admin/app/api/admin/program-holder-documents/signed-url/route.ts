@@ -46,11 +46,13 @@ export async function POST(req: NextRequest) {
   // Look up document record for audit
   const { data: doc } = await db
     .from('program_holder_documents')
-    .select('id, user_id, storage_bucket')
+    .select('id, user_id, storage_bucket, document_type')
     .eq('file_url', filePath)
     .maybeSingle();
 
-  if (!doc || !['documents', 'provider-documents', 'program-holder-documents', 'program_holder_documents'].includes(doc.storage_bucket || 'documents')) return NextResponse.json({ error: 'Document not found.' }, { status: 404 });
+  const holderVideo = doc?.storage_bucket === 'videos' && doc.document_type === 'student_video' &&
+    /^program-holders\/[a-f0-9-]{36}\/student_video\/[a-f0-9-]{36}\.mp4$/i.test(filePath);
+  if (!doc || (!['documents', 'provider-documents', 'program-holder-documents', 'program_holder_documents'].includes(doc.storage_bucket || 'documents') && !holderVideo)) return NextResponse.json({ error: 'Document not found.' }, { status: 404 });
   const { data, error } = await db.storage
     .from(doc.storage_bucket || 'documents')
     .createSignedUrl(filePath, 3600);

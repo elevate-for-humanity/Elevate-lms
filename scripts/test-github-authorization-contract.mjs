@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
@@ -13,4 +14,17 @@ test('ordinary runtime ticks cannot claim repairs or send GitHub requests',async
   assert.deepEqual(await tick({workflowOwnedDispatch:flag}),{enabled:true,dispatched:0,awaitingWorkflow:true});
  }
  assert.equal(otherReads,0);
+});
+
+test('protected Admin releases validate and pin the selected repair engine', async () => {
+  const workflow = await read('.github/workflows/deploy-admin.yml');
+  assert.ok(workflow.includes("PARIS_REPAIR_ENGINE: ${{ vars.PARIS_REPAIR_ENGINE || 'internal' }}"));
+  const guard = workflow.match(/^          case "\$PARIS_REPAIR_ENGINE" in[\s\S]*?^          esac$/m);
+  assert.ok(guard);
+  const binding = 'PARIS_GITHUB_APP_SOURCE=workflow,PARIS_REPAIR_ENGINE=$PARIS_REPAIR_ENGINE';
+  assert.ok(workflow.indexOf(binding) > guard.index);
+  for (const [engine, expected] of [['internal', 0], ['openhands', 0], ['unrecognized', 1], ['openhands,OTHER=value', 1]]) {
+    const result = spawnSync('bash', ['-c', guard[0]], { env: { PARIS_REPAIR_ENGINE: engine } });
+    assert.equal(result.status, expected);
+  }
 });

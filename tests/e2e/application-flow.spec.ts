@@ -10,90 +10,62 @@ test.describe('Application Flow', () => {
     await page.goto('/');
   });
 
-  test('should navigate from homepage to apply page', async ({ page }) => {
-    // Click Apply Now button
-    await page.click('text=Apply Now');
+  const standardIntake = '/apply/student/form?intent=inquiry';
 
-    // Should be on apply page
-    await expect(page).toHaveURL(/\/apply/);
-    await expect(page.locator('h1, h2').first()).toBeVisible();
+  test('should navigate from homepage to apply page', async ({ page }) => {
+    await page.getByRole('link', { name: 'Apply', exact: true }).filter({ visible: true }).first().click();
+    await expect(page).toHaveURL(/\/apply(?:[?#].*)?$/);
+    await expect(page.getByRole('heading', { name: 'Choose your application' })).toBeVisible();
   });
 
   test('should display application form fields', async ({ page }) => {
-    await page.goto('/apply');
-
-    // Form fields should be visible
-    await expect(
-      page.locator('input[name="name"], input[placeholder*="name" i]').first(),
-    ).toBeVisible();
-    await expect(
-      page
-        .locator('input[name="email"], input[placeholder*="email" i], input[type="email"]')
-        .first(),
-    ).toBeVisible();
-    await expect(
-      page.locator('input[name="phone"], input[placeholder*="phone" i], input[type="tel"]').first(),
-    ).toBeVisible();
+    await page.goto(standardIntake);
+    for (const name of ['First Name', 'Last Name', 'Email', 'Phone']) {
+      await expect(page.getByRole('textbox', { name, exact: true })).toBeVisible();
+    }
   });
 
   test('should show validation errors for empty form', async ({ page }) => {
-    await page.goto('/apply');
-
-    // Try to submit empty form
-    const submitButton = page
-      .locator('button[type="submit"], button:has-text("Submit"), button:has-text("Apply")')
-      .first();
-    await submitButton.click();
-
-    // Should show validation or stay on page
-    await expect(page).toHaveURL(/\/apply/);
+    await page.goto(standardIntake);
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await expect(page.getByText('Complete your name, date of birth, email, and phone number.')).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'First Name', exact: true })).toBeVisible();
   });
 
   test('should submit valid application', async ({ page }) => {
-    await page.goto('/apply');
+    await page.goto(standardIntake);
+    await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Browser');
+    await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('QA');
+    await page.getByLabel('Date of Birth', { exact: true }).fill('1990-01-01');
+    await page.getByRole('textbox', { name: 'Email', exact: true }).fill(`e2e-${crypto.randomUUID()}@example.com`);
+    await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('317-555-1234');
+    await page.getByRole('textbox', { name: 'Street Address', exact: true }).fill('100 QA Test Way');
+    await page.getByRole('textbox', { name: 'City', exact: true }).fill('Indianapolis');
+    await page.getByRole('textbox', { name: 'State', exact: true }).fill('IN');
+    await page.getByRole('textbox', { name: 'ZIP Code', exact: true }).fill('46201');
 
-    // Fill form
-    await page.fill('input[name="name"], input[placeholder*="name" i]', 'Test User E2E');
-    await page.fill(
-      'input[name="email"], input[placeholder*="email" i], input[type="email"]',
-      'e2e-test@example.com',
+    const next = page.getByRole('button', { name: 'Continue', exact: true });
+    await next.click();
+    await page.getByLabel(/Program of Interest/).selectOption('hvac-technician');
+    await next.click();
+    await page.getByLabel(/How do you plan to pay/).selectOption('not_sure');
+    await next.click();
+    await next.click();
+    await page.getByRole('checkbox', { name: /I certify that the information provided is accurate/ }).check();
+
+    const submission = page.waitForResponse((response) =>
+      new URL(response.url()).pathname === '/api/applications' &&
+      response.request().method() === 'POST',
     );
-    await page.fill(
-      'input[name="phone"], input[placeholder*="phone" i], input[type="tel"]',
-      '317-555-1234',
-    );
-
-    // Select program if dropdown exists
-    const programSelect = page.locator('select[name="program"]');
-    if (await programSelect.isVisible()) {
-      await programSelect.selectOption({ index: 1 });
-    }
-
-    // Select funding if dropdown exists
-    const fundingSelect = page.locator('select[name="funding"]');
-    if (await fundingSelect.isVisible()) {
-      await fundingSelect.selectOption({ index: 1 });
-    }
-
-    // Submit
-    const submitButton = page
-      .locator('button[type="submit"], button:has-text("Submit"), button:has-text("Apply")')
-      .first();
-    await submitButton.click();
-
-    // Should redirect to confirmation or show success
-    await page.waitForTimeout(2000);
-    const url = page.url();
-    const hasSuccess =
-      url.includes('confirmation') ||
-      url.includes('success') ||
-      (await page
-        .locator('text=success, text=thank you, text=submitted')
-        .first()
-        .isVisible()
-        .catch(() => false));
-
-    expect(hasSuccess || url.includes('apply')).toBeTruthy();
+    await page.getByRole('button', { name: 'Submit Intake Application' }).click();
+    const receipt = await submission;
+    expect(receipt.ok()).toBe(true);
+    expect(await receipt.json()).toMatchObject({
+      ok: true,
+      recordType: 'lead',
+      applicationStatus: 'inquiry',
+    });
+    await expect(page).toHaveURL(/\/enroll\/hvac-technician(?:[?#].*)?$/);
   });
 });
 
@@ -249,7 +221,7 @@ test.describe('Performance', () => {
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
     // Filter out known acceptable errors
     const criticalErrors = errors.filter(

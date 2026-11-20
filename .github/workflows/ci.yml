@@ -43,6 +43,8 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Prove LMS PDF Docker overlay respects package isolation
+        run: node --test scripts/gcp/prepare-lms-pdf-module-overlay.test.mjs
       - name: Install dependencies
         id: dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false

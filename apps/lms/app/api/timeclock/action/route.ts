@@ -188,8 +188,8 @@ async function notifyAdminsOfClockAttempt(
     title: `${outcome}: ${learner}`,
     message: `${learner} — ${site}. ${reason}`,
     action_label: 'Review timeclock',
-    action_url: '/apprenticeships/hours',
-    link: '/apprenticeships/hours',
+    action_url: '/apprenticeships',
+    link: '/apprenticeships',
     read: false,
     metadata: {
       learner_user_id: params.userId,

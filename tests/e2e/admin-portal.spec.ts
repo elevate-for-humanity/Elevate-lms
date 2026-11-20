@@ -16,24 +16,28 @@ test.describe('Admin Portal', () => {
   test('should display admin dashboard', async ({ page }) => {
     await page.goto('/dashboard');
 
-    await expect(page.locator('h1:has-text("Admin")')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Learner Dashboards', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Apprentice Dashboards', exact: true })).toBeVisible();
   });
 
-  test('should manage users', async ({ page }) => {
-    await page.goto('/users');
+  test('should open the canonical student directory', async ({ page }) => {
+    await page.goto('/students');
 
-    await expect(page.locator('text=Users')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Students', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Test & audit records/ })).toBeVisible();
   });
 
   test('should view analytics', async ({ page }) => {
     await page.goto('/analytics');
 
-    await expect(page.locator('text=Analytics')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Analytics', exact: true })).toBeVisible();
   });
 
   test('should approve program holder applications', async ({ page }) => {
     await page.goto('/program-holder-applications');
 
-    await expect(page.locator('text=Program Holder Applications')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Program Holder Applications', exact: true }),
+    ).toBeVisible();
   });
 });

@@ -30,6 +30,7 @@ jobs:
     env:
       PLAYWRIGHT_HTML_OPEN: never
       NODE_OPTIONS: '--max-old-space-size=6144'
+      EXPECTED_LMS_SHA: ${{ github.sha }}
       # Isolated QA only: the full local-dev suite includes service-role
       # writes. Never use the production learner database or its service key.
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
@@ -78,6 +79,10 @@ jobs:
         run: node scripts/qa/verify-e2e-service-config.mjs
       - name: Verify Website Builder authorization with disposable QA sessions
         run: node scripts/qa/test-builder-authorization.mjs
+      - name: Provision disposable Learner and Program Holder QA identities
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Provision disposable Employer, Instructor, Staff and Case Manager QA identities
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
       - name: Verify published marketing artwork through Next image loader
@@ -94,8 +99,22 @@ jobs:
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
+      - name: Certify repaired authenticated portal dependencies
+        run: >-
+          pnpm exec playwright test
+          tests/e2e/employer-onboarding.spec.ts
+          tests/e2e/hvac-live-lesson-playback.spec.ts
+          tests/e2e/portal-responsive-design.spec.ts
+          --grep "Employer setup|Authenticated live HVAC lesson media|critical (Program Holder|Employer|Case Manager) surfaces"
+          --project=desktop-chrome
       - name: Run desktop-chrome E2E (marketing, admin, lms)
         run: pnpm test:e2e
+      - name: Clean up disposable Employer, Instructor, Staff and Case Manager QA identities
+        if: always()
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
+      - name: Clean up disposable Learner and Program Holder QA identities
+        if: always()
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7

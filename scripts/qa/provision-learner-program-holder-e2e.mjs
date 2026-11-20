@@ -59,7 +59,16 @@ async function provision() {
     const holderProgram = await must(db.from('program_holder_programs').insert({ program_holder_id: holder.id, program_id: qaProgram.id, program_slug: qaProgram.slug, role_in_program: 'owner', is_primary: true, status: 'active' }).select('id').single(), 'associate isolated QA program'); state.holderProgramId = holderProgram.id;
     await writePrivateQaState(statePath, state);
     if (process.env.GITHUB_ENV) {
-      await writeFile(process.env.GITHUB_ENV, [`E2E_LEARNER_EMAIL=${learner.email}`, `E2E_LEARNER_PASSWORD=${learner.password}`, `E2E_PROGRAM_HOLDER_EMAIL=${programHolder.email}`, `E2E_PROGRAM_HOLDER_PASSWORD=${programHolder.password}`].join('\n') + '\n', { flag: 'a' });
+      await writeFile(process.env.GITHUB_ENV, [
+        `E2E_LEARNER_EMAIL=${learner.email}`,
+        `E2E_LEARNER_PASSWORD=${learner.password}`,
+        `TEST_STUDENT_EMAIL=${learner.email}`,
+        `TEST_STUDENT_PASSWORD=${learner.password}`,
+        `E2E_PROGRAM_HOLDER_EMAIL=${programHolder.email}`,
+        `E2E_PROGRAM_HOLDER_PASSWORD=${programHolder.password}`,
+        `TEST_PROGRAM_HOLDER_EMAIL=${programHolder.email}`,
+        `TEST_PROGRAM_HOLDER_PASSWORD=${programHolder.password}`,
+      ].join('\n') + '\n', { flag: 'a' });
       console.log(`::add-mask::${learner.password}`); console.log(`::add-mask::${programHolder.password}`);
     }
     console.log(JSON.stringify({ ok: true, learnerUserId: learner.id, programHolderUserId: programHolder.id, holderId: holder.id, qaProgramId: qaProgram.id }));
@@ -71,7 +80,15 @@ async function cleanup() {
   if (state.learner?.id) {
     // Playback stores QA events, never formal credits. Remove only this run's
     // disposable learner rows before its profile and login are removed.
-    for (const table of ['video_playback_events','learner_video_progress']) {
+    for (const table of [
+      'video_playback_events',
+      'learner_video_checkpoint_responses',
+      'interactive_video_quiz_answers',
+      'learner_video_notes',
+      'learner_video_progress',
+      'checkpoint_scores',
+      'lesson_progress',
+    ]) {
       const { error } = await db.from(table).delete().eq('user_id', state.learner.id);
       if (error) throw new Error('QA playback cleanup failed for ' + table + ': ' + error.message);
     }

@@ -1,44 +1,70 @@
 import { test, expect } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
+
+const lmsOrigin = peerOrigin('lms');
 
 test.describe('Critical User Flows', () => {
   test.describe('Homepage', () => {
     test('should load homepage successfully', async ({ page }) => {
       await page.goto('/');
       await expect(page).toHaveTitle(/Elevate for Humanity/);
-      await expect(page.locator('h1')).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     });
 
     test('should have working navigation', async ({ page }) => {
       await page.goto('/');
 
-      // Check main nav links exist
-      await expect(page.getByRole('link', { name: /programs/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /about/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /contact/i })).toBeVisible();
+      const mainNavigation = page.getByRole('navigation', { name: 'Main navigation' });
+      await expect(
+        mainNavigation.getByRole('link', { name: 'Programs', exact: true }),
+      ).toHaveAttribute('href', '/programs');
+      await expect(
+        mainNavigation.getByRole('link', { name: 'About', exact: true }),
+      ).toHaveAttribute('href', '/about');
+      await expect(page.getByRole('link', { name: 'Contact Us', exact: true })).toHaveAttribute(
+        'href',
+        '/contact',
+      );
     });
 
     test('should have CTA buttons', async ({ page }) => {
       await page.goto('/');
 
-      // Look for apply/get started buttons
-      const ctaButton = page.getByRole('link', { name: /apply|get started|enroll/i }).first();
-      await expect(ctaButton).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Apply', exact: true })).toHaveAttribute(
+        'href',
+        '/apply',
+      );
     });
   });
 
   test.describe('Programs Page', () => {
     test('should display program listings', async ({ page }) => {
       await page.goto('/programs');
-      await expect(page).toHaveTitle(/Programs/i);
 
-      // Should have program cards
-      const programCards = page.locator('[class*="card"], [class*="program"]');
-      await expect(programCards.first()).toBeVisible();
+      const main = page.getByRole('main');
+      await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
+      const hvac = main.getByRole('article').filter({
+        has: main.getByRole('heading', { name: 'HVAC Certification', exact: true }),
+      });
+      await expect(hvac).toBeVisible();
+      await expect(hvac.getByRole('link', { name: 'View Program' })).toHaveAttribute(
+        'href',
+        '/programs/hvac-technician',
+      );
     });
 
     test('should navigate to individual program', async ({ page }) => {
-      await page.goto('/programs/healthcare');
-      await expect(page.locator('h1')).toContainText(/healthcare/i);
+      await page.goto('/programs');
+      await page
+        .getByRole('main')
+        .locator('a[href="/programs/hvac-technician"]')
+        .filter({ visible: true })
+        .first()
+        .click();
+
+      await expect(page).toHaveURL(/\/programs\/hvac-technician(?:[?#].*)?$/);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      await expect(page.locator('a[href^="/apply"]').filter({ visible: true }).first()).toBeVisible();
     });
   });
 
@@ -46,7 +72,6 @@ test.describe('Critical User Flows', () => {
     test('should display contact form', async ({ page }) => {
       await page.goto('/contact');
 
-      // Check form fields exist
       await expect(page.getByLabel(/name/i)).toBeVisible();
       await expect(page.getByLabel(/email/i)).toBeVisible();
       await expect(page.getByLabel(/message/i)).toBeVisible();
@@ -55,25 +80,20 @@ test.describe('Critical User Flows', () => {
     test('should validate required fields', async ({ page }) => {
       await page.goto('/contact');
 
-      // Try to submit empty form
       const submitButton = page.getByRole('button', { name: /submit|send/i });
       await submitButton.click();
-
-      // Should show validation errors or not submit
-      // Form should still be visible (not redirected)
       await expect(page.getByLabel(/email/i)).toBeVisible();
     });
   });
 
   test.describe('Apply Page', () => {
-    test('should display application form', async ({ page }) => {
-      await page.goto('/apply');
-      await expect(page).toHaveTitle(/Apply/i);
+    test('should display the canonical application form', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
 
-      // Check for form fields
-      await expect(
-        page.getByLabel(/first name/i).or(page.getByPlaceholder(/first name/i)),
-      ).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'First Name', exact: true })).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'Last Name', exact: true })).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeVisible();
     });
   });
 
@@ -84,9 +104,10 @@ test.describe('Critical User Flows', () => {
       await expect(page.getByLabel(/password/i)).toBeVisible();
     });
 
-    test('should display signup page', async ({ page }) => {
-      await page.goto('/signup');
-      await expect(page.getByLabel(/email/i)).toBeVisible();
+    test('should display signup page on the LMS service', async ({ page }) => {
+      await page.goto(`${lmsOrigin}/signup`);
+      await expect(page.getByRole('heading', { name: 'Create Your Account' })).toBeVisible();
+      await expect(page.locator('input[type="email"]')).toBeVisible();
     });
 
     test('should have link to reset password', async ({ page }) => {
@@ -99,11 +120,15 @@ test.describe('Critical User Flows', () => {
   test.describe('Blog', () => {
     test('should display blog posts', async ({ page }) => {
       await page.goto('/blog');
-      await expect(page).toHaveTitle(/Blog/i);
 
-      // Should have blog post cards or articles
-      const articles = page.locator('article, [class*="blog"], [class*="post"]');
-      await expect(articles.first()).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: 'Practical guidance for your next step.' }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('link', {
+          name: /How Indianapolis Barbershops Can Build an Apprentice Talent Pipeline/,
+        }),
+      ).toBeVisible();
     });
   });
 
@@ -132,24 +157,34 @@ test.describe('Critical User Flows', () => {
   });
 
   test.describe('API Health', () => {
-    test('should return healthy status', async ({ request }) => {
+    test('should return the current healthy service contract', async ({ request }) => {
       const response = await request.get('/api/health');
       expect(response.ok()).toBeTruthy();
 
       const data = await response.json();
-      expect(data.overall).toBe('pass');
+      expect(data).toMatchObject({
+        service: 'marketing',
+        status: 'healthy',
+        healthy: true,
+        ready: true,
+        configuration: { ok: true },
+      });
     });
   });
 
-  test.describe('Redirects', () => {
-    test('/register should redirect to /signup', async ({ page }) => {
-      await page.goto('/register');
-      await expect(page).toHaveURL(/signup/);
+  test.describe('Canonical authentication routes', () => {
+    test('marketing sign-in points to the LMS login', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.getByRole('link', { name: 'Sign In', exact: true })).toHaveAttribute(
+        'href',
+        `${lmsOrigin}/login`,
+      );
     });
 
-    test('/forgot-password should redirect to /reset-password', async ({ page }) => {
-      await page.goto('/forgot-password');
-      await expect(page).toHaveURL(/reset-password/);
+    test('the LMS reset-password page is available', async ({ page }) => {
+      await page.goto(`${lmsOrigin}/reset-password`);
+      await expect(page.getByRole('heading', { name: 'Reset your password' })).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'Email' })).toBeVisible();
     });
 
     test('/for-employers should redirect to /employers', async ({ page }) => {
@@ -163,9 +198,7 @@ test.describe('Critical User Flows', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/');
 
-      // Page should load without horizontal scroll
-      const body = page.locator('body');
-      const bodyWidth = await body.evaluate((el) => el.scrollWidth);
+      const bodyWidth = await page.locator('body').evaluate((element) => element.scrollWidth);
       expect(bodyWidth).toBeLessThanOrEqual(375);
     });
   });

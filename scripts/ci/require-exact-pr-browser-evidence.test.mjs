@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { inspectExactPrBrowserEvidence } from './require-exact-pr-browser-evidence.mjs';
+import { inspectExactPrBrowserEvidence, verifyExactPrBrowserEvidence } from './require-exact-pr-browser-evidence.mjs';
 
 const sha = 'a'.repeat(40);
 const repository = 'elevate-for-humanity/Elevate-lms';
@@ -10,7 +10,7 @@ const run = { id: 123, head_sha: sha, head_branch: headBranch, head_repository: 
 const names = ['E2E desktop-chrome', 'Public Host Shop navigation and application (five devices)', 'Email device browsers'];
 const jobs = names.map(name => ({ name, status: 'completed', conclusion: 'success' }));
 const inspect = (runs = [run], checkedJobs = jobs) => inspectExactPrBrowserEvidence({
-  runs, jobs: checkedJobs, repository, headSha: sha, headBranch,
+  runs, jobs: checkedJobs, sourceRepository: repository, headSha: sha, headBranch,
 });
 
 test('passes only successful exact-head browser workflow with all required jobs', () => {
@@ -38,4 +38,71 @@ test('wrong repository, branch, event, or SHA never satisfies this PR', () => {
 test('incomplete paginated evidence fails closed', () => {
   assert.throws(() => inspect(Array(100).fill(run)), /E2E_RUN_INVENTORY_INCOMPLETE/);
   assert.throws(() => inspect([run], Array(100).fill(jobs[0])), /E2E_JOB_INVENTORY_INCOMPLETE/);
+});
+
+const event = (base = 'main', source = repository) => ({
+  pull_request: {
+    number: 123, head: { sha, ref: headBranch, repo: { full_name: source } },
+    base: { ref: base, repo: { full_name: repository } },
+  },
+});
+const pr = (base = 'main', source = repository) => ({
+  state: 'open', head: { sha, ref: headBranch, repo: { full_name: source } },
+  base: { ref: base, repo: { full_name: repository } },
+});
+function mockApi(prResponse, runResponse) {
+  const seen = [];
+  const request = async url => {
+    const path = new URL(url).pathname;
+    seen.push(path);
+    const response = path.endsWith('/pulls/123') ? prResponse
+      : path.endsWith('/actions/runs/123/jobs') ? { jobs, total_count: jobs.length }
+      : { workflow_runs: [runResponse] };
+    return { ok: true, json: async () => response };
+  };
+  return { request, seen };
+}
+
+test('accepts a fork browser run by source repository identity, not base API repository', async () => {
+  const fork = 'contributor/Elevate-lms';
+  const { request, seen } = mockApi(pr('main', fork), {
+    ...run, head_repository: { full_name: fork },
+  });
+  const result = await verifyExactPrBrowserEvidence({
+    repository, event: event('main', fork), token: 'test-token', request,
+    timeoutMs: 1000, pollMs: 1, sleep: async () => {},
+  });
+  assert.equal(result.state, 'verified');
+  assert.equal(seen.length, 3);
+});
+
+test('non-main PR retains normal CI without requiring a main-only browser workflow', async () => {
+  const { request, seen } = mockApi(pr('work'), run);
+  const result = await verifyExactPrBrowserEvidence({
+    repository, event: event('work'), token: 'test-token', request,
+    timeoutMs: 1000, pollMs: 1, sleep: async () => {},
+  });
+  assert.equal(result.state, 'not-applicable');
+  assert.deepEqual(seen, ['/repos/' + repository + '/pulls/123']);
+});
+
+test('retargeted non-main PR fails closed instead of reusing its prior CI receipt', async () => {
+  const { request } = mockApi(pr('main'), run);
+  await assert.rejects(
+    verifyExactPrBrowserEvidence({ repository, event: event('work'), token: 'test-token', request }),
+    /E2E_PR_HEAD_OR_BASE_CHANGED/,
+  );
+});
+
+test('retargeted main PR or a changed source identity fails closed', async () => {
+  const changedBase = mockApi(pr('work'), run);
+  await assert.rejects(
+    verifyExactPrBrowserEvidence({ repository, event: event('main'), token: 'test-token', request: changedBase.request }),
+    /E2E_PR_HEAD_OR_BASE_CHANGED/,
+  );
+  const changedFork = mockApi(pr('main', 'other/Elevate-lms'), run);
+  await assert.rejects(
+    verifyExactPrBrowserEvidence({ repository, event: event('main'), token: 'test-token', request: changedFork.request }),
+    /E2E_PR_HEAD_OR_BASE_CHANGED/,
+  );
 });

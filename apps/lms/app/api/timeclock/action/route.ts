@@ -137,7 +137,7 @@ async function notifyClockIn(
     .from('notifications')
     .insert({
       user_id: params.userId,
-      type: 'timeclock',
+      type: 'ojt',
       title: 'Clock-in recorded',
       message: `Your clock-in was recorded${params.siteName ? ` at ${params.siteName}` : ''}.`,
       action_label: 'View timeclock',
@@ -184,7 +184,7 @@ async function notifyAdminsOfClockAttempt(
   const reason = params.successful ? `${label} accepted; hours remain subject to review.` : params.reason || `${label} was not accepted.`;
   const rows = (admins || []).map((admin: any) => ({
     user_id: admin.id,
-    type: 'timeclock',
+    type: 'ojt',
     title: `${outcome}: ${learner}`,
     message: `${learner} — ${site}. ${reason}`,
     action_label: 'Review timeclock',
@@ -292,7 +292,7 @@ async function _POST(request: NextRequest) {
       const recordedAt = new Date(attemptedAt).toISOString();
       const reviewId = createHash('sha256').update(JSON.stringify([user.id, site_id, action, recordedAt])).digest('hex').slice(0, 32);
       const { error } = await db.from('admin_alerts').upsert({
-        id: reviewId, alert_type: 'timeclock', severity: 'warning', apprentice_id: apprentice.id,
+        id: reviewId, alert_type: 'ojt', severity: 'warning', apprentice_id: apprentice.id,
         site_id, message: `Review delayed ${action} at ${assignedSite.name} for ${recordedAt}. Check existing shifts before correcting attendance.`,
         metadata: { user_id: user.id, action, client_recorded_at: recordedAt, location_captured: !coordinateError,
           ...(coordinateError ? {} : { lat, lng, accuracy_m }) },
@@ -433,7 +433,7 @@ async function _POST(request: NextRequest) {
         .from('notifications')
         .insert({
           user_id: user.id,
-          type: 'timeclock',
+          type: 'ojt',
           title: studentSubject,
           message: studentText,
           action_label: 'Open timeclock',

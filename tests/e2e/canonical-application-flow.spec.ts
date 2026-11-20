@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { siteUrls } from '../../lib/utils/site-urls';
-import { peerOrigin, usesLocalDevServer } from './helpers/app-origins';
+import { appOrigin, peerOrigin, usesLocalDevServer } from './helpers/app-origins';
 
 // Playwright supplies the peer LMS URL to its own Marketing dev server. A
 // separately started or deployed server uses its configured canonical LMS URL.
 const lmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL?.trim()
   ? peerOrigin('lms')
   : siteUrls.lms;
-import { appOrigin, usesLocalDevServer } from './helpers/app-origins';
 
 const expectedLmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL
   ? appOrigin('lms')

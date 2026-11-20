@@ -91,6 +91,10 @@ def repair(source, revision):
               'currentSha256': digest(TARGET), 'expectedCandidateSha256': NEW}}), flush=True)
         raise ValueError('provisioner_source_requires_review')
     run(['/usr/bin/node', '--check', str(source)])
+    if digest(TARGET) == NEW:
+        if not healthy():
+            raise ValueError('updated_provisioner_health_requires_review')
+        return {'result': 'PASS', 'changed': False, 'sourceSha256': NEW, 'carrierRoutingChanged': False}
     records_path = ROOT / 'current' / 'state.json'
     cli = lambda command: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', command])
     def verify_idle():
@@ -105,10 +109,6 @@ def repair(source, revision):
           'optionalPjsipAliasAvailable': available(cli('core show help pjsip reload'))}}), flush=True)
     if not builtin:
         raise ValueError('builtin_reload_unavailable')
-    if digest(TARGET) == NEW:
-        if not healthy():
-            raise ValueError('updated_provisioner_health_requires_review')
-        return {'result': 'PASS', 'changed': False, 'sourceSha256': NEW, 'carrierRoutingChanged': False}
     verify_idle()
     backup = BACKUPS / ('provisioner-' + revision)
     backup.mkdir(mode=0o700, parents=True, exist_ok=False)

@@ -42,7 +42,9 @@ test('open circuit waits for its provider cooldown without resetting the circuit
 });
 test('cooldown outside the remaining request budget defers without another call',async()=>{
   const {state,options}=clock();let calls=0;
-  await assert.rejects(retryRepairInference(async()=>{calls++;state.time+=190000;throw Error('Circuit "ai:elevate" is open. Retry after 30s.');},options),/PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE/);
+  await assert.rejects(retryRepairInference(async()=>{calls++;state.time+=190000;throw Error('Circuit "ai:elevate" is open. Retry after 30s.');},options),{
+    message:'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE',reason:'provider_cooldown_exceeds_deadline',
+  });
   assert.equal(calls,1);assert.deepEqual(state.waits,[]);
 });
 test('authorization and paid-inference errors remain terminal and unchanged',async()=>{

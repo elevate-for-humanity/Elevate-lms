@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
+
+const lmsOrigin = peerOrigin('lms');
 
 /**
  * Complete Platform E2E Tests
@@ -14,62 +17,41 @@ test.describe('Complete Platform Verification', () => {
     test('homepage loads with all sections', async ({ page }) => {
       await page.goto('/');
 
-      // Hero section
-      await expect(page.locator('section').first()).toBeVisible();
-
-      // Programs section
-      await expect(page.locator('text=Programs')).toBeVisible();
-
-      // Outcomes dashboard
-      await expect(page.locator('text=Student Outcomes')).toBeVisible();
-
-      // Footer
-      await expect(page.locator('footer')).toBeVisible();
+      const main = page.getByRole('main');
+      await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
+      await expect(main.getByRole('link', { name: /Explore programs/ })).toHaveAttribute('href', '/programs');
+      await expect(main.getByRole('heading', { name: /Barber & Beauty Apprenticeships/ })).toBeVisible();
+      await expect(main.getByRole('heading', { name: /Apply and get started/ })).toBeVisible();
+      await expect(page.getByRole('contentinfo')).toBeVisible();
     });
 
     test('eligibility quiz works end-to-end', async ({ page }) => {
       await page.goto('/eligibility/quiz');
+      await expect(page.getByRole('heading', { name: /WorkOne funding conversation/ })).toBeVisible();
 
-      // Check quiz loads
-      await expect(page.locator('text=Could You Qualify')).toBeVisible();
-
-      // Answer first question
-      await page.click('text=25-54 years old');
-      await page.click('text=Next');
-
-      // Answer second question
-      await page.click('text=Unemployed');
-      await page.click('text=Next');
-
-      // Continue through quiz...
-      await page.click('button:has-text("Yes")');
-      await page.click('text=Next');
-
-      // Should eventually show results
-      // (Quiz has 7 questions, we're testing the flow works)
+      const questions = page.getByRole('main').getByRole('group');
+      await expect(questions).toHaveCount(5);
+      await expect(page.getByRole('heading', { name: /Your next step is an agency eligibility review/ })).toBeHidden();
+      for (const question of await questions.all()) {
+        await question.getByRole('button', { name: 'Yes', exact: true }).click();
+      }
+      await expect(page.getByRole('heading', { name: /Your next step is an agency eligibility review/ })).toBeVisible();
+      await expect(page.getByText(/You answered yes to 5 of 5 screening questions/)).toBeVisible();
     });
 
-    test('programs page lists all programs', async ({ page }) => {
+    test('programs page lists the published QA programs', async ({ page }) => {
       await page.goto('/programs');
-
-      await expect(page.locator('h1')).toContainText(/program/i);
-
-      // Check for program categories
-      const programLinks = await page.locator('a[href^="/programs/"]').count();
-      expect(programLinks).toBeGreaterThan(5);
+      const main = page.getByRole('main');
+      await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
+      for (const slug of ['barber-apprenticeship', 'business-administration', 'cdl-training', 'hvac-technician']) {
+        await expect(main.locator(`a[href="/programs/${slug}"]`).filter({ visible: true }).first()).toBeVisible();
+      }
     });
 
-    test('individual program page has all required elements', async ({ page }) => {
-      await page.goto('/programs/barber');
-
-      // Breadcrumbs
-      await expect(page.locator('nav[aria-label="Breadcrumb"]')).toBeVisible();
-
-      // Program title
-      await expect(page.locator('h1')).toBeVisible();
-
-      // Apply CTA
-      await expect(page.locator('text=Apply')).toBeVisible();
+    test('individual program page has its title and application link', async ({ page }) => {
+      await page.goto('/programs/barber-apprenticeship');
+      await expect(page.getByRole('heading', { level: 1, name: 'Learn the trade where the work happens.' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Apply for Barber Apprenticeship' })).toBeVisible();
     });
 
     test('outcomes page shows live metrics', async ({ page }) => {
@@ -92,28 +74,16 @@ test.describe('Complete Platform Verification', () => {
   // ==========================================
 
   test.describe('Application Flow', () => {
-    test('apply page loads with form', async ({ page }) => {
-      await page.goto('/apply');
-
-      await expect(page.locator('form')).toBeVisible();
-
-      // Check required fields exist
-      await expect(page.locator('input[name*="name"], input[name*="Name"]').first()).toBeVisible();
-      await expect(page.locator('input[name="email"], input[type="email"]').first()).toBeVisible();
+    test('standard intake page loads with form', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
+      await expect(page.getByRole('textbox', { name: 'First Name', exact: true })).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible();
     });
 
     test('form validates required fields', async ({ page }) => {
-      await page.goto('/apply');
-
-      // Try to submit empty form
-      const submitButton = page.locator('button[type="submit"]');
-      if (await submitButton.isVisible()) {
-        await submitButton.click();
-
-        // Should show validation errors or prevent submission
-        const url = page.url();
-        expect(url).toContain('/apply'); // Should stay on page
-      }
+      await page.goto('/apply/student/form?intent=inquiry');
+      await page.getByRole('button', { name: 'Continue', exact: true }).click();
+      await expect(page.getByText('Complete your name, date of birth, email, and phone number.')).toBeVisible();
     });
   });
 
@@ -131,10 +101,12 @@ test.describe('Complete Platform Verification', () => {
     });
 
     test('register page loads', async ({ page }) => {
-      await page.goto('/register');
+      await page.goto(`${lmsOrigin}/signup`);
+      await expect(page.getByRole('heading', { name: 'Create Your Account' })).toBeVisible();
 
       await expect(page.locator('input[type="email"]')).toBeVisible();
-      await expect(page.locator('input[type="password"]')).toBeVisible();
+      await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+      await expect(page.getByLabel('Confirm Password', { exact: true })).toBeVisible();
     });
 
     test('protected routes redirect to login', async ({ page }) => {
@@ -147,31 +119,35 @@ test.describe('Complete Platform Verification', () => {
   });
 
   // ==========================================
-  // LMS TESTS (Demo Mode)
+  // LMS TESTS
   // ==========================================
 
-  test.describe('LMS (Demo Mode)', () => {
-    test('dashboard loads in demo mode', async ({ page }) => {
-      await page.goto('/lms/dashboard?demo=true');
-
-      // Should show demo banner
-      await expect(page.locator('text=Demo')).toBeVisible();
-
-      // Should show dashboard content
-      await expect(page.locator('text=Dashboard')).toBeVisible();
+  test.describe('Authenticated LMS', () => {
+    test.beforeEach(async ({ page }) => {
+      const email = process.env.E2E_LEARNER_EMAIL;
+      const password = process.env.E2E_LEARNER_PASSWORD;
+      if (!email || !password) throw new Error('The isolated QA learner credentials are required');
+      await page.goto(`${lmsOrigin}/login?redirect=%2Flms%2Fdashboard`);
+      await page.getByLabel('Email address', { exact: true }).fill(email);
+      await page.getByLabel('Password', { exact: true }).fill(password);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/lms\/dashboard(?:[?#].*)?$/, { timeout: 60_000 });
+      await expect(page.locator('[data-elevate-dashboard-content]:visible')).toBeVisible();
     });
 
-    test('courses page loads in demo mode', async ({ page }) => {
-      await page.goto('/lms/courses?demo=true');
+    test('dashboard loads for the learner', async ({ page }) => {
+      await expect(page.getByText('My Dashboard', { exact: true }).first()).toBeVisible();
+    });
 
-      await expect(page.locator('h1, h2')).toContainText(/course/i);
+    test('courses page loads for the learner', async ({ page }) => {
+      await page.goto(`${lmsOrigin}/lms/courses`);
+      await expect(page).toHaveURL(/\/lms\/courses(?:[?#].*)?$/);
+      await expect(page.getByRole('heading', { name: 'My Courses', exact: true })).toBeVisible();
     });
 
     test('navigation works in LMS', async ({ page }) => {
-      await page.goto('/lms/dashboard?demo=true');
-
-      // Check nav items exist
-      await expect(page.locator('nav, aside').locator('text=Courses')).toBeVisible();
+      await page.locator('a[href="/lms/courses"]').filter({ visible: true }).first().click();
+      await expect(page).toHaveURL(/\/lms\/courses(?:[?#].*)?$/);
     });
   });
 
@@ -183,15 +159,16 @@ test.describe('Complete Platform Verification', () => {
     test('verify page loads', async ({ page }) => {
       await page.goto('/verify');
 
-      await expect(page.locator('text=Verify')).toBeVisible();
-      await expect(page.locator('input')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Verify Credentials' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'How to Verify a Credential' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'info@elevateforhumanity.org' }).first()).toHaveAttribute('href', 'mailto:info@elevateforhumanity.org');
     });
 
-    test('invalid code shows error', async ({ page }) => {
-      await page.goto('/verify/INVALID-CODE-1234');
-
-      // Should show not found or error message
-      await expect(page.locator('text=/not found|invalid|error/i')).toBeVisible();
+    test('unknown credential does not render a verified record', async ({ page }) => {
+      const response = await page.goto('/verify/INVALID-CODE-1234');
+      expect([200, 404]).toContain(response?.status());
+      await expect(page.getByRole('heading', { name: /get you back on the right path/ })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Certificate Verified/ })).toBeHidden();
     });
   });
 
@@ -200,30 +177,23 @@ test.describe('Complete Platform Verification', () => {
   // ==========================================
 
   test.describe('API Endpoints', () => {
-    test('outcomes stats API returns data', async ({ request }) => {
-      const response = await request.get('/api/outcomes/stats');
-
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data).toHaveProperty('totalEnrollments');
-      expect(data).toHaveProperty('timestamp');
+    test('public outcomes methodology is available', async ({ page }) => {
+      const response = await page.goto('/outcomes');
+      expect(response?.status()).toBe(200);
+      await expect(page.getByRole('heading', { name: 'Outcomes & Methodology' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'How We Calculate Outcomes' })).toBeVisible();
     });
 
-    test('stripe endpoint exists', async ({ request }) => {
-      const response = await request.post('/api/stripe', {
-        data: { test: true },
-      });
-
-      // Should return 200 or 400 (not 404)
-      expect(response.status()).not.toBe(404);
+    test('checkout gateway rejects an invalid request before calling a payment provider', async ({ request }) => {
+      const response = await request.post('/api/checkout', { data: {} });
+      expect(response.status()).toBe(400);
+      expect(await response.json()).toMatchObject({ error: 'Invalid checkout request.', issues: expect.any(Array) });
     });
 
-    test('enrollments API exists', async ({ request }) => {
-      const response = await request.get('/api/enrollments');
-
-      // Should return 200 or 401 (not 404)
-      expect(response.status()).not.toBe(404);
+    test('learner enrollment API rejects an unauthenticated request', async ({ request }) => {
+      const response = await request.get(`${lmsOrigin}/api/enrollments/me`, { maxRedirects: 0 });
+      expect(response.status()).toBe(401);
+      expect(await response.json()).toMatchObject({ error: 'Unauthorized' });
     });
   });
 
@@ -235,14 +205,20 @@ test.describe('Complete Platform Verification', () => {
     test('tuition page shows pricing', async ({ page }) => {
       await page.goto('/tuition-fees');
 
-      // Should show pricing information
-      await expect(page.locator('text=/\\$[0-9,]+/')).toBeVisible();
+      const hvac = page.getByRole('row', { name: /^HVAC Technician / });
+      await expect(hvac.getByRole('cell', { name: 'HVAC Technician', exact: true })).toBeVisible();
+      await expect(hvac.getByRole('cell', { name: '$5,000', exact: true }).nth(0)).toBeVisible();
+      await expect(hvac.getByRole('cell', { name: '$5,000', exact: true }).nth(1)).toBeVisible();
     });
 
-    test('funding page shows options', async ({ page }) => {
+    test('funding page shows verified HVAC funding options', async ({ page }) => {
       await page.goto('/funding');
 
-      await expect(page.locator('text=WIOA')).toBeVisible();
+      const hvac = page.getByRole('article').filter({
+        has: page.getByRole('heading', { name: 'HVAC Certification', exact: true }),
+      });
+      await expect(hvac.getByText('WIOA', { exact: true })).toBeVisible();
+      await expect(hvac.getByRole('link', { name: 'Review program' })).toHaveAttribute('href', '/programs/hvac-technician');
     });
   });
 
@@ -255,15 +231,15 @@ test.describe('Complete Platform Verification', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/');
 
-      // Mobile menu button should be visible
-      const menuButton = page.locator('button[aria-label*="menu" i], button[aria-label*="Menu" i]');
-      await expect(menuButton).toBeVisible();
-
-      // Click to open menu
+      const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
+      await expect(menuButton).toBeEnabled();
       await menuButton.click();
-
-      // Menu items should appear
-      await expect(page.locator('text=Programs')).toBeVisible();
+      const navigation = page.getByRole('navigation', { name: 'Site navigation' });
+      await expect(navigation).toBeVisible();
+      const programs = navigation.getByRole('button', { name: 'Programs', exact: true });
+      await programs.click();
+      await expect(programs).toHaveAttribute('aria-expanded', 'true');
+      await expect(navigation.locator('a[href="/programs"]').first()).toBeVisible();
     });
 
     test('no horizontal scroll on mobile', async ({ page }) => {
@@ -301,8 +277,9 @@ test.describe('Complete Platform Verification', () => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(error.message));
 
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('heading', { level: 1, name: 'Train for your next career.' })).toBeVisible();
+      await expect(page.locator('.skip-to-main')).toHaveAttribute('data-interactive', 'true');
 
       // Filter out known non-critical errors
       const criticalErrors = errors.filter(
@@ -332,10 +309,12 @@ test.describe('Complete Platform Verification', () => {
     });
 
     test('program pages have unique titles', async ({ page }) => {
-      await page.goto('/programs/barber');
+      await page.goto('/programs/barber-apprenticeship');
+      await expect(page).toHaveTitle(/Barber Apprenticeship/i);
       const barberTitle = await page.title();
 
-      await page.goto('/programs/cdl-transportation');
+      await page.goto('/programs/cdl-training');
+      await expect(page).toHaveTitle(/CDL/i);
       const cdlTitle = await page.title();
 
       expect(barberTitle).not.toBe(cdlTitle);

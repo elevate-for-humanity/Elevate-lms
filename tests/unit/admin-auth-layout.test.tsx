@@ -38,21 +38,27 @@ describe('Admin authentication layout', () => {
   it('retains dashboard navigation on ordinary authenticated documents', () => {
     route.pathname = '/dashboard';
     const html = renderToStaticMarkup(
-      <AdminApplicationChrome navSections={[]}>Dashboard content</AdminApplicationChrome>,
+      <AdminApplicationChrome navSections={[]} notice={<aside>Cloud notice</aside>}>
+        Dashboard content
+      </AdminApplicationChrome>,
     );
     expect(html).toContain('Dashboard navigation');
     expect(html).toContain('Dashboard dock');
+    expect(html).toContain('Cloud notice');
   });
 
   it.each(['/studio', '/studio/browser'])('preserves the full-screen %s workspace', (pathname) => {
     route.pathname = pathname;
     const html = renderToStaticMarkup(
-      <AdminApplicationChrome navSections={[]}>Studio content</AdminApplicationChrome>,
+      <AdminApplicationChrome navSections={[]} notice={<aside>Cloud notice</aside>}>
+        Studio content
+      </AdminApplicationChrome>,
     );
     expect(html).toContain('data-elevate-dashboard-shell="studio"');
     // Reading settings precede this chrome; document flow would push Send below the viewport.
     expect(html).toContain('fixed inset-0');
     expect(html).not.toContain('Dashboard navigation');
     expect(html).not.toContain('Dashboard dock');
+    expect(html).not.toContain('Cloud notice');
   });
 });

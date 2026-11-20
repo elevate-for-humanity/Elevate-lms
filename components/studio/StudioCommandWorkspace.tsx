@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import { ResizableWorkspace } from './ResizableWorkspace';
-import { useStudioViewport } from './useStudioViewport';
+import { CloudBudgetNotice } from '@/components/admin/CloudBudgetNotice';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import StudioCapabilityRail from './StudioCapabilityRail';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
@@ -135,7 +135,6 @@ export default function StudioCommandWorkspace({
   const hasOpenedTool = (tool: string) => currentTool === tool || visitedTools.has(tool);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const viewportStyle = useStudioViewport();
   const [focusMode, setFocusMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -265,19 +264,7 @@ export default function StudioCommandWorkspace({
   return (
     <div
       data-studio-root="unified"
-      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
-      style={
-        viewportStyle ??
-        (focusMode
-          ? {
-              position: 'fixed',
-              inset: 0,
-              zIndex: 100,
-              width: '100vw',
-              height: '100dvh',
-            }
-          : undefined)
-      }
+      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white ${focusMode ? 'absolute inset-0 z-[100]' : ''}`}
     >
       <header className="shrink-0 border-b border-slate-200 bg-white text-slate-950">
         <div className="flex min-h-14 min-w-0 flex-wrap items-center gap-1 px-2 sm:gap-2 sm:px-5">
@@ -476,6 +463,7 @@ export default function StudioCommandWorkspace({
           >
             <nav aria-label="Saved Studio conversations" className="mb-4 space-y-1">
               <CommunicationTodos inboxPath="/phone/email" />
+              <CloudBudgetNotice />
               <p className="px-2 py-2 text-xs font-semibold text-slate-700">Your conversations</p>
               {historyError ? (
                 <p role="alert" className="px-2 text-xs text-amber-300">

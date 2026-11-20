@@ -7,10 +7,15 @@ const source = (file: string) => readFileSync(path.join(process.cwd(), file), 'u
 describe('Studio, Course Builder and PWA layout regression', () => {
   it('does not force fullscreen on Course Builder selection or duplicate a fixed viewport', () => {
     const studio = source('components/studio/StudioCommandWorkspace.tsx');
+    const chrome = source('components/admin/AdminApplicationChrome.tsx');
+    const browser = source('apps/admin/app/studio/browser/page.tsx');
     const viewport = source('components/studio/useStudioViewport.ts');
     expect(studio).not.toContain("if (surface === 'course') setFocusMode(true)");
     expect(viewport).not.toContain("position: 'fixed'");
     expect(viewport).toContain('height: viewport?.height ?? window.innerHeight');
+    expect(chrome).toContain('useStudioViewport(studioOwnsViewport)');
+    expect(studio).not.toContain('useStudioViewport');
+    expect(browser).not.toContain('useStudioViewport');
   });
   it('keeps the conversation input readable and compact with independently scrollable messages', () => {
     const chat = source('components/studio/UnifiedEllieChat.tsx');

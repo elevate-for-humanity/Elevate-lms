@@ -6,22 +6,30 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
 import { AdminMobileDock } from '@/components/admin/AdminMobileDock';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
+import { useStudioViewport } from '@/components/studio/useStudioViewport';
 import type { NavSection } from '@/lib/admin/nav-config';
 
 export function AdminApplicationChrome({
   children,
   navSections,
+  notice,
 }: {
   children: React.ReactNode;
   navSections: NavSection[];
+  notice?: React.ReactNode;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const studioOwnsViewport =
+    searchParams.get('embedded') !== 'studio' &&
+    (pathname === '/studio' || pathname === '/studio/browser');
+  const viewportStyle = useStudioViewport(studioOwnsViewport);
   // Staff owns a separate, server-authorized shell. Never mount the platform
   // administrator menu, inbox notices, or mobile dock around that workspace.
   if (pathname === '/staff-portal' || pathname.startsWith('/staff-portal/')) {
     return (
       <div data-elevate-staff-shell className="min-h-dvh min-w-0 bg-white">
+        {notice}
         {children}
       </div>
     );
@@ -30,6 +38,7 @@ export function AdminApplicationChrome({
   if (searchParams.get('embedded') === 'studio') {
     return (
       <div data-elevate-embedded-tool className="min-h-dvh min-w-0 bg-white">
+        {notice}
         {children}
       </div>
     );
@@ -39,6 +48,7 @@ export function AdminApplicationChrome({
   if (pathname === '/login' || pathname.startsWith('/auth/')) {
     return (
       <div data-elevate-auth-shell className="min-h-dvh min-w-0 bg-slate-950">
+        {notice}
         {children}
       </div>
     );
@@ -46,11 +56,10 @@ export function AdminApplicationChrome({
   // Only the conversation workspace owns the viewport. Tool pages such as
   // Course Builder are ordinary documents and must retain the Admin header and
   // browser scrolling.
-  const studioOwnsViewport = pathname === '/studio' || pathname === '/studio/browser';
-
   return (
     <div
       data-elevate-dashboard-shell={studioOwnsViewport ? 'studio' : 'admin'}
+      style={viewportStyle}
       className={
         studioOwnsViewport
           ? 'fixed inset-0 z-40 flex h-dvh min-w-0 flex-col overflow-hidden bg-white'
@@ -69,6 +78,7 @@ export function AdminApplicationChrome({
             : 'min-w-0 overflow-x-clip pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0'
         }
       >
+        {!studioOwnsViewport ? notice : null}
         {children}
       </main>
       {!pathname.endsWith('/phone') ? <DashboardVideoCalls /> : null}

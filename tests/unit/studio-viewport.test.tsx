@@ -52,8 +52,7 @@ it('keeps the composer in the visible viewport and preserves a draft when the ke
   });
   expect(screen.getByTestId('workspace').style.height).toBe('420px');
   expect(screen.getByTestId('workspace').style.position).toBe('');
-  expect(screen.getByTestId('workspace').style.top).toBe('');
-  expect(screen.getByTestId('workspace').style.maxHeight).toBe('420px');
+  expect(screen.getByTestId('workspace').style.top).toBe('12px');
   expect((screen.getByLabelText('Draft') as HTMLTextAreaElement).value).toBe(
     'Keep my course request',
   );
@@ -78,4 +77,6 @@ it('uses normal document layout on desktop', () => {
     flush();
   });
   expect(screen.getByTestId('workspace').style.position).toBe('');
+  expect(screen.getByTestId('workspace').style.height).toBe('');
+  expect(screen.getByTestId('workspace').style.top).toBe('');
 });

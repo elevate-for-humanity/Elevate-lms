@@ -1322,6 +1322,20 @@ img:not([data-nimg]) {
   padding: 0 !important;
 }
 
+.admin-studio-viewport {
+  position: relative;
+  container-type: size;
+  overflow-y: auto;
+}
+
+/* Landscape and keyboard viewports can be shorter than the toolbars and
+   editor combined. Keep that content reachable by scrolling the shell. */
+@container (height < 26rem) {
+  .admin-studio-viewport > .studio-workspace {
+    min-height: 26rem;
+  }
+}
+
 @media (max-width: 768px) {
   .admin-studio-viewport .max-w-5xl {
     padding-left: 0;

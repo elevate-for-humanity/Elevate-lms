@@ -93,3 +93,17 @@ it('exposes the real attachment input to the workspace upload control', () => {
   expect(screen.getByLabelText('Upload files')).toHaveAttribute('type', 'file');
   expect(screen.getByRole('button', { name: 'Attach a file', exact: true })).not.toHaveClass('hidden');
 });
+
+it('keeps review shortcuts collapsed until requested and prefills the draft', () => {
+  render(<UnifiedEllieChat embedded restoreLatest={false} />);
+  const actions = screen.getByRole('button', { name: 'Quick actions' });
+  expect(actions).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.queryByRole('button', { name: 'Review applications' })).toBeNull();
+  fireEvent.click(actions);
+  fireEvent.click(screen.getByRole('button', { name: 'Review applications' }));
+  expect(actions).toHaveAttribute('aria-expanded', 'false');
+  const draft = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Tell Paris what you need done...' });
+  expect(draft.value).toMatch(/applications/i);
+  expect(draft).toHaveFocus();
+  expect(screen.getByRole('button', { name: 'Send request' })).toBeEnabled();
+});

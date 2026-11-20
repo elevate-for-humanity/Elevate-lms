@@ -4,25 +4,28 @@ import { useEffect, useState, type CSSProperties } from 'react';
 
 // On phones, the visual viewport shrinks when the software keyboard opens.
 // Resize the existing workspace without remounting its conversation or browser.
-export function useStudioViewport(): CSSProperties | undefined {
+export function useStudioViewport(enabled = true): CSSProperties | undefined {
   const [style, setStyle] = useState<CSSProperties>();
   useEffect(() => {
+    if (!enabled) return;
     const viewport = window.visualViewport;
     let frame = 0;
     const update = () => {
       frame = 0;
-      if (window.innerWidth >= 1024) {
+      // Let the browser handle pinch zoom without shifting the app shell.
+      if (viewport && viewport.scale !== 1) return;
+      if (
+        window.innerWidth >= 1024 &&
+        (!viewport || (viewport.height >= window.innerHeight && viewport.offsetTop === 0))
+      ) {
         setStyle(undefined);
         return;
       }
-      // Let the browser handle pinch zoom; don't resize around magnified content.
-      if (viewport && viewport.scale !== 1) return;
-      // AdminApplicationChrome already owns the fixed Studio viewport.
-      // A second fixed-position child escapes its grid and covers adjacent
-      // controls when the keyboard opens. Resize in place instead.
+      // Size the shell once. Its children share the resulting space in their
+      // existing layout even when the keyboard shrinks or pans the viewport.
       setStyle({
         height: viewport?.height ?? window.innerHeight,
-        maxHeight: viewport?.height ?? window.innerHeight,
+        top: viewport?.offsetTop ?? 0,
       });
     };
     const schedule = () => {
@@ -38,6 +41,6 @@ export function useStudioViewport(): CSSProperties | undefined {
       viewport?.removeEventListener('resize', schedule);
       viewport?.removeEventListener('scroll', schedule);
     };
-  }, []);
-  return style;
+  }, [enabled]);
+  return enabled ? style : undefined;
 }

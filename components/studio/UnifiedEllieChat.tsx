@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import styles from './UnifiedEllieChat.module.css';
 import {courseResultId,courseResultLessonId} from '@/lib/course-builder/workspace-receipt.mjs';
@@ -712,6 +712,8 @@ export default function UnifiedEllieChat({
   const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
   const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
   const [showActivity, setShowActivity] = useState(false);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const quickActionsId = useId();
   const messagesViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
@@ -1208,7 +1210,7 @@ export default function UnifiedEllieChat({
     : 'border-gray-700 bg-gray-950 text-white placeholder:text-gray-500 focus:border-blue-500';
 
   return (
-    <div className={`${styles.root} ${embedded && contentSized ? styles.contentSized : ''} flex h-full min-h-0 min-w-0 flex-col overflow-hidden ${shellClass}`}>
+    <div className={`${styles.root} ${embedded && contentSized ? styles.contentSized : ''} flex h-full min-h-0 min-w-0 flex-col overflow-x-hidden overflow-y-auto ${shellClass}`}>
       {!embedded && (
         <div
           className={`flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 ${headerClass}`}
@@ -1268,7 +1270,7 @@ export default function UnifiedEllieChat({
             id="studio-ai-provider"
             value={selectedProvider}
             onChange={(event) => setSelectedProvider(event.target.value as StudioProvider)}
-            className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800"
+            className="min-h-9 min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800"
           >
             {(Object.keys(STUDIO_PROVIDER_LABELS) as StudioProvider[]).map((provider) => (
               <option
@@ -1288,9 +1290,18 @@ export default function UnifiedEllieChat({
           </span>
           <button
             type="button"
+            aria-controls={quickActionsId}
+            aria-expanded={quickActionsOpen}
+            onClick={() => setQuickActionsOpen((open) => !open)}
+            className="ml-auto inline-flex min-h-9 shrink-0 items-center rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
+          >
+            Quick actions
+          </button>
+          <button
+            type="button"
             onClick={() => setShowActivity((visible) => !visible)}
             aria-expanded={showActivity}
-            className="ml-auto inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
+            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
           >
             <Activity className="h-4 w-4" aria-hidden="true" />
             {showActivity ? 'Hide activity' : 'Activity'}
@@ -1298,7 +1309,12 @@ export default function UnifiedEllieChat({
         </div>
       </div>
 
-      <nav className="shrink-0 border-b border-slate-200 bg-white px-3 py-2" aria-label="Paris actions">
+      <nav
+        id={quickActionsId}
+        hidden={!quickActionsOpen}
+        className="shrink-0 border-b border-slate-200 bg-white px-3 py-2"
+        aria-label="Paris actions"
+      >
             <div className="flex min-w-0 gap-2 overflow-x-auto" aria-label="Paris shortcuts">
               {QUICK.map((quick) => (
                 <button
@@ -1306,6 +1322,7 @@ export default function UnifiedEllieChat({
                   type="button"
                   onClick={() => {
                     setInput(quick.text);
+                    setQuickActionsOpen(false);
                     inputRef.current?.focus();
                   }}
                   className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-base font-semibold text-slate-800 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-600"
@@ -1532,24 +1549,24 @@ export default function UnifiedEllieChat({
               aria-label="Attach a file"
               disabled={uploading}
               onClick={() => attachmentInputRef.current?.click()}
-              className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
+              className="flex h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
             >
               {uploading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
               ) : (
                 <Paperclip className="h-5 w-5" aria-hidden="true" />
               )}
-              <span className="text-xs font-semibold">Files</span>
+              <span className="hidden text-xs font-semibold md:inline">Files</span>
             </button>
             <button
               type="button"
               aria-label="Take a photo"
               disabled={uploading}
               onClick={() => cameraInputRef.current?.click()}
-              className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
+              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
             >
               <Camera className="h-5 w-5" aria-hidden="true" />
-              <span className="text-xs font-semibold">Camera</span>
+              <span className="hidden text-xs font-semibold md:inline">Camera</span>
             </button>
             <button
               type="button"
@@ -1585,7 +1602,7 @@ export default function UnifiedEllieChat({
               aria-label={listening ? 'Stop voice input' : 'Start voice input'}
               aria-pressed={listening}
               onClick={toggleSpeechRecognition}
-              className={`flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 ${
+              className={`${composerToolsOpen || listening ? 'flex' : 'hidden sm:flex'} h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 ${
                 listening
                   ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
                   : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
@@ -1596,7 +1613,7 @@ export default function UnifiedEllieChat({
               ) : (
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
-              <span className="hidden sm:inline">
+              <span className="hidden md:inline">
                 {listening ? 'Stop listening' : 'Talk to Paris'}
               </span>
             </button>
@@ -1611,14 +1628,14 @@ export default function UnifiedEllieChat({
                   return !enabled;
                 });
               }}
-              className={`flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50`}
+              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50`}
             >
               {voiceOutputEnabled ? (
                 <Volume2 className="h-5 w-5" aria-hidden="true" />
               ) : (
                 <VolumeX className="h-5 w-5" aria-hidden="true" />
               )}
-              <span>{voiceOutputEnabled ? 'Voice on' : 'Voice off'}</span>
+              <span className="hidden md:inline">{voiceOutputEnabled ? 'Voice on' : 'Voice off'}</span>
             </button>
             <button
               type="button"

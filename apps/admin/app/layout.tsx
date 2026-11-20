@@ -87,7 +87,10 @@ export default async function AdminGroupLayout({ children }: { children: React.R
         <I18nProvider>
           <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
             <DashboardReadingSupport>
-              <AdminApplicationChrome navSections={DEFAULT_NAV}><CloudBudgetNotice />{children}<Suspense fallback={null}><AutomaticPhone admin /></Suspense></AdminApplicationChrome>
+              <AdminApplicationChrome navSections={DEFAULT_NAV} notice={<CloudBudgetNotice />}>
+                {children}
+                <Suspense fallback={null}><AutomaticPhone admin /></Suspense>
+              </AdminApplicationChrome>
             </DashboardReadingSupport>
           </Suspense>
         </I18nProvider>

@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS } from '@/lib/program-holder/onboarding-readiness';
+import {
+  HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
+  requiredProgramHolderDocuments,
+} from '@/lib/program-holder/onboarding-readiness';
 
 describe('HVAC Program Holder onboarding contract', () => {
   it('requires the payment and compliance document set', () => {
@@ -12,6 +15,19 @@ describe('HVAC Program Holder onboarding contract', () => {
       'w9',
       'hvac_training_plan',
       'profile_photo',
+    ]);
+  });
+
+  it('requires student media only when the Program Holder enables that feature', () => {
+    expect(requiredProgramHolderDocuments(true).map((item) => item.type)).not.toContain(
+      'student_photo',
+    );
+    expect(
+      requiredProgramHolderDocuments(true, { student_media_required: true }).map(
+        (item) => item.type,
+      ),
+    ).toEqual([
+      ...HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
       'student_photo',
       'student_video',
     ]);

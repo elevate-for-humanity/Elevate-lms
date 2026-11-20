@@ -1,18 +1,16 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * E2E tests for AutomaticCourseBuilder — UUID resolution and redirect.
+ * Browser acceptance for the canonical Course Production Studio.
  *
- * These tests mock the API layer so they run without a live backend.
- * They verify that:
- *   1. A valid UUID in `data.id` routes to /admin/lms/courses/{uuid}
- *   2. A valid UUID in `data.course.id` (fallback path) also routes correctly
- *   3. A valid UUID in `data.courseId` (second fallback) also routes correctly
- *   4. A response with no valid UUID shows an error and does not redirect
+ * The retired /admin/lms/courses/new surface no longer exists. These tests
+ * exercise the current /studio/courses route and its saved course selection,
+ * tab navigation, slug compatibility, fallback, and inventory refresh.
  */
 
 const VALID_UUID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
-const COURSE_BUILDER_PATH = '/admin/lms/courses/new';
+const SECOND_UUID = 'b2c3d4e5-f6a7-8901-bcde-f12345678901';
+const COURSE_BUILDER_PATH = '/studio/courses';
 
 async function loginAsAdmin(page: Page) {
   const email = process.env.TEST_ADMIN_EMAIL;
@@ -26,175 +24,103 @@ async function loginAsAdmin(page: Page) {
   await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 30_000 });
 }
 
-test.describe('AutomaticCourseBuilder — UUID resolution', () => {
+async function mockCourseInventory(page: Page, onRead?: () => void) {
+  await page.route('**/api/admin/courses', (route) => {
+    onRead?.();
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          id: VALID_UUID,
+          title: 'HVAC Technician',
+          slug: 'hvac-technician',
+          description: 'Heating and cooling fundamentals',
+          program_id: 'program-hvac',
+          status: 'draft',
+        },
+        {
+          id: SECOND_UUID,
+          title: 'Barber Apprenticeship',
+          slug: 'barber-apprenticeship',
+          description: 'Barber theory and practical training',
+          program_id: 'program-barber',
+          status: 'published',
+        },
+      ]),
+    });
+  });
+  await page.route('**/api/admin/dev-studio/programs', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        data: [
+          { id: 'program-hvac', title: 'HVAC', slug: 'hvac-technician', status: 'active' },
+          {
+            id: 'program-barber',
+            title: 'Barber Apprenticeship',
+            slug: 'barber-apprenticeship',
+            status: 'active',
+          },
+        ],
+      }),
+    }),
+  );
+}
+
+test.describe('Course Production Studio — canonical route and selection', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
 
-  // Intercept all upstream AI generation endpoints so the builder can reach
-  // the final save step without a real OpenAI key.
-  async function mockAiEndpoints(page: import('@playwright/test').Page) {
-    const outline = {
-      title: 'Test Course',
-      description: 'A test course',
-      duration: '4 weeks',
-      level: 'beginner',
-      modules: [
-        {
-          id: 'mod-1',
-          title: 'Module 1',
-          description: 'Intro',
-          duration: 60,
-          lessons: [
-            {
-              id: 'les-1',
-              title: 'Lesson 1',
-              type: 'video',
-              content: 'Content',
-              duration: 30,
-              objectives: ['Understand basics'],
-            },
-          ],
-        },
-      ],
-    };
+  test('loads the requested saved course by UUID', async ({ page }) => {
+    await mockCourseInventory(page);
+    await page.goto(`${COURSE_BUILDER_PATH}?courseId=${VALID_UUID}&tab=courses`);
 
-    await page.route('**/api/ai/generate-course-outline', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(outline),
-      }),
+    await expect(page.getByRole('heading', { name: 'Course Production Studio' })).toBeVisible();
+    await expect(page.locator('#ultimate-course-selector')).toHaveValue(VALID_UUID);
+    await expect(page.locator('#ultimate-course-selector option:checked')).toContainText(
+      'HVAC Technician',
     );
-    await page.route('**/api/ai/generate-module-content', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ lessons: outline.modules[0].lessons }),
-      }),
-    );
-    await page.route('**/api/ai/generate-assessments', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
-    );
-    await page.route('**/api/ai/generate-video-scripts', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) }),
-    );
-  }
-
-  async function fillAndSubmit(page: import('@playwright/test').Page) {
-    await page.fill(
-      'textarea',
-      'Create a comprehensive HVAC technician training course covering basics to advanced troubleshooting',
-    );
-    await page.click('button:has-text("Generate Course")');
-  }
-
-  test('routes to /admin/lms/courses/{uuid} when id is at data.id', async ({ page }) => {
-    await mockAiEndpoints(page);
-
-    await page.route('**/api/admin/lms/courses', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ id: VALID_UUID }),
-      }),
-    );
-
-    await page.goto(COURSE_BUILDER_PATH);
-    await fillAndSubmit(page);
-
-    await page.waitForURL(`**/admin/lms/courses/${VALID_UUID}`, { timeout: 15000 });
-    expect(page.url()).toContain(`/admin/lms/courses/${VALID_UUID}`);
   });
 
-  test('routes correctly when UUID is at data.course.id', async ({ page }) => {
-    await mockAiEndpoints(page);
+  test('resolves a saved course slug to its canonical UUID', async ({ page }) => {
+    await mockCourseInventory(page);
+    await page.goto(`${COURSE_BUILDER_PATH}?courseId=barber-apprenticeship&tab=courses`);
 
-    await page.route('**/api/admin/lms/courses', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ course: { id: VALID_UUID } }),
-      }),
+    await expect(page.locator('#ultimate-course-selector')).toHaveValue(SECOND_UUID);
+    await expect(page.locator('#ultimate-course-selector option:checked')).toContainText(
+      'Barber Apprenticeship',
     );
-
-    await page.goto(COURSE_BUILDER_PATH);
-    await fillAndSubmit(page);
-
-    await page.waitForURL(`**/admin/lms/courses/${VALID_UUID}`, { timeout: 15000 });
-    expect(page.url()).toContain(`/admin/lms/courses/${VALID_UUID}`);
   });
 
-  test('routes correctly when UUID is at data.courseId', async ({ page }) => {
-    await mockAiEndpoints(page);
+  test('falls back to the first saved course for an unknown selection', async ({ page }) => {
+    await mockCourseInventory(page);
+    await page.goto(`${COURSE_BUILDER_PATH}?courseId=missing-course&tab=courses`);
 
-    await page.route('**/api/admin/lms/courses', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ courseId: VALID_UUID }),
-      }),
-    );
-
-    await page.goto(COURSE_BUILDER_PATH);
-    await fillAndSubmit(page);
-
-    await page.waitForURL(`**/admin/lms/courses/${VALID_UUID}`, { timeout: 15000 });
-    expect(page.url()).toContain(`/admin/lms/courses/${VALID_UUID}`);
+    await expect(page.locator('#ultimate-course-selector')).toHaveValue(VALID_UUID);
   });
 
-  test('shows error and does not redirect when response has no valid UUID', async ({ page }) => {
-    await mockAiEndpoints(page);
+  test('keeps canonical tab navigation in the Studio URL', async ({ page }) => {
+    await mockCourseInventory(page);
+    await page.goto(`${COURSE_BUILDER_PATH}?courseId=${VALID_UUID}&tab=courses`);
 
-    await page.route('**/api/admin/lms/courses', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        // Deliberately malformed — no UUID field
-        body: JSON.stringify({ status: 'ok', result: 'created' }),
-      }),
-    );
+    await page.getByRole('button', { name: 'Credential Registry', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`^.+/studio/courses\\?.*courseId=${VALID_UUID}.*tab=registry`));
+  });
 
-    // Capture the alert dialog
-    let alertMessage = '';
-    page.on('dialog', async (dialog) => {
-      alertMessage = dialog.message();
-      await dialog.dismiss();
+  test('refreshes inventory without losing the selected course', async ({ page }) => {
+    let inventoryReads = 0;
+    await mockCourseInventory(page, () => {
+      inventoryReads += 1;
     });
+    await page.goto(`${COURSE_BUILDER_PATH}?courseId=${SECOND_UUID}&tab=courses`);
+    await expect(page.locator('#ultimate-course-selector')).toHaveValue(SECOND_UUID);
 
-    await page.goto(COURSE_BUILDER_PATH);
-    await fillAndSubmit(page);
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click();
 
-    // Wait for the alert to fire (generation completes then throws)
-    await page.waitForTimeout(5000);
-
-    expect(alertMessage).toMatch(/failed to generate course/i);
-    // Must not have navigated away from the builder
-    expect(page.url()).not.toContain(`/admin/lms/courses/${VALID_UUID}`);
-  });
-
-  test('rejects a non-UUID string at data.id and shows error', async ({ page }) => {
-    await mockAiEndpoints(page);
-
-    await page.route('**/api/admin/lms/courses', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ id: 'not-a-uuid' }),
-      }),
-    );
-
-    let alertMessage = '';
-    page.on('dialog', async (dialog) => {
-      alertMessage = dialog.message();
-      await dialog.dismiss();
-    });
-
-    await page.goto(COURSE_BUILDER_PATH);
-    await fillAndSubmit(page);
-
-    await page.waitForTimeout(5000);
-
-    expect(alertMessage).toMatch(/failed to generate course/i);
+    await expect.poll(() => inventoryReads).toBeGreaterThanOrEqual(2);
+    await expect(page.locator('#ultimate-course-selector')).toHaveValue(SECOND_UUID);
   });
 });

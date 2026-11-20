@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
+
+const lmsOrigin = peerOrigin('lms');
 
 /**
  * Complete Platform E2E Tests
@@ -14,62 +17,41 @@ test.describe('Complete Platform Verification', () => {
     test('homepage loads with all sections', async ({ page }) => {
       await page.goto('/');
 
-      // Hero section
-      await expect(page.locator('section').first()).toBeVisible();
-
-      // Programs section
-      await expect(page.locator('text=Programs')).toBeVisible();
-
-      // Outcomes dashboard
-      await expect(page.locator('text=Student Outcomes')).toBeVisible();
-
-      // Footer
-      await expect(page.locator('footer')).toBeVisible();
+      const main = page.getByRole('main');
+      await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
+      await expect(main.getByRole('link', { name: /Explore programs/ })).toHaveAttribute('href', '/programs');
+      await expect(main.getByRole('heading', { name: /Barber & Beauty Apprenticeships/ })).toBeVisible();
+      await expect(main.getByRole('heading', { name: /Apply and get started/ })).toBeVisible();
+      await expect(page.getByRole('contentinfo')).toBeVisible();
     });
 
     test('eligibility quiz works end-to-end', async ({ page }) => {
       await page.goto('/eligibility/quiz');
+      await expect(page.getByRole('heading', { name: /WorkOne funding conversation/ })).toBeVisible();
 
-      // Check quiz loads
-      await expect(page.locator('text=Could You Qualify')).toBeVisible();
-
-      // Answer first question
-      await page.click('text=25-54 years old');
-      await page.click('text=Next');
-
-      // Answer second question
-      await page.click('text=Unemployed');
-      await page.click('text=Next');
-
-      // Continue through quiz...
-      await page.click('button:has-text("Yes")');
-      await page.click('text=Next');
-
-      // Should eventually show results
-      // (Quiz has 7 questions, we're testing the flow works)
+      const questions = page.getByRole('main').getByRole('group');
+      await expect(questions).toHaveCount(5);
+      await expect(page.getByRole('heading', { name: /Your next step is an agency eligibility review/ })).toBeHidden();
+      for (const question of await questions.all()) {
+        await question.getByRole('button', { name: 'Yes', exact: true }).click();
+      }
+      await expect(page.getByRole('heading', { name: /Your next step is an agency eligibility review/ })).toBeVisible();
+      await expect(page.getByText(/You answered yes to 5 of 5 screening questions/)).toBeVisible();
     });
 
-    test('programs page lists all programs', async ({ page }) => {
+    test('programs page lists the published QA programs', async ({ page }) => {
       await page.goto('/programs');
-
-      await expect(page.locator('h1')).toContainText(/program/i);
-
-      // Check for program categories
-      const programLinks = await page.locator('a[href^="/programs/"]').count();
-      expect(programLinks).toBeGreaterThan(5);
+      const main = page.getByRole('main');
+      await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
+      for (const slug of ['barber-apprenticeship', 'business-administration', 'cdl-training', 'hvac-technician']) {
+        await expect(main.locator(`a[href="/programs/${slug}"]`).filter({ visible: true }).first()).toBeVisible();
+      }
     });
 
-    test('individual program page has all required elements', async ({ page }) => {
-      await page.goto('/programs/barber');
-
-      // Breadcrumbs
-      await expect(page.locator('nav[aria-label="Breadcrumb"]')).toBeVisible();
-
-      // Program title
-      await expect(page.locator('h1')).toBeVisible();
-
-      // Apply CTA
-      await expect(page.locator('text=Apply')).toBeVisible();
+    test('individual program page has its title and application link', async ({ page }) => {
+      await page.goto('/programs/barber-apprenticeship');
+      await expect(page.getByRole('heading', { level: 1, name: 'Learn the trade where the work happens.' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Apply for Barber Apprenticeship' })).toBeVisible();
     });
 
     test('outcomes page shows live metrics', async ({ page }) => {
@@ -92,28 +74,16 @@ test.describe('Complete Platform Verification', () => {
   // ==========================================
 
   test.describe('Application Flow', () => {
-    test('apply page loads with form', async ({ page }) => {
-      await page.goto('/apply');
-
-      await expect(page.locator('form')).toBeVisible();
-
-      // Check required fields exist
-      await expect(page.locator('input[name*="name"], input[name*="Name"]').first()).toBeVisible();
-      await expect(page.locator('input[name="email"], input[type="email"]').first()).toBeVisible();
+    test('standard intake page loads with form', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
+      await expect(page.getByRole('textbox', { name: 'First Name', exact: true })).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'Email', exact: true })).toBeVisible();
     });
 
     test('form validates required fields', async ({ page }) => {
-      await page.goto('/apply');
-
-      // Try to submit empty form
-      const submitButton = page.locator('button[type="submit"]');
-      if (await submitButton.isVisible()) {
-        await submitButton.click();
-
-        // Should show validation errors or prevent submission
-        const url = page.url();
-        expect(url).toContain('/apply'); // Should stay on page
-      }
+      await page.goto('/apply/student/form?intent=inquiry');
+      await page.getByRole('button', { name: 'Continue', exact: true }).click();
+      await expect(page.getByText('Complete your name, date of birth, email, and phone number.')).toBeVisible();
     });
   });
 
@@ -131,10 +101,12 @@ test.describe('Complete Platform Verification', () => {
     });
 
     test('register page loads', async ({ page }) => {
-      await page.goto('/register');
+      await page.goto(`${lmsOrigin}/signup`);
+      await expect(page.getByRole('heading', { name: 'Create Your Account' })).toBeVisible();
 
       await expect(page.locator('input[type="email"]')).toBeVisible();
-      await expect(page.locator('input[type="password"]')).toBeVisible();
+      await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+      await expect(page.getByLabel('Confirm Password', { exact: true })).toBeVisible();
     });
 
     test('protected routes redirect to login', async ({ page }) => {

@@ -1,4 +1,14 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { isApprovedDocument, type DocumentReview } from './document-review';
+
+export const BUSINESS_REGISTRATION_GUIDANCE = 'Upload the official business registration, certificate of formation, or articles of organization for the legal entity named on your Program Holder agreement.';
+
+export function programHolderRequirementStatus(documents: DocumentReview[], documentType: string) {
+  const records = documents.filter(document => document.document_type === documentType);
+  if (records.some(isApprovedDocument)) return 'approved';
+  if (records.some(document => programHolderDocumentStatus(document) === 'pending')) return 'pending';
+  return records.length ? 'rejected' : 'missing';
+}
 
 /** Document types accepted by POST /api/program-holder/documents/upload */
 export const PROGRAM_HOLDER_UPLOAD_DOCUMENT_TYPES = [

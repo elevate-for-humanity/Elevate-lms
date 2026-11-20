@@ -211,8 +211,13 @@ jobs:
         env:
           PARIS_GITHUB_AUTH_MODE: workflow
           PARIS_GITHUB_AUTH_SOURCE: signed-job
+          PARIS_REPAIR_ENGINE: ${{ vars.PARIS_REPAIR_ENGINE || 'internal' }}
         run: |
           set -euo pipefail
+          case "$PARIS_REPAIR_ENGINE" in
+            internal|openhands) ;;
+            *) echo '::error::PARIS_REPAIR_ENGINE must be internal or openhands'; exit 1 ;;
+          esac
           IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin'
           [[ "$IMAGE_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
@@ -251,7 +256,7 @@ jobs:
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
-            --update-env-vars=AI_NARRATION_PROVIDER=kokoro,PARIS_GITHUB_AUTH_MODE=workflow,PARIS_GITHUB_APP_SOURCE=workflow "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
+            "--update-env-vars=AI_NARRATION_PROVIDER=kokoro,PARIS_GITHUB_AUTH_MODE=workflow,PARIS_GITHUB_APP_SOURCE=workflow,PARIS_REPAIR_ENGINE=$PARIS_REPAIR_ENGINE" "${GITHUB_RUNTIME_FLAGS[@]}" --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash
         env:

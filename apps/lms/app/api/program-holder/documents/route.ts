@@ -9,6 +9,7 @@ import { materialUploadPolicy } from '@/lib/program-holder/material-upload';
 import {
   CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
   HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
+  PROGRAM_HOLDER_STUDENT_MEDIA_DOCUMENTS,
 } from '@/lib/program-holder/onboarding-readiness';
 
 export const dynamic = 'force-dynamic';
@@ -19,6 +20,7 @@ const MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'video
 const DOCUMENT_TYPES = new Set([
   ...CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
   ...HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
+  ...PROGRAM_HOLDER_STUDENT_MEDIA_DOCUMENTS.map((item) => item.type),
   'company_logo',
   'profile_photo',
   'lab_tracker',
@@ -116,6 +118,10 @@ export async function POST(request: NextRequest) {
     );
   if (documentType === 'profile_photo' && !['image/jpeg', 'image/png'].includes(file.type))
     return NextResponse.json({ error: 'Upload a JPG or PNG profile picture.' }, { status: 400 });
+  if (documentType === 'student_photo' && !['image/jpeg', 'image/png'].includes(file.type))
+    return NextResponse.json({ error: 'Upload a JPG or PNG student training photo.' }, { status: 400 });
+  if ((documentType === 'student_video') !== (file.type === 'video/mp4'))
+    return NextResponse.json({ error: 'Select Student training video for an MP4 file.' }, { status: 400 });
   if (documentType === 'provider_invoice') {
     if (file.type === 'video/mp4')
       return NextResponse.json(
@@ -174,15 +180,16 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
 
-  const extension =
+  const extension = documentType === 'student_video' ? 'mp4' :
     file.name
       .split('.')
       .pop()
       ?.replace(/[^a-zA-Z0-9]/g, '')
       .toLowerCase() || 'bin';
   const path = `program-holders/${ctx.holderId}/${documentType}/${randomUUID()}.${extension}`;
+  const bucket = documentType === 'student_video' ? 'videos' : 'documents';
   const { error: storageError } = await ctx.db.storage
-    .from('documents')
+    .from(bucket)
     .upload(path, await file.arrayBuffer(), {
       contentType: material?.contentType || file.type,
       upsert: false,
@@ -201,7 +208,7 @@ export async function POST(request: NextRequest) {
       document_type: documentType,
       file_name: file.name,
       file_url: path,
-      storage_bucket: 'documents',
+      storage_bucket: bucket,
       file_size: file.size,
       mime_type: material?.contentType || file.type,
       ocr_text: isSyllabus ? syllabusText : null,
@@ -223,7 +230,7 @@ export async function POST(request: NextRequest) {
     .select('id,document_type,file_name,status,created_at')
     .single();
   if (error) {
-    await ctx.db.storage.from('documents').remove([path]);
+    await ctx.db.storage.from(bucket).remove([path]);
     return NextResponse.json({ error: 'The document record could not be saved.' }, { status: 500 });
   }
   if (isSyllabus) {

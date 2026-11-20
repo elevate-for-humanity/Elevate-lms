@@ -137,7 +137,7 @@ async function notifyClockIn(
     .from('notifications')
     .insert({
       user_id: params.userId,
-      type: 'timeclock',
+      type: 'ojt',
       title: 'Clock-in recorded',
       message: `Your clock-in was recorded${params.siteName ? ` at ${params.siteName}` : ''}.`,
       action_label: 'View timeclock',
@@ -184,12 +184,12 @@ async function notifyAdminsOfClockAttempt(
   const reason = params.successful ? `${label} accepted; hours remain subject to review.` : params.reason || `${label} was not accepted.`;
   const rows = (admins || []).map((admin: any) => ({
     user_id: admin.id,
-    type: 'timeclock',
+    type: 'ojt',
     title: `${outcome}: ${learner}`,
     message: `${learner} — ${site}. ${reason}`,
     action_label: 'Review timeclock',
-    action_url: '/apprenticeships/hours',
-    link: '/apprenticeships/hours',
+    action_url: '/apprenticeships',
+    link: '/apprenticeships',
     read: false,
     metadata: {
       learner_user_id: params.userId,
@@ -204,7 +204,7 @@ async function notifyAdminsOfClockAttempt(
       progress_entry_id: params.progressEntryId || null,
       attempted_at: params.attemptedAt,
     },
-    idempotency_key: `admin-${clockAction}-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
+    idempotency_key: `admin-${clockAction}-${admin.id}-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
   }));
   if (rows.length) {
     const { error } = await db.from('notifications').insert(rows);
@@ -433,7 +433,7 @@ async function _POST(request: NextRequest) {
         .from('notifications')
         .insert({
           user_id: user.id,
-          type: 'timeclock',
+          type: 'ojt',
           title: studentSubject,
           message: studentText,
           action_label: 'Open timeclock',

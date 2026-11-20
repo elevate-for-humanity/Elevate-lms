@@ -11,6 +11,10 @@ on:
         description: Run only the isolated QA Website Builder authorization check
         type: boolean
         default: false
+      navigation_health_only:
+        description: Verify the four read-only navigation and health regressions
+        type: boolean
+        default: false
       exhaustive:
         description: Run the focused intake and platform tests, then run the full suite without stopping after twelve failures
         type: boolean
@@ -19,7 +23,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: e2e-desktop-chrome-${{ github.ref }}
+  group: e2e-desktop-chrome-${{ github.ref }}${{ inputs.navigation_health_only && '-navigation-health' || '' }}
   cancel-in-progress: true
 
 permissions:
@@ -27,7 +31,12 @@ permissions:
 
 jobs:
   desktop-chrome:
-    name: E2E desktop-chrome
+    name: ${{ inputs.exhaustive && format('E2E desktop-chrome shard {0}/4', matrix.shard) || 'E2E desktop-chrome' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        shard: ${{ fromJSON(inputs.exhaustive && !inputs.authorization_only && !inputs.navigation_health_only && '[1,2,3,4]' || '[1]') }}
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-noble@sha256:3bed4b1a12f2338642f3d8cba28e291deef3c66bd4a964bbeb3e57bbff511dbd
@@ -86,29 +95,46 @@ jobs:
       - name: Verify isolated QA database and three-service E2E configuration
         run: node scripts/qa/verify-e2e-service-config.mjs
       - name: Verify Website Builder authorization with disposable QA sessions
+        if: ${{ !inputs.navigation_health_only }}
         run: node scripts/qa/test-builder-authorization.mjs
       - name: Verify preinstalled Playwright browsers
         if: ${{ !inputs.authorization_only }}
         run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Verify the four read-only navigation and health checks
+        if: ${{ inputs.navigation_health_only }}
+        env:
+          PLAYWRIGHT_APPS: marketing
+        run: >-
+          pnpm exec playwright test tests/e2e/critical-flows.spec.ts
+          tests/e2e/critical-user-journeys.spec.ts --project=desktop-chrome
+          --grep "should have working navigation|should return healthy status|mobile navigation works|404 page displays correctly"
+          --retries=0 --reporter=line,html
       - name: Verify published marketing artwork through Next image loader
-        if: ${{ !inputs.authorization_only }}
+        if: ${{ !inputs.authorization_only && !inputs.navigation_health_only }}
         run: node --test scripts/marketing-image-config.test.mjs
       - name: Verify Course Builder chat controls in short and landscape panels
-        if: ${{ !inputs.authorization_only }}
+        if: ${{ !inputs.authorization_only && !inputs.navigation_health_only }}
         run: node scripts/test-course-chat-layout.mjs
       # The broad test:e2e command runs desktop-chrome only. Certify the same
       # dedicated Host Shop identity on tablet and phone when configured.
       # A missing identity does NOT certify the Host Shop release.
       - name: Authenticated Host Shop desktop, tablet and mobile geometry
-        if: ${{ !inputs.authorization_only && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
+        if: ${{ matrix.shard == 1 && !inputs.authorization_only && !inputs.navigation_health_only && env.E2E_HOST_SHOP_EMAIL != '' && env.E2E_HOST_SHOP_PASSWORD != '' }}
         run: >-
           pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts
           --grep "critical Host Shop surfaces fit the active device viewport"
           --project=desktop-chrome --project=tablet-chrome
           --project=android-chrome --project=iphone-webkit
+      - name: Repeat homepage readiness and error check
+        id: homepage_repeat
+        if: ${{ matrix.shard == 1 && !inputs.authorization_only && !inputs.navigation_health_only && inputs.exhaustive }}
+        run: >-
+          pnpm exec playwright test tests/e2e/complete-platform.spec.ts
+          --project=desktop-chrome --grep "no console errors on homepage"
+          --repeat-each=3 --retries=0 --output=test-results-homepage-repeat
       - name: Run focused intake and platform browser tests
         id: focused
-        if: ${{ !inputs.authorization_only && inputs.exhaustive }}
+        if: ${{ !cancelled() && matrix.shard == 1 && !inputs.authorization_only && !inputs.navigation_health_only && inputs.exhaustive && (steps.homepage_repeat.outcome == 'success' || steps.homepage_repeat.outcome == 'failure') }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report-focused
         run: >-
@@ -116,28 +142,32 @@ jobs:
           tests/e2e/complete-platform.spec.ts --project=desktop-chrome
           --max-failures=0 --output=test-results-focused
       - name: Run desktop-chrome E2E (marketing, admin, lms)
-        if: ${{ !inputs.authorization_only && !inputs.exhaustive }}
+        if: ${{ !inputs.authorization_only && !inputs.navigation_health_only && !inputs.exhaustive }}
         run: pnpm test:e2e
-      - name: Run every desktop-chrome E2E test
-        if: ${{ !cancelled() && !inputs.authorization_only && inputs.exhaustive && (steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
-        run: pnpm test:e2e --max-failures=0
+      - name: Run desktop-chrome E2E shard
+        if: ${{ !cancelled() && !inputs.authorization_only && !inputs.navigation_health_only && inputs.exhaustive && ((matrix.shard != 1 && success()) || steps.focused.outcome == 'success' || steps.focused.outcome == 'failure') }}
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: browser-shard.json
+        run: pnpm test:e2e --max-failures=0 --shard=${{ matrix.shard }}/4 --reporter=line,html,json
       - name: Upload Playwright report
         if: ${{ always() && !inputs.authorization_only }}
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-desktop-chrome
+          name: ${{ inputs.exhaustive && format('e2e-desktop-chrome-shard-{0}', matrix.shard) || 'e2e-desktop-chrome' }}
           path: |
             playwright-report/
             test-results/
             playwright-report-focused/
             test-results-focused/
+            test-results-homepage-repeat/
+            browser-shard.json
           retention-days: 14
 
   # An isolated, public-only regression must finish even if the broad
   # cross-app E2E suite runs into unrelated Course Builder/Program Holder failures.
   # Keep the full E2E job intact: this supplements, never bypasses, its result.
   public-host-shop-category:
-    if: ${{ !inputs.authorization_only }}
+    if: ${{ !inputs.authorization_only && !inputs.navigation_health_only }}
     name: Public Host Shop navigation and application (five devices)
     runs-on: ubuntu-24.04
     container:
@@ -184,7 +214,7 @@ jobs:
           retention-days: 14
 
   email-device-browsers:
-    if: ${{ !inputs.authorization_only }}
+    if: ${{ !inputs.authorization_only && !inputs.navigation_health_only }}
     name: Email device browsers
     runs-on: ubuntu-24.04
     container:

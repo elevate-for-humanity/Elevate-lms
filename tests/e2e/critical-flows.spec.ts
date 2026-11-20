@@ -11,10 +11,16 @@ test.describe('Critical User Flows', () => {
     test('should have working navigation', async ({ page }) => {
       await page.goto('/');
 
-      // Check main nav links exist
-      await expect(page.getByRole('link', { name: /programs/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /about/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /contact/i })).toBeVisible();
+      const navigation = page.getByRole('navigation', { name: 'Main navigation', exact: true });
+      await expect(navigation.getByRole('link', { name: 'Programs', exact: true })).toHaveAttribute('href', '/programs');
+      await expect(navigation.getByRole('link', { name: 'About', exact: true })).toHaveAttribute('href', '/about');
+      const aboutMenu = navigation.getByRole('button', { name: 'About menu', exact: true });
+      await expect(aboutMenu).toBeEnabled();
+      await aboutMenu.press('ArrowDown');
+      await expect(aboutMenu).toHaveAttribute('aria-expanded', 'true');
+      const contact = navigation.getByRole('link', { name: 'Contact & Visit', exact: true });
+      await expect(contact).toBeVisible();
+      await expect(contact).toHaveAttribute('href', '/contact');
     });
 
     test('should have CTA buttons', async ({ page }) => {
@@ -137,7 +143,12 @@ test.describe('Critical User Flows', () => {
       expect(response.ok()).toBeTruthy();
 
       const data = await response.json();
-      expect(data.overall).toBe('pass');
+      expect(data).toMatchObject({
+        status: 'healthy',
+        healthy: true,
+        ready: true,
+        dependencies: { supabase: { ok: true } },
+      });
     });
   });
 

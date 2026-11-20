@@ -7,7 +7,7 @@ begin
   raise exception 'Website Builder dependencies are required';
  end if;
  if (select md5(prosrc) from pg_proc where oid='rpc_private.ensure_app_trial_wallet(uuid,text,integer)'::regprocedure)
-  is distinct from 'c5a318bd58d891f036f11c4c668d381b' then
+  not in ('c5a318bd58d891f036f11c4c668d381b','a78234d86c2ba4a11c84a43791b6bea5') then
   raise exception 'Trial wallet helper changed since review; inspect before applying';
  end if;
  if to_regprocedure('public.enforce_website_organization_write()') is not null or exists(
@@ -43,6 +43,9 @@ drop policy if exists user_websites_update_own on public.user_websites;
 create policy user_websites_update_own on public.user_websites for update to authenticated
  using (user_id=(select auth.uid()))
  with check (user_id=(select auth.uid()));
+drop policy if exists user_websites_delete_own on public.user_websites;
+create policy user_websites_delete_own on public.user_websites for delete to authenticated
+ using (user_id=(select auth.uid()) and organization_id is null);
 
 -- Preserve a legacy owner's ordinary edits when membership is absent. Only a
 -- new organization attachment needs target-organization management authority.
@@ -53,6 +56,12 @@ begin
  if auth.role() is distinct from 'authenticated' then return new;end if;
  if tg_op='UPDATE' then
   if new.organization_id is not distinct from old.organization_id then return new;end if;
+  if old.organization_id is not null and not exists(
+   select 1 from public.organization_users ou where ou.organization_id=old.organization_id
+    and ou.user_id=auth.uid() and ou.status='active' and ou.role in ('org_owner','org_admin')
+  ) then
+   raise exception 'Organization management authority required' using errcode='42501';
+  end if;
  end if;
  if new.organization_id is not null and not exists(
   select 1 from public.organization_users ou where ou.organization_id=new.organization_id

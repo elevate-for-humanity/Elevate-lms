@@ -9,7 +9,11 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM public.programs WHERE slug = 'hvac-technician') THEN
     RAISE EXCEPTION 'ISOLATED_QA_HVAC_PROGRAM_REQUIRED';
   END IF;
-END $$;
+END $;
+
+CREATE SCHEMA IF NOT EXISTS private;
+REVOKE ALL ON SCHEMA private FROM PUBLIC,anon;
+GRANT USAGE ON SCHEMA private TO authenticated,service_role;
 
 CREATE TABLE IF NOT EXISTS public.employer_onboarding (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -377,10 +381,27 @@ CREATE POLICY qa_workbooks_enrolled_read ON public.digital_workbooks FOR SELECT 
 CREATE POLICY qa_workbook_sections_service ON public.digital_workbook_sections FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY qa_workbook_sections_enrolled_read ON public.digital_workbook_sections FOR SELECT TO authenticated USING (EXISTS (
   SELECT 1 FROM public.digital_workbooks w
+  JOIN public.program_enrollments pe ON pe.program_id=w.program_id
   WHERE w.id=workbook_id
+    AND COALESCE(pe.user_id,pe.student_id)=auth.uid()
+    AND pe.revoked_at IS NULL
+    AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
 ));
 CREATE POLICY qa_workbook_responses_service ON public.digital_workbook_responses FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY qa_workbook_responses_owner ON public.digital_workbook_responses FOR ALL TO authenticated USING (user_id=auth.uid()) WITH CHECK (user_id=auth.uid());
+CREATE POLICY qa_workbook_responses_owner ON public.digital_workbook_responses FOR ALL TO authenticated
+  USING (user_id=auth.uid())
+  WITH CHECK (
+    user_id=auth.uid()
+    AND EXISTS (
+      SELECT 1 FROM public.digital_workbook_sections s
+      JOIN public.digital_workbooks w ON w.id=s.workbook_id
+      JOIN public.program_enrollments pe ON pe.program_id=w.program_id
+      WHERE s.id=section_id
+        AND COALESCE(pe.user_id,pe.student_id)=auth.uid()
+        AND pe.revoked_at IS NULL
+        AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
+    )
+  );
 GRANT SELECT ON public.digital_workbooks, public.digital_workbook_sections TO authenticated;
 GRANT SELECT,INSERT,UPDATE ON public.digital_workbook_responses TO authenticated;
 GRANT ALL ON public.digital_workbooks, public.digital_workbook_sections, public.digital_workbook_responses TO service_role;

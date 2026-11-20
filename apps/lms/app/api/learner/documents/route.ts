@@ -16,9 +16,17 @@ export async function POST(req: NextRequest) {
   const file = form.get('file');
   if (!requirementId || !(file instanceof File)) return NextResponse.json({ error: 'Requirement and file are required' }, { status: 400 });
   if (!ALLOWED.has(file.type) || file.size <= 0 || file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'Use a non-empty PDF, JPG, PNG, or WebP file up to 10 MB' }, { status: 400 });
-  const { data: requirement } = await supabase.from('enrollment_requirements').select('id,enrollment_id,status,requirement_type,title').eq('id', requirementId).maybeSingle();
+  const { data: requirement, error: requirementError } = await supabase.from('enrollment_requirements').select('id,enrollment_id,status,requirement_type,title').eq('id', requirementId).maybeSingle();
+  if (requirementError) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
   if (!requirement) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
-  const { data: ownedEnrollment } = await supabase.from('program_enrollments').select('id').eq('id', requirement.enrollment_id).or(`user_id.eq.${user.id},student_id.eq.${user.id}`).maybeSingle();
+  const { data: ownedEnrollment, error: enrollmentError } = await supabase
+    .from('program_enrollments')
+    .select('id')
+    .eq('id', requirement.enrollment_id)
+    .is('revoked_at', null)
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+    .maybeSingle();
+  if (enrollmentError) return NextResponse.json({ error: 'Document service unavailable' }, { status: 503 });
   if (!ownedEnrollment) return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
   if (requirement.status === 'verified') return NextResponse.json({ error: 'This requirement is already verified. Contact staff to replace it.' }, { status: 409 });
   if (!new Set(['government_id','high_school_diploma','identity','proof_of_address','proof_of_age','social_security_card','eligibility','funding','program']).has(requirement.requirement_type)) return NextResponse.json({ error: 'This requirement does not accept document uploads' }, { status: 400 });

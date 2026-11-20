@@ -27,7 +27,7 @@ it.each([408, 504])('checkpoints the real provider HTTP %i error without another
   expect(sleep).not.toHaveBeenCalled();
 });
 
-it.each([502, 503])('recovers from the real provider HTTP %i error within bounded retry policy', async status => {
+it.each([429, 502, 503])('recovers from the real provider HTTP %i error within bounded retry policy', async status => {
   let requests = 0;
   const request = vi.fn(async () => ++requests === 1 ? failure(status) : Response.json({
     choices: [{ message: { content: 'Validated repair plan' } }],
@@ -63,6 +63,19 @@ it('does not transform an actual authorization rejection into a transient checkp
   await expect(retryRepairInference(signal => new ElevateProvider().chat({ messages, signal }), {
     timeoutMs: 210000, sleep,
   })).rejects.toThrow('HTTP 403');
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(sleep).not.toHaveBeenCalled();
+});
+
+it.each([401, 403])('never retries real HTTP %i authorization errors disguised as transient failures', async status => {
+  const message = status === 401 ? 'rate limit exceeded' : 'temporarily unavailable';
+  const request = vi.fn(async () => Response.json({ error: { message } }, { status }));
+  vi.stubGlobal('fetch', request);
+  const sleep = vi.fn(async () => {});
+  const provider = new ElevateProvider();
+  await expect(retryRepairInference(signal => provider.chat({ messages, signal }), {
+    timeoutMs: 210000, sleep,
+  })).rejects.toThrow(`HTTP ${status}`);
   expect(request).toHaveBeenCalledTimes(1);
   expect(sleep).not.toHaveBeenCalled();
 });

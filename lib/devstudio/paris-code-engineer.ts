@@ -506,6 +506,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string, acto
       } catch (error) {
         if (!(error instanceof Error) || error.message !== 'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE') throw error;
         await checkpoint();
+        logger.warn('[PARIS] repair inference deferred', {
+          repairId: taskId,
+          turn: turn + 1,
+          reason: 'reason' in error ? error.reason : 'unknown',
+        });
         return NextResponse.json({error:'PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE',
           branch:{name:branch},changed_files:[...changedFiles],observations:observations.slice(-6)}, {status:503});
       }

@@ -172,6 +172,11 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 WORKDIR /app
 
 COPY --from=builder /app/apps/lms/.next/standalone ./
+# pnpm/Next standalone can trace pdf-parse as a symlink. Docker COPY cannot
+# overlay a real package directory onto that symlink (observed on 2026-11-20).
+# Clear only the four PDF export entries before copying their complete packages.
+COPY --from=builder /app/scripts/gcp/prepare-lms-pdf-module-overlay.sh /tmp/prepare-lms-pdf-module-overlay.sh
+RUN sh /tmp/prepare-lms-pdf-module-overlay.sh /app/node_modules
 COPY --from=builder /export/pdf-node_modules/ ./node_modules/
 
 # Exercise the same Node ESM import used for Program Holder syllabus uploads.

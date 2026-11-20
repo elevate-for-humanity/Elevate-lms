@@ -215,9 +215,8 @@ export async function approveApplication(
         const { error: authCleanupError } = await db.auth.admin.deleteUser(userId);
         if (authCleanupError) {
           logger.warn(
-            '[approve] failed to remove Auth user after profile provisioning failure',
+            `[approve] failed to remove Auth user after profile provisioning failure for application ${applicationId}`,
             new Error(authCleanupError.message),
-            { userId, applicationId },
           );
         }
       }

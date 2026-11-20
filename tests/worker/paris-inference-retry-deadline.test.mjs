@@ -22,7 +22,7 @@ test('expired inference is not retried with an already-aborted signal',async()=>
   assert.equal(calls,1);assert.deepEqual(state.waits,[]);
 });
 test('never duplicates a timed-out or 504 inference even with time remaining',async()=>{
-  for (const error of [Error('HTTP 504'),Error('The operation was aborted due to timeout'),Object.assign(Error('connection cancelled'),{name:'AbortError'}),Object.assign(Error('deadline exceeded'),{name:'TimeoutError'})]) {
+  for (const error of [Error('HTTP 504'),Error('Elevate LLM worker 504: request failed'),Error('The operation was aborted due to timeout'),Object.assign(Error('connection cancelled'),{name:'AbortError'}),Object.assign(Error('deadline exceeded'),{name:'TimeoutError'})]) {
     const {state,options}=clock();let calls=0;
     await assert.rejects(retryRepairInference(async()=>{calls++;state.time+=100;throw error;},options),/PARIS_INFERENCE_TEMPORARILY_UNAVAILABLE/);
     assert.equal(calls,1,error.message);assert.deepEqual(state.waits,[],error.message);
@@ -33,6 +33,17 @@ test('HTTP 502 and 503 still use bounded transient retries',async()=>{
     const {state,options}=clock();let calls=0;
     assert.equal(await retryRepairInference(async()=>{if(++calls===1)throw Error('HTTP '+code);return 'recovered';},options),'recovered');
     assert.equal(calls,2);assert.deepEqual(state.waits,[5000]);
+  }
+});
+test('owned model responses classify by status even when the provider body uses generic wording',async()=>{
+  for(const status of [429,502,503]){
+    const {state,options}=clock();let calls=0;
+    const result=await retryRepairInference(async()=>{
+      if(++calls===1)throw Error(`Configured AI provider "elevate" failed: Elevate LLM worker ${status}: request failed`);
+      return 'recovered';
+    },options);
+    assert.equal(result,'recovered');assert.equal(calls,2);
+    assert.deepEqual(state.budgets,[210000,205000]);
   }
 });
 test('open circuit waits for its provider cooldown without resetting the circuit',async()=>{
@@ -48,7 +59,7 @@ test('cooldown outside the remaining request budget defers without another call'
   assert.equal(calls,1);assert.deepEqual(state.waits,[]);
 });
 test('authorization and paid-inference errors remain terminal and unchanged',async()=>{
-  for(const message of ['HTTP 403','PARIS_INFERENCE_DENIED','PARIS_INFERENCE_RESULT_REQUIRED']){
+  for(const message of ['HTTP 403','Elevate LLM worker 401: rate limit text','Elevate LLM worker 403: temporarily unavailable','PARIS_INFERENCE_DENIED','PARIS_INFERENCE_RESULT_REQUIRED']){
     const {state,options}=clock();const error=Error(message);
     await assert.rejects(retryRepairInference(async()=>{throw error;},options),actual=>actual===error);
     assert.deepEqual(state.waits,[]);

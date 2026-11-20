@@ -15,6 +15,11 @@ CREATE SCHEMA IF NOT EXISTS private;
 REVOKE ALL ON SCHEMA private FROM PUBLIC,anon;
 GRANT USAGE ON SCHEMA private TO authenticated,service_role;
 
+ALTER TABLE public.employers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY qa_employers_owner_read ON public.employers
+  FOR SELECT TO authenticated USING (owner_user_id = auth.uid());
+GRANT SELECT ON public.employers TO authenticated;
+
 CREATE TABLE IF NOT EXISTS public.employer_onboarding (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   employer_id uuid NOT NULL REFERENCES public.employers(id) ON DELETE CASCADE,
@@ -158,6 +163,7 @@ CREATE TABLE IF NOT EXISTS public.course_lessons (
   learning_objectives jsonb NOT NULL DEFAULT '[]'::jsonb,
   quiz_questions jsonb NOT NULL DEFAULT '[]'::jsonb,
   key_terms jsonb NOT NULL DEFAULT '[]'::jsonb,
+  activities jsonb NOT NULL DEFAULT '[]'::jsonb,
   passing_score integer NOT NULL DEFAULT 80,
   is_published boolean NOT NULL DEFAULT false,
   is_required boolean NOT NULL DEFAULT true,

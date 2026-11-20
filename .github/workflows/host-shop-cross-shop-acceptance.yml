@@ -148,11 +148,24 @@ jobs:
         # partial fixtures too, so clean up every started provisioning outcome.
         if: ${{ always() && (steps.provision.outcome == 'success' || steps.provision.outcome == 'failure' || steps.provision.outcome == 'cancelled') }}
         run: node scripts/qa/host-shop-cross-shop-acceptance.mjs cleanup
-      - name: Upload redacted Playwright failure evidence
+      # Playwright screenshots, videos, traces and error contexts can contain
+      # authenticated browser state. Never upload the raw test-results directory.
+      - name: Prepare metadata-only Host Shop failure record
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa-safe-failure
+          {
+            printf 'run_id=%s\n' "$GITHUB_RUN_ID"
+            printf 'source_sha=%s\n' "$GITHUB_SHA"
+            printf 'test_status=failed\n'
+            printf 'browser_artifacts=not_uploaded\n'
+          } > qa-safe-failure/summary.txt
+      - name: Upload metadata-only Host Shop failure record
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: host-shop-cross-shop-qa-failure
-          path: |
-            test-results/
+          path: qa-safe-failure/summary.txt
           retention-days: 7

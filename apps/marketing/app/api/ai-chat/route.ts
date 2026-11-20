@@ -9,6 +9,7 @@ import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
@@ -168,8 +169,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
     }
 
+    // Marketing must hydrate the same canonical runtime connection as Admin
+    // before deciding that the shared owned model is unavailable.
+    await hydrateProcessEnv();
+    signal.throwIfAborted();
     if (!isAIAvailable()) {
-      return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided' });
+      return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided', liveAiAvailable: false },
+        { headers: { 'Cache-Control': 'no-store' } });
     }
 
     try {
@@ -180,15 +186,18 @@ export async function POST(req: NextRequest) {
         signal,
       });
 
-      return NextResponse.json({ reply: result.content, provider: result.provider });
+      return NextResponse.json({ reply: result.content, provider: result.provider, mode: 'ai', liveAiAvailable: true },
+        { headers: { 'Cache-Control': 'no-store' } });
     } catch (error) {
       console.error('Canonical PARIS gateway error:', error);
-      return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided' });
+      return NextResponse.json({ reply: fallbackReply(lastUserMessage, context), mode: 'guided', liveAiAvailable: false },
+        { headers: { 'Cache-Control': 'no-store' } });
     }
   } catch (error) {
     console.error('PARIS request error:', error);
     return NextResponse.json({
-      reply: `I cannot verify that information right now. Please use /programs or contact Elevate at ${PLATFORM_DEFAULTS.mainPhone}.`,
-    });
+      error: 'PARIS cannot reach live AI guidance right now. Please try again shortly.',
+      code: 'PARIS_AI_UNAVAILABLE',
+    }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }
 }

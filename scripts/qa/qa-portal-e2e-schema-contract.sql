@@ -18,7 +18,139 @@ GRANT USAGE ON SCHEMA private TO authenticated,service_role;
 ALTER TABLE public.employers ENABLE ROW LEVEL SECURITY;
 CREATE POLICY qa_employers_owner_read ON public.employers
   FOR SELECT TO authenticated USING (owner_user_id = auth.uid());
+CREATE POLICY qa_employers_owner_update ON public.employers
+  FOR UPDATE TO authenticated
+  USING (owner_user_id = auth.uid())
+  WITH CHECK (owner_user_id = auth.uid());
 GRANT SELECT ON public.employers TO authenticated;
+GRANT UPDATE (
+  company_name,business_name,contact_name,phone,contact_phone,industry,
+  company_size,city,state,zip,website_url,description,updated_at
+) ON public.employers TO authenticated;
+
+-- The employer report uses these canonical hiring relations through the
+-- signed-in employer's RLS. QA keeps them empty; browser personas never copy or
+-- expose production candidates, applications, placements, or referrals.
+CREATE TABLE IF NOT EXISTS public.job_postings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  employer_id uuid REFERENCES public.employers(id) ON DELETE CASCADE,
+  title text NOT NULL,
+  description text,
+  requirements text,
+  responsibilities text,
+  salary_range text,
+  salary_min numeric,
+  salary_max numeric,
+  location text,
+  remote_allowed boolean DEFAULT false,
+  job_type text,
+  experience_level text,
+  education_required text,
+  skills_required text[],
+  benefits text,
+  application_deadline date,
+  status text DEFAULT 'active',
+  posted_by uuid,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  employment_type text,
+  job_description text,
+  job_title text,
+  positions_available integer DEFAULT 0,
+  positions_filled integer DEFAULT 0,
+  required_certifications jsonb,
+  required_programs jsonb,
+  is_ojt boolean NOT NULL DEFAULT false,
+  is_apprenticeship boolean NOT NULL DEFAULT false,
+  wotc_eligible boolean NOT NULL DEFAULT false,
+  wioa_approved boolean NOT NULL DEFAULT false,
+  remote_type text DEFAULT 'onsite',
+  application_url text,
+  external_source text,
+  external_id text,
+  expires_at timestamptz,
+  approved_at timestamptz,
+  approved_by uuid
+);
+CREATE TABLE IF NOT EXISTS public.job_applications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  job_posting_id uuid REFERENCES public.job_postings(id) ON DELETE CASCADE,
+  student_id uuid,
+  resume_url text,
+  cover_letter text,
+  status text DEFAULT 'submitted',
+  notes text,
+  applied_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  job_id text,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS public.job_placements (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id uuid,
+  employer_id uuid REFERENCES public.employers(id) ON DELETE CASCADE,
+  job_title text,
+  start_date date,
+  end_date date,
+  status text DEFAULT 'active',
+  hourly_wage numeric,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  tenant_id uuid REFERENCES public.tenants(id),
+  employer_name text,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS public.candidate_employer_referrals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  employer_id uuid NOT NULL REFERENCES public.employers(id) ON DELETE CASCADE,
+  candidate_profile_id uuid NOT NULL,
+  enrollment_id uuid NOT NULL REFERENCES public.program_enrollments(id) ON DELETE CASCADE,
+  program_id uuid NOT NULL REFERENCES public.programs(id) ON DELETE CASCADE,
+  status text NOT NULL DEFAULT 'routed'
+    CHECK (status IN ('routed','reviewing','contacted','interviewing','hired','declined','revoked')),
+  routed_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  consent_version text,
+  notes text,
+  UNIQUE(employer_id,enrollment_id)
+);
+ALTER TABLE public.job_postings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.job_placements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.candidate_employer_referrals ENABLE ROW LEVEL SECURITY;
+CREATE POLICY qa_job_postings_service ON public.job_postings
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY qa_job_postings_employer_read ON public.job_postings
+  FOR SELECT TO authenticated USING (EXISTS (
+    SELECT 1 FROM public.employers e
+    WHERE e.id=employer_id AND e.owner_user_id=auth.uid()
+  ));
+CREATE POLICY qa_job_applications_service ON public.job_applications
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY qa_job_applications_employer_read ON public.job_applications
+  FOR SELECT TO authenticated USING (EXISTS (
+    SELECT 1 FROM public.job_postings jp
+    JOIN public.employers e ON e.id=jp.employer_id
+    WHERE jp.id=job_posting_id AND e.owner_user_id=auth.uid()
+  ));
+CREATE POLICY qa_job_placements_service ON public.job_placements
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY qa_job_placements_employer_read ON public.job_placements
+  FOR SELECT TO authenticated USING (EXISTS (
+    SELECT 1 FROM public.employers e
+    WHERE e.id=employer_id AND e.owner_user_id=auth.uid()
+  ));
+CREATE POLICY qa_candidate_referrals_service ON public.candidate_employer_referrals
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY qa_candidate_referrals_employer_read ON public.candidate_employer_referrals
+  FOR SELECT TO authenticated USING (EXISTS (
+    SELECT 1 FROM public.employers e
+    WHERE e.id=employer_id AND e.owner_user_id=auth.uid()
+  ));
+GRANT SELECT ON public.job_postings,public.job_applications,public.job_placements,
+  public.candidate_employer_referrals TO authenticated;
+GRANT ALL ON public.job_postings,public.job_applications,public.job_placements,
+  public.candidate_employer_referrals TO service_role;
 
 CREATE TABLE IF NOT EXISTS public.employer_onboarding (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -479,9 +611,10 @@ INSERT INTO public.course_lessons(
   '<h2>EPA 608 orientation</h2><p>Review the training sequence and safe study expectations.</p>',
   '{}'::jsonb,
   '<h2>EPA 608 orientation</h2><p>Review the training sequence and safe study expectations.</p>',
-  'https://s3.us-east-005.backblazeb2.com/elevate-course-media/course-videos/manual-lessons/d48c61c4-8880-4d9d-9ab5-fab4dd51b201/f1d32b7f-7cd4-44c4-9858-6b756ef21b89/reviewed-a3f0e4f8faf8717c83c64741b63d3f2799cb173e6a56131d7bc2f241e41c139f/completed-lesson-manual.mp4',
+  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4',
   '{}'::jsonb,4,'lesson','[]'::jsonb,'[]'::jsonb,'[]'::jsonb,80,true,true,1,'[]'::jsonb,'published'
-) ON CONFLICT (id) DO NOTHING;
+) ON CONFLICT (id) DO UPDATE
+SET video_url=EXCLUDED.video_url;
 
 INSERT INTO public.digital_workbooks(id,slug,title,program_id,is_active)
 SELECT '73c75d0c-5f03-4bc6-8fb2-e6bb8bb10f31','hvac-epa608-guided-practice',

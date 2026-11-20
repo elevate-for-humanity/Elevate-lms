@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         partnerId: partner.id,
         documentType,
       });
-      return NextResponse.json({ ok: false, error: `File upload failed: ${uploadError.message}` }, { status: 500 });
+      return NextResponse.json({ ok: false, error: 'File upload failed. Please try again.' }, { status: 500 });
     }
 
     const { data: savedDocument, error: insertError } = await db.from('partner_documents').insert({
@@ -80,13 +80,19 @@ export async function POST(request: NextRequest) {
         partnerId: partner.id,
         documentType,
       });
-      return NextResponse.json({ ok: false, error: `Document record failed: ${insertError?.message || 'Unable to verify saved document.'}` }, { status: 500 });
+      return NextResponse.json({ ok: false, error: 'The document record could not be saved.' }, { status: 500 });
     }
 
-    await db
+    const { error: onboardingError } = await db
       .from('partners')
       .update({ onboarding_step: 'documents', updated_at: new Date().toISOString() })
       .eq('id', partner.id);
+    if (onboardingError) {
+      logger.error('[host-shop-documents] Onboarding step could not be updated', onboardingError, {
+        partnerId: partner.id,
+        documentId: savedDocument.id,
+      });
+    }
 
     return NextResponse.json({ ok: true, documentType, documentId: savedDocument.id });
   } catch (error) {

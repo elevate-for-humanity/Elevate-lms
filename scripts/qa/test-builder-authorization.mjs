@@ -110,6 +110,15 @@ try {
     .eq('organization_id', organizations[0]).eq('user_id', ownerId), 'Legacy ownership fixture');
   const legacyUpdate = check(await owner.from('user_websites').update({ site_name: run }).eq('id', sites[0]).select('id'), 'Legacy owner update positive control');
   assert.equal(legacyUpdate.length, 1, 'An unchanged organization must not block the actual owner');
+  const legacyDelete = await owner.from('user_websites').delete().eq('id', sites[0]).select('id');
+  if (legacyDelete.error) mustDeny(legacyDelete, 'Former organization managers cannot delete organization websites');
+  else assert.deepEqual(legacyDelete.data, [], 'Personal ownership must not bypass organization delete authority');
+  const legacyDetach = await owner.from('user_websites').update({ organization_id: null }).eq('id', sites[0]).select('id');
+  if (legacyDetach.error) mustDeny(legacyDetach, 'Former organization managers cannot detach organization websites');
+  else assert.deepEqual(legacyDetach.data, [], 'Personal ownership must not bypass old-organization authority');
+  const protectedOrganization = check(await admin.from('user_websites')
+    .select('organization_id').eq('id', sites[0]).single(), 'Organization attachment remains protected');
+  assert.equal(protectedOrganization.organization_id, organizations[0]);
   check(await admin.from('organization_users').insert({
     organization_id: organizations[0], user_id: ownerId, role: 'org_owner', status: 'active',
   }), 'Restore fixture membership');
@@ -189,6 +198,7 @@ console.info(JSON.stringify({
   real_password_logins: 2, wallet_cap: 500, repeat_refill_denied: true,
   foreign_wallet_denied: true, expired_trial_denied: true,
   member_read_allowed: true, member_delete_denied: true, manager_delete_allowed: true,
+  former_manager_delete_denied: true, former_manager_detach_denied: true,
   forged_revision_denied: true, owner_revision_allowed: true,
   foreign_organization_insert_denied: true, foreign_organization_move_denied: true,
   legacy_owner_update_allowed: true,

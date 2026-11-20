@@ -103,6 +103,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Configure pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
       - name: Reject superseded Marketing requests before building
         env:
           GH_TOKEN: ${{ github.token }}
@@ -129,18 +141,6 @@ jobs:
 
       - name: Check billing before installing or building
         run: node scripts/gcp/preflight-billing.mjs
-
-      - name: Configure pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.2
-
-      - name: Configure Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies and validate before expensive build
         shell: bash

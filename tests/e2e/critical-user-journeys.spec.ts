@@ -3,6 +3,14 @@ import { peerOrigin } from './helpers/app-origins';
 
 const lmsOrigin = peerOrigin('lms');
 
+async function dismissCookiePreferences(page: Page) {
+  const close = page.getByRole('button', {
+    name: 'Close and use necessary cookies only',
+    exact: true,
+  });
+  if (await close.isVisible().catch(() => false)) await close.click();
+}
+
 async function signInLearner(page: Page) {
   const email = process.env.E2E_LEARNER_EMAIL;
   const password = process.env.E2E_LEARNER_PASSWORD;
@@ -23,13 +31,14 @@ test.describe('Critical User Journeys', () => {
   test.describe('New User Application Journey', () => {
     test('complete journey: homepage → programs → apply', async ({ page }) => {
       await page.goto('/');
+      await dismissCookiePreferences(page);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
       await page.getByRole('link', { name: 'Browse training programs', exact: true }).click();
       await expect(page).toHaveURL(/\/programs(?:[?#].*)?$/);
 
       const hvac = page.getByRole('main').getByRole('article').filter({
-        has: page.getByRole('heading', { name: 'HVAC Certification', exact: true }),
+        hasText: 'HVAC Certification',
       });
       await hvac.getByRole('link', { name: 'View Program' }).click();
       await expect(page).toHaveURL(/\/programs\/hvac-technician(?:[?#].*)?$/);
@@ -83,8 +92,10 @@ test.describe('Critical User Journeys', () => {
     test('about page loads correctly', async ({ page }) => {
       await page.goto('/about');
 
-      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-      await expect(page.getByText(/mission|workforce|training/i).first()).toBeVisible();
+      await expect(
+        page.getByRole('heading', { level: 1, name: 'People. Skills. Opportunity.' }),
+      ).toBeVisible();
+      await expect(page.locator('#mission').getByText(/Our mission is to expand access/)).toBeVisible();
     });
   });
 

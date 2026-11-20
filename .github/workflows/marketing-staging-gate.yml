@@ -3,6 +3,15 @@ name: Marketing Staging Gate
 on:
   pull_request:
     branches: [main]
+    # Skip the container build only when every change is unrelated to Marketing.
+    paths-ignore:
+      - 'docs/**'
+      - 'internal-docs/**'
+      - 'tests/e2e/**'
+      - '.github/workflows/deploy-admin.yml'
+      - '.github/workflows/deploy-google-lms-trigger.yml'
+      - '.github/workflows/deploy-google-store-runtime.yml'
+      - 'scripts/test-github-authorization-contract.mjs'
   workflow_dispatch:
 
 permissions:

@@ -407,7 +407,7 @@ GRANT SELECT,INSERT,UPDATE ON public.digital_workbook_responses TO authenticated
 GRANT ALL ON public.digital_workbooks, public.digital_workbook_sections, public.digital_workbook_responses TO service_role;
 
 CREATE OR REPLACE FUNCTION public.can_edit_digital_workbook(p_workbook_id uuid)
-RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
+RETURNS boolean LANGUAGE sql STABLE SECURITY INVOKER SET search_path=''
 AS $function$
   SELECT auth.uid() IS NOT NULL AND EXISTS (
     SELECT 1 FROM public.digital_workbooks w
@@ -421,7 +421,7 @@ REVOKE ALL ON FUNCTION public.can_edit_digital_workbook(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.can_edit_digital_workbook(uuid) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.get_my_course_pacing(p_course_id uuid)
-RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path=''
 AS $function$
 DECLARE actor uuid:=auth.uid();
 BEGIN

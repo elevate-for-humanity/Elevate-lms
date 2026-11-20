@@ -132,7 +132,7 @@ test.describe('Complete Platform Verification', () => {
       await page.getByLabel('Password', { exact: true }).fill(password);
       await page.locator('button[type="submit"]').click();
       await expect(page).toHaveURL(/\/lms\/dashboard(?:[?#].*)?$/, { timeout: 60_000 });
-      await expect(page.locator('[data-elevate-dashboard-content]:visible')).toBeVisible();
+      await expect(page.getByText('My Dashboard', { exact: true }).first()).toBeVisible();
     });
 
     test('dashboard loads for the learner', async ({ page }) => {

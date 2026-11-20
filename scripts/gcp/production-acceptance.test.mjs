@@ -182,3 +182,19 @@ test('Host Shop browser acceptance stays pinned to dispatched source SHA and cur
  assert.ok(workflow.includes('EXPECTED_SHA="$QA_EXPECTED_MAIN_SHA"'));
  assert.ok(workflow.includes('test "$MAIN_SHA" = "$QA_EXPECTED_MAIN_SHA"'));
 });
+
+test('Host Shop failure artifact never uploads raw authenticated browser state',()=>{
+ const workflow=readFileSync(new URL('../../.github/workflows/host-shop-cross-shop-acceptance.yml',import.meta.url),'utf8');
+ const prepare=workflow.split('      - name: Prepare metadata-only Host Shop failure record\n')[1]?.split('\n      - name:')[0];
+ const upload=workflow.split('      - name: Upload metadata-only Host Shop failure record\n')[1]?.split('\n      - name:')[0];
+ assert.ok(prepare,'metadata generation must exist on the failure path');
+ assert.match(prepare,/if: failure\(\)/);
+ assert.match(prepare,/GITHUB_RUN_ID/);
+ assert.match(prepare,/GITHUB_SHA/);
+ assert.doesNotMatch(prepare,/SUPABASE_SERVICE_ROLE_KEY|QA_SHOP_A_PASSWORD|test-results\//);
+ assert.ok(upload,'only safe failure metadata should be uploaded');
+ assert.match(upload,/if: failure\(\)/);
+ assert.match(upload,/path: qa-safe-failure\/summary\.txt/);
+ assert.doesNotMatch(upload,/test-results\/|playwright-report|\.zip|\.png|\.webm|trace/);
+ assert.doesNotMatch(workflow,/name: Upload redacted Playwright failure evidence/);
+});

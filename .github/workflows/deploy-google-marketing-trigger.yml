@@ -75,7 +75,8 @@ jobs:
       group: google-marketing-dispatch-main
       cancel-in-progress: true
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: elevate-protected-marketing
     steps:
       - name: Dispatch trusted main Marketing release
         env:
@@ -90,7 +91,8 @@ jobs:
       cancel-in-progress: false
       queue: max
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: elevate-protected-marketing
     environment: production
     timeout-minutes: 120
     env:
@@ -259,7 +261,8 @@ jobs:
       cancel-in-progress: false
       queue: max
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: elevate-protected-marketing
     environment: production
     timeout-minutes: 120
     env:
@@ -519,7 +522,8 @@ jobs:
   acceptance:
     needs: deploy
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: elevate-protected-marketing
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -540,7 +544,8 @@ jobs:
     name: Confirm Marketing release jobs completed
     needs: [build-marketing, deploy, acceptance]
     if: ${{ always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: elevate-protected-marketing
     timeout-minutes: 2
     steps:
       - name: Require build, deployment and acceptance handoff

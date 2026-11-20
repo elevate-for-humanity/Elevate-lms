@@ -6,8 +6,13 @@ begin
  or to_regprocedure('rpc_private.ensure_app_trial_wallet(uuid,text,integer)') is null then
   raise exception 'Website Builder dependencies are required';
  end if;
- if (select md5(prosrc) from pg_proc where oid='rpc_private.ensure_app_trial_wallet(uuid,text,integer)'::regprocedure)
-  is distinct from 'c5a318bd58d891f036f11c4c668d381b' then
+ -- Both reviewed predecessor definitions are valid: installed production/QA
+ -- and a clean replay of the repository's wallet-hardening migration.
+ if not exists (
+  select 1 from pg_proc
+  where oid='rpc_private.ensure_app_trial_wallet(uuid,text,integer)'::regprocedure
+    and md5(prosrc) in ('c5a318bd58d891f036f11c4c668d381b','a78234d86c2ba4a11c84a43791b6bea5')
+ ) then
   raise exception 'Trial wallet helper changed since review; inspect before applying';
  end if;
  if to_regprocedure('public.enforce_website_organization_write()') is not null or exists(

@@ -190,35 +190,25 @@ export async function createEnrollmentFromPayment(
         enrollmentId,
         paymentProvider,
       });
-    } else if (existing.status !== 'active') {
-      await supabaseAdmin
+    } else {
+      // Settlement updates billing only for an existing enrollment. The
+      // administrator owns its admission state and may approve it concurrently.
+      const { error: paymentUpdateError } = await supabaseAdmin
         .from('program_enrollments')
         .update({
-          status: 'pending',
-          enrollment_state: 'applied',
-          access_status: 'pending',
-          next_required_action: 'ADMIN_APPROVAL_REQUIRED',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
           payment_amount_cents: paymentAmountCents,
-          enrolled_at: new Date().toISOString(),
-          access_granted_at: null,
         })
         .eq('id', existing.id);
 
+      if (paymentUpdateError) {
+        logger.error('[Enrollment] Failed to record payment on existing enrollment', paymentUpdateError);
+        return { success: false, error: 'Failed to update enrollment payment' };
+      }
+
       enrollmentId = existing.id;
-      isNewEnrollment = true;
-      logger.info('[Enrollment] Confirmed payment awaiting administrator enrollment approval', {
-        enrollmentId: existing.id,
-        paymentProvider,
-      });
-    } else {
-      enrollmentId = existing.id;
-      logger.info('[Enrollment] Enrollment already active or pending review', {
-        enrollmentId: existing.id,
-        status: existing.status,
-      });
     }
 
     if (isNewEnrollment && email) {

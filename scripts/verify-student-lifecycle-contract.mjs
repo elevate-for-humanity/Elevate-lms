@@ -52,9 +52,10 @@ for (const path of [
 requireText(studentForm, "fetch('/api/applications'", 'student application must submit through canonical /api/applications');
 requireText(studentForm, "'X-Idempotency-Key': idempotencyKey", 'student application must preserve idempotent submission');
 requireText(studentForm, 'const nextStepUrl =', 'student application must resolve its canonical post-submission handoff');
-requireText(studentForm, "data.nextStepUrl.startsWith('/')", 'student application must limit API-provided handoffs to internal routes');
-requireText(studentForm, ': `/apply/success${suffix}`;', 'student application must retain the canonical success-route fallback');
-requireText(studentForm, 'router.push(nextStepUrl)', 'student application must navigate through the validated canonical handoff');
+requireText(studentForm, 'safeStudentApplicationNextStep(data.nextStepUrl, `/apply/success${suffix}`)', 'student application must validate the API handoff and retain the canonical success fallback');
+requireText(studentForm, 'isExternalStudentApplicationNextStep(nextStepUrl)', 'only exact allowlisted app destinations may use external navigation');
+requireText(studentForm, 'window.location.assign(nextStepUrl)', 'the allowlisted LMS handoff must navigate across application origins');
+requireText(studentForm, 'router.push(nextStepUrl)', 'the validated same-origin handoff must use the application router');
 
 requireText(submissionApi, ".from('applications')", 'application submission must persist to canonical applications table');
 requireText(submissionApi, 'provisionAccount({', 'application submission must provision the learner account through canonical provisionAccount');

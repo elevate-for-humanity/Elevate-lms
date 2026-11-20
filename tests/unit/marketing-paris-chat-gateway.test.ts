@@ -18,7 +18,9 @@ function storeQuestion() {
 }
 
 describe('Marketing PARIS gateway', () => {
-  beforeEach(() => aiChat.mockReset());
+  beforeEach(() => {
+    aiChat.mockReset();
+  });
 
   it('returns the live provider reply', async () => {
     aiChat.mockResolvedValue({ content: 'Compare plans on the Store plans page.', provider: 'elevate' });

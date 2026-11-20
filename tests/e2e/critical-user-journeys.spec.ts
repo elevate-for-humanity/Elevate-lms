@@ -34,7 +34,7 @@ test.describe('Critical User Journeys', () => {
       await dismissCookiePreferences(page);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
-      await page.getByRole('link', { name: 'Browse training programs', exact: true }).click();
+      await page.getByRole('link', { name: 'Explore Career Training', exact: true }).click();
       await expect(page).toHaveURL(/\/programs(?:[?#].*)?$/);
 
       const hvac = page.getByRole('main').getByRole('article').filter({

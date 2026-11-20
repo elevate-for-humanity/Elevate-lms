@@ -1,6 +1,6 @@
 import test from 'node:test';
 import {rankSourcePaths,rememberSourcePaths} from '../lib/devstudio/paris-source-discovery.mjs';
-import {recoverRepeatedInspection} from '../lib/devstudio/paris-inspection-budget.mjs';
+import {checkInspectionBudget,recoverRepeatedInspection} from '../lib/devstudio/paris-inspection-budget.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
@@ -91,4 +91,23 @@ test('real fallback keeps a refined diagnostic query ahead of broad task words a
  const history=[...producers.map(path=>'read:'+path),'search:'+query.toLowerCase()];
  assert.deepEqual(recoverRepeatedInspection(history,action,[],result.discoveredFiles),{type:'read',path:aligned});
  assert.ok(!result.discoveredFiles.includes('lib/ai/.env.picture-alignment'));
+});
+
+test('fresh authenticated tree ranks unread source before applying the shortlist cap', () => {
+  const start = source.indexOf('        const unreadTree =');
+  const end = source.indexOf('        recovered = recoverRepeatedInspection', start);
+  assert.ok(start >= 0 && end > start);
+  const select = new Function('tree','task','inspectionHistory','checkInspectionBudget',
+    'suggestedSourcePaths','rememberSourcePaths',
+    'let discoveredFiles=[];const sourceEvidence={};'+source.slice(start,end)+';return discoveredFiles;');
+  const exhausted = Array.from({length:12},(_,index)=>'lib/studio/events-'+index+'.ts');
+  const unread = 'apps/admin/repairs/event-routing.ts';
+  const task = 'Repair the studio event routing in '+exhausted.join(' ');
+  const tree = [...exhausted,unread].map(path=>({type:'blob',path}));
+  const history = exhausted.map(path=>'read:'+path);
+  assert.ok(!rankSourcePaths(task,tree,task).includes(unread));
+  const result = select({tree},task,history,checkInspectionBudget,rankSourcePaths,rememberSourcePaths);
+  assert.deepEqual(result,[unread]);
+  assert.deepEqual(recoverRepeatedInspection(history,{type:'read',path:exhausted[0]},[],result,task),
+    {type:'read',path:unread});
 });

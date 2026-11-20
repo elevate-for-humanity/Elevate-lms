@@ -156,7 +156,13 @@ export default async function StudentDashboard() {
     ? await loadLearnerBillingRequirement(db, subjectId)
     : null;
   const [careerMatches, careerPlan] = await Promise.all([
-    getLearnerCareerMatches(subjectId, 4),
+    getLearnerCareerMatches(subjectId, 4).catch((error) => {
+      logger.error(
+        'STUDENT_CAREER_MATCHES_FAILED',
+        error instanceof Error ? error : new Error(String(error)),
+      );
+      return [];
+    }),
     loadCareerPlan(supabase, subjectId),
   ]);
   const { data: holderStudentRows } = await db

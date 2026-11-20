@@ -9,6 +9,9 @@ export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'w9', label: 'Completed IRS Form W-9' },
   { type: 'hvac_training_plan', label: 'Approved HVAC syllabus and training plan' },
   { type: 'profile_photo', label: 'Program Holder profile picture' },
+] as const;
+
+export const PROGRAM_HOLDER_STUDENT_MEDIA_DOCUMENTS = [
   { type: 'student_photo', label: 'Student training photo' },
   { type: 'student_video', label: 'Student training video' },
 ] as const;
@@ -21,9 +24,10 @@ export const CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'training_plan', label: 'Approved program syllabus and training plan' },
 ] as const;
 
-export function requiredProgramHolderDocuments(isHvac: boolean, features: Record<string, any> = {}) {
+export function requiredProgramHolderDocuments(isHvac: boolean, features: Record<string, unknown> = {}) {
   const requirements = isHvac ? HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS : CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS;
-  return requirements.filter(item => !(item.type === 'insurance' && features.insurance_required === false));
+  return [...requirements, ...(features.student_media_required === true ? PROGRAM_HOLDER_STUDENT_MEDIA_DOCUMENTS : [])]
+    .filter(item => !(item.type === 'insurance' && features.insurance_required === false));
 }
 
 export type ProgramHolderReadiness = {

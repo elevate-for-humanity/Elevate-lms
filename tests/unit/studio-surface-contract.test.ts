@@ -54,7 +54,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const builder = source('components/course/AutomaticCourseBuilder.tsx');
     const chat = source('components/studio/UnifiedEllieChat.tsx');
     const dictation = source('components/voice/VoiceDictationButton.tsx');
-    const dashboard = source('components/admin/dashboard/DashboardVoiceAssistant.tsx');
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
 
     expect(builder).toContain('VoiceDictationButton');
     expect(builder).toContain('Review Course Request');
@@ -64,8 +64,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(dictation).toContain('createBrowserSpeechRecognition');
     expect(dictation).not.toContain('onTranscript(transcript)');
     expect(dictation).toContain('callbackRef.current(transcript)');
-    expect(dashboard).toContain('<UnifiedEllieChat');
-    expect(dashboard).toContain('Talk to Admin AI');
+    expect(workspace).toContain('<UnifiedEllieChat');
   });
 
   it('uses the canonical workflow API from dashboard and Studio panels', () => {

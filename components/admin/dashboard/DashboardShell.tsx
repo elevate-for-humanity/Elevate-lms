@@ -15,7 +15,6 @@ import {
   FileText,
   Inbox,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
 } from 'lucide-react';
 
@@ -36,7 +35,6 @@ import {
   PublishWebsitePanelLazy,
 } from './DashboardDeferredPanels';
 import { DashboardPanelErrorBoundary } from './DashboardPanelErrorBoundary';
-import { DashboardVoiceAssistant } from './DashboardVoiceAssistant';
 
 function dashboardFirstName(profile: AdminDashboardData['profile']): string {
   const raw = profile?.full_name;
@@ -359,33 +357,6 @@ export function AdminDashboardContent({
       )}
       <StatsOverviewBar data={data} />
       <OperationalShortcuts />
-      {canAccessDevStudio && (
-        <section className="mb-8 overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/70 shadow-sm">
-          <div className="p-5 sm:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-xs font-black uppercase tracking-wider text-blue-800">
-                  <Sparkles className="h-4 w-4" /> Admin AI
-                </div>
-                <h2 className="mt-3 text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
-                  Work with Elevate’s operations assistant
-                </h2>
-                <p className="mt-2 text-sm font-medium leading-6 text-slate-700">
-                  Ask it to inspect records, run approved workflows, build courses, diagnose
-                  deployments, or open the affected page beside the conversation.
-                </p>
-              </div>
-              <Link
-                href="/studio"
-                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-slate-800"
-              >
-                Open Admin AI <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <DashboardVoiceAssistant />
-          </div>
-        </section>
-      )}
       <DashboardPanelErrorBoundary name="Publish website">
         <PublishWebsitePanelLazy />
       </DashboardPanelErrorBoundary>

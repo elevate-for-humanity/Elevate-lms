@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, Bell, ClipboardCheck, LogOut, Search, Settings } from 'lucide-react';
+import { ArrowLeft, Bell, ClipboardCheck, LogOut, PanelLeft, Search, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import LogoImage from '@/components/site/LogoImage';
 import { DEFAULT_NAV, type NavSection } from '@/lib/admin/nav-config';
 import { APPLICATION_CHECKER_URL } from '@/lib/admin/application-checker';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export interface AdminNavNotif {
   id: string;
@@ -91,6 +92,30 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
     <>
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white pt-[env(safe-area-inset-top)] shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-1 px-2 py-1 sm:gap-2 sm:px-4 lg:px-6">
+          <Sheet>
+            <SheetTrigger
+              type="button"
+              aria-label="Open Studio sidebar"
+              title="Studio"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+            >
+              <PanelLeft className="h-5 w-5" aria-hidden="true" />
+            </SheetTrigger>
+            <SheetContent side="left" className="z-[80] overflow-y-auto bg-white pt-[max(1.5rem,env(safe-area-inset-top))]">
+              <SheetTitle className="pr-10 text-slate-950">Dev Studio</SheetTitle>
+              <SheetDescription className="mt-2 text-slate-600">
+                Install Dev Studio to launch it from your home screen or desktop.
+              </SheetDescription>
+              <nav aria-label="Studio apps" className="mt-5">
+                <a
+                  href="/install/dev-studio.html"
+                  className="inline-flex min-h-11 items-center rounded-lg bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800"
+                >
+                  Install Dev Studio
+                </a>
+              </nav>
+            </SheetContent>
+          </Sheet>
           {pathname !== '/dashboard' && (
             <button
               type="button"
@@ -127,12 +152,6 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               >
                 <span className="sm:hidden">Apps</span>
                 <span className="hidden sm:inline">Applications</span>
-              </Link>
-              <Link
-                href="/studio"
-                className={`hidden min-h-10 items-center rounded-lg px-3 text-sm font-bold xl:inline-flex ${isActive(pathname, '/studio') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
-              >
-                Admin AI
               </Link>
             </div>
 

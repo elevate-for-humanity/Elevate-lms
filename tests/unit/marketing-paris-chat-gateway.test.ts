@@ -29,7 +29,10 @@ describe('Marketing PARIS gateway', () => {
     expect(await response.json()).toEqual({
       reply: 'Compare plans on the Store plans page.',
       provider: 'elevate',
+      mode: 'ai',
+      liveAiAvailable: true,
     });
+    expect(response.headers.get('cache-control')).toBe('no-store');
   });
 
   it('cancels an unfinished completion before the route expires', async () => {

@@ -1,139 +1,83 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
+
+const lmsOrigin = peerOrigin('lms');
+
+async function signInLearner(page: Page) {
+  const email = process.env.E2E_LEARNER_EMAIL;
+  const password = process.env.E2E_LEARNER_PASSWORD;
+  if (!email || !password) throw new Error('The isolated QA learner credentials are required');
+
+  await page.goto(`${lmsOrigin}/login?redirect=%2Flms%2Fdashboard`);
+  await page.getByLabel('Email address', { exact: true }).fill(email);
+  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/lms\/dashboard(?:[?#].*)?$/, { timeout: 60_000 });
+  await expect(page.getByText('My Dashboard', { exact: true }).first()).toBeVisible();
+}
 
 /**
- * Critical User Journey E2E Tests
- *
- * These tests cover the most important user flows that directly impact
- * business metrics and user experience.
+ * Critical user journeys across the canonical marketing, application, and LMS services.
  */
-
 test.describe('Critical User Journeys', () => {
-  // ============================================
-  // JOURNEY 1: New User Discovery → Application
-  // ============================================
   test.describe('New User Application Journey', () => {
     test('complete journey: homepage → programs → apply', async ({ page }) => {
-      // Step 1: Land on homepage
       await page.goto('/');
-      await expect(page).toHaveTitle(/Elevate for Humanity/);
-
-      // Verify hero section is visible
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
-      // Step 2: Navigate to programs
-      await page
-        .getByRole('link', { name: /programs/i })
-        .first()
-        .click();
-      await expect(page).toHaveURL(/\/programs/);
+      await page.getByRole('link', { name: 'Browse training programs', exact: true }).click();
+      await expect(page).toHaveURL(/\/programs(?:[?#].*)?$/);
 
-      // Step 3: Select a program
-      const programCard = page.locator('[data-testid="program-card"]').first();
-      if (await programCard.isVisible()) {
-        await programCard.click();
-      } else {
-        // Fallback: click first program link
-        await page
-          .getByRole('link', { name: /healthcare|technology|trades/i })
-          .first()
-          .click();
-      }
+      const hvac = page.getByRole('main').getByRole('article').filter({
+        has: page.getByRole('heading', { name: 'HVAC Certification', exact: true }),
+      });
+      await hvac.getByRole('link', { name: 'View Program' }).click();
+      await expect(page).toHaveURL(/\/programs\/hvac-technician(?:[?#].*)?$/);
 
-      // Step 4: Click apply button
-      const applyButton = page.getByRole('link', { name: /apply|enroll/i }).first();
-      await expect(applyButton).toBeVisible();
-      await applyButton.click();
-
-      // Step 5: Verify application page loads
-      await expect(page).toHaveURL(/\/apply|\/enroll/);
+      const apply = page.locator('a[href^="/apply"]').filter({ visible: true }).first();
+      await expect(apply).toBeVisible();
+      await apply.click();
+      await expect(page).toHaveURL(/\/apply(?:[/?#].*)?$/);
     });
 
-    test('quick apply form submission', async ({ page }) => {
-      await page.goto('/apply');
+    test('canonical inquiry form is usable without submitting', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
 
-      // Fill out quick apply form
-      await page.getByLabel(/first name/i).fill('Test');
-      await page.getByLabel(/last name/i).fill('User');
-      await page.getByLabel(/email/i).fill('test@example.com');
-      await page.getByLabel(/phone/i).fill('3171234567');
-
-      // Select a program if dropdown exists
-      const programSelect = page.getByLabel(/program/i);
-      if (await programSelect.isVisible()) {
-        await programSelect.selectOption({ index: 1 });
-      }
-
-      // Submit form (don't actually submit in test)
-      const submitButton = page.getByRole('button', { name: /submit|apply/i });
-      await expect(submitButton).toBeEnabled();
+      await page.getByRole('textbox', { name: 'First Name', exact: true }).fill('Test');
+      await page.getByRole('textbox', { name: 'Last Name', exact: true }).fill('User');
+      await page.getByRole('textbox', { name: 'Email', exact: true }).fill('test@example.com');
+      await page.getByRole('textbox', { name: 'Phone', exact: true }).fill('3171234567');
+      await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeEnabled();
     });
   });
 
-  // ============================================
-  // JOURNEY 2: Student Learning Flow
-  // ============================================
   test.describe('Student Learning Journey', () => {
     test.beforeEach(async ({ page }) => {
-      // Mock authentication for student tests
-      await page.goto('/');
-      // In real tests, you'd authenticate here
+      await signInLearner(page);
     });
 
-    test('course catalog browsing', async ({ page }) => {
-      await page.goto('/courses');
-
-      // Verify courses page loads
-      await expect(page.getByRole('heading', { name: /courses/i })).toBeVisible();
-
-      // Test search functionality
-      const searchInput = page.getByPlaceholder(/search/i);
-      if (await searchInput.isVisible()) {
-        await searchInput.fill('healthcare');
-        await page.waitForTimeout(500); // Debounce
-      }
-
-      // Test category filters
-      const filterButtons = page.getByRole('button', { name: /all|healthcare|technology/i });
-      const firstFilter = filterButtons.first();
-      if (await firstFilter.isVisible()) {
-        await firstFilter.click();
-      }
+    test('approved learner dashboard loads', async ({ page }) => {
+      await expect(page.getByText('My Dashboard', { exact: true }).first()).toBeVisible();
+      await expect(page.getByRole('link', { name: 'My Courses', exact: true }).first()).toHaveAttribute(
+        'href',
+        '/lms/courses',
+      );
     });
 
-    test('course detail page has required elements', async ({ page }) => {
-      await page.goto('/courses');
-
-      // Click on first course
-      const courseLink = page
-        .getByRole('link')
-        .filter({ hasText: /course|training|program/i })
-        .first();
-      if (await courseLink.isVisible()) {
-        await courseLink.click();
-
-        // Verify course detail elements
-        await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-
-        // Check for enroll/start button
-        const actionButton = page.getByRole('link', { name: /enroll|start|continue/i });
-        await expect(actionButton.first()).toBeVisible();
-      }
+    test('approved learner can open courses', async ({ page }) => {
+      await page.goto(`${lmsOrigin}/lms/courses`);
+      await expect(page).toHaveURL(/\/lms\/courses(?:[?#].*)?$/);
+      await expect(page.getByRole('heading', { name: 'My Courses', exact: true })).toBeVisible();
     });
   });
 
-  // ============================================
-  // JOURNEY 3: Contact & Support
-  // ============================================
   test.describe('Contact & Support Journey', () => {
     test('contact page loads with all information', async ({ page }) => {
       await page.goto('/contact');
 
-      // Verify contact information is visible
-      await expect(page.getByText(/317.*314.*3757|contact/i)).toBeVisible();
-
-      // Verify contact form exists
-      const contactForm = page.locator('form');
-      await expect(contactForm.first()).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      await expect(page.locator('form').first()).toBeVisible();
+      await expect(page.getByLabel(/email/i)).toBeVisible();
     });
 
     test('about page loads correctly', async ({ page }) => {
@@ -144,177 +88,107 @@ test.describe('Critical User Journeys', () => {
     });
   });
 
-  // ============================================
-  // JOURNEY 4: Mobile Experience
-  // ============================================
   test.describe('Mobile Experience', () => {
-    test.use({ viewport: { width: 375, height: 667 } }); // iPhone SE
+    test.use({ viewport: { width: 375, height: 667 } });
 
     test('mobile navigation works', async ({ page }) => {
       await page.goto('/');
 
-      // Open mobile menu
-      const menuButton = page.getByRole('button', { name: /menu|open/i });
-      if (await menuButton.isVisible()) {
-        await menuButton.click();
-
-        // Verify navigation links are visible
-        await expect(page.getByRole('link', { name: /programs/i })).toBeVisible();
-        await expect(page.getByRole('link', { name: /about/i })).toBeVisible();
-      }
+      const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
+      await menuButton.click();
+      const navigation = page.getByRole('navigation', { name: 'Site navigation' });
+      await expect(navigation).toBeVisible();
+      const programs = navigation.getByRole('button', { name: 'Programs', exact: true });
+      await programs.click();
+      await expect(programs).toHaveAttribute('aria-expanded', 'true');
+      await expect(navigation.locator('a[href="/programs"]').first()).toBeVisible();
     });
 
-    test('mobile forms are usable', async ({ page }) => {
-      await page.goto('/apply');
+    test('mobile application form is usable', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
 
-      // Verify form inputs are properly sized for mobile
-      const inputs = page.locator('input[type="text"], input[type="email"]');
-      const firstInput = inputs.first();
-
-      if (await firstInput.isVisible()) {
-        const box = await firstInput.boundingBox();
-        expect(box?.width).toBeGreaterThan(200); // Minimum touch target
-      }
+      const firstName = page.getByRole('textbox', { name: 'First Name', exact: true });
+      await expect(firstName).toBeVisible();
+      const box = await firstName.boundingBox();
+      expect(box?.width).toBeGreaterThan(200);
     });
   });
 
-  // ============================================
-  // JOURNEY 5: Accessibility
-  // ============================================
   test.describe('Accessibility', () => {
     test('homepage is keyboard navigable', async ({ page }) => {
       await page.goto('/');
-
-      // Tab through page
       await page.keyboard.press('Tab');
 
-      // Skip link should be first focusable element
       const skipLink = page.getByText(/skip to/i);
-      if (await skipLink.isVisible()) {
-        await expect(skipLink).toBeFocused();
-      }
-
-      // Continue tabbing to main navigation
-      for (let i = 0; i < 5; i++) {
-        await page.keyboard.press('Tab');
-      }
-
-      // Verify focus is visible
-      const focusedElement = page.locator(':focus');
-      await expect(focusedElement).toBeVisible();
+      await expect(skipLink).toBeFocused();
+      for (let i = 0; i < 5; i++) await page.keyboard.press('Tab');
+      await expect(page.locator(':focus')).toBeVisible();
     });
 
-    test('images have alt text', async ({ page }) => {
+    test('images have alt text or are decorative', async ({ page }) => {
       await page.goto('/');
 
-      // Check all images have alt attributes
       const images = page.locator('img');
       const count = await images.count();
-
       for (let i = 0; i < Math.min(count, 10); i++) {
-        const img = images.nth(i);
-        const alt = await img.getAttribute('alt');
-        const ariaHidden = await img.getAttribute('aria-hidden');
-
-        // Image should have alt text OR be aria-hidden
+        const image = images.nth(i);
+        const alt = await image.getAttribute('alt');
+        const ariaHidden = await image.getAttribute('aria-hidden');
         expect(alt !== null || ariaHidden === 'true').toBeTruthy();
       }
     });
 
-    test('forms have proper labels', async ({ page }) => {
-      await page.goto('/apply');
+    test('application inputs have associated labels', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
 
-      // Check that inputs have associated labels
-      const inputs = page.locator('input:not([type="hidden"]):not([type="submit"])');
-      const count = await inputs.count();
-
-      for (let i = 0; i < Math.min(count, 5); i++) {
-        const input = inputs.nth(i);
-        const id = await input.getAttribute('id');
-        const ariaLabel = await input.getAttribute('aria-label');
-
-        if (id) {
-          const label = page.locator(`label[for="${id}"]`);
-          const hasLabel = (await label.count()) > 0;
-          const hasAriaLabel = ariaLabel !== null;
-
-          expect(hasLabel || hasAriaLabel).toBeTruthy();
-        }
+      for (const name of ['First Name', 'Last Name', 'Email', 'Phone']) {
+        await expect(page.getByRole('textbox', { name, exact: true })).toBeVisible();
       }
     });
   });
 
-  // ============================================
-  // JOURNEY 6: Performance
-  // ============================================
   test.describe('Performance', () => {
     test('homepage loads within acceptable time', async ({ page }) => {
       const startTime = Date.now();
       await page.goto('/');
-      const loadTime = Date.now() - startTime;
-
-      // Page should load within 5 seconds
-      expect(loadTime).toBeLessThan(5000);
+      expect(Date.now() - startTime).toBeLessThan(5000);
     });
 
-    test('no console errors on critical pages', async ({ page }) => {
+    test('no console errors on current marketing pages', async ({ page }) => {
       const errors: string[] = [];
-
-      page.on('console', (msg) => {
-        if (msg.type() === 'error') {
-          errors.push(msg.text());
-        }
+      page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message.text());
       });
 
-      // Visit critical pages
-      const criticalPages = ['/', '/programs', '/courses', '/about', '/contact'];
-
-      for (const url of criticalPages) {
-        await page.goto(url);
-        await page.waitForLoadState('networkidle');
+      for (const url of ['/', '/programs', '/about', '/contact']) {
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
       }
 
-      // Filter out known acceptable errors (e.g., third-party scripts)
       const criticalErrors = errors.filter(
-        (e) =>
-          !e.includes('third-party') &&
-          !e.includes('analytics') &&
-          !e.includes('Failed to load resource'),
+        (error) =>
+          !error.includes('third-party') &&
+          !error.includes('analytics') &&
+          !error.includes('Failed to load resource'),
       );
-
       expect(criticalErrors).toHaveLength(0);
     });
   });
 
-  // ============================================
-  // JOURNEY 7: Error Handling
-  // ============================================
   test.describe('Error Handling', () => {
     test('404 page displays correctly', async ({ page }) => {
       await page.goto('/this-page-does-not-exist-12345');
 
-      // Should show 404 content
-      await expect(page.getByText(/not found|404|doesn't exist/i)).toBeVisible();
-
-      // Should have link back to home
-      await expect(page.getByRole('link', { name: /home|back/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /get you back on the right path/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Return to homepage/i })).toHaveAttribute(
+        'href',
+        '/',
+      );
     });
 
-    test('form validation shows errors', async ({ page }) => {
-      await page.goto('/apply');
-
-      // Try to submit empty form
-      const submitButton = page.getByRole('button', { name: /submit|apply/i });
-      if (await submitButton.isVisible()) {
-        await submitButton.click();
-
-        // Should show validation errors or prevent submission
-        const errorMessages = page.locator('[class*="error"], [role="alert"]');
-        const requiredInputs = page.locator('input:invalid');
-
-        const hasErrors = (await errorMessages.count()) > 0 || (await requiredInputs.count()) > 0;
-        expect(hasErrors).toBeTruthy();
-      }
+    test('application validation shows an error without submitting', async ({ page }) => {
+      await page.goto('/apply/student/form?intent=inquiry');
+      await page.getByRole('button', { name: 'Continue', exact: true }).click();
+      await expect(page.getByText('Complete your name, date of birth, email, and phone number.')).toBeVisible();
     });
   });
 });

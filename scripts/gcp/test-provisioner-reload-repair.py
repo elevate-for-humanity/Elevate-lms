@@ -8,6 +8,14 @@ spec = importlib.util.spec_from_file_location('repair', Path(__file__).with_name
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
+CHECKOUT_PROVISIONER_DIGEST = m.NEW
+
+
+class ProvisionerSourceContract(unittest.TestCase):
+    def test_protected_repair_pin_matches_checked_in_source(self):
+        source = Path(__file__).resolve().parents[2] / 'infra/pbx/provisioner/server.mjs'
+        self.assertEqual(m.digest(source), CHECKOUT_PROVISIONER_DIGEST)
+
 class RepairTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()

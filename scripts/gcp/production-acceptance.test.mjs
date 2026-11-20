@@ -194,6 +194,8 @@ test('Host Shop failure artifact never uploads raw authenticated browser state',
  assert.match(prepare,/workflow_sha=/);
  assert.match(prepare,/attested_release_sha=/);
  assert.match(prepare,/QA_EXPECTED_MAIN_SHA/);
+ assert.match(workflow,/name: Certify authenticated roster and cross-shop API isolation\n\s+id: browser\n/);
+ assert.match(workflow,/name: Remove disposable match requests, shops, placements, and QA users\n\s+id: cleanup\n/);
  assert.match(prepare,/steps\.browser\.outcome/);
  assert.match(prepare,/steps\.cleanup\.outcome/);
  assert.match(prepare,/browser_test_outcome=/);

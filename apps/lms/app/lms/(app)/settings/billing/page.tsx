@@ -6,7 +6,6 @@ import Link from 'next/link';
 import {
   CreditCard,
   DollarSign,
-  Download,
   Plus,
   AlertCircle,
   Loader2,
@@ -14,6 +13,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import type { ApprenticeDashboardInvoice } from '@/lib/billing/apprentice-invoice-batch';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
@@ -28,20 +28,11 @@ interface PaymentMethod {
   is_default: boolean;
 }
 
-interface Invoice {
-  id: string;
-  amount: number;
-  status: 'paid' | 'pending' | 'failed';
-  date: string;
-  description: string;
-  invoice_url?: string;
-}
-
 export default function BillingSettingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoices, setInvoices] = useState<ApprenticeDashboardInvoice[]>([]);
   const [balance, setBalance] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,17 +59,11 @@ export default function BillingSettingsPage() {
         logger.error('Error fetching payment methods', normalizeError(methodsError, 'Failed to fetch payment methods'), getErrorContext(methodsError));
       }
 
-      // Fetch invoices from database
-      const { data: invoiceData, error: invoicesError } = await supabase
-        .from('billing_invoices')
-        .select('id,total_cents,status,created_at,due_at,paid_at,payment_url,provider,invoice_number')
-        .eq('customer_external_key', `user:${user.id}`)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (invoicesError && invoicesError.code !== 'PGRST116') {
-        logger.error('Error fetching invoices', normalizeError(invoicesError, 'Failed to fetch invoices'), getErrorContext(invoicesError));
-      }
+      const invoiceResponse = await fetch('/api/billing/invoices', { cache: 'no-store' });
+      if (!invoiceResponse.ok) throw new Error('Could not load invoices');
+      const { invoices: accountInvoices } = await invoiceResponse.json() as {
+        invoices: ApprenticeDashboardInvoice[];
+      };
 
       // Fetch balance from profile
       const { data: profile } = await supabase
@@ -88,7 +73,7 @@ export default function BillingSettingsPage() {
         .maybeSingle();
 
       setPaymentMethods(methods || []);
-      setInvoices((invoiceData || []).map((row:any)=>({ id:row.id, amount:Number(row.total_cents||0)/100, status:row.status === 'open' ? 'pending' : row.status, date:row.paid_at||row.due_at||row.created_at, description:`${row.provider || 'Elevate'} invoice${row.invoice_number ? ` #${row.invoice_number}` : ''}`, invoice_url:row.payment_url||undefined })));
+      setInvoices(accountInvoices);
       setBalance(profile?.account_balance || 0);
     } catch (err) {
       logger.error('Error loading billing data', normalizeError(err, 'Failed to load billing data'), getErrorContext(err));
@@ -214,7 +199,7 @@ export default function BillingSettingsPage() {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : error ? null : (
             <div className="text-center py-8">
               <CreditCard className="w-12 h-12 text-slate-700 mx-auto mb-3" />
               <p className="text-slate-700 mb-4">No payment methods on file</p>
@@ -238,15 +223,16 @@ export default function BillingSettingsPage() {
               {invoices.map((invoice) => (
                 <div key={invoice.id} className="py-4 flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-slate-900">{invoice.description}</p>
-                    <p className="text-sm text-slate-700">{formatDate(invoice.date)}</p>
+                    <p className="font-medium text-slate-900">{invoice.descriptions?.join(' · ') || 'Invoice details'}</p>
+                    <p className="text-sm text-slate-700">{invoice.invoiceNumber ? `#${invoice.invoiceNumber}` : null}
+                      {invoice.dueDate ? ` · Due ${formatDate(invoice.dueDate)}` : null}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                         invoice.status === 'paid'
                           ? 'bg-brand-green-100 text-brand-green-700'
-                          : invoice.status === 'pending'
+                          : ['open', 'past_due'].includes(invoice.status)
                             ? 'bg-yellow-100 text-yellow-700'
                             : 'bg-brand-red-100 text-brand-red-700'
                       }`}
@@ -258,23 +244,23 @@ export default function BillingSettingsPage() {
                       {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                     </span>
                     <span className="font-semibold text-slate-900">
-                      ${invoice.amount.toFixed(2)}
+                      ${(invoice.amountCents / 100).toFixed(2)}
                     </span>
-                    {invoice.invoice_url && (
+                    {invoice.paymentUrl && ['open', 'past_due'].includes(invoice.status) && (
                       <a
-                        href={invoice.invoice_url}
+                        href={invoice.paymentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 text-slate-700 hover:text-slate-700"
                       >
-                        <Download className="w-4 h-4" />
+                        Pay now
                       </a>
                     )}
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
+          ) : error ? null : (
             <div className="text-center py-8">
               <DollarSign className="w-12 h-12 text-slate-700 mx-auto mb-3" />
               <p className="text-slate-700">No billing history yet</p>

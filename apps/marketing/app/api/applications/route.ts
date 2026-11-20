@@ -1,4 +1,5 @@
 import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
+import { paidApplicationStatusForUrl } from '@/lib/enrollment/paid-admission-response';
 import { POST as submitProgramInquiry } from '../inquiries/route';
 import { resolveCanonicalSlug } from '@/lib/programs/slug';
 import { paidInvoiceMatchesProgram, requiresSelfPayProgramPayment } from '@/lib/programs/paid-intake-policy.mjs';
@@ -350,7 +351,7 @@ async function _POST(req: Request) {
         ...inquiry, applicationStatus: 'inquiry',
         referenceNumber: inquiry.leadId, paymentRequired: true,
         nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
-        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application to activate enrollment and your dashboard.',
+        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application for admissions review. Dashboard access requires administrator approval.',
       } : inquiry, {
         status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
       });
@@ -424,7 +425,7 @@ async function _POST(req: Request) {
       if (saved.error) throw new Error('Full application could not be saved.');
       const dashboardUrl = await activatePaidApplication(paidEvidence, activeApp.id);
       return NextResponse.json({ ok: true, existing: true, id: activeApp.id,
-        program, referenceNumber: activeApp.reference_number, applicationStatus: 'enrolled',
+        program, referenceNumber: activeApp.reference_number, applicationStatus: paidApplicationStatusForUrl(dashboardUrl),
         nextStepUrl: dashboardUrl });
     }
     if (activeApp) {
@@ -1063,7 +1064,7 @@ async function _POST(req: Request) {
         email: data.email,
         program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
-        applicationStatus: dashboardUrl ? 'enrolled' : applicationStatus,
+        applicationStatus: dashboardUrl ? paidApplicationStatusForUrl(dashboardUrl) : applicationStatus,
         nextStepUrl: dashboardUrl || nextStepUrl,
         emailStatus,
       },

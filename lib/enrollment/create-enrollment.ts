@@ -128,7 +128,7 @@ export async function createEnrollmentFromPayment(
       await supabaseAdmin
         .from('applications')
         .update({
-          status: 'accepted',
+          // Preserve admissions decisions: financial settlement cannot approve an application.
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
@@ -140,10 +140,16 @@ export async function createEnrollmentFromPayment(
 
     const { data: existing } = await supabaseAdmin
       .from('program_enrollments')
-      .select('id, status')
+      .select('id, status, revoked_at, suspended_at, cancelled_at, refunded_at')
       .eq('student_id', finalStudentId)
       .eq('program_id', programId)
       .maybeSingle();
+
+    // Do not reactivate revoked, cancelled, suspended or refunded learner records after a new payment event.
+    if (existing && (existing.revoked_at || existing.suspended_at || existing.cancelled_at || existing.refunded_at ||
+      ['revoked', 'suspended', 'cancelled', 'withdrawn'].includes(String(existing.status || '').toLowerCase()))) {
+      return { success: false, error: 'Enrollment reinstatement requires administrator review' };
+    }
 
     let enrollmentId: string | null = null;
     let isNewEnrollment = false;
@@ -156,14 +162,17 @@ export async function createEnrollmentFromPayment(
           program_id: programId,
           ...(programSlug ? { program_slug: programSlug } : {}),
           ...(courseId ? { course_id: courseId } : {}),
-          status: 'active',
+          status: 'pending',
+          enrollment_state: 'applied',
+          access_status: 'pending',
+          next_required_action: 'ADMIN_APPROVAL_REQUIRED',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
           payment_amount_cents: paymentAmountCents,
           funding_source: fundingSource,
           enrolled_at: new Date().toISOString(),
-          access_granted_at: new Date().toISOString(),
+          access_granted_at: null,
         })
         .select('id')
         .maybeSingle();
@@ -185,7 +194,10 @@ export async function createEnrollmentFromPayment(
       await supabaseAdmin
         .from('program_enrollments')
         .update({
-          status: 'active',
+          status: 'pending',
+          enrollment_state: 'applied',
+          access_status: 'pending',
+          next_required_action: 'ADMIN_APPROVAL_REQUIRED',
           payment_status: 'paid',
           payment_provider: paymentProvider,
           payment_reference: paymentReference,
@@ -197,7 +209,7 @@ export async function createEnrollmentFromPayment(
 
       enrollmentId = existing.id;
       isNewEnrollment = true;
-      logger.info('[Enrollment] Activated confirmed-payment enrollment', {
+      logger.info('[Enrollment] Confirmed payment awaiting administrator enrollment approval', {
         enrollmentId: existing.id,
         paymentProvider,
       });
@@ -293,18 +305,18 @@ async function sendEnrollmentWelcomeEmail(params: {
       },
       body: JSON.stringify({
         to: email,
-        subject: `Payment Received - ${programDetails?.name || 'Your Program'} Enrollment Confirmed`,
+        subject: `Payment Received - ${programDetails?.name || 'Your Program'} Pending Enrollment Review`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1e3a8a;">Payment received by ${PLATFORM_DEFAULTS.orgName}</h2>
             <p>Hi ${firstName || 'there'},</p>
-            <p>We received your payment for <strong>${programDetails?.name || 'your program'}</strong>. Your enrollment is now <strong>active</strong>. Sign in to your student dashboard to complete orientation and begin your assigned coursework.</p>
+            <p>We received your payment for <strong>${programDetails?.name || 'your program'}</strong>. Your application and payment are recorded. Training access remains <strong>pending administrator approval</strong>. You may sign in to complete required onboarding steps; coursework is not unlocked until approval.</p>
             ${loginSection}
             <h3>What's Next?</h3>
             <ul>
               <li>Log in to your student portal</li>
               <li>Complete or review your profile</li>
-              <li>Complete orientation, required documents, and your assigned next steps</li>
+              <li>Complete orientation and required documents, then await the administrator's access decision</li>
             </ul>
             <p>If you have any questions, please contact our support team.</p>
             <p>Best regards,<br>The ${PLATFORM_DEFAULTS.orgName} Team</p>

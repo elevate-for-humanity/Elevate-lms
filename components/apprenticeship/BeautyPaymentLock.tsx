@@ -8,7 +8,7 @@ export function BeautyPaymentLock({ programSlug }: { programSlug: string }) {
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8" aria-label="Apprenticeship access pending payment">
       <section role="status" className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-6 text-slate-950">
         <h1 className="text-2xl font-bold">Enrollment deposit required</h1>
-        <p className="mt-3">Your application for {label} is saved. Training and the student dashboard remain locked until your deposit or authorized workforce funding is verified and enrollment is activated.</p>
+        <p className="mt-3">Your application for {label} is saved. Training and the student dashboard remain locked until payment is verified and an administrator approves your enrollment. Payment alone does not unlock coursework.</p>
         <p className="mt-2 text-sm">Your application has not been deleted. If you have already paid, contact Admissions so your existing payment can be reconciled without submitting another application.</p>
         <Link className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-slate-950 px-5 py-3 font-semibold text-white" href={`https://www.elevateforhumanity.org/programs/${programSlug}/apply`}>
           Continue application and payment

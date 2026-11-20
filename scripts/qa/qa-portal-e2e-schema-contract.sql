@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS public.course_lessons (
 CREATE OR REPLACE FUNCTION private.can_access_course_lesson(p_course_id uuid, p_lesson_id uuid)
 RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
-AS $$
+AS $function$
   SELECT auth.uid() IS NOT NULL
     AND EXISTS (
       SELECT 1 FROM public.course_lessons l
@@ -186,7 +186,7 @@ AS $$
         AND pe.revoked_at IS NULL
         AND lower(COALESCE(pe.status, 'active')) IN ('active','enrolled','in_progress','completed','confirmed')
     );
-$$;
+$function$;
 REVOKE ALL ON FUNCTION private.can_access_course_lesson(uuid,uuid) FROM PUBLIC,anon;
 GRANT USAGE ON SCHEMA private TO authenticated;
 GRANT EXECUTE ON FUNCTION private.can_access_course_lesson(uuid,uuid) TO authenticated;
@@ -194,7 +194,7 @@ GRANT EXECUTE ON FUNCTION private.can_access_course_lesson(uuid,uuid) TO authent
 CREATE OR REPLACE FUNCTION public.can_access_lesson(p_user_id uuid, p_lesson_id uuid)
 RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
-AS $$
+AS $function$
   SELECT EXISTS (
     SELECT 1
     FROM public.course_lessons l
@@ -207,7 +207,7 @@ AS $$
       AND pe.revoked_at IS NULL
       AND lower(COALESCE(pe.status, 'active')) IN ('active','enrolled','in_progress','completed','confirmed')
   );
-$$;
+$function$;
 REVOKE ALL ON FUNCTION public.can_access_lesson(uuid,uuid) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.can_access_lesson(uuid,uuid) TO service_role;
 
@@ -408,7 +408,7 @@ GRANT ALL ON public.digital_workbooks, public.digital_workbook_sections, public.
 
 CREATE OR REPLACE FUNCTION public.can_edit_digital_workbook(p_workbook_id uuid)
 RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=''
-AS $$
+AS $function$
   SELECT auth.uid() IS NOT NULL AND EXISTS (
     SELECT 1 FROM public.digital_workbooks w
     JOIN public.program_enrollments pe ON pe.program_id=w.program_id
@@ -416,13 +416,13 @@ AS $$
       AND pe.revoked_at IS NULL
       AND lower(COALESCE(pe.status,'active')) IN ('active','enrolled','in_progress','completed','confirmed')
   );
-$$;
+$function$;
 REVOKE ALL ON FUNCTION public.can_edit_digital_workbook(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.can_edit_digital_workbook(uuid) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.get_my_course_pacing(p_course_id uuid)
 RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
-AS $$
+AS $function$
 DECLARE actor uuid:=auth.uid();
 BEGIN
   IF actor IS NULL THEN RAISE EXCEPTION 'AUTHENTICATION_REQUIRED' USING ERRCODE='42501'; END IF;
@@ -445,7 +445,7 @@ BEGIN
       'published',l.is_published,'releaseWeek',1,'opensAt',now(),'available',l.is_published
     ) ORDER BY l.order_index),'[]'::jsonb) FROM public.course_lessons l WHERE l.course_id=p_course_id)
   );
-END $$;
+END $function$;
 REVOKE ALL ON FUNCTION public.get_my_course_pacing(uuid) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.get_my_course_pacing(uuid) TO authenticated;
 

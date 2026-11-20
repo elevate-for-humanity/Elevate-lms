@@ -56,7 +56,7 @@ describe('timeclock clock-in persistence contract', () => {
     expect(route).toContain('You must clock out at your school or assigned site before leaving');
     expect(route).toContain('No time was recorded');
     expect(route).toContain("type: 'ojt'");
-    expect(route).not.toContain("type: 'timeclock'");
+    expect(route).not.toMatch(/(?<![\w])type: 'timeclock'/);
     expect(route).toContain("message: studentText");
   });
 

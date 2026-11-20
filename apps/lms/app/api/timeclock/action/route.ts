@@ -204,7 +204,7 @@ async function notifyAdminsOfClockAttempt(
       progress_entry_id: params.progressEntryId || null,
       attempted_at: params.attemptedAt,
     },
-    idempotency_key: `admin-${clockAction}-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
+    idempotency_key: `admin-${clockAction}-${admin.id}-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
   }));
   if (rows.length) {
     const { error } = await db.from('notifications').insert(rows);
@@ -292,7 +292,7 @@ async function _POST(request: NextRequest) {
       const recordedAt = new Date(attemptedAt).toISOString();
       const reviewId = createHash('sha256').update(JSON.stringify([user.id, site_id, action, recordedAt])).digest('hex').slice(0, 32);
       const { error } = await db.from('admin_alerts').upsert({
-        id: reviewId, alert_type: 'ojt', severity: 'warning', apprentice_id: apprentice.id,
+        id: reviewId, alert_type: 'timeclock', severity: 'warning', apprentice_id: apprentice.id,
         site_id, message: `Review delayed ${action} at ${assignedSite.name} for ${recordedAt}. Check existing shifts before correcting attendance.`,
         metadata: { user_id: user.id, action, client_recorded_at: recordedAt, location_captured: !coordinateError,
           ...(coordinateError ? {} : { lat, lng, accuracy_m }) },

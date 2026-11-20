@@ -17,6 +17,7 @@ import { attachPartnerRouting } from '@/lib/enrollment/partner-routing';
 import { cachePortalTypeForEnrollment } from '@/lib/portal/router';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 
 export interface ApproveApplicationInput {
   applicationId: string;
@@ -116,7 +117,7 @@ export async function approveApplication(
   }
 
   let canonicalProgramSlug: string | null = null;
-  let canonicalProgramTenantId: string | null = null;
+  let profileTenantId: string | null = null;
   if (resolvedProgramId) {
     const { data: programRow, error: programError } = await db
       .from('programs')
@@ -132,7 +133,31 @@ export async function approveApplication(
       return { success: false, error: 'Failed to resolve canonical program ownership' };
     }
     canonicalProgramSlug = programRow.slug;
-    canonicalProgramTenantId = programRow.tenant_id;
+    profileTenantId = programRow.tenant_id;
+  } else if (assignedRole !== 'student') {
+    const serverUrl = resolveServerSupabaseRawEnv().url;
+    let primaryTenantSlug = 'elevate-for-humanity';
+    try {
+      if (new URL(serverUrl ?? '').hostname === 'isdgjcdabhxxozarmxta.supabase.co') {
+        primaryTenantSlug = 'elevate-lms-qa';
+      }
+    } catch {
+      // A missing or malformed URL cannot authorize an alternate tenant.
+    }
+    const { data: primaryTenant, error: primaryTenantError } = await db
+      .from('tenants')
+      .select('id')
+      .eq('slug', primaryTenantSlug)
+      .maybeSingle();
+    if (primaryTenantError || !primaryTenant?.id) {
+      logger.error(
+        '[approve] primary tenant resolution failed for nonstudent approval',
+        primaryTenantError ? new Error(primaryTenantError.message) : undefined,
+        { applicationId, assignedRole, primaryTenantSlug },
+      );
+      return { success: false, error: 'Failed to resolve authorized tenant assignment' };
+    }
+    profileTenantId = primaryTenant.id;
   }
 
   let userId: string | null = null;
@@ -149,7 +174,7 @@ export async function approveApplication(
   if (existingProfile) {
     userId = existingProfile.id;
   } else {
-    if (!canonicalProgramTenantId) {
+    if (!profileTenantId) {
       return { success: false, error: 'New learner profile requires canonical tenant assignment' };
     }
 
@@ -202,7 +227,7 @@ export async function approveApplication(
         full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
         phone: app.phone,
         role: assignedRole,
-        tenant_id: canonicalProgramTenantId,
+        tenant_id: profileTenantId,
       },
       { onConflict: 'id' },
     );

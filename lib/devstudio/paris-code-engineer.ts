@@ -19,6 +19,8 @@ import { getGitHubHeaders, githubApiErrorMessage } from '@/lib/devstudio/github-
 import { getGitHubAppToken } from '@/lib/devstudio/github-app-token';
 import { logger } from '@/lib/logger';
 import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
+import { getRuntimeReadiness } from '@/lib/health/service-health';
+import { resolveServerSupabaseRawEnv } from '@/lib/supabase/public-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -344,6 +346,58 @@ type RepairContinuation = {
   sourceEvidence?: Record<string, unknown>;
   save: (checkpoint: ParisRepairCheckpoint) => Promise<void>;
 };
+
+export async function probeParisRepairWorkerInference() {
+  const qaUrl = 'https://isdgjcdabhxxozarmxta.supabase.co';
+  const isQa = () =>
+    resolveServerSupabaseRawEnv().url?.replace(/\/$/, '') === qaUrl &&
+    process.env.PARIS_QA_WORKER_PROBE === 'true';
+  const respond = (body: object, status: number) =>
+    NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
+  if (!isQa()) return respond({ error: 'PARIS_QA_WORKER_PROBE_DISABLED' }, 404);
+  await hydrateProcessEnv().catch(() => undefined);
+  if (!isQa()) return respond({ error: 'PARIS_QA_WORKER_PROBE_DISABLED' }, 404);
+
+  const provider = (process.env.AI_PROVIDER ?? 'elevate').trim().toLowerCase();
+  if (provider !== 'elevate') return respond({ error: 'PARIS_QA_OWNED_PROVIDER_REQUIRED' }, 409);
+
+  const { commit, revision } = getRuntimeReadiness();
+  if (!commit || !/^[a-f0-9]{40}$/.test(commit) || !revision || !/^[a-z0-9-]{1,63}$/.test(revision)) {
+    return respond({ error: 'PARIS_QA_WORKER_REVISION_UNVERIFIED' }, 503);
+  }
+  const workerIdentity = 'elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com';
+  const identity = await fetch(
+    'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email',
+    { headers: { 'Metadata-Flavor': 'Google' }, redirect: 'error', signal: AbortSignal.timeout(5000) },
+  ).then(async (response) => response.ok ? (await response.text()).trim() : null).catch(() => null);
+  if (identity !== workerIdentity) {
+    return respond({ error: 'PARIS_QA_WORKER_IDENTITY_UNVERIFIED', commit, revision }, 503);
+  }
+
+  const expected = 'PARIS_QA_WORKER_OK';
+  const evidence = { workerIdentity, provider, commit, revision };
+  try {
+    const result = await aiChat({
+      messages: [{ role: 'user', content: 'Reply with exactly PARIS_QA_WORKER_OK.' }],
+      temperature: 0,
+      maxTokens: 32,
+      signal: AbortSignal.timeout(REPAIR_INFERENCE_TIMEOUT_MS),
+    });
+    const model = result.model === 'elevate-local' ? result.model : null;
+    const passed = result.provider === provider && model !== null &&
+      result.content.trim() === expected;
+    return respond({ ...evidence, model, passed, response: passed ? expected : null }, passed ? 200 : 502);
+  } catch (error) {
+    const authFailure = error instanceof Error
+      ? /^Elevate LLM worker (401|403):/.exec(error.message)?.[1]
+      : undefined;
+    return respond({
+      ...evidence,
+      error: 'PARIS_QA_WORKER_INFERENCE_FAILED',
+      ...(authFailure ? { providerHttpStatus: Number(authFailure) } : {}),
+    }, 502);
+  }
+}
 
 export async function stageParisCodeRepair(task: string, repairId?: string, actorId?: string, continuation?: RepairContinuation) {
   await hydrateProcessEnv().catch(() => undefined);

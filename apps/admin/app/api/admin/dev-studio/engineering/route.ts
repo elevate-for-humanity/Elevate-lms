@@ -14,6 +14,14 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const body = await request.json().catch(() => ({}));
+  if (body.action === 'qa-worker-inference') {
+    // Match the repair worker's primary-profile owner requirement.
+    if (auth.role !== 'admin' && auth.role !== 'super_admin') {
+      return NextResponse.json({ error: 'PARIS_AUTOPILOT_OWNER_AUTHORITY_REQUIRED' }, { status: 403 });
+    }
+    const { probeParisRepairWorkerInference } = await import('@/lib/devstudio/paris-code-engineer');
+    return probeParisRepairWorkerInference();
+  }
   const task = String(body.task ?? body.goal ?? '').trim();
   if (!task) return NextResponse.json({ error: 'task is required' }, { status: 400 });
   if(task.length>12000)return NextResponse.json({error:'Repair task exceeds 12000 characters.'},{status:400});

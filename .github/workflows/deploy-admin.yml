@@ -44,6 +44,10 @@ on:
       - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:
     inputs:
+      paris_qa_image:
+        description: Build an isolated Paris QA image artifact without deploying
+        type: boolean
+        default: false
       requested_sha:
         description: Exact main commit requested by the trusted dispatch
         required: false
@@ -56,6 +60,50 @@ permissions:
 
 
 jobs:
+  build-paris-qa-image:
+    name: Build isolated Paris QA image
+    if: github.event_name == 'workflow_dispatch' && inputs.paris_qa_image && github.ref == 'refs/heads/qa/paris-worker-image'
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test worker probe and verify isolated QA build inputs
+        run: |
+          set -euo pipefail
+          test "$NEXT_PUBLIC_SUPABASE_URL" = 'https://isdgjcdabhxxozarmxta.supabase.co'
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          node --experimental-strip-types --test scripts/test-paris-qa-worker-probe.mjs
+      - name: Build and package the exact QA Admin image
+        run: |
+          set -euo pipefail
+          image="elevate-admin-paris-qa:$GITHUB_SHA"
+          docker build -f Dockerfile.admin -t "$image" \
+            --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
+            --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+          mkdir -p "$RUNNER_TEMP/paris-qa-image"
+          cd "$RUNNER_TEMP/paris-qa-image"
+          docker save "$image" | gzip -1 > admin-image.tar.gz
+          sha256sum admin-image.tar.gz > admin-image.sha256
+          printf '%s\n' "$GITHUB_SHA" > commit.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: paris-qa-admin-image-${{ github.sha }}
+          path: ${{ runner.temp }}/paris-qa-image/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
   dispatch:
     if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
@@ -82,7 +130,7 @@ jobs:
     name: Build and upload Admin image
     outputs:
       digest: ${{ steps.upload.outputs.digest }}
-    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && !inputs.paris_qa_image && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120
@@ -176,7 +224,7 @@ jobs:
       cancel-in-progress: false
       queue: max
     name: Deploy and verify Admin on Google
-    if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && github.event_name == 'workflow_dispatch' && !inputs.paris_qa_image && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 30
@@ -275,7 +323,7 @@ jobs:
 
   acceptance:
     needs: deploy-admin
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy-admin.result == 'success'
+    if: github.event_name == 'workflow_dispatch' && !inputs.paris_qa_image && github.ref == 'refs/heads/main' && needs.deploy-admin.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -316,7 +364,7 @@ jobs:
   release-result:
     name: Confirm Admin release jobs completed
     needs: [build-admin, deploy-admin, acceptance]
-    if: ${{ always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && !inputs.paris_qa_image && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:

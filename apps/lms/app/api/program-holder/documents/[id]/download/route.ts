@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Invalid document.' }, { status: 400 });
   const { data: document, error } = await ctx.db
     .from('program_holder_documents')
-    .select('file_url,storage_bucket')
+    .select('file_url,storage_bucket,document_type')
     .eq('id', id)
     .eq('user_id', ctx.profile.id)
     .maybeSingle();
@@ -44,7 +44,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Invalid storage reference.' }, { status: 409 });
     }
   }
-  if (!['documents', 'provider-documents'].includes(bucket))
+  const holderVideo = bucket === 'videos' && document.document_type === 'student_video' &&
+    path.startsWith(`program-holders/${ctx.holderId}/student_video/`);
+  if (!['documents', 'provider-documents'].includes(bucket) && !holderVideo)
     return NextResponse.json({ error: 'Document storage requires review.' }, { status: 409 });
   if (path.startsWith('program-holders/') && !path.startsWith(`program-holders/${ctx.holderId}/`))
     return NextResponse.json({ error: 'Document not found.' }, { status: 404 });

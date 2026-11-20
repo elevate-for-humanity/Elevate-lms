@@ -1,7 +1,7 @@
 -- Isolated QA contract for the authenticated portal browser suite.
 -- This migration is intentionally QA-only. It creates no production learner,
 -- credit, enrollment, customer-site, or publication records.
-DO $$
+DO $qa$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM public.tenants WHERE slug = 'elevate-lms-qa') THEN
     RAISE EXCEPTION 'ISOLATED_QA_TENANT_REQUIRED';
@@ -9,7 +9,7 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM public.programs WHERE slug = 'hvac-technician') THEN
     RAISE EXCEPTION 'ISOLATED_QA_HVAC_PROGRAM_REQUIRED';
   END IF;
-END $;
+END; $qa$;
 
 CREATE SCHEMA IF NOT EXISTS private;
 REVOKE ALL ON SCHEMA private FROM PUBLIC,anon;
@@ -493,7 +493,7 @@ INSERT INTO public.digital_workbook_sections(
   'f1d32b7f-7cd4-44c4-9858-6b756ef21b89'
 ) ON CONFLICT (id) DO NOTHING;
 
-DO $$
+DO $qa$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM public.courses c
@@ -504,4 +504,4 @@ BEGIN
       AND l.id='f1d32b7f-7cd4-44c4-9858-6b756ef21b89'
       AND l.is_published AND l.status='published'
   ) THEN RAISE EXCEPTION 'QA_HVAC_PLAYBACK_CONTRACT_NOT_INSTALLED'; END IF;
-END $$;
+END; $qa$;

@@ -45,7 +45,7 @@ export default async function ProgramInquiryPage({ searchParams }: { searchParam
             <div className="rounded-2xl bg-brand-red-50 border border-brand-red-100 p-6">
               <ClipboardCheck className="h-7 w-7 text-brand-red-700 mb-4" />
               <h2 className="text-2xl font-extrabold text-slate-950">Ready to enroll?</h2>
-              <p className="mt-3 text-base text-slate-700">The enrollment application starts admissions. Funded programs may require WorkOne intake and authorization. Verified payment is required before the Full Enrollment Application. Complete and submit that paid application to activate enrollment and your dashboard.</p>
+              <p className="mt-3 text-base text-slate-700">The enrollment application starts admissions. Funded programs may require WorkOne intake and authorization. Verified payment is required before the Full Enrollment Application. Complete and submit that paid application for administrator review. Training dashboard access is not automatic.</p>
               <Link href={initialProgram ? `/enroll/${encodeURIComponent(initialProgram)}` : '/programs'} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Start Full Enrollment Application <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>

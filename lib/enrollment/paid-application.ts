@@ -5,6 +5,7 @@ import { paidInvoiceMatchesProgram } from '@/lib/programs/paid-intake-policy.mjs
 import { getInitialProgramInvoiceCents } from '@/lib/programs/deposit-policy';
 import { activateProgramInstallments } from '@/lib/billing/activate-program-installments';
 import { isApprovedPaidEnrollment } from '@/lib/learner/approved-paid-admission.mjs';
+import { APPROVED_LEARNER_DASHBOARD_URL, PENDING_LEARNER_ACCESS_URL } from '@/lib/enrollment/paid-admission-response';
 
 /** A URL parameter is a locator, never evidence of payment or ownership. */
 export async function verifyPaidApplication(programSlug: string, invoiceId?: string) {
@@ -47,8 +48,8 @@ export async function activatePaidApplication(evidence: NonNullable<Awaited<Retu
       throw new Error('Active enrollment payment reference requires administrator review.');
     }
     return isApprovedPaidEnrollment(enrollment)
-      ? 'https://app.elevateforhumanity.org/lms/dashboard'
-      : 'https://app.elevateforhumanity.org/lms/access-pending';
+      ? APPROVED_LEARNER_DASHBOARD_URL
+      : PENDING_LEARNER_ACCESS_URL;
   }
   const now = new Date().toISOString();
   const application = await db.from('applications').update({
@@ -75,5 +76,5 @@ export async function activatePaidApplication(evidence: NonNullable<Awaited<Retu
     tuitionCents: Number(invoice.fulfillment_payload?.total_tuition_cents ?? Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100)),
   });
   // Payment is evidence for admin review, never authorization to enter the LMS.
-  return 'https://app.elevateforhumanity.org/lms/access-pending';
+  return PENDING_LEARNER_ACCESS_URL;
 }

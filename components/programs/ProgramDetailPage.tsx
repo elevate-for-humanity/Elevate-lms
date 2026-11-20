@@ -403,7 +403,7 @@ export default function ProgramDetailPage({
                   <Link href={`/apply/student?program=${encodeURIComponent(p.slug)}&intent=inquiry`} className="mb-3 block w-full rounded-xl border-2 border-blue-700 px-4 py-3 text-center text-sm font-bold text-blue-800">
                     Intake Application — Request Information
                   </Link>
-                  <p className="mb-4 text-xs leading-5 text-slate-600">Intake does not enroll you. Verified payment is required before the Full Enrollment Application. Submit the paid full application to activate enrollment and your dashboard.</p>
+                  <p className="mb-4 text-xs leading-5 text-slate-600">Intake does not enroll you. Verified payment is required before the Full Enrollment Application. Submit the paid full application for administrator review. Training dashboard access begins only after approval.</p>
                   {p.cta.enrollHref && (
                     <>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">

@@ -14,6 +14,8 @@ import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
 import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import { ProgramHolderPaymentAddendum } from './ProgramHolderPaymentAddendum';
 import { filterHolderStudents } from '@/lib/program-holder/roster-filter';
+import { isApprovedDocument } from '@/lib/program-holder/document-review';
+import { programHolderDocumentStatus } from '@/lib/program-holder/document-requirements';
 import { requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { isEpaTestingProgram } from '@/lib/program-holder/enrollment-identity';
 import CourseSyllabus from '@/components/learner/CourseSyllabus';
@@ -113,7 +115,7 @@ export async function ProgramHolderWorkspaceView({
   const isHvac = data.programs.some((program) => program.slug === 'hvac-technician');
   const approvedDocumentTypes = new Set(
     data.documents
-      .filter((row) => row.approved === true || row.status === 'approved')
+      .filter(isApprovedDocument)
       .map((row) => row.document_type),
   );
   const holderFeatures =
@@ -288,9 +290,7 @@ export async function ProgramHolderWorkspaceView({
       ? [
           {
             label: 'Student photos and training videos',
-            complete: data.documents.some((row) =>
-              ['student_photo', 'student_video'].includes(row.document_type),
-            ),
+            complete: ['student_photo', 'student_video'].every((type) => approvedDocumentTypes.has(type)),
             required: true,
             owner: 'Program Holder' as const,
           },
@@ -1772,7 +1772,10 @@ function Documents({
   requiresEnchantedHeartsTerms: boolean;
   insuranceRequired: boolean;
 }) {
-  const onFile = [...new Set((rows || []).map((row) => row.document_type).filter(Boolean))] as string[];
+  const onFile = [...new Set(rows
+    .filter((row) => programHolderDocumentStatus(row) !== 'rejected')
+    .map((row) => row.document_type)
+    .filter(Boolean))] as string[];
   return (
     <div className="space-y-6">
       <Hero
@@ -1800,7 +1803,7 @@ function Documents({
                   <p className="break-words font-bold">
                     {row.document_type || row.file_name || 'Program document'}
                   </p>
-                  <p className="text-xs capitalize text-slate-500">{row.status || 'submitted'}</p>
+                  <p className="text-xs capitalize text-slate-500">{programHolderDocumentStatus(row)}</p>
                   {row.file_name && row.document_type && (
                     <p className="break-all text-xs text-slate-600">{row.file_name}</p>
                   )}

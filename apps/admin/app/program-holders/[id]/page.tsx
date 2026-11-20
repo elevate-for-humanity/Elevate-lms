@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Building2, Mail, Phone, ShieldCheck, Users, BookOpen, ArrowLeft } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { BUSINESS_REGISTRATION_GUIDANCE, programHolderDocumentStatus, programHolderRequirementStatus } from '@/lib/program-holder/document-requirements';
+import { PROGRAM_HOLDER_STUDENT_MEDIA_DOCUMENTS, requiredProgramHolderDocuments } from '@/lib/program-holder/onboarding-readiness';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramHolderBankingReview } from './ProgramHolderBankingReview';
 import { ProgramHolderAdminDocumentUpload } from './ProgramHolderAdminDocumentUpload';
@@ -34,16 +36,16 @@ export default async function ProgramHolderDetailPage({
     .maybeSingle();
   if (error || !holder) notFound();
 
-  const { data: assignments } = await db
+  const { data: assignments, error: assignmentsError } = await db
     .from('program_holder_programs')
     .select('id, program_id, role_in_program, is_primary, status, created_at')
     .eq('program_holder_id', id)
     .order('created_at', { ascending: false });
 
   const programIds = (assignments ?? []).map((row: any) => row.program_id).filter(Boolean);
-  const { data: programs } = programIds.length
+  const { data: programs, error: programsError } = programIds.length
     ? await db.from('programs').select('id, title, name, slug').in('id', programIds)
-    : { data: [] as any[] };
+    : { data: [], error: null };
   const programById = new Map((programs ?? []).map((program: any) => [program.id, program]));
 
   const { data: roster, error: rosterError } = await db
@@ -54,11 +56,18 @@ export default async function ProgramHolderDetailPage({
     .eq('program_holder_id', id)
     .order('enrolled_at', { ascending: false });
   const learners = roster ?? [];
-  const { data: documents } = await db
+  const { data: documents, error: documentsError } = await db
     .from('program_holder_documents')
     .select('id,document_type,file_name,status,approved,created_at')
     .eq('user_id', holder.user_id)
     .order('created_at', { ascending: false });
+  const isHvac = (assignments ?? []).some(
+    (assignment) => assignment.status === 'active' && programById.get(assignment.program_id)?.slug === 'hvac-technician',
+  );
+  const requirements = requiredProgramHolderDocuments(isHvac, holder.features ?? {});
+  const documentLabels = new Map<string, string>(
+    [...requirements, ...PROGRAM_HOLDER_STUDENT_MEDIA_DOCUMENTS].map(({ type, label }) => [type, label]),
+  );
   const { data: trainingLogs } = await db
     .from('hour_entries')
     .select('id,user_id,work_date,hours_claimed,category,notes,approval_status,status,created_at')
@@ -373,19 +382,32 @@ export default async function ProgramHolderDetailPage({
         {canDecide && <ProgramHolderAdminDocumentUpload holderId={id} />}
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-black text-slate-950">Protected onboarding records</h2>
+          <p className="mt-2 text-sm text-slate-700">{BUSINESS_REGISTRATION_GUIDANCE}</p>
+          {documentsError || assignmentsError || programsError ? (
+            <p role="alert" className="mt-3 text-sm text-red-800">The complete onboarding checklist could not be loaded.</p>
+          ) : (
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              {requirements.map(({ type, label }) => (
+                <li key={type} className="flex flex-wrap justify-between gap-2">
+                  <span>{label}</span>
+                  <span className="font-semibold capitalize">{programHolderRequirementStatus(documents ?? [], type)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="mt-4 space-y-2">
-            {documents?.length ? (
+            {documentsError ? null : documents?.length ? (
               documents.map((document: any) => (
                 <div
                   key={document.id}
                   className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 p-4"
                 >
                   <div>
-                    <p className="font-bold">{document.document_type}</p>
+                    <p className="font-bold">{documentLabels.get(document.document_type) ?? document.document_type.replaceAll('_', ' ')}</p>
                     <p className="text-xs text-slate-500">{document.file_name}</p>
                   </div>
                   <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black uppercase text-amber-900">
-                    {document.status || (document.approved ? 'approved' : 'pending')}
+                    {programHolderDocumentStatus(document)}
                   </span>
                 </div>
               ))

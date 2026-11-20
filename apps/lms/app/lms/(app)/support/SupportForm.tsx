@@ -10,6 +10,7 @@ interface SupportFormProps {
 export function SupportForm({ defaultSubject = '' }: SupportFormProps) {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     subject: defaultSubject,
     category: 'general',
@@ -27,19 +28,32 @@ export function SupportForm({ defaultSubject = '' }: SupportFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch('/api/support', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (res.ok) {
-        setSubmitted(true);
+      const result = await res.json().catch(() => null);
+      if (!res.ok || result?.success !== true) {
+        throw new Error(
+          res.status === 401
+            ? 'Your session expired. Sign in again to report this issue. Copy your message before leaving this page; it will not be saved.'
+            : result?.error ||
+              'The support service could not confirm your report. Your message has been kept; please retry.',
+        );
       }
+      setSubmitted(true);
     } catch (err) {
-      console.error('Failed:', err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Your report could not be sent. Your message has been kept; please retry.',
+      );
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (submitted) {
@@ -48,7 +62,10 @@ export function SupportForm({ defaultSubject = '' }: SupportFormProps) {
         <CheckCircle className="w-16 h-16 text-green-600 mx-auto" />
         <h3 className="text-xl font-semibold">Message Sent!</h3>
         <p className="text-gray-600">We will get back to you within 24-48 hours.</p>
-        <button onClick={() => setSubmitted(false)} className="px-6 py-2 bg-blue-600 text-white rounded-lg">
+        <button
+          onClick={() => setSubmitted(false)}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg"
+        >
           Send Another Message
         </button>
       </div>
@@ -57,6 +74,14 @@ export function SupportForm({ defaultSubject = '' }: SupportFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <p
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+        >
+          {error}
+        </p>
+      )}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
         <select
@@ -65,8 +90,10 @@ export function SupportForm({ defaultSubject = '' }: SupportFormProps) {
           className="w-full px-4 py-2 border rounded-lg"
           required
         >
-          {categories.map(cat => (
-            <option key={cat.value} value={cat.value}>{cat.label}</option>
+          {categories.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
+            </option>
           ))}
         </select>
       </div>

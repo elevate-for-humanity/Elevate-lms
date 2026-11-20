@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { evaluateBeautyPaymentGate, isBeautyApprenticeshipSlug } from '../../lib/apprenticeship/beauty-payment-gate.mjs';
+import { evaluateBeautyPaymentGate, isBeautyApprenticeshipSlug, loadBeautyPaymentGate } from '../../lib/apprenticeship/beauty-payment-gate.mjs';
 
 const beauty = ['barber-apprenticeship','cosmetology-apprenticeship','esthetician-apprenticeship','nail-technician-apprenticeship'];
 for (const program_slug of beauty) {
@@ -48,6 +48,43 @@ test('do not accept a revoked enrollment as proof of authorization', () => {
 test('nail technician application also gates legacy nail-tech course alias', () => {
   assert.equal(isBeautyApprenticeshipSlug('nail-tech-apprenticeship'), true);
   assert.ok(evaluateBeautyPaymentGate([{ program_slug: 'nail-technician-apprenticeship' }], [], 'nail-tech-apprenticeship'));
+});
+
+
+test('admitted learner does not depend on optional application history', async () => {
+  let applicationReads = 0;
+  const db = {
+    from(table) {
+      if (table !== 'program_enrollments') {
+        applicationReads += 1;
+        throw new Error('optional applications table unavailable');
+      }
+      return {
+        select() {
+          return this;
+        },
+        or() {
+          return this;
+        },
+        limit() {
+          return Promise.resolve({
+            data: [
+              {
+                program_slug: 'hvac-technician',
+                status: 'active',
+                enrollment_state: 'active',
+                revoked_at: null,
+              },
+            ],
+            error: null,
+          });
+        },
+      };
+    },
+  };
+
+  assert.equal(await loadBeautyPaymentGate(db, 'learner-id', 'learner@example.test'), null);
+  assert.equal(applicationReads, 0);
 });
 
 test('LMS layout, apprentice dashboard, course overview and direct lesson URL enforce the gate', () => {

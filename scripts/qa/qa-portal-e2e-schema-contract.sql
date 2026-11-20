@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS public.video_playback_events (
   event_type text,
   video_id text,
   page_slug text,
-  current_time numeric,
+  "current_time" numeric,
   duration numeric,
   error_message text,
   session_id text,

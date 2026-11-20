@@ -225,36 +225,24 @@ test.describe('Admin Portal — Production Proof', () => {
 
     const bodyText = await page.locator('body').innerText();
     expect(bodyText).not.toContain('Something went wrong');
-    await expect(page.locator('h1').first()).toContainText('Reports');
+    await expect(page.getByRole('heading', { name: 'Analytics', exact: true })).toBeVisible();
 
     // Old hardcoded sentinel values must not appear
     expect(bodyText).not.toContain('CDL Prep Course');
     expect(bodyText).not.toContain('Chart visualization coming soon');
   });
 
-  // ── 5. Users: search input present and functional ─────────────────────────
-  test('users page shows live count and search filters rows', async ({ page }) => {
-    await page.goto('/users');
+  // ── 5. Students: canonical directory and audit-record navigation ─────────
+  test('student directory exposes operational and audit record views', async ({ page }) => {
+    await page.goto('/students');
     await waitForContent(page, 'h1');
 
-    await expect(page.locator('h1').first()).toContainText('User');
-
-    const searchInput = page
-      .locator(
-        'input[placeholder*="search" i], input[placeholder*="name" i], input[placeholder*="email" i]',
-      )
-      .first();
-    await expect(searchInput).toBeVisible();
-
-    const rowsBefore = await page.locator('tbody tr').count();
-    if (rowsBefore > 0) {
-      await searchInput.fill('zzz_no_match_xyz_99');
-      await page.waitForTimeout(600);
-      const rowsAfter = await page.locator('tbody tr').count();
-      const emptyState = page.locator('text=/no users|no results|0 users/i');
-      const filtered = rowsAfter < rowsBefore || (await emptyState.isVisible());
-      expect(filtered).toBe(true);
-    }
+    await expect(page.getByRole('heading', { name: 'Students', exact: true })).toBeVisible();
+    const auditRecords = page.getByRole('link', { name: /Test & audit records/ });
+    await expect(auditRecords).toBeVisible();
+    await auditRecords.click();
+    await expect(page).toHaveURL(/\/students\?include_test=1$/);
+    await expect(page.getByRole('link', { name: 'Operational records', exact: true })).toBeVisible();
   });
 
   // ── 6. Settings: real page, no fake spinner ───────────────────────────────
@@ -265,13 +253,9 @@ test.describe('Admin Portal — Production Proof', () => {
     await expect(page.locator('h1').first()).toContainText('Settings');
     await expect(page.locator('button', { hasText: /saving\.\.\./i })).not.toBeVisible();
 
-    const bodyText = await page.locator('body').innerText();
-    // Real settings page says changes are saved to DB
-    const isReal =
-      bodyText.includes('database') ||
-      bodyText.includes('saved') ||
-      bodyText.includes('immediately');
-    expect(isReal).toBe(true);
+    await expect(page.getByRole('link', { name: /General/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Security/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Integrations & Webhooks/ })).toBeVisible();
   });
 
   // ── 7. Programs View/Manage links resolve without 404 ─────────────────────

@@ -32,6 +32,14 @@ async function createQaUser(kind, role, fullName, tenantId) {
 async function provision() {
   const anchor = await must(db.from('programs').select('organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(), 'load tenant anchor');
   if (!anchor?.tenant_id) throw new Error('Canonical tenant anchor is missing');
+  const adminEmail = String(process.env.E2E_ADMIN_EMAIL || process.env.TEST_ADMIN_EMAIL || '').trim().toLowerCase();
+  if (!adminEmail) throw new Error('Designated isolated-QA administrator email is required');
+  const approvalAdmin = await must(
+    db.from('profiles').select('id,role,tenant_id').eq('email', adminEmail).maybeSingle(),
+    'resolve designated isolated-QA approval administrator',
+  );
+  if (!approvalAdmin?.id || !['admin', 'super_admin'].includes(approvalAdmin.role) || approvalAdmin.tenant_id !== anchor.tenant_id)
+    throw new Error('Designated isolated-QA approval administrator is not authorized for the QA tenant');
   let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null };
   try {
     const learner = await createQaUser('learner', 'student', '[QA E2E] Learner', anchor.tenant_id); state.learner = learner;
@@ -44,6 +52,9 @@ async function provision() {
       user_id: learner.id, student_id: learner.id, email: learner.email,
       full_name: '[QA E2E] Learner', program_id: hvac.program_id, course_id: hvac.id,
       program_slug: 'hvac-technician', status: 'active', enrollment_state: 'active',
+      payment_status: 'paid', approved_at: new Date().toISOString(),
+      approved_by: approvalAdmin.id, access_granted_at: new Date().toISOString(),
+      access_status: 'active',
       funding_source: 'qa-e2e', funding_status: 'unfunded_self_continuing',
       funding_verified: false, amount_paid_cents: 0,
       source: 'qa-e2e', tenant_id: anchor.tenant_id,

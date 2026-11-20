@@ -62,20 +62,23 @@ test('new learner profile inherits canonical program tenant before enrollment', 
     first_name: 'New',
     last_name: 'Learner',
     program_id: 'program',
-    program_slug: 'hvac-technician',
+    program_slug: 'stale-slug',
     funding_verified: false,
     has_workone_approval: false,
   };
   const writes = [];
   let authCreateCount = 0;
+  let authCreateInput;
+  const atomicCalls = [];
   const db = {
     auth: {
       admin: {
         async listUsers() {
           return { data: { users: [] }, error: null };
         },
-        async createUser() {
+        async createUser(input) {
           authCreateCount += 1;
+          authCreateInput = input;
           return { data: { user: { id: 'new-learner' } }, error: null };
         },
         async generateLink() {
@@ -108,7 +111,7 @@ test('new learner profile inherits canonical program tenant before enrollment', 
           if (table === 'profiles') return Promise.resolve({ data: null, error: null });
           if (table === 'programs') {
             return Promise.resolve({
-              data: { slug: 'hvac-technician', tenant_id: 'tenant-qa' },
+              data: { slug: 'cna', tenant_id: 'tenant-qa' },
               error: null,
             });
           }
@@ -127,6 +130,10 @@ test('new learner profile inherits canonical program tenant before enrollment', 
       };
       return query;
     },
+    async rpc(name, args) {
+      atomicCalls.push({ name, args });
+      return { data: { status: 'approved' }, error: null };
+    },
   };
 
   const result = await approve(db, {
@@ -137,6 +144,17 @@ test('new learner profile inherits canonical program tenant before enrollment', 
 
   assert.equal(result.success, true);
   assert.equal(authCreateCount, 1);
+  assert.deepEqual(authCreateInput.app_metadata, {
+    tenant_id: 'tenant-qa',
+    role: 'student',
+  });
+  assert.equal(application.program_slug, 'cna');
+  assert.deepEqual(atomicCalls, [
+    {
+      name: 'approve_application_and_grant_access_atomic',
+      args: { p_application_id: application.id, p_actor_user_id: 'new-learner' },
+    },
+  ]);
   const profileWrite = writes.find(
     (write) => write.table === 'profiles' && write.operation === 'upsert',
   );
@@ -164,13 +182,15 @@ test('nonstudent approval without a program uses the authorized primary tenant',
     has_workone_approval: false,
   };
   const writes = [];
+  let authCreateInput;
   const db = {
     auth: {
       admin: {
         async listUsers() {
           return { data: { users: [] }, error: null };
         },
-        async createUser() {
+        async createUser(input) {
+          authCreateInput = input;
           return { data: { user: { id: 'new-employer' } }, error: null };
         },
         async generateLink() {
@@ -225,6 +245,10 @@ test('nonstudent approval without a program uses the authorized primary tenant',
 
   assert.equal(result.success, true);
   assert.equal(result.enrollmentId, null);
+  assert.deepEqual(authCreateInput.app_metadata, {
+    tenant_id: 'primary-tenant',
+    role: 'employer',
+  });
   const profileWrite = writes.find(
     (write) => write.table === 'profiles' && write.operation === 'upsert',
   );

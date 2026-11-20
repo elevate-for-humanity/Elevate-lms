@@ -190,9 +190,13 @@ export async function approveApplication(
         email,
         password: tempPassword,
         email_confirm: true,
+        app_metadata: {
+          tenant_id: profileTenantId,
+          role: assignedRole,
+        },
         user_metadata: {
           full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
-          role: 'student',
+          role: assignedRole,
           must_change_password: true,
         },
       });
@@ -266,10 +270,12 @@ export async function approveApplication(
   if (!fundingType) fundingType = app.requested_funding_source || 'pending';
 
   let enrollmentId: string | null = null;
+  let resolvedProgramSlug = app.program_slug ?? app.pathway_slug ?? null;
 
   if (assignedRole === 'student') {
     const studentProgramId = resolvedProgramId!;
     const programSlug = canonicalProgramSlug!;
+    resolvedProgramSlug = programSlug;
     if (app.program_slug !== programSlug) {
       const { error: slugUpdateError } = await db
         .from('applications')
@@ -422,7 +428,12 @@ export async function approveApplication(
   }
 
   const ATOMIC_SLUGS = new Set(['cna']);
-  if (ATOMIC_SLUGS.has(app.program_slug ?? '')) {
+  const routedApplication = {
+    ...app,
+    user_id: userId,
+    ...(resolvedProgramSlug ? { program_slug: resolvedProgramSlug } : {}),
+  };
+  if (ATOMIC_SLUGS.has(resolvedProgramSlug ?? '')) {
     const { data: atomicResult, error: atomicErr } = await db.rpc(
       'approve_application_and_grant_access_atomic',
       { p_application_id: applicationId, p_actor_user_id: userId },
@@ -434,17 +445,17 @@ export async function approveApplication(
       ) {
         logger.warn('[approve] atomic RPC not found — falling back to application-layer path', {
           applicationId,
-          slug: app.program_slug,
+          slug: resolvedProgramSlug,
         });
-        await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
+        await attachPartnerRouting({ db, application: routedApplication });
       } else {
-        throw new Error(`Atomic approval failed (${app.program_slug}): ${atomicErr.message}`);
+        throw new Error(`Atomic approval failed (${resolvedProgramSlug}): ${atomicErr.message}`);
       }
     } else if (atomicResult?.status === 'blocked') {
       return { success: false, error: `Approval blocked: ${(atomicResult.blockers as string[]).join(', ')}` };
     }
   } else {
-    await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
+    await attachPartnerRouting({ db, application: routedApplication });
   }
 
   try {

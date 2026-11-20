@@ -88,20 +88,20 @@ export const COPY = {
 
     selfPayHeader: 'Enroll & Pay',
     selfPayDescription:
-      "You'll be routed to secure checkout. Once payment is confirmed, the system automatically provisions your access and unlocks your course.",
+      "You'll be routed to secure checkout. Payment is recorded for admissions review; training access requires explicit administrator approval.",
     selfPayButton: 'Enroll Now (Secure Checkout)',
 
     employerPayHeader: 'Employer-Sponsored Enrollment',
     employerPayDescription:
-      'Your employer will receive an invoice. Once payment is confirmed, your access is unlocked automatically.',
+      'Your employer will receive an invoice. Once payment and sponsorship requirements are verified, administrator approval is required before training access.',
   },
 
   // Provisioning (behind the scenes messaging)
   provisioning: {
     inProgress: 'Setting up your student access...',
-    complete: 'Access unlocked. Go to Student Portal to start.',
+    complete: 'Application recorded. Await administrator approval before starting training.',
     description:
-      "Our system creates your student access, assigns your course, and unlocks your learning dashboard. You don't have to wait for someone to manually add you.",
+      "Our system creates your account and records verified payment, documents and admissions decisions. A school administrator must approve training access before coursework begins.",
   },
 
   // LMS Entry
@@ -125,7 +125,7 @@ export const COPY = {
   },
 
   // Video Script (30 seconds)
-  videoScript: `Ready to start? Click 'Start Eligibility & Apply.' You'll answer a few quick questions so we can route you to funded options if you qualify, or self-pay if you don't. Then you'll create your student account, complete your application, and upload required documents. Once approved, you'll enroll—funded students complete enrollment steps, and self-pay students check out securely. After that, your LMS access is unlocked automatically and you can start class right away.`,
+  videoScript: `Ready to start? Click 'Start Eligibility & Apply.' You'll answer a few quick questions so we can route you to funded options if you qualify, or self-pay if you don't. Then you'll create your student account, complete your application, and upload required documents. Once approved, you'll enroll—funded students complete enrollment steps, and self-pay students check out securely. After payment and enrollment review, an administrator approves LMS access when all requirements are met.`,
 } as const;
 
 /**

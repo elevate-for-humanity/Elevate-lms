@@ -191,6 +191,14 @@ test('Host Shop failure artifact never uploads raw authenticated browser state',
  assert.match(prepare,/if: failure\(\)/);
  assert.match(prepare,/GITHUB_RUN_ID/);
  assert.match(prepare,/GITHUB_SHA/);
+ assert.match(prepare,/workflow_sha=/);
+ assert.match(prepare,/attested_release_sha=/);
+ assert.match(prepare,/QA_EXPECTED_MAIN_SHA/);
+ assert.match(prepare,/steps\.browser\.outcome/);
+ assert.match(prepare,/steps\.cleanup\.outcome/);
+ assert.match(prepare,/browser_test_outcome=/);
+ assert.match(prepare,/fixture_cleanup_outcome=/);
+ assert.doesNotMatch(prepare,/test_status=failed|source_sha=/);
  assert.doesNotMatch(prepare,/SUPABASE_SERVICE_ROLE_KEY|QA_SHOP_A_PASSWORD|test-results\//);
  assert.ok(upload,'only safe failure metadata should be uploaded');
  assert.match(upload,/if: failure\(\)/);

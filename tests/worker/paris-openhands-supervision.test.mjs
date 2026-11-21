@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {observeAcceptedOpenHandsRepair,openHandsRepairPrompt} from '../../lib/devstudio/paris-openhands-repair.mjs';
-import {acceptedOpenHandsNeedsObservation,superviseAcceptedOpenHandsRepair} from '../../lib/devstudio/paris-openhands-supervision.mjs';
+import {acceptedOpenHandsNeedsObservation,superviseAcceptedOpenHandsRepair,shouldReconcileTerminalRepair} from '../../lib/devstudio/paris-openhands-supervision.mjs';
 const repairId='11111111-1111-4111-8111-111111111111', goal='Repair confirmed captions failure.';
 const now=4*60*60_000;
 function fixture(){
@@ -162,4 +162,23 @@ test('a provider-confirmation snapshot still pending approval is read but its pa
   resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{throw Error('no read')}});
  await assert.rejects(h.observe,/PARIS_OPENHANDS_APPROVAL_REQUIRED/);
  assert.deepEqual(resumed,[]);
+});
+
+test('terminal sweep preserves BOTH distinct approval-waiting repairs when only one is observed', () => {
+ const first=fixture().repair;
+ first.error_code='PARIS_OPENHANDS_APPROVAL_REQUIRED';
+ first.verification.openhandsObservation={state:'approval_required',taskId:'task-1',checkedAt:new Date(now).toISOString()};
+ const second=structuredClone(first);
+ second.id='22222222-2222-4222-8222-222222222222';
+ second.candidate.checkpoint.taskId='task-2';
+ second.verification.openhandsObservation={state:'approval_required',taskId:'task-2',checkedAt:new Date(now+1000).toISOString()};
+ // The observation budget selects one; terminal reconciliation protects both.
+ assert.equal(shouldReconcileTerminalRepair(first),false);
+ assert.equal(shouldReconcileTerminalRepair(second),false);
+ const selected=[first,second].filter(acceptedOpenHandsNeedsObservation);
+ assert.equal(selected.length,2);
+ const verified={...first,status:'verified',release_sha:'a'.repeat(40)};
+ assert.equal(shouldReconcileTerminalRepair(verified),true);
+ const trulyFailed={...second,verification:{...second.verification,openhandsObservation:{state:'rejected'}}};
+ assert.equal(shouldReconcileTerminalRepair(trulyFailed),true);
 });

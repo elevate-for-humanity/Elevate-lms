@@ -202,3 +202,19 @@ test('isolated QA approver exists before learner provisioning and is removed las
   assert.ok(dependent.includes('process.env.E2E_ADMIN_EMAIL'));
   assert.match(dependent, /Designated isolated-QA approval administrator is not authorized/);
 });
+
+test('browser engines are installed before QA identity provisioning can fail', () => {
+  const position = name => {
+    const index = job.indexOf('- name: ' + name);
+    assert.ok(index >= 0, 'Missing required workflow step: ' + name);
+    return index;
+  };
+  const dependencyInstall = position('Install dependencies');
+  const browserInstall = position('Install Chromium and WebKit');
+  const qaProvisioning = position('Provision Employer + Instructor + Staff + Case Manager + Admin identities');
+  assert.ok(dependencyInstall < browserInstall && browserInstall < qaProvisioning,
+    'Browser installation cannot depend on successful QA provisioning: public and authenticated suites must never cascade to missing browser binaries');
+  assert.equal((job.match(/- name: Install Chromium and WebKit/g) || []).length, 1);
+  const step = job.slice(browserInstall).split('\n      - name:')[0];
+  assert.match(step, /pnpm exec playwright install chromium webkit --with-deps/);
+});

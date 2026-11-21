@@ -30,6 +30,9 @@ export default async function HostShopsPage() {
           <div className="relative mt-8 aspect-[16/7] max-w-3xl overflow-hidden rounded-2xl border border-white/20 bg-slate-800">
             <Image src="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" alt="Professional barbers at an approved Elevate apprenticeship Host Shop" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
           </div>
+          <Link href="/apprenticeships/indiana" className="mt-6 block w-fit font-bold text-white underline">
+            Search the Indiana map and directory
+          </Link>
           <Link href="/partners/host-shop/apply" className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-white px-6 font-bold text-slate-950 hover:bg-slate-100">
             Own a shop? Apply to host apprentices — Free
           </Link>

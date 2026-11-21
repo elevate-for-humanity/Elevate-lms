@@ -146,6 +146,15 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
     index: true,
   },
   {
+    path: '/apprenticeships/indiana',
+    label: 'Indiana Apprenticeship Host Shops',
+    category: 'Apprenticeships',
+    changeFrequency: 'weekly',
+    priority: 0.85,
+    lastModified: changed,
+    index: true,
+  },
+  {
     path: ROUTES.apprenticeshipsHowItWorks,
     label: 'How Apprenticeships Work',
     category: 'Apprenticeships',

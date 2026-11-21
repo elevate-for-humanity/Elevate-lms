@@ -34,7 +34,9 @@ window.startOwnedPhoneTest=async credential=>{
      const energy=report.totalAudioEnergy,duration=report.totalSamplesDuration;
      if(!Number.isFinite(energy)||!Number.isFinite(duration))continue;
      const prior=inboundAudioStats.get(report.id);
-     inboundAudioStats.set(report.id,{energy,duration});
+     // Concurrent stats reads can resolve out of order. Keep the newest baseline.
+     if(prior&&report.timestamp<=prior.timestamp)continue;
+     inboundAudioStats.set(report.id,{energy,duration,timestamp:report.timestamp});
      // Measure decoded inbound speech rather than speaker output in headless Chromium.
      if(prior&&duration>prior.duration&&energy>=prior.energy&&
        Math.sqrt((energy-prior.energy)/(duration-prior.duration))>.002)state.remoteAudibleWindows++;

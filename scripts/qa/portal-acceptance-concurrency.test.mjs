@@ -174,7 +174,8 @@ test('main pushes that change live acceptance automatically request each product
 });
 
 test('Marketing deployment-triggered HVAC playback is pinned to its exact release SHA', () => {
-  const expression = mediaJob.match(/^          EXPECTED_MARKETING_SHA: \$\\{\\{ (.*?) \\}\\}$/m)?.[1];
+  const expression = mediaJob.split('
+').find(line => line.includes('EXPECTED_MARKETING_SHA: ${{ '))\n    ?.split('EXPECTED_MARKETING_SHA: ${{ ')[1]?.split(' }}')[0];
   assert.ok(expression, 'Missing deployed Marketing SHA binding');
   const released = 'b'.repeat(40);
   assert.equal(evaluate(expression, event('workflow_run', {head_sha: released})), released);

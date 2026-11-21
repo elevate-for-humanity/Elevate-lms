@@ -12,7 +12,7 @@ test('default HVAC links use the active EPA 608 course rather than retired cours
 
 test('runtime HVAC resolution must reject inactive, unpublished or unavailable replacements', () => {
   const resolver=source('lib/courses/resolvers.ts');
-  const functionSource=resolver.slice(resolver.indexOf('export async function resolveHvacCourseId()'),resolver.indexOf('export async function resolveHvacProgramId()'));
+  const functionSource=resolver.slice(resolver.indexOf('export async function findPublishedHvacCourseId()'),resolver.indexOf('export async function resolveHvacProgramId()'));
   assert.match(functionSource, /\.eq\('slug', 'epa608-replacement-20261019'\)/);
   assert.match(functionSource, /\.eq\('is_active', true\)/);
   assert.match(functionSource, /\.eq\('status', 'published'\)/);
@@ -22,7 +22,17 @@ test('runtime HVAC resolution must reject inactive, unpublished or unavailable r
 
 test('the HVAC course landing uses the active runtime course resolver', () => {
   const page = source('apps/lms/app/programs/hvac-technician/course/page.tsx');
-  assert.match(page, /await resolveHvacCourseId\(\)/);
+  assert.match(page, /await findPublishedHvacCourseId\(\)/);
   assert.match(page, /\.eq\('id', activeCourseId\)/);
   assert.doesNotMatch(page, /\.eq\('slug', 'hvac-technician'\)/);
+});
+
+test('the learner page checks sign-in, publication, and enrollment before loading course content', () => {
+  const page = source('apps/lms/app/programs/hvac-technician/course/page.tsx');
+  const firstContentQuery = page.indexOf(".from('course_modules')");
+  assert.ok(firstContentQuery > 0);
+  const guards = page.slice(0, firstContentQuery);
+  assert.match(guards, /if \(!user\) redirect/);
+  assert.match(guards, /if \(!course\)[\s\S]+HVAC course is not published yet/);
+  assert.match(guards, /resolveCourseEnrollment\(user.id, course.id\)[\s\S]+notFound\(\)/);
 });

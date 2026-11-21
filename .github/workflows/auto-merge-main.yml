@@ -28,13 +28,35 @@ jobs:
           repositories: ${{ github.event.repository.name }}
           permission-contents: write
           permission-pull-requests: write
-      - name: Disable auto-merge when a PR leaves main or becomes ineligible
-        if: ${{ github.event.pull_request.base.ref != 'main' || github.event.pull_request.draft || github.event.pull_request.head.ref == 'staging' }}
+      - name: Disable only after transition out of automatic main eligibility
+        # A generic edited event also includes title and description changes.
+        # Keep manually armed staging promotion PRs intact on those edits.
+        if: >-
+          ${{ (github.event.action == 'edited' &&
+                github.event.changes.base.ref.from == 'main' &&
+                github.event.pull_request.base.ref != 'main' &&
+                github.event.pull_request.head.ref != 'staging') ||
+              (github.event.action == 'converted_to_draft' &&
+                github.event.pull_request.base.ref == 'main' &&
+                github.event.pull_request.head.ref != 'staging') }}
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          TRANSITION_ACTION: ${{ github.event.action }}
         run: |
-          armed=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json autoMergeRequest --jq '.autoMergeRequest != null')
+          # A newer webhook may have restored eligibility. Avoid cancelling its
+          # newly armed auto-merge from stale event data.
+          live=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json baseRefName,headRefName,isDraft,autoMergeRequest)
+          base=$(jq -r '.baseRefName' <<<"$live")
+          head=$(jq -r '.headRefName' <<<"$live")
+          draft=$(jq -r '.isDraft' <<<"$live")
+          [[ "$head" != staging ]] || exit 0
+          if [[ "$TRANSITION_ACTION" == edited ]]; then
+            [[ "$base" != main ]] || exit 0
+          else
+            [[ "$base" == main && "$draft" == true ]] || exit 0
+          fi
+          armed=$(jq -r '.autoMergeRequest != null' <<<"$live")
           if [[ "$armed" == true ]]; then
             gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --disable-auto
           fi

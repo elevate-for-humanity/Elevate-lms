@@ -373,7 +373,7 @@ async function _POST(req: Request) {
     const { data: recentApp } = await supabase
       .from('applications')
       .select('id')
-      .ilike('email', body.email.toLowerCase().trim())
+      .eq('normalized_email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .neq('source', 'intake-form')
       .gte('created_at', oneDayAgo)
@@ -399,15 +399,23 @@ async function _POST(req: Request) {
     // Reuse an existing active application for the same applicant/program.
     // A WorkOne or document update must advance the original application, not
     // create a second admissions record.
-    const { data: activeApp } = await supabase
+    const { data: activeApp, error: activeApplicationError } = await supabase
       .from('applications')
       .select('id, reference_number, status, program_interest, funding_type, payment_status, normalized_phone, phone, metadata')
-      .ilike('email', body.email.toLowerCase().trim())
+      .eq('normalized_email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .not('status', 'in', '("rejected","withdrawn","duplicate")')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+
+    if (activeApplicationError) {
+      logger.warn('[api/applications] existing application lookup failed', { code: activeApplicationError.code });
+      return NextResponse.json(
+        { error: 'We could not verify existing applications. Please try again.' },
+        { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
 
     if (activeApp && paidEvidence) {
       const saved = await supabase.from('applications').update({
@@ -563,6 +571,7 @@ async function _POST(req: Request) {
       state: body.state || null,
       address: body.address || null,
       zip: body.zip || '00000',
+      program_id: catalogResult.data.id,
       program_interest: program,
       program_slug: body.programSlug || body.program_slug || null,
       support_notes: notes,
@@ -707,6 +716,7 @@ async function _POST(req: Request) {
           email: body.email,
           city: body.city || 'Not provided',
           zip: body.zip || '00000',
+          program_id: catalogResult.data.id,
           program_interest: program,
           support_notes: notes,
           status: 'submitted',
@@ -718,6 +728,13 @@ async function _POST(req: Request) {
         .maybeSingle();
       data = tier3.data;
       error = tier3.error;
+    }
+
+    if (error?.code === '23505' && String(error.message).includes('unique_applicant_per_program')) {
+      return NextResponse.json(
+        { error: 'An application already exists for this program. Check your application status or contact Admissions.' },
+        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
     }
 
     if (error || !data) {

@@ -172,3 +172,26 @@ test('main pushes that change live acceptance automatically request each product
     assert.ok(push.includes("'scripts/qa/require-portal-e2e-identities.mjs'"), file);
   }
 });
+
+test('Marketing deployment-triggered HVAC playback is pinned to its exact release SHA', () => {
+  const expression = mediaJob.match(/^          EXPECTED_MARKETING_SHA: \$\\{\\{ (.*?) \\}\\}$/m)?.[1];
+  assert.ok(expression, 'Missing deployed Marketing SHA binding');
+  const released = 'b'.repeat(40);
+  assert.equal(evaluate(expression, event('workflow_run', {head_sha: released})), released);
+  assert.equal(evaluate(expression, event('workflow_dispatch', {}, {deployed_sha: released})), released);
+  // A PR runs against existing live Marketing, not an unmerged PR commit.
+  assert.equal(evaluate(expression, event('pull_request')), '');
+});
+
+test('production authenticated acceptance never uploads request-body traces with persistent passwords', () => {
+  // Browser traces include request payloads, including login passwords. Keep
+  // all functional checks and separate screenshot/HTML evidence intact.
+  const commands = job.match(/^\s*run: pnpm exec playwright test .*$/gm) || [];
+  assert.equal(commands.length, 6, 'Every production authenticated browser step must be guarded');
+  for (const command of commands) {
+    assert.match(command, /--trace off(?:\s|$)/, 'Production test must opt out of request-body tracing');
+    assert.doesNotMatch(command, /--trace retain-on-failure/);
+  }
+  assert.match(job, /- name: Upload QA evidence/);
+  assert.match(job, /- name: Preserve authenticated LMS playback and full-screen acceptance evidence/);
+});

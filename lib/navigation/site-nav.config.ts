@@ -566,7 +566,7 @@ export const footerNavigation = {
       { label: 'Ecosystem', href: '/ecosystem' },
       { label: 'Email', href: '/email' },
       { label: 'Government', href: '/government' },
-      { label: 'For Students', href: '/for-students' },
+      { label: 'For Students', href: '/programs' },
       { label: 'For Employers', href: '/for-employers' },
       { label: 'Portals', href: '/portals' },
       { label: 'Mobile App', href: '/mobile-app' },

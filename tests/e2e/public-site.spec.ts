@@ -65,7 +65,7 @@ async function collectInternalLinks(page: Page, selector: string) {
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
-async function assertNoRuntimeFailure(page: Page, route: string) {
+async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
   const failedResponses: string[] = [];
@@ -89,6 +89,10 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
   expect(response, `${route} did not return a response`).not.toBeNull();
   expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
+
+  if (expectedPath) {
+    await expect(page).toHaveURL((url) => url.pathname === expectedPath);
+  }
 
   await page.waitForLoadState('networkidle').catch(() => undefined);
 
@@ -118,7 +122,7 @@ test.describe.configure({ mode: 'serial' });
 test.describe('page-by-page public production audit', () => {
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
+      await assertNoRuntimeFailure(page, route, route === '/for-students' ? '/programs' : undefined);
     });
   }
 

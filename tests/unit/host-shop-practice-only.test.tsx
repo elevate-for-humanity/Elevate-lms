@@ -11,5 +11,5 @@ it('keeps unbound apprentices visible without claiming zero RTI or a final wage 
  expect(screen.getByText('Sponsor setup required')).toBeInTheDocument();
  expect(screen.queryByText('Final Appendix A wage step reached')).not.toBeInTheDocument();
  expect(screen.queryByText('0 RTI hours required')).not.toBeInTheDocument();
- expect(screen.getByRole('link',{name:'Open Practical Service Log'})).toHaveAttribute('href','/host-shop/dashboard/practical-log');
+ expect(screen.getByRole('link',{name:'Open Practical Service Log'})).toHaveAttribute('href','/host-shop/dashboard/practical-log?studentId=student');
 });

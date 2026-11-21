@@ -6,6 +6,10 @@ import {dispatchQueuedCourseJob} from './dispatch-course-job.mjs';
 // Google runner or return jobs to the launch path. Reads only; no claims/writes.
 export async function probeCourseDispatchQueue({env=process.env,request=fetch,
  wait=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}) {
+ const qaOrigin='https://isdgjcdabhxxozarmxta.supabase.co';
+ const qa=env.CI_SUPABASE_PROJECTION_QA==='true';
+ const key=qa?env.CI_SUPABASE_PROJECTION_KEY:env.SUPABASE_SERVICE_ROLE_KEY;
+ assert.ok(key,'Supabase projection verification credentials are required');
  let sampled=0,eligible=0;
  const read=async url=>{
   // The projection is read-only. Retry bounded network timeouts without ever
@@ -13,8 +17,8 @@ export async function probeCourseDispatchQueue({env=process.env,request=fetch,
   let rows;
   for(let attempt=0;attempt<3;attempt++){
    try{
-    const response=await request(url,{headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-     Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY},signal:AbortSignal.timeout(15000)});
+    const response=await request(url,{headers:qa?{apikey:key}:{apikey:key,Authorization:'Bearer '+key},
+     redirect:'error',signal:AbortSignal.timeout(15000)});
     if(!response.ok)throw Error('COURSE_QUEUE_PROJECTION_HTTP_'+response.status);
     rows=await response.json();
     break;
@@ -29,7 +33,8 @@ export async function probeCourseDispatchQueue({env=process.env,request=fetch,
    Object.hasOwn(row.build,'owner_paused'),'COURSE_QUEUE_PARENT_PROJECTION_INVALID');
   return rows;
  };
- await dispatchQueuedCourseJob({env,run:(_command,args)=>{
+ await dispatchQueuedCourseJob({env:{...env,SUPABASE_SERVICE_ROLE_KEY:key},
+  queueUrl:qa?new URL('/rest/v1/ultimate_build_jobs',qaOrigin):undefined,run:(_command,args)=>{
   assert.deepEqual(args.slice(0,4),['run','jobs','executions','list'],'PROBE_CANNOT_LAUNCH_WORK');
   return '[]';
  },request:async url=>{
@@ -52,6 +57,7 @@ export async function probeCourseDispatchQueue({env=process.env,request=fetch,
   eligible=rows.length;
   return {ok:true,json:async()=>[]};
  }});
+ if(qa) assert.equal(eligible,1,'COURSE_QUEUE_SYNTHETIC_FILTER_RESULT_INVALID');
  const result={projectionVerified:true,pausedFilterVerified:true,sampledRows:sampled,eligibleRows:eligible,readOnly:true};
  console.info(JSON.stringify(result));return result;
 }

@@ -19,3 +19,10 @@ test('runtime HVAC resolution must reject inactive, unpublished or unavailable r
   assert.match(functionSource, /ACTIVE_HVAC_COURSE_NOT_AVAILABLE/);
   assert.doesNotMatch(functionSource, /0ba9a61c-1f1b-4019-be6f-90e92eba2bc0/);
 });
+
+test('the HVAC course landing uses the active runtime course resolver', () => {
+  const page = source('apps/lms/app/programs/hvac-technician/course/page.tsx');
+  assert.match(page, /await resolveHvacCourseId\(\)/);
+  assert.match(page, /\.eq\('id', activeCourseId\)/);
+  assert.doesNotMatch(page, /\.eq\('slug', 'hvac-technician'\)/);
+});

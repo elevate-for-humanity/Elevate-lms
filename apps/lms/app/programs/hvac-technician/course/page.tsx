@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getCurrentUser } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import CanonicalHvacCourseHome from './CanonicalHvacCourseHome';
+import { resolveHvacCourseId } from '@/lib/courses/resolvers';
 import { loadCourseActivity } from '@/lib/learner/course-activity';
 
 export const metadata: Metadata = {
@@ -13,10 +14,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function HvacCoursePage() {
   const db = await requireAdminClient();
+  const activeCourseId = await resolveHvacCourseId();
   const { data: course, error: courseError } = await db
     .from('courses')
     .select('id, title, description, slug, is_active')
-    .eq('slug', 'hvac-technician')
+    .eq('id', activeCourseId)
+    .eq('is_active', true)
+    .eq('status', 'published')
     .maybeSingle();
 
   if (courseError) {

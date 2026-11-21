@@ -5,7 +5,10 @@ import assert from 'node:assert/strict';
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const gate = workflow.split('\n  ci-gate:')[1];
 const dependencies = ['preflight', 'typecheck', 'lint', 'enrollment-database', 'website-database', 'diagnostics'];
-const runBlock = gate.split('        run: |\n')[1].split('\n').map(line => line.replace(/^          /, '')).join('\n');
+const runBlock = gate
+  .match(/^        run: \|\n((?: {10}[^\n]*\n)+)/m)?.[1]
+  .replace(/^ {10}/gm, '');
+assert.ok(runBlock, 'The CI required gate must contain its diagnostic shell block');
 function execute(results) {
   const script = runBlock.replace(/\$\{\{ needs\.([\w-]+)\.result \}\}/g, (_, name) => results[name]);
   return spawnSync('bash', ['-e', '-c', script], { stdio: 'ignore' }).status;

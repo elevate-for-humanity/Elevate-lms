@@ -1,7 +1,7 @@
 import {ensureRepairMainCI,hasDurableMainCIObservation,isVerifiedMainCIReceipt} from './exact-main-ci-request.mjs';
 import {loadCourseRepairEvidence} from '@/lib/devstudio/paris-course-repair-evidence.mjs';
 import {parisRepairEngine} from '@/lib/devstudio/paris-openhands-repair.mjs';
-import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
+import {nextAcceptedOpenHandsObservation,superviseAcceptedOpenHandsRepair,shouldReconcileTerminalRepair} from '@/lib/devstudio/paris-openhands-supervision.mjs';
 import {applyOwnedParisRepairTransition} from './paris-owned-transition.mjs';
 import {REPAIR_MODEL_PROBE_TIMEOUT_MS,repairRetryGoal} from '@/lib/devstudio/repair-inference-budget.mjs';
 import {untouchedPlannerNeedsFreshGeneration} from '@/lib/devstudio/repair-checkpoint-recovery.mjs';
@@ -632,13 +632,13 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   const retry=await db.from('paris_code_repairs').update({status:'queued',candidate:null,workflow_run_id:null,error_code:null,goal:repairRetryGoal(repair.goal,evidence),attempt_history:[...(repair.attempt_history??[]),{runId:repair.workflow_run_id,sha:repair.candidate.branch.sha,error:repair.error_code}],updated_at:new Date().toISOString()}).eq('id',repair.id).eq('status','blocked').eq('attempt_count',repair.attempt_count);
   if(retry.error)throw retry.error;
  }
- const terminal=await db.from('paris_code_repairs').select('id,status,release_sha,error_code').in('status',['verified','blocked']).order('updated_at',{ascending:false}).limit(2000);
+ const terminal=await db.from('paris_code_repairs').select('id,status,release_sha,error_code,candidate,verification').in('status',['verified','blocked']).order('updated_at',{ascending:false}).limit(2000);
  if(terminal.error)throw terminal.error;
  if(terminal.data?.length===2000)throw Error('PARIS_TERMINAL_REPAIR_SCAN_LIMIT');
  for(const repair of terminal.data??[]){
-  // A blocked row with an accepted provider receipt is still resumable and
-  // must keep its original task while other repairs pass through the queue.
-  if(repair.id===accepted?.id)continue;
+  // Observe only one receipt per tick, but protect ALL accepted provider
+  // checkpoints from terminal reconciliation, including other approval waits.
+  if(!shouldReconcileTerminalRepair(repair))continue;
   const tasks=await db.from('ai_tasks').select('id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message').eq('status','running').eq('tool_output->>repairId',repair.id);
   if(tasks.error)throw tasks.error;
   for(const task of tasks.data??[]){

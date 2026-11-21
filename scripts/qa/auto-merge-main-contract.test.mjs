@@ -60,28 +60,22 @@ test('live checks and exact-head protected merge guard are retained', () => {
   assert.doesNotMatch(source,/--admin|--force|--bypass/);
 });
 
-test('retarget revocation survives unrelated metadata edits', () => {
+test('retarget/draft revocation and arming serialize on one lossless PR queue', () => {
   const concurrency = source.split('\nconcurrency:\n')[1]?.split('\njobs:\n')[0];
   assert.ok(concurrency, 'workflow concurrency contract must exist');
-  assert.match(concurrency, /cancel-in-progress: true/);
-  const line = concurrency.split('\n').find(value => value.trimStart().startsWith('group: '));
-  const expression = line?.split(' }}-${{ ')[1]?.split(' }}')[0];
-  assert.ok(expression, 'revocation requires a separate per-event concurrency key');
-  const group = (action, from, runId) => {
-    const github = {event: {action, changes: {base: {ref: {from}}}}, run_id: runId};
-    return String(Function('github', `return (${expression})`)(github));
-  };
-  const retarget = group('edited', 'main', 701);
-  const metadata = group('edited', '', 702);
-  const anotherRetarget = group('edited', 'staging', 703);
-  const draft = group('converted_to_draft', '', 704);
-  assert.equal(retarget, '701');
-  assert.equal(anotherRetarget, '703');
-  assert.equal(draft, '704');
-  assert.equal(metadata, 'routine');
-  assert.equal(group('synchronize', '', 705), 'routine');
-  assert.equal(group('edited', '', 706), metadata, 'routine arming remains deduplicated');
-  assert.notEqual(retarget, metadata, 'metadata change must not cancel revoke');
-  assert.notEqual(retarget, anotherRetarget, 'a second retarget cannot cancel revoke');
-  assert.notEqual(draft, metadata, 'metadata change must not cancel draft revoke');
+  assert.match(concurrency, /^\s*group: enable-main-auto-merge-\$\{\{ github\.event\.pull_request\.number \}\}\s*$/m);
+  assert.match(concurrency, /^\s*queue: max\s*$/m);
+  assert.doesNotMatch(concurrency, /cancel-in-progress:\s*true/);
+  // Unique run-ID revocation groups allowed stale arming jobs to run
+  // concurrently. A shared non-cancelling queue ensures every PR event
+  // can reconcile the current live base and autoMergeRequest state.
+  assert.doesNotMatch(concurrency, /github\.run_id|\|\| 'routine'/);
+  const groupFor = number => 'enable-main-auto-merge-' + number;
+  for (const action of ['synchronize','edited','converted_to_draft','ready_for_review']) {
+    assert.equal(groupFor(2769), groupFor(2769), action + ' must share the same serialized queue');
+  }
+  assert.notEqual(groupFor(2769),groupFor(2770), 'unrelated PRs must not block each other');
+  assert.match(source, /types: \[opened, reopened, ready_for_review, synchronize, edited, converted_to_draft\]/);
+  assert.match(disable, /--disable-auto/);
+  assert.match(arm, /--match-head-commit "\$PR_HEAD"/);
 });

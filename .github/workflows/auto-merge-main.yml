@@ -6,11 +6,12 @@ on:
 permissions: {}
 
 concurrency:
-  # Ineligibility transitions must finish revoking stale auto-merge requests.
-  # Isolate each retarget/draft event by run ID, so later metadata edits or
-  # another retarget cannot cancel a revocation. Regular events still coalesce.
-  group: enable-main-auto-merge-${{ github.event.pull_request.number }}-${{ (github.event.action == 'converted_to_draft' || (github.event.action == 'edited' && github.event.changes.base.ref.from)) && github.run_id || 'routine' }}
-  cancel-in-progress: true
+  # Serialize all auto-merge mutations for each PR. The previous separate
+  # arming/revocation groups permitted an in-flight arming request to execute
+  # after a retarget run had found nothing to revoke. Never drop retarget or
+  # draft transitions, and preserve ordinary staging-promotion edits.
+  group: enable-main-auto-merge-${{ github.event.pull_request.number }}
+  queue: max
 
 jobs:
   enable:

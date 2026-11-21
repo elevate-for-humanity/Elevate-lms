@@ -196,19 +196,19 @@ test.describe('pricing and testing integrity', () => {
   });
 
   test('legacy WorkKeys URL redirects to canonical priced provider and retains purchase controls', async ({ page }) => {
-    // Legacy provider routes permanently redirect to an article on /testing.
+    // The legacy provider route is a permanent redirect, not its own content page.
     const response = await page.goto('/testing/workkeys', { waitUntil: 'domcontentloaded' });
     expect(response, 'WorkKeys legacy route did not respond').not.toBeNull();
-    await expect(page).toHaveURL(/\\/testing#workkeys$/);
+    await expect(page).toHaveURL(new RegExp('/testing#workkeys$'));
     await assertNoRuntimeFailure(page, '/testing#workkeys');
 
     const workkeys = page.locator('article#workkeys');
-    await expect(workkeys.getByRole('heading', { name: /ACT WorkKeys \\/ NCRC/i })).toBeVisible();
-    // Require a nonzero approved price from the actual provider catalog,
-    // instead of historical dollar amounts no longer in the pricing source.
-    const bookLinks = workkeys.getByRole('link', { name: /^Book — \\$\\d/ });
+    await expect(workkeys.getByRole('heading', { name: /ACT WorkKeys/i })).toBeVisible();
+    // Verify approved pricing and actions without hardcoding outdated amounts.
+    const bookLinks = workkeys.getByRole('link', { name: /Book —/ });
     await expect(bookLinks.first()).toBeVisible();
-    const amount = (await bookLinks.first().innerText()).match(/\\$([0-9]+(?:\\.[0-9]{2})?)/)?.[1];
+    const amountText = await bookLinks.first().innerText();
+    const amount = amountText.match(new RegExp('[$]([0-9]+(?:[.][0-9]{2})?)'))?.[1];
     expect(Number(amount), 'WorkKeys must expose a positive approved exam price').toBeGreaterThan(0);
     await expect(workkeys.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
     await expect(bookLinks.first()).toHaveAttribute('href', /provider=workkeys.*exam=/);

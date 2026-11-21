@@ -50,6 +50,9 @@ test('live checks and exact-head protected merge guard are retained', () => {
   assert.deepEqual(scenario({action:'edited'}),{disable:false,arm:true});
   assert.match(disable,/headRefName,isDraft,autoMergeRequest/);
   assert.match(disable,/TRANSITION_ACTION/);
+  // The privileged cancellation path may not overwrite a maintainer's request.
+  assert.match(disable,/auto_merge\.enabled_by\.type/);
+  assert.match(disable,/owner_type.*!= Bot/);
   assert.match(arm,/headRefOid,isDraft/);
   assert.match(arm,/--match-head-commit "\$PR_HEAD"/);
   assert.doesNotMatch(source,/--admin|--force|--bypass/);

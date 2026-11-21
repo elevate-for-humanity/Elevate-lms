@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
-import { PROGRAM_LABELS } from '@/lib/programs/host-shop-programs';
+import { PROGRAM_LABELS, PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
 import { PUBLIC_SITE_ORIGIN } from '@/lib/navigation/public-route-registry';
 
 const path = '/apprenticeships/indiana';
@@ -57,9 +57,11 @@ export default async function IndianaApprenticeships({
   const apply = occupation === 'barber-apprenticeship'
     ? '/apply/student?' + new URLSearchParams({ program: occupation })
     : '';
-  const becomeHost = requestedRegion
-    ? '/partners/host-shop/apply?' + new URLSearchParams({ region: requestedRegion })
-    : '/partners/host-shop/apply';
+  const hostProgram = Object.entries(PROGRAM_SLUGS).find(([, slug]) => slug === occupation)?.[0];
+  const hostQuery = new URLSearchParams();
+  if (requestedRegion) hostQuery.set('region', requestedRegion);
+  if (hostProgram) hostQuery.set('program', hostProgram);
+  const becomeHost = '/partners/host-shop/apply' + (hostQuery.size ? '?' + hostQuery : '');
 
   const breadcrumbs = {
     '@context': 'https://schema.org',

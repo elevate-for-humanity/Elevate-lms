@@ -41,7 +41,9 @@ export default function EnrollPage() {
   const [licenseKey, setLicenseKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
+  const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>(() =>
+    getClientSearchParam('payment_method') === 'affirm' ? 'affirm' : 'quickbooks',
+  );
   const [message, setMessage] = useState('');
   const [paymentUrl, setPaymentUrl] = useState('');
   const [apprenticeshipDisclosureAccepted, setApprenticeshipDisclosureAccepted] = useState(false);
@@ -140,6 +142,7 @@ export default function EnrollPage() {
         setMessage('Please sign in to enroll');
         const query = new URLSearchParams(window.location.search);
         query.set('payment_plan', paymentPlan);
+        query.set('payment_method', paymentMethod);
         query.set('down_payment', downPayment);
         if (couponCode.trim()) query.set('coupon', couponCode.trim());
         const destination = `/enroll/${programId}?${query.toString()}`;

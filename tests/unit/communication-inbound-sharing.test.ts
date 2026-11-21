@@ -18,6 +18,7 @@ vi.mock('@/lib/supabase/admin', () => ({
         eq: (key: string, value: any) => { if (key === 'address') address = value; return query; },
         order: () => query,
         limit: () => query,
+        lte: () => query,
         in: (key: string, values: string[]) => { if (key === 'address') requested = values; return query; },
         insert: (row: any) => {
           inserted = row;
@@ -25,11 +26,18 @@ vi.mock('@/lib/supabase/admin', () => ({
           else state.threads.push(row);
           return query;
         },
-        upsert: (rows: any[]) => { state.notifications.push(...rows); return query; },
+        upsert: (rows: any) => {
+          if (table === 'notifications') state.notifications.push(...rows);
+          return query;
+        },
         update: () => query,
         maybeSingle: async () => ({ data: table === 'communication_email_mailboxes' ? state.mailboxes.find(row => row.address === address) || null : null }),
         single: async () => ({
-          data: { id: `thread-${inserted.mailbox_id}`, message_count: 0 },
+          data: table === 'communication_email_mailboxes'
+            ? state.mailboxes.find(row => row.address === address)
+            : table === 'communication_email_folders'
+              ? { id: 'routing-review' }
+              : { id: `thread-${inserted.mailbox_id}`, message_count: 0 },
           error: null,
         }),
         then: (resolve: any) =>
@@ -118,11 +126,13 @@ describe('interoffice copies preserve conversations', () => {
     expect(result.mailboxCount).toBe(1);
     expect(state.messages.map(message => message.mailbox_id)).toEqual(['testing']);
   });
-  it('keeps Admissions fallback for an unknown Elevate recipient', async () => {
+  it('stores unresolved recipients in staff routing review', async () => {
     route.mockResolvedValue(null);
     const result = await storeInboundCommunicationEmail({...parsed,to:'unknown@elevateforhumanity.org',envelopeRecipients:['unknown@elevateforhumanity.org']});
-    expect(result.mailboxCount).toBe(1);
-    expect(state.messages.map(message => message.mailbox_id)).toEqual(['admin']);
+    expect(result).toEqual({ stored: false, mailboxCount: 0, review: true });
+    expect(state.messages[0]).toMatchObject({ mailbox_id: 'admin', subject: 'Routing error: Re: CDL status' });
+    expect(state.threads[0]).toMatchObject({ custom_folder_id: 'routing-review' });
+    expect(state.notifications).toEqual([]);
   });
 });
 
@@ -176,4 +186,25 @@ it('does not claim full inbound delivery when one directly addressed mailbox fai
       envelopeRecipients: ['admissions@elevateforhumanity.org', 'billing@elevateforhumanity.org'],
     }),
   ).rejects.toThrow('could not be stored');
+});
+
+it('routes tagged envelope recipients while keeping blind addresses out of message headers', async () => {
+  route.mockResolvedValue(null);
+  state.messages = [];
+  state.threads = [];
+  state.notifications = [];
+  state.failMailboxIds = [];
+  state.mailboxes = [
+    { id: 'support', address: 'support@elevateforhumanity.org' },
+    { id: 'staff', address: 'staff@elevateforhumanity.org' },
+  ];
+  expect(await storeInboundCommunicationEmail({
+    ...parsed,
+    to: 'support+qa@elevateforhumanity.org',
+    envelopeRecipients: ['support+qa@elevateforhumanity.org', 'staff@elevateforhumanity.org'],
+  })).toEqual({ stored: true, mailboxCount: 2 });
+  expect(state.messages.map(message => message.mailbox_id)).toEqual(['support', 'staff']);
+  expect(state.messages.every(message =>
+    message.to_addresses.length === 1 && message.bcc_addresses.length === 0,
+  )).toBe(true);
 });

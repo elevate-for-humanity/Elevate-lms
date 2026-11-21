@@ -27,7 +27,7 @@ export async function assignedStudentDirectory(db: SupabaseClient<any>, userId: 
         .select(
           table === 'program_enrollments'
             ? 'id,user_id,student_id,full_name,email'
-            : 'id,applicant_name,applicant_email',
+            : 'id,user_id,applicant_name,applicant_email',
         )
         .in('program_holder_id', holderIds)
         .in(
@@ -42,27 +42,32 @@ export async function assignedStudentDirectory(db: SupabaseClient<any>, userId: 
         .range(offset, offset + 499)
         .returns<DirectoryStudent[]>();
       if (error) throw error;
-      const missingIds =
-        table === 'program_enrollments'
-          ? [
-              ...new Set(
-                (students ?? [])
-                  .filter((student) => !student.email)
-                  .map((student) => student.user_id || student.student_id)
-                  .filter(Boolean),
-              ),
-            ]
-          : [];
+      const userIds = [...new Set(
+        (students ?? []).flatMap((student) => {
+          const id = student.user_id || student.student_id;
+          return id ? [id] : [];
+        }),
+      )];
+      const { data: studentMailboxes, error: mailboxError } = userIds.length
+        ? await db.from('communication_email_mailboxes').select('address,owner_user_id')
+            .in('owner_user_id', userIds).eq('mailbox_kind', 'individual').eq('active', true)
+        : { data: [], error: null };
+      if (mailboxError) throw mailboxError;
+      const mailboxByOwner = new Map((studentMailboxes ?? []).map((box) => [box.owner_user_id, box.address]));
+      const missingIds = [...new Set((students ?? []).flatMap((student) => {
+        const id = student.user_id || student.student_id;
+        return id && !student.email && !mailboxByOwner.has(id) ? [id] : [];
+      }))];
       const { data: profiles, error: profileError } = missingIds.length
         ? await db.from('profiles').select('id,email').in('id', missingIds)
         : { data: [], error: null };
       if (profileError) throw profileError;
       const accountEmails = new Map((profiles ?? []).map((profile) => [profile.id, profile.email]));
       for (const student of students ?? []) {
+        const ownerId = student.user_id || student.student_id;
         const address = String(
-          table === 'program_enrollments'
-            ? (student.email ?? accountEmails.get(student.user_id || student.student_id) ?? '')
-            : (student.applicant_email ?? ''),
+          (ownerId && mailboxByOwner.get(ownerId)) ||
+          student.email || student.applicant_email || (ownerId && accountEmails.get(ownerId)) || '',
         ).trim();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) continue;
         rows.push({

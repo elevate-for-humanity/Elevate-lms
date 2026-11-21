@@ -324,9 +324,15 @@ export async function handleCommunicationEmailGet(
           .concat(await assignedInstructorDirectory(context.db, context.user.id))
           .concat([
             {
+              id: 'support',
+              address: 'support@elevateforhumanity.org',
+              display_name: 'Elevate Support',
+              mailbox_kind: 'department',
+            },
+            {
               id: 'admin',
               address: 'admissions@elevateforhumanity.org',
-              display_name: 'Elevate Admin',
+              display_name: 'Elevate Admissions',
               mailbox_kind: 'department',
             },
           ]),

@@ -139,20 +139,16 @@ export async function processInterofficeOutbox(limit = 20) {
       .update({ message_count: 1, last_message_at: now })
       .eq('id', thread.id);
     if (result.success && row.user_id) {
-      const membership = await db
-        .from('communication_email_mailbox_members')
-        .select('mailbox_id')
-        .eq('user_id', row.user_id);
-      const targets = await db
-        .from('communication_email_mailboxes')
+      // Campaign payloads are addressed to a person. Shared mailbox membership
+      // grants the person access to the team inbox, never the inverse.
+      const target = await db.from('communication_email_mailboxes')
         .select('address')
         .eq('active', true)
-        .in(
-          'id',
-          (membership.data || []).map((m: any) => m.mailbox_id),
-        )
-        .neq('mailbox_kind', 'department');
-      const addresses = (targets.data || []).map((m: any) => m.address);
+        .eq('owner_user_id', row.user_id)
+        .eq('mailbox_kind', 'individual')
+        .maybeSingle();
+      if (target.error) throw new Error('Campaign recipient inbox unavailable');
+      const addresses = target.data ? [target.data.address] : [];
       if (addresses.length)
         await storeInboundCommunicationEmail(
           {
@@ -163,8 +159,7 @@ export async function processInterofficeOutbox(limit = 20) {
             text: row.body,
             html: textToEmailHtml(row.body),
             envelopeRecipients: addresses,
-            // Each recipient delivery owns its copy. A campaign can contain
-            // several recipients whose memberships reach the same mailbox.
+            // A retry for this recipient must reuse its copy identity.
             eventId: `outbox-copy:${row.id}`,
             attachments: [],
             headers: '',

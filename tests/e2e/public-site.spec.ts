@@ -69,6 +69,13 @@ async function collectInternalLinks(page: Page, selector: string) {
 async function assertNoRuntimeFailure(page: Page, route: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
+  const failedResponses: string[] = [];
+
+  page.on('response', (response) => {
+    if (response.status() < 400) return;
+    const url = new URL(response.url());
+    failedResponses.push(`${response.status()} ${url.origin}${url.pathname}`);
+  });
 
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
@@ -79,13 +86,14 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   expect(response, `${route} did not return a response`).not.toBeNull();
   expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
 
-  await page.waitForLoadState('networkidle').catch(() => undefined);
-
   // innerText excludes embedded scripts. The application shell intentionally
   // contains chunk-recovery source code whose text includes "ChunkLoadError";
   // that source is not a rendered failure and must not trip the visible-page check.
-  const body = await page.locator('body').innerText();
-  expect(body.trim().length, `${route} rendered an empty body`).toBeGreaterThan(80);
+  const visibleBody = page.locator('body');
+  await expect.poll(async () => (await visibleBody.innerText()).trim().length, {
+    message: `${route} rendered an empty body`,
+  }).toBeGreaterThan(80);
+  const body = await visibleBody.innerText();
   expect(body, `${route} rendered an application exception`).not.toMatch(
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
@@ -97,11 +105,9 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   );
   expect(
     actionableConsoleErrors,
-    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}`,
+    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}. HTTP failures: ${failedResponses.join(' | ')}`,
   ).toEqual([]);
 }
-
-test.describe.configure({ mode: 'serial' });
 
 test.describe('page-by-page public production audit', () => {
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {

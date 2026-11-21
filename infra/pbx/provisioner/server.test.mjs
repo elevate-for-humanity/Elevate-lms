@@ -111,7 +111,7 @@ async function fixture(t, options = {}) {
   };
   return { request, service, root, failures, inject: (...values) => injected = values, deny: () => authorized = false, contacts: (a,b) => {contact=a;reachable=b;},
     reloads: () => reloads, loseOperator: () => operatorMissing = true,
-    reject: (count = 12) => rejectedReadbacks = count, delayRemoval: count => staleRemovals = count, waits: () => waits, expire: () => clock += 700000 };
+    reject: (count = 12) => rejectedReadbacks = count, delayRemoval: count => staleRemovals = count, waits: () => waits, advance: ms => clock += ms, expire: () => clock += 700000 };
 }
 
 for (const legacyEmpty of [false, true]) {
@@ -194,9 +194,22 @@ test('a leased non-admin device cannot become the operator when the admin is off
  assert.doesNotMatch(config.dialplan,/exten => 0,1,Gosub\(elevate-pwa-extensions,101,1\)/);
 });
 
+test('a transient Asterisk reload failure during status renewal does not quarantine provisioning', async t => {
+  const f = await fixture(t);
+  assert.equal((await f.request()).status, 200);
+  f.advance(301000);
+  f.inject('Module reported a reload failure');
+  const status = await f.request('/status');
+  assert.equal(status.status, 200);
+  assert.equal(status.body.provider, 'asterisk');
+  assert.equal(f.waits(), 1);
+  assert.deepEqual(f.failures, []);
+  assert.equal((await f.request('/revoke')).body.revoked, true);
+});
+
 test('request apply failure preserves code after successful rollback', async t => {
   const f = await fixture(t);
-  f.inject('Unable to reload');
+  f.inject('Unable to reload', 'Unable to reload', 'Unable to reload');
   assert.equal((await f.request()).body.error, 'asterisk_reload_failed');
   assert.match(f.failures[0], /provision apply asterisk_reload_failed\n$/);
   assert.match(f.failures[1], /provision request asterisk_reload_failed\n$/);
@@ -205,7 +218,7 @@ test('request apply failure preserves code after successful rollback', async t =
 
 test('distinct apply and rollback failures retain quarantine and external error', async t => {
   const f = await fixture(t);
-  f.inject('Unable to reload');
+  f.inject('Unable to reload', 'Unable to reload', 'Unable to reload');
   f.loseOperator();
   assert.equal((await f.request()).body.error, 'asterisk_rollback_failed');
   assert.match(f.failures[0], /provision apply asterisk_reload_failed\n$/);

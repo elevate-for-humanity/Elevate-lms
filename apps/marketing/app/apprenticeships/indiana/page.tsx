@@ -52,23 +52,27 @@ export default async function IndianaApprenticeships({
   const search = typeof params.q === 'string' ? params.q.trim().slice(0, 80) : '';
   const availability = params.availability === 'inquiry' ? 'inquiry' : params.availability === 'hosts' ? 'hosts' : '';
   const shops = (await getHostShopNetwork()).filter((shop) => /^(IN|Indiana)$/i.test(shop.state));
-  const counties = [...new Set(shops.map((shop) => publicHostCounties[shop.city.trim().toLowerCase()]).filter(Boolean))].sort();
+  const counties = [...new Set([
+    ...HOST_SHOP_REGIONS.flatMap((area) => area.counties),
+    ...Object.values(publicHostCounties),
+  ])].sort();
   const county = counties.find((entry) => entry === params.county) ?? '';
   const requestedRegion = region?.slug ?? '';
-  const filters = new URLSearchParams({ q: search, county, occupation, availability });
+  const filterKey = new URLSearchParams({ q: search, county, region: requestedRegion, occupation, availability }).toString();
+  const searchTerms = search.toLowerCase().split(/\s+/);
+  if (searchTerms.length > 1 && searchTerms.at(-1) === 'county') searchTerms.pop();
   const inquiries = new URLSearchParams({ apprenticeship: occupation || 'general', region: requestedRegion, community: county ? county + ' County' : search });
   const results = shops.filter((shop) => {
     const city = shop.city.trim().toLowerCase();
-    const areas = HOST_SHOP_REGIONS.filter((area) =>
-      [area.city, ...area.nearbyCities].some((name) => name.toLowerCase() === city),
-    );
+    const shopCounty = publicHostCounties[city] ?? '';
+    const inRegion = !region || region.counties.includes(shopCounty) ||
+      [region.city, ...region.nearbyCities].some((name) => name.toLowerCase() === city);
+    const searchable = [shop.name, shop.city, shopCounty].join(' ').toLowerCase();
     return availability !== 'inquiry' &&
-      (!region || areas.includes(region)) &&
-      (!county || publicHostCounties[city] === county) &&
+      inRegion &&
+      (!county || shopCounty === county) &&
       (!occupation || shop.programs.includes(occupation)) &&
-      (!search || [shop.name, shop.city, publicHostCounties[city] ?? ''].some(
-        (value) => value.toLowerCase().includes(search.toLowerCase()),
-      ));
+      searchTerms.every((term) => searchable.includes(term));
   });
   const matchingHosts = results.length;
   const apply = matchingHosts > 0 && occupation === 'barber-apprenticeship'
@@ -104,8 +108,9 @@ export default async function IndianaApprenticeships({
           <p className="my-3 text-sm text-slate-600">Select a region on the schematic map or use the directory filters. Map labels show regional hubs.</p>
           <div className="grid grid-cols-3 grid-rows-5 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-2">
             {HOST_SHOP_REGIONS.map((area) => {
-              const query = new URLSearchParams(filters);
-              query.set('region', area.slug);
+              const query = new URLSearchParams({ region: area.slug });
+              if (occupation) query.set('occupation', occupation);
+              if (availability) query.set('availability', availability);
               return (
                 <Link key={area.slug} href={path + '?' + query + '#directory'}
                   aria-current={region === area ? 'true' : undefined}
@@ -118,11 +123,11 @@ export default async function IndianaApprenticeships({
         </section>
         <section id="directory" aria-labelledby="directory-title">
           <h2 id="directory-title" className="text-2xl font-black">Search the public directory</h2>
-          <form action={path + '#directory'} className="my-5 grid gap-4 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
+          <form key={filterKey} action={path + '#directory'} className="my-5 grid gap-4 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
             <label className="grid gap-1 font-semibold">Shop, city or county
               <input name="q" maxLength={80} defaultValue={search} className="min-h-11 rounded-lg border border-slate-400 px-3" />
             </label>
-            <label className="grid gap-1 font-semibold">County with listed hosts
+            <label className="grid gap-1 font-semibold">County
               <select name="county" defaultValue={county} className="min-h-11 rounded-lg border border-slate-400 px-3">
                 <option value="">All counties</option>
                 {counties.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
@@ -148,8 +153,9 @@ export default async function IndianaApprenticeships({
               </select>
             </label>
             <button className="min-h-11 rounded-lg bg-slate-950 px-4 font-bold text-white">Search</button>
-            <Link href={path + '#directory'} className="flex min-h-11 items-center font-semibold underline">Clear filters</Link>
+            <button type="submit" form="clear-indiana-filters" className="min-h-11 text-left font-semibold underline">Clear filters</button>
           </form>
+          <form id="clear-indiana-filters" action={path + '#directory'} />
           <p className="mb-4 font-semibold">{matchingHosts} matching {matchingHosts === 1 ? 'Host Shop' : 'Host Shops'}</p>
           {results.length > 0 ? (
             <ul className="grid gap-3">

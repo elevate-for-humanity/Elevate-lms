@@ -11,7 +11,6 @@ const CRITICAL_PUBLIC_ROUTES = [
   '/for-employers',
   '/partners',
   '/testing',
-  '/testing/workkeys',
   '/pricing',
   '/apply',
   '/apply/student',
@@ -196,9 +195,22 @@ test.describe('pricing and testing integrity', () => {
     expect(body).not.toMatch(/0 programs available/i);
   });
 
-  test('WorkKeys page shows non-zero prices and purchase controls', async ({ page }) => {
-    await assertNoRuntimeFailure(page, '/testing/workkeys');
-    await expect(page.getByText(/\$104|\$168/).first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
+  test('legacy WorkKeys URL redirects to canonical priced provider and retains purchase controls', async ({ page }) => {
+    // Legacy provider routes permanently redirect to an article on /testing.
+    const response = await page.goto('/testing/workkeys', { waitUntil: 'domcontentloaded' });
+    expect(response, 'WorkKeys legacy route did not respond').not.toBeNull();
+    await expect(page).toHaveURL(/\\/testing#workkeys$/);
+    await assertNoRuntimeFailure(page, '/testing#workkeys');
+
+    const workkeys = page.locator('article#workkeys');
+    await expect(workkeys.getByRole('heading', { name: /ACT WorkKeys \\/ NCRC/i })).toBeVisible();
+    // Require a nonzero approved price from the actual provider catalog,
+    // instead of historical dollar amounts no longer in the pricing source.
+    const bookLinks = workkeys.getByRole('link', { name: /^Book — \\$\\d/ });
+    await expect(bookLinks.first()).toBeVisible();
+    const amount = (await bookLinks.first().innerText()).match(/\\$([0-9]+(?:\\.[0-9]{2})?)/)?.[1];
+    expect(Number(amount), 'WorkKeys must expose a positive approved exam price').toBeGreaterThan(0);
+    await expect(workkeys.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
+    await expect(bookLinks.first()).toHaveAttribute('href', /provider=workkeys.*exam=/);
   });
 });

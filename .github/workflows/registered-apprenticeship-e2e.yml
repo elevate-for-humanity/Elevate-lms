@@ -255,6 +255,8 @@ jobs:
       - name: Install dependencies
         id: install-dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Install Chromium and WebKit
+        run: pnpm exec playwright install chromium webkit --with-deps
       - name: Require Supabase QA provisioning authority
         shell: bash
         run: |
@@ -274,8 +276,6 @@ jobs:
         run: |
           node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
           node scripts/qa/require-portal-e2e-identities.mjs
-      - name: Install Chromium and WebKit
-        run: pnpm exec playwright install chromium webkit --with-deps
       # LMS lesson media and public Marketing films are different acceptance
       # surfaces. The marketing-only hvac-public-playback matrix is deliberately
       # skipped on LMS releases; this independent test certifies REAL authenticated

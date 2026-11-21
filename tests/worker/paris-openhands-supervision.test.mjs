@@ -160,3 +160,29 @@ test('a provider-confirmation snapshot still pending approval is read but its pa
   resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{throw Error('no read')}});
  assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});assert.deepEqual(resumed,[]);
 });
+
+test('transport failure observes the original task only after workflow evidence proves prepare failed', async () => {
+  for (const validationConclusion of ['skipped', 'failure']) {
+    const h = fixture();
+    h.repair.error_code = 'fetch failed';
+    const workflowJobs = [
+      { name: 'prepare', status: 'completed', conclusion: 'failure' },
+      { name: 'validate', status: 'completed', conclusion: validationConclusion },
+      { name: 'publish', status: 'completed', conclusion: 'skipped' },
+    ];
+    const result = await superviseAcceptedOpenHandsRepair(h.repair, {
+      now: () => now,
+      workflow: async () => h.run,
+      jobs: async () => ({ total_count: workflowJobs.length, jobs: workflowJobs }),
+      sourceEligible: async () => true,
+      observe: h.observe,
+      record: async (value) => h.records.push(value),
+      claim: async (value) => { h.claims.push(value); return true; },
+    });
+    const interruptedPrepare = validationConclusion === 'skipped';
+    assert.equal(result.awaitingProvider, interruptedPrepare);
+    assert.equal(h.refreshes, interruptedPrepare ? 1 : 0);
+    assert.equal(h.claims.length, 0);
+    assert.equal(h.records[0].openhandsObservation.state, interruptedPrepare ? 'pending' : 'attention_required');
+  }
+});

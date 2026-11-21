@@ -3,6 +3,9 @@ import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 import { normalizePublicProgram } from '@/data/programs';
 import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
+import Image from 'next/image';
+import Link from 'next/link';
+import { DOWNTOWN_TRAINING_ADDRESS, DOWNTOWN_TRAINING_PROGRAMS } from '@/lib/partners/downtown-training';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
@@ -13,6 +16,8 @@ import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndus
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
+
+const estheticsHost = DOWNTOWN_TRAINING_PROGRAMS[1];
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -135,7 +140,24 @@ export default async function EstheticianApprenticeshipPage() {
           <JozannaIndustryInstructor industry="esthetician" />
           <BeautyApprenticeshipAuthority program={program} />
 
-          <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">
+          <section className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-2" aria-labelledby="downtown-host">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+              <Image src={estheticsHost.image} alt={estheticsHost.alt} fill sizes="(max-width: 767px) 100vw, 50vw" className="object-cover" />
+            </div>
+            <div className="self-center">
+              <h2 id="downtown-host" className="text-2xl font-black text-slate-950">Train with Mesmerized by Beauty</h2>
+              <p className="mt-3 leading-7 text-slate-700">
+                This approved Indianapolis Host Shop is listed for Esthetician and Nail Technician apprenticeships.
+                The planned downtown training location is {DOWNTOWN_TRAINING_ADDRESS}. Placement and start dates are confirmed through the application.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link href={program.cta.applyHref} className="inline-flex min-h-12 items-center rounded-xl bg-brand-red-700 px-5 font-bold text-white">Apply for esthetics</Link>
+                <Link href={estheticsHost.href} className="inline-flex min-h-12 items-center rounded-xl border px-5 font-bold text-slate-900">See the downtown training site</Link>
+              </div>
+            </div>
+          </section>
+
+          <section className="border-y border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-16">
             <div className="mx-auto max-w-5xl rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-9">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
                 For Indiana employers and Host Shops

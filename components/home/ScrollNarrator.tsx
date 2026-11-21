@@ -17,7 +17,7 @@ import {
 const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
 const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 const SECTION_PAUSE_MS = 1000;
-const SCROLL_SETTLE_MS = 850;
+const SCROLL_SETTLE_MS = 220;
 const NARRATION_GESTURE_NOTICE = 'Tap the speaker to start page narration.';
 
 function narrationFor(section: HTMLElement) {
@@ -194,15 +194,26 @@ export function ScrollNarrator() {
       pendingRef.current = null;
       window.clearTimeout(transitionTimerRef.current);
     };
+    const continueAfterMedia = (event: Event) => {
+      const media = event.target;
+      if (!enabled || !(media instanceof HTMLMediaElement) || speakingRef.current ||
+          (media.muted && !media.hasAttribute('data-narrated-tour'))) return;
+      window.clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = window.setTimeout(() => continueRef.current(), SECTION_PAUSE_MS);
+    };
     window.addEventListener(NATURAL_VOICE_STOP_EVENT, releaseInterruptedNarration);
+    document.addEventListener('ended', continueAfterMedia, true);
+    document.addEventListener('pause', continueAfterMedia, true);
     document.addEventListener('play', governAudibleMedia, true);
     document.addEventListener('volumechange', governAudibleMedia, true);
     return () => {
       window.removeEventListener(NATURAL_VOICE_STOP_EVENT, releaseInterruptedNarration);
+      document.removeEventListener('ended', continueAfterMedia, true);
+      document.removeEventListener('pause', continueAfterMedia, true);
       document.removeEventListener('play', governAudibleMedia, true);
       document.removeEventListener('volumechange', governAudibleMedia, true);
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     // Privacy modes may reject even reading Storage. Narration preferences
@@ -246,12 +257,10 @@ export function ScrollNarrator() {
     lastNarrationRef.current = null;
     stop();
     if (!enabled || !hasNarration) return;
-    // Give the page and opening visual time to settle before narration begins.
-    // This prevents the hero, route transition, and first scroll section from
-    // competing to speak during initial render.
-    const timer = window.setTimeout(() => void narrateVisibleSection(), 1400);
+    // Wait one frame for streamed sections to be measured.
+    const frame = window.requestAnimationFrame(() => void narrateVisibleSection());
     return () => {
-      window.clearTimeout(timer);
+      window.cancelAnimationFrame(frame);
       window.clearTimeout(transitionTimerRef.current);
       playbackGenerationRef.current += 1;
       speakingRef.current = false;
@@ -314,8 +323,7 @@ export function ScrollNarrator() {
       timer = window.setTimeout(() => {
         const current = lastNarrationRef.current?.section;
         const visible = mostVisiblePageSection();
-        if (visible === current) return;
-        if (!visible) return;
+        if (!visible || visible === current) return;
         void narrateVisibleSection();
       }, Math.max(SCROLL_SETTLE_MS, quietUntilRef.current - Date.now()));
     };

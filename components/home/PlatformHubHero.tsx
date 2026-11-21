@@ -14,7 +14,8 @@ export function PlatformHubHero({ compact = false }: { compact?: boolean }) {
       className="relative w-full overflow-hidden bg-white text-slate-950"
       aria-labelledby="home-hero-heading"
       data-scroll-narration
-      data-narration="Explore career training and apprenticeships with Elevate for Humanity. Choose a program, check your funding options, and apply."
+      data-narration="Welcome to Elevate for Humanity. Explore career training and apprenticeships, compare program hours, tuition, and funding options, and start your application when you’re ready."
+      data-narration-src="/audio/home-introductions/opening.mp3"
       data-narration-style="instructor"
     >
       <ImageMetadata

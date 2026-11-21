@@ -15,6 +15,8 @@ import ProgramCohortFlyer from '@/components/programs/ProgramCohortFlyer';
 import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide';
 
 import Image from 'next/image';
+import { RAPIDS_VERIFIED_INVENTORY } from '@/lib/apprenticeship/rapids-verified-inventory';
+import { HAIR_STYLIST_PROGRAM } from '@/lib/apprenticeship/hair-stylist-program';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -28,17 +30,13 @@ import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 import { type HeroBannerConfig } from '@/content/heroBanners';
 import {
   BookOpen,
-  Clock,
   DollarSign,
-  MapPin,
   Shield,
   TrendingUp,
   ChevronRight,
   Award,
   ExternalLink,
   Layers,
-  CheckCircle2,
-  WalletCards,
   CalendarDays,
   ClipboardList,
 } from 'lucide-react';
@@ -115,7 +113,12 @@ export default function ProgramDetailPage({
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   const isApprenticeship = p.programType === 'apprenticeship';
   const registeredProgram = isApprenticeship ? getRegisteredProgramStandard(p.slug) : null;
-  const instructionHours = registeredProgram?.completion.requiredRtiHours ?? totalHours;
+  const registeredTerm = isApprenticeship
+    ? RAPIDS_VERIFIED_INVENTORY.occupations.find(occupation => occupation.slug === p.slug)
+    : undefined;
+  const relatedInstructionHours = registeredProgram?.completion.requiredRtiHours ??
+    (p.slug === HAIR_STYLIST_PROGRAM.slug ? HAIR_STYLIST_PROGRAM.relatedInstructionHours : null);
+  const instructionHours = relatedInstructionHours ?? totalHours;
   // The shared media hero renders no title; the program content owns its main heading.
   const ProgramTitle = 'h1';
   const weeklyHoursLabel =
@@ -142,11 +145,9 @@ export default function ProgramDetailPage({
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
   const applicationHref = p.cta.applyHref || `/apply?program=${encodeURIComponent(p.slug)}`;
   const paymentSelectionHref = (mode: 'full' | 'plan' | 'bnpl') =>
-    `/apply/student?${new URLSearchParams({
-      program: p.slug,
-      intent: 'enrollment',
-      funding: 'self_pay',
-      payment: mode,
+    `/enroll/${encodeURIComponent(p.slug)}?${new URLSearchParams({
+      payment_plan: mode === 'plan' ? 'installments' : 'full',
+      ...(mode === 'bnpl' ? { payment_method: 'affirm' } : {}),
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
@@ -328,33 +329,15 @@ export default function ProgramDetailPage({
                 {/* Quick fact chips */}
                 <div className="flex flex-wrap gap-2">
                   {[
-                    {
-                      icon: <Clock className="w-3.5 h-3.5" />,
-                      val: durationLabel,
-                    },
-                    {
-                      icon: <BookOpen className="w-3.5 h-3.5" />,
-                      val: weeklyHoursLabel,
-                    },
-                    {
-                      icon: <Award aria-label="award" className="w-3.5 h-3.5" />,
-                      val: `${p.credentials.length} credential${p.credentials.length !== 1 ? 's' : ''}`,
-                    },
-                    {
-                      icon: <MapPin className="w-3.5 h-3.5" />,
-                      val:
-                        p.deliveryMode === 'hybrid'
-                          ? 'Hybrid'
-                          : p.deliveryMode === 'online'
-                            ? 'Online'
-                            : 'In-Person',
-                    },
-                  ].map(({ icon, val }) => (
+                    durationLabel,
+                    weeklyHoursLabel,
+                    registeredTerm?.displayedTerm ?? (instructionHours > 0 ? `${instructionHours.toLocaleString()} training hours` : hoursRange),
+                    p.deliveryMode === 'hybrid' ? 'Hybrid' : p.deliveryMode === 'online' ? 'Online' : 'In-Person',
+                  ].map((val) => (
                     <span
                       key={val}
                       className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-slate-200"
                     >
-                      {icon}
                       {val}
                     </span>
                   ))}
@@ -684,10 +667,6 @@ export default function ProgramDetailPage({
                   key={requirement}
                   className="flex gap-3 rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-800"
                 >
-                  <CheckCircle2
-                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700"
-                    aria-hidden="true"
-                  />
                   <span>{requirement}</span>
                 </div>
               ))}
@@ -696,15 +675,14 @@ export default function ProgramDetailPage({
               <DecisionFact label="Length" value={durationLabel} />
               <DecisionFact label="Schedule" value={weeklyHoursLabel} />
               <DecisionFact
-                label={registeredProgram ? 'Related instruction' : 'Training'}
-                value={instructionHours > 0 ? `${instructionHours} hours` : hoursRange}
+                label={registeredTerm ? 'Registered term' : 'Training'}
+                value={registeredTerm?.displayedTerm ?? (instructionHours > 0 ? `${instructionHours.toLocaleString()} hours` : hoursRange)}
               />
               <DecisionFact label="Credential" value={`${p.credentials.length} included`} />
             </div>
           </div>
 
           <aside id={consolidatedEnrollment ? "payment-options" : undefined} className="rounded-2xl border border-slate-200 bg-white p-5 text-slate-950 sm:p-6">
-            <WalletCards className="h-8 w-8 text-slate-700" aria-hidden="true" />
             <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-slate-700">
               Price & Enrollment
             </p>
@@ -741,7 +719,7 @@ export default function ProgramDetailPage({
                 </span>
                 <span className="mt-1 block text-xl font-black text-slate-950">{p.selfPayCost}</span>
                 <span className="mt-1 block text-xs leading-5 text-slate-600">
-                  One payment after application approval
+                  Review the full tuition at secure checkout
                 </span>
               </Link>
               <Link
@@ -773,6 +751,11 @@ export default function ProgramDetailPage({
                 </span>
               </Link>
             </div>
+            {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && (
+              <div className="mt-6" id="payment-calculator">
+                <PaymentPlanCalculator programSlug={p.slug} />
+              </div>
+            )}
             <div className="mt-4 grid gap-3">
               <Link
                 href={applicationHref}
@@ -791,6 +774,41 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
+      {registeredTerm && (
+        <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6" aria-labelledby="registered-hours">
+          <h2 id="registered-hours" className="text-2xl font-black text-slate-950">Apprenticeship hours and completion</h2>
+          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 p-5">
+              <dt className="font-bold text-slate-700">Registered term shown in RAPIDS</dt>
+              <dd className="mt-2 text-2xl font-black text-slate-950">{registeredTerm.displayedTerm}</dd>
+            </div>
+            {relatedInstructionHours !== null && (
+              <div className="rounded-xl border border-slate-200 p-5">
+                <dt className="font-bold text-slate-700">Required related instruction</dt>
+                <dd className="mt-2 text-2xl font-black text-slate-950">{relatedInstructionHours.toLocaleString()} hours</dd>
+              </div>
+            )}
+          </dl>
+          {registeredProgram ? (
+            <p className="mt-4 leading-7 text-slate-700">
+              Complete {registeredProgram.completion.competencyCount} verified occupational competencies and the required related instruction.
+              Your training agreement sets your supervised workplace schedule.
+            </p>
+          ) : registeredTerm.approach === 'hybrid' ? (
+            <p className="mt-4 leading-7 text-slate-700">Complete the registered work term, required related instruction, and verified work processes.</p>
+          ) : (
+            <p className="mt-4 leading-7 text-slate-700">Completion follows the occupation’s approved competency and instruction requirements.</p>
+          )}
+          <h3 className="mt-6 text-lg font-bold">How earn while you learn works</h3>
+          <p className="mt-2 leading-7 text-slate-700">
+            Choose an approved Host Shop and confirm your employment and training schedule before starting.
+            Your employer pays wages for compensable work under your approved wage schedule.
+            Related instruction builds the knowledge you use on the job. Your supervisor verifies workplace practice,
+            and the sponsor verifies progress against the registered standard.
+          </p>
+        </section>
+      )}
+
       {featuredContent ? <div>{featuredContent}</div> : null}
 
       {/* CREDIBILITY STRIP */}
@@ -805,11 +823,11 @@ export default function ProgramDetailPage({
             </div>
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
-                {instructionHours > 0 ? `${instructionHours} hrs` : hoursRange}
+                {registeredTerm?.displayedTerm ?? (instructionHours > 0 ? `${instructionHours.toLocaleString()} hrs` : hoursRange)}
               </div>
               <div className="text-xs text-slate-500 mt-0.5">
-                {registeredProgram
-                  ? 'Related instruction hours; workplace training is separate'
+                {registeredTerm
+                  ? 'Registered term shown in RAPIDS'
                   : isApprenticeship
                     ? 'Listed course hours; review workplace requirements separately'
                     : 'Total training hours'}
@@ -1206,17 +1224,6 @@ export default function ProgramDetailPage({
                   />
                 </div>
               )}
-
-              {/* Every published self-pay program uses the canonical server-created checkout.
-                  This provides the payment calculator, BNPL eligibility, and coupon entry
-                  without depending on a legacy hard-coded QuickBooks URL. */}
-              {enrollmentTracks.selfPay.available &&
-                selfPayNumeric > 0 &&
-                p.slug !== 'hvac-technician' && (
-                  <div className="mt-4 mb-4">
-                    <PaymentPlanCalculator programSlug={p.slug} />
-                  </div>
-                )}
 
               {/* Application fallback remains available when no legacy direct link exists. */}
               {enrollmentTracks.selfPay.available && !p.cta.quickbooksCheckoutHref && (

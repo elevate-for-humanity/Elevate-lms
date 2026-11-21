@@ -154,7 +154,7 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Verify project billing and empty upload admission before building
+      - name: Verify project billing and empty registry upload admission
         run: node scripts/gcp/preflight-billing.mjs
       - name: Upload tested Admin image
         id: upload

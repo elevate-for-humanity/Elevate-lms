@@ -122,6 +122,10 @@ const nextConfig = {
   },
 
   async redirects() {
+    const publicMarketingHost = process.env.NODE_ENV === 'development'
+      ? '(?:www[.]elevateforhumanity[.]org|localhost|127[.]0[.]0[.]1)'
+      : 'www[.]elevateforhumanity[.]org';
+    const onPublicMarketing = [{ type: 'host', value: publicMarketingHost }];
     return [
       {
         source: '/:path*',
@@ -139,9 +143,9 @@ const nextConfig = {
       { source: '/about/mission/mission', destination: '/about', permanent: true },
       { source: '/hire-graduates/hire-graduates', destination: '/employers', permanent: true },
       { source: '/accreditation/accreditation', destination: '/approvals', permanent: true },
-      { source: '/for-students/for-students', destination: '/programs', permanent: true },
-      { source: '/for-students', destination: '/programs', permanent: true },
-      { source: '/for-employers', destination: '/employers', permanent: false },
+      { source: '/for-students/for-students', destination: '/programs', has: onPublicMarketing, permanent: true },
+      { source: '/for-students', destination: '/programs', has: onPublicMarketing, permanent: true },
+      { source: '/for-employers', destination: '/employers', has: onPublicMarketing, permanent: false },
       { source: '/merigoldround', destination: '/sites/meri-gold-round', permanent: true },
       { source: '/apply/status', destination: '/apply/track', permanent: true },
       { source: '/course-factory', destination: '/ai/course-factory', permanent: true },

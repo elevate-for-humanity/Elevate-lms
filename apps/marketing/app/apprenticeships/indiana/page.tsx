@@ -46,7 +46,8 @@ export default async function IndianaApprenticeships({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const region = HOST_SHOP_REGIONS.find((entry) => entry.slug === params.region);
+  const mappedRegion = HOST_SHOP_REGIONS.find((entry) => entry.slug === params.mapRegion);
+  const region = mappedRegion ?? HOST_SHOP_REGIONS.find((entry) => entry.slug === params.region);
   const occupation = typeof params.occupation === 'string' && Object.hasOwn(PROGRAM_LABELS, params.occupation)
     ? params.occupation
     : '';
@@ -118,23 +119,24 @@ export default async function IndianaApprenticeships({
           <h2 id="region-map" className="text-2xl font-black">Indiana regions</h2>
           <p className="my-3 text-sm text-slate-600">Select a region on the schematic map or use the directory filters. Map labels show regional hubs.</p>
           <div className="grid grid-cols-3 grid-rows-5 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-2">
-            {HOST_SHOP_REGIONS.map((area) => {
-              const query = new URLSearchParams({ region: area.slug });
-              if (occupation) query.set('occupation', occupation);
-              if (availability) query.set('availability', availability);
-              return (
-                <Link key={area.slug} href={path + '?' + query + '#directory'}
-                  aria-current={region === area ? 'true' : undefined}
-                  className={`flex min-h-11 items-center justify-center rounded-lg border border-slate-300 p-1 text-center text-xs font-bold hover:bg-blue-100 aria-[current=true]:bg-blue-900 aria-[current=true]:text-white ${positions[area.slug]}`}>
-                  {area.city}
-                </Link>
-              );
-            })}
+            {HOST_SHOP_REGIONS.map((area) => (
+              <button
+                key={area.slug}
+                type="submit"
+                form="indiana-directory-filters"
+                name="mapRegion"
+                value={area.slug}
+                aria-current={region === area ? 'true' : undefined}
+                className={`flex min-h-11 items-center justify-center rounded-lg border border-slate-300 p-1 text-center text-xs font-bold hover:bg-blue-100 aria-[current=true]:bg-blue-900 aria-[current=true]:text-white ${positions[area.slug]}`}
+              >
+                {area.city}
+              </button>
+            ))}
           </div>
         </section>
         <section id="directory" aria-labelledby="directory-title">
           <h2 id="directory-title" className="text-2xl font-black">Search the public directory</h2>
-          <form key={filterKey} action={path + '#directory'} className="my-5 grid gap-4 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
+          <form id="indiana-directory-filters" key={filterKey} action={path + '#directory'} className="my-5 grid gap-4 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
             <label className="grid gap-1 font-semibold">Shop, city or county
               <input name="q" maxLength={80} defaultValue={search} className="min-h-11 rounded-lg border border-slate-400 px-3" />
             </label>

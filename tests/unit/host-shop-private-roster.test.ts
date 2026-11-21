@@ -161,8 +161,10 @@ describe('independent exact approved shop + program privacy regressions', () => 
 describe('Host Shop E2E identity isolation', () => {
   it('passes only dedicated Host Shop test credentials to the desktop runner', () => {
     const workflow = readFileSync(resolve(process.cwd(), '.github/workflows/e2e-desktop-chrome.yml'), 'utf8');
-    const desktop = workflow.split('  desktop-chrome:')[1]?.split('  email-device-browsers:')[0] || '';
-    expect(desktop).not.toBe(''); // Reject a renamed or missing browser job before asserting its identity.
+    const desktop = workflow.match(/^ {2}desktop-chrome-shard:\n([\s\S]*?)(?=^ {2}[\w-]+:\s*$|(?![\s\S]))/m)?.[1] || '';
+    const aggregate = workflow.match(/^ {2}desktop-chrome:\n([\s\S]*?)(?=^ {2}[\w-]+:\s*$|(?![\s\S]))/m)?.[1] || '';
+    expect(desktop).not.toBe('');
+    expect(aggregate).toContain('needs: [desktop-chrome-shard]');
     expect(desktop).toContain('E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}');
     expect(desktop).toContain('E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}');
     expect(desktop).not.toContain('secrets.TEST_HOST_SHOP_');
@@ -174,7 +176,9 @@ describe('Host Shop E2E identity isolation', () => {
     for (const device of ['desktop-chrome', 'tablet-chrome', 'android-chrome', 'iphone-webkit']) {
       expect(desktop).toContain('--project=' + device);
     }
-    expect(desktop.indexOf('Authenticated Host Shop desktop, tablet and mobile geometry'))
-      .toBeLessThan(desktop.indexOf('Run desktop-chrome E2E (marketing, admin, lms)'));
+    const geometry = desktop.indexOf('Authenticated Host Shop desktop, tablet and mobile geometry');
+    const fullSuite = desktop.indexOf('Run all cases in this desktop-chrome shard');
+    expect(geometry).toBeGreaterThanOrEqual(0);
+    expect(fullSuite).toBeGreaterThan(geometry);
   });
 });

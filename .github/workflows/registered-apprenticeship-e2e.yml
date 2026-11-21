@@ -255,24 +255,27 @@ jobs:
       - name: Install dependencies
         id: install-dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Install Chromium and WebKit
+        run: pnpm exec playwright install chromium webkit --with-deps
       - name: Require Supabase QA provisioning authority
         shell: bash
         run: |
           set -euo pipefail
           test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo '::error::NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
           test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is not configured'; exit 1; }
-      - name: Provision disposable Host Shop + Apprentice identities
-        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
-      - name: Provision isolated Learner + Program Holder identities
-        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      # The learner fixture requires the per-run isolated QA admin identity as
+      # its recorded enrollment approver. Create it before the learner fixture.
+      # The remaining-persona provisioner also rejects non-QA Supabase hosts.
       - name: Provision Employer + Instructor + Staff + Case Manager + Admin identities
         run: node scripts/qa/provision-remaining-portal-e2e.mjs provision
+      - name: Provision isolated Learner + Program Holder identities
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Provision disposable Host Shop + Apprentice identities
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Require all nine roles so authenticated tests cannot silently skip
         run: |
           node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
           node scripts/qa/require-portal-e2e-identities.mjs
-      - name: Install Chromium and WebKit
-        run: pnpm exec playwright install chromium webkit --with-deps
       # LMS lesson media and public Marketing films are different acceptance
       # surfaces. The marketing-only hvac-public-playback matrix is deliberately
       # skipped on LMS releases; this independent test certifies REAL authenticated
@@ -343,15 +346,16 @@ jobs:
           ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
           ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
         run: node scripts/gcp/production-acceptance.mjs verify
-      - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
-        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
-        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
-      - name: Clean isolated Learner + Program Holder identities
-        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
-        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Clean disposable Host Shop + Apprentice identities
         if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
         run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
+      - name: Clean isolated Learner + Program Holder identities
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
+      # Remove the QA approver last to keep the learner approval's FK valid.
+      - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
+        if: ${{ always() && steps.install-dependencies.outcome == 'success' }}
+        run: node scripts/qa/provision-remaining-portal-e2e.mjs cleanup
       - name: Upload QA evidence
         if: always()
         uses: actions/upload-artifact@v7

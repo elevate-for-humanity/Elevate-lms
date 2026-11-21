@@ -12,12 +12,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!supabaseUrl || !serviceRoleKey) throw new Error('Supabase QA credentials are required');
 
+const qaHostname = new URL(supabaseUrl).hostname;
+if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
+  throw new Error('This fixture may run only against the isolated QA project');
+}
+
 const db = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
-const runId = String(process.env.GITHUB_RUN_ID || Date.now());
+const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-portal-e2e-${runId}`;
 const roles = [
+  ['admin', 'admin', 'Admin'],
   ['employer', 'employer', 'Employer'],
   ['instructor', 'instructor', 'Instructor'],
   ['staff', 'staff', 'Staff'],
@@ -172,6 +178,7 @@ async function provision() {
     await writePrivateQaState(statePath, state);
     if (process.env.GITHUB_ENV) {
       const envNames = {
+        admin: 'ADMIN',
         employer: 'EMPLOYER',
         instructor: 'INSTRUCTOR',
         staff: 'STAFF',

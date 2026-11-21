@@ -13,8 +13,13 @@ if (!supabaseUrl || !serviceRoleKey) {
   throw new Error('NEXT_PUBLIC_SUPABASE_URL/SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
 }
 
+const qaHostname = new URL(supabaseUrl).hostname;
+if (qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co') {
+  throw new Error('This fixture may run only against the isolated QA project');
+}
+
 const db = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
-const runId = String(process.env.GITHUB_RUN_ID || Date.now());
+const runId = String(process.env.QA_PORTAL_E2E_RUN_ID || process.env.GITHUB_RUN_ID || Date.now());
 const marker = `qa-portal-e2e-${runId}`;
 const QA_HVAC_COURSE_ID = 'd48c61c4-8880-4d9d-9ab5-fab4dd51b201';
 
@@ -33,13 +38,19 @@ async function provision() {
   const anchor = await must(db.from('programs').select('organization_id,tenant_id').eq('slug', 'barber-apprenticeship').maybeSingle(), 'load tenant anchor');
   if (!anchor?.tenant_id) throw new Error('Canonical tenant anchor is missing');
   const adminEmail = String(process.env.E2E_ADMIN_EMAIL || process.env.TEST_ADMIN_EMAIL || '').trim().toLowerCase();
-  if (!adminEmail) throw new Error('Designated isolated-QA administrator email is required');
-  const approvalAdmin = await must(
-    db.from('profiles').select('id,role,tenant_id').eq('email', adminEmail).maybeSingle(),
-    'resolve designated isolated-QA approval administrator',
+  let approvalAdminQuery = db
+    .from('profiles')
+    .select('id,role,tenant_id')
+    .eq('tenant_id', anchor.tenant_id)
+    .in('role', ['admin', 'super_admin']);
+  if (adminEmail) approvalAdminQuery = approvalAdminQuery.eq('email', adminEmail);
+  const approvalAdmins = await must(
+    approvalAdminQuery.order('id', { ascending: true }).limit(1),
+    'resolve authorized isolated-QA approval administrator',
   );
-  if (!approvalAdmin?.id || !['admin', 'super_admin'].includes(approvalAdmin.role) || approvalAdmin.tenant_id !== anchor.tenant_id)
-    throw new Error('Designated isolated-QA approval administrator is not authorized for the QA tenant');
+  const approvalAdmin = approvalAdmins?.[0];
+  if (!approvalAdmin?.id)
+    throw new Error('No authorized isolated-QA approval administrator is available');
   let state = { runId, marker, learner: null, programHolder: null, qaProgramId: null, holderId: null, holderProgramId: null, hvacEnrollmentId: null };
   try {
     const learner = await createQaUser('learner', 'student', '[QA E2E] Learner', anchor.tenant_id); state.learner = learner;
@@ -109,6 +120,9 @@ async function cleanup() {
       .eq('id', state.hvacEnrollmentId).eq('user_id', state.learner.id).select('id');
     if (error || data?.length !== 1)
       throw new Error('QA HVAC enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
+    const { error: courseError } = await db.from('course_enrollments').delete()
+      .eq('student_id', state.learner.id);
+    if (courseError) throw new Error('QA course enrollment cleanup failed: ' + courseError.message);
   }
   if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
   if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);

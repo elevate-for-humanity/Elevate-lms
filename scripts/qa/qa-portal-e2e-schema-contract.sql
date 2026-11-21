@@ -27,6 +27,31 @@ CREATE SCHEMA IF NOT EXISTS private;
 REVOKE ALL ON SCHEMA private FROM PUBLIC,anon;
 GRANT USAGE ON SCHEMA private TO authenticated,service_role;
 
+-- Approval verifies course rows synchronously against the published LMS catalog.
+CREATE OR REPLACE FUNCTION private.qa_sync_active_program_courses()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $qa_sync$
+BEGIN
+  IF NEW.user_id IS NULL OR NEW.program_id IS NULL
+     OR COALESCE(NEW.enrollment_state, NEW.status) IS DISTINCT FROM 'active' THEN
+    RETURN NEW;
+  END IF;
+
+  INSERT INTO public.course_enrollments (student_id, course_id, status, progress, created_at, updated_at)
+  SELECT NEW.user_id, course.id, 'active', '0', now(), now()
+  FROM public.lms_courses AS course
+  WHERE course.program_id = NEW.program_id
+    AND course.is_active
+    AND course.status = 'published'
+  ON CONFLICT (student_id, course_id) DO NOTHING;
+  RETURN NEW;
+END;
+$qa_sync$;
+REVOKE ALL ON FUNCTION private.qa_sync_active_program_courses() FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS qa_sync_active_program_courses ON public.program_enrollments;
+CREATE TRIGGER qa_sync_active_program_courses
+AFTER INSERT OR UPDATE OF user_id, program_id, status, enrollment_state ON public.program_enrollments
+FOR EACH ROW EXECUTE FUNCTION private.qa_sync_active_program_courses();
+
 ALTER TABLE public.employers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS qa_employers_owner_read ON public.employers;
 CREATE POLICY qa_employers_owner_read ON public.employers
@@ -397,8 +422,8 @@ AS $function$
       AND pe.refunded_at IS NULL
   );
 $function$;
-REVOKE ALL ON FUNCTION public.can_access_lesson(uuid,uuid) FROM PUBLIC,anon,authenticated;
-GRANT EXECUTE ON FUNCTION public.can_access_lesson(uuid,uuid) TO service_role;
+REVOKE ALL ON FUNCTION public.can_access_lesson(uuid,uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.can_access_lesson(uuid,uuid) TO authenticated,service_role;
 
 ALTER TABLE public.course_lessons ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS qa_course_lessons_service ON public.course_lessons;
@@ -746,6 +771,28 @@ INSERT INTO public.digital_workbook_sections(
 ) ON CONFLICT (id) DO UPDATE SET
   prompts=EXCLUDED.prompts,
   lesson_id=EXCLUDED.lesson_id;
+
+-- Optimistic locking prevents a second device or tab from overwriting newer answers.
+CREATE OR REPLACE FUNCTION public.save_digital_workbook_section(
+ p_section_id uuid,p_answers jsonb,p_reviewed boolean,p_expected_version integer
+) RETURNS SETOF public.digital_workbook_responses
+LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+BEGIN
+ IF auth.uid() IS NULL THEN RAISE EXCEPTION 'AUTHENTICATION_REQUIRED' USING ERRCODE='42501'; END IF;
+ IF p_expected_version<0 OR p_expected_version IS NULL THEN RAISE EXCEPTION 'INVALID_VERSION' USING ERRCODE='22023'; END IF;
+ IF p_expected_version=0 THEN
+  RETURN QUERY INSERT INTO public.digital_workbook_responses(user_id,section_id,answers,reviewed)
+   VALUES(auth.uid(),p_section_id,p_answers,p_reviewed)
+   ON CONFLICT(user_id,section_id) DO NOTHING RETURNING *;
+ ELSE
+  RETURN QUERY UPDATE public.digital_workbook_responses SET answers=p_answers,reviewed=p_reviewed,
+   version=version+1,updated_at=now()
+   WHERE user_id=auth.uid() AND section_id=p_section_id AND version=p_expected_version RETURNING *;
+ END IF;
+ IF NOT FOUND THEN RAISE EXCEPTION 'WORKBOOK_VERSION_CONFLICT' USING ERRCODE='40001'; END IF;
+END $$;
+REVOKE ALL ON FUNCTION public.save_digital_workbook_section(uuid,jsonb,boolean,integer) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.save_digital_workbook_section(uuid,jsonb,boolean,integer) TO authenticated;
 
 DO $qa$
 BEGIN

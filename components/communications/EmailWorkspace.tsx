@@ -23,7 +23,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { createBrowserSpeechRecognition, type BrowserSpeechRecognition } from '@/lib/browser/speech-recognition';
+import { appendEmailDictation, createBrowserSpeechRecognition, type BrowserSpeechRecognition } from '@/lib/browser/speech-recognition';
 import { MAIL_VIEWS } from '@/lib/email/mail-management';
 
 type Mailbox = {
@@ -188,20 +188,10 @@ export function EmailWorkspace({
       if (!phrases.length) return;
       setCompose((previous) => {
         if (!previous) return previous;
-        let value = previous[dictationField];
-        for (const phrase of phrases) {
-          const words = phrase.trim();
-          if (!words) continue;
-          const command = words.toLowerCase().replace(/[.!?]$/, '');
-          if (dictationField === 'body' && command === 'command new line') {
-            value += '\n';
-          } else if (dictationField === 'body' && command === 'command new paragraph') {
-            value += '\n\n';
-          } else {
-            value += value && !/\s$/.test(value) ? ' ' + words : words;
-          }
-        }
-        return { ...previous, [dictationField]: value };
+        return {
+          ...previous,
+          [dictationField]: appendEmailDictation(previous[dictationField], phrases, dictationField),
+        };
       });
     };
     recognition.onerror = (event) => {

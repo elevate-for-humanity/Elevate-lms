@@ -42,3 +42,14 @@ export function speechSessionText(prefix: string, results: BrowserSpeechRecognit
   const before = prefix.trimEnd();
   return `${before}${before && transcript ? ' ' : ''}${transcript}`;
 }
+
+/** Append final email dictation while interpreting explicit body formatting commands. */
+export function appendEmailDictation(value: string, phrases: string[], field: 'subject' | 'body'): string {
+  const transcript = phrases.map(phrase => phrase.trim()).filter(Boolean).join(' ');
+  if (!transcript) return value;
+  const formatted = field === 'body'
+    ? transcript.replace(/[ \t]*\bcommand\s+new\s+(paragraph|line)\b[.,!?;:]?[ \t]*/gi,
+        (_, command: string) => command.toLowerCase() === 'paragraph' ? '\n\n' : '\n')
+    : transcript;
+  return value + (value && !/\s$/.test(value) && !/^\s/.test(formatted) ? ' ' : '') + formatted;
+}

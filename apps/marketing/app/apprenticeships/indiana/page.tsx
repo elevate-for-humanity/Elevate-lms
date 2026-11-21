@@ -25,6 +25,20 @@ const positions: Record<string, string> = {
   evansville: 'col-start-1 row-start-5',
 };
 
+// Municipalities verified from the public profiles and Indiana’s county directory.
+const publicHostCounties: Readonly<Record<string, string>> = {
+  carmel: 'Hamilton',
+  elkhart: 'Elkhart',
+  indianapolis: 'Marion',
+  lafayette: 'Tippecanoe',
+  'new castle': 'Henry',
+  'new palestine': 'Hancock',
+  plainfield: 'Hendricks',
+  'south bend': 'St. Joseph',
+  sullivan: 'Sullivan',
+  'west lafayette': 'Tippecanoe',
+};
+
 export default async function IndianaApprenticeships({
   searchParams,
 }: {
@@ -38,9 +52,11 @@ export default async function IndianaApprenticeships({
   const search = typeof params.q === 'string' ? params.q.trim().slice(0, 80) : '';
   const availability = params.availability === 'inquiry' ? 'inquiry' : params.availability === 'hosts' ? 'hosts' : '';
   const shops = (await getHostShopNetwork()).filter((shop) => /^(IN|Indiana)$/i.test(shop.state));
+  const counties = [...new Set(shops.map((shop) => publicHostCounties[shop.city.trim().toLowerCase()]).filter(Boolean))].sort();
+  const county = counties.find((entry) => entry === params.county) ?? '';
   const requestedRegion = region?.slug ?? '';
-  const filters = new URLSearchParams({ q: search, occupation, availability });
-  const inquiries = new URLSearchParams({ apprenticeship: occupation || 'general', region: requestedRegion, community: search });
+  const filters = new URLSearchParams({ q: search, county, occupation, availability });
+  const inquiries = new URLSearchParams({ apprenticeship: occupation || 'general', region: requestedRegion, community: county ? county + ' County' : search });
   const results = shops.filter((shop) => {
     const city = shop.city.trim().toLowerCase();
     const areas = HOST_SHOP_REGIONS.filter((area) =>
@@ -48,8 +64,9 @@ export default async function IndianaApprenticeships({
     );
     return availability !== 'inquiry' &&
       (!region || areas.includes(region)) &&
+      (!county || publicHostCounties[city] === county) &&
       (!occupation || shop.programs.includes(occupation)) &&
-      (!search || [shop.name, shop.city, ...areas.filter((area) => area.city.toLowerCase() === city && area.counties.length === 1).flatMap((area) => area.counties)].some(
+      (!search || [shop.name, shop.city, publicHostCounties[city] ?? ''].some(
         (value) => value.toLowerCase().includes(search.toLowerCase()),
       ));
   });
@@ -105,6 +122,12 @@ export default async function IndianaApprenticeships({
             <label className="grid gap-1 font-semibold">Shop, city or county
               <input name="q" maxLength={80} defaultValue={search} className="min-h-11 rounded-lg border border-slate-400 px-3" />
             </label>
+            <label className="grid gap-1 font-semibold">County with listed hosts
+              <select name="county" defaultValue={county} className="min-h-11 rounded-lg border border-slate-400 px-3">
+                <option value="">All counties</option>
+                {counties.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+              </select>
+            </label>
             <label className="grid gap-1 font-semibold">Region
               <select name="region" defaultValue={requestedRegion} className="min-h-11 rounded-lg border border-slate-400 px-3">
                 <option value="">All Indiana</option>
@@ -133,7 +156,9 @@ export default async function IndianaApprenticeships({
               {results.map((shop) => (
                 <li key={shop.id} className="rounded-xl border border-slate-200 p-4">
                   <Link href={`/host-shops/${shop.slug}`} className="font-black underline">{shop.name}</Link>
-                  <p className="text-sm text-slate-700">{shop.city}, Indiana</p>
+                  <p className="text-sm text-slate-700">
+                    {shop.city}, Indiana{publicHostCounties[shop.city.trim().toLowerCase()] ? ` · ${publicHostCounties[shop.city.trim().toLowerCase()]} County` : ''}
+                  </p>
                   <p className="mt-1 text-sm">{shop.programs.map((program) => PROGRAM_LABELS[program]).filter(Boolean).join(', ')}</p>
                 </li>
               ))}

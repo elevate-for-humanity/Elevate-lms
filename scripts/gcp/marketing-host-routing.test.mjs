@@ -23,7 +23,8 @@ const portalUrl=moduleUrl(readFileSync(new URL('../../lib/routing/portal-map.ts'
   .replace("'./lms-host'",JSON.stringify(lmsHostUrl)));
 const runtimeUrl=moduleUrl(readFileSync(new URL('../../lib/health/public-runtime-service.ts',import.meta.url),'utf8'));
 const withdrawalsUrl=moduleUrl(readFileSync(new URL('../../lib/programs/withdrawn-programs.mjs',import.meta.url),'utf8'));
-const routingImports=`import {ADMIN_HOST,LMS_HOST,MARKETING_HOST,getPortalKeyFromPath,PORTAL_MAP} from ${JSON.stringify(portalUrl)};\nimport {getPublicRuntimeService} from ${JSON.stringify(runtimeUrl)};\nimport {isWithdrawnProgramRequest} from ${JSON.stringify(withdrawalsUrl)};\n`;
+const aliasesUrl=moduleUrl(readFileSync(new URL('../../lib/routing/public-entry-aliases.mjs',import.meta.url),'utf8'));
+const routingImports=`import {resolvePublicEntryAlias,resolvePublicPageRedirect} from ${JSON.stringify(aliasesUrl)};\nimport {ADMIN_HOST,LMS_HOST,MARKETING_HOST,getPortalKeyFromPath,PORTAL_MAP} from ${JSON.stringify(portalUrl)};\nimport {getPublicRuntimeService} from ${JSON.stringify(runtimeUrl)};\nimport {isWithdrawnProgramRequest} from ${JSON.stringify(withdrawalsUrl)};\n`;
 const { middleware } = await import(moduleUrl(routingImports+boundaries+source));
 
 function request(host, path) {

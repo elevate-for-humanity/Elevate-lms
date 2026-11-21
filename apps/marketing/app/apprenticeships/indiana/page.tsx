@@ -1,0 +1,151 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { PROGRAM_LABELS } from '@/lib/programs/host-shop-programs';
+import { PUBLIC_SITE_ORIGIN } from '@/lib/navigation/public-route-registry';
+
+const path = '/apprenticeships/indiana';
+const canonical = PUBLIC_SITE_ORIGIN + path;
+const description = 'Search Elevate’s approved Indiana apprenticeship Host Shops and ask about training opportunities in your community.';
+
+export const dynamic = 'force-dynamic';
+export const metadata: Metadata = {
+  title: 'Indiana Apprenticeships and Host Shop Directory',
+  description,
+  alternates: { canonical },
+};
+
+const positions: Record<string, string> = {
+  gary: 'col-start-1 row-start-1',
+  'south-bend': 'col-start-2 row-start-1',
+  'fort-wayne': 'col-start-3 row-start-2',
+  indianapolis: 'col-start-2 row-start-3',
+  bloomington: 'col-start-2 row-start-4',
+  evansville: 'col-start-1 row-start-5',
+};
+
+export default async function IndianaApprenticeships({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const region = HOST_SHOP_REGIONS.find((entry) => entry.slug === params.region);
+  const occupation = typeof params.occupation === 'string' && Object.hasOwn(PROGRAM_LABELS, params.occupation)
+    ? params.occupation
+    : '';
+  const search = typeof params.q === 'string' ? params.q.trim().slice(0, 80) : '';
+  const availability = params.availability === 'inquiry' ? 'inquiry' : params.availability === 'hosts' ? 'hosts' : '';
+  const shops = (await getHostShopNetwork()).filter((shop) => /^(IN|Indiana)$/i.test(shop.state));
+  const requestedRegion = region?.slug ?? '';
+  const filters = new URLSearchParams({ q: search, occupation, availability });
+  const inquiries = new URLSearchParams({ apprenticeship: occupation || 'general', region: requestedRegion, community: search });
+  const results = shops.filter((shop) => {
+    const city = shop.city.trim().toLowerCase();
+    const areas = HOST_SHOP_REGIONS.filter((area) =>
+      [area.city, ...area.nearbyCities].some((name) => name.toLowerCase() === city),
+    );
+    return availability !== 'inquiry' &&
+      (!region || areas.includes(region)) &&
+      (!occupation || shop.programs.includes(occupation)) &&
+      (!search || [shop.name, shop.city, ...areas.filter((area) => area.city.toLowerCase() === city && area.counties.length === 1).flatMap((area) => area.counties)].some(
+        (value) => value.toLowerCase().includes(search.toLowerCase()),
+      ));
+  });
+  const matchingHosts = results.length;
+  const apply = occupation === 'barber-apprenticeship'
+    ? '/apply/student?' + new URLSearchParams({ program: occupation })
+    : '';
+  const becomeHost = requestedRegion
+    ? '/partners/host-shop/apply?' + new URLSearchParams({ region: requestedRegion })
+    : '/partners/host-shop/apply';
+
+  const breadcrumbs = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Apprenticeships', item: PUBLIC_SITE_ORIGIN + '/apprenticeships' },
+      { '@type': 'ListItem', position: 2, name: 'Indiana Host Shops', item: canonical },
+    ],
+  };
+  return (
+    <main className="min-h-screen bg-white text-slate-950">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs).replace(/</g, '\\u003c') }} />
+      <header className="bg-slate-950 px-4 py-14 text-white sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <h1 className="max-w-3xl text-4xl font-black tracking-tight sm:text-6xl">Find an apprenticeship Host Shop in Indiana</h1>
+          <p className="mt-5 max-w-2xl text-lg text-slate-200">{description}</p>
+          <p className="mt-3 max-w-2xl text-slate-300">An approved shop may be able to host apprentices. Ask Elevate to confirm openings, supervision, and program eligibility.</p>
+        </div>
+      </header>
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[20rem_1fr]">
+        <section aria-labelledby="region-map">
+          <h2 id="region-map" className="text-2xl font-black">Indiana regions</h2>
+          <p className="my-3 text-sm text-slate-600">Select a region on the schematic map or use the directory filters. Map labels show regional hubs.</p>
+          <div className="grid grid-cols-3 grid-rows-5 gap-1 rounded-2xl border border-slate-200 bg-slate-100 p-2">
+            {HOST_SHOP_REGIONS.map((area) => {
+              const query = new URLSearchParams(filters);
+              query.set('region', area.slug);
+              return (
+                <Link key={area.slug} href={path + '?' + query + '#directory'}
+                  aria-current={region === area ? 'true' : undefined}
+                  className={`flex min-h-11 items-center justify-center rounded-lg border border-slate-300 p-1 text-center text-xs font-bold hover:bg-blue-100 aria-[current=true]:bg-blue-900 aria-[current=true]:text-white ${positions[area.slug]}`}>
+                  {area.city}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+        <section id="directory" aria-labelledby="directory-title">
+          <h2 id="directory-title" className="text-2xl font-black">Search the public directory</h2>
+          <form action={path + '#directory'} className="my-5 grid gap-4 rounded-2xl border border-slate-200 p-4 sm:grid-cols-2">
+            <label className="grid gap-1 font-semibold">Shop, city or county
+              <input name="q" maxLength={80} defaultValue={search} className="min-h-11 rounded-lg border border-slate-400 px-3" />
+            </label>
+            <label className="grid gap-1 font-semibold">Region
+              <select name="region" defaultValue={requestedRegion} className="min-h-11 rounded-lg border border-slate-400 px-3">
+                <option value="">All Indiana</option>
+                {HOST_SHOP_REGIONS.map((area) => <option key={area.slug} value={area.slug}>{area.city}</option>)}
+              </select>
+            </label>
+            <label className="grid gap-1 font-semibold">Occupation
+              <select name="occupation" defaultValue={occupation} className="min-h-11 rounded-lg border border-slate-400 px-3">
+                <option value="">All occupations</option>
+                {Object.entries(PROGRAM_LABELS).map(([slug, name]) => <option key={slug} value={slug}>{name}</option>)}
+              </select>
+            </label>
+            <label className="grid gap-1 font-semibold">Availability
+              <select name="availability" defaultValue={availability} className="min-h-11 rounded-lg border border-slate-400 px-3">
+                <option value="">All options</option>
+                <option value="hosts">Approved public hosts</option>
+                <option value="inquiry">Request placement information</option>
+              </select>
+            </label>
+            <button className="min-h-11 rounded-lg bg-slate-950 px-4 font-bold text-white">Search</button>
+            <Link href={path + '#directory'} className="flex min-h-11 items-center font-semibold underline">Clear filters</Link>
+          </form>
+          <p className="mb-4 font-semibold">{matchingHosts} matching {matchingHosts === 1 ? 'Host Shop' : 'Host Shops'}</p>
+          {results.length > 0 ? (
+            <ul className="grid gap-3">
+              {results.map((shop) => (
+                <li key={shop.id} className="rounded-xl border border-slate-200 p-4">
+                  <Link href={`/host-shops/${shop.slug}`} className="font-black underline">{shop.name}</Link>
+                  <p className="text-sm text-slate-700">{shop.city}, Indiana</p>
+                  <p className="mt-1 text-sm">{shop.programs.map((program) => PROGRAM_LABELS[program]).filter(Boolean).join(', ')}</p>
+                </li>
+              ))}
+            </ul>
+          ) : <p>{availability === 'inquiry' ? 'Tell Elevate where you want to train.' : 'No matching approved public hosts are listed. Ask about options in your community.'}</p>}
+          <div className="mt-6 flex flex-wrap gap-4 font-bold">
+            {apply && <Link href={apply} className="underline">Apply for barber apprenticeship</Link>}
+            {!occupation && <Link href="/apprenticeships#programs" className="underline">Explore apprenticeship programs</Link>}
+            <Link href={'/contact?' + inquiries + '#contact-form'} className="underline">Request information</Link>
+            <Link href={becomeHost} className="underline">Become a Host Shop</Link>
+            {region && matchingHosts > 0 && <Link href={`/partners/host-shops/indiana/${region.slug}`} className="underline">Visit the {region.city} regional guide</Link>}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}

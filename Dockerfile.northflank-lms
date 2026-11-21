@@ -172,6 +172,10 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 WORKDIR /app
 
 COPY --from=builder /app/apps/lms/.next/standalone ./
+# Replace standalone traces with the complete verified PDF runtime export. Some
+# Next standalone entries are files or links, which cannot be overlaid by dirs.
+RUN rm -rf ./node_modules/pdf-parse ./node_modules/pdfjs-dist \
+    ./node_modules/@napi-rs/canvas ./node_modules/@napi-rs/canvas-linux-x64-gnu
 COPY --from=builder /export/pdf-node_modules/ ./node_modules/
 
 # Exercise the same Node ESM import used for Program Holder syllabus uploads.

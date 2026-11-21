@@ -178,3 +178,27 @@ test('LMS course playback is not skipped by the Marketing-film admission gate', 
   assert.match(learnerTest,/videoWidth/);
   assert.match(learnerTest,/data-expanded/);
 });
+
+test('isolated QA approver exists before learner provisioning and is removed last', () => {
+  const position = (name) => {
+    const at = job.indexOf('- name: ' + name);
+    assert.ok(at >= 0, 'Missing protected QA step: ' + name);
+    return at;
+  };
+  const remaining = position('Provision Employer + Instructor + Staff + Case Manager + Admin identities');
+  const learner = position('Provision isolated Learner + Program Holder identities');
+  const hostShop = position('Provision disposable Host Shop + Apprentice identities');
+  assert.ok(remaining < learner && learner < hostShop,
+    'The learner must use a real disposable QA admin, never a fabricated approver');
+  const hostCleanup = position('Clean disposable Host Shop + Apprentice identities');
+  const learnerCleanup = position('Clean isolated Learner + Program Holder identities');
+  const adminCleanup = position('Clean Employer + Instructor + Staff + Case Manager + Admin identities');
+  assert.ok(hostCleanup < learnerCleanup && learnerCleanup < adminCleanup,
+    'Cleanup must release dependent QA records before deleting the QA approver');
+  const creator = readFileSync(new URL('./provision-remaining-portal-e2e.mjs', import.meta.url), 'utf8');
+  const dependent = readFileSync(new URL('./provision-learner-program-holder-e2e.mjs', import.meta.url), 'utf8');
+  assert.match(creator, /qaHostname !== 'isdgjcdabhxxozarmxta\\.supabase\\.co'/);
+  assert.match(creator, /E2E_\\$\\{prefix\\}_EMAIL/);
+  assert.match(dependent, /process\\.env\\.E2E_ADMIN_EMAIL/);
+  assert.match(dependent, /Designated isolated-QA approval administrator is not authorized/);
+});

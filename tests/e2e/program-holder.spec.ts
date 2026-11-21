@@ -96,11 +96,11 @@ test.describe('Program Holder Portal', () => {
       await page.goto('/login');
 
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -112,8 +112,8 @@ test.describe('Program Holder Portal', () => {
     test('should show error for invalid credentials', async ({ page }) => {
       await page.goto('/login');
 
-      await page.fill('input[name="email"]', 'invalid@example.com');
-      await page.fill('input[name="password"]', 'wrongpassword');
+      await page.fill('input[type="email"]', 'invalid@example.com');
+      await page.fill('input[type="password"]', 'wrongpassword');
       await page.click('button[type="submit"]');
 
       await expect(page.locator('text=Invalid')).toBeVisible();
@@ -125,11 +125,11 @@ test.describe('Program Holder Portal', () => {
       // Login first
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -177,11 +177,11 @@ test.describe('Program Holder Portal', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -231,11 +231,11 @@ test.describe('Program Holder Portal', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -276,11 +276,11 @@ test.describe('Program Holder Portal', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -312,11 +312,11 @@ test.describe('Program Holder Portal', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -340,11 +340,11 @@ test.describe('Program Holder Portal', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');
@@ -407,11 +407,11 @@ test.describe('Program Holder Portal', () => {
     test('should load dashboard within 3 seconds', async ({ page }) => {
       await page.goto('/login');
       await page.fill(
-        'input[name="email"]',
+        'input[type="email"]',
         process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
       );
       await page.fill(
-        'input[name="password"]',
+        'input[type="password"]',
         process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
       );
       await page.click('button[type="submit"]');

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { saveHiringNeeds } from './actions';
 
@@ -22,6 +22,8 @@ const fields: { name: keyof HiringNeedsFields; label: string; required: boolean 
  * it enforces employer identity and validates persisted values. */
 export function HiringNeedsForm({ initial, saved = false }: { initial: HiringNeedsFields; saved?: boolean }) {
   const [values, setValues] = useState(initial);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const dirty = fields.some(({ name }) => values[name] !== initial[name]);
   return (
     <form action={saveHiringNeeds} className="space-y-5 rounded-xl border bg-white p-5">
@@ -31,6 +33,7 @@ export function HiringNeedsForm({ initial, saved = false }: { initial: HiringNee
           <textarea
             name={name}
             required={required}
+            disabled={!hydrated}
             maxLength={4000}
             value={values[name]}
             onChange={event => setValues(previous => ({
@@ -42,12 +45,12 @@ export function HiringNeedsForm({ initial, saved = false }: { initial: HiringNee
           />
         </label>
       ))}
-      <SaveStatus saved={saved && !dirty} />
+      <SaveStatus ready={hydrated} saved={saved && !dirty} />
     </form>
   );
 }
 
-function SaveStatus({ saved }: { saved: boolean }) {
+function SaveStatus({ saved, ready }: { saved: boolean; ready: boolean }) {
   const { pending } = useFormStatus();
   return (
     <>
@@ -56,7 +59,7 @@ function SaveStatus({ saved }: { saved: boolean }) {
           Your hiring and training needs are saved.
         </p>
       )}
-      <button type="submit" disabled={pending} aria-busy={pending}
+      <button type="submit" disabled={!ready || pending} aria-busy={!ready || pending}
         className="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white disabled:opacity-60">
         {pending ? 'Saving hiring and training needs…' : 'Save hiring and training needs'}
       </button>

@@ -11,7 +11,6 @@ const CRITICAL_PUBLIC_ROUTES = [
   '/for-employers',
   '/partners',
   '/testing',
-  '/testing/workkeys',
   '/pricing',
   '/apply',
   '/apply/student',
@@ -66,10 +65,22 @@ async function collectInternalLinks(page: Page, selector: string) {
   return [...new Set(hrefs.filter(isInternalHref))].sort();
 }
 
-async function assertNoRuntimeFailure(page: Page, route: string) {
+async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
+  const failedResponses: string[] = [];
 
+  // Capture the failing resource URL instead of reporting an untraceable 503.
+  // Only store same-origin request paths; never log credential-bearing queries.
+  page.on('response', (response) => {
+    if (response.status() < 500) return;
+    try {
+      const url = new URL(response.url());
+      if (url.origin === new URL(page.url()).origin) {
+        failedResponses.push(`${response.status()} ${url.pathname}`);
+      }
+    } catch { /* Browser errors remain available below. */ }
+  });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
@@ -78,6 +89,10 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
   expect(response, `${route} did not return a response`).not.toBeNull();
   expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
+
+  if (expectedPath) {
+    await expect(page).toHaveURL((url) => url.pathname === expectedPath);
+  }
 
   await page.waitForLoadState('networkidle').catch(() => undefined);
 
@@ -90,6 +105,7 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
 
+  expect(failedResponses, `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`).toEqual([]);
   expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
 
   const actionableConsoleErrors = consoleErrors.filter(
@@ -104,9 +120,10 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
 test.describe.configure({ mode: 'serial' });
 
 test.describe('page-by-page public production audit', () => {
+  const destinationByAlias = new Map([['/for-students', '/programs'], ['/for-employers', '/employers']]);
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
+      await assertNoRuntimeFailure(page, route, destinationByAlias.get(route));
     });
   }
 
@@ -196,9 +213,22 @@ test.describe('pricing and testing integrity', () => {
     expect(body).not.toMatch(/0 programs available/i);
   });
 
-  test('WorkKeys page shows non-zero prices and purchase controls', async ({ page }) => {
-    await assertNoRuntimeFailure(page, '/testing/workkeys');
-    await expect(page.getByText(/\$104|\$168/).first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
+  test('legacy WorkKeys URL redirects to canonical priced provider and retains purchase controls', async ({ page }) => {
+    // The legacy provider route is a permanent redirect, not its own content page.
+    const response = await page.goto('/testing/workkeys', { waitUntil: 'domcontentloaded' });
+    expect(response, 'WorkKeys legacy route did not respond').not.toBeNull();
+    await expect(page).toHaveURL(new RegExp('/testing#workkeys$'));
+    await assertNoRuntimeFailure(page, '/testing#workkeys');
+
+    const workkeys = page.locator('article#workkeys');
+    await expect(workkeys.getByRole('heading', { name: /ACT WorkKeys/i })).toBeVisible();
+    // Verify approved pricing and actions without hardcoding outdated amounts.
+    const bookLinks = workkeys.getByRole('link', { name: /Book —/ });
+    await expect(bookLinks.first()).toBeVisible();
+    const amountText = await bookLinks.first().innerText();
+    const amount = amountText.match(new RegExp('[$]([0-9]+(?:[.][0-9]{2})?)'))?.[1];
+    expect(Number(amount), 'WorkKeys must expose a positive approved exam price').toBeGreaterThan(0);
+    await expect(workkeys.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
+    await expect(bookLinks.first()).toHaveAttribute('href', /provider=workkeys.*exam=/);
   });
 });

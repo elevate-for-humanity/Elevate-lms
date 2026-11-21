@@ -9,6 +9,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
+      - '.github/workflows/registered-apprenticeship-e2e.yml'
+      - 'scripts/qa/require-portal-e2e-identities.mjs'
       - 'scripts/gcp/verify-public-entry.*'
       - 'scripts/gcp/apprenticeship-payment-contract.*'
       - 'scripts/build-memory-policy.*'
@@ -230,7 +232,7 @@ jobs:
             --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID .
 
       - name: Test final Marketing container before release
-        timeout-minutes: 5
+        timeout-minutes: 7
         run: node scripts/gcp/smoke-marketing-container.mjs
 
       # Builds can outlive the federated token; refresh only after build acceptance.

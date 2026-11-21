@@ -19,7 +19,7 @@ import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import StoreFooter from '@/components/store/StoreFooter';
 import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
+import { PublicParisLauncher } from './PublicParisLauncher';
 import { I18nProvider } from '@/lib/i18n/context';
 import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
@@ -156,7 +156,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             storeOnly={storeOnly}
             header={<Header />}
             footer={storeOnly ? <StoreFooter /> : <SiteFooter />}
-            paris={<ParisFloatingWrapper surface="public" />}
+            paris={<PublicParisLauncher />}
           >
             <DashboardReadingSupport dashboardOnly>{children}</DashboardReadingSupport>
           </MarketingChromeBoundary>

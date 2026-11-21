@@ -8,6 +8,36 @@ import {
   type CommunicationMailboxKind,
 } from '@/lib/email/communication-email';
 
+async function loadMailboxMemberships(userId: string | undefined, personalOnly: boolean) {
+  try {
+    const db = await requireAdminClient();
+    let effectiveUserId = userId;
+    if (!effectiveUserId) {
+      const authDb = await createClient();
+      const { data: { user } } = await authDb.auth.getUser();
+      const preview = await resolvePortalPreviewSubject(db, user?.id ?? null);
+      effectiveUserId = preview?.previewing ? preview.userId : user?.id;
+    }
+    if (!effectiveUserId) return null;
+
+    let query = db
+      .from('communication_email_mailbox_members')
+      .select(
+        'mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active,owner_user_id)',
+      )
+      .eq('user_id', effectiveUserId)
+      .eq('mailbox.active', true);
+    if (personalOnly) {
+      query = query.eq('mailbox.owner_user_id', effectiveUserId).eq('mailbox.mailbox_kind', 'individual');
+    }
+    const { data, error } = await query.abortSignal(AbortSignal.timeout(8000));
+    return error ? null : data;
+  } catch {
+    // Mailbox availability must not prevent the surrounding portal from rendering.
+    return null;
+  }
+}
+
 export async function EmailAccountNotice({
   href,
   userId,
@@ -19,26 +49,7 @@ export async function EmailAccountNotice({
   accountName?: string;
   personalOnly?: boolean;
 }) {
-  const authDb = await createClient();
-  const {
-    data: { user },
-  } = await authDb.auth.getUser();
-  const db = await requireAdminClient();
-  const preview = userId ? null : await resolvePortalPreviewSubject(db, user?.id ?? null);
-  const effectiveUserId = userId || (preview?.previewing ? preview.userId : user?.id);
-  if (!effectiveUserId) return null;
-
-  let query = db
-    .from('communication_email_mailbox_members')
-    .select(
-      'mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active,owner_user_id)',
-    )
-    .eq('user_id', effectiveUserId)
-    .eq('mailbox.active', true);
-  if (personalOnly) {
-    query = query.eq('mailbox.owner_user_id', effectiveUserId).eq('mailbox.mailbox_kind', 'individual');
-  }
-  const { data } = await query;
+  const data = await loadMailboxMemberships(userId, personalOnly);
   const mailboxes = (data ?? [])
     .map((row: any) => (Array.isArray(row.mailbox) ? row.mailbox[0] : row.mailbox))
     .filter(Boolean)

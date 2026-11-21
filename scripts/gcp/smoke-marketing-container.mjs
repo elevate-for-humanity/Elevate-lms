@@ -10,12 +10,25 @@ assert.match(sha ?? '', /^[a-f0-9]{40}$/);
 const component = process.env.COMPONENT || 'marketing';
 assert.ok(['marketing','store'].includes(component));
 const image = `elevate-${component}:${sha}`;
-const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}`;
-const docker = args => execFileSync('docker', args, { encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-let started = false;
+const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}-${process.env.GITHUB_RUN_ATTEMPT || 1}`;
+const probe = `${name}-probe`;
+const containers = [];
+function docker(operation, args, timeout = 30000) {
+  try {
+    return execFileSync('docker', args, {
+      encoding: 'utf8', timeout, killSignal: 'SIGKILL', stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch (error) {
+    const reason = error.code === 'ETIMEDOUT'
+      ? `timed out after ${timeout / 1000} seconds`
+      : error.code || error.signal || `exited with status ${error.status}`;
+    throw new Error(`Docker ${operation} ${reason}`, { cause: error });
+  }
+}
 try {
   // Resolve dependencies and assets inside the final image, as its runtime user.
-  docker(['run', '--rm', '--entrypoint=node', image, '-e', `
+  containers.push(probe);
+  docker('packaged-file probe', ['run', '--rm', '--name', probe, '--entrypoint=node', image, '-e', `
     const fs=require('fs');
     for(const file of ['/app/apps/marketing/server.js','/app/apps/marketing/.next/BUILD_ID','/app/apps/marketing/public/version.json','/app/apps/marketing/public/data/hero-banners.json']) {
       if(!fs.statSync(file).size) throw new Error('Missing runtime file: '+file);
@@ -23,20 +36,21 @@ try {
     for(const pkg of ['next','react','react-dom','styled-jsx/style']) require.resolve(pkg,{paths:['/app/apps/marketing']});
     const version=JSON.parse(fs.readFileSync('/app/apps/marketing/public/version.json','utf8'));
     if(version.commit!==process.env.GIT_SHA) throw new Error('Packaged version mismatch');
-  `]);
-  docker(['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
+  `], 60000);
+  containers.pop();
+  containers.push(name);
+  docker('server container start', ['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
     '--env', 'PORT=3000', '--env', 'HOSTNAME=0.0.0.0',
     '--env', `K_SERVICE=elevate-${component}-migration`,
     '--env', `STORE_ONLY_RUNTIME=${component === 'store'}`,
-    '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image]);
-  started = true;
-  const port = docker(['port', name, '3000/tcp']).split(':').at(-1);
+    '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image], 60000);
+  const port = docker('published port lookup', ['port', name, '3000/tcp']).split(':').at(-1);
   assert.match(port, /^\d+$/);
   const root = `http://127.0.0.1:${port}`;
   const deadline = Date.now() + 120000;
   let ready = false;
   while (Date.now() < deadline) {
-    assert.equal(docker(['inspect', '--format={{.State.Running}}', name]), 'true', 'Container exited during startup');
+    assert.equal(docker('container state inspection', ['inspect', '--format={{.State.Running}}', name]), 'true', 'Container exited during startup');
     try {
       const {status,body} = await fetchSmoke(root + '/api/ping', {redirect:'manual'}, 5000);
       ready = status === 200 && body.ok === true && body.service === component && body.commit === sha;
@@ -84,8 +98,23 @@ try {
 } catch (error) {
   // Do not export raw application logs or runtime environment values from CI.
   console.error('Marketing container smoke test failed:', error.message);
-  if (started) console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name]));
   process.exitCode = 1;
+  if (containers.includes(name)) {
+    try {
+      console.error('Container state:', docker('container state inspection', ['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name], 5000));
+    } catch (inspectionError) {
+      console.error(inspectionError.message);
+    }
+  }
 } finally {
-  if (started) { try { docker(['rm', '-f', name]); } catch { console.error('Smoke container cleanup failed'); process.exitCode = 1; } }
+  for (const container of containers.reverse()) {
+    try {
+      docker('container cleanup', ['rm', '-f', container], 10000);
+    } catch (error) {
+      if (!/No such container/i.test(error.cause?.stderr ?? '')) {
+        console.error(error.message);
+        process.exitCode = 1;
+      }
+    }
+  }
 }

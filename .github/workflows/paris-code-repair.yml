@@ -19,6 +19,7 @@ on:
   schedule:
     - cron: '*/10 * * * *'
   workflow_run:
+    branches: [main]
     workflows: ['Deploy Admin', 'Deploy LMS automatically on Google', 'Deploy Google Marketing on trigger', 'Deploy Google Course Builder on source changes', 'Deploy Google Store runtime identity', 'CI', 'Integrity Gate', 'Pre-deploy Check', 'Course Factory Authority Gate', 'Lockfile Integrity', 'Registered Apprenticeship E2E', 'Verify PARIS Admin production authorization']
     types: [completed]
   workflow_dispatch:

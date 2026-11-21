@@ -68,7 +68,19 @@ async function collectInternalLinks(page: Page, selector: string) {
 async function assertNoRuntimeFailure(page: Page, route: string) {
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
+  const failedResponses: string[] = [];
 
+  // Capture the failing resource URL instead of reporting an untraceable 503.
+  // Only store same-origin request paths; never log credential-bearing queries.
+  page.on('response', (response) => {
+    if (response.status() < 500) return;
+    try {
+      const url = new URL(response.url());
+      if (url.origin === new URL(page.url()).origin) {
+        failedResponses.push(`${response.status()} ${url.pathname}`);
+      }
+    } catch { /* Browser errors remain available below. */ }
+  });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
@@ -89,6 +101,7 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
 
+  expect(failedResponses, `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`).toEqual([]);
   expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
 
   const actionableConsoleErrors = consoleErrors.filter(

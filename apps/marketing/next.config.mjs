@@ -140,6 +140,8 @@ const nextConfig = {
       { source: '/hire-graduates/hire-graduates', destination: '/employers', permanent: true },
       { source: '/accreditation/accreditation', destination: '/approvals', permanent: true },
       { source: '/for-students/for-students', destination: '/programs', permanent: true },
+      { source: '/for-students', destination: '/programs', permanent: true },
+      { source: '/for-employers', destination: '/employers', permanent: false },
       { source: '/merigoldround', destination: '/sites/meri-gold-round', permanent: true },
       { source: '/apply/status', destination: '/apply/track', permanent: true },
       { source: '/course-factory', destination: '/ai/course-factory', permanent: true },

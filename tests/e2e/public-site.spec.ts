@@ -120,9 +120,10 @@ async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: 
 test.describe.configure({ mode: 'serial' });
 
 test.describe('page-by-page public production audit', () => {
+  const destinationByAlias = new Map([['/for-students', '/programs'], ['/for-employers', '/employers']]);
   for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
     test(`${route} renders without runtime failure`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route, route === '/for-students' ? '/programs' : undefined);
+      await assertNoRuntimeFailure(page, route, destinationByAlias.get(route));
     });
   }
 

@@ -1,7 +1,6 @@
 import { verifyPaidApplication, activatePaidApplication } from '@/lib/enrollment/paid-application';
-import { paidApplicationStatusForUrl } from '@/lib/enrollment/paid-admission-response';
 import { POST as submitProgramInquiry } from '../inquiries/route';
-import { resolveCanonicalSlug } from '@/lib/programs/slug';
+import { applicationMatchesProgram, resolveCanonicalSlug } from '@/lib/programs/slug';
 import { paidInvoiceMatchesProgram, requiresSelfPayProgramPayment } from '@/lib/programs/paid-intake-policy.mjs';
 import { copyApplicationToProgramHolders } from '@/lib/program-holder/application-copy';
 import {
@@ -351,7 +350,7 @@ async function _POST(req: Request) {
         ...inquiry, applicationStatus: 'inquiry',
         referenceNumber: inquiry.leadId, paymentRequired: true,
         nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
-        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application for admissions review. Dashboard access requires administrator approval.',
+        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application to activate enrollment and your dashboard.',
       } : inquiry, {
         status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
       });
@@ -366,56 +365,39 @@ async function _POST(req: Request) {
       if (missing) return NextResponse.json({ error: `Complete the full enrollment application: ${missing} is required.` }, { status: 400 });
     }
 
-    // Dedup: block same email + program within 24 hours.
-    // Excludes intake-form mirrors - those are pre-application inquiries, not submissions.
-    // Allows re-application after the window (e.g. student applies months later).
+    // Match historical names only when the record has no authoritative program ID.
+    const programId = catalogResult.data.id;
+    const closedStatuses = '("rejected","withdrawn","duplicate")';
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: recentApp } = await supabase
-      .from('applications')
-      .select('id')
-      .eq('normalized_email', body.email.toLowerCase().trim())
-      .eq('program_interest', program)
-      .neq('source', 'intake-form')
-      .gte('created_at', oneDayAgo)
-      .limit(1)
-      .maybeSingle();
+    const [emailMatches, phoneMatches] = await Promise.all([
+      supabase.from('applications')
+        .select('id, reference_number, status, program_id, program_slug, program_interest, funding_type, payment_status, normalized_phone, phone, metadata')
+        .eq('normalized_email', body.email.toLowerCase().trim())
+        .or(`program_id.eq.${programId},program_id.is.null`)
+        .not('status', 'in', closedStatuses)
+        .order('created_at', { ascending: false }),
+      normalizedPhone.length >= 10
+        ? supabase.from('applications')
+            .select('program_id, program_slug, program_interest')
+            .eq('normalized_phone', normalizedPhone)
+            .or(`program_id.eq.${programId},program_id.is.null`)
+            .not('status', 'in', closedStatuses)
+            .neq('source', 'intake-form')
+            .gte('created_at', oneDayAgo)
+        : null,
+    ]);
 
-    let recentByPhone: { id: string } | null = null;
-    if (normalizedPhone.length >= 10) {
-      const phoneQuery = await supabase
-        .from('applications')
-        .select('id')
-        .eq('normalized_phone', normalizedPhone)
-        .eq('program_interest', program)
-        .neq('source', 'intake-form')
-        .gte('created_at', oneDayAgo)
-        .limit(1)
-        .maybeSingle();
-      if (!phoneQuery.error) {
-        recentByPhone = phoneQuery.data;
-      }
-    }
-
-    // Reuse an existing active application for the same applicant/program.
-    // A WorkOne or document update must advance the original application, not
-    // create a second admissions record.
-    const { data: activeApp, error: activeApplicationError } = await supabase
-      .from('applications')
-      .select('id, reference_number, status, program_interest, funding_type, payment_status, normalized_phone, phone, metadata')
-      .eq('normalized_email', body.email.toLowerCase().trim())
-      .eq('program_interest', program)
-      .not('status', 'in', '("rejected","withdrawn","duplicate")')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (activeApplicationError) {
-      logger.warn('[api/applications] existing application lookup failed', { code: activeApplicationError.code });
+    const lookupError = emailMatches.error || phoneMatches?.error;
+    if (lookupError) {
+      logger.warn('[api/applications] existing application lookup failed', { code: lookupError.code });
       return NextResponse.json(
         { error: 'We could not verify existing applications. Please try again.' },
         { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
     }
+
+    const activeApp = emailMatches.data?.find(application => applicationMatchesProgram(application, programId, program));
+    const recentByPhone = phoneMatches?.data?.some(application => applicationMatchesProgram(application, programId, program));
 
     if (activeApp && paidEvidence) {
       const saved = await supabase.from('applications').update({
@@ -433,7 +415,7 @@ async function _POST(req: Request) {
       if (saved.error) throw new Error('Full application could not be saved.');
       const dashboardUrl = await activatePaidApplication(paidEvidence, activeApp.id);
       return NextResponse.json({ ok: true, existing: true, id: activeApp.id,
-        program, referenceNumber: activeApp.reference_number, applicationStatus: paidApplicationStatusForUrl(dashboardUrl),
+        program, referenceNumber: activeApp.reference_number, applicationStatus: 'enrolled',
         nextStepUrl: dashboardUrl });
     }
     if (activeApp) {
@@ -449,7 +431,7 @@ async function _POST(req: Request) {
           ok: true,
           existing: true,
           id: activeApp.id,
-          program: activeApp.program_interest ?? program,
+          program,
           referenceNumber: activeApp.reference_number ?? activeApp.id,
           applicationStatus: activeApp.status,
           nextStepUrl:
@@ -458,17 +440,17 @@ async function _POST(req: Request) {
               : String(activeApp.funding_type || '').startsWith('self_pay') &&
                   activeApp.payment_status !== 'paid' &&
                   requiresSelfPayPayment
-                ? `/programs/${encodeURIComponent(activeApp.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
+                ? `/programs/${encodeURIComponent(program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
                 : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
         },
         { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
     }
 
-    if (recentApp || recentByPhone) {
+    if (recentByPhone) {
       return NextResponse.json(
         {
-          error: `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
+          error: `An application for this program was already submitted with this phone number in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
         },
         { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -1081,7 +1063,7 @@ async function _POST(req: Request) {
         email: data.email,
         program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
-        applicationStatus: dashboardUrl ? paidApplicationStatusForUrl(dashboardUrl) : applicationStatus,
+        applicationStatus: dashboardUrl ? 'enrolled' : applicationStatus,
         nextStepUrl: dashboardUrl || nextStepUrl,
         emailStatus,
       },

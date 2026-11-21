@@ -57,9 +57,15 @@ jobs:
             [[ "$base" == main && "$draft" == true ]] || exit 0
           fi
           armed=$(jq -r '.autoMergeRequest != null' <<<"$live")
-          if [[ "$armed" == true ]]; then
-            gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --disable-auto
+          [[ "$armed" == true ]] || exit 0
+          # A maintainer may have armed a manual promotion. Only the App bot's
+          # own request can be cancelled by this privileged automatic policy.
+          owner_type=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.auto_merge.enabled_by.type // ""')
+          if [[ "$owner_type" != Bot ]]; then
+            echo "Auto-merge was not armed by an App bot; retain manual request"
+            exit 0
           fi
+          gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --disable-auto
       - name: Request squash auto-merge through the existing branch rules
         if: ${{ github.event.pull_request.base.ref == 'main' && !github.event.pull_request.draft && github.event.pull_request.head.ref != 'staging' }}
         env:

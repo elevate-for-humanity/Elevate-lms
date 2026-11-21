@@ -142,7 +142,7 @@ jobs:
         run: node tests/browser/lesson-player-pause-resume.mjs --project=${{ matrix.device }}
       - name: Capture the live Marketing release being tested
         env:
-          EXPECTED_MARKETING_SHA: ${{ inputs.deployed_sha }}
+          EXPECTED_MARKETING_SHA: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || '' }}
           HVAC_DEVICE: ${{ matrix.device }}
         run: |
           node --input-type=module <<'NODE'
@@ -280,13 +280,15 @@ jobs:
       # skipped on LMS releases; this independent test certifies REAL authenticated
       # playback of the published LMS video and learner full-screen layout.
       # Dedicated production test credentials are mandatory.
+      # Never capture HTTP request-body traces while persistent production QA
+      # identities are in scope; screenshots, assertions and HTML reports remain.
       - name: Verify authenticated HVAC course video playback and full-screen layout on devices
         if: ${{ success() && !inputs.employer_only && inputs.component == 'lms' }}
         env:
           PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
           EXPECTED_LMS_SHA: ${{ inputs.deployed_sha }}
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/hvac-lms-playback
-        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/hvac-live-lesson-playback.spec.ts --reporter=line,html --config playwright.config.ts --output=test-results/hvac-lms-playback --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
       - name: Preserve authenticated LMS playback and full-screen acceptance evidence
         if: ${{ always() && !inputs.employer_only && inputs.component == 'lms' }}
         uses: actions/upload-artifact@v7
@@ -301,7 +303,7 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: https://lms.elevateforhumanity.org
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/employer-onboarding
-        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --trace retain-on-failure --project=desktop-chrome --project=iphone-webkit
+        run: pnpm exec playwright test tests/e2e/employer-onboarding.spec.ts --reporter=html,github --config playwright.config.ts --output=test-results/employer-onboarding --project=desktop-chrome --project=iphone-webkit --trace off
       - name: Upload employer onboarding evidence immediately
         if: always()
         uses: actions/upload-artifact@v7
@@ -320,22 +322,22 @@ jobs:
         if: ${{ success() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/public-runtime
-        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/public-runtime-acceptance.spec.ts --config playwright.config.ts --output=test-results/public-runtime --project=desktop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
       - name: Certify Studio sign-in and fonts on all devices
         if: ${{ success() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/studio
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --trace retain-on-failure --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --output=test-results/studio --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
       - name: Run authenticated production functional E2E
         if: ${{ success() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/functional
-        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --output=test-results/functional --project=desktop-chrome --trace off
       - name: Run authenticated cross-device responsive design certification
         if: ${{ success() && !inputs.employer_only }}
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/responsive
-        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --output=test-results/responsive --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome --trace off
       - name: Require the attested release to remain live through acceptance
         if: ${{ !cancelled() && inputs.deployment_run_id != '' }}
         env:

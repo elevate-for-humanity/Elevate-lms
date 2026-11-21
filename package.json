@@ -160,7 +160,7 @@
     "tesseract.js": "7.0.0",
     "three": "^0.184.0",
     "uuid": "^11.0.0",
-    "video.js": "8.23.7",
+    "video.js": "10.5.0",
     "web-push": "3.6.7",
     "winston": "3.19.0",
     "winston-daily-rotate-file": "5.0.0",

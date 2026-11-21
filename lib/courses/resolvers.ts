@@ -59,7 +59,7 @@ export async function resolveProgramId(slug: string): Promise<string | null> {
  * so using that slug or its UUID can send students into a retired course.
  * Fail closed rather than returning an inactive course on DB errors.
  */
-export async function resolveHvacCourseId(): Promise<string> {
+export async function findPublishedHvacCourseId(): Promise<string | null> {
   const db = (await requireAdminClient()) ?? (await createClient());
   const { data, error } = await db.from('courses')
     .select('id')
@@ -67,8 +67,14 @@ export async function resolveHvacCourseId(): Promise<string> {
     .eq('is_active', true)
     .eq('status', 'published')
     .maybeSingle();
-  if (error || !data?.id) throw new Error('ACTIVE_HVAC_COURSE_NOT_AVAILABLE');
-  return data.id;
+  if (error) throw new Error('ACTIVE_HVAC_COURSE_LOOKUP_FAILED', { cause: error });
+  return data?.id ?? null;
+}
+
+export async function resolveHvacCourseId(): Promise<string> {
+  const id = await findPublishedHvacCourseId();
+  if (!id) throw new Error('ACTIVE_HVAC_COURSE_NOT_AVAILABLE');
+  return id;
 }
 
 /**

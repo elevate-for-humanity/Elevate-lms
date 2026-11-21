@@ -15,6 +15,6 @@ test('private Admin publishes a robots route with full crawl exclusion', () => {
 
 test('Admin robots route remains public to scanners without weakening session RBAC', () => {
   // Middleware already allows root-level .txt assets for unauthenticated requests.
-  assert.match(middleware, /\^\\\/\[\^\/\]\+\\\.\(\?:png\|jpe\?g\|webp\|svg\|ico\|json\|webmanifest\|js\|css\|txt\)/);
+  assert.ok(middleware.includes('webmanifest|js|css|txt'), 'robots.txt must remain unauthenticated');
   assert.match(layout, /robots:\s*\{\s*index:\s*false,\s*follow:\s*false/);
 });

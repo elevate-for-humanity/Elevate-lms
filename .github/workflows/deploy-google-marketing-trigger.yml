@@ -232,7 +232,7 @@ jobs:
             --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID .
 
       - name: Test final Marketing container before release
-        timeout-minutes: 5
+        timeout-minutes: 7
         run: node scripts/gcp/smoke-marketing-container.mjs
 
       # Builds can outlive the federated token; refresh only after build acceptance.

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { PROGRAM_LABELS, PROGRAM_SLUGS } from '@/lib/programs/host-shop-programs';
@@ -100,6 +101,16 @@ export default async function IndianaApprenticeships({
           <h1 className="max-w-3xl text-4xl font-black tracking-tight sm:text-6xl">Find an apprenticeship Host Shop in Indiana</h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-200">{description}</p>
           <p className="mt-3 max-w-2xl text-slate-300">An approved shop may be able to host apprentices. Ask Elevate to confirm openings, supervision, and program eligibility.</p>
+          <div className="relative mt-8 aspect-[16/7] max-w-3xl overflow-hidden rounded-2xl">
+            <Image
+              src="/images/pages/apprenticeships-hero.webp"
+              alt="Apprentices learning skilled occupations through supervised workplace training"
+              fill
+              priority
+              sizes="(min-width: 768px) 768px, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
       </header>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[20rem_1fr]">

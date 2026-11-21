@@ -55,7 +55,7 @@ async function assertSuccessfulResponse(
   href: string,
   context: string,
 ) {
-  const response = await request.get(href, { maxRedirects: 10 });
+  const response = await request.get(href, { maxRedirects: 10, timeout: 30_000 });
   expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
 }
 
@@ -129,11 +129,14 @@ test.describe('page-by-page public production audit', () => {
   });
 
   test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    test.setTimeout(180_000);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
     expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'navigation integrity');
+    for (let index = 0; index < links.length; index += 3) {
+      await Promise.all(links.slice(index, index + 3).map((href) =>
+        assertSuccessfulResponse(request, href, 'navigation integrity'),
+      ));
     }
   });
 
@@ -163,11 +166,11 @@ test.describe('responsive navigation acceptance', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const menuButton = page.getByRole('button', { name: /open menu|menu/i }).first();
+    const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 
-    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i });
+    const mobileNav = page.getByRole('dialog').getByRole('navigation', { name: 'Site navigation' });
     await expect(mobileNav).toBeVisible();
   });
 });

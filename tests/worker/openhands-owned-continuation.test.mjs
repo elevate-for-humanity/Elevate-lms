@@ -24,6 +24,9 @@ test('follow-up requires same owner and privileged dev-tool role before Cloud me
   assert.ok(fromContinuation.indexOf('findOwnedOpenHandsTask(') >= 0);
   assert.ok(fromContinuation.indexOf('findOwnedOpenHandsTask(') < fromContinuation.indexOf('sendOpenHandsMessage('));
   assert.match(fromContinuation, /\['running', 'queued'\]\.includes\(task\.status\)/);
+  assert.match(fromContinuation, /task\.approvalStatus === 'approved'/);
+  assert.match(fromContinuation, /task\.requiresApproval === false && task\.approvalStatus === 'not_required'/);
+  assert.ok(fromContinuation.indexOf('continuationAuthorized') < fromContinuation.indexOf('sendOpenHandsMessage('));
   assert.match(fromContinuation, /status: 404/);
   assert.match(fromContinuation, /status: 409/);
 });

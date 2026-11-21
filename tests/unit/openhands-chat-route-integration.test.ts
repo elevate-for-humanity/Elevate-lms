@@ -44,7 +44,7 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     state.context.mockResolvedValue('approved scope');
     state.owned.mockResolvedValue({
       taskId: 'original-task', status: 'running', conversationId: 'existing-conversation',
-      startTaskId: 'existing-start',
+      startTaskId: 'existing-start', requiresApproval: false, approvalStatus: 'not_required',
     });
     state.send.mockResolvedValue({ success: true, sandbox_status: 'RUNNING' });
     state.dispatch.mockResolvedValue({
@@ -71,6 +71,37 @@ describe('OpenHands authenticated conversation endpoint (real route, mocked exte
     const response = await post({ taskId: 'different-owner-task', conversationId: 'stolen-id', message: 'No' });
     expect(response.status).toBe(404);
     expect(state.send).not.toHaveBeenCalled();
+    expect(state.dispatch).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { requiresApproval: true, approvalStatus: 'pending' },
+    { requiresApproval: false, approvalStatus: 'pending' },
+    { requiresApproval: true, approvalStatus: null },
+    { requiresApproval: false, approvalStatus: null },
+  ])('blocks running-but-unapproved task before Cloud message: %j', async (approval) => {
+    state.owned.mockResolvedValue({
+      taskId: 'original-task', status: 'running', conversationId: 'existing-conversation',
+      ...approval,
+    });
+    const response = await post({
+      taskId: 'original-task', conversationId: 'existing-conversation', message: 'Continue',
+    });
+    expect(response.status).toBe(409);
+    expect(state.send).not.toHaveBeenCalled();
+    expect(state.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('allows exact owned continuation after recorded approval', async () => {
+    state.owned.mockResolvedValue({
+      taskId: 'original-task', status: 'running', conversationId: 'existing-conversation',
+      requiresApproval: true, approvalStatus: 'approved',
+    });
+    const response = await post({
+      taskId: 'original-task', conversationId: 'existing-conversation', message: 'Approved follow-up',
+    });
+    expect(response.status).toBe(200);
+    expect(state.send).toHaveBeenCalledWith('existing-conversation', 'Approved follow-up');
     expect(state.dispatch).not.toHaveBeenCalled();
   });
 

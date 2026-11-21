@@ -108,6 +108,12 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.program_holder_acknowledgements,
 GRANT ALL ON public.program_holder_acknowledgements,
   public.program_holder_documents, public.program_holder_students TO service_role;
 
+-- Authenticated holders may edit syllabus text only; no direct updates to review state.
+-- Admin review uses an authenticated Admin endpoint with the server-side service role.
+REVOKE UPDATE ON public.program_holder_documents FROM authenticated;
+GRANT UPDATE (description, ocr_text, updated_at)
+  ON public.program_holder_documents TO authenticated;
+
 CREATE POLICY ack_owner_select ON public.program_holder_acknowledgements
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY ack_owner_insert ON public.program_holder_acknowledgements
@@ -120,10 +126,24 @@ CREATE POLICY ack_admin_all ON public.program_holder_acknowledgements
 CREATE POLICY docs_owner_select ON public.program_holder_documents
   FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 CREATE POLICY docs_owner_insert ON public.program_holder_documents
-  FOR INSERT TO authenticated WITH CHECK (user_id = (SELECT auth.uid()));
+  FOR INSERT TO authenticated WITH CHECK (
+    user_id = (SELECT auth.uid())
+    AND approved IS FALSE AND status = 'pending'
+    AND approved_by IS NULL AND approved_at IS NULL
+    AND reviewed_by IS NULL AND reviewed_at IS NULL
+    AND approval_notes IS NULL AND rejection_reason IS NULL
+    AND (uploaded_by IS NULL OR uploaded_by = (SELECT auth.uid()))
+  );
 CREATE POLICY docs_owner_update ON public.program_holder_documents
-  FOR UPDATE TO authenticated USING (user_id = (SELECT auth.uid()))
-  WITH CHECK (user_id = (SELECT auth.uid()));
+  FOR UPDATE TO authenticated
+  USING (user_id = (SELECT auth.uid()) AND approved IS FALSE AND status = 'pending')
+  WITH CHECK (
+    user_id = (SELECT auth.uid())
+    AND approved IS FALSE AND status = 'pending'
+    AND approved_by IS NULL AND approved_at IS NULL
+    AND reviewed_by IS NULL AND reviewed_at IS NULL
+    AND approval_notes IS NULL AND rejection_reason IS NULL
+  );
 CREATE POLICY docs_admin_all ON public.program_holder_documents
   FOR ALL TO authenticated USING ((SELECT rpc_private.is_admin()))
   WITH CHECK ((SELECT rpc_private.is_admin()));

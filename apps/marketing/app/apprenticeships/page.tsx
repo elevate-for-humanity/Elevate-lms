@@ -72,6 +72,7 @@ export default async function ApprenticeshipsPage() {
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
       <section
         data-scroll-narration
+        data-narration-src="/audio/heroes/apprenticeships-intro.mp3"
         data-narration-rate="0.82"
         data-narration-style="instructor"
         data-narration="Welcome to Elevate's apprenticeship programs. An apprenticeship is not a regular classroom course. You learn the occupation through structured related instruction and paid, supervised work at an approved employer or Host Site. Start by choosing barbering, cosmetology, esthetics, or nail technology. Each page explains the skills, required hours, workplace training, progress records, licensing preparation, costs, and application steps. Apply first. Elevate then confirms enrollment, the training site, supervision, wages, schedule, and self-pay tuition before training begins."

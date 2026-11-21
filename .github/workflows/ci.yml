@@ -46,6 +46,9 @@ jobs:
       - name: Install dependencies
         id: dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Prove LMS PDF Docker overlay respects package isolation
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test scripts/gcp/prepare-lms-pdf-module-overlay.test.mjs
       - name: Hosted tenant release regressions
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs scripts/test-tenant-assessment-options.mjs scripts/test-tenant-paris.mjs

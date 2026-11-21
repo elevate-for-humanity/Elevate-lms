@@ -86,6 +86,14 @@ class RecoveryTests(unittest.TestCase):
                     self.inspect()
                 self.output[command] = prior
 
+    def test_current_structured_quarantine_marker_is_recognized(self):
+        journal = 'PBX failure v1 2026-11-20T22:18:05.774Z expiry timer provisioner_quarantined'
+        with patch.object(m, 'run', return_value=journal):
+            self.assertEqual(self.inspect()['leaseCount'], 1)
+        with patch.object(m, 'run', return_value=journal.replace(' timer ', ' request ')):
+            with self.assertRaisesRegex(m.Blocked, 'recent_quarantine_unverified'):
+                self.inspect()
+
     def test_source_and_authentication_must_match(self):
         with patch.object(m, 'SOURCE_SHA', '0' * 64), self.assertRaisesRegex(m.Blocked, 'runtime_source'):
             self.inspect()

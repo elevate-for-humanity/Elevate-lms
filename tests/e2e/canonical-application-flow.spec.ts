@@ -7,6 +7,7 @@ import { peerOrigin, usesLocalDevServer } from './helpers/app-origins';
 const lmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL?.trim()
   ? peerOrigin('lms')
   : siteUrls.lms;
+
 test.describe('Canonical application flow', () => {
   test('homepage exposes a visible application path', async ({ page }) => {
     await page.goto('/');

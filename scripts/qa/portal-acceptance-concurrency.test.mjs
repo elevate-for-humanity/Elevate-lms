@@ -200,7 +200,10 @@ test('isolated QA approver exists before learner provisioning and is removed las
   assert.ok(creator.includes("qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co'"));
   assert.ok(creator.includes('E2E_${prefix}_EMAIL'));
   assert.ok(dependent.includes('process.env.E2E_ADMIN_EMAIL'));
-  assert.match(dependent, /Designated isolated-QA approval administrator is not authorized/);
+  assert.ok(dependent.includes(".eq('tenant_id', anchor.tenant_id)"));
+  assert.ok(dependent.includes(".in('role', ['admin', 'super_admin'])"));
+  assert.ok(dependent.includes("if (adminEmail) approvalAdminQuery = approvalAdminQuery.eq('email', adminEmail)"));
+  assert.match(dependent, /No authorized isolated-QA approval administrator is available/);
 });
 
 test('browser engines are installed before QA identity provisioning can fail', () => {

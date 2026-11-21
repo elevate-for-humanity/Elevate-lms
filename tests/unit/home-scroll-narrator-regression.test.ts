@@ -18,8 +18,9 @@ describe('homepage scroll narration lifecycle', () => {
       source.indexOf('const synchronizeNarrationToScroll'),
       source.indexOf("window.addEventListener('scroll'"),
     );
-    expect(scrollHandler).toContain('if (visible === current) return');
-    expect(scrollHandler).toContain('if (!visible) return');
+    // A combined guard is equivalent to two early returns and prevents
+    // restarts on a section boundary or on small movements within a section.
+    expect(scrollHandler).toMatch(/if \(!visible\s*\|\|\s*visible === current\) return|if \(visible === current\) return;?[\s\S]*?if \(!visible\) return/);
     expect(scrollHandler).not.toContain('lastNarrationRef.current = null');
     expect(scrollHandler).not.toContain('stop()');
     expect(scrollHandler).toContain('void narrateVisibleSection()');

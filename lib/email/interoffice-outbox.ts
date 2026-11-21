@@ -148,7 +148,11 @@ export async function processInterofficeOutbox(limit = 20) {
         .eq('mailbox_kind', 'individual')
         .maybeSingle();
       if (target.error) throw new Error('Campaign recipient inbox unavailable');
-      const addresses = target.data ? [target.data.address] : [];
+      // A send directly to the individual address arrives through Inbound
+      // Parse. A second local copy would create a separate inbox message.
+      const addresses = target.data && target.data.address !== row.recipient_email.trim().toLowerCase()
+        ? [target.data.address]
+        : [];
       if (addresses.length)
         await storeInboundCommunicationEmail(
           {

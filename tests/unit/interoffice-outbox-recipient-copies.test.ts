@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-const mocks = vi.hoisted(() => ({ copy: vi.fn(), send: vi.fn(), sequence: 0 }));
+const mocks = vi.hoisted(() => ({ copy: vi.fn(), send: vi.fn(), sequence: 0, direct: false }));
 vi.mock('@/lib/email/communication-inbound', () => ({
   storeInboundCommunicationEmail: mocks.copy,
 }));
@@ -60,7 +60,7 @@ vi.mock('@/lib/supabase/admin', () => ({
         return query;
       };
       query.maybeSingle = async () => ({
-        data: owner && kind === 'individual' ? { address: `${owner}@example.org` } : null,
+        data: owner && kind === 'individual' ? { address: mocks.direct ? `${owner}@example.org` : `${owner}@elevateforhumanity.org` } : null,
         error: null,
       });
       query.single = async () => ({
@@ -81,12 +81,12 @@ it('keeps each campaign copy in its recipient’s individual inbox', async () =>
   expect(await processInterofficeOutbox()).toMatchObject({ sent: 2, failed: 0 });
   expect(mocks.copy).toHaveBeenCalledTimes(2);
   expect(mocks.copy.mock.calls[0][0]).toMatchObject({
-    envelopeRecipients: ['one@example.org'],
+    envelopeRecipients: ['one@elevateforhumanity.org'],
     eventId: 'outbox-copy:delivery-one',
     text: 'For one',
   });
   expect(mocks.copy.mock.calls[1][0]).toMatchObject({
-    envelopeRecipients: ['two@example.org'],
+    envelopeRecipients: ['two@elevateforhumanity.org'],
     eventId: 'outbox-copy:delivery-two',
     text: 'For two',
   });
@@ -98,4 +98,15 @@ it('keeps each campaign copy in its recipient’s individual inbox', async () =>
     internalCopy: true,
     applicantEmail: 'two@example.org',
   });
+});
+
+it('does not create a local copy when SendGrid is already delivering to the personal inbox address', async () => {
+  mocks.direct = true;
+  mocks.copy.mockClear();
+  try {
+    expect(await processInterofficeOutbox()).toMatchObject({ sent: 2, failed: 0 });
+    expect(mocks.copy).not.toHaveBeenCalled();
+  } finally {
+    mocks.direct = false;
+  }
 });

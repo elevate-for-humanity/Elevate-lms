@@ -158,9 +158,19 @@ export function EmailWorkspace({
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
   const [listening, setListening] = useState(false);
+  const [dictationField, setDictationField] = useState<'subject' | 'body'>('body');
   const [speechError, setSpeechError] = useState('');
   const speechRef = useRef<BrowserSpeechRecognition | null>(null);
   useEffect(() => () => speechRef.current?.stop(), []);
+  const composeOpen = compose !== null;
+  useEffect(() => {
+    if (!composeOpen || sending) {
+      const recognition = speechRef.current;
+      speechRef.current = null;
+      recognition?.stop();
+      setListening(false);
+    }
+  }, [composeOpen, sending]);
   function toggleDictation() {
     if (listening) { speechRef.current?.stop(); setListening(false); return; }
     const recognition = createBrowserSpeechRecognition();
@@ -170,12 +180,29 @@ export function EmailWorkspace({
     recognition.continuous = true;
     recognition.interimResults = false;
     recognition.onresult = (event) => {
+      if (speechRef.current !== recognition) return;
       const phrases: string[] = [];
       for (let i = event.resultIndex ?? 0; i < event.results.length; i++) {
         if (event.results[i].isFinal) phrases.push(event.results[i][0].transcript);
       }
-      const words = phrases.join(' ').trim();
-      if (words) setCompose(previous => previous ? { ...previous, body: [previous.body.trimEnd(), words].filter(Boolean).join(' ') } : previous);
+      if (!phrases.length) return;
+      setCompose((previous) => {
+        if (!previous) return previous;
+        let value = previous[dictationField];
+        for (const phrase of phrases) {
+          const words = phrase.trim();
+          if (!words) continue;
+          const command = words.toLowerCase().replace(/[.!?]$/, '');
+          if (dictationField === 'body' && command === 'command new line') {
+            value += '\n';
+          } else if (dictationField === 'body' && command === 'command new paragraph') {
+            value += '\n\n';
+          } else {
+            value += value && !/\s$/.test(value) ? ' ' + words : words;
+          }
+        }
+        return { ...previous, [dictationField]: value };
+      });
     };
     recognition.onerror = (event) => {
       setSpeechError(event.error === 'not-allowed' ? 'Microphone permission denied.' : 'Dictation stopped. Try again.');
@@ -1389,15 +1416,27 @@ export function EmailWorkspace({
                   className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 px-4 font-medium"
                 />
               </label>
-              <button type="button" onClick={toggleDictation}
-                aria-label={listening ? 'Stop voice dictation' : 'Dictate email message'}
+              <label className="mr-3 inline-flex items-center gap-2 text-sm font-bold text-slate-800">
+                Dictation field
+                <select
+                  value={dictationField}
+                  disabled={listening || sending}
+                  onChange={(event) => setDictationField(event.target.value === 'subject' ? 'subject' : 'body')}
+                  className="min-h-11 rounded-xl border border-slate-300 px-3"
+                >
+                  <option value="body">Message</option>
+                  <option value="subject">Subject</option>
+                </select>
+              </label>
+              <button type="button" onClick={toggleDictation} disabled={sending}
+                aria-label={listening ? 'Stop voice dictation' : dictationField === 'subject' ? 'Dictate email subject' : 'Dictate email message'}
                 aria-pressed={listening}
                 className="mb-2 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold">
                 {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                {listening ? 'Stop dictation' : 'Dictate message'}
+                {listening ? 'Stop dictation' : 'Start dictation'}
               </button>
               {speechError && <p role="alert" className="text-sm text-red-700">{speechError}</p>}
-              <p className="text-xs text-slate-600">Review your message and recipients before sending.</p>
+              <p className="text-xs text-slate-600">In the message, say “command new line” or “command new paragraph.” Review your draft and recipients before sending.</p>
               <label className="block text-sm font-black text-slate-800">
                 Message
                 <textarea

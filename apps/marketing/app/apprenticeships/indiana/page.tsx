@@ -54,7 +54,7 @@ export default async function IndianaApprenticeships({
       ));
   });
   const matchingHosts = results.length;
-  const apply = occupation === 'barber-apprenticeship'
+  const apply = matchingHosts > 0 && occupation === 'barber-apprenticeship'
     ? '/apply/student?' + new URLSearchParams({ program: occupation })
     : '';
   const hostProgram = Object.entries(PROGRAM_SLUGS).find(([, slug]) => slug === occupation)?.[0];

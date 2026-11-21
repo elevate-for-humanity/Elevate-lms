@@ -173,17 +173,27 @@ test.describe('responsive navigation acceptance', () => {
 });
 
 test.describe('application entry audit', () => {
-  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
-    test(`${route} exposes an actionable application experience`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
-      const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
-      await expect(control, `${route} has no actionable application control`).toBeVisible();
-    });
-  }
+  test('application chooser hands off to the student intake', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply');
+    await page.getByRole('link', { name: /^Intake Application/ }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview/);
+    await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible();
+  });
 
-  test('student application has a submission control', async ({ page }) => {
-    await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /submit application/i })).toBeVisible();
+  test('Barber enrollment retains the selected program and paid enrollment intent', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
+    const enrollment = page.getByRole('link', { name: 'Start Enrollment' });
+    await expect(enrollment).toHaveAttribute('href',
+      '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
+    await enrollment.click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview\?program=barber-apprenticeship&intent=enrollment/);
+  });
+
+  test('student application exposes the standard intake form', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply/student');
+    await page.getByRole('link', { name: 'Use standard form instead' }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/form/);
+    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeVisible();
   });
 
   test('application status page accepts tracking information', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { workspaceManifest } from '@/lib/pwa/workspace-manifest';
+import { workspaceManifest } from '../workspace-manifest';
 
 export function GET() {
   return workspaceManifest('email');

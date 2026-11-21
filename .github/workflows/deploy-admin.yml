@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
+      - '.github/workflows/registered-apprenticeship-e2e.yml'
+      - 'scripts/qa/require-portal-e2e-identities.mjs'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'

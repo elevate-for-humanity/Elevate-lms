@@ -9,6 +9,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/gcp/production-acceptance.*'
+      - '.github/workflows/registered-apprenticeship-e2e.yml'
+      - 'scripts/qa/require-portal-e2e-identities.mjs'
       - 'scripts/gcp/verify-public-entry.*'
       - 'scripts/gcp/apprenticeship-payment-contract.*'
       - 'scripts/build-memory-policy.*'

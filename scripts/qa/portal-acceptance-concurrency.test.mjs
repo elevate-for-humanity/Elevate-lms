@@ -162,3 +162,13 @@ test('LMS course playback is not skipped by the Marketing-film admission gate', 
   assert.match(learnerTest,/videoWidth/);
   assert.match(learnerTest,/data-expanded/);
 });
+
+test('main pushes that change live acceptance automatically request each production release', () => {
+  for (const file of ['deploy-admin.yml', 'deploy-google-marketing-trigger.yml', 'deploy-google-lms-trigger.yml']) {
+    const source = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8');
+    const push = source.split('\n  push:\n')[1]?.split('\n  workflow_dispatch:')[0];
+    assert.ok(push?.includes('branches: [main]'), file);
+    assert.ok(push.includes("'.github/workflows/registered-apprenticeship-e2e.yml'"), file);
+    assert.ok(push.includes("'scripts/qa/require-portal-e2e-identities.mjs'"), file);
+  }
+});

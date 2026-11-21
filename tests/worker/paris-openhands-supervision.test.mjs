@@ -109,6 +109,8 @@ test('an approval-blocked repair may be observed but a real approval gate preven
  h.task.requires_approval=true;h.task.approval_status='pending';
  const result=await h.supervise();
  assert.equal(result.awaitingProvider,true);assert.equal(h.refreshes,0);
+  assert.equal(result.approvalRequired,true);
+  assert.equal(h.records[0].openhandsObservation.state,'approval_required');
  assert.equal(h.reads,0);assert.equal(h.claims.length,0);
 });
 
@@ -158,5 +160,6 @@ test('a provider-confirmation snapshot still pending approval is read but its pa
  h.observe=()=>observeAcceptedOpenHandsRepair({repairId,actorId:'owner',attempt:1,runId:12,goal,checkpoint:h.cp},{
   now:()=>now,findTask:async()=>h.task,refresh:async()=>({task:h.task,lifecycle:h.lifecycle}),
   resumeSandbox:async id=>{resumed.push(id)},readCandidate:async()=>{throw Error('no read')}});
- assert.deepEqual(await h.observe(),{state:'pending',taskId:'task'});assert.deepEqual(resumed,[]);
+ await assert.rejects(h.observe,/PARIS_OPENHANDS_APPROVAL_REQUIRED/);
+ assert.deepEqual(resumed,[]);
 });

@@ -454,8 +454,10 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
     },
    });
    if(result.dispatchRequired)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:result.repairId};
-   if(result.awaitingProvider)return {enabled:true,dispatched:0,awaitingProvider:true,reason:'ACCEPTED_OPENHANDS_EXECUTION_PENDING'};
-   if(result.handled)return {enabled:true,dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'};
+   if(!result.approvalRequired){
+    if(result.awaitingProvider)return {enabled:true,dispatched:0,awaitingProvider:true,reason:'ACCEPTED_OPENHANDS_EXECUTION_PENDING'};
+    if(result.handled)return {enabled:true,dispatched:0,reason:'ACCEPTED_OPENHANDS_OBSERVATION_RECORDED'};
+   }
   }
  }
  let recoveredProviderThisTick=false;
@@ -634,6 +636,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  if(terminal.error)throw terminal.error;
  if(terminal.data?.length===2000)throw Error('PARIS_TERMINAL_REPAIR_SCAN_LIMIT');
  for(const repair of terminal.data??[]){
+  // A blocked row with an accepted provider receipt is still resumable and
+  // must keep its original task while other repairs pass through the queue.
+  if(repair.id===accepted?.id)continue;
   const tasks=await db.from('ai_tasks').select('id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message').eq('status','running').eq('tool_output->>repairId',repair.id);
   if(tasks.error)throw tasks.error;
   for(const task of tasks.data??[]){

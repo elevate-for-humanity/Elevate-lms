@@ -164,7 +164,7 @@ test('a provider-confirmation snapshot still pending approval is read but its pa
  assert.deepEqual(resumed,[]);
 });
 
-test('terminal sweep preserves BOTH distinct approval-waiting repairs when only one is observed', () => {
+test('terminal reconciliation preserves simultaneous approval waits for the policy owner without trapping other admins', () => {
  const first=fixture().repair;
  first.error_code='PARIS_OPENHANDS_APPROVAL_REQUIRED';
  first.verification.openhandsObservation={state:'approval_required',taskId:'task-1',checkedAt:new Date(now).toISOString()};
@@ -172,13 +172,23 @@ test('terminal sweep preserves BOTH distinct approval-waiting repairs when only 
  second.id='22222222-2222-4222-8222-222222222222';
  second.candidate.checkpoint.taskId='task-2';
  second.verification.openhandsObservation={state:'approval_required',taskId:'task-2',checkedAt:new Date(now+1000).toISOString()};
- // The observation budget selects one; terminal reconciliation protects both.
- assert.equal(shouldReconcileTerminalRepair(first),false);
- assert.equal(shouldReconcileTerminalRepair(second),false);
- const selected=[first,second].filter(acceptedOpenHandsNeedsObservation);
- assert.equal(selected.length,2);
+ const foreign=structuredClone(first);
+ foreign.id='33333333-3333-4333-8333-333333333333';
+ foreign.actor_id='other-admin';
+ foreign.candidate.checkpoint.taskId='task-3';
+ // A signed monitor observes only its own actor's provider receipt.
+ const owned=[first,foreign,second].filter(r=>r.actor_id==='owner' && acceptedOpenHandsNeedsObservation(r));
+ assert.equal(owned.length,2);
+ assert.equal(shouldReconcileTerminalRepair(first,'owner'),false);
+ assert.equal(shouldReconcileTerminalRepair(second,'owner'),false);
+ // An accepted receipt from another administrator cannot be supervised by
+ // this policy identity. Preserve the original task but reconcile its linked
+ // blocked workflow action to a visible administrator-attention state.
+ assert.equal(acceptedOpenHandsNeedsObservation(foreign),true);
+ assert.equal(shouldReconcileTerminalRepair(foreign,'owner'),true);
  const verified={...first,status:'verified',release_sha:'a'.repeat(40)};
- assert.equal(shouldReconcileTerminalRepair(verified),true);
+ assert.equal(shouldReconcileTerminalRepair(verified,'owner'),true);
  const trulyFailed={...second,verification:{...second.verification,openhandsObservation:{state:'rejected'}}};
- assert.equal(shouldReconcileTerminalRepair(trulyFailed),true);
+ assert.equal(shouldReconcileTerminalRepair(trulyFailed,'owner'),true);
+ assert.equal(shouldReconcileTerminalRepair({...first,status:'queued'},'owner'),false);
 });

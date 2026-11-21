@@ -9,6 +9,7 @@ function database(
   acknowledged = true,
   enrollments: any[] = [],
   profiles: any[] = [],
+  mailboxes: any[] = [],
 ) {
   const holderQuery: any = {
     select: vi.fn().mockReturnThis(),
@@ -44,6 +45,12 @@ function database(
       .fn()
       .mockResolvedValue({ data: acknowledged ? [{ document_type: 'non_compete' }] : [] }),
   };
+  const mailboxQuery: any = {
+    select: vi.fn().mockReturnThis(),
+    in: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    then: (resolve: any) => Promise.resolve({ data: mailboxes }).then(resolve),
+  };
   return {
     db: {
       from: vi.fn((table: string) =>
@@ -58,12 +65,15 @@ function database(
                 }
               : table === 'program_enrollments'
                 ? enrollmentQuery
-                : studentQuery,
+                : table === 'communication_email_mailboxes'
+                  ? mailboxQuery
+                  : studentQuery,
       ),
     },
     holderQuery,
     studentQuery,
     enrollmentQuery,
+    mailboxQuery,
   };
 }
 describe('assigned student email suggestions', () => {
@@ -202,4 +212,21 @@ it('loads later roster pages and uses only linked account emails when enrollment
   expect(result).toHaveLength(501);
   expect(result.some((row) => row.address === 'linked@example.com')).toBe(true);
   expect(enrollmentQuery.range).toHaveBeenCalledWith(500, 999);
+});
+
+it('prefers the linked learner’s active personal inbox for an assigned roster contact', async () => {
+  const { db, mailboxQuery } = database(
+    [{ id: 'holder-1' }],
+    [],
+    true,
+    [{ id: 'enrollment-1', user_id: 'learner-1', full_name: 'Assigned Learner', email: 'account@example.com' }],
+    [],
+    [{ owner_user_id: 'learner-1', address: 'learner-inbox@elevateforhumanity.org' }],
+  );
+  expect(await assignedStudentDirectory(db as any, 'holder-user')).toEqual([
+    expect.objectContaining({ address: 'learner-inbox@elevateforhumanity.org', display_name: 'Assigned Learner' }),
+  ]);
+  expect(mailboxQuery.in).toHaveBeenCalledWith('owner_user_id', ['learner-1']);
+  expect(mailboxQuery.eq).toHaveBeenCalledWith('mailbox_kind', 'individual');
+  expect(mailboxQuery.eq).toHaveBeenCalledWith('active', true);
 });

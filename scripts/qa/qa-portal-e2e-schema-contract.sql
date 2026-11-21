@@ -27,6 +27,31 @@ CREATE SCHEMA IF NOT EXISTS private;
 REVOKE ALL ON SCHEMA private FROM PUBLIC,anon;
 GRANT USAGE ON SCHEMA private TO authenticated,service_role;
 
+-- Approval verifies course rows synchronously against the published LMS catalog.
+CREATE OR REPLACE FUNCTION private.qa_sync_active_program_courses()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $qa_sync$
+BEGIN
+  IF NEW.user_id IS NULL OR NEW.program_id IS NULL
+     OR COALESCE(NEW.enrollment_state, NEW.status) IS DISTINCT FROM 'active' THEN
+    RETURN NEW;
+  END IF;
+
+  INSERT INTO public.course_enrollments (student_id, course_id, status, progress, created_at, updated_at)
+  SELECT NEW.user_id, course.id, 'active', '0', now(), now()
+  FROM public.lms_courses AS course
+  WHERE course.program_id = NEW.program_id
+    AND course.is_active
+    AND course.status = 'published'
+  ON CONFLICT (student_id, course_id) DO NOTHING;
+  RETURN NEW;
+END;
+$qa_sync$;
+REVOKE ALL ON FUNCTION private.qa_sync_active_program_courses() FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS qa_sync_active_program_courses ON public.program_enrollments;
+CREATE TRIGGER qa_sync_active_program_courses
+AFTER INSERT OR UPDATE OF user_id, program_id, status, enrollment_state ON public.program_enrollments
+FOR EACH ROW EXECUTE FUNCTION private.qa_sync_active_program_courses();
+
 ALTER TABLE public.employers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS qa_employers_owner_read ON public.employers;
 CREATE POLICY qa_employers_owner_read ON public.employers

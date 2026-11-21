@@ -120,6 +120,9 @@ async function cleanup() {
       .eq('id', state.hvacEnrollmentId).eq('user_id', state.learner.id).select('id');
     if (error || data?.length !== 1)
       throw new Error('QA HVAC enrollment cleanup was not independently confirmed: ' + (error?.message || 'row count mismatch'));
+    const { error: courseError } = await db.from('course_enrollments').delete()
+      .eq('student_id', state.learner.id);
+    if (courseError) throw new Error('QA course enrollment cleanup failed: ' + courseError.message);
   }
   if (state.holderProgramId) await db.from('program_holder_programs').delete().eq('id', state.holderProgramId);
   if (state.holderId) await db.from('program_holders').delete().eq('id', state.holderId);

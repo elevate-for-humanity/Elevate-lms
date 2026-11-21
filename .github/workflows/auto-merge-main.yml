@@ -6,7 +6,10 @@ on:
 permissions: {}
 
 concurrency:
-  group: enable-main-auto-merge-${{ github.event.pull_request.number }}
+  # Ineligibility transitions must finish revoking stale auto-merge requests.
+  # Isolate each retarget/draft event by run ID, so later metadata edits or
+  # another retarget cannot cancel a revocation. Regular events still coalesce.
+  group: enable-main-auto-merge-${{ github.event.pull_request.number }}-${{ (github.event.action == 'converted_to_draft' || (github.event.action == 'edited' && github.event.changes.base.ref.from)) && github.run_id || 'routine' }}
   cancel-in-progress: true
 
 jobs:

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import PodcastProgramGuideReview from '@/components/admin/PodcastProgramGuideReview';
 import { Metadata } from 'next';
@@ -45,7 +46,9 @@ export default async function AdminDashboardPage() {
   return (
     <>
       <div className="px-3 pt-4 sm:px-5 lg:px-6">
-        <EmailAccountNotice href="/phone/email" userId={user.id} personalOnly />
+        <Suspense fallback={null}>
+          <EmailAccountNotice href="/phone/email" userId={user.id} personalOnly />
+        </Suspense>
         <div className="mt-3 flex flex-wrap gap-3">
           <Link href="/calendar" className="rounded-lg bg-blue-700 px-4 py-3 font-bold text-white">Calendar and Google appointments</Link>
           <Link href="/settings/notifications" className="rounded-lg border bg-white px-4 py-3 font-bold">Cellphone email alerts</Link>

@@ -197,8 +197,8 @@ test('isolated QA approver exists before learner provisioning and is removed las
     'Cleanup must release dependent QA records before deleting the QA approver');
   const creator = readFileSync(new URL('./provision-remaining-portal-e2e.mjs', import.meta.url), 'utf8');
   const dependent = readFileSync(new URL('./provision-learner-program-holder-e2e.mjs', import.meta.url), 'utf8');
-  assert.match(creator, /qaHostname !== 'isdgjcdabhxxozarmxta\\.supabase\\.co'/);
-  assert.match(creator, /E2E_\\$\\{prefix\\}_EMAIL/);
-  assert.match(dependent, /process\\.env\\.E2E_ADMIN_EMAIL/);
+  assert.ok(creator.includes("qaHostname !== 'isdgjcdabhxxozarmxta.supabase.co'"));
+  assert.ok(creator.includes('E2E_${prefix}_EMAIL'));
+  assert.ok(dependent.includes('process.env.E2E_ADMIN_EMAIL'));
   assert.match(dependent, /Designated isolated-QA approval administrator is not authorized/);
 });

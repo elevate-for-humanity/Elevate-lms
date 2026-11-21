@@ -368,6 +368,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify protected auto-merge eligibility transitions
+        run: node --test scripts/qa/auto-merge-main-contract.test.mjs
       - name: Run required Vitest suite
         run: pnpm exec vitest run
       - name: Install isolated composition browser

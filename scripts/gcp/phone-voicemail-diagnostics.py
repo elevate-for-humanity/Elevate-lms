@@ -35,7 +35,9 @@ def main():
   if section=='general' and match:general[match[1]]=match[2]
  logs=run(['docker','logs','--since','15m','--tail','1500','pbx_asterisk_1'])[1]
  for path in ['/var/log/asterisk/messages','/var/log/asterisk/messages.log','/var/log/asterisk/full','/var/log/asterisk/full.log']:
-  logs+=run(['docker','exec','pbx_asterisk_1','tail','-n','1500',path])[1]
+  # Bound the read by bytes so a line scan cannot stall the phone preflight.
+  _,recent=run(['docker','exec','pbx_asterisk_1','tail','-c','262144',path])
+  logs+='\n'+'\n'.join(recent.splitlines()[-1500:])
  logs=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',logs)
  reasons={label:len(re.findall(pattern,logs,re.I)) for label,pattern in {
   'permissionDenied':r'Permission denied',

@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { CLOUD_BILLING_URL, type CloudBudgetState } from '@/lib/gcp/cloud-budget';
 
 export function CloudBudgetNotice() {
+  const pathname = usePathname();
   const [state, setState] = useState<CloudBudgetState | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   useEffect(() => {
@@ -22,6 +24,8 @@ export function CloudBudgetNotice() {
     return () => { active = false; window.clearInterval(timer); };
   }, []);
   const stale = state && Date.now() - Date.parse(state.reportedAt) > 86400000;
+  // Keep threshold alerts available on the dashboard without the report-status notice.
+  if (pathname === '/dashboard' && (!state || stale || state.costAmount < 90)) return null;
   if (!unavailable && !stale && (!state || state.costAmount < 90)) return null;
   return <aside role="status" aria-label="Google Cloud spending alert" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-950">
     <strong>{state && !stale ? `Cloud spending warning: $${state.costAmount.toFixed(2)}` : 'Cloud spending monitoring needs attention'}</strong>

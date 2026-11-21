@@ -16,7 +16,7 @@ export const LMS_ROLE_MANIFESTS = [
 ] as const;
 
 export const ADMIN_WORKSPACE_PWAS = {
-  'dev-studio': { name: 'Dev Studio', openPath: '/studio', installPath: '/install/dev-studio.html' },
-  'course-builder': { name: 'Course Builder', openPath: '/studio/courses', installPath: '/install/course-builder.html' },
-  email: { name: 'Email', openPath: '/phone/email', installPath: '/install/email.html' },
+  'dev-studio': { name: 'Dev Studio', openPath: '/studio', installPath: '/install/dev-studio.html', icons: ['/install/dev-studio-192.png', '/install/dev-studio-512.png'] },
+  'course-builder': { name: 'Course Builder', openPath: '/studio/courses', installPath: '/install/course-builder.html', icons: ['/install/course-builder-192.png', '/install/course-builder-512.png'] },
+  email: { name: 'Email', openPath: '/phone/email', installPath: '/install/email.html', icons: ['/install/email-192.png', '/install/email-512.png'] },
 } as const;

@@ -12,9 +12,9 @@ export function workspaceManifest(key: keyof typeof ADMIN_WORKSPACE_PWAS) {
     display: 'standalone',
     background_color: '#ffffff',
     theme_color: '#153052',
-    icons: [192, 512].map((size) => ({
-      src: `/install/${key}-${size}.png`,
-      sizes: `${size}x${size}`,
+    icons: app.icons.map((src, index) => ({
+      src,
+      sizes: index === 0 ? '192x192' : '512x512',
       type: 'image/png',
       purpose: 'any',
     })),

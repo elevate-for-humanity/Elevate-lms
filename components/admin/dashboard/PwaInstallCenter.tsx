@@ -30,13 +30,13 @@ const apps: readonly InstallableApp[] = [
 ];
 
 const workspaceApps: readonly InstallableApp[] = Object.values(ADMIN_WORKSPACE_PWAS).map((app) => ({
-    name: app.name,
-    description: app.name === 'Email' ? 'Open your staff inbox.' : 'Open the secure workspace or install it for offline drafting.',
-    manageHref: app.openPath,
-    installHref: app.installPath,
-    manageLabel: 'Open app',
-    local: false,
-  }));
+  name: app.name,
+  description: app.name === 'Email' ? 'Open your staff inbox.' : 'Open the secure workspace or install it for offline drafting.',
+  manageHref: app.openPath,
+  installHref: app.installPath,
+  manageLabel: 'Open app',
+  local: false,
+}));
 
 export function PwaInstallCenter({ showWorkspaceApps = false }: { showWorkspaceApps?: boolean }) {
   const visibleApps = showWorkspaceApps

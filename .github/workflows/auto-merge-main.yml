@@ -1,8 +1,7 @@
 name: Enable auto-merge for main
 on:
   pull_request_target:
-    branches: [main]
-    types: [opened, reopened, ready_for_review, synchronize, edited]
+    types: [opened, reopened, ready_for_review, synchronize, edited, converted_to_draft]
 
 permissions: {}
 
@@ -13,9 +12,7 @@ concurrency:
 jobs:
   enable:
     if: >-
-      ${{ !github.event.pull_request.draft &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.head.ref != 'staging' &&
+      ${{ github.event.pull_request.head.repo.full_name == github.repository &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -31,9 +28,30 @@ jobs:
           repositories: ${{ github.event.repository.name }}
           permission-contents: write
           permission-pull-requests: write
+      - name: Disable auto-merge when a PR leaves main or becomes ineligible
+        if: ${{ github.event.pull_request.base.ref != 'main' || github.event.pull_request.draft || github.event.pull_request.head.ref == 'staging' }}
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          armed=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json autoMergeRequest --jq '.autoMergeRequest != null')
+          if [[ "$armed" == true ]]; then
+            gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --disable-auto
+          fi
       - name: Request squash auto-merge through the existing branch rules
+        if: ${{ github.event.pull_request.base.ref == 'main' && !github.event.pull_request.draft && github.event.pull_request.head.ref != 'staging' }}
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --auto --squash --match-head-commit "$PR_HEAD"
+        run: |
+          # Event contexts can be stale when a maintainer edits the PR base.
+          # Recheck the live target and head before requesting auto-merge.
+          live=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json baseRefName,headRefOid,isDraft)
+          if [[ "$(jq -r '.baseRefName' <<<"$live")" != main ||
+                "$(jq -r '.headRefOid' <<<"$live")" != "$PR_HEAD" ||
+                "$(jq -r '.isDraft' <<<"$live")" != false ]]; then
+            echo "PR target/head/draft changed; leave auto-merge disabled"
+            exit 0
+          fi
+          gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --auto --squash --match-head-commit "$PR_HEAD"

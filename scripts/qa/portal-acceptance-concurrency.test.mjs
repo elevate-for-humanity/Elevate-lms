@@ -196,3 +196,31 @@ test('production authenticated acceptance never uploads request-body traces with
   assert.match(job, /- name: Upload QA evidence/);
   assert.match(job, /- name: Preserve authenticated LMS playback and full-screen acceptance evidence/);
 });
+
+
+test('main auto-merge handles retarget edits and fails closed on stale PR details', () => {
+  const source = readFileSync(new URL('../../.github/workflows/auto-merge-main.yml', import.meta.url), 'utf8');
+  const trigger = source.slice(0, source.indexOf('\npermissions:'));
+  assert.match(trigger, /pull_request_target:/);
+  assert.match(trigger, /types: \[[^\]]*edited[^\]]*converted_to_draft/);
+  assert.doesNotMatch(trigger, /branches:\s*\[main\]/, 'Retargeting away from main must emit a disabling event');
+  const disable = source.split('- name: Disable auto-merge when a PR leaves main or becomes ineligible')[1]
+    ?.split('\n      - name: Request squash auto-merge')[0];
+  const enable = source.split('- name: Request squash auto-merge through the existing branch rules')[1];
+  assert.ok(disable && enable, 'Both disable and enable paths must be present');
+  const decision = section => section.match(/^        if: \$\{\{ (.+) \}\}$/m)?.[1];
+  const context = (base, draft, head='feature') => ({
+    github: {event: {pull_request: {base:{ref:base}, draft, head:{ref:head}}}}, inputs:{},
+  });
+  for (const [base, draft, head, shouldEnable] of [
+    ['main',false,'feature',true], ['staging',false,'feature',false],
+    ['main',true,'feature',false], ['main',false,'staging',false],
+  ]) {
+    assert.equal(evaluate(decision(enable), context(base,draft,head)), shouldEnable);
+    assert.equal(evaluate(decision(disable), context(base,draft,head)), !shouldEnable);
+  }
+  assert.match(disable, /--json autoMergeRequest/);
+  assert.match(disable, /--disable-auto/);
+  assert.match(enable, /--json baseRefName,headRefOid,isDraft/);
+  assert.match(enable, /--match-head-commit "\$PR_HEAD"/);
+});

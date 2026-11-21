@@ -272,6 +272,7 @@ jobs:
           node --test scripts/qa/require-portal-e2e-identities.test.mjs scripts/qa/write-private-state.test.mjs
           node scripts/qa/require-portal-e2e-identities.mjs
       - name: Install Chromium and WebKit
+        if: ${{ !cancelled() && steps.install-dependencies.outcome == 'success' }}
         run: pnpm exec playwright install chromium webkit --with-deps
       # LMS lesson media and public Marketing films are different acceptance
       # surfaces. The marketing-only hvac-public-playback matrix is deliberately

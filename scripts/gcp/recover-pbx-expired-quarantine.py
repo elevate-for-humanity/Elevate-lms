@@ -18,6 +18,10 @@ SOURCE = Path('/opt/elevate-pbx/provisioner/server.mjs')
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
 BACKUPS = Path('/var/lib/elevate-pbx/rollback')
 SOURCE_SHA = '087a160226a4aaff8057acaf0525961a1301c989076460bdb1fc92bae3d21257'
+REVIEWED_RELOAD_SOURCES = {
+    'dc9ee2515796a2581be2a78fd67ea8847d17115eed1118507b9650cde09b9b96',
+    '9bfd10cb3237aa4484e6b01ffdaf7d7e66afd7bef90adf258de28ea968a9259d',
+}
 PROBE_SHA = 'd01db04c092c0b41caf79da40447475f91b30e67c8abc9579cd0bdc5178a4faf'
 EXPECTED_UID = 0
 ENDPOINT = re.compile(r'pwa-[a-f0-9]{40}')
@@ -119,7 +123,7 @@ def inspect(probe_path, now=None):
     now = time.time() * 1000 if now is None else now
     trusted_directory(ROOT)
     source = private_file(SOURCE)
-    require(digest(source) == SOURCE_SHA, 'runtime_source_unreviewed')
+    require(digest(source) in {SOURCE_SHA, *REVIEWED_RELOAD_SOURCES}, 'runtime_source_unreviewed')
     properties = unit_properties()
     environment = Path('/proc/' + properties['MainPID'] + '/environ').read_bytes()
     require(len(environment) <= 1048576, 'runtime_environment_unverified')
@@ -155,8 +159,12 @@ def inspect(probe_path, now=None):
     require(len(set(ids)) == len(ids), 'duplicate_device_unverified')
     observed = idle_inventory(ids)
     journal = run(['journalctl', '-u', UNIT, '--since', '30 seconds ago', '-n', '1000', '--no-pager', '-o', 'cat'])
-    require(any(re.fullmatch(r'PBX (expired-credential revocation stage|ownership/runtime reconciliation failed): provisioner_quarantined',
-                             line) for line in journal.splitlines()), 'recent_quarantine_unverified')
+    quarantine_marker = re.compile(
+        r'PBX (?:(?:expired-credential revocation stage|ownership/runtime reconciliation failed): |'
+        r'failure v1 \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z (?:expiry|reconciliation) timer )'
+        r'provisioner_quarantined')
+    require(any(quarantine_marker.fullmatch(line) for line in journal.splitlines()),
+            'recent_quarantine_unverified')
     reports = probe(probe_path)
     require(all(reports.get(side, {}).get('httpStatus') == 503 and
                 reports[side].get('code') == 'provisioner_unavailable' for side in ['private', 'public']),

@@ -200,6 +200,20 @@ async function defaultCommand(container, command) {
   }
 }
 
+async function reloadAsterisk(command, wait) {
+  for (const operation of ['module reload res_pjsip.so', 'dialplan reload']) {
+    for (let attempt = 0; ; attempt++) {
+      const output = await command(operation);
+      if (/no such (?:command|module)|does not support reloads|not properly initialized/i.test(output)) {
+        throw new ProvisioningError('asterisk_reload_failed');
+      }
+      if (!/unable to reload|failed to reload|reported a reload failure|reload already in progress/i.test(output)) break;
+      if (attempt >= 2) throw new ProvisioningError('asterisk_reload_failed');
+      await wait(250 * (attempt + 1));
+    }
+  }
+}
+
 export function createProvisioner(config, dependencies = {}) {
   if (!config.token || Buffer.byteLength(config.token) < 32 || !UUID.test(config.phoneSystemId || '') ||
       new URL(config.supabaseUrl).protocol !== 'https:' || !config.supabaseKey ||
@@ -246,10 +260,7 @@ export function createProvisioner(config, dependencies = {}) {
   }
 
   async function reloadAndVerify(next, removed = []) {
-    for (const operation of ['module reload res_pjsip.so', 'dialplan reload']) {
-      const output = await command(operation);
-      if (/no such (?:command|module)|unable to reload|failed to reload|reported a reload failure|does not support reloads|not properly initialized/i.test(output)) throw new ProvisioningError('asterisk_reload_failed');
-    }
+    await reloadAsterisk(command, wait);
     // Asterisk acknowledges the reload before its configuration workers finish.
     // Verify actual objects, with a bounded settling period for apply AND rollback.
     for (let attempt = 0; ; attempt++) {
@@ -482,10 +493,7 @@ async function main() {
     const container = process.env.PBX_ASTERISK_CONTAINER;
     if (!path.isAbsolute(root || '') || !/^[A-Za-z0-9_.-]+$/.test(container || '')) throw new Error('Invalid cleanup configuration');
     await rm(path.join(root, 'current'), { force: true });
-    for (const cmd of ['module reload res_pjsip.so', 'dialplan reload']) {
-      const output = await defaultCommand(container, cmd);
-      if (/no such (?:command|module)|unable to reload|failed to reload|reported a reload failure|does not support reloads|not properly initialized/i.test(output)) throw new Error('Cleanup reload failed');
-    }
+    await reloadAsterisk(cmd => defaultCommand(container, cmd), delay => new Promise(resolve => setTimeout(resolve, delay)));
     const endpoints = await defaultCommand(container, 'pjsip show endpoints');
     if (/Endpoint:\s+pwa-[0-9a-f]{40}/.test(endpoints)) throw new Error('Cleanup endpoint removal unverified');
     return;

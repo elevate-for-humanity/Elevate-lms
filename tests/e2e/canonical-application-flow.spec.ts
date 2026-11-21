@@ -7,11 +7,6 @@ import { peerOrigin, usesLocalDevServer } from './helpers/app-origins';
 const lmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL?.trim()
   ? peerOrigin('lms')
   : siteUrls.lms;
-import { appOrigin, usesLocalDevServer } from './helpers/app-origins';
-
-const expectedLmsOrigin = usesLocalDevServer('marketing') || process.env.PLAYWRIGHT_LMS_URL
-  ? appOrigin('lms')
-  : siteUrls.app;
 
 test.describe('Canonical application flow', () => {
   test('homepage exposes a visible application path', async ({ page }) => {
@@ -56,7 +51,6 @@ test.describe('Canonical application flow', () => {
     await expect(page).toHaveURL(/\/partners\/host-shop\/apply/);
     await expect(page.getByRole('heading', { name: 'Become an approved apprenticeship Host Site' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${lmsOrigin}/host-shop/login`);
-    await expect(page.getByRole('link', { name: 'Sign in to finish your Host Shop onboarding' })).toHaveAttribute('href', `${expectedLmsOrigin}/host-shop/login`);
     await expect(page.getByRole('checkbox', { name: 'Cosmetology Apprenticeship', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Save application and finish later' })).toBeEnabled();
     const submit = page.getByRole('button', { name: 'Submit Host Site Application', exact: true });
@@ -114,7 +108,6 @@ test.describe('Canonical application flow', () => {
     }
     const target = new URL(destination);
     expect(target.origin).toBe(new URL(lmsOrigin).origin);
-    expect(target.origin).toBe(new URL(expectedLmsOrigin).origin);
     expect(target.pathname).toBe('/login');
     expect(target.searchParams.get('next')).toBe('/lms');
     expect(target.searchParams.get('reason')).toBe('session');

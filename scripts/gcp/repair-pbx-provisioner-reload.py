@@ -21,7 +21,8 @@ REVIEWED_PREVIOUS = '5632d72f704f20b476a2248187197f5738216468250fcdd08256d88e146
 EMPTY_BOOTSTRAP_PREVIOUS = 'ba1f4f812ba025449240a51d15c5092ef626447e1b1ad0a97ccf44f661503dea'
 REVIEWED_RUNTIME_LOGGING = '1301b77799d6c4f158e19391658579b6db8c57852e0e2193fae4c1e740aab058'
 REVIEWED_LIVE_BASELINE = '087a160226a4aaff8057acaf0525961a1301c989076460bdb1fc92bae3d21257'
-NEW = 'dc9ee2515796a2581be2a78fd67ea8847d17115eed1118507b9650cde09b9b96'
+REVIEWED_BEFORE_RELOAD_RETRY = 'dc9ee2515796a2581be2a78fd67ea8847d17115eed1118507b9650cde09b9b96'
+NEW = '9bfd10cb3237aa4484e6b01ffdaf7d7e66afd7bef90adf258de28ea968a9259d'
 TARGET = Path('/opt/elevate-pbx/provisioner/server.mjs')
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
 UNIT = 'elevate-pbx-provisioner.service'
@@ -85,11 +86,15 @@ def repair(source, revision):
     for path in [source, TARGET]:
         if path.is_symlink() or not path.is_file() or (path == TARGET and (path.stat().st_uid != EXPECTED_UID or path.stat().st_mode & 0o022)):
             raise ValueError('provisioner_file_ownership_unverified')
-    if digest(source) != NEW or digest(TARGET) not in [OLD, PREVIOUS, NATIVE, REVIEWED_PREVIOUS, EMPTY_BOOTSTRAP_PREVIOUS, REVIEWED_RUNTIME_LOGGING, REVIEWED_LIVE_BASELINE, NEW]:
+    if digest(source) != NEW or digest(TARGET) not in [OLD, PREVIOUS, NATIVE, REVIEWED_PREVIOUS, EMPTY_BOOTSTRAP_PREVIOUS, REVIEWED_RUNTIME_LOGGING, REVIEWED_LIVE_BASELINE, REVIEWED_BEFORE_RELOAD_RETRY, NEW]:
         print(json.dumps({'provisionerSourceReview': {'candidateSha256': digest(source),
               'currentSha256': digest(TARGET), 'expectedCandidateSha256': NEW}}), flush=True)
         raise ValueError('provisioner_source_requires_review')
     run(['/usr/bin/node', '--check', str(source)])
+    if digest(TARGET) == NEW:
+        if not healthy():
+            raise ValueError('updated_provisioner_health_requires_review')
+        return {'result': 'PASS', 'changed': False, 'sourceSha256': NEW, 'carrierRoutingChanged': False}
     records_path = ROOT / 'current' / 'state.json'
     cli = lambda command: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', command])
     def verify_idle():
@@ -104,10 +109,6 @@ def repair(source, revision):
           'optionalPjsipAliasAvailable': available(cli('core show help pjsip reload'))}}), flush=True)
     if not builtin:
         raise ValueError('builtin_reload_unavailable')
-    if digest(TARGET) == NEW:
-        if not healthy():
-            raise ValueError('updated_provisioner_health_requires_review')
-        return {'result': 'PASS', 'changed': False, 'sourceSha256': NEW, 'carrierRoutingChanged': False}
     verify_idle()
     backup = BACKUPS / ('provisioner-' + revision)
     backup.mkdir(mode=0o700, parents=True, exist_ok=False)

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isApprovedPaidEnrollment, hasApprovedPaidLearnerEnrollment } from '../../lib/learner/approved-paid-admission.mjs';
+import { isApprovedPaidEnrollment, hasApprovedPaidLearnerEnrollment, hasAdmissionPaymentOrFunding } from '../../lib/learner/approved-paid-admission.mjs';
 
 const valid = {
   user_id:'student-1', student_id:null, status:'active', payment_status:'paid',
@@ -53,5 +53,11 @@ test('verified self-pay and manually approved state funding grant access indepen
   const stateFunded = { ...valid, funding_source: 'wioa', funding_verified: true, eligibility_status: 'eligible', payment_status: 'pending' };
   assert.equal(isApprovedPaidEnrollment(stateFunded), true);
   assert.equal(isApprovedPaidEnrollment({ ...stateFunded, approved_by: null }), false);
+  for (const funding_source of ['wioa', 'wrg', 'workone', 'jri']) {
+    const paidFunded = { ...stateFunded, funding_source, payment_status: 'paid' };
+    assert.equal(hasAdmissionPaymentOrFunding(paidFunded), true);
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, funding_verified: false }), false);
+    assert.equal(hasAdmissionPaymentOrFunding({ ...paidFunded, eligibility_status: null }), false);
+  }
   assert.equal(isApprovedPaidEnrollment({ ...stateFunded, funding_verified: false, payment_status: 'paid' }), false);
 });

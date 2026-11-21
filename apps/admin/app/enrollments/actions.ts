@@ -1,6 +1,6 @@
 'use server';
 
-import { hasVerifiedStateFunding } from '@/lib/learner/approved-paid-admission.mjs';
+import { hasAdmissionPaymentOrFunding } from '@/lib/learner/approved-paid-admission.mjs';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { writeAdminAuditEvent } from '@/lib/audit';
@@ -232,8 +232,7 @@ export async function approveEnrollment(enrollmentId: string, userId: string) {
     enrollment.suspended_at ||
     enrollment.refunded_at ||
     enrollment.eligibility_status !== 'eligible' ||
-    (!['paid', 'paid_in_full'].includes(String(enrollment.payment_status || '').toLowerCase()) &&
-      !hasVerifiedStateFunding(enrollment))
+    !hasAdmissionPaymentOrFunding(enrollment)
   ) {
     throw new Error(
       'Enrollment funding, eligibility, or authorization check failed'

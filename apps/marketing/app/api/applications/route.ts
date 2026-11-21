@@ -357,7 +357,7 @@ async function _POST(req: Request) {
         ...inquiry, applicationStatus: 'inquiry',
         referenceNumber: inquiry.leadId, paymentRequired: true,
         nextStepUrl: `/enroll/${encodeURIComponent(program)}`,
-        message: 'Intake Application received. Pay the required deposit, then complete the Full Enrollment Application to activate enrollment and your dashboard.',
+        message: 'Intake application received. For self-pay, verify payment and submit the full application to activate dashboard access. Funded applications require Admissions review.',
       } : inquiry, {
         status: inquiryResponse.status, headers: corsHeadersForOrigin(origin, allowedOrigins),
       });

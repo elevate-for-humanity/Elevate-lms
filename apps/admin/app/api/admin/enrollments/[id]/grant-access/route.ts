@@ -7,7 +7,7 @@
  * Requires admin, admin, or staff role.
  */
 
-import { hasVerifiedStateFunding } from '@/lib/learner/approved-paid-admission.mjs';
+import { hasAdmissionPaymentOrFunding } from '@/lib/learner/approved-paid-admission.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -60,8 +60,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (enrollment.revoked_at || enrollment.cancelled_at || enrollment.suspended_at || enrollment.refunded_at) {
     return safeError('Enrollment is not eligible for activation', 409);
   }
-  if (!['paid', 'paid_in_full'].includes(String(enrollment.payment_status || '').toLowerCase()) &&
-      !hasVerifiedStateFunding(enrollment)) {
+  if (!hasAdmissionPaymentOrFunding(enrollment)) {
     return safeError('Verified payment or confirmed state funding is required before approval', 409);
   }
 

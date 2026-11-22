@@ -145,9 +145,11 @@ export default function ProgramDetailPage({
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
   const applicationHref = p.cta.applyHref || `/apply?program=${encodeURIComponent(p.slug)}`;
   const paymentSelectionHref = (mode: 'full' | 'plan' | 'bnpl') =>
-    `/enroll/${encodeURIComponent(p.slug)}?${new URLSearchParams({
-      payment_plan: mode === 'plan' ? 'installments' : 'full',
-      ...(mode === 'bnpl' ? { payment_method: 'affirm' } : {}),
+    `/apply/student?${new URLSearchParams({
+      program: p.slug,
+      intent: 'enrollment',
+      funding: 'self_pay',
+      payment: mode,
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';

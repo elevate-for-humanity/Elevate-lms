@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import PracticalProgressEntry from '@/components/host-shop/PracticalProgressEntry';
-const params = vi.hoisted(() => ({ studentId: '' }));
+const params = vi.hoisted(() => ({ studentId: '', enrollmentId: '' }));
 vi.mock('@/hooks/useSafeSearchParams', () => ({
-  useSafeSearchParams: () => ({ get: () => params.studentId || null }),
+  useSafeSearchParams: () => ({ get: (key: keyof typeof params) => params[key] || null }),
 }));
 const apprentice = {
   enrollmentId: 'enrollment',
@@ -15,6 +15,7 @@ const practice = { items: [], recordedCount: 0, requiredCount: 0, percent: 100, 
 const response = (body: any, ok = true) => ({ ok, json: async () => body });
 beforeEach(() => {
   params.studentId = '';
+  params.enrollmentId = '';
 });
 afterEach(() => {
   cleanup();
@@ -210,4 +211,34 @@ it('uses the full verified aggregate instead of counting only recent entries', a
   );
   render(<PracticalProgressEntry />);
   expect(await screen.findByRole('row', { name: 'Updo 602 Owner checkoff' })).toBeInTheDocument();
+});
+
+it.each([
+  ['esthetician-enrollment', 'esthetician-enrollment'],
+  ['unassigned-enrollment', ''],
+])('selects only the requested authorized enrollment %s', async (requested, expected) => {
+  params.enrollmentId = requested;
+  params.studentId = apprentice.studentId;
+  const request = vi.fn(async (url: string) => response(
+    url === '/api/host-shop/competencies'
+      ? { apprentices: [
+          apprentice,
+          { ...apprentice, enrollmentId: 'esthetician-enrollment', standard: { occupationTitle: 'Esthetician' } },
+        ] }
+      : { entries: [], canRecord: true, practice },
+  ));
+  vi.stubGlobal('fetch', request);
+  render(<PracticalProgressEntry />);
+  const select = screen.getByRole('combobox', { name: 'Select apprentice' });
+  await waitFor(() => expect(select).toBeEnabled());
+  expect(select).toHaveValue(expected);
+  if (expected) {
+    await waitFor(() => expect(request).toHaveBeenCalledWith(
+      '/api/host-shop/practical-services?enrollmentId=' + expected,
+      expect.anything(),
+    ));
+  } else {
+    expect(screen.getByText('The requested enrollment is not assigned to this shop.')).toBeInTheDocument();
+    expect(request).toHaveBeenCalledTimes(1);
+  }
 });

@@ -319,7 +319,7 @@ export default function CompetencyManager() {
                   formal competency sign-offs.
                 </p>
                 <Link
-                  href={`/host-shop/dashboard/practical-log?studentId=${encodeURIComponent(apprentice.studentId)}`}
+                  href={`/host-shop/dashboard/practical-log?enrollmentId=${encodeURIComponent(apprentice.enrollmentId)}`}
                   className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-blue-700 px-4 py-2 font-bold text-white"
                 >
                   Open Practical Service Log
@@ -362,7 +362,7 @@ export default function CompetencyManager() {
                     </div>
                     <div className="flex flex-col gap-2">
                       <Link
-                        href={`/host-shop/dashboard/practical-log?studentId=${encodeURIComponent(apprentice.studentId)}`}
+                        href={`/host-shop/dashboard/practical-log?enrollmentId=${encodeURIComponent(apprentice.enrollmentId)}`}
                         className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-900"
                       >
                         Open Practical Service Log

@@ -204,22 +204,30 @@ test('main auto-merge handles retarget edits and fails closed on stale PR detail
   assert.match(trigger, /pull_request_target:/);
   assert.match(trigger, /types: \[[^\]]*edited[^\]]*converted_to_draft/);
   assert.doesNotMatch(trigger, /branches:\s*\[main\]/, 'Retargeting away from main must emit a disabling event');
-  const disable = source.split('- name: Disable auto-merge when a PR leaves main or becomes ineligible')[1]
+  const disable = source.split('- name: Disable only after transition out of automatic main eligibility')[1]
     ?.split('\n      - name: Request squash auto-merge')[0];
   const enable = source.split('- name: Request squash auto-merge through the existing branch rules')[1];
   assert.ok(disable && enable, 'Both disable and enable paths must be present');
-  const decision = section => section.match(/^        if: \$\{\{ (.+) \}\}$/m)?.[1];
-  const context = (base, draft, head='feature') => ({
-    github: {event: {pull_request: {base:{ref:base}, draft, head:{ref:head}}}}, inputs:{},
+  const decision = section => {
+    const expression = section.match(/\$\{\{([\s\S]+?)\}\}/)?.[1];
+    assert.ok(expression, 'Each auto-merge path needs an eligibility condition');
+    return expression.trim().replace(/\n\s*/g, ' ');
+  };
+  const context = (action, base, previousBase, draft, head) => ({
+    github: {event: {action, changes: {base: {ref: {from: previousBase}}}, pull_request: {base:{ref:base}, draft, head:{ref:head}}}}, inputs:{},
   });
-  for (const [base, draft, head, shouldEnable] of [
-    ['main',false,'feature',true], ['staging',false,'feature',false],
-    ['main',true,'feature',false], ['main',false,'staging',false],
+  for (const [action, base, previousBase, draft, head, shouldEnable, shouldDisable] of [
+    ['synchronize', 'main', '', false, 'feature', true, false],
+    ['edited', 'staging', 'main', false, 'feature', false, true],
+    ['edited', 'staging', '', false, 'feature', false, false],
+    ['converted_to_draft', 'main', '', true, 'feature', false, true],
+    ['edited', 'main', '', false, 'staging', false, false],
   ]) {
-    assert.equal(evaluate(decision(enable), context(base,draft,head)), shouldEnable);
-    assert.equal(evaluate(decision(disable), context(base,draft,head)), !shouldEnable);
+    const pr = context(action, base, previousBase, draft, head);
+    assert.equal(evaluate(decision(enable), pr), shouldEnable);
+    assert.equal(evaluate(decision(disable), pr), shouldDisable);
   }
-  assert.match(disable, /--json autoMergeRequest/);
+  assert.match(disable, /--json baseRefName,headRefName,isDraft,autoMergeRequest/);
   assert.match(disable, /--disable-auto/);
   assert.match(enable, /--json baseRefName,headRefOid,isDraft/);
   assert.match(enable, /--match-head-commit "\$PR_HEAD"/);

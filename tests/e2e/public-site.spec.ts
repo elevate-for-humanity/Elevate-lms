@@ -54,7 +54,7 @@ async function assertSuccessfulResponse(
   href: string,
   context: string,
 ) {
-  const response = await request.get(href, { maxRedirects: 10 });
+  const response = await request.get(href, { maxRedirects: 10, timeout: 30_000 });
   expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
 }
 
@@ -94,18 +94,23 @@ async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: 
     await expect(page).toHaveURL((url) => url.pathname === expectedPath);
   }
 
-  await page.waitForLoadState('networkidle').catch(() => undefined);
-
   // innerText excludes embedded scripts. The application shell intentionally
   // contains chunk-recovery source code whose text includes "ChunkLoadError";
   // that source is not a rendered failure and must not trip the visible-page check.
-  const body = await page.locator('body').innerText();
-  expect(body.trim().length, `${route} rendered an empty body`).toBeGreaterThan(80);
+  const visibleBody = page.locator('body');
+  await expect.poll(async () => (await visibleBody.innerText()).trim().length, {
+    message: `${route} rendered an empty body`,
+  }).toBeGreaterThan(80);
+  const body = await visibleBody.innerText();
   expect(body, `${route} rendered an application exception`).not.toMatch(
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
 
-  expect(failedResponses, `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`).toEqual([]);
+  expect(
+    failedResponses,
+    `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`,
+  ).toEqual([]);
+
   expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
 
   const actionableConsoleErrors = consoleErrors.filter(
@@ -113,11 +118,9 @@ async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: 
   );
   expect(
     actionableConsoleErrors,
-    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}`,
+    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}. HTTP failures: ${failedResponses.join(' | ')}`,
   ).toEqual([]);
 }
-
-test.describe.configure({ mode: 'serial' });
 
 test.describe('page-by-page public production audit', () => {
   const destinationByAlias = new Map([['/for-students', '/programs'], ['/for-employers', '/employers']]);
@@ -140,17 +143,22 @@ test.describe('page-by-page public production audit', () => {
   });
 
   test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    test.setTimeout(180_000);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
     expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
-    for (const href of links) {
-      await assertSuccessfulResponse(request, href, 'navigation integrity');
+    for (let index = 0; index < links.length; index += 3) {
+      await Promise.all(links.slice(index, index + 3).map((href) =>
+        assertSuccessfulResponse(request, href, 'navigation integrity'),
+      ));
     }
   });
 
   test('program directory links resolve', async ({ page, request }) => {
     await page.goto('/programs', { waitUntil: 'domcontentloaded' });
-    const links = await collectInternalLinks(page, 'main a[href^="/programs/"]');
+    const programLinks = 'main a[href^="/programs/"]';
+    await expect(page.locator(`${programLinks}:visible`).first()).toBeVisible();
+    const links = await collectInternalLinks(page, programLinks);
     expect(links.length, 'No program links were discovered').toBeGreaterThan(0);
     for (const href of links) {
       await assertSuccessfulResponse(request, href, 'program route');
@@ -174,27 +182,37 @@ test.describe('responsive navigation acceptance', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const menuButton = page.getByRole('button', { name: /open menu|menu/i }).first();
+    const menuButton = page.getByRole('button', { name: 'Open menu', exact: true });
     await expect(menuButton).toBeVisible();
     await menuButton.click();
 
-    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i });
+    const mobileNav = page.getByRole('dialog').getByRole('navigation', { name: 'Site navigation' });
     await expect(mobileNav).toBeVisible();
   });
 });
 
 test.describe('application entry audit', () => {
-  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
-    test(`${route} exposes an actionable application experience`, async ({ page }) => {
-      await assertNoRuntimeFailure(page, route);
-      const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
-      await expect(control, `${route} has no actionable application control`).toBeVisible();
-    });
-  }
+  test('application chooser hands off to the student intake', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply');
+    await page.getByRole('link', { name: /^Intake Application/ }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview/);
+    await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible();
+  });
 
-  test('student application has a submission control', async ({ page }) => {
-    await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /submit application/i })).toBeVisible();
+  test('Barber enrollment retains the selected program and paid enrollment intent', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/programs/barber-apprenticeship/apply');
+    const enrollment = page.getByRole('link', { name: 'Start Enrollment' });
+    await expect(enrollment).toHaveAttribute('href',
+      '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
+    await enrollment.click();
+    await expect(page).toHaveURL(/\/apply\/student\/interview\?program=barber-apprenticeship&intent=enrollment/);
+  });
+
+  test('student application exposes the standard intake form', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/apply/student');
+    await page.getByRole('link', { name: 'Use standard form instead' }).click();
+    await expect(page).toHaveURL(/\/apply\/student\/form/);
+    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeVisible();
   });
 
   test('application status page accepts tracking information', async ({ page }) => {

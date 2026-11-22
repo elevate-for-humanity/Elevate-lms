@@ -97,6 +97,49 @@ jobs:
         run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
       - name: Verify preinstalled Playwright browsers
         run: node scripts/verify-playwright-runtime.mjs chromium
+      - name: Install locked Studio Browser dependencies
+        working-directory: services/studio-browser
+        run: npm ci --no-audit --no-fund
+      - name: Start the isolated Studio Browser service
+        run: |
+          state_dir="$(mktemp -d "$RUNNER_TEMP/studio-browser.XXXXXX")"
+          studio_secret="$(node -p 'require("node:crypto").randomBytes(32).toString("hex")')"
+          echo "::add-mask::$studio_secret"
+          studio_origin=http://127.0.0.1:3100
+
+          PORT=3100 \
+          STUDIO_BROWSER_SECRET="$studio_secret" \
+          STUDIO_BROWSER_ADMIN_ORIGIN=http://localhost:3001 \
+          STUDIO_BROWSER_EXECUTABLE_PATH="$(node -p 'require("playwright").chromium.executablePath()')" \
+          STUDIO_WORKSPACE_ROOT="$state_dir/workspace" \
+          STUDIO_BROWSER_AUTH_STATE_DIR="$state_dir/auth" \
+          STUDIO_BROWSER_ALLOWED_DOMAINS=envato.com,elevateforhumanity.org \
+            node services/studio-browser/server.mjs > "$state_dir/server.log" 2>&1 &
+          studio_pid=$!
+
+          ready=false
+          for attempt in {1..45}; do
+            if curl --fail --silent --max-time 2 "$studio_origin/health" >/dev/null; then
+              ready=true
+              break
+            fi
+            if ! kill -0 "$studio_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          if [[ "$ready" != true ]]; then
+            echo "::error::Studio Browser did not become ready on the CI runner"
+            exit 1
+          fi
+          test "$(curl --silent --max-time 5 --output /dev/null --write-out '%{http_code}' \
+            --request POST "$studio_origin/sessions")" = 401
+
+          {
+            echo "STUDIO_BROWSER_URL=$studio_origin"
+            echo "STUDIO_BROWSER_PUBLIC_URL=$studio_origin"
+            echo "STUDIO_BROWSER_SECRET=$studio_secret"
+          } >> "$GITHUB_ENV"
       - name: Verify published marketing artwork through Next image loader
         run: node --test scripts/marketing-image-config.test.mjs
       - name: Verify Course Builder chat controls in short and landscape panels
@@ -175,7 +218,9 @@ jobs:
     name: E2E desktop-chrome
     runs-on: ubuntu-24.04
     needs: [desktop-chrome-shard]
-    if: ${{ always() }}
+    # A superseded run must release the branch concurrency group without
+    # waiting for an extra runner just to report its canceled matrix.
+    if: ${{ !cancelled() }}
     steps:
       - name: Require successful desktop results from the full matrix
         env:

@@ -84,6 +84,13 @@ export async function POST(request: Request) {
       .select('id, created_at')
       .maybeSingle();
 
+    if (error?.code === '23505' && error.message === 'PROGRAM_HOLDER_APPLICATION_ALREADY_PENDING') {
+      return NextResponse.json(
+        { ok: false, error: 'An application for this organization and email is already pending review.' },
+        { status: 409 },
+      );
+    }
+
     if (error || !data?.id) {
       logger.error('[program-holder/apply] intake insert failed', error ?? undefined, {
         email,

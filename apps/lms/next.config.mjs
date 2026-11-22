@@ -72,6 +72,12 @@ const nextConfig = {
         ],
       },
       {
+        // Native same-origin form POSTs must retain Origin for Next Server
+        // Actions' CSRF validation. Suppress referrers to every other origin.
+        source: '/employer/:path*',
+        headers: [{ key: 'Referrer-Policy', value: 'same-origin' }],
+      },
+      {
         // Keep legacy same-origin framing outside the signed course-preview
         // handoff and lesson surfaces. Their CSP admits only the owning Admin.
         source: '/:path((?!api/admin/course-preview$|lms/courses(?:/|$)).*)',

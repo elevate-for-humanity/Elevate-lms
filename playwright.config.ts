@@ -115,6 +115,7 @@ const PEER_APPS: Record<string, E2EApp[]> = {
   'complete-platform.spec.ts': ['lms'],
   'program-e2e-flows.spec.ts': ['lms'],
   'portal-responsive-design.spec.ts': ['admin', 'marketing'],
+  'program-holder.spec.ts': ['marketing'],
   'registered-apprenticeship-authenticated.spec.ts': ['admin'],
 };
 

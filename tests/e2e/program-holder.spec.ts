@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+import { peerOrigin } from './helpers/app-origins';
 
 /**
  * E2E Tests for Program Holder Portal
@@ -12,6 +13,37 @@ import { test, expect } from '@playwright/test';
  * - Compliance tracking
  */
 
+const applicationUrl = `${peerOrigin('marketing')}/apply/program-holder`;
+const programHolderCredentials = {
+  email: process.env.E2E_PROGRAM_HOLDER_EMAIL || process.env.TEST_PROGRAM_HOLDER_EMAIL || '',
+  password: process.env.E2E_PROGRAM_HOLDER_PASSWORD || process.env.TEST_PROGRAM_HOLDER_PASSWORD || '',
+};
+
+async function signInProgramHolder(page: Page) {
+  const { email, password } = programHolderCredentials;
+  if (!email || !password) {
+    throw new Error('The disposable Program Holder sign-in fixture is missing.');
+  }
+  await page.goto('/login?next=%2Fprogram-holder%2Fdashboard');
+  await page.getByLabel('Email address').fill(email);
+  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+}
+
+async function fillApplication(page: Page, email: string) {
+  await page.getByLabel('Legal Organization Name').fill('QA Training Center');
+  await page.getByLabel('Primary Contact').fill('QA Applicant');
+  await page.getByLabel('Email', { exact: false }).fill(email);
+  await page.getByLabel('Phone').fill('317-555-0100');
+  await page.getByLabel('Street Address').fill('123 Main St');
+  await page.getByLabel('City', { exact: true }).fill('Indianapolis');
+  await page.getByLabel('State', { exact: true }).fill('IN');
+  await page.getByLabel('ZIP').fill('46204');
+  await page.locator('select[name="requestedProgram"]').selectOption({ index: 1 });
+  await page.getByRole('checkbox', { name: 'Healthcare Training' }).check();
+  await page.getByRole('checkbox', { name: /I certify that I am authorized/ }).check();
+}
+
 test.describe('Program Holder Portal', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -19,68 +51,38 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Application Flow', () => {
     test('should submit program holder application', async ({ page }) => {
-      await page.goto('/program-holder/apply');
+      await page.goto(applicationUrl);
+      await fillApplication(page, `ph-qa-${Date.now()}@example.com`);
 
-      // Fill out application form
-      await page.fill('input[name="organizationName"]', 'Test Training Center');
-      await page.fill('input[name="contactName"]', 'John Doe');
-      await page.fill('input[name="contactEmail"]', `test-${Date.now()}@example.com`);
-      await page.fill('input[name="contactPhone"]', '317-555-0100');
-      await page.fill('input[name="address"]', '123 Main St');
-      await page.fill('input[name="city"]', 'Indianapolis');
-      await page.selectOption('select[name="state"]', 'IN');
-      await page.fill('input[name="zip"]', '46204');
-
-      // Select programs
-      await page.check('input[value="healthcare"]');
-      await page.check('input[value="technology"]');
-
-      await page.fill('input[name="estimatedStudents"]', '50');
-      await page.fill('textarea[name="additionalInfo"]', 'We are a certified training provider');
-
-      // Submit form
-      await page.click('button[type="submit"]');
-
-      // Verify success message
-      await expect(page.locator('text=Application submitted successfully')).toBeVisible({
-        timeout: 10000,
-      });
+      const receipt = page.waitForResponse((response) =>
+        new URL(response.url()).pathname === '/api/program-holder/apply' &&
+        response.request().method() === 'POST',
+      );
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      const response = await receipt;
+      expect(response.status()).toBe(201);
+      expect(await response.json()).toMatchObject({ ok: true, applicationType: 'program_holder' });
+      await expect(page).toHaveURL(/\/apply\/success\?(?=.*\bref=)(?=.*\btype=program-holder)/);
     });
 
     test('should validate required fields', async ({ page }) => {
-      await page.goto('/program-holder/apply');
-
-      // Try to submit without filling required fields
-      await page.click('button[type="submit"]');
-
-      // Check for validation errors
-      await expect(page.locator('text=required')).toBeVisible();
+      await page.goto(applicationUrl);
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      await expect(page.locator('input[name="orgName"]:invalid')).toBeFocused();
     });
 
     test('should prevent duplicate applications', async ({ page }) => {
       const email = `duplicate-${Date.now()}@example.com`;
 
-      await page.goto('/program-holder/apply');
+      await page.goto(applicationUrl);
+      await fillApplication(page, email);
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      await expect(page).toHaveURL(/\/apply\/success\?/);
 
-      // Submit first application
-      await page.fill('input[name="organizationName"]', 'Test Org');
-      await page.fill('input[name="contactName"]', 'Jane Doe');
-      await page.fill('input[name="contactEmail"]', email);
-      await page.check('input[value="healthcare"]');
-      await page.click('button[type="submit"]');
-
-      await expect(page.locator('text=Application submitted')).toBeVisible({ timeout: 10000 });
-
-      // Try to submit duplicate
-      await page.goto('/program-holder/apply');
-      await page.fill('input[name="organizationName"]', 'Test Org 2');
-      await page.fill('input[name="contactName"]', 'Jane Doe');
-      await page.fill('input[name="contactEmail"]', email);
-      await page.check('input[value="healthcare"]');
-      await page.click('button[type="submit"]');
-
-      // Should show error
-      await expect(page.locator('text=already pending')).toBeVisible();
+      await page.goto(applicationUrl);
+      await fillApplication(page, email);
+      await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
+      await expect(page.getByText(/already pending/i)).toBeVisible();
     });
   });
 
@@ -93,17 +95,7 @@ test.describe('Program Holder Portal', () => {
     });
 
     test('should login successfully', async ({ page }) => {
-      await page.goto('/login');
-
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
 
       // Should redirect to dashboard
       await expect(page).toHaveURL(/.*dashboard/, { timeout: 10000 });
@@ -112,8 +104,8 @@ test.describe('Program Holder Portal', () => {
     test('should show error for invalid credentials', async ({ page }) => {
       await page.goto('/login');
 
-      await page.fill('input[name="email"]', 'invalid@example.com');
-      await page.fill('input[name="password"]', 'wrongpassword');
+      await page.getByLabel('Email address').fill('invalid@example.com');
+      await page.getByLabel('Password', { exact: true }).fill('wrongpassword');
       await page.click('button[type="submit"]');
 
       await expect(page.locator('text=Invalid')).toBeVisible();
@@ -123,16 +115,7 @@ test.describe('Program Holder Portal', () => {
   test.describe('Dashboard', () => {
     test.beforeEach(async ({ page }) => {
       // Login first
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
       await page.waitForURL(/.*dashboard/);
     });
 
@@ -175,16 +158,7 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Student Management', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
       await page.waitForURL(/.*dashboard/);
     });
 
@@ -229,16 +203,7 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Report Submission', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
       await page.waitForURL(/.*dashboard/);
     });
 
@@ -274,16 +239,7 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Compliance', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
       await page.waitForURL(/.*dashboard/);
     });
 
@@ -310,16 +266,7 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Documents', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
       await page.waitForURL(/.*dashboard/);
     });
 
@@ -338,16 +285,7 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Settings', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
       await page.waitForURL(/.*dashboard/);
     });
 
@@ -405,16 +343,7 @@ test.describe('Program Holder Portal', () => {
 
   test.describe('Performance', () => {
     test('should load dashboard within 3 seconds', async ({ page }) => {
-      await page.goto('/login');
-      await page.fill(
-        'input[name="email"]',
-        process.env.TEST_PROGRAM_HOLDER_EMAIL || 'test@example.com',
-      );
-      await page.fill(
-        'input[name="password"]',
-        process.env.TEST_PROGRAM_HOLDER_PASSWORD || 'password123',
-      );
-      await page.click('button[type="submit"]');
+      await signInProgramHolder(page);
 
       const startTime = Date.now();
       await page.goto('/program-holder/dashboard');

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isOpenHandsManagedTask } from '@/lib/devstudio/openhands/studio-timeout-policy.mjs';
 import { approvalReason, detectRiskTags, requiresApproval } from './risk';
 import { newTraceId, writeDevAuditLog } from './audit';
 import type { CreateTaskInput, TaskPlanStep } from './types';
@@ -807,7 +808,7 @@ export async function recoverStaleAiTasks(
     // OpenHands has its own provider-aware reconciler. Age alone is not a
     // terminal signal when paid execution or human confirmation is pending.
     // Do not let generic Studio recovery destroy the original provider receipt.
-    if (task.tool_name === 'openhands.execute') continue;
+    if (isOpenHandsManagedTask(task)) continue;
     const timeoutMessage = `Studio task exceeded the ${boundedTimeout}-minute runtime limit and was closed instead of remaining stuck.`;
     const { data: closed, error: closeError } = await db
       .from('ai_tasks')

@@ -648,7 +648,12 @@ export async function refreshOpenHandsTask(input: {
   const needsHumanApproval =
     evaluation.status === 'REQUIRES_HUMAN_REVIEW' &&
     !verificationStillRunning && !parisProviderCandidatePendingValidation;
+  // Pending approval is a higher-priority canonical state than provider
+  // queued/running. Observations never authorize execution or clear a decision.
+  const pendingApproval = task.requires_approval === true &&
+    task.approval_status === 'pending' && !resolvedProviderConfirmation;
   const taskStatus =
+    pendingApproval ? 'awaiting_approval' :
     executionStillRunning || parisProviderCandidatePendingValidation
       ? 'running'
       : evaluation.status === 'PASS'
@@ -694,9 +699,9 @@ export async function refreshOpenHandsTask(input: {
           ? { provider: 'openhands', lifecycle, githubEvidence, evaluation }
           : task.result,
       error_message: evaluation.status === 'FAIL_BLOCKING' ? evaluation.reasons.join(' ') : null,
-      requires_approval: resolvedProviderConfirmation ? false : staleProviderConfirmation ? true : needsHumanApproval,
-      approval_status: resolvedProviderConfirmation ? 'not_required' : needsHumanApproval ? 'pending' : task.approval_status,
-      approval_reason: resolvedProviderConfirmation ? null : needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
+      requires_approval: resolvedProviderConfirmation ? false : pendingApproval ? true : staleProviderConfirmation ? true : needsHumanApproval,
+      approval_status: resolvedProviderConfirmation ? 'not_required' : pendingApproval ? 'pending' : needsHumanApproval ? 'pending' : task.approval_status,
+      approval_reason: resolvedProviderConfirmation ? null : pendingApproval ? task.approval_reason : needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
       completed_at: ['completed', 'failed'].includes(taskStatus) ? now : null,
       updated_at: now,
     })
@@ -710,7 +715,7 @@ export async function refreshOpenHandsTask(input: {
     .eq('status', task.status)
     .eq('attempts', task.attempts)
     .eq('updated_at', task.updated_at);
-  if (resolvedProviderConfirmation) {
+  if (resolvedProviderConfirmation || pendingApproval) {
     guardedTaskUpdate = guardedTaskUpdate
       .eq('approval_status', 'pending')
       .eq('requires_approval', task.requires_approval)
@@ -740,8 +745,10 @@ export async function refreshOpenHandsTask(input: {
       .from('ai_task_steps')
       .update({
         status:
-          lifecycle.status === 'completed'
-            ? 'completed'
+          pendingApproval
+            ? 'awaiting_approval'
+            : lifecycle.status === 'completed'
+              ? 'completed'
             : lifecycle.status === 'failed'
               ? 'failed'
               : lifecycle.status === 'approval_required'
@@ -761,8 +768,10 @@ export async function refreshOpenHandsTask(input: {
       .from('ai_task_steps')
       .update({
         status:
-          executionStillRunning
-            ? 'pending'
+          pendingApproval
+            ? 'awaiting_approval'
+            : executionStillRunning
+              ? 'pending'
             : evaluation.status === 'PASS'
               ? 'completed'
               : needsHumanApproval

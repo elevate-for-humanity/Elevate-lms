@@ -44,9 +44,21 @@ export default async function HvacCoursePage() {
     );
   }
 
+  const accessStatuses = ['active', 'enrolled', 'in_progress', 'confirmed', 'completed'];
   const enrollment = await resolveCourseEnrollment(user.id, course.id);
-  if (!enrollment || !['active', 'enrolled', 'in_progress', 'confirmed', 'completed'].includes(enrollment.status)) {
-    notFound();
+  if (!enrollment || !accessStatuses.includes(enrollment.status)) {
+    // The paid digital bundle grants access to this course on its own.
+    const { data: directEnrollment, error: directEnrollmentError } = await db
+      .from('course_enrollments')
+      .select('id')
+      .eq('student_id', user.id)
+      .eq('course_id', course.id)
+      .in('status', accessStatuses)
+      .is('revoked_at', null)
+      .limit(1)
+      .maybeSingle();
+    if (directEnrollmentError) throw new Error('HVAC_COURSE_ENROLLMENT_UNAVAILABLE');
+    if (!directEnrollment) notFound();
   }
 
   const [{ data: modules, error: modulesError }, { data: lessons, error: lessonsError }] = await Promise.all([

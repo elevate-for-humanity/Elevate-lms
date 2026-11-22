@@ -34,5 +34,6 @@ test('the learner page checks sign-in, publication, and enrollment before loadin
   const guards = page.slice(0, firstContentQuery);
   assert.match(guards, /if \(!user\) redirect/);
   assert.match(guards, /if \(!course\)[\s\S]+HVAC course is not published yet/);
+  assert.match(guards, /\.from\('course_enrollments'\)[\s\S]+\.eq\('student_id', user.id\)[\s\S]+\.eq\('course_id', course.id\)[\s\S]+\.in\('status', accessStatuses\)[\s\S]+\.is\('revoked_at', null\)/);
   assert.match(guards, /resolveCourseEnrollment\(user.id, course.id\)[\s\S]+notFound\(\)/);
 });

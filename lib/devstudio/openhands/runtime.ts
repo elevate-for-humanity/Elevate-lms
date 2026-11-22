@@ -1,4 +1,5 @@
 import 'server-only';
+import { shouldExpireOpenHandsWithoutReceipt } from './studio-timeout-policy.mjs';
 import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -452,20 +453,11 @@ export async function reconcileOpenHandsTasks(
       const timeoutMinutes = Number.isFinite(configuredTimeout)
         ? Math.max(30, configuredTimeout)
         : 360;
-      const startedAt = new Date(candidate.started_at ?? candidate.created_at).getTime();
-      // An accepted provider start is a durable external execution, not a
-      // six-hour Studio lease. Observe its original receipt until an actual
-      // provider + GitHub outcome is independently reconciled. Never restart
-      // paid work solely because the local wall-clock deadline elapsed.
-      const acceptedStart = typeof candidate.tool_output?.start_task_id === 'string' &&
-        candidate.tool_output.start_task_id.length > 0;
-      const pendingApproval = candidate.requires_approval === true &&
-        candidate.approval_status !== 'approved';
-      const expired =
-        candidate.status === 'running' &&
-        !acceptedStart && !pendingApproval &&
-        Number.isFinite(startedAt) &&
-        startedAt < Date.now() - timeoutMinutes * 60_000;
+      // Only unaccepted/unapproved local dispatch may expire. The durable
+      // provider receipt remains subject to independent provider/GitHub review.
+      const expired = shouldExpireOpenHandsWithoutReceipt(
+        candidate, Date.now(), timeoutMinutes,
+      );
       if (expired) {
         const timeoutMessage = `OpenHands execution exceeded the ${timeoutMinutes}-minute runtime limit and was closed instead of remaining stuck.`;
         const { data: timedOut, error: timeoutError } = await db

@@ -55,16 +55,13 @@ function harness(input = task()) {
   return {approve: id => approve(db, taskId, id, {actorRoles:['admin']}), writes, dispatches:()=>dispatches};
 }
 
-test('owner approval authorizes original OpenHands receipt without re-dispatch',async()=>{
+test('accepted PARIS OpenHands task requires confirmation in the original provider conversation',async()=>{
   const h = harness();
-  await h.approve(owner);
-  assert.deepEqual(h.writes.slice(0,2).map(x=>x.table),['ai_approvals','ai_tasks']);
-  assert.equal(h.writes[1].mutation.status,'running');
-  assert.equal(h.writes[1].mutation.approval_status,'approved');
-  assert.equal(h.writes.some(x=>x.table==='audit'),true);
+  await assert.rejects(h.approve(owner),/OPENHANDS_PROVIDER_CONFIRMATION_REQUIRED/);
+  assert.equal(h.writes.length,0);
   assert.equal(h.dispatches(),0);
 });
-test('wrong owner, missing receipt and altered approval reason are rejected without mutation',async()=>{
+test('wrong owner, missing receipt and altered approval reason fail closed',async()=>{
   for(const invalid of [
     [task(),'other-owner'],
     [{...task(),tool_output:{}},owner],
@@ -72,7 +69,7 @@ test('wrong owner, missing receipt and altered approval reason are rejected with
     [{...task(),approval_status:'rejected'},owner],
   ]){
     const h=harness(invalid[0]);
-    await assert.rejects(h.approve(invalid[1]),/OPENHANDS_APPROVAL_RECEIPT_OR_OWNER_MISMATCH|GENERIC EXECUTOR MUST NOT RUN/);
+    await assert.rejects(h.approve(invalid[1]),/OPENHANDS_APPROVAL_RECEIPT_OR_OWNER_MISMATCH/);
     assert.equal(h.writes.length,0);
     assert.equal(h.dispatches(),0);
   }

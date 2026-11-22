@@ -72,9 +72,15 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   const failedResponses: string[] = [];
 
   page.on('response', (response) => {
-    if (response.status() < 400) return;
-    const url = new URL(response.url());
-    failedResponses.push(`${response.status()} ${url.origin}${url.pathname}`);
+    if (response.status() < 500) return;
+    try {
+      const url = new URL(response.url());
+      if (url.origin === new URL(page.url()).origin) {
+        failedResponses.push(`${response.status()} ${url.pathname}`);
+      }
+    } catch {
+      // Ignore malformed URLs; browser runtime checks remain enforced.
+    }
   });
 
   page.on('pageerror', (error) => pageErrors.push(error.message));
@@ -97,6 +103,11 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
   expect(body, `${route} rendered an application exception`).not.toMatch(
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
+
+  expect(
+    failedResponses,
+    `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`,
+  ).toEqual([]);
 
   expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
 

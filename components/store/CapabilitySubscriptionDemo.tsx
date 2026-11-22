@@ -52,18 +52,18 @@ export default function CapabilitySubscriptionDemo({
     },
     {
       eyebrow: paidOnly ? '2 · See the workflow' : '2 · Try it first',
-      title: paidOnly ? 'Use Course Builder with a paid plan' : 'Use the capability during the 14-day trial',
+      title: paidOnly ? 'Preview the paid Course Builder' : 'Use the capability during the 14-day trial',
       body: trialText,
     },
     {
       eyebrow: '3 · Understand the subscription',
       title: priceLabel,
-      body: paidOnly ? 'Review the monthly allowance before subscribing. AI generation uses Course Builder credits.' : 'The demo shows the commercial model before checkout so customers know what continues after the trial and what becomes an upgrade.',
+      body: paidOnly ? 'Compare the monthly allowance against the number of lessons you need to draft.' : 'The demo shows the commercial model before checkout so customers know what continues after the trial and what becomes an upgrade.',
     },
     {
-      eyebrow: '4 · Activate when ready',
-      title: 'Keep the tools you actually use',
-      body: 'Start small, then activate the subscription, add-on, credits, or higher-capacity plan only when the business needs it.',
+      eyebrow: paidOnly ? '4 · Request availability' : '4 · Activate when ready',
+      title: paidOnly ? 'Choose the capacity you need' : 'Keep the tools you actually use',
+      body: paidOnly ? 'Ask about a monthly plan, one-time credits, or a larger monthly allowance.' : 'Start small, then activate the subscription, add-on, credits, or higher-capacity plan only when the business needs it.',
     },
   ];
 
@@ -237,7 +237,7 @@ export default function CapabilitySubscriptionDemo({
             </h2>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-200">
               {paidOnly
-                ? 'Choose a paid plan and activate Course Builder for the organization that will use the credits.'
+                ? 'Review the course sizes and monthly allowance, then request access or a quote for additional credits.'
                 : 'Start a no-card trial or choose a base plan and add-ons. Workspace setup happens before payment so the subscription and entitlements attach to the correct organization.'}
             </p>
           </div>

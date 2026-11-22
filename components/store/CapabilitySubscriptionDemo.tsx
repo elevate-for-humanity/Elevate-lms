@@ -166,11 +166,12 @@ export default function CapabilitySubscriptionDemo({
 
               <div className="mt-7 rounded-xl border border-cyan-200 bg-cyan-50 p-4">
                 <div className="flex items-center gap-2 font-black text-slate-950">
-                  <Sparkles className="h-5 w-5 text-cyan-700" /> Trial first
+                  <Sparkles className="h-5 w-5 text-cyan-700" /> {paidOnly ? 'Preview the workflow' : 'Trial first'}
                 </div>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">
-                  Customers can see the workflow before they commit, then upgrade only for the
-                  capacity and automation they want to keep.
+                  {paidOnly
+                    ? 'See how course planning, generation, review, and publishing work before subscribing.'
+                    : 'Customers can see the workflow before they commit, then upgrade only for the capacity and automation they want to keep.'}
                 </p>
               </div>
 
@@ -178,7 +179,7 @@ export default function CapabilitySubscriptionDemo({
                 href={actionHref}
                 className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white hover:bg-brand-red-800"
               >
-                View / start {name} <ArrowRight className="h-4 w-4" />
+                {paidOnly ? 'View Course Builder pricing' : `View / start ${name}`} <ArrowRight className="h-4 w-4" />
               </Link>
             </aside>
           </div>

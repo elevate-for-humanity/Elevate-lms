@@ -61,6 +61,21 @@ const blocks = [
   },
 ];
 
+const creditLabels: Record<keyof typeof COURSE_BUILDER_CREDIT_COSTS, string> = {
+  generate: 'Generate a course draft',
+  'generate-from-blueprint': 'Generate a draft from a blueprint',
+  repair: 'Repair course content',
+  'generate-missing': 'Generate missing content',
+  'queue-media': 'Queue course media',
+  'ai-write': 'Run an AI writing request',
+  assessment: 'Generate an assessment',
+  integrated: 'Run an integrated course build',
+};
+
+const standardDraftCost = COURSE_BUILDER_CREDIT_COSTS.generate;
+const monthlyDraftCount = Math.floor(COURSE_BUILDER_MONTHLY_ALLOWANCE / standardDraftCost);
+const monthlyCreditsAfterDrafts = COURSE_BUILDER_MONTHLY_ALLOWANCE % standardDraftCost;
+
 export default function CourseBuilderPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -74,7 +89,7 @@ export default function CourseBuilderPage() {
         posterImage="/images/refresh-20261014/business.webp"
         microLabel="Elevate Course Creation & Learning Platform"
         belowHeroHeadline="Build colorful, narrated, interactive courses end to end"
-        belowHeroSubheadline={`$79/month includes ${COURSE_BUILDER_MONTHLY_ALLOWANCE.toLocaleString()} Course Builder credits, the unified builder, AI instructor workflows, LMS delivery, certificates, and learner progress tracking.`}
+        belowHeroSubheadline={`$79/month includes enough credits for ${monthlyDraftCount === 1 ? 'one standard AI course draft' : `${monthlyDraftCount} standard AI course drafts`} each month, plus ${monthlyCreditsAfterDrafts.toLocaleString()} credits for additional work.`}
         ctas={[
           { label: 'Open Course Builder', href: getAdminUrl('/course-builder') },
           {
@@ -97,19 +112,25 @@ export default function CourseBuilderPage() {
         <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-[0.8fr_1.2fr] md:items-center">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
-              Profit-aware usage
+              Course generation allowance
             </p>
             <p className="mt-2 text-4xl font-black text-slate-950">$79/month</p>
             <p className="mt-2 font-semibold text-slate-700">
-              Includes {COURSE_BUILDER_MONTHLY_ALLOWANCE.toLocaleString()} credits. Course records
-              stay yours; only compute-heavy creation work consumes credits.
+              Your {COURSE_BUILDER_MONTHLY_ALLOWANCE.toLocaleString()} monthly credits cover{' '}
+              <strong>{monthlyDraftCount === 1 ? 'one standard AI course draft' : `${monthlyDraftCount} standard AI course drafts`}</strong>{' '}
+              with {monthlyCreditsAfterDrafts.toLocaleString()} credits left for other actions.
+            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              One standard draft uses {standardDraftCost.toLocaleString()} credits. Review the
+              draft before publishing it to the LMS. Separate AI assessment, media, and repair
+              requests use their listed amounts.
             </p>
           </div>
           <dl className="grid gap-3 sm:grid-cols-2">
             {Object.entries(COURSE_BUILDER_CREDIT_COSTS).map(([operation, credits]) => (
               <div key={operation} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <dt className="font-bold capitalize text-slate-900">
-                  {operation.replace(/-/g, ' ')}
+                  {creditLabels[operation as keyof typeof COURSE_BUILDER_CREDIT_COSTS]}
                 </dt>
                 <dd className="mt-1 text-sm font-black text-brand-blue-800">
                   {credits.toLocaleString()} credits

@@ -305,9 +305,12 @@ export async function reportParisDispatchFailure(id:string) {
 }
 
 export async function reportParisRepairFailure(id:string,runId:number){
- const db=await requireAdminClient();const {data}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
- if(data?.workflow_run_id!==runId)return;
- if(['patching','validating'].includes(data.status))await updateOwnedRepair(id,runId,data.status,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'},true);
+ const db=await requireAdminClient();const {data,error}=await db.from('paris_code_repairs').select('status,workflow_run_id').eq('id',id).maybeSingle();
+ if(error)throw error;
+ if(data?.workflow_run_id!==runId)return {recorded:false,reason:'RUN_NOT_ASSOCIATED'};
+ if(!['patching','validating'].includes(data.status))return {recorded:false,reason:'STATE_ALREADY_SETTLED'};
+ const recorded=await updateOwnedRepair(id,runId,data.status,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'},true);
+ return {recorded,reason:recorded?'FAILURE_RECORDED':'STATE_CHANGED'};
 }
 export async function tickParisCodeRepairs(options:{workflowOwnedDispatch?:boolean}={}){
  const result=await runParisCodeRepairTick(options);
@@ -878,9 +881,11 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
  if(queued.data?.length===1000)throw Error('PARIS_QUEUED_REPAIR_SCAN_LIMIT');
  if(queued.error)throw queued.error;
  let pending: {id:string;attempt_count:number;source_job_id:string|null;attempt_history:unknown;workflow_run_id:number|null;candidate:unknown}|null=null;
+ const queueScan={scanned:0,attemptBudgetExhausted:0,workflowEvidenceRejected:0,courseEvidenceRejected:0};
  let awaitingCurrentWorkflowEvidence=0;
  const sourceRunCache=new Map<number,any>();
  for(const candidate of queued.data??[]){
+  queueScan.scanned++;
   // The production CHECK constraint was reconciled by the reviewed
   // paris_bounded_context_retry_contract migration. The policy below is the
   // sole application preflight; Postgres enforces the identical bound.
@@ -895,6 +900,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
    }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
    if(limited.error)throw limited.error;
    if(!limited.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+   queueScan.attemptBudgetExhausted++;
    continue;
   }
   if(!candidate.source_job_id){
@@ -915,6 +921,7 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
       .eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
      if(retained.error)throw retained.error;
      if(!retained.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+     queueScan.workflowEvidenceRejected++;
      continue;
     }
    }
@@ -937,8 +944,9 @@ async function runParisCodeRepairTick({workflowOwnedDispatch=false}:{workflowOwn
   }).eq('id',candidate.id).eq('status','queued').eq('attempt_count',candidate.attempt_count).select('id').maybeSingle();
   if(blocked.error)throw blocked.error;
   if(!blocked.data?.id)throw Error('PARIS_REPAIR_DISPOSITION_LOST_CAS');
+  queueScan.courseEvidenceRejected++;
  }
- if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence};
+ if(!pending)return {enabled:true,dispatched:0,reason:awaitingCurrentWorkflowEvidence?'CURRENT_WORKFLOW_EVIDENCE_PENDING':'NO_ELIGIBLE_REPAIR_IN_SCANNED_QUEUE',awaitingCurrentWorkflowEvidence,queueScan};
  // New repairs use the owned internal engine by default. Explicit OpenHands
  // opt-in still requires read-only provider authorization before admission;
  // readiness alone never proves successful execution or a completed repair.

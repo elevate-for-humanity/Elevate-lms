@@ -70,41 +70,9 @@ permissions:
   actions: read
 
 jobs:
-  request-employer-regression:
-    # A successful Admin deployment also requests its own authenticated employer
-    # regression. Never dispatch against a PR, an unverified release, or a
-    # superseded serving SHA; production execution remains receipt-gated.
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Admin' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      actions: write
-    steps:
-      - name: Request current employer tests against a verified live Admin release
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const response = await fetch('https://admin.elevateforhumanity.org/api/health', {
-              cache: 'no-store', signal: AbortSignal.timeout(20000),
-            });
-            const health = await response.json();
-            if (!response.ok || health.service !== 'admin' || !health.ready || !health.healthy ||
-                !health.dependencies?.supabase?.ok || !/^[a-f0-9]{40}$/.test(health.commit || '')) {
-              throw new Error('Live Admin must be healthy before employer regression');
-            }
-            const runs = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner, repo: context.repo.repo,
-              workflow_id: 'deploy-admin.yml', event: 'workflow_dispatch', status: 'completed', per_page: 100,
-            });
-            const source = runs.data.workflow_runs.find(run => run.conclusion === 'success' &&
-              run.head_branch === 'main' && run.head_sha === health.commit);
-            if (!source) throw new Error('A successful deployment must attest the live Admin version');
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner, repo: context.repo.repo,
-              workflow_id: 'registered-apprenticeship-e2e.yml', ref: 'main',
-              inputs: { employer_only: 'true', deployed_sha: health.commit,
-                deployment_run_id: String(source.id), component: 'admin' },
-            });
+  # Employer regression is dispatched once by deploy-admin.yml acceptance,
+  # after a successful attested Admin deployment. Do not duplicate the
+  # workflow on main pushes or the completed-deployment notification.
 
   hvac-public-playback:
     if: (inputs.employer_only != true) && (github.event_name == 'pull_request' || (github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Deploy Google Marketing on trigger' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'workflow_dispatch' && inputs.component == 'marketing'))))

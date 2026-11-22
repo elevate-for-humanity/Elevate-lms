@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { assertStorePageChrome } from './store-page-contract.mjs';
 import { fetchSmoke } from './smoke-fetch.mjs';
+import { smokeProbe } from './smoke-probe.mjs';
 // The Store smoke is intentionally dependency-free on the host runner.
 // Only Marketing needs the homepage HTML parser (Cheerio).
 
@@ -45,9 +46,17 @@ try {
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
   assert.ok(ready, 'Packaged server did not start within 120 seconds');
+  // Diagnose and bound intermittent localhost response stalls on a freshly
+  // unpacked image. Contract mismatches, non-200 HTTP and wrong SHA still fail.
+  const probe = (url, options={}, timeoutMs=10000, type='json') =>
+    smokeProbe(url, options, timeoutMs, type, {
+      report: ({path, host, attempt}) => console.log(
+        `Marketing smoke: ${component} ${path} host=${host} attempt=${attempt}/3`,
+      ),
+    });
   for (const host of ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org']) {
     for (const path of ['/api/ping', '/api/ready', '/api/health']) {
-      const {status,body} = await fetchSmoke(root + path, {headers:{host},redirect:'manual'}, 10000);
+      const {status,body} = await probe(root + path, {headers:{host},redirect:'manual'}, 10000);
       if (path === '/api/health') assert.ok([200,503].includes(status), 'Dependency health must return its real status');
       else assert.equal(status, 200, `${host}${path} must reach the service endpoint`);
       assert.equal(body.service, component);
@@ -55,18 +64,18 @@ try {
       assert.equal(path === '/api/ping' ? body.ok : body.ready, true);
     }
   }
-  const runtimeVersion = await fetchSmoke(root + '/api/version', {}, 10000);
+  const runtimeVersion = await probe(root + '/api/version', {}, 10000);
   assert.equal(runtimeVersion.status, 200);
   const identity = runtimeVersion.body;
   assert.equal(identity.service, component);
   assert.equal(identity.commitSha, sha);
-  const version = await fetchSmoke(root + '/version.json', {}, 10000);
+  const version = await probe(root + '/version.json', {}, 10000);
   assert.equal(version.status, 200);
   const packagedVersion = version.body;
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
   if (component === 'marketing') {
-    const home = await fetchSmoke(root + '/', {}, 20000, 'text');
+    const home = await probe(root + '/', {}, 20000, 'text');
     assert.equal(home.status, 200, 'Packaged homepage must render');
     const { assertHomepageHostShopContract } = await import('./homepage-content.mjs');
     assertHomepageHostShopContract(home.body);
@@ -75,7 +84,7 @@ try {
     // Exercise the packaged pages: source-level rendering tests cannot detect a
     // Store image that accidentally prerendered the shared Marketing chrome.
     for (const path of ['/store', '/login', '/privacy', '/terms-of-service', '/security-and-data-protection']) {
-      const {status,body:html} = await fetchSmoke(root + path, {headers:{host:'store.elevateforhumanity.org'},redirect:'manual'}, 20000, 'text');
+      const {status,body:html} = await probe(root + path, {headers:{host:'store.elevateforhumanity.org'},redirect:'manual'}, 20000, 'text');
       assert.equal(status, 200, `Store page ${path} must be served locally`);
       assertStorePageChrome(html, path);
     }
@@ -84,7 +93,12 @@ try {
 } catch (error) {
   // Do not export raw application logs or runtime environment values from CI.
   console.error('Marketing container smoke test failed:', error.message);
-  if (started) console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name]));
+  if (started) {
+    console.error('Container state:', docker(['inspect', '--format={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}', name]));
+    try {
+      console.error('Container resource snapshot:', docker(['stats', '--no-stream', '--format', 'cpu={{.CPUPerc}} memory={{.MemUsage}}', name]));
+    } catch { console.error('Container resource snapshot unavailable'); }
+  }
   process.exitCode = 1;
 } finally {
   if (started) { try { docker(['rm', '-f', name]); } catch { console.error('Smoke container cleanup failed'); process.exitCode = 1; } }

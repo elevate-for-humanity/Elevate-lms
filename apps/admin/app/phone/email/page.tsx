@@ -7,6 +7,8 @@ import { COMMUNICATION_MEMBER_ROLES } from '@/lib/phone/access';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Elevate Email' };
 
+const LMS_ORIGIN = process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org';
+
 export default async function AdminEmailPage({
   searchParams,
 }: {
@@ -25,12 +27,14 @@ export default async function AdminEmailPage({
           <h1 className="mt-1 text-3xl font-black text-slate-950">Elevate Email</h1>
         </div>
         <div className="flex gap-2">
-          <Link
-            href="/phone"
-            className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
-          >
-            Phone & meetings
-          </Link>
+          {canViewDirectory ? (
+            <Link
+              href="/phone"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
+            >
+              Phone & meetings
+            </Link>
+          ) : null}
           {canViewDirectory ? (
             <Link
               href="/phone/email/accounts"
@@ -41,7 +45,15 @@ export default async function AdminEmailPage({
           ) : null}
         </div>
       </div>
-      <EmailWorkspace initialMailboxId={params.mailboxId} initialThreadId={params.threadId} />
+      <EmailWorkspace
+        initialMailboxId={params.mailboxId}
+        initialThreadId={params.threadId}
+        communicationLinks={canViewDirectory ? undefined : {
+          phone: `${LMS_ORIGIN}/communications/phone`,
+          chat: `${LMS_ORIGIN}/lms/messages`,
+          calendar: `${LMS_ORIGIN}/lms/calendar`,
+        }}
+      />
     </main>
   );
 }

@@ -16,7 +16,7 @@ vi.mock('@/lib/auth/privileged-mfa', () => ({ PRIVILEGED_MFA_ROLES: ['admin', 's
 import { middleware } from '@/apps/admin/middleware';
 beforeEach(() => { state.role = 'staff'; });
 describe('staff authorization boundary', () => {
-  it.each(['/students', '/programs', '/hr/payroll', '/settings'])('denies staff direct access to %s', async path => {
+  it.each(['/students', '/programs', '/hr/payroll', '/settings', '/phone/email/accounts'])('denies staff direct access to %s', async path => {
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org' + path));
     expect(response.headers.get('location')).toBe('https://admin.elevateforhumanity.org/unauthorized');
   });
@@ -24,9 +24,14 @@ describe('staff authorization boundary', () => {
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org/api/admin/impersonate'));
     expect(response.status).toBe(403);
   });
-  it.each(['/staff-portal/dashboard', '/staff-portal/courses', '/api/staff/my-students', '/dashboard', '/api/auth/session', '/api/auth/signout'])('retains the authorized staff surface %s', async path => {
+  it.each(['/staff-portal/dashboard', '/staff-portal/courses', '/api/staff/my-students', '/dashboard', '/api/auth/session', '/api/auth/signout', '/phone/email', '/api/communications/email'])('retains the authorized staff surface %s', async path => {
     const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org' + path));
     expect(response.headers.get('x-middleware-next')).toBe('1');
+  });
+  it('denies the Admin inbox API to learner accounts', async () => {
+    state.role = 'student';
+    const response = await middleware(new NextRequest('https://admin.elevateforhumanity.org/api/communications/email'));
+    expect(response.status).toBe(403);
   });
   it('retains platform administrator access', async () => {
     state.role = 'admin';

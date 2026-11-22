@@ -38,7 +38,7 @@ test('failed response headers cannot be hidden by a later successful retry', asy
  let attempts=0;
  const actualFetch=async()=>{
   attempts++;
-  return new Response(null,{status:503,headers:{'content-type':'application/json'}});
+  return new Response(JSON.stringify({service:'marketing',ready:false}),{status:503,headers:{'content-type':'application/json'}});
  };
  const got=await smokeProbe(url,{},30,'json',{
   request:(u,o,t,r)=>fetchSmoke(u,o,t,r,actualFetch),
@@ -53,6 +53,18 @@ test('200 headers followed by a stalled body never get retried', async()=>{
  const actualFetch=async()=>{
   attempts++;
   return {ok:true,status:200,json:()=>new Promise(()=>{})};
+ };
+ await assert.rejects(smokeProbe(url,{},20,'json',{
+  request:(u,o,t,r)=>fetchSmoke(u,o,t,r,actualFetch),pause:sleep,
+ }),/response_unreadable/);
+ assert.equal(attempts,1);
+});
+
+test('HTTP 500 response headers with an unreadable body cannot be retried', async()=>{
+ let attempts=0;
+ const actualFetch=async()=>{
+  attempts++;
+  return {status:500,ok:false,json:async()=>new Promise(()=>{})};
  };
  await assert.rejects(smokeProbe(url,{},20,'json',{
   request:(u,o,t,r)=>fetchSmoke(u,o,t,r,actualFetch),pause:sleep,

@@ -46,6 +46,19 @@ describe('separate staff and learner workspaces', () => {
       getRoleDestinationUrl('staff'),
     );
   });
+  it('returns instructors to the exact LMS orientation page and preserves its selection', () => {
+    const guide = '/portal-guide?portal=instructor';
+    const lms = new URL(getRoleDestinationUrl('student'));
+    expect(resolveRoleCompatiblePostLoginUrl(guide, 'instructor')).toBe(
+      new URL(guide, lms).toString(),
+    );
+    expect(resolveRoleCompatiblePostLoginUrl('/portal-guide/private', 'instructor')).toBe(
+      getRoleDestinationUrl('instructor'),
+    );
+    expect(resolveRoleCompatiblePostLoginUrl('https://example.org' + guide, 'instructor')).toBe(
+      getRoleDestinationUrl('instructor'),
+    );
+  });
   it('does not let a student return into the staff workspace', () => {
     expect(
       resolveRoleCompatiblePostLoginUrl('/staff-portal/dashboard', 'student', ['student']),

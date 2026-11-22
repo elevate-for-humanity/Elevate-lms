@@ -13,11 +13,12 @@ function firstPathSegment(path: string): string {
 
 const STORE_ORIGIN = 'https://store.elevateforhumanity.org';
 
-/** Shared tools enforce their own subscription and site ownership after login. */
+/** Shared tools check their own authentication and access after login. */
 export function isSharedPostLoginDestination(destination: string): boolean {
   try {
     const url = new URL(destination);
     return (
+      (url.origin === new URL(siteUrls.app).origin && url.pathname === '/portal-guide') ||
       (url.origin === STORE_ORIGIN &&
         (url.pathname === '/store' || url.pathname.startsWith('/store/'))) ||
       (url.origin === new URL(siteUrls.site).origin &&
@@ -59,9 +60,8 @@ export function resolveRoleCompatiblePostLoginUrl(
     const requestedUrl = new URL(absoluteRoleDestination(requestedPath));
     const canonical = new URL(canonicalUrl);
 
-    // The Store is a trusted shared buyer surface, not a role-owned portal.
-    // A validated sign-in may return any role to a Store route without granting
-    // access to a different role's dashboard.
+    // Shared surfaces enforce access in their own routes. Their admission
+    // does not permit cross-role dashboard destinations.
     if (isSharedPostLoginDestination(requestedUrl.toString())) {
       return requestedUrl.toString();
     }

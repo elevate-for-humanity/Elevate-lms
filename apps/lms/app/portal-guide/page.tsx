@@ -18,7 +18,8 @@ export default async function PortalGuidePage({ searchParams }: { searchParams: 
 
   const key = typeof portal === 'string' && Object.hasOwn(portalGuides, portal) ? portal : null;
   const guide = key ? portalGuides[key] : undefined;
-  const navigation = key ? getNavigationForRole((key === 'administrator' ? 'admin' : key) as UserRole) : [];
+  const role = key === 'administrator' ? 'admin' : key === 'testing' ? 'testing_center' : key;
+  const navigation = role ? getNavigationForRole(role as UserRole) : [];
   const liveUrl = liveAvatarGuideUrl(process.env.LIVEAVATAR_PORTAL_GUIDE_EMBED_URL);
   const welcome = 'Welcome to Elevate for Humanity. I’m PARIS. I’ll walk you through your dashboard, what you can do here, and where to get help. You can pause at any time and follow the steps on screen.';
   const narration = guide ? [

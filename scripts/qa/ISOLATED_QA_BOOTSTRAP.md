@@ -116,6 +116,10 @@ reject overlapping relations.
 3. `bootstrap-apprentice-runtime-20261122.sql` restores the applied
    apprenticeship stage, including placements, the active Barber standard
    and the document requirement catalog.
+4. `bootstrap-apprentice-acceptance-20261122.sql` adds the Host Shop attendance,
+   wage and certificate schema, seeds the approved Barber RTI categories,
+   and aligns the existing private document bucket with allowed uploads.
+   Apply this stage on existing QA projects that already have steps 1–3.
 
 The desktop workflow installs the locked Node dependencies, verifies its QA
 connection, and provisions the disposable Admin before the Host Shop fallback.

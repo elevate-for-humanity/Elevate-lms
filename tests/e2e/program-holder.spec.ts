@@ -1,4 +1,6 @@
-import { test, expect, type Page } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
+import { test as base, expect, type Page } from '@playwright/test';
+import { createClient } from '@supabase/supabase-js';
 import { peerOrigin } from './helpers/app-origins';
 
 /**
@@ -14,6 +16,41 @@ import { peerOrigin } from './helpers/app-origins';
  */
 
 const applicationUrl = `${peerOrigin('marketing')}/apply/program-holder`;
+const test = base.extend<{ applicationEmail: string }>({
+  applicationEmail: async ({}, use) => {
+    const qaOrigin = 'https://isdgjcdabhxxozarmxta.supabase.co';
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || new URL(url).origin !== qaOrigin || !key) {
+      throw new Error('Program Holder submission requires the dedicated isolated QA database.');
+    }
+    const applicationEmail = `ph-e2e-${randomUUID()}@qa.invalid`;
+    const db = createClient(qaOrigin, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    try {
+      await use(applicationEmail);
+    } finally {
+      // Use the per-test email so teardown also finds submissions whose
+      // response or redirect failed before the test could read the receipt.
+      const { data: intake, error } = await db.from('application_intake')
+        .select('id,destination_table,destination_id')
+        .eq('application_type', 'program_holder').eq('payload->>email', applicationEmail);
+      if (error) throw new Error(`Program Holder QA intake lookup failed: ${error.message}`);
+      for (const row of intake ?? []) {
+        if (row.destination_table === 'program_holder_applications' && row.destination_id) {
+          const { error: reviewError } = await db.from('program_holder_applications')
+            .delete().eq('id', row.destination_id).eq('email', applicationEmail);
+          if (reviewError) throw new Error(`Program Holder QA review cleanup failed: ${reviewError.message}`);
+        }
+        const { error: intakeError } = await db.from('application_intake')
+          .delete().eq('id', row.id).eq('application_type', 'program_holder')
+          .eq('payload->>email', applicationEmail);
+        if (intakeError) throw new Error(`Program Holder QA intake cleanup failed: ${intakeError.message}`);
+      }
+    }
+  },
+});
 const programHolderCredentials = {
   email: process.env.E2E_PROGRAM_HOLDER_EMAIL || process.env.TEST_PROGRAM_HOLDER_EMAIL || '',
   password: process.env.E2E_PROGRAM_HOLDER_PASSWORD || process.env.TEST_PROGRAM_HOLDER_PASSWORD || '',
@@ -46,9 +83,9 @@ async function fillApplication(page: Page, email: string) {
 
 test.describe('Program Holder Portal', () => {
   test.describe('Application Flow', () => {
-    test('should submit program holder application', async ({ page }) => {
+    test('should submit program holder application', async ({ page, applicationEmail }) => {
       await page.goto(applicationUrl);
-      await fillApplication(page, `ph-qa-${Date.now()}@example.com`);
+      await fillApplication(page, applicationEmail);
 
       const receipt = page.waitForResponse((response) =>
         new URL(response.url()).pathname === '/api/program-holder/apply' &&
@@ -67,16 +104,14 @@ test.describe('Program Holder Portal', () => {
       await expect(page.locator('input[name="orgName"]:invalid')).toBeFocused();
     });
 
-    test('should prevent duplicate applications', async ({ page }) => {
-      const email = `duplicate-${Date.now()}@qa.invalid`;
-
+    test('should prevent duplicate applications', async ({ page, applicationEmail }) => {
       await page.goto(applicationUrl);
-      await fillApplication(page, email);
+      await fillApplication(page, applicationEmail);
       await page.getByRole('button', { name: 'Submit Program Holder Application' }).click();
       await expect(page).toHaveURL(/\/apply\/success\?/);
 
       await page.goto(applicationUrl);
-      await fillApplication(page, email);
+      await fillApplication(page, applicationEmail);
       const duplicate = page.waitForResponse((response) =>
         new URL(response.url()).pathname === '/api/program-holder/apply' &&
         response.request().method() === 'POST',

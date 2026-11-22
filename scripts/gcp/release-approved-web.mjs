@@ -29,10 +29,23 @@ export async function dispatchCompletedMainCI({ env, event, request = fetch }) {
   const head = await api('git/ref/heads/main');
   if (head.object?.sha !== run.head_sha) return { status: 'superseded', deploymentVerified: false };
   const previous = await api(`actions/workflows/release-approved-google-web.yml/runs?head_sha=${run.head_sha}&event=workflow_dispatch&per_page=30`);
-  if (previous.workflow_runs?.some(r => r.head_sha === run.head_sha &&
-      (['queued', 'in_progress', 'waiting', 'requested', 'pending'].includes(r.status) ||
-       (r.status === 'completed' && r.conclusion === 'success')))) {
+  const activeStates = ['queued', 'in_progress', 'waiting', 'requested', 'pending'];
+  const priorRuns = previous.workflow_runs?.filter(r => r.head_sha === run.head_sha) ?? [];
+  // Controller completion does NOT attest four service releases. The previous
+  // Marketing controller completed green even though its image smoke failed,
+  // and a later CI completion was incorrectly suppressed as already_requested.
+  if (priorRuns.some(r => activeStates.includes(r.status))) {
     return { status: 'already_requested', commit: run.head_sha, deploymentVerified: false };
+  }
+  if (priorRuns.some(r => r.status === 'completed' && r.conclusion === 'success')) {
+    const serviceStates = await Promise.all(workflows.map(async workflow => {
+      const releases = await api(`actions/workflows/${workflow}/runs?head_sha=${run.head_sha}&event=workflow_dispatch&per_page=30`);
+      return releases.workflow_runs?.some(r => r.head_sha === run.head_sha &&
+        (activeStates.includes(r.status) || (r.status === 'completed' && r.conclusion === 'success'))) === true;
+    }));
+    if (serviceStates.every(Boolean)) {
+      return { status: 'already_requested', commit: run.head_sha, deploymentVerified: false };
+    }
   }
   await api('actions/workflows/release-approved-google-web.yml/dispatches', 'POST', { ref: 'main' });
   return { status: 'requested', commit: run.head_sha, deploymentVerified: false };
@@ -65,8 +78,12 @@ export async function releaseApprovedWeb({ sha, token, releaseHold, request = fe
   const dispatched = [];
   for (const workflow of workflows) {
     const active = await api(`actions/workflows/${workflow}/runs?head_sha=${sha}&event=workflow_dispatch&per_page=30`);
-    if (active.workflow_runs?.some(run => run.head_sha === sha && ['queued', 'in_progress', 'waiting', 'requested', 'pending'].includes(run.status))) {
-      dispatched.push({ workflow, status: 'already_active' }); continue;
+    const prior = active.workflow_runs?.find(run => run.head_sha === sha &&
+      (['queued', 'in_progress', 'waiting', 'requested', 'pending'].includes(run.status) ||
+       (run.status === 'completed' && run.conclusion === 'success')));
+    if (prior) {
+      dispatched.push({ workflow, status: prior.status === 'completed' ? 'already_succeeded' : 'already_active' });
+      continue;
     }
     const inputs = workflow === 'deploy-google-marketing-trigger.yml' ? {} : { requested_sha: sha };
     await api(`actions/workflows/${workflow}/dispatches`, 'POST', { ref: 'main', inputs });

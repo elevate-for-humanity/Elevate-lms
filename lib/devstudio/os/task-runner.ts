@@ -6,6 +6,7 @@ import { executeAICommand } from '@/lib/ai/runtime/command-executor';
 import { getAITool, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
+import { isProviderConfirmationSnapshot } from '@/lib/devstudio/openhands/provider-confirmation.mjs';
 
 export type TaskExecutionRuntimeContext = {
   actorRoles: readonly string[];
@@ -733,6 +734,54 @@ export async function approveTask(
   const { data: task } = await db.from('ai_tasks').select('*').eq('id', taskId).single();
   if (!task) throw new Error('Task not found');
   const isInteractive = task.tool_input?.__executionMode === 'interactive';
+
+  // A PARIS OpenHands task with a recorded start receipt already exists at the
+  // provider. Human approval must authorize observation of THAT task, never
+  // re-enter the generic AI command executor and create a second conversation.
+  if (task.tool_name === 'openhands.execute' && task.tool_output?.start_task_id) {
+    if (task.user_id !== reviewerId || (task.tenant_id ?? null) !== null ||
+        task.status !== 'awaiting_approval' ||
+        !isProviderConfirmationSnapshot(task) ||
+        task.tool_input?.repository !== 'elevate-for-humanity/Elevate-lms' ||
+        !/^studio\/[a-zA-Z0-9/_-]+$/.test(task.tool_input?.branch ?? '')) {
+      throw new Error('OPENHANDS_APPROVAL_RECEIPT_OR_OWNER_MISMATCH');
+    }
+    // Persist the human decision before enabling the original task. A failed
+    // approval write leaves the provider execution gated; never infer consent.
+    const { data: decision, error: decisionError } = await db
+      .from('ai_approvals')
+      .update({
+        status: 'approved', approved_by: reviewerId,
+        decided_at: new Date().toISOString(),
+        reviewed_by: reviewerId, reviewed_at: new Date().toISOString(),
+      })
+      .eq('task_id', taskId).eq('status', 'pending')
+      .select('id').maybeSingle();
+    if (decisionError || !decision?.id)
+      throw new Error('OPENHANDS_PENDING_APPROVAL_DECISION_NOT_RECORDED');
+    const { data: resumed, error: resumeError } = await db
+      .from('ai_tasks')
+      .update({
+        status: 'running', approval_status: 'approved',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', taskId).eq('user_id', reviewerId)
+      .eq('tool_name', 'openhands.execute')
+      .eq('status', 'awaiting_approval').eq('approval_status', 'pending')
+      .select('id').maybeSingle();
+    if (resumeError || !resumed?.id)
+      throw new Error('OPENHANDS_APPROVAL_CONCURRENT_TRANSITION_UNVERIFIED');
+    await writeDevAuditLog(db, {
+      actorId: reviewerId, action: 'task.approve',
+      resourceType: 'ai_tasks', resourceId: taskId, traceId: task.trace_id,
+      metadata: { continuation: 'original-openhands-receipt' },
+    });
+    await appendTaskLog(db, taskId,
+      'Owner approved observation of the existing OpenHands receipt. No new provider task dispatched.',
+      'info', undefined, null, reviewerId);
+    await reconcileTaskProjection(db, taskId);
+    return;
+  }
 
   await db
     .from('ai_approvals')

@@ -91,10 +91,13 @@ async function assertNoRuntimeFailure(page: Page, route: string, expectedPath?: 
   // return null despite the page being loaded. Check the actual canonical HTTP
   // response without dropping any visible content, console or runtime assertions.
   // All other navigations still require a non-null browser response.
-  const target = new URL(route, page.url());
-  const sameHashDocument = Boolean(target.hash) && target.href === page.url();
+  // A newly created Playwright page is about:blank, not an HTTP URL base.
+  // Resolve same-document fragment navigation only after a real page loads.
+  const currentUrl = page.url();
+  const target = /^https?:\/\//.test(currentUrl) ? new URL(route, currentUrl) : null;
+  const sameHashDocument = Boolean(target?.hash && target.href === currentUrl);
   const response = sameHashDocument
-    ? await page.request.get(target.href, { maxRedirects: 10, timeout: 30_000 })
+    ? await page.request.get(currentUrl, { maxRedirects: 10, timeout: 30_000 })
     : await page.goto(route, { waitUntil: 'domcontentloaded' });
   expect(response, `${route} did not return a response`).not.toBeNull();
   expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);

@@ -48,6 +48,16 @@ describe('homepage scroll narration lifecycle', () => {
     expect(source).toContain("window.addEventListener('keydown', beginFromNaturalInteraction");
   });
 
+  it('restarts narration interrupted by media and only deduplicates completed sections', () => {
+    const end = source.slice(source.indexOf('onEnded: () =>'), source.indexOf('onError: () =>'));
+    const start = source.slice(source.indexOf('const started = await playback'), source.indexOf('return started;'));
+    const interrupt = source.slice(source.indexOf('const governAudibleMedia'), source.indexOf('const continueAfterMedia'));
+    expect(end).toContain('narratedRef.current.add(key)');
+    expect(start).not.toContain('narratedRef.current.add(key)');
+    expect(interrupt).toContain('lastNarrationRef.current = null');
+    expect(source).toContain('window.setTimeout(() => continueRef.current(), SECTION_PAUSE_MS)');
+  });
+
   it('does not rebuild scroll listeners for transient playback state', () => {
     const scrollEffect = source.slice(
       source.indexOf('const synchronizeNarrationToScroll'),

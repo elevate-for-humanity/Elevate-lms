@@ -140,6 +140,7 @@ export function ScrollNarrator() {
       onEnded: () => {
         if (generation !== playbackGenerationRef.current) return;
         speakingRef.current = false;
+        narratedRef.current.add(key);
         quietUntilRef.current = Math.max(quietUntilRef.current, Date.now() + SECTION_PAUSE_MS);
         window.clearTimeout(transitionTimerRef.current);
         transitionTimerRef.current = window.setTimeout(
@@ -164,7 +165,6 @@ export function ScrollNarrator() {
         ? NARRATION_GESTURE_NOTICE
         : 'Narration could not start. Turn narration off and on to retry.');
     } else {
-      narratedRef.current.add(key);
       setNotice(null);
     }
     return started;
@@ -182,6 +182,7 @@ export function ScrollNarrator() {
       playbackGenerationRef.current += 1;
       speakingRef.current = false;
       pendingRef.current = null;
+      lastNarrationRef.current = null;
       window.clearTimeout(transitionTimerRef.current);
       stopAllNaturalVoicePlayback();
       pauseOtherAudibleMedia(media);
@@ -192,6 +193,7 @@ export function ScrollNarrator() {
       playbackGenerationRef.current += 1;
       speakingRef.current = false;
       pendingRef.current = null;
+      lastNarrationRef.current = null;
       window.clearTimeout(transitionTimerRef.current);
     };
     const continueAfterMedia = (event: Event) => {

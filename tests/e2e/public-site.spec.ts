@@ -104,20 +104,15 @@ async function assertNoRuntimeFailure(page: Page, route: string) {
     /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
   );
 
-  expect(
-    failedResponses,
-    `${route} had failed same-origin resources: ${failedResponses.join(' | ')}`,
-  ).toEqual([]);
-
-  expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
-
   const actionableConsoleErrors = consoleErrors.filter(
     (error) => !/favicon|third-party cookie/i.test(error),
   );
-  expect(
-    actionableConsoleErrors,
-    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}. HTTP failures: ${failedResponses.join(' | ')}`,
-  ).toEqual([]);
+  const runtimeFailures = [
+    ...failedResponses.map((error) => `HTTP: ${error}`),
+    ...pageErrors.map((error) => `Page: ${error}`),
+    ...actionableConsoleErrors.map((error) => `Console: ${error}`),
+  ];
+  expect(runtimeFailures, `${route} had runtime failures:\n${runtimeFailures.join('\n')}`).toEqual([]);
 }
 
 test.describe('page-by-page public production audit', () => {
@@ -144,11 +139,16 @@ test.describe('page-by-page public production audit', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
     expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
+    const failures: string[] = [];
     for (let index = 0; index < links.length; index += 3) {
-      await Promise.all(links.slice(index, index + 3).map((href) =>
+      const results = await Promise.allSettled(links.slice(index, index + 3).map((href) =>
         assertSuccessfulResponse(request, href, 'navigation integrity'),
       ));
+      for (const result of results) {
+        if (result.status === 'rejected') failures.push(String(result.reason));
+      }
     }
+    expect(failures, failures.join('\n')).toEqual([]);
   });
 
   test('program directory links resolve', async ({ page, request }) => {
@@ -200,7 +200,7 @@ test.describe('application entry audit', () => {
     await expect(enrollment).toHaveAttribute('href',
       '/apply/student/interview?program=barber-apprenticeship&intent=enrollment');
     await enrollment.click();
-    await expect(page).toHaveURL(/\/apply\/student\/interview\?program=barber-apprenticeship&intent=enrollment/);
+    await expect(page).toHaveURL(/\/enroll\/barber-apprenticeship(?:\?|$)/);
   });
 
   test('student application exposes the standard intake form', async ({ page }) => {

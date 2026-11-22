@@ -48,6 +48,10 @@ export default function OpenHandsRepairPanel(){
    {repair.blockerCode&&<p className="mt-1 break-all text-amber-200">Blocker: {repair.blockerCode}</p>}
    <p className="mt-1 text-gray-300">{repair.status.replaceAll('_',' ')}{repair.verifiedLive?' · production verified':' · production not yet verified'}</p>
    {repair.conversationId&&<p className="mt-1 break-all text-gray-300">Existing conversation: {repair.conversationId}</p>}
+   {repair.approvalRequired&&repair.approvalStatus==='pending'&&repair.conversationId&&
+    <a className="mt-2 inline-flex min-h-11 items-center underline text-amber-200"
+      href={`https://app.all-hands.dev/conversations/${encodeURIComponent(repair.conversationId)}`}
+      target="_blank" rel="noopener noreferrer">Review pending action in original OpenHands conversation</a>}
    {repair.branch&&<p className="mt-1 break-all text-gray-300">Branch: {repair.branch}</p>}
    {repair.changedFiles.length>0&&<details className="mt-2"><summary className="cursor-pointer">Proposed files ({repair.changedFiles.length})</summary><ul className="mt-2 space-y-1">{repair.changedFiles.map(path=><li key={path} className="break-all">{path}</li>)}</ul></details>}
    {repair.taskId&&<p className="mt-1 break-all text-gray-300">OpenHands task: {repair.taskId}</p>}
